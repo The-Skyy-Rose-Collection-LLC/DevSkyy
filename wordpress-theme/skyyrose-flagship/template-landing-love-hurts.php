@@ -3,240 +3,436 @@
  * Template Name: Landing — Love Hurts
  * Template Post Type: page
  *
- * Conversion-focused landing page for the Love Hurts collection.
- * "Hurts" is the bloodline that raised the founder — Foster is the name he carries publicly.
- * Voice: raw, emotional, vulnerability as strength.
+ * Split scrollytell landing page for the Love Hurts collection.
+ * Five narrative panes paired with a sticky product viewport (desktop);
+ * stacked alternating layout on mobile.
  *
  * @package SkyyRose
- * @since   6.5.0
+ * @since   1.2.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
+// Fetch the full Love Hurts product catalog (all items for the grid).
+$lh_products = skyyrose_get_collection_products( 'love-hurts' );
+
+// Featured products for the five narrative panes (order matters).
+// SKUs: lh-004, lh-002, lh-003, lh-006, lh-005
+$pane_skus     = array( 'lh-004', 'lh-002', 'lh-003', 'lh-006', 'lh-005' );
+$catalog_all   = skyyrose_get_product_catalog();
+$pane_products = array();
+foreach ( $pane_skus as $sku ) {
+	if ( isset( $catalog_all[ $sku ] ) ) {
+		$pane_products[] = $catalog_all[ $sku ];
+	}
+}
+
+// Asset base URI (CSV paths start with 'assets/' — strip that prefix).
+$assets = trailingslashit( SKYYROSE_ASSETS_URI );
+
 get_header();
 ?>
+<a class="lp-skip-link" href="#product-grid"><?php esc_html_e( 'Skip to products', 'skyyrose' ); ?></a>
+<div id="lp-live-region" class="lp-sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <main id="primary" class="lp" data-collection="love-hurts" role="main" tabindex="-1">
-	<h1 class="screen-reader-text"><?php esc_html_e( 'Love Hurts Collection — the Hurts bloodline', 'skyyrose' ); ?></h1>
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Love Hurts Collection — SkyyRose', 'skyyrose' ); ?></h1>
 
-	<?php
-	/* ───── 1. Hero ───── */
-	get_template_part(
-		'template-parts/landing/hero',
-		null,
-		array(
-			'collection'    => 'love-hurts',
-			'badge_text'    => 'Family Legacy — The Hurts Collection',
-			'logo_image'    => '/images/hero-overlays/lh-logo-combined.png',
-			'logo_alt'      => 'Love Hurts Collection',
-			'subtitle'      => 'This isn\'t a theme. It\'s what you\'ve survived.',
-			'countdown'     => false,
-			'cta_primary'   => array(
-				'text' => 'Shop Love Hurts',
-				'url'  => '#products',
-			),
-			'cta_secondary' => array(
-				'text' => 'The Story',
-				'url'  => '#story',
-			),
-		)
-	);
-	?>
-
-	<?php /* ───── 2. Press Bar ───── */ ?>
-	<section class="lp-press lp-rv">
-		<div class="lp__container">
-			<div class="lp-press__row">
-				<span class="lp-press__name">Maxim</span>
-				<span class="lp-press__name">CEO Weekly</span>
-				<span class="lp-press__name">SF Post</span>
-				<span class="lp-press__name">Best of Best Review</span>
+	<!-- ================================================================
+		Hero
+	================================================================ -->
+	<section class="lp-hero" aria-label="<?php esc_attr_e( 'Love Hurts collection hero', 'skyyrose' ); ?>">
+		<div class="lp-hero__bg" aria-hidden="true">
+			<div class="lp-hero__atmosphere">
+				<img
+					class="lp-hero__atmosphere-img"
+					src="<?php echo esc_url( $assets . 'images/logos/red-roses-cloud-cluster.webp' ); ?>"
+					alt=""
+					role="presentation"
+					loading="eager"
+					decoding="async"
+				/>
 			</div>
+			<div class="lp-hero__vignette"></div>
 		</div>
-	</section>
 
-	<?php /* ───── 3. Story ───── */ ?>
-	<section class="lp-story" id="story">
-		<div class="lp__container">
-			<div class="lp-story__grid">
-				<div class="lp-story__text lp-rv">
-					<span class="lp-story__label">THE LEGACY</span>
-					<h2 class="lp-story__title"><?php echo esc_html( 'This Isn\'t a Theme. It\'s the Bloodline That Raised Me.' ); ?></h2>
-					<p class="lp-story__text">
-						<?php echo esc_html( 'Most brands pick a concept off a mood board. I didn\'t pick this one — it picked me. "Hurts" isn\'t a word I chose for the aesthetic. It\'s the bloodline that raised me. Every scar, every lesson, every door that closed and every one we kicked open — it\'s all in that name.' ); ?>
-					</p>
-					<p class="lp-story__text">
-						<?php echo esc_html( 'This collection takes that pain and turns it into something you can wear. Something beautiful. Something that says: I\'ve been through it, and I\'m still here.' ); ?>
-					</p>
-					<blockquote class="lp-story__quote">
-						<p><?php echo esc_html( 'Every piece carries the weight of what we\'ve been through — and the strength of what we\'ve become.' ); ?></p>
-						<cite><?php echo esc_html( '— Corey Foster, Founder' ); ?></cite>
-					</blockquote>
-				</div>
-				<div class="lp-story__image lp-rv" data-delay="2">
-					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-front-model.webp' ); ?>"
-						alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, editorial portrait', 'skyyrose' ); ?>"
-						loading="lazy" decoding="async"
-						width="1024" height="1024"
-						style="width:100%;height:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--skyyrose-radius);">
-				</div>
+		<div class="lp-hero__content">
+			<!-- Lockup image IS the collection name — never type-rendered as text -->
+			<div class="lp-hero__lockup-wrap">
+				<picture>
+					<source
+						srcset="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.avif' ); ?>"
+						type="image/avif"
+					/>
+					<source
+						srcset="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.webp' ); ?>"
+						type="image/webp"
+					/>
+					<img
+						class="lp-hero__lockup"
+						src="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.webp' ); ?>"
+						alt="<?php esc_attr_e( 'Love Hurts Collection', 'skyyrose' ); ?>"
+						width="540"
+						height="200"
+						fetchpriority="high"
+						decoding="sync"
+					/>
+				</picture>
 			</div>
-		</div>
-	</section>
 
-	<?php /* ───── 4. Parallax Banner ───── */ ?>
-	<?php get_template_part( 'template-parts/pin-narrative', null, array( 'slug' => 'love-hurts' ) ); ?>
-
-	<section class="lp-parallax" aria-label="Statement">
-		<div class="lp-parallax__text lp-rv">
-			<p><?php echo esc_html( 'Wear Your Heart. Own Your Scars.' ); ?></p>
-		</div>
-	</section>
-
-	<?php
-	/* ───── 5. Product Grid ───── */
-	get_template_part(
-		'template-parts/landing/product-grid',
-		null,
-		array(
-			'heading'    => 'The Collection',
-			'subheading' => 'Wear what you\'ve survived.',
-			'skus'       => array( 'lh-004', 'lh-002', 'lh-003', 'lh-005' ),
-			'wear_count' => 200,
-		)
-	);
-	?>
-
-	<?php /* ───── 6. Editorial Gallery ───── */ ?>
-	<section class="lp-editorial">
-		<div class="lp__container">
-			<div class="lp-editorial__header lp-rv">
-				<h2><?php echo esc_html( 'The Look' ); ?></h2>
-			</div>
-			<div class="lp-editorial__grid lp-rv" data-delay="1">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-basketball-shorts-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts basketball shorts, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts varsity jacket, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/the-fannie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'The Fannie piece, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
-			</div>
-			<div class="lp-editorial__grid lp-editorial__grid--row2 lp-rv" data-delay="2">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/beauty-and-beast-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts collection — enchanted rose under glass', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1280" height="549"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
-			</div>
-		</div>
-	</section>
-
-	<?php /* ───── 7. Reviews ───── */ ?>
-	<section class="lp-reviews">
-		<div class="lp__container">
-			<div class="lp-reviews__header lp-rv">
-				<h2><?php echo esc_html( 'What LOVE HURTS Means to People' ); ?></h2>
-			</div>
-			<div class="lp-reviews__grid">
-				<div class="lp-review-card lp-rv" data-delay="1">
-					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<p class="lp-review-card__text"><?php echo esc_html( 'I bought this for my daughter. She said it\'s the first brand that feels like it understands her.' ); ?></p>
-					<cite class="lp-review-card__author">Tamika R., Atlanta</cite>
-				</div>
-				<div class="lp-review-card lp-rv" data-delay="2">
-					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<p class="lp-review-card__text"><?php echo esc_html( 'The varsity jacket is a piece of art. I wear it every time I need to feel invincible.' ); ?></p>
-					<cite class="lp-review-card__author">Ray C., Oakland</cite>
-				</div>
-				<div class="lp-review-card lp-rv" data-delay="3">
-					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<p class="lp-review-card__text"><?php echo esc_html( 'Hurts is more than a name on a tag. When you know the story, it hits different.' ); ?></p>
-					<cite class="lp-review-card__author">Kiera M., Chicago</cite>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<?php /* ───── 8. Craft ───── */ ?>
-	<section class="lp-craft">
-		<div class="lp__container">
-			<div class="lp-craft__header lp-rv">
-				<h2><?php echo esc_html( 'Every Detail Is Intentional' ); ?></h2>
-			</div>
-			<div class="lp-craft__grid">
-				<div class="lp-craft__card lp-rv" data-delay="1">
-					<span class="lp-craft__icon" aria-hidden="true">Satin</span>
-					<h3><?php echo esc_html( 'Premium Satin Shell' ); ?></h3>
-					<p><?php echo esc_html( 'The varsity jacket features a heavyweight satin shell with custom quilted lining. Built to last decades, not seasons.' ); ?></p>
-				</div>
-				<div class="lp-craft__card lp-rv" data-delay="2">
-					<span class="lp-craft__icon" aria-hidden="true">Hand</span>
-					<h3><?php echo esc_html( 'Hand-Applied Script' ); ?></h3>
-					<p><?php echo esc_html( 'Fire-red chain-stitch lettering applied by hand. No two pieces are identical — each one carries its own character.' ); ?></p>
-				</div>
-				<div class="lp-craft__card lp-rv" data-delay="3">
-					<span class="lp-craft__icon" aria-hidden="true">Rose</span>
-					<h3><?php echo esc_html( 'Hidden Rose Garden' ); ?></h3>
-					<p><?php echo esc_html( 'Flip the hood and find an embroidered rose garden lining. Beauty hidden where only you know to look.' ); ?></p>
-				</div>
-				<div class="lp-craft__card lp-rv" data-delay="4">
-					<span class="lp-craft__icon" aria-hidden="true">Soul</span>
-					<h3><?php echo esc_html( 'Family Name Legacy' ); ?></h3>
-					<p><?php echo esc_html( '"Hurts" is stitched into every seam, woven into every label. This isn\'t branding — it\'s personal. Every piece carries meaning you can feel.' ); ?></p>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<?php
-	/* ───── 9. FAQ ───── */
-	get_template_part(
-		'template-parts/landing/faq',
-		null,
-		array(
-			'heading'   => 'Questions We Get Asked',
-			'questions' => array(
-				array(
-					'q' => 'What does "Love Hurts" mean?',
-					'a' => '<p>"Hurts is the bloodline that raised me." That is Corey\'s own framing. Foster is the surname he carries publicly; Hurts is the line that shaped who carries it. This collection is for the second one.</p>',
-				),
-				array(
-					'q' => 'How does sizing run?',
-					'a' => '<p>Love Hurts pieces run true to size. The joggers and basketball shorts have an athletic fit with adjustable waistbands. The varsity jacket is cut relaxed for layering. When in doubt, go with your usual size.</p>',
-				),
-				array(
-					'q' => 'How should I care for my pieces?',
-					'a' => '<p>Machine wash cold on a gentle cycle, inside out. Hang dry to preserve the satin finish and embroidery details. Do not bleach or iron directly on printed areas.</p>',
-				),
-				array(
-					'q' => 'What is the return policy?',
-					'a' => '<p>We offer a 30-day return policy on all unworn items with original tags attached. Pre-order items can be cancelled for a full refund before they ship.</p>',
-				),
-				array(
-					'q' => 'How long does shipping take?',
-					'a' => '<p>Standard shipping is 5&ndash;7 business days within the US. Express options are available at checkout. International orders typically arrive within 10&ndash;14 business days.</p>',
-				),
-			),
-		)
-	);
-	?>
-
-	<?php /* ───── 10. Email CTA ───── */ ?>
-	<section class="lp-cta">
-		<div class="lp__container">
-			<h2 class="lp-cta__title lp-rv"><?php echo esc_html( 'New Stories Drop Monthly' ); ?></h2>
-			<p class="lp-cta__subtitle lp-rv" data-delay="1">
-				<?php echo esc_html( 'Every release tells a chapter. Don\'t miss yours.' ); ?>
+			<p class="lp-hero__subtitle">
+				<?php esc_html_e( 'For the love that survived everything.', 'skyyrose' ); ?>
 			</p>
-			<form class="lp-cta__form lp-rv" data-delay="2" action="#" method="post">
-				<label class="screen-reader-text" for="lh-lp-email"><?php esc_html_e( 'Email address', 'skyyrose' ); ?></label>
-				<input class="lp-cta__input"
-						id="lh-lp-email"
-						type="email"
-						name="email"
-						placeholder="<?php esc_attr_e( 'Your email', 'skyyrose' ); ?>"
-						required
-						autocomplete="email">
-				<button class="lp-cta__submit" type="submit"><?php echo esc_html__( 'Join', 'skyyrose' ); ?></button>
-			</form>
-			<p class="lp-cta__note lp-rv" data-delay="3"><?php echo esc_html( 'Join 12,400+ members' ); ?></p>
+
+			<div class="lp-hero__cta-group">
+				<a href="#product-grid" class="lp-btn lp-btn--primary">
+					<?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?>
+				</a>
+				<a href="#lp-split" class="lp-btn lp-btn--outline">
+					<?php esc_html_e( 'Explore the Story', 'skyyrose' ); ?>
+				</a>
+			</div>
+		</div>
+
+		<div class="lp-hero__scroll-cue" aria-hidden="true">
+			<span class="lp-hero__scroll-arrow"></span>
+			<span><?php esc_html_e( 'Scroll', 'skyyrose' ); ?></span>
 		</div>
 	</section>
 
-</main><!-- .lp -->
+	<!-- ================================================================
+		Split scrollytell
+	================================================================ -->
+	<section class="lp-split" id="lp-split" aria-label="<?php esc_attr_e( 'Collection narrative', 'skyyrose' ); ?>">
+
+		<!-- Indicator dots (desktop only, JS-driven) -->
+		<nav class="lp-pane-indicators" aria-label="<?php esc_attr_e( 'Navigate to pane', 'skyyrose' ); ?>">
+			<?php for ( $d = 0; $d < 5; $d++ ) : ?>
+			<button
+				class="lp-pane-indicator<?php echo 0 === $d ? ' is-active' : ''; ?>"
+				aria-label="<?php echo esc_attr( sprintf( __( 'Pane %d', 'skyyrose' ), $d + 1 ) ); ?>"
+				<?php echo 0 === $d ? 'aria-current="true"' : ''; ?>
+			></button>
+			<?php endfor; ?>
+		</nav>
+
+		<!-- Left: narrative panes -->
+		<div class="lp-narrative">
+
+			<?php
+			// Pane 0 — The Bomber Jacket
+			$p0 = isset( $pane_products[0] ) ? $pane_products[0] : null;
+			?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="0">
+				<p class="lp-pane__number">01 / 05</p>
+				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Statement Piece', 'skyyrose' ); ?></p>
+				<h2 class="lp-pane__headline">
+					<?php esc_html_e( 'Wear every chapter.', 'skyyrose' ); ?>
+				</h2>
+				<p class="lp-pane__body">
+					<?php esc_html_e( 'Some love stories don\'t have clean endings. The Love Hurts Bomber Jacket carries that weight — embroidered devotion on the back, silence on the chest. Structured. Unforgettable.', 'skyyrose' ); ?>
+				</p>
+				<blockquote class="lp-pane__pull-quote">
+					<?php esc_html_e( '"You don\'t dress for the memories. You dress through them."', 'skyyrose' ); ?>
+				</blockquote>
+				<?php if ( $p0 ) : ?>
+				<ul class="lp-pane__detail-list">
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Heavyweight satin shell', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Embroidered back panel', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item">
+						<?php echo esc_html( sprintf( __( 'From $%s', 'skyyrose' ), number_format( (float) $p0['price'], 0 ) ) ); ?>
+					</li>
+				</ul>
+				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p0['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
+					<?php esc_html_e( 'View Jacket', 'skyyrose' ); ?>
+				</a>
+				<div class="lp-pane__mobile-product">
+					<?php if ( ! empty( $p0['front_model_image'] ) ) : ?>
+					<img
+						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p0['front_model_image'] ), '/' ) ); ?>"
+						alt="<?php echo esc_attr( $p0['name'] ); ?>"
+						loading="lazy"
+						decoding="async"
+						style="width:100%;max-width:320px;border-radius:2px;"
+					/>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</article>
+
+			<?php
+			// Pane 1 — Joggers Black
+			$p1 = isset( $pane_products[1] ) ? $pane_products[1] : null;
+			?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="1">
+				<p class="lp-pane__number">02 / 05</p>
+				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Foundation', 'skyyrose' ); ?></p>
+				<h2 class="lp-pane__headline">
+					<?php esc_html_e( 'Soft outside. Carrying everything inside.', 'skyyrose' ); ?>
+				</h2>
+				<p class="lp-pane__body">
+					<?php esc_html_e( 'Cotton-fleece joggers built for the long stretch — after the conversation, before the next decision. The Love Hurts wordmark embroidered at the left ankle. Crimson, black, and gold on dark.', 'skyyrose' ); ?>
+				</p>
+				<?php if ( $p1 ) : ?>
+				<ul class="lp-pane__detail-list">
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Mid-weight cotton-fleece', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Ribbed ankle cuffs', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Athletic fit', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item">
+						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p1['price'], 0 ) ) ); ?>
+					</li>
+				</ul>
+				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p1['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
+					<?php esc_html_e( 'Shop Joggers', 'skyyrose' ); ?>
+				</a>
+				<div class="lp-pane__mobile-product">
+					<?php if ( ! empty( $p1['front_model_image'] ) ) : ?>
+					<img
+						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p1['front_model_image'] ), '/' ) ); ?>"
+						alt="<?php echo esc_attr( $p1['name'] ); ?>"
+						loading="lazy"
+						decoding="async"
+						style="width:100%;max-width:320px;border-radius:2px;"
+					/>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</article>
+
+			<?php
+			// Pane 2 — Basketball Shorts
+			$p2 = isset( $pane_products[2] ) ? $pane_products[2] : null;
+			?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="2">
+				<p class="lp-pane__number">03 / 05</p>
+				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Move', 'skyyrose' ); ?></p>
+				<h2 class="lp-pane__headline">
+					<?php esc_html_e( 'Built for what you carry off the court.', 'skyyrose' ); ?>
+				</h2>
+				<p class="lp-pane__body">
+					<?php esc_html_e( 'Basketball shorts that live past the game. The heart emblem at the inseam. Moisture-wicking shell. Every rep, every comeback, every day you showed up anyway.', 'skyyrose' ); ?>
+				</p>
+				<?php if ( $p2 ) : ?>
+				<ul class="lp-pane__detail-list">
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Moisture-wicking shell', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Side-slit hem', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item">
+						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p2['price'], 0 ) ) ); ?>
+					</li>
+				</ul>
+				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p2['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
+					<?php esc_html_e( 'Shop Shorts', 'skyyrose' ); ?>
+				</a>
+				<div class="lp-pane__mobile-product">
+					<?php if ( ! empty( $p2['front_model_image'] ) ) : ?>
+					<img
+						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p2['front_model_image'] ), '/' ) ); ?>"
+						alt="<?php echo esc_attr( $p2['name'] ); ?>"
+						loading="lazy"
+						decoding="async"
+						style="width:100%;max-width:320px;border-radius:2px;"
+					/>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</article>
+
+			<?php
+			// Pane 3 — Joggers White
+			$p3 = isset( $pane_products[3] ) ? $pane_products[3] : null;
+			?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="3">
+				<p class="lp-pane__number">04 / 05</p>
+				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Mirror', 'skyyrose' ); ?></p>
+				<h2 class="lp-pane__headline">
+					<?php esc_html_e( 'The same devotion. Different light.', 'skyyrose' ); ?>
+				</h2>
+				<p class="lp-pane__body">
+					<?php esc_html_e( 'The white colorway of the Love Hurts Joggers. Crimson, black, and gold on white — the same emblem reading differently when you step into the room. A mirror of the black pair.', 'skyyrose' ); ?>
+				</p>
+				<?php if ( $p3 ) : ?>
+				<ul class="lp-pane__detail-list">
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Cotton-fleece, white colorway', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Mirror of Love Hurts Joggers (Black)', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item">
+						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p3['price'], 0 ) ) ); ?>
+					</li>
+				</ul>
+				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p3['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
+					<?php esc_html_e( 'Shop White Joggers', 'skyyrose' ); ?>
+				</a>
+				<div class="lp-pane__mobile-product">
+					<?php if ( ! empty( $p3['front_model_image'] ) ) : ?>
+					<img
+						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p3['front_model_image'] ), '/' ) ); ?>"
+						alt="<?php echo esc_attr( $p3['name'] ); ?>"
+						loading="lazy"
+						decoding="async"
+						style="width:100%;max-width:320px;border-radius:2px;"
+					/>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</article>
+
+			<?php
+			// Pane 4 — The Fannie
+			$p4 = isset( $pane_products[4] ) ? $pane_products[4] : null;
+			?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="4">
+				<p class="lp-pane__number">05 / 05</p>
+				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Detail', 'skyyrose' ); ?></p>
+				<h2 class="lp-pane__headline">
+					<?php esc_html_e( 'Even the small things carry it.', 'skyyrose' ); ?>
+				</h2>
+				<p class="lp-pane__body">
+					<?php esc_html_e( 'The Fannie wears the Love Hurts logo at the front pocket. Worn across the body or around the waist, it\'s the accessory that finishes the set — quietly, without announcement.', 'skyyrose' ); ?>
+				</p>
+				<?php if ( $p4 ) : ?>
+				<ul class="lp-pane__detail-list">
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Love Hurts logo embroidery', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item"><?php esc_html_e( 'Adjustable strap', 'skyyrose' ); ?></li>
+					<li class="lp-pane__detail-item">
+						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p4['price'], 0 ) ) ); ?>
+					</li>
+				</ul>
+				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p4['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
+					<?php esc_html_e( 'Shop The Fannie', 'skyyrose' ); ?>
+				</a>
+				<div class="lp-pane__mobile-product">
+					<?php if ( ! empty( $p4['front_model_image'] ) ) : ?>
+					<img
+						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p4['front_model_image'] ), '/' ) ); ?>"
+						alt="<?php echo esc_attr( $p4['name'] ); ?>"
+						loading="lazy"
+						decoding="async"
+						style="width:100%;max-width:320px;border-radius:2px;"
+					/>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</article>
+
+		</div><!-- .lp-narrative -->
+
+		<!-- Right: sticky viewport — PHP-rendered layers, JS crossfades only -->
+		<div class="lp-viewport-col" aria-hidden="true">
+			<div id="lp-sticky-viewport">
+				<div id="lp-viewport-inner">
+					<?php foreach ( $pane_products as $pane_idx => $prd ) : ?>
+						<?php
+						$img_path    = ! empty( $prd['front_model_image'] )
+						? ltrim( str_replace( 'assets/', '', $prd['front_model_image'] ), '/' )
+						: '';
+						$product_url = (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) );
+						?>
+					<div
+						class="lp-vp__layer<?php echo 0 === $pane_idx ? ' lp-vp__layer--visible' : ''; ?>"
+						data-pane="<?php echo absint( $pane_idx ); ?>"
+						<?php echo 0 !== $pane_idx ? 'aria-hidden="true"' : ''; ?>
+					>
+						<?php if ( $img_path ) : ?>
+						<div class="lp-vp__img-wrap">
+							<img
+								class="lp-vp__img"
+								src="<?php echo esc_url( $assets . $img_path ); ?>"
+								alt="<?php echo esc_attr( $prd['name'] ); ?>"
+								loading="<?php echo 0 === $pane_idx ? 'eager' : 'lazy'; ?>"
+								decoding="async"
+							/>
+						</div>
+						<?php endif; ?>
+						<div class="lp-vp__product-footer">
+							<div>
+								<span class="lp-vp__sku"><?php echo esc_html( strtoupper( $prd['sku'] ) ); ?></span>
+								<p class="lp-vp__name"><?php echo esc_html( $prd['name'] ); ?></p>
+								<p class="lp-vp__price">
+									<?php echo esc_html( '$' . number_format( (float) $prd['price'], 0 ) ); ?>
+								</p>
+							</div>
+							<?php if ( $product_url ) : ?>
+							<a href="<?php echo esc_url( $product_url ); ?>" class="lp-vp__cta">
+								<?php echo esc_html( $prd['is_preorder'] ? __( 'Pre-Order', 'skyyrose' ) : __( 'Shop', 'skyyrose' ) ); ?>
+							</a>
+							<?php endif; ?>
+						</div>
+					</div>
+					<?php endforeach; ?>
+				</div><!-- #lp-viewport-inner -->
+			</div><!-- #lp-sticky-viewport -->
+		</div><!-- .lp-viewport-col -->
+
+	</section><!-- .lp-split -->
+
+	<!-- ================================================================
+		Divider
+	================================================================ -->
+	<div class="lp-divider" aria-hidden="true">
+		<span class="lp-divider__line"></span>
+	</div>
+
+	<!-- ================================================================
+		Full product grid
+	================================================================ -->
+	<section
+		class="lp-grid-section"
+		id="product-grid"
+		aria-label="<?php esc_attr_e( 'Love Hurts — Full Collection', 'skyyrose' ); ?>"
+	>
+		<header class="lp-grid-section__header lp-rv">
+			<span class="lp-grid-section__eyebrow"><?php esc_html_e( 'The Full Collection', 'skyyrose' ); ?></span>
+			<h2 class="lp-grid-section__title"><?php esc_html_e( 'Love Hurts', 'skyyrose' ); ?></h2>
+			<p class="lp-grid-section__subtitle"><?php esc_html_e( 'For the love that survived everything.', 'skyyrose' ); ?></p>
+		</header>
+
+		<?php
+		get_template_part(
+			'template-parts/landing/product-grid',
+			null,
+			array(
+				'collection' => 'love-hurts',
+				'products'   => $lh_products,
+			)
+		);
+		?>
+	</section>
+
+	<!-- ================================================================
+		Email CTA
+	================================================================ -->
+	<section
+		class="lp-email-section"
+		aria-label="<?php esc_attr_e( 'Stay connected', 'skyyrose' ); ?>"
+	>
+		<div class="lp-email__inner lp-rv">
+			<span class="lp-email__eyebrow"><?php esc_html_e( 'Stay Connected', 'skyyrose' ); ?></span>
+			<h2 class="lp-email__title">
+				<?php esc_html_e( 'Love never left. Neither should you.', 'skyyrose' ); ?>
+			</h2>
+			<p class="lp-email__subtitle">
+				<?php esc_html_e( 'New drops, restocks, and stories — straight to your inbox.', 'skyyrose' ); ?>
+			</p>
+			<form class="lp-email__form" novalidate>
+				<label class="lp-sr-only" for="lp-email-lh">
+					<?php esc_html_e( 'Email address', 'skyyrose' ); ?>
+				</label>
+				<input
+					class="lp-email__input"
+					type="email"
+					id="lp-email-lh"
+					name="email"
+					autocomplete="email"
+					placeholder="<?php esc_attr_e( 'your@email.com', 'skyyrose' ); ?>"
+					required
+				/>
+				<button type="submit" class="lp-btn lp-btn--primary">
+					<?php esc_html_e( 'Subscribe', 'skyyrose' ); ?>
+				</button>
+			</form>
+			<p class="lp-email__status" aria-live="polite"></p>
+		</div>
+	</section>
+
+</main><!-- #primary -->
 
 <?php get_footer(); ?>

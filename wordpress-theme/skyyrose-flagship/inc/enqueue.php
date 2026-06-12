@@ -495,7 +495,7 @@ function skyyrose_enqueue_template_styles() {
 		'search'              => 'search-results.css',
 		'faq'                 => 'info-pages.css',
 		'shipping-returns'    => 'info-pages.css',
-		'landing'             => 'landing-pages.css',
+		'landing'             => 'landing-scrollytell.css',
 		'elementor-editorial' => 'landing-pages.css',
 		'single'              => 'generic-pages.css',
 		'blog'                => 'generic-pages.css',
@@ -667,13 +667,13 @@ function skyyrose_enqueue_template_scripts() {
 		}
 	}
 
-	// Landing pages JS — countdown, parallax, FAQ accordion, scroll reveal.
+	// Landing pages JS — split scrollytell (IntersectionObserver scroll-sync, no GSAP).
 	if ( in_array( $slug, array( 'landing', 'elementor-editorial' ), true ) ) {
-		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-pages.min.js' )
-			? 'landing-pages.min.js' : 'landing-pages.js';
+		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-scrollytell.min.js' )
+			? 'landing-scrollytell.min.js' : 'landing-scrollytell.js';
 		if ( file_exists( $base_js_dir . '/' . $lp_js ) ) {
 			wp_enqueue_script(
-				'skyyrose-landing-pages',
+				'skyyrose-landing-scrollytell',
 				$base_js_uri . '/' . $lp_js,
 				array(),
 				SKYYROSE_VERSION,
