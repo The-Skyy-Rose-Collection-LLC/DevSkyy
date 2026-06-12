@@ -75,6 +75,17 @@ def _l2_normalize(v: np.ndarray) -> np.ndarray:
     return v / norm
 
 
+def _projected(features):
+    """Extract the projected embedding tensor from a CLIP get_*_features() call.
+
+    transformers >=5 returns a ``BaseModelOutputWithPooling`` whose
+    ``.pooler_output`` holds the projected embeds (the text/visual projection is
+    written back into that field). Older versions returned the tensor directly,
+    which has no ``pooler_output`` attribute — so fall back to the value itself.
+    """
+    return getattr(features, "pooler_output", features)
+
+
 def embed_image(source: str | Path | Image.Image) -> np.ndarray:
     """Run CLIP vision encoder. Returns L2-normalized 512-d numpy array."""
     state = get_clip()
@@ -86,7 +97,7 @@ def embed_image(source: str | Path | Image.Image) -> np.ndarray:
         raise TypeError(f"embed_image expects path or PIL.Image, got {type(source).__name__}")
     inputs = state.processor(images=img, return_tensors="pt").to(state.device)
     with torch.no_grad():
-        feats = state.model.get_image_features(**inputs)
+        feats = _projected(state.model.get_image_features(**inputs))
     feats = feats.squeeze(0).cpu().numpy().astype(np.float32)
     return _l2_normalize(feats)
 
@@ -100,7 +111,7 @@ def embed_text(text: str) -> np.ndarray:
         state.device
     )
     with torch.no_grad():
-        feats = state.model.get_text_features(**inputs)
+        feats = _projected(state.model.get_text_features(**inputs))
     feats = feats.squeeze(0).cpu().numpy().astype(np.float32)
     return _l2_normalize(feats)
 
