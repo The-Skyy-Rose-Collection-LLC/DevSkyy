@@ -5,7 +5,8 @@
   "is_pair": true,
   "attempt": 2,
   "failure_tags": [
+    "wrong_garment",
     "branding_drift"
   ],
-  "reason": "The logo/text on the garment is not visible; the branding is not legible in the render."
+  "reason": "The embossed logo on the crewneck is not accurately represented, as it is not visibly 3D and tactile. Additionally, the joggers do not have the correct silicone-appliqu\u00e9 patch in the specified location."
 }

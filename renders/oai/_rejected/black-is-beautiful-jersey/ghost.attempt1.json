@@ -7,5 +7,5 @@
   "failure_tags": [
     "branding_drift"
   ],
-  "reason": "The embroidered sport patch is not visible; it must be present and match the reference exactly."
+  "reason": "The rendered jersey is missing the complete embroidered Black Rose Authentic Collection patch as specified, impacting the branding gate."
 }

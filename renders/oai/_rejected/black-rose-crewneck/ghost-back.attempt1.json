@@ -6,7 +6,8 @@
   "attempt": 1,
   "failure_tags": [
     "wrong_garment",
+    "wrong_view",
     "branding_drift"
   ],
-  "reason": "The garment does not match the reference images due to the absence of the rose graphic on the back of the crewneck, which is expected based on the references. Additionally, the branding at the neckline is incorrect."
+  "reason": "The branding on the garment shows 'BR' instead of the specified 'SR' monogram in gold-tone thread at the back neck, which fails the branding gate. Additionally, the view is incorrect as it is not a true back facing; the layout suggests it is more of a mirrored front."
 }

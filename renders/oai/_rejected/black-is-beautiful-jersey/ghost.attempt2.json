@@ -7,5 +7,5 @@
   "failure_tags": [
     "branding_drift"
   ],
-  "reason": "The branding on the render is not legible and does not match the reference exactly; specifically, the embroidered sports patch is incomplete or not accurately depicted."
+  "reason": "The branding gate fails because the Black Rose Authentic Collection patch is missing from the front-left-hem. It must be present and visible as per specifications."
 }

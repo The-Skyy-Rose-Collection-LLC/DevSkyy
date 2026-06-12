@@ -5,7 +5,9 @@
   "is_pair": false,
   "attempt": 1,
   "failure_tags": [
+    "wrong_garment",
+    "wrong_view",
     "branding_drift"
   ],
-  "reason": "The logo or graphic details on the render may not match the brand references correctly, leading to a False verdict on branding."
+  "reason": "The render shows the front view of the joggers instead of the required back view, disqualifying it for the view correctness. Additionally, it lacks the specified SR monogram branding on the right thigh in gold-tone thread."
 }

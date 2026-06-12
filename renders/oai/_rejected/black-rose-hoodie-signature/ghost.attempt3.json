@@ -1,0 +1,12 @@
+{
+  "sku": "br-005",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 3,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The Black Rose logo is missing from the front-right-chest area, failing the branding gate. It does not match the specified logo in shape or placement."
+}

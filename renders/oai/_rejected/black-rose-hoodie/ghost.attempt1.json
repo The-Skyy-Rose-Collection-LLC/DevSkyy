@@ -1,0 +1,11 @@
+{
+  "sku": "br-004",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The logo is placed correctly but does not match the required Black Rose branding art as specified in the dossier."
+}

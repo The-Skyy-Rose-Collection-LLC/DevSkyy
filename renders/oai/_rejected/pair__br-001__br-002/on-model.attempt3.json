@@ -5,7 +5,8 @@
   "is_pair": true,
   "attempt": 3,
   "failure_tags": [
+    "wrong_garment",
     "branding_drift"
   ],
-  "reason": "The branding on the garment does not match the references; the logos or graphics do not show the correct and complete branding as indicated in the reference images."
+  "reason": "The Black Rose logo on the crewneck is not embossed; instead, it appears to be a flat or printed version, and the joggers' logo colorway does not match the specified monochromatic scheme."
 }

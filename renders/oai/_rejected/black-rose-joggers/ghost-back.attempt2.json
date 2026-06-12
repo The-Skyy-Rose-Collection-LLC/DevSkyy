@@ -5,7 +5,9 @@
   "is_pair": false,
   "attempt": 2,
   "failure_tags": [
+    "wrong_garment",
+    "wrong_view",
     "branding_drift"
   ],
-  "reason": "The logo on the joggers is not visible in the render, which is inconsistent with the references where the branding is apparent."
+  "reason": "The render shows the back view but is missing the required gold-tone embroidered SR monogram on the right thigh. Additionally, the overall design does not match the references provided for the BLACK Rose Joggers."
 }

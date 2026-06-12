@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-11T20:13:17+00:00",
+  "generated_at": "2026-06-12T13:04:58+00:00",
   "catalog_sha": "sha256:6f090ec4f526a6e22cd423646fc1ff0203be6448f0ec117648e32f980bc743be",
   "skus": {
     "br-001": {
@@ -26,8 +26,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -59,8 +59,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -120,8 +120,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -148,8 +148,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -176,8 +176,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -204,8 +204,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
-          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
@@ -820,7 +820,7 @@
         {
           "role": "logo",
           "path": "assets/products/logos/three-rose-cluster-greyscale.png",
-          "sha256": "sha256:be36471c855395cf0ef8d84ac2acc524fe0516d3101df24ae1020b97a40d1f36"
+          "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
         },
         {
           "role": "dossier",
