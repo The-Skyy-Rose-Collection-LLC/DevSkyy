@@ -2033,6 +2033,63 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-12T08:45:00Z"
+    },
+    {
+      "id": "bug-128",
+      "timestamp": "2026-06-12T01:39:00-07:00",
+      "error_message": "AttributeError: 'BaseModelOutputWithPooling' object has no attribute 'squeeze' (tests/elite_studio/test_clip_alignment.py)",
+      "file": "skyyrose/core/clip_embedder.py",
+      "root_cause": "transformers 5.11.0 changed CLIPModel.get_image_features/get_text_features (now @can_return_tuple) to return a BaseModelOutputWithPooling whose .pooler_output holds the projected embeds, instead of returning the projected tensor directly. .squeeze(0) was called on the wrapper object. The 5.x bump was collateral from the headroom-ai[all] install dep conflicts (obs 14316).",
+      "fix": "Added module-level _projected(features) helper = getattr(features,'pooler_output',features); wrapped both get_image_features and get_text_features calls. Version-robust: <5 returns a tensor (no pooler_output attr -> falls through to the value). Applied in main repo AND the CI mirror (DevSkyy-ci-mirror). 4 CLIP alignment tests pass in both.",
+      "tags": [
+        "clip",
+        "transformers",
+        "version-break",
+        "headroom-ai",
+        "elite_studio",
+        "pooler_output"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-12T01:39:00-07:00"
+    },
+    {
+      "id": "bug-129",
+      "timestamp": "2026-06-12T09:05:00Z",
+      "error_message": "Stop-hook pytest: AttributeError 'BaseModelOutputWithPooling' object has no attribute 'squeeze' in test_clip_alignment \u2014 NOT reproducible afterward",
+      "file": "tests/elite_studio/test_clip_alignment.py (no change needed)",
+      "root_cause": "Async Stop-hook test run raced `pip install headroom-ai[all]` mid-swap of transformers 4.57.6\u21925.11.0; pytest imported a half-replaced package. Isolated rerun and full tests/elite_studio/ green on settled 5.11.0.",
+      "fix": "None \u2014 transient. Rule: treat Stop-hook failures that coincide with dependency installs as suspect; re-run the failing test on the settled env before touching code.",
+      "tags": [
+        "stop-hook",
+        "pip-race",
+        "transformers",
+        "transient",
+        "false-positive"
+      ],
+      "related_bugs": [
+        "bug-127"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12T09:05:00Z"
+    },
+    {
+      "id": "bug-130",
+      "timestamp": "2026-06-12T09:30:00Z",
+      "error_message": "test_generator_node_routes_adk_engine_to_invoker: assert 0 == 1 \u2014 monkeypatch on graph.nodes._invoke_adk_render_engine never reached the call site",
+      "file": "skyyrose/elite_studio/graph/nodes/layer1.py",
+      "root_cause": "nodes flat-module \u2192 package split kept the _shim() call-time-lookup pattern for GeneratorAgent/VisionAgent etc., but the adk-render branch called _invoke_adk_render_engine via layer1's own import-time binding from ._shared \u2014 patches on the package namespace (the documented patch target) were invisible to it",
+      "fix": "Route the adk branch through _shim()._invoke_adk_render_engine(...) like every other patchable callable; ruff --fix removed the now-dead direct import. 19/19 hardening tests green.",
+      "tags": [
+        "monkeypatch",
+        "package-split",
+        "shim-pattern",
+        "elite-studio",
+        "import-binding"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-12T09:30:00Z"
     }
   ]
 }
