@@ -60,6 +60,7 @@ class MockSuperAgent:
     agent_type: str = "mock_commerce"
     result: MockAgentResult = field(default_factory=MockAgentResult)
     raise_on_call: int = 0
+    error_message: str = "simulated failure"
     heal_entries_to_add: list[MockHealEntry] = field(default_factory=list)
     consecutive_failures: int = 0
     circuit_state: str = "closed"
@@ -85,5 +86,5 @@ class MockSuperAgent:
         for i, entry in enumerate(self.heal_entries_to_add):
             self._heal_journal[f"heal_{self._call_count}_{i}"] = entry
         if self.raise_on_call >= self._call_count:
-            raise RuntimeError(f"simulated failure #{self._call_count}")
+            raise RuntimeError(f"{self.error_message} #{self._call_count}")
         return self.result

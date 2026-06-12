@@ -1976,6 +1976,63 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-11T07:30:00Z"
+    },
+    {
+      "id": "bug-118",
+      "timestamp": "2026-06-11",
+      "error_message": "Stop-hook pytest: AssertionError Status code 204 must not have a response body (api/v1/rag_anything.py:201 via main_enterprise import)",
+      "file": "api/v1/rag_anything.py",
+      "root_cause": "PEP 563 stringified `-> None` return annotation resolves to NoneType, which FastAPI 0.133 treats as a response model on a 204 route. Fix (response_model=None + comment) was landed by a parallel session; hook raced the fix window",
+      "fix": "No change needed \u2014 verified current tree: direct import clean, tests/test_new_api_endpoints.py 13/13 pass. Pattern for any new 204 route: always pass response_model=None explicitly",
+      "tags": [
+        "fastapi",
+        "204",
+        "pep563",
+        "response_model",
+        "stop-hook",
+        "race"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-11"
+    },
+    {
+      "id": "bug-126",
+      "timestamp": "2026-06-12T08:45:00Z",
+      "error_message": "TypeError: MockSuperAgent.__init__() got an unexpected keyword argument 'error_message' + AttributeError: AuditEventType has no attribute HEAL_ATTEMPTED",
+      "file": "aos/governance/types.py, tests/aos/_mocks.py",
+      "root_cause": "Regression pair: HEAL_ATTEMPTED/HEAL_ABORTED/HEAL_ESCALATED enum members and MockSuperAgent.error_message field were fixed 2026-05-25 in the audit-p0-sprint worktree but never committed (cmem #8778 'lost unstaged work'); PR #539 revived other audit fixes, not these",
+      "fix": "Re-added 3 HEAL_* members to AuditEventType; restored error_message field + raise message interpolation in MockSuperAgent. tests/aos 100% green.",
+      "tags": [
+        "aos",
+        "regression",
+        "lost-unstaged-work",
+        "enum",
+        "mock"
+      ],
+      "related_bugs": [
+        "bug-125"
+      ],
+      "occurrences": 2,
+      "last_seen": "2026-06-12T08:45:00Z"
+    },
+    {
+      "id": "bug-127",
+      "timestamp": "2026-06-12T08:45:00Z",
+      "error_message": "pytest hangs forever at interpreter shutdown (threading._shutdown) after running aos kernel tests \u2014 12h45m elapsed, 0.75s CPU",
+      "file": "tests/aos/kernel/*.py, tests/aos/test_execute_plan.py, tests/aos/test_smoke_real_agent.py",
+      "root_cause": "Six kernel fixtures booted Kernel (opens aiosqlite audit connection = non-daemon thread) and `return k` with no teardown; leaked threads block threading._shutdown at exit. Hang is silent because piped output stays buffered.",
+      "fix": "Converted all 6 fixtures to `yield k` + `await k.close()` (closes audit conn). tests/aos now exits in 26s wall. Diagnostic trick: SIGINT the hung process \u2014 buffered pipe flushes + traceback shows _thread_shutdown.",
+      "tags": [
+        "pytest",
+        "thread-leak",
+        "aiosqlite",
+        "fixture-teardown",
+        "hang"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-12T08:45:00Z"
     }
   ]
 }
