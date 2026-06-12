@@ -106,212 +106,138 @@ get_header();
 	<section class="lp-split" id="lp-split" aria-label="<?php esc_attr_e( 'Collection narrative', 'skyyrose' ); ?>">
 
 		<!-- Indicator dots (desktop only, JS-driven) -->
-		<nav class="lp-pane-indicators" aria-label="<?php esc_attr_e( 'Navigate to pane', 'skyyrose' ); ?>">
+		<ol class="lp-pane-indicators" aria-label="<?php esc_attr_e( 'Navigate to pane', 'skyyrose' ); ?>">
 			<?php for ( $d = 0; $d < 5; $d++ ) : ?>
-			<button
-				class="lp-pane-indicator<?php echo 0 === $d ? ' is-active' : ''; ?>"
-				aria-label="<?php echo esc_attr( sprintf( __( 'Pane %d', 'skyyrose' ), $d + 1 ) ); ?>"
-				<?php echo 0 === $d ? 'aria-current="true"' : ''; ?>
-			></button>
+			<li>
+				<button
+					class="lp-pane-indicator<?php echo 0 === $d ? ' is-active' : ''; ?>"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Pane %d', 'skyyrose' ), $d + 1 ) ); ?>"
+					<?php echo 0 === $d ? 'aria-current="true"' : ''; ?>
+				></button>
+			</li>
 			<?php endfor; ?>
-		</nav>
+		</ol>
 
 		<!-- Left: narrative panes -->
 		<div class="lp-narrative">
 
 			<?php
-			// Pane 0 — The Bomber Jacket
-			$p0 = isset( $pane_products[0] ) ? $pane_products[0] : null;
-			?>
-			<article class="lp-narrative__pane lp-rv" data-pane-index="0">
-				<p class="lp-pane__number">01 / 05</p>
-				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Statement Piece', 'skyyrose' ); ?></p>
-				<h2 class="lp-pane__headline">
-					<?php esc_html_e( 'Wear every chapter.', 'skyyrose' ); ?>
-				</h2>
-				<p class="lp-pane__body">
-					<?php esc_html_e( 'Some love stories don\'t have clean endings. The Love Hurts Bomber Jacket carries that weight — embroidered devotion on the back, silence on the chest. Structured. Unforgettable.', 'skyyrose' ); ?>
-				</p>
-				<blockquote class="lp-pane__pull-quote">
-					<?php esc_html_e( '"You don\'t dress for the memories. You dress through them."', 'skyyrose' ); ?>
-				</blockquote>
-				<?php if ( $p0 ) : ?>
-				<ul class="lp-pane__detail-list">
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Heavyweight satin shell', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Embroidered back panel', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item">
-						<?php echo esc_html( sprintf( __( 'From $%s', 'skyyrose' ), number_format( (float) $p0['price'], 0 ) ) ); ?>
-					</li>
-				</ul>
-				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p0['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
-					<?php esc_html_e( 'View Jacket', 'skyyrose' ); ?>
-				</a>
-				<div class="lp-pane__mobile-product">
-					<?php if ( ! empty( $p0['front_model_image'] ) ) : ?>
-					<img
-						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p0['front_model_image'] ), '/' ) ); ?>"
-						alt="<?php echo esc_attr( $p0['name'] ); ?>"
-						loading="lazy"
-						decoding="async"
-						style="width:100%;max-width:320px;border-radius:2px;"
-					/>
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-			</article>
+			// Pane copy — LH narrative register.
+			// Each entry maps to the corresponding index in $pane_products.
+			$panes = array(
+				0 => array(
+					'number'     => '01 / 05',
+					'eyebrow'    => __( 'The Statement Piece', 'skyyrose' ),
+					'headline'   => __( 'Wear every chapter.', 'skyyrose' ),
+					'body'       => __( 'Some love stories don\'t have clean endings. The Love Hurts Bomber Jacket carries that weight — embroidered devotion on the back, silence on the chest. Structured. Unforgettable.', 'skyyrose' ),
+					'pull_quote' => __( '"You don\'t dress for the memories. You dress through them."', 'skyyrose' ),
+					'details'    => array(
+						__( 'Heavyweight satin shell', 'skyyrose' ),
+						__( 'Embroidered back panel', 'skyyrose' ),
+					),
+					'price_fmt'  => 'from',
+					'cta_label'  => __( 'View Jacket', 'skyyrose' ),
+				),
+				1 => array(
+					'number'    => '02 / 05',
+					'eyebrow'   => __( 'The Foundation', 'skyyrose' ),
+					'headline'  => __( 'Soft outside. Carrying everything inside.', 'skyyrose' ),
+					'body'      => __( 'Cotton-fleece joggers built for the long stretch — after the conversation, before the next decision. The Love Hurts wordmark embroidered at the left ankle. Crimson, black, and gold on dark.', 'skyyrose' ),
+					'details'   => array(
+						__( 'Mid-weight cotton-fleece', 'skyyrose' ),
+						__( 'Ribbed ankle cuffs', 'skyyrose' ),
+						__( 'Athletic fit', 'skyyrose' ),
+					),
+					'cta_label' => __( 'Shop Joggers', 'skyyrose' ),
+				),
+				2 => array(
+					'number'    => '03 / 05',
+					'eyebrow'   => __( 'The Move', 'skyyrose' ),
+					'headline'  => __( 'Built for what you carry off the court.', 'skyyrose' ),
+					'body'      => __( 'Basketball shorts that live past the game. The heart emblem at the inseam. Moisture-wicking shell. Every rep, every comeback, every day you showed up anyway.', 'skyyrose' ),
+					'details'   => array(
+						__( 'Moisture-wicking shell', 'skyyrose' ),
+						__( 'Side-slit hem', 'skyyrose' ),
+					),
+					'cta_label' => __( 'Shop Shorts', 'skyyrose' ),
+				),
+				3 => array(
+					'number'    => '04 / 05',
+					'eyebrow'   => __( 'The Mirror', 'skyyrose' ),
+					'headline'  => __( 'The same devotion. Different light.', 'skyyrose' ),
+					'body'      => __( 'The white colorway of the Love Hurts Joggers. Crimson, black, and gold on white — the same emblem reading differently when you step into the room. A mirror of the black pair.', 'skyyrose' ),
+					'details'   => array(
+						__( 'Cotton-fleece, white colorway', 'skyyrose' ),
+						__( 'Mirror of Love Hurts Joggers (Black)', 'skyyrose' ),
+					),
+					'cta_label' => __( 'Shop White Joggers', 'skyyrose' ),
+				),
+				4 => array(
+					'number'    => '05 / 05',
+					'eyebrow'   => __( 'The Detail', 'skyyrose' ),
+					'headline'  => __( 'Even the small things carry it.', 'skyyrose' ),
+					'body'      => __( 'The Fannie wears the Love Hurts logo at the front pocket. Worn across the body or around the waist, it\'s the accessory that finishes the set — quietly, without announcement.', 'skyyrose' ),
+					'details'   => array(
+						__( 'Love Hurts logo embroidery', 'skyyrose' ),
+						__( 'Adjustable strap', 'skyyrose' ),
+					),
+					'cta_label' => __( 'Shop The Fannie', 'skyyrose' ),
+				),
+			);
 
-			<?php
-			// Pane 1 — Joggers Black
-			$p1 = isset( $pane_products[1] ) ? $pane_products[1] : null;
-			?>
-			<article class="lp-narrative__pane lp-rv" data-pane-index="1">
-				<p class="lp-pane__number">02 / 05</p>
-				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Foundation', 'skyyrose' ); ?></p>
-				<h2 class="lp-pane__headline">
-					<?php esc_html_e( 'Soft outside. Carrying everything inside.', 'skyyrose' ); ?>
-				</h2>
-				<p class="lp-pane__body">
-					<?php esc_html_e( 'Cotton-fleece joggers built for the long stretch — after the conversation, before the next decision. The Love Hurts wordmark embroidered at the left ankle. Crimson, black, and gold on dark.', 'skyyrose' ); ?>
-				</p>
-				<?php if ( $p1 ) : ?>
+			foreach ( $panes as $pane_idx => $pane ) :
+				$prd     = isset( $pane_products[ $pane_idx ] ) ? $pane_products[ $pane_idx ] : null;
+				$img_src = '';
+				$prd_url = '#';
+				if ( $prd ) {
+					if ( ! empty( $prd['front_model_image'] ) ) {
+						$img_src = esc_url( $assets . ltrim( str_replace( 'assets/', '', $prd['front_model_image'] ), '/' ) );
+					}
+					$prd_url = function_exists( 'wc_get_product_id_by_sku' )
+						? (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) )
+						: '#';
+				}
+				?>
+			<article class="lp-narrative__pane lp-rv" data-pane-index="<?php echo absint( $pane_idx ); ?>">
+				<p class="lp-pane__number"><?php echo esc_html( $pane['number'] ); ?></p>
+				<p class="lp-pane__eyebrow"><?php echo esc_html( $pane['eyebrow'] ); ?></p>
+				<h2 class="lp-pane__headline"><?php echo esc_html( $pane['headline'] ); ?></h2>
+				<p class="lp-pane__body"><?php echo esc_html( $pane['body'] ); ?></p>
+				<?php if ( ! empty( $pane['pull_quote'] ) ) : ?>
+				<blockquote class="lp-pane__pull-quote"><?php echo esc_html( $pane['pull_quote'] ); ?></blockquote>
+				<?php endif; ?>
+				<?php if ( $prd ) : ?>
 				<ul class="lp-pane__detail-list">
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Mid-weight cotton-fleece', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Ribbed ankle cuffs', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Athletic fit', 'skyyrose' ); ?></li>
+					<?php foreach ( $pane['details'] as $detail ) : ?>
+					<li class="lp-pane__detail-item"><?php echo esc_html( $detail ); ?></li>
+					<?php endforeach; ?>
 					<li class="lp-pane__detail-item">
-						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p1['price'], 0 ) ) ); ?>
+						<?php
+						if ( ! empty( $pane['price_fmt'] ) && 'from' === $pane['price_fmt'] ) {
+							echo esc_html( sprintf( __( 'From $%s', 'skyyrose' ), number_format( (float) $prd['price'], 0 ) ) );
+						} else {
+							echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $prd['price'], 0 ) ) );
+						}
+						?>
 					</li>
 				</ul>
-				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p1['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
-					<?php esc_html_e( 'Shop Joggers', 'skyyrose' ); ?>
+				<a href="<?php echo esc_url( $prd_url ); ?>" class="lp-btn lp-btn--secondary">
+					<?php echo esc_html( $pane['cta_label'] ); ?>
 				</a>
-				<div class="lp-pane__mobile-product">
-					<?php if ( ! empty( $p1['front_model_image'] ) ) : ?>
+				<div class="lp-pane__mobile-product" aria-hidden="true">
+					<?php if ( $img_src ) : ?>
 					<img
-						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p1['front_model_image'] ), '/' ) ); ?>"
-						alt="<?php echo esc_attr( $p1['name'] ); ?>"
+						class="lp-pane__mobile-img"
+						src="<?php echo esc_url( $img_src ); ?>"
+						alt="<?php echo esc_attr( $prd['name'] ); ?>"
 						loading="lazy"
 						decoding="async"
-						style="width:100%;max-width:320px;border-radius:2px;"
 					/>
 					<?php endif; ?>
 				</div>
 				<?php endif; ?>
 			</article>
-
-			<?php
-			// Pane 2 — Basketball Shorts
-			$p2 = isset( $pane_products[2] ) ? $pane_products[2] : null;
-			?>
-			<article class="lp-narrative__pane lp-rv" data-pane-index="2">
-				<p class="lp-pane__number">03 / 05</p>
-				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Move', 'skyyrose' ); ?></p>
-				<h2 class="lp-pane__headline">
-					<?php esc_html_e( 'Built for what you carry off the court.', 'skyyrose' ); ?>
-				</h2>
-				<p class="lp-pane__body">
-					<?php esc_html_e( 'Basketball shorts that live past the game. The heart emblem at the inseam. Moisture-wicking shell. Every rep, every comeback, every day you showed up anyway.', 'skyyrose' ); ?>
-				</p>
-				<?php if ( $p2 ) : ?>
-				<ul class="lp-pane__detail-list">
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Moisture-wicking shell', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Side-slit hem', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item">
-						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p2['price'], 0 ) ) ); ?>
-					</li>
-				</ul>
-				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p2['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
-					<?php esc_html_e( 'Shop Shorts', 'skyyrose' ); ?>
-				</a>
-				<div class="lp-pane__mobile-product">
-					<?php if ( ! empty( $p2['front_model_image'] ) ) : ?>
-					<img
-						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p2['front_model_image'] ), '/' ) ); ?>"
-						alt="<?php echo esc_attr( $p2['name'] ); ?>"
-						loading="lazy"
-						decoding="async"
-						style="width:100%;max-width:320px;border-radius:2px;"
-					/>
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-			</article>
-
-			<?php
-			// Pane 3 — Joggers White
-			$p3 = isset( $pane_products[3] ) ? $pane_products[3] : null;
-			?>
-			<article class="lp-narrative__pane lp-rv" data-pane-index="3">
-				<p class="lp-pane__number">04 / 05</p>
-				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Mirror', 'skyyrose' ); ?></p>
-				<h2 class="lp-pane__headline">
-					<?php esc_html_e( 'The same devotion. Different light.', 'skyyrose' ); ?>
-				</h2>
-				<p class="lp-pane__body">
-					<?php esc_html_e( 'The white colorway of the Love Hurts Joggers. Crimson, black, and gold on white — the same emblem reading differently when you step into the room. A mirror of the black pair.', 'skyyrose' ); ?>
-				</p>
-				<?php if ( $p3 ) : ?>
-				<ul class="lp-pane__detail-list">
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Cotton-fleece, white colorway', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Mirror of Love Hurts Joggers (Black)', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item">
-						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p3['price'], 0 ) ) ); ?>
-					</li>
-				</ul>
-				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p3['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
-					<?php esc_html_e( 'Shop White Joggers', 'skyyrose' ); ?>
-				</a>
-				<div class="lp-pane__mobile-product">
-					<?php if ( ! empty( $p3['front_model_image'] ) ) : ?>
-					<img
-						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p3['front_model_image'] ), '/' ) ); ?>"
-						alt="<?php echo esc_attr( $p3['name'] ); ?>"
-						loading="lazy"
-						decoding="async"
-						style="width:100%;max-width:320px;border-radius:2px;"
-					/>
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-			</article>
-
-			<?php
-			// Pane 4 — The Fannie
-			$p4 = isset( $pane_products[4] ) ? $pane_products[4] : null;
-			?>
-			<article class="lp-narrative__pane lp-rv" data-pane-index="4">
-				<p class="lp-pane__number">05 / 05</p>
-				<p class="lp-pane__eyebrow"><?php esc_html_e( 'The Detail', 'skyyrose' ); ?></p>
-				<h2 class="lp-pane__headline">
-					<?php esc_html_e( 'Even the small things carry it.', 'skyyrose' ); ?>
-				</h2>
-				<p class="lp-pane__body">
-					<?php esc_html_e( 'The Fannie wears the Love Hurts logo at the front pocket. Worn across the body or around the waist, it\'s the accessory that finishes the set — quietly, without announcement.', 'skyyrose' ); ?>
-				</p>
-				<?php if ( $p4 ) : ?>
-				<ul class="lp-pane__detail-list">
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Love Hurts logo embroidery', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item"><?php esc_html_e( 'Adjustable strap', 'skyyrose' ); ?></li>
-					<li class="lp-pane__detail-item">
-						<?php echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $p4['price'], 0 ) ) ); ?>
-					</li>
-				</ul>
-				<a href="<?php echo esc_url( (string) get_permalink( wc_get_product_id_by_sku( $p4['sku'] ) ) ); ?>" class="lp-btn lp-btn--secondary">
-					<?php esc_html_e( 'Shop The Fannie', 'skyyrose' ); ?>
-				</a>
-				<div class="lp-pane__mobile-product">
-					<?php if ( ! empty( $p4['front_model_image'] ) ) : ?>
-					<img
-						src="<?php echo esc_url( $assets . ltrim( str_replace( 'assets/', '', $p4['front_model_image'] ), '/' ) ); ?>"
-						alt="<?php echo esc_attr( $p4['name'] ); ?>"
-						loading="lazy"
-						decoding="async"
-						style="width:100%;max-width:320px;border-radius:2px;"
-					/>
-					<?php endif; ?>
-				</div>
-				<?php endif; ?>
-			</article>
+			<?php endforeach; ?>
 
 		</div><!-- .lp-narrative -->
 
@@ -324,7 +250,9 @@ get_header();
 						$img_path    = ! empty( $prd['front_model_image'] )
 						? ltrim( str_replace( 'assets/', '', $prd['front_model_image'] ), '/' )
 						: '';
-						$product_url = (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) );
+						$product_url = function_exists( 'wc_get_product_id_by_sku' )
+							? (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) )
+							: '#';
 						?>
 					<div
 						class="lp-vp__layer<?php echo 0 === $pane_idx ? ' lp-vp__layer--visible' : ''; ?>"
@@ -381,7 +309,25 @@ get_header();
 	>
 		<header class="lp-grid-section__header lp-rv">
 			<span class="lp-grid-section__eyebrow"><?php esc_html_e( 'The Full Collection', 'skyyrose' ); ?></span>
-			<h2 class="lp-grid-section__title"><?php esc_html_e( 'Love Hurts', 'skyyrose' ); ?></h2>
+			<picture class="lp-grid-section__lockup">
+				<source
+					srcset="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.avif' ); ?>"
+					type="image/avif"
+				/>
+				<source
+					srcset="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.webp' ); ?>"
+					type="image/webp"
+				/>
+				<img
+					src="<?php echo esc_url( $assets . 'images/hero-overlays/lh-logo-combined.webp' ); ?>"
+					alt=""
+					width="360"
+					height="120"
+					loading="lazy"
+					decoding="async"
+				/>
+			</picture>
+			<h2 class="screen-reader-text"><?php esc_html_e( 'Love Hurts Collection', 'skyyrose' ); ?></h2>
 			<p class="lp-grid-section__subtitle"><?php esc_html_e( 'For the love that survived everything.', 'skyyrose' ); ?></p>
 		</header>
 
@@ -391,7 +337,7 @@ get_header();
 			null,
 			array(
 				'collection' => 'love-hurts',
-				'products'   => $lh_products,
+				'skus'       => array_keys( $lh_products ),
 			)
 		);
 		?>
@@ -413,6 +359,7 @@ get_header();
 				<?php esc_html_e( 'New drops, restocks, and stories — straight to your inbox.', 'skyyrose' ); ?>
 			</p>
 			<form class="lp-email__form" novalidate>
+				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
 				<label class="lp-sr-only" for="lp-email-lh">
 					<?php esc_html_e( 'Email address', 'skyyrose' ); ?>
 				</label>

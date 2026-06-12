@@ -85,8 +85,12 @@ get_header();
 					href="#lp-split"
 					class="lp-btn lp-btn--primary btn-sweep"
 				><?php esc_html_e( 'Explore the Collection', 'skyyrose' ); ?></a>
+				<?php
+				$_br_col_page = get_page_by_path( 'collection-black-rose' );
+				$_br_col_url  = $_br_col_page ? get_permalink( $_br_col_page ) : home_url( '/collection-black-rose/' );
+				?>
 				<a
-					href="<?php echo esc_url( get_permalink( get_page_by_path( 'collection-black-rose' ) ) ); ?>"
+					href="<?php echo esc_url( $_br_col_url ); ?>"
 					class="lp-btn lp-btn--ghost"
 				><?php esc_html_e( 'Shop All Black Rose', 'skyyrose' ); ?></a>
 			</div>
@@ -119,10 +123,7 @@ get_header();
 
 				<?php foreach ( $featured as $idx => $prd ) : ?>
 					<?php
-					$img_path = isset( $prd['front_model_image'] ) && $prd['front_model_image']
-						? ltrim( str_replace( 'assets/', '', $prd['front_model_image'] ), '/' )
-						: '';
-					$img_src  = $img_path ? esc_url( $assets . $img_path ) : '';
+					$img_src  = ! empty( $prd['front_model_image'] ) ? skyyrose_product_image_uri( $prd['front_model_image'] ) : '';
 					$prd_url  = function_exists( 'wc_get_product_id_by_sku' )
 						? (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) )
 						: '#';
@@ -188,15 +189,12 @@ get_header();
 
 			<?php foreach ( $featured as $idx => $prd ) : ?>
 				<?php
-				$copy     = isset( $pane_copy[ $idx ] ) ? $pane_copy[ $idx ] : array(
+				$copy    = isset( $pane_copy[ $idx ] ) ? $pane_copy[ $idx ] : array(
 					'heading' => $prd['name'],
 					'body'    => '',
 				);
-				$img_path = isset( $prd['front_model_image'] ) && $prd['front_model_image']
-					? ltrim( str_replace( 'assets/', '', $prd['front_model_image'] ), '/' )
-					: '';
-				$img_src  = $img_path ? esc_url( $assets . $img_path ) : '';
-				$prd_url  = function_exists( 'wc_get_product_id_by_sku' )
+				$img_src = ! empty( $prd['front_model_image'] ) ? skyyrose_product_image_uri( $prd['front_model_image'] ) : '';
+				$prd_url = function_exists( 'wc_get_product_id_by_sku' )
 					? (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) )
 					: '#';
 				?>
@@ -268,7 +266,7 @@ get_header();
 		null,
 		array(
 			'collection' => 'black-rose',
-			'products'   => $all_products,
+			'skus'       => array_keys( $all_products ),
 		)
 	);
 	?>
@@ -295,6 +293,7 @@ get_header();
 						for="lp-email-br-input"
 						class="screen-reader-text"
 					><?php esc_html_e( 'Your email address', 'skyyrose' ); ?></label>
+					<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
 					<input
 						id="lp-email-br-input"
 						type="email"

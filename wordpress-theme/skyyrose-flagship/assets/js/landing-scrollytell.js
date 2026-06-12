@@ -263,15 +263,16 @@
 
 					// Native WordPress AJAX via wp-admin/admin-ajax.php.
 					var formData = new FormData();
-					formData.append( 'action', 'skyyrose_email_subscribe' );
+					formData.append( 'action', 'skyyrose_newsletter_subscribe' );
 					formData.append( 'email', email );
-					if ( typeof skyroseAjax !== 'undefined' && skyroseAjax.nonce ) {
-						formData.append( 'nonce', skyroseAjax.nonce );
+					var nonceField = form.querySelector( '[name="skyyrose_newsletter_nonce"]' );
+					if ( nonceField ) {
+						formData.append( 'skyyrose_newsletter_nonce', nonceField.value );
 					}
 
 					fetch(
-						( typeof skyroseAjax !== 'undefined' && skyroseAjax.ajaxUrl )
-							? skyroseAjax.ajaxUrl
+						( typeof skyyRoseData !== 'undefined' && skyyRoseData.ajaxUrl )
+							? skyyRoseData.ajaxUrl
 							: '/wp-admin/admin-ajax.php',
 						{ method: 'POST', body: formData, credentials: 'same-origin' }
 					)

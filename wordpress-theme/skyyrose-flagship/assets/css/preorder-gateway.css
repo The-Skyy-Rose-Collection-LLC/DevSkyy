@@ -14,13 +14,13 @@
    ───────────────────────────────────────────────────────────── */
 .po-page {
   --po-bg:        var(--skyyrose-bg,       #0a0a0a);
-  --po-fg:        var(--skyyrose-text,     #f0f0f0);
+  --po-fg:        var(--skyyrose-text,     #F5E6D3);
   --po-muted:     var(--skyyrose-text-muted, rgba(240,240,240,.55));
   --po-accent:    var(--skyyrose-accent,   #c0c0c0);
-  --po-accent2:   var(--skyyrose-secondary,#888);
+  --po-accent2:   var(--skyyrose-secondary,#D4AF37);
   --po-font-d:    var(--skyyrose-font-display, 'Cinzel', serif);
   --po-font-b:    var(--skyyrose-font-body,    'Cormorant Garamond', serif);
-  --po-font-ui:   var(--skyyrose-font-ui,      'Inter', sans-serif);
+  --po-font-ui:   var(--skyyrose-font-ui,      'Bebas Neue', sans-serif);
   --po-ease:      var(--skyyrose-ease,     cubic-bezier(.22,1,.36,1));
   --po-radius:    var(--skyyrose-radius,   4px);
 

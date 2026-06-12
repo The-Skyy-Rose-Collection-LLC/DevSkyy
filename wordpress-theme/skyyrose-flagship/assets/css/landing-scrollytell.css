@@ -452,6 +452,13 @@
 	margin-top: 1.5rem;
 }
 
+.lp-pane__mobile-img {
+	width: 100%;
+	max-width: 320px;
+	border-radius: 2px;
+	display: block;
+}
+
 /* ==========================================================================
    Viewport layers (PHP-rendered, JS crossfades)
    ========================================================================== */
@@ -635,6 +642,17 @@
 	line-height: 1.15;
 }
 
+.lp-grid-section__lockup {
+	display: block;
+	margin: 0 0 1rem;
+}
+
+.lp-grid-section__lockup img {
+	max-width: 360px;
+	width: 100%;
+	height: auto;
+}
+
 .lp-grid-section__subtitle {
 	font-family: var( --skyyrose-font-body );
 	font-size: 1rem;
@@ -805,4 +823,40 @@
 		width: 100%;
 		max-width: 320px;
 	}
+}
+
+/* ==========================================================================
+   Reduced motion — kill all decorative animations and motion transitions.
+   Opacity-only state changes (e.g. .lp-rv.is-visible) are left instant
+   because they convey state, not decoration.
+   ========================================================================== */
+
+@media ( prefers-reduced-motion: reduce ) {
+
+	/* Kill scroll-pulse arrow animation */
+	.lp-hero__scroll-arrow::after {
+		animation: none;
+	}
+
+	/* Kill skeleton shimmer animation */
+	.lp-skeleton {
+		animation: none;
+	}
+
+	/* Kill scroll-reveal motion — keep opacity so content is still visible */
+	.lp-rv {
+		transition: opacity 0.1s;
+		transform: none;
+	}
+
+	/* Kill input focus transition */
+	.lp-email__input {
+		transition: none;
+	}
+}
+
+/* Black script logotype reads invisible on the dark hero ground — invert to the
+   Black Rose silver register. Scoped so gold/red lockups stay untouched. */
+[data-collection="black-rose"] .lp-hero__lockup-img {
+  filter: invert(1) grayscale(1) brightness(1.05);
 }

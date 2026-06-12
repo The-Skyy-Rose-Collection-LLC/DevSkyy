@@ -726,9 +726,9 @@ get_header();
 
 		<div class="po-email-capture__inner">
 			<picture class="po-email-capture__art po-rv" aria-hidden="true">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/logos/heart-rose-composite.avif?v=' . $po_ver ); ?>" type="image/avif">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/logos/heart-rose-composite.webp?v=' . $po_ver ); ?>" type="image/webp">
-				<img src="<?php echo esc_url( $po_assets . '/images/logos/heart-rose-composite.jpeg?v=' . $po_ver ); ?>"
+				<source srcset="<?php echo esc_url( $po_assets . '/images/logos/sr-monogram-gold.avif?v=' . $po_ver ); ?>" type="image/avif">
+				<source srcset="<?php echo esc_url( $po_assets . '/images/logos/sr-monogram-gold.webp?v=' . $po_ver ); ?>" type="image/webp">
+				<img src="<?php echo esc_url( $po_assets . '/images/logos/sr-monogram-gold.jpeg?v=' . $po_ver ); ?>"
 					alt="" width="200" height="200" loading="lazy">
 			</picture>
 
@@ -744,7 +744,7 @@ get_header();
 			<form class="po-email-form po-rv" id="po-email-form"
 				aria-label="<?php esc_attr_e( 'Subscribe for drop alerts', 'skyyrose' ); ?>">
 
-				<?php wp_nonce_field( 'skyyrose_newsletter_signup', 'skyyrose_nonce' ); ?>
+				<?php wp_nonce_field( 'skyyrose-nonce', 'nonce' ); ?>
 
 				<div class="po-email-form__row">
 					<label for="po-email-input" class="screen-reader-text">

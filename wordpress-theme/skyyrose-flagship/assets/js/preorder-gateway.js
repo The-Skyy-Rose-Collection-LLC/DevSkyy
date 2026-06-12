@@ -107,6 +107,10 @@
         var opacity = Math.max(0, 1 - window.scrollY / 180);
         cue.style.opacity = String(opacity);
         ticking = false;
+        if (opacity === 0) {
+          window.removeEventListener('scroll', onScroll);
+          cue.style.visibility = 'hidden';
+        }
       });
     }
 
@@ -162,7 +166,16 @@
       panels = qsa('.po-panel[data-collection]');
     }
 
-    if (!panels.length) { return; }
+    if (!panels.length) {
+      /* last-resort fallback: grids exist but no panel buttons — activate first grid directly */
+      var grids = qsa('.po-grid[data-collection]');
+      if (grids.length) {
+        var firstCol = grids[0].getAttribute('data-collection');
+        if (firstCol) { document.body.setAttribute('data-collection', firstCol); }
+        grids[0].classList.add('is-active');
+      }
+      return;
+    }
 
     /* activate first collection on load */
     var first = panels[0];
@@ -350,18 +363,24 @@
     var countEl = qs('.po-cart-count');
     var totalEl = qs('.po-cart-total');
 
-    /* read from WC session via window.wc_cart_fragments_params if available */
-    var fragments = window.wc_cart_fragments_params;
-    if (!fragments) { return; }
+    /* Try to read cart count from WC fragment DOM (most reliable client-side source).
+       woocommerce_items_in_cart cookie is a presence flag (0 or 1), not a count — do not use it. */
+    var countFromFragment = null;
+    var countNode = document.querySelector('.cart-contents-count, .woocommerce-cart-count');
+    if (countNode) {
+      var parsed = parseInt(countNode.textContent, 10);
+      if (!isNaN(parsed)) { countFromFragment = parsed; }
+    }
 
-    /* WC stores cart count in wc-cart-count cookie */
-    var cookies = document.cookie.split(';');
-    cookies.forEach(function (c) {
-      var parts = c.trim().split('=');
-      if (parts[0] === 'woocommerce_items_in_cart' && countEl) {
-        countEl.textContent = decodeURIComponent(parts[1] || '0');
+    if (countEl) {
+      if (countFromFragment !== null) {
+        countEl.textContent = String(countFromFragment);
+        countEl.removeAttribute('hidden');
+      } else {
+        /* count unavailable — hide badge rather than show wrong number */
+        countEl.setAttribute('hidden', '');
       }
-    });
+    }
 
     /* cart total is harder to get client-side without an AJAX call;
        leave as rendered by PHP unless WC fires the fragment event with data */
@@ -376,7 +395,8 @@
 
     btns.forEach(function (btn) {
       var panelId = btn.getAttribute('aria-controls');
-      var panel = panelId ? byId(panelId) : btn.closest('.po-accordion').querySelector('.po-accordion-panel');
+      var accordionEl = btn.closest('.po-accordion');
+      var panel = panelId ? byId(panelId) : (accordionEl ? accordionEl.querySelector('.po-accordion-panel') : null);
       if (!panel) { return; }
 
       /* ensure proper initial aria state */
@@ -423,7 +443,7 @@
       var nonce = form.querySelector('[name="nonce"]') || byId('po-email-nonce');
       if (nonce) { data.append('nonce', nonce.value || nonce.getAttribute('data-nonce') || ''); }
 
-      fetch(ajaxUrl, { method: 'POST', body: data })
+      fetch(ajaxUrl, { method: 'POST', body: data, credentials: 'same-origin' })
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (statusEl) {

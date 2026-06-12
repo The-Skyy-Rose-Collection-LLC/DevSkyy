@@ -668,13 +668,36 @@ function skyyrose_enqueue_template_scripts() {
 	}
 
 	// Landing pages JS — split scrollytell (IntersectionObserver scroll-sync, no GSAP).
-	if ( in_array( $slug, array( 'landing', 'elementor-editorial' ), true ) ) {
+	if ( 'landing' === $slug ) {
 		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-scrollytell.min.js' )
 			? 'landing-scrollytell.min.js' : 'landing-scrollytell.js';
 		if ( file_exists( $base_js_dir . '/' . $lp_js ) ) {
 			wp_enqueue_script(
 				'skyyrose-landing-scrollytell',
 				$base_js_uri . '/' . $lp_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+			wp_localize_script(
+				'skyyrose-landing-scrollytell',
+				'skyyRoseData',
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
+				)
+			);
+		}
+	}
+
+	// Elementor editorial templates keep the legacy landing-pages layout + JS.
+	if ( 'elementor-editorial' === $slug ) {
+		$lp_legacy_js = $use_min && file_exists( $base_js_dir . '/landing-pages.min.js' )
+			? 'landing-pages.min.js' : 'landing-pages.js';
+		if ( file_exists( $base_js_dir . '/' . $lp_legacy_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-landing-pages',
+				$base_js_uri . '/' . $lp_legacy_js,
 				array(),
 				SKYYROSE_VERSION,
 				true
