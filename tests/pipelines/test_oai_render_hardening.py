@@ -407,11 +407,13 @@ def test_qc_judge_receives_dossier_branding_ground_truth():
     catalog = references.load_catalog()
     dossiers = references.build_dossier_index()
     plan = pipeline.plan_sku("sg-006", catalog, dossiers, style="ghost", view="front")
-    exp = pipeline._expectation_for(plan)
+    exp = pipeline.expectation_for(plan)
     assert exp.branding_spec  # flowed from the dossier
     text = _judge_instructions(exp)
-    assert "DOSSIER GROUND TRUTH" in text
-    assert "ABSENCE of branding" in text
+    # Behavior (not exact wording): the dossier's per-view spec reaches the judge,
+    # and blank panels are explicitly NOT failed for "missing branding".
+    assert exp.branding_spec in text
+    assert "blank" in text.lower() and "absence" in text.lower()
 
 
 def test_founder_keeper_assets_skip_their_plan(tmp_path, monkeypatch):

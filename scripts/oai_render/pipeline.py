@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from .client import RenderClient
     from .cost import SpendTracker
     from .qc import QCGate
+    from .runlog import RunLog
 
 log = logging.getLogger(__name__)
 
@@ -310,6 +311,7 @@ def render_sku(
     *,
     gate: QCGate | None = None,
     spend: SpendTracker | None = None,
+    runlog: RunLog | None = None,
 ) -> RenderResult:
     """Render one renderable SKU; QC-gate the output before accepting it.
 
@@ -319,59 +321,68 @@ def render_sku(
     batch continues. Without a gate the first successful render is accepted
     (legacy behavior, used by tests and judge-disabled runs).
     """
+
+    def _emit(event: str, **fields) -> None:
+        if runlog is not None:
+            if spend is not None:
+                fields.setdefault("spent_usd", round(spend.spent_usd, 2))
+            runlog.emit(event, sku=plan.sku, slug=plan.output_slug, **fields)
+
     if not plan.renderable:
+        _emit("skipped", reason=plan.error or "no references")
         return RenderResult(sku=plan.sku, status="skipped", reason=plan.error or "no references")
 
+    max_attempts = 1 + config.QC_MAX_RENDER_RETRIES
     last_verdict = None
-    for attempt in range(1 + config.QC_MAX_RENDER_RETRIES):
+    for attempt in range(max_attempts):
         if spend is not None and not spend.can_afford(config.EST_COST_PER_IMAGE_USD):
+            _emit("budget_stop", cap_usd=spend.cap_usd)
             return RenderResult(
                 sku=plan.sku,
                 status="error",
                 reason=f"budget: ${spend.spent_usd:.2f} spent, cap ${spend.cap_usd:.2f} — "
                 "refusing further paid calls",
             )
+        _emit(
+            "attempt",
+            name=plan.name,
+            style=plan.style,
+            view=plan.view,
+            attempt=attempt + 1,
+            max_attempts=max_attempts,
+        )
         try:
             data = client.edit(prompt=plan.prompt, image_paths=[r.path for r in plan.references])
         except Exception as exc:  # surfaced, never swallowed
             log.error("Render failed for %s: %s", plan.sku, exc)
-            return RenderResult(sku=plan.sku, status="error", reason=str(exc))
+            reason = f"{type(exc).__name__}: {str(exc)[:300]}"
+            _emit("render_error", reason=reason)
+            return RenderResult(sku=plan.sku, status="error", reason=reason)
         if spend is not None:
             spend.add(config.EST_COST_PER_IMAGE_USD)
 
         if gate is None:
             verdict = None
         else:
-            verdict = gate.check(data, _expectation_for(plan))
+            verdict = gate.check(data, expectation_for(plan))
             if spend is not None and verdict.judge_cost_usd:
                 spend.add(verdict.judge_cost_usd)
+            _emit(
+                "qc_verdict",
+                attempt=attempt + 1,
+                passed=verdict.passed,
+                tags=list(verdict.failure_tags),
+                reason=verdict.reason,
+                analysis=verdict.analysis,
+            )
 
         if verdict is None or verdict.passed:
-            try:
-                out_dir = config.OUTPUT_DIR / plan.output_slug
-                out_dir.mkdir(parents=True, exist_ok=True)
-                out_path = out_dir / _output_filename(plan)
-                out_path.write_bytes(data)
-            except OSError as exc:  # disk error after a paid call — capture, don't abort
-                log.error("Disk write failed for %s: %s", plan.sku, exc)
-                return RenderResult(sku=plan.sku, status="error", reason=f"disk: {exc}")
-            log.info("Rendered %s → %s (%d bytes)", plan.sku, out_path, len(data))
-            return RenderResult(sku=plan.sku, status="rendered", output_path=out_path)
+            return _accept_render(plan, data, attempt + 1, _emit)
 
         last_verdict = verdict
-        try:
-            _quarantine(plan, data, attempt + 1, verdict)
-        except OSError as exc:
-            log.error("Quarantine write failed for %s: %s", plan.sku, exc)
-        log.warning(
-            "QC rejected %s attempt %d/%d [%s] — %s",
-            plan.sku,
-            attempt + 1,
-            1 + config.QC_MAX_RENDER_RETRIES,
-            ",".join(verdict.failure_tags),
-            verdict.reason,
-        )
+        _reject_render(plan, data, attempt + 1, max_attempts, verdict, _emit)
 
+    _emit("qc_exhausted", reason=last_verdict.summary if last_verdict else "qc failed")
     return RenderResult(
         sku=plan.sku,
         status="qc_failed",
@@ -379,7 +390,40 @@ def render_sku(
     )
 
 
-def _expectation_for(plan: SkuPlan):
+def _accept_render(plan: SkuPlan, data: bytes, attempt: int, _emit) -> RenderResult:
+    """Persist an accepted render to the output tree (disk errors captured, not raised)."""
+    try:
+        out_dir = config.OUTPUT_DIR / plan.output_slug
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / _output_filename(plan)
+        out_path.write_bytes(data)
+    except OSError as exc:  # disk error after a paid call — capture, don't abort
+        log.error("Disk write failed for %s: %s", plan.sku, exc)
+        _emit("render_error", reason=f"disk: {exc}")
+        return RenderResult(sku=plan.sku, status="error", reason=f"disk: {exc}")
+    log.info("Rendered %s → %s (%d bytes)", plan.sku, out_path, len(data))
+    _emit("accepted", attempt=attempt, path=str(out_path))
+    return RenderResult(sku=plan.sku, status="rendered", output_path=out_path)
+
+
+def _reject_render(plan: SkuPlan, data: bytes, attempt: int, max_attempts: int, verdict, _emit):
+    """Quarantine a QC-rejected attempt for human review; the caller decides on retry."""
+    try:
+        _quarantine(plan, data, attempt, verdict)
+    except OSError as exc:
+        log.error("Quarantine write failed for %s: %s", plan.sku, exc)
+    _emit("quarantined", attempt=attempt, tags=list(verdict.failure_tags))
+    log.warning(
+        "QC rejected %s attempt %d/%d [%s] — %s",
+        plan.sku,
+        attempt,
+        max_attempts,
+        ",".join(verdict.failure_tags),
+        verdict.reason,
+    )
+
+
+def expectation_for(plan: SkuPlan):
     from .qc import RenderExpectation
 
     return RenderExpectation(
@@ -403,6 +447,7 @@ def run(
     dry_run: bool = True,
     client=None,
     verify_assets: bool = True,
+    front_only: bool = False,
 ) -> dict:
     """Plan the render matrix for all targets; render them when not dry-run (client required).
 
@@ -412,25 +457,28 @@ def run(
       - on-model:     if the SKU is in a pair → ONE paired-look render per unique pair (two
                       garments, one model), deduped; else a solo on-model. Front only, with a
                       collection-specific scene background (hero image).
+
+    ``front_only=True`` renders ONLY ghost-front (the product card) — no ghost-back,
+    no on-model/paired looks. Used for a fast, cheap product-card-coverage pass when
+    the back-view and paired renders are the expensive, low-yield cases.
     """
-    use_styles = styles or ["ghost"]
+    use_styles = ["ghost"] if front_only else (styles or ["ghost"])
     plans: list[SkuPlan] = []
     seen_pairs: set[str] = set()
     for s in targets:
         for st in use_styles:
             if st == "ghost":
                 plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="front"))
-                if references.has_back_source(s):
+                if not front_only and references.has_back_source(s):
                     plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="back"))
             elif st == "on-model":
                 # A pair is only renderable when NO member is excluded — an excluded
                 # member's dossier is known-bad and would corrupt the paired look.
+                all_pairs = references.get_pairs_for_sku(s)
                 pairs = [
-                    pr
-                    for pr in references.get_pairs_for_sku(s)
-                    if not any(m in config.EXCLUDED_SKUS for m in pr.skus)
+                    pr for pr in all_pairs if not any(m in config.EXCLUDED_SKUS for m in pr.skus)
                 ]
-                for pr in references.get_pairs_for_sku(s):
+                for pr in all_pairs:
                     excluded = [m for m in pr.skus if m in config.EXCLUDED_SKUS]
                     if excluded:
                         log.warning(
@@ -521,7 +569,11 @@ def verify_plan_assets(plans: list[SkuPlan]) -> list:
 
 
 def render_all(
-    plans: list[SkuPlan], client: RenderClient, *, verify_assets: bool = True
+    plans: list[SkuPlan],
+    client: RenderClient,
+    *,
+    verify_assets: bool = True,
+    runlog: RunLog | None = None,
 ) -> list[RenderResult]:
     """Render every plan in order; per-SKU skips/errors are captured, not raised.
 
@@ -543,6 +595,28 @@ def render_all(
 
     gate = QCGate() if config.QC_ENABLED else None
     spend = SpendTracker()
-    results = [render_sku(p, client, gate=gate, spend=spend) for p in plans]
+    if runlog is not None:
+        runlog.emit(
+            "run_start",
+            n_plans=len(plans),
+            skus=[p.sku for p in plans],
+            est_cost_usd=round(len(plans) * config.EST_COST_PER_IMAGE_USD, 2),
+            cap_usd=spend.cap_usd,
+            judge=config.QC_JUDGE_MODEL_ANTHROPIC
+            if config.QC_JUDGE_PROVIDER == "anthropic"
+            else config.QC_JUDGE_MODEL,
+        )
+    results = [render_sku(p, client, gate=gate, spend=spend, runlog=runlog) for p in plans]
+    if runlog is not None:
+        statuses = [r.status for r in results]
+        runlog.emit(
+            "run_end",
+            rendered=statuses.count("rendered"),
+            skipped=statuses.count("skipped"),
+            errored=statuses.count("error"),
+            qc_failed=statuses.count("qc_failed"),
+            spent_usd=round(spend.spent_usd, 2),
+            cap_usd=spend.cap_usd,
+        )
     log.info("Batch spend (estimated): $%.2f of $%.2f cap", spend.spent_usd, spend.cap_usd)
     return results

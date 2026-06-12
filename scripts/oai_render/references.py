@@ -179,7 +179,11 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
 def _collection_logos() -> dict[str, Path]:
     o = config.OVERLAYS_DIR
     return {
-        "black-rose": o / "br-brand-script.png",
+        # Black Rose non-jersey products carry the three-rose-cluster (greyscale),
+        # per every dossier's logo_reference. (Jerseys override to sport patches
+        # in _sku_logo_refs.) The old br-brand-script.png default was the wrong
+        # mark — it made the model render a "BR" wordmark instead of the cluster.
+        "black-rose": config.LOGOS_DIR / "three-rose-cluster-greyscale.png",
         "love-hurts": o / "lh-logo-combined.png",
         "signature": o / "sig-brand-skyy-rose-gold.png",
     }

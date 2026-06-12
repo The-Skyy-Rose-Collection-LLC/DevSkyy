@@ -36,6 +36,15 @@ def _add_target_args(p: argparse.ArgumentParser) -> None:
             f"({', '.join(PRESENTATIONS)}). Default: ghost,on-model."
         ),
     )
+    p.add_argument(
+        "--front-only",
+        action="store_true",
+        help=(
+            "Render ONLY ghost-front (the product card) — no ghost-back, no "
+            "on-model/paired looks. Fast, cheap full-catalog product-card pass. "
+            "Overrides --style."
+        ),
+    )
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -92,8 +101,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: invalid --style {bad or '(empty)'}. Choose from: {', '.join(PRESENTATIONS)}")
         return 1
 
-    # Always plan first (no API) and show the manifest.
-    dry = pipeline.run(targets, catalog, dossier_index, styles=styles, dry_run=True)
+    # Always plan first (no API) and show the manifest. --front-only is registered
+    # on every subparser via _add_target_args, so args.front_only is always present.
+    dry = pipeline.run(
+        targets, catalog, dossier_index, styles=styles, dry_run=True, front_only=args.front_only
+    )
     manifest = dry["manifest"]
     print(cost.format_manifest(manifest))
     _print_skips(dry["plans"])
@@ -137,10 +149,14 @@ def main(argv: list[str] | None = None) -> int:
             return 4
 
     from .client import OAIImageClient
+    from .runlog import RunLog
 
     client = OAIImageClient()  # validates the API key
+    runlog = RunLog()  # every paid run is observable + leaves a forensic JSONL
+    print(f"\nRun log: {runlog.path}")
+    print("Watch live: python scripts/oai-render-monitor.py  →  http://127.0.0.1:8946/")
     # Render the EXACT plans the manifest was built from (no re-plan → no TOCTOU).
-    results = pipeline.render_all(dry["plans"], client, verify_assets=False)
+    results = pipeline.render_all(dry["plans"], client, verify_assets=False, runlog=runlog)
 
     rendered = [r for r in results if r.status == "rendered"]
     errored = [r for r in results if r.status == "error"]
