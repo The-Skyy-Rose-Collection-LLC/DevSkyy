@@ -199,3 +199,15 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 - [ ] Run build.sh to generate missing .min.css/.min.js for new files
 - [ ] Lighthouse audit: target Performance >90, Accessibility >90
 - [ ] Mobile viewport test (375px)
+
+# WP Port — Landing v3 + Pre-Order Flagship (2026-06-12)
+
+Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-scrollytell; pre-order = prototypes/preorder-page/flagship-full-throttle (video hero, conversion-led order).
+
+- [ ] 1. Two parallel port builders (landing v3 → 3 landing templates + landing-scrollytell.css/js; pre-order flagship → template-preorder-gateway.php + preorder-gateway.css/js rewrite, hero-cinematic part with preorder-hero.mp4, WC cart wiring, meters OFF until real stock — edition chips only)
+- [ ] 2. Verify: php -l, PHPCS, escaping/nonces, visual-manifest compliance, .min rebuild, grep source+min
+- [ ] 3. Full sweep clean
+- [ ] 4. STOP-AND-SHOW manifest → deploy (standing auth) → post-verify curl+Playwright mobile+desktop
+- [ ] 5. Logs: memory/cerebrum/anatomy
+
+Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.

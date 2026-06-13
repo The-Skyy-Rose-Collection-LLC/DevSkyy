@@ -2173,6 +2173,85 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-131",
+      "timestamp": "2026-06-12T17:30:00-07:00",
+      "error_message": "QC judge eval stuck at 4-5/6: every Claude judge (sonnet@300, opus@300, sonnet+CoT@1500) 'false-passed' br-006 missing-sherpa",
+      "file": "tests/fixtures/qc_ground_truth/labels.json",
+      "root_cause": "The ground-truth LABEL was wrong, not the judges: direct pixel audit showed the br-006 render DOES have sherpa lining visible in the hood. The FAIL label came from an earlier audit claim that was never pixel-verified.",
+      "fix": "Flipped br-006 expect FAIL->PASS with pixel-verified reason + _meta correction note; eval immediately scored 6/6 twice consecutively (JUDGE FIT). Also added forced visual_analysis chain-of-thought field to the judge schema so its reasoning is auditable (it exposed this label bug).",
+      "tags": [
+        "qc-judge",
+        "ground-truth",
+        "eval-harness",
+        "label-error",
+        "verify-before-claim"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-132",
+      "timestamp": "2026-06-12T17:30:00-07:00",
+      "error_message": "claude-fable-5 judge call: 400 invalid_request_error 'tool_choice forces tool use is not compatible with this model'",
+      "file": "scripts/oai_render/qc.py",
+      "root_cause": "fable-5 always emits thinking blocks first; Anthropic API rejects forced tool_choice ({'type':'any'}) when extended thinking is active, so the model proven 6/6 via the Agent tool cannot run the in-process forced-tool judge path.",
+      "fix": "Documented the incompatibility in config.py; kept claude-sonnet-4-6 (proven 6/6 twice with CoT schema field). If fable is ever needed in-process, rework to tool_choice auto + must-call instruction or structured outputs.",
+      "tags": [
+        "anthropic-api",
+        "tool-choice",
+        "fable-5",
+        "extended-thinking",
+        "qc-judge"
+      ],
+      "related_bugs": [
+        "bug-131"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-111",
+      "timestamp": "2026-06-12T16:45:00-07:00",
+      "error_message": "Founder report: collection page 'not doing the scroll thing' \u2014 pin-narrative stage scrolls away instead of pinning while beats cross-fade",
+      "file": "wordpress-theme/skyyrose-flagship/assets/css/collection-pages.css",
+      "root_cause": ".col-page had overflow-x: hidden, which computes overflow-y: auto and makes the wrapper a scroll container \u2014 .pin-stage's position:sticky then pins to .col-page's scrollport (which never scrolls) instead of the viewport. Markup, pin-narrative.css, and premium-interactions.js were all live and correct.",
+      "fix": "overflow-x: clip on .col-page \u2014 clips horizontal bleed without creating a scroll container, so sticky descendants pin to the viewport again.",
+      "tags": [
+        "css",
+        "sticky",
+        "overflow",
+        "pin-narrative",
+        "collection-pages",
+        "scroll"
+      ],
+      "related_bugs": [
+        "bug-109"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-112",
+      "timestamp": "2026-06-12T16:45:00-07:00",
+      "error_message": "Founder report: collection page product images 'way too big' \u2014 holo cards render as full-width stacked blocks, one product fills the whole viewport",
+      "file": "wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "root_cause": "Collection pages render the shared product-grid part (.product-grid__items markup) but product-grid.css \u2014 the only file defining the 4-column bento grid layout \u2014 was enqueued solely for landing/elementor-editorial/preorder-gateway slugs, never collection-standalone. Cards had holo styling but no grid container. (First observed Jun 8, cmem #13092; founder-visible since.)",
+      "fix": "Added 'collection-standalone' to the product-grid.css slug array in inc/enqueue.php. Shipped v1.6.2.",
+      "tags": [
+        "css",
+        "enqueue",
+        "product-grid",
+        "collection-pages",
+        "wordpress"
+      ],
+      "related_bugs": [
+        "bug-110"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
     }
   ]
 }
