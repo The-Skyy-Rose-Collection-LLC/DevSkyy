@@ -12,6 +12,7 @@ load_dotenv()
 
 app = FastAPI(title="WooCommerce Webhook Handler", version="1.0.0")
 
+
 def verify_woocommerce_webhook(raw_body: bytes, signature: str | None, secret: str | None) -> bool:
     """
     Verify WooCommerce webhook signature using HMAC SHA-256
@@ -28,16 +29,13 @@ def verify_woocommerce_webhook(raw_body: bytes, signature: str | None, secret: s
         return False
 
     # Generate expected signature
-    hash_digest = hmac.new(
-        secret.encode('utf-8'),
-        raw_body,
-        hashlib.sha256
-    ).digest()
+    hash_digest = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).digest()
 
-    expected_signature = base64.b64encode(hash_digest).decode('utf-8')
+    expected_signature = base64.b64encode(hash_digest).decode("utf-8")
 
     # Use timing-safe comparison to prevent timing attacks
     return hmac.compare_digest(signature, expected_signature)
+
 
 def handle_woocommerce_event(topic: str, payload: dict[str, Any]) -> None:
     """
@@ -49,32 +47,33 @@ def handle_woocommerce_event(topic: str, payload: dict[str, Any]) -> None:
     """
     print(f"Processing {topic} event for ID: {payload.get('id')}")
 
-    if topic == 'order.created':
+    if topic == "order.created":
         print(f"New order #{payload.get('id')} for ${payload.get('total')}")
         # Add your order processing logic here
 
-    elif topic == 'order.updated':
+    elif topic == "order.updated":
         print(f"Order #{payload.get('id')} updated to status: {payload.get('status')}")
         # Add your order update logic here
 
-    elif topic == 'product.created':
+    elif topic == "product.created":
         print(f"New product: {payload.get('name')} (ID: {payload.get('id')})")
         # Add your product sync logic here
 
-    elif topic == 'product.updated':
+    elif topic == "product.updated":
         print(f"Product updated: {payload.get('name')} (ID: {payload.get('id')})")
         # Add your product update logic here
 
-    elif topic == 'customer.created':
+    elif topic == "customer.created":
         print(f"New customer: {payload.get('email')} (ID: {payload.get('id')})")
         # Add your customer onboarding logic here
 
-    elif topic == 'customer.updated':
+    elif topic == "customer.updated":
         print(f"Customer updated: {payload.get('email')} (ID: {payload.get('id')})")
         # Add your customer update logic here
 
     else:
         print(f"Unhandled event type: {topic}")
+
 
 @app.post("/webhooks/woocommerce")
 async def handle_webhook(request: Request):
@@ -83,10 +82,10 @@ async def handle_webhook(request: Request):
     """
     try:
         # Get headers
-        signature = request.headers.get('x-wc-webhook-signature')
-        topic = request.headers.get('x-wc-webhook-topic')
-        source = request.headers.get('x-wc-webhook-source')
-        secret = os.getenv('WOOCOMMERCE_WEBHOOK_SECRET')
+        signature = request.headers.get("x-wc-webhook-signature")
+        topic = request.headers.get("x-wc-webhook-topic")
+        source = request.headers.get("x-wc-webhook-source")
+        secret = os.getenv("WOOCOMMERCE_WEBHOOK_SECRET")
 
         print(f"Received webhook: {topic} from {source}")
 
@@ -117,16 +116,16 @@ async def handle_webhook(request: Request):
         print(f"Error processing webhook: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
 @app.get("/health")
 async def health_check():
     """
     Health check endpoint
     """
-    return {
-        "status": "healthy",
-        "timestamp": "2024-01-15T10:30:00Z"
-    }
+    return {"status": "healthy", "timestamp": "2024-01-15T10:30:00Z"}
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
