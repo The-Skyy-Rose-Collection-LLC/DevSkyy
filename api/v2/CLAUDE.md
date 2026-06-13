@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/v2/ — Enterprise unified API (creative ops, characters, assets, webhooks)
 
 Successor surface to `api/v1/`. Mounted under `/api/v2` from `main_enterprise.py`. Used when v1 field shapes would break backward compatibility or when consolidating fragmented v1 endpoints behind a single resource.

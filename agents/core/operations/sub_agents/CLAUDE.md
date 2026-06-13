@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/operations/sub_agents/ — Operations sub-agents
 
 Three sub-agents registered by `OperationsCoreAgent`. All extend `SubAgent` with `parent_type = CoreAgentType.OPERATIONS`.

@@ -29,6 +29,3 @@
 - Tests — mock `ILLMProvider` for unit tests of consumers
 
 
-<claude-mem-context>
-
-</claude-mem-context>

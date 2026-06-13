@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/graphql/dataloaders/ — N+1 prevention via aiodataloader
 
 Batches concurrent GraphQL field resolutions into single DB queries. One loader per entity type. Lives here (not in `core/`) because DataLoaders are GraphQL-specific lifecycle objects.

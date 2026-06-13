@@ -102,6 +102,3 @@ Parent CoreAgent routes by keyword; both native + SDK sub-agents are eligible ca
 - Klaviyo MCP server: registered via the `claude.ai Klaviyo` MCP server
 
 
-<claude-mem-context>
-
-</claude-mem-context>

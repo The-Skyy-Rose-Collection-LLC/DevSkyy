@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/llm_roundtable/ui/ — LLM Round-Table React visualization
 
 React visualization component for the devskyy-dashboard. Shows model roster, ELO leaderboard, and active battles in read-only display. This is NOT the TypeScript consensus engine — that lives in `agents/llm_roundtable/agent.ts`.

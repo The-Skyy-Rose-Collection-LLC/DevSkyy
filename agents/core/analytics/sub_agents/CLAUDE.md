@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/analytics/sub_agents/ — Analytics sub-agents
 
 Three sub-agents registered by `AnalyticsCoreAgent`. All extend `SubAgent` with `parent_type = CoreAgentType.ANALYTICS`.

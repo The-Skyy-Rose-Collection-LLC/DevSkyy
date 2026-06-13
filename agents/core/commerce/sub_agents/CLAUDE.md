@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/commerce/sub_agents/ — Commerce sub-agents
 
 Three sub-agents registered by `CommerceCoreAgent`. All extend `SubAgent` with `parent_type = CoreAgentType.COMMERCE`.

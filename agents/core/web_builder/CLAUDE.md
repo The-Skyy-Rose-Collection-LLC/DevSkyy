@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/web_builder/ — Web Builder domain CoreAgent
 
 `WebBuilderCoreAgent` — WordPress/Shopify theme generation, template building, and theme development automation. Extends `CoreAgent` (`core_type = CoreAgentType.WEB_BUILDER`). One native sub-agent (`WebDevSubAgent`) plus two SDK sub-agents, delegating heavy build work to `elite_web_builder/director.py`.

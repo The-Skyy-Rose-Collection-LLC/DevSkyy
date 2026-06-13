@@ -35,6 +35,3 @@
 - `skyyrose/elite_studio/*` — canonical imagery pipeline
 
 
-<claude-mem-context>
-
-</claude-mem-context>

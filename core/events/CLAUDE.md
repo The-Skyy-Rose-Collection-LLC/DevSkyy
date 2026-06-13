@@ -43,6 +43,3 @@ await event_bus.publish(ProductCreated(sku="br-001", name="..."))
 - `core/cqrs` — command handlers publish events; query handlers replay from store
 
 
-<claude-mem-context>
-
-</claude-mem-context>

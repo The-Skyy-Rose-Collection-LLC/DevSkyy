@@ -30,6 +30,3 @@ Generates 3D models, virtual photoshoots, and quality-enhanced renders for the S
 - Storage: `services/storage/three_d_storage.py`
 
 
-<claude-mem-context>
-
-</claude-mem-context>

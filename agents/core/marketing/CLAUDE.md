@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/marketing/ — Marketing domain CoreAgent
 
 `MarketingCoreAgent` — campaigns, social media, audience growth. Extends `CoreAgent` (`core_type = CoreAgentType.MARKETING`). Two native sub-agents (`SocialMediaSubAgent`, `CampaignOpsSubAgent`) plus two SDK sub-agents.

@@ -133,6 +133,3 @@ The `adaptive.ts` module provides:
 - Adaptive learning surface is comprehensive — Elo, circuit breakers, anomaly detection, technique A/B, fallback selection — don't reinvent on the Python side; bridge via MCP if needed.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

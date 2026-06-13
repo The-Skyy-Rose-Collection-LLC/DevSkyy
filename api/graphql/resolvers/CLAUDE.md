@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/graphql/resolvers/ — Resolver functions for GraphQL fields
 
 Database query functions called from `schema.py` Query/Mutation fields. Split out from `schema.py` so caching, batching, and DB concerns stay isolated from the schema definition.

@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/elite_web_builder/config/ — Elite Web Builder runtime configuration
 
 Three JSON files that drive routing, quality enforcement, and learning across all Director story cycles. Modified at runtime by `core/learning_journal.py` and `core/model_router.py` — never hand-edit during an active build.

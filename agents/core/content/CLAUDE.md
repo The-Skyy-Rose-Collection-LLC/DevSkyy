@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/content/ — Content domain CoreAgent
 
 `ContentCoreAgent` — all written content: collection pages, product descriptions, blogs, SEO copy. Extends `CoreAgent` (`core_type = CoreAgentType.CONTENT`). Wraps legacy `SkyyRoseContentAgent` plus two native sub-agents and two SDK sub-agents.

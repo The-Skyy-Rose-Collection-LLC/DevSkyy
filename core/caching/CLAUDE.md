@@ -37,6 +37,3 @@
 - `core/redis_cache.py` is the pre-multi-tier LLM response cache. New code uses `core.caching` instead
 
 
-<claude-mem-context>
-
-</claude-mem-context>

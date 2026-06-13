@@ -56,6 +56,3 @@ These three patterns recur across many services — when adding new services, fo
 - Brand-voice canon (drives vision prompts): `knowledge-base/seed/from-interview.md`
 
 
-<claude-mem-context>
-
-</claude-mem-context>

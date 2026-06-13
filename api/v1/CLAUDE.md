@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/v1/ — Versioned REST routers (25+ routers)
 
 The stable v1 API surface. Each file or subpackage exports a FastAPI `APIRouter` consumed by `api/v1/__init__.py` and mounted into `main_enterprise.py`. Versioning policy: additive changes only; breaking shapes move to `api/v2/`.

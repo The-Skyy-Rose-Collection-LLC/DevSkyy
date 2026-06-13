@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # Email Flows Skill — Brand Canon Guardrails
 
 ## Hard Rules (Enforced in Every Email Output)

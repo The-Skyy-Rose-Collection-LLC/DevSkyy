@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/commerce/ — Commerce domain CoreAgent
 
 `CommerceCoreAgent` — all revenue-generating operations: products, orders, pricing, inventory, WooCommerce sync. Extends `CoreAgent` (`core_type = CoreAgentType.COMMERCE`). Three native sub-agents + two SDK sub-agents registered at init.

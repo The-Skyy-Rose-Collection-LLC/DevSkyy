@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/ — SuperAgent layer (162 Python files)
 
 The brain of DevSkyy. Six SuperAgents handle the major domains, each consolidating what used to be many narrow agents.

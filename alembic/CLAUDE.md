@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # alembic/ — Database migration management
 
 Alembic migration environment for DevSkyy's SQLAlchemy database. Manages schema evolution for the FastAPI backend's PostgreSQL database.

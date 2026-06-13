@@ -109,6 +109,3 @@ Cost-prohibitive for hot paths — keep thresholds tight.
 - Per `model_ids.py` migration (2026-05-05, cmem #2103): all 8 production agent files aligned to elite-team model policy tiers. New agents must use `model_ids.py` aliases, not hardcoded model strings.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

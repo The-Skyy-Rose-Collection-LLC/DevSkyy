@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/devskyy-a2a/ — Agent-to-Agent (A2A) framework placeholder
 
 Stub directory for the planned A2A communication framework. No implementation exists yet — only the directory structure has been created.

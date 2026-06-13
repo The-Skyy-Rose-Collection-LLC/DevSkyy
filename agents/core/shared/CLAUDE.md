@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/shared/ — Shared cross-domain infrastructure
 
 Shared sub-agents and utilities consumed by multiple domain CoreAgents. Not owned by any single domain.

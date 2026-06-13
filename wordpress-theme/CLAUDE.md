@@ -94,6 +94,3 @@ Post-deploy verify gate automatically curls `https://skyyrose.co/?deploy_verify=
 - Don't use `products.json` — it doesn't exist. Use the CSV helpers.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

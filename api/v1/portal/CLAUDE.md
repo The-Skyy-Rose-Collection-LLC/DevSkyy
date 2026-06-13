@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/v1/portal/ — Tenant self-service portal
 
 Customer-facing endpoints for tenants to manage their own subscriptions, usage, billing, and team. Auth-gated by `Depends(get_current_user)` from `security/jwt_oauth2_auth.py`. All routers nest under `/api/v1/portal/`.

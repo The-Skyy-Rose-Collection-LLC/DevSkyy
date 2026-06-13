@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # public/ — Static assets served by the FastAPI app
 
 Static files served directly by `main_enterprise.py` via FastAPI's `StaticFiles` mount. Do not confuse with `wordpress-theme/skyyrose-flagship/assets/` — these are for the Python API server, not WordPress.

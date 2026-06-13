@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # aos/shell/ — interactive REPL and command dispatch
 
 Provides a text-driven interface for inspecting and controlling a running `Kernel` instance. The REPL loop is pure I/O glue; all business logic lives in `commands.py`.

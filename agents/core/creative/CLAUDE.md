@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/creative/ — Creative domain CoreAgent
 
 `CreativeCoreAgent` — visual identity, design system, brand enforcement. Extends `CoreAgent` (`core_type = CoreAgentType.CREATIVE`). One native sub-agent (`BrandCreativeSubAgent`) plus keyword routing to four logical roles.

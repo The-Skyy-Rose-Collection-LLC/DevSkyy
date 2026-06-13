@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/ — FastAPI endpoint layer (78 Python files)
 
 HTTP surface for the platform. Every file is an `APIRouter` mounted into the app. One file per resource.

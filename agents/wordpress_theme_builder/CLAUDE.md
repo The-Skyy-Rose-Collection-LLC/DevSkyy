@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/wordpress_theme_builder/ — WordPress theme builder (Claude Agent SDK, TypeScript)
 
 Claude Agent SDK TypeScript agent that builds, evaluates, and deploys the SkyyRose WordPress theme. Exposes a `theme-build` MCP tool backed by `scripts/theme-build.sh`. Distinct from `agents/elite_web_builder/` (Python Director system) — this is the SDK integration layer for interactive CLI use.

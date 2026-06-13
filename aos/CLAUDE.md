@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # aos/ — Agent Operating System micro-kernel
 
 AOS is the runtime substrate for all AI agent execution in DevSkyy. It provides spawn lifecycle, policy enforcement, inter-process messaging, audit, cognitive planning, memory, and self-healing — without modifying the underlying `EnhancedSuperAgent` classes.

@@ -322,6 +322,16 @@ open-claude-code/
 .wolf/hooks/_session.json
 .wolf/claude-mem-digest.md
 
+# claude-mem per-folder context injection → CLAUDE.local.md (FOLDER_USE_LOCAL_MD=true).
+# Claude Code still loads it as local context; git ignores it so the sync gathers
+# info without churning tracked CLAUDE.md files (matches at any depth, no slash).
+CLAUDE.local.md
+
+# Prototype scratch tree (61MB; founder-picked variants are PORTED into the theme,
+# the scratch itself is not tracked). Also avoids duplicate build-standalone.py
+# module collisions in mypy. Un-ignore deliberately if a variant must be preserved.
+prototypes/
+
 # Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
 /*.ipynb
 

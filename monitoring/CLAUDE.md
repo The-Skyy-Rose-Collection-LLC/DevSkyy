@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # monitoring/ — DevSkyy MCP observability stack
 
 Prometheus + Grafana monitoring for all MCP servers, tools, and Elite Studio pipeline health. Includes an AB comparison runner, a stream processor, and a metrics server that exposes the `/metrics` endpoint scraped by Prometheus.

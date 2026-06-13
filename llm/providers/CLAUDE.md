@@ -71,6 +71,3 @@ class FooClient(BaseLLMClient):
 - Model IDs: `llm/model_ids.py` — single source of truth
 
 
-<claude-mem-context>
-
-</claude-mem-context>

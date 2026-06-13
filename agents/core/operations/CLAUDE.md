@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/operations/ — Operations domain CoreAgent
 
 `OperationsCoreAgent` — deploy health, security monitoring, coding diagnostics. Extends `CoreAgent` (`core_type = CoreAgentType.OPERATIONS`). Three native sub-agents plus three SDK sub-agents with filesystem + shell access.

@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/v1/analytics/ — Admin analytics surface
 
 Six routers powering the DevSkyy admin dashboard's analytics views. Reads from production metrics stores (Prometheus, Redis, DB) and aggregates into dashboard-ready shapes.

@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/product_generation/ — Product generation pipeline placeholder
 
 Stub directory for the planned automated product generation pipeline. No implementation exists yet.

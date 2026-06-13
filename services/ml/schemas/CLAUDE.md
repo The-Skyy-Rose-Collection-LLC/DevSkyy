@@ -29,6 +29,3 @@
 - `api/v1/products/descriptions` — endpoint surface uses these as response model
 
 
-<claude-mem-context>
-
-</claude-mem-context>

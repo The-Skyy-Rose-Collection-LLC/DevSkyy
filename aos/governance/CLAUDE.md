@@ -33,6 +33,3 @@ The control plane the kernel consults before every spawn and every paid/destruct
 - Repo root `CLAUDE.md` — defines the STOP-AND-SHOW protocol enforced here
 
 
-<claude-mem-context>
-
-</claude-mem-context>

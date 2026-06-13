@@ -28,6 +28,3 @@
 - `agents/core/content/*` — SEO and tag generation
 
 
-<claude-mem-context>
-
-</claude-mem-context>

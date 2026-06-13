@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/graphql/ — Strawberry GraphQL surface
 
 Alternative read API alongside REST. Mounts at `/graphql` (defined in `main_enterprise.py` via the Strawberry/FastAPI adapter). GraphiQL playground enabled in non-production.

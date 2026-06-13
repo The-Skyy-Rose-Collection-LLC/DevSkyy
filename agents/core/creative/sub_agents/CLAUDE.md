@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/creative/sub_agents/ — Creative sub-agents
 
 One consolidated sub-agent registered by `CreativeCoreAgent`. Handles all four creative roles through ALIASES.

@@ -109,6 +109,3 @@ Claude Desktop config:
 - `MCP_BACKEND=critical-fuchsia-ape` is the FastMCP-hosted production endpoint. Set `CRITICAL_FUCHSIA_APE_KEY` in addition to URL.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

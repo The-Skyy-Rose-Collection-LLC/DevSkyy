@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/image-processing/ — Isolated TypeScript image enhancer (legacy spike)
 
 Single file `luxury-enhance.ts` — a Node/TS class `LuxuryImageProcessor` that composes `sharp` + `@fal-ai/serverless-client` + `replicate` for product image cleanup (bg removal, upscale, luxury filter, format conversion).

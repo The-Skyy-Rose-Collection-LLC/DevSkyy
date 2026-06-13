@@ -69,6 +69,3 @@ After saving, the next import of `mcp_tools` will register the handler. **No man
 - Underlying services: `services/`, `agents/`
 
 
-<claude-mem-context>
-
-</claude-mem-context>

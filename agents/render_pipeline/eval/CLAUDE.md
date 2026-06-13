@@ -84,6 +84,3 @@ The harness asserts on:
 - Tournament score variability is real (judge LLM noise) — tolerance is intentional, not technical debt.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

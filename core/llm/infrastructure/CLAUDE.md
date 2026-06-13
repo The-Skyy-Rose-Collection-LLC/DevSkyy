@@ -31,6 +31,3 @@
 - `api/v1/llm` — capability listing endpoint
 
 
-<claude-mem-context>
-
-</claude-mem-context>

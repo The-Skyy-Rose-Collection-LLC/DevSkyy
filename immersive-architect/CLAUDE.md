@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # immersive-architect/ — Immersive experience design skills (placeholder)
 
 Placeholder directory for immersive 3D experience design skills. Currently contains an empty `skills/` subdirectory. No implementation exists yet.

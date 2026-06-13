@@ -36,6 +36,3 @@
 See `registrations.py` for the canonical list of standard service names and shapes consumed across the app
 
 
-<claude-mem-context>
-
-</claude-mem-context>

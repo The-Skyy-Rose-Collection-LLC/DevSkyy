@@ -46,6 +46,3 @@ Outer layers depend on `core` abstractions. Implementations live elsewhere.
 - Singletons (registry, event_bus, flag_manager) survive the process — tests MUST `.clear()` between cases
 
 
-<claude-mem-context>
-
-</claude-mem-context>

@@ -31,6 +31,3 @@
 - `agents/core/imagery/*` — single-image enhancement requests
 
 
-<claude-mem-context>
-
-</claude-mem-context>

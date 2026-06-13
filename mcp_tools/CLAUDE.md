@@ -113,6 +113,3 @@ A new tool under `mcp_tools/tools/foo.py`:
 - LoRA training and LoRA generation are split (`lora_training.py` + `lora_generation.py`) because training jobs are long-running and need separate timeout / async-queue handling.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

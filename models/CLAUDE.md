@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # models/ — SkyyRose LoRA model registry
 
 Local registry for SkyyRose FLUX LoRA checkpoints. Stores training metadata, trigger maps, and test images for v3/v4. Weights are not stored locally — they live on Replicate and HuggingFace.

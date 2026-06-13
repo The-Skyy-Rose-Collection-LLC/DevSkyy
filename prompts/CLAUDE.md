@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # prompts/ — DevSkyy centralized prompt engineering library
 
 Single Python package serving prompts to all 54 agents across DevSkyy. Houses the COSTARD + Constitutional AI base, per-agent specialty prompts, and a technique engine that auto-selects reasoning strategy by task type.

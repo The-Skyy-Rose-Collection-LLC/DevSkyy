@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/elite_web_builder/templates/ — Output scaffold templates
 
 Starter files the Director uses as the structural skeleton for generated themes. The Director copies and populates these during story execution — they define required shape, not final content.

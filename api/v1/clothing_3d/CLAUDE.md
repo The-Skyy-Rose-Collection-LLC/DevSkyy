@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # api/v1/clothing_3d/ — TRELLIS clothing 3D pipeline (sync + async)
 
 FastAPI surface for the TRELLIS-backed clothing-to-3D pipeline. Sync execution for internal callers; async job queue (Redis Streams) for production. Mount: `app.include_router(clothing_3d_router, prefix="/v1/clothing-3d")`.

@@ -27,6 +27,3 @@
 - `agents/core/marketing/*` — strategic insights from competitor distribution data
 
 
-<claude-mem-context>
-
-</claude-mem-context>

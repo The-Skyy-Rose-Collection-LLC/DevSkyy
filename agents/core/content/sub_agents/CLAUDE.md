@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/content/sub_agents/ — Content sub-agents
 
 Two sub-agents registered by `ContentCoreAgent`. Both extend `SubAgent` with `parent_type = CoreAgentType.CONTENT`.

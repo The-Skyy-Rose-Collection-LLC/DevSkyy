@@ -98,6 +98,3 @@ Every mutation tool surfaces a confirmation argument at the schema level; the pa
 - 15 MCP tools is the current surface — composed via `create_wordpress_tools()` factory in `mcp_server.py`.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

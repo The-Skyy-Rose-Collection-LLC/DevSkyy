@@ -27,6 +27,3 @@
 - Background workers — `RollupScheduler` cron job aggregates raw events into time-bucketed rollups
 
 
-<claude-mem-context>
-
-</claude-mem-context>

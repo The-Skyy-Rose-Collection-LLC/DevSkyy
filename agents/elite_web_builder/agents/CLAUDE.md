@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/elite_web_builder/agents/ — Elite Web Builder specialist agents
 
 14 specialist agents (13 + base) that the `Director` assigns stories to. Each file exports a single `*_SPEC = AgentSpec(...)` constant — no class instantiation. The Director imports all specs and assigns each story to the appropriate role via `ModelRouter`.

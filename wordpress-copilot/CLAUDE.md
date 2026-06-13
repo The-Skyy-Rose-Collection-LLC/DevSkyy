@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # wordpress-copilot/ — Hardcoded skyyrose.co Claude Code copilot config
 
 Custom Claude Code configuration wiring together agents, commands, hooks, and skills specifically for the skyyrose.co WordPress/WooCommerce production site. Not a generic WP toolkit — every file is tuned for the SkyyRose theme, collections, and deploy pipeline.

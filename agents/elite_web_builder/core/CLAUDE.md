@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/elite_web_builder/core/ — Elite Web Builder shared infrastructure
 
 11 infrastructure modules shared by all specialist agents and the Director. Handles cost, provider routing, quality gates, self-healing, and Ralph integration. Do not add domain logic here — this layer is pure machinery.

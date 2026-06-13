@@ -125,6 +125,3 @@ Cache hit/miss tracked in `VectorSearchCache._hits` / `_misses`. Persistence to 
 - Phase 0 (Pathfinder, 2026-05-04): asset_pipeline.py + F2 LangGraph pipeline + F8 verdict documented as PARALLEL_INDEPENDENT (no shared state, safe to run concurrently).
 
 
-<claude-mem-context>
-
-</claude-mem-context>

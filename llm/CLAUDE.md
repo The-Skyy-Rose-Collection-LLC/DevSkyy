@@ -116,6 +116,3 @@ Use for **high-stakes** outputs (creative judging, brand-critical copy). Cost-pr
 - LiteLLM gateway support landed 2026-05-14 — provider count is **8**, not 6 as older docs claim.
 
 
-<claude-mem-context>
-
-</claude-mem-context>

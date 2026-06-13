@@ -35,6 +35,3 @@ Downstream skills that reference this skill:
 - STOP-AND-SHOW before paid API calls, Klaviyo sends, WC writes, deploys
 
 
-<claude-mem-context>
-
-</claude-mem-context>

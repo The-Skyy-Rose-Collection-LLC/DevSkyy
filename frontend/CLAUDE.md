@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # frontend/ — DevSkyy dashboard (Next.js 16, React 19)
 
 Package: `devskyy-dashboard`. Internal admin UI for the AI agent pipeline. Deploys to Vercel at devskyy.app.

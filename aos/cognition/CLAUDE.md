@@ -31,6 +31,3 @@ Deterministic, rule-based cognitive layer. Turns a free-form goal string into a 
 - `tests/aos/cognition/` — full coverage for decomposer / planner / reflector
 
 
-<claude-mem-context>
-
-</claude-mem-context>

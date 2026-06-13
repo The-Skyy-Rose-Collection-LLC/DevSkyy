@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/web_builder/sub_agents/ — Web Builder sub-agents
 
 One consolidated sub-agent registered by `WebBuilderCoreAgent`. Covers all five web development roles through ALIASES.

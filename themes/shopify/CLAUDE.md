@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # themes/shopify/ — SkyyRose Shopify OS 2.0 theme
 
 Shopify Online Store 2.0 theme for SkyyRose. Parallel to `wordpress-theme/skyyrose-flagship/` — same brand, different platform. Status: in development, not yet deployed to a live Shopify store.

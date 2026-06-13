@@ -1,7 +1,3 @@
-<claude-mem-context>
-
-</claude-mem-context>
-
 # agents/core/analytics/ — Analytics domain CoreAgent
 
 `AnalyticsCoreAgent` — data, trends, and conversion intelligence. Extends `CoreAgent` (`core_type = CoreAgentType.ANALYTICS`). Three sub-agents registered at init via `_register_sub_agents()` with ImportError guards.

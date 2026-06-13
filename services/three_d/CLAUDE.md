@@ -42,6 +42,3 @@
 - `trellis/` — TRELLIS-specific pipeline (config, garment-aware prompts, pre/postprocess). Implements `I3DProvider` via `TrellisProvider`
 
 
-<claude-mem-context>
-
-</claude-mem-context>
