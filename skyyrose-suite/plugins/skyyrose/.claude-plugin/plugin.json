@@ -1,0 +1,9 @@
+{
+  "name": "skyyrose",
+  "version": "1.0.0",
+  "description": "SkyyRose Suite orchestrator — the front door. Classifies any task and routes it to the right plugin(s) (market / design / core / qa); runs the embedded dev-team workflow for multi-step work. Invoke with /skyyrose <task>.",
+  "author": { "name": "SkyyRose / Corey Foster", "email": "skyyroseco@gmail.com" },
+  "license": "UNLICENSED",
+  "homepage": "https://skyyrose.co",
+  "keywords": ["skyyrose", "orchestrator", "router", "dev-team", "workflow", "luxury-streetwear"]
+}
