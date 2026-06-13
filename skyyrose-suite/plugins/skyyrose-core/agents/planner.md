@@ -210,3 +210,9 @@ Each phase should be mergeable independently. Avoid plans that require all phase
 - Phases that cannot be delivered independently
 
 **Remember**: A great plan is specific, actionable, and considers both the happy path and edge cases. The best plans enable confident, incremental implementation.
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.

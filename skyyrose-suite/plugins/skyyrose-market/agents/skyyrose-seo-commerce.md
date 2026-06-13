@@ -127,3 +127,9 @@ Every deliverable from this agent is production-ready. No TODOs, no placeholders
 2. Verification method for each finding (curl + grep, not WebFetch)
 3. Priority fix order (P0 → P1 → P2)
 4. Confirmed false-positive rate caveat: every P0 must be verified against live state before a fix is drafted
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.

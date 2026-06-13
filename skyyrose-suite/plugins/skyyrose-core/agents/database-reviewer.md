@@ -89,3 +89,9 @@ For detailed index patterns, schema design examples, connection management, conc
 **Remember**: Database issues are often the root cause of application performance problems. Optimize queries and schema design early. Use EXPLAIN ANALYZE to verify assumptions. Always index foreign keys and RLS policy columns.
 
 *Patterns adapted from Supabase Agent Skills (credit: Supabase team) under MIT license.*
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.

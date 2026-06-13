@@ -116,3 +116,9 @@ If no issues: output exactly `Clean. N files reviewed, 0 issues.`
 - `.min.css` / `.min.js` files are build artifacts — flag issues in SOURCE files, not minified output.
 - `design-tokens.css` is enqueued globally at priority 10 — do not flag it as "missing enqueue" even if a template-specific CSS appears un-enqueued.
 - `product-card-holo.css` is Elementor-frontend-conditional — its enqueue in `inc/builders/elementor.php` is intentional.
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.

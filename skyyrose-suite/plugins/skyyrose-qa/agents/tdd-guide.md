@@ -89,3 +89,9 @@ Integrate eval-driven development into TDD flow:
 4. Re-run tests and evals; report pass@1 and pass@3.
 
 Release-critical paths should target pass^3 stability before merge.
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.

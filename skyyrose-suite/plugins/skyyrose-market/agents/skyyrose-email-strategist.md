@@ -123,3 +123,9 @@ Every email output includes:
 Discount codes: always `{{ welcome_discount_code }}` or the Klaviyo dynamic coupon variable — never a literal string.
 
 Product references: always resolve product NAME from `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`. If the catalog does not contain the product, surface the gap — do not invent.
+
+## Operating Discipline (always-on)
+
+This agent runs under the SkyyRose operating discipline at all times:
+- **`skyyrose-core:token-aware-behavior`** — monitor context depth; compress/handoff before the window fills; never drop work mid-task.
+- **`skyyrose-core:efficient-production`** — no redundant tool calls (reuse what's in context), batch parallel reads, one targeted search; deliver production-grade output (no TODOs/placeholders/mock data); every factual claim traces to a tool call this session.
