@@ -1,42 +1,39 @@
-# SkyyRose Elite
+# SkyyRose Suite
 
-One installable Claude Code plugin that bundles the SkyyRose **marketing & commerce team** — nine skills and seven specialist agent personas, each grounded in verified vendor docs and wired to the SkyyRose Elite Studio runtime and dev-team pipeline.
+A private Claude Code **marketplace** of five plugins — an orchestrator plus four themed teams (marketing, design, core-engineering, QA) — each grounded in verified vendor docs and wired to the SkyyRose Elite Studio runtime and dev-team pipeline.
 
 > Tagline canon: **"Luxury Grows from Concrete."**
 
-## What's inside
+## The five plugins
 
-**Skills** (`skills/`)
-| Skill | Purpose | Grounded in |
-|---|---|---|
-| `skyyrose-brand-dna` | Brand canon, collections, voice, The Five, guardrails | Internal canon |
-| `skyyrose-content-engine` | Social/content branch index + Elite Studio social venture | Internal |
-| `skyyrose-product-copy` | PDP / collection / FAQ copy on WooCommerce | WooCommerce REST + schema.org |
-| `skyyrose-seo-commerce` | WooCommerce SEO, schema markup, technical SEO | schema.org Product/Offer, WC REST `meta_data` |
-| `skyyrose-email-flows` | Klaviyo welcome / cart / post-purchase / drop flows | Klaviyo Flows API |
-| `skyyrose-paid-media` | Meta / Google / TikTok campaigns, PMax, retargeting | Meta Ads + Google Ads API |
-| `skyyrose-influencer-growth` | Creator program: discovery → outreach → brief → tracking | FTC disclosure, platform programs |
-| `skyyrose-photography-brief` | Product + brand shoot briefs, shot lists, art direction | WooCommerce image specs, platform crops |
-| `skyyrose-launch-commander` | Drop orchestration T-30 → T+7, propose-roster-and-wait | Composes the above |
+| Plugin | What it does | Skills | Agents |
+|--------|--------------|-------:|-------:|
+| **`skyyrose`** | Orchestrator + front door. `/skyyrose <task>` classifies and routes; runs the embedded dev-team workflow for multi-step work. | — | 1 |
+| **`skyyrose-market`** | Brand DNA, product copy, WooCommerce SEO, Klaviyo email flows, paid media, influencer growth, photography briefs, launch orchestration, 30+ social skills. | 50 | 6 |
+| **`skyyrose-design`** | Imagery (gpt-image-2 prompt composition + brand-native element library), frontend, Three.js/immersive 3D, WP/WooCommerce theming, accessibility, layout. | 37 | 5 |
+| **`skyyrose-core`** | FastAPI/Python backend, Postgres/Redis, Alembic migrations, Docker, API design, behavior/token discipline, planning, memory & self-healing. | 23 | 8 |
+| **`skyyrose-qa`** | TDD, drive-to-green, verification loops, audits, evals, regression testing, code review. | 16 | 5 |
 
-**Agents** (`agents/`) — one persona per specialist, embedding its skill(s): `skyyrose-content-engine`, `skyyrose-email-strategist`, `skyyrose-paid-media-buyer`, `skyyrose-seo-commerce`, `skyyrose-influencer-lead`, `skyyrose-photography-director`, `skyyrose-launch-commander`.
-
-**Command** (`commands/`) — `/skyyrose-elite <intent>` routes to the right specialist, or runs a full drop campaign behind a propose-roster-and-wait gate.
+Routing and handoffs between plugins are documented in [`CROSS-PLUGIN.md`](./CROSS-PLUGIN.md).
 
 ## Install (local marketplace)
 
 ```bash
-# from anywhere
-/plugin marketplace add /Users/theceo/DevSkyy/skyyrose-elite
-/plugin install skyyrose-elite@skyyrose-elite
+/plugin marketplace add /Users/theceo/DevSkyy/skyyrose-suite
+/plugin install skyyrose@skyyrose-suite
+/plugin install skyyrose-market@skyyrose-suite
+/plugin install skyyrose-design@skyyrose-suite
+/plugin install skyyrose-core@skyyrose-suite
+/plugin install skyyrose-qa@skyyrose-suite
 ```
 
-Then the nine skills load under the plugin namespace and the seven agents register as `subagent_type`s.
+Skills load under each plugin's namespace (`skyyrose-market:*`, `skyyrose-design:*`, …) and agents register as `subagent_type`s. Start any task with `/skyyrose <task>`.
 
 ## Wiring
 
-See [`WIRING.md`](./WIRING.md) for how each agent maps to the Python runtime SuperAgents (`SkyyRoseContentAgent`, `MarketingAgent`, `SkyyRoseImageryAgent`, `agents/core/orchestrator.py`), the Elite Studio imagery pipelines, and the dev-team workflow marketing lane.
+- [`CROSS-PLUGIN.md`](./CROSS-PLUGIN.md) — handoff graph (market → design → qa → core → qa), namespace table, when-to-call-which.
+- [`WIRING.md`](./WIRING.md) — how the marketing/design agent personas map to the Python runtime SuperAgents (`SkyyRoseContentAgent`, `MarketingAgent`, `SkyyRoseImageryAgent`, `agents/core/orchestrator.py`), the Elite Studio imagery pipelines, and the dev-team workflow lane.
 
 ## Guardrails
 
-Paid-media spend, Klaviyo sends, WooCommerce writes, and media uploads are all **STOP-AND-SHOW** — the agents propose and wait for explicit founder approval before any money or production action.
+Every agent carries the always-on operating discipline (`skyyrose-core:token-aware-behavior` + `skyyrose-core:efficient-production`). Paid-media spend, Klaviyo sends, WooCommerce writes, media uploads, and paid renders (gpt-image-2) are all **STOP-AND-SHOW** — agents propose and wait for explicit founder approval before any money or production action. Product facts resolve through the catalog CSV + per-SKU dossiers only; brand canon (collections, palettes, The Five) is locked.

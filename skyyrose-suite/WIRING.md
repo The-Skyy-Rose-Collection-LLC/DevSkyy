@@ -1,6 +1,6 @@
-# SkyyRose Elite — Wiring Map
+# SkyyRose Suite — Wiring Map
 
-How the `skyyrose-elite` plugin connects to the **Elite Team** (Python runtime SuperAgents), the **Elite Studio** imagery pipelines, and the **dev-team** workflow. Every claim cites the source verified during the 2026-06-05 discovery pass.
+How the `skyyrose-suite` plugins connect to the **Elite Team** (Python runtime SuperAgents), the **Elite Studio** imagery pipelines, and the **dev-team** workflow. The seven personas below now live across `skyyrose-market` (6) and `skyyrose-design` (photography-director). Every claim cites the source verified during the 2026-06-05 discovery pass.
 
 ---
 
@@ -11,7 +11,7 @@ The plugin operates on the **authoring plane** (Claude Code skills + subagent pe
 ```
  AUTHORING PLANE (this plugin)                RUNTIME PLANE (agents/*.py)
  ┌─────────────────────────────┐             ┌────────────────────────────────┐
- │ /skyyrose-elite  (command)  │             │ EnhancedSuperAgent base        │
+ │ /skyyrose  (command)        │             │ EnhancedSuperAgent base        │
  │   ├─ content-engine  ◄──────┼──maps to────┤ SkyyRoseContentAgent           │
  │   ├─ email-strategist ◄─────┼──maps to────┤ MarketingAgent (email cap)     │
  │   ├─ paid-media-buyer ◄─────┼──maps to────┤ agents/core/marketing/ (slot)  │
@@ -56,7 +56,7 @@ Source: `agents/base_super_agent/agent.py`, `agents/skyyrose_content_agent.py`, 
 
 ## 4. Dev-team workflow lane
 
-Source: `.claude/workflows/skyyrose-dev-team.js`. The marketing lane is added via the **`batch` enum** (least-invasive option A):
+Source: `plugins/skyyrose/workflows/skyyrose-dev-team.js` (embedded in the orchestrator plugin, CHARTER co-located; the original dev-time copy remains at `.claude/workflows/`). The marketing lane is added via the **`batch` enum** (least-invasive option A):
 
 ```js
 // PLAN_SCHEMA, ~js:37 — extend the enum
@@ -70,7 +70,7 @@ function agentFor(batch) {
 }
 ```
 
-The architect (Phase 1) can then assign marketing workstreams (copy, email, SEO, photography briefs) with `batch: 'marketing'`; the existing `pipeline()` fan-out (js:162-195) runs them alongside FE/BE workstreams, and the Phase-3 review loop reviews them. This edit lives in the **gitignored** `.claude/workflows/` — applied to the main checkout during install, not shipped in the plugin.
+The architect (Phase 1) can then assign marketing workstreams (copy, email, SEO, photography briefs) with `batch: 'marketing'`; the existing `pipeline()` fan-out (js:162-195) runs them alongside FE/BE workstreams, and the Phase-3 review loop reviews them. The workflow now ships **embedded** in the `skyyrose` orchestrator plugin (`plugins/skyyrose/workflows/`), so it travels with the suite; the copy under the gitignored `.claude/workflows/` remains the dev-time original.
 
 ---
 

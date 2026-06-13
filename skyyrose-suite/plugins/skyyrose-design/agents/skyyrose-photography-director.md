@@ -75,7 +75,7 @@ SkyyRoseImageryAgent.generate_image(
 )
 ```
 
-Source: `agents/skyyrose_imagery_agent.py`. Seam verified in `skyyrose-elite/WIRING.md` row `skyyrose-photography-director → SkyyRoseImageryAgent (CAMPAIGN)`.
+Source: `agents/skyyrose_imagery_agent.py`. Seam verified in `skyyrose-suite/WIRING.md` row `skyyrose-photography-director → SkyyRoseImageryAgent (CAMPAIGN)`.
 
 The brief you produce on the authoring plane is the input artifact that feeds Elite Studio's render execution path:
 
