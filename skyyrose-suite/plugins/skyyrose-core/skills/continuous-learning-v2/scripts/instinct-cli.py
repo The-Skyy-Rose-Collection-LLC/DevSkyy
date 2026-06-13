@@ -16,16 +16,16 @@ Commands:
 """
 
 import argparse
-import json
 import hashlib
+import json
 import os
+import re
 import subprocess
 import sys
-import re
 import urllib.request
-from pathlib import Path
-from datetime import datetime, UTC
 from collections import defaultdict
+from datetime import UTC, datetime
+from pathlib import Path
 
 try:
     import fcntl
