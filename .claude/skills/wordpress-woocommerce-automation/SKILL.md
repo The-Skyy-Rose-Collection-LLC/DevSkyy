@@ -14,34 +14,26 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 class WPClient:
+    # CANON: skyyrose.co (WP.com Atomic) returns 401 on /wp-json/ paths. The
+    # ?rest_route= query-param form is MANDATORY (project CLAUDE.md). Pass the
+    # bare route as `endpoint`, e.g. "wc/v3/products" → {site}/?rest_route=/wc/v3/products.
     def __init__(self, site_url: str, username: str, app_password: str):
-        self.base_url = f"{site_url}/wp-json"
+        self.site_url = site_url.rstrip("/")
         self.auth = HTTPBasicAuth(username, app_password)
         self.headers = {"Content-Type": "application/json"}
-    
+
+    def _url(self, endpoint: str) -> str:
+        # requests appends `params` with & since the URL already has a query string.
+        return f"{self.site_url}/?rest_route=/{endpoint.lstrip('/')}"
+
     def get(self, endpoint: str, params: dict = None):
-        return requests.get(
-            f"{self.base_url}/{endpoint}",
-            auth=self.auth,
-            headers=self.headers,
-            params=params
-        )
-    
+        return requests.get(self._url(endpoint), auth=self.auth, headers=self.headers, params=params)
+
     def post(self, endpoint: str, data: dict):
-        return requests.post(
-            f"{self.base_url}/{endpoint}",
-            auth=self.auth,
-            headers=self.headers,
-            json=data
-        )
-    
+        return requests.post(self._url(endpoint), auth=self.auth, headers=self.headers, json=data)
+
     def put(self, endpoint: str, data: dict):
-        return requests.put(
-            f"{self.base_url}/{endpoint}",
-            auth=self.auth,
-            headers=self.headers,
-            json=data
-        )
+        return requests.put(self._url(endpoint), auth=self.auth, headers=self.headers, json=data)
 ```
 
 ## WooCommerce Products
