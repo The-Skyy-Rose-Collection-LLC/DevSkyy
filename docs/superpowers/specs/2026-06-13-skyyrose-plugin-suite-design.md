@@ -94,7 +94,17 @@ One local marketplace, 5 installable plugins. Claude Code exposes every installe
 | `wp-code-simplifier` | 30L — thin | complete to standard |
 | `deploy-and-verify` | 37L — thin | complete to standard |
 
-**Total fill work:** 8 missing companion docs across 5 skills · 1 source-copy fix · 5 agent completions · embed block on all 25 agents.
+**Total structural fill work:** 8 missing companion docs across 5 skills · 1 source-copy fix · 5 agent completions · embed block on all 25 agents.
+
+### 4b. Content-quality findings (deep per-skill audit → `docs/skill-quality-audit-2026-06-13.md`)
+A 7-auditor content pass (verified against the filesystem) found, beyond structural gaps:
+- **8 STALE** — incl. 3 project-canon **correctness** bugs: `wordpress-woocommerce-automation` (`/wp-json/` → must be `?rest_route=` on WP.com), `ai-image-generation` + `fal-ai-media` (Gemini/FLUX/nano-banana → locked OAI Image 2). Plus `redis-patterns` (no async), `database-migrations` (no Alembic), `backend-patterns` (Node-only), `immersive-interactive-architect` (Three.js r128), `interactive-web-development` (unpinned framer-motion).
+- **~6 REDUNDANT** consolidations — `immersive-architect`≈`immersive-interactive-architect`, TDD trio→1, behavior cluster→`context-budget`+`efficient-production`, `systematic-debugging`≈`diagnose`, `error-handling`≈`backend-patterns`, `crosspost`≈`social-publisher`.
+- **4 SHALLOW** — `design-master`/`universal-learner` (Chinese-only, off-purpose), `frontend-design-direction` (thin), `woocommerce` (generic, no HPOS).
+- **~15 NEEDS-VERIFY** deps (verify filesystem/dep before any fix).
+- **3 DISPROVEN** auditor false-positives (companions/skills that DO exist) — do not act.
+
+**Rule:** every needs-verify and missing-file claim is filesystem-checked before a fix is written. The audit is the starting point, not truth (auditor missing-file false-positive rate ~50% this run).
 
 ---
 
