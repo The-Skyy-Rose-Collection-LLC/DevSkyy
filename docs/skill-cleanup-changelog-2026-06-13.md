@@ -49,11 +49,21 @@ Phase 1 of the SkyyRose Plugin Suite build (`docs/superpowers/plans/2026-06-13-s
 | 1.14 | `wordpress-woocommerce-automation/references/woo-schemas.md` (new, gitignored) | author WC REST product/order/customer/webhook schemas | 320L |
 | 1.14 | `layout/reference/spatial-design.md` (`.agents`) | author spatial/layout reference (grid, spacing scale, optical alignment, container queries) | 349L |
 
-## Gated — pending founder approval (Decision 2)
+## Decision 2 — Chinese skills: FULL ENHANCEMENT (founder-approved, done)
 
-| Task | Skills | Status |
-|------|--------|--------|
-| 1.13 | `design-master` (215L), `universal-learner` (266L) — both Chinese | **Enhance → describe → translate → include both.** Read both, write enhancement spec, STOP for founder sign-off before translate/add. Not yet started. |
+Both rewritten English + made brand-native + wired to the real `gpt-image-2` grammar (`scripts/oai_render/prompt.py`). Uncommittable (`~/.claude`); land in git via Phase-2 suite copy. Shared contract: `references/element-schema.md` (authored canonical; copied verbatim into both skills).
+
+| File (`~/.claude/skills/`) | Change | Verify |
+|----------------------------|--------|--------|
+| `design-master/SKILL.md` (497L) | full English rewrite → gpt-image-2 prompt composer aligned to `prompt.py` grammar (ghost/on-model/flatlay modes, COLLECTION_SCENES, view, structured output contract, STOP-AND-SHOW cost gate, The-Five anchors) | gpt-image-2/1024x1536=21; STOP-AND-SHOW=6; Chinese=0; locked-out lineage=0 |
+| `design-master/references/skyyrose-templates.json` (135L) | 5 presets: pdp-ghost + 1 on-model campaign per collection (verbatim COLLECTION_SCENES + palette + The-Five anchor) | JSON parses; 5 templates |
+| `design-master/references/luxury-element-taxonomy.md` (179L) | 42 luxury-fashion elements by grammatical_position, tagged collection+mode | — |
+| `design-master/references/element-schema.md` (94L) | verbatim copy of shared contract | identical to canonical |
+| `universal-learner/SKILL.md` (591L) | full English rewrite + all 10 enhancements: `fashion_editorial` domain, SKU-aware dossier ingestion, collection auto-tag, brand-canon validation (Step 3.5), 4-axis scoring, gpt-image-2 extraction mode, provenance fields, human-review diff gate, seed-corpus procedure, manifest export | Chinese=0; fashion_editorial/brand-canon/provenance=22; diff-gate/manifest=22 |
+| `universal-learner/references/element-schema.md` (94L) | authored canonical shared contract (dossier input → gpt-image-2 output) | — |
+| `universal-learner/references/skyyrose-seed-elements.json` | **97 real elements** extracted from 11 dossiers (all 4 collections) + `prompt.py` COLLECTION_SCENES + collection-stories + visual-references | 97 elements; 0 violations; 0 missing fields; 0 dup ids; spans 9 grammatical positions + 4 collections |
+
+Wiring: two separate files, one shared schema; `universal-learner` writes the seed library, `design-master` reads it (by `collection_tags`+`mode_tags`); STOP-AND-SHOW gate lives in `design-master` (the render trigger). Both enter git via Phase-2 `skyyrose-design` plugin copy.
 
 ## Lessons (for `.wolf/cerebrum.md` at Phase-3 land)
 
