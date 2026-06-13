@@ -65,6 +65,22 @@ Both rewritten English + made brand-native + wired to the real `gpt-image-2` gra
 
 Wiring: two separate files, one shared schema; `universal-learner` writes the seed library, `design-master` reads it (by `collection_tags`+`mode_tags`); STOP-AND-SHOW gate lives in `design-master` (the render trigger). Both enter git via Phase-2 `skyyrose-design` plugin copy.
 
+## Post-build QC pass (`/code-review` + `/simplify`, 2026-06-13)
+
+A 3-agent review of the full changed surface (committed diff + uncommittable build) found **9 real defects in embedded example code** (prose was clean of secrets/SQLi). All fixed + re-verified:
+
+- `universal-learner/SKILL.md`: hardcoded "36 SKUs" → "33" (catalog is 33 distinct SKUs, verified).
+- `element-schema.md` (both copies): output contract was missing `reference_labels`/`is_patch`/`founder_corrections` (design-master emits them); `dossier_spec_path` example used wrong root path → full `wordpress-theme/skyyrose-flagship/...`.
+- `design-master/SKILL.md`: `corrections.json` → real path `wordpress-theme/skyyrose-flagship/data/render-corrections.json` (shape `{"corrections":{sku:[...]}}`); seed-library ref → canonical `universal-learner/references/` path.
+- `luxury-element-taxonomy.md`: BLOCK list completed (+Off-White-early, +Burberry-Imagined).
+- `skyyrose-seed-elements.json`: `element_count` 90→97 (matched array); canon fix — `signature-scene-bay-bridge-oakland-anchor` retagged black-rose (Bay Bridge/Oakland = Black Rose scene) + id renamed.
+- `database-migrations/SKILL.md`: `.limit()` on a Postgres UPDATE (CompileError) → `scalar_subquery` pattern.
+- `agents/frontend-developer.md`: invalid JSON code-fence + dangling `context-manager` agent ref removed.
+- immersive refs: `gsap-scroll-patterns.md` dead cdnjs SplitText URL (Club GSAP) + fabricated `gsap.core.globals()` → captured tween; `ar-mediapipe.md` non-existent `POSE_LANDMARKS` export → integer indices; `three-js-patterns.md` `process.env` guarded; `woocommerce-3d-embed.md` `esc_url()` at output.
+- `woo-schemas.md`: removed non-existent root-level Order `subtotal`, added `discount_total`.
+
+1 reviewer false positive dismissed (immersive ref docs reported "missing" — verified present). ~25% audit/review false-positive rate held; all findings filesystem-checked before applying.
+
 ## Lessons (for `.wolf/cerebrum.md` at Phase-3 land)
 
 1. **Three install views of one skill** — project `.claude/skills/` (symlink or realdir), in-repo gitignored `.agents/skills/`, out-of-repo `~/.claude/skills/`. Committability = is-the-target-tracked, NOT realdir-vs-symlink.
