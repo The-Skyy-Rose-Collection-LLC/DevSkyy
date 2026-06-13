@@ -1,10 +1,12 @@
 ---
 name: backend-patterns
-description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
+description: "Node.js / TypeScript backend patterns: REST API design, repository pattern, middleware, caching, and error handling for Express and Next.js API routes. (Python/FastAPI service layers live in the fastapi-patterns skill.)"
 origin: ECC
 ---
 
 # Backend Development Patterns
+
+> **Scope:** Node/TypeScript backends. For Python/FastAPI service layers, see the `fastapi-patterns` skill.
 
 Backend architecture patterns and best practices for scalable server-side applications.
 

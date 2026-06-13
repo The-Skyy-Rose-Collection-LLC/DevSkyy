@@ -50,11 +50,14 @@ ruff check . 2>&1 | head -30
 
 ### Phase 4: Test Suite
 ```bash
-# Run tests with coverage
+# JavaScript/TypeScript — run tests with coverage
 npm run test -- --coverage 2>&1 | tail -50
+# Target: 80% minimum coverage
 
-# Check coverage threshold
-# Target: 80% minimum
+# Python — run tests with short traceback, quiet summary
+pytest --tb=short -q 2>&1 | tail -50
+# Target: 85% minimum coverage (per project rules)
+# For coverage report: pytest --cov --cov-report=term-missing -q
 ```
 
 Report:
@@ -65,12 +68,15 @@ Report:
 
 ### Phase 5: Security Scan
 ```bash
-# Check for secrets
+# JavaScript/TypeScript — check for secrets and debug leaks
 grep -rn "sk-" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
-
-# Check for console.log
 grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
+
+# Python — static security analysis (low severity and above)
+bandit -r . -ll 2>&1 | head -40
+# -ll = report LOW severity and above; add -x ./tests to exclude test dirs
+# Install: pip install bandit
 ```
 
 ### Phase 6: Diff Review

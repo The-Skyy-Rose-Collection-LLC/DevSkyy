@@ -40,8 +40,45 @@ Select based on the experience type and output target:
 | WordPress/WooCommerce Integration | Standalone HTML embed + PHP wrapper | REST API for product data |
 
 ### Library CDN References (always use exact versions for stability)
+
+Three.js r169 requires ESM import maps — the legacy UMD `three.min.js` bundle is no longer the recommended path. Use the module build with an importmap:
+
+```html
+<!-- Import map — place before any <script type="module"> -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- Then in your module script: -->
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
+// CapsuleGeometry, WebGPURenderer — all available in r169
+const capsule = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+</script>
 ```
-Three.js r128:     https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js
+
+For WebGPU renderer (r169+):
+```html
+<script type="importmap">
+{
+  "imports": {
+    "three":        "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.webgpu.js",
+    "three/tsl":    "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.tsl.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+```
+
+```
 GSAP 3.12:        https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js
 GSAP ScrollTrigger: https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js
 A-Frame 1.4:      https://aframe.io/releases/1.4.0/aframe.min.js
@@ -54,9 +91,9 @@ Lottie Web:       https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie
 ## Output Format Patterns
 
 ### React / JSX (Claude.ai Artifacts)
-- Use `import * as THREE from 'three'` (r128 available)
+- Use `import * as THREE from 'three'` (r169 — full ESM, all modern geometry available)
 - Use `useEffect` + `useRef` for Three.js canvas lifecycle
-- **Do NOT use** `THREE.CapsuleGeometry` (added r142+) — use `CylinderGeometry` + `SphereGeometry` composites
+- `THREE.CapsuleGeometry` is available natively — `new THREE.CapsuleGeometry(radius, length, capSegments, radialSegments)`
 - GSAP via CDN script tag injected dynamically, or use CSS animations
 - State management: `useState`/`useReducer` for experience phases (loading → explore → selected → cart)
 
