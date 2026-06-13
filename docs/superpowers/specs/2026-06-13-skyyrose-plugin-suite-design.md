@@ -65,9 +65,25 @@ One local marketplace, 5 installable plugins. Claude Code exposes every installe
 
 ---
 
-## 4. Completeness standard (end-to-end)
+## 4. Completeness standard + verified gap inventory (deep-dive 2026-06-13)
 
-Every suite skill must meet the prototype-skill bar: valid frontmatter (`name` + `description`), a complete body (purpose, when-to-use, procedure, examples/output spec), zero TODO/placeholder/stub sections. **Audit result (2026-06-13):** suite-bound skills pass; the thin/stub files in the inventory are almost entirely `gsd-*` (excluded). Any suite-bound skill found below the bar during implementation is completed before its plugin is finalized.
+**Standard:** every suite skill = valid frontmatter (`name` + `description`), complete body (purpose, when-to-use, procedure, examples/output), **all referenced companion files present**, zero real placeholders. A content-level audit (not line-count — that first pass was too shallow) ran across all suite skills, then *read the flagged content* to separate real gaps from detector noise.
+
+### Skill gaps — REAL (verified by reading the content)
+| Skill | Gap | Fix |
+|-------|-----|-----|
+| `immersive-architect` | SKILL.md §"Reference Files" promises 4 companion docs that don't exist: `references/{three-js-patterns,gsap-scroll-patterns,ar-mediapipe,woocommerce-3d-embed}.md` | author the 4 reference docs |
+| `immersive-interactive-architect` | same 4 missing `references/*.md` | author (or share immersive-architect's) |
+| `layout` | references `reference/spatial-design.md` (missing) | author it |
+| `wordpress-woocommerce-automation` | references `references/woo-schemas.md` (missing; has `elementor-json.md`) | author it |
+| `woocommerce-code-review` | dangles on sibling skill `woocommerce-copy-guidelines/sentence-case.md` (skill doesn't exist) | create the guideline skill OR inline the rule |
+| `ui-ux-pro-max` | the **user** copy is broken (no SKILL.md — only data/scripts/templates); the **project** copy is complete (377L) | embed the project copy |
+
+### Disproven (detector noise — content verified present, NOT gaps)
+- ~14 "empty section" flags = `#` comments inside fenced code blocks (`# Success`, `# Workflow`) mis-read as markdown headers. `api-design`, `verification-loop`, `docker-patterns`, `python-patterns`, `database-migrations` etc. all have full content.
+- `ui-demo` / `writing-plans` "placeholder" = a literal JS prop `placeholder:` / a skill *describing* what to avoid.
+- `templates/*.html`, `prompts/<agent-slug>.json` = glob / template-variable patterns, not literal files.
+- `learned` "no SKILL.md" = **by design** — a knowledge-store folder (per-pattern `.md` files); it's part of the memory substrate (§7), not an invocable skill.
 
 ### Agent gaps to fill
 | Agent | Gap | Fix |
@@ -77,6 +93,8 @@ Every suite skill must meet the prototype-skill bar: valid frontmatter (`name` +
 | `loop-operator` | 36L — thin | complete to standard |
 | `wp-code-simplifier` | 30L — thin | complete to standard |
 | `deploy-and-verify` | 37L — thin | complete to standard |
+
+**Total fill work:** 8 missing companion docs across 5 skills · 1 source-copy fix · 5 agent completions · embed block on all 25 agents.
 
 ---
 
