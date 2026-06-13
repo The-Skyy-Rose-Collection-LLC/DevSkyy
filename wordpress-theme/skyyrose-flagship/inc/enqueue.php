@@ -592,8 +592,11 @@ function skyyrose_enqueue_template_styles() {
 		skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_min, $global_deps );
 	}
 
-	// Product grid bento layout — landing pages + preorder gateway.
-	if ( in_array( $slug, array( 'landing', 'elementor-editorial', 'preorder-gateway' ), true ) ) {
+	// Product grid bento layout — landing pages, preorder gateway, and
+	// collection pages (their shared product-grid part renders
+	// .product-grid__items, which lays out as full-width stacked blocks
+	// without this stylesheet — bug-112).
+	if ( in_array( $slug, array( 'landing', 'elementor-editorial', 'preorder-gateway', 'collection-standalone' ), true ) ) {
 		$grid_css = $use_min && file_exists( $base_css_dir . '/product-grid.min.css' )
 			? 'product-grid.min.css' : 'product-grid.css';
 		if ( file_exists( $base_css_dir . '/' . $grid_css ) ) {
