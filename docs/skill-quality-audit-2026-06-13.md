@@ -39,8 +39,27 @@ These are correctness issues, not just freshness — several conflict with locke
 | `frontend-design-direction` | thin salvaged PR; no production triad / anti-fingerprint | merge into `frontend-design` or expand |
 | `woocommerce` | generic cookbook; no HPOS / `wc_get_order` data-store / WP.com constraints | add HPOS + data-store; prune boilerplate |
 
-## D. NEEDS-VERIFY at build (auditor flagged a dep/ref unverified — confirm before acting)
-`extract-design` (designlang npm) · `ui-ux-pro-max` (search.py dep + Vietnamese example text) · `accessibility` (ARIA-widget + axe/NVDA gaps; broken refs) · `woocommerce-backend-dev` + `woocommerce-code-review` (companion-file paths) · `wordpress-router` (external node triage script, no fallback) · `eval-harness` (/eval commands wired?) · `agent-eval` (external binary) · `critique` (npx impeccable) · `requesting-code-review` (template + agent name) · `verification-loop` (security scan JS-only — add ruff/bandit) · `executing-plans` (no error-recovery procedure) · `crosspost` (Postbridge setup) · `to-prd`/`to-issues` (foreign `/setup-matt-pocock-skills` dependency — make project-native) · `social-publisher` (socialclaw version pin) · `fastapi-python` (61L — thin; confirm it's a real skill vs alias)
+## D. NEEDS-VERIFY — RESOLVED against filesystem (2026-06-13)
+
+### D1. CONFIRMED real (fix in cleanup pass)
+| Skill | Confirmed issue | Fix |
+|-------|-----------------|-----|
+| `wordpress-router` | depends on **missing** `wp-project-triage` skill; no fallback | add manual triage fallback or inline detection |
+| `crosspost` | Postbridge setup undocumented (0 install mentions) + dead `social-graph-ranker` ref + overlaps `social-publisher` | document setup or drop Postbridge; remove dead ref; dedupe vs social-publisher |
+| `agent-eval` | external binary, **0 install docs** | document install or mark aspirational |
+| `eval-harness` | `/eval` commands not wired to real skills | wire or mark aspirational |
+| `accessibility` | dead `swiftui-patterns` ref + content gaps (ARIA widgets, axe/NVDA testing) | drop dead ref; add ARIA-widget + axe/Playwright a11y sections |
+| `verification-loop` | security scan is JS-only | add ruff/bandit Python phase |
+| `executing-plans` | no error-recovery / escalation procedure | add blocker-handling + retry limit |
+| `woocommerce-code-review` | dead `../woocommerce-copy-guidelines/sentence-case.md` (skill missing) | create guideline or inline the rule |
+| `fastapi-python` | 61L generic; redundant with `fastapi-patterns` (327L) + `fastapi-async-patterns` (791L) | drop or merge into fastapi-patterns |
+| `to-prd` / `to-issues` | `setup-matt-pocock-skills` EXISTS (satisfiable) but runtime issue-tracker config dep remains; structural overlap | make issue-tracker config explicit; dedupe overlap |
+
+### D2. DISPROVEN by filesystem check (NO action)
+- `ui-ux-pro-max` — `scripts/search.py` **exists**; SKILL.md **ASCII-only** (no "Vietnamese"). Complete.
+- `woocommerce-backend-dev` — all 8 companion `.md` (code-entities, hooks, dependency-injection, …) **exist** in-dir. Not dangling.
+- `extract-design` (designlang install documented, 8 mentions), `critique` (npx documented), `social-publisher` (socialclaw documented) — deps OK. social-publisher's only dead ref is `social-graph-ranker` (cosmetic).
+- Sibling refs `liquid-glass-design`, `impeccable`, `setup-matt-pocock-skills` all **exist**.
 
 ## E. DISPROVEN — auditor claims verified FALSE (do NOT act)
 - `frontend-slides` "missing STYLE_PRESETS.md" → **exists** (both copies)
