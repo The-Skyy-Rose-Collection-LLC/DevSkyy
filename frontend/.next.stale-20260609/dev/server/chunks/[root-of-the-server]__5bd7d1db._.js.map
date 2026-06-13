@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 82, "column": 0}, "map": {"version":3,"sources":["file:///Users/theceo/DevSkyy/frontend/proxy.ts"],"sourcesContent":["/**\n * Next.js Proxy — Protects /admin/* routes with NextAuth.js\n *\n * Unauthenticated users are redirected to /login with a callbackUrl\n * so they return to their intended page after signing in.\n *\n * Renamed from middleware.ts → proxy.ts (Next.js 16 convention change).\n */\n\nimport { NextResponse } from 'next/server';\nimport type { NextRequest } from 'next/server';\nimport { getToken } from 'next-auth/jwt';\n\nexport async function proxy(request: NextRequest) {\n  const token = await getToken({ req: request });\n\n  if (!token) {\n    const loginUrl = new URL('/login', request.url);\n    loginUrl.searchParams.set('callbackUrl', request.url);\n    return NextResponse.redirect(loginUrl);\n  }\n\n  return NextResponse.next();\n}\n\nexport const config = {\n  matcher: ['/admin/:path*'],\n};\n"],"names":[],"mappings":";;;;;;AAAA;;;;;;;CAOC,GAED;AAEA;;;AAEO,eAAe,MAAM,OAAoB;IAC9C,MAAM,QAAQ,MAAM,IAAA,oKAAQ,EAAC;QAAE,KAAK;IAAQ;IAE5C,IAAI,CAAC,OAAO;QACV,MAAM,WAAW,IAAI,IAAI,UAAU,QAAQ,GAAG;QAC9C,SAAS,YAAY,CAAC,GAAG,CAAC,eAAe,QAAQ,GAAG;QACpD,OAAO,0JAAY,CAAC,QAAQ,CAAC;IAC/B;IAEA,OAAO,0JAAY,CAAC,IAAI;AAC1B;AAEO,MAAM,SAAS;IACpB,SAAS;QAAC;KAAgB;AAC5B"}}]
-}

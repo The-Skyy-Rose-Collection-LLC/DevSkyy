@@ -1,1 +1,0 @@
-[{"id":"meshy","name":"Meshy","type":"commercial","capabilities":["text-to-3d","image-to-3d"],"avg_generation_time_s":90,"status":"offline"},{"id":"tripo","name":"Tripo","type":"commercial","capabilities":["text-to-3d","image-to-3d"],"avg_generation_time_s":120,"status":"offline"}]
