@@ -12,7 +12,7 @@ export const meta = {
 }
 
 const REPO = '/Users/theceo/DevSkyy'
-const CHARTER = '/Users/theceo/DevSkyy/.claude/workflows/skyyrose-dev-team-context.html'
+const CHARTER = REPO + '/skyyrose-suite/plugins/skyyrose/workflows/skyyrose-dev-team-context.html'
 const READ_FIRST =
   `BEFORE anything else, Read ${CHARTER} in full and obey it. It is the team charter: SkyyRose brand canon, ` +
   `the /efficient-production standard, anti-generic driven examples (good vs bad), the role->skill map, and hard rules. ` +

@@ -16,14 +16,6 @@ Entry point for the SkyyRose Suite. Hand it any task in `$ARGUMENTS` and it rout
    - **Multi-step / cross-domain** (e.g. "launch the drop", "build and ship the landing page") → run the embedded dev-team workflow at `workflows/skyyrose-dev-team.js` (plan → batched build → review-fix loop → WP health sweep → synthesis).
 4. **Honor the guardrails** the orchestrator surfaces: STOP-AND-SHOW before any paid render (gpt-image-2) or production write; product facts resolve through the catalog CSV + per-SKU dossiers only.
 
-## Routing quick reference
+## Routing
 
-| Task shape | Route |
-|------------|-------|
-| copy / email / social / SEO / launch plan | `skyyrose-market` |
-| product image / page / theme / 3D build | `skyyrose-design` |
-| API / backend / migration / plan a feature | `skyyrose-core` |
-| test / review / audit / verify / make-it-pass | `skyyrose-qa` |
-| multi-step spanning the above | dev-team workflow |
-
-If the task is ambiguous, state your interpretation and the chosen route in one line, then proceed.
+The `skyyrose-orchestrator` agent owns the authoritative task→plugin classification table and the handoff graph (see `CROSS-PLUGIN.md`) — this command does not restate it (single source of truth). Pass `$ARGUMENTS` to the orchestrator and follow its decision. If the task is ambiguous, state your interpretation and chosen route in one line, then proceed.
