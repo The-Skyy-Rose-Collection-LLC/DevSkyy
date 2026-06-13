@@ -1,6 +1,6 @@
 ---
 name: fal-ai-media
-description: Unified media generation via fal.ai MCP — image, video, and audio. Covers text-to-image (Nano Banana), text/image-to-video (Seedance, Kling, Veo 3), text-to-speech (CSM-1B), and video-to-audio (ThinkSound). Use when the user wants to generate images, videos, or audio with AI.
+description: Video and audio generation via fal.ai MCP. Covers text/image-to-video (Seedance, Kling, Veo 3), text-to-speech (CSM-1B), and video-to-audio (ThinkSound). For product or still images use the ai-image-generation skill (OpenAI Image 2 is the canonical SkyyRose engine) — fal.ai image models are not used for product imagery. Use when the user wants to generate videos or audio with AI.
 origin: ECC
 ---
 
@@ -10,11 +10,12 @@ Generate images, videos, and audio using fal.ai models via MCP.
 
 ## When to Activate
 
-- User wants to generate images from text prompts
 - Creating videos from text or images
 - Generating speech, music, or sound effects
-- Any media generation task
-- User says "generate image", "create video", "text to speech", "make a thumbnail", or similar
+- Any video/audio generation task
+- User says "create video", "text to speech", "make a video", or similar
+
+> **Product / still images → use the `ai-image-generation` skill** (OpenAI Image 2 / `gpt-image-2`, the canonical SkyyRose product-image engine). fal.ai image models (Nano Banana, etc.) are not used here.
 
 ## MCP Requirement
 
@@ -45,65 +46,11 @@ The fal.ai MCP provides these tools:
 
 ---
 
-## Image Generation
+## Image Generation → use `ai-image-generation`
 
-### Nano Banana 2 (Fast)
-Best for: quick iterations, drafts, text-to-image, image editing.
+SkyyRose product and still imagery is generated with **OpenAI Image 2 (`gpt-image-2`, high fidelity)** via the `ai-image-generation` skill — the locked canonical engine (`project_imagery_engine_oai2`), chosen for repeatable, identity-preserving product renders. **Do not** use fal.ai image models for product imagery. fal.ai's role in this skill is **video and audio only** (below).
 
-```
-generate(
-  model_name: "fal-ai/nano-banana-2",
-  input: {
-    "prompt": "a futuristic cityscape at sunset, cyberpunk style",
-    "image_size": "landscape_16_9",
-    "num_images": 1,
-    "seed": 42
-  }
-)
-```
-
-### Nano Banana Pro (High Fidelity)
-Best for: production images, realism, typography, detailed prompts.
-
-```
-generate(
-  model_name: "fal-ai/nano-banana-pro",
-  input: {
-    "prompt": "professional product photo of wireless headphones on marble surface, studio lighting",
-    "image_size": "square",
-    "num_images": 1,
-    "guidance_scale": 7.5
-  }
-)
-```
-
-### Common Image Parameters
-
-| Param | Type | Options | Notes |
-|-------|------|---------|-------|
-| `prompt` | string | required | Describe what you want |
-| `image_size` | string | `square`, `portrait_4_3`, `landscape_16_9`, `portrait_16_9`, `landscape_4_3` | Aspect ratio |
-| `num_images` | number | 1-4 | How many to generate |
-| `seed` | number | any integer | Reproducibility |
-| `guidance_scale` | number | 1-20 | How closely to follow the prompt (higher = more literal) |
-
-### Image Editing
-Use Nano Banana 2 with an input image for inpainting, outpainting, or style transfer:
-
-```
-# First upload the source image
-upload(file_path: "/path/to/image.png")
-
-# Then generate with image input
-generate(
-  model_name: "fal-ai/nano-banana-2",
-  input: {
-    "prompt": "same scene but in watercolor style",
-    "image_url": "<uploaded_url>",
-    "image_size": "landscape_16_9"
-  }
-)
-```
+Any paid image generation is gated by STOP-AND-SHOW (Action / SKU / Source / Cost → wait for `y`); see the `ai-image-generation` skill for the gate and the `belt`/`gpt-image-2` invocation.
 
 ---
 
@@ -249,7 +196,7 @@ sfx = coll.generate_sound_effect(prompt="thunder crack followed by rain")
 Before generating, check estimated cost:
 
 ```
-estimate_cost(model_name: "fal-ai/nano-banana-pro", input: {...})
+estimate_cost(model_name: "fal-ai/seedance-1-0-pro", input: {...})
 ```
 
 ## Model Discovery
@@ -265,7 +212,7 @@ models()
 ## Tips
 
 - Use `seed` for reproducible results when iterating on prompts
-- Start with lower-cost models (Nano Banana 2) for prompt iteration, then switch to Pro for finals
+- Start with shorter durations and lower-cost video models when iterating, then switch to higher-fidelity models for finals
 - For video, keep prompts descriptive but concise — focus on motion and scene
 - Image-to-video produces more controlled results than pure text-to-video
 - Check `estimate_cost` before running expensive video generations
