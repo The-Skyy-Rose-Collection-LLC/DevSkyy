@@ -37,11 +37,12 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 - [ ] 4.1 HOLD wip/codex-homepage-v2 (51ee222a2). Trigger: OAI render batch re-run + validated
       (sections hard-reference deleted render image paths). Then cherry-pick onto theme branch.
 - [ ] 4.2 HOLD PR #538 (pipeline3d draft). Trigger: founder picks 3D path (tasks/3d-pipeline-handoff.md).
-- [ ] 4.3 Main-checkout cleanup (confirm deletes):
-      frontend/.next.stale-20260609/ (252MB stale build) → delete;
-      scripts/oai_render/CLAUDE.md stub + renders/oai/ + scripts/oai-render-review.py →
-      gitignore or separate commit, NOT on fix/ci-bandit-debt;
-      4 dirty CLAUDE.md files (claude-mem churn) → never stage.
+- [x] 4.3 Main-checkout cleanup — DONE 2026-06-12 (landed on main via 525c6799a):
+      frontend/.next.stale-20260609/ (252MB) DELETED (commit 76acaa98e);
+      claude-mem CLAUDE.md churn ROOT-FIXED — redirected to gitignored CLAUDE.local.md
+      (FOLDER_USE_LOCAL_MD=true) + worker restarted; 265 stub CLAUDE.md deleted, 77
+      stripped, 0 blocks left tracked (commit 525c6799a); prototypes/ gitignored.
+      Doctrine: docs/memory-architecture.html. clip bug-128 + theme v1.6.2 also landed.
 
 **Done when:** main = #537 + #539 + #540(+2 commits) + #534-partition-B + wp-templates + fad555a50;
 #501 + #534 closed; render-fixes worktree gone; every merge locally verified.
