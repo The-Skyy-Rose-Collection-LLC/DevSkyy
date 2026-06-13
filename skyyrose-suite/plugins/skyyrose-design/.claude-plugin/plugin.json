@@ -1,0 +1,9 @@
+{
+  "name": "skyyrose-design",
+  "version": "1.0.0",
+  "description": "SkyyRose design & build: brand-native gpt-image-2 prompt composition (design-master + universal-learner element library), frontend engineering, Three.js & immersive 3D, WordPress/WooCommerce theming (HPOS-aware), accessibility, and layout — wired to the OAI Image 2 render pipeline with STOP-AND-SHOW cost gating.",
+  "author": { "name": "SkyyRose / Corey Foster", "email": "skyyroseco@gmail.com" },
+  "license": "UNLICENSED",
+  "homepage": "https://skyyrose.co",
+  "keywords": ["skyyrose", "design", "imagery", "gpt-image-2", "frontend", "threejs", "immersive", "wordpress", "woocommerce", "accessibility", "luxury-streetwear"]
+}

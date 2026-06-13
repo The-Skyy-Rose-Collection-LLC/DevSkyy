@@ -1,0 +1,174 @@
+{
+  "$schema": "../schemas/agent-brief.schema.json",
+  "agent": "Senior Developer",
+  "mode": "refine",
+  "platform": "standalone-html",
+  "criteria": "luxury",
+  "mission": {
+    "objective": "Execute the consolidated fix manifest atomically (Tier 0 → 1 → 2 → 3 → U), one commit per fix-group, HTML parse verification + canon-pattern grep after each. Implement the Tier U ROI upgrade as final commit. Drive to manifest-complete or surface BLOCKED cleanly.",
+    "founder_feedback": "[RESOLVED-AT-DISPATCH — orchestrator MUST replace this placeholder with verbatim founder quote OR explicit 'ORCHESTRATOR_FORWARDS_FROM_MANIFEST: <path>' before invoking Senior Dev. Static dispatch = stale brief = failed gate.]",
+    "success_metric": "Every fix lands as atomic commit with conventional message. HTML parses after every commit. Acceptance grep checks pass. Tier U upgrade ships production-grade with fallback."
+  },
+  "scope": {
+    "_scope_policy": "FULL-SITE coverage. Senior Developer holds the whole site in context while executing fix-by-fix. Atomic commits stay narrow, but each commit's review verifies no ripple-effect breakage across header/footer/other-pages/widgets.",
+    "header": {
+      "navbar": true,
+      "mobile_nav": true,
+      "announcement_bar": true,
+      "search": true,
+      "account_menu": true,
+      "cart_indicator": true
+    },
+    "page_body": {
+      "pages": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"],
+      "components": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"],
+      "widgets": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"],
+      "layouts": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+    },
+    "footer": {
+      "primary_footer": true,
+      "newsletter_block": true,
+      "link_columns": true,
+      "social_strip": true,
+      "payment_icons": true,
+      "legal_strip": true,
+      "founder_signature": true,
+      "back_to_top": true
+    },
+    "primary_focus_surfaces": ["home"],
+    "scope_note": "primary_focus_surfaces lists what the current fix sprint targets. Senior Developer's commits target those surfaces, but verification (HTML parse + canon grep + diff) runs against the whole document — confirms nothing outside primary scope regressed."
+  },
+  "performance_baseline": {
+    "lcp_seconds": 2.5,
+    "cls": 0.1,
+    "inp_ms": 200,
+    "lighthouse_performance": 95,
+    "lighthouse_accessibility": 100,
+    "lighthouse_seo": 100,
+    "lighthouse_best_practices": 100,
+    "wcag_level": "AA",
+    "image_format_priority": ["avif", "webp", "jpg"],
+    "font_loading": "self-hosted woff2, font-display: swap, preload critical",
+    "js_budget_kb": 200,
+    "css_budget_kb": 100
+  },
+  "deliverables": [
+    {
+      "name": "Modified v2.html with atomic commits",
+      "path": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+      "format": "html",
+      "sections": [
+        "Tier 0 (critical UX) commits",
+        "Tier 1 (canon) commits",
+        "Tier 2 (visual fidelity) commits",
+        "Tier 3 (polish) commits",
+        "Tier U (ROI upgrade) commit"
+      ]
+    },
+    {
+      "name": "Execution report",
+      "path": "stdout",
+      "format": "markdown",
+      "sections": [
+        "Status: DONE | BLOCKED | NEEDS_CONTEXT",
+        "Commits landed (SHA + message per fix-group)",
+        "Tier U upgrade SHA",
+        "Line count before/after",
+        "Self-review grep outputs",
+        "HTML parse final result",
+        "Browser-support matrix for ROI upgrade",
+        "Deferred items"
+      ]
+    }
+  ],
+  "roi_upgrade": {
+    "mandate": "Implement exactly 1 high-ROI advanced web-platform feature as Tier U commit per the Upgrade Mandate.",
+    "category_options": [
+      "CSS scroll-driven animation on .hero__bg.parallax via animation-timeline: scroll() — replaces JS rAF, deletes ~22 LOC, 120fps native, Safari fallback",
+      "View-transitions API choreography between Cover → Hero → Voice → Spread (document.startViewTransition with crossfade)",
+      "CSS Houdini paint worklet for animated gradient overlay on hero (registerPaint, fallback to static linear-gradient)",
+      "Container queries on .spread__tile to swap layouts at component-relative breakpoints (not viewport)",
+      ":has() selector chain for state-driven palette switching (parent inherits child collection context)",
+      "color-mix() at-runtime palette derivation from --sr-accent (tints/shades without preprocessor)",
+      "@scope rule to isolate spread-tile hover effects from BR page palette overrides",
+      "CSS @starting-style for first-render entrance animations (no JS observer needed)",
+      "Native CSS anchor positioning for tooltip / popover on tile hover"
+    ],
+    "constraints": {
+      "self_contained": true,
+      "production_grade": true,
+      "prefers_reduced_motion_safe": true,
+      "browser_fallback_required": true,
+      "single_commit_scope": true
+    }
+  },
+  "constraints": {
+    "no_three_js": true,
+    "no_cdn_dependencies": true,
+    "no_modify_target": false,
+    "canon_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/visual-references.md",
+      "/Users/theceo/DevSkyy/docs/brand/collection-stories.md",
+      "/Users/theceo/DevSkyy/docs/brand/asset-hierarchy.md"
+    ],
+    "locked_out_references": [
+      "Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"
+    ],
+    "working_directory": "/Users/theceo/DevSkyy",
+    "staging_rule": "Stage ONLY docs/brand/design-mockups/v2.html per commit (no git add -A)",
+    "branch_rule": "Work on main, do not push, do not amend prior commits",
+    "verification_commands": [
+      "python3 -c 'import html.parser; p=html.parser.HTMLParser(); p.feed(open(\"docs/brand/design-mockups/v2.html\").read()); print(\"OK\")'",
+      "git log --oneline -<N>",
+      "git diff --name-only HEAD~<N> HEAD",
+      "grep -c '<pattern>' docs/brand/design-mockups/v2.html"
+    ]
+  },
+  "inputs": {
+    "fix_manifest": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-fix-manifest.md",
+    "target": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+    "source_audit_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-amplitude-audit.md",
+      "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-visual-fixes-v2.md",
+      "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-canon-audit-home.md",
+      "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-asset-triage.md"
+    ],
+    "loop_wrapper": {
+      "enabled": true,
+      "max_cycles": 6,
+      "on_block": "stop loop, surface BLOCKED report",
+      "acceptance_check": "html parses + canon-pattern grep counts match expected + git diff shows only target file"
+    }
+  },
+  "return_format": {
+    "max_words": 280,
+    "required_fields": [
+      "status",
+      "commits_landed_count",
+      "tier_U_upgrade_SHA",
+      "line_count_delta",
+      "grep_self_review_outputs",
+      "html_parse_result",
+      "browser_support_matrix",
+      "deferred_items"
+    ],
+    "format": "markdown"
+  },
+  "html_reference_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/references/full-theme-skeleton.html",
+  "memory": {
+    "read_paths": [
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/_shared/INDEX.md",
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/senior-developer/INDEX.md"
+    ],
+    "write_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/senior-developer/",
+    "write_mandate": "Write at least 1 memory entry per dispatch when you compose two CSS systems that conflict (e.g., scroll-driven anim + rAF parallax), discover a browser support quirk requiring `@supports`/feature-detection guard, OR commit-discipline lesson (atomic vs batch). Include exact code excerpt + fallback strategy.",
+    "previous_entries": [
+      "_shared/the-five.md",
+      "_shared/scope-policy.md",
+      "_shared/saas-gate.md",
+      "_shared/stop-and-show.md",
+      "senior-developer/scroll-timeline-supports-pattern.md",
+      "senior-developer/saas-gate-avif-blocked-vs-code.md"
+    ]
+  }
+}

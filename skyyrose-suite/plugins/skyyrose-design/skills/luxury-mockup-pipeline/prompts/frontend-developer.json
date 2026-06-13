@@ -1,0 +1,159 @@
+{
+  "$schema": "../schemas/agent-brief.schema.json",
+  "agent": "Frontend Developer",
+  "mode": "refine",
+  "platform": "standalone-html",
+  "criteria": "luxury",
+  "mission": {
+    "objective": "Asset triage across home surface: confirm dimensions/quality/variants on every image, diagnose 'hero quality terrible', recommend swaps to purpose-built homepage assets, flag asset generation needs.",
+    "founder_feedback": "the hero image quality is still terrible. ... why is the jersey patched displayed. each collection card should be a image of the scene i want.",
+    "success_metric": "Per-asset triage table complete. Quality diagnosis verdict named with root cause. 6 swap recommendations with confirmed-existing target paths."
+  },
+  "scope": {
+    "_scope_policy": "FULL-SITE coverage. Frontend Developer audits assets + performance across every surface — header monogram (alpha needed?), mega-menu featured imagery, hero LCP, body image budgets, product card variants, footer logo, widget icons. Every asset is in scope; missing variants anywhere = perf debt.",
+    "header": {
+      "navbar": true,
+      "mobile_nav": true,
+      "announcement_bar": true,
+      "search": true,
+      "account_menu": true,
+      "cart_indicator": true
+    },
+    "page_body": {
+      "pages": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"],
+      "components": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"],
+      "widgets": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"],
+      "layouts": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+    },
+    "footer": {
+      "primary_footer": true,
+      "newsletter_block": true,
+      "link_columns": true,
+      "social_strip": true,
+      "payment_icons": true,
+      "legal_strip": true,
+      "founder_signature": true,
+      "back_to_top": true
+    },
+    "primary_focus_surfaces": ["home"],
+    "scope_note": "primary_focus_surfaces lists what the current fix sprint targets. Even so, Frontend Developer audits global asset health — payment icons (SVG?), social icons (sprite?), all hero/cover images across all templates, footer logo, monogram alpha state."
+  },
+  "performance_baseline": {
+    "lcp_seconds": 2.5,
+    "cls": 0.1,
+    "inp_ms": 200,
+    "lighthouse_performance": 95,
+    "lighthouse_accessibility": 100,
+    "lighthouse_seo": 100,
+    "lighthouse_best_practices": 100,
+    "wcag_level": "AA",
+    "image_format_priority": ["avif", "webp", "jpg"],
+    "font_loading": "self-hosted woff2, font-display: swap, preload critical",
+    "js_budget_kb": 200,
+    "css_budget_kb": 100
+  },
+  "deliverables": [
+    {
+      "name": "Asset triage report",
+      "path": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-asset-triage.md",
+      "format": "markdown",
+      "sections": [
+        "A — Home asset inventory (table: path / dimensions / size / alpha / variants / verdict)",
+        "B — Quality diagnosis (asset vs filter vs resolution mismatch)",
+        "C — Recommended swaps per surface (cover / hero / 4 spread tiles)",
+        "D — Missing variants",
+        "E — Asset generation needed (flag for user approval; do NOT execute)",
+        "F — ROI Upgrade Proposal (mandatory)"
+      ]
+    }
+  ],
+  "roi_upgrade": {
+    "mandate": "Propose exactly 1 high-ROI asset upgrade per the Upgrade Mandate. Recommend only — do NOT execute paid or compute-heavy operations.",
+    "category_options": [
+      "Transparent monogram via rembg on sr-monogram-rose-gold.webp → outputs to assets/images/branding/sr-monogram-rose-gold-transparent.{avif,webp}",
+      "AVIF re-encode at quality 80 for hero assets (current webp likely 75) → ~30% smaller, sharper edges",
+      "Color-grading LUT applied to hero/cover photos (.cube file applied via canvas processing once, saved as variant)",
+      "Generate missing 480w/768w/1280w/1680w variants for any single-resolution scene asset",
+      "Convert PNG fallbacks to compressed JPEG (95% quality) — only retain PNG when alpha required",
+      "Add 2x retina variants for above-fold LCP assets",
+      "Apply unsharp-mask pre-pass to hero assets to compensate for editorial filter softening"
+    ],
+    "constraints": {
+      "self_contained": true,
+      "production_grade": true,
+      "prefers_reduced_motion_safe": true,
+      "browser_fallback_required": true,
+      "single_commit_scope": true
+    }
+  },
+  "constraints": {
+    "no_three_js": true,
+    "no_cdn_dependencies": true,
+    "no_modify_target": true,
+    "canon_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/asset-hierarchy.md"
+    ],
+    "locked_out_references": [],
+    "working_directory": "/Users/theceo/DevSkyy"
+  },
+  "inputs": {
+    "mockup": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+    "asset_root": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/",
+    "current_home_assets": {
+      "home_cover_bg": "assets/branding/hero/forbidden-midnight-{480,768,1280,1680}w.webp",
+      "home_hero_bg": "assets/branding/hero/forbidden-midnight-{480,768,1280,1680}w.webp (duplicate w/ cover)",
+      "home_hero_lockup": "assets/images/hero-overlays/br-brand-script.{avif,webp,png}",
+      "home_spread_tile_BR": "assets/branding/black-rose-logo-hero.webp",
+      "home_spread_tile_LH": "assets/branding/love-hurts-logo-hero.webp",
+      "home_spread_tile_SIG": "assets/branding/signature-logo-hero.webp",
+      "home_spread_tile_Kids": "assets/images/logos/skyy-rose-collection-circular-patch.webp"
+    },
+    "candidate_swap_targets": {
+      "purpose_built_hero": [
+        "assets/images/homepage-hero-bg.{avif,webp}",
+        "assets/images/homepage-hero-bg-alt.{avif,webp}"
+      ],
+      "purpose_built_collection_cards": [
+        "assets/images/homepage-col-black-rose.{avif,webp}",
+        "assets/images/homepage-col-love-hurts.{avif,webp}",
+        "assets/images/homepage-col-signature.{avif,webp}"
+      ],
+      "kids_fallbacks": [
+        "assets/images/lookbook/lb-kid-black-rose-960w.{avif,webp}",
+        "assets/images/products/kids-001-red-set.{avif,webp}",
+        "assets/images/products/kids-002-purple-set.{avif,webp}"
+      ]
+    },
+    "verification_commands": [
+      "identify <asset>",
+      "ls -la <path>",
+      "file <asset>"
+    ]
+  },
+  "return_format": {
+    "max_words": 180,
+    "required_fields": [
+      "quality_diagnosis_verdict",
+      "six_swap_recommendations",
+      "asset_generation_needed_yes_no",
+      "roi_upgrade_name",
+      "roi_upgrade_one_line_pitch",
+      "deliverable_file_path"
+    ],
+    "format": "markdown"
+  },
+  "html_reference_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/references/full-theme-skeleton.html",
+  "memory": {
+    "read_paths": [
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/_shared/INDEX.md",
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/frontend-developer/INDEX.md"
+    ],
+    "write_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/frontend-developer/",
+    "write_mandate": "Write at least 1 memory entry per dispatch when you discover asset master dimensions, missing variant patterns, alpha-channel quirks in named assets, OR encode-quality sweet-spots (e.g., 'q80 AVIF matches q85 WebP visually'). Cite `identify` output.",
+    "previous_entries": [
+      "_shared/scope-policy.md",
+      "_shared/saas-gate.md",
+      "_shared/stop-and-show.md"
+    ]
+  }
+}
