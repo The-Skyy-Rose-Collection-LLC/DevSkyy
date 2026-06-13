@@ -167,6 +167,25 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 
 ---
 
+## Loop Protocol
+
+Every task runs as a loop, not a line:
+
+1. Write the change.
+2. Run the checks: tests, linter, type checker.
+3. If anything fails, read the error, fix the cause, go back to step 2.
+4. Repeat up to 5 times.
+
+Stop conditions:
+- All checks pass: report "done" with the passing output as proof.
+- 5 attempts used: stop and report what still fails and what you tried.
+- Same error appears twice in a row: stop. You're guessing, not fixing.
+
+Never report "done" without check output from this session.
+Never fix a test by weakening it. Fix the code, not the test.
+
+---
+
 ## Critical Rules
 
 - Files <800 lines, functions <50 lines
@@ -274,6 +293,8 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 - **About page reveal CSS lives in BOTH `about.css` source AND `about.min.css`** as of U-1. Pre-existing source/min drift was repaired during U-1 — `.abt-page .rv` and `.abt-page .rv.is-visible` rules are now in source. The toggled state class changed from `.vis` to `.is-visible` to align with the unified observer.
 - **Theme page creation is one-shot, gated by `SKYYROSE_SETUP_VERSION`** (`inc/theme-activation-setup.php`). Init hook (`add_action('init', ..., 30)`) calls `skyyrose_run_activation_setup()` exactly once per setup version — gate: `if (get_option('skyyrose_activation_setup_version') === SKYYROSE_SETUP_VERSION) return;`. To re-create theme-owned pages that were deleted from WP admin, bump the constant in source. Next request fires `wp_insert_post()` for any missing slug returned by `get_page_by_path()`, assigning `_wp_page_template` meta. Bumped `4.0.0 → 4.1.0` on 2026-05-12 (theme 1.1.2, commit `016f7025f`) to fix DATA-01 where all four `/collection-{slug}/` URLs were serving page-id-9822 (homepage) because the collection pages had been deleted. Post-deploy: pages now resolve to page-id 9454/9455/9456/9651. **DO NOT touch the DB or ask the user to re-create pages manually — bump the constant.**
 - **Cursor/global enqueues that must vary by template gate on `skyyrose_get_current_template_slug()`.** Helper defined in `inc/enqueue.php`, maps `template-immersive-*.php → 'immersive'`. Any enqueue inside `skyyrose_enqueue_global_scripts()` (priority 10, every page) that should be suppressed on immersive must wrap in `if ('immersive' !== skyyrose_get_current_template_slug()) { wp_enqueue_script(...); }`. **CURS-03 fix** (theme 1.1.2, commit `016f7025f`): `skyyrose-luxury-cursor` enqueue at `inc/enqueue.php:247-263` was unconditional; cursor JS shipped to immersive pages where the cursor is CSS-hidden. Now gated; cursor JS no longer downloads on `/experience-{slug}/` URLs. If an asset is CSS-hidden on a template, the JS enqueue should also be suppressed — don't ship dead bytes. The slug helper is the project's canonical mechanism; do not introduce parallel `is_page_template()` checks.
+
+- **Sherpa render identity (2026-06-10, founder-confirmed):** the red-rose closed-jacket render mis-filed at `black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp` is the SIGNATURE Sherpa — renamed to `signature-sherpa-jacket-front-closed.webp` and wired as sg-009 `front_model_image` (was ghost). br-006's true front model = flat `black-rose-sherpa-jacket-front-model.webp` (hooded satin, silver rose). Never reuse `black-rose-sherpa-jacket/` subdir filenames as identity evidence — verify the pixels.
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches

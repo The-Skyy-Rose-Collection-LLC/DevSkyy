@@ -32,7 +32,8 @@ def _import_real_agent():
 async def kernel(tmp_path) -> Kernel:
     k = Kernel(audit_db_path=str(tmp_path / "audit.db"), system_budget_usd=10.0)
     await k.boot()
-    return k
+    yield k
+    await k.close()
 
 
 @pytest.mark.asyncio

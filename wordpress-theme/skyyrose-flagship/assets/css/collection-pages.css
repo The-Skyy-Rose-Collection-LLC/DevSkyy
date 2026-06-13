@@ -8,7 +8,9 @@
 .col-page {
 	background: transparent;
 	color: #fff;
-	overflow-x: hidden;
+	/* clip, not hidden: hidden computes overflow-y:auto and makes .col-page a
+	   scroll container, which un-sticks the pin-narrative stage (bug-111). */
+	overflow-x: clip;
 }
 
 /* ==========================================================================

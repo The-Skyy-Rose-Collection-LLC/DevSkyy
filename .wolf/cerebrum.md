@@ -5,6 +5,7 @@
 > Last updated: 2026-04-07
 
 ## User Preferences
+- **Prototypes = production candidates (2026-06-10).** "Prototype" from founder means: production-ready code, only backend wiring remains, winner merges without rewrite. Zero TODOs even at adapter seams. If model can name a better version, it must BUILD it before presenting — no deferred-quality notes. Enforced by ~/.claude/skills/parallel-prototyping/SKILL.md (min 5 variants, axis matrix, senior standard, self-critique loop).
 
 <!-- How the user likes things done. Code style, tools, patterns, communication. -->
 
@@ -163,3 +164,19 @@ Goal: eliminate fix cycles caused by outdated or assumed API knowledge — spend
 - **Key Learning:** Founder review annotations live in `renders/oai/_review/review-state.json` (review board: `scripts/oai-render-review.py`, port 8944) and flow into prompts via `data/render-corrections.json` → FOUNDER CORRECTIONS block in prompt.py. Keyed by SKU, lines verbatim.
 - **Key Learning:** Split techflats (assets/techflats/split/) are FLAT vector drawings — SKUs whose only garment ref is a split techflat (bridge shorts, kids sets) rendered flat/vector-looking. PHOTOREALISM directive + photorealistic_not_flat QC gate added; if still failing, those SKUs need real photos.
 - **Key Learning:** renders/oai PNGs were deleted from disk ~2-4PM 2026-06-09 (culprit unknown; not mac-cleanup.sh). Paid render outputs must be backed up off-tree immediately after a run — evidence sheets + annotations now committed to the branch for durability.
+
+## Do-Not-Repeat (2026-06-10 consolidation sweep)
+- **Never push `<sha>:branch` without verifying parent direction.** `git log -1 --format=%P <sha>` first; push branch TIPS. PR #540 merged missing its tip (2b2ab382a was child of 409187921, not parent — standup notes listed them in ambiguous order). Recovery: PR #544. Post-merge gate that caught it: `git merge-base --is-ancestor <every-expected-sha> origin/main`.
+- **Standup/audit "mergeable" claims must be tested against CURRENT main** (`git merge-tree`), not branch hygiene. refactor/wp-template-consolidation looked "clean, 1 commit, trivial conflict risk" but was a 50-commits-behind reference snapshot; 9 main commits had rewritten the same 4 templates. Its own commit message said "not mergeable code" — WIP commit messages are load-bearing, read them.
+- **Buglog IDs race across parallel sessions/PRs.** Renumber additively against origin/main's committed max at merge time, and re-check local uncommitted entries after any PR lands buglog changes (local bug-120 collided with PR #545's bug-120..123 → renumbered to bug-124).
+- [2026-06-10] Asset FILENAMES are not identity. black-rose-sherpa-jacket/ subdir held the SIGNATURE Sherpa render (red roses). Before mapping any product image, verify pixels match the SKU's branding_spec. Founder is final authority on garment identity.
+- Founder likes v3 (split-scrollytell register) from landing prototypes — weight scrollytell DNA in future variant sets (2026-06-10)
+- [2026-06-10] Visual-asset references resolve through wordpress-theme/skyyrose-flagship/data/visual-manifest.json (canonical, same tier as catalog CSV). NEVER lay out pages from ad-hoc greps or session memory. Verify: python3 data/verify-visual-manifest.py. New imagery enters manifest in same commit.
+
+- **[2026-06-12] Bash `if fn` suppresses errexit for the ENTIRE function body.** `scripts/deploy-theme.sh` `try_rsync` ran with `set -e` disabled because `transfer_files` calls it as `if try_rsync`; a mid-upload scp death + failed remote extract fell through to `log_success` and the run reported "Deploy complete (verified live)" while live still served the old theme (bug-107). Any function used as a condition needs explicit `|| return 1` on every step that matters.
+- **[2026-06-12] Release verification must grep markers unique to the NEW code, one pattern per grep.** Combined `grep -c "po-gateway|preorder-hero.mp4"` "confirmed" the pre-order port live when only the video filename (present in the OLD template too) matched (bug-108). The decisive, implementation-independent check is the version stamp: live `style.css` `Version:` vs local — now enforced inside deploy verify.
+- **[2026-06-12] `skyyrose_get_collection_products()` is NUMERICALLY indexed; only `skyyrose_get_product_catalog()` is SKU-keyed.** `array_keys()` on a collection array yields [0,1,2…], and `isset($collection['br-006'])` is always false — both shipped briefly as empty grids/panes (bug-110). To resolve SKUs use the catalog; to get SKUs from a collection array use `wp_list_pluck($products, 'sku')`. SIG's template (catalog-based featured pinning) is the reference pattern.
+- **[2026-06-12] Same-version redeploys are doubly blind: the style.css version-stamp gate passes trivially AND `?ver=` asset URLs stay CDN-cached, so changed CSS/JS never reaches clients.** Any deploy carrying user-visible changes must bump SKYYROSE_VERSION — patch bump (1.6.0→1.6.1) is the cache-bust and the verification stamp in one.
+
+- **[2026-06-12] Eval-harness labels are claims, not truth.** When every capable model "fails" the same eval item, pixel-audit the LABEL before tuning the model — br-006 "missing sherpa" label was wrong; 3 judge configs were blamed for being right. Fix: forced visual_analysis CoT field made judge reasoning auditable, which exposed the label.
+- **[2026-06-12] claude-fable-5 rejects forced tool_choice** (400 "not compatible") — always emits thinking blocks. In-process structured-output judges must use sonnet/opus 4.x, or rework to tool_choice:auto.

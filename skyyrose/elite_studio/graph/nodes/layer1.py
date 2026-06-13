@@ -29,7 +29,6 @@ from ._shared import (
     _QC_TOKENS_ESTIMATE,
     _TRYON_EST_COST_USD,
     _VISION_TOKENS_ESTIMATE,
-    _invoke_adk_render_engine,
     _record_cost,
     run_sync,
 )
@@ -136,7 +135,8 @@ def generator_node(state: EliteStudioState) -> dict:
             }
 
     if engine_selector == "adk-render":
-        result = _invoke_adk_render_engine(state["sku"], state["view"])
+        # Resolve through the shim so test patches on graph.nodes apply at call time
+        result = _shim()._invoke_adk_render_engine(state["sku"], state["view"])
     else:
         agent = _shim().GeneratorAgent()
         result = run_sync(

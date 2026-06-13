@@ -201,6 +201,9 @@ async def list_collections(
 @router.delete(
     "/collections/{collection}",
     status_code=status.HTTP_204_NO_CONTENT,
+    # PEP 563 stringifies `-> None`, which FastAPI resolves to NoneType and treats
+    # as a response model — tripping the 204-must-not-have-body assert at import.
+    response_model=None,
     summary="Delete a RAG collection",
     description=(
         "Permanently delete a knowledge-base collection and all its storage. "

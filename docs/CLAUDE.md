@@ -15,7 +15,7 @@ When working on **anything visual, brand-touching, or collection-specific**, rea
 
 | Spec | Status | Scope |
 |------|--------|-------|
-| `docs/superpowers/specs/2026-05-25-v2-mockup-design.md` | Locked + committed 2026-05-25 | v2 design ref at `docs/brand/design-mockups/v2.html` — magazine-as-site, 4 frames (Cover / Hero / Voice / Spread), homepage + Black Rose page |
+| `docs/superpowers/specs/2026-05-25-v2-mockup-design.md` | Spec retained; mockup ERASED 2026-06-10 | v2 design ref `docs/brand/design-mockups/v2.html` deleted by founder (wrong/pre-OAI imagery). Spec survives as composition reference — magazine-as-site, 4 frames (Cover / Hero / Voice / Spread) |
 | `docs/superpowers/specs/2026-05-25-footer-logo-swap.md` | Locked + committed 2026-05-25 | Single-file edit: footer monogram swap to canonical branding tier |
 
 ## Locked rules (do not break)

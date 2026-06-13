@@ -15,7 +15,8 @@ from tests.aos._mocks import MockAgentResult, MockSuperAgent
 async def kernel(tmp_path):
     k = Kernel(audit_db_path=str(tmp_path / "audit.db"), system_budget_usd=100.0)
     await k.boot()
-    return k
+    yield k
+    await k.close()
 
 
 def _register_mock(kernel: Kernel, agent_type: str, **mock_kwargs) -> MockSuperAgent:

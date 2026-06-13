@@ -1,5 +1,53 @@
 # Current Tasks
 
+## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
+
+Source: `~/.claude-mem/STANDUP.md` (10-agent standup; all decisions founder-approved 2026-06-10).
+Context: org Actions block = ALL PR checks red regardless of code. Gate every merge on
+LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
+
+### Phase 1 — Independent quick lands — DONE 2026-06-10
+- [x] 1.1 Merge PR #537 — gate 20/20 tests green; merged `9169db1d`
+- [x] 1.2 Merge PR #539 — php -l + ast + import gates clean; merged `dfe5254c`
+- [x] 1.3 Land fix/ci-bandit-debt (consolidated assets + hook fix; PR #546)
+      [this session: fad555a50 landed via PR #543; PR #546 = parallel session's follow-up, still OPEN]
+- [x] 1.4 Close PR #501 — CLOSED with superseded comment
+
+### Phase 2 — oai_render pipeline — DONE 2026-06-10 (with recovery)
+- [x] 2.1 Pushed 409187921 → feat/oai-render-pipeline. CORRECTION: commit order was inverted —
+      2b2ab382a was the TIP (child of 409187921), not parent; it was stranded by the push.
+- [x] 2.2 PR #540 merged `948b59b25` (51/51 tests + dry-run smoke: 75 imgs/30 SKUs, 3 excluded).
+      Stranded tip recovered via PR #544, merged `0f0ea0c43`, 52/52 tests. Both SHAs verified
+      ancestors of origin/main. Lesson logged as buglog bug-124 (push tips, not assumed parents).
+- [x] 2.3 render-fixes worktree + feat/legal-policies-shipping-sync branch deleted;
+      be3a072c (.claude/-deletion hazard) now unreachable.
+
+### Phase 3 — WP theme — DONE/DEFERRED 2026-06-10
+- [x] 3.1 PR #534 CLOSED; partition B re-cut as PR #545, merged `6fb5350d4`.
+      php -l clean; buglog merged additively (4 entries renumbered bug-120..123); webps carried.
+- [x] 3.2 DEFERRED (founder call 2026-06-10): refactor/wp-template-consolidation is a stale
+      reference snapshot (own commit message says "not mergeable code"); 9 main commits rewrote
+      the 4 landing templates since branch point — merging would wipe brand/a11y/perf work.
+      Branch kept as pattern reference. Redo on current main when templates stabilize.
+- [x] 3.3 Not triggered: #545 = docblocks/artifacts only, no CSS/JS source changes this sweep.
+      NOTE: #539's PDP size-chip JS (min rebuilt in-branch) is on main but NOT yet deployed
+      to skyyrose.co — rides the next deploy train.
+
+### Phase 4 — Holds + hygiene
+- [ ] 4.1 HOLD wip/codex-homepage-v2 (51ee222a2). Trigger: OAI render batch re-run + validated
+      (sections hard-reference deleted render image paths). Then cherry-pick onto theme branch.
+- [ ] 4.2 HOLD PR #538 (pipeline3d draft). Trigger: founder picks 3D path (tasks/3d-pipeline-handoff.md).
+- [ ] 4.3 Main-checkout cleanup (confirm deletes):
+      frontend/.next.stale-20260609/ (252MB stale build) → delete;
+      scripts/oai_render/CLAUDE.md stub + renders/oai/ + scripts/oai-render-review.py →
+      gitignore or separate commit, NOT on fix/ci-bandit-debt;
+      4 dirty CLAUDE.md files (claude-mem churn) → never stage.
+
+**Done when:** main = #537 + #539 + #540(+2 commits) + #534-partition-B + wp-templates + fad555a50;
+#501 + #534 closed; render-fixes worktree gone; every merge locally verified.
+
+---
+
 ## ACTIVE — 3D products on skyyrose.co PDPs (2026-05-31)
 
 **Decisions (founder):** Balanced KTX2+meshopt · Cloudflare R2 hosting · PDP-only · Google `<model-viewer>`.
@@ -151,3 +199,15 @@
 - [ ] Run build.sh to generate missing .min.css/.min.js for new files
 - [ ] Lighthouse audit: target Performance >90, Accessibility >90
 - [ ] Mobile viewport test (375px)
+
+# WP Port — Landing v3 + Pre-Order Flagship (2026-06-12)
+
+Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-scrollytell; pre-order = prototypes/preorder-page/flagship-full-throttle (video hero, conversion-led order).
+
+- [ ] 1. Two parallel port builders (landing v3 → 3 landing templates + landing-scrollytell.css/js; pre-order flagship → template-preorder-gateway.php + preorder-gateway.css/js rewrite, hero-cinematic part with preorder-hero.mp4, WC cart wiring, meters OFF until real stock — edition chips only)
+- [ ] 2. Verify: php -l, PHPCS, escaping/nonces, visual-manifest compliance, .min rebuild, grep source+min
+- [ ] 3. Full sweep clean
+- [ ] 4. STOP-AND-SHOW manifest → deploy (standing auth) → post-verify curl+Playwright mobile+desktop
+- [ ] 5. Logs: memory/cerebrum/anatomy
+
+Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.

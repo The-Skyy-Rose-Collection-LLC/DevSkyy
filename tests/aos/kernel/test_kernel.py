@@ -13,7 +13,8 @@ from aos.kernel.types import ProcessStatus, SpawnRequest
 async def kernel(tmp_path) -> Kernel:
     k = Kernel(audit_db_path=str(tmp_path / "audit.db"))
     await k.boot()
-    return k
+    yield k
+    await k.close()
 
 
 class TestBoot:

@@ -441,3 +441,6 @@ wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analys
 
 # Autonomous coding agent scratch/demo output dir
 my_project/
+renders/oai/
+scripts/oai_render/CLAUDE.md
+scripts/oai-render-review.py
