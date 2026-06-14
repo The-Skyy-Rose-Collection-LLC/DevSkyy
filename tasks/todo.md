@@ -212,3 +212,20 @@ Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-sc
 - [ ] 5. Logs: memory/cerebrum/anatomy
 
 Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.
+
+# Collection Identity SOT (2026-06-14)
+
+Spec: `docs/superpowers/specs/2026-06-14-collection-identity-sot-design.md` (approved). Branch: `feat/collection-identity-sot`.
+Per-collection folders `data/collections/<slug>/` = single source: `identity.json` (canon) + `copy.md` + generated `sot.json` + `index.html`. Canon-driven design-tokens rebuild + OFL fonts (Yellowtail/Kaushan/Pinyon, specimen-confirm). Hard cut-over: repoint all refs → delete all old.
+
+- [ ] P0 Canon scaffold — folder convention + identity.schema.json + 4 hand-authored identity.json + validated load_identity()
+- [ ] P1 Fonts — font-ID specimen confirm → self-host 3 OFL woff2 + @font-face
+- [ ] P2 design-tokens rebuild — generated [data-collection] blocks (corrected palettes + 2-role font stacks)
+- [ ] P3 SOT builder — reads identity.json; per-folder sot.json; _orphans.json set-diff; exists() ext-pref + guarded loads
+- [ ] P4 Designer bundle — copy.md + generated index.html hub (reference + rendered gallery, no image dup)
+- [ ] P5 Verify + tests — drift gate · golden test · unit tests · CI + catalog-drift-guard
+- [ ] **P6 ⛔ GATE — FOUNDER WALKTHROUGH BEFORE ANY DELETE.** Consumer census + exact deletion list + repoint diffs walked through with Corey. NO deletion without explicit sign-off in that walkthrough. (Its own task — do not skip.)
+- [ ] P6 Cut-over — repoint every reference to new SOT → (walkthrough) → delete old artifacts → rebuild .min → update docs/anatomy
+- [ ] P7 Verify + review gate — re-verify green (captured output) · wiring/completeness · harden · /simplify · /code-review · security
+
+Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
