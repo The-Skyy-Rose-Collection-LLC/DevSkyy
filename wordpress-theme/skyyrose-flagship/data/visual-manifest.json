@@ -1,7 +1,7 @@
 {
   "$schema_note": "Canonical visual-asset registry for SkyyRose. Same authority tier as skyyrose-catalog.csv: every page layout, prototype brief, and agent dispatch that places NON-PRODUCT imagery MUST resolve through this file. Product imagery resolves through the catalog CSV (image/front_model_image/back_model_image columns). Paths relative to assets/. An asset used for a collection it is not registered to is a canon violation. status: 'verified' = founder-confirmed or canon-derived; 'needs-founder-review' = best-evidence assignment awaiting Corey's confirmation.",
-  "version": "1.1.0",
-  "updated": "2026-06-11",
+  "version": "1.2.1",
+  "updated": "2026-06-13",
   "collections": [
     "black-rose",
     "love-hurts",
@@ -105,6 +105,24 @@
       "status": "verified",
       "notes": "THE Black Rose Collection script with rose. BLACK lettering — on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
     },
+    "lockup_display": {
+      "path": "images/lockups/black-rose-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/black-rose-script.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
     "lockup_alt": {
       "path": "images/hero-overlays/br-brand-script",
       "formats": [
@@ -137,6 +155,24 @@
         "kind": "collection-portrait",
         "status": "verified",
         "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
+      },
+      {
+        "path": "branding/collection-logo-black-rose",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "BR collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "branding/sr-monogram-blackrose-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-hero-art",
+        "status": "verified",
+        "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
       }
     ],
     "patches": [
@@ -239,6 +275,24 @@
       "status": "verified",
       "notes": "Love Hurts combined red script. The lockup IS the collection name."
     },
+    "lockup_display": {
+      "path": "images/lockups/love-hurts-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/love-hurts-full-lettering.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
     "lockup_parts": [
       {
         "path": "images/hero-overlays/lh-logo-love",
@@ -296,6 +350,24 @@
         "kind": "lettering",
         "status": "verified",
         "notes": "Raster; SVG master available."
+      },
+      {
+        "path": "branding/love-hurts-love-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
+      },
+      {
+        "path": "branding/love-hurts-hurts-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
       }
     ],
     "atmospherics": [
@@ -340,6 +412,24 @@
         "kind": "scene-art",
         "status": "verified",
         "notes": "LH cathedral immersive scene still. Heavy atmospheric — hero/manifesto scale."
+      },
+      {
+        "path": "branding/collection-logo-love-hurts",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "LH collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "branding/love-hurts-neon-star-ref",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo-alt",
+        "status": "verified",
+        "notes": "Red neon star — ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
       }
     ],
     "lookbook": [
@@ -384,6 +474,24 @@
       "status": "verified",
       "notes": "Gold script — doubles as brand lockup (see brand_global). The lockup IS the collection name."
     },
+    "lockup_display": {
+      "path": "images/lockups/signature-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/signature-script.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
     "atmospherics": [
       {
         "path": "images/homepage-col-signature",
@@ -405,6 +513,15 @@
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
+      },
+      {
+        "path": "branding/collection-logo-signature",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
       }
     ],
     "lookbook": [

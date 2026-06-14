@@ -42,6 +42,7 @@ THEME_ROOT: Path = CATALOG_CSV.parent.parent
 WP_ASSETS_DIR: Path = THEME_ROOT / "assets"
 WP_PRODUCTS_DIR: Path = WP_ASSETS_DIR / "images" / "products"
 WP_LOGOS_DIR: Path = WP_ASSETS_DIR / "images" / "logos"
+WP_LOCKUPS_DIR: Path = WP_ASSETS_DIR / "images" / "lockups"
 
 # ─── Elite Studio canonical inputs ─────────────────────────────────────
 ELITE_STUDIO_ROOT: Path = REPO_ROOT / "skyyrose" / "elite_studio"
@@ -109,6 +110,7 @@ __all__ = [
     "THEME_ROOT",
     "UPLOADER_URL",
     "WP_ASSETS_DIR",
+    "WP_LOCKUPS_DIR",
     "WP_LOGOS_DIR",
     "WP_PRODUCTS_DIR",
     "golden_path",

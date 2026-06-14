@@ -30,6 +30,7 @@ REL_FILE="${EDITED_FILE#"$REPO_ROOT/"}"
 
 CATALOG_PATTERNS=(
   "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
+  "wordpress-theme/skyyrose-flagship/data/visual-manifest.json"
   "wordpress-theme/skyyrose-flagship/data/logo-registry.json"
   "wordpress-theme/skyyrose-flagship/data/product-similarities.json"
   "skyyrose/elite_studio/sku_resolver.py"
@@ -71,6 +72,42 @@ done
 if [[ -z "$PYTHON" ]]; then
   exit 0
 fi
+
+# ── Regenerate + verify per-collection SOT (when a SOT master is edited) ───
+# data/collections/*.json are a GENERATED VIEW of three masters (catalog CSV,
+# visual-manifest.json, logo-registry.json). Editing a master without
+# regenerating leaves the view stale — the exact drift that caused repeated
+# wrong-file pick-ups. Regenerate + verify in-session so the view never lags.
+# Placed BEFORE the optional catalog-validator gate so a repo without that
+# validator still keeps the SOT current.
+SOT_MASTERS=(
+  "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
+  "wordpress-theme/skyyrose-flagship/data/visual-manifest.json"
+  "wordpress-theme/skyyrose-flagship/data/logo-registry.json"
+)
+SOT_DATA_DIR="${REPO_ROOT}/wordpress-theme/skyyrose-flagship/data"
+for master in "${SOT_MASTERS[@]}"; do
+  if [[ "$REL_FILE" == "$master" && -f "${SOT_DATA_DIR}/build-collection-sot.py" ]]; then
+    if "$PYTHON" "${SOT_DATA_DIR}/build-collection-sot.py" >/dev/null 2>&1; then
+      if "$PYTHON" "${SOT_DATA_DIR}/verify-collection-sot.py" >/dev/null 2>&1; then
+        echo ""
+        echo "[catalog-drift-guard] per-collection SOT regenerated + verified (data/collections/*.json) after ${REL_FILE} edit."
+        echo ""
+      else
+        echo ""
+        echo "[catalog-drift-guard] WARNING: SOT regenerated but verification FAILED after editing ${REL_FILE}."
+        echo "  Run: python3 wordpress-theme/skyyrose-flagship/data/verify-collection-sot.py   (to see details)"
+        echo ""
+      fi
+    else
+      echo ""
+      echo "[catalog-drift-guard] WARNING: per-collection SOT regeneration FAILED after editing ${REL_FILE}."
+      echo "  Run: python3 wordpress-theme/skyyrose-flagship/data/build-collection-sot.py   (to see details)"
+      echo ""
+    fi
+    break
+  fi
+done
 
 VALIDATOR="${REPO_ROOT}/scripts/validate_catalog_consistency.py"
 if [[ ! -f "$VALIDATOR" ]]; then
