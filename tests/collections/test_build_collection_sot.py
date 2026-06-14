@@ -31,3 +31,15 @@ def test_registered_expands_format_siblings():
     # both siblings must be registered (not orphaned)
     assert not any(o.endswith("homepage-col-black-rose.avif") for o in orph)
     assert not any(o.endswith("homepage-col-black-rose.webp") for o in orph)
+
+
+def test_registered_expands_responsive_dash_siblings():
+    # Responsive width tokens ("480w.webp") are dash-suffixed on disk (base-480w.webp).
+    # hero backdrops + lookbook responsives must ALL be registered, not orphaned.
+    orph = set(json.loads((DATA / "collections" / "_orphans.json").read_text())["orphans"])
+    for f in (
+        "branding/hero/luxury-nighttime-1280w.webp",
+        "branding/hero/forbidden-midnight-480w.webp",
+        "images/lookbook/lb-black-rose-football-960w.avif",
+    ):
+        assert f not in orph, f"{f} should be registered (responsive sibling), not orphaned"

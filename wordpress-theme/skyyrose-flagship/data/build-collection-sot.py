@@ -104,8 +104,11 @@ def expand_formats(entry: dict) -> set[str]:
     base = entry.get("path", "")
     if not base:
         return out
-    for ext in entry.get("formats", []) or []:
-        cand = f"{base}.{ext}"
+    for fmt in entry.get("formats", []) or []:
+        # Plain extensions ("webp") join with a dot; responsive width tokens
+        # ("480w.webp") are dash-suffixed on disk (base-480w.webp).
+        sep = "-" if fmt[:1].isdigit() else "."
+        cand = f"{base}{sep}{fmt}"
         if (ASSETS / cand).is_file():
             out.add(cand)
     r = sot_common.resolve_asset(base)
