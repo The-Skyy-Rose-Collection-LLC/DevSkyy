@@ -235,64 +235,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   COLLECTION-DISTINCT DISPLAY FONTS (added 2026-05-24)
-   Each collection gets typography that matches its visual asset DNA:
-   - Yellowtail        → Love Hurts (bold brush script, matches graffiti lettering)
-   - Italiana          → Signature + Kids Capsule (high-contrast didone, matches monogram)
-   - Pinyon Script     → Signature + KC monogram accent (calligraphic flourish)
-   - UnifrakturMaguntia → Black Rose gothic accent (optional, for blackletter moments)
-   All Apache 2.0 / OFL licensed — commercial-safe, self-hosted.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ─── Yellowtail (Love Hurts display) ─────────────────────────────── */
-@font-face {
-	font-family: 'Yellowtail';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url('../fonts/collections/yellowtail-latin.woff2') format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ─── Italiana (Signature + KC display) ───────────────────────────── */
-@font-face {
-	font-family: 'Italiana';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url('../fonts/collections/italiana-latin.woff2') format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ─── Pinyon Script (Signature + KC monogram-style accent) ────────── */
-@font-face {
-	font-family: 'Pinyon Script';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url('../fonts/collections/pinyon-script-latin.woff2') format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ─── UnifrakturMaguntia (Black Rose gothic accent, optional) ─────── */
-@font-face {
-	font-family: 'UnifrakturMaguntia';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url('../fonts/collections/unifraktur-maguntia-latin.woff2') format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
    SOT COLLECTION SCRIPT FONTS (added 2026-06-14)
    Per-collection interior heading/accent voice — referenced by
    identity.json fonts.script.woff2 (assets/fonts/ root, not collections/).
