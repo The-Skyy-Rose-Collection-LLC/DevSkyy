@@ -218,14 +218,15 @@ Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N
 Spec: `docs/superpowers/specs/2026-06-14-collection-identity-sot-design.md` (approved). Branch: `feat/collection-identity-sot`.
 Per-collection folders `data/collections/<slug>/` = single source: `identity.json` (canon) + `copy.md` + generated `sot.json` + `index.html`. Canon-driven design-tokens rebuild + OFL fonts (Yellowtail/Kaushan/Pinyon, specimen-confirm). Hard cut-over: repoint all refs → delete all old.
 
-- [x] P0 Canon scaffold — schema + 4 identity.json + load_identity() (commits 7e4ad264c, df25936f4, 232225497)
-- [x] P1 Fonts — Yellowtail/Kaushan/Pinyon self-hosted woff2 + @font-face (commit f3b1a4ad0)
-- [ ] P2 design-tokens rebuild — generated [data-collection] blocks (corrected palettes + 2-role font stacks)
-- [x] P3 SOT builder loader — sot_common.py validated loader + ext-pref resolver (commits 3026518dc, 421984f7d); per-folder sot.json builder rewrite still pending (its own step)
-- [ ] P4 Designer bundle — copy.md + generated index.html hub (reference + rendered gallery, no image dup)
-- [ ] P5 Verify + tests — drift gate · golden test · unit tests · CI + catalog-drift-guard
-- [ ] **P6 ⛔ GATE — FOUNDER WALKTHROUGH BEFORE ANY DELETE.** Consumer census + exact deletion list + repoint diffs walked through with Corey. NO deletion without explicit sign-off in that walkthrough. (Its own task — do not skip.)
-- [ ] P6 Cut-over — repoint every reference to new SOT → (walkthrough) → delete old artifacts → rebuild .min → update docs/anatomy
+- [x] P0 Canon scaffold — schema + 4 identity.json + load_identity() (7e4ad264c, df25936f4, 232225497)
+- [x] P1 Fonts — Yellowtail/Kaushan/Pinyon self-hosted woff2 + @font-face (f3b1a4ad0)
+- [x] P2 design-tokens rebuild — generated [data-collection] blocks; palettes fixed, accent-rgb preserved, 2-role fonts, font-gothic dropped, LH secondary fixed (5cfe4fc92, 8e90f601d)
+- [x] P3/SOT builder — sot_common.py loader + ext-pref resolver + responsive-aware builder → per-folder sot.json + global _orphans.json (3026518dc, 421984f7d, b528b0536, e32f008eb)
+- [x] P4 Designer bundle — 4 copy.md (verbatim canon) + generated index.html hub (62bfd5ef1)
+- [x] P5 Verify + tests — full drift gate + golden test; 20 unit tests green; verifier 33/33 SKUs, 0 broken refs (78678d44f). [catalog-drift-guard hook re-point deferred to P6]
+- [x] P6 census — DONE (non-destructive). FINDING: ZERO repoint work — no production PHP/JS/Python reads the flat JSONs or data/collections/. Cut-over = pure deletion w/ proof of zero consumers.
+- [ ] **P6 ⛔ GATE — FOUNDER WALKTHROUGH BEFORE ANY DELETE.** ← CURRENT STOP. Deletion list below; awaiting Corey sign-off.
+- [ ] P6 Cut-over (post-walkthrough) — delete old artifacts (below) → rebuild .min → re-point catalog-drift-guard hook → update docs/anatomy
 - [ ] P7 Verify + review gate — re-verify green (captured output) · wiring/completeness · harden · /simplify · /code-review · security
 
 Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
