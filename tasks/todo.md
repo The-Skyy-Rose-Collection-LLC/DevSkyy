@@ -225,9 +225,9 @@ Per-collection folders `data/collections/<slug>/` = single source: `identity.jso
 - [x] P4 Designer bundle — 4 copy.md (verbatim canon) + generated index.html hub (62bfd5ef1)
 - [x] P5 Verify + tests — full drift gate + golden test; 20 unit tests green; verifier 33/33 SKUs, 0 broken refs (78678d44f). [catalog-drift-guard hook re-point deferred to P6]
 - [x] P6 census — DONE (non-destructive). FINDING: ZERO repoint work — no production PHP/JS/Python reads the flat JSONs or data/collections/. Cut-over = pure deletion w/ proof of zero consumers.
-- [ ] **P6 ⛔ GATE — FOUNDER WALKTHROUGH BEFORE ANY DELETE.** ← CURRENT STOP. Deletion list below; awaiting Corey sign-off.
-- [ ] P6 Cut-over (post-walkthrough) — delete old artifacts (below) → rebuild .min → re-point catalog-drift-guard hook → update docs/anatomy
-- [ ] P7 Verify + review gate — re-verify green (captured output) · wiring/completeness · harden · /simplify · /code-review · security
+- [x] **P6 ⛔ GATE — FOUNDER WALKTHROUGH.** APPROVED 2026-06-14 ("Yes — run cut-over + P7").
+- [x] P6 Cut-over — deleted flat JSONs + retired woff2 + old fonts.css block → rebuilt .min → re-pointed catalog-drift-guard hook (identity.json trigger) → updated README/docs (commit 56bb9a898).
+- [x] P7 Verify + review gate — 20 unit tests green · drift gate 33/33 SKUs 0 broken refs · holistic review VERDICT ship · CSS-injection fix landed (font.family schema pattern, 02ca2b7fc) · 4 LOW/INFO follow-ups logged on PR #550.
 
 Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
 
