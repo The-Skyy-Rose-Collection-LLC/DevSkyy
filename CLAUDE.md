@@ -17,6 +17,33 @@ You are the DevSkyy engineering agent. 100% quality, no stubs, no partial delive
 
 ---
 
+## Verification Protocol — Always Verify with Authoritative Sources
+
+**Every claim, fix, and "done" is backed by the RIGHT verification for what is being verified.** Pick the method by the *kind* of claim — never verify a visual with a grep, a live page with WebFetch, or a library API from memory. If you can't verify it, say so.
+
+| What you're verifying | Authoritative method | Gotcha |
+|---|---|---|
+| Library / framework / SDK / API usage | **Context7** (`resolve-library-id` → `query-docs`) | Mandatory before any non-stdlib code — training data is stale. |
+| Visual / UI / live-page rendering | **Chrome DevTools MCP** or **Playwright MCP** — navigate + screenshot/snapshot, mobile **and** desktop | Eyes-on proof for skyyrose.co, not just an HTTP code. |
+| Live HTML / JSON-LD / OG tags / headers | `curl -s "URL?cb=$(date +%s)" \| grep` | **NEVER WebFetch** — it strips `<script>` (JSON-LD/OG). Cache-bust (WP.com Batcache serves stale). |
+| Codebase facts (paths, symbols, exports, signatures) | **Read / Grep / Glob** the source; quote `file:line` | Anatomy.md first; don't trust memory for code that may have moved. |
+| Product facts (SKU, price, name, collection) | **catalog CSV** + per-SKU dossier + `identity.json` / `sot.json` | Canonical-sources-only. Memory rots; the CSV doesn't. |
+| Non-product imagery ownership | **visual-manifest.json** (+ generated `sot.json`) | Filenames are NOT identity — the manifest is. Verify pixels if in doubt. |
+| Prior work / "did we solve this?" | **mem-search** / `get_observations([IDs])` | Check before re-deriving; cite obs IDs. |
+| API connectivity / integration up-or-down | A real `verify_connectivity()` call | Don't declare blocked OR working without the proof. |
+| Test pass / fail | `rtk proxy pytest …` (true exit code) + read output | Bare pytest's compressed line can falsely say "no tests collected". |
+| WP deploy result | Post-verify `curl` (HTTP 200, ≥50KB, no PHP-error markers) **+ Playwright** | Cache-bust the curl; eyes-on after. |
+| Package availability / version | `pip show X` / `npm ls X` / the registry | Don't assume a dependency is installed. |
+| Recent web facts (prices, events, status) | **WebSearch** | Only when the answer depends on current state. |
+| Existing implementation to reuse | `gh search code` / `gh search repos` | Search before writing net-new. |
+| What a render / image actually shows | **Read the image** (vision); `identify` for metadata | One-shot batch quota — batch reads, never retry (all fail once exceeded). |
+
+**Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
+
+> Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
+
+---
+
 ## Commands by Workspace
 
 ### Python API (root)
