@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 DATA = Path(__file__).resolve().parents[2] / "wordpress-theme/skyyrose-flagship/data"
 SCHEMA = DATA / "collections/identity.schema.json"
 
@@ -12,8 +14,6 @@ def test_schema_is_valid_jsonschema():
     jsonschema.Draft202012Validator.check_schema(schema)  # raises if schema itself is malformed
     assert schema["required"]  # has required keys
 
-
-import pytest
 
 SLUGS = ["black-rose", "love-hurts", "signature", "kids-capsule"]
 EXPECTED_PALETTE = {
