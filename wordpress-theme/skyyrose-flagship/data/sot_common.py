@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Shared, validated readers for the per-collection SOT pipeline.
+
+Single place that loads the masters (identity.json, visual-manifest.json,
+logo-registry.json) and resolves asset paths. Both build-collection-sot.py and
+verify-collection-sot.py import from here so resolution + validation never drift.
+"""
+
+import json
+import sys
+from pathlib import Path
+
+DATA = Path(__file__).resolve().parent
+sys.path.insert(0, str(DATA.parents[2]))
+from skyyrose.core.paths import WP_ASSETS_DIR  # noqa: E402
+
+ASSETS = WP_ASSETS_DIR
+COLLECTIONS_DIR = DATA / "collections"
+SCHEMA = COLLECTIONS_DIR / "identity.schema.json"
+MANIFEST = DATA / "visual-manifest.json"
+LOGO_REG = DATA / "logo-registry.json"
+
+# webp first = preferred; resolve_asset honors THIS order, not alphabetical glob order.
+IMG_EXTS = (".webp", ".avif", ".png", ".jpg", ".jpeg", ".svg", ".mp4", ".webm")
+
+
+class IdentityError(Exception):
+    """identity.json failed schema validation or could not be read."""
+
+
+def slug_to_key(slug: str) -> str:
+    return slug.replace("-", "_")
+
+
+def _load_json(path: Path):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except FileNotFoundError as e:
+        raise IdentityError(f"required master missing: {path}") from e
+    except json.JSONDecodeError as e:
+        raise IdentityError(f"malformed JSON in {path}: {e}") from e
+
+
+def load_manifest():
+    return _load_json(MANIFEST)
+
+
+def load_logo_registry():
+    return _load_json(LOGO_REG)
+
+
+def load_identity() -> dict:
+    """Return {slug: identity dict} for every collection folder, schema-validated."""
+    import jsonschema
+
+    schema = _load_json(SCHEMA)
+    out = {}
+    for d in sorted(p for p in COLLECTIONS_DIR.iterdir() if p.is_dir()):
+        fp = d / "identity.json"
+        if not fp.is_file():
+            continue
+        ident = _load_json(fp)
+        try:
+            jsonschema.validate(ident, schema)
+        except jsonschema.ValidationError as e:
+            raise IdentityError(f"{fp}: {e.message}") from e
+        if ident["slug"] != d.name:
+            raise IdentityError(f"{fp}: slug '{ident['slug']}' != folder '{d.name}'")
+        if ident["key"] != slug_to_key(ident["slug"]):
+            raise IdentityError(f"{fp}: key must be slug_to_key('{ident['slug']}')")
+        out[d.name] = ident
+    if not out:
+        raise IdentityError(f"no identity.json found under {COLLECTIONS_DIR}")
+    return out
+
+
+def resolve_asset(rel: str) -> str | None:
+    """assets-relative path (possibly extension-less) -> real file rel-path, else None.
+
+    For an extension-less base, return the sibling whose extension ranks first in
+    IMG_EXTS (webp before avif), NOT the alphabetically-first glob hit.
+    """
+    if not rel:
+        return None
+    rel = rel.replace("assets/", "", 1) if rel.startswith("assets/") else rel
+    p = ASSETS / rel
+    if p.is_file():
+        return rel
+    parent = p.parent
+    if not parent.is_dir():
+        return None
+    cands = [f for f in parent.glob(p.name + "*") if f.is_file() and f.suffix.lower() in IMG_EXTS]
+    if not cands:
+        return None
+    cands.sort(key=lambda f: (IMG_EXTS.index(f.suffix.lower()), f.name))
+    return str(cands[0].relative_to(ASSETS))
