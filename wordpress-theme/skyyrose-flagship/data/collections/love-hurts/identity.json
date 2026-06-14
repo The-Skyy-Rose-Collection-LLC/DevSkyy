@@ -15,6 +15,7 @@
     "black": "#0A0A0A",
     "accent": "#DC143C",
     "accent_dark": "#9B0F2E",
+    "secondary": "#9B0F2E",
     "bg": "#0A0A0A",
     "text": "#F5F5F5"
   },

@@ -17,10 +17,20 @@ def test_schema_is_valid_jsonschema():
 
 SLUGS = ["black-rose", "love-hurts", "signature", "kids-capsule"]
 EXPECTED_PALETTE = {
-    "black-rose": {"black", "white", "silver", "accent", "accent_dark", "bg", "text"},
-    "love-hurts": {"red", "red_dark", "white", "black", "accent", "accent_dark", "bg", "text"},
-    "signature": {"gold", "rose_gold", "accent", "accent_dark", "bg", "text"},
-    "kids-capsule": {"gold", "rose_gold", "accent", "accent_dark", "bg", "text"},
+    "black-rose": {"black", "white", "silver", "accent", "accent_dark", "secondary", "bg", "text"},
+    "love-hurts": {
+        "red",
+        "red_dark",
+        "white",
+        "black",
+        "accent",
+        "accent_dark",
+        "secondary",
+        "bg",
+        "text",
+    },
+    "signature": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
+    "kids-capsule": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
 }
 SCRIPT_FONT = {
     "black-rose": "Yellowtail",

@@ -265,40 +265,47 @@ html {
 	--skyyrose-radius:       2px;
 }
 
+/* GENERATED:collection-tokens START — do not edit; run data/gen-design-tokens.py */
 [data-collection="black-rose"] {
 	--skyyrose-accent:       #C0C0C0;
 	--skyyrose-accent-rgb:   192, 192, 192;
-	--skyyrose-accent-dark:  #999;
-	--skyyrose-secondary:    #DC143C;
-	--skyyrose-font-display: 'Cinzel', serif;
-	--skyyrose-font-gothic:  'UnifrakturMaguntia', 'Cinzel', serif;
+	--skyyrose-accent-dark:  #999999;
+	--skyyrose-secondary:    #FFFFFF;
+	--skyyrose-font-script:  'Yellowtail', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
+}
+
+[data-collection="kids-capsule"] {
+	--skyyrose-accent:       #D4AF37;
+	--skyyrose-accent-rgb:   212, 175, 55;
+	--skyyrose-accent-dark:  #B8960C;
+	--skyyrose-secondary:    #B76E79;
+	--skyyrose-font-script:  'Pinyon Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
 }
 
 [data-collection="love-hurts"] {
 	--skyyrose-accent:       #DC143C;
 	--skyyrose-accent-rgb:   220, 20, 60;
 	--skyyrose-accent-dark:  #9B0F2E;
-	--skyyrose-secondary:    #B76E79;
-	--skyyrose-font-display: 'Yellowtail', 'Playfair Display', cursive, serif;
+	--skyyrose-secondary:    #9B0F2E;
+	--skyyrose-font-script:  'Kaushan Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
 }
 
 [data-collection="signature"] {
 	--skyyrose-accent:       #D4AF37;
 	--skyyrose-accent-rgb:   212, 175, 55;
 	--skyyrose-accent-dark:  #B8960C;
-	--skyyrose-secondary:    #F7E7CE;
-	--skyyrose-font-display: 'Italiana', 'Playfair Display', serif;
+	--skyyrose-secondary:    #B76E79;
 	--skyyrose-font-script:  'Pinyon Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
 }
-
-[data-collection="kids-capsule"] {
-	--skyyrose-accent:       #B76E79;
-	--skyyrose-accent-rgb:   183, 110, 121;
-	--skyyrose-accent-dark:  #9A5662;
-	--skyyrose-secondary:    #D4AF37;
-	--skyyrose-font-display: 'Italiana', 'Playfair Display', serif;
-	--skyyrose-font-script:  'Pinyon Script', cursive;
-}
+/* GENERATED:collection-tokens END */
 
 /* ═══════════════════════════════════════════════════════════════════
    §3  Reduced Motion — Override duration tokens
