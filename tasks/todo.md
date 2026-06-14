@@ -218,10 +218,10 @@ Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N
 Spec: `docs/superpowers/specs/2026-06-14-collection-identity-sot-design.md` (approved). Branch: `feat/collection-identity-sot`.
 Per-collection folders `data/collections/<slug>/` = single source: `identity.json` (canon) + `copy.md` + generated `sot.json` + `index.html`. Canon-driven design-tokens rebuild + OFL fonts (Yellowtail/Kaushan/Pinyon, specimen-confirm). Hard cut-over: repoint all refs → delete all old.
 
-- [ ] P0 Canon scaffold — folder convention + identity.schema.json + 4 hand-authored identity.json + validated load_identity()
-- [ ] P1 Fonts — font-ID specimen confirm → self-host 3 OFL woff2 + @font-face
+- [x] P0 Canon scaffold — schema + 4 identity.json + load_identity() (commits 7e4ad264c, df25936f4, 232225497)
+- [x] P1 Fonts — Yellowtail/Kaushan/Pinyon self-hosted woff2 + @font-face (commit f3b1a4ad0)
 - [ ] P2 design-tokens rebuild — generated [data-collection] blocks (corrected palettes + 2-role font stacks)
-- [ ] P3 SOT builder — reads identity.json; per-folder sot.json; _orphans.json set-diff; exists() ext-pref + guarded loads
+- [x] P3 SOT builder loader — sot_common.py validated loader + ext-pref resolver (commits 3026518dc, 421984f7d); per-folder sot.json builder rewrite still pending (its own step)
 - [ ] P4 Designer bundle — copy.md + generated index.html hub (reference + rendered gallery, no image dup)
 - [ ] P5 Verify + tests — drift gate · golden test · unit tests · CI + catalog-drift-guard
 - [ ] **P6 ⛔ GATE — FOUNDER WALKTHROUGH BEFORE ANY DELETE.** Consumer census + exact deletion list + repoint diffs walked through with Corey. NO deletion without explicit sign-off in that walkthrough. (Its own task — do not skip.)
@@ -229,3 +229,11 @@ Per-collection folders `data/collections/<slug>/` = single source: `identity.jso
 - [ ] P7 Verify + review gate — re-verify green (captured output) · wiring/completeness · harden · /simplify · /code-review · security
 
 Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
+
+## P6 DELETION CENSUS (running list — for the founder walkthrough; NOTHING deleted until sign-off)
+- Flat `data/collections/{black-rose,love-hurts,signature,kids-capsule}.json` — superseded by per-folder `sot.json`.
+- `assets/css/fonts.css` OLD `collections/` @font-face section: `Italiana` + `UnifrakturMaguntia` (NOT in canon — dead), and the superseded `Yellowtail`/`Pinyon Script` blocks pointing at `../fonts/collections/` (now duplicated by the canonical root-path blocks added in P1; root wins via cascade so site is correct, but the old blocks are dead weight).
+- `assets/fonts/collections/{italiana,unifraktur-maguntia,yellowtail,pinyon-script}-latin.woff2` — old placeholder/duplicate font files (canon now uses root `assets/fonts/{yellowtail,kaushan-script,pinyon-script}-latin.woff2`).
+- `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
+- Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
+- NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.
