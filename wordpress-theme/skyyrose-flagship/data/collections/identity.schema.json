@@ -48,7 +48,7 @@
       "additionalProperties": false,
       "required": ["family", "woff2", "source"],
       "properties": {
-        "family": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9 ]*$"},
         "woff2": {"type": ["string", "null"]},
         "source": {"type": "string", "minLength": 1}
       }
