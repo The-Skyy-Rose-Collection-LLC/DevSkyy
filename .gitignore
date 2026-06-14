@@ -316,6 +316,38 @@ open-claude-code/
 .aidesigner/
 .mcp.json
 
+# Third-party AI coding-assistant config dirs. Each contains ONLY symlinks
+# mirroring skills from .agents/skills/ (gitignored) — so they are DEAD on a
+# fresh clone. Untracked in the repo-cleanup pass; kept on disk locally.
+.adal/
+.augment/
+.bob/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
 # OpenWolf session-local state (churns every action — not content, ignore)
 .wolf/memory.md
 .wolf/token-ledger.json
