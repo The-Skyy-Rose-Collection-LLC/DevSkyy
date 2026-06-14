@@ -1,0 +1,422 @@
+{
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Signature. Canon = identity.json.",
+  "collection": "signature",
+  "name": "Signature",
+  "updated": "GENERATED",
+  "story": {
+    "seed": "The beginning of it all \u2014 where it started from.",
+    "doc_ref": "docs/brand/collection-stories.md#signature"
+  },
+  "palette": {
+    "gold": "#D4AF37",
+    "rose_gold": "#B76E79",
+    "accent": "#D4AF37",
+    "accent_dark": "#B8960C",
+    "secondary": "#B76E79",
+    "bg": "#0A0A0A",
+    "text": "#F5E6D3"
+  },
+  "fonts": {
+    "script": {
+      "family": "Pinyon Script",
+      "woff2": "assets/fonts/pinyon-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
+  },
+  "masters": {
+    "identity": "data/collections/signature/identity.json",
+    "products": "data/skyyrose-catalog.csv",
+    "imagery": "data/visual-manifest.json",
+    "logos": "data/logo-registry.json"
+  },
+  "lockup": {
+    "canonical": "images/lockups/signature-lockup.webp",
+    "display_webp": {
+      "path": "images/lockups/signature-lockup.webp",
+      "resolved": "images/lockups/signature-lockup.webp",
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup \u2014 gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
+    },
+    "svg_master": {
+      "path": "branding/vectorized/signature-script.svg",
+      "resolved": "branding/vectorized/signature-script.svg",
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
+    "source_art": {
+      "path": "images/hero-overlays/sig-brand-skyy-rose-gold",
+      "resolved": "images/hero-overlays/sig-brand-skyy-rose-gold.webp",
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Gold script \u2014 doubles as brand lockup (see brand_global). The lockup IS the collection name."
+    },
+    "alt": null,
+    "rule": "The lockup IS the collection name; never type-render it."
+  },
+  "imagery": {
+    "scene_portrait": {
+      "path": "images/homepage-col-signature",
+      "resolved": "images/homepage-col-signature.webp",
+      "kind": "collection-portrait",
+      "status": "verified",
+      "notes": "Signature world art. Collection cards/panels/portals."
+    },
+    "hero_backdrop": null,
+    "atmospherics": [
+      {
+        "path": "images/logos/rose-gold-rose",
+        "resolved": "images/logos/rose-gold-rose.webp",
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
+      },
+      {
+        "path": "branding/collection-logo-signature",
+        "resolved": "branding/collection-logo-signature.jpg",
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
+      }
+    ],
+    "patches": [],
+    "lettering_alt": [],
+    "lockup_parts": [],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-rose-hoodie-beanie",
+        "resolved": "images/lookbook/lb-rose-hoodie-beanie-480w.webp",
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "Rose hoodie + beanie worn, editorial. Signature (founder-confirmed 2026-06-11)."
+      }
+    ]
+  },
+  "logos": [
+    {
+      "id": "rose-gold-rose",
+      "file": "rose-gold-rose.jpeg",
+      "resolved": "images/logos/rose-gold-rose.jpeg",
+      "primary_color": "#B76E79",
+      "notes": "SIGNATURE COLLECTION LOGO (paired with red-roses-cloud-cluster). Standalone stylized rose in rose-gold metallic. Used on sg-015 The Windbreaker Set (left chest "
+    },
+    {
+      "id": "red-roses-cloud-cluster",
+      "file": "red-roses-cloud-cluster.jpeg",
+      "resolved": "images/logos/red-roses-cloud-cluster.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "DUAL-COLLECTION RED ROSE CLUSTER. Cluster of red roses with green thorns emerging from clouds. Used on BOTH Signature collection (sg-009 The Sherpa Jacket front"
+    }
+  ],
+  "products": [
+    {
+      "sku": "sg-001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "price": "195",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-001-bay-bridge-shorts.jpeg",
+          "resolved": "images/products/sg-001-bay-bridge-shorts.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/bridge-bay-bridge-shorts-front-model.webp",
+          "resolved": "images/products/bridge-bay-bridge-shorts-front-model.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/the-bay-set-back-model.webp",
+          "resolved": "images/products/the-bay-set-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/bridge-bay-bridge-shorts-back-model.webp",
+          "resolved": "images/products/bridge-bay-bridge-shorts-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-bridge-series-the-bay-bridge-shorts.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "price": "65",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-002-stay-golden-shirt.jpeg",
+          "resolved": "images/products/sg-002-stay-golden-shirt.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/stay-golden-tee-front-model.webp",
+          "resolved": "images/products/stay-golden-tee-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/stay-golden-tee-back-model.webp",
+          "resolved": "images/products/stay-golden-tee-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-bridge-series-stay-golden-shirt.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-003",
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "price": "65",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-003-stay-golden-shorts.jpeg",
+          "resolved": "images/products/sg-003-stay-golden-shorts.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/bridge-stay-golden-shorts-front-model.webp",
+          "resolved": "images/products/bridge-stay-golden-shorts-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/bridge-stay-golden-shorts-back-model.webp",
+          "resolved": "images/products/bridge-stay-golden-shorts-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-bridge-series-stay-golden-shorts.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-005",
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "price": "25",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-005-bay-bridge-shirt.jpeg",
+          "resolved": "images/products/sg-005-bay-bridge-shirt.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/bridge-bay-bridge-shirt-front-model.webp",
+          "resolved": "images/products/bridge-bay-bridge-shirt-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/bridge-bay-bridge-shirt-back-model.webp",
+          "resolved": "images/products/bridge-bay-bridge-shirt-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-bridge-series-the-bay-bridge-shirt.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-006",
+      "name": "Mint & Lavender Hoodie",
+      "price": "45",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-006-mint-lavender-hoodie.png",
+          "resolved": "images/products/sg-006-mint-lavender-hoodie.png"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/sg-006-ghost-front.webp",
+          "resolved": "images/products/ghost/sg-006-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/mint-lavender-hoodie-back-model.webp",
+          "resolved": "images/products/mint-lavender-hoodie-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/mint-lavender-hoodie-back-model.webp",
+          "resolved": "images/products/mint-lavender-hoodie-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/mint-lavender-hoodie.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-007",
+      "name": "The Signature Beanie",
+      "price": "25",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-007-signature-beanie.png",
+          "resolved": "images/products/sg-007-signature-beanie.png"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/signature-beanie-front-model.webp",
+          "resolved": "images/products/signature-beanie-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/signature-beanie-back-model.webp",
+          "resolved": "images/products/signature-beanie-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-signature-beanie.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "price": "80",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-009-sherpa-jacket.jpeg",
+          "resolved": "images/products/sg-009-sherpa-jacket.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/signature-sherpa-jacket-front-closed.webp",
+          "resolved": "images/products/signature-sherpa-jacket-front-closed.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/the-sherpa-jacket-back-model.webp",
+          "resolved": "images/products/the-sherpa-jacket-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/signature-sherpa-jacket-back-model.webp",
+          "resolved": "images/products/signature-sherpa-jacket-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-sherpa-jacket.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-011",
+      "name": "Original Label Tee (White)",
+      "price": "30",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-011-original-label-tee-white.jpeg",
+          "resolved": "images/products/sg-011-original-label-tee-white.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/sg-011-ghost-front.webp",
+          "resolved": "images/products/ghost/sg-011-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/original-label-tee-white-back-model.webp",
+          "resolved": "images/products/original-label-tee-white-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/original-label-tee-white-back-model.webp",
+          "resolved": "images/products/original-label-tee-white-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/original-label-tee-white.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "price": "30",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-012-original-label-tee-orchid.jpeg",
+          "resolved": "images/products/sg-012-original-label-tee-orchid.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/original-label-tee-orchid-front-model.webp",
+          "resolved": "images/products/original-label-tee-orchid-front-model.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/original-label-tee-orchid-back-model.webp",
+          "resolved": "images/products/original-label-tee-orchid-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/original-label-tee-orchid-back-model.webp",
+          "resolved": "images/products/original-label-tee-orchid-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/original-label-tee-orchid.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-013",
+      "name": "Mint & Lavender Crewneck",
+      "price": "40",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-013-mint-lavender-crewneck.jpeg",
+          "resolved": "images/products/sg-013-mint-lavender-crewneck.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/sg-013-ghost-front.webp",
+          "resolved": "images/products/ghost/sg-013-ghost-front.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/mint-lavender-crewneck-back-model.webp",
+          "resolved": "images/products/mint-lavender-crewneck-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/mint-lavender-crewneck.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-014",
+      "name": "Mint & Lavender Sweatpants",
+      "price": "45",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-014-mint-lavender-sweatpants.jpeg",
+          "resolved": "images/products/sg-014-mint-lavender-sweatpants.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/sg-014-ghost-front.webp",
+          "resolved": "images/products/ghost/sg-014-ghost-front.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/mint-lavender-sweatpants-back-model.webp",
+          "resolved": "images/products/mint-lavender-sweatpants-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/mint-lavender-sweatpants.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "sg-015",
+      "name": "The Windbreaker Set",
+      "price": "85",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/sg-015-windbreaker-set.jpg",
+          "resolved": "images/products/sg-015-windbreaker-set.jpg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/signature-windbreaker-set-front-model.webp",
+          "resolved": "images/products/signature-windbreaker-set-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/signature-windbreaker-set-back-model.webp",
+          "resolved": "images/products/signature-windbreaker-set-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-windbreaker-set.md",
+      "dossier_exists": true
+    }
+  ],
+  "unresolved_product_images": []
+}

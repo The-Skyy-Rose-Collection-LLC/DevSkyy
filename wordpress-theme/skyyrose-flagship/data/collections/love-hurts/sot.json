@@ -1,0 +1,358 @@
+{
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Love Hurts. Canon = identity.json.",
+  "collection": "love-hurts",
+  "name": "Love Hurts",
+  "updated": "GENERATED",
+  "story": {
+    "seed": "Beauty and the Beast told from the Beast's perspective, through luxury attire.",
+    "doc_ref": "docs/brand/collection-stories.md#love-hurts"
+  },
+  "palette": {
+    "red": "#DC143C",
+    "red_dark": "#9B0F2E",
+    "white": "#FFFFFF",
+    "black": "#0A0A0A",
+    "accent": "#DC143C",
+    "accent_dark": "#9B0F2E",
+    "secondary": "#FFFFFF",
+    "bg": "#0A0A0A",
+    "text": "#F5F5F5"
+  },
+  "fonts": {
+    "script": {
+      "family": "Kaushan Script",
+      "woff2": "assets/fonts/kaushan-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
+  },
+  "masters": {
+    "identity": "data/collections/love-hurts/identity.json",
+    "products": "data/skyyrose-catalog.csv",
+    "imagery": "data/visual-manifest.json",
+    "logos": "data/logo-registry.json"
+  },
+  "lockup": {
+    "canonical": "images/lockups/love-hurts-lockup.webp",
+    "display_webp": {
+      "path": "images/lockups/love-hurts-lockup.webp",
+      "resolved": "images/lockups/love-hurts-lockup.webp",
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup \u2014 full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
+    },
+    "svg_master": {
+      "path": "branding/vectorized/love-hurts-full-lettering.svg",
+      "resolved": "branding/vectorized/love-hurts-full-lettering.svg",
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
+    "source_art": {
+      "path": "images/hero-overlays/lh-logo-combined",
+      "resolved": "images/hero-overlays/lh-logo-combined.webp",
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Love Hurts combined red script. The lockup IS the collection name."
+    },
+    "alt": null,
+    "rule": "The lockup IS the collection name; never type-render it."
+  },
+  "imagery": {
+    "scene_portrait": {
+      "path": "images/homepage-col-love-hurts",
+      "resolved": "images/homepage-col-love-hurts.webp",
+      "kind": "collection-portrait",
+      "status": "verified",
+      "notes": "LH world art. Collection cards/panels/portals."
+    },
+    "hero_backdrop": {
+      "path": "branding/hero/beauty-and-beast",
+      "resolved": "branding/hero/beauty-and-beast-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "verified",
+      "notes": "Love Hurts cinematic backdrop (founder-assigned 2026-06-11). LH heroes/manifesto surfaces."
+    },
+    "atmospherics": [
+      {
+        "path": "images/logos/red-roses-cloud-cluster",
+        "resolved": "images/logos/red-roses-cloud-cluster.webp",
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Red roses on clouds. LH surfaces only (red roses = Love Hurts register)."
+      },
+      {
+        "path": "images/logos/heart-rose-composite",
+        "resolved": "images/logos/heart-rose-composite.webp",
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Heart + rose composite. LH emotional register."
+      },
+      {
+        "path": "images/immersive/scene-love-hurts-cathedral",
+        "resolved": "images/immersive/scene-love-hurts-cathedral.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "LH cathedral immersive scene still. Heavy atmospheric \u2014 hero/manifesto scale."
+      },
+      {
+        "path": "branding/collection-logo-love-hurts",
+        "resolved": "branding/collection-logo-love-hurts.jpg",
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "LH collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "branding/love-hurts-neon-star-ref",
+        "resolved": "branding/love-hurts-neon-star-ref.jpg",
+        "kind": "collection-logo-alt",
+        "status": "verified",
+        "notes": "Red neon star \u2014 ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
+      }
+    ],
+    "patches": [],
+    "lettering_alt": [
+      {
+        "path": "images/logos/love-hurts-full-lettering",
+        "resolved": "images/logos/love-hurts-full-lettering.webp",
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Full lettering raster. SVG masters exist: branding/vectorized/love-hurts-full-lettering.svg, love-lettering.svg, hurts-lettering.svg (use SVG when crispness at scale matters)."
+      },
+      {
+        "path": "images/logos/love-lettering",
+        "resolved": "images/logos/love-lettering.webp",
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Raster; SVG master available."
+      },
+      {
+        "path": "images/logos/hurts-lettering",
+        "resolved": "images/logos/hurts-lettering.webp",
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Raster; SVG master available."
+      },
+      {
+        "path": "branding/love-hurts-love-hero",
+        "resolved": "branding/love-hurts-love-hero.webp",
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
+      },
+      {
+        "path": "branding/love-hurts-hurts-hero",
+        "resolved": "branding/love-hurts-hurts-hero.webp",
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
+      }
+    ],
+    "lockup_parts": [
+      {
+        "path": "images/hero-overlays/lh-logo-love",
+        "resolved": "images/hero-overlays/lh-logo-love.webp",
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Love' script alone \u2014 stacked/split hero compositions."
+      },
+      {
+        "path": "images/hero-overlays/lh-logo-hurts",
+        "resolved": "images/hero-overlays/lh-logo-hurts.webp",
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Hurts' script alone."
+      }
+    ],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-love-hurts-varsity",
+        "resolved": "images/lookbook/lb-love-hurts-varsity-480w.webp",
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "LH varsity jacket worn, editorial."
+      }
+    ]
+  },
+  "logos": [
+    {
+      "id": "red-roses-cloud-cluster",
+      "file": "red-roses-cloud-cluster.jpeg",
+      "resolved": "images/logos/red-roses-cloud-cluster.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "DUAL-COLLECTION RED ROSE CLUSTER. Cluster of red roses with green thorns emerging from clouds. Used on BOTH Signature collection (sg-009 The Sherpa Jacket front"
+    },
+    {
+      "id": "heart-rose-composite",
+      "file": "heart-rose-composite.jpeg",
+      "resolved": "images/logos/heart-rose-composite.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "LOVE HURTS COLLECTION LOGO. Red heart wrapped in thorns with roses emerging from the top, blood splatters. The Love Hurts 'heart-and-rose' composite logo. Canon"
+    },
+    {
+      "id": "love-hurts-full-lettering",
+      "file": "love-hurts-full-lettering.jpeg",
+      "resolved": "images/logos/love-hurts-full-lettering.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "LOVE HURTS WORDMARK. Full 'Love Hurts' graffiti lettering with heart+thorns composite integrated. Used as large sublimated element on Love Hurts basketball shor"
+    },
+    {
+      "id": "love-lettering",
+      "file": "love-lettering.jpeg",
+      "resolved": "images/logos/love-lettering.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "Split 'Love' graffiti lettering component of the Love Hurts wordmark. Available for layouts where Love/Hurts are placed separately."
+    },
+    {
+      "id": "hurts-lettering",
+      "file": "hurts-lettering.jpeg",
+      "resolved": "images/logos/hurts-lettering.jpeg",
+      "primary_color": "#DC143C",
+      "notes": "Split 'Hurts' graffiti lettering component of the Love Hurts wordmark. Pairs with love-lettering for split layouts."
+    }
+  ],
+  "products": [
+    {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers (Black)",
+      "price": "95",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/lh-002-joggers.jpeg",
+          "resolved": "images/products/lh-002-joggers.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/lh-002-ghost-front.webp",
+          "resolved": "images/products/ghost/lh-002-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/love-hurts-joggers-back-model.webp",
+          "resolved": "images/products/love-hurts-joggers-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/love-hurts-joggers-back-model.webp",
+          "resolved": "images/products/love-hurts-joggers-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/love-hurts-joggers.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "lh-003",
+      "name": "Love Hurts Basketball Shorts",
+      "price": "75",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/lh-003-shorts.jpeg",
+          "resolved": "images/products/lh-003-shorts.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/lh-003-ghost-front.webp",
+          "resolved": "images/products/ghost/lh-003-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/lh-003-real-back.jpg",
+          "resolved": "images/products/lh-003-real-back.jpg"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/love-hurts-basketball-shorts-back-model.webp",
+          "resolved": "images/products/love-hurts-basketball-shorts-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/love-hurts-basketball-shorts.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "lh-004",
+      "name": "Love Hurts Bomber Jacket",
+      "price": "265",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/lh-004-bomber.png",
+          "resolved": "images/products/lh-004-bomber.png"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/lh-004-ghost-front.webp",
+          "resolved": "images/products/ghost/lh-004-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/lh-004-bomber-back.png",
+          "resolved": "images/products/lh-004-bomber-back.png"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/love-hurts-bomber-back-model.webp",
+          "resolved": "images/products/love-hurts-bomber-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/love-hurts-bomber-jacket.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "price": "45",
+      "is_preorder": true,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/lh-005-fannie.jpeg",
+          "resolved": "images/products/lh-005-fannie.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/the-fannie-front-model.webp",
+          "resolved": "images/products/the-fannie-front-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/the-fannie-back-model.webp",
+          "resolved": "images/products/the-fannie-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/the-fannie.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "lh-006",
+      "name": "Love Hurts Joggers (White)",
+      "price": "95",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/lh-006-joggers-white.jpeg",
+          "resolved": "images/products/lh-006-joggers-white.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/lh-006-ghost-front.webp",
+          "resolved": "images/products/ghost/lh-006-ghost-front.webp"
+        },
+        "back_image": {
+          "path": "assets/images/products/love-hurts-joggers-white-back-model.webp",
+          "resolved": "images/products/love-hurts-joggers-white-back-model.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/love-hurts-joggers-white-back-model.webp",
+          "resolved": "images/products/love-hurts-joggers-white-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/love-hurts-joggers-white.md",
+      "dossier_exists": true
+    }
+  ],
+  "unresolved_product_images": []
+}
