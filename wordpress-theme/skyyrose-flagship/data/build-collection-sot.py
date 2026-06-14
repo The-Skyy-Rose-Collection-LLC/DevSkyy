@@ -12,6 +12,7 @@ their declared `formats`, so format siblings (avif/png of a webp role) count as 
 USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD]
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -186,15 +187,17 @@ def logos_for(slug, key, logo_reg):
 def build_collection(slug, ident, manifest, logo_reg, products, updated):
     key = ident["key"]
     mc = manifest.get(key, {})
-    imagery = imagery_block(mc)
+    full = imagery_block(mc)
     lockup = {
         "canonical": sot_common.resolve_asset(ident["lockup"]["ref"]),
-        "display_webp": imagery.pop("lockup_display"),
-        "svg_master": imagery.pop("lockup_svg_master"),
-        "source_art": imagery.pop("lockup_source_art"),
-        "alt": imagery.pop("lockup_alt"),
+        "display_webp": full["lockup_display"],
+        "svg_master": full["lockup_svg_master"],
+        "source_art": full["lockup_source_art"],
+        "alt": full["lockup_alt"],
         "rule": "The lockup IS the collection name; never type-render it.",
     }
+    lockup_keys = {"lockup_display", "lockup_svg_master", "lockup_source_art", "lockup_alt"}
+    imagery = {k: v for k, v in full.items() if k not in lockup_keys}
     return {
         "_generated_by": "data/build-collection-sot.py — DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
         "_authority": f"Single Source of Truth view for {ident['name']}. Canon = identity.json.",
@@ -224,9 +227,15 @@ def build_collection(slug, ident, manifest, logo_reg, products, updated):
 
 
 def main() -> int:
-    updated = "GENERATED"
-    if "--updated" in sys.argv:
-        updated = sys.argv[sys.argv.index("--updated") + 1]
+    parser = argparse.ArgumentParser(
+        description="Generate per-collection SOT JSON + the global _orphans.json."
+    )
+    parser.add_argument(
+        "--updated",
+        default="GENERATED",
+        help="Value for each sot.json 'updated' field, e.g. 2026-06-14.",
+    )
+    updated = parser.parse_args().updated
     idents = sot_common.load_identity()
     manifest = sot_common.load_manifest()
     logo_reg = sot_common.load_logo_registry()

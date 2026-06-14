@@ -48,6 +48,13 @@ def main() -> int:
     idents = sot_common.load_identity()
     body = "\n".join(block(idents[s]) for s in sorted(idents))
     css = CSS.read_text()
+    if START not in css or END not in css:
+        print(
+            f"ERROR: {CSS} is missing the GENERATED:collection-tokens markers "
+            f"('{START.strip()}' ... '{END.strip()}') — cannot regenerate the region.",
+            file=sys.stderr,
+        )
+        return 1
     s = css.index(START)
     e = css.index(END)
     line_end = css.index("\n", s) + 1

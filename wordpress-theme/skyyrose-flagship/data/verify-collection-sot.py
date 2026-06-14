@@ -15,6 +15,7 @@ DATA = Path(__file__).resolve().parent
 sys.path.insert(0, str(DATA))
 sys.path.insert(0, str(DATA.parents[2]))
 import sot_common  # noqa: E402
+
 from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
 
 OUT = DATA / "collections"
@@ -48,7 +49,9 @@ def main() -> int:
     before = CSS.read_text()
     subprocess.run([sys.executable, str(DATA / "gen-design-tokens.py")], check=True)
     if CSS.read_text() != before:
-        hard.append("design-tokens.css collection region is STALE — run gen-design-tokens.py and commit")
+        hard.append(
+            "design-tokens.css collection region is STALE — run gen-design-tokens.py and commit"
+        )
 
     for slug, ident in idents.items():
         fp = OUT / slug / "sot.json"
@@ -62,8 +65,8 @@ def main() -> int:
             hard.append(f"{slug}: catalog SKUs missing from SOT: {sorted(miss)}")
         if extra := sot_skus - expected:
             hard.append(f"{slug}: SOT SKUs not in catalog: {sorted(extra)}")
-        for role in ("script", "caps", "body"):
-            w = ident["fonts"][role]["woff2"]
+        for role, font in ident["fonts"].items():
+            w = font["woff2"]
             if w and not sot_common.resolve_asset(w):
                 hard.append(f"{slug}: font {role} woff2 missing: {w}")
         walk_resolved(sot.get("lockup", {}), slug, hard)
