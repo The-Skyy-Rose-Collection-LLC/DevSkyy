@@ -9,6 +9,7 @@ verify-collection-sot.py import from here so resolution + validation never drift
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 DATA = Path(__file__).resolve().parent
 sys.path.insert(0, str(DATA.parents[2]))
@@ -32,14 +33,16 @@ def slug_to_key(slug: str) -> str:
     return slug.replace("-", "_")
 
 
-def _load_json(path: Path):
+def _load_json(path: Path) -> Any:
     try:
         with open(path, encoding="utf-8") as fh:
             return json.load(fh)
     except FileNotFoundError as e:
         raise IdentityError(f"required master missing: {path}") from e
-    except json.JSONDecodeError as e:
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
         raise IdentityError(f"malformed JSON in {path}: {e}") from e
+    except OSError as e:
+        raise IdentityError(f"cannot read {path}: {e}") from e
 
 
 def load_manifest():
@@ -50,7 +53,7 @@ def load_logo_registry():
     return _load_json(LOGO_REG)
 
 
-def load_identity() -> dict:
+def load_identity() -> dict[str, Any]:
     """Return {slug: identity dict} for every collection folder, schema-validated."""
     import jsonschema
 
@@ -78,8 +81,12 @@ def load_identity() -> dict:
 def resolve_asset(rel: str) -> str | None:
     """assets-relative path (possibly extension-less) -> real file rel-path, else None.
 
-    For an extension-less base, return the sibling whose extension ranks first in
-    IMG_EXTS (webp before avif), NOT the alphabetically-first glob hit.
+    Resolution order for an extension-less base:
+      1. exact-stem siblings (``base.ext``) — preferred,
+      2. then prefix siblings (``base*`` — e.g. responsive ``-480w.webp`` variants),
+    and within each group the extension ranking in IMG_EXTS (webp before avif),
+    NOT the alphabetically-first glob hit. Exact-stem-first prevents ``front`` from
+    resolving to ``front-model.webp`` when ``front.webp`` exists.
     """
     if not rel:
         return None
@@ -90,8 +97,13 @@ def resolve_asset(rel: str) -> str | None:
     parent = p.parent
     if not parent.is_dir():
         return None
-    cands = [f for f in parent.glob(p.name + "*") if f.is_file() and f.suffix.lower() in IMG_EXTS]
-    if not cands:
-        return None
-    cands.sort(key=lambda f: (IMG_EXTS.index(f.suffix.lower()), f.name))
-    return str(cands[0].relative_to(ASSETS))
+
+    def ranked(files) -> list[Path]:
+        usable = [f for f in files if f.is_file() and f.suffix.lower() in IMG_EXTS]
+        usable.sort(key=lambda f: (IMG_EXTS.index(f.suffix.lower()), f.name))
+        return usable
+
+    for group in (ranked(parent.glob(p.name + ".*")), ranked(parent.glob(p.name + "*"))):
+        if group:
+            return str(group[0].relative_to(ASSETS))
+    return None

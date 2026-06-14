@@ -76,3 +76,23 @@ def test_resolve_asset_prefers_webp_over_avif(tmp_path, monkeypatch):
     (tmp_path / "x.avif").write_bytes(b"a")
     (tmp_path / "x.webp").write_bytes(b"w")
     assert sot_common.resolve_asset("x").endswith("x.webp")  # IMG_EXTS preference, not alphabetical
+
+
+def test_resolve_asset_exact_stem_beats_prefix_sibling(tmp_path, monkeypatch):
+    monkeypatch.setattr(sot_common, "ASSETS", tmp_path)
+    (tmp_path / "front.webp").write_bytes(b"w")
+    (tmp_path / "front-model.webp").write_bytes(b"m")
+    # exact stem 'front.webp' must win over the prefix sibling 'front-model.webp'
+    assert sot_common.resolve_asset("front").endswith("front.webp")
+
+
+def test_resolve_asset_prefix_fallback_for_responsive(tmp_path, monkeypatch):
+    monkeypatch.setattr(sot_common, "ASSETS", tmp_path)
+    (tmp_path / "luxury-480w.webp").write_bytes(b"w")  # responsive sibling, no exact base.ext
+    assert sot_common.resolve_asset("luxury").endswith("luxury-480w.webp")
+
+
+def test_load_json_unreadable_path_raises_identity_error(tmp_path):
+    # a directory (not a file) triggers OSError, which must surface as IdentityError
+    with pytest.raises(sot_common.IdentityError):
+        sot_common._load_json(tmp_path)
