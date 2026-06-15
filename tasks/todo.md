@@ -1,5 +1,26 @@
 # Current Tasks
 
+## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
+
+Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
+the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
+Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
+`/mcp` (→ `api.devskyy.app/mcp/`); reuse the backend both surfaces already call.
+
+- [x] P0 Research — Context7 confirmed `app.mount("/mcp", mcp.streamable_http_app())` +
+      `session_manager.run()` in lifespan + Bearer auth. SDK FastMCP already has the methods.
+- [x] P1 HTTP mount — `api/mcp_mount.py` + lifespan wrap + mount in main_enterprise.
+      Fixed double-path (`streamable_http_path="/"`). Verified: `/mcp/` → 200 + session.
+- [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
+      200 with. Enforced when token set; warns if unset in non-dev.
+- [ ] P3 Backend deploy ⚠️ STOP-AND-SHOW — deploy api.devskyy.app + set MCP_SERVICE_TOKEN secret.
+- [ ] P4 Dashboard AI console — `app/api/mcp` server-side MCP client proxy + `app/admin/mcp`
+      tool console UI. Deploy Vercel ⚠️.
+- [ ] P5 WP-admin buttons — `inc/mcp-bridge.php` (nonce+cap gated → /mcp) + expose WC
+      catalog/orders as MCP resources (read direction). Deploy skyyrose.co ⚠️.
+- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
 Source: `~/.claude-mem/STANDUP.md` (10-agent standup; all decisions founder-approved 2026-06-10).
