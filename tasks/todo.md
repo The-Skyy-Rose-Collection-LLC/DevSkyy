@@ -14,9 +14,12 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       Fixed double-path (`streamable_http_path="/"`). Verified: `/mcp/` → 200 + session.
 - [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
       200 with. Enforced when token set; warns if unset in non-dev.
-- [ ] P3 Backend deploy ⚠️ STOP-AND-SHOW — deploy api.devskyy.app + set MCP_SERVICE_TOKEN secret.
-- [ ] P4 Dashboard AI console — `app/api/mcp` server-side MCP client proxy + `app/admin/mcp`
-      tool console UI. Deploy Vercel ⚠️.
+- [x] P3a fly.toml pinned to 1 always-on machine (commit 624631520); MCP_SERVICE_TOKEN generated.
+- [ ] P3b Backend deploy ⚠️ STOP-AND-SHOW — `fly deploy --ha=false -a devskyy` + `fly secrets set
+      MCP_SERVICE_TOKEN=…` (runbook delivered; user runs — flyctl not in this env). PENDING.
+- [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
+      console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
+      Vercel deploy ⚠️ PENDING.
 - [ ] P5 WP-admin buttons — `inc/mcp-bridge.php` (nonce+cap gated → /mcp) + expose WC
       catalog/orders as MCP resources (read direction). Deploy skyyrose.co ⚠️.
 - [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
