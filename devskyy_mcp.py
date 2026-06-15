@@ -24,6 +24,8 @@ Usage:
 
 import sys
 
+from utils.logging_utils import configure_logging
+
 from mcp_tools import mcp  # noqa: F401 - re-export for deploy script compatibility
 from mcp_tools.server import API_BASE_URL, API_KEY
 
@@ -31,6 +33,9 @@ if __name__ == "__main__":
     # stdio transport uses STDOUT as the JSON-RPC channel \u2014 every human-readable
     # line must go to stderr, and must never crash startup on an unencodable glyph.
     sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
+    # structlog defaults to stdout — re-route it to stderr for stdio mode so logs
+    # never pollute the JSON-RPC channel. Scoped here; the FastAPI app keeps stdout.
+    configure_logging(json_output=True, stream=sys.stderr)
 
     # Validate configuration
     if not API_KEY:

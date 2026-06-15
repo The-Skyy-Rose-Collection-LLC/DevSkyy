@@ -2156,5 +2156,27 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-15"
+  },
+  {
+    "id": "bug-135",
+    "timestamp": "2026-06-15",
+    "error_message": "MCP stdio tool calls failed end-to-end: (1) structlog logged to STDOUT, polluting the JSON-RPC channel; (2) empty DEVSKYY_API_KEY produced 'Authorization: Bearer ' -> httpx LocalProtocolError 'Illegal header value' before the request was sent.",
+    "file": "utils/logging_utils.py, devskyy_mcp.py, mcp_tools/api_client.py",
+    "root_cause": "structlog.PrintLoggerFactory() defaults to sys.stdout; for a stdio MCP server stdout is the JSON-RPC transport. Separately, api_client.py built the Authorization header unconditionally as f'Bearer {API_KEY}', so an empty key (the default \u2014 no key is configured anywhere) yielded a malformed header httpx refuses to send.",
+    "fix": "configure_logging() gained a `stream` param (default None -> stdout, FastAPI app unchanged); devskyy_mcp.py re-calls it with sys.stderr in stdio mode only. api_client.py now sets Authorization only when API_KEY is truthy. Verified: stdout 0 non-JSON-RPC lines, 0 bearer errors, tool_completed success=true, request reaches backend GET /api/v1/agents/list.",
+    "tags": [
+      "mcp",
+      "stdio",
+      "structlog",
+      "stdout",
+      "httpx",
+      "auth",
+      "devskyy_mcp"
+    ],
+    "related_bugs": [
+      "bug-134"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-15"
   }
 ]
