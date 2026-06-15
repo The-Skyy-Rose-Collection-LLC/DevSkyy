@@ -20,9 +20,19 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
 - [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
       console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
       Vercel deploy ⚠️ PENDING.
-- [ ] P5 WP-admin buttons — `inc/mcp-bridge.php` (nonce+cap gated → /mcp) + expose WC
-      catalog/orders as MCP resources (read direction). Deploy skyyrose.co ⚠️.
+- [x] P5 WP-admin console — `inc/mcp-bridge.php` (PHP streamable-HTTP client: initialize →
+      notifications/initialized → tools/call, SSE-frame parse, session DELETE teardown;
+      SSRF-guarded via `skyyrose_see_is_safe_url`; Bearer from SKYYROSE_MCP_TOKEN const/env/option).
+      Tools → DevSkyy MCP page + `assets/js/admin-mcp-console.js` (createElement only, no innerHTML),
+      nonce + `manage_options` gated AJAX relay. Wired in functions.php after fastapi-client.php.
+      WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
+      (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
+      php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
 - [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+
+  Deploy order (each ⚠️ STOP-AND-SHOW): P3b backend `fly deploy --ha=false -a devskyy`
+  (+ `fly secrets set MCP_SERVICE_TOKEN=…`) → P4 Vercel env (MCP_URL + MCP_SERVICE_TOKEN) →
+  P5 `bash scripts/deploy-theme.sh` → P6 E2E. WP deploy is inert until the backend `/mcp/` is live.
 
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 

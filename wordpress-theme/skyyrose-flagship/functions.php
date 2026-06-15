@@ -87,6 +87,7 @@ $skyyrose_core_includes = array(
 	'/inc/klaviyo-integration.php',
 	'/inc/experience-engine.php',
 	'/inc/fastapi-client.php',
+	'/inc/mcp-bridge.php',
 	'/inc/rest-api-experience.php',
 	'/inc/personalization.php',
 	'/inc/performance-guardian.php',
