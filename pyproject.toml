@@ -164,6 +164,7 @@ api = [
 
 mcp = [
     "mcp>=1.23.0",
+    "fastmcp==3.0.0",  # standalone FastMCP 3.0 (pinned; SDK-bundled mcp.server.fastmcp still used by devskyy_mcp)
     "openai>=1.57.2",
     "anthropic>=0.75.0",
     "google-genai>=1.50.0",

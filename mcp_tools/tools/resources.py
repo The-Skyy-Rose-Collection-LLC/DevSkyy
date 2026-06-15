@@ -25,7 +25,7 @@ from mcp_tools.types import ResponseFormat
 )
 @secure_tool("list_agents")
 async def list_agents(response_format: ResponseFormat = ResponseFormat.MARKDOWN) -> str:
-    """List all 54 DevSkyy AI agents with capabilities.
+    """List all DevSkyy AI agents with capabilities.
 
     Get a comprehensive directory of all available agents organized by category:
     - Infrastructure & System (Scanner, Fixer, Self-Healing, Security)
@@ -47,11 +47,13 @@ async def list_agents(response_format: ResponseFormat = ResponseFormat.MARKDOWN)
         response_format: Output format (markdown or json)
 
     Returns:
-        str: Complete agent directory with 54 agents
+        str: Complete agent directory of all available agents
     """
-    data = await _make_api_request("agents/list", method="GET")
+    # Canonical agents endpoint is GET /api/v1/agents (200, no auth). The old
+    # "agents/list" path fell through to the JWT-gated /{agent_name} catch-all → 422.
+    data = await _make_api_request("agents", method="GET")
 
-    return _format_response(data, response_format, "DevSkyy Agent Directory (54 Agents)")
+    return _format_response(data, response_format, "DevSkyy Agent Directory")
 
 
 @mcp.tool(

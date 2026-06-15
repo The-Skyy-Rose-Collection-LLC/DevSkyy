@@ -9,6 +9,7 @@ Following Context7 best practices for structlog.
 import logging
 import uuid
 from contextvars import ContextVar
+from typing import TextIO
 
 import structlog
 
@@ -59,12 +60,15 @@ def clear_request_context() -> None:
     user_id_var.set("")
 
 
-def configure_logging(json_output: bool = True) -> None:
+def configure_logging(json_output: bool = True, stream: TextIO | None = None) -> None:
     """
     Configure structlog for the MCP server.
 
     Args:
         json_output: If True, use JSON renderer for production
+        stream: Log output stream. None (default) -> sys.stdout via PrintLoggerFactory.
+            The MCP stdio entrypoint passes sys.stderr so structlog never writes to
+            stdout, which is the JSON-RPC transport channel.
     """
     processors = [
         # Add correlation context from contextvars
@@ -94,7 +98,7 @@ def configure_logging(json_output: bool = True) -> None:
         processors=processors,
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.PrintLoggerFactory(file=stream),
         cache_logger_on_first_use=True,
     )
 
