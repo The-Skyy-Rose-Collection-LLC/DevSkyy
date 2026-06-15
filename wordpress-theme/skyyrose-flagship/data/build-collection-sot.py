@@ -15,7 +15,9 @@ USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD]
 import argparse
 import json
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 DATA = Path(__file__).resolve().parent
 sys.path.insert(0, str(DATA))
@@ -40,7 +42,7 @@ TREE_SCAN_DIRS = [
 ]
 
 
-def manifest_entry(entry):
+def manifest_entry(entry: Any) -> dict | None:
     if not isinstance(entry, dict):
         return None
     raw = entry.get("path", "")
@@ -53,7 +55,7 @@ def manifest_entry(entry):
     }
 
 
-def load_products_by_collection():
+def load_products_by_collection() -> dict[str, list]:
     by_col: dict[str, list] = {}
     for row in read_catalog_rows():
         imgs = {}
@@ -89,7 +91,7 @@ def scan_tree() -> set[str]:
     return found
 
 
-def walk_manifest_entries(obj):
+def walk_manifest_entries(obj: Any) -> Iterator[dict]:
     if isinstance(obj, dict):
         if "path" in obj:
             yield obj
@@ -118,7 +120,7 @@ def expand_formats(entry: dict) -> set[str]:
     return out
 
 
-def registered_files(manifest, logo_reg, products_by_col) -> set[str]:
+def registered_files(manifest: Any, logo_reg: Any, products_by_col: dict[str, list]) -> set[str]:
     reg: set[str] = set()
     for entry in walk_manifest_entries(manifest):
         reg |= expand_formats(entry)
@@ -166,7 +168,7 @@ def imagery_block(mc: dict) -> dict:
     }
 
 
-def logos_for(slug, key, logo_reg):
+def logos_for(slug: str, key: str, logo_reg: Any) -> list[dict]:
     out = []
     for lid, lg in logo_reg.get("logos", {}).items():
         lcol = lg.get("collection") or ""
@@ -184,7 +186,14 @@ def logos_for(slug, key, logo_reg):
     return out
 
 
-def build_collection(slug, ident, manifest, logo_reg, products, updated):
+def build_collection(
+    slug: str,
+    ident: dict,
+    manifest: Any,
+    logo_reg: Any,
+    products: list,
+    updated: str,
+) -> dict:
     key = ident["key"]
     mc = manifest.get(key, {})
     full = imagery_block(mc)

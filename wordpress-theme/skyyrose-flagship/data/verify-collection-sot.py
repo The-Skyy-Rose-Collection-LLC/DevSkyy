@@ -4,12 +4,16 @@
 Per collection asserts: catalog SKU coverage; every declared resolved path is a real file;
 every identity font woff2 resolves; the generated design-tokens region matches a fresh
 generation (staleness gate); broken catalog product refs are reported (non-fatal).
+
+The staleness gate regenerates design-tokens.css to compare, then restores the original
+bytes on mismatch — so verify never leaves a net change in the working tree.
 """
 
 import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 DATA = Path(__file__).resolve().parent
 sys.path.insert(0, str(DATA))
@@ -22,14 +26,14 @@ OUT = DATA / "collections"
 CSS = DATA.parent / "assets/css/design-tokens.css"
 
 
-def catalog_skus():
+def catalog_skus() -> dict[str, set]:
     by: dict[str, set] = {}
     for row in read_catalog_rows():
         by.setdefault(row["collection"], set()).add(row["sku"])
     return by
 
 
-def walk_resolved(obj, slug, hard):
+def walk_resolved(obj: Any, slug: str, hard: list) -> None:
     if isinstance(obj, dict):
         p, r = obj.get("path"), obj.get("resolved")
         if p and "resolved" in obj and (not r or not (sot_common.ASSETS / r).is_file()):
@@ -49,6 +53,7 @@ def main() -> int:
     before = CSS.read_text()
     subprocess.run([sys.executable, str(DATA / "gen-design-tokens.py")], check=True)
     if CSS.read_text() != before:
+        CSS.write_text(before)  # verify is net read-only: undo the regen, just report staleness
         hard.append(
             "design-tokens.css collection region is STALE — run gen-design-tokens.py and commit"
         )

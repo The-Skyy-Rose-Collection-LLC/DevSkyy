@@ -43,3 +43,26 @@ def test_registered_expands_responsive_dash_siblings():
         "images/lookbook/lb-black-rose-football-960w.avif",
     ):
         assert f not in orph, f"{f} should be registered (responsive sibling), not orphaned"
+
+
+def test_updated_defaults_to_generated():
+    subprocess.run([sys.executable, str(BUILD)], check=True)
+    sot = json.loads((DATA / "collections" / "black-rose" / "sot.json").read_text())
+    assert sot["updated"] == "GENERATED"
+
+
+def test_updated_flag_sets_field_then_restores():
+    try:
+        subprocess.run([sys.executable, str(BUILD), "--updated", "2026-06-14"], check=True)
+        sot = json.loads((DATA / "collections" / "signature" / "sot.json").read_text())
+        assert sot["updated"] == "2026-06-14"
+    finally:
+        subprocess.run([sys.executable, str(BUILD)], check=True)  # restore default state
+
+
+def test_updated_flag_without_value_exits_clean_not_indexerror():
+    # argparse rejects a missing value with a usage error (exit != 0), NOT the old
+    # IndexError traceback from manual sys.argv indexing.
+    r = subprocess.run([sys.executable, str(BUILD), "--updated"], capture_output=True, text=True)
+    assert r.returncode != 0
+    assert "IndexError" not in r.stderr

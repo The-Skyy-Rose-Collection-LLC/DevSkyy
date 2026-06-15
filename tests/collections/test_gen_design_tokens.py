@@ -1,3 +1,4 @@
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -6,6 +7,15 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "wordpress-theme/skyyrose-flagship/data"
 CSS = ROOT / "wordpress-theme/skyyrose-flagship/assets/css/design-tokens.css"
 GEN = DATA / "gen-design-tokens.py"
+
+
+def _load_gen():
+    # Filename is hyphenated (not importable normally) — load it as a module so we
+    # can monkeypatch its CSS path and call main() in-process.
+    spec = importlib.util.spec_from_file_location("gen_design_tokens_mod", GEN)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def _region():
@@ -46,3 +56,23 @@ def test_generation_idempotent():
     first = CSS.read_text()
     subprocess.run([sys.executable, str(GEN)], check=True)
     assert CSS.read_text() == first
+
+
+def test_missing_markers_exits_1(tmp_path, monkeypatch, capsys):
+    mod = _load_gen()
+    bad = tmp_path / "design-tokens.css"
+    bad.write_text(":root { --x: 1; }\n")  # no GENERATED markers at all
+    monkeypatch.setattr(mod, "CSS", bad)
+    assert mod.main() == 1
+    assert "missing the GENERATED" in capsys.readouterr().err
+
+
+def test_end_marker_before_start_exits_1(tmp_path, monkeypatch, capsys):
+    mod = _load_gen()
+    bad = tmp_path / "design-tokens.css"
+    bad.write_text(
+        "/* GENERATED:collection-tokens END */\n/* GENERATED:collection-tokens START */\n"
+    )
+    monkeypatch.setattr(mod, "CSS", bad)
+    assert mod.main() == 1
+    assert "END marker before START" in capsys.readouterr().err

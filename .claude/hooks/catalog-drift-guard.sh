@@ -19,9 +19,12 @@ fi
 EDITED_FILE="${CLAUDE_TOOL_INPUT_FILE_PATH:-}"
 
 if [[ -z "$EDITED_FILE" ]]; then
-  # Try reading from stdin (Claude Code passes tool input as JSON on stdin)
-  if read -r -t 0 LINE 2>/dev/null; then
-    EDITED_FILE="$(echo "$LINE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))" 2>/dev/null || true)"
+  # Claude Code passes tool input as JSON on stdin. Slurp ALL of it — JSON is
+  # multi-line, so reading a single line truncates it and silently no-ops the
+  # guard. `timeout 1 cat` reads everything but never hangs on an idle stdin.
+  STDIN_JSON="$(timeout 1 cat 2>/dev/null || true)"
+  if [[ -n "$STDIN_JSON" ]]; then
+    EDITED_FILE="$(printf '%s' "$STDIN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('file_path',''))" 2>/dev/null || true)"
   fi
 fi
 

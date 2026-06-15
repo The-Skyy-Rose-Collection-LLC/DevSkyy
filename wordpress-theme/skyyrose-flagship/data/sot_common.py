@@ -92,6 +92,12 @@ def resolve_asset(rel: str) -> str | None:
         return None
     rel = rel.replace("assets/", "", 1) if rel.startswith("assets/") else rel
     p = ASSETS / rel
+    # Containment: a traversal path ("../") must never escape the assets tree.
+    try:
+        if not p.resolve().is_relative_to(ASSETS.resolve()):
+            return None
+    except (OSError, ValueError):
+        return None
     if p.is_file():
         return rel
     parent = p.parent

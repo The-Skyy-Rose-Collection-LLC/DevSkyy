@@ -49,7 +49,7 @@
       "required": ["family", "woff2", "source"],
       "properties": {
         "family": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9 ]*$"},
-        "woff2": {"type": ["string", "null"]},
+        "woff2": {"type": ["string", "null"], "pattern": "^assets/fonts/[A-Za-z0-9._-]+\\.woff2$"},
         "source": {"type": "string", "minLength": 1}
       }
     }

@@ -57,6 +57,13 @@ def main() -> int:
         return 1
     s = css.index(START)
     e = css.index(END)
+    if e < s:
+        print(
+            f"ERROR: {CSS} has the GENERATED:collection-tokens END marker before START "
+            f"— cannot regenerate the region.",
+            file=sys.stderr,
+        )
+        return 1
     line_end = css.index("\n", s) + 1
     css = css[:line_end] + body + css[e:]
     CSS.write_text(css)
