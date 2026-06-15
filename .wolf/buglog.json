@@ -2178,5 +2178,25 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-15"
+  },
+  {
+    "id": "bug-136",
+    "timestamp": "2026-06-15",
+    "error_message": "devskyy_list_agents tool -> GET /api/v1/agents/list returned 422 Unprocessable Content; the agent list never loaded.",
+    "file": "mcp_tools/tools/resources.py",
+    "root_cause": "The tool requested endpoint 'agents/list'. No such route exists: agents_router has GET / (prefix /api/v1/agents, JWT-gated) and a /{agent_name} catch-all. '/api/v1/agents/list' fell through to the catch-all and failed validation (422). The canonical unauthenticated agent-list endpoint is GET /api/v1/agents (api/v1/monitoring.py:540), which returns 200.",
+    "fix": "Repoint the tool to _make_api_request('agents') -> GET /api/v1/agents (200, no auth). Also dropped the hardcoded '54 agents' wording per project_agent_count (count is API-driven). Added tests/mcp/test_api_client.py asserting endpoint path + Bearer-header behavior.",
+    "tags": [
+      "mcp",
+      "fastapi",
+      "routing",
+      "422",
+      "devskyy_list_agents"
+    ],
+    "related_bugs": [
+      "bug-135"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-15"
   }
 ]
