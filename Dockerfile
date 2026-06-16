@@ -106,6 +106,7 @@ COPY agents/ ./agents/
 COPY api/ ./api/
 COPY adk/ ./adk/
 COPY core/ ./core/
+COPY utils/ ./utils/
 COPY integrations/ ./integrations/
 COPY llm/ ./llm/
 COPY mcp_servers/ ./mcp_servers/

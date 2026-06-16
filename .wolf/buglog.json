@@ -2198,5 +2198,27 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-15"
+  },
+  {
+    "id": "bug-137",
+    "timestamp": "2026-06-15T17:05:00Z",
+    "error_message": "Mounting MCP into main_enterprise would crash-loop the Fly container: ImportError on 'utils' (not COPY'd in Dockerfile) and ModuleNotFoundError on 'scripts'/'imagery' via eager mcp_tools.tools imports",
+    "file": "Dockerfile, mcp_tools/tools/__init__.py",
+    "root_cause": "api/mcp_mount.py imports utils.logging_utils + 'from mcp_tools import mcp' which eagerly imports all 19 tool modules; oai_render imports scripts.oai_render, lora_generation imports imagery.*. utils/ was never in the Dockerfile COPY list (current prod main_enterprise didn't import utils, so it shipped without it); scripts/ and imagery/ are heavy render/GPU dirs not in the slim image.",
+    "fix": "Added 'COPY utils/ ./utils/' to Dockerfile (foundational pkg, grouped with core/). Rewrote mcp_tools/tools/__init__.py to import each tool module defensively in a loop, catching ImportError and logging 'mcp_tool_module_skipped' so modules with absent optional deps skip registration instead of crashing the server import. Verified via slim-image import simulation (blocked scripts/imagery): 44/51 tools register, build_mcp_app()+session_manager build, only oai_render+lora_generation skip.",
+    "tags": [
+      "mcp",
+      "docker",
+      "fly",
+      "deploy",
+      "import-error",
+      "resilience"
+    ],
+    "related_bugs": [
+      "bug-134",
+      "bug-135"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-15T17:05:00Z"
   }
 ]
