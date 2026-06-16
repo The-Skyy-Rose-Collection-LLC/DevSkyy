@@ -216,14 +216,18 @@ def _sku_logo_refs() -> dict[str, Path]:
         "br-015": o / "br-patch-mlb-baseball.png",
         # Love Hurts — graffiti script
         "lh-004": t / "love-hurts" / "logo-love.jpeg",
-        # Signature — gold script
-        "sg-011": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
-        "sg-012": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
+        # NOTE: sg-011 / sg-012 (Original Label Tees) intentionally carry NO logo —
+        # see _NO_LOGO_SKUS. Founder-confirmed 2026-06-16: blank tees, neck label only.
         # Signature — three-rose-cluster recolored per the founder-approved
         # colorway (2026-06-11). Attaching a colorway-correct reference makes the
         # model copy the right rose color instead of inferring it from text.
         "sg-002": cw / "three-rose-cluster-purple.png",  # 'Stay Golden' Shirt
         "sg-005": cw / "three-rose-cluster-blue-cyan.png",  # 'Bay Bridge' Shirt
+        # Bridge shorts carry the bottom-left embroidered rose-cluster (NOT the gold
+        # brand script the collection fallback would attach). Colorway pairs with the
+        # matching shirt: Bay Bridge=blue (day), Stay Golden=purple (night). 2026-06-16.
+        "sg-001": cw / "three-rose-cluster-blue-cyan.png",  # 'Bay Bridge' Shorts (day, blue rose)
+        "sg-003": cw / "three-rose-cluster-purple.png",  # 'Stay Golden' Shorts (night, purple rose)
         "sg-006": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Hoodie
         "sg-014": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Sweatpants
         "sg-007": cw / "three-rose-cluster-greyscale.png",  # Signature Beanie
@@ -308,8 +312,16 @@ def get_pairs_for_sku(sku: str) -> list[Pair]:
     return [p for p in PAIRS if sku in p.skus]
 
 
+# Blank-canvas SKUs with NO exterior logo (founder-confirmed 2026-06-16): the
+# Original Label Tees carry no chest mark, no sleeve badge, no print — only an
+# interior neck label. They must NOT receive a SKU or collection logo composite.
+_NO_LOGO_SKUS = frozenset({"sg-011", "sg-012"})
+
+
 def get_logo_reference(sku: str, collection: str) -> Path | None:
     """Return the logo/patch reference for a SKU. SKU-specific > collection default."""
+    if sku in _NO_LOGO_SKUS:
+        return None
     sku_refs = _sku_logo_refs()
     if sku in sku_refs:
         path = sku_refs[sku]
