@@ -97,7 +97,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": p / "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
             "back": None,
         },
-        "br-006": {"front": p / "black-rose-sherpa-jacket-sherpa-product.jpg", "back": None},
+        "br-006": {
+            "front": p / "black-rose-sherpa-jacket-sherpa-product.jpg",
+            "back": p / "black-rose-sherpa-jacket-back.jpg",
+        },
         "br-007": {"front": p / "br-007-real-front.jpg", "back": p / "br-007-real-back.jpg"},
         "br-008": {
             "front": s / "black-rose" / "br-jersey-football-sf-front.jpeg",
@@ -126,6 +129,7 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": s / "love-hurts" / "lh-bomber-front.jpeg",
             "back": s / "love-hurts" / "lh-bomber-back.jpeg",
         },
+        "lh-005": {"front": p / "the-fannie-pack-photo.jpg", "back": None},
         "lh-006": {"front": p / "lh-006-joggers-white.jpeg", "back": None},
         # ── SIGNATURE ──
         "sg-001": {
