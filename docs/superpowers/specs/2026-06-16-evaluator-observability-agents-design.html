@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluator + Observability Agents — Design Spec</title>
+<style>
+  body { max-width: 60rem; margin: 2rem auto; padding: 0 1.25rem; font: 16px/1.6 -apple-system, Segoe UI, Roboto, sans-serif; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .4rem; }
+  h2 { margin-top: 2.4rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+  h3 { margin-top: 1.6rem; color: #444; }
+  code { background: #f4f4f4; padding: .1rem .35rem; border-radius: 3px; font-size: .9em; }
+  pre { background: #1a1a1a; color: #eee; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  pre code { background: none; color: inherit; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .94em; }
+  th, td { border: 1px solid #ccc; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f0e6e8; }
+  .nav { background: #faf7f8; border: 1px solid #e0d4d7; border-radius: 6px; padding: 1rem 1.25rem; }
+  .nav a { display: inline-block; margin: .15rem .6rem .15rem 0; color: #8a4f58; text-decoration: none; }
+  .tag { display: inline-block; font-size: .72em; font-weight: 700; padding: .1rem .45rem; border-radius: 3px; vertical-align: middle; }
+  .v1 { background: #d6f0d6; color: #1e5e1e; }
+  .p2 { background: #fde9c8; color: #8a5a00; }
+  .crit { background: #f7d4d4; color: #8a1e1e; }
+  blockquote { border-left: 4px solid #B76E79; margin: 1rem 0; padding: .4rem 1rem; background: #faf7f8; color: #444; }
+</style>
+</head>
+<body>
+
+<h1>Evaluator + Observability Agents — Design Spec</h1>
+<p><strong>Date:</strong> 2026-06-16 &nbsp;·&nbsp; <strong>Status:</strong> Approved design, pre-plan &nbsp;·&nbsp;
+<strong>Companion:</strong> <code>docs/superpowers/specs/2026-06-16-evaluator-observability-research.md</code> (~55 cited sources backing every decision below).</p>
+
+<div class="nav">
+<strong>Sections:</strong><br>
+<a href="#overview">1. Overview &amp; goals</a>
+<a href="#seam">2. Shared interceptor seam</a>
+<a href="#evaluator">3. Evaluator agent</a>
+<a href="#observer">4. Observability agent</a>
+<a href="#contracts">5. Data contracts</a>
+<a href="#config">6. Configuration</a>
+<a href="#integration">7. Integration points</a>
+<a href="#testing">8. Testing plan</a>
+<a href="#phasing">9. Phasing</a>
+<a href="#risks">10. Scope, risks, open questions</a>
+</div>
+
+<section id="overview">
+<h2>1. Overview &amp; goals</h2>
+<p>DevSkyy runs ~75–80 agent classes (8 orchestrated <code>CoreAgent</code> domains in <code>agents/core/factory.py:22-31</code> plus ~40–50 sub-agents and SDK/AOS tiers). Two cross-cutting capabilities are missing:</p>
+<ol>
+<li><strong>Evaluator / Critic</strong> — automated quality gate on agent-produced content/copy <em>before</em> a human reviewer sees the draft. Closes the "mock-driven confidence" loop: today the content path (<code>agents/skyyrose_content_agent.py:271</code> → <code>publish_to_wordpress()</code> at <code>:692</code>) creates WordPress drafts with <strong>no</strong> automated evaluation; the only scoring is manual <code>content_feedback_scores</code> recorded after the fact.</li>
+<li><strong>Observability</strong> — consume per-execution metrics, detect anomalies (token spend, latency, retry storms, dead/looping agents, runaway cost), and alert. Today metrics go into the void: the <code>AgentExecution</code> table (<code>agents/models.py:201</code>) is defined and migrated but <strong>never written to</strong> — nothing constructs an <code>AgentExecution(...)</code> row anywhere in the codebase; <code>_record_success</code>/<code>_record_failure</code> (<code>agents/core/base.py:475,487</code>) are in-memory circuit-breaker state only (confirmed, obs #16055).</li>
+</ol>
+
+<h3>Design principles (from the brainstorm + research pass)</h3>
+<ul>
+<li><strong>Framework-invoked interceptors, not routed agents.</strong> You don't "route a task" to a watcher; it would never fire. Both hang off the existing execution wrap.</li>
+<li><strong>External-feedback correction.</strong> The evaluator's revise loop is driven by a deterministic fact-gate + a separate judge — the validated path. (Intrinsic self-correction is unreliable; ours is not intrinsic.)</li>
+<li><strong>Deterministic before probabilistic.</strong> Code-based fact checks (catalog-grounded) run free and first; the LLM judge only scores taste on drafts that already passed the facts.</li>
+<li><strong>Alert, never auto-act.</strong> The observer recommends; the orchestrator or a human pulls the trigger. Honors STOP-AND-SHOW.</li>
+<li><strong>Adopt standards.</strong> Metric fields use OpenTelemetry GenAI semantic-convention names; scoring uses a 0–5 scale with chain-of-thought (both research-backed over the originally-proposed bespoke choices).</li>
+</ul>
+
+<h3>Non-goals (v1)</h3>
+<ul>
+<li>No auto-remediation (disabling/killing agents) — recommendation only.</li>
+<li>No SuperAgent-tier (<code>EnhancedSuperAgent</code>) instrumentation — v1 covers the orchestrated <code>CoreAgent</code> tier. <span class="tag p2">phase 2</span></li>
+<li>No full OTel span emission / distributed trace hierarchy — v1 is a flat metrics table for alerting + cost. <span class="tag p2">phase 2</span></li>
+<li>No frontend dashboard build — v1 exposes alerts via API + EventBus; the devskyy.app admin panel is a thin follow-on. <span class="tag p2">phase 2</span></li>
+</ul>
+</section>
+
+<section id="seam">
+<h2>2. Shared interceptor seam</h2>
+<p>Both agents hang off one wrap point: <code>CoreAgent.execute_safe(task, **kwargs)</code> (<code>agents/core/base.py:670</code>), which already brackets every orchestrated execution and calls the in-memory record hooks (<code>_record_success</code> at <code>:685,696</code>; <code>_record_failure</code> at <code>:699,707</code>). A single new hook runs after the inner <code>execute()</code> returns.</p>
+
+<pre><code>async def execute_safe(self, task, **kwargs):
+    started = monotonic()
+    try:
+        result = await self.execute(task, **kwargs)   # existing
+        status = "completed"
+    except Exception as e:
+        status = "failed"; result = self._error_envelope(e)
+    # ── QUALITY HOOK (new, thin; no-op when disabled) ──────────────
+    result = await quality_hooks.after_execute(
+        agent=self, task=task, result=result, status=status,
+        duration_ms=int((monotonic()-started)*1000), kwargs=kwargs,
+    )
+    # ───────────────────────────────────────────────────────────────
+    return result</code></pre>
+
+<p><code>quality_hooks.after_execute()</code> (new, <code>agents/quality/hooks.py</code>) does, in order:</p>
+<ol>
+<li><strong>Observer.record(...)</strong> — always: build an <code>AgentMetrics</code>, persist one <code>AgentExecution</code> row, publish an <code>AgentExecEvent</code> on the EventBus.</li>
+<li><strong>Evaluator.gate(...)</strong> — only when <code>result.output_type ∈ {content, copy}</code>: run the two-pass evaluation + bounded revise loop, returning a possibly-revised result.</li>
+</ol>
+
+<blockquote>The hook is a no-op unless enabled in config, so it ships dormant and is switched on per environment. Keeping the hook body in <code>agents/quality/</code> (not inline in <code>base.py</code>) keeps the base class clean and the interceptors independently testable.</blockquote>
+
+<p><strong>Coverage note:</strong> content flows through <code>ContentCoreAgent</code> (<code>agents/core/content/agent.py:21</code>) even when it delegates to the <code>SkyyRoseContentAgent</code> SuperAgent, so the gate catches orchestrated content. Direct <code>SkyyRoseContentAgent</code> calls that bypass the <code>CoreAgent</code> are <strong>not</strong> gated in v1 — a named limitation, addressed in <a href="#phasing">phase 2</a>.</p>
+</section>
+
+<section id="evaluator">
+<h2>3. Evaluator agent</h2>
+<p>Package: <code>agents/quality/</code> (new; requires <code>__init__.py</code> per the project's no-implicit-namespace-packages rule).</p>
+
+<h3>3.1 Two-pass scoring</h3>
+<table>
+<tr><th>Pass</th><th>Module</th><th>What it does</th><th>Cost</th></tr>
+<tr>
+<td><strong>Pass 1 — deterministic gate</strong></td>
+<td><code>agents/quality/deterministic_gate.py</code></td>
+<td>Pure Python, no LLM. Hard-fails (short-circuits to revise) on any of:
+  <ul>
+    <li><strong>Product-fact mismatch</strong> vs the canonical catalog CSV (<code>wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv</code>, 33 SKUs): product name, price, collection, sizes, edition size. Resolves by SKU/name; the only un-hallucinatable check.</li>
+    <li><strong>Placeholder/stub markers</strong>: <code>TODO</code>, <code>FIXME</code>, <code>lorem</code>, <code>{{</code>, empty required fields.</li>
+    <li><strong>Banned-phrase / canon violations</strong>: per-collection canon (e.g. "bloodline that raised me" is Love Hurts only) sourced from <code>docs/brand/collection-stories.md</code>; banned cross-collection quote leakage; tagline must be exactly "Luxury Grows from Concrete."</li>
+    <li><strong>Required-structure check</strong>: presence of expected sections for the content type (e.g. PDP copy must have title + body; SEO copy must have meta description within length bounds).</li>
+  </ul>
+</td>
+<td>$0</td>
+</tr>
+<tr>
+<td><strong>Pass 2 — Claude judge</strong></td>
+<td><code>agents/quality/judge.py</code></td>
+<td>Runs only if Pass 1 clears. <strong>Criterion-separated</strong>: each rubric dimension is its own evaluation with a <strong>chain-of-thought trace before the score</strong>. Dimensions: <em>brand-voice alignment</em>, <em>clarity</em>, <em>persuasiveness</em>, <em>distinctiveness</em> (anti-homogenization). Scored <strong>0–5 integer</strong> (research: 0–5 maximizes human alignment; 0–1 float is false precision). Sonnet by default; Opus for hero/landing copy (per model-routing policy).</td>
+<td>1 model call/draft/attempt</td>
+</tr>
+</table>
+
+<h3>3.2 Scoring scale &amp; routing</h3>
+<pre><code>per-dimension 0–5 integer:
+  1 = hard fail (must not reach reviewer)
+  2 = weak (significant revision needed)
+  3 = acceptable (minor notes)
+  4 = good (reviewer may approve in one read)
+  5 = excellent (fast-track)
+
+composite = weighted mean of dimension scores  (weights in EvaluatorConfig)
+route:
+  composite < 3            → revise loop
+  3 ≤ composite < 5        → surface to human reviewer + attach CoT critiques
+  composite == 5           → surface to fast-track queue
+  normalized = (composite - 1) / 4   # 0–1 form for any downstream system</code></pre>
+
+<h3>3.3 Self/family-preference bias mitigations</h3>
+<p>A Claude judge rates Claude-written copy higher via perplexity-preference (real, unquantified for our exact case). Single-Claude judge is kept for cost, with mandatory mitigations:</p>
+<ul>
+<li><strong>Blind authorship</strong>: the judge prompt never states the draft is AI-written or names the generating agent.</li>
+<li><strong>Concrete grounding</strong>: brand-voice criteria reference specific locked phrases, canonical copy exemplars, and named banned patterns — never abstract adjectives ("luxurious", "authentic").</li>
+<li><strong>Anti-verbosity clause</strong> in every judge prompt: "Length is not a quality signal; credit density over word count."</li>
+<li><strong>Borderline position-bias check</strong>: when a dimension score is within 1 point of the pass threshold, re-run that dimension with rubric exemplars in reversed order; if the two scores diverge by &gt;1, flag for human instead of auto-deciding.</li>
+<li><strong>Escape hatch</strong>: <code>EvaluatorConfig.judge_provider</code> lets the brand-voice dimension route to a non-Claude judge if calibration later shows inflation.</li>
+</ul>
+
+<h3>3.4 Calibration gate <span class="tag crit">phase-0 prerequisite</span></h3>
+<p>The judge is <strong>not</strong> a hard gate until validated against humans:</p>
+<ul>
+<li>Build a ground-truth set of ~100 brand-team-labeled drafts spanning the score range (deliberately bad → excellent), stored under <code>tests/fixtures/evaluator_ground_truth/</code>.</li>
+<li>Compute Cohen's κ (judge vs human). <strong>κ ≥ 0.65</strong> → judge runs as a hard gate (auto-revise on fail). <strong>κ &lt; 0.65</strong> → judge runs as a <em>soft signal</em> (annotate only, never blocks) until the rubric is revised and re-validated.</li>
+<li>Monthly re-validation on 20–30 production samples; the Observer watches the live score distribution for leniency drift (<a href="#observer">§4</a>).</li>
+</ul>
+
+<h3>3.5 Bounded revise loop</h3>
+<p>Module: <code>agents/quality/revise_loop.py</code>. On a failing composite (&lt;3) or any Pass-1 hard fail:</p>
+<ol>
+<li>Build a <strong>specific, decomposed critique</strong> (format below) and route it back to the originating agent via the existing <code>CoreAgent.delegate()</code> path (<code>agents/core/base.py:558</code>).</li>
+<li>Regenerate → re-score.</li>
+<li><strong>Cap = 2 attempts</strong> (config). <strong>Early-exit</strong>: if attempt 1 clears Pass 1 AND composite ≥ threshold, stop — do not consume attempt 2.</li>
+<li>If still failing after the cap, surface the <strong>best-scoring attempt</strong>, flagged, with the critique attached for the human reviewer. Preserve the revision-1 candidate for comparison on creative dimensions (attractor-state guard).</li>
+</ol>
+
+<h4>Critique format (research-driven — specificity is the highest-leverage variable)</h4>
+<pre><code>{
+  "fact_corrections": [          # from Pass 1 — comply, do not balance
+    {"check": "price", "sku": "br-006",
+     "found": "$245", "canonical": "$265",
+     "fragment": "...priced at $245..."}
+  ],
+  "style_notes": [               # from Pass 2 — balance against brand voice
+    {"dimension": "brand-voice", "score": 2,
+     "issue": "reads generic-luxury; not Oakland-anchored",
+     "fragment": "elevated essentials for the modern wardrobe",
+     "fix_direction": "ground in concrete/Bay imagery per Black Rose canon"}
+  ],
+  "dossier_context": "<per-SKU dossier excerpt>"   # SKU-specific, anti-homogenization
+}</code></pre>
+<p>Rules: cite the exact failing check + offending fragment; YES/NO-decomposed items; separate facts (comply) from style (balance); inject the per-SKU dossier so corrections are product-specific; <strong>no generic praise/encouragement</strong>.</p>
+
+<h3>3.6 Named domain risk</h3>
+<blockquote>Aligned-model revision passes can flatten brand voice toward low-entropy "attractor states" (RLHF debiasing finding). Mitigation: the <em>distinctiveness</em> rubric dimension, SKU-specific critique grounding, and preserving the revision-1 candidate for creative-dimension comparison rather than blindly taking the last attempt.</blockquote>
+</section>
+
+<section id="observer">
+<h2>4. Observability agent</h2>
+<p>Two halves: instrument the write, then consume + detect + alert.</p>
+
+<h3>4.1 Half A — instrument the write (the missing emit)</h3>
+<p>In <code>quality_hooks.after_execute()</code>, persist one <code>AgentExecution</code> row per execution. The current model (<code>agents/models.py:201</code>) has only <code>tokens_used</code> (combined) + <code>duration_ms</code> — insufficient (output tokens cost 3–5× input; combined total can't reconstruct cost). <strong>Extend the model via an Alembic migration</strong>, OTel-GenAI-aligned:</p>
+<table>
+<tr><th>New column</th><th>OTel semconv source</th><th>Type / note</th></tr>
+<tr><td><code>input_tokens</code></td><td><code>gen_ai.usage.input_tokens</code></td><td>INTEGER</td></tr>
+<tr><td><code>output_tokens</code></td><td><code>gen_ai.usage.output_tokens</code></td><td>INTEGER</td></tr>
+<tr><td><code>cache_read_tokens</code></td><td><code>gen_ai.usage.cache_read.input_tokens</code></td><td>INTEGER, nullable</td></tr>
+<tr><td><code>cost_usd</code></td><td>(none — computed)</td><td>NUMERIC(10,6); computed at insert from pricing table</td></tr>
+<tr><td><code>provider_name</code></td><td><code>gen_ai.provider.name</code></td><td>TEXT (anthropic/openai/…)</td></tr>
+<tr><td><code>request_model</code></td><td><code>gen_ai.request.model</code></td><td>TEXT</td></tr>
+<tr><td><code>finish_reason</code></td><td><code>gen_ai.response.finish_reasons</code></td><td>TEXT</td></tr>
+<tr><td><code>error_type</code></td><td><code>error.type</code></td><td>TEXT, nullable</td></tr>
+<tr><td><code>conversation_id</code></td><td><code>gen_ai.conversation.id</code></td><td>TEXT, indexed — the correlation key for per-conversation cost</td></tr>
+<tr><td><code>trace_id</code></td><td>OTel trace_id</td><td>TEXT, nullable — forward-compat for phase-2 spans</td></tr>
+<tr><td><code>retry_attempt</code></td><td>—</td><td>SMALLINT default 0</td></tr>
+</table>
+<p>Retained existing columns: <code>execution_id</code>, <code>agent_name</code> (indexed), <code>prompt</code>, <code>status</code>, <code>result</code> (JSONB), <code>created_at</code>, <code>extra_data</code> (JSONB overflow). <code>tokens_used</code> kept for back-compat (= input+output). Postgres column names use underscores (dotted OTel names mapped, mapping documented in <code>agents/quality/contracts.py</code>).</p>
+<p><strong>Cost computation</strong> (<code>agents/quality/cost.py</code>): <code>cost = input·price_in + output·price_out + cache_read·price_cache</code>, from a config-driven pricing table; recompute-on-rate-change supported via a backfill script. The DB write obtains an <code>AsyncSession</code> from the project's existing session factory in <code>database/</code> (exact import to be confirmed in the plan).</p>
+
+<h3>4.2 Half B — consume + detect + alert</h3>
+<p>Three inputs → detection (<code>agents/quality/detection_rules.py</code>) → one output (<code>AgentAlert</code>):</p>
+<ul>
+<li><strong>EventBus subscriber</strong> (real-time): subscribes to <code>AgentExecEvent</code> via <code>event_bus.subscribe()</code> (<code>core/events/event_bus.py:39</code>; singleton at <code>:79</code>; events carry <code>.event_type</code>). Catches retry storms / failure bursts as they happen.</li>
+<li><strong>Scheduled scan</strong> (default 5 min): SQL over <code>agent_executions</code> for trends — spend deltas, p95 latency, dead agents, per-conversation cost.</li>
+<li><strong>Circuit-breaker state</strong> (in-memory): reads existing breaker state for looping/runaway signal.</li>
+</ul>
+
+<h3>4.3 Detection rules</h3>
+<table>
+<tr><th>Rule</th><th>Mechanism</th><th>Default</th><th>Tier</th></tr>
+<tr><td>Retry storm</td><td>static count</td><td>≥5 failures to same target / 60s</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Dead agent</td><td>static absence</td><td>0 executions in window (no warm-up needed)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Looping/runaway agent</td><td>static (breaker open)</td><td>circuit breaker OPEN</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td><strong>Per-conversation cost accumulator</strong></td><td>static ceiling, grouped by <code>conversation_id</code></td><td>sum(<code>cost_usd</code>) &gt; ceiling (config; default $5)</td><td><span class="tag crit">v1 — the $47K-loop rule</span></td></tr>
+<tr><td>Workflow TTL</td><td>static wall-clock</td><td>conversation not terminal by T (config)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Per-agent tool-failure rate</td><td>static ratio</td><td>&gt;20% failures / 5-min rolling</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Token-spend spike</td><td>rolling EWMA(24h), <em>warm-up gated</em></td><td>&gt;3× EWMA alert; ≥10× = circuit-level recommendation</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Latency regression</td><td>static p95 SLO bound + MWMBR, <em>warm-up gated</em></td><td>p95 &gt; bound AND burn-rate &gt;6× over 30-min; alert p95, dashboard p99</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Evaluator score drift</td><td>rolling mean/variance of judge composite</td><td>leniency-drift flag (cross-link to §3.4)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>Duplicate tool-call hash</td><td>hash(tool+args) repeat ≥2 in window</td><td>needs tool-loop hooks deeper than execute_safe</td><td><span class="tag p2">phase 2</span></td></tr>
+<tr><td>Context-growth rate</td><td>per-step token quadratic acceleration</td><td>needs tool-loop hooks</td><td><span class="tag p2">phase 2</span></td></tr>
+</table>
+
+<h3>4.4 Warm-up behavior</h3>
+<ul>
+<li>Trend rules (spend spike, latency) stay <strong>dormant</strong> until a configurable warm-up window of data exists (default 14 days). Liveness/policy rules (dead agent, retry storm, cost ceiling, TTL, breaker) work from minute one.</li>
+<li>During warm-up: emit raw measurements to the dashboard/log (visibility, no alerts) so the baseline is observable.</li>
+<li>Apply static floor bounds day-zero. Suppress trend alerts for 10–15 min after an agent deploy/restart (settling window).</li>
+</ul>
+
+<h3>4.5 Authority &amp; alerting hygiene</h3>
+<ul>
+<li><strong>Alert + recommend, never act.</strong> Each <code>AgentAlert</code> writes to the dashboard API + emits an EventBus event the orchestrator may react to, and carries a specific remediation string (e.g. "circuit-break agent X — looped 12×"). The Observer never disables/kills.</li>
+<li><strong>Severity tiers</strong>: page (cost ceiling, breaker open, fleet-wide dead) / ticket (spend trend, latency regression) / dashboard-only (warm-up, drift).</li>
+<li><strong>Hysteresis</strong>: alert once per open condition; resurface only on escalation. Alert state tracked per detection instance.</li>
+<li><strong>Warm-up shadow routing</strong> until a rule clears 70% precision; 30-day actionability review deletes rules below 20% conversion.</li>
+</ul>
+</section>
+
+<section id="contracts">
+<h2>5. Data contracts</h2>
+<p>All new, frozen dataclasses in <code>agents/quality/contracts.py</code>.</p>
+<table>
+<tr><th>Contract</th><th>Fields</th><th>Producer → Consumer</th></tr>
+<tr><td><code>AgentMetrics</code></td><td>maps 1:1 to the extended <code>AgentExecution</code> row (OTel-aligned names)</td><td><code>after_execute</code> → DB + EventBus</td></tr>
+<tr><td><code>EvalVerdict</code></td><td><code>passed: bool</code>, <code>composite: float</code>, <code>dimension_scores: dict[str,int]</code>, <code>deterministic_failures: list</code>, <code>critique: dict</code>, <code>attempts: int</code>, <code>mode: Literal["hard_gate","soft_signal"]</code></td><td>Evaluator → caller / draft metadata</td></tr>
+<tr><td><code>AgentExecEvent</code></td><td><code>event_type: str</code>, <code>agent_name</code>, <code>status</code>, <code>conversation_id</code>, <code>cost_usd</code>, <code>duration_ms</code>, <code>error_type</code></td><td>after_execute → EventBus subscribers</td></tr>
+<tr><td><code>AgentAlert</code></td><td><code>severity</code>, <code>kind</code>, <code>agent_name</code>, <code>evidence: dict</code>, <code>recommendation: str</code>, <code>ts</code></td><td>Observer → dashboard API / EventBus</td></tr>
+</table>
+</section>
+
+<section id="config">
+<h2>6. Configuration</h2>
+<p>Config-driven (living-doc pattern, mirroring <code>docs/model-routing.md</code>). <code>agents/quality/config.py</code>:</p>
+<ul>
+<li><code>EvaluatorConfig</code>: <code>enabled</code>, <code>judge_provider</code>, <code>judge_model_default</code>/<code>judge_model_hero</code>, dimension <code>weights</code>, <code>pass_threshold</code> (3), <code>revise_cap</code> (2), <code>mode</code> (hard_gate/soft_signal, set by calibration κ), per-agent enable map.</li>
+<li><code>ObserverConfig</code>: <code>enabled</code>, <code>scan_interval_s</code> (300), <code>warmup_days</code> (14), <code>settling_window_s</code> (600), per-rule thresholds, severity routing, <code>per_conversation_cost_ceiling_usd</code> (5), <code>workflow_ttl_s</code>.</li>
+<li><code>PricingTable</code>: per-provider/model input/output/cache prices (USD per token).</li>
+</ul>
+</section>
+
+<section id="integration">
+<h2>7. Integration points (verified this session)</h2>
+<table>
+<tr><th>Concern</th><th>File:line</th></tr>
+<tr><td>Interceptor wrap</td><td><code>agents/core/base.py:670</code> (<code>execute_safe</code>)</td></tr>
+<tr><td>Failure route-back path</td><td><code>agents/core/base.py:558</code> (<code>delegate</code>)</td></tr>
+<tr><td>In-memory record hooks (untouched)</td><td><code>agents/core/base.py:475,487</code></td></tr>
+<tr><td>Content pipeline (gated)</td><td><code>agents/core/content/agent.py:21</code>; <code>agents/skyyrose_content_agent.py:271,692</code></td></tr>
+<tr><td>EventBus</td><td><code>core/events/event_bus.py:21,39,43,79</code></td></tr>
+<tr><td>Metrics model (to extend)</td><td><code>agents/models.py:201</code>; migration alongside <code>alembic/versions/001_baseline_schema.py</code></td></tr>
+<tr><td>Catalog (fact gate)</td><td><code>wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv</code> (33 SKUs) + per-SKU dossiers</td></tr>
+<tr><td>Canon (banned-phrase gate)</td><td><code>docs/brand/collection-stories.md</code></td></tr>
+<tr><td>New package</td><td><code>agents/quality/</code> (+ <code>__init__.py</code>)</td></tr>
+</table>
+</section>
+
+<section id="testing">
+<h2>8. Testing plan</h2>
+<p>Target ≥85% (project rule). No mocks in integration tests.</p>
+<ul>
+<li><strong>Unit</strong> — deterministic gate (hallucinated-SKU/price draft → hard fail; clean → pass); rubric scorer with mocked Claude (0–5 parsing, CoT extraction, weighting); revise loop honors cap 2 + early-exit; each detection rule fires at threshold and stays quiet below; warm-up gating; cost computation vs pricing table; borderline position-swap re-check.</li>
+<li><strong>Integration</strong> — <code>execute_safe</code> wrap persists exactly one row + publishes one event; content output triggers gate; failing gate routes critique through <code>delegate()</code> and regenerates; scheduled scan over seeded rows emits the right <code>AgentAlert</code>; per-conversation cost accumulator trips on a synthetic loop. Real EventBus, real test DB (SQLite/PG).</li>
+<li><strong>Fixtures</strong> — <code>tests/fixtures/evaluator_ground_truth/</code> (~100 labeled drafts for calibration κ); known-bad drafts; synthetic <code>agent_executions</code> rows incl. a runaway-conversation set.</li>
+</ul>
+</section>
+
+<section id="phasing">
+<h2>9. Phasing</h2>
+<table>
+<tr><th>Phase</th><th>Scope</th></tr>
+<tr><td><strong>Phase 0</strong></td><td>Calibration set + κ measurement → decides evaluator <code>mode</code> (hard_gate vs soft_signal). Pricing table. Alembic migration (extend <code>AgentExecution</code>).</td></tr>
+<tr><td><strong>Phase 1 (v1)</strong></td><td>Shared hook; Observer Half A (write) + Half B (EventBus + scheduled scan + the v1 detection rules incl. per-conversation cost); Evaluator (deterministic gate + Claude judge + revise loop) at the <code>CoreAgent</code> tier; alerts via API + EventBus; config + tests.</td></tr>
+<tr><td><strong>Phase 2</strong></td><td>SuperAgent-tier instrumentation; OTel span emission (OTLP) for the debug span hierarchy; duplicate-tool-call hash + context-growth detection; devskyy.app admin dashboard panel; optional Langfuse Cloud.</td></tr>
+</table>
+</section>
+
+<section id="risks">
+<h2>10. Scope, risks, open questions</h2>
+<h3>Risks (named, mitigated)</h3>
+<ul>
+<li><strong>Judge self-bias</strong> → blind authorship + concrete grounding + calibration gate (§3.3–3.4).</li>
+<li><strong>Revision homogenization</strong> → distinctiveness dimension + SKU grounding + keep revision-1 candidate (§3.6).</li>
+<li><strong>Empty-table cold start</strong> → trend rules warm up; liveness rules immediate (§4.4).</li>
+<li><strong>Judge cost</strong> → free deterministic gate filters first; cap 2 + early-exit; per-agent disable.</li>
+<li><strong>Alert fatigue</strong> → tiers, hysteresis, shadow routing, 30-day review (§4.5).</li>
+</ul>
+<h3>Open questions for the plan</h3>
+<ol>
+<li>Exact <code>AsyncSession</code> factory import in <code>database/</code> for the hook's DB write.</li>
+<li>Where token usage is available at the <code>execute_safe</code> seam — does <code>result</code> carry per-call token counts, or must the hook read them from the LLM client layer? Determines whether v1 token metrics are exact or estimated.</li>
+<li>Dashboard alert API surface — new endpoint under <code>api/v1/</code> vs reuse of an existing admin route.</li>
+<li>Who labels the ~100-draft calibration set, and when (gates evaluator hard-gate mode).</li>
+<li><strong>Content-type detection at the seam.</strong> The gate triggers on <code>result.output_type ∈ {content, copy}</code>, but the orchestrator returns an untyped <code>dict[str, Any]</code> (no enforced envelope). The plan must decide how the hook recognizes content output — options: (a) add an <code>output_type</code> key to <code>ContentCoreAgent</code> results, (b) key on the agent's <code>CoreAgentType</code> being <code>CONTENT</code>, or (c) a registered set of content-producing agent names. Option (b) is the least invasive and recommended.</li>
+</ol>
+</section>
+
+</body>
+</html>
