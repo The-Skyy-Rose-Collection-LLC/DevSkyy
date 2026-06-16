@@ -70,6 +70,7 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
     """
     s = config.SPLIT_DIR
     p = config.PRODUCTS_DIR
+    sp = config.PRODUCT_SOURCE_PHOTOS_DIR
     return {
         # ── BLACK ROSE ──
         "br-001": {
@@ -145,7 +146,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back": s / "signature" / "sg-bridge-shorts-golden-back.jpeg",
         },
         "sg-004": {"front": p / "signature-hoodie-techflat.jpeg", "back": None},
-        "sg-005": {"front": p / "bay-bridge-shirt-front.jpg", "back": None},
+        "sg-005": {
+            "front": sp / "signature" / "sg-005-bay-bridge-shirt-front-authentic.jpg",
+            "back": None,
+        },
         "sg-006": {"front": s / "signature" / "sg-mint-lav-hoodie-front.jpeg", "back": None},
         "sg-007": {"front": s / "signature" / "sg-beanie-purple.jpeg", "back": None},
         "sg-009": {"front": p / "sherpa-jacket-front.jpg", "back": None},

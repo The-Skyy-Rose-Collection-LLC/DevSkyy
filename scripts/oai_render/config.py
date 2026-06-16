@@ -116,6 +116,7 @@ CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
 # each entry skips one (sku, style, view) plan in batches; explicit --sku overrides.
 KEEPERS_JSON = THEME_ROOT / "data" / "render-keepers.json"
 PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
+PRODUCT_SOURCE_PHOTOS_DIR = _ap.PRODUCT_SOURCE_PHOTOS
 PRODUCTS_DIR = _ap.WP_PRODUCTS_DIR
 SPLIT_DIR = _ap.PRODUCT_TECHFLATS / "split"
 OVERLAYS_DIR = _ap.PRODUCT_TECHFLATS / "hero-overlays"
