@@ -1,129 +1,85 @@
-# fly.toml - DevSkyy Enterprise Platform
-# Enterprise-hardened configuration for production deployment
+# fly.toml app configuration file generated for devskyy-mz1-ow on 2026-06-16T00:47:21Z
 #
-# See https://fly.io/docs/reference/configuration/ for documentation
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = 'devskyy'
-primary_region = 'sjc'
-
-# Kill signal for graceful shutdown
+app = 'devskyy-mz1-ow'
+primary_region = 'ams'
 kill_signal = 'SIGTERM'
 kill_timeout = '30s'
 
-# Environment variables (non-sensitive only)
-# Secrets should be set via: fly secrets set KEY=value
-[env]
-  # Core Production Settings
-  ENVIRONMENT = 'production'
-  LOG_LEVEL = 'INFO'
-  LOG_JSON = 'true'
-  PYTHONUNBUFFERED = '1'
-  PYTHONDONTWRITEBYTECODE = '1'
-
-  # Monitoring & Observability
-  SENTRY_ENVIRONMENT = 'production'
-  SENTRY_TRACES_SAMPLE_RATE = '0.1'  # Sample 10% of traces in production
-  SENTRY_PROFILES_SAMPLE_RATE = '0.05'  # Sample 5% of profiles
-
-  # Security & Feature Flags
-  CORS_ORIGINS = 'https://app.devskyy.app,https://api.devskyy.app,https://*.devskyy.app'
-  SESSION_TIMEOUT_MINUTES = '60'
-  MAX_LOGIN_ATTEMPTS = '5'
-  LOGIN_LOCKOUT_MINUTES = '15'
-
-  # Redis Cache Configuration (Optional - graceful fallback if unavailable)
-  REDIS_SOCKET_TIMEOUT = '2.0'  # Reduced from 5.0 for faster timeout
-  REDIS_CONNECT_TIMEOUT = '2.0'
-  REDIS_RETRY_ON_TIMEOUT = 'true'
-  REDIS_MAX_CONNECTIONS = '10'
-
-  # RAG Pipeline Configuration (disabled by default)
-  RAG_AUTO_INGEST = 'false'
-  RAG_ENABLE_REWRITING = 'false'
-  RAG_ENABLE_RERANKING = 'false'
-
-  # Request & Connection Limits
-  MAX_REQUEST_BODY_SIZE = '10485760'  # 10MB
-  REQUEST_TIMEOUT_SECONDS = '60'
-  KEEPALIVE_TIMEOUT_SECONDS = '65'
-
-  # Database Configuration (when available)
-  DATABASE_POOL_SIZE = '5'
-  DATABASE_MAX_OVERFLOW = '10'
-  DATABASE_POOL_TIMEOUT = '5'
-  DATABASE_POOL_RECYCLE = '3600'
-  DATABASE_CONNECT_TIMEOUT = '10'
-
-  # IMPORTANT: Set these via secrets, not env vars:
-  # fly secrets set DATABASE_URL=postgresql+asyncpg://...
-  # fly secrets set REDIS_URL=redis://...
-  # fly secrets set JWT_SECRET_KEY=...
-  # fly secrets set ENCRYPTION_MASTER_KEY=...
-  # fly secrets set OPENAI_API_KEY=...
-  # fly secrets set ANTHROPIC_API_KEY=...
-  # fly secrets set SENTRY_DSN=https://...
-
 [build]
-  # Uses Dockerfile in root directory
 
-# HTTP service configuration
+[env]
+  CORS_ORIGINS = 'https://app.devskyy.app,https://api.devskyy.app,https://*.devskyy.app'
+  DATABASE_CONNECT_TIMEOUT = '10'
+  DATABASE_MAX_OVERFLOW = '10'
+  DATABASE_POOL_RECYCLE = '3600'
+  DATABASE_POOL_SIZE = '5'
+  DATABASE_POOL_TIMEOUT = '5'
+  ENVIRONMENT = 'production'
+  KEEPALIVE_TIMEOUT_SECONDS = '65'
+  LOGIN_LOCKOUT_MINUTES = '15'
+  LOG_JSON = 'true'
+  LOG_LEVEL = 'INFO'
+  MAX_LOGIN_ATTEMPTS = '5'
+  MAX_REQUEST_BODY_SIZE = '10485760'
+  PYTHONDONTWRITEBYTECODE = '1'
+  PYTHONUNBUFFERED = '1'
+  RAG_AUTO_INGEST = 'false'
+  RAG_ENABLE_RERANKING = 'false'
+  RAG_ENABLE_REWRITING = 'false'
+  REDIS_CONNECT_TIMEOUT = '2.0'
+  REDIS_MAX_CONNECTIONS = '10'
+  REDIS_RETRY_ON_TIMEOUT = 'true'
+  REDIS_SOCKET_TIMEOUT = '2.0'
+  REQUEST_TIMEOUT_SECONDS = '60'
+  SENTRY_ENVIRONMENT = 'production'
+  SENTRY_PROFILES_SAMPLE_RATE = '0.05'
+  SENTRY_TRACES_SAMPLE_RATE = '0.1'
+  SESSION_TIMEOUT_MINUTES = '60'
+
 [http_service]
-  internal_port = 8000
+  internal_port = 8080
   force_https = true
-  auto_stop_machines = 'suspend'  # Suspend instead of stop for faster cold starts
+  auto_stop_machines = 'suspend'
   auto_start_machines = true
-  min_machines_running = 1  # Enterprise: always have at least 1 machine running
+  min_machines_running = 1
   processes = ['app']
 
-  # Concurrency limits per machine
   [http_service.concurrency]
     type = 'requests'
     hard_limit = 250
     soft_limit = 200
 
-# Auto-scaling configuration for production
-[http_service.auto_scaling]
-  min_machines = 1
-  max_machines = 5  # Max 5 machines for cost control + performance
-  # Scale up when CPU or memory exceeds threshold
-  [http_service.auto_scaling.metrics]
-    cpu_threshold = 75  # Scale up if CPU > 75%
-    memory_threshold = 80  # Scale up if memory > 80%
-    requests_per_second_threshold = 100  # Scale up if RPS > 100
+  [[http_service.checks]]
+    interval = '15s'
+    timeout = '10s'
+    grace_period = '1m0s'
+    method = 'GET'
+    path = '/health'
+    protocol = 'http'
+    tls_skip_verify = false
 
-# Health checks for load balancer
-[[http_service.checks]]
-  grace_period = '60s'  # Increased from 30s for slow startup
-  interval = '15s'
-  timeout = '10s'
-  method = 'GET'
-  path = '/health'
-  protocol = 'http'
-  tls_skip_verify = false
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '1m0s'
+    method = 'GET'
+    path = '/ready'
+    protocol = 'http'
+    tls_skip_verify = false
 
-# Readiness check
-[[http_service.checks]]
-  grace_period = '60s'  # Increased from 10s for slow startup
-  interval = '30s'
-  timeout = '5s'
-  method = 'GET'
-  path = '/ready'
-  protocol = 'http'
-  tls_skip_verify = false
-
-# VM configuration - Enterprise tier
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
   memory_mb = 1024
 
-# Metrics endpoint for monitoring
-[metrics]
-  port = 8000
-  path = '/metrics'
-
-# Statics configuration (if serving static files)
 [[statics]]
   guest_path = '/app/public'
   url_prefix = '/static'
+
+[[metrics]]
+  port = 8000
+  path = '/metrics'
