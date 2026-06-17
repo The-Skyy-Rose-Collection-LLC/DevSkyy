@@ -207,6 +207,19 @@ def build_collection(
     }
     lockup_keys = {"lockup_display", "lockup_svg_master", "lockup_source_art", "lockup_alt"}
     imagery = {k: v for k, v in full.items() if k not in lockup_keys}
+    # Resolve imagery.hero from identity.json (collection-specific canonical hub slot).
+    ident_hero_raw = (ident.get("imagery") or {}).get("hero")
+    if ident_hero_raw:
+        h_path = ident_hero_raw.get("path", "")
+        imagery["hero"] = {
+            "path": h_path,
+            "resolved": sot_common.resolve_asset(h_path),
+            "kind": ident_hero_raw.get("kind"),
+            "status": ident_hero_raw.get("status"),
+            "notes": ident_hero_raw.get("notes"),
+        }
+    else:
+        imagery["hero"] = None
     return {
         "_generated_by": "data/build-collection-sot.py — DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
         "_authority": f"Single Source of Truth view for {ident['name']}. Canon = identity.json.",

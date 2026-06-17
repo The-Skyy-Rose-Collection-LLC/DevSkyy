@@ -91,6 +91,7 @@ $skyyrose_core_includes = array(
 	'/inc/rest-api-experience.php',
 	'/inc/personalization.php',
 	'/inc/performance-guardian.php',
+	'/inc/image-placements.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
 );

@@ -490,21 +490,101 @@ function skyyrose_gd_convert( $src_path, $dst_path, $format ) {
  * Falls back to a plain <img> when no next-gen siblings exist on disk.
  * The fallback <img> always uses the original URL.
  *
+ * ### Placement support (optional)
+ *
+ * Pass a 'placement' key in $attrs to activate sizing-by-surface mode.
+ * The key is consumed as a directive — it is NOT emitted as an HTML attribute.
+ *
+ * When 'placement' matches a registered contract in skyyrose_image_placements():
+ *  - The <source> and <img> tags receive a `sizes` attribute from the contract.
+ *  - A responsive `srcset` is built from on-disk width-suffixed siblings via
+ *    skyyrose_image_srcset(); this supplements (not replaces) the AVIF/WebP
+ *    next-gen source handling.
+ *  - Baseline `width` and `height` attributes are derived from the contract's
+ *    aspect ratio string (e.g. '16 / 9') to eliminate CLS before the image loads.
+ *  - `data-fit` and `data-position` attributes are emitted so CSS can apply
+ *    object-fit / object-position without needing inline !important overrides.
+ *
+ * Backward compatibility: omitting 'placement' (or passing an unregistered key)
+ * produces output identical to the pre-1.6.3 behaviour.
+ *
  * @since  1.5.8
+ * @since  1.6.3 Optional 'placement' directive; data-fit/data-position; srcset.
  * @param  string $src    Image source URL.
  * @param  string $alt    Alt text (pass '' for decorative).
- * @param  array  $attrs  Extra HTML attrs for the <img> (class, loading, etc.).
+ * @param  array  $attrs  Extra HTML attrs for the <img> plus optional 'placement' directive.
  * @return string         Rendered <picture> markup (already escaped).
  */
 function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
+	// --- Placement directive ------------------------------------------------
+	$placement_key      = isset( $attrs['placement'] ) ? (string) $attrs['placement'] : '';
+	$placement_contract = array();
+
+	if ( '' !== $placement_key && function_exists( 'skyyrose_image_placement' ) ) {
+		$resolved = skyyrose_image_placement( $placement_key );
+		if ( is_array( $resolved ) ) {
+			$placement_contract = $resolved;
+		}
+	}
+
+	// Remove the directive so it is never rendered as an HTML attribute.
+	unset( $attrs['placement'] );
+
+	// --- Placement: inject sizes, data-fit, data-position, width/height -----
+	$sizes_attr  = '';
+	$srcset_attr = '';
+
+	if ( ! empty( $placement_contract ) ) {
+		// sizes attribute.
+		if ( ! empty( $placement_contract['sizes'] ) ) {
+			$sizes_attr = (string) $placement_contract['sizes'];
+		}
+
+		// Responsive srcset from on-disk width-suffixed siblings.
+		if ( ! empty( $placement_contract['widths'] ) && function_exists( 'skyyrose_image_srcset' ) ) {
+			$srcset_attr = skyyrose_image_srcset( $src, (array) $placement_contract['widths'] );
+		}
+
+		// Baseline width/height from aspect ratio string to kill CLS.
+		// Parse e.g. '16 / 9' → w=1600, h=900 (baseline units, not CSS px).
+		if ( ! isset( $attrs['width'] ) && ! isset( $attrs['height'] )
+			&& ! empty( $placement_contract['aspect'] ) ) {
+			$parts = array_map( 'trim', explode( '/', (string) $placement_contract['aspect'] ) );
+			if ( 2 === count( $parts ) && is_numeric( $parts[0] ) && is_numeric( $parts[1] ) && (float) $parts[1] > 0 ) {
+				$ratio         = (float) $parts[0] / (float) $parts[1];
+				$baseline_h    = 900;
+				$attrs['width']  = (int) round( $baseline_h * $ratio );
+				$attrs['height'] = $baseline_h;
+			}
+		}
+
+		// data-fit / data-position — consumed by CSS, no inline !important needed.
+		if ( ! isset( $attrs['data-fit'] ) && ! empty( $placement_contract['fit'] ) ) {
+			$attrs['data-fit'] = (string) $placement_contract['fit'];
+		}
+		if ( ! isset( $attrs['data-position'] ) && ! empty( $placement_contract['position'] ) ) {
+			$attrs['data-position'] = (string) $placement_contract['position'];
+		}
+	}
+	// --- end placement -------------------------------------------------------
+
 	$sources = skyyrose_picture_sources( $src );
 
+	// Build the HTML attribute string for the <img> tag.
 	$attr_html = '';
 	foreach ( $attrs as $key => $val ) {
 		if ( null === $val || false === $val ) {
 			continue;
 		}
 		$attr_html .= ' ' . esc_attr( $key ) . '="' . esc_attr( (string) $val ) . '"';
+	}
+
+	// Append srcset + sizes to <img> when placement supplied them.
+	if ( '' !== $srcset_attr ) {
+		$attr_html .= ' srcset="' . esc_attr( $srcset_attr ) . '"';
+	}
+	if ( '' !== $sizes_attr ) {
+		$attr_html .= ' sizes="' . esc_attr( $sizes_attr ) . '"';
 	}
 
 	$img_tag = sprintf(
@@ -519,12 +599,19 @@ function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
 	}
 
 	$out = '<picture>';
+
+	// Emit next-gen <source> tags, adding sizes + srcset when placement is active.
 	if ( ! empty( $sources['avif'] ) ) {
-		$out .= sprintf( '<source type="image/avif" srcset="%s">', esc_url( $sources['avif'] ) );
+		$avif_srcset = '' !== $srcset_attr ? ' srcset="' . esc_attr( $srcset_attr ) . '"' : sprintf( ' srcset="%s"', esc_url( $sources['avif'] ) );
+		$avif_sizes  = '' !== $sizes_attr ? ' sizes="' . esc_attr( $sizes_attr ) . '"' : '';
+		$out        .= sprintf( '<source type="image/avif"%s%s>', $avif_srcset, $avif_sizes );
 	}
 	if ( ! empty( $sources['webp'] ) ) {
-		$out .= sprintf( '<source type="image/webp" srcset="%s">', esc_url( $sources['webp'] ) );
+		$webp_srcset = '' !== $srcset_attr ? ' srcset="' . esc_attr( $srcset_attr ) . '"' : sprintf( ' srcset="%s"', esc_url( $sources['webp'] ) );
+		$webp_sizes  = '' !== $sizes_attr ? ' sizes="' . esc_attr( $sizes_attr ) . '"' : '';
+		$out        .= sprintf( '<source type="image/webp"%s%s>', $webp_srcset, $webp_sizes );
 	}
+
 	$out .= $img_tag;
 	$out .= '</picture>';
 

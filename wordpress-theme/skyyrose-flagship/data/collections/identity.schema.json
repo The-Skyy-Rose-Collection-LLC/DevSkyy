@@ -40,7 +40,24 @@
       "required": ["ref"],
       "properties": {"ref": {"type": "string", "minLength": 1}}
     },
-    "known_orphans": {"type": "array", "items": {"type": "string"}}
+    "known_orphans": {"type": "array", "items": {"type": "string"}},
+    "imagery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hero": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "kind", "status"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "kind": {"type": "string", "minLength": 1},
+            "status": {"type": "string", "minLength": 1},
+            "notes": {"type": "string"}
+          }
+        }
+      }
+    }
   },
   "$defs": {
     "font": {

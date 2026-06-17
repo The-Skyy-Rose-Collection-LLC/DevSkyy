@@ -24,6 +24,7 @@ from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
 
 OUT = DATA / "collections"
 CSS = DATA.parent / "assets/css/design-tokens.css"
+HERO_MIN_WIDTH = 2560  # MJ masters target; interim files are < 2560 (warn, not fail)
 
 
 def catalog_skus() -> dict[str, set]:
@@ -43,6 +44,23 @@ def walk_resolved(obj: Any, slug: str, hard: list) -> None:
     elif isinstance(obj, list):
         for v in obj:
             walk_resolved(v, slug, hard)
+
+
+def _hero_pixel_width(resolved: str) -> int | None:
+    """Return the pixel width of a resolved asset path, or None if unreadable."""
+    abs_path = sot_common.ASSETS / resolved
+    try:
+        r = subprocess.run(
+            ["identify", "-format", "%w", str(abs_path)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if r.returncode == 0 and r.stdout.strip().isdigit():
+            return int(r.stdout.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+    return None
 
 
 def main() -> int:
@@ -77,6 +95,28 @@ def main() -> int:
         walk_resolved(sot.get("lockup", {}), slug, hard)
         walk_resolved(sot.get("imagery", {}), slug, hard)
         walk_resolved(sot.get("logos", []), slug, hard)
+        # Hero slot check: must exist and resolve to a real file.
+        hero = (sot.get("imagery") or {}).get("hero")
+        if not hero or not hero.get("path"):
+            hard.append(f"{slug}: imagery.hero slot missing — add to identity.json")
+        else:
+            h_resolved = hero.get("resolved")
+            if not h_resolved or not (sot_common.ASSETS / h_resolved).is_file():
+                hard.append(
+                    f"{slug}: imagery.hero declared path does not resolve: {hero.get('path')}"
+                )
+            else:
+                w = _hero_pixel_width(h_resolved)
+                if w is not None and w < HERO_MIN_WIDTH:
+                    warn.append(
+                        f"{slug}: imagery.hero width {w}px < {HERO_MIN_WIDTH}px"
+                        f" ({h_resolved}) — interim master; MJ hero pending"
+                    )
+                print(
+                    f"  hero: {h_resolved}"
+                    + (f" ({w}px wide)" if w is not None else "")
+                    + (" [interim]" if (hero.get("status") or "").startswith("interim") else "")
+                )
         for u in sot.get("unresolved_product_images", []):
             warn.append(f"{slug}: {u['sku']} {u['column']} -> {u['path']} (missing file)")
         print(
@@ -85,7 +125,7 @@ def main() -> int:
         )
 
     if warn:
-        print("\nWARNINGS (fix in skyyrose-catalog.csv):")
+        print("\nWARNINGS:")
         for w in warn:
             print("  ⚠ " + w)
     if hard:

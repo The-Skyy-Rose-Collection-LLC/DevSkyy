@@ -23,5 +23,13 @@
     "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
   },
   "lockup": {"ref": "images/lockups/signature-lockup.webp"},
+  "imagery": {
+    "hero": {
+      "path": "branding/hero/luxury-nighttime",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Signature MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
+  },
   "known_orphans": []
 }

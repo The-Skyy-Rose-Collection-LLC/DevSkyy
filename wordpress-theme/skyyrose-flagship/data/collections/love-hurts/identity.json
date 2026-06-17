@@ -25,5 +25,13 @@
     "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
   },
   "lockup": {"ref": "images/lockups/love-hurts-lockup.webp"},
+  "imagery": {
+    "hero": {
+      "path": "branding/hero/beauty-and-beast",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Love Hurts MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
+  },
   "known_orphans": []
 }
