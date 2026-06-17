@@ -1,6 +1,6 @@
 """Seed the DevSkyy database with SkyyRose product catalog.
 
-Loads from the canonical CSV at data/product-catalog.csv.
+Loads from the canonical catalog CSV via skyyrose.core.catalog_loader (single source of truth).
 
 Usage:
     python -m database.seed_catalog
@@ -9,13 +9,10 @@ Usage:
 from __future__ import annotations
 
 import asyncio
-import csv
 import json
 import uuid
-from pathlib import Path
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
-_CATALOG_CSV = _PROJECT_ROOT / "data" / "product-catalog.csv"
+from skyyrose.core.catalog_loader import read_catalog_rows
 
 
 def _infer_category(name: str) -> str:
@@ -44,32 +41,30 @@ def _infer_category(name: str) -> str:
 
 
 def _load_products() -> list[dict]:
-    """Load canonical product list from data/product-catalog.csv.
+    """Load the canonical product list via skyyrose.core.catalog_loader.
 
-    Skips render-only variants (rows where render_variant_of is set),
-    which are not standalone WooCommerce products.
+    Reads the single source of truth
+    (wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv). The loader
+    already skips blank / SKU-less rows, and the canonical CSV carries no
+    render-variant rows, so every row is a standalone product.
     """
     products = []
-    with _CATALOG_CSV.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            sku = row["sku"].strip()
-            if not sku or row["render_variant_of"].strip():
-                continue
-            sizes = [s.strip() for s in row["sizes"].split("|") if s.strip()]
-            products.append(
-                {
-                    "sku": sku,
-                    "name": row["name"].strip(),
-                    "price": float(row["price"]) if row["price"].strip() else 0.0,
-                    "collection": row["collection_slug"].strip(),
-                    "category": _infer_category(row["name"]),
-                    "description": row["description"].strip(),
-                    "quantity": int(row["edition_size"]) if row["edition_size"].strip() else 250,
-                    "is_active": row["is_preorder"].strip() == "1",
-                    "sizes": sizes,
-                    "color": row["color"].strip(),
-                }
-            )
+    for row in read_catalog_rows():
+        sizes = [s.strip() for s in row["sizes"].split("|") if s.strip()]
+        products.append(
+            {
+                "sku": row["sku"].strip(),
+                "name": row["name"].strip(),
+                "price": float(row["price"]) if row["price"].strip() else 0.0,
+                "collection": row["collection"].strip(),
+                "category": _infer_category(row["name"]),
+                "description": row["description"].strip(),
+                "quantity": int(row["edition_size"]) if row["edition_size"].strip() else 250,
+                "is_active": row["is_preorder"].strip() == "1",
+                "sizes": sizes,
+                "color": row["color"].strip(),
+            }
+        )
     return products
 
 

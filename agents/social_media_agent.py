@@ -29,7 +29,6 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
-from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -282,19 +281,21 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
 }
 
 
-# Product catalog — loaded from data/product-catalog.csv (single source of truth)
+# Product catalog — loaded from the canonical skyyrose-catalog.csv (single source of truth)
 def _load_catalog() -> dict[str, dict[str, str]]:
+    from skyyrose.core.catalog_loader import CATALOG_CSV
+
     catalog: dict[str, dict[str, str]] = {}
-    csv_path = Path(__file__).resolve().parent.parent / "data" / "product-catalog.csv"
+    csv_path = CATALOG_CSV
     try:
         with csv_path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 sku = row["sku"].strip()
-                if not sku or row["render_variant_of"].strip():
+                if not sku:
                     continue
                 catalog[sku] = {
                     "name": row["name"].strip(),
-                    "collection": row["collection_slug"].strip(),
+                    "collection": row["collection"].strip(),
                 }
     except FileNotFoundError:
         logger.warning(
