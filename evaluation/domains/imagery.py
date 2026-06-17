@@ -12,6 +12,9 @@ from pathlib import Path
 
 from evaluation.contracts import Verdict
 from evaluation.judge import image_block
+
+# Leading-underscore imports from qc.py are intentional reuse of stable internals
+# (this is the only cross-package consumer). Migrate if qc.py grows a public API.
 from scripts.oai_render import config as render_config
 from scripts.oai_render.qc import (
     _GATE_TAGS,
@@ -58,6 +61,8 @@ class ImageryAdapter:
         )
 
     def deterministic_checks(self, subject: bytes, ref: RenderExpectation) -> list[str]:
+        # Excluded SKUs skip image QC entirely by policy; the corrupt-bytes case won't
+        # reach qc.deterministic_checks so no PIL/numpy import is needed for them.
         if ref.sku in render_config.EXCLUDED_SKUS:
             return ["excluded_sku"]
         return deterministic_checks(subject)
@@ -74,9 +79,12 @@ class ImageryAdapter:
         return {"messages": [{"role": "user", "content": content}], "tool": IMAGERY_TOOL}
 
     def parse_verdict(self, judge_output: dict, det_failures: list[str]) -> Verdict:
-        tags = tuple(tag for gate, tag in _GATE_TAGS.items() if judge_output.get(gate) is False)
+        # Fail-closed: a gate that is absent or False counts as a failure. Under forced
+        # tool-use (required + additionalProperties:False) all gate keys are present, but
+        # this guards a degraded/truncated tool response from yielding a false "pass".
+        tags = tuple(tag for gate, tag in _GATE_TAGS.items() if judge_output.get(gate) is not True)
         passed = not tags and not det_failures
-        gate_results = {g: bool(judge_output.get(g)) for g in _GATES}
+        gate_results = {g: judge_output.get(g) is True for g in _GATES}
         score = sum(1 for g in _GATES if judge_output.get(g) is True) / len(_GATES)
         return Verdict(
             domain="imagery",

@@ -53,6 +53,32 @@ def test_parse_verdict_maps_gates_to_tags():
     assert v.domain == "imagery"
 
 
+def test_build_judge_request_structure():
+    ad = ImageryAdapter()
+    req = ad.build_judge_request(b"\x89PNG\r\n\x1a\n" + b"\x00" * 64, _exp())
+    assert "messages" in req and req["tool"]["name"] == "render_qc_verdict"
+    content = req["messages"][0]["content"]
+    assert content[0]["type"] == "text"
+    assert any(b["type"] == "image" for b in content)
+
+
+def test_parse_verdict_missing_gate_is_failure():
+    ad = ImageryAdapter()
+    # judge omitted 'all_garments_present' → must NOT pass (fail-closed)
+    out = {
+        "visual_analysis": "x",
+        "is_single_photograph": True,
+        "garment_matches_reference": True,
+        "view_correct": True,
+        "branding_legible_and_correct": True,
+        "photorealistic_not_flat": True,
+        "reason": "truncated",
+    }
+    v = ad.parse_verdict(out, det_failures=[])
+    assert v.passed is False
+    assert "missing_pair_garment" in v.failure_tags
+
+
 def test_load_ground_truth_from_review_state(tmp_path):
     import json
 
