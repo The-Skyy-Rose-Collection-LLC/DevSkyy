@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bump this constant when adding new pages or changing setup logic.
  * The `init` runner uses this to determine if setup has already run.
  */
-define( 'SKYYROSE_SETUP_VERSION', '4.2.0' );
+define( 'SKYYROSE_SETUP_VERSION', '4.3.0' );
 
 /*
 --------------------------------------------------------------
@@ -106,6 +106,13 @@ function skyyrose_get_required_pages() {
 		'experience-kids-capsule' => array(
 			'title'    => __( 'Kids Capsule Experience', 'skyyrose' ),
 			'template' => 'template-immersive-kids-capsule.php',
+			'content'  => '',
+		),
+
+		// --- Experiences hub (links to all four immersive worlds) ---
+		'experiences'             => array(
+			'title'    => __( 'Immersive Worlds', 'skyyrose' ),
+			'template' => 'template-experiences.php',
 			'content'  => '',
 		),
 

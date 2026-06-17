@@ -1,5 +1,5 @@
 """
-Master product registry — the canonical source-of-truth for every SKU's reference imagery.
+Master product registry — hash-pinning registry for locked product reference imagery.
 
 Wave 1 of the commercial compositor retrofit: **reference-first pipeline**.
 
@@ -7,9 +7,13 @@ A "master" is the immutable, locked image that represents a product exactly. All
 renders (compositor scene variants, marketing derivatives) MUST derive from a master — never
 from a generated variant. This module enforces that by hash-pinning.
 
-Masters live at `assets/product-masters/` at the repo root; the manifest is
-`assets/product-masters/manifest.json`. Override the manifest location via the
-`SKYYROSE_MASTER_MANIFEST_PATH` environment variable (used by tests).
+NOTE (2026-06-16 SOT cutover): The old `assets/product-masters/` tree (manifest.json +
+catalog.yaml) was deleted. That directory now holds only a README. Product data (SKUs, names,
+prices, collection membership) is authoritative in `data/skyyrose-catalog.csv`, accessed via
+`skyyrose.core.catalog_loader.read_catalog_rows`. This module's hash-pinning machinery
+(`Manifest`, `MasterEntry`, `sha256_of_file`) remains intact for render provenance; the
+default manifest path resolves to the same directory but will load an empty manifest when no
+manifest.json is present. Override via `SKYYROSE_MASTER_MANIFEST_PATH` (used by tests).
 
 Master sources (`master_source` field):
     photograph        — physical product photographed against neutral background
@@ -37,6 +41,9 @@ MasterSource = Literal["photograph", "cad_render", "3d_model", "generative_locke
 MasterStatus = Literal["pending", "locked", "retired"]
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+# NOTE: assets/product-masters/ exists but holds only a README; manifest.json was deleted
+# in the SOT cutover (2026-06-16).  Manifest.load() returns an empty Manifest when the file
+# is absent, so this default is safe.  Override via SKYYROSE_MASTER_MANIFEST_PATH in tests.
 _DEFAULT_MASTERS_DIR = _REPO_ROOT / "assets" / "product-masters"
 _MANIFEST_FILENAME = "manifest.json"
 

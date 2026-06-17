@@ -87,6 +87,8 @@ $index = (int) ( $args['index'] ?? 0 );
 						'class'    => 'holo__img holo__img--front',
 						'loading'  => 'lazy',
 						'decoding' => 'async',
+						'width'    => '600',
+						'height'   => '750',
 					)
 				);
 				echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
@@ -96,6 +98,8 @@ $index = (int) ( $args['index'] ?? 0 );
 						'class'    => 'holo__img holo__img--back',
 						'loading'  => 'lazy',
 						'decoding' => 'async',
+						'width'    => '600',
+						'height'   => '750',
 					)
 				);
 				?>

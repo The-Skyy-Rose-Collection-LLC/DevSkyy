@@ -50,21 +50,21 @@ function skyyrose_setup() {
 	/*
 	 * Register navigation menus.
 	 *
-	 * primary      - Main header navigation
-	 * collection   - Collection-specific navigation (per-collection pages)
-	 * experiences  - Immersive experience pages navigation (3D storytelling)
-	 * footer-legal - Footer column: Legal / policy links
-	 * footer       - Footer menu (legal nav in footer.php)
-	 * mobile       - Mobile-specific navigation (legacy)
-	 * top-bar      - Announcement / utility bar (legacy)
+	 * primary     - Main header navigation (also used by mobile slide-in panel)
+	 * collection  - Collection-specific navigation (per-collection pages)
+	 * experiences - Immersive experience pages navigation (3D storytelling)
+	 * footer      - Footer copyright bar menu (rendered in footer.php)
+	 *
+	 * Removed: footer-legal — was never called in any template (orphaned location).
+	 * Removed: mobile — mobile panel uses 'primary'; no divergence needed yet.
+	 * Removed: top-bar — never implemented.
 	 */
 	register_nav_menus(
 		array(
-			'primary'      => esc_html__( 'Primary Menu', 'skyyrose' ),
-			'collection'   => esc_html__( 'Collection Navigation', 'skyyrose' ),
-			'experiences'  => esc_html__( 'Experiences Navigation', 'skyyrose' ),
-			'footer-legal' => esc_html__( 'Footer - Legal', 'skyyrose' ),
-			'footer'       => esc_html__( 'Footer Menu', 'skyyrose' ),
+			'primary'     => esc_html__( 'Primary Menu', 'skyyrose' ),
+			'collection'  => esc_html__( 'Collection Navigation', 'skyyrose' ),
+			'experiences' => esc_html__( 'Experiences Navigation', 'skyyrose' ),
+			'footer'      => esc_html__( 'Footer Menu', 'skyyrose' ),
 		)
 	);
 
