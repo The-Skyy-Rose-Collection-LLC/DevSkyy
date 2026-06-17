@@ -1696,6 +1696,21 @@
 
 - `current-site-audit.md` — SkyyRose Current-Site Critique Audit — v1 (Phase 0) (~11205 tok)
 
+## evaluation/
+
+- `__init__.py` — Package init; re-exports RenderFidelityEvaluator, Verdict (~20 tok)
+- `contracts.py` — Normalized Verdict dataclass (frozen), Severity enum, EvalDomain literal (~406 tok)
+- `adapter.py` — DomainAdapter Protocol: deterministic_checks / build_judge_request / parse_verdict / revise (~258 tok)
+- `judge.py` — ClaudeJudge: Anthropic vision judge via forced tool-use; image_block helper; configurable model (~768 tok)
+- `core.py` — EvaluationCore: score() det-gate→judge→verdict; gate() revise loop with cap (~658 tok)
+- `calibration.py` — CalibrationHarness: runs adapter over ground-truth labels, computes Cohen's kappa (~210 tok)
+- `observer.py` — EvaluationObserver: structured JSON event logging for every verdict (~512 tok)
+- `agents.py` — RenderFidelityEvaluator job-title agent: thin wrapper over EvaluationCore + ImageryAdapter (~206 tok)
+
+## evaluation/domains/
+
+- `imagery.py` — ImageryAdapter: deterministic_checks (excluded SKU gate + PNG validation), build_judge_request, parse_verdict (fail-closed 6-gate scoring) (~1200 tok)
+
 ## examples/
 
 - `aos_demo.py` — Live demo of the AOS kernel — Phase 1 + 2. (~1752 tok)
@@ -2884,6 +2899,15 @@
 ## scripts/_lib/
 
 - `script-utils.js` — scripts/_lib/script-utils.js — shared utilities for the per-edit toolchain. (~543 tok)
+
+## scripts/oai_render/
+
+- `qc.py` — RenderExpectation, deterministic_checks, QCGate; provider switch via QC_JUDGE_PROVIDER env (anthropic|openai); dossier reference_image + extra_references fields added (~1800 tok)
+- `config.py` — EXCLUDED_SKUS, OUTPUT_DIR, render pipeline constants (~300 tok)
+
+## scripts/
+
+- `oai-render-qc-eval.py` — CLI eval harness: runs CalibrationHarness over founder-labelled ground truth, reports Cohen's kappa + accuracy, exits non-zero on regression (~600 tok)
 
 ## scripts/clustering/
 
