@@ -58,6 +58,9 @@ QC_JUDGE_DETAIL = "low"  # NEVER "auto"/"high" — community-verified token infl
 QC_JUDGE_MAX_OUTPUT_TOKENS = 300
 QC_MAX_RENDER_RETRIES = 2  # judged re-renders per plan before quarantine
 EST_JUDGE_COST_USD = 0.0002  # generous ceiling per judge call (actual ≈ $0.000075)
+QC_JUDGE_PROVIDER = "openai"  # "openai" (gpt-4o-mini) | "anthropic" (Claude vision)
+QC_JUDGE_ANTHROPIC_MODEL = "claude-sonnet-4-6"
+QC_JUDGE_ANTHROPIC_MAX_TOKENS = 1500  # room for the visual_analysis CoT field
 EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 
 # ── Batch exclusions ────────────────────────────────────────────────────────
