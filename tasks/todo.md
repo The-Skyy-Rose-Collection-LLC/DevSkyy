@@ -15,8 +15,12 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
 - [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
       200 with. Enforced when token set; warns if unset in non-dev.
 - [x] P3a fly.toml pinned to 1 always-on machine (commit 624631520); MCP_SERVICE_TOKEN generated.
-- [ ] P3b Backend deploy ⚠️ STOP-AND-SHOW — `fly deploy --ha=false -a devskyy` + `fly secrets set
-      MCP_SERVICE_TOKEN=…` (runbook delivered; user runs — flyctl not in this env). PENDING.
+- [x] P3b Backend deploy — LIVE at https://devskyy-api.fly.dev/mcp/ (Fly app `devskyy-api`, 1 machine,
+      MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
+      (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
+      ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
+      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
 - [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
       console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
       Vercel deploy ⚠️ PENDING.
@@ -30,9 +34,15 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
 - [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
 
-  Deploy order (each ⚠️ STOP-AND-SHOW): P3b backend `fly deploy --ha=false -a devskyy`
-  (+ `fly secrets set MCP_SERVICE_TOKEN=…`) → P4 Vercel env (MCP_URL + MCP_SERVICE_TOKEN) →
-  P5 `bash scripts/deploy-theme.sh` → P6 E2E. WP deploy is inert until the backend `/mcp/` is live.
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
+  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
+    redeploy frontend. ⚠️
+  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
+    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
+    + DNS records); then the committed default URLs work without per-surface overrides.
+  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
 
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
