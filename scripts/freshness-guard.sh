@@ -65,8 +65,9 @@ if [ "$MODE" = "--fix" ]; then
       || { c_bad "SOT regeneration failed (see /tmp/fg_fix_sot.log)"; tail -8 /tmp/fg_fix_sot.log | sed 's/^/    /'; }
   fi
   if command -v npm >/dev/null 2>&1 && [ -d "$WP/node_modules/clean-css" ]; then
-    ( cd "$WP" && npm run build:css && npm run build:js ) >/tmp/fg_fix_min.log 2>&1 \
-      && c_ok "rebuilt .min (css + js)" || c_bad "min rebuild failed (see /tmp/fg_fix_min.log)"
+    ( cd "$WP" && npm run build ) >/tmp/fg_fix_min.log 2>&1 \
+      && { c_ok "rebuilt .min (css + js)"; MIN_REBUILT=1; } \
+      || c_bad "min rebuild failed (see /tmp/fg_fix_min.log)"
   fi
   git -C "$ROOT" add -- "$THEME/assets/css/design-tokens.css" \
       "$THEME/data/collections" "$THEME/assets/css" "$THEME/assets/js" 2>/dev/null || true
@@ -97,7 +98,8 @@ if forced || staged_match "$MIN_TRIGGER"; then
     # --all/--fix audit: rebuild, surface any .min that differs from the build
     # (also catches toolchain drift), then restore the tree (read-only audit).
     if command -v npm >/dev/null 2>&1 && [ -d "$WP/node_modules/clean-css" ]; then
-      ( cd "$WP" && npm run build:css && npm run build:js ) >/tmp/fg_min.log 2>&1 || true
+      # --fix already rebuilt above; avoid a second redundant minification pass.
+      [ "${MIN_REBUILT:-0}" = "1" ] || ( cd "$WP" && npm run build ) >/tmp/fg_min.log 2>&1 || true
       DRIFTED="$(git -C "$ROOT" diff --name-only -- '*.min.css' '*.min.js' 2>/dev/null)"
       [ "$MODE" = "--fix" ] || git -C "$ROOT" checkout -- '*.min.css' '*.min.js' 2>/dev/null || true
       if [ -n "$DRIFTED" ]; then
@@ -150,7 +152,10 @@ if forced; then
 else
   CODE="$(printf '%s\n' "$STAGED" | grep -E '\.(py|php|js)$' | grep -vE 'test|/tests/|/docs/|\.min\.' || true)"
   HITS=""
-  [ -n "$CODE" ] && HITS="$(cd "$ROOT" && grep -nIE "$RETIRED" $CODE 2>/dev/null || true)"
+  # NUL-delimit the path list so filenames with spaces, globs, or a leading
+  # dash cannot word-split or inject grep flags ('--' terminates options).
+  [ -n "$CODE" ] && HITS="$(cd "$ROOT" && printf '%s\n' "$CODE" | tr '\n' '\0' \
+    | xargs -0 grep -nIE "$RETIRED" -- 2>/dev/null || true)"
 fi
 if [ -n "$HITS" ]; then
   c_bad "retired-master reference(s) — repoint to the catalog CSV / per-collection SOT:"

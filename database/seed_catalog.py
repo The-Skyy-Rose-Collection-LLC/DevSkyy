@@ -15,6 +15,28 @@ import uuid
 from skyyrose.core.catalog_loader import read_catalog_rows
 
 
+def _to_float(value: str, default: float) -> float:
+    """Parse a CSV money field; fall back rather than abort the whole seed."""
+    value = value.strip()
+    if not value:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+def _to_int(value: str, default: int) -> int:
+    """Parse a CSV integer field; fall back rather than abort the whole seed."""
+    value = value.strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
 def _infer_category(name: str) -> str:
     n = name.lower()
     if "jogger" in n:
@@ -55,11 +77,11 @@ def _load_products() -> list[dict]:
             {
                 "sku": row["sku"].strip(),
                 "name": row["name"].strip(),
-                "price": float(row["price"]) if row["price"].strip() else 0.0,
+                "price": _to_float(row["price"], 0.0),
                 "collection": row["collection"].strip(),
                 "category": _infer_category(row["name"]),
                 "description": row["description"].strip(),
-                "quantity": int(row["edition_size"]) if row["edition_size"].strip() else 250,
+                "quantity": _to_int(row["edition_size"], 250),
                 "is_active": row["is_preorder"].strip() == "1",
                 "sizes": sizes,
                 "color": row["color"].strip(),

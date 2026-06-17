@@ -10,7 +10,6 @@ Creates or updates products with images, prices, categories, and attributes.
 
 from __future__ import annotations
 
-import csv
 import json
 import os
 import sys
@@ -19,7 +18,7 @@ from pathlib import Path
 
 import httpx
 
-from skyyrose.core.catalog_loader import CATALOG_CSV
+from skyyrose.core.catalog_loader import read_catalog_rows
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 IMAGE_MAP_JSON = ROOT / "scripts" / "launch" / "sku_image_map.json"
@@ -196,11 +195,8 @@ def sync_all():
     with open(IMAGE_MAP_JSON) as f:
         image_map: dict[str, dict] = json.load(f)
 
-    # Load catalog
-    products: list[dict] = []
-    with open(CATALOG_CSV, newline="") as f:
-        for row in csv.DictReader(f):
-            products.append(row)
+    # Load catalog (canonical CSV via the shared, memoized loader)
+    products: list[dict] = list(read_catalog_rows())
 
     print(f"Catalog: {len(products)} products")
     print(f"Images:  {len(image_map)} mapped")

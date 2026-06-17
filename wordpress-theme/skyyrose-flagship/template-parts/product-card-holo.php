@@ -51,10 +51,7 @@ if ( empty( $front_url ) ) {
 }
 // Only if the catalog/SOT has no render: fall back to a WC featured image.
 if ( empty( $front_url ) && $wc_product ) {
-	$wc_featured = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' );
-	if ( $wc_featured ) {
-		$front_url = $wc_featured;
-	}
+	$front_url = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) ?: '';
 }
 $back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
 $permalink = $args['permalink'] ?? '';
