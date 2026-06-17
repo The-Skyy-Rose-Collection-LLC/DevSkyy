@@ -13,7 +13,8 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import replace
-from typing import Any, Awaitable, Callable
+from typing import Any
+from collections.abc import Awaitable, Callable
 
 from evaluation.adapter import DomainAdapter
 from evaluation.contracts import Verdict

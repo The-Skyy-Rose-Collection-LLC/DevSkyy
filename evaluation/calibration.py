@@ -12,7 +12,7 @@ def cohen_kappa(judge: list[int], human: list[int]) -> float:
     if len(judge) != len(human) or not judge:
         raise ValueError("equal-length non-empty rating lists required")
     n = len(judge)
-    po = sum(1 for a, b in zip(judge, human) if a == b) / n
+    po = sum(1 for a, b in zip(judge, human, strict=True) if a == b) / n
     cj, ch = Counter(judge), Counter(human)
     cats = set(judge) | set(human)
     pe = sum((cj.get(c, 0) / n) * (ch.get(c, 0) / n) for c in cats)

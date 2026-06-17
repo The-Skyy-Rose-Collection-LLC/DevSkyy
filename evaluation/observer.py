@@ -53,4 +53,4 @@ class Observer:
 def judge_human_agreement(judge_pass: list[bool], human_pass: list[bool]) -> float:
     if len(judge_pass) != len(human_pass) or not judge_pass:
         raise ValueError("equal-length non-empty lists required")
-    return sum(1 for a, b in zip(judge_pass, human_pass) if a == b) / len(judge_pass)
+    return sum(1 for a, b in zip(judge_pass, human_pass, strict=True) if a == b) / len(judge_pass)
