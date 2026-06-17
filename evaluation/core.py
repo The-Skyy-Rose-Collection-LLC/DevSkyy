@@ -12,9 +12,9 @@ that passes on the first score returns attempts=0.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable, Callable
 from dataclasses import replace
 from typing import Any
-from collections.abc import Awaitable, Callable
 
 from evaluation.adapter import DomainAdapter
 from evaluation.contracts import Verdict
