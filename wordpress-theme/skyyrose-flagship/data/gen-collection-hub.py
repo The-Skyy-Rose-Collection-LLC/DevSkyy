@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the per-collection designer hub: data/collections/<slug>/index.html.
 
-Renders FROM the canonical assets/ tree via relative ../../assets/ paths — no image
+Renders FROM the canonical assets/ tree via relative ../../../assets/ paths — no image
 duplication (single-asset-tree lock). Reads identity.json + the generated sot.json +
 copy.md. All dynamic text is HTML-escaped. DO NOT hand-edit index.html.
 """
@@ -16,7 +16,10 @@ sys.path.insert(0, str(DATA))
 import sot_common  # noqa: E402
 
 OUT = DATA / "collections"
-ASSET_PREFIX = "../../assets/"
+# index.html lives at data/collections/<slug>/ — three levels below the theme
+# root, so assets/ resolves via ../../../ (was ../../, which pointed at the
+# nonexistent data/assets/ and 404'd every hub image).
+ASSET_PREFIX = "../../../assets/"
 
 
 def e(s) -> str:
@@ -44,7 +47,7 @@ def fontfaces(fonts: dict) -> str:
         if not w or fam in seen:
             continue
         seen.add(fam)
-        url = "../../" + w if w.startswith("assets/") else w
+        url = "../../../" + w if w.startswith("assets/") else w
         out += (
             f"@font-face{{font-family:'{e(fam)}';"
             f"src:url('{e(url)}') format('woff2');font-display:swap;}}\n"

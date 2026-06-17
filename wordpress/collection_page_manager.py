@@ -7,10 +7,11 @@ agents for consistency checks, recovery prompts, and LLM context — not for
 rendering (that happens in PHP/WordPress).
 
 **This module is a thin adapter.** Authoritative data lives in:
-  - `assets/brand/brand.yaml`            (via skyyrose.elite_studio.brand)
-  - `assets/product-masters/catalog.yaml` (via skyyrose.elite_studio.catalog)
+  - `assets/brand/brand.yaml`                                   (via skyyrose.elite_studio.brand)
+  - `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (via skyyrose.elite_studio.catalog → skyyrose.core.catalog_loader)
 
-Do not hardcode collection metadata here. Edit the YAML SoTs instead.
+Do not hardcode collection metadata here. Edit the brand YAML / catalog CSV SoTs instead.
+(The old `assets/product-masters/catalog.yaml` master was retired 2026-04-19; the catalog is now the CSV.)
 """
 
 from __future__ import annotations
@@ -69,7 +70,7 @@ def _build_template(
     brand: BrandConfig | None = None,
     catalog: Catalog | None = None,
 ) -> CollectionTemplate:
-    """Assemble a CollectionTemplate from brand.yaml + catalog.yaml. Pure read — no mutation."""
+    """Assemble a CollectionTemplate from brand.yaml + the catalog CSV. Pure read — no mutation."""
     brand = brand or BrandConfig.load()
     catalog = catalog or Catalog.load()
 
@@ -102,7 +103,7 @@ class CollectionDesignTemplates:
     """
     Registry of SkyyRose collection design templates.
 
-    Templates are assembled on-demand from brand.yaml + catalog.yaml, so changes
+    Templates are assembled on-demand from brand.yaml + the catalog CSV, so changes
     to either SoT are reflected on the next call. All methods are class-level —
     no instantiation required.
     """
