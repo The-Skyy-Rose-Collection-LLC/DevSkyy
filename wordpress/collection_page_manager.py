@@ -11,7 +11,7 @@ rendering (that happens in PHP/WordPress).
   - `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (via skyyrose.elite_studio.catalog → skyyrose.core.catalog_loader)
 
 Do not hardcode collection metadata here. Edit the brand YAML / catalog CSV SoTs instead.
-(The old `assets/product-masters/catalog.yaml` master was retired 2026-04-19; the catalog is now the CSV.)
+(The old product-masters YAML catalog master was retired 2026-04-19; the catalog is now the CSV.)
 """
 
 from __future__ import annotations
