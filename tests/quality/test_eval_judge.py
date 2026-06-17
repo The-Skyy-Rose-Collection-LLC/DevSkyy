@@ -1,4 +1,6 @@
-from evaluation.judge import ClaudeJudge, anthropic_cost_usd
+import pytest
+
+from evaluation.judge import ClaudeJudge, anthropic_cost_usd, image_block
 
 
 class _Block:
@@ -79,7 +81,18 @@ def test_judge_raises_when_no_tool_use():
             )()
 
     judge = ClaudeJudge(client=_Empty(), model="claude-sonnet-4-6")
-    import pytest
-
     with pytest.raises(RuntimeError):
         judge.run(messages=[], tool={"name": "t", "input_schema": {}})
+
+
+def test_cost_formula_unknown_model_falls_back_to_sonnet():
+    assert anthropic_cost_usd("claude-future-99", 1_000_000, 0) == 3.0
+
+
+def test_image_block_rejects_bad_media_type():
+    with pytest.raises(ValueError):
+        image_block("x", "jpg")
+
+
+def test_image_block_valid():
+    assert image_block("abc", "image/png")["source"]["media_type"] == "image/png"

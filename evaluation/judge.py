@@ -19,13 +19,21 @@ _PRICING: dict[str, tuple[float, float]] = {
 }
 
 
+_VALID_MEDIA_TYPES = frozenset({"image/jpeg", "image/png", "image/gif", "image/webp"})
+
+
 def anthropic_cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
+    if model not in _PRICING:
+        logger.warning("anthropic_cost_usd: unknown model %r — using Sonnet pricing", model)
     pin, pout = _PRICING.get(model, (3.0, 15.0))
     return input_tokens / 1_000_000 * pin + output_tokens / 1_000_000 * pout
 
 
 def make_client() -> Any:
-    """Construct an Anthropic client from config.settings.ANTHROPIC_API_KEY."""
+    """Construct an Anthropic client from config.settings.ANTHROPIC_API_KEY.
+
+    Note: `.strip()` is applied so a whitespace-only key is treated as empty.
+    """
     from anthropic import Anthropic
     from config.settings import settings  # Pydantic settings; key field exists at line 63
 
@@ -35,7 +43,9 @@ def make_client() -> Any:
     return Anthropic(api_key=key)
 
 
-def image_block(b64_data: str, media_type: str = "image/png") -> dict:
+def image_block(b64_data: str, media_type: str = "image/png") -> dict[str, Any]:
+    if media_type not in _VALID_MEDIA_TYPES:
+        raise ValueError(f"image_block: unsupported media_type {media_type!r}")
     return {
         "type": "image",
         "source": {"type": "base64", "media_type": media_type, "data": b64_data},
@@ -43,7 +53,12 @@ def image_block(b64_data: str, media_type: str = "image/png") -> dict:
 
 
 class ClaudeJudge:
-    def __init__(self, client: Any, model: str, max_tokens: int = 1500) -> None:
+    def __init__(
+        self,
+        client: Any,
+        model: str,
+        max_tokens: int = 1500,  # generous for a verdict JSON; bump if adapters request large free-text fields
+    ) -> None:
         self._client = client
         self._model = model
         self._max_tokens = max_tokens
@@ -58,7 +73,7 @@ class ClaudeJudge:
             tool_choice={"type": "tool", "name": tool["name"], "disable_parallel_tool_use": True},
         )
         blocks = [b for b in resp.content if getattr(b, "type", None) == "tool_use"]
-        cost = anthropic_cost_usd(self._model, resp.usage.input_tokens, resp.usage.output_tokens)
         if not blocks:
             raise RuntimeError(f"judge returned no tool_use block (stop={resp.stop_reason})")
+        cost = anthropic_cost_usd(self._model, resp.usage.input_tokens, resp.usage.output_tokens)
         return dict(blocks[0].input), cost
