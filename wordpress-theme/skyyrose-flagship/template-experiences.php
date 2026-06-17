@@ -2,24 +2,23 @@
 /**
  * Template Name: Experiences Hub
  *
- * The "Immersive Worlds" hub (/experiences/). A type-led Concrete Index: each
- * collection is a numbered row whose oversized name is the primary affordance,
- * with its SOT scene art shown as an always-visible panel + canonical lockup.
- * All imagery + copy sourced from per-collection sot.json — no hardcoded paths.
+ * "Immersive Worlds" hub (/experiences/) — "Stacked Cinema": four full-viewport
+ * scroll-snap worlds. Each collection's SOT hero fills the block edge-to-edge
+ * (Ken-Burns), its name centered in that collection's own script face, framed by
+ * faded hairline rules + an accent glow.
  *
- * Linked experience slugs (confirmed from Template Name headers):
- *   /experience-signature/      → template-immersive-signature.php
- *   /experience-black-rose/     → template-immersive-black-rose.php
- *   /experience-love-hurts/     → template-immersive-love-hurts.php
- *   /experience-kids-capsule/   → template-immersive-kids-capsule.php
+ * Imagery resolves through SOT imagery.hero via the `experience-hero` placement
+ * contract (inc/image-placements.php) — never stretches, auto-upgrades to the
+ * full srcset when the dedicated Midjourney masters land (one identity.json swap).
  *
- * Styling: assets/css/experiences.css (enqueued for slug 'experiences').
+ * Experience slugs: /experience-{signature,black-rose,love-hurts,kids-capsule}/.
+ * Styling: assets/css/experiences.css · Behaviour: assets/js/experiences.js
+ * (both slug-gated in inc/enqueue.php).
  *
  * @package SkyyRose
  * @since   1.2.0
  */
 
-// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -27,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Load and parse a collection sot.json file.
  *
- * @param string $slug Collection directory slug (e.g. 'black-rose').
+ * @param string $slug Collection directory slug.
  * @return array Decoded SOT data or empty array.
  */
 function skyyrose_experiences_load_sot( $slug ) {
@@ -44,185 +43,138 @@ function skyyrose_experiences_load_sot( $slug ) {
 }
 
 /**
- * Resolve the cinematic scene image for the hub row panel.
+ * Resolve the full-bleed hero image (theme-relative) from a SOT array.
  *
- * Priority: imagery.hero_backdrop → imagery.scene_portrait → imagery.lookbook[0].
- * Returns a theme-relative path (no leading slash) or null.
+ * Priority: imagery.hero → imagery.hero_backdrop → imagery.scene_portrait →
+ * imagery.lookbook[0]. Returns a theme-relative path (no leading slash) or null.
  *
  * @param array $sot Decoded SOT data.
- * @return string|null Theme-relative asset path, or null if none found.
+ * @return string|null
  */
-function skyyrose_experiences_card_image( $sot ) {
+function skyyrose_experiences_hero( $sot ) {
 	$imagery = isset( $sot['imagery'] ) ? $sot['imagery'] : array();
-
-	// Prefer the cinematic hero backdrop for the at-a-glance scene panel.
-	if ( ! empty( $imagery['hero_backdrop']['resolved'] ) ) {
-		return 'assets/' . ltrim( $imagery['hero_backdrop']['resolved'], '/' );
+	foreach ( array( 'hero', 'hero_backdrop', 'scene_portrait' ) as $key ) {
+		if ( ! empty( $imagery[ $key ]['resolved'] ) ) {
+			return 'assets/' . ltrim( $imagery[ $key ]['resolved'], '/' );
+		}
 	}
-
-	// Then the collection portal / scene portrait.
-	if ( ! empty( $imagery['scene_portrait']['resolved'] ) ) {
-		return 'assets/' . ltrim( $imagery['scene_portrait']['resolved'], '/' );
-	}
-
-	// Last: first lookbook image (e.g. Kids Capsule, which has no scene yet).
 	if ( ! empty( $imagery['lookbook'][0]['resolved'] ) ) {
 		return 'assets/' . ltrim( $imagery['lookbook'][0]['resolved'], '/' );
 	}
-
 	return null;
 }
 
-/**
- * Resolve the canonical lockup image path from a SOT array.
- *
- * @param array $sot Decoded SOT data.
- * @return string|null Theme-relative asset path, or null if none found.
- */
-function skyyrose_experiences_lockup_image( $sot ) {
-	$lockup = isset( $sot['lockup'] ) ? $sot['lockup'] : array();
-
-	if ( ! empty( $lockup['display_webp']['resolved'] ) ) {
-		return 'assets/' . ltrim( $lockup['display_webp']['resolved'], '/' );
-	}
-
-	if ( ! empty( $lockup['source_art']['resolved'] ) ) {
-		return 'assets/' . ltrim( $lockup['source_art']['resolved'], '/' );
-	}
-
-	return null;
-}
-
-// ─── Collection definitions (canonical 01–04 order) ───────────────────────────
-$experiences_collections = array(
+// ─── Collections (canonical 01–04 order) ──────────────────────────────────────
+$exp_collections = array(
 	array(
 		'slug'            => 'signature',
 		'name'            => __( 'Signature', 'skyyrose' ),
 		'experience_slug' => 'experience-signature',
-		'fallback_hook'   => __( 'The beginning of it all — where it started from.', 'skyyrose' ),
 	),
 	array(
 		'slug'            => 'black-rose',
 		'name'            => __( 'Black Rose', 'skyyrose' ),
 		'experience_slug' => 'experience-black-rose',
-		'fallback_hook'   => __( 'Defining beauty through the color black.', 'skyyrose' ),
 	),
 	array(
 		'slug'            => 'love-hurts',
 		'name'            => __( 'Love Hurts', 'skyyrose' ),
 		'experience_slug' => 'experience-love-hurts',
-		'fallback_hook'   => __( 'Beauty and the Beast — told from the Beast\'s side.', 'skyyrose' ),
 	),
 	array(
 		'slug'            => 'kids-capsule',
 		'name'            => __( 'Kids Capsule', 'skyyrose' ),
 		'experience_slug' => 'experience-kids-capsule',
-		'fallback_hook'   => __( 'The heir to the throne.', 'skyyrose' ),
 	),
 );
 
-// Enrich each entry with SOT-driven imagery + copy.
-foreach ( $experiences_collections as &$col ) {
-	$sot             = skyyrose_experiences_load_sot( $col['slug'] );
-	$col['card_img'] = skyyrose_experiences_card_image( $sot );
-	$col['lockup']   = skyyrose_experiences_lockup_image( $sot );
-	$seed            = isset( $sot['story']['seed'] ) ? trim( (string) $sot['story']['seed'] ) : '';
-	$col['hook']     = '' !== $seed ? $seed : $col['fallback_hook'];
+foreach ( $exp_collections as &$exp_col ) {
+	$exp_col['hero'] = skyyrose_experiences_hero( skyyrose_experiences_load_sot( $exp_col['slug'] ) );
 }
-unset( $col );
+unset( $exp_col );
 
 get_header();
 ?>
 
-<main
-	id="primary"
-	class="site-main experiences-hub"
-	data-collection="signature"
-	role="main"
-	tabindex="-1"
->
+<main id="primary" class="site-main experiences-hub" data-collection="signature" role="main" tabindex="-1">
 
-	<?php // ─── Kicker ──────────────────────────────────────────────────────── ?>
-	<section class="exp-kicker">
-		<p class="exp-kicker__eyebrow"><?php esc_html_e( 'Immersive Worlds', 'skyyrose' ); ?></p>
-		<h1 class="exp-kicker__title"><?php esc_html_e( 'Enter the Collection', 'skyyrose' ); ?></h1>
-	</section>
+	<?php // Right-edge progress rail. ?>
+	<nav class="exp-rail" aria-label="<?php esc_attr_e( 'Collection navigation', 'skyyrose' ); ?>">
+		<?php foreach ( $exp_collections as $i => $exp_col ) : ?>
+			<a
+				class="exp-rail__tick<?php echo 0 === $i ? ' is-active' : ''; ?>"
+				href="#exp-<?php echo esc_attr( $exp_col['slug'] ); ?>"
+				data-index="<?php echo esc_attr( (string) $i ); ?>"
+				aria-label="<?php echo esc_attr( $exp_col['name'] ); ?>"
+			></a>
+		<?php endforeach; ?>
+	</nav>
 
-	<?php // ─── Index ───────────────────────────────────────────────────────── ?>
-	<ol class="exp-index" role="list">
+	<p class="exp-tagline" aria-hidden="true"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?></p>
+
+	<?php
+	$exp_i = 0;
+	foreach ( $exp_collections as $exp_col ) :
+		$exp_url  = home_url( '/' . $exp_col['experience_slug'] . '/' );
+		$hero_url = $exp_col['hero'] ? get_template_directory_uri() . '/' . $exp_col['hero'] : '';
+		$is_first = 0 === $exp_i;
+		?>
+
+		<section
+			class="exp-block"
+			id="exp-<?php echo esc_attr( $exp_col['slug'] ); ?>"
+			data-collection="<?php echo esc_attr( $exp_col['slug'] ); ?>"
+			data-block="<?php echo esc_attr( (string) $exp_i ); ?>"
+			aria-label="<?php
+			/* translators: %s: collection name */
+			echo esc_attr( sprintf( __( '%s — enter the world', 'skyyrose' ), $exp_col['name'] ) );
+			?>"
+		>
+			<div class="exp-block__scene">
+				<?php
+				if ( $hero_url ) {
+					echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
+						$hero_url,
+						'',
+						array(
+							'placement' => 'experience-hero',
+							'loading'   => $is_first ? 'eager' : 'lazy',
+							'decoding'  => 'async',
+							'aria-hidden' => 'true',
+						) + ( $is_first ? array( 'fetchpriority' => 'high' ) : array() )
+					);
+				}
+				?>
+			</div>
+
+			<div class="exp-block__overlay" aria-hidden="true"></div>
+			<div class="exp-block__tint" aria-hidden="true"></div>
+
+			<div class="exp-block__content">
+				<a class="exp-name-frame" href="<?php echo esc_url( $exp_url ); ?>" aria-label="<?php
+				/* translators: %s: collection name */
+				echo esc_attr( sprintf( __( 'Enter the %s world', 'skyyrose' ), $exp_col['name'] ) );
+				?>" style="text-decoration:none;">
+					<span class="exp-name"><?php echo esc_html( $exp_col['name'] ); ?></span>
+				</a>
+				<a class="exp-cue" href="<?php echo esc_url( $exp_url ); ?>">
+					<?php esc_html_e( 'Enter', 'skyyrose' ); ?>
+					<span class="exp-cue__arrow" aria-hidden="true">&rarr;</span>
+				</a>
+			</div>
+
+			<?php if ( $is_first ) : ?>
+				<div class="exp-hint" aria-hidden="true">
+					<span><?php esc_html_e( 'Scroll', 'skyyrose' ); ?></span>
+					<span class="exp-hint__chevron"></span>
+				</div>
+			<?php endif; ?>
+		</section>
 
 		<?php
-		$exp_i = 0;
-		foreach ( $experiences_collections as $col ) :
-			++$exp_i;
-			$scene_url  = $col['card_img'] ? get_template_directory_uri() . '/' . $col['card_img'] : '';
-			$lockup_url = $col['lockup'] ? get_template_directory_uri() . '/' . $col['lockup'] : '';
-			$exp_url    = home_url( '/' . $col['experience_slug'] . '/' );
-			?>
-
-			<li class="exp-index__row" data-collection="<?php echo esc_attr( $col['slug'] ); ?>">
-				<a
-					class="exp-index__link"
-					href="<?php echo esc_url( $exp_url ); ?>"
-					aria-label="<?php
-					/* translators: %s: collection name */
-					echo esc_attr( sprintf( __( 'Enter the %s world', 'skyyrose' ), $col['name'] ) );
-					?>"
-				>
-					<span class="exp-index__num" aria-hidden="true"><?php echo esc_html( sprintf( '%02d', $exp_i ) ); ?></span>
-
-					<span class="exp-index__name">
-						<span class="exp-index__name-text"><?php echo esc_html( $col['name'] ); ?></span>
-						<?php if ( $col['hook'] ) : ?>
-							<span class="exp-index__hook"><?php echo esc_html( $col['hook'] ); ?></span>
-						<?php endif; ?>
-					</span>
-
-					<span class="exp-index__scene">
-						<?php if ( $scene_url ) : ?>
-							<img
-								class="exp-index__scene-img"
-								src="<?php echo esc_url( $scene_url ); ?>"
-								alt=""
-								aria-hidden="true"
-								loading="lazy"
-								decoding="async"
-								width="1280"
-								height="720"
-							>
-						<?php endif; ?>
-						<?php if ( $lockup_url ) : ?>
-							<img
-								class="exp-index__lockup"
-								src="<?php echo esc_url( $lockup_url ); ?>"
-								alt=""
-								aria-hidden="true"
-								loading="lazy"
-								decoding="async"
-								width="128"
-								height="64"
-							>
-						<?php endif; ?>
-					</span>
-
-					<span class="exp-index__caret" aria-hidden="true">&rarr;</span>
-				</a>
-			</li>
-
-		<?php endforeach; ?>
-
-	</ol>
-
-	<?php // ─── Sign-off ────────────────────────────────────────────────────── ?>
-	<section class="exp-signoff" aria-label="<?php esc_attr_e( 'Brand statement', 'skyyrose' ); ?>">
-		<p class="exp-signoff__quote"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?></p>
-		<a
-			href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
-			class="exp-signoff__cta btn-border-draw"
-		>
-			<?php esc_html_e( 'Pre-Order Now', 'skyyrose' ); ?>
-		</a>
-	</section>
+		++$exp_i;
+	endforeach;
+	?>
 
 </main>
 

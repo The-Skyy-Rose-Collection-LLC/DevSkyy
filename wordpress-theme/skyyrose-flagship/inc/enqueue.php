@@ -802,6 +802,7 @@ function skyyrose_enqueue_template_scripts() {
 		'preorder-gateway' => 'preorder-gateway.js',
 		'about'            => 'about.js',
 		'kc-launch'        => 'kids-capsule-launch.js',
+		'experiences'      => 'experiences.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
