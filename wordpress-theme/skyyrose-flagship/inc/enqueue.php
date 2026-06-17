@@ -502,7 +502,7 @@ function skyyrose_enqueue_template_styles() {
 		'blog'                => 'generic-pages.css',
 		'page'                => 'generic-pages.css',
 		'kc-launch'           => 'kids-capsule.css',
-		'experiences'         => 'collection-pages.css',
+		'experiences'         => 'experiences.css',
 	);
 
 	if ( isset( $template_styles[ $slug ] ) ) {
