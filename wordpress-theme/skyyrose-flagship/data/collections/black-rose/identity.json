@@ -1,0 +1,28 @@
+{
+  "$schema": "../identity.schema.json",
+  "slug": "black-rose",
+  "key": "black_rose",
+  "name": "Black Rose",
+  "status": "verified",
+  "story": {
+    "seed": "Defining beauty through the color black.",
+    "doc_ref": "docs/brand/collection-stories.md#black-rose"
+  },
+  "palette": {
+    "black": "#0A0A0A",
+    "white": "#FFFFFF",
+    "silver": "#C0C0C0",
+    "accent": "#C0C0C0",
+    "accent_dark": "#999999",
+    "secondary": "#FFFFFF",
+    "bg": "#0A0A0A",
+    "text": "#F5F5F5"
+  },
+  "fonts": {
+    "script": {"family": "Yellowtail", "woff2": "assets/fonts/yellowtail-latin.woff2", "source": "OFL / Google Fonts"},
+    "caps": {"family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "source": "OFL (already hosted)"},
+    "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
+  },
+  "lockup": {"ref": "images/lockups/black-rose-lockup.webp"},
+  "known_orphans": []
+}

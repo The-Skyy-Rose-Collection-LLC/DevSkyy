@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SkyyRose Collection Identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "key", "name", "status", "story", "palette", "fonts", "lockup"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "slug": {"type": "string", "pattern": "^[a-z]+(-[a-z]+)*$"},
+    "key": {"type": "string", "pattern": "^[a-z]+(_[a-z]+)*$"},
+    "name": {"type": "string", "minLength": 1},
+    "status": {"enum": ["verified", "needs-founder-review"]},
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seed", "doc_ref"],
+      "properties": {
+        "seed": {"type": "string", "minLength": 1},
+        "doc_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "palette": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["script", "caps", "body"],
+      "properties": {
+        "script": {"$ref": "#/$defs/font"},
+        "caps": {"$ref": "#/$defs/font"},
+        "body": {"$ref": "#/$defs/font"}
+      }
+    },
+    "lockup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref"],
+      "properties": {"ref": {"type": "string", "minLength": 1}}
+    },
+    "known_orphans": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "woff2", "source"],
+      "properties": {
+        "family": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9 ]*$"},
+        "woff2": {"type": ["string", "null"], "pattern": "^assets/fonts/[A-Za-z0-9._-]+\\.woff2$"},
+        "source": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

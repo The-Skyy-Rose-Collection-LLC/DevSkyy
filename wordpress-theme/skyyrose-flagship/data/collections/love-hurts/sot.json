@@ -1,24 +1,49 @@
 {
-  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT BY HAND. Fix the master (catalog.csv / visual-manifest.json / logo-registry.json) and regenerate.",
-  "_authority": "Single Source of Truth for the Love Hurts collection. Resolves products + imagery + logos to ONE verified file per role. Every 'resolved' path is existence-checked.",
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Love Hurts. Canon = identity.json.",
   "collection": "love-hurts",
   "name": "Love Hurts",
   "updated": "GENERATED",
+  "story": {
+    "seed": "Beauty and the Beast told from the Beast's perspective, through luxury attire.",
+    "doc_ref": "docs/brand/collection-stories.md#love-hurts"
+  },
   "palette": {
+    "red": "#DC143C",
+    "red_dark": "#9B0F2E",
+    "white": "#FFFFFF",
+    "black": "#0A0A0A",
     "accent": "#DC143C",
-    "dark": "#0A0A0A",
-    "rose_gold": "#B76E79"
+    "accent_dark": "#9B0F2E",
+    "secondary": "#FFFFFF",
+    "bg": "#0A0A0A",
+    "text": "#F5F5F5"
   },
   "fonts": {
-    "display": "Playfair Display",
-    "body": "Cormorant Garamond"
+    "script": {
+      "family": "Kaushan Script",
+      "woff2": "assets/fonts/kaushan-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
   "masters": {
+    "identity": "data/collections/love-hurts/identity.json",
     "products": "data/skyyrose-catalog.csv",
     "imagery": "data/visual-manifest.json",
     "logos": "data/logo-registry.json"
   },
   "lockup": {
+    "canonical": "images/lockups/love-hurts-lockup.webp",
     "display_webp": {
       "path": "images/lockups/love-hurts-lockup.webp",
       "resolved": "images/lockups/love-hurts-lockup.webp",
@@ -35,18 +60,18 @@
     },
     "source_art": {
       "path": "images/hero-overlays/lh-logo-combined",
-      "resolved": "images/hero-overlays/lh-logo-combined.avif",
+      "resolved": "images/hero-overlays/lh-logo-combined.webp",
       "kind": "collection-lockup",
       "status": "verified",
       "notes": "Love Hurts combined red script. The lockup IS the collection name."
     },
     "alt": null,
-    "rule": "Use display_webp for web/homepage. svg_master only when infinite scale/recolor needed. source_art is the raw master the others derive from \u2014 not for direct placement. The lockup IS the collection name; never type-render it."
+    "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-love-hurts",
-      "resolved": "images/homepage-col-love-hurts.avif",
+      "resolved": "images/homepage-col-love-hurts.webp",
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "LH world art. Collection cards/panels/portals."
@@ -61,21 +86,21 @@
     "atmospherics": [
       {
         "path": "images/logos/red-roses-cloud-cluster",
-        "resolved": "images/logos/red-roses-cloud-cluster.avif",
+        "resolved": "images/logos/red-roses-cloud-cluster.webp",
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Red roses on clouds. LH surfaces only (red roses = Love Hurts register)."
       },
       {
         "path": "images/logos/heart-rose-composite",
-        "resolved": "images/logos/heart-rose-composite.avif",
+        "resolved": "images/logos/heart-rose-composite.webp",
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Heart + rose composite. LH emotional register."
       },
       {
         "path": "images/immersive/scene-love-hurts-cathedral",
-        "resolved": "images/immersive/scene-love-hurts-cathedral.avif",
+        "resolved": "images/immersive/scene-love-hurts-cathedral.webp",
         "kind": "scene-art",
         "status": "verified",
         "notes": "LH cathedral immersive scene still. Heavy atmospheric \u2014 hero/manifesto scale."
@@ -99,21 +124,21 @@
     "lettering_alt": [
       {
         "path": "images/logos/love-hurts-full-lettering",
-        "resolved": "images/logos/love-hurts-full-lettering.avif",
+        "resolved": "images/logos/love-hurts-full-lettering.webp",
         "kind": "lettering",
         "status": "verified",
         "notes": "Full lettering raster. SVG masters exist: branding/vectorized/love-hurts-full-lettering.svg, love-lettering.svg, hurts-lettering.svg (use SVG when crispness at scale matters)."
       },
       {
         "path": "images/logos/love-lettering",
-        "resolved": "images/logos/love-lettering.avif",
+        "resolved": "images/logos/love-lettering.webp",
         "kind": "lettering",
         "status": "verified",
         "notes": "Raster; SVG master available."
       },
       {
         "path": "images/logos/hurts-lettering",
-        "resolved": "images/logos/hurts-lettering.avif",
+        "resolved": "images/logos/hurts-lettering.webp",
         "kind": "lettering",
         "status": "verified",
         "notes": "Raster; SVG master available."
@@ -133,10 +158,26 @@
         "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
       }
     ],
+    "lockup_parts": [
+      {
+        "path": "images/hero-overlays/lh-logo-love",
+        "resolved": "images/hero-overlays/lh-logo-love.webp",
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Love' script alone \u2014 stacked/split hero compositions."
+      },
+      {
+        "path": "images/hero-overlays/lh-logo-hurts",
+        "resolved": "images/hero-overlays/lh-logo-hurts.webp",
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Hurts' script alone."
+      }
+    ],
     "lookbook": [
       {
         "path": "images/lookbook/lb-love-hurts-varsity",
-        "resolved": "images/lookbook/lb-love-hurts-varsity-480w.avif",
+        "resolved": "images/lookbook/lb-love-hurts-varsity-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "LH varsity jacket worn, editorial."
@@ -313,31 +354,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [],
-  "other_collection_files": {
-    "_note": "Files in the asset tree whose name matches this collection but which are NOT assigned a canonical role above. Audit before use: some are legitimate (nav/thumb logos, format siblings), some are duplicates/superseded source art to retire. Never grab one of these for a role the SOT already fills.",
-    "files": [
-      "branding/love-hurts-logo-hero.webp",
-      "branding/love-hurts-logo-transparent.png",
-      "branding/love-hurts-logo.webp",
-      "branding/vectorized/hurts-lettering.svg",
-      "branding/vectorized/love-lettering.svg",
-      "images/hero-overlays/lh-logo-combined.png",
-      "images/hero-overlays/lh-logo-combined.webp",
-      "images/hero-overlays/lh-logo-hurts.png",
-      "images/hero-overlays/lh-logo-hurts.webp",
-      "images/hero-overlays/lh-logo-love.png",
-      "images/hero-overlays/lh-logo-love.webp",
-      "images/homepage-col-love-hurts.webp",
-      "images/immersive/scene-love-hurts-cathedral.webp",
-      "images/logos/heart-rose-composite.webp",
-      "images/logos/hurts-lettering.webp",
-      "images/logos/love-hurts-full-lettering.webp",
-      "images/logos/love-lettering.webp",
-      "images/logos/red-roses-cloud-cluster.webp",
-      "images/lookbook/lb-love-hurts-varsity-480w.webp",
-      "images/lookbook/lb-love-hurts-varsity-960w.avif",
-      "images/lookbook/lb-love-hurts-varsity-960w.webp"
-    ]
-  }
+  "unresolved_product_images": []
 }

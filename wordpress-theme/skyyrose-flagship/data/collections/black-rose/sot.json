@@ -1,24 +1,48 @@
 {
-  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT BY HAND. Fix the master (catalog.csv / visual-manifest.json / logo-registry.json) and regenerate.",
-  "_authority": "Single Source of Truth for the Black Rose collection. Resolves products + imagery + logos to ONE verified file per role. Every 'resolved' path is existence-checked.",
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Black Rose. Canon = identity.json.",
   "collection": "black-rose",
   "name": "Black Rose",
   "updated": "GENERATED",
+  "story": {
+    "seed": "Defining beauty through the color black.",
+    "doc_ref": "docs/brand/collection-stories.md#black-rose"
+  },
   "palette": {
+    "black": "#0A0A0A",
+    "white": "#FFFFFF",
+    "silver": "#C0C0C0",
     "accent": "#C0C0C0",
-    "dark": "#0A0A0A",
-    "rose_gold": "#B76E79"
+    "accent_dark": "#999999",
+    "secondary": "#FFFFFF",
+    "bg": "#0A0A0A",
+    "text": "#F5F5F5"
   },
   "fonts": {
-    "display": "Cinzel",
-    "body": "Cormorant Garamond"
+    "script": {
+      "family": "Yellowtail",
+      "woff2": "assets/fonts/yellowtail-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
   "masters": {
+    "identity": "data/collections/black-rose/identity.json",
     "products": "data/skyyrose-catalog.csv",
     "imagery": "data/visual-manifest.json",
     "logos": "data/logo-registry.json"
   },
   "lockup": {
+    "canonical": "images/lockups/black-rose-lockup.webp",
     "display_webp": {
       "path": "images/lockups/black-rose-lockup.webp",
       "resolved": "images/lockups/black-rose-lockup.webp",
@@ -35,24 +59,24 @@
     },
     "source_art": {
       "path": "images/hero-overlays/br-brand-script-logotype",
-      "resolved": "images/hero-overlays/br-brand-script-logotype.avif",
+      "resolved": "images/hero-overlays/br-brand-script-logotype.webp",
       "kind": "collection-lockup",
       "status": "verified",
       "notes": "THE Black Rose Collection script with rose. BLACK lettering \u2014 on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
     },
     "alt": {
       "path": "images/hero-overlays/br-brand-script",
-      "resolved": "images/hero-overlays/br-brand-script.avif",
+      "resolved": "images/hero-overlays/br-brand-script.webp",
       "kind": "collection-lockup-alt",
       "status": "verified",
       "notes": "Script variant without 'Collection' line. Same black-lettering handling rules."
     },
-    "rule": "Use display_webp for web/homepage. svg_master only when infinite scale/recolor needed. source_art is the raw master the others derive from \u2014 not for direct placement. The lockup IS the collection name; never type-render it."
+    "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-black-rose",
-      "resolved": "images/homepage-col-black-rose.avif",
+      "resolved": "images/homepage-col-black-rose.webp",
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
@@ -67,7 +91,7 @@
     "atmospherics": [
       {
         "path": "images/logos/black-roses-cloud-cluster",
-        "resolved": "images/logos/black-roses-cloud-cluster.avif",
+        "resolved": "images/logos/black-roses-cloud-cluster.webp",
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Black roses on clouds. Section backdrops at low opacity, BR surfaces only."
@@ -90,45 +114,46 @@
     "patches": [
       {
         "path": "images/hero-overlays/br-patch-hockey",
-        "resolved": "images/hero-overlays/br-patch-hockey.avif",
+        "resolved": "images/hero-overlays/br-patch-hockey.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
       },
       {
         "path": "images/hero-overlays/br-patch-mlb-baseball",
-        "resolved": "images/hero-overlays/br-patch-mlb-baseball.avif",
+        "resolved": "images/hero-overlays/br-patch-mlb-baseball.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (baseball, br-003/br-012)."
       },
       {
         "path": "images/hero-overlays/br-patch-nba-basketball",
-        "resolved": "images/hero-overlays/br-patch-nba-basketball.avif",
+        "resolved": "images/hero-overlays/br-patch-nba-basketball.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (basketball, br-010)."
       },
       {
         "path": "images/hero-overlays/br-patch-nfl-football",
-        "resolved": "images/hero-overlays/br-patch-nfl-football.avif",
+        "resolved": "images/hero-overlays/br-patch-nfl-football.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (football, br-008/br-009)."
       }
     ],
     "lettering_alt": [],
+    "lockup_parts": [],
     "lookbook": [
       {
         "path": "images/lookbook/lb-black-rose-football",
-        "resolved": "images/lookbook/lb-black-rose-football-480w.avif",
+        "resolved": "images/lookbook/lb-black-rose-football-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "BIB football jersey editorial."
       },
       {
         "path": "images/lookbook/lb-black-rose-hockey",
-        "resolved": "images/lookbook/lb-black-rose-hockey-480w.avif",
+        "resolved": "images/lookbook/lb-black-rose-hockey-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "BIB hockey jersey editorial."
@@ -500,37 +525,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [],
-  "other_collection_files": {
-    "_note": "Files in the asset tree whose name matches this collection but which are NOT assigned a canonical role above. Audit before use: some are legitimate (nav/thumb logos, format siblings), some are duplicates/superseded source art to retire. Never grab one of these for a role the SOT already fills.",
-    "files": [
-      "branding/black-rose-collection-text.webp",
-      "branding/black-rose-logo-hero.webp",
-      "branding/black-rose-logo.webp",
-      "images/hero-overlays/br-brand-script-logotype.png",
-      "images/hero-overlays/br-brand-script-logotype.webp",
-      "images/hero-overlays/br-brand-script.png",
-      "images/hero-overlays/br-brand-script.webp",
-      "images/hero-overlays/br-patch-hockey.png",
-      "images/hero-overlays/br-patch-hockey.webp",
-      "images/hero-overlays/br-patch-mlb-baseball.png",
-      "images/hero-overlays/br-patch-mlb-baseball.webp",
-      "images/hero-overlays/br-patch-nba-basketball.png",
-      "images/hero-overlays/br-patch-nba-basketball.webp",
-      "images/hero-overlays/br-patch-nfl-football.png",
-      "images/hero-overlays/br-patch-nfl-football.webp",
-      "images/homepage-col-black-rose.webp",
-      "images/logos/black-roses-cloud-cluster.webp",
-      "images/lookbook/lb-black-rose-football-480w.webp",
-      "images/lookbook/lb-black-rose-football-960w.avif",
-      "images/lookbook/lb-black-rose-football-960w.webp",
-      "images/lookbook/lb-black-rose-hockey-480w.webp",
-      "images/lookbook/lb-black-rose-hockey-960w.avif",
-      "images/lookbook/lb-black-rose-hockey-960w.webp",
-      "images/lookbook/lb-kid-black-rose-480w.avif",
-      "images/lookbook/lb-kid-black-rose-480w.webp",
-      "images/lookbook/lb-kid-black-rose-960w.avif",
-      "images/lookbook/lb-kid-black-rose-960w.webp"
-    ]
-  }
+  "unresolved_product_images": []
 }
