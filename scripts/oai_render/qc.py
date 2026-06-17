@@ -20,6 +20,7 @@ import base64
 import io
 import json
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -243,12 +244,17 @@ def _judge_instructions(exp: RenderExpectation) -> str:
 class QCGate:
     """Deterministic checks + optional VLM judge. One instance per batch run."""
 
-    def __init__(self, *, use_judge: bool = True, judge_fn=None) -> None:
+    def __init__(
+        self,
+        *,
+        use_judge: bool = True,
+        judge_fn: Callable[[dict], tuple[dict, float]] | None = None,
+    ) -> None:
         self._use_judge = use_judge and config.QC_ENABLED
-        self._provider = config.QC_JUDGE_PROVIDER
+        self._use_anthropic = (judge_fn is not None) or (config.QC_JUDGE_PROVIDER == "anthropic")
         self._judge_fn = judge_fn
         self._client = None
-        if self._use_judge and judge_fn is None and self._provider == "openai":
+        if self._use_judge and not self._use_anthropic:
             try:
                 from openai import OpenAI
 
@@ -273,7 +279,7 @@ class QCGate:
         return self._judge(data, exp)
 
     def _judge(self, data: bytes, exp: RenderExpectation) -> QCVerdict:
-        if self._provider == "anthropic" or self._judge_fn is not None:
+        if self._use_anthropic:
             return self._judge_anthropic(data, exp)
         content: list[dict] = [{"type": "text", "text": _judge_instructions(exp)}]
         content.append(
@@ -329,25 +335,27 @@ class QCGate:
 
         adapter = ImageryAdapter()
         request = adapter.build_judge_request(data, exp)
-        judge_fn = self._judge_fn
-        if judge_fn is None:
+        if self._judge_fn is not None:
+            fn = self._judge_fn
+        else:
             judge = ClaudeJudge(
                 client=make_client(),
                 model=config.QC_JUDGE_ANTHROPIC_MODEL,
                 max_tokens=config.QC_JUDGE_ANTHROPIC_MAX_TOKENS,
             )
 
-            def judge_fn(req):
+            def fn(req):
                 return judge.run(messages=req["messages"], tool=req["tool"])
 
         try:
-            output, cost = judge_fn(request)
+            output, cost = fn(request)
         except Exception as exc:
             log.error("Claude QC judge failed for %s: %s — accepting unjudged", exp.sku, exc)
             return QCVerdict(
                 passed=True,
                 failure_tags=("judge_unavailable",),
                 reason=f"judge error: {exc}",
+                judge_cost_usd=0.0,
             )
         verdict = adapter.parse_verdict(output, det_failures=[])
         return QCVerdict(
