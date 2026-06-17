@@ -64,3 +64,25 @@ async def test_gate_revises_until_pass_with_cap_and_early_exit():
 
     v = await core.gate(ad, ref={}, producer=_producer, cap=2)
     assert v.passed is True and v.attempts == 1  # one revision, early-exit
+
+
+async def test_gate_returns_pass_immediately_without_revisions():
+    core = EvaluationCore(judge_fn=lambda req: ({}, 0.01))
+    ad = _Adapter(det=[], verdicts=[_v(True)])
+
+    async def _producer(ref):
+        return "initial"
+
+    v = await core.gate(ad, ref={}, producer=_producer, cap=2)
+    assert v.passed is True and v.attempts == 0
+
+
+async def test_gate_exhausts_cap_and_returns_failing_verdict():
+    core = EvaluationCore(judge_fn=lambda req: ({}, 0.01))
+    ad = _Adapter(det=[], verdicts=[_v(False), _v(False), _v(False)])
+
+    async def _producer(ref):
+        return "initial"
+
+    v = await core.gate(ad, ref={}, producer=_producer, cap=2)
+    assert v.passed is False and v.attempts == 2
