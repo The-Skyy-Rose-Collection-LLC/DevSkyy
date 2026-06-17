@@ -228,6 +228,27 @@ html {
 /* Letter-spacing entrance: tight → open. */
 .exp-block__content:not(.is-visible) .exp-name { letter-spacing: -0.03em; }
 
+/* ─── Collection lockup (the brand-script name image; canon hero) ─────── */
+
+.exp-lockup-img {
+	display: block;
+	width: auto;
+	height: auto;
+	max-width: min(560px, 80vw);
+	max-height: 32vh;
+	filter:
+		drop-shadow(0 0 40px rgba(var(--skyyrose-accent-rgb, 183 110 121), 0.45))
+		drop-shadow(0 4px 18px rgba(0, 0, 0, 0.55));
+}
+
+/* Black Rose lockup is near-black — lift it off the dark scene with a light halo. */
+.exp-block[data-collection='black-rose'] .exp-lockup-img {
+	filter:
+		drop-shadow(0 0 26px rgba(255, 255, 255, 0.5))
+		drop-shadow(0 0 60px rgba(192, 192, 192, 0.4))
+		drop-shadow(0 4px 18px rgba(0, 0, 0, 0.6));
+}
+
 /* ─── Enter cue ──────────────────────────────────────────────────────── */
 
 .exp-cue {
@@ -320,6 +341,7 @@ html {
 	.exp-name-frame { gap: 10px; }
 	.exp-name-frame::before { width: min(280px, 78vw); }
 	.exp-name-frame::after { width: min(320px, 88vw); }
+	.exp-lockup-img { max-width: 82vw; max-height: 22vh; }
 	.exp-tagline { bottom: 16px; font-size: 0.6rem; letter-spacing: 0.2em; }
 	.exp-block[data-collection='signature'] .exp-name { font-size: clamp(3.5rem, 18vw, 6rem); }
 	.exp-block[data-collection='black-rose'] .exp-name { font-size: clamp(3rem, 15vw, 5.5rem); }

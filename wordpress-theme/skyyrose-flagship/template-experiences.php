@@ -64,6 +64,39 @@ function skyyrose_experiences_hero( $sot ) {
 	return null;
 }
 
+/**
+ * Resolve the canonical collection lockup (the brand-script name image).
+ *
+ * Per brand canon the lockup IS the collection's hero name. Returns
+ * [ 'url', 'w', 'h' ] for the transparent display lockup, or null when the
+ * collection has none (e.g. Kids Capsule → falls back to type-rendered name).
+ *
+ * @param array $sot Decoded SOT data.
+ * @return array|null
+ */
+function skyyrose_experiences_lockup( $sot ) {
+	$lockup = isset( $sot['lockup'] ) ? $sot['lockup'] : array();
+	if ( empty( $lockup['display_webp']['resolved'] ) ) {
+		return null;
+	}
+	$rel = 'assets/' . ltrim( $lockup['display_webp']['resolved'], '/' );
+	$abs = SKYYROSE_DIR . '/' . $rel;
+	$w   = 0;
+	$h   = 0;
+	if ( file_exists( $abs ) ) {
+		$size = @getimagesize( $abs ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- size probe is best-effort for CLS.
+		if ( $size ) {
+			$w = (int) $size[0];
+			$h = (int) $size[1];
+		}
+	}
+	return array(
+		'url' => get_template_directory_uri() . '/' . $rel,
+		'w'   => $w,
+		'h'   => $h,
+	);
+}
+
 // ─── Collections (canonical 01–04 order) ──────────────────────────────────────
 $exp_collections = array(
 	array(
@@ -89,7 +122,9 @@ $exp_collections = array(
 );
 
 foreach ( $exp_collections as &$exp_col ) {
-	$exp_col['hero'] = skyyrose_experiences_hero( skyyrose_experiences_load_sot( $exp_col['slug'] ) );
+	$exp_sot           = skyyrose_experiences_load_sot( $exp_col['slug'] );
+	$exp_col['hero']   = skyyrose_experiences_hero( $exp_sot );
+	$exp_col['lockup'] = skyyrose_experiences_lockup( $exp_sot );
 }
 unset( $exp_col );
 
@@ -155,7 +190,23 @@ get_header();
 				/* translators: %s: collection name */
 				echo esc_attr( sprintf( __( 'Enter the %s world', 'skyyrose' ), $exp_col['name'] ) );
 				?>" style="text-decoration:none;">
-					<span class="exp-name"><?php echo esc_html( $exp_col['name'] ); ?></span>
+					<?php if ( $exp_col['lockup'] ) : ?>
+						<img
+							class="exp-lockup-img"
+							src="<?php echo esc_url( $exp_col['lockup']['url'] ); ?>"
+							alt=""
+							aria-hidden="true"
+							<?php
+							if ( $exp_col['lockup']['w'] && $exp_col['lockup']['h'] ) {
+								printf( 'width="%d" height="%d" ', (int) $exp_col['lockup']['w'], (int) $exp_col['lockup']['h'] );
+							}
+							?>
+							loading="<?php echo $is_first ? 'eager' : 'lazy'; ?>"
+							decoding="async"
+						>
+					<?php else : ?>
+						<span class="exp-name"><?php echo esc_html( $exp_col['name'] ); ?></span>
+					<?php endif; ?>
 				</a>
 				<a class="exp-cue" href="<?php echo esc_url( $exp_url ); ?>">
 					<?php esc_html_e( 'Enter', 'skyyrose' ); ?>
