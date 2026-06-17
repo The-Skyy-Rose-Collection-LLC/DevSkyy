@@ -3,7 +3,7 @@
 #
 # See https://fly.io/docs/reference/configuration/ for documentation
 
-app = 'devskyy'
+app = 'devskyy-api'
 primary_region = 'sjc'
 
 # Kill signal for graceful shutdown
@@ -65,7 +65,9 @@ kill_timeout = '30s'
   # fly secrets set MCP_SERVICE_TOKEN=...   # Bearer token guarding /mcp (dashboard + WP send it)
 
 [build]
-  # Uses Dockerfile in root directory
+  # Slim standalone MCP service (no ML stack). The full main_enterprise image
+  # (root Dockerfile) is a torch monolith; this app serves only /mcp.
+  dockerfile = "Dockerfile.mcp"
 
 # HTTP service configuration
 [http_service]
@@ -109,7 +111,9 @@ kill_timeout = '30s'
   protocol = 'http'
   tls_skip_verify = false
 
-# VM configuration - Enterprise tier
+# VM configuration
+# 1GB is ample for the slim MCP service (FastAPI + mcp + tool-module imports,
+# no torch). Bump only if the in-memory MCP session load grows.
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'

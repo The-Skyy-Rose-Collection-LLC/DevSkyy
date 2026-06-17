@@ -87,7 +87,7 @@ async def lifespan(app: FastAPI):
 
     # Run the MCP streamable-HTTP session manager for the app lifetime so the
     # mounted /mcp endpoint can serve sessions to the dashboard + WordPress.
-    from api.mcp_mount import mcp_session_manager
+    from mcp_tools.http_mount import mcp_session_manager
 
     async with mcp_session_manager().run():
         log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
@@ -131,8 +131,8 @@ app = FastAPI(
 # Mount the DevSkyy MCP server (streamable HTTP, Bearer-auth) at /mcp so the
 # Next.js dashboard and WordPress site can consume the same tools the stdio
 # server exposes. build_mcp_app() also constructs mcp.session_manager, which the
-# lifespan above runs. See api/mcp_mount.py.
-from api.mcp_mount import MCP_MOUNT_PATH, build_mcp_app  # noqa: E402
+# lifespan above runs. See mcp_tools/http_mount.py.
+from mcp_tools.http_mount import MCP_MOUNT_PATH, build_mcp_app  # noqa: E402
 
 app.mount(MCP_MOUNT_PATH, build_mcp_app())
 

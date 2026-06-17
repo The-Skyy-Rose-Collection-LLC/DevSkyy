@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 
+from mcp.server.transport_security import TransportSecuritySettings
 from starlette.types import ASGIApp, Receive, Scope, Send
 from utils.logging_utils import get_logger
 
@@ -26,6 +27,18 @@ logger = get_logger(__name__)
 
 MCP_MOUNT_PATH = "/mcp"
 _TOKEN_ENV = "MCP_SERVICE_TOKEN"
+_ALLOWED_HOSTS_ENV = "MCP_ALLOWED_HOSTS"
+
+# FastMCP auto-enables DNS-rebinding protection scoped to localhost when built
+# with the default host="127.0.0.1". Behind a proxy (Fly) the forwarded Host is
+# the public domain, which would 421 ("Invalid Host header"). Allowlist the real
+# hosts; extend/override via MCP_ALLOWED_HOSTS (comma-separated).
+_DEFAULT_ALLOWED_HOSTS = (
+    "api.devskyy.app",
+    "devskyy-api.fly.dev",
+    "127.0.0.1",
+    "localhost",
+)
 _UNAUTHORIZED_BODY = (
     b'{"error":"unauthorized","detail":"MCP requires Authorization: Bearer <MCP_SERVICE_TOKEN>"}'
 )
@@ -78,6 +91,24 @@ class BearerAuthMiddleware:
         await send({"type": "http.response.body", "body": _UNAUTHORIZED_BODY})
 
 
+def _allowed_hosts() -> list[str]:
+    """Allowed Host-header values for MCP DNS-rebinding protection.
+
+    Each configured host is accepted both bare (default 443) and with any
+    explicit port (``host:*``), matching the SDK's wildcard-port matcher.
+    """
+    raw = os.getenv(_ALLOWED_HOSTS_ENV, "").strip()
+    hosts = (
+        [h.strip() for h in raw.split(",") if h.strip()] if raw else list(_DEFAULT_ALLOWED_HOSTS)
+    )
+    expanded: list[str] = []
+    for host in hosts:
+        expanded.append(host)
+        if not host.endswith(":*"):
+            expanded.append(f"{host}:*")
+    return expanded
+
+
 def build_mcp_app():
     """Return the auth-wrapped MCP streamable-HTTP ASGI app to mount on FastAPI.
 
@@ -88,6 +119,16 @@ def build_mcp_app():
     # ("/mcp") would double the path to "/mcp/mcp". Serve at the app root so the
     # mount path IS the full public endpoint (/mcp).
     mcp.settings.streamable_http_path = "/"
+
+    # Keep DNS-rebinding protection ON, but allowlist the real public hosts
+    # (FastMCP otherwise auto-scopes it to localhost and 421s behind a proxy).
+    # Origins are absent on our server-to-server callers, so an empty origin
+    # allowlist is correct (the SDK passes absent Origin).
+    mcp.settings.transport_security = TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=_allowed_hosts(),
+        allowed_origins=[],
+    )
     return BearerAuthMiddleware(mcp.streamable_http_app())
 
 
