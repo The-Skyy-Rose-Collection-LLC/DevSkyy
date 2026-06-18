@@ -1,5 +1,49 @@
 # Current Tasks
 
+## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
+
+Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
+the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
+Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
+`/mcp` (→ `api.devskyy.app/mcp/`); reuse the backend both surfaces already call.
+
+- [x] P0 Research — Context7 confirmed `app.mount("/mcp", mcp.streamable_http_app())` +
+      `session_manager.run()` in lifespan + Bearer auth. SDK FastMCP already has the methods.
+- [x] P1 HTTP mount — `api/mcp_mount.py` + lifespan wrap + mount in main_enterprise.
+      Fixed double-path (`streamable_http_path="/"`). Verified: `/mcp/` → 200 + session.
+- [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
+      200 with. Enforced when token set; warns if unset in non-dev.
+- [x] P3a fly.toml pinned to 1 always-on machine (commit 624631520); MCP_SERVICE_TOKEN generated.
+- [x] P3b Backend deploy — LIVE at https://devskyy-api.fly.dev/mcp/ (Fly app `devskyy-api`, 1 machine,
+      MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
+      (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
+      ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
+      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
+- [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
+      console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
+      Vercel deploy ⚠️ PENDING.
+- [x] P5 WP-admin console — `inc/mcp-bridge.php` (PHP streamable-HTTP client: initialize →
+      notifications/initialized → tools/call, SSE-frame parse, session DELETE teardown;
+      SSRF-guarded via `skyyrose_see_is_safe_url`; Bearer from SKYYROSE_MCP_TOKEN const/env/option).
+      Tools → DevSkyy MCP page + `assets/js/admin-mcp-console.js` (createElement only, no innerHTML),
+      nonce + `manage_options` gated AJAX relay. Wired in functions.php after fastapi-client.php.
+      WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
+      (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
+      php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
+- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
+  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
+    redeploy frontend. ⚠️
+  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
+    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
+    + DNS records); then the committed default URLs work without per-surface overrides.
+  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
 Source: `~/.claude-mem/STANDUP.md` (10-agent standup; all decisions founder-approved 2026-06-10).

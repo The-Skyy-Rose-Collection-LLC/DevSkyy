@@ -1969,7 +1969,7 @@
     "error_message": "AssertionError: Status code 204 must not have a response body \u2014 app import crashed at api/v1/rag_anything.py:201, collected by new Stop-hook pytest run",
     "file": "api/v1/rag_anything.py",
     "root_cause": "PEP 563 (`from __future__ import annotations`) stringifies the handler's `-> None` return annotation; FastAPI 0.115 get_type_hints resolves it to the NoneType CLASS, which is truthy as response_model, tripping the 204-no-body assert at route registration. Only route in repo combining future-import + `-> None` + 204.",
-    "fix": "Explicit `response_model=None` on the @router.delete decorator. 4 sibling 204 routes (elite_studio, v2/assets, v2/creative, v2/webhooks) have future-import but UNannotated handlers \u2014 dormant; adding `-> None` to them without response_model=None will re-trigger this.",
+    "fix": "Re-evaluated both kids dossiers vs real photos. Real branding = chest cluster + ONE sleeve patch + ONE pants cluster. Removed phantom chest Authentic-Collection patch (real round patch is the SLEEVE patch), phantom belly/stomach cluster, dual sleeve patches, dual pants clusters. Dossiers were the contamination source (ML-drafted, same class as sg-006). Composite step still recommended for guaranteed placement. Committed on render/run-2026-06-15.",
     "tags": [
       "fastapi",
       "pep563",
@@ -1980,7 +1980,7 @@
     ],
     "related_bugs": [],
     "occurrences": 1,
-    "last_seen": "2026-06-11T07:30:00Z"
+    "last_seen": "2026-06-15T19:55:00-07:00"
   },
   {
     "id": "bug-126",
@@ -2198,5 +2198,91 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-15"
+  },
+  {
+    "id": "bug-137",
+    "timestamp": "2026-06-15T17:05:00Z",
+    "error_message": "Mounting MCP into main_enterprise would crash-loop the Fly container: ImportError on 'utils' (not COPY'd in Dockerfile) and ModuleNotFoundError on 'scripts'/'imagery' via eager mcp_tools.tools imports",
+    "file": "Dockerfile, mcp_tools/tools/__init__.py",
+    "root_cause": "api/mcp_mount.py imports utils.logging_utils + 'from mcp_tools import mcp' which eagerly imports all 19 tool modules; oai_render imports scripts.oai_render, lora_generation imports imagery.*. utils/ was never in the Dockerfile COPY list (current prod main_enterprise didn't import utils, so it shipped without it); scripts/ and imagery/ are heavy render/GPU dirs not in the slim image.",
+    "fix": "Added 'COPY utils/ ./utils/' to Dockerfile (foundational pkg, grouped with core/). Rewrote mcp_tools/tools/__init__.py to import each tool module defensively in a loop, catching ImportError and logging 'mcp_tool_module_skipped' so modules with absent optional deps skip registration instead of crashing the server import. Verified via slim-image import simulation (blocked scripts/imagery): 44/51 tools register, build_mcp_app()+session_manager build, only oai_render+lora_generation skip.",
+    "tags": [
+      "mcp",
+      "docker",
+      "fly",
+      "deploy",
+      "import-error",
+      "resilience"
+    ],
+    "related_bugs": [
+      "bug-134",
+      "bug-135"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-15T17:05:00Z"
+  },
+  {
+    "id": "bug-125",
+    "timestamp": "2026-06-15T19:30:00-07:00",
+    "error_message": "Founder: kids sets render with no logo on the stomach; red also has a hallucinated jersey patch on the chest. QC judge PASSED them anyway.",
+    "file": "scripts/oai_render/references.py",
+    "root_cause": "kids-001/kids-002 absent from _sku_logo_refs() AND kids-capsule absent from _collection_logos() -> get_logo_reference returns None -> build_references attaches ZERO logo/patch art for kids. Model infers branding from busy flat-lay only and drifts (drops stomach three-rose-cluster, invents chest patch). The Claude judge compares against the same refs, so with no logo ref it is ALSO blind to the missing stomach logo - catches ADDED branding but not MISSING branding. Architectural: build_references attaches only ONE logo per SKU; kids dossier needs two (cluster + authentic-collection patch).",
+    "fix": "Re-evaluated both kids dossiers vs real photos. Real branding = chest cluster + ONE sleeve patch + ONE pants cluster. Removed phantom chest Authentic-Collection patch (real round patch is the SLEEVE patch), phantom belly/stomach cluster, dual sleeve patches, dual pants clusters. Dossiers were the contamination source (ML-drafted, same class as sg-006). Composite step still recommended for guaranteed placement. Committed on render/run-2026-06-15.",
+    "tags": [
+      "oai-render",
+      "kids",
+      "logo-drift",
+      "missing-reference",
+      "qc-blindspot",
+      "composite-needed"
+    ],
+    "related_bugs": [
+      "bug-119",
+      "bug-124"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-15T19:55:00-07:00"
+  },
+  {
+    "id": "bug-138",
+    "timestamp": "2026-06-16T21:40:00Z",
+    "error_message": "fly deploy failed: pip install -r requirements.txt -> 'file:///app does not appear to be a Python project' then with .[all]: ResolutionImpossible (mcp extra pins aiofiles==25.1.0, ml extra's gradio needs aiofiles<25.0)",
+    "file": "Dockerfile, pyproject.toml",
+    "root_cause": "requirements.txt is a deprecated '-e .' stub; real deps in pyproject. Dockerfile copied only requirements.txt before pip install so -e . had no project. [all] is internally unsatisfiable: [mcp] aiofiles==25.1.0 vs [ml]->gradio aiofiles<25.0.",
+    "fix": "Pivoted to a slim standalone MCP service (mcp_service.py + Dockerfile.mcp) installing a lean set (requirements-mcp.txt: mcp/fastapi/uvicorn/httpx/pydantic/structlog) instead of the torch monolith. Root Dockerfile also fixed to install .[all] from pyproject for the full-app path. Curated set .[api,ml,worker,deploy,sdk,rag,observability] (drops [mcp] pin) resolves if the monolith is ever needed.",
+    "tags": [
+      "fly",
+      "docker",
+      "pip",
+      "dependency-conflict",
+      "mcp",
+      "deploy"
+    ],
+    "related_bugs": [
+      "bug-137"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-16T21:40:00Z"
+  },
+  {
+    "id": "bug-139",
+    "timestamp": "2026-06-16T21:56:00Z",
+    "error_message": "Authenticated POST /mcp/ on Fly returned HTTP 421 'Invalid Host header'",
+    "file": "mcp_tools/http_mount.py",
+    "root_cause": "FastMCP auto-enables DNS-rebinding protection scoped to localhost when built with default host=127.0.0.1 (mcp/server/fastmcp/server.py:177-182). Behind Fly's proxy the forwarded Host is the public domain -> 421. Not caught by local import-sim (never sends a non-localhost Host).",
+    "fix": "build_mcp_app() now sets mcp.settings.transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=True, allowed_hosts=_allowed_hosts()) before streamable_http_app(). Allowlist = api.devskyy.app + devskyy-api.fly.dev + localhost (bare and :* per the SDK matcher), env-extendable via MCP_ALLOWED_HOSTS. Verified live: initialize->200+session id, evil host->reject.",
+    "tags": [
+      "mcp",
+      "fastmcp",
+      "dns-rebinding",
+      "421",
+      "fly",
+      "transport-security"
+    ],
+    "related_bugs": [
+      "bug-138"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-16T21:56:00Z"
   }
 ]

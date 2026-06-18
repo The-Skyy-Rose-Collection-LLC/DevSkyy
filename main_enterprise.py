@@ -85,9 +85,13 @@ async def lifespan(app: FastAPI):
         except Exception as exc:  # noqa: BLE001 — observability is non-critical
             log.warning("langfuse_init_failed", error=str(exc))
 
-    log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
+    # Run the MCP streamable-HTTP session manager for the app lifetime so the
+    # mounted /mcp endpoint can serve sessions to the dashboard + WordPress.
+    from mcp_tools.http_mount import mcp_session_manager
 
-    yield
+    async with mcp_session_manager().run():
+        log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
+        yield
 
     # Shutdown
     log.info("platform_shutting_down")
@@ -123,6 +127,14 @@ app = FastAPI(
     redoc_url=_redoc_url,
     lifespan=lifespan,
 )
+
+# Mount the DevSkyy MCP server (streamable HTTP, Bearer-auth) at /mcp so the
+# Next.js dashboard and WordPress site can consume the same tools the stdio
+# server exposes. build_mcp_app() also constructs mcp.session_manager, which the
+# lifespan above runs. See mcp_tools/http_mount.py.
+from mcp_tools.http_mount import MCP_MOUNT_PATH, build_mcp_app  # noqa: E402
+
+app.mount(MCP_MOUNT_PATH, build_mcp_app())
 
 # =============================================================================
 # Middleware
