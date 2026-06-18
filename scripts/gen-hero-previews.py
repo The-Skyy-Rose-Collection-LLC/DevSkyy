@@ -29,9 +29,10 @@ import base64
 import os
 import sys
 import urllib.parse
-import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
+
+import httpx
 
 # ── Runtime key load (interpreter reads .env.hf; values never surface) ───────
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -226,8 +227,11 @@ def _read_replicate_output(output: object) -> bytes:
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or not (parsed.hostname or "").endswith("replicate.delivery"):
         raise RuntimeError(f"refusing to fetch untrusted Replicate URL: {url!r}")
-    with urllib.request.urlopen(url, timeout=120) as resp:  # noqa: S310 — validated above
-        return resp.read()
+    # follow_redirects=False so a CDN redirect cannot bounce the fetch to an
+    # unvalidated (internal) host after the allowlist check.
+    resp = httpx.get(url, follow_redirects=False, timeout=120.0)
+    resp.raise_for_status()
+    return resp.content
 
 
 ENGINES = {"openai": gen_openai, "replicate": gen_replicate}
@@ -277,6 +281,8 @@ def run(engines: list[str]) -> int:
     if total_est > HARD_CAP_USD:
         print(f"ABORT: estimate ${total_est:.2f} exceeds hard cap ${HARD_CAP_USD:.2f}")
         return 2
+    import openai
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     failures = 0
     for scene in SCENES:
@@ -287,6 +293,13 @@ def run(engines: list[str]) -> int:
                 data = ENGINES[eng](scene)
                 dest.write_bytes(data)
                 print(f"[{eng}] {scene.slug} ✓ {dest}  ({len(data) // 1024} KB)", flush=True)
+            except openai.AuthenticationError:
+                # Never print str(exc) — the OpenAI SDK echoes a partial key in it.
+                print(
+                    f"[{eng}] {scene.slug} ✗ AuthenticationError: check OPENAI_API_KEY",
+                    file=sys.stderr,
+                )
+                return 1
             except Exception as exc:  # noqa: BLE001 — surface, continue other scenes
                 failures += 1
                 print(f"[{eng}] {scene.slug} ✗ {type(exc).__name__}: {exc}", file=sys.stderr)

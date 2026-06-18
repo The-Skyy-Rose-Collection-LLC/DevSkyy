@@ -150,6 +150,40 @@ def _manifest(skus: list[str]) -> cost.CostManifest:
     return cost.CostManifest(entries=entries)
 
 
+def _run_batch(skus: list[str], scene: Path, collection: str | None, out_dir: Path) -> int:
+    """Render each SKU on-model, tracking spend against the hard cap. Returns exit code."""
+    import openai
+
+    tracker = cost.SpendTracker()
+    failures = 0
+    for sku in skus:
+        safe_sku = re.sub(r"[^a-z0-9\-]", "", sku.lower())
+        dest = out_dir / f"{safe_sku}-onmodel.png"
+        if not tracker.can_afford(config.EST_COST_PER_IMAGE_USD):
+            print(f"STOP: spend cap ${tracker.cap_usd:.2f} reached before {sku}", file=sys.stderr)
+            break
+        try:
+            print(f"[{sku}] rendering on-model ...", flush=True)
+            data = generate_one(sku, scene, collection, dest)
+            tracker.add(config.EST_COST_PER_IMAGE_USD)
+            print(f"[{sku}] [ok] {dest} ({len(data) // 1024} KB)", flush=True)
+        except openai.AuthenticationError:
+            # Never print str(exc) — the OpenAI SDK echoes a partial key in it.
+            print(
+                f"[{sku}] [fail] AuthenticationError: check {config.API_KEY_ENV}", file=sys.stderr
+            )
+            failures += 1
+            break  # every subsequent call fails identically
+        except (references.MissingReferenceError, FileNotFoundError) as exc:
+            print(f"[{sku}] [fail] {type(exc).__name__}: {exc}", file=sys.stderr)
+            failures += 1
+        except Exception as exc:  # noqa: BLE001 — surface, continue the batch
+            failures += 1
+            print(f"[{sku}] [fail] {type(exc).__name__}: {exc}", file=sys.stderr)
+    print(f"\nDone. spent ~${tracker.spent_usd:.2f}, {failures} failed -> {out_dir}")
+    return 1 if failures else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="On-model lookbook (gpt-image-2 edit)")
     ap.add_argument("mode", choices=["plan", "generate"])
@@ -181,7 +215,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.mode == "plan":
         return 0
 
-    cost.enforce_cap(manifest)
+    try:
+        cost.enforce_cap(manifest)
+    except cost.CostCapExceeded as exc:
+        print(f"ABORT: {exc}", file=sys.stderr)
+        return 2
     if not args.yes:
         print("\nRefusing to spend without --yes (STOP-AND-SHOW gate).", file=sys.stderr)
         return 3
@@ -189,36 +227,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ABORT: {config.API_KEY_ENV} not set (add to .env.hf)", file=sys.stderr)
         return 2
 
-    import openai
-
-    tracker = cost.SpendTracker()
-    failures = 0
-    for sku in args.sku:
-        safe_sku = re.sub(r"[^a-z0-9\-]", "", sku.lower())
-        dest = out_dir / f"{safe_sku}-onmodel.png"
-        if not tracker.can_afford(config.EST_COST_PER_IMAGE_USD):
-            print(f"STOP: spend cap ${tracker.cap_usd:.2f} reached before {sku}", file=sys.stderr)
-            break
-        try:
-            print(f"[{sku}] rendering on-model ...", flush=True)
-            data = generate_one(sku, args.scene, args.collection, dest)
-            tracker.add(config.EST_COST_PER_IMAGE_USD)
-            print(f"[{sku}] [ok] {dest} ({len(data) // 1024} KB)", flush=True)
-        except openai.AuthenticationError:
-            # Never print str(exc) — the OpenAI SDK echoes a partial key in it.
-            print(
-                f"[{sku}] [fail] AuthenticationError: check {config.API_KEY_ENV}", file=sys.stderr
-            )
-            failures += 1
-            break  # every subsequent call fails identically
-        except (references.MissingReferenceError, FileNotFoundError) as exc:
-            print(f"[{sku}] [fail] {type(exc).__name__}: {exc}", file=sys.stderr)
-            failures += 1
-        except Exception as exc:  # noqa: BLE001 — surface, continue the batch
-            failures += 1
-            print(f"[{sku}] [fail] {type(exc).__name__}: {exc}", file=sys.stderr)
-    print(f"\nDone. spent ~${tracker.spent_usd:.2f}, {failures} failed -> {out_dir}")
-    return 1 if failures else 0
+    return _run_batch(args.sku, args.scene, args.collection, out_dir)
 
 
 if __name__ == "__main__":
