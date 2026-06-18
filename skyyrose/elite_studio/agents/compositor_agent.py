@@ -66,7 +66,6 @@ def _maybe_apply_gate(
 
     from ..quality import embedding_gate
     from ..quality.brand_centroid import load_centroid
-    from .compositor.stage_g_visual_qa import _DEFAULT_CENTROID_PATH
 
     resolved = Path(centroid_path) if centroid_path else _DEFAULT_CENTROID_PATH
     if not resolved.exists():

@@ -469,7 +469,7 @@ class LazyImport:
 # =============================================================================
 
 
-class cached_property[T]:
+class cached_property(Generic[T]):
     """
     Thread-safe cached property decorator.
 

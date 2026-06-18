@@ -29,7 +29,7 @@ def is_transient_error(error_msg: str) -> bool:
     return any(kw in lower for kw in TRANSIENT_KEYWORDS)
 
 
-def retry_on_transient[T](
+def retry_on_transient(
     fn: Callable[[], T],
     *,
     label: str = "",

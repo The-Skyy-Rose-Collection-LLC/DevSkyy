@@ -146,7 +146,9 @@ def _render_markdown(coverages, failures, summary):
     if failures:
         lines += ["## Failures", "", "| SKU | Reason |", "|-----|--------|"]
         for sku, reason in failures:
-            lines.append(f"| `{sku}` | {reason.replace('|', '\\|')[:120]} |")
+            pipe = "|"
+            safe_reason = reason.replace(pipe, r"\|")[:120]
+            lines.append(f"| `{sku}` | {safe_reason} |")
         lines.append("")
 
     lines += [

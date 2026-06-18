@@ -6,7 +6,7 @@ import asyncio
 
 import pytest
 
-from aos.runtime.container import AgentContainer, ResourceLimitExceeded
+from aos.runtime.container import AgentContainer
 from aos.runtime.types import ResourceLimits
 
 

@@ -21,10 +21,10 @@ import logging
 import logging.handlers
 import os
 import sys
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator, Mapping
 
 _DEFAULT_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 _DEFAULT_DATEFMT = "%Y-%m-%dT%H:%M:%S%z"

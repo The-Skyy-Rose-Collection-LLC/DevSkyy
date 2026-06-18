@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from aos.kernel.process_manager import ProcessManager, ProcessNotFoundError
-from aos.kernel.types import ProcessPriority, ProcessStatus, SpawnRequest
+from aos.kernel.types import ProcessStatus, SpawnRequest
 
 
 @pytest.fixture

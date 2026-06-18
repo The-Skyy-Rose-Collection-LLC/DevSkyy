@@ -6,7 +6,6 @@ the judge path (the raw bytes b"\x89PNG" are not a valid PNG and would
 short-circuit to passed=False without the patch).
 """
 
-import pytest
 
 from evaluation.agents import RenderFidelityEvaluator
 from scripts.oai_render.qc import RenderExpectation

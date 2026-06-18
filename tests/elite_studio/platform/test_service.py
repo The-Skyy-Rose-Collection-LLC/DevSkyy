@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from skyyrose.elite_studio.platform.capability import CapabilityMatrix, CapabilityStatus
-from skyyrose.elite_studio.platform.service import GenerationResult, generate_3d
+from skyyrose.elite_studio.platform.service import generate_3d
 from skyyrose.elite_studio.platform.tenancy import TenantRegistry
 
 
