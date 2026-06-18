@@ -33,7 +33,7 @@ on:
         type: boolean
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.12"
   NODE_VERSION: "22"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -377,10 +377,11 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f  # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
+      # Root project has no committed package-lock.json; use `npm install`
+      # (not `npm ci`) and skip npm cache, which requires a lockfile to key on.
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Three.js collection tests
         run: npm run test:collections
