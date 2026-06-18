@@ -1,0 +1,13 @@
+{
+  "sku": "br-002",
+  "style": "ghost",
+  "view": "back",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "wrong_view",
+    "branding_drift"
+  ],
+  "reason": "The render shows the front view of the joggers instead of the required back view, disqualifying it for the view correctness. Additionally, it lacks the specified SR monogram branding on the right thigh in gold-tone thread."
+}

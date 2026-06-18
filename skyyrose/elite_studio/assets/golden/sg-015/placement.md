@@ -33,7 +33,7 @@ Two-piece matching set sold as a single SKU — **lightweight nylon zip-front ho
 - NO half-zip placket on the jacket — the zipper runs the FULL body length.
 - NO additional pockets on the back of the jacket, pants, or sleeves — only the two front slash hand pockets per piece.
 - NO sherpa lining (this is a windbreaker, not a sherpa-lined jacket — sg-009 is the sherpa-lined sibling).
-- NO solid back yoke without the SR monogram — the back yoke MUST carry the large SR monogram embroidery (this is the main back-decoration distinguishing the windbreaker set from the sg-006 fleece hoodie which has only a small back-neck SR).
+- NO solid back yoke without the SR monogram — the back yoke MUST carry the large SR monogram embroidery (this is the main back-decoration distinguishing the windbreaker set from the sg-006 fleece hoodie, whose back is blank).
 
 ---
 _This file is auto-generated from the canonical sources_

@@ -1,0 +1,12 @@
+{
+  "sku": "br-004",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 3,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The logo on the hoodie does not match the identity and design specified in the dossier; it features additional graphic elements not present in the reference."
+}

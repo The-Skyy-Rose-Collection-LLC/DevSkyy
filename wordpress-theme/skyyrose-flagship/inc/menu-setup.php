@@ -79,6 +79,84 @@ function skyyrose_setup_menus() {
 }
 
 /**
+ * Rebuild menu items for all registered locations.
+ *
+ * Deletes existing items and recreates them from the current definitions.
+ * Gated on a version option so it fires exactly once per version bump —
+ * mirrors the theme-activation-setup pattern.
+ *
+ * To re-run: change SKYYROSE_MENU_BUILD_VERSION to a new string value.
+ *
+ * @since 7.0.0
+ * @return void
+ */
+function skyyrose_rebuild_menu_items() {
+	$menus = skyyrose_get_menu_definitions();
+
+	foreach ( $menus as $location => $menu_data ) {
+		$menu_obj = wp_get_nav_menu_object( $menu_data['name'] );
+		if ( ! $menu_obj ) {
+			continue;
+		}
+		$menu_id = $menu_obj->term_id;
+
+		// Delete all existing items so the current definitions take effect.
+		$existing = wp_get_nav_menu_items( $menu_id );
+		if ( $existing ) {
+			foreach ( $existing as $existing_item ) {
+				wp_delete_post( $existing_item->db_id, true );
+			}
+		}
+
+		// Recreate items without the empty-check guard.
+		if ( ! empty( $menu_data['items'] ) ) {
+			foreach ( $menu_data['items'] as $item ) {
+				$args    = array(
+					'menu-item-title'  => $item['title'],
+					'menu-item-url'    => home_url( $item['url'] ),
+					'menu-item-status' => 'publish',
+					'menu-item-type'   => 'custom',
+				);
+				$item_id = wp_update_nav_menu_item( $menu_id, 0, $args );
+
+				if ( ! is_wp_error( $item_id ) && ! empty( $item['children'] ) ) {
+					foreach ( $item['children'] as $child ) {
+						wp_update_nav_menu_item(
+							$menu_id,
+							0,
+							array(
+								'menu-item-title'     => $child['title'],
+								'menu-item-url'       => home_url( $child['url'] ),
+								'menu-item-status'    => 'publish',
+								'menu-item-type'      => 'custom',
+								'menu-item-parent-id' => $item_id,
+							)
+						);
+					}
+				}
+			}
+		}
+	}
+}
+
+// One-time rebuild trigger on init — bump SKYYROSE_MENU_BUILD_VERSION to re-run.
+// Fires after skyyrose_setup_menus() (priority 20 vs 10) so menu objects exist.
+define( 'SKYYROSE_MENU_BUILD_VERSION', 'v700' );
+
+add_action(
+	'init',
+	function () {
+		$flag = 'skyyrose_menu_rebuild_' . SKYYROSE_MENU_BUILD_VERSION;
+		if ( get_option( $flag ) ) {
+			return;
+		}
+		skyyrose_rebuild_menu_items();
+		update_option( $flag, true );
+	},
+	20
+);
+
+/**
  * Menu definitions: location => name + items.
  *
  * @return array
@@ -175,84 +253,15 @@ function skyyrose_get_menu_definitions() {
 				),
 			),
 		),
-		'footer-legal' => array(
-			'name'  => __( 'Footer - Legal', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'Privacy Policy', 'skyyrose' ),
-					'url'   => '/privacy-policy/',
-				),
-				array(
-					'title' => __( 'Terms of Service', 'skyyrose' ),
-					'url'   => '/terms-of-service/',
-				),
-			),
-		),
-		'mobile'       => array(
-			'name'  => __( 'Mobile Menu', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'Home', 'skyyrose' ),
-					'url'   => '/',
-				),
-				array(
-					'title'    => __( 'Collections', 'skyyrose' ),
-					'url'      => '/collections/',
-					'children' => array(
-						array(
-							'title' => __( 'Black Rose', 'skyyrose' ),
-							'url'   => '/collection-black-rose/',
-						),
-						array(
-							'title' => __( 'Love Hurts', 'skyyrose' ),
-							'url'   => '/collection-love-hurts/',
-						),
-						array(
-							'title' => __( 'Signature', 'skyyrose' ),
-							'url'   => '/collection-signature/',
-						),
-						array(
-							'title' => __( 'Kids Capsule', 'skyyrose' ),
-							'url'   => '/collection-kids-capsule/',
-						),
-					),
-				),
-				array(
-					'title'    => __( 'Experiences', 'skyyrose' ),
-					'url'      => '/experiences/',
-					'children' => array(
-						array(
-							'title' => __( 'The Garden', 'skyyrose' ),
-							'url'   => '/experience-black-rose/',
-						),
-						array(
-							'title' => __( 'The Ballroom', 'skyyrose' ),
-							'url'   => '/experience-love-hurts/',
-						),
-						array(
-							'title' => __( 'The Runway', 'skyyrose' ),
-							'url'   => '/experience-signature/',
-						),
-						array(
-							'title' => __( 'Heir Apparent', 'skyyrose' ),
-							'url'   => '/experience-kids-capsule/',
-						),
-					),
-				),
-				array(
-					'title' => __( 'Pre-Order', 'skyyrose' ),
-					'url'   => '/pre-order/',
-				),
-				array(
-					'title' => __( 'About', 'skyyrose' ),
-					'url'   => '/about/',
-				),
-				array(
-					'title' => __( 'Contact', 'skyyrose' ),
-					'url'   => '/contact/',
-				),
-			),
-		),
+		// NOTE: 'footer-legal' location removed — it was never rendered in any template.
+		// Footer legal links live in the 'footer' menu (rendered in footer.php:235)
+		// and in the hardcoded footer-grid Legal column. No separate location needed.
+
+		// NOTE: 'mobile' location removed — the mobile slide-in panel uses the
+		// 'primary' location (header.php:110). A separate mobile menu object was DB
+		// waste. If mobile and desktop menus ever need to diverge, register 'mobile'
+		// in theme-setup.php and re-add it here.
+
 		'collection'   => array(
 			'name'  => __( 'Collection Navigation', 'skyyrose' ),
 			'items' => array(

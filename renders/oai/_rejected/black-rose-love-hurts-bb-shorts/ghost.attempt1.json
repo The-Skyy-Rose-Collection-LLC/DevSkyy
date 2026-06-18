@@ -1,0 +1,12 @@
+{
+  "sku": "br-007",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The branding fails because the Black Rose graphic on the front is either misrepresented or too prominent compared to the specifications, and the 'Love Hurts' wordmark colors and placement do not match the required tonal specifications."
+}

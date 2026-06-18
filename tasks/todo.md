@@ -1,5 +1,49 @@
 # Current Tasks
 
+## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
+
+Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
+the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
+Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
+`/mcp` (→ `api.devskyy.app/mcp/`); reuse the backend both surfaces already call.
+
+- [x] P0 Research — Context7 confirmed `app.mount("/mcp", mcp.streamable_http_app())` +
+      `session_manager.run()` in lifespan + Bearer auth. SDK FastMCP already has the methods.
+- [x] P1 HTTP mount — `api/mcp_mount.py` + lifespan wrap + mount in main_enterprise.
+      Fixed double-path (`streamable_http_path="/"`). Verified: `/mcp/` → 200 + session.
+- [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
+      200 with. Enforced when token set; warns if unset in non-dev.
+- [x] P3a fly.toml pinned to 1 always-on machine (commit 624631520); MCP_SERVICE_TOKEN generated.
+- [x] P3b Backend deploy — LIVE at https://devskyy-api.fly.dev/mcp/ (Fly app `devskyy-api`, 1 machine,
+      MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
+      (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
+      ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
+      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
+- [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
+      console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
+      Vercel deploy ⚠️ PENDING.
+- [x] P5 WP-admin console — `inc/mcp-bridge.php` (PHP streamable-HTTP client: initialize →
+      notifications/initialized → tools/call, SSE-frame parse, session DELETE teardown;
+      SSRF-guarded via `skyyrose_see_is_safe_url`; Bearer from SKYYROSE_MCP_TOKEN const/env/option).
+      Tools → DevSkyy MCP page + `assets/js/admin-mcp-console.js` (createElement only, no innerHTML),
+      nonce + `manage_options` gated AJAX relay. Wired in functions.php after fastapi-client.php.
+      WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
+      (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
+      php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
+- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
+  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
+    redeploy frontend. ⚠️
+  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
+    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
+    + DNS records); then the committed default URLs work without per-surface overrides.
+  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
 Source: `~/.claude-mem/STANDUP.md` (10-agent standup; all decisions founder-approved 2026-06-10).
@@ -212,3 +256,29 @@ Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-sc
 - [ ] 5. Logs: memory/cerebrum/anatomy
 
 Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.
+
+# Collection Identity SOT (2026-06-14)
+
+Spec: `docs/superpowers/specs/2026-06-14-collection-identity-sot-design.md` (approved). Branch: `feat/collection-identity-sot`.
+Per-collection folders `data/collections/<slug>/` = single source: `identity.json` (canon) + `copy.md` + generated `sot.json` + `index.html`. Canon-driven design-tokens rebuild + OFL fonts (Yellowtail/Kaushan/Pinyon, specimen-confirm). Hard cut-over: repoint all refs → delete all old.
+
+- [x] P0 Canon scaffold — schema + 4 identity.json + load_identity() (7e4ad264c, df25936f4, 232225497)
+- [x] P1 Fonts — Yellowtail/Kaushan/Pinyon self-hosted woff2 + @font-face (f3b1a4ad0)
+- [x] P2 design-tokens rebuild — generated [data-collection] blocks; palettes fixed, accent-rgb preserved, 2-role fonts, font-gothic dropped, LH secondary fixed (5cfe4fc92, 8e90f601d)
+- [x] P3/SOT builder — sot_common.py loader + ext-pref resolver + responsive-aware builder → per-folder sot.json + global _orphans.json (3026518dc, 421984f7d, b528b0536, e32f008eb)
+- [x] P4 Designer bundle — 4 copy.md (verbatim canon) + generated index.html hub (62bfd5ef1)
+- [x] P5 Verify + tests — full drift gate + golden test; 20 unit tests green; verifier 33/33 SKUs, 0 broken refs (78678d44f). [catalog-drift-guard hook re-point deferred to P6]
+- [x] P6 census — DONE (non-destructive). FINDING: ZERO repoint work — no production PHP/JS/Python reads the flat JSONs or data/collections/. Cut-over = pure deletion w/ proof of zero consumers.
+- [x] **P6 ⛔ GATE — FOUNDER WALKTHROUGH.** APPROVED 2026-06-14 ("Yes — run cut-over + P7").
+- [x] P6 Cut-over — deleted flat JSONs + retired woff2 + old fonts.css block → rebuilt .min → re-pointed catalog-drift-guard hook (identity.json trigger) → updated README/docs (commit 56bb9a898).
+- [x] P7 Verify + review gate — 20 unit tests green · drift gate 33/33 SKUs 0 broken refs · holistic review VERDICT ship · CSS-injection fix landed (font.family schema pattern, 02ca2b7fc) · 4 LOW/INFO follow-ups logged on PR #550.
+
+Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
+
+## P6 DELETION CENSUS (running list — for the founder walkthrough; NOTHING deleted until sign-off)
+- Flat `data/collections/{black-rose,love-hurts,signature,kids-capsule}.json` — superseded by per-folder `sot.json`.
+- `assets/css/fonts.css` OLD `collections/` @font-face section: `Italiana` + `UnifrakturMaguntia` (NOT in canon — dead), and the superseded `Yellowtail`/`Pinyon Script` blocks pointing at `../fonts/collections/` (now duplicated by the canonical root-path blocks added in P1; root wins via cascade so site is correct, but the old blocks are dead weight).
+- `assets/fonts/collections/{italiana,unifraktur-maguntia,yellowtail,pinyon-script}-latin.woff2` — old placeholder/duplicate font files (canon now uses root `assets/fonts/{yellowtail,kaushan-script,pinyon-script}-latin.woff2`).
+- `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
+- Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
+- NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.

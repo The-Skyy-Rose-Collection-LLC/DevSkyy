@@ -7,7 +7,7 @@ logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/nba-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-010-design-front.jpeg
+reference_image: assets/products/references/br-010-design-front.jpeg
 ---
 
 # BLACK is Beautiful Jersey Series — 3. The Bay (Basketball)
@@ -28,7 +28,7 @@ renderings only.
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - NBA Authentic Collection patch: `data/brand-logos/nba-authentic-collection-patch.md`
 > - SR monogram (back-neck):       `data/brand-logos/sr-monogram.md`
-> - Product design render:          `data/product-references/br-010-design-front.jpeg`
+> - Product design render:          `assets/products/references/br-010-design-front.jpeg`
 >
 > ### COLORWAY OVERRIDE — read this BEFORE rendering
 >

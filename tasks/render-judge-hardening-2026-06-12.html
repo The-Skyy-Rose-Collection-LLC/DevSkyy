@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose Render QC Judge — Hardening Status (2026-06-12)</title>
+<style>
+  body{font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}
+  h1{font-size:1.5rem;border-bottom:3px solid #B76E79;padding-bottom:.3rem}
+  h2{font-size:1.15rem;margin-top:1.8rem;color:#0A0A0A;border-left:4px solid #B76E79;padding-left:.5rem}
+  code{background:#f4f0f1;padding:.1rem .35rem;border-radius:3px;font-size:.9em}
+  table{border-collapse:collapse;width:100%;margin:.6rem 0}
+  th,td{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;font-size:.92em;vertical-align:top}
+  th{background:#B76E79;color:#fff}
+  .ok{color:#1a7f37;font-weight:600}.bad{color:#cf222e;font-weight:600}.warn{color:#9a6700;font-weight:600}
+  .box{background:#fff8f9;border:1px solid #e8d5d9;border-radius:6px;padding:.8rem 1rem;margin:1rem 0}
+  .blocker{background:#fff5f5;border:2px solid #cf222e;border-radius:6px;padding:.8rem 1rem;margin:1rem 0}
+</style>
+</head>
+<body>
+<h1>Render QC Judge — Hardening Status</h1>
+<p><strong>Goal:</strong> get accurate SkyyRose product-card renders by fixing the unreliable QC judge.
+<br><strong>Status:</strong> <span class="ok">DONE — JUDGE FIT ✓ 6/6 on TWO consecutive live runs (2026-06-12, in-process claude-sonnet-4-6).</span></p>
+
+<div class="box">
+<h2 style="border:0;margin:.2rem 0;padding:0">✓ Proven live (key added, eval executed)</h2>
+<p><code>python scripts/oai-render-qc-eval.py</code> → <span class="ok">JUDGE FIT ✓ (6/6)</span>, twice consecutively with consistent reasoning.</p>
+<p><strong>The decisive find:</strong> br-006's FAIL label was WRONG — direct pixel audit showed the render DOES have sherpa
+lining in the hood. Judges that "false-passed" it were correct; the label is fixed (<code>labels.json</code> <code>correction_2026_06_12</code>).
+The working judge recipe: forced <code>visual_analysis</code> chain-of-thought field before the boolean gates + 1500-token budget +
+hue-family / cross-panel-placement gate language. br-005 now fails for exactly the right reason (pure-black body vs real forest-green).</p>
+<p><strong>Also shipped:</strong> every paid run writes JSONL events (<code>renders/oai/_runs/</code>) and
+<code>python scripts/oai-render-monitor.py</code> serves a live dashboard at <code>http://127.0.0.1:8946/</code> —
+spend bar vs the $50 cap, per-SKU attempts, and the judge's reasoning per verdict. <code>claude-fable-5</code> was probed live:
+callable, but rejects forced tool_choice (400) — documented in <code>config.py</code>; sonnet stays the judge.</p>
+<p><strong>Render ledger:</strong> br-001/002/004/006/007 recovered (br-006 restored after the label flip, md5-verified).
+Only <strong>br-005</strong> needs a re-render.</p>
+</div>
+
+<h2>Why the judge was broken (proven, not guessed)</h2>
+<p>The QC vision judge gates real money — a wrong verdict discards a good $0.40 render or ships a defective card.
+It was wrong in <em>both</em> directions: it hallucinated green that wasn't there, <strong>false-passed</strong> a
+missing-sherpa-lining render (br-006), and <strong>false-rejected</strong> 4 good renders.</p>
+<p><strong>Three OpenAI vision models were tested against the ground-truth set — all failed:</strong></p>
+<table>
+<tr><th>Judge model</th><th>Score</th><th>Verdict</th></tr>
+<tr><td><code>gpt-4o-mini</code> @ detail:low (original)</td><td>~1/6</td><td class="bad">unfit</td></tr>
+<tr><td><code>gpt-4.1</code> @ detail:high</td><td>2/6</td><td class="bad">unfit</td></tr>
+<tr><td><code>gpt-5.1</code></td><td>2/6</td><td class="bad">unfit</td></tr>
+<tr><td><strong>Fable / Claude vision</strong></td><td>matched ground truth</td><td class="ok">reliable</td></tr>
+</table>
+<p>This is a <strong>model-class limitation</strong>, not a prompt/config problem: no OpenAI model reliably
+perceives garment-level detail (absent sherpa lining, multi-rose vs single-rose, greyscale vs green at logo scale).
+Claude does. That is why the fix is the Claude judge.</p>
+
+<h2>What was built this session</h2>
+<table>
+<tr><th>Artifact</th><th>File</th><th>Purpose</th></tr>
+<tr><td>Config-selectable Claude judge</td><td><code>scripts/oai_render/qc.py</code>, <code>config.py</code></td><td><code>QC_JUDGE_PROVIDER="anthropic"</code> (default) | <code>"openai"</code>. Anthropic path uses <code>tool_choice:{"type":"any"}</code> + raw-base64 image blocks (Context7-verified). <strong>Fail-closed</strong> without the key — never runs a paid batch un-judged.</td></tr>
+<tr><td>Ground-truth eval harness</td><td><code>scripts/oai_render/qc_eval.py</code> + CLI</td><td>Scores any judge against 6 Fable-labeled renders for ~$0.06. Exits non-zero if it misranks any. The proof the judge is fixed.</td></tr>
+<tr><td>Ground-truth fixtures</td><td><code>tests/fixtures/qc_ground_truth/</code></td><td>6 labeled renders preserved (were perishable in <code>_rejected/</code>).</td></tr>
+<tr><td>Colorway canon resolved</td><td>labels + memory</td><td>Fable settled the dossier-vs-judge conflict from real photos (below).</td></tr>
+</table>
+<p class="box"><strong>Quality:</strong> ruff clean · 41 footprint tests pass · fail-closed verified · OpenAI fallback constructs.
+The Claude adapter cannot be validated end-to-end without the key, but its message/tool shape matches the
+Context7-verified Anthropic spec exactly, and the <em>approach</em> is proven (Fable scored the set correctly).</p>
+
+<h2>Colorway ground truth (resolves the canon conflict)</h2>
+<table>
+<tr><th>SKU</th><th>Logo colorway (from real photo)</th></tr>
+<tr><td>br-001, br-002, br-004, br-005, br-006</td><td><span class="ok">GREYSCALE</span> — black/white/grey only, no green. The greyscale ref is correct.</td></tr>
+<tr><td>br-007</td><td><span class="warn">MIXED</span> — allover print greyscale, BUT the left mesh side-panel patch has a real <strong>green stem</strong> the dossier wrongly forbids. Needs a green-stemmed side-panel ref.</td></tr>
+</table>
+
+<h2>Renders we already paid for (~$10 across two batches)</h2>
+<table>
+<tr><th>SKU</th><th>Fable verdict</th><th>Action taken</th></tr>
+<tr><td>br-001 Crewneck</td><td class="ok">shippable</td><td>RECOVERED → <code>renders/oai/black-rose-crewneck/ghost.png</code></td></tr>
+<tr><td>br-002 Joggers</td><td class="ok">shippable</td><td>RECOVERED → <code>renders/oai/black-rose-joggers/ghost.png</code></td></tr>
+<tr><td>br-004 Hoodie</td><td class="ok">shippable</td><td>RECOVERED → <code>renders/oai/black-rose-hoodie/ghost.png</code></td></tr>
+<tr><td>br-007 BB Shorts</td><td class="ok">shippable (minor side-panel green miss)</td><td>RECOVERED → <code>renders/oai/black-rose-love-hurts-bb-shorts/ghost.png</code></td></tr>
+<tr><td>br-005 Sig Hoodie</td><td class="bad">re-render</td><td>wrong body color (black, real is forest green)</td></tr>
+<tr><td>br-006 Sherpa</td><td class="bad">re-render</td><td>missing sherpa lining; QC had false-PASSED it → now quarantined</td></tr>
+</table>
+<p>The two-rose prompt constraint <span class="ok">worked</span> — it cured the single-peony drift; Fable confirmed
+the cluster renders correctly across the recovered SKUs.</p>
+
+<h2>Broader pipeline hardening (Fable's design — for after the key)</h2>
+<p>The workflow produced a full build plan. High-value items beyond the judge:</p>
+<ul>
+<li><strong>Asset-verify gap check</strong> — SKUs in the source map but absent from <code>manifest.json</code> should hard-fail (bug-119 class).</li>
+<li><strong>Worst-case cost manifest</strong> — show est. <em>with</em> QC retries (3× the floor), so you approve the real number.</li>
+<li><strong>Per-SKU colorway routing</strong> — logo refs keyed per-SKU, not per-collection (br-007 needs the green side-panel variant).</li>
+<li><strong>Stateful retry</strong> — inject the prior failure tags as correction hints into the re-render prompt.</li>
+<li><strong>Judge-port ABC</strong> — extract <code>OpenAIJudge</code>/<code>ClaudeJudge</code> into <code>judge_port.py</code> (my inline version works; this is the cleaner refactor).</li>
+</ul>
+
+<h2>One open question for you</h2>
+<p>br-007: the real garment's side-panel rose has a green stem; the render is greyscale there. Fable called it
+"shippable, minor." <strong>Ship as-is, or re-render with the green side-panel?</strong> (Affects whether br-007 counts as done.)</p>
+
+<p style="margin-top:2rem;color:#666;font-size:.85em">All work is uncommitted in <code>~/DevSkyy-ci-mirror</code>, ready to commit on your word.</p>
+</body>
+</html>

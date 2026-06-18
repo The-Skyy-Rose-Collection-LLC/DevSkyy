@@ -24,15 +24,18 @@ $sku          = $wc_product ? $wc_product->get_sku() : ( $args['sku'] ?? '' );
 $garment_lock = $args['garment_lock'] ?? '';
 
 // Images — Front (Model/Finished) vs Back (Techflat/Technical)
-$front_url = $wc_product ? wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) : ( $args['image_url'] ?? '' );
-$back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
-$permalink = $args['permalink'] ?? '';
-
-// WooCommerce products have no featured image set yet, so the WC path above
-// returns false. Fall back to the catalog's theme-asset render (the same
-// front_model_image the collection/landing cards already use) before the
-// generic placeholder, so /shop + PDP cards resolve from theme assets.
-if ( empty( $front_url ) && '' !== $sku && function_exists( 'skyyrose_get_product' ) ) {
+//
+// IMAGERY PRECEDENCE (canon, 2026-06-16): the catalog/SOT render is the
+// AUTHORITY for which garment a card shows — NOT the WooCommerce featured
+// image. WC featured images were uploaded during the store sync and can
+// diverge from the per-collection SOT (data/collections/<slug>/sot.json,
+// generated from the catalog) — that divergence is how never-made / wrong-
+// garment renders leaked onto cards. So resolve the SOT/catalog
+// front_model_image FIRST; use a WC featured image only when the catalog has
+// no render; placeholder last. WooCommerce still owns price, stock, and
+// add-to-cart (below) — imagery is the SOT's job, commerce is WC's.
+$front_url = '';
+if ( '' !== $sku && function_exists( 'skyyrose_get_product' ) ) {
 	$lookup_sku      = function_exists( 'skyyrose_normalize_sku' ) ? skyyrose_normalize_sku( $sku ) : $sku;
 	$catalog_product = skyyrose_get_product( $lookup_sku );
 	if ( $catalog_product ) {
@@ -42,6 +45,17 @@ if ( empty( $front_url ) && '' !== $sku && function_exists( 'skyyrose_get_produc
 		}
 	}
 }
+// Static-card path (no WC product) already carries the resolved SOT image.
+if ( empty( $front_url ) ) {
+	$front_url = $args['image_url'] ?? '';
+}
+// Only if the catalog/SOT has no render: fall back to a WC featured image.
+if ( empty( $front_url ) && $wc_product ) {
+	$front_url = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) ?: '';
+}
+$back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
+$permalink = $args['permalink'] ?? '';
+
 if ( empty( $front_url ) ) {
 	$front_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 }
@@ -73,6 +87,8 @@ $index = (int) ( $args['index'] ?? 0 );
 						'class'    => 'holo__img holo__img--front',
 						'loading'  => 'lazy',
 						'decoding' => 'async',
+						'width'    => '600',
+						'height'   => '750',
 					)
 				);
 				echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
@@ -82,6 +98,8 @@ $index = (int) ( $args['index'] ?? 0 );
 						'class'    => 'holo__img holo__img--back',
 						'loading'  => 'lazy',
 						'decoding' => 'async',
+						'width'    => '600',
+						'height'   => '750',
 					)
 				);
 				?>

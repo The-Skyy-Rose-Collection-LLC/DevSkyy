@@ -1,0 +1,1 @@
+"""Collection identity SOT tests."""

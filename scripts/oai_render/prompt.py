@@ -88,9 +88,16 @@ def sanitize_name(name: str) -> str:
 # Presentation styles — view-agnostic; the VIEW directive sets front/back.
 PRESENTATIONS = {
     "ghost": (
-        "PRESENTATION: clean ghost-mannequin / invisible-form — the garment holds its 3D shape "
-        "with NO visible person, no hanger, no mannequin. Exactly ONE garment — never a flat "
-        "multi-panel technical diagram or multiple views in one frame."
+        "PRESENTATION: clean GHOST-MANNEQUIN / invisible-form — the garment is filled out into "
+        "its full three-dimensional WORN shape: shoulders, chest, sleeves, and hem holding real "
+        "volume as if on an invisible body, photographed standing in the round with NO visible "
+        "person, hanger, or mannequin. The garment MUST read as dimensional and worn — natural "
+        "drape, soft interior shadow inside the neckline and sleeves, fabric falling under "
+        "gravity. This is NOT a flatlay, NOT a top-down shot, NOT a garment laid flat, NOT a flat "
+        "technical drawing. RE-POSE any flat or laid-flat reference into this standing 3D form — "
+        "the reference images define the garment's GRAPHICS, COLOUR, and CONSTRUCTION ONLY, never "
+        "its flatness or layout. Exactly ONE garment — never a flat multi-panel technical diagram "
+        "or multiple views in one frame."
     ),
     "on-model": (
         "PRESENTATION: worn by a single full-body fashion model, natural confident pose, neutral "
@@ -259,6 +266,31 @@ def read_dossier(dossier_path: Path | None) -> str | None:
         )
         body = body[:MAX_DOSSIER_CHARS].rsplit("\n", 1)[0]
     return body or None
+
+
+_VIEW_SECTION_HEADER = {"front": "### Front", "back": "### Back"}
+
+
+def extract_view_branding(dossier_text: str | None, view: str) -> str:
+    """Return the dossier's branding bullets for one view ("front"/"back"), or "".
+
+    Feeds the QC judge per-view ground truth so a deliberately blank panel
+    (e.g. "back-body: no decoration") is not failed for "missing branding".
+    The text is repo-controlled dossier markdown, not user input.
+    """
+    if not dossier_text:
+        return ""
+    header = _VIEW_SECTION_HEADER.get(view)
+    if header is None:
+        return ""
+    idx = dossier_text.find(header)
+    if idx == -1:
+        return ""
+    section = dossier_text[idx + len(header) :]
+    cuts = [c for c in (section.find("\n### "), section.find("\n## ")) if c != -1]
+    if cuts:
+        section = section[: min(cuts)]
+    return section.strip()
 
 
 @functools.lru_cache(maxsize=1)

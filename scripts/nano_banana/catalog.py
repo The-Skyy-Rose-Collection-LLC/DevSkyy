@@ -1,4 +1,4 @@
-"""Product catalog loader — reads from data/product-catalog.csv.
+"""Product catalog loader — reads the canonical skyyrose-catalog.csv.
 
 Single source of truth for all product metadata. No hardcoded catalogs.
 """

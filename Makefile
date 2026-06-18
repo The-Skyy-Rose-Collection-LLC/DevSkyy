@@ -7,7 +7,8 @@
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
         demo security docker-build docker-run \
-        validate-catalog sync-catalog sync-catalog-dry catalog-help
+        validate-catalog sync-catalog sync-catalog-dry catalog-help \
+        fresh fresh-fix
 
 # Python
 PYTHON := python3
@@ -90,6 +91,12 @@ format:
 	isort .
 	ruff check . --fix
 	black .
+
+fresh:  ## Check derived files are in sync (SOT, theme .min, version, retired refs)
+	bash scripts/freshness-guard.sh --all
+
+fresh-fix:  ## Regenerate SOT + rebuild theme .min, then re-stage for commit
+	bash scripts/freshness-guard.sh --fix
 
 test:
 	pytest tests/ -v --tb=short

@@ -8,6 +8,7 @@ When working on **anything visual, brand-touching, or collection-specific**, rea
 |-----|---------------|--------------|
 | `docs/brand/visual-references.md` | The Five canonical visual references (Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels) + the locked-out European-luxury-house lineage | Any aesthetic, mockup, design proposal, brand pitch, agent visual brief |
 | `docs/brand/collection-stories.md` | Per-collection canon: Black Rose / Love Hurts / Signature / Kids Capsule — origin, voice, mood, founder-locked taglines | Any copy, any collection page, any product description |
+| `wordpress-theme/skyyrose-flagship/data/collections/<slug>/identity.json` | **Per-collection identity SOT (canon seed):** palette (named hex), fonts {script,caps,body}, story seed, lockup. `design-tokens.css`, `sot.json`, `index.html` are GENERATED from it. Edit identity.json, never the generated files. | Any collection palette/font/identity work. See `data/collections/README.md` |
 | `docs/brand/corey-questions.md` + `docs/brand/canon-audit-2026-05-23.md` | Founder voice locks (verbatim) + canon audit history | Voice-frame copy, founder-quote attribution |
 | `docs/brand/asset-hierarchy.md` | 3-tier brand asset map; brand-primary monogram = `sr-monogram-rose-gold` | Any brand-mark placement decision |
 

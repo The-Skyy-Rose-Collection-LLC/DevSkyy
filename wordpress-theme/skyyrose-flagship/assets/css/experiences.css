@@ -1,0 +1,350 @@
+/**
+ * experiences.css — Immersive Worlds hub (/experiences/)
+ *
+ * "Stacked Cinema" (V1): four full-viewport scroll-snap worlds. Each collection's
+ * scene fills the block edge-to-edge (Ken-Burns), its name centered in that
+ * collection's OWN script face (--skyyrose-font-script), framed by faded hairline
+ * rules + an accent glow. Imagery resolves through the `experience-hero` placement
+ * contract (see inc/image-placements.php) so it never stretches.
+ *
+ * Loaded only on the Experiences Hub template (slug 'experiences', inc/enqueue.php).
+ * Per-collection accent + script font come from design-tokens.css [data-collection].
+ *
+ * @package SkyyRose
+ */
+
+/* Self-host the collection script faces here too, so the hero names can never
+   silently fall back to a system serif (the "where are the collection fonts" bug).
+   Duplicate of fonts.css declarations — browsers dedupe by URL. */
+@font-face { font-family: 'Pinyon Script'; src: url('../fonts/pinyon-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Yellowtail'; src: url('../fonts/yellowtail-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Kaushan Script'; src: url('../fonts/kaushan-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+
+/* Page-scoped scroll-snap (this CSS only loads on the hub). */
+html {
+	scroll-snap-type: y proximity;
+	scroll-behavior: smooth;
+}
+
+.experiences-hub {
+	--exp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	position: relative;
+	background: #0a0a0a;
+	color: #fff;
+	overflow-x: hidden;
+}
+
+/* ─── Progress rail (right edge) ─────────────────────────────────────── */
+
+.exp-rail {
+	position: fixed;
+	right: 24px;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 60;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+.exp-rail__tick {
+	display: block;
+	width: 2px;
+	height: 28px;
+	border-radius: 1px;
+	background: rgba(255, 255, 255, 0.18);
+	transition: background 0.4s ease, height 0.4s ease;
+}
+
+.exp-rail__tick.is-active {
+	height: 44px;
+	background: rgba(255, 255, 255, 0.85);
+}
+
+/* ─── Tagline (fixed, bottom-center) ─────────────────────────────────── */
+
+.exp-tagline {
+	position: fixed;
+	bottom: 26px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 55;
+	white-space: nowrap;
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 0.72rem;
+	font-weight: 300;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.32);
+	pointer-events: none;
+}
+
+/* ─── Collection blocks ──────────────────────────────────────────────── */
+
+.exp-block {
+	position: relative;
+	display: flex;
+	width: 100%;
+	height: 100dvh;
+	min-height: 100vh;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	scroll-snap-align: start;
+}
+
+/* Full-bleed scene (the render_picture output lives in here). */
+.exp-block__scene {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.exp-block__scene > picture,
+.exp-block__scene > img {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.exp-block__scene img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	transform-origin: center;
+	will-change: transform;
+	animation: exp-kenburns 24s ease-in-out infinite alternate;
+}
+
+.exp-block:nth-child(odd) .exp-block__scene img { animation-name: exp-kenburns-a; }
+.exp-block:nth-child(even) .exp-block__scene img { animation-name: exp-kenburns-b; }
+
+@keyframes exp-kenburns-a {
+	from { transform: scale(1) translate(0, 0); }
+	to { transform: scale(1.08) translate(-1.5%, -1%); }
+}
+@keyframes exp-kenburns-b {
+	from { transform: scale(1.08) translate(1.5%, 0); }
+	to { transform: scale(1) translate(-1%, 1.5%); }
+}
+
+/* Legibility overlay + accent vignette. */
+.exp-block__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 38%, rgba(0, 0, 0, 0.06) 55%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+.exp-block__tint {
+	position: absolute;
+	inset: 0;
+	opacity: 0.12;
+	background: radial-gradient(ellipse at center, var(--skyyrose-accent, #b76e79) 0%, transparent 70%);
+}
+
+/* ─── Centered content + entrance reveal ─────────────────────────────── */
+
+.exp-block__content {
+	position: relative;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 24px;
+	text-align: center;
+	opacity: 0;
+	transform: translateY(28px);
+	transition: opacity 1.1s var(--exp-ease), transform 1.1s var(--exp-ease);
+}
+
+.exp-block__content.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ─── Faded-border treatment: hairline rules above + below the name ──── */
+
+.exp-name-frame {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+}
+
+.exp-name-frame::before,
+.exp-name-frame::after {
+	content: '';
+	display: block;
+	width: min(520px, 80vw);
+	height: 1px;
+	background: var(--skyyrose-accent, #b76e79);
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.9) 22%, #fff 50%, rgba(255, 255, 255, 0.9) 78%, transparent 100%);
+	mask-image: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.9) 22%, #fff 50%, rgba(255, 255, 255, 0.9) 78%, transparent 100%);
+	opacity: 0;
+	transition: opacity 0.9s 0.35s var(--exp-ease);
+	animation: exp-border-pulse 4s ease-in-out infinite;
+	animation-play-state: paused;
+}
+
+.exp-name-frame::after { width: min(640px, 90vw); }
+
+.exp-block__content.is-visible .exp-name-frame::before,
+.exp-block__content.is-visible .exp-name-frame::after {
+	opacity: 1;
+	animation-play-state: running;
+}
+
+@keyframes exp-border-pulse {
+	0%, 100% { opacity: 0.85; }
+	50% { opacity: 1; }
+}
+
+/* ─── Collection name — each in its own script face ──────────────────── */
+
+.exp-name {
+	display: block;
+	font-family: var(--skyyrose-font-script, 'Pinyon Script', cursive);
+	font-weight: 400;
+	line-height: 1;
+	color: #fff;
+	text-shadow:
+		0 0 40px var(--skyyrose-accent, #b76e79),
+		0 0 80px rgba(var(--skyyrose-accent-rgb, 183 110 121), 0.35),
+		0 2px 12px rgba(0, 0, 0, 0.6);
+	transition: letter-spacing 1.4s 0.1s var(--exp-ease);
+}
+
+/* Per-collection sizing (script x-heights differ). */
+.exp-block[data-collection='signature'] .exp-name { font-size: clamp(5rem, 14vw, 11rem); letter-spacing: 0.02em; }
+.exp-block[data-collection='black-rose'] .exp-name { font-size: clamp(4.5rem, 12vw, 9.5rem); letter-spacing: 0.02em; }
+.exp-block[data-collection='love-hurts'] .exp-name { font-size: clamp(4rem, 11vw, 9rem); letter-spacing: 0.02em; }
+.exp-block[data-collection='kids-capsule'] .exp-name { font-size: clamp(4.5rem, 12vw, 9.5rem); letter-spacing: 0.02em; }
+
+/* Letter-spacing entrance: tight → open. */
+.exp-block__content:not(.is-visible) .exp-name { letter-spacing: -0.03em; }
+
+/* ─── Collection lockup (the brand-script name image; canon hero) ─────── */
+
+.exp-lockup-img {
+	display: block;
+	width: auto;
+	height: auto;
+	max-width: min(560px, 80vw);
+	max-height: 32vh;
+	filter:
+		drop-shadow(0 0 40px rgba(var(--skyyrose-accent-rgb, 183 110 121), 0.45))
+		drop-shadow(0 4px 18px rgba(0, 0, 0, 0.55));
+}
+
+/* Black Rose lockup is near-black — lift it off the dark scene with a light halo. */
+.exp-block[data-collection='black-rose'] .exp-lockup-img {
+	filter:
+		drop-shadow(0 0 26px rgba(255, 255, 255, 0.5))
+		drop-shadow(0 0 60px rgba(192, 192, 192, 0.4))
+		drop-shadow(0 4px 18px rgba(0, 0, 0, 0.6));
+}
+
+/* ─── Enter cue ──────────────────────────────────────────────────────── */
+
+.exp-cue {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 28px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 0.8rem;
+	letter-spacing: 0.22em;
+	color: rgba(255, 255, 255, 0.6);
+	text-decoration: none;
+	opacity: 0;
+	transition: color 0.3s ease, border-color 0.3s ease, opacity 0.9s 0.55s ease;
+}
+
+.exp-block__content.is-visible .exp-cue { opacity: 1; }
+
+.exp-cue:hover {
+	color: rgba(255, 255, 255, 0.95);
+	border-color: var(--skyyrose-accent, #b76e79);
+}
+
+.exp-cue__arrow { display: inline-block; transition: transform 0.3s ease; }
+.exp-cue:hover .exp-cue__arrow { transform: translateX(4px); }
+
+/* ─── Scroll hint (first block) ──────────────────────────────────────── */
+
+.exp-hint {
+	position: absolute;
+	bottom: 40px;
+	left: 50%;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	opacity: 0;
+	transform: translateX(-50%);
+	animation: exp-hint-in 1.2s 2.4s ease forwards;
+}
+
+.exp-hint span {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 0.65rem;
+	letter-spacing: 0.3em;
+	color: rgba(255, 255, 255, 0.4);
+}
+
+.exp-hint__chevron {
+	width: 16px;
+	height: 16px;
+	border-right: 1px solid rgba(255, 255, 255, 0.35);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+	transform: rotate(45deg);
+	animation: exp-chevron 1.8s ease-in-out infinite;
+}
+
+@keyframes exp-hint-in {
+	from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+	to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes exp-chevron {
+	0%, 100% { transform: rotate(45deg) translateY(0); opacity: 0.5; }
+	50% { transform: rotate(45deg) translateY(4px); opacity: 1; }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-snap-type: none; }
+	.exp-block__scene img { animation: none; transform: scale(1.04); }
+	.exp-block__content { opacity: 1; transform: none; transition: none; }
+	.exp-name { letter-spacing: 0.02em !important; transition: none; }
+	.exp-name-frame::before,
+	.exp-name-frame::after { opacity: 0.85; animation: none; transition: none; }
+	.exp-cue { opacity: 1; transition: none; }
+	.exp-hint { animation: none; opacity: 0.6; }
+	.exp-hint__chevron { animation: none; }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+	.exp-rail { right: 12px; gap: 8px; }
+	.exp-rail__tick { height: 20px; }
+	.exp-rail__tick.is-active { height: 32px; }
+	.exp-name-frame { gap: 10px; }
+	.exp-name-frame::before { width: min(280px, 78vw); }
+	.exp-name-frame::after { width: min(320px, 88vw); }
+	.exp-lockup-img { max-width: 82vw; max-height: 22vh; }
+	.exp-tagline { bottom: 16px; font-size: 0.6rem; letter-spacing: 0.2em; }
+	.exp-block[data-collection='signature'] .exp-name { font-size: clamp(3.5rem, 18vw, 6rem); }
+	.exp-block[data-collection='black-rose'] .exp-name { font-size: clamp(3rem, 15vw, 5.5rem); }
+	.exp-block[data-collection='love-hurts'] .exp-name { font-size: clamp(2.8rem, 14vw, 5.5rem); }
+	.exp-block[data-collection='kids-capsule'] .exp-name { font-size: clamp(3rem, 15vw, 5.5rem); }
+}

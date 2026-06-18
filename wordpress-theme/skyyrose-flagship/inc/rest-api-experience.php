@@ -198,10 +198,20 @@ function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_R
 	$events       = $request->get_param( 'events' );
 	$visitor_hash = $request->get_param( 'visitorHash' );
 
+	// Guard: experience-analyzer.php defines skyyrose_see_store_events() but is
+	// loaded inside a WooCommerce-gated block in functions.php. When WooCommerce
+	// is inactive the function is undefined and calling it would produce a fatal
+	// error that WordPress translates into a 404 rest_no_route response.
+	if ( ! function_exists( 'skyyrose_see_store_events' ) ) {
+		return new WP_REST_Response( array( 'stored' => 0, 'note' => 'analytics_unavailable' ), 200 );
+	}
+
 	$stored = skyyrose_see_store_events( $events, $visitor_hash );
 
-	// Relay to FastAPI backend (non-blocking).
-	skyyrose_see_relay_analytics( $events );
+	// Relay to FastAPI backend (non-blocking) — guarded for same reason.
+	if ( function_exists( 'skyyrose_see_relay_analytics' ) ) {
+		skyyrose_see_relay_analytics( $events );
+	}
 
 	return new WP_REST_Response( array( 'stored' => $stored ), 200 );
 }
@@ -210,7 +220,14 @@ function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_R
  * Return analytics summary for the admin dashboard.
  */
 function skyyrose_see_rest_get_summary( WP_REST_Request $request ): WP_REST_Response {
-	$days    = $request->get_param( 'days' );
+	$days = $request->get_param( 'days' );
+
+	// Guard: skyyrose_see_get_summary() defined in experience-analyzer.php which
+	// is WooCommerce-gated; return an empty summary rather than a fatal error.
+	if ( ! function_exists( 'skyyrose_see_get_summary' ) ) {
+		return new WP_REST_Response( array(), 200 );
+	}
+
 	$summary = skyyrose_see_get_summary( $days );
 
 	return new WP_REST_Response( $summary, 200 );

@@ -3,10 +3,10 @@ sku: br-006
 name: BLACK Rose Sherpa Jacket
 collection: black-rose
 logo_reference: data/brand-logos/three-rose-cluster.md
-reference_image: data/product-references/br-006-sherpa-jacket-real-front.jpeg
+reference_image: assets/products/references/br-006-sherpa-jacket-real-front.jpeg
 extra_references:
-  - data/product-references/br-006-sherpa-jacket-real-open.jpeg
-  - data/product-references/br-006-sherpa-jacket-real-closeup.jpeg
+  - assets/products/references/br-006-sherpa-jacket-real-open.jpeg
+  - assets/products/references/br-006-sherpa-jacket-real-closeup.jpeg
 ---
 
 # BLACK Rose Sherpa Jacket
@@ -17,9 +17,9 @@ extra_references:
 
 > Logo art canonical reference:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
-> - Reference photos:               `data/product-references/br-006-sherpa-jacket-real-front.jpeg`,
->                                   `data/product-references/br-006-sherpa-jacket-real-open.jpeg`,
->                                   `data/product-references/br-006-sherpa-jacket-real-closeup.jpeg`
+> - Reference photos:               `assets/products/references/br-006-sherpa-jacket-real-front.jpeg`,
+>                                   `assets/products/references/br-006-sherpa-jacket-real-open.jpeg`,
+>                                   `assets/products/references/br-006-sherpa-jacket-real-closeup.jpeg`
 
 ### Front
 - **front-left-chest** (small, ~3–4in tall): The Black Rose logo embroidered

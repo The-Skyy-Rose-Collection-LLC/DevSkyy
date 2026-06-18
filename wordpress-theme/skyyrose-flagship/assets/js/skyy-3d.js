@@ -132,7 +132,10 @@
 		var GLTFLoader = window.THREE_GLTFLoader ||
 			( window.THREE && window.THREE.GLTFLoader );
 		if ( ! GLTFLoader ) {
-			console.warn( 'Skyy 3D: GLTFLoader not available' );
+			if ( window.SKYYROSE_DEBUG ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'Skyy 3D: GLTFLoader not available' );
+			}
 			return;
 		}
 
@@ -180,7 +183,8 @@
 					} );
 
 					// Warn if expected clip names weren't found (helps debug GLB exports).
-					if ( ! actions[ CLIP_IDLE ] || ! actions[ CLIP_WALK ] ) {
+					if ( ( ! actions[ CLIP_IDLE ] || ! actions[ CLIP_WALK ] ) && window.SKYYROSE_DEBUG ) {
+						// eslint-disable-next-line no-console
 						console.warn( 'Skyy 3D: expected clips "idle"/"walk" not found. Available:', Object.keys( actions ) );
 					}
 
@@ -196,7 +200,10 @@
 			},
 			undefined,
 			function ( error ) {
-				console.warn( 'Skyy 3D: model load failed —', error );
+				if ( window.SKYYROSE_DEBUG ) {
+					// eslint-disable-next-line no-console
+					console.warn( 'Skyy 3D: model load failed —', error );
+				}
 				// Hide canvas so it doesn't show a black box
 				canvas.style.display = 'none';
 			}

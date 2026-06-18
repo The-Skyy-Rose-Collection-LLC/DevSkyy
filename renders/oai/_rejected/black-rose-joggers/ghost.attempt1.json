@@ -1,0 +1,12 @@
+{
+  "sku": "br-002",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The logo on the joggers is depicted as an embroidered design instead of the required silicone-appliqu\u00e9 patch with multi-color art, resulting in a mismatch."
+}

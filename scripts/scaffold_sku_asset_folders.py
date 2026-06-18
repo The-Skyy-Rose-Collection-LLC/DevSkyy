@@ -16,7 +16,7 @@ bundle of inputs the render pipeline can consume directly:
     └── placement.md             ← generated brief (NOT canonical — re-derive any time)
 
 All asset files are SYMLINKS into the canonical sources
-(``data/product-references/``, ``assets/images/logos/``) so editing the
+(``assets/products/references/``, ``assets/images/logos/``) so editing the
 source updates every per-SKU bundle in lockstep. ``placement.md`` is a
 generated derivative of CSV + dossier + logo-registry — re-running the
 scaffolder regenerates it from current canon.
@@ -57,7 +57,9 @@ from skyyrose.core.paths import (  # noqa: E402
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
-PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
+from skyyrose.core import paths
+
+PRODUCT_REFERENCES_DIR = paths.PRODUCT_REFERENCES
 LOGO_REGISTRY_JSON = THEME_ROOT / "data" / "logo-registry.json"
 
 SUBDIRS = ("flatlays", "techflat", "logos")
@@ -106,7 +108,7 @@ def _atomic_symlink(target: Path, link: Path, *, dry_run: bool) -> bool:
 
 
 def _find_techflat_source(sku: str) -> Path | None:
-    """Find the FRONT techflat file for a SKU under data/product-references/.
+    """Find the FRONT techflat file for a SKU under assets/products/references/.
 
     Resolution order:
         1. {sku}-techflat-front.*   (split output — preferred, view-accurate)

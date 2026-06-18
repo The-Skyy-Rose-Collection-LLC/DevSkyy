@@ -56,11 +56,18 @@ RUN apt-get update --fix-missing || apt-get update --fix-missing && \
 
 WORKDIR /app
 
-# Copy requirements
-COPY requirements.txt ./
+# Copy project metadata only. Dependencies resolve from pyproject.toml; the
+# application source is added in the production stage and run from /app, so the
+# builder only needs to install third-party deps. setuptools' explicit
+# packages.find produces an (empty) devskyy wheel here — verified to build from
+# pyproject.toml + README.md alone — which keeps this expensive layer cacheable
+# (busts only when pyproject/README change, not on source edits).
+COPY pyproject.toml README.md ./
 
-# Install Python dependencies with timeout
-RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
+# Install all production dependencies. Documented Docker install target is
+# ".[all]" (requirements.txt is a deprecated -e . stub). Longer timeout for the
+# large ML wheels (torch/transformers/diffusers).
+RUN pip install --no-cache-dir --timeout=600 ".[all]"
 
 # =============================================================================
 # Stage 3: Production Runtime
@@ -106,6 +113,7 @@ COPY agents/ ./agents/
 COPY api/ ./api/
 COPY adk/ ./adk/
 COPY core/ ./core/
+COPY utils/ ./utils/
 COPY integrations/ ./integrations/
 COPY llm/ ./llm/
 COPY mcp_servers/ ./mcp_servers/

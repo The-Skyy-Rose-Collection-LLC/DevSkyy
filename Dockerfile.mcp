@@ -1,0 +1,42 @@
+# Dockerfile.mcp — slim standalone MCP HTTP service (mcp_service:app).
+# Serves only /mcp; NO ML/torch stack. Selected by fly.toml [build] dockerfile.
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+RUN apt-get update --fix-missing \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Dependencies first for layer caching.
+COPY requirements-mcp.txt ./
+RUN pip install --no-cache-dir --timeout=300 -r requirements-mcp.txt
+
+# Application code — only the MCP surface and what its tools import.
+# utils/      : logging + security/rate-limit helpers used by mcp_tools.
+# mcp_tools/  : the FastMCP instance, tool registrations, and http_mount.
+# skyyrose/   : just integrations.wc_safe_client (httpx-only) so the WooCommerce
+#               tools function standalone; the empty package __init__s keep the
+#               import path valid without dragging in the rest of skyyrose/.
+COPY utils/ ./utils/
+COPY mcp_tools/ ./mcp_tools/
+COPY skyyrose/__init__.py ./skyyrose/__init__.py
+COPY skyyrose/integrations/ ./skyyrose/integrations/
+COPY mcp_service.py ./
+
+# Non-root runtime user.
+RUN useradd -r -u 1000 -m appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["python", "-m", "uvicorn", "mcp_service:app", "--host", "0.0.0.0", "--port", "8000"]

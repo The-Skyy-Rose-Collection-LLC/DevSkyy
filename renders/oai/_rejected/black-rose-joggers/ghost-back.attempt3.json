@@ -1,0 +1,12 @@
+{
+  "sku": "br-002",
+  "style": "ghost",
+  "view": "back",
+  "is_pair": false,
+  "attempt": 3,
+  "failure_tags": [
+    "wrong_view",
+    "branding_drift"
+  ],
+  "reason": "The render shows the front view instead of the required back view, which is a failure."
+}
