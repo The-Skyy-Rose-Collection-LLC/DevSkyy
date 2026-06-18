@@ -5,7 +5,7 @@ collection: signature
 logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg
+reference_image: assets/products/references/sg-005-bay-bridge-shirt-techflat.jpeg
 ---
 
 # The Bridge Series 'The Bay Bridge' Shirt
@@ -25,18 +25,22 @@ reference_image: data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg
 > Logo art canonical references:
 > - Black Rose three-rose-cluster (recolored to blue for this SKU): `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (back-neck):                                         `data/brand-logos/sr-monogram.md`
-> - Product techflat:                                                 `data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg`
+> - Product techflat:                                                 `assets/products/references/sg-005-bay-bridge-shirt-techflat.jpeg`
 >
 > ### COLORWAY OVERRIDE — read this BEFORE rendering
 >
-> The chest rose-cluster is rendered in **BLUE/CYAN tonal colors** with
-> dark grey/black ink outlines, sitting on a dark grey/black cloud at the
-> base — NOT canonical multi-color and NOT canonical greyscale. The
-> "Bay Bridge" colorway uses a blue-on-white palette to harmonize with
-> the matching Bay Bridge Shorts (sg-001) daytime blue-sky colorway.
+> The chest rose-cluster is rendered in **BLUE/CYAN colors** with
+> grey/silver vine outlines, sitting on a **BLUE cloud** at the base
+> (light-blue with darker accents — NOT grey/charcoal), and the rose
+> **petals are filled with a photographic Bay Bridge scene** (the bridge
+> is rendered *inside* the bloom). NOT canonical multi-color and NOT
+> canonical greyscale. The "Bay Bridge" colorway uses a blue-on-white
+> palette to harmonize with the matching Bay Bridge Shorts (sg-001)
+> daytime blue-sky colorway. (Founder-verified 2026-06-16 against the
+> authentic product photo.)
 
 ### Front
-- **front-left-chest** (small, ~3in tall, on the wearer's left chest): The canonical Black Rose three-rose-cluster art (three roses + thorny vines + cloud at base) rendered in **blue/cyan tonal colors** — petals in saturated blue-and-cyan shades with darker navy-blue shading and black ink outlines, stems and vines in darker blue-grey, cloud at the base in dark grey/charcoal. NOT canonical multi-color. NOT canonical greyscale. **Technique:** sublimated. **Color:** blue-cyan rose-cluster on white ground.
+- **front-chest** (small, ~3in tall, center-to-left chest): The Black Rose three-rose-cluster art (three roses + thorny vines + cloud at base) in a **blue colorway whose rose petals are filled with a photographic Bay Bridge scene** — the large bloom's petals contain a small hyper-real Bay Bridge image (steel-truss bridge + water + sky), so the blue/cyan rose's interior IS the bridge. Grey/silver thorny vines and stems, and a **BLUE cloud at the base** (light-blue with darker accents, matching the blue rose — NOT grey/charcoal). NOT canonical multi-color. NOT canonical greyscale. **Technique:** sublimated/printed. **Color:** blue rose with photographic-bridge petal fill + blue cloud on white ground.
 
 ### Back
 - **back-neck** (small, ~1.5in wide, top-center just below the collar): The SR monogram embroidered onto the jersey in **dark grey / black thread** (NOT canonical gold). **Technique:** embroidered. **Color:** dark grey / black thread on white.

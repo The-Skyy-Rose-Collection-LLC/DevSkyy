@@ -53,11 +53,44 @@ HARD_COST_CAP_USD = 50.0  # abort any run whose manifest estimate exceeds this
 # accumulated spend (renders + judged retries + judge calls) at runtime, which
 # closes the retry-storm gap (worst case previously ~$189 vs the $50 cap).
 QC_ENABLED = True
-QC_JUDGE_MODEL = "gpt-4o-mini"  # vision judge; detail:"low" = 85 image tokens flat
-QC_JUDGE_DETAIL = "low"  # NEVER "auto"/"high" — community-verified token inflation
-QC_JUDGE_MAX_OUTPUT_TOKENS = 300
+# Vision judge. Was gpt-4o-mini @ detail:"low" — that combo was UNRELIABLE in both
+# directions: it hallucinated defects (green that wasn't there), false-PASSED a
+# missing-sherpa-lining render, and false-REJECTED good renders. Root cause:
+# detail:"low" downsamples to ~512px / 85 image tokens, so the judge cannot resolve
+# logo art, colorway, or material — exactly the gates it must enforce. A wrong verdict
+# costs a wasted $0.40 render (or discards good work); the few-cent token cost of a
+# capable judge at full detail is trivial by comparison. gpt-4.1 keeps the existing
+# chat.completions + max_tokens + json_schema call shape (GPT-5.x would need
+# max_completion_tokens); detail:"high" lets it actually see the garment.
+# Provider: "anthropic" (Claude-class vision — reliable) | "openai" (gpt-* — proven
+# UNRELIABLE on fine garment/colorway perception). The ground-truth eval harness
+# (scripts/oai-render-qc-eval.py) scored Claude correctly where THREE OpenAI models
+# (gpt-4o-mini, gpt-4.1, gpt-5.1) each hit only ~2/6 — all missed a gross missing-sherpa
+# defect and mis-read fine logo art. Default is anthropic; fail-closed without its key so
+# a paid batch never runs on the unreliable judge or, worse, silently un-judged.
+QC_JUDGE_PROVIDER = "anthropic"
+# OpenAI fallback (do NOT trust as a sole gate — kept for offline/keyless smoke tests).
+QC_JUDGE_MODEL = "gpt-4.1"
+QC_JUDGE_DETAIL = "high"  # full-resolution tiles (OpenAI only)
+# Anthropic judge (preferred). Needs ANTHROPIC_API_KEY. Structured output via a FORCED
+# tool call (tool_choice={"type":"any"}). claude-fable-5 IS API-callable (verified live
+# 2026-06-12) but rejects forced tool_choice with 400 "tool_choice forces tool use is not
+# compatible with this model" (it always emits thinking blocks first) — so it cannot be
+# the in-process judge without reworking the structured-output path. sonnet/opus 4.x work.
+QC_JUDGE_MODEL_ANTHROPIC = "claude-sonnet-4-6"
+ANTHROPIC_API_KEY_ENV = "ANTHROPIC_API_KEY"
+# Budget covers a forced chain-of-thought: the schema's leading `visual_analysis`
+# field makes the judge describe the garment (type, body color, lining/material,
+# logo art+colorway+panel) BEFORE the boolean gates, so the gates are decided from
+# observation. 300 tokens forced an instant verdict with no room to look — it
+# false-PASSED the missing-sherpa br-006. ~1500 fits analysis + 6 gates + reason.
+QC_JUDGE_MAX_OUTPUT_TOKENS = 1500
 QC_MAX_RENDER_RETRIES = 2  # judged re-renders per plan before quarantine
-EST_JUDGE_COST_USD = 0.0002  # generous ceiling per judge call (actual ≈ $0.000075)
+# Per-judge-call cost ceiling for the cap math. OpenAI gpt-4.1@high ≈ $0.005-0.008;
+# Anthropic claude-sonnet-4-6 (1 candidate + 3 refs, full-res) ≈ $0.04-0.05.
+EST_JUDGE_COST_USD = 0.05
+
+
 EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 
 # ── Batch exclusions ────────────────────────────────────────────────────────
@@ -66,26 +99,29 @@ EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 EXCLUDED_SKUS: dict[str, str] = {
     "sg-015": "only reference is a 4-panel composite techflat — needs a clean cropped front "
     "techflat before it can render as a single garment (would otherwise produce a multi-panel).",
-    "sg-006": "dossier describes a different garment (white chevron zip-up ≈ windbreaker set) than "
-    "the mint pullover techflat — 2026-06-08 render produced the wrong product. Founder must "
-    "re-author the dossier from the real mint garment before this SKU renders again.",
-    "sg-014": "dossier describes a different garment (white chevron sweatpants ≈ windbreaker set) "
-    "than the mint sweatpants techflat — same contamination as sg-006. Founder must re-author "
-    "the dossier before this SKU renders again.",
+    # sg-006 / sg-014 removed 2026-06-10: dossiers re-authored from the real mint
+    # garments (bug-119 contamination cleared) — both SKUs render again.
 }
 
-# ── Paths ───────────────────────────────────────────────────────────────────
-THEME_ROOT = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship"
-CATALOG_CSV = THEME_ROOT / "data" / "skyyrose-catalog.csv"
-DOSSIER_DIR = THEME_ROOT / "data" / "dossiers"
+# ── Paths (single authority: skyyrose/core/paths.py) ────────────────────────
+from skyyrose.core import paths as _ap  # noqa: E402
+
+THEME_ROOT = _ap.THEME_ROOT
+CATALOG_CSV = _ap.CATALOG_CSV
+DOSSIER_DIR = _ap.DOSSIERS_DIR
 # Founder's verbatim render-review corrections, injected into prompts per SKU
 # (generated from the 2026-06-09 review board; see the file's _meta block).
 CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
-PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
-PRODUCTS_DIR = THEME_ROOT / "assets" / "images" / "products"
-SPLIT_DIR = PROJECT_ROOT / "assets" / "techflats" / "split"
-OVERLAYS_DIR = PROJECT_ROOT / "assets" / "techflats" / "hero-overlays"
-TECHFLATS_DIR = PROJECT_ROOT / "assets" / "techflats"
+# Founder-approved surviving assets (tasks/mockup-render-inventory.md keep pass):
+# each entry skips one (sku, style, view) plan in batches; explicit --sku overrides.
+KEEPERS_JSON = THEME_ROOT / "data" / "render-keepers.json"
+PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
+PRODUCT_SOURCE_PHOTOS_DIR = _ap.PRODUCT_SOURCE_PHOTOS
+PRODUCTS_DIR = _ap.WP_PRODUCTS_DIR
+SPLIT_DIR = _ap.PRODUCT_TECHFLATS / "split"
+OVERLAYS_DIR = _ap.PRODUCT_TECHFLATS / "hero-overlays"
+TECHFLATS_DIR = _ap.PRODUCT_TECHFLATS
+LOGOS_DIR = _ap.PRODUCT_LOGOS  # colorway-correct three-rose-cluster render references
 OUTPUT_DIR = PROJECT_ROOT / "renders" / "oai"
 REJECTED_DIR = OUTPUT_DIR / "_rejected"  # QC-failed renders quarantined for human review
 

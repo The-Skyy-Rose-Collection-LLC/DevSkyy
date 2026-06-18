@@ -44,3 +44,12 @@ config references to these IDs over literals scattered in code.
 The Catalog & Dossier Steward
 (`docs/superpowers/specs/2026-05-29-catalog-dossier-steward-design.md`): deep reasoning →
 Opus 4.8, quick actions → Haiku 4.5.
+
+## Render Fidelity Evaluator (imagery QC)
+
+`evaluation.judge.ClaudeJudge` uses **`claude-sonnet-4-6`** vision via
+`QC_JUDGE_PROVIDER=anthropic` (default in `scripts/oai_render/config.py`). This is the
+live judge behind `RenderFidelityEvaluator`; the copy/text judge will use the same model
+family. Provider is config-driven — set `QC_JUDGE_PROVIDER=openai` to switch to GPT-4o
+vision for A/B calibration. Calibration harness: `scripts/oai-render-qc-eval.py`;
+ground-truth labels in `tests/fixtures/qc_ground_truth/`.

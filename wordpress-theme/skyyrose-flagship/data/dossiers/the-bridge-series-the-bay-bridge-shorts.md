@@ -2,9 +2,9 @@
 sku: sg-001
 name: The Bridge Series 'The Bay Bridge' Shorts
 collection: signature
-reference_image: data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
+reference_image: assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
 extra_references:
-  - data/product-references/sg-001-day-bay-bridge-shorts.jpeg
+  - assets/products/references/sg-001-day-bay-bridge-shorts.jpeg
 ---
 
 # The Bridge Series 'The Bay Bridge' Shorts
@@ -14,11 +14,13 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Reference images:
-> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
-> - Bay Bridge shorts standalone techflat: `data/product-references/sg-001-day-bay-bridge-shorts.jpeg`
+> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
+> - Bay Bridge shorts standalone techflat: `assets/products/references/sg-001-day-bay-bridge-shorts.jpeg`
 
 ### Front
 - **front-body** (entire body — front and back continuous): All-over sublimated photographic print of the **San Francisco-Oakland Bay Bridge in daytime daylight** — clear blue sky filling the upper third, the steel-truss Bay Bridge spanning across the middle (center-aligned, with the cantilever section visible), the SF skyline (downtown buildings) visible behind/beside the bridge, and water at the lower portion with reflections of the bridge. Photographic, hyper-realistic, NOT illustrated. The print wraps continuously front-to-back. **Technique:** sublimated. **Color:** photographic full-color (blue sky + grey-and-white bridge steel + tan/grey building skyline + blue water with reflections).
+
+- **front-bottom-left-leg** (~3in tall, lower-left leg panel, layered on top of the sublimated bridge print): Embroidered **blue** rose-cluster — the daytime variant carries a BLUE rose (the night Stay Golden variant carries a purple rose, see sg-003). **Technique:** embroidered. **Color:** blue thread. Catalog branding_spec (canonical): "Embroidered rose on the bottom-left."
 
 ### Back
 - **back-body** (entire field, continuation of front): Same Bay Bridge daytime photographic print continuing seamlessly from the front around to the back. **Technique:** sublimated. **Color:** photographic full-color, continuous wrap.
@@ -37,8 +39,9 @@ extra_references:
 - NO sunset / twilight / orange palette — this is the DAYTIME Bay Bridge with blue sky. Sunset/sunrise palette belongs to sg-003.
 - NO night-time Bay Bridge with city lights — this is the clear-day variant. (A night-Bay-Bridge alternate render exists in older asset directories but is NOT a current SKU.)
 - NO illustrated / cartoon-rendered bridge — the print is a hyper-realistic photographic sublimation, not a stylized illustration.
-- NO rose-cluster decoration anywhere on the body — the Bridge Series shorts carry the photographic print only, NO rose graphics layered on top of the body.
-- NO Black Rose three-rose-cluster, NO Love Hurts canonical roses, NO SR monogram, NO Authentic Collection patch on these shorts. The Bridge Series is purely the bridge photograph as the brand identifier.
+- The ONLY layered mark is the embroidered BLUE rose-cluster at the bottom-left leg (see Front) — daytime Bay Bridge variant = BLUE rose. NO rose graphics anywhere else on the body.
+- NO purple rose on this SKU — purple is the night variant (sg-003 Stay Golden). The daytime Bay Bridge carries the BLUE rose.
+- NO Love Hurts canonical roses, NO SR monogram, NO Authentic Collection patch on these shorts. Branding = the bridge photograph + the single bottom-left blue rose.
 - NO black mesh body — body is WHITE mesh with the sublimated print on top (the print supplies all visible color).
 - NO contrast color side-panels — body is uniform front-to-back.
 - NO black drawstring — drawstring is WHITE.

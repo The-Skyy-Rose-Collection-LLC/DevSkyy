@@ -40,10 +40,7 @@ from skyyrose.core.paths import (
 )
 from skyyrose.core.paths import DOSSIERS_DIR as DOSSIER_ROOT  # noqa: E402
 from skyyrose.core.paths import GOLDEN_DIR as GOLDEN_ROOT
-from skyyrose.core.paths import (
-    THEME_ROOT,
-    golden_path,
-)
+from skyyrose.core.paths import PRODUCT_REFERENCES, golden_path
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +50,7 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 ALLOWED_PIL_FORMATS = {"JPEG", "PNG", "WEBP"}
 PORT = 8765
 
-PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
+PRODUCT_REFERENCES_DIR = PRODUCT_REFERENCES
 TECHFLAT_REVIEW_JSON = PRODUCT_REFERENCES_DIR / "techflat-review.json"
 # Layout codes the founder assigns per techflat in the review tab.
 TECHFLAT_LAYOUTS = {
@@ -260,7 +257,7 @@ _SKU_TOKEN_RE = re.compile(r"(?:br|lh|sg|kids)-\d+")
 def _infer_skus_from_filename(filename: str) -> list[str]:
     """Pull every SKU-like token from a techflat filename, de-duplicated in order.
 
-    e.g. ``sg-006-and-sg-014-mint-lavender-set-techflat.jpeg`` -> [sg-006, sg-014].
+    e.g. ``sg-001-and-sg-003-bridge-shorts-techflat.jpeg`` -> [sg-001, sg-003].
     """
     seen: list[str] = []
     for token in _SKU_TOKEN_RE.findall(filename):

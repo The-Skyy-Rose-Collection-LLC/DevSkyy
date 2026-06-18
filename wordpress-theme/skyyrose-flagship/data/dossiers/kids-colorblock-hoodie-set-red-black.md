@@ -3,11 +3,9 @@ sku: kids-001
 name: Kids Colorblock Hoodie Set — Red/Black
 collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
-extra_logos:
-  - data/brand-logos/black-rose-authentic-collection-patch.md
-reference_image: data/product-references/kids-001-techflat.jpeg
+reference_image: assets/products/references/kids-001-techflat.jpeg
 extra_references:
-  - data/product-references/kids-001-real-photo.jpeg
+  - assets/products/references/kids-001-real-photo.jpeg
 ---
 
 # Kids Colorblock Hoodie Set — Red/Black
@@ -18,14 +16,12 @@ extra_references:
 
 > Logo art canonical references:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
-> - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
-> - Product techflat:              `data/product-references/kids-001-techflat.jpeg`
-> - Real product photo:            `data/product-references/kids-001-real-photo.jpeg`
+> - Product techflat:              `assets/products/references/kids-001-techflat.jpeg`
+> - Real product photo:            `assets/products/references/kids-001-real-photo.jpeg`
 
 ### Hoodie — Front
 - **front-body color-block** (entire front body): Angular geometric color-block construction — the body is divided into three colorway panels by diagonal seams. **Upper-left panel** (from top-left descending diagonally toward center): solid **black**. **Upper-right panel** (from top-right descending diagonally toward center): solid **white**. **Lower body** (from the diagonal meeting points down to the hem, including the kangaroo pocket area): solid **red**. The diagonals create an angular chevron pointing down toward the kangaroo pocket. **Technique:** stitched. **Color:** black + white + red.
-- **front-left-chest** (small, ~2.5in tall, on the wearer's left chest, on the black panel): The Black Rose Authentic Collection patch (yellow field + navy "BLACK ROSE / COLLECTION" + MLB-style batter silhouette + white "AUTHENTIC" banner + red diamond divider + "Members Only / Yay Area, Ca" footer — see patch reference). **Technique:** embroidered-patch.
-- **front-center-chest** (small, ~2in tall, just above the kangaroo pocket on the red lower body): The Black Rose three-rose-cluster, rendered in greyscale (NOT canonical multi-color). **Technique:** embroidered. **Color:** white + black thread on red.
+- **front-chest cluster** (ONLY mark on the hoodie front body; small, ~2in tall, on the CHEST — see the real product photo for exact position): The Black Rose three-rose-cluster, rendered in greyscale (NOT canonical multi-color). **Technique:** embroidered. **Color:** white + black + grey thread. NOTE: there is NO patch on the chest and NO logo on the stomach / lower body (above the kangaroo pocket) — the front body carries this single chest cluster and nothing else.
 
 ### Hoodie — Back
 - **back-body color-block**: Mirrors the front color-block construction — the back has the same angular black/white upper panels and red lower body, with the diagonals continuing from the front around to the back. **Technique:** stitched. **Color:** black + white + red.
@@ -33,7 +29,7 @@ extra_references:
 ### Hoodie — Sleeves / Hood / Hem / Other
 - **left-sleeve**: Solid **black** to match the front-upper-left panel. **Technique:** stitched. **Color:** black.
 - **right-sleeve**: Solid **white** to match the front-upper-right panel. **Technique:** stitched. **Color:** white.
-- **left-sleeve patch / right-sleeve patch** (~2in diameter, centered on each upper sleeve / shoulder area): A small circular rose-cluster patch — Black Rose three-rose-cluster art rendered in greyscale on a circular patch backing with a contrast border ring. **Technique:** embroidered-patch.
+- **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve): A small circular rose-cluster patch — Black Rose three-rose-cluster art rendered in greyscale on a circular patch backing with a contrast border ring. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
 - **hood**: Solid **red** (full hood, matching the red lower body). **Technique:** stitched. **Color:** red.
 - **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white.
 - **kangaroo-pocket**: Red front kangaroo pocket integrated into the lower-body red panel. No decoration on the pocket fabric.
@@ -43,8 +39,7 @@ extra_references:
 
 ### Sweatpants — Front
 - **pants-body**: Solid **black** sweatpants. **Technique:** stitched. **Color:** black.
-- **pants-front-center / waistband-center** (small, ~2in tall): A small Black Rose three-rose-cluster (greyscale) embroidered at the center-front near the waistband. **Technique:** embroidered. **Color:** white + black thread on black.
-- **right-thigh** (small, ~2in tall): A small Black Rose three-rose-cluster (greyscale) accent on the wearer's right thigh. **Technique:** embroidered. **Color:** white + black thread on black.
+- **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on black. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
 - **waistband-drawstring**: White flat drawstring at the waistband. **Technique:** stitched. **Color:** white.
@@ -61,10 +56,12 @@ extra_references:
 - NO colored drawstrings — drawstrings are WHITE on the hoodie + WHITE on the pants.
 - NO decoration on the back-body — the back is a clean color-block panel with no logo placement.
 - NO logos on the kangaroo pocket fabric — the pocket is clean red.
-- NO Love Hurts logo on this product — this is a Black Rose / Kids Capsule product, NOT Love Hurts. The patches are the Black Rose Authentic Collection patch + Black Rose rose-cluster only.
+- NO Love Hurts logo on this product — this is a Black Rose / Kids Capsule product, NOT Love Hurts.
+- THE ONLY MARKS ON THIS SET: (1) ONE rose-cluster on the hoodie CHEST, (2) ONE round patch on ONE sleeve, (3) ONE rose-cluster on the pants. Nothing else.
 - NO multi-color (canonical) rose-cluster — the rose-cluster is greyscale.
-- NO NFL Authentic Collection patch. NO NBA Authentic Collection patch. NO Hockey Championship patch — this kids product uses the BLACK ROSE (MLB-style) Authentic Collection patch.
-- NO chest text or wordmark on the front body fabric — only the patches.
+- NO patch on the CHEST — the chest carries ONLY the rose-cluster. NO MLB/NFL/NBA/Hockey "Authentic Collection" batter patch on the chest or body. (The single round SLEEVE patch is the only patch; render its art per the real product photo.)
+- NO logo on the stomach / lower body above the kangaroo pocket. NO second sleeve patch (one sleeve only; the other is plain). NO second pants cluster.
+- NO chest text or wordmark on the front body fabric — only the single chest rose-cluster.
 - NO pinstripes anywhere.
 - NO embossed/debossed decoration.
 - NO color-block on the sweatpants — the pants are SOLID BLACK (color-block construction is on the HOODIE only).
@@ -72,5 +69,5 @@ extra_references:
 
 ## Scene direction
 
-- **Pose:** Front view straight-on showing the kids hoodie color-block + chest patches + sleeve patches, with the matching black sweatpants laid below the hoodie. Three-quarter view catches the diagonal panel seam-lines.
+- **Pose:** Front view straight-on showing the kids hoodie color-block + the single chest rose-cluster + the single sleeve patch, with the matching black sweatpants (one rose-cluster) laid below the hoodie. Three-quarter view catches the diagonal panel seam-lines.
 - **Setting:** Pure white studio backdrop, soft directional studio lighting from front-left, subtle natural drop shadow on the floor.

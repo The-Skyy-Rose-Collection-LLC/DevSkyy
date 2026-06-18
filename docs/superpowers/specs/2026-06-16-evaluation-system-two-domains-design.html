@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation System (Two Domains) — Design Spec</title>
+<style>
+  body { max-width: 62rem; margin: 2rem auto; padding: 0 1.25rem; font: 16px/1.6 -apple-system, Segoe UI, Roboto, sans-serif; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .4rem; }
+  h2 { margin-top: 2.4rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+  h3 { margin-top: 1.5rem; color: #444; }
+  code { background: #f4f4f4; padding: .1rem .35rem; border-radius: 3px; font-size: .9em; }
+  pre { background: #1a1a1a; color: #eee; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  pre code { background: none; color: inherit; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92em; }
+  th, td { border: 1px solid #ccc; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f0e6e8; }
+  .nav { background: #faf7f8; border: 1px solid #e0d4d7; border-radius: 6px; padding: 1rem 1.25rem; }
+  .nav a { display: inline-block; margin: .15rem .6rem .15rem 0; color: #8a4f58; text-decoration: none; }
+  .tag { display:inline-block; font-size:.72em; font-weight:700; padding:.1rem .45rem; border-radius:3px; }
+  .now { background:#d6f0d6; color:#1e5e1e; } .later { background:#fde9c8; color:#8a5a00; }
+  .crit { background:#f7d4d4; color:#8a1e1e; }
+  blockquote { border-left: 4px solid #B76E79; margin: 1rem 0; padding: .4rem 1rem; background: #faf7f8; color:#444; }
+</style>
+</head>
+<body>
+
+<h1>Evaluation System (Two Domains) — Design Spec</h1>
+<p><strong>Date:</strong> 2026-06-16 · <strong>Status:</strong> Re-scoped design, pre-approval ·
+<strong>Supersedes:</strong> <code>2026-06-16-evaluator-observability-agents-design.html</code> (now domain #2 of this system).<br>
+<strong>Grounded by:</strong> verified codebase sweep (workflow <code>wf_2a2fe9e9-f0c</code>, 6 readers + completeness critic).</p>
+
+<div class="nav"><strong>Sections:</strong>
+<a href="#goal">1. Goal</a> <a href="#arch">2. Architecture</a> <a href="#port">3. DomainAdapter port</a>
+<a href="#imagery">4. Render Fidelity Evaluator</a> <a href="#content">5. Content Accuracy Evaluator</a>
+<a href="#observer">6. Shared Observer</a> <a href="#reuse">7. Reuse map</a> <a href="#prefix">8. Pre-fixes</a>
+<a href="#seq">9. Build sequence</a> <a href="#risks">10. Risks &amp; open questions</a>
+</div>
+
+<section id="goal">
+<h2>1. Goal</h2>
+<p>One shared evaluation system that guarantees output accuracy <em>before</em> it ships, serving two domains
+through one core: <strong>imagery</strong> (does a generated product photo 100%-replicate the real garment?)
+and <strong>copy</strong> (is marketing/product text brand- and catalog-accurate?). Two distinct
+"job-title" agents, one core, swappable domains — the founder's ports-and-adapters model.</p>
+
+<h3>The two agents (job titles — confirm/adjust)</h3>
+<table>
+<tr><th>Agent</th><th>Domain</th><th>Judges</th><th>Against</th><th>Priority</th></tr>
+<tr><td><strong>Render Fidelity Evaluator</strong></td><td>imagery</td><td>generated product photo</td>
+  <td>dossier + real reference photos + logo canon</td><td><span class="tag now">build now</span></td></tr>
+<tr><td><strong>Content Accuracy Evaluator</strong></td><td>copy</td><td>marketing/product copy draft</td>
+  <td>catalog CSV facts + collection canon</td><td><span class="tag later">domain #2, later</span></td></tr>
+</table>
+<blockquote>Both agents are thin: a job-title identity + a <code>DomainAdapter</code>. All real machinery lives in the shared core. Adding a third domain later (e.g. 3D meshes) = one new adapter.</blockquote>
+</section>
+
+<section id="arch">
+<h2>2. Architecture</h2>
+<pre><code>                      ┌──────────────────────────────────────────┐
+   subject + ref ───▶  │            EvaluationCore                 │
+                      │  1. adapter.deterministic_checks() (free) │ ──fail──▶ revise
+                      │  2. adapter.build_judge_request()         │
+                      │  3. judge (Claude; vision OR text)        │
+                      │  4. adapter.parse_verdict() → Verdict     │
+                      │  5. bounded revise loop (cap 2, early-exit)│
+                      │  6. calibration mode gate (κ vs labels)   │
+                      └───────────────┬──────────────────────────┘
+                                      │ Verdict (normalized)
+                  ┌───────────────────┼───────────────────┐
+                  ▼                                        ▼
+        ImageryAdapter (vision)                 ContentAdapter (text)
+   reuses qc.py det-checks + 6 gates       catalog-fact gate + 0–5 dims
+   + references.build_references            + collection canon
+                  │                                        │
+                  └──────────────▶  Observer  ◀────────────┘
+            (domain-tagged: outcome, cost, pass/flag rate, alerts)</code></pre>
+
+<p><strong>Fresh package:</strong> <code>evaluation/</code> (new top-level package, requires <code>__init__.py</code>).
+Per the founder's "fresh agent" direction — the imagery adapter <em>reuses</em> the proven logic in
+<code>scripts/oai_render/qc.py</code> (imported, not copied) rather than editing it in place; the core is new.</p>
+
+<table>
+<tr><th>Module</th><th>Responsibility</th></tr>
+<tr><td><code>evaluation/core.py</code></td><td><code>EvaluationCore.evaluate(subject, ref)</code> — the 6-step orchestration; domain-agnostic</td></tr>
+<tr><td><code>evaluation/contracts.py</code></td><td><code>Verdict</code> (normalized), <code>Critique</code>, <code>Severity</code></td></tr>
+<tr><td><code>evaluation/adapter.py</code></td><td><code>DomainAdapter</code> Protocol (the port)</td></tr>
+<tr><td><code>evaluation/judge.py</code></td><td>Claude judge client wrapper — vision + text modes, forced tool-call, <code>visual_analysis</code>/<code>reasoning</code> CoT field, accurate cost</td></tr>
+<tr><td><code>evaluation/calibration.py</code></td><td>Cohen's κ vs a labeled set → hard-gate / soft-signal mode</td></tr>
+<tr><td><code>evaluation/observer.py</code></td><td>domain-tagged per-evaluation record + cost + flag-rate + alerts</td></tr>
+<tr><td><code>evaluation/domains/imagery.py</code></td><td><code>ImageryAdapter</code> — Render Fidelity Evaluator</td></tr>
+<tr><td><code>evaluation/domains/content.py</code></td><td><code>ContentAdapter</code> — Content Accuracy Evaluator (domain #2)</td></tr>
+<tr><td><code>evaluation/agents.py</code></td><td>the two job-title agents: identity + bound adapter</td></tr>
+</table>
+</section>
+
+<section id="port">
+<h2>3. The DomainAdapter port ("same system, slightly different domains")</h2>
+<pre><code>class DomainAdapter(Protocol):
+    domain: str                       # "imagery" | "copy"
+
+    def deterministic_checks(self, subject, ref) -> list[CheckFailure]: ...
+        # free, un-hallucinatable. imagery: PNG decode/size/collage-band + identity;
+        # copy: catalog-fact match + placeholder + banned-phrase + structure
+
+    def build_judge_request(self, subject, ref) -> JudgeRequest: ...
+        # imagery: vision messages (candidate image + reference images + dossier text);
+        # copy: text messages (draft + catalog/canon context). Both force a CoT-first schema.
+
+    def parse_verdict(self, judge_output, det_failures) -> Verdict: ...
+        # imagery: 6 boolean gates → pass/fail + failure_tags;
+        # copy: 0–5 dimension scores → weighted composite
+
+    async def revise(self, ref, critique) -> Subject: ...
+        # imagery: re-render via scripts/oai_render pipeline with corrections;
+        # copy: re-invoke the content agent with critique-augmented task
+
+    def load_ground_truth(self) -> list[LabeledExample]: ...
+        # imagery: renders/oai/_review/review-state.json (81 founder labels);
+        # copy: tests/fixtures/.../labels (built later)</code></pre>
+<p><code>Verdict</code> is normalized across domains: <code>passed: bool</code>, <code>score: float</code> (0–1),
+<code>gate_results: dict</code>, <code>failure_tags: tuple[str,...]</code>, <code>reason: str</code>,
+<code>cost_usd: float</code>, <code>attempts: int</code>, <code>mode: "hard_gate"|"soft_signal"</code>,
+<code>domain: str</code>. Imagery fills <code>gate_results</code> with the 6 booleans; copy fills it with dimension scores.</p>
+</section>
+
+<section id="imagery">
+<h2>4. Render Fidelity Evaluator <span class="tag now">build now</span></h2>
+<p>Domain adapter: <code>evaluation/domains/imagery.py</code>. Reuses the proven, on-disk render-QC machinery.</p>
+<table>
+<tr><th>Step</th><th>Implementation (reuse → new)</th></tr>
+<tr><td>deterministic_checks</td><td><strong>Reuse</strong> <code>scripts/oai_render/qc.py:173</code> <code>deterministic_checks()</code> (PNG decode, 1024×1536, numpy collage-band) verbatim. <strong>Add</strong> identity guard: SKU not in <code>EXCLUDED_SKUS</code> (sg-006/sg-014/sg-015), reference photo resolvable.</td></tr>
+<tr><td>build_judge_request</td><td><strong>Reuse</strong> <code>qc.py</code> <code>_JUDGE_SCHEMA</code> (6 gates) + <code>_judge_instructions()</code>; <strong>reuse</strong> <code>references.build_references()</code> (real photo = GROUND TRUTH first). <strong>New:</strong> add leading <code>visual_analysis</code> CoT field (describe hue/material/logo-panels before the booleans), feed <code>brand-logos/*.md</code> logo canon + <code>render-corrections.json</code> known-failure patterns as judge context.</td></tr>
+<tr><td>judge</td><td><strong>New:</strong> Claude vision (<code>claude-sonnet-4-6</code>) via <code>evaluation/judge.py</code>, forced tool-call. Replaces the on-disk <code>gpt-4o-mini</code> (verified hardwired at <code>qc.py:248</code>, the accuracy weakness).</td></tr>
+<tr><td>parse_verdict</td><td><strong>Reuse</strong> <code>QCVerdict</code> shape (<code>qc.py:104</code>) → normalize to <code>Verdict</code>. Map the 6 gates to <code>_GATE_TAGS</code> (<code>qc.py:91</code>): collage_panels, wrong_garment, wrong_view, branding_drift, flat_render, missing_pair_garment.</td></tr>
+<tr><td>revise</td><td><strong>Reuse</strong> the pipeline retry/quarantine (<code>pipeline.py:254</code>). The Evaluator returns a <code>Verdict</code>; the pipeline's existing loop re-renders on fail. Wire the new judge in at the <code>gate.check()</code> seam.</td></tr>
+<tr><td>ground truth</td><td><strong>Reuse</strong> <code>renders/oai/_review/review-state.json</code> — 81 founder labels (45 flagged / 33 approved). approved→pass, flagged→fail. Seed <code>tests/fixtures/qc_ground_truth/</code> from it. <strong>This replaces the unverifiable "6/6" memory claim with a measured κ.</strong></td></tr>
+</table>
+</section>
+
+<section id="content">
+<h2>5. Content Accuracy Evaluator <span class="tag later">domain #2, later</span></h2>
+<p>Domain adapter: <code>evaluation/domains/content.py</code>. This is the previously-approved text evaluator, re-homed
+onto the shared core. The plan already written (<code>docs/superpowers/plans/2026-06-16-evaluator-agent.md</code>)
+maps directly: deterministic catalog-fact gate, Claude <em>text</em> judge (0–5 criterion-separated, CoT, blind,
+anti-verbosity), bounded revise loop, calibration. No re-design needed; it becomes a <code>DomainAdapter</code>
+implementation instead of a standalone package. Build after imagery ships.</p>
+</section>
+
+<section id="observer">
+<h2>6. Shared Observer</h2>
+<p><code>evaluation/observer.py</code> — one Observer, domain-tagged. Per evaluation it records: domain, subject id
+(SKU or content id), passed, failure_tags, score, cost_usd, duration, attempts. Computes pass-rate, flag-rate,
+judge cost, judge-vs-human agreement (against the ground-truth set). Alert+recommend only (never auto-acts).</p>
+<ul>
+<li><strong>Imagery persistence:</strong> today only failures persist (quarantine sidecars, <code>renders/oai/_rejected/</code>); successes vanish. Observer writes a per-render outcome record (JSONL run-log under <code>renders/oai/_runs/&lt;run_id&gt;.jsonl</code>) + a batch summary. Optionally also the orphaned <code>AgentExecution</code> table (<code>agents/models.py:201</code>) — but JSONL is the low-risk v1 (that table is unwired and PG-typed).</li>
+<li><strong>Cost accuracy:</strong> current <code>judge_cost_usd</code> is a fixed <code>$0.0002</code> constant (OpenAI). The Observer + the STOP-AND-SHOW manifest must compute <em>real</em> Claude-vision judge cost (input image tokens + output) before any paid run. <span class="tag crit">required</span></li>
+<li><strong>Cross-domain:</strong> the same Observer records content evaluations when domain #2 lands — one dashboard, two domains.</li>
+</ul>
+</section>
+
+<section id="reuse">
+<h2>7. Reuse map (verified, file:line)</h2>
+<table>
+<tr><th>Reuse</th><th>Path</th><th>For</th></tr>
+<tr><td>Deterministic checks + 6-gate schema + verdict</td><td><code>scripts/oai_render/qc.py:33,91,104,173</code></td><td>imagery adapter</td></tr>
+<tr><td>Reference resolution (real photo = ground truth)</td><td><code>scripts/oai_render/references.py</code> <code>build_references()</code></td><td>imagery canon load</td></tr>
+<tr><td>Render pipeline seam + retry/quarantine</td><td><code>scripts/oai_render/pipeline.py:254,232</code></td><td>imagery revise</td></tr>
+<tr><td>Cost + STOP-AND-SHOW + cap</td><td><code>scripts/oai_render/cost.py</code>, <code>cli.py</code></td><td>paid-run gate</td></tr>
+<tr><td>81 founder labels</td><td><code>renders/oai/_review/review-state.json</code></td><td>imagery calibration</td></tr>
+<tr><td>Pixel gates (ΔE color, OCR, CLIP)</td><td><code>skyyrose/elite_studio/fidelity.py</code></td><td>optional deterministic adds</td></tr>
+<tr><td>Canon: dossiers, logo canon, catalog</td><td><code>skyyrose/core/dossier_loader.py</code>, <code>brand-logos/*.md</code>, catalog CSV</td><td>both domains</td></tr>
+<tr><td>Catalog-fact gate</td><td><code>skyyrose/core/catalog_loader.py</code></td><td>content adapter</td></tr>
+<tr><td>Content evaluator design</td><td><code>docs/superpowers/plans/2026-06-16-evaluator-agent.md</code></td><td>content adapter</td></tr>
+</table>
+</section>
+
+<section id="prefix">
+<h2>8. Mandatory pre-fixes (flagged by the completeness critic)</h2>
+<ol>
+<li><span class="tag crit">silent-fallback bug</span> <code>dossier_loader.py</code> parses <code>reference_image</code> + <code>extra_references</code> from frontmatter but <strong>drops them from the <code>Dossier</code> dataclass</strong>. The imagery adapter needs the ground-truth photo paths — add these fields (or load via <code>references.build_references()</code>). Without this, the judge silently gets no reference. Violates no-silent-fallback canon.</li>
+<li><span class="tag crit">cost</span> Replace the fixed <code>EST_JUDGE_COST_USD=$0.0002</code> with real Claude-vision cost in the manifest before any paid run.</li>
+<li>Do <strong>not</strong> read <code>placement.md</code> (auto-generated scaffolding, non-authoritative); resolve canon from CSV + dossier + logo-registry. Verify <code>GOLDEN_DIR/{sku}/reference.jpg</code> provenance before trusting it as ground truth.</li>
+</ol>
+</section>
+
+<section id="seq">
+<h2>9. Build sequence (judge-first → photos)</h2>
+<table>
+<tr><th>Phase</th><th>Work</th><th>Paid?</th></tr>
+<tr><td><strong>0 — Core</strong></td><td><code>evaluation/</code> package: contracts, DomainAdapter port, EvaluationCore, judge.py (Claude vision+text), calibration, Observer skeleton. Pre-fix #1 (dossier fields). Unit-tested with fakes.</td><td>no</td></tr>
+<tr><td><strong>1 — Render Fidelity Evaluator</strong></td><td>ImageryAdapter reusing qc.py pieces + Claude vision judge + visual_analysis CoT. Seed ground truth from the 81 labels. <strong>Calibrate</strong> → measured κ → hard-gate vs soft-signal. Wire judge into the pipeline <code>gate.check()</code> seam.</td><td>calibration = small paid Claude run (STOP-AND-SHOW)</td></tr>
+<tr><td><strong>2 — Re-render</strong></td><td>Run the pipeline (existing CLI) to regenerate deleted renders, gated by the new accurate judge → photos for the senior dev.</td><td><span class="tag crit">paid — STOP-AND-SHOW + cost manifest + y</span></td></tr>
+<tr><td><strong>3 — Observer over renders</strong></td><td>Per-render run-log + batch summary + judge-vs-human agreement dashboard surface.</td><td>no</td></tr>
+<tr><td><strong>4 — Content Accuracy Evaluator</strong></td><td>ContentAdapter from the existing content plan, on the shared core.</td><td>no</td></tr>
+</table>
+<blockquote>Calibration (Phase 1) makes a small number of paid Claude-vision judge calls against the ~81 labeled images. That is the first paid step and goes through STOP-AND-SHOW with an exact cost manifest. The big paid step is Phase 2 (re-render).</blockquote>
+</section>
+
+<section id="risks">
+<h2>10. Risks &amp; open questions</h2>
+<ul>
+<li><strong>"6/6 Claude" is unverified</strong> — no committed harness ever proved it. Phase 1 calibration produces the real number; if κ &lt; 0.65 the judge ships as soft-signal (annotate, don't block) until tuned.</li>
+<li><strong>ANTHROPIC_API_KEY wiring</strong> — not present in <code>scripts/oai_render/config.py</code>. Confirm the secret-load path (<code>gemini/.env</code> / <code>.env.secrets</code>) in Phase 0.</li>
+<li><strong>Deleted renders</strong> — only 2 PNGs survive; calibration uses the 81 labels but the <em>images</em> for flagged/approved renders are mostly gone (13 evidence imgs remain). Open question: do we calibrate the judge against the 13 recoverable evidence images + re-render a small labeled set, or re-render the full 81 first? (Affects Phase-1 paid cost.)</li>
+<li><strong>4 SKUs lack a reference photo</strong> (black-rose-crewneck, black-rose-joggers, original-label-tee-orchid/white) — imagery judge needs a defined fallback (techflat) or reduced gate for these.</li>
+<li><strong>Job titles</strong> — "Render Fidelity Evaluator" / "Content Accuracy Evaluator" are proposals; confirm or rename.</li>
+</ul>
+</section>
+
+</body>
+</html>

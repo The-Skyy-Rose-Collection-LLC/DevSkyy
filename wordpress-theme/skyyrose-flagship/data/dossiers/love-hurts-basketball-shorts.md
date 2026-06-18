@@ -5,7 +5,7 @@ collection: love-hurts
 logo_reference: data/brand-logos/love-hurts-logo.md
 extra_logos:
   - data/brand-logos/red-roses-cloud-cluster.md
-reference_image: data/product-references/lh-003-techflat-front.jpeg
+reference_image: assets/products/references/lh-003-techflat-front.jpeg
 ---
 
 # Love Hurts Basketball Shorts
@@ -17,7 +17,7 @@ reference_image: data/product-references/lh-003-techflat-front.jpeg
 > Logo art canonical references:
 > - Love Hurts logo (wordmark + heart-and-thorns): `data/brand-logos/love-hurts-logo.md`
 > - Red Roses Cloud Cluster (the LH variant of the rose-cluster — red roses + green stems + white-and-blue cloud): `data/brand-logos/red-roses-cloud-cluster.md`
-> - Product techflat: `data/product-references/lh-003-techflat-front.jpeg`
+> - Product techflat: `assets/products/references/lh-003-techflat-front.jpeg`
 
 ### Front
 - **front-body** (entire white mesh field, front and back continuous): The canonical Red Roses Cloud Cluster art (three red roses + thorny green vines + white-and-blue cloud at base) sublimated as a small repeating pattern across the entire white mesh body, scattered evenly with the cloud pointing down. Each rose-cluster is rendered in canonical full color (saturated red roses, kelly-green stems, white-and-blue cloud) on the white ground. **Technique:** sublimated. **Color:** canonical multi-color red green white blue on white mesh.

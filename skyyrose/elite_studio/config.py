@@ -11,7 +11,15 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:  # optional env loader — minimal CI/validation envs don't ship it
+
+    def load_dotenv(*_args, **_kwargs):  # type: ignore[misc]
+        """No-op fallback when python-dotenv is absent (e.g. the Dossier Check CI job).
+
+        Catalog/dossier validation reads tracked files only; it never needs .env."""
+        return False
 
 # ---------------------------------------------------------------------------
 # Environment loading (authoritative key last with override=True)
@@ -375,7 +383,7 @@ def verify_no_orphans(*, raise_on_orphan: bool = False) -> dict[str, list[str]]:
     """Audit production image dirs — flag any SKU-prefixed file whose SKU
     is not in the canonical CSV.
 
-    Walks wordpress-theme/.../products/, skyyrose/assets/images/source-products/,
+    Walks wordpress-theme/.../products/, assets/products/source-photos/,
     skyyrose/assets/images/products/. For every file matching SKU_RE, asserts
     the SKU prefix is in canonical OR explicitly retired. Files in neither set
     are orphans (the dress-mislabel class of bug).

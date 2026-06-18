@@ -625,7 +625,7 @@ The owner has provided reference images for each scene. Agents must regenerate t
 - sg-009 The Sherpa Jacket **on a mannequin** in a glass display case (right side)
 - sg-010 The Bridge Series Shorts **folded on a brushed-gold shelf** between cases
 - sg-013 Mint & Lavender Crewneck Set **displayed on a mannequin pair** near the panorama wall
-- sg-014 Pastel Chevron Tracksuit Set **on a styled display table** center stage
+- sg-014 Mint & Lavender Sweatpants **on a styled display table** center stage
 - **Navigation ← →** arrows to go back to Runway or forward to Fitting Room
 
 ##### Room 3: "The Fitting Room" (end view)

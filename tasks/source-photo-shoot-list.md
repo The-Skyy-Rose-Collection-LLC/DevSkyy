@@ -13,18 +13,17 @@ can stand in temporarily — but real photography is the durable fix.
 |-----|------|------|---------|
 | `br-001` | BLACK Rose Crewneck | crewneck | back, three-quarter, detail-graphic |
 | `br-002` | BLACK Rose Joggers | crewneck | back, three-quarter, detail-graphic |
-| `br-003` | BLACK is Beautiful Jersey Series: 0. Baseball Classic | hoodie | back, three-quarter, detail-hood, detail-pocket |
-| `br-003-giants` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition) | jersey | front, back, three-quarter, detail-patch, detail-stitching |
-| `br-003-white` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition) | jersey | front, back, three-quarter, detail-patch, detail-stitching |
+| `br-003` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black) | hoodie | back, three-quarter, detail-hood, detail-pocket |
 | `br-004` | BLACK Rose Hoodie | crewneck | back, three-quarter, detail-graphic |
 | `br-005` | BLACK Rose Hoodie — Signature Edition | crewneck | back, three-quarter, detail-graphic |
 | `br-009` | BLACK is Beautiful Jersey Series: 2. Last Oakland (Football) | hoodie | back, three-quarter, detail-hood, detail-pocket |
 | `br-010` | BLACK is Beautiful Jersey Series: 3. The Bay (Basketball) | jersey | front, back, three-quarter, detail-patch, detail-stitching |
-| `br-011` | BLACK is Beautiful Jersey Series: 4. The Rose (Hockey) | hoodie | back, three-quarter, detail-hood, detail-pocket |
+| `br-014` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants) | jersey | back, three-quarter, detail-patch, detail-stitching |
+| `br-015` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (White) | jersey | back, three-quarter, detail-patch, detail-stitching |
 | `kids-001` | Kids Colorblock Hoodie Set — Red/Black | hoodie | back, three-quarter, detail-hood, detail-pocket |
 | `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | hoodie | back, three-quarter, detail-hood, detail-pocket |
-| `lh-002` | Love Hurts Joggers | jersey | back, three-quarter, detail-patch, detail-stitching |
-| `sg-001` | The Bridge Series 'The Bay Bridge' Shorts | jersey | back, three-quarter, detail-patch, detail-stitching |
+| `lh-002` | Love Hurts Joggers (Black) | jersey | back, three-quarter, detail-patch, detail-stitching |
+| `lh-006` | Love Hurts Joggers (White) | jersey | back, three-quarter, detail-patch, detail-stitching |
 | `sg-002` | The Bridge Series 'Stay Golden' Shirt | hoodie | back, three-quarter, detail-hood, detail-pocket |
 | `sg-003` | The Bridge Series 'Stay Golden' Shorts | jersey | back, three-quarter, detail-patch, detail-stitching |
 | `sg-005` | The Bridge Series 'The Bay Bridge' Shirt | hoodie | back, three-quarter, detail-hood, detail-pocket |
@@ -33,7 +32,7 @@ can stand in temporarily — but real photography is the durable fix.
 | `sg-009` | The Sherpa Jacket | hoodie | back, three-quarter, detail-hood, detail-pocket |
 | `sg-011` | Original Label Tee (White) | crewneck | back, three-quarter, detail-graphic |
 | `sg-012` | Original Label Tee (Orchid) | crewneck | back, three-quarter, detail-graphic |
-| `sg-015` | The Windbreaker Set | hoodie | front, back, three-quarter, detail-hood, detail-pocket |
+| `sg-015` | The Windbreaker Set | hoodie | back, three-quarter, detail-hood, detail-pocket |
 
 ## Tier 2 — Compositor-Ready, Under Required Coverage
 
@@ -43,13 +42,14 @@ next sourcing pass; not launch-blocking.
 
 | SKU | Name | Type | Missing |
 |-----|------|------|---------|
-| `br-003-oakland` | BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition) | jersey | three-quarter, detail-patch, detail-stitching |
 | `br-006` | BLACK Rose Sherpa Jacket | hoodie | three-quarter, detail-hood, detail-pocket |
 | `br-007` | BLACK Rose x Love Hurts Basketball Shorts | jersey | three-quarter, detail-patch, detail-stitching |
 | `br-008` | BLACK is Beautiful Jersey Series: 1. SF Inspired (Football) | hoodie | three-quarter, detail-hood, detail-pocket |
-| `br-012` | BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball) | hoodie | three-quarter, detail-hood, detail-pocket |
+| `br-011` | BLACK is Beautiful Jersey Series: 4. The Rose (Hockey) | hoodie | three-quarter, detail-hood, detail-pocket |
+| `br-012` | BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland) | hoodie | three-quarter, detail-hood, detail-pocket |
 | `lh-003` | Love Hurts Basketball Shorts | jersey | three-quarter, detail-patch, detail-stitching |
 | `lh-004` | Love Hurts Bomber Jacket | hoodie | three-quarter, detail-hood, detail-pocket |
 | `lh-005` | The Fannie | accessory | in-context |
+| `sg-001` | The Bridge Series 'The Bay Bridge' Shorts | jersey | three-quarter, detail-patch, detail-stitching |
 | `sg-013` | Mint & Lavender Crewneck | crewneck | three-quarter, detail-graphic |
 | `sg-014` | Mint & Lavender Sweatpants | hoodie | three-quarter, detail-hood, detail-pocket |

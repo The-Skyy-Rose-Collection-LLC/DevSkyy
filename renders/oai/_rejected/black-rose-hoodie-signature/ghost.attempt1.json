@@ -1,0 +1,13 @@
+{
+  "sku": "br-005",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift",
+    "flat_render"
+  ],
+  "reason": "The rendered garment does not match the reference in terms of branding; the logo on the front-right-chest is absent, and additional graphics appear that are not part of the specified branding. Additionally, the overall appearance lacks photorealism and fabric texture."
+}

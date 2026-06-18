@@ -1,0 +1,12 @@
+{
+  "sku": "br-001",
+  "style": "on-model",
+  "view": "front",
+  "is_pair": true,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The Black Rose logo on the crewneck is incorrectly rendered; it appears flat and does not incorporate the required embossed dimensionality. Additionally, the logo lacks the specified color and detailing (e.g., missing the light-grey shading on petals and incorrect representation of vine colors). The"
+}

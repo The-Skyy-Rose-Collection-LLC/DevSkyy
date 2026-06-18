@@ -50,6 +50,8 @@ class Dossier:
     scene_setting: str = ""
     logo_reference: str = ""
     extra_logos: list[str] = field(default_factory=list)
+    reference_image: str = ""
+    extra_references: list[str] = field(default_factory=list)
     raw: str = field(default="", repr=False)
 
     def to_dict(self) -> dict:
@@ -65,6 +67,8 @@ class Dossier:
             "scene_setting": self.scene_setting,
             "logo_reference": self.logo_reference,
             "extra_logos": list(self.extra_logos),
+            "reference_image": self.reference_image,
+            "extra_references": list(self.extra_references),
         }
 
 
@@ -170,6 +174,8 @@ def parse_dossier_markdown(text: str) -> Dossier:
         scene_setting=_extract_scene_field(scene_section, "Setting"),
         logo_reference=fm.get("logo_reference", ""),
         extra_logos=fm_lists.get("extra_logos", []),
+        reference_image=fm.get("reference_image", ""),
+        extra_references=fm_lists.get("extra_references", []),
         raw=text,
     )
 

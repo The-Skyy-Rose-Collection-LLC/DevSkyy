@@ -346,11 +346,24 @@ get_header();
 		<?php foreach ( $collections as $idx => $col ) : ?>
 			<a href="<?php echo esc_url( $col['link'] ); ?>" class="col-card <?php echo esc_attr( $col['class'] ); ?> magnetic">
 				<div class="col-card-img">
-					<img src="<?php echo esc_url( $col['image'] ); ?>"
-						alt="<?php echo esc_attr( $col['name'] . ' Collection' ); ?>"
-						loading="<?php echo 0 === $idx ? 'eager' : 'lazy'; ?>"
-						<?php echo 0 === $idx ? 'fetchpriority="high"' : ''; ?>
-						decoding="async" width="480" height="640">
+					<?php
+					// alt is passed as the 2nd positional arg to skyyrose_render_picture()
+					// below; do NOT repeat it here or the <img> emits a duplicate alt=.
+					$card_img_attrs = array(
+						'loading'  => 0 === $idx ? 'eager' : 'lazy',
+						'decoding' => 'async',
+						'width'    => '480',
+						'height'   => '640',
+					);
+					if ( 0 === $idx ) {
+						$card_img_attrs['fetchpriority'] = 'high';
+					}
+					echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
+						$col['image'],
+						$col['name'] . ' Collection',
+						$card_img_attrs
+					);
+					?>
 				</div>
 				<div class="col-card-ov"></div>
 				<div class="col-card-content">
@@ -490,11 +503,19 @@ get_template_part(
 				: '(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 370px';
 			?>
 			<div class="lb-img rv<?php echo $lb['tall'] ? ' tall' : ''; ?>">
-				<img src="<?php echo esc_url( $lb_base . '-960w.webp' ); ?>"
-					srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
-					sizes="<?php echo esc_attr( $lb_sizes ); ?>"
-					alt="<?php echo esc_attr( $lb['alt'] ); ?>"
-					loading="lazy" decoding="async" width="960" height="1280">
+				<picture>
+					<source type="image/avif"
+						srcset="<?php echo esc_url( $lb_base . '-480w.avif' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.avif' ); ?> 960w"
+						sizes="<?php echo esc_attr( $lb_sizes ); ?>">
+					<source type="image/webp"
+						srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
+						sizes="<?php echo esc_attr( $lb_sizes ); ?>">
+					<img src="<?php echo esc_url( $lb_base . '-960w.webp' ); ?>"
+						srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
+						sizes="<?php echo esc_attr( $lb_sizes ); ?>"
+						alt="<?php echo esc_attr( $lb['alt'] ); ?>"
+						loading="lazy" decoding="async" width="960" height="1280">
+				</picture>
 				<span class="lb-label"><?php echo esc_html( $lb['label'] ); ?></span>
 			</div>
 		<?php endforeach; ?>

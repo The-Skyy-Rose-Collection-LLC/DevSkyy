@@ -237,7 +237,7 @@ defined( 'ABSPATH' ) || exit;
 								'menu_class'     => 'footer-copyright__menu',
 								'container'      => false,
 								'depth'          => 1,
-								'fallback_cb'    => false,
+								'fallback_cb'    => 'skyyrose_nav_fallback',
 							)
 						);
 						?>

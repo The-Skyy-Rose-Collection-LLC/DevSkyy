@@ -31,3 +31,11 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
     pytest tests/unit/ -x -q
   fi
 fi
+
+# Freshness guard: derived files (SOT sot.json/design-tokens, theme .min,
+# theme version, retired-master refs) must not be committed stale. Scoped to
+# staged files, so it is a no-op unless you touched a source whose derived file
+# drifted. Fix with: bash scripts/freshness-guard.sh --fix
+if [ -f "$REPO_ROOT/scripts/freshness-guard.sh" ]; then
+  bash "$REPO_ROOT/scripts/freshness-guard.sh" || exit 1
+fi

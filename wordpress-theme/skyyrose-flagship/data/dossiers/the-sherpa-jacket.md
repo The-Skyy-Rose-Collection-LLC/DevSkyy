@@ -5,8 +5,8 @@ collection: signature
 logo_reference: data/brand-logos/red-roses-cloud-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/sg-009-sherpa-front.jpeg
-reference_image_interior: data/product-references/sg-009-sherpa-interior.jpeg
+reference_image: assets/products/references/sg-009-sherpa-front.jpeg
+reference_image_interior: assets/products/references/sg-009-sherpa-interior.jpeg
 ---
 
 # The Sherpa Jacket
@@ -19,9 +19,9 @@ reference_image_interior: data/product-references/sg-009-sherpa-interior.jpeg
 > - Red Roses Cloud Cluster (left-chest exterior embroidery): `data/brand-logos/red-roses-cloud-cluster.md`
 > - SR monogram / brand woven label (interior back-neck): `data/brand-logos/sr-monogram.md`
 > - Product reference exterior front (rose-cluster placement visible):
->   `data/product-references/sg-009-sherpa-front.jpeg`
+>   `assets/products/references/sg-009-sherpa-front.jpeg`
 > - Product reference interior detail (sherpa lining + brand label visible):
->   `data/product-references/sg-009-sherpa-interior.jpeg`
+>   `assets/products/references/sg-009-sherpa-interior.jpeg`
 
 ### Front
 - **front-body** (entire black exterior field, between the stand-up collar and the bottom hem): Solid **black** nylon-style smooth shell fabric. **Technique:** stitched. **Color:** black.

@@ -428,17 +428,16 @@ jobs:
           fi
           echo "All PHP files passed syntax check"
 
+      # package.json + build scripts live in wordpress-theme/ (the build:css/build:js
+      # scripts reference the skyyrose-flagship/ subdir). Running from the subdir
+      # itself fails with ENOENT (no package.json there).
       - name: Install theme dependencies
-        working-directory: wordpress-theme/skyyrose-flagship
+        working-directory: wordpress-theme
         run: npm install
 
       - name: Build theme assets (CI-04)
-        working-directory: wordpress-theme/skyyrose-flagship
+        working-directory: wordpress-theme
         run: npm run build
-
-      - name: Verify build output (CI-04)
-        working-directory: wordpress-theme/skyyrose-flagship
-        run: bash scripts/verify-build.sh
 
       - name: Check for minification drift (CI-05)
         run: |

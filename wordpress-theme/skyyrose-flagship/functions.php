@@ -76,6 +76,7 @@ $skyyrose_core_includes = array(
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',
 	'/inc/collection-content.php',
+	'/inc/collection-sot-reader.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
 	'/inc/immersive-product-adapter.php',
@@ -91,6 +92,7 @@ $skyyrose_core_includes = array(
 	'/inc/rest-api-experience.php',
 	'/inc/personalization.php',
 	'/inc/performance-guardian.php',
+	'/inc/image-placements.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
 );

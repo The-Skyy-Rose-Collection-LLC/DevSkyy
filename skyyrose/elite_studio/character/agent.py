@@ -6,7 +6,7 @@ for the canonical SkyyRose mascot 'Rosie'.
 
 Rosie already exists — reference assets live at:
   - assets/branding/mascot/skyyrose-mascot-reference.png  (primary)
-  - skyyrose/assets/images/source-products/brand-assets/skyyrose-avatar-reference.jpeg
+  - assets/products/source-photos/brand-assets/skyyrose-avatar-reference.jpeg
 
 The frontend mascot system (/api/mascot, MascotBubble.tsx) is the canonical
 generation system. This agent bridges Rosie into the Elite Studio creative pipeline.
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 _CANONICAL_REFERENCE = Path("assets/branding/mascot/skyy-canonical-reference.jpeg")
 _MASCOT_REFERENCE_PNG = Path("assets/branding/mascot/skyyrose-mascot-reference.png")
 _AVATAR_REFERENCE_JPEG = Path(
-    "skyyrose/assets/images/source-products/brand-assets/skyyrose-avatar-reference.jpeg"
+    "assets/products/source-photos/brand-assets/skyyrose-avatar-reference.jpeg"
 )
 
 # Base prompt — describes the canonical Skyy character precisely as seen in reference image.

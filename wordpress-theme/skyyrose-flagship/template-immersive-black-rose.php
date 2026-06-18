@@ -23,12 +23,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	Room Data — 2 atmospheric rooms with product hotspots.
 	───────────────────────────────────────────────────────── */
 
+// SOT-wired scene images. skyyrose_sot_scene() returns the imagery.scene_portrait.resolved
+// path (leading '/') from data/collections/black-rose/sot.json. basename() strips the
+// directory prefix so scene.php can safely prepend assets/images/immersive/.
+// Falls back to the original hand-maintained filename when the accessor returns ''.
+$_sot_scene_br_room1 = skyyrose_sot_scene( 'black-rose' );
+$_br_room1_image     = ( '' !== $_sot_scene_br_room1 ) ? basename( $_sot_scene_br_room1 ) : 'scene-black-rose-courtyard.webp';
+
 $rooms = array(
 
 	// Room 1 — Moonlit Courtyard.
 	array(
 		'name'     => esc_html__( 'Moonlit Courtyard', 'skyyrose' ),
-		'image'    => 'scene-black-rose-courtyard.webp',
+		'image'    => $_br_room1_image,
 		'products' => array(
 			skyyrose_immersive_product(
 				'br-006',

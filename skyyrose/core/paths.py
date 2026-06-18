@@ -44,6 +44,15 @@ WP_PRODUCTS_DIR: Path = WP_ASSETS_DIR / "images" / "products"
 WP_LOGOS_DIR: Path = WP_ASSETS_DIR / "images" / "logos"
 WP_LOCKUPS_DIR: Path = WP_ASSETS_DIR / "images" / "lockups"
 
+# ─── Product source assets (pipeline inputs — founder decision 2026-06-10:
+#     ONE location for product assets; nothing product-source lives outside) ──
+PRODUCT_ASSETS: Path = REPO_ROOT / "assets" / "products"
+PRODUCT_TECHFLATS: Path = PRODUCT_ASSETS / "techflats"  # split/, hero-overlays/
+PRODUCT_REFERENCES: Path = PRODUCT_ASSETS / "references"
+PRODUCT_SOURCE_PHOTOS: Path = PRODUCT_ASSETS / "source-photos"
+PRODUCT_MASTERS: Path = PRODUCT_ASSETS / "masters"  # locked master registry
+PRODUCT_LOGOS: Path = PRODUCT_ASSETS / "logos"  # colorway-correct logo render references
+
 # ─── Elite Studio canonical inputs ─────────────────────────────────────
 ELITE_STUDIO_ROOT: Path = REPO_ROOT / "skyyrose" / "elite_studio"
 GOLDEN_DIR: Path = ELITE_STUDIO_ROOT / "assets" / "golden"
@@ -102,6 +111,12 @@ def wp_product_path(filename: str) -> Path:
 
 __all__ = [
     "CATALOG_CSV",
+    "PRODUCT_ASSETS",
+    "PRODUCT_LOGOS",
+    "PRODUCT_MASTERS",
+    "PRODUCT_REFERENCES",
+    "PRODUCT_SOURCE_PHOTOS",
+    "PRODUCT_TECHFLATS",
     "DOSSIERS_DIR",
     "ELITE_STUDIO_ROOT",
     "GOLDEN_DIR",

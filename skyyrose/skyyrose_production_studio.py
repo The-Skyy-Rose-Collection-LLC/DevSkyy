@@ -66,7 +66,9 @@ from llm.model_ids import (
 
 APP_NAME = "skyyrose_production_studio"
 OVERRIDES_DIR = Path(__file__).parent / "assets" / "data" / "prompts" / "overrides"
-SOURCE_DIR = Path(__file__).parent / "assets" / "images" / "source-products"
+from skyyrose.core import paths as _paths
+
+SOURCE_DIR = _paths.PRODUCT_SOURCE_PHOTOS
 OUTPUT_DIR = Path(__file__).parent / "assets" / "images" / "products"
 
 # Initialize all provider clients

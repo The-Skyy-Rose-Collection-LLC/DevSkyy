@@ -6,10 +6,10 @@ logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-014-techflat.jpeg
+reference_image: assets/products/references/br-014-techflat.jpeg
 extra_references:
-  - data/product-references/br-014-real-front.jpeg
-  - data/product-references/br-014-real-back.jpeg
+  - assets/products/references/br-014-real-front.jpeg
+  - assets/products/references/br-014-real-back.jpeg
 inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 ---
 
@@ -23,9 +23,9 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - SR monogram:                   `data/brand-logos/sr-monogram.md`
-> - Product techflat:              `data/product-references/br-014-techflat.jpeg`
-> - Real product photos:           `data/product-references/br-014-real-front.jpeg`,
->                                  `data/product-references/br-014-real-back.jpeg`
+> - Product techflat:              `assets/products/references/br-014-techflat.jpeg`
+> - Real product photos:           `assets/products/references/br-014-real-front.jpeg`,
+>                                  `assets/products/references/br-014-real-back.jpeg`
 
 ### Front
 - **front-chest** (large, arched, ~9in wide): The phrase **"BLACK IS BEAUTIFUL"**
