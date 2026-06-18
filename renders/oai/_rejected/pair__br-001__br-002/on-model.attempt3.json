@@ -1,0 +1,12 @@
+{
+  "sku": "br-001",
+  "style": "on-model",
+  "view": "front",
+  "is_pair": true,
+  "attempt": 3,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The Black Rose logo on the crewneck is not embossed; instead, it appears to be a flat or printed version, and the joggers' logo colorway does not match the specified monochromatic scheme."
+}

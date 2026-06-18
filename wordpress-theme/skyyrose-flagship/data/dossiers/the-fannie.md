@@ -3,9 +3,9 @@ sku: lh-005
 name: The Fannie
 collection: love-hurts
 logo_reference: data/brand-logos/love-hurts-logo.md
-reference_image: data/product-references/lh-005-fannie-photo.jpeg
+reference_image: assets/products/references/lh-005-fannie-photo.jpeg
 extra_references:
-  - data/product-references/lh-005-fannie-mockup.jpeg
+  - assets/products/references/lh-005-fannie-mockup.jpeg
 ---
 
 # The Fannie
@@ -16,8 +16,8 @@ extra_references:
 
 > Logo art canonical references:
 > - Love Hurts logo (cursive script):  `data/brand-logos/love-hurts-logo.md` (only the cursive lettering style is referenced here — the full lockup with broken-heart is NOT on this bag)
-> - Product real photo:                 `data/product-references/lh-005-fannie-photo.jpeg`
-> - Product mockup:                     `data/product-references/lh-005-fannie-mockup.jpeg`
+> - Product real photo:                 `assets/products/references/lh-005-fannie-photo.jpeg`
+> - Product mockup:                     `assets/products/references/lh-005-fannie-mockup.jpeg`
 
 ### Front
 - **front-body** (the front face of the bag, ~6–8in wide): Solid **black pebbled faux-leather** fabric. **Technique:** stitched. **Color:** black.

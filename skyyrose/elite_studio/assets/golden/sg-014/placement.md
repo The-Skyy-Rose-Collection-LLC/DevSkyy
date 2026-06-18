@@ -5,32 +5,44 @@ _Collection: signature_
 Embroidered rose logo on the left thigh.
 
 ## Garment silhouette lock
-Athletic-cut full-length sweatpants — solid **white** body fabric with a **multi-color V-shape rainbow chevron color-block detail** at each upper-thigh / hip area + matching multi-color stripe band at the waistband and at each ankle cuff. White flat drawstring at the waistband, vertical slash hand pockets with **pink contrast piping**, slim athletic fit. Mid-weight cotton-fleece fabric. Pairs with the Mint & Lavender Hoodie (sg-006) as a matching set. **Sold as the sweatpants SKU only — the matching hoodie is sg-006, separate SKU.** NOT joggers (these are full-length sweatpants with the multi-color chevron, distinct from the simpler joggers in other SKUs). NOT shorts. NOT a track pant.
+Athletic-cut sweatpants with a tapered jogger leg and
+ribbed ankle cuffs — solid **mint green** body, front and back, all one mint
+color. Small lavender rose-cluster logo on the **wearer's left thigh** (upper
+thigh, below the hip). Elasticated drawstring waistband, side-seam hand
+pockets. Mid-weight cotton-fleece fabric. Pairs with the Mint & Lavender
+Hoodie (sg-006) as a matching set. **Sold as the sweatpants SKU only — the
+matching hoodie is sg-006, separate SKU.** NOT shorts. NOT track pants. NOT
+the white chevron windbreaker-set pants (that's sg-015 — a completely
+different product).
 
 ## Logo placements
 1. **black-roses-cloud-cluster** — position: `left_thigh`, technique: `embroidered`
 
 ## Render scene context (dossier)
-**Pose:** Front view straight-on showing the white body + V-chevron thigh stripes + small pink rose at center-waist + multi-color waistband stripe + multi-color ankle cuffs + slash pocket pink piping. Three-quarter view shows the chevron mirroring on each thigh. For the back: back view straight-on showing the clean white back panel with the multi-color waistband and ankle bands.
-**Setting:** Pure white studio backdrop, soft directional studio lighting from front-left, subtle natural drop shadow on the floor.
+**Pose:** Front view straight-on showing the solid mint legs, drawstring
+  waistband, side-seam pockets, small lavender rose-cluster on the wearer's
+  left thigh, and ribbed ankle cuffs. For the back: back view straight-on
+  showing the clean blank mint back panels and ankle cuffs.
+**Setting:** Pure white studio backdrop, soft directional studio lighting
+  from front-left, subtle natural drop shadow on the floor.
 
 ## Do NOT render
-- NO solid mint or solid lavender body — body is WHITE.
-- NO solid-color stripe band — the band is multi-color rainbow chevron.
-- NO black drawstring — drawstring is WHITE.
-- NO contrast-color body — body is solid white front and back.
-- NO chevron on the back — chevron decorations are on the FRONT thighs only.
-- NO solid-color cuffs or waistband — those areas have the stripe band.
-- NO contrast piping anywhere except on the slash pockets (pink piping).
-- NO Black Rose three-rose-cluster as a thigh emblem — the front-center small rose is light pink tonal.
-- NO Love Hurts canonical roses.
+- NO white body — the body is SOLID MINT GREEN, front and back.
+- NO rainbow chevron, NO multi-color stripe bands, NO color-block thigh panels —
+  that is the sg-015 windbreaker set, a different product.
+- NO rose at the center-front waistband — the rose-cluster sits on the
+  wearer's LEFT THIGH only, and nowhere else.
+- NO logo on the right thigh — left thigh only.
+- NO pink piping on the pockets — pockets are plain self-color side-seam pockets.
+- NO decoration on the back — back is blank mint.
+- NO back pockets.
+- NO red Love Hurts roses — the rose-cluster here is LAVENDER (Signature collection).
+- NO greyscale Black Rose treatment.
 - NO Authentic Collection patch.
-- NO Bridge Series photo print on the body.
-- NO printed graphics other than the sublimated chevron stripes and small pink rose.
+- NO Bridge Series photo print.
+- NO text or wordmark anywhere.
 - NO embossed/debossed decoration.
-- NO back pockets — only the two front slash hand pockets.
-- NO zipper closures on the pockets — open welt slash pockets.
-- NO ankle taper without a cuff — the pants terminate cleanly at the ribbed multi-color cuff at ankle level.
+- NO multi-color cuffs or waistband — all ribbing and elastication is self-color mint.
 
 ---
 _This file is auto-generated from the canonical sources_

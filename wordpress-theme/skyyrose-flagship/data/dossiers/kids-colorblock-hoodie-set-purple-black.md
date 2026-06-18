@@ -3,11 +3,9 @@ sku: kids-002
 name: Kids Colorblock Hoodie Set — Purple/Black
 collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
-extra_logos:
-  - data/brand-logos/black-rose-authentic-collection-patch.md
-reference_image: data/product-references/kids-002-techflat.jpeg
+reference_image: assets/products/references/kids-002-techflat.jpeg
 extra_references:
-  - data/product-references/kids-002-real-photo.jpeg
+  - assets/products/references/kids-002-real-photo.jpeg
 ---
 
 # Kids Colorblock Hoodie Set — Purple/Black
@@ -20,14 +18,12 @@ extra_references:
 
 > Logo art canonical references:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
-> - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
-> - Product techflat:              `data/product-references/kids-002-techflat.jpeg`
-> - Real product photo:            `data/product-references/kids-002-real-photo.jpeg`
+> - Product techflat:              `assets/products/references/kids-002-techflat.jpeg`
+> - Real product photo:            `assets/products/references/kids-002-real-photo.jpeg`
 
 ### Hoodie — Front
 - **front-body color-block** (entire front body): Angular geometric color-block construction with diagonal seams. **Upper-left panel** (descending from top-left toward center): **lavender / light pink-purple**. **Upper-right panel** (descending from top-right toward center): **medium purple**. **Lower body** (from the diagonal meeting points down to the hem, including the kangaroo pocket area): **deep / dark purple**. **Technique:** stitched. **Color:** lavender + medium purple + deep purple.
-- **front-left-chest** (small, ~2.5in tall, on the lavender panel): The Black Rose Authentic Collection patch — same multi-color patch as kids-001 (yellow field + navy text + MLB-style silhouette + white "AUTHENTIC" banner + red diamond divider + Yay Area footer). **Technique:** embroidered-patch.
-- **front-center-chest** (small, ~2in tall, just above the kangaroo pocket on the deep purple lower body): The Black Rose three-rose-cluster, rendered in greyscale (NOT canonical multi-color). **Technique:** embroidered. **Color:** white + black thread on deep purple.
+- **front-chest cluster** (ONLY mark on the hoodie front body; small, ~2in tall, on the CHEST — see the real product photo for exact position): The Black Rose three-rose-cluster, rendered in greyscale (NOT canonical multi-color). **Technique:** embroidered. **Color:** white + black + grey thread. NOTE: there is NO patch on the chest and NO logo on the stomach / lower body (above the kangaroo pocket) — the front body carries this single chest cluster and nothing else.
 
 ### Hoodie — Back
 - **back-body color-block**: Mirrors the front — the back has the same angular lavender/medium-purple upper panels and deep-purple lower body. **Technique:** stitched. **Color:** lavender + medium purple + deep purple.
@@ -35,7 +31,7 @@ extra_references:
 ### Hoodie — Sleeves / Hood / Hem / Other
 - **left-sleeve**: Solid **lavender / light pink-purple** to match the front-upper-left panel. **Technique:** stitched. **Color:** lavender.
 - **right-sleeve**: Solid **medium purple** to match the front-upper-right panel. **Technique:** stitched. **Color:** medium purple.
-- **left-sleeve patch / right-sleeve patch** (~2in diameter): Small circular rose-cluster patch (greyscale on circular patch backing). **Technique:** embroidered-patch.
+- **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve and its exact artwork): A small round embroidered patch. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
 - **hood**: Solid **lavender / light pink-purple** (matching the upper-left panel). **Technique:** stitched. **Color:** lavender.
 - **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white.
 - **kangaroo-pocket**: Deep purple front kangaroo pocket integrated into the lower-body panel.
@@ -45,8 +41,7 @@ extra_references:
 
 ### Sweatpants — Front
 - **pants-body**: Solid **deep / dark purple** sweatpants (NOT black — see catalog-name note above). **Technique:** stitched. **Color:** deep purple.
-- **pants-front-center / waistband-center** (small, ~2in tall): A small Black Rose three-rose-cluster (greyscale) embroidered at the center-front near the waistband. **Technique:** embroidered. **Color:** white + black thread on deep purple.
-- **right-thigh** (small, ~2in tall): A small Black Rose three-rose-cluster (greyscale) accent on the wearer's right thigh. **Technique:** embroidered. **Color:** white + black thread on deep purple.
+- **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on deep purple. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
 - **waistband-drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white.
@@ -65,14 +60,16 @@ extra_references:
 - NO decoration on the back-body — back is a clean color-block panel.
 - NO logos on the kangaroo pocket fabric.
 - NO Love Hurts logo on this product.
+- THE ONLY MARKS ON THIS SET: (1) ONE rose-cluster on the hoodie CHEST, (2) ONE round patch on ONE sleeve, (3) ONE rose-cluster on the pants. Nothing else.
 - NO multi-color (canonical) rose-cluster — greyscale only.
-- NO NFL / NBA / Hockey Championship patches — only the BLACK ROSE (MLB-style) Authentic Collection patch.
-- NO chest text or wordmark on the front body fabric.
+- NO patch on the CHEST — the chest carries ONLY the rose-cluster. NO MLB/NFL/NBA/Hockey "Authentic Collection" batter patch on the chest or body. (The single round SLEEVE patch is the only patch; render its art per the real product photo.)
+- NO logo on the stomach / lower body above the kangaroo pocket. NO second sleeve patch (one sleeve only; the other is plain). NO second pants cluster.
+- NO chest text or wordmark on the front body fabric — only the single chest rose-cluster.
 - NO pinstripes.
 - NO embossed/debossed decoration.
 - NO color-block on the sweatpants — pants are SOLID deep purple.
 
 ## Scene direction
 
-- **Pose:** Front view straight-on showing the lavender/purple color-block hoodie + chest patches + sleeve patches, with the matching deep-purple sweatpants laid below the hoodie.
+- **Pose:** Front view straight-on showing the lavender/purple color-block hoodie + the single chest rose-cluster + the single sleeve patch, with the matching deep-purple sweatpants (one rose-cluster) laid below the hoodie.
 - **Setting:** Pure white studio backdrop, soft directional studio lighting from front-left, subtle natural drop shadow on the floor.

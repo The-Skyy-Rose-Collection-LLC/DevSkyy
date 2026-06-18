@@ -313,11 +313,11 @@ def test_clean_catalog_has_no_violations(tmp_path: Path, monkeypatch: pytest.Mon
 
 
 def test_live_catalog_passes_strict_validation() -> None:
-    """Sanity: the actual assets/product-masters/catalog.yaml should load strict-clean."""
+    """Sanity: the actual assets/products/masters/catalog.yaml should load strict-clean."""
     from pathlib import Path as P
 
     repo_root = P(__file__).resolve().parents[3]
-    live = repo_root / "assets" / "product-masters" / "catalog.yaml"
+    live = repo_root / "assets" / "products" / "masters" / "catalog.yaml"
     if not live.is_file():
         pytest.skip("Live catalog.yaml not present in test environment")
     cat = Catalog.load(path=live, strict=True)

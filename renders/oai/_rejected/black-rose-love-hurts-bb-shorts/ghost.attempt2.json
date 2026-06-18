@@ -1,0 +1,12 @@
+{
+  "sku": "br-007",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The rendered garment features multiple logos and art elements that do not match the specified placements or colorways in the dossier ground truth, particularly on the left and right panels."
+}

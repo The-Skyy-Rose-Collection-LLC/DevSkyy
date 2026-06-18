@@ -1,0 +1,13 @@
+{
+  "sku": "br-001",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift",
+    "flat_render"
+  ],
+  "reason": "The rendered logo does not match the specified colorway and style of the Black Rose logo as per the specifications. It appears too flat and lacks the required dimensional embossing effect. Additionally, the elements of the branding, such as the clouds and leaves, do not align with the required detai"
+}

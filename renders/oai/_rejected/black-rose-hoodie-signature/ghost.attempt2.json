@@ -1,0 +1,12 @@
+{
+  "sku": "br-005",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The branding on the front-right-chest is incorrect; it shows a different logo instead of the required Black Rose logo as a silicone cut-out patch."
+}

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 
 import pytest
 
@@ -17,7 +16,6 @@ from pipelines.clothing_3d.reliability import (
     request_fingerprint,
 )
 from services.three_d.trellis.config import TrellisQualityPreset
-
 
 # =============================================================================
 # RetryPolicy
@@ -83,19 +81,25 @@ def test_retry_delay_grows_with_attempt() -> None:
 
 
 def test_fingerprint_stable_across_identical_requests() -> None:
-    a = PipelineRequest(prompt="hoodie", product_name="X", garment_type="hoodie",
-                        quality=TrellisQualityPreset.STANDARD)
-    b = PipelineRequest(prompt="hoodie", product_name="X", garment_type="hoodie",
-                        quality=TrellisQualityPreset.STANDARD,
-                        correlation_id="differs")
+    a = PipelineRequest(
+        prompt="hoodie",
+        product_name="X",
+        garment_type="hoodie",
+        quality=TrellisQualityPreset.STANDARD,
+    )
+    b = PipelineRequest(
+        prompt="hoodie",
+        product_name="X",
+        garment_type="hoodie",
+        quality=TrellisQualityPreset.STANDARD,
+        correlation_id="differs",
+    )
     assert request_fingerprint(a) == request_fingerprint(b)
 
 
 def test_fingerprint_changes_with_quality() -> None:
-    a = PipelineRequest(prompt="hoodie", product_name="X",
-                        quality=TrellisQualityPreset.DRAFT)
-    b = PipelineRequest(prompt="hoodie", product_name="X",
-                        quality=TrellisQualityPreset.PRODUCTION)
+    a = PipelineRequest(prompt="hoodie", product_name="X", quality=TrellisQualityPreset.DRAFT)
+    b = PipelineRequest(prompt="hoodie", product_name="X", quality=TrellisQualityPreset.PRODUCTION)
     assert request_fingerprint(a) != request_fingerprint(b)
 
 
@@ -152,9 +156,7 @@ async def test_idempotency_disabled_passthrough() -> None:
     async def runner(_req):
         nonlocal runs
         runs += 1
-        return PipelineResult(
-            status=PipelineStatus.SUCCEEDED, artifact_id="x", correlation_id="c"
-        )
+        return PipelineResult(status=PipelineStatus.SUCCEEDED, artifact_id="x", correlation_id="c")
 
     cache = IdempotencyCache(enabled=False)
     req = PipelineRequest(prompt="x", product_name="x")

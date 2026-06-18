@@ -14,6 +14,7 @@ skipped, never rendered as an incomplete image.
 from __future__ import annotations
 
 import csv
+import functools
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -59,10 +60,17 @@ def load_catalog() -> dict[str, dict]:
 # ── Authoritative SKU → {front, back} garment source map ────────────────────
 # Ported verbatim from nano_banana/source_map.py. ``S`` = split techflats,
 # ``P`` = original product photos.
+@functools.lru_cache(maxsize=1)
 def get_source_map() -> dict[str, dict[str, Path | None]]:
-    """Return the complete SKU → {front, back} garment image mapping."""
+    """Return the complete SKU → {front, back} garment image mapping.
+
+    Memoized: the map is built from static ``config`` path constants, so it is
+    reconstructed once per process rather than on every ``build_references`` /
+    ``requires_patch`` / ``find_flatlay_photo`` call (was ~3x per SKU per batch).
+    """
     s = config.SPLIT_DIR
     p = config.PRODUCTS_DIR
+    sp = config.PRODUCT_SOURCE_PHOTOS_DIR
     return {
         # ── BLACK ROSE ──
         "br-001": {
@@ -90,7 +98,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": p / "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
             "back": None,
         },
-        "br-006": {"front": p / "black-rose-sherpa-jacket-sherpa-product.jpg", "back": None},
+        "br-006": {
+            "front": p / "black-rose-sherpa-jacket-sherpa-product.jpg",
+            "back": p / "black-rose-sherpa-jacket-back.jpg",
+        },
         "br-007": {"front": p / "br-007-real-front.jpg", "back": p / "br-007-real-back.jpg"},
         "br-008": {
             "front": s / "black-rose" / "br-jersey-football-sf-front.jpeg",
@@ -119,6 +130,7 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": s / "love-hurts" / "lh-bomber-front.jpeg",
             "back": s / "love-hurts" / "lh-bomber-back.jpeg",
         },
+        "lh-005": {"front": p / "the-fannie-pack-photo.jpg", "back": None},
         "lh-006": {"front": p / "lh-006-joggers-white.jpeg", "back": None},
         # ── SIGNATURE ──
         "sg-001": {
@@ -134,7 +146,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back": s / "signature" / "sg-bridge-shorts-golden-back.jpeg",
         },
         "sg-004": {"front": p / "signature-hoodie-techflat.jpeg", "back": None},
-        "sg-005": {"front": p / "bay-bridge-shirt-front.jpg", "back": None},
+        "sg-005": {
+            "front": sp / "signature" / "sg-005-bay-bridge-shirt-front-authentic.jpg",
+            "back": None,
+        },
         "sg-006": {"front": s / "signature" / "sg-mint-lav-hoodie-front.jpeg", "back": None},
         "sg-007": {"front": s / "signature" / "sg-beanie-purple.jpeg", "back": None},
         "sg-009": {"front": p / "sherpa-jacket-front.jpg", "back": None},
@@ -172,15 +187,23 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
 def _collection_logos() -> dict[str, Path]:
     o = config.OVERLAYS_DIR
     return {
-        "black-rose": o / "br-brand-script.png",
+        # Black Rose non-jersey products carry the three-rose-cluster (greyscale),
+        # per every dossier's logo_reference. (Jerseys override to sport patches
+        # in _sku_logo_refs.) The old br-brand-script.png default was the wrong
+        # mark — it made the model render a "BR" wordmark instead of the cluster.
+        "black-rose": config.LOGOS_DIR / "three-rose-cluster-greyscale.png",
         "love-hurts": o / "lh-logo-combined.png",
         "signature": o / "sig-brand-skyy-rose-gold.png",
     }
 
 
 def _sku_logo_refs() -> dict[str, Path]:
+    # RUNTIME SOURCE OF TRUTH for SKU→logo. The colorway assignments below mirror
+    # logo-registry.json::three_rose_cluster_colorways (documentation). Keep in
+    # sync: adding a colorway SKU here means updating the registry's variants too.
     o = config.OVERLAYS_DIR
     t = config.TECHFLATS_DIR
+    cw = config.LOGOS_DIR  # colorway-correct three-rose-cluster references
     return {
         # Black Rose jerseys → sport patches (the elements that were going missing)
         "br-008": o / "br-patch-nfl-football.png",
@@ -193,9 +216,21 @@ def _sku_logo_refs() -> dict[str, Path]:
         "br-015": o / "br-patch-mlb-baseball.png",
         # Love Hurts — graffiti script
         "lh-004": t / "love-hurts" / "logo-love.jpeg",
-        # Signature — gold script
-        "sg-011": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
-        "sg-012": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
+        # NOTE: sg-011 / sg-012 (Original Label Tees) intentionally carry NO logo —
+        # see _NO_LOGO_SKUS. Founder-confirmed 2026-06-16: blank tees, neck label only.
+        # Signature — three-rose-cluster recolored per the founder-approved
+        # colorway (2026-06-11). Attaching a colorway-correct reference makes the
+        # model copy the right rose color instead of inferring it from text.
+        "sg-002": cw / "three-rose-cluster-purple.png",  # 'Stay Golden' Shirt
+        "sg-005": cw / "three-rose-cluster-blue-cyan.png",  # 'Bay Bridge' Shirt
+        # Bridge shorts carry the bottom-left embroidered rose-cluster (NOT the gold
+        # brand script the collection fallback would attach). Colorway pairs with the
+        # matching shirt: Bay Bridge=blue (day), Stay Golden=purple (night). 2026-06-16.
+        "sg-001": cw / "three-rose-cluster-blue-cyan.png",  # 'Bay Bridge' Shorts (day, blue rose)
+        "sg-003": cw / "three-rose-cluster-purple.png",  # 'Stay Golden' Shorts (night, purple rose)
+        "sg-006": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Hoodie
+        "sg-014": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Sweatpants
+        "sg-007": cw / "three-rose-cluster-greyscale.png",  # Signature Beanie
     }
 
 
@@ -277,8 +312,16 @@ def get_pairs_for_sku(sku: str) -> list[Pair]:
     return [p for p in PAIRS if sku in p.skus]
 
 
+# Blank-canvas SKUs with NO exterior logo (founder-confirmed 2026-06-16): the
+# Original Label Tees carry no chest mark, no sleeve badge, no print — only an
+# interior neck label. They must NOT receive a SKU or collection logo composite.
+_NO_LOGO_SKUS = frozenset({"sg-011", "sg-012"})
+
+
 def get_logo_reference(sku: str, collection: str) -> Path | None:
     """Return the logo/patch reference for a SKU. SKU-specific > collection default."""
+    if sku in _NO_LOGO_SKUS:
+        return None
     sku_refs = _sku_logo_refs()
     if sku in sku_refs:
         path = sku_refs[sku]
@@ -293,7 +336,7 @@ def get_logo_reference(sku: str, collection: str) -> Path | None:
 def find_flatlay_photo(sku: str) -> Path | None:
     """Find a real product photo for a SKU (ground truth) in product-references/.
 
-    Searches the curated ``data/product-references/`` first, then the theme
+    Searches the curated ``assets/products/references/`` first, then the theme
     products dir, excluding generated renders.
     """
     # Sibling SKUs that extend this one (e.g. kids-001 → kids-001-joggers); their

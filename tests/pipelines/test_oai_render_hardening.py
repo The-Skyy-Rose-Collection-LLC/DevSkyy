@@ -359,9 +359,98 @@ def test_qc_schema_gates_flat_renders():
     assert "photorealistic_not_flat" in qc._JUDGE_SCHEMA["schema"]["required"]
 
 
-def test_contaminated_mint_lavender_skus_excluded():
-    assert "sg-006" in config.EXCLUDED_SKUS
-    assert "sg-014" in config.EXCLUDED_SKUS
+def test_mint_lavender_skus_render_again_with_clean_dossiers():
+    # bug-119 regression guard: the contamination was cleared 2026-06-10 by
+    # re-authoring both dossiers from the real mint garments. These SKUs must
+    # stay renderable, and their dossiers must never drift back to the
+    # windbreaker-set design (white body + rainbow chevron zip-up).
+    assert "sg-006" not in config.EXCLUDED_SKUS
+    assert "sg-014" not in config.EXCLUDED_SKUS
+    for slug, garment in (
+        ("mint-lavender-hoodie", "PULLOVER"),
+        ("mint-lavender-sweatpants", "sweatpants"),
+    ):
+        text = (config.DOSSIER_DIR / f"{slug}.md").read_text(encoding="utf-8")
+        lock = text.split("**Garment type lock:**", 1)[1].split("##", 1)[0]
+        assert garment in lock
+        assert "mint green" in lock
+        # exact phrasing the contaminated dossiers used for the wrong garment
+        assert "solid **white**" not in lock
+        assert "rainbow chevron color-block" not in lock
+        assert "zip-up hoodie" not in lock.lower()
+
+
+def test_extract_view_branding_returns_per_view_sections():
+    from scripts.oai_render.prompt import extract_view_branding
+
+    dossier = (
+        "# X\n## Branding\n### Front\n- **front-chest**: rose art. Color: red.\n"
+        "### Back\n- **back-body**: Solid, no decoration.\n"
+        "## Negative\n- NO stripes\n"
+    )
+    front = extract_view_branding(dossier, "front")
+    back = extract_view_branding(dossier, "back")
+    assert "front-chest" in front and "back-body" not in front
+    assert "no decoration" in back and "rose art" not in back
+    assert "NO stripes" not in back  # stops at the next ## section
+    assert extract_view_branding(None, "front") == ""
+    assert extract_view_branding(dossier, "sideways") == ""
+
+
+def test_qc_judge_receives_dossier_branding_ground_truth():
+    # bug: blank-back garments were failed for "missing branding" because the
+    # judge only saw front/logo references. The judge must receive the
+    # dossier's per-view spec and be told blank panels are correct.
+    from scripts.oai_render import pipeline, references
+    from scripts.oai_render.qc import _judge_instructions
+
+    catalog = references.load_catalog()
+    dossiers = references.build_dossier_index()
+    plan = pipeline.plan_sku("sg-006", catalog, dossiers, style="ghost", view="front")
+    exp = pipeline.expectation_for(plan)
+    assert exp.branding_spec  # flowed from the dossier
+    text = _judge_instructions(exp)
+    # Behavior (not exact wording): the dossier's per-view spec reaches the judge,
+    # and blank panels are explicitly NOT failed for "missing branding".
+    assert exp.branding_spec in text
+    assert "blank" in text.lower() and "absence" in text.lower()
+
+
+def test_founder_keeper_assets_skip_their_plan(tmp_path, monkeypatch):
+    # tasks/mockup-render-inventory.md keep pass: a checked keeper drops its
+    # exact (sku, style, view) plan from the batch — direct cost savings.
+    import json
+
+    from scripts.oai_render import pipeline, references
+
+    # A keeper must name an asset that exists on disk to be honored (else it
+    # would silently block the re-render of a product whose "kept" image is gone).
+    keeper_asset = tmp_path / "sg-009-keeper.webp"
+    keeper_asset.write_bytes(b"fake-image")
+    monkeypatch.setattr(config, "PROJECT_ROOT", tmp_path)
+    kj = tmp_path / "render-keepers.json"
+    kj.write_text(
+        json.dumps(
+            {
+                "keepers": [
+                    {
+                        "sku": "sg-009",
+                        "style": "on-model",
+                        "view": "front",
+                        "asset": "sg-009-keeper.webp",
+                        "founder_note": "good render, save it",
+                    }
+                ]
+            }
+        )
+    )
+    monkeypatch.setattr(config, "KEEPERS_JSON", kj)
+    catalog = references.load_catalog()
+    dossiers = references.build_dossier_index()
+    result = pipeline.run(["sg-009"], catalog, dossiers, styles=["ghost", "on-model"], dry_run=True)
+    combos = {(p.sku, p.style, p.view) for p in result["plans"]}
+    assert ("sg-009", "on-model", "front") not in combos
+    assert ("sg-009", "ghost", "front") in combos  # only the keeper plan drops
 
 
 def test_pair_with_excluded_member_falls_back_to_solo(monkeypatch):

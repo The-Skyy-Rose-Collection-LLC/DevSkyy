@@ -3,7 +3,7 @@ sku: br-004
 name: BLACK Rose Hoodie
 collection: black-rose
 logo_reference: data/brand-logos/three-rose-cluster.md
-reference_image: data/product-references/br-004-hoodie-real-front.jpeg
+reference_image: assets/products/references/br-004-hoodie-real-front.jpeg
 ---
 
 # BLACK Rose Hoodie
@@ -14,7 +14,7 @@ reference_image: data/product-references/br-004-hoodie-real-front.jpeg
 
 > Logo art canonical reference:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
-> - Reference photo:                `data/product-references/br-004-hoodie-real-front.jpeg`
+> - Reference photo:                `assets/products/references/br-004-hoodie-real-front.jpeg`
 
 ### Front
 - **front-chest** (~5–6in tall, centered just above the kangaroo pocket):

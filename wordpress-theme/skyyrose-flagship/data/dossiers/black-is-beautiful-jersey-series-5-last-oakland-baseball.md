@@ -8,7 +8,7 @@ logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-012-techflat.jpeg
+reference_image: assets/products/references/br-012-techflat.jpeg
 ---
 
 # BLACK is Beautiful Jersey Series — 5. Baseball Classic (Last Oakland)

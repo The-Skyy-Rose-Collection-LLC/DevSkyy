@@ -1,12 +1,12 @@
 {
-  "$schema": "Canonical logo registry for the SkyyRose imagery pipeline. Logos with `co_located_per_sku: true` are resolved at consumption time via `assets/images/products/<sku-folder>/<filename>` \u2014 the sku-folder is the canonical render_output_slug from skyyrose-catalog.csv. All other logos live in assets/images/logos/. Every SKU's logo placements are defined here, cross-checked with skyyrose-catalog.csv::branding_spec during pre-flight. Edit both files together when adding a logo or reassigning placements.",
-  "version": 5,
-  "updated": "2026-05-27",
+  "$schema": "Canonical logo registry for the SkyyRose imagery pipeline. Logos with `co_located_per_sku: true` are resolved at consumption time via `assets/images/products/<sku-folder>/<filename>` — the sku-folder is the canonical render_output_slug from skyyrose-catalog.csv. All other logos live in assets/images/logos/. Every SKU's logo placements are defined here, cross-checked with skyyrose-catalog.csv::branding_spec during pre-flight. Edit both files together when adding a logo or reassigning placements.",
+  "version": 6,
+  "updated": "2026-06-11",
   "brand_primary": "sr-monogram-rose-gold",
   "logos": {
     "sr-monogram-rose-gold": {
       "file": "sr-monogram-rose-gold.jpeg",
-      "description": "SKYYROSE BRAND PRIMARY LOGO (site-wide). Rose-gold metallic SR monogram with stylized rose flourish. Use in header, footer, favicon, loading states, mobile menu. ALSO used as embroidered placement on br-005 (Black Rose Hoodie \u2014 Signature Edition) at right chest. Confirmed brand primary 2026-05-24.",
+      "description": "SKYYROSE BRAND PRIMARY LOGO (site-wide). Rose-gold metallic SR monogram with stylized rose flourish. Use in header, footer, favicon, loading states, mobile menu. ALSO used as embroidered placement on br-005 (Black Rose Hoodie — Signature Edition) at right chest. Confirmed brand primary 2026-05-24.",
       "primary_color": "#B76E79",
       "recolor_allowed": true,
       "site_wide": true
@@ -26,7 +26,7 @@
     },
     "black-roses-cloud-cluster": {
       "file": "black-roses-cloud-cluster.jpeg",
-      "description": "BLACK ROSE COLLECTION LOGO. Cluster of gray/black roses with green thorns emerging from clouds. 'Black Is Beautiful Series' signature rose imagery \u2014 used on NBA/NFL/MLB authentic-collection cards and as embroidered motif on Black Rose jerseys. Rendered in colorway-shifted variants (lavender, blue, purple, red) on collection-specific pieces; recolor is applied at render time, not to the source file.",
+      "description": "BLACK ROSE COLLECTION LOGO. Cluster of gray/black roses with green thorns emerging from clouds. 'Black Is Beautiful Series' signature rose imagery — used on NBA/NFL/MLB authentic-collection cards and as embroidered motif on Black Rose jerseys. Rendered in colorway-shifted variants (lavender, blue, purple, red) on collection-specific pieces; recolor is applied at render time, not to the source file.",
       "primary_color": "#2F2F2F",
       "recolor_allowed": false,
       "collection": "black_rose"
@@ -40,14 +40,14 @@
     },
     "heart-rose-composite": {
       "file": "heart-rose-composite.jpeg",
-      "description": "LOVE HURTS COLLECTION LOGO. Red heart wrapped in thorns with roses emerging from the top, blood splatters. The Love Hurts 'heart-and-rose' composite logo. Canonical use (per founder 2026-05-27): lh-002 + lh-006 (LH joggers, left thigh), lh-004 (bomber, back centered middle), lh-005 (Fannie, dot of 'i' in 'Fannie' lettering). NOT on lh-003 (basketball shorts) and NOT on lh-004 inside hood \u2014 those use red-roses-cloud-cluster.",
+      "description": "LOVE HURTS COLLECTION LOGO. Red heart wrapped in thorns with roses emerging from the top, blood splatters. The Love Hurts 'heart-and-rose' composite logo. Canonical use (per founder 2026-05-27): lh-002 + lh-006 (LH joggers, left thigh), lh-004 (bomber, back centered middle), lh-005 (Fannie, dot of 'i' in 'Fannie' lettering). NOT on lh-003 (basketball shorts) and NOT on lh-004 inside hood — those use red-roses-cloud-cluster.",
       "primary_color": "#DC143C",
       "recolor_allowed": false,
       "collection": "love_hurts"
     },
     "love-hurts-full-lettering": {
       "file": "love-hurts-full-lettering.jpeg",
-      "description": "LOVE HURTS WORDMARK. Full 'Love Hurts' graffiti lettering with heart+thorns composite integrated. Used as large sublimated element on Love Hurts basketball shorts + Black Rose \u00d7 Love Hurts shorts, and as front lettering on Love Hurts bomber.",
+      "description": "LOVE HURTS WORDMARK. Full 'Love Hurts' graffiti lettering with heart+thorns composite integrated. Used as large sublimated element on Love Hurts basketball shorts + Black Rose × Love Hurts shorts, and as front lettering on Love Hurts bomber.",
       "primary_color": "#DC143C",
       "recolor_allowed": false,
       "collection": "love_hurts"
@@ -69,7 +69,7 @@
     "nba-authentic-collection-card": {
       "filename": "nba-authentic-collection-card.jpeg",
       "co_located_per_sku": true,
-      "description": "'BLACK ROSE NBA AUTHENTIC COLLECTION' card graphic \u2014 navy lettering on yellow ground, NBA logo, 'Property Of Black Is Beautiful Series' tagline. Used as custom basketball-style patch on BLACK Is Beautiful Jersey Series basketball SKUs. Resolved per-SKU at `products/<sku-folder>/nba-authentic-collection-card.<fmt>` \u2014 see sku_logos for placement.",
+      "description": "'BLACK ROSE NBA AUTHENTIC COLLECTION' card graphic — navy lettering on yellow ground, NBA logo, 'Property Of Black Is Beautiful Series' tagline. Used as custom basketball-style patch on BLACK Is Beautiful Jersey Series basketball SKUs. Resolved per-SKU at `products/<sku-folder>/nba-authentic-collection-card.<fmt>` — see sku_logos for placement.",
       "primary_color": "#F5B93C",
       "recolor_allowed": false,
       "category": "sport_patch"
@@ -77,7 +77,7 @@
     "nfl-authentic-collection-card": {
       "filename": "nfl-authentic-collection-card.jpeg",
       "co_located_per_sku": true,
-      "description": "'BLACK ROSE NFL AUTHENTIC COLLECTION' card graphic \u2014 navy lettering on yellow ground, NFL logo, 'Property Of Black Is Beautiful Series' tagline. Used as custom football-style patch (bottom-left corner) on BLACK Is Beautiful Jersey Series football SKUs. Resolved per-SKU at `products/<sku-folder>/nfl-authentic-collection-card.<fmt>` \u2014 see sku_logos for placement.",
+      "description": "'BLACK ROSE NFL AUTHENTIC COLLECTION' card graphic — navy lettering on yellow ground, NFL logo, 'Property Of Black Is Beautiful Series' tagline. Used as custom football-style patch (bottom-left corner) on BLACK Is Beautiful Jersey Series football SKUs. Resolved per-SKU at `products/<sku-folder>/nfl-authentic-collection-card.<fmt>` — see sku_logos for placement.",
       "primary_color": "#F5B93C",
       "recolor_allowed": false,
       "category": "sport_patch"
@@ -85,14 +85,14 @@
     "mlb-authentic-collection-card": {
       "filename": "mlb-authentic-collection-card.jpeg",
       "co_located_per_sku": true,
-      "description": "'BLACK ROSE MLB AUTHENTIC COLLECTION' card graphic \u2014 navy lettering on yellow ground, MLB logo, 'Authentic Collection' banner. Ornate footer with 'Members only \u2014 Yay Area, Ca', Skyy Rose Collection script logo with moon, and 'Made for Kings ang Queens' tagline. Used as custom baseball-style patch on BLACK Is Beautiful Jersey Series baseball SKUs. Resolved per-SKU at `products/<sku-folder>/mlb-authentic-collection-card.<fmt>` \u2014 see sku_logos for placement.",
+      "description": "'BLACK ROSE MLB AUTHENTIC COLLECTION' card graphic — navy lettering on yellow ground, MLB logo, 'Authentic Collection' banner. Ornate footer with 'Members only — Yay Area, Ca', Skyy Rose Collection script logo with moon, and 'Made for Kings ang Queens' tagline. Used as custom baseball-style patch on BLACK Is Beautiful Jersey Series baseball SKUs. Resolved per-SKU at `products/<sku-folder>/mlb-authentic-collection-card.<fmt>` — see sku_logos for placement.",
       "primary_color": "#F5B93C",
       "recolor_allowed": false,
       "category": "sport_patch"
     },
     "skyy-rose-collection-circular-patch": {
       "file": "skyy-rose-collection-circular-patch.jpeg",
-      "description": "KIDS CAPSULE LOGO. 'SKYY ROSE COLLECTION' circular patch \u2014 white/gray ground with black 'SKYY ROSE' arched on top + 'COLLECTION' arched on bottom, detailed black rose bouquet emerging from cloud in center. Used on right arm of Kids Capsule hoodie sets.",
+      "description": "KIDS CAPSULE LOGO. 'SKYY ROSE COLLECTION' circular patch — white/gray ground with black 'SKYY ROSE' arched on top + 'COLLECTION' arched on bottom, detailed black rose bouquet emerging from cloud in center. Used on right arm of Kids Capsule hoodie sets.",
       "primary_color": "#FFFFFF",
       "recolor_allowed": false,
       "collection": "kids_capsule"
@@ -100,7 +100,7 @@
     "hockey-championship-card": {
       "filename": "hockey-championship-card.jpeg",
       "co_located_per_sku": true,
-      "description": "'BLACK ROSE HOCKEY CHAMPIONSHIP COLLECTION' card graphic \u2014 gray/silver ground, navy lettering, hockey shield with crossed sticks + puck. Minimalist design (no 'Property Of' footer). Used as custom hockey-style patch on BLACK Is Beautiful Jersey Series hockey SKUs (Sharks Edition). Resolved per-SKU at `products/<sku-folder>/hockey-championship-card.<fmt>` \u2014 see sku_logos for placement.",
+      "description": "'BLACK ROSE HOCKEY CHAMPIONSHIP COLLECTION' card graphic — gray/silver ground, navy lettering, hockey shield with crossed sticks + puck. Minimalist design (no 'Property Of' footer). Used as custom hockey-style patch on BLACK Is Beautiful Jersey Series hockey SKUs (Sharks Edition). Resolved per-SKU at `products/<sku-folder>/hockey-championship-card.<fmt>` — see sku_logos for placement.",
       "primary_color": "#8A8F99",
       "recolor_allowed": false,
       "category": "sport_patch"
@@ -140,7 +140,7 @@
       ]
     },
     "br-003": {
-      "name": "BLACK Is Beautiful Jersey Series: 0 \u2014 Baseball Classic (Black)",
+      "name": "BLACK Is Beautiful Jersey Series: 0 — Baseball Classic (Black)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -167,7 +167,7 @@
       ]
     },
     "br-005": {
-      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "name": "BLACK Rose Hoodie — Signature Edition",
       "placements": [
         {
           "logo_id": "sr-monogram-rose-gold",
@@ -233,7 +233,7 @@
       "front_text_technique": "tackle_twill_cut_out"
     },
     "br-008": {
-      "name": "BLACK Is Beautiful Jersey Series: 1 \u2014 SF Inspired (Red Football)",
+      "name": "BLACK Is Beautiful Jersey Series: 1 — SF Inspired (Red Football)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -247,7 +247,7 @@
           "position": "back_number_0",
           "technique": "stitched",
           "colorway": "rose_gold",
-          "notes": "Reversed on back \u2014 '8' is plain, '0' has the rose cluster fill."
+          "notes": "Reversed on back — '8' is plain, '0' has the rose cluster fill."
         },
         {
           "logo_id": "nfl-authentic-collection-card",
@@ -258,7 +258,7 @@
       "jersey_number": "80"
     },
     "br-009": {
-      "name": "BLACK Is Beautiful Jersey Series: 2 \u2014 Last Oakland (White Football)",
+      "name": "BLACK Is Beautiful Jersey Series: 2 — Last Oakland (White Football)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -272,7 +272,7 @@
           "position": "back_number_2",
           "technique": "stitched",
           "colorway": "rose_gold",
-          "notes": "Reversed on back \u2014 '3' is plain, '2' has the rose cluster fill."
+          "notes": "Reversed on back — '3' is plain, '2' has the rose cluster fill."
         },
         {
           "logo_id": "nfl-authentic-collection-card",
@@ -283,7 +283,7 @@
       "jersey_number": "32"
     },
     "br-010": {
-      "name": "BLACK Is Beautiful Jersey Series: 3 \u2014 The Bay (Basketball)",
+      "name": "BLACK Is Beautiful Jersey Series: 3 — The Bay (Basketball)",
       "placements": [
         {
           "logo_id": "nba-authentic-collection-card",
@@ -291,22 +291,22 @@
           "technique": "custom_basketball_patch"
         }
       ],
-      "notes": "User confirmed: vision pipeline produced a good first render \u2014 preserve existing spec."
+      "notes": "User confirmed: vision pipeline produced a good first render — preserve existing spec."
     },
     "br-011": {
-      "name": "BLACK Is Beautiful Jersey Series: 4 \u2014 The Rose / Sharks Edition (Hockey)",
+      "name": "BLACK Is Beautiful Jersey Series: 4 — The Rose / Sharks Edition (Hockey)",
       "placements": [
         {
           "logo_id": "hockey-championship-card",
           "position": "front_patch",
           "technique": "custom_hockey_patch",
-          "notes": "Hockey Championship card \u2014 different visual style from NBA/NFL cards (gray ground, shield with sticks+puck, minimalist)."
+          "notes": "Hockey Championship card — different visual style from NBA/NFL cards (gray ground, shield with sticks+puck, minimalist)."
         }
       ],
-      "notes": "User confirmed: vision did a good job on the first render of this \u2014 preserve existing."
+      "notes": "User confirmed: vision did a good job on the first render of this — preserve existing."
     },
     "br-012": {
-      "name": "BLACK Is Beautiful Jersey Series: 5 \u2014 Baseball Classic (Last Oakland)",
+      "name": "BLACK Is Beautiful Jersey Series: 5 — Baseball Classic (Last Oakland)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -323,7 +323,7 @@
       "front_text_notes": "'A' of BLACK in black lettering, remainder of BLACK IS BEAUTIFUL in gold lettering."
     },
     "br-014": {
-      "name": "BLACK Is Beautiful Jersey Series: 0 \u2014 Baseball Classic (Giants)",
+      "name": "BLACK Is Beautiful Jersey Series: 0 — Baseball Classic (Giants)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -338,10 +338,10 @@
         }
       ],
       "front_text": "BLACK IS BEAUTIFUL",
-      "colorway_notes": "Giants colorway \u2014 black and orange accents."
+      "colorway_notes": "Giants colorway — black and orange accents."
     },
     "br-015": {
-      "name": "BLACK Is Beautiful Jersey Series: 0 \u2014 Baseball Classic (White)",
+      "name": "BLACK Is Beautiful Jersey Series: 0 — Baseball Classic (White)",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -551,12 +551,12 @@
     "sg-011": {
       "name": "Original Label Tee (White)",
       "placements": [],
-      "notes": "Plain tee \u2014 no logo placements. Confirmed 2026-04-20."
+      "notes": "Plain tee — no logo placements. Confirmed 2026-04-20."
     },
     "sg-012": {
       "name": "Original Label Tee (Orchid)",
       "placements": [],
-      "notes": "Plain tee \u2014 no logo placements. Confirmed 2026-04-20."
+      "notes": "Plain tee — no logo placements. Confirmed 2026-04-20."
     },
     "sg-013": {
       "name": "Mint & Lavender Crewneck",
@@ -607,7 +607,7 @@
       "notes": "rose-gold-rose + red-roses-cloud-cluster are the Signature collection logo system. Tech flat at sg-015-windbreaker-set.jpg is wired as render source."
     },
     "kids-001": {
-      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "name": "Kids Colorblock Hoodie Set — Red/Black",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -629,7 +629,7 @@
       ]
     },
     "kids-002": {
-      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "name": "Kids Colorblock Hoodie Set — Purple/Black",
       "placements": [
         {
           "logo_id": "black-roses-cloud-cluster",
@@ -669,8 +669,8 @@
       "version": 4,
       "date": "2026-05-25",
       "changes": [
-        "Retired br-013 (Baseball Classic Oakland Edition) \u2014 confirmed duplicate of br-003. The 4 MLB-patched baseball jerseys are now br-003 (Black), br-012 (Last Oakland), br-014 (Giants), br-015 (White).",
-        "Renamed for catalog-naming consistency: br-003 \u2192 '(Black)', br-012 \u2192 'Baseball Classic (Last Oakland)', br-014/015 dropped 'Edition' suffix. Only city-affiliated colorways carry parenthetical names beyond the color descriptor."
+        "Retired br-013 (Baseball Classic Oakland Edition) — confirmed duplicate of br-003. The 4 MLB-patched baseball jerseys are now br-003 (Black), br-012 (Last Oakland), br-014 (Giants), br-015 (White).",
+        "Renamed for catalog-naming consistency: br-003 → '(Black)', br-012 → 'Baseball Classic (Last Oakland)', br-014/015 dropped 'Edition' suffix. Only city-affiliated colorways carry parenthetical names beyond the color descriptor."
       ]
     },
     {
@@ -678,9 +678,9 @@
       "date": "2026-05-25",
       "changes": [
         "Sport patches (nfl/nba/mlb/hockey) moved out of assets/images/logos/ and co-located in each using SKU's product folder. Logo entries use `co_located_per_sku: true` flag; consumers resolve via `assets/images/products/<sku_folders[sku]>/<filename>`.",
-        "Added sku_folders block as canonical SKU \u2192 product-folder map for sports patches.",
-        "Added br-013, br-014, br-015 sku_logos entries (Baseball Classic Oakland/Giants/White Editions) \u2014 each with mlb-authentic-collection-card front_patch.",
-        "Corrected red-roses-cloud-cluster description \u2014 it is a SIGNATURE COLLECTION LOGO (paired with rose-gold-rose), not a Love Hurts variant. Used only on sg-009.",
+        "Added sku_folders block as canonical SKU → product-folder map for sports patches.",
+        "Added br-013, br-014, br-015 sku_logos entries (Baseball Classic Oakland/Giants/White Editions) — each with mlb-authentic-collection-card front_patch.",
+        "Corrected red-roses-cloud-cluster description — it is a SIGNATURE COLLECTION LOGO (paired with rose-gold-rose), not a Love Hurts variant. Used only on sg-009.",
         "Corrected lh-003 + lh-004 placements that referenced red-roses-cloud-cluster: replaced with heart-rose-composite (the actual Love Hurts collection LOGO). Affects lh-003 all_over + mesh_side_panels, and lh-004 inside_hood.",
         "Added `collection` field to logos to make Signature/Black Rose/Love Hurts/Kids Capsule ownership explicit.",
         "Added `category` field to sport patches for compositor classification."
@@ -690,8 +690,46 @@
       "version": 3,
       "date": "2026-05-24",
       "changes": [
-        "sr-monogram-rose-gold designated brand-primary (site-wide) \u2014 header, footer, favicon, loading states."
+        "sr-monogram-rose-gold designated brand-primary (site-wide) — header, footer, favicon, loading states."
       ]
     }
-  ]
+  ],
+  "three_rose_cluster_colorways": {
+    "_note": "Colorway-correct render references derived from the canonical three-rose-cluster base via selective petal recolor (scripts/recolor_rose_cluster.py). Attached as references at render time so the model copies the right rose color. Base art is greyscale; recolor preserves green stems, cloud, and petal shading. Wired per SKU in scripts/oai_render/references.py::_sku_logo_refs.",
+    "base": "data/brand-logos/three-rose-cluster.jpeg",
+    "reference_dir": "assets/products/logos/",
+    "variants": {
+      "greyscale": {
+        "file": "three-rose-cluster-greyscale.png",
+        "skus": [
+          "sg-007",
+          "black-rose products"
+        ]
+      },
+      "lavender": {
+        "file": "three-rose-cluster-lavender.png",
+        "skus": [
+          "sg-006",
+          "sg-014"
+        ]
+      },
+      "pink": {
+        "file": "three-rose-cluster-pink.png",
+        "skus": [],
+        "note": "generated for the lavender-vs-pink review; founder chose lavender 2026-06-11"
+      },
+      "purple": {
+        "file": "three-rose-cluster-purple.png",
+        "skus": [
+          "sg-002"
+        ]
+      },
+      "blue-cyan": {
+        "file": "three-rose-cluster-blue-cyan.png",
+        "skus": [
+          "sg-005"
+        ]
+      }
+    }
+  }
 }
