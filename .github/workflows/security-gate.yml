@@ -110,7 +110,7 @@ jobs:
   license-check:
     name: 📜 License Compliance
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -119,18 +119,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           pip install pip-licenses
           pip install -e ".[dev]" || pip install -e . || true
 
+      # Policy: block copyleft (GPL/AGPL) only — mirrors the dependency-review
+      # deny list. The prior --allow-only whitelist was deny-by-default and
+      # false-positived on legitimate proprietary runtime deps (e.g. the NVIDIA
+      # CUDA libraries pulled in transitively by torch) and any unlisted license
+      # string. --fail-on captures the actual intent without the brittleness.
       - name: Check Python licenses
         run: |
           pip-licenses --format=markdown --with-urls > licenses.md
-          pip-licenses --fail-on="GPL-3.0-only;AGPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-or-later" \
-            --allow-only="MIT;BSD-2-Clause;BSD-3-Clause;Apache-2.0;ISC;PSF-2.0;Python-2.0;MPL-2.0;Unlicense;LGPL-2.1-only;LGPL-3.0-only;Public Domain"
+          pip-licenses --fail-on="GPL-3.0-only;AGPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-or-later"
 
       - name: Upload license report
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
