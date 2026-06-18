@@ -16,7 +16,7 @@ def _exp(sku="br-006"):
 
 def test_excluded_sku_hard_fails_deterministically():
     ad = ImageryAdapter()
-    tags = ad.deterministic_checks(subject=b"\x89PNG...", ref=_exp("sg-006"))
+    tags = ad.deterministic_checks(subject=b"\x89PNG...", ref=_exp("sg-015"))
     assert "excluded_sku" in tags
 
 

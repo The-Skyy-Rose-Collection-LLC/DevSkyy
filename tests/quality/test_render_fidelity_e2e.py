@@ -1,7 +1,7 @@
 """End-to-end test: RenderFidelityEvaluator -> EvaluationCore -> judge -> Verdict.
 
 Two scenarios:
-1. Excluded SKU (sg-006) — deterministic gate must block the paid judge entirely.
+1. Excluded SKU (sg-015) — deterministic gate must block the paid judge entirely.
 2. Clean render (br-001) — full pass-through to a fake vision judge, verdict passes.
 """
 
@@ -33,7 +33,7 @@ async def test_excluded_sku_blocks_before_judge():
         return ({}, 0.0)
 
     agent = RenderFidelityEvaluator(judge_fn=judge)
-    v = await agent.evaluate(subject=b"\x89PNG", ref=_exp("sg-006"))  # excluded SKU
+    v = await agent.evaluate(subject=b"\x89PNG", ref=_exp("sg-015"))  # excluded SKU
 
     assert v.passed is False
     assert "excluded_sku" in v.failure_tags
