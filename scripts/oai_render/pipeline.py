@@ -305,6 +305,45 @@ def _quarantine(plan: SkuPlan, data: bytes, attempt: int, verdict) -> Path:
     return img_path
 
 
+# Per-failure-tag corrective guidance fed back into the next render attempt. The QC
+# judge already says WHY a render failed; replaying the identical prompt ignores that
+# signal and pays full price for a coin-flip. Injecting it makes each retry targeted.
+_RETRY_TAG_GUIDANCE = {
+    "branding_drift": "A logo, patch, or text was missing, invented, garbled, or misplaced. "
+    "Reproduce EVERY mark EXACTLY as in the references — correct content, position, and size; "
+    "render NO mark on a panel its reference leaves blank.",
+    "wrong_garment": "The garment did not match the references. Match silhouette, fabric, colour, "
+    "and every graphic to the reference images exactly.",
+    "wrong_view": "The wrong face of the garment was shown. Render ONLY the requested view.",
+    "flat_render": "The output looked flat, vector, or illustrated. Render a photorealistic, "
+    "dimensional garment with real drape, seams, texture, and studio lighting.",
+    "collage_panels": "The output had multiple panels / a collage. Produce ONE single full-bleed "
+    "photograph — no grid, no split-screen, no reference sheet.",
+    "missing_pair_garment": "A required garment was missing. BOTH garments must be worn and "
+    "visible on the one model.",
+    "wrong_dimensions": "Render at the exact portrait framing requested; do not crop the garment.",
+}
+
+
+def _retry_correction(verdict) -> str:
+    """Build a targeted correction block from a rejected QC verdict for the next attempt.
+
+    The judge already explained the defect; feeding it back turns a blind re-render
+    (a full-price coin-flip) into a targeted fix.
+    """
+    lines = [_RETRY_TAG_GUIDANCE[t] for t in verdict.failure_tags if t in _RETRY_TAG_GUIDANCE]
+    block = [
+        "",
+        "",
+        "PREVIOUS ATTEMPT REJECTED BY QC — you MUST correct these specific problems now:",
+    ]
+    reason = (getattr(verdict, "reason", "") or "").strip()
+    if reason:
+        block.append(f"  - Reviewer feedback: {reason}")
+    block.extend(f"  - {ln}" for ln in lines)
+    return "\n".join(block)
+
+
 def render_sku(
     plan: SkuPlan,
     client: RenderClient,
@@ -351,8 +390,11 @@ def render_sku(
             attempt=attempt + 1,
             max_attempts=max_attempts,
         )
+        attempt_prompt = plan.prompt
+        if last_verdict is not None:
+            attempt_prompt += _retry_correction(last_verdict)
         try:
-            data = client.edit(prompt=plan.prompt, image_paths=[r.path for r in plan.references])
+            data = client.edit(prompt=attempt_prompt, image_paths=[r.path for r in plan.references])
         except Exception as exc:  # surfaced, never swallowed
             log.error("Render failed for %s: %s", plan.sku, exc)
             reason = f"{type(exc).__name__}: {str(exc)[:300]}"
@@ -379,8 +421,25 @@ def render_sku(
         if verdict is None or verdict.passed:
             return _accept_render(plan, data, attempt + 1, _emit)
 
-        last_verdict = verdict
         _reject_render(plan, data, attempt + 1, max_attempts, verdict, _emit)
+        # Early-abort: the SAME failure mode twice running means the references +
+        # corrective feedback still didn't fix it — a further identical-failure render
+        # is wasted spend. Stop and quarantine for human review.
+        if (
+            attempt + 1 < max_attempts
+            and last_verdict is not None
+            and verdict.failure_tags
+            and verdict.failure_tags == last_verdict.failure_tags
+        ):
+            _emit(
+                "retry_aborted",
+                attempt=attempt + 1,
+                tags=list(verdict.failure_tags),
+                reason="same QC failure twice — aborting retries to avoid wasted spend",
+            )
+            last_verdict = verdict
+            break
+        last_verdict = verdict
 
     _emit("qc_exhausted", reason=last_verdict.summary if last_verdict else "qc failed")
     return RenderResult(

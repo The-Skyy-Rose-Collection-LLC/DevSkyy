@@ -206,25 +206,31 @@ class _FakeClient:
     def __init__(self, payload: bytes):
         self.payload = payload
         self.calls = 0
+        self.prompts: list[str] = []
 
     def edit(self, *, prompt: str, image_paths: list[Path]) -> bytes:
         self.calls += 1
+        self.prompts.append(prompt)
         return self.payload
 
 
 class _ScriptedGate:
-    """QC gate double whose verdicts are scripted per attempt."""
+    """QC gate double whose verdicts (and optional per-attempt failure tags) are scripted."""
 
-    def __init__(self, verdicts: list[bool]):
+    def __init__(self, verdicts: list[bool], tags: list[tuple[str, ...]] | None = None):
         self._verdicts = verdicts
+        self._tags = tags
         self.calls = 0
 
     def check(self, data: bytes, exp) -> qc.QCVerdict:
         passed = self._verdicts[min(self.calls, len(self._verdicts) - 1)]
+        tag = ("collage_panels",)
+        if self._tags is not None:
+            tag = self._tags[min(self.calls, len(self._tags) - 1)]
         self.calls += 1
         if passed:
             return qc.QCVerdict(passed=True, reason="pass")
-        return qc.QCVerdict(passed=False, failure_tags=("collage_panels",), reason="scripted fail")
+        return qc.QCVerdict(passed=False, failure_tags=tag, reason="scripted fail")
 
 
 @pytest.fixture()
@@ -257,7 +263,8 @@ def test_render_sku_accepts_on_retry_after_qc_fail(_tmp_output):
 
 def test_render_sku_quarantines_after_exhausting_retries(_tmp_output):
     client = _FakeClient(b"png-bytes")
-    gate = _ScriptedGate([False])  # every attempt fails
+    # DISTINCT failure each attempt → no early-abort → genuinely exhausts every retry.
+    gate = _ScriptedGate([False], tags=[("collage_panels",), ("wrong_view",), ("flat_render",)])
     result = render_sku(_plan(), client, gate=gate, spend=SpendTracker())
     assert result.status == "qc_failed"
     assert client.calls == 1 + config.QC_MAX_RENDER_RETRIES
@@ -267,6 +274,28 @@ def test_render_sku_quarantines_after_exhausting_retries(_tmp_output):
     assert meta["failure_tags"] == ["collage_panels"]
     # accepted output was never written
     assert not (config.OUTPUT_DIR / "black-rose-crewneck" / "ghost.png").exists()
+
+
+def test_render_sku_early_aborts_on_repeated_identical_failure(_tmp_output):
+    """Same QC failure twice running → abort before burning the final retry (saves spend)."""
+    client = _FakeClient(b"png-bytes")
+    gate = _ScriptedGate([False])  # identical tag (collage_panels) every attempt
+    result = render_sku(_plan(), client, gate=gate, spend=SpendTracker())
+    assert result.status == "qc_failed"
+    # 2 renders, NOT 1 + QC_MAX_RENDER_RETRIES — the 3rd identical-failure render is saved.
+    assert client.calls == 2
+
+
+def test_render_sku_feeds_qc_reason_into_retry(_tmp_output):
+    """The retry prompt carries the prior rejection's reason — not a blind replay."""
+    client = _FakeClient(b"png-bytes")
+    gate = _ScriptedGate([False, True])
+    result = render_sku(_plan(), client, gate=gate, spend=SpendTracker())
+    assert result.status == "rendered"
+    assert client.calls == 2
+    assert client.prompts[0] == "prompt"  # first attempt = unmodified plan prompt
+    assert "PREVIOUS ATTEMPT REJECTED" in client.prompts[1]
+    assert "scripted fail" in client.prompts[1]  # the judge's reason fed back in
 
 
 def test_render_sku_stops_when_budget_exhausted(_tmp_output):
