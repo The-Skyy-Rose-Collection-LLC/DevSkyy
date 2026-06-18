@@ -11,7 +11,15 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:  # optional env loader — minimal CI/validation envs don't ship it
+
+    def load_dotenv(*_args, **_kwargs):  # type: ignore[misc]
+        """No-op fallback when python-dotenv is absent (e.g. the Dossier Check CI job).
+
+        Catalog/dossier validation reads tracked files only; it never needs .env."""
+        return False
 
 # ---------------------------------------------------------------------------
 # Environment loading (authoritative key last with override=True)
