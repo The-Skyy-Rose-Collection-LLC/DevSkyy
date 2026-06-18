@@ -47,7 +47,7 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sudo sh -s -- -b /usr/local/bin
 
       - name: Run TruffleHog
-        run: trufflehog git file://. --only-verified
+        run: trufflehog git file://. --only-verified --no-update
 
   # ===========================================================================
   # Dependency Review
