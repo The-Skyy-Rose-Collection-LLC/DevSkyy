@@ -247,9 +247,7 @@ class IdempotencyCache:
         if cached is not None:
             age = (datetime.now(UTC) - cached.cached_at).total_seconds()
             if age <= self._ttl:
-                logger.info(
-                    "idempotency.hit fingerprint=%s age=%.0fs", fingerprint[:12], age
-                )
+                logger.info("idempotency.hit fingerprint=%s age=%.0fs", fingerprint[:12], age)
                 return cached.result, True
 
         result = await runner(request)

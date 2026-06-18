@@ -448,6 +448,7 @@ exclude = '''
     | build
     | dist
     | legacy
+    | node_modules
 )/
 '''
 
@@ -459,7 +460,8 @@ exclude = '''
 profile = "black"
 line_length = 100
 known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
-skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/"]
+skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/", "node_modules/"]
+extend_skip_glob = ["*/node_modules/*"]
 
 # =============================================================================
 # MyPy Configuration — canonical config lives in mypy.ini (not here)

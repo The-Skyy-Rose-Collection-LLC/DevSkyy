@@ -73,7 +73,9 @@ class BaseSuperAgent(BaseDevSkyyAgent):
 
     async def initialize(self) -> None:
         """Initialize super agent with sub-capabilities"""
-        logger.info(f"Initializing Super Agent: {self.agent_type} (Provider: {self.config.provider})")
+        logger.info(
+            f"Initializing Super Agent: {self.agent_type} (Provider: {self.config.provider})"
+        )
 
         # Initialize based on configured ADK provider
         try:
@@ -86,7 +88,7 @@ class BaseSuperAgent(BaseDevSkyyAgent):
             else:
                 # Fallback to Pydantic
                 await self._init_pydantic_backend()
-            
+
             self._initialized = True
         except Exception as e:
             logger.error(f"Failed to initialize Super Agent backend: {e}")
@@ -95,7 +97,7 @@ class BaseSuperAgent(BaseDevSkyyAgent):
     async def _init_google_backend(self) -> None:
         """Initialize with Google ADK backend"""
         from adk.google_adk import GoogleADKAgent
-        
+
         self._backend_agent = GoogleADKAgent(self.config)
         await self._backend_agent.initialize()
         self._active_provider = ADKProvider.GOOGLE

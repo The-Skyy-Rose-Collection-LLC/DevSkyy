@@ -33,6 +33,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()

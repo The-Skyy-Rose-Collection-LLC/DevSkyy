@@ -322,9 +322,7 @@ class TrellisProvider:
         correlation_id: str,
     ) -> PostprocessResult:
         artifact_id = (
-            request.metadata.get("artifact_id")
-            or request.correlation_id
-            or correlation_id[:12]
+            request.metadata.get("artifact_id") or request.correlation_id or correlation_id[:12]
         )
         sampling = self._resolve_sampling(request)
         try:

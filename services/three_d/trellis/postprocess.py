@@ -252,9 +252,7 @@ class MeshPostprocessor:
         if self._export_usdz_via_cli(glb_path, usdz_out, warnings):
             return usdz_out
 
-        warnings.append(
-            "USDZ export skipped — install `usd-core` or `usd_from_gltf` to enable"
-        )
+        warnings.append("USDZ export skipped — install `usd-core` or `usd_from_gltf` to enable")
         return None
 
     def _export_usdz_via_python(

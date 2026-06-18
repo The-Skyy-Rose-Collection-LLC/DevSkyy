@@ -31,6 +31,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from services.three_d.trellis.config import TrellisConfig
 
 from api.v1.clothing_3d.schemas import (
     GenerateRequest,
@@ -57,7 +58,6 @@ from pipelines.clothing_3d.reliability import (
     QuotaExceededError,
     request_fingerprint,
 )
-from services.three_d.trellis.config import TrellisConfig
 
 logger = logging.getLogger(__name__)
 

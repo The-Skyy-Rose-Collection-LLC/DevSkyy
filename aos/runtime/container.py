@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 
 from aos.runtime.types import ExecutionResult, ResourceLimits, ResourceUsage

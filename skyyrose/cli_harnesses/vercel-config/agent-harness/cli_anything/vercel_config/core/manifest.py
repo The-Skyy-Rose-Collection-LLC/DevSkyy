@@ -56,10 +56,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from cli_anything.vercel_config.core.domains import (Domain, DomainDiff,
-                                                     diff_domains)
-from cli_anything.vercel_config.core.env_vars import (EnvVar, EnvVarDiff,
-                                                      diff_env_vars)
+from cli_anything.vercel_config.core.domains import Domain, DomainDiff, diff_domains
+from cli_anything.vercel_config.core.env_vars import EnvVar, EnvVarDiff, diff_env_vars
 
 # ── Constants ─────────────────────────────────────────────────────────
 

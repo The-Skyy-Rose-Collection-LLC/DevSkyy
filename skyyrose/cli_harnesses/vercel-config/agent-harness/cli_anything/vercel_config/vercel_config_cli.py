@@ -26,12 +26,18 @@ import sys
 from typing import Optional
 
 import click
-
 from cli_anything.vercel_config import __version__
 from cli_anything.vercel_config.utils.repl_skin import ReplSkin
 from cli_anything.vercel_config.utils.vercel_backend import (
-    VercelAuthError, VercelBackend, VercelBackendError, VercelNotFoundError,
-    VercelRateLimitedError, VercelValidationError, _confirm, resolve_token)
+    VercelAuthError,
+    VercelBackend,
+    VercelBackendError,
+    VercelNotFoundError,
+    VercelRateLimitedError,
+    VercelValidationError,
+    _confirm,
+    resolve_token,
+)
 
 # ── Shared context object ─────────────────────────────────────────────
 
@@ -711,8 +717,7 @@ def manifest_plan(ctx: click.Context, manifest_file: str) -> None:
 
     from cli_anything.vercel_config.core.domains import Domain
     from cli_anything.vercel_config.core.env_vars import EnvVar
-    from cli_anything.vercel_config.core.manifest import (build_plan,
-                                                          load_manifest)
+    from cli_anything.vercel_config.core.manifest import build_plan, load_manifest
 
     c = _get_ctx(ctx)
     try:
@@ -774,8 +779,7 @@ def manifest_apply(ctx: click.Context, manifest_file: str, confirmed: bool) -> N
 
     from cli_anything.vercel_config.core.domains import Domain
     from cli_anything.vercel_config.core.env_vars import EnvVar
-    from cli_anything.vercel_config.core.manifest import (build_plan,
-                                                          load_manifest)
+    from cli_anything.vercel_config.core.manifest import build_plan, load_manifest
 
     c = _get_ctx(ctx)
     try:

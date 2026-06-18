@@ -6,6 +6,9 @@ import logging
 import time
 from typing import Any
 
+from services.three_d.trellis.config import TrellisConfig
+from services.three_d.trellis.provider import TrellisProvider
+
 from pipelines.clothing_3d.events import PipelineEventBus, log_event_subscriber
 from pipelines.clothing_3d.models import (
     PipelineQualityReport,
@@ -24,8 +27,6 @@ from pipelines.clothing_3d.stages import (
     stage_store,
 )
 from pipelines.clothing_3d.storage import ArtifactStore, LocalArtifactStore
-from services.three_d.trellis.config import TrellisConfig
-from services.three_d.trellis.provider import TrellisProvider
 
 logger = logging.getLogger(__name__)
 

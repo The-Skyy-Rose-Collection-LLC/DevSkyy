@@ -6,7 +6,7 @@ All types are frozen Pydantic models — state transitions produce new instances
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from enum import IntEnum
 from typing import Any
 

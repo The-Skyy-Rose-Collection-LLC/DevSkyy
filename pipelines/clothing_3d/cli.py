@@ -29,17 +29,18 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from pipelines.clothing_3d.models import (
-    PipelineRequest,
-    PipelineStatus,
-)
-from pipelines.clothing_3d.pipeline import ClothingPipeline
 from services.three_d.trellis.config import (
     TrellisBackend,
     TrellisConfig,
     TrellisQualityPreset,
 )
 from services.three_d.trellis.provider import TrellisProvider, make_stub_provider
+
+from pipelines.clothing_3d.models import (
+    PipelineRequest,
+    PipelineStatus,
+)
+from pipelines.clothing_3d.pipeline import ClothingPipeline
 
 logger = logging.getLogger("clothing_3d.cli")
 

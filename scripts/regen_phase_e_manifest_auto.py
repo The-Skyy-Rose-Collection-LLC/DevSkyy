@@ -317,10 +317,13 @@ def _build_persku_block() -> str:
 
     def src_ok(row):
         return (THEME_ROOT / (row.get("image") or "").strip()).exists()
+
     def logo_ok(slug):
         return _parse_dossier_keys(slug)["logo_reference"]
+
     def extras_ok(slug):
         return _parse_dossier_keys(slug)["extra_logos"]
+
     def dossier_missing(slug):
         return _parse_dossier_keys(slug)["missing"]
 

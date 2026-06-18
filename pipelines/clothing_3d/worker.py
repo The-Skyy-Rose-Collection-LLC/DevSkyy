@@ -33,6 +33,8 @@ from contextlib import suppress
 from datetime import UTC, datetime
 from typing import Any
 
+from services.three_d.trellis.config import TrellisConfig
+
 from pipelines.clothing_3d.events import PipelineEventBus
 from pipelines.clothing_3d.job_store import JobRecord, JobStore, build_job_store
 from pipelines.clothing_3d.models import PipelineRequest, PipelineStatus
@@ -49,7 +51,6 @@ from pipelines.clothing_3d.reliability import (
     QuotaExceededError,
     RetryPolicy,
 )
-from services.three_d.trellis.config import TrellisConfig
 
 logger = logging.getLogger(__name__)
 
@@ -94,9 +95,7 @@ class PipelineWorker:
         # the caller (API, test harness) owns lifecycle and we'd corrupt
         # their state by closing on shutdown.
         owned_default = (pipeline is None) and (queue is None) and (store is None)
-        self._owns_dependencies = (
-            owned_default if owns_dependencies is None else owns_dependencies
-        )
+        self._owns_dependencies = owned_default if owns_dependencies is None else owns_dependencies
         self.pipeline = pipeline or ClothingPipeline(config=TrellisConfig.from_env())
         self.queue = queue or build_queue()
         self.store = store or build_job_store()
@@ -143,9 +142,7 @@ class PipelineWorker:
                     self._sem.release()
                     continue
 
-                task = asyncio.create_task(
-                    self._process_one(msg), name=f"job-{msg.job_id}"
-                )
+                task = asyncio.create_task(self._process_one(msg), name=f"job-{msg.job_id}")
                 self._inflight.add(task)
                 task.add_done_callback(self._on_task_done)
         finally:
@@ -189,8 +186,9 @@ class PipelineWorker:
             try:
                 self.quota.charge(backend)
             except QuotaExceededError as exc:
-                logger.warning("worker.quota_exceeded backend=%s job=%s err=%s",
-                               backend, job.job_id, exc)
+                logger.warning(
+                    "worker.quota_exceeded backend=%s job=%s err=%s", backend, job.job_id, exc
+                )
                 job.status = PipelineStatus.FAILED
                 job.error = f"quota exceeded: {exc}"
                 job.finished_at = datetime.now(UTC)
@@ -228,9 +226,7 @@ class PipelineWorker:
                 cost_usd = self.quota.spent(backend) - (
                     self.quota.spent(backend) - 0.0  # placeholder; charge already recorded
                 )
-                self._metrics.backend_cost_usd.labels(backend=backend).inc(
-                    max(cost_usd, 0.0)
-                )
+                self._metrics.backend_cost_usd.labels(backend=backend).inc(max(cost_usd, 0.0))
 
             job.result = result
             job.status = result.status
@@ -341,7 +337,9 @@ def main(argv: list[str] | None = None) -> int:
     import argparse
 
     parser = argparse.ArgumentParser(prog="clothing_3d.worker")
-    parser.add_argument("--concurrency", type=int, default=int(os.getenv("CLOTHING_3D_CONCURRENCY", "1")))
+    parser.add_argument(
+        "--concurrency", type=int, default=int(os.getenv("CLOTHING_3D_CONCURRENCY", "1"))
+    )
     parser.add_argument("--log-level", default=os.getenv("LOG_LEVEL", "INFO"))
     args = parser.parse_args(argv)
     return asyncio.run(_run_worker(args))

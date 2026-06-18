@@ -21,6 +21,7 @@ except ImportError:  # optional env loader — minimal CI/validation envs don't 
         Catalog/dossier validation reads tracked files only; it never needs .env."""
         return False
 
+
 # ---------------------------------------------------------------------------
 # Environment loading (authoritative key last with override=True)
 # ---------------------------------------------------------------------------
