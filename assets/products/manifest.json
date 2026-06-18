@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-12T13:04:58+00:00",
+  "generated_at": "2026-06-18T07:41:55+00:00",
   "catalog_sha": "sha256:6f090ec4f526a6e22cd423646fc1ff0203be6448f0ec117648e32f980bc743be",
   "skus": {
     "br-001": {
@@ -173,6 +173,11 @@
           "role": "garment",
           "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-sherpa-product.jpg",
           "sha256": "sha256:b7c3d91431884e2b3f40dd8e4fab84dba4981864ce39e2fd1a0250cc3fa79a79"
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-back.jpg",
+          "sha256": "sha256:ef980d90ac3beb786a16351cbb523222cf909c3c74c3b10165e929fd1aa881ce"
         },
         {
           "role": "logo",
@@ -469,7 +474,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-red-black.md",
-          "sha256": "sha256:5e0d041a269b8f58f8880eb1598f5d38eca572ca201cd5099f6a6eb9c9c9b43b"
+          "sha256": "sha256:af98b74131430762ffb05fbc7726fd6f483d15e2d71604315b4233eca3bb77ce"
         }
       ]
     },
@@ -497,7 +502,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
-          "sha256": "sha256:e795477182194ae0cb50997aad0c74e6bc1a6332ec1471a88574fe1836ee7f29"
+          "sha256": "sha256:50f0ac3ce94c2d60e4a1b97e7959d06cb6a7cfedf51440f4b338bfc0376eee48"
         }
       ]
     },
@@ -607,6 +612,11 @@
           "sha256": "sha256:a81ea0ddde232a07253ba53168580bc36fba6b0c61622e172b65e8b161c36213"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-pack-photo.jpg",
+          "sha256": "sha256:b70ab3937f1991ef02c2e5f91ecf42dfbb9803be77d60eea9446065789eb14bf"
+        },
+        {
           "role": "logo",
           "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
           "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d"
@@ -669,13 +679,13 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-blue-cyan.png",
+          "sha256": "sha256:236e93936bbc7b600456a2c7f323be622ee828868449738aeb89fdbe92776b6a"
         },
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shorts.md",
-          "sha256": "sha256:7723ebeafd0d9dd027b9b670395d0fca2b64974ee8ebbd06950784e661cf5a4b"
+          "sha256": "sha256:01196b736501e92c14c41135128970fe383e284b6d7dd3ff08eee93866eed99e"
         }
       ]
     },
@@ -735,13 +745,13 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-purple.png",
+          "sha256": "sha256:fd316770c9e40902c8ac286b6325042bc265495bdd3495c768f6035c645f479a"
         },
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shorts.md",
-          "sha256": "sha256:f8af8ac39e082c8efa7c7cb93de19c1531aa60ae08927202d1c1fa645def668e"
+          "sha256": "sha256:4deca5c523b2b4dde6fc5768a978a5e8b9af6a530a250da1c0a50518a3d3ca7d"
         }
       ]
     },
@@ -758,8 +768,8 @@
         },
         {
           "role": "garment",
-          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/bay-bridge-shirt-front.jpg",
-          "sha256": "sha256:11118381362081c6d62f33121469529baab175d22b2e18f78ecd79499be02a75"
+          "path": "assets/products/source-photos/signature/sg-005-bay-bridge-shirt-front-authentic.jpg",
+          "sha256": "sha256:5666c853832dfe5fb092813081c03dfb7991adf165e9766df100aa6a888a3cf1"
         },
         {
           "role": "logo",
@@ -769,7 +779,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shirt.md",
-          "sha256": "sha256:5a7cb951bc73a04b8fb94c5cfcedbc4e78bce816f75a3833576218f50d585f3c"
+          "sha256": "sha256:8d85cab5b536b01b023500dce3935e0e0199f4396b813fa8f514c8ae541152c3"
         }
       ]
     },
@@ -874,14 +884,9 @@
           "sha256": "sha256:87a41b8ad37c9214d2b52be933c96f0b9d5fdeeca769eedd0f0087c5daeade75"
         },
         {
-          "role": "logo",
-          "path": "assets/products/techflats/signature/brand-skyy-rose-collection-gold.jpeg",
-          "sha256": "sha256:7b60b0e50f0a4b2e91c1a5ac6d07691e86e734cd6f9125d52a685448eed67d60"
-        },
-        {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-white.md",
-          "sha256": "sha256:8f4b6d97066f5599c6fda67698a2280b7b70e80578fe5904b0e0e8894499031f"
+          "sha256": "sha256:0d2fd02c684cc717e165734925f6198ed119812b5cb9eda1ffbe3b523a2df4a2"
         }
       ]
     },
@@ -902,14 +907,9 @@
           "sha256": "sha256:c2b7b172a6c459652343da31ad96fa9c6598f56e10b763219a84b6c70776f46b"
         },
         {
-          "role": "logo",
-          "path": "assets/products/techflats/signature/brand-skyy-rose-collection-gold.jpeg",
-          "sha256": "sha256:7b60b0e50f0a4b2e91c1a5ac6d07691e86e734cd6f9125d52a685448eed67d60"
-        },
-        {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-orchid.md",
-          "sha256": "sha256:e3a8d1519be8dadc9acc697302fab8e0f10759dc5ff172d7d531286bbf3f7aa0"
+          "sha256": "sha256:cc5de2341bffaf523116b8f8a78db94dc9c77f61cb38bfef210521313f94ea9a"
         }
       ]
     },
