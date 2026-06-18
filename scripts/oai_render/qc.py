@@ -22,7 +22,7 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import lru_cache
 from pathlib import Path
 
@@ -361,12 +361,13 @@ def _judge_instructions(exp: RenderExpectation) -> str:
 class QCGate:
     """Deterministic checks + optional VLM judge. One instance per batch run."""
 
-    def __init__(self, *, use_judge: bool = True) -> None:
+    def __init__(self, *, use_judge: bool = True, judge_fn=None) -> None:
         self._use_judge = use_judge and config.QC_ENABLED
         self._provider = config.QC_JUDGE_PROVIDER
+        self._judge_fn = judge_fn  # injection seam: callable(req) -> (verdict_dict, cost_usd)
         self._client = None
         self._model = ""
-        if self._use_judge:
+        if self._use_judge and self._judge_fn is None:
             try:
                 if self._provider == "anthropic":
                     import anthropic
@@ -407,10 +408,31 @@ class QCGate:
         return self._judge(data, exp)
 
     def _judge(self, data: bytes, exp: RenderExpectation) -> QCVerdict:
-        """Dispatch to the configured provider's vision judge."""
+        """Dispatch to an injected judge_fn (seam), else the configured provider's judge."""
+        if self._judge_fn is not None:
+            return self._judge_injected(data, exp)
         if self._provider == "anthropic":
             return self._judge_anthropic(data, exp)
         return self._judge_openai(data, exp)
+
+    def _judge_injected(self, data: bytes, exp: RenderExpectation) -> QCVerdict:
+        """Judge via an injected callable — the swappable seam (tests + alt backends).
+
+        ``judge_fn`` receives a provider-agnostic request dict and returns
+        ``(verdict_dict, cost_usd)``. Any exception fails OPEN (judge_unavailable),
+        identical to a real judge-infrastructure failure — a paid render is never
+        discarded because the judge backend broke.
+        """
+        req = {
+            "instructions": _judge_instructions(exp),
+            "image": data,
+            "reference_paths": tuple(exp.reference_paths),
+        }
+        try:
+            verdict, cost = self._judge_fn(req)
+        except Exception as exc:
+            return self._unavailable(exp, exc)
+        return replace(self._verdict_from_dict(verdict, exp), judge_cost_usd=float(cost))
 
     def _judge_openai(self, data: bytes, exp: RenderExpectation) -> QCVerdict:
         content: list[dict] = [{"type": "text", "text": _judge_instructions(exp)}]
