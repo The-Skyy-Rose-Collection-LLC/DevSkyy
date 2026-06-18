@@ -1,85 +1,34 @@
 #!/usr/bin/env python3
-"""Generate per-collection Source-Of-Truth files: data/collections/<slug>.json.
+"""Generate per-collection SOT: data/collections/<slug>/sot.json + a global _orphans.json.
 
-WHY THIS EXISTS
----------------
-A collection's assets were spread across three masters that don't cross-check:
-  - skyyrose-catalog.csv   (products + their imagery)
-  - visual-manifest.json   (non-product imagery: lockups, scenes, lookbook, hero)
-  - logo-registry.json     (logos, monograms, per-SKU branding placements)
-...plus many near-duplicate lockup/logo files in the asset tree with no authority.
-Answering "what is Black Rose's lockup?" meant crossing 3 files and guessing among
-duplicates -> repeated wrong-file pick-ups. This script collapses all of that into
-ONE verified file per collection.
+Canon source = data/collections/<slug>/identity.json (via sot_common, schema-validated).
+The masters (catalog CSV, visual-manifest.json, logo-registry.json) remain authoritative
+for their domain; sot.json is a GENERATED VIEW — DO NOT hand-edit it.
 
-CONTRACT
---------
-- The three masters remain authoritative for their domain. This is a GENERATED VIEW.
-- DO NOT hand-edit data/collections/*.json. Fix the master, then regenerate.
-- Every emitted path is existence-checked (with format-sibling fallback). A role that
-  cannot resolve to a real file is emitted as null, never guessed.
-- `other_collection_files` lists every other tree file that name-matches the collection
-  but is NOT a chosen role -> the trap list. Treat as "do not use unless promoted here."
+Orphans = every image file in the scanned tree registered to NO manifest entry, catalog
+product, or logo (naming-independent set-difference). Manifest entries are expanded across
+their declared `formats`, so format siblings (avif/png of a webp role) count as registered.
 
 USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD]
 """
 
+import argparse
 import json
-import re
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 DATA = Path(__file__).resolve().parent
-# Single path authority + canonical catalog reader (feedback_single_asset_tree /
-# feedback_canonical_sources_only): never hardcode the asset root or hand-roll CSV reads.
+sys.path.insert(0, str(DATA))
 sys.path.insert(0, str(DATA.parents[2]))
+import sot_common  # noqa: E402
+
 from skyyrose.core.catalog_loader import bool_col, read_catalog_rows  # noqa: E402
-from skyyrose.core.paths import WP_ASSETS_DIR  # noqa: E402
 
-ASSETS = WP_ASSETS_DIR
+ASSETS = sot_common.ASSETS
+IMG_EXTS = sot_common.IMG_EXTS
 OUT = DATA / "collections"
-MANIFEST = DATA / "visual-manifest.json"
-LOGO_REG = DATA / "logo-registry.json"
-
-# accent + display_font mirror assets/css/design-tokens.css [data-collection="<slug>"]
-# (--skyyrose-accent / --skyyrose-font-display) — keep in sync if those tokens change.
-COLLECTIONS = {
-    "black-rose": {
-        "key": "black_rose",
-        "name": "Black Rose",
-        "accent": "#C0C0C0",
-        "display_font": "Cinzel",
-        "match": r"black[-_ ]?rose|^br-|black-roses|br-brand|br-patch",
-    },
-    "love-hurts": {
-        "key": "love_hurts",
-        "name": "Love Hurts",
-        "accent": "#DC143C",
-        "display_font": "Playfair Display",
-        "match": r"love[-_ ]?hurts|lh-logo|love-lettering|hurts-lettering|red-roses|heart-rose",
-    },
-    "signature": {
-        "key": "signature",
-        "name": "Signature",
-        "accent": "#D4AF37",
-        "display_font": "Playfair Display",
-        "match": r"signature|sig-brand|rose-gold-rose|skyy-rose",
-    },
-    "kids-capsule": {
-        "key": "kids_capsule",
-        "name": "Kids Capsule",
-        "accent": "#B76E79",
-        "display_font": "Playfair Display",
-        "match": r"kids-|kids-capsule|kid-black-rose",
-    },
-}
-BODY_FONT = "Cormorant Garamond"
-
-# Display + vector lockups are NOT hardcoded here — they are read from
-# visual-manifest.json (lockup_display / lockup_svg_master per collection),
-# which is the canonical imagery authority. Register a new lockup there.
-
-IMG_EXTS = (".webp", ".avif", ".png", ".jpg", ".jpeg", ".svg", ".mp4", ".webm")
 TREE_SCAN_DIRS = [
     "branding",
     "images/lockups",
@@ -93,48 +42,27 @@ TREE_SCAN_DIRS = [
 ]
 
 
-def exists(rel: str) -> str | None:
-    """Resolve an assets-relative path (possibly extension-less) to a real file, else None."""
-    if not rel:
-        return None
-    rel = rel.replace("assets/", "", 1) if rel.startswith("assets/") else rel
-    p = ASSETS / rel
-    if p.is_file():
-        return rel
-    # Extension-less manifest path: prefer an exact-extension sibling (base.ext),
-    # then fall back to a "formats" sibling (base-480w.webp etc.).
-    parent = p.parent
-    if parent.is_dir():
-        for pat in (p.name + ".*", p.name + "*"):
-            for f in sorted(parent.glob(pat)):
-                if f.is_file() and f.suffix.lower() in IMG_EXTS:
-                    return str(f.relative_to(ASSETS))
-    return None
-
-
-def manifest_entry(entry):
-    """One visual-manifest asset dict -> {path, resolved, kind, status, notes}."""
+def manifest_entry(entry: Any) -> dict | None:
     if not isinstance(entry, dict):
         return None
     raw = entry.get("path", "")
     return {
         "path": raw,
-        "resolved": exists(raw),
+        "resolved": sot_common.resolve_asset(raw),
         "kind": entry.get("kind"),
         "status": entry.get("status"),
         "notes": entry.get("notes"),
     }
 
 
-def load_products_by_collection():
-    """Partition the canonical catalog into {collection: [product dict]} in one read."""
+def load_products_by_collection() -> dict[str, list]:
     by_col: dict[str, list] = {}
     for row in read_catalog_rows():
         imgs = {}
         for col in ("image", "front_model_image", "back_image", "back_model_image"):
             v = (row.get(col) or "").strip()
             if v:
-                imgs[col] = {"path": v, "resolved": exists(v)}
+                imgs[col] = {"path": v, "resolved": sot_common.resolve_asset(v)}
         dslug = (row.get("dossier_slug") or "").strip()
         by_col.setdefault(row.get("collection", ""), []).append(
             {
@@ -151,8 +79,7 @@ def load_products_by_collection():
     return by_col
 
 
-def scan_tree():
-    """All image files under the scan dirs, once, as a set of assets-relative paths."""
+def scan_tree() -> set[str]:
     found = set()
     for d in TREE_SCAN_DIRS:
         dd = ASSETS / d
@@ -164,53 +91,60 @@ def scan_tree():
     return found
 
 
-def imagery_lockup(imagery):
-    """Group the lockup roles into one block (the #1 source of mix-ups)."""
-    return {
-        "display_webp": imagery["lockup_display"],
-        "svg_master": imagery["lockup_svg_master"],
-        "source_art": imagery["lockup_source_art"],
-        "alt": imagery["lockup_alt"],
-        "rule": "Use display_webp for web/homepage. svg_master only when infinite scale/recolor needed. source_art is the raw master the others derive from — not for direct placement. The lockup IS the collection name; never type-render it.",
-    }
-
-
-def collect_resolved(obj, into):
-    """Recursively add every 'resolved' value found in obj to the set `into`."""
+def walk_manifest_entries(obj: Any) -> Iterator[dict]:
     if isinstance(obj, dict):
-        if obj.get("resolved"):
-            into.add(obj["resolved"])
+        if "path" in obj:
+            yield obj
         for v in obj.values():
-            collect_resolved(v, into)
+            yield from walk_manifest_entries(v)
     elif isinstance(obj, list):
         for v in obj:
-            collect_resolved(v, into)
+            yield from walk_manifest_entries(v)
 
 
-def build_collection(slug, meta, manifest, logo_reg, products, all_tree, updated):
-    mkey = meta["key"]
-    mc = manifest.get(mkey, {})
+def expand_formats(entry: dict) -> set[str]:
+    out = set()
+    base = entry.get("path", "")
+    if not base:
+        return out
+    for fmt in entry.get("formats", []) or []:
+        # Plain extensions ("webp") join with a dot; responsive width tokens
+        # ("480w.webp") are dash-suffixed on disk (base-480w.webp).
+        sep = "-" if fmt[:1].isdigit() else "."
+        cand = f"{base}{sep}{fmt}"
+        if (ASSETS / cand).is_file():
+            out.add(cand)
+    r = sot_common.resolve_asset(base)
+    if r:
+        out.add(r)
+    return out
 
-    logos = []
-    for lid, l in logo_reg.get("logos", {}).items():
-        lcol = l.get("collection") or ""
-        if mkey in lcol or slug in lcol:
-            logos.append(
-                {
-                    "id": lid,
-                    "file": l.get("file"),
-                    "resolved": exists(f"images/logos/{l.get('file', '')}")
-                    or exists(l.get("file", "")),
-                    "primary_color": l.get("primary_color"),
-                    "notes": (l.get("description") or "")[:160],
-                }
-            )
 
+def registered_files(manifest: Any, logo_reg: Any, products_by_col: dict[str, list]) -> set[str]:
+    reg: set[str] = set()
+    for entry in walk_manifest_entries(manifest):
+        reg |= expand_formats(entry)
+    for _lid, lg in logo_reg.get("logos", {}).items():
+        for cand in (
+            sot_common.resolve_asset(f"images/logos/{lg.get('file', '')}"),
+            sot_common.resolve_asset(lg.get("file", "")),
+        ):
+            if cand:
+                reg.add(cand)
+    for prods in products_by_col.values():
+        for p in prods:
+            for im in p["images"].values():
+                if im.get("resolved"):
+                    reg.add(im["resolved"])
+    return reg
+
+
+def imagery_block(mc: dict) -> dict:
     def lst(key):
         v = mc.get(key)
         return [manifest_entry(e) for e in v] if isinstance(v, list) else []
 
-    imagery = {
+    return {
         "lockup_display": manifest_entry(mc.get("lockup_display")),
         "lockup_svg_master": manifest_entry(mc.get("lockup_svg_master")),
         "lockup_source_art": manifest_entry(mc.get("lockup_primary")),
@@ -233,29 +167,64 @@ def build_collection(slug, meta, manifest, logo_reg, products, all_tree, updated
         "lookbook": lst("lookbook"),
     }
 
-    chosen: set[str] = set()
-    collect_resolved(imagery, chosen)
-    collect_resolved(logos, chosen)
-    collect_resolved(products, chosen)
-    rx = re.compile(meta["match"], re.IGNORECASE)
-    not_in_sot = sorted(f for f in all_tree if rx.search(Path(f).name) and f not in chosen)
 
+def logos_for(slug: str, key: str, logo_reg: Any) -> list[dict]:
+    out = []
+    for lid, lg in logo_reg.get("logos", {}).items():
+        lcol = lg.get("collection") or ""
+        if key in lcol or slug in lcol:
+            out.append(
+                {
+                    "id": lid,
+                    "file": lg.get("file"),
+                    "resolved": sot_common.resolve_asset(f"images/logos/{lg.get('file', '')}")
+                    or sot_common.resolve_asset(lg.get("file", "")),
+                    "primary_color": lg.get("primary_color"),
+                    "notes": (lg.get("description") or "")[:160],
+                }
+            )
+    return out
+
+
+def build_collection(
+    slug: str,
+    ident: dict,
+    manifest: Any,
+    logo_reg: Any,
+    products: list,
+    updated: str,
+) -> dict:
+    key = ident["key"]
+    mc = manifest.get(key, {})
+    full = imagery_block(mc)
+    lockup = {
+        "canonical": sot_common.resolve_asset(ident["lockup"]["ref"]),
+        "display_webp": full["lockup_display"],
+        "svg_master": full["lockup_svg_master"],
+        "source_art": full["lockup_source_art"],
+        "alt": full["lockup_alt"],
+        "rule": "The lockup IS the collection name; never type-render it.",
+    }
+    lockup_keys = {"lockup_display", "lockup_svg_master", "lockup_source_art", "lockup_alt"}
+    imagery = {k: v for k, v in full.items() if k not in lockup_keys}
     return {
-        "_generated_by": "data/build-collection-sot.py — DO NOT EDIT BY HAND. Fix the master (catalog.csv / visual-manifest.json / logo-registry.json) and regenerate.",
-        "_authority": f"Single Source of Truth for the {meta['name']} collection. Resolves products + imagery + logos to ONE verified file per role. Every 'resolved' path is existence-checked.",
+        "_generated_by": "data/build-collection-sot.py — DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+        "_authority": f"Single Source of Truth view for {ident['name']}. Canon = identity.json.",
         "collection": slug,
-        "name": meta["name"],
+        "name": ident["name"],
         "updated": updated,
-        "palette": {"accent": meta["accent"], "dark": "#0A0A0A", "rose_gold": "#B76E79"},
-        "fonts": {"display": meta["display_font"], "body": BODY_FONT},
+        "story": ident["story"],
+        "palette": ident["palette"],
+        "fonts": ident["fonts"],
         "masters": {
+            "identity": f"data/collections/{slug}/identity.json",
             "products": "data/skyyrose-catalog.csv",
             "imagery": "data/visual-manifest.json",
             "logos": "data/logo-registry.json",
         },
-        "lockup": imagery_lockup(imagery),
-        "imagery": {k: v for k, v in imagery.items() if not k.startswith("lockup")},
-        "logos": logos,
+        "lockup": lockup,
+        "imagery": imagery,
+        "logos": logos_for(slug, key, logo_reg),
         "products": products,
         "unresolved_product_images": [
             {"sku": p["sku"], "column": col, "path": im["path"]}
@@ -263,35 +232,58 @@ def build_collection(slug, meta, manifest, logo_reg, products, all_tree, updated
             for col, im in p["images"].items()
             if not im.get("resolved")
         ],
-        "other_collection_files": {
-            "_note": "Files in the asset tree whose name matches this collection but which are NOT assigned a canonical role above. Audit before use: some are legitimate (nav/thumb logos, format siblings), some are duplicates/superseded source art to retire. Never grab one of these for a role the SOT already fills.",
-            "files": not_in_sot,
-        },
     }
 
 
-def main():
-    updated = "GENERATED"
-    if "--updated" in sys.argv:
-        updated = sys.argv[sys.argv.index("--updated") + 1]
-    manifest = json.load(open(MANIFEST))
-    logo_reg = json.load(open(LOGO_REG))
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Generate per-collection SOT JSON + the global _orphans.json."
+    )
+    parser.add_argument(
+        "--updated",
+        default="GENERATED",
+        help="Value for each sot.json 'updated' field, e.g. 2026-06-14.",
+    )
+    updated = parser.parse_args().updated
+    idents = sot_common.load_identity()
+    manifest = sot_common.load_manifest()
+    logo_reg = sot_common.load_logo_registry()
     products_by_col = load_products_by_collection()
-    all_tree = scan_tree()
-    OUT.mkdir(exist_ok=True)
+    tree = scan_tree()
+    reg = registered_files(manifest, logo_reg, products_by_col)
 
-    for slug, meta in COLLECTIONS.items():
+    for slug, ident in idents.items():
         products = products_by_col.get(slug, [])
-        sot = build_collection(slug, meta, manifest, logo_reg, products, all_tree, updated)
-        out = OUT / f"{slug}.json"
-        out.write_text(json.dumps(sot, indent=2) + "\n")
-        n_unres = len(sot["unresolved_product_images"])
+        sot = build_collection(slug, ident, manifest, logo_reg, products, updated)
+        folder = OUT / slug
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "sot.json").write_text(json.dumps(sot, indent=2) + "\n")
         print(
-            f"{slug}: {len(products)} products ({n_unres} unresolved imgs), "
-            f"{len(sot['logos'])} logos, {len(sot['other_collection_files']['files'])} trap files "
-            f"-> {out.relative_to(DATA.parent.parent)}"
+            f"{slug}: {len(products)} products, {len(sot['logos'])} logos "
+            f"({len(sot['unresolved_product_images'])} unresolved imgs)"
         )
+
+    known = set()
+    for ident in idents.values():
+        known |= set(ident.get("known_orphans", []))
+    orphans = sorted(tree - reg - known)
+    (OUT / "_orphans.json").write_text(
+        json.dumps(
+            {
+                "_note": "Image files in the asset tree registered to NO manifest entry, product, or logo. "
+                "Audit before use; add legit non-role files to a collection identity.json known_orphans[].",
+                "count": len(orphans),
+                "orphans": orphans,
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    print(
+        f"_orphans.json: {len(orphans)} unregistered (of {len(tree)} scanned, {len(reg)} registered)"
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

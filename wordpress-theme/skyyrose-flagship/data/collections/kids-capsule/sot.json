@@ -1,35 +1,58 @@
 {
-  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT BY HAND. Fix the master (catalog.csv / visual-manifest.json / logo-registry.json) and regenerate.",
-  "_authority": "Single Source of Truth for the Kids Capsule collection. Resolves products + imagery + logos to ONE verified file per role. Every 'resolved' path is existence-checked.",
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Kids Capsule. Canon = identity.json.",
   "collection": "kids-capsule",
   "name": "Kids Capsule",
   "updated": "GENERATED",
+  "story": {
+    "seed": "The Heir to the throne.",
+    "doc_ref": "docs/brand/collection-stories.md#kids-capsule"
+  },
   "palette": {
-    "accent": "#B76E79",
-    "dark": "#0A0A0A",
-    "rose_gold": "#B76E79"
+    "gold": "#D4AF37",
+    "rose_gold": "#B76E79",
+    "accent": "#D4AF37",
+    "accent_dark": "#B8960C",
+    "secondary": "#B76E79",
+    "bg": "#0A0A0A",
+    "text": "#F5E6D3"
   },
   "fonts": {
-    "display": "Playfair Display",
-    "body": "Cormorant Garamond"
+    "script": {
+      "family": "Pinyon Script",
+      "woff2": "assets/fonts/pinyon-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
   "masters": {
+    "identity": "data/collections/kids-capsule/identity.json",
     "products": "data/skyyrose-catalog.csv",
     "imagery": "data/visual-manifest.json",
     "logos": "data/logo-registry.json"
   },
   "lockup": {
+    "canonical": "images/logos/sr-monogram-rose-gold.webp",
     "display_webp": null,
     "svg_master": null,
     "source_art": {
       "path": "images/logos/sr-monogram-rose-gold",
-      "resolved": "images/logos/sr-monogram-rose-gold.avif",
+      "resolved": "images/logos/sr-monogram-rose-gold.webp",
       "kind": "collection-lockup",
       "status": "verified",
       "notes": "Kids Capsule uses the rose-gold monogram as its mark (no dedicated script lockup exists yet). Launch-mode collection \u2014 empty grid by design."
     },
     "alt": null,
-    "rule": "Use display_webp for web/homepage. svg_master only when infinite scale/recolor needed. source_art is the raw master the others derive from \u2014 not for direct placement. The lockup IS the collection name; never type-render it."
+    "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
     "scene_portrait": null,
@@ -37,10 +60,11 @@
     "atmospherics": [],
     "patches": [],
     "lettering_alt": [],
+    "lockup_parts": [],
     "lookbook": [
       {
         "path": "images/lookbook/lb-kid-black-rose",
-        "resolved": "images/lookbook/lb-kid-black-rose-480w.avif",
+        "resolved": "images/lookbook/lb-kid-black-rose-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "Kid wearing Black Rose piece. Kids Capsule surfaces (founder-assigned 2026-06-11)."
@@ -104,13 +128,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [],
-  "other_collection_files": {
-    "_note": "Files in the asset tree whose name matches this collection but which are NOT assigned a canonical role above. Audit before use: some are legitimate (nav/thumb logos, format siblings), some are duplicates/superseded source art to retire. Never grab one of these for a role the SOT already fills.",
-    "files": [
-      "images/lookbook/lb-kid-black-rose-480w.webp",
-      "images/lookbook/lb-kid-black-rose-960w.avif",
-      "images/lookbook/lb-kid-black-rose-960w.webp"
-    ]
-  }
+  "unresolved_product_images": []
 }

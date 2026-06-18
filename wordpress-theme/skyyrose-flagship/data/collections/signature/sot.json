@@ -1,24 +1,47 @@
 {
-  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT BY HAND. Fix the master (catalog.csv / visual-manifest.json / logo-registry.json) and regenerate.",
-  "_authority": "Single Source of Truth for the Signature collection. Resolves products + imagery + logos to ONE verified file per role. Every 'resolved' path is existence-checked.",
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Signature. Canon = identity.json.",
   "collection": "signature",
   "name": "Signature",
   "updated": "GENERATED",
+  "story": {
+    "seed": "The beginning of it all \u2014 where it started from.",
+    "doc_ref": "docs/brand/collection-stories.md#signature"
+  },
   "palette": {
+    "gold": "#D4AF37",
+    "rose_gold": "#B76E79",
     "accent": "#D4AF37",
-    "dark": "#0A0A0A",
-    "rose_gold": "#B76E79"
+    "accent_dark": "#B8960C",
+    "secondary": "#B76E79",
+    "bg": "#0A0A0A",
+    "text": "#F5E6D3"
   },
   "fonts": {
-    "display": "Playfair Display",
-    "body": "Cormorant Garamond"
+    "script": {
+      "family": "Pinyon Script",
+      "woff2": "assets/fonts/pinyon-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
   "masters": {
+    "identity": "data/collections/signature/identity.json",
     "products": "data/skyyrose-catalog.csv",
     "imagery": "data/visual-manifest.json",
     "logos": "data/logo-registry.json"
   },
   "lockup": {
+    "canonical": "images/lockups/signature-lockup.webp",
     "display_webp": {
       "path": "images/lockups/signature-lockup.webp",
       "resolved": "images/lockups/signature-lockup.webp",
@@ -35,18 +58,18 @@
     },
     "source_art": {
       "path": "images/hero-overlays/sig-brand-skyy-rose-gold",
-      "resolved": "images/hero-overlays/sig-brand-skyy-rose-gold.avif",
+      "resolved": "images/hero-overlays/sig-brand-skyy-rose-gold.webp",
       "kind": "collection-lockup",
       "status": "verified",
       "notes": "Gold script \u2014 doubles as brand lockup (see brand_global). The lockup IS the collection name."
     },
     "alt": null,
-    "rule": "Use display_webp for web/homepage. svg_master only when infinite scale/recolor needed. source_art is the raw master the others derive from \u2014 not for direct placement. The lockup IS the collection name; never type-render it."
+    "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-signature",
-      "resolved": "images/homepage-col-signature.avif",
+      "resolved": "images/homepage-col-signature.webp",
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "Signature world art. Collection cards/panels/portals."
@@ -55,7 +78,7 @@
     "atmospherics": [
       {
         "path": "images/logos/rose-gold-rose",
-        "resolved": "images/logos/rose-gold-rose.avif",
+        "resolved": "images/logos/rose-gold-rose.webp",
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
@@ -70,10 +93,11 @@
     ],
     "patches": [],
     "lettering_alt": [],
+    "lockup_parts": [],
     "lookbook": [
       {
         "path": "images/lookbook/lb-rose-hoodie-beanie",
-        "resolved": "images/lookbook/lb-rose-hoodie-beanie-480w.avif",
+        "resolved": "images/lookbook/lb-rose-hoodie-beanie-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "Rose hoodie + beanie worn, editorial. Signature (founder-confirmed 2026-06-11)."
@@ -394,20 +418,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [],
-  "other_collection_files": {
-    "_note": "Files in the asset tree whose name matches this collection but which are NOT assigned a canonical role above. Audit before use: some are legitimate (nav/thumb logos, format siblings), some are duplicates/superseded source art to retire. Never grab one of these for a role the SOT already fills.",
-    "files": [
-      "branding/signature-logo-hero.webp",
-      "branding/signature-logo-transparent.png",
-      "branding/signature-logo.webp",
-      "images/hero-overlays/sig-brand-skyy-rose-gold.png",
-      "images/hero-overlays/sig-brand-skyy-rose-gold.webp",
-      "images/homepage-col-signature.webp",
-      "images/logos/rose-gold-rose.webp",
-      "images/logos/skyy-rose-collection-circular-patch.avif",
-      "images/logos/skyy-rose-collection-circular-patch.jpeg",
-      "images/logos/skyy-rose-collection-circular-patch.webp"
-    ]
-  }
+  "unresolved_product_images": []
 }
