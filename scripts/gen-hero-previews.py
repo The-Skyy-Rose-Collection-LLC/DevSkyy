@@ -307,6 +307,18 @@ def run(engines: list[str]) -> int:
     return 1 if failures else 0
 
 
+def _confirm(engines: list[str], assume_yes: bool) -> bool:
+    """Real STOP-AND-SHOW gate before any paid call; fail-closed in non-TTY."""
+    print(build_manifest(engines))
+    if assume_yes:
+        print("\n--yes supplied — proceeding.")
+        return True
+    if not sys.stdin.isatty():
+        print("\nABORT: non-interactive (no TTY) and --yes not set.", file=sys.stderr)
+        return False
+    return input().strip().lower() in {"y", "yes"}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Hero-scene preview generator")
     ap.add_argument("mode", choices=["plan", "go"])
@@ -316,11 +328,19 @@ def main() -> int:
         choices=["openai", "replicate"],
         help="restrict to one engine (repeatable); default = both",
     )
+    ap.add_argument(
+        "--yes",
+        action="store_true",
+        help="skip the interactive confirmation (required in non-TTY/automation)",
+    )
     args = ap.parse_args()
     engines = args.engine or ["openai", "replicate"]
     if args.mode == "plan":
         print(build_manifest(engines))
         return 0
+    if not _confirm(engines, args.yes):
+        print("Aborted — no images generated.", file=sys.stderr)
+        return 2
     return run(engines)
 
 

@@ -185,6 +185,18 @@ def run(source: Path, variants: list[str], mask: Path | None) -> int:
     return 1 if failures else 0
 
 
+def _confirm(source: Path, variants: list[str], mask: Path | None, assume_yes: bool) -> bool:
+    """Real STOP-AND-SHOW gate before any paid call; fail-closed in non-TTY."""
+    print(build_manifest(source, variants, mask))
+    if assume_yes:
+        print("\n--yes supplied — proceeding.")
+        return True
+    if not sys.stdin.isatty():
+        print("\nABORT: non-interactive (no TTY) and --yes not set.", file=sys.stderr)
+        return False
+    return input().strip().lower() in {"y", "yes"}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="gpt-image-2 lookbook remake")
     ap.add_argument("mode", choices=["plan", "go"])
@@ -201,6 +213,11 @@ def main() -> int:
         help="pixel-exact: use the prepped frame + garment mask (frozen garments)",
     )
     ap.add_argument("--mask", type=Path, default=None, help="override mask path (implies --masked)")
+    ap.add_argument(
+        "--yes",
+        action="store_true",
+        help="skip the interactive confirmation (required in non-TTY/automation)",
+    )
     args = ap.parse_args()
     variants = args.variant or ["v1", "v2"]
 
@@ -215,6 +232,9 @@ def main() -> int:
     if args.mode == "plan":
         print(build_manifest(source, variants, mask))
         return 0
+    if not _confirm(source, variants, mask, args.yes):
+        print("Aborted — no images generated.", file=sys.stderr)
+        return 2
     return run(source, variants, mask)
 
 
