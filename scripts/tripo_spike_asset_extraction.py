@@ -74,7 +74,7 @@ def show_manifest(
     print("STOP — Confirm before proceeding:")
     print("=" * 64)
     print(f"  Action       : Tripo generate_image (template={template})")
-    print(f"  Region       : .ai (https://api.tripo3d.ai/v2/openapi)")
+    print("  Region       : .ai (https://api.tripo3d.ai/v2/openapi)")
     print(f"  SKU          : {row['sku']}")
     print(f"  Name         : {row['name']}")
     print(f"  Source       : {image_path}")
@@ -82,11 +82,11 @@ def show_manifest(
         size_kb = image_path.stat().st_size / 1024
         print(f"  Source size  : {size_kb:.1f} KB")
     else:
-        print(f"  Source size  : MISSING — file does not exist")
+        print("  Source size  : MISSING — file does not exist")
     print(f"  Model        : {model_version}")
     print(f"  Template     : {template}")
     print(f"  Prompt       : {prompt or '(none — template + file is sufficient)'}")
-    print(f"  Cost         : ~10 credits (~$0.040 on Professional plan)")
+    print("  Cost         : ~10 credits (~$0.040 on Professional plan)")
     print(f"  Output       : {OUTPUT_DIR / (row['sku'] + '_' + template + '.png')}")
     print("=" * 64)
     if dry_run:
@@ -110,7 +110,7 @@ async def run_spike(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     async with TripoClient() as client:
-        print(f"[1/3] Creating generate_image task...")
+        print("[1/3] Creating generate_image task...")
         task_id = await client.generate_image(
             prompt=prompt,
             model_version=model_version,

@@ -6,7 +6,7 @@ All types are frozen Pydantic models — state transitions produce new instances
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from enum import IntEnum
 from typing import Any
 
@@ -89,7 +89,7 @@ class AgentProcess(BaseModel):
     prompt: str
     status: ProcessStatus = ProcessStatus.PENDING
     priority: ProcessPriority = ProcessPriority.NORMAL
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     started_at: datetime | None = None
     completed_at: datetime | None = None
     result: Any | None = None
@@ -110,9 +110,9 @@ class AgentProcess(BaseModel):
             raise ValueError(msg)
         updates: dict[str, Any] = {"status": new_status, **kwargs}
         if new_status == ProcessStatus.RUNNING and self.started_at is None:
-            updates.setdefault("started_at", datetime.now(timezone.utc))
+            updates.setdefault("started_at", datetime.now(UTC))
         if is_terminal(new_status) and self.completed_at is None:
-            updates.setdefault("completed_at", datetime.now(timezone.utc))
+            updates.setdefault("completed_at", datetime.now(UTC))
         return self.model_copy(update=updates)
 
     def add_child(self, child_pid: int) -> AgentProcess:

@@ -786,7 +786,7 @@ class EncryptionError(DevSkyError):
 T = TypeVar("T")
 
 
-def error_handler[T](
+def error_handler(
     default_return: T | None = None,
     retries: int = 0,
     log_errors: bool = True,

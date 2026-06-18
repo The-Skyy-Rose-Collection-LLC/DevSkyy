@@ -19,7 +19,6 @@ Version: 1.0.0
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import os
 import uuid
@@ -97,7 +96,7 @@ class InMemoryQueue:
     async def dequeue(self, *, block_seconds: float = 5.0) -> QueueMessage | None:
         try:
             msg = await asyncio.wait_for(self._q.get(), timeout=block_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return None
         self._unacked[msg.delivery_id] = msg
         return msg

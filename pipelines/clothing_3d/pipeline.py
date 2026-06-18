@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import time
-import uuid
 from typing import Any
 
 from pipelines.clothing_3d.events import PipelineEventBus, log_event_subscriber
@@ -14,7 +13,6 @@ from pipelines.clothing_3d.models import (
     PipelineResult,
     PipelineStage,
     PipelineStatus,
-    StageReport,
 )
 from pipelines.clothing_3d.stages import (
     PipelineContext,

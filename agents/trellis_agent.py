@@ -270,7 +270,7 @@ class TrellisAgent:
             return proc.stdout, proc.stderr, proc.returncode
         except subprocess.TimeoutExpired as exc:
             stderr = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
-            stdout = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
+            (exc.stdout or "") if isinstance(exc.stdout, str) else ""
             raise TrellisTimeoutError(
                 f"trellis subprocess timed out after {self.timeout_seconds}s: {stderr[-2000:]}"
             ) from exc

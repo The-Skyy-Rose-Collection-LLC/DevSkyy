@@ -33,7 +33,7 @@ from pipelines.clothing_3d.models import (
     PipelineRequest,
     PipelineStatus,
 )
-from pipelines.clothing_3d.pipeline import ClothingPipeline, run_clothing_pipeline
+from pipelines.clothing_3d.pipeline import ClothingPipeline
 from services.three_d.trellis.config import (
     TrellisBackend,
     TrellisConfig,

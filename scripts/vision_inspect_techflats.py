@@ -95,9 +95,7 @@ def _split_flagged() -> list[str]:
     for fn, v in review.items():
         layout = v.get("layout", "unset")
         note = (v.get("note") or "").lower()
-        if layout in ("lr", "tb", "grid"):
-            out.append(fn)
-        elif layout == "unset" and ("split" in note or "beanie" in note or "4 " in note):
+        if layout in ("lr", "tb", "grid") or layout == "unset" and ("split" in note or "beanie" in note or "4 " in note):
             out.append(fn)
     return sorted(out)
 

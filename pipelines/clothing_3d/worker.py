@@ -33,7 +33,7 @@ from contextlib import suppress
 from datetime import UTC, datetime
 from typing import Any
 
-from pipelines.clothing_3d.events import PipelineEventBus, log_event_subscriber
+from pipelines.clothing_3d.events import PipelineEventBus
 from pipelines.clothing_3d.job_store import JobRecord, JobStore, build_job_store
 from pipelines.clothing_3d.models import PipelineRequest, PipelineStatus
 from pipelines.clothing_3d.observability import (
@@ -48,7 +48,6 @@ from pipelines.clothing_3d.reliability import (
     IdempotencyCache,
     QuotaExceededError,
     RetryPolicy,
-    request_fingerprint,
 )
 from services.three_d.trellis.config import TrellisConfig
 
@@ -300,7 +299,7 @@ class PipelineWorker:
                     self._stop.wait(),
                     timeout=self.reclaim_interval_seconds,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
 

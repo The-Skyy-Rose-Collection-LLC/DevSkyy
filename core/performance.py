@@ -28,7 +28,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -274,7 +274,7 @@ def instructor_cache(
 # =============================================================================
 
 
-class HierarchicalCache[T]:
+class HierarchicalCache(Generic[T]):
     """
     Multi-level caching following Netflix Dispatch patterns.
 

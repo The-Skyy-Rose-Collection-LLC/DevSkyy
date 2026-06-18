@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from typing import Any
 
 from aos.runtime.types import ExecutionResult, ResourceLimits, ResourceUsage
@@ -62,7 +62,7 @@ class AgentContainer:
         The factory receives the container so the agent can call register_tool_call().
         """
         start = time.monotonic()
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         self._started_at = start
 
         timed_out = False
@@ -76,7 +76,7 @@ class AgentContainer:
                 timeout=self.limits.max_runtime_seconds,
             )
             success = True
-        except asyncio.TimeoutError:
+        except TimeoutError:
             timed_out = True
             error = f"Execution exceeded {self.limits.max_runtime_seconds}s timeout"
         except ResourceLimitExceeded as exc:
@@ -93,7 +93,7 @@ class AgentContainer:
             subprocess_count=self._subprocess_count,
             tool_call_count=self._tool_calls,
             started_at=started_at,
-            ended_at=datetime.now(timezone.utc),
+            ended_at=datetime.now(UTC),
         )
 
         if success and output_bytes > self.limits.max_output_bytes:

@@ -195,7 +195,7 @@ class HFSpaceClient:
                 asyncio.to_thread(_call),
                 timeout=self.config.timeout_seconds,
             )
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             raise TimeoutError(
                 f"TRELLIS HF Space timed out after {self.config.timeout_seconds}s"
             ) from e
@@ -480,7 +480,7 @@ class ReplicateClient:
                 asyncio.to_thread(_call),
                 timeout=self.config.timeout_seconds,
             )
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             raise TimeoutError("Replicate TRELLIS timed out") from e
 
         # Download the GLB locally so the rest of the pipeline can postprocess it.

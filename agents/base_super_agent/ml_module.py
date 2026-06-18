@@ -124,7 +124,6 @@ class ProphetModelWrapper:
 
     def predict(self, periods: int = 30, **kwargs) -> Any:
         """Generate forecasts for future periods."""
-        import pandas as pd
 
         if not self.fitted:
             # P1 #10: previously synthesized 365 days of cumulative random-walk

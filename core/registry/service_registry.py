@@ -20,7 +20,7 @@ from __future__ import annotations
 import logging
 import threading
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class ServiceNotFoundError(Exception):
         self.service_name = service_name
 
 
-class ServiceEntry[T]:
+class ServiceEntry(Generic[T]):
     """
     Entry in the service registry.
 
@@ -225,7 +225,7 @@ class ServiceRegistry:
 _registry = ServiceRegistry()
 
 
-def register_service[T](
+def register_service(
     service_name: str,
     instance: T | None = None,
     factory: Callable[[], T] | None = None,
