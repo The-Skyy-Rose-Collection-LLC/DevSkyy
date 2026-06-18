@@ -72,7 +72,9 @@ class ReplicateClient:
         "flux-dev": "black-forest-labs/flux-dev",
         "flux-schnell": "black-forest-labs/flux-schnell",
         "sd-3": "stability-ai/stable-diffusion-3",
-        # SkyyRose Custom LoRA (trained on 390 exact product images)
+        # SkyyRose Custom LoRA (trained on 604 exact product images; verified
+        # 2026-06-18 against the live Replicate model description — the prior
+        # "390" comment was stale).
         "skyyrose-lora": "devskyy/skyyrose-lora-v3:64dbb859fed83670e7cde81fc161c183bd9d0607fb7028b01bfc0a000ec114b4",
         # Image Enhancement
         "real-esrgan": "nightmareai/real-esrgan:42fed1c4974146d4d2414e2be2c5277c7fcf05fcc3a73abf41610695738c1d7b",
@@ -191,9 +193,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
             "scale": scale,
             "face_enhance": face_enhance,
         }
@@ -214,9 +214,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
         }
 
         output = client.run(self.MODELS["rembg"], input=input_params)
@@ -237,9 +235,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
             "task": "image_captioning",
         }
 

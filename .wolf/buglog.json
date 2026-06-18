@@ -2284,5 +2284,43 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-16T21:56:00Z"
+  },
+  {
+    "id": "bug-140",
+    "timestamp": "2026-06-18T08:10:00Z",
+    "error_message": "Relayed to founder that skyyrose-lora-v3 was trained on 390 product images; live Replicate model description says 604.",
+    "file": "llm/providers/replicate.py",
+    "root_cause": "Stale provenance comment at replicate.py:75 ('trained on 390 exact product images') was copied from an older training run and never updated when the LoRA was re-trained on 604 images (v3, pinned 64dbb859, created 2026-01-18). Asserting model facts from a source-code comment instead of the authoritative live model description.",
+    "fix": "Verified the model against the live Replicate API via scripts/verify-replicate-models.py (free metadata read, no prediction): model exists under devskyy org, public, pinned version hash matches latest_version, description='...trained on 604 exact product images'. Corrected the comment 390->604 with a verified-2026-06-18 note.",
+    "tags": [
+      "replicate",
+      "lora",
+      "provenance",
+      "stale-comment",
+      "anti-hallucination",
+      "verify-against-live"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-18T08:10:00Z"
+  },
+  {
+    "id": "bug-141",
+    "timestamp": "2026-06-18T15:00:00Z",
+    "error_message": "FASHN try-on variants B+C failed: HTTP 401 {\"error\":\"UnauthorizedAccess\",\"message\":\"Unauthorized: Invalid token\"} on https://api.fashn.ai/v1/run",
+    "file": "scripts/proto-onmodel-lookbook.py",
+    "root_cause": "The FASHN_API_KEY in .env.production is invalid — 27 chars, does NOT start with the FASHN 'fa-' prefix (real keys are ~50+ chars, fa-...). The on-model research workflow had over-claimed it as a 'real-key format, 106-char line'; verified false. Auth header format was correct (matches the working skyyrose/integrations/fashn_client.py:126 'Bearer {key}'), so the 401 is purely the bad key, not a code bug.",
+    "fix": "Diagnosed by printing FASHN's 401 response body + key SHAPE only (len/prefix/quotes, never the value). Confirmed invalid token. Code is correct + resilient (per-variant failure isolation let variant A still succeed). RESOLUTION PENDING founder: supply a valid fa- FASHN key, OR swap the try-on engine to Replicate IDM-VTON (REPLICATE_API_TOKEN in .env.hf is valid). No code change needed for variant A (gpt-image-2 edit) which succeeded.",
+    "tags": [
+      "fashn",
+      "401",
+      "invalid-api-key",
+      "env-production",
+      "verify-against-live",
+      "workflow-overclaim"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-18T15:00:00Z"
   }
 ]
