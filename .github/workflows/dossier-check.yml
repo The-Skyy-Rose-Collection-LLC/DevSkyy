@@ -36,7 +36,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install minimal dependencies
-        run: pip install --quiet pyyaml
+        run: pip install --quiet pyyaml httpx
 
       - name: Coverage — every active SKU has a dossier
         run: python scripts/check_dossier_coverage.py
