@@ -437,6 +437,7 @@ function skyyrose_get_current_template_slug() {
 			'template-preorder-gateway.php'        => 'preorder-gateway',
 			'template-faq.php'                     => 'faq',
 			'template-shipping-returns.php'        => 'shipping-returns',
+			'template-experiences.php'             => 'experiences',
 			'template-landing-black-rose.php'      => 'landing',
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
@@ -501,6 +502,7 @@ function skyyrose_enqueue_template_styles() {
 		'blog'                => 'generic-pages.css',
 		'page'                => 'generic-pages.css',
 		'kc-launch'           => 'kids-capsule.css',
+		'experiences'         => 'experiences.css',
 	);
 
 	if ( isset( $template_styles[ $slug ] ) ) {
@@ -800,6 +802,7 @@ function skyyrose_enqueue_template_scripts() {
 		'preorder-gateway' => 'preorder-gateway.js',
 		'about'            => 'about.js',
 		'kc-launch'        => 'kids-capsule-launch.js',
+		'experiences'      => 'experiences.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {

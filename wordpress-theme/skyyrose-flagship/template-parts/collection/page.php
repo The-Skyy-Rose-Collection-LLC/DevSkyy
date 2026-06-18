@@ -38,14 +38,27 @@ if ( ! $c ) {
 }
 
 /* ── Shared data ────────────────────────────────────────────────── */
-$products    = skyyrose_get_collection_display_products( $slug );
-$cross_nav   = skyyrose_get_cross_nav( $slug );
-$svg_kses    = skyyrose_svg_kses();
-$has_wc      = function_exists( 'wc_get_cart_url' );
-$is_kids     = ( 'kids-capsule' === $slug );
-$has_hero_bg = ! empty( $c['hero_bg'] );
-$has_logo    = ! empty( $c['hero_logo'] );
-$has_3d      = ! empty( $c['experience_url'] );
+$products  = skyyrose_get_collection_display_products( $slug );
+$cross_nav = skyyrose_get_cross_nav( $slug );
+$svg_kses  = skyyrose_svg_kses();
+$has_wc    = function_exists( 'wc_get_cart_url' );
+$is_kids   = ( 'kids-capsule' === $slug );
+$has_3d    = ! empty( $c['experience_url'] );
+
+/*
+ * SOT-first image resolution (S-5).
+ * skyyrose_sot_hero()   → imagery.hero_backdrop.resolved   (maps to hero_bg)
+ * skyyrose_sot_lockup() → lockup.display_webp.resolved     (maps to hero_logo)
+ * Falls back to the hand-maintained $c values when SOT returns ''.
+ */
+$sot_hero_bg  = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
+$sot_hero_logo = function_exists( 'skyyrose_sot_lockup' ) ? skyyrose_sot_lockup( $slug ) : '';
+
+$resolved_hero_bg  = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
+$resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_logo'] ?? '' );
+
+$has_hero_bg = ! empty( $resolved_hero_bg );
+$has_logo    = ! empty( $resolved_hero_logo );
 
 /* Kids Capsule uses pre-order URL for product links */
 $preorder_url  = $is_kids ? home_url( '/pre-order/' ) : '';
@@ -73,7 +86,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			}
 			?>
 			<div class="col-hero__bg parallax-ken-burns">
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_bg'] . '?v=' . SKYYROSE_VERSION ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_bg . '?v=' . SKYYROSE_VERSION ); ?>"
 					<?php
 					if ( '' !== $hero_srcset ) :
 						?>
@@ -93,7 +106,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 				// existing .rv-clip-up reveal. Reduced-motion respected.
 				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
 				?>
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_logo'] . '?v=' . SKYYROSE_VERSION ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_logo . '?v=' . SKYYROSE_VERSION ); ?>"
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
 					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager" fetchpriority="high" decoding="async">
 				<h1 class="screen-reader-text"><?php echo esc_html( $c['hero_logo_alt'] ); ?></h1>

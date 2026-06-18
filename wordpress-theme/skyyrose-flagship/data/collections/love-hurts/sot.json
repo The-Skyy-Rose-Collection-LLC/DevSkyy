@@ -182,7 +182,14 @@
         "status": "verified",
         "notes": "LH varsity jacket worn, editorial."
       }
-    ]
+    ],
+    "hero": {
+      "path": "branding/hero/beauty-and-beast",
+      "resolved": "branding/hero/beauty-and-beast-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Love Hurts MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
   },
   "logos": [
     {

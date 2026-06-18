@@ -102,7 +102,14 @@
         "status": "verified",
         "notes": "Rose hoodie + beanie worn, editorial. Signature (founder-confirmed 2026-06-11)."
       }
-    ]
+    ],
+    "hero": {
+      "path": "branding/hero/luxury-nighttime",
+      "resolved": "branding/hero/luxury-nighttime-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Signature MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
   },
   "logos": [
     {

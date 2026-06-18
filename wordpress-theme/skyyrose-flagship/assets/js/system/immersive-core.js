@@ -557,7 +557,10 @@
 
 		img.addEventListener( 'error', function onLockupError() {
 			img.removeEventListener( 'error', onLockupError );
-			console.warn( '[immersive-core] .scene-lockup img failed to load — showing scene-title fallback.' ); // eslint-disable-line no-console
+			if ( window.SKYYROSE_DEBUG ) {
+				// eslint-disable-next-line no-console
+				console.warn( '[immersive-core] .scene-lockup img failed to load — showing scene-title fallback.' );
+			}
 
 			// Hide the broken image icon so it is never on screen.
 			img.style.display = 'none';

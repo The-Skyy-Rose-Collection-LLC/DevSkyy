@@ -323,5 +323,38 @@ function skyyrose_get_collection_content( $slug ) {
 		),
 	);
 
-	return isset( $collections[ $slug ] ) ? $collections[ $slug ] : null;
+	if ( ! isset( $collections[ $slug ] ) ) {
+		return null;
+	}
+
+	$data = $collections[ $slug ];
+
+	/*
+	 * SOT override (S-5): resolve hero_bg and hero_logo from sot.json FIRST.
+	 *
+	 * skyyrose_sot_hero()   → imagery.hero_backdrop.resolved  → overrides hero_bg
+	 * skyyrose_sot_lockup() → lockup.display_webp.resolved    → overrides hero_logo
+	 *
+	 * The SOT reader may not be loaded yet in very early bootstrap (e.g. during
+	 * unit tests). Guard with function_exists() so this file remains safe to
+	 * include independently.
+	 *
+	 * Returns '' when the key/file is absent → fall through to the hand-maintained
+	 * value already in $data, preserving backward compatibility exactly.
+	 */
+	if ( function_exists( 'skyyrose_sot_hero' ) ) {
+		$sot_hero = skyyrose_sot_hero( $slug );
+		if ( '' !== $sot_hero ) {
+			$data['hero_bg'] = $sot_hero;
+		}
+	}
+
+	if ( function_exists( 'skyyrose_sot_lockup' ) ) {
+		$sot_lockup = skyyrose_sot_lockup( $slug );
+		if ( '' !== $sot_lockup ) {
+			$data['hero_logo'] = $sot_lockup;
+		}
+	}
+
+	return $data;
 }

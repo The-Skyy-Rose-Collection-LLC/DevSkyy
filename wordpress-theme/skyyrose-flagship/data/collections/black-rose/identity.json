@@ -24,5 +24,13 @@
     "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
   },
   "lockup": {"ref": "images/lockups/black-rose-lockup.webp"},
+  "imagery": {
+    "hero": {
+      "path": "branding/hero/forbidden-midnight",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Black Rose MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
+  },
   "known_orphans": []
 }

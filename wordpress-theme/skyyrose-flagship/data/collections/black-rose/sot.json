@@ -158,7 +158,14 @@
         "status": "verified",
         "notes": "BIB hockey jersey editorial."
       }
-    ]
+    ],
+    "hero": {
+      "path": "branding/hero/forbidden-midnight",
+      "resolved": "branding/hero/forbidden-midnight-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Interim wide master. Dedicated Black Rose MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
   },
   "logos": [
     {
