@@ -60,7 +60,7 @@ from skyyrose.core.review import (  # noqa: E402
 # assets/product-source/{sku}__{slug}/renders/seedream-probe*.png
 PRODUCT_SOURCE_REL = "assets/product-source"
 RENDERS_SUBDIR = "renders"
-RENDER_GLOB = "seedream-probe*.png"
+RENDER_GLOB = "*-probe*.png"  # matches openai-probe.png (gpt-image-2) + seedream-probe*.png
 SKIPPED_JSON = "SKIPPED.json"
 WEBP_QUALITY = 92
 # Match the version suffix in seedream-probe-v4-clean.png; bare seedream-probe.png == v1.
