@@ -28,6 +28,16 @@ import os
 import sys
 from pathlib import Path
 
+try:
+    import openai
+    from openai import OpenAI
+except ImportError:  # pragma: no cover
+    print(
+        "FATAL: openai package not installed. Run: pip install openai",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = Path("/tmp/lh-lookbook-ref-hires.png")
 OUTPUT_DIR = PROJECT_ROOT / "renders" / "oai" / "_lookbook"
@@ -94,8 +104,6 @@ def _as_upload(path: Path) -> tuple[str, bytes, str]:
 
 
 def gen_edit(source: Path, prompt: str, mask: Path | None = None) -> bytes:
-    from openai import OpenAI
-
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not key:
         raise RuntimeError("OPENAI_API_KEY absent from .env.hf")
@@ -151,7 +159,7 @@ def build_manifest(source: Path, variants: list[str], mask: Path | None) -> str:
     return "\n".join(lines)
 
 
-def run(source: Path, variants: list[str], mask: Path | None) -> int:
+def run(source: Path, variants: list[str], mask: Path | None, *, yes: bool = False) -> int:
     if not source.exists():
         print(f"ABORT: source image not found: {source}", file=sys.stderr)
         return 2
@@ -162,7 +170,18 @@ def run(source: Path, variants: list[str], mask: Path | None) -> int:
     if total > HARD_CAP_USD:
         print(f"ABORT: estimate ${total:.2f} exceeds hard cap ${HARD_CAP_USD:.2f}")
         return 2
-    import openai
+
+    # STOP-AND-SHOW gate (H1): print manifest + require explicit confirmation
+    # unless the caller passed --yes / -y for non-interactive use.
+    if not yes:
+        print(build_manifest(source, variants, mask))
+        try:
+            answer = input().strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            answer = ""
+        if answer not in ("y", "yes"):
+            print("Aborted — no charges made.", file=sys.stderr)
+            return 1
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     suffix = "-masked" if mask else ""
@@ -180,7 +199,8 @@ def run(source: Path, variants: list[str], mask: Path | None) -> int:
             return 1
         except Exception as exc:  # noqa: BLE001
             failures += 1
-            print(f"[{v}] ✗ {type(exc).__name__}: {exc}", file=sys.stderr)
+            # Never interpolate str(exc) — SDK errors may contain request IDs or prompt fragments.
+            print(f"[{v}] ✗ {type(exc).__name__}: render failed", file=sys.stderr)
     print(f"\nDone. {len(variants) - failures} ok, {failures} failed -> {OUTPUT_DIR}")
     return 1 if failures else 0
 
@@ -201,6 +221,12 @@ def main() -> int:
         help="pixel-exact: use the prepped frame + garment mask (frozen garments)",
     )
     ap.add_argument("--mask", type=Path, default=None, help="override mask path (implies --masked)")
+    ap.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="bypass interactive confirmation (non-interactive use; paid calls proceed immediately)",
+    )
     args = ap.parse_args()
     variants = args.variant or ["v1", "v2"]
 
@@ -215,7 +241,7 @@ def main() -> int:
     if args.mode == "plan":
         print(build_manifest(source, variants, mask))
         return 0
-    return run(source, variants, mask)
+    return run(source, variants, mask, yes=args.yes)
 
 
 if __name__ == "__main__":

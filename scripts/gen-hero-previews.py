@@ -175,19 +175,23 @@ SCENES: list[Scene] = [
 # ── Engines ──────────────────────────────────────────────────────────────────
 def gen_openai(scene: Scene) -> bytes:
     """gpt-image-2 text-to-image, 1536x1024 landscape, high fidelity."""
-    from openai import OpenAI
+    from openai import AuthenticationError, OpenAI
 
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not key:
         raise RuntimeError("OPENAI_API_KEY absent from .env.hf")
     client = OpenAI(api_key=key, timeout=180.0)
-    resp = client.images.generate(
-        model="gpt-image-2",
-        prompt=scene.openai_prompt,
-        size="1536x1024",
-        quality="high",
-        n=1,
-    )
+    try:
+        resp = client.images.generate(
+            model="gpt-image-2",
+            prompt=scene.openai_prompt,
+            size="1536x1024",
+            quality="high",
+            n=1,
+        )
+    except AuthenticationError:
+        # Never print str(exc) — the OpenAI SDK echoes a partial key in the message.
+        raise RuntimeError("__openai_auth_error__")
     b64 = resp.data[0].b64_json
     if not b64:
         raise RuntimeError("openai returned no image data")
@@ -225,7 +229,10 @@ def _read_replicate_output(output: object) -> bytes:
         return data
     url = str(output)
     parsed = urllib.parse.urlparse(url)
-    if parsed.scheme != "https" or not (parsed.hostname or "").endswith("replicate.delivery"):
+    host = parsed.hostname or ""
+    if parsed.scheme != "https" or not (
+        host == "replicate.delivery" or host.endswith(".replicate.delivery")
+    ):
         raise RuntimeError(f"refusing to fetch untrusted Replicate URL: {url!r}")
     # follow_redirects=False so a CDN redirect cannot bounce the fetch to an
     # unvalidated (internal) host after the allowlist check.
@@ -276,12 +283,14 @@ def build_manifest(engines: list[str]) -> str:
     return "\n".join(lines)
 
 
+_AUTH_SENTINEL = "__openai_auth_error__"
+
+
 def run(engines: list[str]) -> int:
     total_est = sum(len(SCENES) * EST_COST[e] for e in engines)
     if total_est > HARD_CAP_USD:
         print(f"ABORT: estimate ${total_est:.2f} exceeds hard cap ${HARD_CAP_USD:.2f}")
         return 2
-    import openai
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     failures = 0
@@ -293,16 +302,23 @@ def run(engines: list[str]) -> int:
                 data = ENGINES[eng](scene)
                 dest.write_bytes(data)
                 print(f"[{eng}] {scene.slug} ✓ {dest}  ({len(data) // 1024} KB)", flush=True)
-            except openai.AuthenticationError:
-                # Never print str(exc) — the OpenAI SDK echoes a partial key in it.
-                print(
-                    f"[{eng}] {scene.slug} ✗ AuthenticationError: check OPENAI_API_KEY",
-                    file=sys.stderr,
-                )
-                return 1
+            except RuntimeError as exc:
+                if str(exc) == _AUTH_SENTINEL:
+                    # AuthenticationError re-raised from gen_openai — never log str(exc)
+                    # because the OpenAI SDK embeds a partial key in it.
+                    print(
+                        f"[{eng}] {scene.slug} ✗ AuthenticationError: check OPENAI_API_KEY",
+                        file=sys.stderr,
+                    )
+                    return 1
+                failures += 1
+                # Safe to show RuntimeError messages — they are authored by this script.
+                print(f"[{eng}] {scene.slug} ✗ {type(exc).__name__}: {exc}", file=sys.stderr)
             except Exception as exc:  # noqa: BLE001 — surface, continue other scenes
                 failures += 1
-                print(f"[{eng}] {scene.slug} ✗ {type(exc).__name__}: {exc}", file=sys.stderr)
+                # Omit str(exc): SDK exceptions (openai / replicate) can embed partial
+                # keys or request headers in their string representations.
+                print(f"[{eng}] {scene.slug} ✗ {type(exc).__name__}", file=sys.stderr)
     print(f"\nDone. {len(SCENES) * len(engines) - failures} ok, {failures} failed -> {OUTPUT_DIR}")
     return 1 if failures else 0
 
@@ -316,11 +332,29 @@ def main() -> int:
         choices=["openai", "replicate"],
         help="restrict to one engine (repeatable); default = both",
     )
+    ap.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        default=False,
+        help="skip interactive confirmation prompt (for non-interactive / CI use)",
+    )
     args = ap.parse_args()
     engines = args.engine or ["openai", "replicate"]
     if args.mode == "plan":
         print(build_manifest(engines))
         return 0
+    # `go` — PAID path: always show manifest and require confirmation unless --yes/-y
+    manifest = build_manifest(engines)
+    print(manifest)
+    if not args.yes:
+        try:
+            reply = input().strip().lower()
+        except EOFError:
+            reply = ""
+        if reply not in ("y", "yes"):
+            print("Aborted.", file=sys.stderr)
+            return 1
     return run(engines)
 
 

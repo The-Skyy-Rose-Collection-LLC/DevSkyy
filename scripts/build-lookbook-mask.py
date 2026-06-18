@@ -33,6 +33,9 @@ from scipy import ndimage
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = PROJECT_ROOT / "renders" / "oai" / "_lookbook"
 
+# Kernel sizes grow as O(n^2) in memory; cap to a safe maximum.
+_MAX_KERNEL_PX = 200
+
 # Per-garment protect boxes in the prepped 1536x1024 frame. Salient-object
 # models miss scattered garments, so we segment each garment inside its own box
 # (where it IS the salient object) and union the cuts. Boxes are generous;
@@ -107,6 +110,39 @@ def segment_by_boxes(
     return full
 
 
+def build_mask(
+    prepped: Image.Image,
+    dilate_px: int,
+    feather_px: int,
+    model: str,
+    preset: str | None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Segment + clean alpha; return (fg, mask_rgba, overlay) arrays.
+
+    fg        — uint8 H×W cleaned alpha (255 = frozen garment, 0 = regen zone)
+    mask_rgba — uint8 H×W×4 OpenAI mask (alpha channel = fg)
+    overlay   — uint8 H×W×3 human-readable review image
+    """
+    if preset:
+        alpha = segment_by_boxes(prepped, PRESETS[preset], model)
+    else:
+        cut = remove(prepped, session=new_session(model))  # RGBA, bg transparent
+        alpha = np.array(cut.split()[-1])
+    fg = clean_alpha(alpha, dilate_px=dilate_px, feather_px=feather_px)
+
+    w, h = prepped.size
+    mask_rgba = np.zeros((h, w, 4), dtype=np.uint8)
+    mask_rgba[..., 3] = fg
+
+    base = np.array(prepped).astype(np.float32)
+    fg_f = (fg.astype(np.float32) / 255.0)[..., None]
+    dimmed = base * 0.30
+    dimmed[..., 1] = np.clip(dimmed[..., 1] + 40, 0, 255)  # green cast on regen zone
+    overlay = (base * fg_f + dimmed * (1 - fg_f)).astype(np.uint8)
+
+    return fg, mask_rgba, overlay
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Build garment-preserving edit mask")
     ap.add_argument("--source", type=Path, default=Path("/tmp/lh-lookbook-ref-hires.png"))
@@ -122,6 +158,11 @@ def main() -> int:
     )
     args = ap.parse_args()
 
+    if args.dilate < 0 or args.dilate > _MAX_KERNEL_PX:
+        ap.error(f"--dilate must be 0..{_MAX_KERNEL_PX}, got {args.dilate}")
+    if args.feather < 0 or args.feather > _MAX_KERNEL_PX:
+        ap.error(f"--feather must be 0..{_MAX_KERNEL_PX}, got {args.feather}")
+
     if not args.source.is_file():
         print(f"ABORT: source not a readable file: {args.source}")
         return 2
@@ -135,25 +176,11 @@ def main() -> int:
     prep_path = OUTPUT_DIR / f"_prep-{stem}.png"
     prepped.save(prep_path)
 
-    if args.preset:
-        alpha = segment_by_boxes(prepped, PRESETS[args.preset], args.model)
-    else:
-        cut = remove(prepped, session=new_session(args.model))  # RGBA, bg transparent
-        alpha = np.array(cut.split()[-1])
-    fg = clean_alpha(alpha, dilate_px=args.dilate, feather_px=args.feather)
+    fg, mask_rgba, overlay = build_mask(prepped, args.dilate, args.feather, args.model, args.preset)
 
-    # OpenAI mask: alpha=255 over garments (FROZEN), 0 over scene (REGEN).
-    mask_rgba = np.zeros((args.height, args.width, 4), dtype=np.uint8)
-    mask_rgba[..., 3] = fg
     mask_path = OUTPUT_DIR / f"_mask-{stem}.png"
     Image.fromarray(mask_rgba, "RGBA").save(mask_path)
 
-    # Human overlay: garments full-colour; regen zone dimmed + green-tinted.
-    base = np.array(prepped).astype(np.float32)
-    fg_f = (fg.astype(np.float32) / 255.0)[..., None]
-    dimmed = base * 0.30
-    dimmed[..., 1] = np.clip(dimmed[..., 1] + 40, 0, 255)  # green cast on regen zone
-    overlay = (base * fg_f + dimmed * (1 - fg_f)).astype(np.uint8)
     overlay_path = OUTPUT_DIR / f"_overlay-{stem}.png"
     Image.fromarray(overlay).save(overlay_path)
 

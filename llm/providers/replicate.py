@@ -18,8 +18,10 @@ Reference: https://replicate.com/docs
 
 from __future__ import annotations
 
+import ipaddress
 import logging
 import os
+import urllib.parse
 
 # Import config for API keys (loads .env.hf)
 try:
@@ -32,6 +34,71 @@ except ImportError:
     REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN", "")
 
 logger = logging.getLogger(__name__)
+
+_PRIVATE_NETWORKS = (
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),  # link-local
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+)
+
+
+def _validate_remote_url(url: str) -> str:
+    """
+    Validate a remote URL before passing it to the Replicate SDK.
+
+    Requires https scheme and rejects private/link-local/loopback IP literals.
+    Hostname-based URLs are passed through (DNS resolution happens server-side).
+
+    Args:
+        url: The URL to validate.
+
+    Returns:
+        The validated URL (unchanged).
+
+    Raises:
+        ValueError: If the scheme is not https or the host is a private IP.
+    """
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https":
+        raise ValueError(f"Remote URL must use https scheme, got: {parsed.scheme!r}")
+    host = parsed.hostname or ""
+    try:
+        addr = ipaddress.ip_address(host)
+        for net in _PRIVATE_NETWORKS:
+            if addr in net:
+                raise ValueError(
+                    f"Remote URL host resolves to a private/loopback address: {host!r}"
+                )
+    except ValueError as exc:
+        # Re-raise SSRF errors; ignore "not a valid IP address" (hostname case).
+        if "private" in str(exc) or "loopback" in str(exc):
+            raise
+    return url
+
+
+class ConfirmationRequired(Exception):
+    """
+    Raised when REPLICATE_REQUIRE_CONFIRM=1 and a public method is called
+    without passing confirm=True.
+
+    Attributes:
+        model_id: The Replicate model identifier that would be invoked.
+        input_summary: A brief human-readable summary of the inputs.
+    """
+
+    def __init__(self, model_id: str, input_summary: str) -> None:
+        self.model_id = model_id
+        self.input_summary = input_summary
+        super().__init__(
+            f"Confirmation required before calling Replicate model {model_id!r}. "
+            f"Input summary: {input_summary}. "
+            "Pass confirm=True or unset REPLICATE_REQUIRE_CONFIRM."
+        )
 
 
 class ReplicateClient:
@@ -108,13 +175,30 @@ class ReplicateClient:
         """Lazy-load the replicate client."""
         if self._client is None:
             try:
-                import replicate
+                from replicate import Client
 
-                os.environ["REPLICATE_API_TOKEN"] = self.api_token
-                self._client = replicate
+                # Pass the token directly to the Client constructor — never
+                # write secrets into os.environ (leaks to subprocesses).
+                self._client = Client(api_token=self.api_token)
             except ImportError:
                 raise ImportError("Install replicate: pip install replicate")
         return self._client
+
+    # ------------------------------------------------------------------
+    # Cost-confirmation gate (opt-in via REPLICATE_REQUIRE_CONFIRM=1)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _gate(model_id: str, input_summary: str, confirm: bool) -> None:
+        """
+        Raise ConfirmationRequired when the env-level gate is active and the
+        caller has not explicitly set confirm=True.
+
+        With REPLICATE_REQUIRE_CONFIRM unset or "0" (the default), this is a
+        no-op and existing callers are unaffected.
+        """
+        if os.getenv("REPLICATE_REQUIRE_CONFIRM", "0") == "1" and not confirm:
+            raise ConfirmationRequired(model_id, input_summary)
 
     async def generate_image(
         self,
@@ -127,6 +211,7 @@ class ReplicateClient:
         guidance_scale: float = 7.5,
         num_inference_steps: int = 50,
         scheduler: str = "K_EULER",
+        confirm: bool = False,
         **kwargs,
     ) -> list[str]:
         """
@@ -142,6 +227,7 @@ class ReplicateClient:
             guidance_scale: CFG scale (7.5 typical)
             num_inference_steps: Denoising steps
             scheduler: Sampling method
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             List of image URLs
@@ -154,6 +240,7 @@ class ReplicateClient:
         """
         client = self._get_client()
         model_id = self.MODELS.get(model, model)
+        self._gate(model_id, f"prompt={prompt[:50]!r}", confirm)
 
         input_params = {
             "prompt": prompt,
@@ -178,6 +265,7 @@ class ReplicateClient:
         image_path: str,
         scale: int = 4,
         face_enhance: bool = False,
+        confirm: bool = False,
     ) -> str:
         """
         Upscale an image using Real-ESRGAN.
@@ -186,41 +274,61 @@ class ReplicateClient:
             image_path: Path to image file or URL
             scale: Upscale factor (2 or 4)
             face_enhance: Use GFPGAN for face enhancement
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             URL to upscaled image
         """
         client = self._get_client()
+        model_id = self.MODELS["real-esrgan"]
+        self._gate(model_id, f"image_path={image_path!r}", confirm)
 
-        input_params = {
-            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
-            "scale": scale,
-            "face_enhance": face_enhance,
-        }
+        if image_path.startswith("http"):
+            image_value = _validate_remote_url(image_path)
+            input_params = {"image": image_value, "scale": scale, "face_enhance": face_enhance}
+            output = client.run(model_id, input=input_params)
+        else:
+            with open(image_path, "rb") as fh:
+                input_params = {"image": fh, "scale": scale, "face_enhance": face_enhance}
+                output = client.run(model_id, input=input_params)
 
-        output = client.run(self.MODELS["real-esrgan"], input=input_params)
         return str(output)
 
-    async def remove_background(self, image_path: str) -> str:
+    async def remove_background(
+        self,
+        image_path: str,
+        confirm: bool = False,
+    ) -> str:
         """
         Remove background from an image.
 
         Args:
             image_path: Path to image file or URL
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             URL to image with transparent background
         """
         client = self._get_client()
+        model_id = self.MODELS["rembg"]
+        self._gate(model_id, f"image_path={image_path!r}", confirm)
 
-        input_params = {
-            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
-        }
+        if image_path.startswith("http"):
+            image_value = _validate_remote_url(image_path)
+            input_params = {"image": image_value}
+            output = client.run(model_id, input=input_params)
+        else:
+            with open(image_path, "rb") as fh:
+                input_params = {"image": fh}
+                output = client.run(model_id, input=input_params)
 
-        output = client.run(self.MODELS["rembg"], input=input_params)
         return str(output)
 
-    async def caption_image(self, image_path: str) -> str:
+    async def caption_image(
+        self,
+        image_path: str,
+        confirm: bool = False,
+    ) -> str:
         """
         Generate caption for an image using BLIP-2.
 
@@ -228,18 +336,24 @@ class ReplicateClient:
 
         Args:
             image_path: Path to image file or URL
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             Image caption text
         """
         client = self._get_client()
+        model_id = self.MODELS["blip-2"]
+        self._gate(model_id, f"image_path={image_path!r}", confirm)
 
-        input_params = {
-            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
-            "task": "image_captioning",
-        }
+        if image_path.startswith("http"):
+            image_value = _validate_remote_url(image_path)
+            input_params = {"image": image_value, "task": "image_captioning"}
+            output = client.run(model_id, input=input_params)
+        else:
+            with open(image_path, "rb") as fh:
+                input_params = {"image": fh, "task": "image_captioning"}
+                output = client.run(model_id, input=input_params)
 
-        output = client.run(self.MODELS["blip-2"], input=input_params)
         return str(output)
 
     async def run_controlnet(
@@ -247,6 +361,7 @@ class ReplicateClient:
         prompt: str,
         control_image: str,
         control_type: str = "canny",
+        confirm: bool = False,
         **kwargs,
     ) -> list[str]:
         """
@@ -256,6 +371,7 @@ class ReplicateClient:
             prompt: Text description
             control_image: Path to control image (edge map, pose, etc.)
             control_type: Type of control ("canny", "pose")
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
             **kwargs: Additional generation parameters
 
         Returns:
@@ -276,23 +392,24 @@ class ReplicateClient:
         if not model_id:
             raise ValueError(f"Unknown ControlNet type: {control_type}")
 
-        input_params = {
-            "prompt": prompt,
-            "image": (
-                open(control_image, "rb")  # noqa: SIM115
-                if not control_image.startswith("http")
-                else control_image
-            ),
-            **kwargs,
-        }
+        self._gate(model_id, f"prompt={prompt[:50]!r}, control_image={control_image!r}", confirm)
 
-        output = client.run(model_id, input=input_params)
+        if control_image.startswith("http"):
+            image_value = _validate_remote_url(control_image)
+            input_params = {"prompt": prompt, "image": image_value, **kwargs}
+            output = client.run(model_id, input=input_params)
+        else:
+            with open(control_image, "rb") as fh:
+                input_params = {"prompt": prompt, "image": fh, **kwargs}
+                output = client.run(model_id, input=input_params)
+
         return list(output) if hasattr(output, "__iter__") else [output]
 
     async def run_lora(
         self,
         model_id: str,
         prompt: str,
+        confirm: bool = False,
         **kwargs,
     ) -> list[str]:
         """
@@ -301,6 +418,7 @@ class ReplicateClient:
         Args:
             model_id: Full Replicate model ID (e.g., "damBruh/skyyrose-lora:latest")
             prompt: Generation prompt with trigger words
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
             **kwargs: Additional model parameters
 
         Returns:
@@ -313,6 +431,7 @@ class ReplicateClient:
             )
         """
         client = self._get_client()
+        self._gate(model_id, f"prompt={prompt[:50]!r}", confirm)
 
         input_params = {
             "prompt": prompt,
@@ -329,12 +448,13 @@ class ReplicateClient:
         num_outputs: int = 1,
         guidance_scale: float = 3.5,
         num_inference_steps: int = 28,
+        confirm: bool = False,
         **kwargs,
     ) -> list[str]:
         """
         Generate SkyyRose product images using custom-trained LoRA.
 
-        The LoRA was trained on 390 exact SkyyRose product images
+        The LoRA was trained on 604 exact SkyyRose product images
         with trigger word "skyyrose".
 
         Args:
@@ -343,6 +463,7 @@ class ReplicateClient:
             num_outputs: Number of images to generate (1-4)
             guidance_scale: CFG scale (3.5 recommended for Flux)
             num_inference_steps: Denoising steps (28 default)
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             List of image URLs
@@ -370,6 +491,7 @@ class ReplicateClient:
         return await self.run_lora(
             model_id=self.MODELS["skyyrose-lora"],
             prompt=full_prompt,
+            confirm=confirm,
             num_outputs=num_outputs,
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
@@ -381,6 +503,7 @@ class ReplicateClient:
         image_path: str,
         motion_bucket_id: int = 127,
         fps: int = 7,
+        confirm: bool = False,
         **kwargs,
     ) -> str:
         """
@@ -390,6 +513,7 @@ class ReplicateClient:
             image_path: Path to source image
             motion_bucket_id: Amount of motion (1-255)
             fps: Frames per second (6-30)
+            confirm: Set True to bypass the opt-in cost-confirmation gate.
 
         Returns:
             URL to generated video
@@ -398,20 +522,29 @@ class ReplicateClient:
             video_url = await client.generate_video("product.jpg")
         """
         client = self._get_client()
+        model_id = self.MODELS["svd"]
+        self._gate(model_id, f"image_path={image_path!r}", confirm)
 
-        input_params = {
-            "input_image": (
-                open(image_path, "rb")  # noqa: SIM115
-                if not image_path.startswith("http")
-                else image_path
-            ),
-            "motion_bucket_id": motion_bucket_id,
-            "fps": fps,
-            **kwargs,
-        }
+        if image_path.startswith("http"):
+            image_value = _validate_remote_url(image_path)
+            input_params = {
+                "input_image": image_value,
+                "motion_bucket_id": motion_bucket_id,
+                "fps": fps,
+                **kwargs,
+            }
+            output = client.run(model_id, input=input_params)
+        else:
+            with open(image_path, "rb") as fh:
+                input_params = {
+                    "input_image": fh,
+                    "motion_bucket_id": motion_bucket_id,
+                    "fps": fps,
+                    **kwargs,
+                }
+                output = client.run(model_id, input=input_params)
 
-        output = client.run(self.MODELS["svd"], input=input_params)
         return str(output)
 
 
-__all__ = ["ReplicateClient"]
+__all__ = ["ConfirmationRequired", "ReplicateClient"]

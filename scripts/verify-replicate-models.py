@@ -61,7 +61,7 @@ def describe_model(ref: str, *, label: str) -> bool:
     try:
         model = replicate.models.get(ref)
     except Exception as exc:  # noqa: BLE001
-        print(f"    ✗ DOES NOT RESOLVE — {type(exc).__name__}: {exc}\n")
+        print(f"    ✗ DOES NOT RESOLVE — {type(exc).__name__}\n")
         return False
     _line("exists", "✓")
     _line("owner", model.owner)
@@ -85,7 +85,7 @@ def check_pinned_version(ref: str, version_id: str) -> None:
         model = replicate.models.get(ref)
         version = model.versions.get(version_id)
     except Exception as exc:  # noqa: BLE001
-        print(f"    ✗ version NOT found — {type(exc).__name__}: {exc}\n")
+        print(f"    ✗ version NOT found — {type(exc).__name__}\n")
         return
     _line("version_exists", "✓")
     _line("created_at", getattr(version, "created_at", "?"))

@@ -2322,5 +2322,25 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-18T15:00:00Z"
+  },
+  {
+    "id": "bug-142",
+    "timestamp": "2026-06-18T13:54:00Z",
+    "error_message": "Paid imagery CLIs fire OpenAI gpt-image-2 / Replicate FLUX charges on the `go` subcommand with NO interactive STOP-AND-SHOW confirmation — manifest was built but never shown, input() never read, so `python scripts/gen-hero-previews.py go` (and gen-lookbook-remake.py go) charged immediately.",
+    "file": "scripts/gen-hero-previews.py, scripts/gen-lookbook-remake.py",
+    "root_cause": "build_manifest() (the 'Proceed? [y/N]' block) was only wired into the `plan` subcommand; the `go` branch called run() directly. The only guard on the paid path was a numeric hard-cap abort, which is not the project's required confirmation gate. Surfaced by the /code-review ultra multi-agent pass (C1 CRITICAL + H1 HIGH), adversarially verified.",
+    "fix": "Wired the gate into the `go` path of both scripts: print build_manifest(), read input() (EOFError/KeyboardInterrupt => empty => abort), proceed only on 'y'/'yes'; added a `--yes`/`-y` flag for non-interactive/CI use, default interactive. Proven: `go </dev/null` => exit 1 + 'Aborted.' with the paid call never reached. Part of a 21-finding review-fix batch. NOTE: cost gate belongs at the CLI boundary (these scripts), NOT buried in the reusable ReplicateClient — the provider got only an OPT-IN env-gated hook (REPLICATE_REQUIRE_CONFIRM, default off) so existing callers are unaffected.",
+    "tags": [
+      "stop-and-show",
+      "paid-api",
+      "cost-gate",
+      "openai",
+      "replicate",
+      "code-review-ultra",
+      "boundary-not-library"
+    ],
+    "related_bugs": ["bug-140"],
+    "occurrences": 1,
+    "last_seen": "2026-06-18T13:54:00Z"
   }
 ]
