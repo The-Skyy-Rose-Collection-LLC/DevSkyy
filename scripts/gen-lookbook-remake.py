@@ -162,6 +162,8 @@ def run(source: Path, variants: list[str], mask: Path | None) -> int:
     if total > HARD_CAP_USD:
         print(f"ABORT: estimate ${total:.2f} exceeds hard cap ${HARD_CAP_USD:.2f}")
         return 2
+    import openai
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     suffix = "-masked" if mask else ""
     failures = 0
@@ -172,6 +174,10 @@ def run(source: Path, variants: list[str], mask: Path | None) -> int:
             data = gen_edit(source, VARIANTS[v], mask=mask)
             dest.write_bytes(data)
             print(f"[{v}] ✓ {dest}  ({len(data) // 1024} KB)", flush=True)
+        except openai.AuthenticationError:
+            # Never print str(exc) — the OpenAI SDK echoes a partial key in it.
+            print(f"[{v}] ✗ AuthenticationError: check OPENAI_API_KEY", file=sys.stderr)
+            return 1
         except Exception as exc:  # noqa: BLE001
             failures += 1
             print(f"[{v}] ✗ {type(exc).__name__}: {exc}", file=sys.stderr)

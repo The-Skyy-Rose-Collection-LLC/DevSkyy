@@ -51,8 +51,8 @@ def whoami() -> None:
     try:
         acct = replicate.Client(api_token=token).accounts.current()
         _line("account", f"{acct.username} ({acct.type})")
-    except Exception as exc:  # noqa: BLE001
-        _line("account", f"could not resolve ({type(exc).__name__}: {exc})")
+    except Exception as exc:  # noqa: BLE001 — drop str(exc); SDK error chains can echo the token
+        _line("account", f"could not resolve ({type(exc).__name__})")
     print()
 
 

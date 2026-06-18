@@ -122,8 +122,8 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    if not args.source.exists():
-        print(f"ABORT: source not found: {args.source}")
+    if not args.source.is_file():
+        print(f"ABORT: source not a readable file: {args.source}")
         return 2
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     stem = args.source.stem
