@@ -2,7 +2,6 @@ import pytest
 
 from skyyrose.elite_studio.platform.tenancy import (
     FidelityThresholds,
-    Tenant,
     TenantRegistry,
     UnknownTenantError,
 )

@@ -89,16 +89,12 @@ class JobRecord:
                 else None
             ),
             result=(
-                PipelineResult.model_validate(payload["result"])
-                if payload.get("result")
-                else None
+                PipelineResult.model_validate(payload["result"]) if payload.get("result") else None
             ),
             error=payload.get("error"),
             submitted_at=datetime.fromisoformat(payload["submitted_at"]),
             started_at=(
-                datetime.fromisoformat(payload["started_at"])
-                if payload.get("started_at")
-                else None
+                datetime.fromisoformat(payload["started_at"]) if payload.get("started_at") else None
             ),
             finished_at=(
                 datetime.fromisoformat(payload["finished_at"])

@@ -10,12 +10,12 @@ Payload:        (value, type, gitBranch)
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, FrozenSet, List, Optional, Tuple
+from typing import Any
 
 # ── Constants ─────────────────────────────────────────────────────────
 
-VALID_TARGETS: FrozenSet[str] = frozenset({"production", "preview", "development"})
-VALID_TYPES: FrozenSet[str] = frozenset({"plain", "secret", "encrypted", "sensitive"})
+VALID_TARGETS: frozenset[str] = frozenset({"production", "preview", "development"})
+VALID_TYPES: frozenset[str] = frozenset({"plain", "secret", "encrypted", "sensitive"})
 
 _MASKED = "***"
 
@@ -39,9 +39,9 @@ class EnvVar:
     key: str
     value: str
     env_type: str = "plain"
-    targets: List[str] = field(default_factory=lambda: ["production"])
-    id: Optional[str] = field(default=None)
-    git_branch: Optional[str] = field(default=None)
+    targets: list[str] = field(default_factory=lambda: ["production"])
+    id: str | None = field(default=None)
+    git_branch: str | None = field(default=None)
 
     def __post_init__(self) -> None:
         if not self.key or not self.key.strip():
@@ -53,7 +53,7 @@ class EnvVar:
             raise ValueError(f"Invalid type {self.env_type!r}. Valid types: {sorted(VALID_TYPES)}")
 
     @property
-    def identity(self) -> Tuple[str, Tuple[str, ...]]:
+    def identity(self) -> tuple[str, tuple[str, ...]]:
         """Identity tuple: (key, sorted_targets)."""
         return (self.key, tuple(sorted(self.targets)))
 
@@ -65,9 +65,9 @@ class EnvVar:
         """Return value for display; masked unless ``reveal=True``."""
         return self.value if reveal else _MASKED
 
-    def to_create_payload(self) -> Dict[str, Any]:
+    def to_create_payload(self) -> dict[str, Any]:
         """Build a payload dict for POST /v9/projects/{idOrName}/env."""
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "key": self.key,
             "value": self.value,
             "type": self.env_type,
@@ -77,9 +77,9 @@ class EnvVar:
             payload["gitBranch"] = self.git_branch
         return payload
 
-    def to_update_payload(self) -> Dict[str, Any]:
+    def to_update_payload(self) -> dict[str, Any]:
         """Build a payload dict for PATCH /v9/projects/{idOrName}/env/{id}."""
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "value": self.value,
             "type": self.env_type,
             "target": self.targets,
@@ -89,7 +89,7 @@ class EnvVar:
         return payload
 
     @classmethod
-    def from_api(cls, record: Dict[str, Any]) -> "EnvVar":
+    def from_api(cls, record: dict[str, Any]) -> EnvVar:
         """Construct from a Vercel API env record dict."""
         target_raw = record.get("target", ["production"])
         if isinstance(target_raw, str):
@@ -127,16 +127,16 @@ class EnvVarDiff:
     """
 
     key: str
-    targets: Tuple[str, ...]
+    targets: tuple[str, ...]
     action: str
-    current: Optional[EnvVar]
-    desired: Optional[EnvVar]
+    current: EnvVar | None
+    desired: EnvVar | None
 
 
 def diff_env_vars(
-    current: List[EnvVar],
-    desired: List[EnvVar],
-) -> List[EnvVarDiff]:
+    current: list[EnvVar],
+    desired: list[EnvVar],
+) -> list[EnvVarDiff]:
     """Compute a diff between current (API) and desired (manifest) env vars.
 
     Identity: (key, sorted_targets) tuple.
@@ -149,10 +149,10 @@ def diff_env_vars(
         List of ``EnvVarDiff`` instances describing required changes.
         Items with ``action == "unchanged"`` indicate no change needed.
     """
-    current_map: Dict[Tuple[str, Tuple[str, ...]], EnvVar] = {ev.identity: ev for ev in current}
-    desired_map: Dict[Tuple[str, Tuple[str, ...]], EnvVar] = {ev.identity: ev for ev in desired}
+    current_map: dict[tuple[str, tuple[str, ...]], EnvVar] = {ev.identity: ev for ev in current}
+    desired_map: dict[tuple[str, tuple[str, ...]], EnvVar] = {ev.identity: ev for ev in desired}
 
-    results: List[EnvVarDiff] = []
+    results: list[EnvVarDiff] = []
 
     # desired vars — may be add or update
     for identity, des in desired_map.items():
@@ -211,6 +211,4 @@ def _env_var_changed(current: EnvVar, desired: EnvVar) -> bool:
         return True
     if current.env_type != desired.env_type:
         return True
-    if current.git_branch != desired.git_branch:
-        return True
-    return False
+    return current.git_branch != desired.git_branch

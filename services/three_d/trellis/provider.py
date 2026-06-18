@@ -322,9 +322,7 @@ class TrellisProvider:
         correlation_id: str,
     ) -> PostprocessResult:
         artifact_id = (
-            request.metadata.get("artifact_id")
-            or request.correlation_id
-            or correlation_id[:12]
+            request.metadata.get("artifact_id") or request.correlation_id or correlation_id[:12]
         )
         sampling = self._resolve_sampling(request)
         try:
@@ -362,7 +360,7 @@ class TrellisProvider:
                     prompt_hint=prompt_hint,
                     seed=seed,
                 )
-            except asyncio.TimeoutError as exc:
+            except TimeoutError as exc:
                 raise ThreeDTimeoutError(
                     f"TRELLIS timed out after {self.config.timeout_seconds}s",
                     provider=self.name,
@@ -403,9 +401,9 @@ class TrellisProvider:
                 sampling=sampling_steps,
                 seed=seed,
             )
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             raise ThreeDTimeoutError(
-                f"TRELLIS text-to-3D timed out",
+                "TRELLIS text-to-3D timed out",
                 provider=self.name,
                 timeout_seconds=self.config.timeout_seconds,
                 correlation_id=correlation_id,

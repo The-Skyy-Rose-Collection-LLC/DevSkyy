@@ -1,7 +1,6 @@
 from skyyrose.elite_studio.platform.fidelity.report import FidelityReport, FidelityVerdict
 from skyyrose.elite_studio.platform.tenancy import TenantRegistry
 from skyyrose.elite_studio.ventures.threed.service import (
-    ReplicaOutcome,
     default_replica_runner,
     run_replica,
 )

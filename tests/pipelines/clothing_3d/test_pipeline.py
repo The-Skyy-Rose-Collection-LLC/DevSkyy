@@ -5,6 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from services.three_d.trellis import (
+    TrellisConfig,
+    TrellisProvider,
+    TrellisQualityPreset,
+)
+from services.three_d.trellis.client import StubClient
 
 from pipelines.clothing_3d import (
     ClothingPipeline,
@@ -15,12 +21,6 @@ from pipelines.clothing_3d import (
 from pipelines.clothing_3d.events import log_event_subscriber
 from pipelines.clothing_3d.stages import QCThresholds
 from pipelines.clothing_3d.storage import LocalArtifactStore
-from services.three_d.trellis import (
-    TrellisConfig,
-    TrellisProvider,
-    TrellisQualityPreset,
-)
-from services.three_d.trellis.client import StubClient
 
 pytest.importorskip("PIL.Image")
 

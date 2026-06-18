@@ -19,16 +19,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from services.three_d.provider_interface import OutputFormat, ThreeDRequest, ThreeDResponse
+from services.three_d.trellis.config import TrellisConfig
+from services.three_d.trellis.garment_aware import GarmentCategory, classify_garment
+from services.three_d.trellis.provider import TrellisProvider
+
 from pipelines.clothing_3d.models import (
     PipelineQualityReport,
     PipelineRequest,
     PipelineStage,
     StageReport,
 )
-from services.three_d.provider_interface import OutputFormat, ThreeDRequest, ThreeDResponse
-from services.three_d.trellis.config import TrellisConfig
-from services.three_d.trellis.garment_aware import GarmentCategory, classify_garment
-from services.three_d.trellis.provider import TrellisProvider
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +195,11 @@ async def stage_generate(
         collection=request.collection,
         garment_type=(
             request.garment_type
-            or (ctx.garment_category.value if ctx.garment_category != GarmentCategory.UNKNOWN else None)
+            or (
+                ctx.garment_category.value
+                if ctx.garment_category != GarmentCategory.UNKNOWN
+                else None
+            )
         ),
         correlation_id=ctx.correlation_id,
         metadata={
@@ -336,13 +341,16 @@ async def stage_store(
     started_at, started_perf = _start_report(PipelineStage.STORE)
     response = ctx.three_d_response
     if response is None or not response.model_path:
-        return _finish_report(
-            PipelineStage.STORE,
-            started_at,
-            started_perf,
-            success=False,
-            error="No artifact to store",
-        ), None
+        return (
+            _finish_report(
+                PipelineStage.STORE,
+                started_at,
+                started_perf,
+                success=False,
+                error="No artifact to store",
+            ),
+            None,
+        )
 
     meta = response.metadata or {}
     bundle = ArtifactBundle(
@@ -361,13 +369,16 @@ async def stage_store(
     try:
         stored = await store.store(bundle)
     except Exception as exc:  # noqa: BLE001
-        return _finish_report(
-            PipelineStage.STORE,
-            started_at,
-            started_perf,
-            success=False,
-            error=f"{type(exc).__name__}: {exc}",
-        ), None
+        return (
+            _finish_report(
+                PipelineStage.STORE,
+                started_at,
+                started_perf,
+                success=False,
+                error=f"{type(exc).__name__}: {exc}",
+            ),
+            None,
+        )
 
     detail = {
         "glb_url": stored.glb_url,
@@ -375,13 +386,16 @@ async def stage_store(
         "thumbnail_url": stored.thumbnail_url,
         "metadata": stored.metadata,
     }
-    return _finish_report(
-        PipelineStage.STORE,
-        started_at,
-        started_perf,
-        success=True,
-        detail=detail,
-    ), stored
+    return (
+        _finish_report(
+            PipelineStage.STORE,
+            started_at,
+            started_perf,
+            success=True,
+            detail=detail,
+        ),
+        stored,
+    )
 
 
 # =============================================================================

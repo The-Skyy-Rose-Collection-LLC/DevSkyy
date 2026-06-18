@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()

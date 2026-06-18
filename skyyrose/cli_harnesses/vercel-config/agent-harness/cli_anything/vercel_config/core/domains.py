@@ -9,7 +9,7 @@ Payload:   redirect, gitBranch, verified
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # ── Dataclass ─────────────────────────────────────────────────────────
 
@@ -26,8 +26,8 @@ class Domain:
     """
 
     name: str
-    redirect: Optional[str] = field(default=None)
-    git_branch: Optional[str] = field(default=None)
+    redirect: str | None = field(default=None)
+    git_branch: str | None = field(default=None)
     verified: bool = field(default=False)
 
     def __post_init__(self) -> None:
@@ -42,18 +42,18 @@ class Domain:
         """Identity key: normalized hostname."""
         return self.name
 
-    def to_add_payload(self) -> Dict[str, Any]:
+    def to_add_payload(self) -> dict[str, Any]:
         """Build a payload dict for POST /v10/projects/{idOrName}/domains."""
-        payload: Dict[str, Any] = {"name": self.name}
+        payload: dict[str, Any] = {"name": self.name}
         if self.redirect:
             payload["redirect"] = self.redirect
         if self.git_branch:
             payload["gitBranch"] = self.git_branch
         return payload
 
-    def to_update_payload(self) -> Dict[str, Any]:
+    def to_update_payload(self) -> dict[str, Any]:
         """Build a payload dict for PATCH /v10/projects/{idOrName}/domains/{domain}."""
-        payload: Dict[str, Any] = {}
+        payload: dict[str, Any] = {}
         if self.redirect is not None:
             payload["redirect"] = self.redirect
         if self.git_branch is not None:
@@ -61,7 +61,7 @@ class Domain:
         return payload
 
     @classmethod
-    def from_api(cls, record: Dict[str, Any]) -> "Domain":
+    def from_api(cls, record: dict[str, Any]) -> Domain:
         """Construct from a Vercel API domain record dict."""
         return cls(
             name=record.get("name", ""),
@@ -87,14 +87,14 @@ class DomainDiff:
 
     name: str
     action: str
-    current: Optional[Domain]
-    desired: Optional[Domain]
+    current: Domain | None
+    desired: Domain | None
 
 
 def diff_domains(
-    current: List[Domain],
-    desired: List[Domain],
-) -> List[DomainDiff]:
+    current: list[Domain],
+    desired: list[Domain],
+) -> list[DomainDiff]:
     """Compute a diff between current (API) and desired (manifest) domains.
 
     Identity: normalized hostname.
@@ -106,10 +106,10 @@ def diff_domains(
     Returns:
         List of ``DomainDiff`` instances describing required changes.
     """
-    current_map: Dict[str, Domain] = {d.identity: d for d in current}
-    desired_map: Dict[str, Domain] = {d.identity: d for d in desired}
+    current_map: dict[str, Domain] = {d.identity: d for d in current}
+    desired_map: dict[str, Domain] = {d.identity: d for d in desired}
 
-    results: List[DomainDiff] = []
+    results: list[DomainDiff] = []
 
     for name, des in desired_map.items():
         cur = current_map.get(name)
@@ -132,6 +132,4 @@ def _domain_changed(current: Domain, desired: Domain) -> bool:
     """Return True if the domain payload differs."""
     if current.redirect != desired.redirect:
         return True
-    if current.git_branch != desired.git_branch:
-        return True
-    return False
+    return current.git_branch != desired.git_branch

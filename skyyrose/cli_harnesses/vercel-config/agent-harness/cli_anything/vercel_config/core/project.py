@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # ── Constants ─────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ class ProjectRef:
     """
 
     id_or_name: str
-    team_id: Optional[str] = field(default=None)
+    team_id: str | None = field(default=None)
 
     def __post_init__(self) -> None:
         if not self.id_or_name or not self.id_or_name.strip():
@@ -100,7 +100,7 @@ def parse_project_ref(spec: str) -> ProjectRef:
 # ── Payload builder ───────────────────────────────────────────────────
 
 
-def build_patch_payload(updates: Dict[str, Any]) -> Dict[str, Any]:
+def build_patch_payload(updates: dict[str, Any]) -> dict[str, Any]:
     """Build a validated PATCH payload for /v9/projects/{idOrName}.
 
     Filters out unknown fields and returns only the keys present in
@@ -125,6 +125,6 @@ def build_patch_payload(updates: Dict[str, Any]) -> Dict[str, Any]:
     return filtered
 
 
-def patchable_fields() -> List[str]:
+def patchable_fields() -> list[str]:
     """Return sorted list of patchable project fields."""
     return sorted(_PATCHABLE_FIELDS)

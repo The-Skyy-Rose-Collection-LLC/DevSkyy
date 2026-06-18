@@ -31,14 +31,15 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from pipelines.clothing_3d.models import PipelineRequest  # noqa: E402
-from pipelines.clothing_3d.pipeline import ClothingPipeline  # noqa: E402
 from services.three_d.trellis.config import (  # noqa: E402
     TrellisBackend,
     TrellisConfig,
     TrellisQualityPreset,
 )
 from services.three_d.trellis.provider import TrellisProvider, make_stub_provider  # noqa: E402
+
+from pipelines.clothing_3d.models import PipelineRequest  # noqa: E402
+from pipelines.clothing_3d.pipeline import ClothingPipeline  # noqa: E402
 
 logger = logging.getLogger("trellis_demo")
 

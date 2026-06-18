@@ -175,11 +175,7 @@ BINARY_EXTS = {
 
 # Extract backtick-quoted things that look like file paths.
 # Must contain / OR end with a known extension (2-4 alphanumeric chars after final .).
-PATH_RE = re.compile(
-    r"`([A-Za-z0-9_\-./]*?"
-    r"(?:/[A-Za-z0-9_\-.]+"
-    r"|\.[a-zA-Z0-9]{2,4}))`"
-)
+PATH_RE = re.compile(r"`([A-Za-z0-9_\-./]*?" r"(?:/[A-Za-z0-9_\-.]+" r"|\.[a-zA-Z0-9]{2,4}))`")
 LINECOUNT_RE = re.compile(r"\(\s*(\d+)\s*(?:L|lines?)\b", re.IGNORECASE)
 VERIFIED_RE = re.compile(r"verified\s+(\d{4}-\d{2}-\d{2})", re.IGNORECASE)
 

@@ -154,7 +154,7 @@ class MessageBus:
         try:
             await self.publish(req)
             return await asyncio.wait_for(fut, timeout=timeout_seconds)
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             async with self._lock:
                 self._pending.pop(correlation_id, None)
             msg = f"Request on topic {topic!r} timed out after {timeout_seconds}s"
