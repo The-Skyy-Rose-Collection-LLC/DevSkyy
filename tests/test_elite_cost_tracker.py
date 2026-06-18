@@ -106,9 +106,11 @@ def test_get_job_cost_returns_zero_for_unknown_job(tracker):
     assert tracker.get_job_cost("nonexistent-job") == 0.0
 
 
-def test_get_job_cost_returns_zero_when_redis_unavailable():
+def test_get_job_cost_returns_zero_when_redis_unavailable(monkeypatch):
     ct = CostTracker()
-    ct._redis = None
+    # Patch _get_redis to simulate total unavailability (setting _redis=None
+    # alone doesn't prevent reconnection when a live Redis is present in CI).
+    monkeypatch.setattr(ct, "_get_redis", lambda: None)
     assert ct.get_job_cost("job-x") == 0.0
 
 
@@ -137,9 +139,11 @@ def test_get_total_cost_excludes_old_entries(tracker, fake_redis):
     assert total < 9.99 + 0.30 + 0.01  # old entry must be excluded
 
 
-def test_get_total_cost_returns_zero_when_redis_unavailable():
+def test_get_total_cost_returns_zero_when_redis_unavailable(monkeypatch):
     ct = CostTracker()
-    ct._redis = None
+    # Patch _get_redis to simulate total unavailability (setting _redis=None
+    # alone doesn't prevent reconnection when a live Redis is present in CI).
+    monkeypatch.setattr(ct, "_get_redis", lambda: None)
     assert ct.get_total_cost() == 0.0
 
 
