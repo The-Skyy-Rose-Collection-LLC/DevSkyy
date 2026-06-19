@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,9 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.6.5 =
+* SEO: static front page now emits og:type=website (was article). The is_singular() branches in the Open Graph, Twitter, and meta-description functions now defer to is_front_page(), so the homepage gets website OG + the brand-tagline description. Exposed when the 1.6.4 Jetpack OG dedup removed the masking duplicate website tag.
 
 = 1.6.4 =
 * SEO: immersive and landing page templates now emit og:type=website with brand-correct titles/descriptions and collection ItemList schema (previously fell through to og:type=article)

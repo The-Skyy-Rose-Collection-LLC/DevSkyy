@@ -571,7 +571,7 @@ function skyyrose_open_graph_tags() {
 		} else {
 			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 		}
-	} elseif ( is_singular() ) {
+	} elseif ( is_singular() && ! is_front_page() ) {
 		global $post;
 
 		echo '<meta property="og:type" content="' . esc_attr( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
@@ -704,7 +704,7 @@ function skyyrose_twitter_card_tags() {
 		} else {
 			echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
 		}
-	} elseif ( is_singular() ) {
+	} elseif ( is_singular() && ! is_front_page() ) {
 		echo '<meta name="twitter:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 
@@ -780,7 +780,7 @@ function skyyrose_meta_description() {
 
 	$description = '';
 
-	if ( is_singular() ) {
+	if ( is_singular() && ! is_front_page() ) {
 		// Custom template meta descriptions (155 chars max, CTA-driven).
 		if ( is_page() ) {
 			$template     = get_page_template_slug();
