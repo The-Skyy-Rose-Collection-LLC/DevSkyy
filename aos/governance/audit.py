@@ -117,7 +117,7 @@ class AuditTrail:
             clauses.append("timestamp <= ?")
             params.append(until.isoformat())
 
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""  # nosec B608 — clauses contain only static literal strings; user values go in parameterized `params` list
         sql = (
             "SELECT id, timestamp, event_type, actor_pid, target_pid, details, correlation_id "
             f"FROM audit_log{where} ORDER BY timestamp DESC LIMIT ?"
@@ -150,7 +150,7 @@ class AuditTrail:
         if target_pid is not None:
             clauses.append("target_pid = ?")
             params.append(target_pid)
-        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""  # nosec B608 — static literal clauses; user values in parameterized params list
         sql = f"SELECT COUNT(*) FROM audit_log{where}"
         conn = self._require_conn()
         async with conn.execute(sql, params) as cursor:

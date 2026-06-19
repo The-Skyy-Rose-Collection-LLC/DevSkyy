@@ -475,7 +475,7 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "main_enterprise:app",
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
         port=8000,
         reload=True,
         log_level="info",

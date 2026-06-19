@@ -36,17 +36,18 @@ def gimp_pixel_cleanup(
     """
     out = Path(output_dir)
     cleanup_path = str(out / f"{sku}-composite-clean.png")
-    commands = [
-        f"media open --path {composite_path}",
-        "filter apply --name gaussian-blur --radius 1",
-        f"export save --output {cleanup_path} --format PNG",
-    ]
+    # cli-anything-gimp surface (2026-05-26): media={check,histogram,list,probe},
+    # filter={add,info,list,remove,set}, export={render,presets,preset-info}. The previous
+    # "media open / filter apply / export save" sequence never matched the real CLI surface.
+    # Stage E is a no-op until a project new -> layer add -> filter add -> export render
+    # pipeline is wired. Stage D output is returned unchanged; downstream stages handle it fine.
+    commands: list[str] = []
     try:
         for cmd in commands:
             argv = ["cli-anything-gimp", "--json"] + shlex.split(cmd)
             result = subprocess.run(argv, capture_output=True, text=True, timeout=60)
             if result.returncode != 0:
-                logger.warning(
+                logger.debug(
                     "GIMP cleanup step failed for %s: %s",
                     sku,
                     result.stderr.strip()[:200],

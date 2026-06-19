@@ -108,7 +108,7 @@ def main() -> int:
     products = REPO / "wordpress-theme/skyyrose-flagship/assets/images/products"
     source_path = products / "black-rose-crewneck-techflat-v4.jpg"
     candidate_path = products / "br-001-crewneck.png"
-    refined_path = Path("/tmp/br-001-refined.png")
+    refined_path = Path("/tmp/br-001-refined.png")  # nosec B108 — validation script, ephemeral output
 
     for label, p in (("source", source_path), ("baseline candidate", candidate_path)):
         if not p.exists():

@@ -147,7 +147,7 @@ class TrellisInference:
 
         from trellis.pipelines import TrellisImageTo3DPipeline  # type: ignore[import-not-found]
 
-        self._pipeline = TrellisImageTo3DPipeline.from_pretrained(_MODEL_NAME)
+        self._pipeline = TrellisImageTo3DPipeline.from_pretrained(_MODEL_NAME)  # nosec B615 — HF model ID constant; well-known public model from trusted org
         self._pipeline.cuda()
 
     @modal.method()
@@ -314,7 +314,7 @@ def smoke(
             f"{_GOLDEN_ROOT}/{sku}/ or pass --image-path"
         )
 
-    dest = Path(output_path) if output_path else Path(f"/tmp/{sku}-trellis-modal.glb")
+    dest = Path(output_path) if output_path else Path(f"/tmp/{sku}-trellis-modal.glb")  # nosec B108 — CLI smoke test output; path is user-overridable via --output-path
 
     print(f"[smoke] sku={sku} reading {src} ({src.stat().st_size} bytes)")
     image_bytes = src.read_bytes()

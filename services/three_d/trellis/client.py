@@ -302,7 +302,7 @@ class LocalTrellisClient:
         os.environ.setdefault("ATTN_BACKEND", "xformers")
         os.environ.setdefault("SPCONV_ALGO", "native")
 
-        pipeline = TrellisImageTo3DPipeline.from_pretrained(self.config.local_model_name)
+        pipeline = TrellisImageTo3DPipeline.from_pretrained(self.config.local_model_name)  # nosec B615 — HF model ID constant; well-known public model from trusted org
         if hasattr(pipeline, "cuda"):
             pipeline.cuda()
         return pipeline
@@ -513,7 +513,7 @@ def _download_to_temp(url: str, suffix: str) -> str:
     import urllib.request
 
     tmp = Path(tempfile.mkdtemp(prefix="trellis_replicate_")) / f"output{suffix}"
-    with urllib.request.urlopen(url) as src, open(tmp, "wb") as dst:  # noqa: S310 — trusted URL
+    with urllib.request.urlopen(url) as src, open(tmp, "wb") as dst:  # noqa: S310 — trusted URL  # nosec B310 — URL from controlled API response, not user input
         shutil.copyfileobj(src, dst)
     return str(tmp)
 

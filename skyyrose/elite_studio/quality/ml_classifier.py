@@ -59,8 +59,8 @@ def _load_clip_model() -> tuple:
     from transformers import CLIPModel, CLIPProcessor  # type: ignore[import]
 
     logger.info("Loading CLIP model %s (first call — subsequent calls use cache)", _CLIP_MODEL_ID)
-    processor = CLIPProcessor.from_pretrained(_CLIP_MODEL_ID)
-    model = CLIPModel.from_pretrained(_CLIP_MODEL_ID)
+    processor = CLIPProcessor.from_pretrained(_CLIP_MODEL_ID)  # nosec B615 — model ID constant defined at module level; well-known public CLIP model
+    model = CLIPModel.from_pretrained(_CLIP_MODEL_ID)  # nosec B615 — same
     model.eval()
     return model, processor
 

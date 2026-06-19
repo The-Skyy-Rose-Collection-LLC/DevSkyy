@@ -407,7 +407,7 @@ class MTLSHandler:
     def create_secure_server_socket(
         self,
         service_name: str,
-        bind_address: str = "0.0.0.0",
+        bind_address: str = "0.0.0.0",  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
         bind_port: int | None = None,
         require_client_cert: bool = True,
     ) -> ssl.SSLSocket:

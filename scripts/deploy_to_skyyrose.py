@@ -62,7 +62,7 @@ class WordPressDeployer:
         req = urllib.request.Request(url, data=body, headers=headers, method=method)
 
         try:
-            with urllib.request.urlopen(req, timeout=30) as response:
+            with urllib.request.urlopen(req, timeout=30) as response:  # nosec B310 — URL from controlled API response, not user input
                 if response.status in (200, 201):
                     content = response.read().decode()
                     return json.loads(content) if content else {}

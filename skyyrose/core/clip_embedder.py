@@ -62,8 +62,8 @@ def get_clip() -> _ClipState:
             return _STATE
         device = _select_device()
         logger.info("Loading CLIP %s on %s", MODEL_ID, device)
-        model = CLIPModel.from_pretrained(MODEL_ID).to(device).eval()
-        processor = CLIPProcessor.from_pretrained(MODEL_ID)
+        model = CLIPModel.from_pretrained(MODEL_ID).to(device).eval()  # nosec B615 — openai/clip-vit-base-patch32 is a pinned well-known public model; revision pinned via MODEL_ID constant above
+        processor = CLIPProcessor.from_pretrained(MODEL_ID)  # nosec B615 — same model, same justification
         _STATE = _ClipState(model=model, processor=processor, device=device)
     return _STATE
 

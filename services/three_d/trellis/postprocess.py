@@ -63,7 +63,7 @@ class MeshPostprocessor:
     Usage:
         post = MeshPostprocessor(TrellisConfig())
         result = post.process(
-            raw_glb="/tmp/trellis_out.glb",
+            raw_glb="/tmp/trellis_out.glb",  # nosec B108 — docstring example only, not executed
             category=GarmentCategory.HOODIE,
             sampling=config.sampling,
         )

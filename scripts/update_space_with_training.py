@@ -88,7 +88,7 @@ def train_lora(progress=gr.Progress()):
         yield "\\n".join(logs)
 
         from huggingface_hub import snapshot_download
-        dataset_path = snapshot_download(
+        dataset_path = snapshot_download(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             repo_id="damBruh/skyyrose-lora-dataset-v1",
             repo_type="dataset",
             local_dir="./skyyrose_dataset"

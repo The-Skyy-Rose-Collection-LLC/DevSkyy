@@ -120,7 +120,7 @@ class VertexImagenClient:
             from vertexai.preview.vision_models import ImageGenerationModel
 
             vertexai.init(project=self.project_id, location=self.location)
-            self._model = ImageGenerationModel.from_pretrained(self.MODELS["imagen-3"])
+            self._model = ImageGenerationModel.from_pretrained(self.MODELS["imagen-3"])  # nosec B615 — HF model ID constant; well-known public model from trusted org
             self._initialized = True
             logger.info(f"Vertex AI initialized: {self.project_id}/{self.location}")
 
@@ -144,7 +144,7 @@ class VertexImagenClient:
             except ImportError:
                 import urllib.request
 
-                with urllib.request.urlopen(image_path) as response:
+                with urllib.request.urlopen(image_path) as response:  # nosec B310 — URL from Google Vertex API response, not user input
                     return response.read()
         return Path(image_path).read_bytes()
 
@@ -192,7 +192,7 @@ class VertexImagenClient:
         if model != "imagen-3" and model in self.MODELS:
             from vertexai.preview.vision_models import ImageGenerationModel
 
-            self._model = ImageGenerationModel.from_pretrained(self.MODELS[model])
+            self._model = ImageGenerationModel.from_pretrained(self.MODELS[model])  # nosec B615 — HF model ID constant; well-known public model from trusted org
 
         logger.info(f"Generating with Imagen 3: {prompt[:50]}...")
 

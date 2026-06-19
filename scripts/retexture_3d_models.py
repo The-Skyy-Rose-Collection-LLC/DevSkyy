@@ -110,7 +110,7 @@ def download_file(url: str, output_path: Path) -> bool:
     import urllib.request
 
     try:
-        urllib.request.urlretrieve(url, str(output_path))
+        urllib.request.urlretrieve(url, str(output_path))  # nosec B310 — URL from controlled API response, not user input
         return True
     except Exception as e:
         print(f"Download failed: {e}")

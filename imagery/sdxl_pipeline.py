@@ -160,7 +160,7 @@ class SDXLPipeline:
 
             dtype = torch.float16 if self.dtype == "float16" else torch.float32
 
-            self._base_pipeline = StableDiffusionXLPipeline.from_pretrained(
+            self._base_pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                 str(model_path),
                 torch_dtype=dtype,
                 variant="fp16" if dtype == torch.float16 else None,
@@ -195,7 +195,7 @@ class SDXLPipeline:
 
             dtype = torch.float16 if self.dtype == "float16" else torch.float32
 
-            self._refiner_pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+            self._refiner_pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                 str(model_path),
                 torch_dtype=dtype,
                 variant="fp16" if dtype == torch.float16 else None,
@@ -220,7 +220,7 @@ class SDXLPipeline:
                         model_path = "diffusers/controlnet-canny-sdxl-1.0"
 
                     dtype = torch.float16 if self.dtype == "float16" else torch.float32
-                    self._controlnet_canny = ControlNetModel.from_pretrained(
+                    self._controlnet_canny = ControlNetModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         str(model_path),
                         torch_dtype=dtype,
                     ).to(self.device)
@@ -234,7 +234,7 @@ class SDXLPipeline:
                         model_path = "diffusers/controlnet-depth-sdxl-1.0"
 
                     dtype = torch.float16 if self.dtype == "float16" else torch.float32
-                    self._controlnet_depth = ControlNetModel.from_pretrained(
+                    self._controlnet_depth = ControlNetModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         str(model_path),
                         torch_dtype=dtype,
                     ).to(self.device)

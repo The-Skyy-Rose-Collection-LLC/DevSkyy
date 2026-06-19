@@ -74,7 +74,7 @@ class UpscalingAgent:
             else:
                 import urllib.request
 
-                urllib.request.urlretrieve(str(output), str(output_path))
+                urllib.request.urlretrieve(str(output), str(output_path))  # nosec B310 — URL from controlled API response, not user input
 
             return UpscaleResult(
                 success=True,

@@ -324,7 +324,7 @@ async def get_alert_history(
         where_clause = " AND ".join(conditions) if conditions else "1=1"
 
         # Count total
-        count_query = text(f"""
+        count_query = text(f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT COUNT(*) FROM alert_history ah
             WHERE {where_clause}
         """)
@@ -336,7 +336,7 @@ async def get_alert_history(
         params["limit"] = page_size
         params["offset"] = offset
 
-        data_query = text(f"""
+        data_query = text(f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 ah.id,
                 ah.alert_config_id,
@@ -459,7 +459,7 @@ async def get_active_alerts(
         where_clause = " AND ".join(conditions)
 
         # Get active alerts
-        data_query = text(f"""
+        data_query = text(f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 ah.id,
                 ah.alert_config_id,

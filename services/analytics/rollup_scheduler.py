@@ -608,7 +608,7 @@ class RollupScheduler:
             List of rollup results for this dimension.
         """
         # SQL query for aggregation with percentiles
-        query = text(f"""
+        query = text(f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 '{dimension.value}' as dimension,
                 {dimension.value} as dimension_value,

@@ -99,13 +99,13 @@ async def generate_model_wearing_product(
 
     # Load VAE for better quality
     print("  Loading VAE and pipeline...")
-    vae = AutoencoderKL.from_pretrained(
+    vae = AutoencoderKL.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "madebyollin/sdxl-vae-fp16-fix",
         torch_dtype=torch.float16,
     ).to(device)
 
     # Load SDXL pipeline with IP-Adapter for EXACT clothing transfer
-    pipeline = StableDiffusionXLPipeline.from_pretrained(
+    pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "RunDiffusion/Juggernaut-XL-v9",
         torch_dtype=torch.float16,
         vae=vae,

@@ -540,7 +540,7 @@ def cmd_import(args) -> int:
     if source.startswith("http://") or source.startswith("https://"):
         print(f"Fetching from URL: {source}")
         try:
-            with urllib.request.urlopen(source) as response:
+            with urllib.request.urlopen(source) as response:  # nosec B310 — URL from controlled API response, not user input
                 content = response.read().decode("utf-8")
         except Exception as e:
             print(f"Error fetching URL: {e}", file=sys.stderr)

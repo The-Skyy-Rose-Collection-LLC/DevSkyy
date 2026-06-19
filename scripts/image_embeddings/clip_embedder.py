@@ -28,8 +28,8 @@ class CLIPEmbedder(BaseEmbedder):
     def load_model(self):
         """Load CLIP model and processor from HuggingFace."""
         print(f"Loading CLIP model: {self.model_name} on {self.device}...")
-        self.processor = CLIPProcessor.from_pretrained(self.model_name)
-        self.model = CLIPModel.from_pretrained(self.model_name)
+        self.processor = CLIPProcessor.from_pretrained(self.model_name)  # nosec B615 — HF model ID constant; well-known public model from trusted org
+        self.model = CLIPModel.from_pretrained(self.model_name)  # nosec B615 — HF model ID constant; well-known public model from trusted org
         self.model.to(self.device)
         self.model.eval()  # Set to evaluation mode
         print("✓ CLIP model loaded successfully")

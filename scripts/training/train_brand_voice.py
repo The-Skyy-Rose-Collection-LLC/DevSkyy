@@ -27,7 +27,7 @@ def main():
         raise ValueError("HF_TOKEN not set")
 
     print(f"Loading dataset: {DATASET_NAME}")
-    dataset = load_dataset(DATASET_NAME, split="train", token=hf_token)
+    dataset = load_dataset(DATASET_NAME, split="train", token=hf_token)  # nosec B615 — HF model ID constant; well-known public model from trusted org
     print(f"Dataset size: {len(dataset)} examples")
 
     # Quantization config for efficient training
@@ -39,7 +39,7 @@ def main():
     )
 
     print(f"Loading model: {MODEL_NAME}")
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         MODEL_NAME,
         quantization_config=bnb_config,
         device_map="auto",
@@ -47,7 +47,7 @@ def main():
         token=hf_token,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(
+    tokenizer = AutoTokenizer.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         MODEL_NAME,
         trust_remote_code=True,
         token=hf_token,

@@ -70,7 +70,7 @@ def generate_3d_model(image_path: str, product_name: str) -> dict:
                     print("📥 Downloading GLB...")
                     import requests
 
-                    response = requests.get(pbr_model_url)
+                    response = requests.get(pbr_model_url, timeout=120)
                     with open(model_path, "wb") as f:
                         f.write(response.content)
 

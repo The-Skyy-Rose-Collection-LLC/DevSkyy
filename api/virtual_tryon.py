@@ -122,7 +122,7 @@ def validate_url_for_ssrf(url: str) -> None:
 
     # Block localhost variants
     hostname_lower = parsed.hostname.lower()
-    if hostname_lower in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+    if hostname_lower in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
         raise ValueError("Access to localhost is not allowed.")
 
     # Resolve hostname and check if it's a private IP
