@@ -65,7 +65,13 @@ $figure_classes = implode(
 			'sr-figure',
 			$args['rounded'] ? 'sr-figure--rounded' : '',
 			$args['aspect_ratio'] ? 'sr-figure--aspect' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			implode(
+				' ',
+				array_map(
+					'sanitize_html_class',
+					preg_split( '/\s+/', (string) $args['extra_classes'], -1, PREG_SPLIT_NO_EMPTY ) ?: array()
+				)
+			),
 		)
 	)
 );
