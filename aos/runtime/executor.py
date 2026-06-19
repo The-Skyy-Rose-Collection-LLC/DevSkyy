@@ -14,8 +14,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from aos.adapters.superagent_adapter import AdapterRun, HealJournalEntry, SuperAgentAdapter
-from aos.observability.learning_hook import LearningTrace
+from aos.adapters.superagent_adapter import AdapterRun, HealJournalEntry
 from aos.runtime.types import ExecutionResult
 
 

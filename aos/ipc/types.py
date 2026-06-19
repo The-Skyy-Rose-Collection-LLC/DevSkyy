@@ -6,7 +6,7 @@ All messages are immutable. Correlation IDs link request/response pairs.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -48,7 +48,7 @@ class Message(BaseModel):
     recipient_pid: int | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
     correlation_id: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     ttl_seconds: float | None = None
     priority: int = 0
 
@@ -73,7 +73,7 @@ class Message(BaseModel):
         """Check if this message has exceeded its TTL."""
         if self.ttl_seconds is None:
             return False
-        elapsed = (datetime.now(timezone.utc) - self.created_at).total_seconds()
+        elapsed = (datetime.now(UTC) - self.created_at).total_seconds()
         return elapsed > self.ttl_seconds
 
 

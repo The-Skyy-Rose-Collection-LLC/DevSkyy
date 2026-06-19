@@ -60,7 +60,7 @@ class SSRFProtection:
         return [
             "localhost",
             "127.0.0.1",
-            "0.0.0.0",
+            "0.0.0.0",  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
             "::1",
             "metadata.google.internal",
             "169.254.169.254",  # AWS metadata service

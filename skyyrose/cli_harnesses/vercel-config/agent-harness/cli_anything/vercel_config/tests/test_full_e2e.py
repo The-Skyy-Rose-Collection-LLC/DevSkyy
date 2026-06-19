@@ -29,7 +29,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -45,9 +44,9 @@ _ENTRY_MODULE = "cli_anything.vercel_config.vercel_config_cli"
 
 
 def _run(
-    args: List[str],
-    env: Optional[dict] = None,
-    input: Optional[str] = None,
+    args: list[str],
+    env: dict | None = None,
+    input: str | None = None,
     timeout: int = 30,
 ) -> subprocess.CompletedProcess:
     """Run the CLI via `python -m <module>` so we don't need the entry point installed."""
@@ -196,9 +195,8 @@ class TestJsonOutput:
 
     def test_project_show_json(self, tmp_path, monkeypatch):
         """project show --json with mocked backend should emit valid JSON."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -218,9 +216,8 @@ class TestJsonOutput:
 
     def test_env_list_json(self, tmp_path, monkeypatch):
         """env list --json should emit a JSON array."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -240,9 +237,8 @@ class TestJsonOutput:
 
     def test_domain_list_json(self, tmp_path, monkeypatch):
         """domain list --json should emit a JSON array."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -262,9 +258,8 @@ class TestJsonOutput:
 
     def test_deployment_list_json(self, tmp_path, monkeypatch):
         """deployment list --json should emit a JSON array."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -292,9 +287,8 @@ class TestJsonOutput:
 
     def test_integration_list_json(self, tmp_path, monkeypatch):
         """integration list --json should emit a JSON array."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -346,9 +340,8 @@ class TestDestructiveGates:
 
     def test_env_remove_no_confirm_aborts(self, monkeypatch):
         """env remove without --confirm should abort (non-zero exit or no delete called)."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -360,7 +353,7 @@ class TestDestructiveGates:
                 "cli_anything.vercel_config.utils.vercel_backend._confirm", return_value=False
             ):
                 runner = CliRunner()
-                result = runner.invoke(
+                runner.invoke(
                     main,
                     [
                         "--token",
@@ -379,9 +372,8 @@ class TestDestructiveGates:
 
     def test_domain_remove_no_confirm_aborts(self, monkeypatch):
         """domain remove without --confirm should abort."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._make_mock_backend()
 
@@ -393,7 +385,7 @@ class TestDestructiveGates:
                 "cli_anything.vercel_config.utils.vercel_backend._confirm", return_value=False
             ):
                 runner = CliRunner()
-                result = runner.invoke(
+                runner.invoke(
                     main,
                     [
                         "--token",
@@ -418,9 +410,8 @@ class TestSessionCommands:
 
     def test_session_list_empty(self, tmp_path, monkeypatch):
         """session list with empty dir emits empty list or no-sessions message."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         monkeypatch.setenv("VERCEL_TOKEN", "tok_fake")
 
@@ -435,9 +426,8 @@ class TestSessionCommands:
 
     def test_session_save_and_list(self, tmp_path, monkeypatch):
         """session save creates a session; session list shows it."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         with patch("cli_anything.vercel_config.core.session.SESSIONS_DIR", tmp_path):
             runner = CliRunner()
@@ -469,10 +459,9 @@ class TestSessionCommands:
 
     def test_session_delete(self, tmp_path, monkeypatch):
         """session delete removes the session file."""
-        from click.testing import CliRunner
-
         import cli_anything.vercel_config.core.session as session_mod
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         with patch.object(session_mod, "SESSIONS_DIR", tmp_path):
             runner = CliRunner()
@@ -525,9 +514,8 @@ class TestEnvMasking:
 
     def test_env_list_masked_by_default(self):
         """Env value should be masked (***) without --reveal."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._backend_with_env()
 
@@ -547,9 +535,8 @@ class TestEnvMasking:
 
     def test_env_list_revealed_with_flag(self):
         """Env value should appear with --reveal."""
-        from click.testing import CliRunner
-
         from cli_anything.vercel_config.vercel_config_cli import main
+        from click.testing import CliRunner
 
         mock_backend = self._backend_with_env()
 

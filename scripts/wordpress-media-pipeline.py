@@ -75,6 +75,7 @@ class WordPressMediaPipeline:
                     "media_type": "image",
                 },
                 auth=(self.wp_username, self.wp_password),
+                timeout=30,
             )
 
             if response.status_code != 200:
@@ -137,6 +138,7 @@ class WordPressMediaPipeline:
                 f"{self.media_endpoint}/{media_id}",
                 json={"meta": metadata},
                 auth=(self.wp_username, self.wp_password),
+                timeout=30,
             )
 
             return response.status_code == 200

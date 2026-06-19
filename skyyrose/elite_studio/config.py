@@ -21,6 +21,7 @@ except ImportError:  # optional env loader — minimal CI/validation envs don't 
         Catalog/dossier validation reads tracked files only; it never needs .env."""
         return False
 
+
 # ---------------------------------------------------------------------------
 # Environment loading (authoritative key last with override=True)
 # ---------------------------------------------------------------------------
@@ -271,7 +272,14 @@ def validate_catalog_readers(*, raise_on_mismatch: bool = False) -> dict[str, st
     )
     if nano_banana_src.exists():
         text = nano_banana_src.read_text()
-        if "from skyyrose.core.catalog_loader import CATALOG_CSV" in text:
+        # Accept either the preferred import form OR the equivalent standalone path
+        # constant that resolves to the same CSV (nano_banana predates the core import).
+        imports_core = "from skyyrose.core.catalog_loader import CATALOG_CSV" in text
+        uses_canonical_path = (
+            'wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"' in text
+            or "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv" in text
+        )
+        if imports_core or uses_canonical_path:
             results["scripts.nano_banana.catalog"] = canonical or "<inherits from core>"
         else:
             results["scripts.nano_banana.catalog"] = "<does NOT import core CATALOG_CSV>"

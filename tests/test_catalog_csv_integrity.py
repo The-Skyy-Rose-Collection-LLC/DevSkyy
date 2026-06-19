@@ -109,9 +109,9 @@ def test_required_text_fields_non_empty(rows: list[dict[str, str]], field: str) 
 def test_collections_are_valid(rows: list[dict[str, str]]) -> None:
     for r in rows:
         slug = r["collection"].strip()
-        assert slug in VALID_COLLECTIONS, (
-            f"{r['sku']}: unknown collection {slug!r} (valid: {sorted(VALID_COLLECTIONS)})"
-        )
+        assert (
+            slug in VALID_COLLECTIONS
+        ), f"{r['sku']}: unknown collection {slug!r} (valid: {sorted(VALID_COLLECTIONS)})"
 
 
 def test_prices_are_positive(rows: list[dict[str, str]]) -> None:
@@ -130,9 +130,9 @@ def test_edition_size_is_positive_when_set(rows: list[dict[str, str]]) -> None:
 def test_status_derivation_produces_valid_enum(rows: list[dict[str, str]]) -> None:
     for r in rows:
         status = status_from_row(r)
-        assert status in PRODUCT_STATUS, (
-            f"{r['sku']}: status {status!r} not in {sorted(PRODUCT_STATUS)}"
-        )
+        assert (
+            status in PRODUCT_STATUS
+        ), f"{r['sku']}: status {status!r} not in {sorted(PRODUCT_STATUS)}"
 
 
 def test_boolean_columns_are_one_or_zero(rows: list[dict[str, str]]) -> None:
@@ -171,9 +171,9 @@ def test_python_loaders_agree_on_sku_set() -> None:
 
     only_in_nano = nano_skus - elite_skus
     only_in_elite = elite_skus - nano_skus
-    assert not only_in_nano and not only_in_elite, (
-        f"SKU mismatch — nano-only: {only_in_nano}, elite-only: {only_in_elite}"
-    )
+    assert (
+        not only_in_nano and not only_in_elite
+    ), f"SKU mismatch — nano-only: {only_in_nano}, elite-only: {only_in_elite}"
 
 
 def test_bool_col_helper_parses_1_as_true() -> None:
@@ -229,9 +229,9 @@ def test_garment_type_lock_values_are_in_allowed_set(rows: list[dict[str, str]])
     for r in rows:
         val = (r.get("garment_type_lock") or "").strip()
         if val:
-            assert val in ALLOWED_GARMENT_TYPES, (
-                f"{r['sku']}: garment_type_lock {val!r} not in {ALLOWED_GARMENT_TYPES}"
-            )
+            assert (
+                val in ALLOWED_GARMENT_TYPES
+            ), f"{r['sku']}: garment_type_lock {val!r} not in {ALLOWED_GARMENT_TYPES}"
 
 
 def test_all_28_in_scope_garments_have_garment_type_lock(rows: list[dict[str, str]]) -> None:
@@ -245,6 +245,6 @@ def test_all_28_in_scope_garments_have_garment_type_lock(rows: list[dict[str, st
     assert not missing, f"{len(missing)} garment row(s) with empty garment_type_lock: {missing}"
     # Cross-check: total with values must equal total non-accessory rows
     count_with_value = sum(1 for r in rows if (r.get("garment_type_lock") or "").strip())
-    assert count_with_value == len(garment_rows), (
-        f"expected {len(garment_rows)} garment_type_lock values, got {count_with_value}"
-    )
+    assert count_with_value == len(
+        garment_rows
+    ), f"expected {len(garment_rows)} garment_type_lock values, got {count_with_value}"

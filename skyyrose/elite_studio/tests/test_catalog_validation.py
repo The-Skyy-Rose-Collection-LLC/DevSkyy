@@ -73,8 +73,7 @@ def _load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, yaml_text: str, **kwa
 
 
 def test_invalid_status_raises_value_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    bad = _catalog_yaml(
-        product_override="""
+    bad = _catalog_yaml(product_override="""
   - sku: br-001
     name: Crewneck
     collection: black-rose
@@ -91,8 +90,7 @@ def test_invalid_status_raises_value_error(tmp_path: Path, monkeypatch: pytest.M
     ai_renders: []
     review_flags: []
     notes: ""
-"""
-    )
+""")
     with pytest.raises(ValueError, match="not in allowed values"):
         _load(tmp_path, monkeypatch, bad)
 
@@ -100,8 +98,7 @@ def test_invalid_status_raises_value_error(tmp_path: Path, monkeypatch: pytest.M
 def test_invalid_hex_color_raises_value_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    bad = _catalog_yaml(
-        product_override="""
+    bad = _catalog_yaml(product_override="""
   - sku: br-001
     name: Crewneck
     collection: black-rose
@@ -118,15 +115,13 @@ def test_invalid_hex_color_raises_value_error(
     ai_renders: []
     review_flags: []
     notes: ""
-"""
-    )
+""")
     with pytest.raises(ValueError, match="invalid hex color"):
         _load(tmp_path, monkeypatch, bad)
 
 
 def test_negative_price_raises_value_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    bad = _catalog_yaml(
-        product_override="""
+    bad = _catalog_yaml(product_override="""
   - sku: br-001
     name: Crewneck
     collection: black-rose
@@ -143,15 +138,13 @@ def test_negative_price_raises_value_error(tmp_path: Path, monkeypatch: pytest.M
     ai_renders: []
     review_flags: []
     notes: ""
-"""
-    )
+""")
     with pytest.raises(ValueError, match=">= 0"):
         _load(tmp_path, monkeypatch, bad)
 
 
 def test_invalid_master_source_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    bad = _catalog_yaml(
-        product_override="""
+    bad = _catalog_yaml(product_override="""
   - sku: br-001
     name: Crewneck
     collection: black-rose
@@ -168,15 +161,13 @@ def test_invalid_master_source_raises(tmp_path: Path, monkeypatch: pytest.Monkey
     ai_renders: []
     review_flags: []
     notes: ""
-"""
-    )
+""")
     with pytest.raises(ValueError, match="not in allowed values"):
         _load(tmp_path, monkeypatch, bad)
 
 
 def test_invalid_sku_format_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    bad = _catalog_yaml(
-        product_override="""
+    bad = _catalog_yaml(product_override="""
   - sku: BR_001
     name: Crewneck
     collection: black-rose
@@ -193,8 +184,7 @@ def test_invalid_sku_format_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     ai_renders: []
     review_flags: []
     notes: ""
-"""
-    )
+""")
     with pytest.raises(ValueError, match="invalid SKU"):
         _load(tmp_path, monkeypatch, bad)
 

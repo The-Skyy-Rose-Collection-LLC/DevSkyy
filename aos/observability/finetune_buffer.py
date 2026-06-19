@@ -93,8 +93,8 @@ def _build_record(reflection: Reflection) -> FineTuneRecord:
             "agent_type": trace.agent_type,
             "quality_score": reflection.quality_score,
             "success": reflection.success,
-            "failure_category": reflection.failure_category.value
-            if reflection.failure_category
-            else None,
+            "failure_category": (
+                reflection.failure_category.value if reflection.failure_category else None
+            ),
         },
     )

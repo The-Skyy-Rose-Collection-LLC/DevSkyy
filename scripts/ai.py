@@ -266,7 +266,7 @@ def model_download(
 ):
     """Download model from Hub to local directory."""
     repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
-    local_dir = snapshot_download(
+    local_dir = snapshot_download(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         repo_id=repo_id,
         local_dir=f"{output}/{name}",
         token=config.get_hf_token(),

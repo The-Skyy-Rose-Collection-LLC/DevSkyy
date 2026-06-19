@@ -26,7 +26,6 @@ from __future__ import annotations
 import argparse
 import csv
 import os
-import sys
 import tempfile
 from pathlib import Path
 
@@ -153,7 +152,7 @@ def show_manifest(plan: list[dict], dry_run: bool) -> None:
     print("=" * 70)
     print("STOP — Confirm before proceeding:")
     print("=" * 70)
-    print(f"  Action  : Copy Tripo outputs → theme assets + update catalog CSV")
+    print("  Action  : Copy Tripo outputs → theme assets + update catalog CSV")
     print(f"  Source  : {TRIPO_OUTPUT}/")
     print(f"  Dest    : {ASSETS_DIR}/")
     print(f"  Catalog : {CATALOG_CSV}")
@@ -241,7 +240,7 @@ def main() -> int:
     if not outputs:
         target = f"SKU {args.sku!r}" if args.sku else "any SKU"
         print(f"No Tripo output found for {target} in {TRIPO_OUTPUT}")
-        print(f"Run 'python scripts/tripo_dispatch.py --execute' first.")
+        print("Run 'python scripts/tripo_dispatch.py --execute' first.")
         return 0
 
     rows = load_catalog()

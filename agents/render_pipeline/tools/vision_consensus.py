@@ -25,6 +25,7 @@ import json
 import logging
 import os
 from pathlib import Path
+
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
 
 ensure_repo_paths()

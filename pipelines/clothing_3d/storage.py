@@ -94,14 +94,15 @@ class LocalArtifactStore:
         public_prefix: str = "/assets/3d-models-generated",
     ) -> None:
         self.base_dir = Path(
-            base_dir
-            or os.getenv("THREE_D_OUTPUT_DIR", "./assets/3d-models-generated")
+            base_dir or os.getenv("THREE_D_OUTPUT_DIR", "./assets/3d-models-generated")
         )
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.public_prefix = public_prefix.rstrip("/")
 
     async def store(self, bundle: ArtifactBundle) -> StoredArtifact:
-        glb_dst = self._move_into_base(bundle.glb_path, suffix=".glb", artifact_id=bundle.artifact_id)
+        glb_dst = self._move_into_base(
+            bundle.glb_path, suffix=".glb", artifact_id=bundle.artifact_id
+        )
         usdz_dst = (
             self._move_into_base(bundle.usdz_path, suffix=".usdz", artifact_id=bundle.artifact_id)
             if bundle.usdz_path
@@ -187,9 +188,7 @@ class S3ArtifactStore:
         try:
             import boto3  # type: ignore[import-not-found]
         except ImportError as e:
-            raise RuntimeError(
-                "S3ArtifactStore requires boto3 — pip install boto3"
-            ) from e
+            raise RuntimeError("S3ArtifactStore requires boto3 — pip install boto3") from e
         self._client = boto3.client("s3", region_name=self.region)
         return self._client
 

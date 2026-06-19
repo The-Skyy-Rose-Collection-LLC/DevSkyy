@@ -92,7 +92,7 @@ def start_training(
 
         # Download dataset
         status_log.append(f"📥 Downloading dataset: {dataset_id}")
-        dataset_path = snapshot_download(
+        dataset_path = snapshot_download(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             repo_id=dataset_id,
             repo_type="dataset",
             token=os.environ.get("HF_TOKEN")

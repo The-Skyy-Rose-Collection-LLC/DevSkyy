@@ -27,9 +27,9 @@ import json
 import os
 import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # ── Constants ─────────────────────────────────────────────────────────
 
@@ -56,8 +56,8 @@ class Session:
 
     name: str
     project: str
-    team_id: Optional[str] = field(default=None)
-    history: List[str] = field(default_factory=list)
+    team_id: str | None = field(default=None)
+    history: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=lambda: _now_iso())
     updated_at: str = field(default_factory=lambda: _now_iso())
 
@@ -74,7 +74,7 @@ class Session:
             if len(self.history) > MAX_HISTORY:
                 self.history = self.history[-MAX_HISTORY:]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "schema": SCHEMA,
             "name": self.name,
@@ -86,7 +86,7 @@ class Session:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Session":
+    def from_dict(cls, data: dict[str, Any]) -> Session:
         return cls(
             name=data["name"],
             project=data["project"],
@@ -162,7 +162,7 @@ def delete(name: str, sessions_dir: Path = SESSIONS_DIR) -> bool:
         return False
 
 
-def list_sessions(sessions_dir: Path = SESSIONS_DIR) -> List[Session]:
+def list_sessions(sessions_dir: Path = SESSIONS_DIR) -> list[Session]:
     """Return all saved sessions, sorted by updated_at descending.
 
     Args:
@@ -172,7 +172,7 @@ def list_sessions(sessions_dir: Path = SESSIONS_DIR) -> List[Session]:
         List of ``Session`` instances (may be empty).
     """
     sessions_dir.mkdir(parents=True, exist_ok=True)
-    results: List[Session] = []
+    results: list[Session] = []
     for p in sessions_dir.glob("*.json"):
         try:
             raw = p.read_text(encoding="utf-8")
@@ -187,7 +187,7 @@ def list_sessions(sessions_dir: Path = SESSIONS_DIR) -> List[Session]:
 # ── Atomic write ──────────────────────────────────────────────────────
 
 
-def _locked_save_json(path: Path, payload: Dict[str, Any]) -> None:
+def _locked_save_json(path: Path, payload: dict[str, Any]) -> None:
     """Write JSON to path atomically using temp file + fcntl.flock + os.replace.
 
     This is the canonical _locked_save_json pattern for cli-anything harnesses.
@@ -217,4 +217,4 @@ def _locked_save_json(path: Path, payload: Dict[str, Any]) -> None:
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")

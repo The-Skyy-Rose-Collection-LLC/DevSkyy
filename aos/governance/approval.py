@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -46,7 +46,7 @@ class ApprovalRequest(BaseModel):
     risk: RiskLevel
     estimated_cost_usd: float = 0.0
     details: dict[str, Any] = Field(default_factory=dict)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     expires_at: datetime | None = None
 
 
@@ -59,7 +59,7 @@ class ApprovalDecision(BaseModel):
     status: ApprovalStatus
     approver: str | None = None
     reason: str | None = None
-    decided_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    decided_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def is_approved(self) -> bool:
@@ -119,7 +119,7 @@ class ApprovalGate:
         _req, fut = entry
         try:
             return await asyncio.wait_for(asyncio.shield(fut), timeout=timeout_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             decision = ApprovalDecision(
                 request_id=request_id,
                 status=ApprovalStatus.EXPIRED,

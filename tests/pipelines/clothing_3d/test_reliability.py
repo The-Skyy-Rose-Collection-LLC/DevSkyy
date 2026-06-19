@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 
 import pytest
+from services.three_d.trellis.config import TrellisQualityPreset
 
 from pipelines.clothing_3d.models import PipelineRequest, PipelineResult, PipelineStatus
 from pipelines.clothing_3d.reliability import (
@@ -15,7 +16,6 @@ from pipelines.clothing_3d.reliability import (
     RetryPolicy,
     request_fingerprint,
 )
-from services.three_d.trellis.config import TrellisQualityPreset
 
 # =============================================================================
 # RetryPolicy
@@ -204,6 +204,7 @@ def test_cost_quota_snapshot_shape() -> None:
 async def test_in_memory_store_evicts_when_full() -> None:
     store = InMemoryIdempotencyStore(capacity=2)
     from datetime import UTC, datetime
+
     from pipelines.clothing_3d.reliability import IdempotencyEntry
 
     def make(fp: str) -> IdempotencyEntry:

@@ -1,4 +1,4 @@
-from skyyrose.elite_studio.platform.approval import ApprovalQueue, ApprovalRecord
+from skyyrose.elite_studio.platform.approval import ApprovalQueue
 
 
 def test_enqueue_creates_pending_record(tmp_path):

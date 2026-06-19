@@ -73,9 +73,9 @@ def test_cursor_zindex_above_modals() -> None:
         for zidx_match in re.finditer(r"z-index\s*:\s*(\d+)", rule_body):
             found_zindex_values.append(int(zidx_match.group(1)))
 
-    assert found_zindex_values, (
-        f"No z-index declarations found for .cursor-dot or .cursor-ring in {CSS_FILE}"
-    )
+    assert (
+        found_zindex_values
+    ), f"No z-index declarations found for .cursor-dot or .cursor-ring in {CSS_FILE}"
 
     for val in found_zindex_values:
         assert val > 9999, (

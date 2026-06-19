@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 import time
-import uuid
 from typing import Any
+
+from services.three_d.trellis.config import TrellisConfig
+from services.three_d.trellis.provider import TrellisProvider
 
 from pipelines.clothing_3d.events import PipelineEventBus, log_event_subscriber
 from pipelines.clothing_3d.models import (
@@ -14,7 +16,6 @@ from pipelines.clothing_3d.models import (
     PipelineResult,
     PipelineStage,
     PipelineStatus,
-    StageReport,
 )
 from pipelines.clothing_3d.stages import (
     PipelineContext,
@@ -26,8 +27,6 @@ from pipelines.clothing_3d.stages import (
     stage_store,
 )
 from pipelines.clothing_3d.storage import ArtifactStore, LocalArtifactStore
-from services.three_d.trellis.config import TrellisConfig
-from services.three_d.trellis.provider import TrellisProvider
 
 logger = logging.getLogger(__name__)
 

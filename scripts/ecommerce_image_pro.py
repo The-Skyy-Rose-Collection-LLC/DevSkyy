@@ -168,7 +168,9 @@ class EcommerceImageProcessor:
                 # URL output
                 import urllib.request
 
-                urllib.request.urlretrieve(str(output), upscaled_path)
+                urllib.request.urlretrieve(
+                    str(output), upscaled_path
+                )  # nosec B310 — URL from controlled API response, not user input
 
             logger.info(f"  Upscaled: {upscaled_path.name}")
             return upscaled_path
@@ -198,7 +200,9 @@ class EcommerceImageProcessor:
             else:
                 import urllib.request
 
-                urllib.request.urlretrieve(str(output), nobg_path)
+                urllib.request.urlretrieve(
+                    str(output), nobg_path
+                )  # nosec B310 — URL from controlled API response, not user input
 
             logger.info(f"  Background removed: {nobg_path.name}")
             return nobg_path

@@ -8,21 +8,17 @@ Run with:
 from __future__ import annotations
 
 import json
-import os
-import tempfile
-from pathlib import Path
-from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
 import pytest
-from cli_anything.vercel_config.core.project import (ProjectRef,
-                                                     build_patch_payload,
-                                                     parse_project_ref,
-                                                     patchable_fields)
+from cli_anything.vercel_config.core.project import (
+    ProjectRef,
+    build_patch_payload,
+    parse_project_ref,
+    patchable_fields,
+)
 
 # ── project.py ────────────────────────────────────────────────────────
-
-
 
 
 class TestProjectRef:
@@ -95,8 +91,7 @@ class TestBuildPatchPayload:
 # ── env_vars.py ───────────────────────────────────────────────────────
 
 
-from cli_anything.vercel_config.core.env_vars import (EnvVar, EnvVarDiff,
-                                                      diff_env_vars)
+from cli_anything.vercel_config.core.env_vars import EnvVar, diff_env_vars
 
 
 class TestEnvVar:
@@ -214,8 +209,7 @@ class TestDiffEnvVars:
 # ── domains.py ───────────────────────────────────────────────────────
 
 
-from cli_anything.vercel_config.core.domains import (Domain, DomainDiff,
-                                                     diff_domains)
+from cli_anything.vercel_config.core.domains import Domain, diff_domains
 
 
 class TestDomain:
@@ -281,9 +275,7 @@ class TestDiffDomains:
 # ── manifest.py ───────────────────────────────────────────────────────
 
 
-from cli_anything.vercel_config.core.manifest import (Manifest, ManifestPlan,
-                                                      build_plan,
-                                                      load_manifest)
+from cli_anything.vercel_config.core.manifest import Manifest, build_plan, load_manifest
 
 
 class TestManifest:
@@ -436,9 +428,14 @@ class TestBuildPlan:
 # ── session.py ───────────────────────────────────────────────────────
 
 
-from cli_anything.vercel_config.core.session import (Session,
-                                                     _locked_save_json, delete,
-                                                     list_sessions, load, save)
+from cli_anything.vercel_config.core.session import (
+    Session,
+    _locked_save_json,
+    delete,
+    list_sessions,
+    load,
+    save,
+)
 
 
 class TestSession:
@@ -539,8 +536,14 @@ class TestLockedSaveJson:
 
 
 from cli_anything.vercel_config.utils.vercel_backend import (
-    VercelAuthError, VercelBackend, VercelBackendError, VercelNotFoundError,
-    VercelRateLimitedError, VercelValidationError, _confirm, resolve_token)
+    VercelAuthError,
+    VercelBackend,
+    VercelBackendError,
+    VercelNotFoundError,
+    VercelRateLimitedError,
+    VercelValidationError,
+    resolve_token,
+)
 
 
 class TestResolveToken:
@@ -615,48 +618,42 @@ class TestVercelBackendErrors:
         return resp
 
     def test_401_raises_auth_error(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = self._mock_response(401, {"error": {"message": "bad token"}})
         with pytest.raises(VercelAuthError):
             _raise_for_status(resp, "/v9/projects/x")
 
     def test_404_raises_not_found(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = self._mock_response(404, {"error": {"message": "not found"}})
         with pytest.raises(VercelNotFoundError):
             _raise_for_status(resp, "/v9/projects/x")
 
     def test_400_raises_validation_error(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = self._mock_response(400, {"error": {"message": "bad input"}})
         with pytest.raises(VercelValidationError):
             _raise_for_status(resp, "/v9/projects/x")
 
     def test_500_raises_backend_error(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = self._mock_response(500, {"error": {"message": "server error"}})
         with pytest.raises(VercelBackendError):
             _raise_for_status(resp, "/v9/projects/x")
 
     def test_200_returns_dict(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = self._mock_response(200, {"id": "prj_abc"})
         result = _raise_for_status(resp, "/v9/projects/x")
         assert result["id"] == "prj_abc"
 
     def test_204_returns_empty_dict(self):
-        from cli_anything.vercel_config.utils.vercel_backend import \
-            _raise_for_status
+        from cli_anything.vercel_config.utils.vercel_backend import _raise_for_status
 
         resp = MagicMock()
         resp.status_code = 204
@@ -669,7 +666,6 @@ class TestVercelBackend429Retry:
     """Test exponential backoff on 429 responses."""
 
     def test_retries_on_429_then_succeeds(self):
-        import requests
 
         backend = VercelBackend(token="tok")
         call_count = 0

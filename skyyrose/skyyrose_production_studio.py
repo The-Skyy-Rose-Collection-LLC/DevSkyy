@@ -522,7 +522,7 @@ CRITICAL: Exact garment replication - all logos, colors, details must match spec
         image_url = response.data[0].url
         import requests
 
-        image_response = requests.get(image_url)
+        image_response = requests.get(image_url, timeout=30)
 
         output_dir = OUTPUT_DIR / sku
         output_dir.mkdir(parents=True, exist_ok=True)

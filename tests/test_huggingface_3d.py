@@ -21,7 +21,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from orchestration.asset_pipeline import AssetPipelineResult, PipelineConfig, ProductAssetPipeline
+from orchestration.asset_pipeline import PipelineConfig, ProductAssetPipeline
 from orchestration.huggingface_3d_client import (
     HF3DFormat,
     HF3DModel,

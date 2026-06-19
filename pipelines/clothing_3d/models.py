@@ -7,9 +7,7 @@ from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
-
 from services.three_d.trellis.config import TrellisBackend, TrellisQualityPreset
-
 
 # =============================================================================
 # Enums

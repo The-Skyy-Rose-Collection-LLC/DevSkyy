@@ -618,7 +618,7 @@ if __name__ == "__main__":
 
     app = create_app()
     app.launch(
-        server_name="0.0.0.0",
+        server_name="0.0.0.0",  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
         server_port=7860,
         share=False,  # Set to True for public URL
         show_error=True,
