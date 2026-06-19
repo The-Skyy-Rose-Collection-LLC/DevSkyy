@@ -26,6 +26,9 @@ def render_image(tmp_path: Path) -> Path:
     return tmp_path / "render.png"
 
 
+# Only this test calls the real scorer (CLIP); the evaluate() tests below
+# monkeypatch score_against_centroid and need no model — gate just this one.
+@pytest.mark.usefixtures("clip_model_available")
 def test_score_returns_cosine_in_range(fake_centroid: BrandCentroid, render_image: Path) -> None:
     score = embedding_gate.score_against_centroid(render_image, fake_centroid)
     assert -1.0 <= score <= 1.0

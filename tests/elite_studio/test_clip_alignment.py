@@ -9,6 +9,10 @@ from PIL import Image, ImageDraw
 
 from skyyrose.elite_studio.quality import clip_alignment
 
+# clip_alignment scores via the real CLIP encoder; skip the module when the
+# weights can't be loaded (cold CI cache / Hub rate-limit) — see conftest.py.
+pytestmark = pytest.mark.usefixtures("clip_model_available")
+
 
 @pytest.fixture
 def red_circle_image(tmp_path: Path) -> Path:

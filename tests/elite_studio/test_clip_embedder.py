@@ -10,6 +10,10 @@ from PIL import Image
 
 from skyyrose.core import clip_embedder
 
+# Every test here exercises the real CLIP encoder; skip the module when the
+# weights can't be loaded (cold CI cache / Hub rate-limit) — see conftest.py.
+pytestmark = pytest.mark.usefixtures("clip_model_available")
+
 
 @pytest.fixture
 def red_image(tmp_path: Path) -> Path:

@@ -15,6 +15,11 @@ from skyyrose.elite_studio.quality.brand_centroid import (
     save_centroid,
 )
 
+# Both tests drive the real embedding gate (only Gemini QA is mocked), which
+# loads the CLIP encoder; skip the module when the weights can't be loaded
+# (cold CI cache / Hub rate-limit) — see conftest.py.
+pytestmark = pytest.mark.usefixtures("clip_model_available")
+
 
 @pytest.fixture
 def fake_centroid_file(tmp_path: Path) -> Path:
