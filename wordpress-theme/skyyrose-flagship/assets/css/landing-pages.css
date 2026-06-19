@@ -996,3 +996,13 @@
     max-width: 1200px;
   }
 }
+
+/* Progressive enhancement: landing sections are hidden (opacity:0) for the
+   JS-driven reveal animation. If scripting is disabled the reveal never fires,
+   so force all content visible. Keeps landing pages readable without JS. */
+@media (scripting: none) {
+  .lp section {
+    opacity: 1;
+    transform: none;
+  }
+}

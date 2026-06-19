@@ -183,6 +183,7 @@ wordpress-theme/skyyrose-flagship/
 - Composer must be installed first: `~/.local/bin/composer install`
 
 ### WordPress Rules
+- **Theme serves `.min` in production** (`$use_min = ! SCRIPT_DEBUG`). After ANY CSS/JS edit, rebuild with `node scripts/build-css.js && node scripts/build-js.js` or the change is inert live. Re-verify the `.min` output, not just the source.
 - Extend via hooks (actions/filters), never modify core
 - API: `index.php?rest_route=` NOT `/wp-json/`
 - Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`

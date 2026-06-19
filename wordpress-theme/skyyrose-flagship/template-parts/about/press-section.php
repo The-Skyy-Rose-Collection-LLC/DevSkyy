@@ -46,9 +46,13 @@ $svg_kses         = function_exists( 'skyyrose_svg_kses' ) ? skyyrose_svg_kses()
 		if ( file_exists( $press_img ) ) :
 			?>
 			<figure class="abt-press__poster rv rv-d2">
-				<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.jpg' ) ); ?>"
-					alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose' ); ?>"
-					loading="lazy" width="1200" height="675">
+				<picture>
+					<source srcset="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.avif' ) ); ?>" type="image/avif">
+					<source srcset="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.webp' ) ); ?>" type="image/webp">
+					<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.jpg' ) ); ?>"
+						alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose' ); ?>"
+						loading="lazy" width="1200" height="675">
+				</picture>
 				<figcaption class="abt-press__poster-cap"><?php esc_html_e( 'Corey Foster on The Blox', 'skyyrose' ); ?></figcaption>
 			</figure>
 		<?php endif; ?>

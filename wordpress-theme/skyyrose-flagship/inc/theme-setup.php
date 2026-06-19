@@ -308,5 +308,11 @@ function skyyrose_disable_wpcom_optimization() {
 	add_filter( 'jetpack_implode_frontend_css', '__return_false', 999 );
 	add_filter( 'js_do_concat', '__return_false', 999 );
 	add_filter( 'css_do_concat', '__return_false', 999 );
+
+	// Suppress Jetpack's Open Graph tags. The theme emits its own complete,
+	// deduplicated OG/Twitter set via inc/seo.php; leaving Jetpack's enabled
+	// produces duplicate og:title/og:description and a conflicting og:type
+	// (article) on WordPress.com Atomic. Honored on Atomic; verified live.
+	add_filter( 'jetpack_enable_open_graph', '__return_false', 999 );
 }
 add_action( 'init', 'skyyrose_disable_wpcom_optimization', 1 );
