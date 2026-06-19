@@ -494,8 +494,12 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install -e ".[dev]" || pip install -e .
+          pip install -e ".[dev,mcp]" || pip install -e ".[dev]" || pip install -e .
           pip install uvicorn
+          # main_enterprise:app imports these optional deps transitively; without
+          # them the backend server fails to boot (ModuleNotFoundError) and the
+          # Playwright run hangs until the job is cancelled.
+          pip install boto3 scikit-image trimesh pyotp
 
       - name: Install frontend dependencies
         run: npm ci
