@@ -11,6 +11,12 @@ from PIL import Image
 from skyyrose.elite_studio.quality import embedding_gate
 from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid
 
+# Network/model-download integration tests — these pull CLIP/DINO weights from
+# HF Hub at runtime. Excluded from the fast gate (CI runs `-m "not slow and not
+# integration"`) so a transient HF outage cannot flake main red; run on demand
+# with `-m integration`.
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def fake_centroid() -> BrandCentroid:
