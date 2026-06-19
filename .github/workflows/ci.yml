@@ -216,8 +216,14 @@ jobs:
         id: pip_audit
         run: |
           pip_audit_status=0
-          pip-audit --format=json --output=pip-audit-results.json || pip_audit_status=$?
-          pip-audit --strict 2>&1 | tee pip-audit.txt || pip_audit_status=$?
+          # Targeted ignores: CVEs with NO fixed release in any version (cannot be
+          # bumped away). Documented + revisited when upstreams publish a fix.
+          #   chromadb     CVE-2026-45829   (no patched release)
+          #   torch        PYSEC-2026-139, CVE-2025-3000   (no patched release)
+          #   transformers PYSEC-2025-217   (no patched release)
+          IGNORE="--ignore-vuln CVE-2026-45829 --ignore-vuln PYSEC-2026-139 --ignore-vuln CVE-2025-3000 --ignore-vuln PYSEC-2025-217"
+          pip-audit $IGNORE --format=json --output=pip-audit-results.json || pip_audit_status=$?
+          pip-audit $IGNORE --strict 2>&1 | tee pip-audit.txt || pip_audit_status=$?
           echo "pip_audit_exit=$pip_audit_status" >> "$GITHUB_OUTPUT"
 
       - name: Run bandit (code security)
@@ -306,7 +312,8 @@ jobs:
           semgrep_exit="${{ steps.semgrep.outputs.semgrep_exit }}"
 
           if [ -n "$pip_exit" ] && [ "$pip_exit" != "0" ]; then
-            echo "::warning::pip-audit found vulnerabilities (exit $pip_exit) — informational, pre-existing"
+            echo "::error::pip-audit found FIXABLE dependency vulnerabilities (exit $pip_exit) — bump the flagged packages, or add a documented --ignore-vuln only if there is no upstream fix"
+            failed=1
           fi
           if [ -n "$bandit_exit" ] && [ "$bandit_exit" != "0" ]; then
             echo "::warning::bandit found MEDIUM/LOW issues (exit $bandit_exit) — informational"
