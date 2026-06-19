@@ -21,6 +21,7 @@ except ImportError:  # optional env loader — minimal CI/validation envs don't 
         Catalog/dossier validation reads tracked files only; it never needs .env."""
         return False
 
+
 # ---------------------------------------------------------------------------
 # Environment loading (authoritative key last with override=True)
 # ---------------------------------------------------------------------------
@@ -62,6 +63,29 @@ if not os.getenv("GOOGLE_API_KEY"):
     _gkey = os.getenv("GOOGLE_AI_API_KEY") or os.getenv("GEMINI_API_KEY")
     if _gkey:
         os.environ["GOOGLE_API_KEY"] = _gkey
+
+# ---------------------------------------------------------------------------
+# Environment parsing helpers
+# ---------------------------------------------------------------------------
+
+
+def _int_env(name: str, default: int) -> int:
+    """Parse an int from the environment, falling back to ``default``.
+
+    ``os.getenv(name, default)`` returns the default only when the key is
+    *absent*. A key that is present but empty (``ELITE_MAX_QC_RETRIES=`` in a
+    .env) yields ``""``, and ``int("")`` raises ValueError at import time —
+    taking the whole module graph down. Treat empty / whitespace-only values,
+    and any unparseable value, as "use the default".
+    """
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return int(raw.strip())
+    except ValueError:
+        return default
+
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -130,7 +154,7 @@ RETRY_DELAY_SECONDS = 5
 MAX_RETRIES = 2
 
 # LangGraph engine
-MAX_QC_RETRIES = int(os.getenv("ELITE_MAX_QC_RETRIES", "2"))
+MAX_QC_RETRIES = _int_env("ELITE_MAX_QC_RETRIES", 2)
 GRAPH_CHECKPOINT_DIR = Path(os.getenv("ELITE_CHECKPOINT_DIR", str(_BASE_DIR / ".checkpoints")))
 
 # ---------------------------------------------------------------------------
@@ -169,15 +193,15 @@ ICLIGHT_RESOLUTION = 384
 REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 # Worker concurrency (number of concurrent render jobs per worker process)
-WORKER_CONCURRENCY: int = int(os.getenv("ELITE_WORKER_CONCURRENCY", "1"))
+WORKER_CONCURRENCY: int = _int_env("ELITE_WORKER_CONCURRENCY", 1)
 
 # Cost tracking — set to "false" to disable Redis cost writes
 COST_TRACKING_ENABLED: bool = os.getenv("ELITE_COST_TRACKING", "true").lower() != "false"
 
 # Rate limit constants per provider (requests / minute)
-RATE_LIMIT_GEMINI: int = int(os.getenv("ELITE_RATE_LIMIT_GEMINI", "60"))
-RATE_LIMIT_OPENAI: int = int(os.getenv("ELITE_RATE_LIMIT_OPENAI", "500"))
-RATE_LIMIT_ANTHROPIC: int = int(os.getenv("ELITE_RATE_LIMIT_ANTHROPIC", "50"))
+RATE_LIMIT_GEMINI: int = _int_env("ELITE_RATE_LIMIT_GEMINI", 60)
+RATE_LIMIT_OPENAI: int = _int_env("ELITE_RATE_LIMIT_OPENAI", 500)
+RATE_LIMIT_ANTHROPIC: int = _int_env("ELITE_RATE_LIMIT_ANTHROPIC", 50)
 
 # ---------------------------------------------------------------------------
 # Stripe / Billing configuration

@@ -3880,3 +3880,9 @@
 - `PriceTag3D.test.tsx` — Unit Tests for PriceTag3D (~1765 tok)
 - `ProductConfigurator.test.tsx` — Unit Tests for ProductConfigurator (~1093 tok)
 - `SuccessCelebration.test.tsx` — Mock canvas context for confetti animation (~730 tok)
+
+### wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php (~3.2k tok)
+wp-admin console + PHP MCP streamable-HTTP client to api.devskyy.app/mcp/. Stateful handshake (initialize→notifications/initialized→tools/call) with Mcp-Session-Id; SSE data-frame parse; DELETE teardown. SSRF via skyyrose_see_is_safe_url(); Bearer from SKYYROSE_MCP_TOKEN const/env/option. Tools→DevSkyy MCP page, manage_options+nonce AJAX (skyyrose_mcp_invoke: list/call).
+
+### wordpress-theme/skyyrose-flagship/assets/js/admin-mcp-console.js (~0.9k tok)
+Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call via admin-ajax. Vanilla, createElement/textContent only (no innerHTML). Enqueued only on tools_page_skyyrose-mcp.

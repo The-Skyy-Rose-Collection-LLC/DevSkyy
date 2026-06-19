@@ -1987,6 +1987,65 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-18T13:54:00Z"
+    },
+    {
+      "id": "bug-143",
+      "timestamp": "2026-06-18",
+      "error_message": "On-model renders misplace SKU logos: br-005 Signature hoodie logo rendered on the arm/sleeve instead of the left hip; Love Hurts joggers lh-002/lh-006 hallucinate/misplace the left-thigh logo.",
+      "file": "scripts/oai_render/lookbook.py",
+      "root_cause": "build_prompt logo clause was generic ('reproduce the logo in its proper place') and never relayed the dossier's documented placement, so gpt-image-2 invented placement. The exact placement (br-005 left-hip 'NOT sleeve'; LH joggers left-thigh) lives in the dossier branding_block/negative_block, nested under row['_dossier'] \u2014 never injected into the prompt.",
+      "fix": "Added _placement_spec(row): reads branding_block+negative_block from the nested _dossier, strips file-path/markdown noise, injects an imperative placement directive into build_prompt. Generalised to every SKU. Verified br-005 keeps left-hip+'NOT on the sleeve', lh-002/006 keep left-thigh; prompt ~4000c; ruff+black clean.",
+      "tags": [
+        "imagery",
+        "oai-render",
+        "logo-placement",
+        "dossier",
+        "gpt-image-2",
+        "lookbook"
+      ],
+      "related_bugs": [
+        "bug-141"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-18"
+    },
+    {
+      "id": "bug-144",
+      "timestamp": "2026-06-18T20:45:00-07:00",
+      "error_message": "ValueError: invalid literal for int() with base 10: '' at skyyrose/elite_studio/config.py:133 (MAX_QC_RETRIES) \u2014 crashed pytest collection of tests/elite_studio/platform/test_threed_service.py",
+      "file": "skyyrose/elite_studio/config.py",
+      "root_cause": "os.getenv(name, default) returns the default ONLY when the key is absent. skyyrose/.env:31 ships ELITE_MAX_QC_RETRIES= (present but empty), so getenv returned '' not '2', and int('') raised at import time, taking down the whole elite_studio module graph. Five reads shared this flaw (MAX_QC_RETRIES, WORKER_CONCURRENCY, RATE_LIMIT_GEMINI/OPENAI/ANTHROPIC).",
+      "fix": "Added _int_env(name, default) helper in config.py that treats None / empty / whitespace-only / unparseable env values as 'use the default', and routed all five int(os.getenv(...)) reads through it. Did NOT edit the .env (gitignored config); hardened the parser instead. Verified: forced-empty import OK + test_threed_service.py 3 passed (EXIT 0) + full tests/elite_studio/ green with ELITE_MAX_QC_RETRIES=''.",
+      "tags": [
+        "env-parsing",
+        "config",
+        "import-error",
+        "getenv-empty-string",
+        "elite_studio",
+        "boundary-validation"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18T20:45:00-07:00"
+    },
+    {
+      "id": "bug-145",
+      "timestamp": "2026-06-18",
+      "error_message": "AssertionError: assert '' == 'skyyrose-assets' \u2014 tests/services/test_r2_client.py::TestR2Config::test_default_bucket (full-suite only)",
+      "file": "skyyrose/.env (generated); pattern affects any loaded .env",
+      "root_cause": "Per-domain .env scaffold emitted unfilled keys as bare 'KEY='. skyyrose.core.env_loader.load_project_env lists skyyrose/.env in its load order; load_dotenv(override=False) still SETS a key not already present, so 'KEY=' injected an explicit empty string into global os.environ. r2_client's os.getenv('R2_BUCKET', DEFAULT_BUCKET) then returned '' instead of 'skyyrose-assets', polluting full-suite test ordering. 'KEY=' in a loaded dotenv is an explicit empty value, NOT absence.",
+      "fix": "Generate unfilled keys COMMENTED ('# KEY=') so they are genuinely absent and os.getenv(K, default) defaults stand; only resolved keys stay active 'KEY=value'. Regenerated all 6 per-domain env files.",
+      "tags": [
+        "env",
+        "dotenv",
+        "os.getenv-default-shadowing",
+        "test-pollution",
+        "load_project_env",
+        "r2_client"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18"
     }
   ]
 }

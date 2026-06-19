@@ -54,24 +54,44 @@ from .client import OAIImageClient  # noqa: E402
 # Per-collection scene register (the prompt's setting; the actual backdrop image
 # is supplied via --scene). love-hurts = the Beauty-and-the-Beast gothic world;
 # the others default to the brand's Oakland-concrete-luxury register.
+# Locked 2026-06-18 by the photography-director + image-prompt-engineer
+# collaboration (brand-canon settings + photographic craft, director final
+# canon sign-off). Cathedral (European-house lineage, locked out) rerouted to a
+# decayed Oakland Art Deco theater for canon-safe Beauty-and-the-Beast grandeur
+# (founder asked for more B&B feel); Kids "mauve" → "warm neutral" (mauve = Love
+# Hurts palette). Each string completes "The model stands in {scene_desc}."
 COLLECTION_SCENE: dict[str, str] = {
     "love-hurts": (
-        "a candlelit gothic cathedral interior with a Beauty-and-the-Beast mood — "
-        "ornate stone arches, stained glass, crimson velvet drapes, an enchanted "
-        "rose under a glass cloche, rose petals scattered on the stone floor, "
-        "dramatic warm candlelight"
+        "the gilded mezzanine of a decayed Oakland Art Deco theater at midnight — "
+        "peeling gold leaf on ornate columns, an enchanted rose under a glass cloche "
+        "burning amber as the room's sole heart-light, candlelight pooling from "
+        "flanking candelabra, crimson velvet on the balcony rail, rose petals mid-fall "
+        "catching the flame, soft god-rays through faded gilt, crimson-and-gold "
+        "split-tone, 85mm f/1.4 painterly bokeh"
     ),
     "black-rose": (
-        "a rain-slick West Oakland concrete underpass at night — brutalist pillars, "
-        "silver-rimmed light, wet asphalt reflections, cold monochrome luxury"
+        "a nocturnal Oakland waterfront rose garden at low tide — rows of black and "
+        "white roses silver-wet with rain, cold silver moonlight raking from "
+        "camera-right, rain suspended mid-air as fine platinum threads, the Bay "
+        "Bridge a distant rain-blurred ice-blue span across dark water, wet stone "
+        "underfoot mirroring the subject, monochrome platinum-charcoal grade, "
+        "85mm f/1.8 painterly depth"
     ),
     "signature": (
-        "an Oakland rooftop at warm predawn — raw concrete parapet, the Bay Bridge "
-        "glowing amber in the haze, gold-graded cinematic editorial light"
+        "the rooftop of a Deep East Oakland low-rise at 4 a.m. — raw poured concrete "
+        "parapet as foreground texture, the Bay Bridge strung amber across the water "
+        "dissolving into marine-layer haze, warm golden key from camera-left at 45 "
+        "degrees raking the model, faint lens haze from damp pre-dawn air, 85mm "
+        "portrait compression, honey-gold grade cooled slightly in the shadows for "
+        "contrast lift, contact shadow anchored on bare concrete"
     ),
     "kids-capsule": (
-        "an Oakland rooftop at magic-hour dusk facing the downtown skyline — warm "
-        "rose-gold light, Bay Bridge on the horizon, grounded and unhurried"
+        "a sunlit East Oakland neighborhood sidewalk on a Saturday morning — "
+        "rose-gold light raking painted concrete steps from camera-left at a low "
+        "angle, a mural soft-focused at frame-left, warm golden fill diffused by "
+        "open shade, 50mm editorial lens feel, warm rose-gold grade held in the "
+        "highlights with shadows pulled to a soft warm neutral, contact shadow "
+        "grounded on painted concrete underfoot, unhurried open-air atmosphere"
     ),
 }
 DEFAULT_SCENE = "an Oakland concrete-luxury editorial setting with dramatic directional light"
@@ -119,10 +139,68 @@ def _resolve(sku: str, collection: str | None) -> tuple[str, str, str]:
     name = (row.get("name") or sku).strip()
     coll = (collection or row.get("collection") or "").strip()
     scene_desc = COLLECTION_SCENE.get(coll, DEFAULT_SCENE)
-    return name, coll, scene_desc
+    placement = _placement_spec(row)
+    return name, coll, scene_desc, placement
 
 
-def build_prompt(name: str, scene_desc: str, has_logo: bool = False) -> str:
+def _placement_spec(row: dict) -> str:
+    """One-line brand-mark placement directive built from the dossier.
+
+    The on-model prompt must state WHERE each mark sits or gpt-image-2 invents
+    placement (founder-reported: the br-005 hip logo rendered on the arm). Pulls
+    the dossier's Branding + Negative blocks, strips markdown, and collapses them
+    into an imperative the edit call can follow — generalises to every SKU rather
+    than special-casing br-005.
+    """
+
+    # Keep only the placement-bearing lines: drop the reference/file-path block
+    # ("> Logo art canonical reference: data/...") and markdown chrome, so the
+    # edit prompt gets WHERE-each-mark-sits, not file paths it cannot use.
+    _noise = re.compile(
+        r"(data/|assets/|\.md\b|\.jpe?g\b|\.png\b|\.webp\b"
+        r"|canonical reference|reference photo|logo art)",
+        re.I,
+    )
+
+    def _lines(text: str) -> str:
+        kept: list[str] = []
+        for ln in (text or "").splitlines():
+            ln = ln.strip()
+            if not ln or ln.startswith(">") or _noise.search(ln):
+                continue
+            ln = re.sub(r"[*_`]+", "", ln)
+            ln = re.sub(r"^#{1,6}\s*", "", ln)
+            ln = re.sub(r"^[-•]\s*", "", ln).strip()
+            if ln:
+                kept.append(ln)
+        return "; ".join(kept)
+
+    # get_product_with_dossier nests the parsed Dossier under "_dossier" (the
+    # branding/negative blocks are NOT promoted to the top-level row).
+    dossier = row.get("_dossier")
+    if dossier is not None:
+        branding_raw = getattr(dossier, "branding_block", "") or ""
+        negative_raw = getattr(dossier, "negative_block", "") or ""
+    else:
+        d = row.get("dossier") if isinstance(row.get("dossier"), dict) else {}
+        branding_raw = d.get("branding_block", "")
+        negative_raw = d.get("negative_block", "")
+    branding = _lines(branding_raw)[:1800]
+    negative = _lines(negative_raw)[:900]
+    parts: list[str] = []
+    if branding:
+        parts.append(
+            "Render each described brand mark EXACTLY ONCE, only in its single "
+            "stated location — do NOT mirror, repeat, or duplicate any mark onto "
+            "the opposite side of the body, onto a sleeve or arm, or anywhere the "
+            f"spec does not name. Placement spec: {branding}"
+        )
+    if negative:
+        parts.append(f"These must NOT appear anywhere on the garment: {negative}")
+    return " ".join(parts)
+
+
+def build_prompt(name: str, scene_desc: str, has_logo: bool = False, placement: str = "") -> str:
     """Lookbook 'worn, not floating' prompt — garment is the protagonist."""
     logo_clause = (
         " One of the reference images is a CLOSE-UP of the exact brand logo/emblem that is "
@@ -133,13 +211,14 @@ def build_prompt(name: str, scene_desc: str, has_logo: bool = False) -> str:
         if has_logo
         else ""
     )
+    placement_clause = f" {placement}" if placement else ""
     return (
         f"Full-body editorial fashion photograph of a model wearing this exact "
         f"{name}, worn naturally with realistic drape, fit, fabric folds and grounded "
         f"contact shadows. Reproduce the garment's exact design, colors, embroidery "
         f"and lettering from the reference image — do not invent, recolor or restyle "
-        f"any part of the garment.{logo_clause} The model stands in {scene_desc}. The garment "
-        f"is the protagonist of the frame. Cinematic, photographic, ultra-detailed, 8k."
+        f"any part of the garment.{logo_clause}{placement_clause} The model stands in {scene_desc}. "
+        f"The garment is the protagonist of the frame. Cinematic, photographic, ultra-detailed, 8k."
     )
 
 
@@ -150,11 +229,11 @@ def _generate_one(sku: str, scene: Path, collection: str | None, dest: Path) -> 
     """
     if not scene.exists():
         raise FileNotFoundError(f"scene image not found: {scene}")
-    name, coll, scene_desc = _resolve(sku, collection)
+    name, coll, scene_desc, placement = _resolve(sku, collection)
     refs = _garment_refs(sku, coll)
     image_paths = [r.path for r in refs] + [scene]  # garment+logo lead; scene = context
     has_logo = any(r.kind == "logo" for r in refs)
-    prompt = build_prompt(name, scene_desc, has_logo)
+    prompt = build_prompt(name, scene_desc, has_logo, placement)
     data = OAIImageClient().edit(prompt=prompt, image_paths=image_paths)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes(data)
@@ -164,7 +243,7 @@ def _generate_one(sku: str, scene: Path, collection: str | None, dest: Path) -> 
 def _manifest(skus: list[str]) -> cost.CostManifest:
     entries = []
     for sku in skus:
-        name, coll, _ = _resolve(sku, None)
+        name, coll, _, _ = _resolve(sku, None)
         # Count the refs actually sent to the edit call (garment + logo + any
         # required patch) so the manifest matches the real API inputs.
         ref_count = len(_garment_paths(sku, coll))
