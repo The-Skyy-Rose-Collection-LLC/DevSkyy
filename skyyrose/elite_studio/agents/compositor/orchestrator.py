@@ -275,7 +275,6 @@ class CompositorAgent(FluxProviderMixin):
             # (per-SKU golden photo). No paid API. See
             # docs/superpowers/specs/2026-05-27-mockup-stage-d-and-cost-ceiling-design.md
             started = time.perf_counter()
-<<<<<<< Updated upstream
             stage_d_mode = os.environ.get("ELITE_STUDIO_STAGE_D_MODE", "kontext")
 
             if stage_d_mode == "rasterize":
@@ -337,38 +336,6 @@ class CompositorAgent(FluxProviderMixin):
                 if provider != "fal-fill":
                     result_kwargs["used_fallback"] = True
                     result_kwargs["fallback_provider"] = provider
-=======
-            aligned_mask_path = str(out / f"{sku}-mask-aligned.png")
-            _align_mask_to_scene(alpha_path, scene_image_path, aligned_mask_path)
-            stages["mask_align"] = {"path": aligned_mask_path}
-            with ThreadPoolExecutor(max_workers=3) as pool:
-                scene_fut = pool.submit(upload_to_fal, scene_image_path)
-                subject_fut = pool.submit(upload_to_fal, relit_path)
-                mask_fut = pool.submit(upload_to_fal, aligned_mask_path)
-                scene_url = scene_fut.result()
-                subject_url = subject_fut.result()
-                mask_url = mask_fut.result()
-            composite_bytes, provider = self._composite_with_flux(
-                scene_url=scene_url,
-                subject_url=subject_url,
-                mask_url=mask_url,
-                prompt=prompt,
-                budget=budget,
-            )
-            composite_path = str(out / f"{sku}-composite.png")
-            Path(composite_path).write_bytes(composite_bytes)
-            stages["composite"] = {
-                "path": composite_path,
-                "provider": provider,
-                "duration_s": round(time.perf_counter() - started, 3),
-            }
-            stages_done = 4
-            result_kwargs["provider"] = provider
-            result_kwargs["model"] = "flux-fill-pro" if provider == "fal-fill" else provider
-            if provider != "fal-fill":
-                result_kwargs["used_fallback"] = True
-                result_kwargs["fallback_provider"] = provider
->>>>>>> Stashed changes
 
             # ------------------------------ Stage 4.5: GIMP pixel cleanup
             started = time.perf_counter()
