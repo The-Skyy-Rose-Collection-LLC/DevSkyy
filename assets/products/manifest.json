@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-18T07:41:55+00:00",
-  "catalog_sha": "sha256:6f090ec4f526a6e22cd423646fc1ff0203be6448f0ec117648e32f980bc743be",
+  "generated_at": "2026-06-19T03:57:38+00:00",
+  "catalog_sha": "sha256:8d20467b496fe324a3d49ad8582e75942a18e849a7386e6f18b210b5c462c340",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -875,8 +875,8 @@
       "assets": [
         {
           "role": "garment",
-          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-original-label-tee-white.jpeg",
-          "sha256": "sha256:9e80fd8e297d6e5da548d39569301b2f032f1bb73949db2bc7a1c2b41f231ab1"
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-onmodel.webp",
+          "sha256": "sha256:b278f4abfc7127ef62c97db79e21bd65d1f7506d18e44686325b1953dec89f06"
         },
         {
           "role": "garment",
@@ -898,8 +898,8 @@
       "assets": [
         {
           "role": "garment",
-          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-original-label-tee-orchid.jpeg",
-          "sha256": "sha256:ebbe6620d6781d128c7da811e7febad138dbbccb91fb8f760df98c6749fd8fb5"
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-onmodel.webp",
+          "sha256": "sha256:5cd91f17c0bbd77633be628e76b7d0100c2572f76b2912add5022b9831262f87"
         },
         {
           "role": "garment",

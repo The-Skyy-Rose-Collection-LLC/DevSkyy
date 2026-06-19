@@ -167,8 +167,8 @@
           "resolved": "images/products/sg-002-stay-golden-shirt.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/stay-golden-tee-front-model.webp",
-          "resolved": "images/products/stay-golden-tee-front-model.webp"
+          "path": "assets/images/products/sg-002-onmodel.webp",
+          "resolved": "images/products/sg-002-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/stay-golden-tee-back-model.webp",
@@ -213,8 +213,8 @@
           "resolved": "images/products/sg-005-bay-bridge-shirt.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/bridge-bay-bridge-shirt-front-model.webp",
-          "resolved": "images/products/bridge-bay-bridge-shirt-front-model.webp"
+          "path": "assets/images/products/sg-005-onmodel.webp",
+          "resolved": "images/products/sg-005-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/bridge-bay-bridge-shirt-back-model.webp",
@@ -236,8 +236,8 @@
           "resolved": "images/products/sg-006-mint-lavender-hoodie.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/sg-006-ghost-front.webp",
-          "resolved": "images/products/ghost/sg-006-ghost-front.webp"
+          "path": "assets/images/products/sg-006-onmodel.webp",
+          "resolved": "images/products/sg-006-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/mint-lavender-hoodie-back-model.webp",
@@ -263,8 +263,8 @@
           "resolved": "images/products/sg-007-signature-beanie.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/signature-beanie-front-model.webp",
-          "resolved": "images/products/signature-beanie-front-model.webp"
+          "path": "assets/images/products/sg-007-onmodel.webp",
+          "resolved": "images/products/sg-007-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/signature-beanie-back-model.webp",
@@ -286,8 +286,8 @@
           "resolved": "images/products/sg-009-sherpa-jacket.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/signature-sherpa-jacket-front-closed.webp",
-          "resolved": "images/products/signature-sherpa-jacket-front-closed.webp"
+          "path": "assets/images/products/sg-009-onmodel.webp",
+          "resolved": "images/products/sg-009-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/the-sherpa-jacket-back-model.webp",
@@ -313,8 +313,8 @@
           "resolved": "images/products/sg-011-original-label-tee-white.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/sg-011-ghost-front.webp",
-          "resolved": "images/products/ghost/sg-011-ghost-front.webp"
+          "path": "assets/images/products/sg-011-onmodel.webp",
+          "resolved": "images/products/sg-011-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/original-label-tee-white-back-model.webp",
@@ -340,8 +340,8 @@
           "resolved": "images/products/sg-012-original-label-tee-orchid.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/original-label-tee-orchid-front-model.webp",
-          "resolved": "images/products/original-label-tee-orchid-front-model.webp"
+          "path": "assets/images/products/sg-012-onmodel.webp",
+          "resolved": "images/products/sg-012-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/original-label-tee-orchid-back-model.webp",
@@ -367,8 +367,8 @@
           "resolved": "images/products/sg-013-mint-lavender-crewneck.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/sg-013-ghost-front.webp",
-          "resolved": "images/products/ghost/sg-013-ghost-front.webp"
+          "path": "assets/images/products/sg-013-onmodel.webp",
+          "resolved": "images/products/sg-013-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/mint-lavender-crewneck-back-model.webp",
@@ -413,8 +413,8 @@
           "resolved": "images/products/sg-015-windbreaker-set.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/signature-windbreaker-set-front-model.webp",
-          "resolved": "images/products/signature-windbreaker-set-front-model.webp"
+          "path": "assets/images/products/sg-015-onmodel.webp",
+          "resolved": "images/products/sg-015-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/signature-windbreaker-set-back-model.webp",
