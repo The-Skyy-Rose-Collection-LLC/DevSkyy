@@ -64,8 +64,12 @@ def get_dino() -> _DinoState:
             return _STATE
         device = _select_device()
         logger.info("Loading DINOv2 %s on %s", MODEL_ID, device)
-        model = AutoModel.from_pretrained(MODEL_ID).to(device).eval()  # nosec B615 — facebook/dinov2-base is a pinned well-known public model; model ID constant defined above
-        processor = AutoImageProcessor.from_pretrained(MODEL_ID)  # nosec B615 — same model, same justification
+        model = (
+            AutoModel.from_pretrained(MODEL_ID).to(device).eval()
+        )  # nosec B615 — facebook/dinov2-base is a pinned well-known public model; model ID constant defined above
+        processor = AutoImageProcessor.from_pretrained(
+            MODEL_ID
+        )  # nosec B615 — same model, same justification
         _STATE = _DinoState(model=model, processor=processor, device=device)
     return _STATE
 

@@ -317,7 +317,9 @@ async def main() -> None:
     parser.add_argument(
         "--fallback-dir",
         type=Path,
-        default=Path("/tmp/wordpress_integration/webp_optimized/fallback"),  # nosec B108 — CLI default; user can override via --fallback-dir
+        default=Path(
+            "/tmp/wordpress_integration/webp_optimized/fallback"
+        ),  # nosec B108 — CLI default; user can override via --fallback-dir
         help="Directory containing fallback JPG files",
     )
     parser.add_argument(

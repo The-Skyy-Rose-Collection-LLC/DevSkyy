@@ -165,7 +165,9 @@ class SDXLPipeline:
                 torch_dtype=dtype,
                 variant="fp16" if dtype == torch.float16 else None,
                 use_safetensors=True,
-            ).to(self.device)
+            ).to(
+                self.device
+            )
 
             # Enable memory optimizations
             if self.device == "cuda":
@@ -200,7 +202,9 @@ class SDXLPipeline:
                 torch_dtype=dtype,
                 variant="fp16" if dtype == torch.float16 else None,
                 use_safetensors=True,
-            ).to(self.device)
+            ).to(
+                self.device
+            )
 
             logger.info("SDXL refiner loaded")
 
@@ -223,7 +227,9 @@ class SDXLPipeline:
                     self._controlnet_canny = ControlNetModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         str(model_path),
                         torch_dtype=dtype,
-                    ).to(self.device)
+                    ).to(
+                        self.device
+                    )
                     logger.info("ControlNet Canny loaded")
                 return self._controlnet_canny
 
@@ -237,7 +243,9 @@ class SDXLPipeline:
                     self._controlnet_depth = ControlNetModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         str(model_path),
                         torch_dtype=dtype,
-                    ).to(self.device)
+                    ).to(
+                        self.device
+                    )
                     logger.info("ControlNet Depth loaded")
                 return self._controlnet_depth
 

@@ -315,8 +315,12 @@ class VisualComparisonEngine:
         global _clip_model, _clip_processor
         try:
             if _clip_model is None or _clip_processor is None:
-                _clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")  # nosec B615 — well-known public model from OpenAI
-                _clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")  # nosec B615 — same
+                _clip_model = CLIPModel.from_pretrained(
+                    "openai/clip-vit-base-patch32"
+                )  # nosec B615 — well-known public model from OpenAI
+                _clip_processor = CLIPProcessor.from_pretrained(
+                    "openai/clip-vit-base-patch32"
+                )  # nosec B615 — same
                 _clip_model.eval()
 
             inputs = _clip_processor(

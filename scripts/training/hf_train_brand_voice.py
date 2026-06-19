@@ -13,7 +13,9 @@ from datasets import load_dataset
 hf_token = os.environ.get("HF_TOKEN")
 
 print("Loading SkyyRose brand voice dataset...")
-dataset = load_dataset("damBruh/skyyrose-brand-voice-training", split="train", token=hf_token)  # nosec B615 — HF model ID constant; well-known public model from trusted org
+dataset = load_dataset(
+    "damBruh/skyyrose-brand-voice-training", split="train", token=hf_token
+)  # nosec B615 — HF model ID constant; well-known public model from trusted org
 print(f"Dataset loaded: {len(dataset)} examples")
 
 # LoRA configuration for efficient fine-tuning

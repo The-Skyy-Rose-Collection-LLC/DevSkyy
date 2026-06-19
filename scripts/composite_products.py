@@ -161,7 +161,9 @@ def call_fal_product_shot(
     for attempt in range(1, retries + 1):
         try:
             req = urllib.request.Request(FAL_ENDPOINT, data=payload, headers=headers, method="POST")
-            with urllib.request.urlopen(req, timeout=120) as resp:  # nosec B310 — URL from controlled API response, not user input
+            with urllib.request.urlopen(
+                req, timeout=120
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 result = json.loads(resp.read().decode("utf-8"))
 
             # Synchronous endpoint returns result directly
@@ -191,12 +193,16 @@ def poll_fal_result(request_id: str, retries: int = 30) -> dict:
     for i in range(retries):
         try:
             req = urllib.request.Request(status_url, headers=headers)
-            with urllib.request.urlopen(req, timeout=30) as resp:  # nosec B310 — URL from controlled API response, not user input
+            with urllib.request.urlopen(
+                req, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 status = json.loads(resp.read().decode("utf-8"))
 
             if status.get("status") == "COMPLETED":
                 req2 = urllib.request.Request(result_url, headers=headers)
-                with urllib.request.urlopen(req2, timeout=30) as resp2:  # nosec B310 — URL from controlled API response, not user input
+                with urllib.request.urlopen(
+                    req2, timeout=30
+                ) as resp2:  # nosec B310 — URL from controlled API response, not user input
                     return json.loads(resp2.read().decode("utf-8"))
             elif status.get("status") in ("FAILED", "CANCELLED"):
                 return {"error": f"Job {status.get('status')}: {status}"}

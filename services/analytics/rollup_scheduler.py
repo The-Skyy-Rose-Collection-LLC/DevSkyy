@@ -608,7 +608,8 @@ class RollupScheduler:
             List of rollup results for this dimension.
         """
         # SQL query for aggregation with percentiles
-        query = text(f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
+        query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 '{dimension.value}' as dimension,
                 {dimension.value} as dimension_value,
@@ -624,7 +625,8 @@ class RollupScheduler:
             WHERE event_timestamp >= :period_start
               AND event_timestamp < :period_end
             GROUP BY {dimension.value}
-        """)
+        """
+        )
 
         result = await session.execute(
             query,

@@ -227,7 +227,9 @@ def generate_flux(
         import urllib.request
 
         try:
-            with urllib.request.urlopen(img_data.url, timeout=30) as resp:  # nosec B310 — URL from controlled API response, not user input
+            with urllib.request.urlopen(
+                img_data.url, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 raw_bytes = resp.read()
         except Exception as e:
             log.error("FLUX image URL download failed: %s", e)

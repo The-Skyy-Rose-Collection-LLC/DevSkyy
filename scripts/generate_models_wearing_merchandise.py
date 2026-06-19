@@ -102,7 +102,9 @@ async def generate_model_wearing_product(
     vae = AutoencoderKL.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "madebyollin/sdxl-vae-fp16-fix",
         torch_dtype=torch.float16,
-    ).to(device)
+    ).to(
+        device
+    )
 
     # Load SDXL pipeline with IP-Adapter for EXACT clothing transfer
     pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
@@ -110,7 +112,9 @@ async def generate_model_wearing_product(
         torch_dtype=torch.float16,
         vae=vae,
         variant="fp16",
-    ).to(device)
+    ).to(
+        device
+    )
 
     pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
     pipeline.scheduler.config.use_karras_sigmas = True

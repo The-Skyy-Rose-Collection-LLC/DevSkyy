@@ -55,7 +55,9 @@ def train_brand_voice():
         raise ValueError("HF_TOKEN not found in secrets")
 
     print(f"Loading dataset: {DATASET_NAME}")
-    dataset = load_dataset(DATASET_NAME, split="train", token=hf_token)  # nosec B615 — HF model ID constant; well-known public model from trusted org
+    dataset = load_dataset(
+        DATASET_NAME, split="train", token=hf_token
+    )  # nosec B615 — HF model ID constant; well-known public model from trusted org
     print(f"Dataset loaded: {len(dataset)} examples")
 
     # Quantization config
@@ -75,7 +77,9 @@ def train_brand_voice():
         token=hf_token,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True, token=hf_token)  # nosec B615 — HF model ID constant; well-known public model from trusted org
+    tokenizer = AutoTokenizer.from_pretrained(
+        MODEL_NAME, trust_remote_code=True, token=hf_token
+    )  # nosec B615 — HF model ID constant; well-known public model from trusted org
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 

@@ -158,7 +158,9 @@ def download_training_script():
         print("📥 Downloading HuggingFace training script...")
         import urllib.request
 
-        urllib.request.urlretrieve(script_url, script_path)  # nosec B310 — URL from controlled API response, not user input
+        urllib.request.urlretrieve(
+            script_url, script_path
+        )  # nosec B310 — URL from controlled API response, not user input
         print("✓ Training script downloaded\n")
     else:
         print("✓ Training script already exists\n")

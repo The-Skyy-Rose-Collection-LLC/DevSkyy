@@ -34,7 +34,9 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 # Hostnames that must never be reachable from a FASHN-side fetch. FASHN
 # fetches the URL we hand it server-side, so any private/link-local/loopback
 # host = SSRF surface (e.g., 169.254.169.254 = AWS IMDS).
-_BLOCKED_HOSTS: frozenset[str] = frozenset({"localhost", "0.0.0.0"})  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
+_BLOCKED_HOSTS: frozenset[str] = frozenset(
+    {"localhost", "0.0.0.0"}
+)  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
 
 
 def _validate_public_url(label: str, url: str) -> None:

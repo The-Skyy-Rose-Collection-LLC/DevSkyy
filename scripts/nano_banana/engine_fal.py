@@ -79,7 +79,9 @@ def _fal_available() -> bool:
 def _download_image(url: str) -> bytes | None:
     """Download image from fal.ai result URL."""
     try:
-        with urllib.request.urlopen(url, timeout=60) as resp:  # nosec B310 — URL from controlled API response, not user input
+        with urllib.request.urlopen(
+            url, timeout=60
+        ) as resp:  # nosec B310 — URL from controlled API response, not user input
             return resp.read()
     except Exception as exc:
         log.error("Failed to download fal.ai image: %s", exc)

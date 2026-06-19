@@ -497,7 +497,10 @@ def _download_image(url: str, cache_dir: str) -> str:
     if dst.exists():
         return str(dst)
     dst.parent.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(url, timeout=30) as src, open(dst, "wb") as out:  # noqa: S310  # nosec B310 — URL from controlled API response, not user input
+    with (
+        urllib.request.urlopen(url, timeout=30) as src,
+        open(dst, "wb") as out,
+    ):  # noqa: S310  # nosec B310 — URL from controlled API response, not user input
         out.write(src.read())
     return str(dst)
 

@@ -202,7 +202,9 @@ def main():
         print(f"WordPress mapping: {args.wordpress_mapping}")
         # TODO: Extract image paths from WordPress mapping
         # For now, use fallback directory
-        fallback_dir = Path("/tmp/full_catalog_processing/webp_optimized/webp")  # nosec B108 — fallback path for local processing script
+        fallback_dir = Path(
+            "/tmp/full_catalog_processing/webp_optimized/webp"
+        )  # nosec B108 — fallback path for local processing script
         if fallback_dir.exists():
             image_paths = collect_product_images(fallback_dir)
         else:
