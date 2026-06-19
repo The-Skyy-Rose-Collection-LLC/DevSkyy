@@ -502,10 +502,13 @@ jobs:
         working-directory: frontend
 
       - name: Install Playwright
+        # Install inside frontend/ so the binary that runs tests is the same one
+        # that downloads browsers. npx resolves the Python playwright first (v1.60,
+        # headless-shell-1208) which conflicts with the Node @playwright/test version.
+        # Using ./node_modules/.bin/playwright from the same directory avoids the mismatch.
+        working-directory: frontend
         run: |
           npm install -D @playwright/test
-          # Use the exact playwright binary from the locally installed package so
-          # browser version matches what npx playwright test will use at runtime.
           # mobile project uses iPhone 14 (WebKit engine), chromium for Desktop Chrome.
           ./node_modules/.bin/playwright install --with-deps chromium webkit
 
@@ -534,7 +537,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: Run Playwright tests
-        run: npx playwright test --reporter=html
+        run: ./node_modules/.bin/playwright test --reporter=html
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
