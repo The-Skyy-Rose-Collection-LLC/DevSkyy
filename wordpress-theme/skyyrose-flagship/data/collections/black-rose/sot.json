@@ -293,8 +293,8 @@
           "resolved": "images/products/br-005-signature-hoodie.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/br-005-onmodel.webp",
-          "resolved": "images/products/br-005-onmodel.webp"
+          "path": "assets/images/products/ghost/br-005-ghost-front.webp",
+          "resolved": "images/products/ghost/br-005-ghost-front.webp"
         },
         "back_image": {
           "path": "assets/images/products/black-rose-hoodie-signature-edition-back-model.webp",
@@ -470,8 +470,8 @@
           "resolved": "images/products/br-012-last-oakland-baseball-front.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/br-012-onmodel.webp",
-          "resolved": "images/products/br-012-onmodel.webp"
+          "path": "assets/images/products/jersey-last-oakland-baseball-front-model.webp",
+          "resolved": "images/products/jersey-last-oakland-baseball-front-model.webp"
         },
         "back_image": {
           "path": "assets/images/products/br-012-last-oakland-baseball-back.jpeg",
