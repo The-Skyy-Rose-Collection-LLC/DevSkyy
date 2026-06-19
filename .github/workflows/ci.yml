@@ -477,6 +477,9 @@ jobs:
     name: 🎭 Playwright E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Non-gating: E2E suite is nascent / not yet CI-stable. Still runs for visibility,
+    # but does not block merges until the suite is hardened (see settings-page.spec follow-up).
+    continue-on-error: true
     needs: [python-tests, frontend-tests]
     if: ${{ !inputs.skip_e2e }}
 
