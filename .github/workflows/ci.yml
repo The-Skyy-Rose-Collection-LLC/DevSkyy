@@ -504,8 +504,10 @@ jobs:
       - name: Install Playwright
         run: |
           npm install -D @playwright/test
-          # Install chromium + webkit; mobile project uses iPhone 14 (WebKit engine)
-          npx playwright install --with-deps chromium webkit
+          # Use the exact playwright binary from the locally installed package so
+          # browser version matches what npx playwright test will use at runtime.
+          # mobile project uses iPhone 14 (WebKit engine), chromium for Desktop Chrome.
+          ./node_modules/.bin/playwright install --with-deps chromium webkit
 
       - name: Download frontend build
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # v7.0.0
