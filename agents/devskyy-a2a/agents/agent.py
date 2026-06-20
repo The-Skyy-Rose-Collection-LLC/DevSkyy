@@ -103,8 +103,7 @@ def _check_budget(skill: str, max_cost_usd: float | None) -> dict[str, Any] | No
             "skill": skill,
             "estimate_usd": estimate,
             "message": (
-                f"Skill '{skill}' costs ~${estimate:.2f} per call; "
-                "caller must pass max_cost_usd"
+                f"Skill '{skill}' costs ~${estimate:.2f} per call; " "caller must pass max_cost_usd"
             ),
         }
     if max_cost_usd is not None and estimate > max_cost_usd:
@@ -114,9 +113,7 @@ def _check_budget(skill: str, max_cost_usd: float | None) -> dict[str, Any] | No
             "skill": skill,
             "estimate_usd": estimate,
             "max_cost_usd": max_cost_usd,
-            "message": (
-                f"Estimated cost ${estimate:.2f} exceeds cap ${max_cost_usd:.2f}"
-            ),
+            "message": (f"Estimated cost ${estimate:.2f} exceeds cap ${max_cost_usd:.2f}"),
         }
     return None
 
@@ -283,9 +280,7 @@ def product_description(
 
     try:
         agent = CommerceAgent()
-        result = agent.describe_product(
-            sku=sku, audience=audience, max_words=int(max_words)
-        )
+        result = agent.describe_product(sku=sku, audience=audience, max_words=int(max_words))
     except Exception as exc:  # noqa: BLE001
         return {
             "ok": False,
@@ -295,9 +290,7 @@ def product_description(
             "message": str(exc),
         }
 
-    description = (
-        result.get("description", "") if isinstance(result, dict) else str(result)
-    )
+    description = result.get("description", "") if isinstance(result, dict) else str(result)
     if _RETIRED_TAGLINE.lower() in description.lower():
         return {
             "ok": False,
