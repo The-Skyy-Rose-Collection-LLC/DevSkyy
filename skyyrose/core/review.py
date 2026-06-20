@@ -29,6 +29,11 @@ GHOST_REL = "renders/ghost-mannequin"
 APPROVED_SUBDIR = "approved"
 FRONT_MODEL_COL = "front_model_image"
 GHOST_FILENAME_FMT = "{sku}-ghost-front.webp"
+# Approved ghost renders are copied into the THEME's deployable assets tree so the
+# storefront resolves front_model_image via get_theme_file_uri(). The repo-local
+# renders/ path is NOT shipped by deploy-theme.sh, so it must never be the CSV value.
+THEME_GHOST_REL = "wordpress-theme/skyyrose-flagship/assets/images/products/ghost"
+FRONT_MODEL_VALUE_FMT = "assets/images/products/ghost/{sku}-ghost-front.webp"
 APPROVALS_JSON = "approvals.json"
 REJECTIONS_JSON = "rejections.json"
 
@@ -266,10 +271,17 @@ def approve(sku: str, *, root: Path | str | None = None) -> ApprovalResult:
     row_count_before = len(rows)
     idx = _find_row_index(rows, sku)
 
-    new_front = f"{GHOST_REL}/{APPROVED_SUBDIR}/{GHOST_FILENAME_FMT.format(sku=sku)}"
+    # The CSV value must be a THEME-relative path (get_theme_file_uri-resolvable),
+    # never the repo-local renders/ path, which the theme deploy does not ship.
+    new_front = FRONT_MODEL_VALUE_FMT.format(sku=sku)
+    theme_dst = base / THEME_GHOST_REL / GHOST_FILENAME_FMT.format(sku=sku)
 
     shutil.move(str(src), str(dst))
     try:
+        # Deployable theme copy — what the storefront actually serves. The approved/
+        # original stays put for the WooCommerce uploader to read.
+        theme_dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(dst), str(theme_dst))
         rows[idx] = {**rows[idx], FRONT_MODEL_COL: new_front}
         # Runtime invariant — survives python -O (unlike assert).
         if len(rows) != row_count_before:
@@ -278,6 +290,11 @@ def approve(sku: str, *, root: Path | str | None = None) -> ApprovalResult:
             )
         atomic_csv_write(rows, fieldnames, csv_path)
     except BaseException:
+        if theme_dst.exists():
+            try:
+                theme_dst.unlink()
+            except OSError:
+                pass
         if dst.exists() and not src.exists():
             _safe_rollback_move(src, dst)
         raise
