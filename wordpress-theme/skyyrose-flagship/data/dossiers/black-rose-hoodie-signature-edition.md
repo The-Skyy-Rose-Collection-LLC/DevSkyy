@@ -23,6 +23,16 @@ reference_image: assets/products/references/br-005-signature-hoodie-real.jpeg
   rather than full-color silicone-appliqué). Tonal/monochrome treatment
   per the reference photo. **Technique:** silicone. **Color:** as rendered
   in the canonical logo + reference image (white/grey tonal).
+- **front-left-hip** (LARGE, ~9–11in tall — prominent; render it noticeably
+  BIGGER than the small right-chest mark, spanning much of the lower-left front
+  panel from beside the kangaroo pocket toward the bottom hem and the left side
+  seam): The Black Rose three-rose-cluster embroidered LOW on the wearer's LEFT
+  side of the BODY at HIP level — on the front-left torso beside / just above the
+  left edge of the kangaroo pocket, roughly level with the bottom hem. On the
+  BODY, **NOT on the sleeve, arm, or shoulder** (Corey: "NOT SLEEVE").
+  Front-visible in a straight-on or three-quarter-front view.
+  **Technique:** embroidered. **Color:** tonal white/grey per the canonical
+  logo + reference photo.
 
 ### Back
 - (No back-neck SR monogram, no back-center logo confirmed in this read-back —

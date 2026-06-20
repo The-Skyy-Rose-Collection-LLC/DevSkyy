@@ -10,7 +10,7 @@
   },
   "corrections": {
     "br-005": [
-      "[on-model] the logo is on the sleeve and its supposed to be on the side or the hoodie",
+      "[on-model] the rose-cluster keeps rendering on the arm — it goes LOW on the front-LEFT HIP (beside the kangaroo pocket, near the bottom hem), on the body NOT the sleeve or arm; and it is LARGE on the real garment — render it bigger / more prominent than the last render showed",
       "[ghost] The Black Rose rose-cluster logo is a cluster of MULTIPLE separate roses — one dominant upright rose plus a smaller rose or bud offset to the side, on a single cumulus cloud at the base. It is NOT a single large bloom and NOT a peony. Keep the roses as distinct flowers; do not merge them into one."
     ],
     "br-002": [
