@@ -631,7 +631,11 @@ jobs:
   docker-build:
     name: 🐳 Docker Build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # The .[all] backend image pulls the full ML stack (torch+CUDA, transformers,
+    # mineru, chromadb, faiss, sentence-transformers) — a multi-GB image whose
+    # build + GHCR push legitimately exceeds 20 min cold. Deps now resolve (aiofiles
+    # cap); the only remaining failure was this timeout. 45 min fits the real build.
+    timeout-minutes: 45
     needs: [python-tests, frontend-tests, security]
     if: github.event_name == 'push'
 
