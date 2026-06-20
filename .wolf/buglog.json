@@ -1927,6 +1927,125 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-16"
+    },
+    {
+      "id": "bug-140",
+      "timestamp": "2026-06-18T08:10:00Z",
+      "error_message": "Relayed to founder that skyyrose-lora-v3 was trained on 390 product images; live Replicate model description says 604.",
+      "file": "llm/providers/replicate.py",
+      "root_cause": "Stale provenance comment at replicate.py:75 ('trained on 390 exact product images') was copied from an older training run and never updated when the LoRA was re-trained on 604 images (v3, pinned 64dbb859, created 2026-01-18). Asserting model facts from a source-code comment instead of the authoritative live model description.",
+      "fix": "Verified the model against the live Replicate API via scripts/verify-replicate-models.py (free metadata read, no prediction): model exists under devskyy org, public, pinned version hash matches latest_version, description='...trained on 604 exact product images'. Corrected the comment 390->604 with a verified-2026-06-18 note.",
+      "tags": [
+        "replicate",
+        "lora",
+        "provenance",
+        "stale-comment",
+        "anti-hallucination",
+        "verify-against-live"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18T08:10:00Z"
+    },
+    {
+      "id": "bug-141",
+      "timestamp": "2026-06-18T15:00:00Z",
+      "error_message": "FASHN try-on variants B+C failed: HTTP 401 {\"error\":\"UnauthorizedAccess\",\"message\":\"Unauthorized: Invalid token\"} on https://api.fashn.ai/v1/run",
+      "file": "scripts/proto-onmodel-lookbook.py",
+      "root_cause": "The FASHN_API_KEY in .env.production is invalid \u2014 27 chars, does NOT start with the FASHN 'fa-' prefix (real keys are ~50+ chars, fa-...). The on-model research workflow had over-claimed it as a 'real-key format, 106-char line'; verified false. Auth header format was correct (matches the working skyyrose/integrations/fashn_client.py:126 'Bearer {key}'), so the 401 is purely the bad key, not a code bug.",
+      "fix": "Diagnosed by printing FASHN's 401 response body + key SHAPE only (len/prefix/quotes, never the value). Confirmed invalid token. Code is correct + resilient (per-variant failure isolation let variant A still succeed). RESOLUTION PENDING founder: supply a valid fa- FASHN key, OR swap the try-on engine to Replicate IDM-VTON (REPLICATE_API_TOKEN in .env.hf is valid). No code change needed for variant A (gpt-image-2 edit) which succeeded.",
+      "tags": [
+        "fashn",
+        "401",
+        "invalid-api-key",
+        "env-production",
+        "verify-against-live",
+        "workflow-overclaim"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18T15:00:00Z"
+    },
+    {
+      "id": "bug-142",
+      "timestamp": "2026-06-18T13:54:00Z",
+      "error_message": "Paid imagery CLIs fire OpenAI gpt-image-2 / Replicate FLUX charges on the `go` subcommand with NO interactive STOP-AND-SHOW confirmation \u2014 manifest was built but never shown, input() never read, so `python scripts/gen-hero-previews.py go` (and gen-lookbook-remake.py go) charged immediately.",
+      "file": "scripts/gen-hero-previews.py, scripts/gen-lookbook-remake.py",
+      "root_cause": "build_manifest() (the 'Proceed? [y/N]' block) was only wired into the `plan` subcommand; the `go` branch called run() directly. The only guard on the paid path was a numeric hard-cap abort, which is not the project's required confirmation gate. Surfaced by the /code-review ultra multi-agent pass (C1 CRITICAL + H1 HIGH), adversarially verified.",
+      "fix": "Wired the gate into the `go` path of both scripts: print build_manifest(), read input() (EOFError/KeyboardInterrupt => empty => abort), proceed only on 'y'/'yes'; added a `--yes`/`-y` flag for non-interactive/CI use, default interactive. Proven: `go </dev/null` => exit 1 + 'Aborted.' with the paid call never reached. Part of a 21-finding review-fix batch. NOTE: cost gate belongs at the CLI boundary (these scripts), NOT buried in the reusable ReplicateClient \u2014 the provider got only an OPT-IN env-gated hook (REPLICATE_REQUIRE_CONFIRM, default off) so existing callers are unaffected.",
+      "tags": [
+        "stop-and-show",
+        "paid-api",
+        "cost-gate",
+        "openai",
+        "replicate",
+        "code-review-ultra",
+        "boundary-not-library"
+      ],
+      "related_bugs": [
+        "bug-140"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-18T13:54:00Z"
+    },
+    {
+      "id": "bug-143",
+      "timestamp": "2026-06-18",
+      "error_message": "On-model renders misplace SKU logos: br-005 Signature hoodie logo rendered on the arm/sleeve instead of the left hip; Love Hurts joggers lh-002/lh-006 hallucinate/misplace the left-thigh logo.",
+      "file": "scripts/oai_render/lookbook.py",
+      "root_cause": "build_prompt logo clause was generic ('reproduce the logo in its proper place') and never relayed the dossier's documented placement, so gpt-image-2 invented placement. The exact placement (br-005 left-hip 'NOT sleeve'; LH joggers left-thigh) lives in the dossier branding_block/negative_block, nested under row['_dossier'] \u2014 never injected into the prompt.",
+      "fix": "Added _placement_spec(row): reads branding_block+negative_block from the nested _dossier, strips file-path/markdown noise, injects an imperative placement directive into build_prompt. Generalised to every SKU. Verified br-005 keeps left-hip+'NOT on the sleeve', lh-002/006 keep left-thigh; prompt ~4000c; ruff+black clean.",
+      "tags": [
+        "imagery",
+        "oai-render",
+        "logo-placement",
+        "dossier",
+        "gpt-image-2",
+        "lookbook"
+      ],
+      "related_bugs": [
+        "bug-141"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-18"
+    },
+    {
+      "id": "bug-144",
+      "timestamp": "2026-06-18T20:45:00-07:00",
+      "error_message": "ValueError: invalid literal for int() with base 10: '' at skyyrose/elite_studio/config.py:133 (MAX_QC_RETRIES) \u2014 crashed pytest collection of tests/elite_studio/platform/test_threed_service.py",
+      "file": "skyyrose/elite_studio/config.py",
+      "root_cause": "os.getenv(name, default) returns the default ONLY when the key is absent. skyyrose/.env:31 ships ELITE_MAX_QC_RETRIES= (present but empty), so getenv returned '' not '2', and int('') raised at import time, taking down the whole elite_studio module graph. Five reads shared this flaw (MAX_QC_RETRIES, WORKER_CONCURRENCY, RATE_LIMIT_GEMINI/OPENAI/ANTHROPIC).",
+      "fix": "Added _int_env(name, default) helper in config.py that treats None / empty / whitespace-only / unparseable env values as 'use the default', and routed all five int(os.getenv(...)) reads through it. Did NOT edit the .env (gitignored config); hardened the parser instead. Verified: forced-empty import OK + test_threed_service.py 3 passed (EXIT 0) + full tests/elite_studio/ green with ELITE_MAX_QC_RETRIES=''.",
+      "tags": [
+        "env-parsing",
+        "config",
+        "import-error",
+        "getenv-empty-string",
+        "elite_studio",
+        "boundary-validation"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18T20:45:00-07:00"
+    },
+    {
+      "id": "bug-145",
+      "timestamp": "2026-06-18",
+      "error_message": "AssertionError: assert '' == 'skyyrose-assets' \u2014 tests/services/test_r2_client.py::TestR2Config::test_default_bucket (full-suite only)",
+      "file": "skyyrose/.env (generated); pattern affects any loaded .env",
+      "root_cause": "Per-domain .env scaffold emitted unfilled keys as bare 'KEY='. skyyrose.core.env_loader.load_project_env lists skyyrose/.env in its load order; load_dotenv(override=False) still SETS a key not already present, so 'KEY=' injected an explicit empty string into global os.environ. r2_client's os.getenv('R2_BUCKET', DEFAULT_BUCKET) then returned '' instead of 'skyyrose-assets', polluting full-suite test ordering. 'KEY=' in a loaded dotenv is an explicit empty value, NOT absence.",
+      "fix": "Generate unfilled keys COMMENTED ('# KEY=') so they are genuinely absent and os.getenv(K, default) defaults stand; only resolved keys stay active 'KEY=value'. Regenerated all 6 per-domain env files.",
+      "tags": [
+        "env",
+        "dotenv",
+        "os.getenv-default-shadowing",
+        "test-pollution",
+        "load_project_env",
+        "r2_client"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-18"
     }
   ]
 }

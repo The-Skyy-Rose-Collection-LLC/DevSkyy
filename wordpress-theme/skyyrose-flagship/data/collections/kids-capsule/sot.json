@@ -100,8 +100,8 @@
           "resolved": "images/products/kids-001-red-set.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/kids-001-ghost-front.webp",
-          "resolved": "images/products/ghost/kids-001-ghost-front.webp"
+          "path": "assets/images/products/kids-001-onmodel.webp",
+          "resolved": "images/products/kids-001-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/kids-red-set-back-model.webp",

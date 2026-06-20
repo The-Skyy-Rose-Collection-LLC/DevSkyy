@@ -241,8 +241,8 @@
           "resolved": "images/products/lh-002-joggers.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/lh-002-ghost-front.webp",
-          "resolved": "images/products/ghost/lh-002-ghost-front.webp"
+          "path": "assets/images/products/lh-002-onmodel.webp",
+          "resolved": "images/products/lh-002-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/love-hurts-joggers-back-model.webp",
@@ -295,8 +295,8 @@
           "resolved": "images/products/lh-004-bomber.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/lh-004-ghost-front.webp",
-          "resolved": "images/products/ghost/lh-004-ghost-front.webp"
+          "path": "assets/images/products/lh-004-onmodel.webp",
+          "resolved": "images/products/lh-004-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/lh-004-bomber-back.png",
@@ -322,8 +322,8 @@
           "resolved": "images/products/lh-005-fannie.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/the-fannie-front-model.webp",
-          "resolved": "images/products/the-fannie-front-model.webp"
+          "path": "assets/images/products/lh-005-onmodel.webp",
+          "resolved": "images/products/lh-005-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/the-fannie-back-model.webp",
@@ -345,8 +345,8 @@
           "resolved": "images/products/lh-006-joggers-white.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/lh-006-ghost-front.webp",
-          "resolved": "images/products/ghost/lh-006-ghost-front.webp"
+          "path": "assets/images/products/lh-006-onmodel.webp",
+          "resolved": "images/products/lh-006-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/love-hurts-joggers-white-back-model.webp",

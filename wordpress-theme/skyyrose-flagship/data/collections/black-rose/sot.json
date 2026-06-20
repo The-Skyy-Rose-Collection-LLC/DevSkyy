@@ -189,8 +189,8 @@
           "resolved": "images/products/br-001-crewneck.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/br-001-ghost-front.webp",
-          "resolved": "images/products/ghost/br-001-ghost-front.webp"
+          "path": "assets/images/products/br-001-onmodel.webp",
+          "resolved": "images/products/br-001-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/black-rose-crewneck-back-model.webp",
@@ -239,8 +239,8 @@
           "resolved": "images/products/br-003-baseball-classic.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-front-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-front-model.webp"
+          "path": "assets/images/products/br-003-onmodel.webp",
+          "resolved": "images/products/br-003-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
@@ -266,8 +266,8 @@
           "resolved": "images/products/br-004-black-rose-hoodie.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/br-004-ghost-front.webp",
-          "resolved": "images/products/ghost/br-004-ghost-front.webp"
+          "path": "assets/images/products/br-004-onmodel.webp",
+          "resolved": "images/products/br-004-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/black-rose-hoodie-back-model.webp",
@@ -320,8 +320,8 @@
           "resolved": "images/products/br-006-sherpa-jacket.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/black-rose-sherpa-jacket-front-model.webp",
-          "resolved": "images/products/black-rose-sherpa-jacket-front-model.webp"
+          "path": "assets/images/products/br-006-onmodel.webp",
+          "resolved": "images/products/br-006-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
@@ -374,8 +374,8 @@
           "resolved": "images/products/br-008-sf-inspired.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/jersey-sf-inspired-football-front-model.webp",
-          "resolved": "images/products/jersey-sf-inspired-football-front-model.webp"
+          "path": "assets/images/products/br-008-onmodel.webp",
+          "resolved": "images/products/br-008-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp",
@@ -397,8 +397,8 @@
           "resolved": "images/products/br-009-last-oakland-football.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/jersey-last-oakland-football-front-model.webp",
-          "resolved": "images/products/jersey-last-oakland-football-front-model.webp"
+          "path": "assets/images/products/br-009-onmodel.webp",
+          "resolved": "images/products/br-009-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-last-oakland-football-back-model.webp",
@@ -420,8 +420,8 @@
           "resolved": "images/products/br-010-the-bay-basketball.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/jersey-the-bay-basketball-front-model.webp",
-          "resolved": "images/products/jersey-the-bay-basketball-front-model.webp"
+          "path": "assets/images/products/br-010-onmodel.webp",
+          "resolved": "images/products/br-010-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp",
@@ -443,8 +443,8 @@
           "resolved": "images/products/br-011-the-rose-hockey.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/jersey-the-rose-hockey-front-model.webp",
-          "resolved": "images/products/jersey-the-rose-hockey-front-model.webp"
+          "path": "assets/images/products/br-011-onmodel.webp",
+          "resolved": "images/products/br-011-onmodel.webp"
         },
         "back_image": {
           "path": "assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp",
@@ -497,8 +497,8 @@
           "resolved": "images/products/br-014-baseball-classic-giants.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/br-014-ghost-front.webp",
-          "resolved": "images/products/ghost/br-014-ghost-front.webp"
+          "path": "assets/images/products/br-014-onmodel.webp",
+          "resolved": "images/products/br-014-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/black-is-beautiful-jersey-giants-back-model.webp",
@@ -520,8 +520,8 @@
           "resolved": "images/products/br-015-baseball-classic-white.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/br-015-ghost-front.webp",
-          "resolved": "images/products/ghost/br-015-ghost-front.webp"
+          "path": "assets/images/products/br-015-onmodel.webp",
+          "resolved": "images/products/br-015-onmodel.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/black-is-beautiful-jersey-white-back-model.webp",

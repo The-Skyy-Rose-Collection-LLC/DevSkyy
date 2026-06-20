@@ -156,6 +156,33 @@ def test_primary_image_paths_resolve(rows: list[dict[str, str]]) -> None:
     assert not missing, f"primary image paths do not exist: {missing[:5]}"
 
 
+ALL_IMAGE_COLUMNS = ("image", "front_model_image", "back_image", "back_model_image")
+
+
+def test_all_image_columns_resolve(rows: list[dict[str, str]]) -> None:
+    """Every non-empty image cell across all 4 columns resolves to a real file.
+
+    Covers ``front_model_image`` — the PRIMARY product-card image since the
+    on-model render wiring (consumed by template-parts/product-card-holo.php,
+    which overrides the WC featured image). The narrower
+    ``test_primary_image_paths_resolve`` only checks the ``image`` column; this
+    guards the on-model + back + back-model columns the holo cards actually
+    serve. A render referenced in the CSV but missing on disk (e.g. a render
+    committed to the catalog but whose webp was never git-added) is a broken
+    product card — this test fails closed on exactly that.
+    """
+    theme_root = CATALOG_CSV.parent.parent  # wordpress-theme/skyyrose-flagship/
+    missing: list[str] = []
+    for r in rows:
+        for col in ALL_IMAGE_COLUMNS:
+            rel = (r.get(col) or "").strip()
+            if not rel:
+                continue
+            if not (theme_root / rel).is_file():
+                missing.append(f"{r['sku']}:{col} → {rel}")
+    assert not missing, f"image cells that do not resolve on disk: {missing}"
+
+
 def test_python_loaders_agree_on_sku_set() -> None:
     """nano_banana.load_catalog() and elite_studio.Catalog.load() must see the same SKUs."""
     import sys
