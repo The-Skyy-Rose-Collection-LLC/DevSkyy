@@ -50,13 +50,17 @@ class FluxProviderMixin:
         catch the worst-case (all three providers fire) where actual spend
         would exceed the coarse estimate.
         """
-        out = self._flux_fill_fal(scene_url, mask_url, prompt, budget=budget)
-        if out:
-            return out, "fal-fill"
-
+        # Kontext is primary because it accepts ``reference_image_url`` (the IC-Light relit
+        # product photo), so FLUX conditions the inpaint on the actual garment instead of
+        # hallucinating from prompt text alone. fal-fill stays as text-only fallback for
+        # cases where the reference upload fails or kontext rejects the input.
         out = self._flux_kontext(scene_url, mask_url, subject_url, prompt, budget=budget)
         if out:
             return out, "kontext"
+
+        out = self._flux_fill_fal(scene_url, mask_url, prompt, budget=budget)
+        if out:
+            return out, "fal-fill"
 
         out = self._flux_fill_replicate(scene_url, mask_url, prompt, budget=budget)
         if out:

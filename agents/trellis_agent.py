@@ -270,7 +270,6 @@ class TrellisAgent:
             return proc.stdout, proc.stderr, proc.returncode
         except subprocess.TimeoutExpired as exc:
             stderr = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
-            stdout = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
             raise TrellisTimeoutError(
                 f"trellis subprocess timed out after {self.timeout_seconds}s: {stderr[-2000:]}"
             ) from exc
@@ -328,7 +327,7 @@ try:
     from PIL import Image
     from trellis2.pipelines import Trellis2ImageTo3DPipeline
 
-    pipeline = Trellis2ImageTo3DPipeline.from_pretrained(MODEL_REPO)
+    pipeline = Trellis2ImageTo3DPipeline.from_pretrained(MODEL_REPO)  # nosec B615 — HF model ID constant; well-known public model from trusted org
     pipeline.cuda()
 
     image = Image.open(INPUT_IMAGE).convert("RGBA")

@@ -37,7 +37,9 @@ from monitoring.prometheus_metrics import get_metrics_text, update_server_uptime
 
 # Server configuration
 METRICS_PORT = int(os.getenv("METRICS_PORT", "9090"))
-METRICS_HOST = os.getenv("METRICS_HOST", "0.0.0.0")
+METRICS_HOST = os.getenv(
+    "METRICS_HOST", "0.0.0.0"
+)  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
 
 # Track server start time
 SERVER_START_TIME = time.time()

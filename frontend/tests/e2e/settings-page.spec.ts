@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Settings Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to settings page
-    await page.goto('https://www.devskyy.app/admin/settings');
+    // Navigate to settings page (relative — uses baseURL: the CI-served build, not production)
+    await page.goto('/admin/settings');
 
     // Wait for page to load
     await page.waitForLoadState('networkidle');

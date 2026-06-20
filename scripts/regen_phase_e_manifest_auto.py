@@ -299,9 +299,7 @@ def _parse_dossier_keys(slug: str) -> dict[str, bool]:
         if not match:
             return False
         value = match.group(1).strip()
-        if value in ("", "[]", "null", "~"):
-            return False
-        return True
+        return value not in ("", "[]", "null", "~")
 
     return {
         "logo_reference": has_non_empty("logo_reference"),
@@ -317,10 +315,17 @@ def _build_persku_block() -> str:
         reader = csv.DictReader(fh)
         rows = list(reader)
 
-    src_ok = lambda row: (THEME_ROOT / (row.get("image") or "").strip()).exists()
-    logo_ok = lambda slug: _parse_dossier_keys(slug)["logo_reference"]
-    extras_ok = lambda slug: _parse_dossier_keys(slug)["extra_logos"]
-    dossier_missing = lambda slug: _parse_dossier_keys(slug)["missing"]
+    def src_ok(row):
+        return (THEME_ROOT / (row.get("image") or "").strip()).exists()
+
+    def logo_ok(slug):
+        return _parse_dossier_keys(slug)["logo_reference"]
+
+    def extras_ok(slug):
+        return _parse_dossier_keys(slug)["extra_logos"]
+
+    def dossier_missing(slug):
+        return _parse_dossier_keys(slug)["missing"]
 
     out: list[str] = [""]
     out.append("| SKU | Collection | SRC | logo_reference | extra_logos | Dossier slug |")

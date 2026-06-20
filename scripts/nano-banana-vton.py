@@ -1043,7 +1043,9 @@ def generate_image_flux(
 
         try:
             req = urllib.request.Request(img_data.url)
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urllib.request.urlopen(
+                req, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 raw_bytes = resp.read()
         except urllib.error.HTTPError as e:
             log.error("Image URL download failed (%s %s)", e.code, e.reason)
@@ -1237,7 +1239,9 @@ def generate_image_gpt(
 
         try:
             req = urllib.request.Request(img_data.url)
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urllib.request.urlopen(
+                req, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 raw_bytes = resp.read()
         except urllib.error.HTTPError as e:
             log.error("Image URL download failed (%s %s)", e.code, e.reason)

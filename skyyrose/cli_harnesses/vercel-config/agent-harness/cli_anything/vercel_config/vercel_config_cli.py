@@ -23,15 +23,16 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import Optional
 
 import click
-
 from cli_anything.vercel_config import __version__
 from cli_anything.vercel_config.utils.repl_skin import ReplSkin
 from cli_anything.vercel_config.utils.vercel_backend import (
-    VercelAuthError, VercelBackend, VercelBackendError, VercelNotFoundError,
-    VercelRateLimitedError, VercelValidationError, _confirm, resolve_token)
+    VercelAuthError,
+    VercelBackend,
+    _confirm,
+    resolve_token,
+)
 
 # ── Shared context object ─────────────────────────────────────────────
 
@@ -42,17 +43,17 @@ class _Ctx:
     def __init__(
         self,
         token: str,
-        team_id: Optional[str],
+        team_id: str | None,
         as_json: bool,
-        project: Optional[str] = None,
+        project: str | None = None,
     ) -> None:
         self.token = token
         self.team_id = team_id
         self.as_json = as_json
         self.project = project
-        self._backend: Optional[VercelBackend] = None
+        self._backend: VercelBackend | None = None
 
-    def require_project(self, override: Optional[str] = None) -> str:
+    def require_project(self, override: str | None = None) -> str:
         """Resolve project id from override → ctx.project. Raise if missing."""
         chosen = override or self.project
         if not chosen:
@@ -131,9 +132,9 @@ def _handle_error(exc: Exception, as_json: bool) -> None:
 @click.pass_context
 def main(
     ctx: click.Context,
-    token: Optional[str],
-    team_id: Optional[str],
-    project_opt: Optional[str],
+    token: str | None,
+    team_id: str | None,
+    project_opt: str | None,
     as_json: bool,
 ) -> None:
     """cli-anything-vercel-config — Vercel project settings CLI.
@@ -175,7 +176,7 @@ def project() -> None:
 @click.argument("project_id", required=False, default=None)
 @click.option("--json", "as_json_flag", is_flag=True, default=False)
 @click.pass_context
-def project_show(ctx: click.Context, project_id: Optional[str], as_json_flag: bool) -> None:
+def project_show(ctx: click.Context, project_id: str | None, as_json_flag: bool) -> None:
     """Show project metadata for PROJECT_ID (id or slug)."""
     c = _get_ctx(ctx)
     as_json = as_json_flag or c.as_json
@@ -228,7 +229,7 @@ def project_list(ctx: click.Context, as_json_flag: bool) -> None:
 @click.pass_context
 def project_patch(
     ctx: click.Context,
-    project_id: Optional[str],
+    project_id: str | None,
     kv_pairs: tuple[str, ...],
     confirmed: bool,
     as_json_flag: bool,
@@ -250,7 +251,7 @@ def project_patch(
         sys.exit(1)
 
     if not confirmed:
-        payload_display = {k: v for k, v in updates.items()}
+        payload_display = dict(updates.items())
         if not _confirm("PATCH project", pid, payload_display):
             click.echo("  Aborted.")
             return
@@ -282,7 +283,7 @@ def env() -> None:
 @click.pass_context
 def env_list(
     ctx: click.Context,
-    project_id: Optional[str],
+    project_id: str | None,
     reveal: bool,
     as_json_flag: bool,
 ) -> None:
@@ -319,7 +320,7 @@ def env_list(
 def env_get(
     ctx: click.Context,
     env_id: str,
-    project_override: Optional[str],
+    project_override: str | None,
     reveal: bool,
     as_json_flag: bool,
 ) -> None:
@@ -371,10 +372,10 @@ def env_set(
     ctx: click.Context,
     key: str,
     value: str,
-    project_override: Optional[str],
+    project_override: str | None,
     target: tuple[str, ...],
     env_type: str,
-    git_branch: Optional[str],
+    git_branch: str | None,
     confirmed: bool,
     as_json_flag: bool,
 ) -> None:
@@ -427,7 +428,7 @@ def env_set(
 def env_remove(
     ctx: click.Context,
     env_id: str,
-    project_override: Optional[str],
+    project_override: str | None,
     confirmed: bool,
     as_json_flag: bool,
 ) -> None:
@@ -461,7 +462,7 @@ def domain() -> None:
 @click.argument("project_id", required=False, default=None)
 @click.option("--json", "as_json_flag", is_flag=True, default=False)
 @click.pass_context
-def domain_list(ctx: click.Context, project_id: Optional[str], as_json_flag: bool) -> None:
+def domain_list(ctx: click.Context, project_id: str | None, as_json_flag: bool) -> None:
     """List custom domains for PROJECT_ID (or --project from root)."""
     c = _get_ctx(ctx)
     as_json = as_json_flag or c.as_json
@@ -495,9 +496,9 @@ def domain_list(ctx: click.Context, project_id: Optional[str], as_json_flag: boo
 def domain_add(
     ctx: click.Context,
     hostname: str,
-    project_override: Optional[str],
-    redirect: Optional[str],
-    git_branch: Optional[str],
+    project_override: str | None,
+    redirect: str | None,
+    git_branch: str | None,
     confirmed: bool,
     as_json_flag: bool,
 ) -> None:
@@ -537,7 +538,7 @@ def domain_add(
 def domain_remove(
     ctx: click.Context,
     hostname: str,
-    project_override: Optional[str],
+    project_override: str | None,
     confirmed: bool,
     as_json_flag: bool,
 ) -> None:
@@ -570,7 +571,7 @@ def domain_redirect(
     ctx: click.Context,
     hostname: str,
     redirect_to: str,
-    project_override: Optional[str],
+    project_override: str | None,
     confirmed: bool,
     as_json_flag: bool,
 ) -> None:
@@ -615,7 +616,7 @@ def deployment() -> None:
 @click.pass_context
 def deployment_list(
     ctx: click.Context,
-    project_override: Optional[str],
+    project_override: str | None,
     limit: int,
     as_json_flag: bool,
 ) -> None:
@@ -711,8 +712,7 @@ def manifest_plan(ctx: click.Context, manifest_file: str) -> None:
 
     from cli_anything.vercel_config.core.domains import Domain
     from cli_anything.vercel_config.core.env_vars import EnvVar
-    from cli_anything.vercel_config.core.manifest import (build_plan,
-                                                          load_manifest)
+    from cli_anything.vercel_config.core.manifest import build_plan, load_manifest
 
     c = _get_ctx(ctx)
     try:
@@ -774,8 +774,7 @@ def manifest_apply(ctx: click.Context, manifest_file: str, confirmed: bool) -> N
 
     from cli_anything.vercel_config.core.domains import Domain
     from cli_anything.vercel_config.core.env_vars import EnvVar
-    from cli_anything.vercel_config.core.manifest import (build_plan,
-                                                          load_manifest)
+    from cli_anything.vercel_config.core.manifest import build_plan, load_manifest
 
     c = _get_ctx(ctx)
     try:
@@ -943,8 +942,8 @@ def session_status(ctx: click.Context, name: str) -> None:
 def session_save(
     ctx: click.Context,
     name: str,
-    project_override: Optional[str],
-    team_id: Optional[str],
+    project_override: str | None,
+    team_id: str | None,
     as_json_flag: bool,
 ) -> None:
     """Save a session NAME pointing at the active project."""
@@ -1023,7 +1022,7 @@ def _run_repl(app_ctx: _Ctx) -> None:
     skin.print_banner()
     pt_session = skin.create_prompt_session()
 
-    current_project: Optional[str] = None
+    current_project: str | None = None
 
     while True:
         try:

@@ -193,9 +193,9 @@ def test_text_muted_blend() -> None:
     """
     blended = alpha_blend(245, 230, 211, 0.7, "#0A0A0A")
     ratio = wcag_ratio(blended, "#0A0A0A")
-    assert ratio >= 4.5, (
-        f"text-muted blended ({blended}) on bg fails WCAG AA: {ratio:.2f}:1 < 4.5:1"
-    )
+    assert (
+        ratio >= 4.5
+    ), f"text-muted blended ({blended}) on bg fails WCAG AA: {ratio:.2f}:1 < 4.5:1"
 
 
 def test_root_text_bg_meets_wcag_aa() -> None:

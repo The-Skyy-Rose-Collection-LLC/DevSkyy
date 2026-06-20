@@ -136,7 +136,9 @@ def make_request(url: str, method: str = "GET", data: dict | None = None) -> dic
     body = json.dumps(data).encode() if data else None
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
 
-    with urllib.request.urlopen(req, timeout=60) as response:
+    with urllib.request.urlopen(
+        req, timeout=60
+    ) as response:  # nosec B310 — URL from controlled API response, not user input
         return json.loads(response.read().decode())
 
 

@@ -15,7 +15,6 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 
-
 # =============================================================================
 # Backends
 # =============================================================================
@@ -206,7 +205,9 @@ class TrellisConfig:
     seed: int | None = field(
         default_factory=lambda: int(os.environ["TRELLIS_SEED"]) if os.getenv("TRELLIS_SEED") else 42
     )
-    timeout_seconds: float = field(default_factory=lambda: float(os.getenv("TRELLIS_TIMEOUT", "420")))
+    timeout_seconds: float = field(
+        default_factory=lambda: float(os.getenv("TRELLIS_TIMEOUT", "420"))
+    )
     retry_attempts: int = field(default_factory=lambda: int(os.getenv("TRELLIS_RETRIES", "2")))
     retry_backoff_seconds: float = 4.0
 

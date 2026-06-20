@@ -200,7 +200,10 @@ class TrellisPreprocessor:
         return img
 
     def _validate_dimensions(self, img: Image, warnings: list[str]) -> None:
-        if img.width < self.config.min_input_resolution or img.height < self.config.min_input_resolution:
+        if (
+            img.width < self.config.min_input_resolution
+            or img.height < self.config.min_input_resolution
+        ):
             warnings.append(
                 f"Input resolution {img.size} below recommended minimum "
                 f"{self.config.min_input_resolution}px — quality may suffer"

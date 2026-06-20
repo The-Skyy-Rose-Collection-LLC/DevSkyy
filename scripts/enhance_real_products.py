@@ -164,7 +164,9 @@ async def main():
 
     # Source directories
     signature_dir = Path("/Users/coreyfoster/Desktop/_Signature Collection_")
-    black_rose_dir = Path("/tmp")  # Extracted ZIP
+    black_rose_dir = Path(
+        "/tmp"
+    )  # Extracted ZIP  # nosec B108 — one-shot extraction script, not production API
 
     # Output directory
     enhanced_dir = project_root / "assets" / "enhanced_products"

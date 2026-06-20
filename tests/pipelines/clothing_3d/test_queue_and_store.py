@@ -10,7 +10,6 @@ from pipelines.clothing_3d.job_store import InMemoryJobStore, JobRecord
 from pipelines.clothing_3d.models import PipelineRequest, PipelineStatus
 from pipelines.clothing_3d.queue import InMemoryQueue
 
-
 # =============================================================================
 # InMemoryQueue
 # =============================================================================

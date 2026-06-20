@@ -295,7 +295,7 @@ class ReplSkin:
         Returns:
             list of (style, text) tuples for prompt_toolkit.
         """
-        accent_hex = _ANSI_256_TO_HEX.get(self.accent, "#5fafff")
+        _ANSI_256_TO_HEX.get(self.accent, "#5fafff")
         tokens = []
 
         tokens.append(("class:icon", "◆ "))

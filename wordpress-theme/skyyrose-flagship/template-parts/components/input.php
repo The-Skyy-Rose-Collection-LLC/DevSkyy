@@ -69,7 +69,13 @@ $field_classes = implode(
 			'sr-input__field',
 			$has_error ? 'sr-input__field--error' : '',
 			$args['disabled'] ? 'sr-input__field--disabled' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			implode(
+				' ',
+				array_map(
+					'sanitize_html_class',
+					preg_split( '/\s+/', (string) $args['extra_classes'], -1, PREG_SPLIT_NO_EMPTY ) ?: array()
+				)
+			),
 		)
 	)
 );

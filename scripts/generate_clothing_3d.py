@@ -205,7 +205,9 @@ async def generate_3d_model(image_path: Path, api_key: str, output_dir: Path) ->
     )
 
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
+        with urllib.request.urlopen(
+            req, context=ctx, timeout=60
+        ) as resp:  # nosec B310 — URL from controlled API response, not user input
             result = json.loads(resp.read())
             if result.get("code") != 0:
                 print(f"FAILED: {result.get('message')}")
@@ -235,7 +237,9 @@ async def generate_3d_model(image_path: Path, api_key: str, output_dir: Path) ->
         )
 
         try:
-            with urllib.request.urlopen(poll_req, context=ctx, timeout=30) as resp:
+            with urllib.request.urlopen(
+                poll_req, context=ctx, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 status_result = json.loads(resp.read())
                 status = status_result.get("data", {}).get("status", "unknown")
 
@@ -261,7 +265,9 @@ async def generate_3d_model(image_path: Path, api_key: str, output_dir: Path) ->
 
     try:
         download_req = urllib.request.Request(model_url)
-        with urllib.request.urlopen(download_req, context=ctx, timeout=120) as resp:  # noqa: SIM117
+        with urllib.request.urlopen(
+            download_req, context=ctx, timeout=120
+        ) as resp:  # noqa: SIM117  # nosec B310 — URL from controlled API response, not user input
             with open(output_path, "wb") as f:
                 f.write(resp.read())
         size_mb = output_path.stat().st_size / 1024 / 1024
@@ -329,7 +335,9 @@ async def main():
         headers={"Authorization": f"Bearer {api_key}"},
     )
     try:
-        with urllib.request.urlopen(bal_req, context=ctx, timeout=10) as resp:
+        with urllib.request.urlopen(
+            bal_req, context=ctx, timeout=10
+        ) as resp:  # nosec B310 — URL from controlled API response, not user input
             bal_data = json.loads(resp.read())
             balance = bal_data.get("data", {}).get("balance", 0)
             print(f"Balance: {balance} credits")

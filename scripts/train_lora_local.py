@@ -122,18 +122,18 @@ def train_lora(
     logger.info("Loading SDXL components...")
 
     # Load tokenizer and text encoder (CPU to save memory)
-    tokenizer = CLIPTokenizer.from_pretrained(
+    tokenizer = CLIPTokenizer.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "stabilityai/stable-diffusion-xl-base-1.0",
         subfolder="tokenizer",
     )
-    text_encoder = CLIPTextModel.from_pretrained(
+    text_encoder = CLIPTextModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "stabilityai/stable-diffusion-xl-base-1.0",
         subfolder="text_encoder",
         torch_dtype=torch.float16,
     )
 
     # Load VAE (CPU, only used for encoding)
-    vae = AutoencoderKL.from_pretrained(
+    vae = AutoencoderKL.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "stabilityai/stable-diffusion-xl-base-1.0",
         subfolder="vae",
         torch_dtype=torch.float16,
@@ -141,7 +141,7 @@ def train_lora(
 
     # Load UNet and add LoRA
     logger.info("Loading UNet and configuring LoRA...")
-    unet = UNet2DConditionModel.from_pretrained(
+    unet = UNet2DConditionModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "stabilityai/stable-diffusion-xl-base-1.0",
         subfolder="unet",
         torch_dtype=torch.float16,

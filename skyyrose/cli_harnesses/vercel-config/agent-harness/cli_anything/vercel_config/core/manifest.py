@@ -54,12 +54,10 @@ import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from cli_anything.vercel_config.core.domains import (Domain, DomainDiff,
-                                                     diff_domains)
-from cli_anything.vercel_config.core.env_vars import (EnvVar, EnvVarDiff,
-                                                      diff_env_vars)
+from cli_anything.vercel_config.core.domains import Domain, DomainDiff, diff_domains
+from cli_anything.vercel_config.core.env_vars import EnvVar, EnvVarDiff, diff_env_vars
 
 # ── Constants ─────────────────────────────────────────────────────────
 
@@ -86,21 +84,21 @@ class Manifest:
     """
 
     project: str
-    team_id: Optional[str] = field(default=None)
-    project_patch: Dict[str, Any] = field(default_factory=dict)
-    env_vars: List[EnvVar] = field(default_factory=list)
-    domains: List[Domain] = field(default_factory=list)
+    team_id: str | None = field(default=None)
+    project_patch: dict[str, Any] = field(default_factory=dict)
+    env_vars: list[EnvVar] = field(default_factory=list)
+    domains: list[Domain] = field(default_factory=list)
     remove_unlisted_env: bool = field(default=False)
     remove_unlisted_domains: bool = field(default=False)
-    source_path: Optional[Path] = field(default=None)
+    source_path: Path | None = field(default=None)
 
     def __post_init__(self) -> None:
         if not self.project or not self.project.strip():
             raise ValueError("Manifest.project must not be empty.")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to a JSON-serializable dict."""
-        d: Dict[str, Any] = {
+        d: dict[str, Any] = {
             "schema": MANIFEST_SCHEMA,
             "project": self.project,
         }
@@ -134,7 +132,7 @@ class Manifest:
             d["removeUnlistedDomains"] = True
         return d
 
-    def save(self, path: Optional[Path] = None) -> Path:
+    def save(self, path: Path | None = None) -> Path:
         """Write manifest to disk atomically.
 
         Args:
@@ -163,9 +161,9 @@ class ManifestPlan:
         has_changes:    True if any add/update/remove actions exist.
     """
 
-    project_patch: Dict[str, Any]
-    env_diffs: List[EnvVarDiff]
-    domain_diffs: List[DomainDiff]
+    project_patch: dict[str, Any]
+    env_diffs: list[EnvVarDiff]
+    domain_diffs: list[DomainDiff]
 
     @property
     def has_changes(self) -> bool:
@@ -176,19 +174,17 @@ class ManifestPlan:
         for d in self.domain_diffs:
             if d.action != "unchanged":
                 return True
-        if self.project_patch:
-            return True
-        return False
+        return bool(self.project_patch)
 
     @property
-    def env_changes(self) -> List[EnvVarDiff]:
+    def env_changes(self) -> list[EnvVarDiff]:
         return [d for d in self.env_diffs if d.action != "unchanged"]
 
     @property
-    def domain_changes(self) -> List[DomainDiff]:
+    def domain_changes(self) -> list[DomainDiff]:
         return [d for d in self.domain_diffs if d.action != "unchanged"]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize plan to a JSON-safe dict."""
         return {
             "projectPatch": self.project_patch,
@@ -216,9 +212,9 @@ class ManifestPlan:
 
 def build_plan(
     manifest: Manifest,
-    actual_project: Dict[str, Any],
-    actual_env_vars: List[EnvVar],
-    actual_domains: List[Domain],
+    actual_project: dict[str, Any],
+    actual_env_vars: list[EnvVar],
+    actual_domains: list[Domain],
 ) -> ManifestPlan:
     """Compute a plan by diffing manifest declared state against live API state.
 
@@ -232,7 +228,7 @@ def build_plan(
         ``ManifestPlan`` describing what changes would be applied.
     """
     # Project patch: only fields that differ from live state
-    project_patch: Dict[str, Any] = {}
+    project_patch: dict[str, Any] = {}
     for k, v in manifest.project_patch.items():
         if actual_project.get(k) != v:
             project_patch[k] = v
@@ -291,7 +287,7 @@ def load_manifest(path: Path) -> Manifest:
     if not project:
         raise ValueError("Manifest missing required field 'project'.")
 
-    env_vars: List[EnvVar] = []
+    env_vars: list[EnvVar] = []
     for record in data.get("envVars", []):
         target = record.get("target", ["production"])
         if isinstance(target, str):
@@ -306,7 +302,7 @@ def load_manifest(path: Path) -> Manifest:
             )
         )
 
-    domains: List[Domain] = []
+    domains: list[Domain] = []
     for record in data.get("domains", []):
         domains.append(
             Domain(
@@ -331,7 +327,7 @@ def load_manifest(path: Path) -> Manifest:
 # ── Atomic write ──────────────────────────────────────────────────────
 
 
-def _atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
+def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     """Write JSON to ``path`` atomically using a temp file + os.replace."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp_fd, tmp_name = tempfile.mkstemp(dir=str(path.parent), prefix=".manifest-", suffix=".json")

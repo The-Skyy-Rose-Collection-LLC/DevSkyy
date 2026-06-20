@@ -91,6 +91,52 @@ Rules:
 """
 
 
+def _align_mask_to_scene(
+    alpha_path: str,
+    scene_image_path: str,
+    output_path: str,
+    *,
+    subject_fill_ratio: float = 0.72,
+    vertical_bias: float = 0.55,
+) -> str:
+    """Resize and center the product alpha matte onto a scene-sized canvas.
+
+    FAL flux-fill requires ``image_url`` and ``mask_url`` to have identical
+    dimensions. The raw alpha matte comes from rembg at the product image's
+    native size (e.g. 864x1184) which rarely matches the scene Gemini emits
+    (e.g. 896x1200), so the API rejects the call with
+    ``Image and mask sizes do not match``.
+
+    This helper produces a scene-sized 8-bit grayscale PNG where white pixels
+    mark the inpaint region (product silhouette) and black pixels mark the
+    preserve region (rest of scene). The silhouette is scaled to occupy
+    ``subject_fill_ratio`` of the scene's shorter dimension and centered
+    horizontally with a vertical bias toward the lower mid (typical fashion
+    composition staging).
+
+    Returns the path to the aligned mask PNG.
+    """
+    with Image.open(scene_image_path) as scene_img:
+        scene_w, scene_h = scene_img.size
+    with Image.open(alpha_path) as alpha_img:
+        alpha_silhouette = (
+            alpha_img.split()[-1] if alpha_img.mode in ("RGBA", "LA") else alpha_img.convert("L")
+        )
+        target_dim = int(min(scene_w, scene_h) * subject_fill_ratio)
+        aw, ah = alpha_silhouette.size
+        scale = target_dim / max(aw, ah)
+        new_w = max(1, int(round(aw * scale)))
+        new_h = max(1, int(round(ah * scale)))
+        resized = alpha_silhouette.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+    canvas = Image.new("L", (scene_w, scene_h), 0)
+    paste_x = (scene_w - new_w) // 2
+    paste_y = int((scene_h - new_h) * vertical_bias)
+    canvas.paste(resized, (paste_x, paste_y), resized)
+    canvas.save(output_path, "PNG", optimize=True)
+    return output_path
+
+
 class CompositorAgent(FluxProviderMixin):
     """6-stage scene compositor.
 

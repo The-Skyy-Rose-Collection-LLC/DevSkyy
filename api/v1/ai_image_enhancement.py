@@ -9,6 +9,7 @@ Provides REST endpoints for luxury image processing
 """
 
 import os
+import tempfile
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
@@ -121,9 +122,8 @@ async def enhance_image(
     **Timeout**: 60 seconds (upscaling may take 30-60s)
     """
     try:
-        # Create temp directory for processing
-        temp_dir = Path("/tmp/skyyrose_ai_enhancement")
-        temp_dir.mkdir(exist_ok=True)
+        # Create temp directory (OS-managed; avoids hardcoded /tmp — B108)
+        temp_dir = Path(tempfile.mkdtemp(prefix="skyyrose_ai_enhancement_"))
 
         # Save uploaded file
         input_path = temp_dir / file.filename

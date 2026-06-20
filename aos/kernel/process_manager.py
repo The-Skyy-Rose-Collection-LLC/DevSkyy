@@ -97,9 +97,7 @@ class ProcessManager:
         """Forcibly terminate a process (FAILED state)."""
         async with self._lock:
             proc = self._get_locked(pid)
-            if proc.status in {ProcessStatus.PENDING, ProcessStatus.READY}:
-                updated = proc.with_status(ProcessStatus.FAILED, error=reason)
-            elif proc.status in {
+            if proc.status in {ProcessStatus.PENDING, ProcessStatus.READY} or proc.status in {
                 ProcessStatus.RUNNING,
                 ProcessStatus.PAUSED,
                 ProcessStatus.WAITING,

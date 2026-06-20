@@ -259,9 +259,11 @@ async def _check_db_service(db: AsyncSession) -> ServiceHealthStatus:
             "timestamp": datetime.now(UTC).isoformat(),
             "type": event_type,
             "service": name,
-            "message": "DB ping ok" + (f" — {response_ms:.0f}ms" if response_ms else "")
-            if ok
-            else "DB ping failed",
+            "message": (
+                "DB ping ok" + (f" — {response_ms:.0f}ms" if response_ms else "")
+                if ok
+                else "DB ping failed"
+            ),
         }
     )
 

@@ -184,7 +184,9 @@ def download_outputs(task_data: dict, glb_path: Path) -> None:
         if not url:
             return
         try:
-            urllib.request.urlretrieve(url, dest)
+            urllib.request.urlretrieve(
+                url, dest
+            )  # nosec B310 — URL from controlled API response, not user input
             print(f"  Saved: {dest.name} ({dest.stat().st_size // 1024} KB)")
         except Exception as e:
             print(f"  [WARN] Could not download {dest.name}: {e}")

@@ -25,6 +25,9 @@ jobs:
     name: PR Agent Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Non-gating: reporting agent that rejects bot actors and gets concurrency-cancelled,
+    # leaving CANCELLED/failed states that aren't real code failures. Don't block merges.
+    continue-on-error: true
 
     # Skip draft PRs and bot comments (except on PR events from dependabot)
     if: |

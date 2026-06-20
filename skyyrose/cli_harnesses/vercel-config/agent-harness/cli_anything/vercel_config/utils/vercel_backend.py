@@ -22,7 +22,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 import requests as requests_lib
 
@@ -44,7 +44,7 @@ class VercelNotFoundError(Exception):
 class VercelRateLimitedError(Exception):
     """Raised when the Vercel API returns HTTP 429 after max retries."""
 
-    def __init__(self, msg: str, retry_after: Optional[int] = None) -> None:
+    def __init__(self, msg: str, retry_after: int | None = None) -> None:
         super().__init__(msg)
         self.retry_after = retry_after
 
@@ -60,7 +60,7 @@ class VercelBackendError(Exception):
 class VercelValidationError(Exception):
     """Raised for HTTP 400/422 validation failures."""
 
-    def __init__(self, msg: str, errors: Optional[List[Dict[str, Any]]] = None) -> None:
+    def __init__(self, msg: str, errors: list[dict[str, Any]] | None = None) -> None:
         super().__init__(msg)
         self.errors = errors or []
 
@@ -85,7 +85,7 @@ _AUTH_JSON_PATHS = [
 # ── Auth resolution ───────────────────────────────────────────────────
 
 
-def _confirm(action: str, target: str, payload: Optional[Dict[str, Any]] = None) -> bool:
+def _confirm(action: str, target: str, payload: dict[str, Any] | None = None) -> bool:
     """STOP-AND-SHOW confirmation gate for destructive operations.
 
     Prints a structured summary of the action, target, and payload, then
@@ -123,7 +123,7 @@ def _confirm(action: str, target: str, payload: Optional[Dict[str, Any]] = None)
     return answer in ("y", "yes")
 
 
-def resolve_token(explicit_token: Optional[str] = None) -> str:
+def resolve_token(explicit_token: str | None = None) -> str:
     """Resolve a Vercel bearer token.
 
     Priority:
@@ -173,7 +173,7 @@ def resolve_token(explicit_token: Optional[str] = None) -> str:
     )
 
 
-def _dig_nested_token(data: Dict[str, Any]) -> Optional[str]:
+def _dig_nested_token(data: dict[str, Any]) -> str | None:
     """Search one level deep in a dict for a token value."""
     for v in data.values():
         if isinstance(v, dict):
@@ -199,9 +199,9 @@ class VercelBackend:
     def __init__(
         self,
         token: str,
-        team_id: Optional[str] = None,
+        team_id: str | None = None,
         timeout: int = _DEFAULT_TIMEOUT,
-        _session: Optional[requests_lib.Session] = None,
+        _session: requests_lib.Session | None = None,
     ) -> None:
         self._token = token  # never expose via __repr__ or logs
         self._team_id = team_id
@@ -211,14 +211,14 @@ class VercelBackend:
     def __repr__(self) -> str:
         return f"VercelBackend(team_id={self._team_id!r}, timeout={self._timeout})"
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self._token}",
             "Content-Type": "application/json",
         }
 
-    def _base_params(self) -> Dict[str, str]:
-        params: Dict[str, str] = {}
+    def _base_params(self) -> dict[str, str]:
+        params: dict[str, str] = {}
         if self._team_id:
             params["teamId"] = self._team_id
         return params
@@ -227,10 +227,10 @@ class VercelBackend:
         self,
         method: str,
         path: str,
-        params: Optional[Dict[str, Any]] = None,
-        json_body: Optional[Any] = None,
-        timeout: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        json_body: Any | None = None,
+        timeout: int | None = None,
+    ) -> dict[str, Any]:
         """Execute an authenticated request with retry on 429.
 
         Returns:
@@ -244,10 +244,10 @@ class VercelBackend:
             VercelValidationError: HTTP 400/422.
         """
         url = f"{_BASE_URL}{path}"
-        merged_params: Dict[str, Any] = {**self._base_params(), **(params or {})}
+        merged_params: dict[str, Any] = {**self._base_params(), **(params or {})}
         effective_timeout = timeout if timeout is not None else self._timeout
 
-        last_429_after: Optional[int] = None
+        last_429_after: int | None = None
 
         for attempt in range(1, _MAX_RETRIES + 1):
             resp = self._session.request(
@@ -282,17 +282,17 @@ class VercelBackend:
 
     # ── Project API ───────────────────────────────────────────────────
 
-    def get_project(self, id_or_name: str) -> Dict[str, Any]:
+    def get_project(self, id_or_name: str) -> dict[str, Any]:
         """GET /v9/projects/{idOrName}"""
         return self._request("GET", f"/v9/projects/{id_or_name}")
 
-    def patch_project(self, id_or_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def patch_project(self, id_or_name: str, payload: dict[str, Any]) -> dict[str, Any]:
         """PATCH /v9/projects/{idOrName}"""
         return self._request("PATCH", f"/v9/projects/{id_or_name}", json_body=payload)
 
     # ── Env var API ───────────────────────────────────────────────────
 
-    def list_env_vars(self, id_or_name: str) -> List[Dict[str, Any]]:
+    def list_env_vars(self, id_or_name: str) -> list[dict[str, Any]]:
         """GET /v9/projects/{idOrName}/env — returns all env var records.
 
         Note: Secret values are masked by the API (``value`` may be empty or
@@ -302,17 +302,17 @@ class VercelBackend:
         resp = self._request("GET", f"/v9/projects/{id_or_name}/env")
         return resp.get("envs", [])
 
-    def decrypt_env_var(self, id_or_name: str, env_var_id: str) -> Dict[str, Any]:
+    def decrypt_env_var(self, id_or_name: str, env_var_id: str) -> dict[str, Any]:
         """GET /v9/projects/{idOrName}/env/{id} — retrieve decrypted value."""
         return self._request("GET", f"/v9/projects/{id_or_name}/env/{env_var_id}")
 
-    def create_env_var(self, id_or_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def create_env_var(self, id_or_name: str, payload: dict[str, Any]) -> dict[str, Any]:
         """POST /v9/projects/{idOrName}/env — create a single env var."""
         return self._request("POST", f"/v9/projects/{id_or_name}/env", json_body=payload)
 
     def update_env_var(
-        self, id_or_name: str, env_var_id: str, payload: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, id_or_name: str, env_var_id: str, payload: dict[str, Any]
+    ) -> dict[str, Any]:
         """PATCH /v9/projects/{idOrName}/env/{id}"""
         return self._request(
             "PATCH",
@@ -326,18 +326,18 @@ class VercelBackend:
 
     # ── Domain API ────────────────────────────────────────────────────
 
-    def list_domains(self, id_or_name: str) -> List[Dict[str, Any]]:
+    def list_domains(self, id_or_name: str) -> list[dict[str, Any]]:
         """GET /v10/projects/{idOrName}/domains"""
         resp = self._request("GET", f"/v10/projects/{id_or_name}/domains")
         return resp.get("domains", [])
 
-    def add_domain(self, id_or_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def add_domain(self, id_or_name: str, payload: dict[str, Any]) -> dict[str, Any]:
         """POST /v10/projects/{idOrName}/domains"""
         return self._request("POST", f"/v10/projects/{id_or_name}/domains", json_body=payload)
 
     def update_domain(
-        self, id_or_name: str, domain: str, payload: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, id_or_name: str, domain: str, payload: dict[str, Any]
+    ) -> dict[str, Any]:
         """PATCH /v10/projects/{idOrName}/domains/{domain}"""
         return self._request(
             "PATCH",
@@ -353,12 +353,12 @@ class VercelBackend:
 
     def list_deployments(
         self,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
         limit: int = 20,
-        extra_params: Optional[Dict[str, Any]] = None,
-    ) -> List[Dict[str, Any]]:
+        extra_params: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
         """GET /v6/deployments"""
-        params: Dict[str, Any] = {"limit": limit}
+        params: dict[str, Any] = {"limit": limit}
         if project_id:
             params["projectId"] = project_id
         if extra_params:
@@ -366,7 +366,7 @@ class VercelBackend:
         resp = self._request("GET", "/v6/deployments", params=params)
         return resp.get("deployments", [])
 
-    def get_deployment_events(self, deployment_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+    def get_deployment_events(self, deployment_id: str, limit: int = 100) -> list[dict[str, Any]]:
         """GET /v3/deployments/{id}/events"""
         params = {"limit": limit}
         resp = self._request("GET", f"/v3/deployments/{deployment_id}/events", params=params)
@@ -377,7 +377,7 @@ class VercelBackend:
 
     # ── Integration API ───────────────────────────────────────────────
 
-    def list_integrations(self) -> List[Dict[str, Any]]:
+    def list_integrations(self) -> list[dict[str, Any]]:
         """GET /v1/integrations/configurations"""
         resp = self._request("GET", "/v1/integrations/configurations")
         return resp.get("configurations", [])
@@ -386,7 +386,7 @@ class VercelBackend:
 # ── Internal helpers ──────────────────────────────────────────────────
 
 
-def _parse_retry_after(resp: requests_lib.Response) -> Optional[int]:
+def _parse_retry_after(resp: requests_lib.Response) -> int | None:
     """Parse Retry-After header; return seconds as int or None."""
     header = resp.headers.get("Retry-After") or resp.headers.get("retry-after")
     if header is None:
@@ -397,14 +397,14 @@ def _parse_retry_after(resp: requests_lib.Response) -> Optional[int]:
         return None
 
 
-def _retry_delay(attempt: int, retry_after: Optional[int]) -> float:
+def _retry_delay(attempt: int, retry_after: int | None) -> float:
     """Compute sleep duration for attempt N (1-indexed)."""
     if retry_after is not None:
         return float(retry_after)
     return _RETRY_BASE_DELAY * (2 ** (attempt - 1))
 
 
-def _raise_for_status(resp: requests_lib.Response, path: str) -> Dict[str, Any]:
+def _raise_for_status(resp: requests_lib.Response, path: str) -> dict[str, Any]:
     """Parse response or raise a typed exception."""
     if resp.status_code in (200, 201, 204):
         if resp.status_code == 204 or not resp.content:
@@ -412,7 +412,7 @@ def _raise_for_status(resp: requests_lib.Response, path: str) -> Dict[str, Any]:
         return resp.json()
 
     # Try to parse error body
-    error_body: Dict[str, Any] = {}
+    error_body: dict[str, Any] = {}
     try:
         error_body = resp.json()
     except Exception:
@@ -437,7 +437,7 @@ def _raise_for_status(resp: requests_lib.Response, path: str) -> Dict[str, Any]:
     )
 
 
-def _extract_error_message(body: Dict[str, Any], status_code: int, path: str) -> str:
+def _extract_error_message(body: dict[str, Any], status_code: int, path: str) -> str:
     """Extract a human-readable message from a Vercel error response."""
     if body.get("error", {}).get("message"):
         return body["error"]["message"]

@@ -15,6 +15,12 @@ from skyyrose.elite_studio.quality.brand_centroid import (
     save_centroid,
 )
 
+# Network/model-download integration tests — these pull CLIP/DINO weights from
+# HF Hub at runtime. Excluded from the fast gate (CI runs `-m "not slow and not
+# integration"`) so a transient HF outage cannot flake main red; run on demand
+# with `-m integration`.
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def fake_centroid_file(tmp_path: Path) -> Path:

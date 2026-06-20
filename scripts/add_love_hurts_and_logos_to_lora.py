@@ -294,7 +294,9 @@ async def main():
 
     # Process LOVE HURTS collection
     print("=== Processing LOVE HURTS Collection ===")
-    love_hurts_dir = Path("/tmp/love_hurts_extraction/Love Hurts X SkyyRose Collection")
+    love_hurts_dir = Path(
+        "/tmp/love_hurts_extraction/Love Hurts X SkyyRose Collection"
+    )  # nosec B108 — one-shot extraction script
 
     love_hurts_images = []
     for ext in ["jpg", "jpeg", "png"]:

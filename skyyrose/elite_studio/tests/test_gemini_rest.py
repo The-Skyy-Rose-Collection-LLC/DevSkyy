@@ -24,12 +24,17 @@ class TestGetKey:
     @patch.dict("os.environ", {"GEMINI_API_KEY": "", "GOOGLE_API_KEY": ""}, clear=False)
     def test_returns_empty_if_no_key(self):
         # We need to make sure none of the other keys are set in the environment either
-        with patch.dict("os.environ", {
-            "GEMINI_API_KEY": "", "GOOGLE_AI_API_KEY": "", "GOOGLE_API_KEY": "",
-            **{f"GEMINI_API_KEY_{i}": "" for i in range(1, 11)},
-            **{f"GOOGLE_AI_API_KEY_{i}": "" for i in range(1, 11)},
-            **{f"GOOGLE_API_KEY_{i}": "" for i in range(1, 11)},
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "GEMINI_API_KEY": "",
+                "GOOGLE_AI_API_KEY": "",
+                "GOOGLE_API_KEY": "",
+                **{f"GEMINI_API_KEY_{i}": "" for i in range(1, 11)},
+                **{f"GOOGLE_AI_API_KEY_{i}": "" for i in range(1, 11)},
+                **{f"GOOGLE_API_KEY_{i}": "" for i in range(1, 11)},
+            },
+        ):
             assert gemini_rest._get_keys() == []
 
     def test_key_rotation(self):
@@ -102,7 +107,11 @@ class TestAnalyzeVision:
 
         # Verify payload includes image data
         call_args, call_kwargs = mock_post.call_args
-        payload = call_kwargs.get("json") or call_args[1] if len(call_args) > 1 else call_kwargs.get("json")
+        payload = (
+            call_kwargs.get("json") or call_args[1]
+            if len(call_args) > 1
+            else call_kwargs.get("json")
+        )
         if not payload and call_args:
             payload = call_args[1] if isinstance(call_args[1], dict) else None
 

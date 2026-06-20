@@ -4,6 +4,7 @@ Provides REST API for WordPress integration
 """
 
 import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -44,9 +45,8 @@ async def enhance_image(
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Create temp directory
-    temp_dir = Path("/tmp/skyyrose_enhancement")
-    temp_dir.mkdir(exist_ok=True)
+    # Create temp directory (OS-managed; avoids hardcoded /tmp — B108)
+    temp_dir = Path(tempfile.mkdtemp(prefix="skyyrose_enhancement_"))
 
     # Save uploaded file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -115,9 +115,8 @@ async def generate_blurhash_endpoint(
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Create temp directory
-    temp_dir = Path("/tmp/skyyrose_blurhash")
-    temp_dir.mkdir(exist_ok=True)
+    # Create temp directory (OS-managed; avoids hardcoded /tmp — B108)
+    temp_dir = Path(tempfile.mkdtemp(prefix="skyyrose_blurhash_"))
 
     # Save uploaded file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -162,9 +161,8 @@ async def interrogate_image(
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Create temp directory
-    temp_dir = Path("/tmp/skyyrose_interrogate")
-    temp_dir.mkdir(exist_ok=True)
+    # Create temp directory (OS-managed; avoids hardcoded /tmp — B108)
+    temp_dir = Path(tempfile.mkdtemp(prefix="skyyrose_interrogate_"))
 
     # Save uploaded file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -250,9 +248,8 @@ async def create_product_video(
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Create temp directory
-    temp_dir = Path("/tmp/skyyrose_video")
-    temp_dir.mkdir(exist_ok=True)
+    # Create temp directory (OS-managed; avoids hardcoded /tmp — B108)
+    temp_dir = Path(tempfile.mkdtemp(prefix="skyyrose_video_"))
 
     # Save uploaded file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

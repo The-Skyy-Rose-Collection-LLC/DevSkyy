@@ -39,10 +39,28 @@ class _JsonFormatter(logging.Formatter):
     """Minimal JSON log formatter — one JSON object per line."""
 
     _RESERVED = {
-        "name", "msg", "args", "levelname", "levelno", "pathname", "filename",
-        "module", "exc_info", "exc_text", "stack_info", "lineno", "funcName",
-        "created", "msecs", "relativeCreated", "thread", "threadName",
-        "processName", "process", "message", "asctime",
+        "name",
+        "msg",
+        "args",
+        "levelname",
+        "levelno",
+        "pathname",
+        "filename",
+        "module",
+        "exc_info",
+        "exc_text",
+        "stack_info",
+        "lineno",
+        "funcName",
+        "created",
+        "msecs",
+        "relativeCreated",
+        "thread",
+        "threadName",
+        "processName",
+        "process",
+        "message",
+        "asctime",
     }
 
     def format(self, record: logging.LogRecord) -> str:
@@ -92,9 +110,7 @@ def configure_logging(
     if json_format:
         handler.setFormatter(_JsonFormatter())
     else:
-        handler.setFormatter(
-            logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
-        )
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
     handler._clothing_3d_owned = True  # type: ignore[attr-defined]
     root.addHandler(handler)
     root.setLevel(level)

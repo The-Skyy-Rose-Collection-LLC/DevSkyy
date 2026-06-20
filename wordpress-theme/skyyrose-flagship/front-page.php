@@ -178,7 +178,9 @@ get_header();
 <div class="mob-menu" id="mobMenu" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose' ); ?>">
 	<button class="mob-close" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose' ); ?>">&times;</button>
 	<a href="#story"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
+	<a href="#commercial-runway"><?php esc_html_e( 'Shop', 'skyyrose' ); ?></a>
 	<a href="#collections"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></a>
+	<a href="#style-atelier"><?php esc_html_e( 'Style Atelier', 'skyyrose' ); ?></a>
 	<a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose' ); ?></a>
 	<a href="#craft"><?php esc_html_e( 'Craft', 'skyyrose' ); ?></a>
 	<a href="#community"><?php esc_html_e( 'Community', 'skyyrose' ); ?></a>
@@ -193,10 +195,10 @@ get_header();
 	</a>
 	<div class="nav-center">
 		<a href="#story" class="nav-link"><?php esc_html_e( 'Story', 'skyyrose' ); ?></a>
+		<a href="#commercial-runway" class="nav-link"><?php esc_html_e( 'Shop', 'skyyrose' ); ?></a>
 		<a href="#collections" class="nav-link"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></a>
+		<a href="#style-atelier" class="nav-link"><?php esc_html_e( 'Atelier', 'skyyrose' ); ?></a>
 		<a href="#lookbook" class="nav-link"><?php esc_html_e( 'Lookbook', 'skyyrose' ); ?></a>
-		<a href="#craft" class="nav-link"><?php esc_html_e( 'Craft', 'skyyrose' ); ?></a>
-		<a href="#community" class="nav-link"><?php esc_html_e( 'Community', 'skyyrose' ); ?></a>
 	</div>
 	<div class="nav-right">
 		<button class="nav-bag" type="button" aria-label="<?php esc_attr_e( 'Shopping Bag', 'skyyrose' ); ?>">
@@ -293,6 +295,56 @@ get_header();
 		<?php endfor; ?>
 	</div>
 </div>
+
+<!-- ═══ COMMERCIAL RUNWAY ═══ -->
+<section class="commercial-runway" id="commercial-runway" aria-label="<?php esc_attr_e( 'Shop SkyyRose', 'skyyrose' ); ?>">
+	<div class="commercial-runway__intro rv-clip-up">
+		<p class="commercial-runway__eyebrow"><?php esc_html_e( 'The Storefront', 'skyyrose' ); ?></p>
+		<h2><?php esc_html_e( 'Luxury Streetwear, Ready To Move.', 'skyyrose' ); ?></h2>
+		<p><?php esc_html_e( 'A faster path from first impression to cart: signature drops, collection worlds, fit help, and real product photography in one commercial flow.', 'skyyrose' ); ?></p>
+	</div>
+	<div class="commercial-runway__rail stagger-grid">
+		<a class="commercial-tile commercial-tile--wide magnetic" href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>">
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+				alt="<?php esc_attr_e( 'Black Rose sherpa jacket on model', 'skyyrose' ); ?>"
+				loading="lazy"
+				decoding="async"
+				width="1024"
+				height="1024">
+			<span class="commercial-tile__kicker"><?php esc_html_e( 'Drop Focus', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Black Rose Outerwear', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Cold-weather statement pieces with Oakland weight.', 'skyyrose' ); ?></em>
+		</a>
+		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>">
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>"
+				alt="<?php esc_attr_e( 'Love Hurts varsity jacket on model', 'skyyrose' ); ?>"
+				loading="lazy"
+				decoding="async"
+				width="1024"
+				height="1024">
+			<span class="commercial-tile__kicker"><?php esc_html_e( 'Now Styling', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Varsity Heat', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Built for nights that need proof.', 'skyyrose' ); ?></em>
+		</a>
+		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>">
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/signature-sherpa-jacket-front-model.webp' ); ?>"
+				alt="<?php esc_attr_e( 'Signature sherpa jacket on model', 'skyyrose' ); ?>"
+				loading="lazy"
+				decoding="async"
+				width="1024"
+				height="1024">
+			<span class="commercial-tile__kicker"><?php esc_html_e( 'Core Luxury', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Signature Layering', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Gold-standard essentials for daily rotation.', 'skyyrose' ); ?></em>
+		</a>
+	</div>
+	<div class="commercial-runway__bar rv">
+		<span><?php esc_html_e( 'Limited runs', 'skyyrose' ); ?></span>
+		<span><?php esc_html_e( 'Gender neutral fit', 'skyyrose' ); ?></span>
+		<span><?php esc_html_e( 'Oakland story', 'skyyrose' ); ?></span>
+		<span><?php esc_html_e( 'Wishlist ready', 'skyyrose' ); ?></span>
+	</div>
+</section>
 
 <!-- ═══ STORY ═══ -->
 <section class="story" id="story" aria-label="<?php esc_attr_e( 'Our Story', 'skyyrose' ); ?>">
@@ -414,6 +466,76 @@ get_header();
 	</div>
 </section>
 
+<!-- ═══ STYLE ATELIER ═══ -->
+<section class="style-atelier" id="style-atelier" aria-label="<?php esc_attr_e( 'Style Atelier', 'skyyrose' ); ?>">
+	<div class="style-atelier__copy rv-clip-up">
+		<p class="style-atelier__eyebrow"><?php esc_html_e( 'Customer Driven', 'skyyrose' ); ?></p>
+		<h2><?php esc_html_e( 'Find Your SkyyRose Lane.', 'skyyrose' ); ?></h2>
+		<p><?php esc_html_e( 'Choose how you want to show up. The atelier responds with a collection direction and first piece to explore.', 'skyyrose' ); ?></p>
+	</div>
+	<div class="style-atelier__stage">
+		<div class="style-atelier__choices" role="group" aria-label="<?php esc_attr_e( 'Choose a styling profile', 'skyyrose' ); ?>">
+			<button type="button"
+				class="style-choice is-active"
+				aria-pressed="true"
+				data-style-option
+				data-style-title="<?php esc_attr_e( 'Statement Layer', 'skyyrose' ); ?>"
+				data-style-kicker="<?php esc_attr_e( 'Black Rose', 'skyyrose' ); ?>"
+				data-style-copy="<?php esc_attr_e( 'Structured outerwear, dark palette, heavyweight presence. Start with the sherpa and build the rest quiet.', 'skyyrose' ); ?>"
+				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+				data-style-alt="<?php esc_attr_e( 'Black Rose sherpa jacket style recommendation', 'skyyrose' ); ?>"
+				data-style-link="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>">
+				<span><?php esc_html_e( 'Statement', 'skyyrose' ); ?></span>
+				<em><?php esc_html_e( 'Outerwear first', 'skyyrose' ); ?></em>
+			</button>
+			<button type="button"
+				class="style-choice"
+				aria-pressed="false"
+				data-style-option
+				data-style-title="<?php esc_attr_e( 'Clean Daily Rotation', 'skyyrose' ); ?>"
+				data-style-kicker="<?php esc_attr_e( 'Signature', 'skyyrose' ); ?>"
+				data-style-copy="<?php esc_attr_e( 'Soft luxury staples with mint, gold, and easy proportions. Built for repeat wear without losing identity.', 'skyyrose' ); ?>"
+				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/mint-lavender-hoodie-front-model.webp' ); ?>"
+				data-style-alt="<?php esc_attr_e( 'Mint lavender hoodie style recommendation', 'skyyrose' ); ?>"
+				data-style-link="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>">
+				<span><?php esc_html_e( 'Daily', 'skyyrose' ); ?></span>
+				<em><?php esc_html_e( 'Soft luxury', 'skyyrose' ); ?></em>
+			</button>
+			<button type="button"
+				class="style-choice"
+				aria-pressed="false"
+				data-style-option
+				data-style-title="<?php esc_attr_e( 'Night Signal', 'skyyrose' ); ?>"
+				data-style-kicker="<?php esc_attr_e( 'Love Hurts', 'skyyrose' ); ?>"
+				data-style-copy="<?php esc_attr_e( 'Varsity energy, crimson edge, and pieces that read from across the room. Designed for entrance moments.', 'skyyrose' ); ?>"
+				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>"
+				data-style-alt="<?php esc_attr_e( 'Love Hurts varsity jacket style recommendation', 'skyyrose' ); ?>"
+				data-style-link="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>">
+				<span><?php esc_html_e( 'Night', 'skyyrose' ); ?></span>
+				<em><?php esc_html_e( 'Entrance energy', 'skyyrose' ); ?></em>
+			</button>
+		</div>
+		<div class="style-atelier__result rv-blur" aria-live="polite">
+			<div class="style-atelier__image">
+				<img id="styleAtelierImage"
+					src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+					alt="<?php esc_attr_e( 'Black Rose sherpa jacket style recommendation', 'skyyrose' ); ?>"
+					loading="lazy"
+					decoding="async"
+					width="1024"
+					height="1024">
+			</div>
+			<div class="style-atelier__panel">
+				<p id="styleAtelierKicker"><?php esc_html_e( 'Black Rose', 'skyyrose' ); ?></p>
+				<h3 id="styleAtelierTitle"><?php esc_html_e( 'Statement Layer', 'skyyrose' ); ?></h3>
+				<div class="style-atelier__rule" aria-hidden="true"></div>
+				<p id="styleAtelierCopy"><?php esc_html_e( 'Structured outerwear, dark palette, heavyweight presence. Start with the sherpa and build the rest quiet.', 'skyyrose' ); ?></p>
+				<a id="styleAtelierLink" class="style-atelier__cta btn-sweep" href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>"><?php esc_html_e( 'Shop This Direction', 'skyyrose' ); ?></a>
+			</div>
+		</div>
+	</div>
+</section>
+
 <!-- ═══ KIDS CAPSULE — HEIR APPARENT (envelope reveal, hover breaks the seal) ═══ -->
 <?php
 $kc_config = function_exists( 'skyyrose_get_collection' ) ? skyyrose_get_collection( 'kids-capsule' ) : null;
@@ -486,6 +608,36 @@ get_template_part(
 	)
 );
 ?>
+
+<!-- ═══ SERVICE PROMISE ═══ -->
+<section class="service-promise" aria-label="<?php esc_attr_e( 'SkyyRose Service Promise', 'skyyrose' ); ?>">
+	<div class="service-promise__head rv-clip-up">
+		<p><?php esc_html_e( 'Commercial Standard', 'skyyrose' ); ?></p>
+		<h2><?php esc_html_e( 'The House Service Layer.', 'skyyrose' ); ?></h2>
+	</div>
+	<div class="service-promise__list stagger-grid">
+		<a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>" class="service-card">
+			<span><?php esc_html_e( '01', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Clear Shipping', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Delivery and return expectations before checkout.', 'skyyrose' ); ?></em>
+		</a>
+		<button type="button" class="service-card service-card--button" data-open-size-guide>
+			<span><?php esc_html_e( '02', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Fit Guide', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Measure once, shop every drop with more confidence.', 'skyyrose' ); ?></em>
+		</button>
+		<a href="<?php echo esc_url( home_url( '/wishlist/' ) ); ?>" class="service-card">
+			<span><?php esc_html_e( '03', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Wishlist Flow', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Save looks before small runs disappear.', 'skyyrose' ); ?></em>
+		</a>
+		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="service-card">
+			<span><?php esc_html_e( '04', 'skyyrose' ); ?></span>
+			<strong><?php esc_html_e( 'Concierge Contact', 'skyyrose' ); ?></strong>
+			<em><?php esc_html_e( 'Questions, press, styling, and collaboration routes.', 'skyyrose' ); ?></em>
+		</a>
+	</div>
+</section>
 
 <!-- ═══ LOOKBOOK ═══ -->
 <section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>">

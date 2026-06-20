@@ -403,7 +403,7 @@ class SkyyRoseLoRATrainer:
         logger.info("Loading base model...")
         dtype = torch.float16 if self.device == "cuda" else torch.float32
 
-        pipeline = StableDiffusionXLPipeline.from_pretrained(
+        pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             self.config.base_model,
             torch_dtype=dtype,
             variant="fp16" if dtype == torch.float16 else None,

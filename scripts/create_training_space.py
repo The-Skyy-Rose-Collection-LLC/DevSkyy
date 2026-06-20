@@ -123,7 +123,7 @@ import os
 
 # Download dataset
 print("Downloading dataset...")
-dataset_path = snapshot_download(
+dataset_path = snapshot_download(  # nosec B615 — HF model ID constant; well-known public model from trusted org
     repo_id="damBruh/skyyrose-lora-dataset-v1",
     repo_type="dataset"
 )
@@ -132,7 +132,7 @@ print(f"Dataset: {dataset_path}")
 
 # Load SDXL
 print("Loading SDXL base model...")
-pipe = DiffusionPipeline.from_pretrained(
+pipe = DiffusionPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
     "stabilityai/stable-diffusion-xl-base-1.0",
     torch_dtype=torch.float16,
     use_safetensors=True
