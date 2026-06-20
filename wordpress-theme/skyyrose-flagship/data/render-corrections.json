@@ -30,6 +30,7 @@
       "[ghost] missing logo and not rendered looks more like a tech flat"
     ],
     "sg-002": [
+      "[on-model] NO inset / detail / close-up callout panel or boxed swatch anywhere in the frame (the last render had a collar close-up box in the corner) — ONE single full-frame photograph of the worn shirt only",
       "[ghost] needs to be slightly bigger and look embroidered for the logo"
     ],
     "sg-003": [
@@ -52,11 +53,13 @@
     ],
     "kids-002": [
       "[ghost-back] not rendered to look 3d extra logos were added",
-      "[ghost] not rendered to look 3d extra logos were added"
+      "[ghost] not rendered to look 3d extra logos were added",
+      "[on-model] EXACTLY three marks: a greyscale three-rose-cluster on the CHEST, the round 'Skyy Rose Collection' circular patch on the RIGHT sleeve (copy the patch art EXACTLY from the reference — white ground, black 'SKYY ROSE' arched on top + 'COLLECTION' arched on bottom, black rose bouquet in the center), and a greyscale rose-cluster on the LEFT thigh of the pants. NO MLB/NFL/NBA/hockey sport patch anywhere. Do not invent extra logos. Colorway: deep PURPLE + black colorblock."
     ],
     "kids-001": [
       "[ghost-back] not rendered to look 3d extra logos were added",
-      "[ghost] not rendered to look 3d extra logos were added"
+      "[ghost] not rendered to look 3d extra logos were added",
+      "[on-model] EXACTLY three marks: a greyscale three-rose-cluster on the CHEST, the round 'Skyy Rose Collection' circular patch on the RIGHT sleeve (copy the patch art EXACTLY from the reference — white ground, black 'SKYY ROSE' arched on top + 'COLLECTION' arched on bottom, black rose bouquet in the center), and a greyscale rose-cluster on the LEFT thigh of the pants. NO MLB/NFL/NBA/hockey sport patch anywhere. Do not invent extra logos. Colorway: RED + black colorblock."
     ],
     "lh-004": [
       "[ghost-back] doesn't look satin",
@@ -89,6 +92,12 @@
     "br-006": [
       "[ghost] The Black Rose rose-cluster logo is a cluster of MULTIPLE separate roses — one dominant upright rose plus a smaller rose or bud offset to the side, on a single cumulus cloud at the base. It is NOT a single large bloom and NOT a peony. Keep the roses as distinct flowers; do not merge them into one.",
       "[ghost] Render the rose logo at the size and position shown in the real product photo and tech flat — do NOT enlarge it to fill or dominate the chest."
+    ],
+    "lh-003": [
+      "[on-model] the large red cursive 'Love Hurts' wordmark goes on the RIGHT thigh (NOT the left); body is WHITE mesh with the all-over full-color red-rose-and-cloud sublimation pattern across front and back; small black square 'Love Hurts' patch at the lower-LEFT hem; white drawstring, black waistband with red leg piping; NO heart-and-thorns lockup, NO black mesh body, NO jersey numbers"
+    ],
+    "sg-015": [
+      "[on-model] fabric MUST render as smooth, slightly lustrous ripstop NYLON windbreaker shell — light-catching, crinkle-prone technical shell, NOT cotton fleece and NOT matte jersey; WHITE colorway (jacket + matching pants)"
     ]
   }
 }

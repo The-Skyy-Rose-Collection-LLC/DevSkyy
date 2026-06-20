@@ -231,6 +231,13 @@ def _sku_logo_refs() -> dict[str, Path]:
         "sg-006": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Hoodie
         "sg-014": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Sweatpants
         "sg-007": cw / "three-rose-cluster-greyscale.png",  # Signature Beanie
+        # Kids Capsule — the round 'Skyy Rose Collection' sleeve patch. Was MISSING
+        # (no entry here, no kids-capsule fallback) → get_logo_reference returned None
+        # and the model invented sport patches / wrong marks. Chest + thigh rose-clusters
+        # come from the real-photo reference + corrections; this attaches the distinctive
+        # circular patch art the model kept hallucinating. 2026-06-20.
+        "kids-001": cw / "skyy-rose-collection-circular-patch.jpeg",
+        "kids-002": cw / "skyy-rose-collection-circular-patch.jpeg",
     }
 
 

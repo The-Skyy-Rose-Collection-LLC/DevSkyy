@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-20T22:40:03+00:00",
-  "catalog_sha": "sha256:9c10f1e6e984d53a290b491fd6fad08355794c397fb225a9fb2336f81821f165",
+  "generated_at": "2026-06-20T23:24:12+00:00",
+  "catalog_sha": "sha256:3939d7f52602eab7822548fc41c0d545c374509bf7827d01481be07245e1fcfe",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -98,7 +98,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic.md",
-          "sha256": "sha256:270932b90c048e0eff087cf56bcf87d8f399cc4b4a2d2cf8aef57a2ba2ab950a"
+          "sha256": "sha256:9bafe77d2fcda0c17bc60992c3388f9febccf0f7bd2969cb252597bbba5f5a0c"
         }
       ]
     },
@@ -446,7 +446,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",
-          "sha256": "sha256:8de09558baf3c484ebffe9d6acf342c6b9a01023e68a0daf49bc4c9913d48147"
+          "sha256": "sha256:ad8dc509ba9b8008f03e6d5bb85f38307bb30396edd11f88c90b62524fe7fa25"
         }
       ]
     },
@@ -470,6 +470,11 @@
           "role": "garment-back",
           "path": "assets/products/techflats/split/kids-capsule/kids-red-hoodie-back.jpeg",
           "sha256": "sha256:32b1ea6046170a347a864693f99a818ab239dd6b5584248d926dbd89542ca42f"
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/logos/skyy-rose-collection-circular-patch.jpeg",
+          "sha256": "sha256:0dcc7b4589a77a07acc81548452e4d35bd28d395e4c2a7925e2c6ef8330301cd"
         },
         {
           "role": "dossier",
@@ -498,6 +503,11 @@
           "role": "garment-back",
           "path": "assets/products/techflats/split/kids-capsule/kids-purple-hoodie-back.jpeg",
           "sha256": "sha256:ebe474c10631c0b7a0a832b8ec7693da91d828f5676e344770974228dcfea940"
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/logos/skyy-rose-collection-circular-patch.jpeg",
+          "sha256": "sha256:0dcc7b4589a77a07acc81548452e4d35bd28d395e4c2a7925e2c6ef8330301cd"
         },
         {
           "role": "dossier",
