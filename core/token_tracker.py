@@ -14,6 +14,7 @@ Integrates with all providers: OpenAI, Anthropic, Google, Mistral, Cohere, Groq.
 
 from __future__ import annotations
 
+import contextvars
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -86,7 +87,7 @@ class TokenUsage:
     def calculate_cost(self) -> float:
         """Calculate USD cost for this usage."""
         if self.model not in PROVIDER_COSTS:
-            logger.warning(f"Unknown model cost: {self.model}")
+            logger.warning("unknown_model_cost", model=self.model)
             return 0.0
 
         costs = PROVIDER_COSTS[self.model]
@@ -288,6 +289,17 @@ class TokenTracker:
 
         return by_agent
 
+    def records(self, since: datetime | None = None) -> list[TokenUsage]:
+        """Return a snapshot copy of recorded usages, optionally filtered by time.
+
+        A copy is returned so consumers (e.g. the fleet observer) can iterate without
+        racing concurrent ``record()`` appends — the backing list is not locked. Use
+        this instead of touching ``_usages`` directly.
+        """
+        if since is None:
+            return list(self._usages)
+        return [u for u in self._usages if u.timestamp >= since]
+
     def clear(self) -> None:
         """Clear all tracked usage (useful for testing)."""
         self._usages.clear()
@@ -304,3 +316,50 @@ def get_token_tracker() -> TokenTracker:
     if _global_tracker is None:
         _global_tracker = TokenTracker()
     return _global_tracker
+
+
+# Per-agent attribution for telemetry across the async call chain. An agent sets this
+# before dispatching an LLM call; the LLM-router emitter reads it when recording usage.
+# ContextVars are task-local, so concurrent agents attribute correctly.
+current_agent_id: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "current_agent_id", default=None
+)
+
+
+def record_llm_usage(
+    *,
+    provider: str,
+    model: str,
+    input_tokens: int = 0,
+    output_tokens: int = 0,
+    total_tokens: int = 0,
+    latency_ms: float = 0.0,
+    success: bool = True,
+    error: str | None = None,
+    task_type: TaskType = TaskType.CHAT,
+    agent_id: str | None = None,
+    correlation_id: str | None = None,
+) -> None:
+    """Record one LLM call into the global tracker, attributed to the current agent.
+
+    ``agent_id`` falls back to the ``current_agent_id`` ContextVar (set by the dispatching
+    agent) when not given. NEVER raises — telemetry must not break the LLM call path.
+    """
+    try:
+        get_token_tracker().record(
+            TokenUsage(
+                provider=provider,
+                model=model,
+                task_type=task_type,
+                agent_id=agent_id if agent_id is not None else current_agent_id.get(),
+                correlation_id=correlation_id,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                total_tokens=total_tokens,
+                latency_ms=latency_ms,
+                success=success,
+                error=error,
+            )
+        )
+    except Exception:  # noqa: BLE001 — telemetry must never break the call path
+        logger.warning("record_llm_usage_failed", exc_info=True)
