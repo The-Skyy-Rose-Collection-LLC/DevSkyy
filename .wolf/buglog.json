@@ -2046,6 +2046,136 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-18"
+    },
+    {
+      "id": "bug-146",
+      "timestamp": "2026-06-19",
+      "error_message": "On-model render QC: 3/26 renders defective (br-005 black-not-green, br-012 black-not-green, sg-002 collage inset) + committed CSV front_model_image still on OLD paths while committed SOT/binaries are onmodel (parallel commit b432bcac9 shipped old CSV).",
+      "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+      "root_cause": "Parallel session committed 26 onmodel binaries+SOT+manifest+test with the OLD CSV -> committed CSV<->SOT inconsistency. Separately, gpt-image rendered dark-green garments (br-005 olive hoodie, br-012 green jersey) as pure black, and sg-002 got a corner inset panel; deterministic_checks passed all three (color/inset invisible to dimension+band checks), only the paid Claude vision judge caught them.",
+      "fix": "Working-tree CSV re-wired 23 good SKUs to onmodel; br-005/br-012/sg-002 reverted to prior fallback (ghost/front-model). Regenerated SOT to match; manifest --check + 23 tests green. br-005 CSV color=Black is ALSO wrong (real garment olive-green, founder confirmed). Re-render the 3 (paid, gated) before wiring them. NOT committed (parallel session active).",
+      "tags": [
+        "imagery",
+        "qc",
+        "render-fidelity",
+        "catalog-csv",
+        "sot",
+        "parallel-session",
+        "colorway"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-19"
+    },
+    {
+      "id": "bug-147",
+      "timestamp": "2026-06-20T08:30:00Z",
+      "error_message": "main CI red across 58 PRs; loop-till-green blocked by 7 stacked root causes",
+      "file": ".github/workflows/ci.yml, pyproject.toml, Dockerfile, tests/elite_studio/*, mypy.ini, wp template-parts",
+      "root_cause": "Unprotected main hid push-only job failures: (1) langgraph/submodule/lint debt #564; (2) CLIP/DINO tests hard-fail when HF Hub unreachable #569; (3) tracked .env + sanitize_html_class multi-class bug #571; (4) Dockerfile py3.11 vs requires-python>=3.12 #574; (5) mcp extra aiofiles==25.1.0 vs rag->mineru->gradio aiofiles<25 #575; (6) docker-build 20-min timeout too short for ML image #578; (7) #475 a2a unlinted: black drift + typing.py shadows stdlib #580.",
+      "fix": "Sequential fixes merged #564,#569,#571,#574,#575,#578,#580; each verified by reading the actual failed-job log. Final main 7e4e27326 all real gates green incl Docker (31min).",
+      "tags": [
+        "ci",
+        "docker",
+        "dependency-resolution",
+        "lint",
+        "loop-till-green",
+        "pr-consolidation"
+      ],
+      "related_bugs": [
+        "bug-146"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-20T08:30:00Z"
+    },
+    {
+      "id": "bug-148",
+      "timestamp": "2026-06-20T21:35:00Z",
+      "error_message": "Adversarial self-review of the new CopyAdapter content-evaluator found 3 real defects (10 confirmed / 30 raised; 20 refuted by skeptic stage): (1) HIGH _maybe_eval_copy had no try/except \u2014 a Claude judge exception (network/429/no-tool_use) would propagate through generate_content and kill content generation, violating the 'never blocks' soft-signal contract; (2) MED related-products regex matched inside 'unrelated products' -> false hard-fail on clean copy; (3) MED SKU lookbehind missed '( br-001)' (space inside paren) -> false sku_first_naming hard-fail.",
+      "file": "agents/skyyrose_content_agent.py, evaluation/domains/copy.py",
+      "root_cause": "Soft-signal advisory gate written without wrapping the external (paid) judge call in exception handling; deterministic regexes used substring / single-char-lookbehind patterns without word-boundary or whitespace tolerance. All three only misfire under the COPY_EVAL_ENABLED opt-in flag, but each is a real contract/canon violation.",
+      "fix": "(1) Wrapped _maybe_eval_copy body in try/except Exception -> log warning + record content.metadata['copy_eval']={'error':...} + return content unchanged. (2) Added leading word-boundary to the related-products regex. (3) Replaced the lookbehind with _uses_sku_as_handle(): finditer SKU tokens, allow only when nearest non-space char before the token is '('. Each fix landed RED->GREEN with a dedicated test. 103 tests green, ruff/black/mypy clean.",
+      "tags": [
+        "evaluation",
+        "content-evaluator",
+        "soft-signal",
+        "exception-handling",
+        "regex-false-positive",
+        "adversarial-review",
+        "tdd"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-20T21:35:00Z"
+    },
+    {
+      "id": "bug-149",
+      "timestamp": "2026-06-20T23:05:00Z",
+      "error_message": "Adversarial self-review of the Tier-1 fleet-observability change (FleetObserver consumer + record_llm_usage emitter) found 4 real defects (37 raised, 33 refuted incl a TOCTOU race correctly refuted because FleetObserver.evaluate has zero awaits = atomic under asyncio): (1) HIGH test gap \u2014 consecutive_failures PAGE escalation (streak >= 2*threshold) untested, a silent PAGE->TICKET regression would pass; (2) LOW circuit-breaker-OPEN path raised before the emitter -> CB-blocked calls produced no telemetry (error_rate/consecutive_failures blind during the CB window); (3) LOW calculate_cost used an f-string logger losing the structured field; (4) LOW _observer test helper missing **overrides annotation.",
+      "file": "llm/router.py, monitoring/fleet_observer.py, core/token_tracker.py, tests/test_fleet_health_consumer.py",
+      "root_cause": "Two-tier severity branch shipped without a test for the upper tier; the circuit-breaker early-return sat above the try/except emitter seam; pre-existing f-string log + a test-helper annotation gap in the edited files.",
+      "fix": "(1) Added test_consecutive_failures_at_double_threshold_is_page + asserted TICKET on the at-threshold test. (2) Added record_llm_usage(success=False, error='circuit_breaker_open') before the CB raise; new test_router_circuit_breaker_open_records_failure (RED->GREEN). (3) logger.warning('unknown_model_cost', model=...). (4) annotated **overrides: float. 45 tests green, ruff/black/mypy clean.",
+      "tags": [
+        "observability",
+        "fleet-observer",
+        "token-tracker",
+        "circuit-breaker",
+        "telemetry",
+        "adversarial-review",
+        "tdd"
+      ],
+      "related_bugs": [
+        "bug-148"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-20T23:05:00Z"
+    },
+    {
+      "id": "bug-150",
+      "timestamp": "2026-06-20T23:55:00Z",
+      "error_message": "Adversarial review of the new deterministic fraud scorer (services/risk/fraud.py) found 16 real defects. Top: (HIGH) never-raises contract broken \u2014 `raw = sum(s.weight for s in signals)` sat OUTSIDE the try/except, so FraudScorer(weights={'x':'str'}).assess(...) raised TypeError; (HIGH) false-positive \u2014 a legit first-time guest sending a $500+ gift internationally stacked country(20)+name(10)+highvalue(10)+firsttime(15)=55 -> HIGH/review, costing real sales; (MEDIUM) mixed naive/aware date_created silently zeroed ALL velocity signals (TypeError caught -> every history row out-of-window); (MEDIUM) raw email/IP/full names leaked into signal detail strings + as_dict; (MEDIUM) markdown pipe-injection in format_assessment; (LOW) NaN total treated as 0-risk; current order counted in its own velocity; guest==None false-positive; stale hardcoded total_tools.",
+      "file": "services/risk/fraud.py, mcp_tools/tools/resources.py",
+      "root_cause": "Green TDD suite proved each rule fires but never exercised calibration (signal stacking across action boundaries), the never-raises guard scope, mixed-tz real-world WooCommerce timestamps, or PII/markdown safety \u2014 blind spots only adversarial review surfaces.",
+      "fix": "Recalibrated weights (country 20->15, first_time->guest_high_value 15->10) so benign intl gift = 45 MEDIUM/approve while AVS/CVV still escalate; moved score sum inside the guarded block + logger.warning on fallback; _parse_dt normalizes naive->UTC; masked email(***@domain)/IP(/24)/redacted names in details; _md_cell escapes pipes/newlines; _to_float rejects NaN/inf; velocity excludes the order's own id; guest only when customer_id explicitly '0'; total_tools computed dynamically from the FastMCP registry. Added 9 regression tests.",
+      "tags": [
+        "fraud",
+        "adversarial-review",
+        "never-raises",
+        "calibration",
+        "pii",
+        "datetime-tz",
+        "tier2-agent-gaps"
+      ],
+      "related_bugs": [
+        "bug-148",
+        "bug-149"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-20T23:55:00Z"
+    },
+    {
+      "id": "bug-151",
+      "timestamp": "2026-06-21T00:35:00Z",
+      "error_message": "Adversarial review of the 3 remaining Tier-2 scorers (retention/forecasting/personalization) found 43 confirmed findings (6 HIGH/13 MED/24 LOW; heavy dedup -> ~16 distinct). Top: (HIGH x3, same root) LOYAL lifecycle stage UNREACHABLE past at_risk_days=90 because recency gates fired before the loyalty frequency check -> a 5-order buyer in a normal 91-180d inter-drop gap was demoted to AT_RISK and routed to win-back (100% false-positive on loyal buyers for SkyyRose's quarterly drop cadence); (HIGH) pre-order products triggered false CRITICAL 'reorder_now' alerts because is_preorder was captured but never consulted in sellout risk; (HIGH) personalization popularity used raw unbounded count -> a bestseller could swamp personalized signals; (MED) forecast window included today (partial day) inflating velocity; forecast_units_30d used self.horizon_days not literal 30; _price used `or` dropping price=0.0; segment_customers/forecast_sales fallbacks called now() per row (non-deterministic batch); _parse_dt dropped datetime objects; (HIGH, verified-but-out-of-scope) orphaned analytics_forecast_sales ToolSpec -> documented canonical surface rather than building dispatch.",
+      "file": "services/lifecycle/retention.py, services/forecasting/demand.py, services/personalization/recommender.py, agents/analytics_agent.py",
+      "root_cause": "Green TDD proved each rule fires in isolation but never tested cross-band interactions (stage-ordering precedence), domain calibration (drop cadence, pre-order semantics), bounded scales (raw-count swamp), batch determinism, or real-world datetime types. Adversarial review with domain context surfaced them.",
+      "fix": "Retention: loyalty check moved before the at_risk recency gate so loyal buyers stay LOYAL through the inter-drop window (degrade only past dormant/churned); churn_risk=0 when frequency<=0; _parse_dt accepts datetime. Forecasting: is_preorder -> SelloutRisk.NONE; window excludes today (recency>=1); forecast_units_30d fixed at literal 30d (removed dead horizon_days ctor param); removed unreachable _trend branch; _parse_dt accepts datetime. Personalization: popularity log1p-scaled; _price uses explicit None; added similarity_k fanout param. analytics_agent: forecast_sales/segment_customers take as_of (single now -> reproducible batch), segment_customers rejects non-rfm methods gracefully, ToolSpec metadata documented. Added 15 regression tests (148 total green).",
+      "tags": [
+        "retention",
+        "forecasting",
+        "personalization",
+        "adversarial-review",
+        "calibration",
+        "lifecycle-staging",
+        "preorder",
+        "determinism",
+        "tier2-agent-gaps"
+      ],
+      "related_bugs": [
+        "bug-150"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-21T00:35:00Z"
     }
   ]
 }
