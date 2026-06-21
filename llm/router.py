@@ -21,6 +21,7 @@ from enum import StrEnum
 from typing import Any
 
 from core.telemetry.tracer import get_tracer
+from core.token_tracker import record_llm_usage
 
 from .base import BaseLLMClient, CompletionResponse, Message, ModelProvider
 from .exceptions import LLMError
@@ -390,6 +391,12 @@ class LLMRouter:
 
         # Enterprise hardening: Check circuit breaker before attempting
         if not self.circuit_breaker.is_available(provider):
+            record_llm_usage(
+                provider=provider.value,
+                model=model or self.configs[provider].default_model,
+                success=False,
+                error="circuit_breaker_open",
+            )
             raise LLMError(
                 f"Provider {provider.value} temporarily unavailable (circuit breaker OPEN)",
                 details={"circuit_breaker_state": self.circuit_breaker.get_status()},
@@ -411,11 +418,26 @@ class LLMRouter:
                 span.set_attribute("llm.input_tokens", response.input_tokens)
                 span.set_attribute("llm.output_tokens", response.output_tokens)
                 span.set_attribute("llm.latency_ms", response.latency_ms)
+                record_llm_usage(
+                    provider=provider.value,
+                    model=response.model,
+                    input_tokens=response.input_tokens,
+                    output_tokens=response.output_tokens,
+                    total_tokens=response.total_tokens,
+                    latency_ms=response.latency_ms,
+                    success=True,
+                )
                 return response
             except Exception as e:
                 # Record failure
                 self.circuit_breaker.record_failure(provider)
                 span.record_exception(e)
+                record_llm_usage(
+                    provider=provider.value,
+                    model=model,
+                    success=False,
+                    error=str(e),
+                )
                 raise
 
     async def complete_with_fallback(
