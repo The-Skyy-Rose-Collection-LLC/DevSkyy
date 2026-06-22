@@ -149,10 +149,11 @@ class DemandForecaster:
         self.baseline_days = max(
             1, baseline_days if baseline_days is not None else self.window_days
         )
-        # Clamp both bands defensively (mirrors the window/baseline clamps above). The class is
-        # founder-tunable, and _sellout_risk's cascade assumes 0 < lead_time_days < sellout_horizon
-        # _days. Without this, lead <= 0 makes CRITICAL unreachable (silent under-alert) and
-        # lead >= horizon collapses the HIGH band to empty. +1 keeps HIGH a non-empty interval.
+        # Clamp both bands defensively (mirrors the window/baseline clamps above).
+        # The class is founder-tunable, and _sellout_risk's cascade assumes
+        # 0 < lead_time_days < sellout_horizon_days. Without this, lead <= 0 makes
+        # CRITICAL unreachable (silent under-alert) and lead >= horizon collapses
+        # the HIGH band to empty. +1 keeps HIGH a non-empty interval.
         self.lead_time_days = max(1, lead_time_days)
         self.sellout_horizon_days = max(self.lead_time_days + 1, sellout_horizon_days)
         self.accel_ratio = accel_ratio
