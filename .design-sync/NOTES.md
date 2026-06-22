@@ -2,9 +2,30 @@
 
 ## Preview images
 
-All three preview files use `placehold.co` placeholder images. On re-sync, replace with
-real product renders from `renders/output/` or CDN URLs for accurate visual verification
-in claude.ai/design.
+Updated 2026-06-22: all placehold.co URLs replaced with real hosted skyyrose.co imagery
+(verified 200 before use). Sources:
+
+### HoloCard.tsx — WooCommerce product renders (i0.wp.com Jetpack CDN)
+
+| Component | SKU | Name | Price | URL |
+|-----------|-----|------|-------|-----|
+| BlackRose | br-001 | BLACK Rose Crewneck | $35 | https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/06/black-rose-crewneck-front-model.webp?fit=1024%2C1024&ssl=1 |
+| LoveHurts | lh-002 | Love Hurts Joggers (Black) | $95 | https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/06/love-hurts-joggers-front-model.webp?fit=1024%2C1024&ssl=1 |
+| Signature | sg-003 | The Bridge Series 'Stay Golden' Shorts | $65 | https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/06/bridge-stay-golden-shorts-front-model.webp?fit=1024%2C1024&ssl=1 |
+| KidsCapsule | kids-001 | Kids Colorblock Hoodie Set — Red/Black | $65 | https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/06/kids-red-set-front-model.webp?fit=896%2C1200&ssl=1 |
+
+Names/prices match live WC catalog (read-only API, 2026-06-22).
+
+### CollectionHero.tsx — Canonical brand-script lockup images (theme asset CDN)
+
+| Component | Asset | URL |
+|-----------|-------|-----|
+| BlackRose | br-brand-script-logotype.webp | https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/br-brand-script-logotype.webp |
+| LoveHurts | lh-logo-combined.png | https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/lh-logo-combined.png |
+| Signature | sig-brand-skyy-rose-gold.webp | https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/sig-brand-skyy-rose-gold.webp |
+| KidsCapsule | sr-monogram-rose-gold.webp (no dedicated Kids script exists) | https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/logos/sr-monogram-rose-gold.webp |
+
+All 7 URLs returned HTTP 200 (curl -sI verified). No data-URI fallbacks needed.
 
 ## Font delivery
 
