@@ -551,7 +551,10 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: Run Playwright tests
-        run: ./node_modules/.bin/playwright test --reporter=html
+        # Cap the run so a slow/failing E2E suite fails fast (exit 124, absorbed by this job's
+        # continue-on-error) instead of hanging to the 30-min job timeout — a job timeout surfaces
+        # as a cancellation, which continue-on-error cannot absorb, so it would gate the pipeline.
+        run: timeout 900 ./node_modules/.bin/playwright test --reporter=html
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
