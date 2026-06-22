@@ -188,7 +188,7 @@ mcp = [
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
-    "cryptography==48.0.1",
+    "cryptography==49.0.0",
     "pyjwt==2.13.0",
     "sqlalchemy==2.0.45",
     "aiosqlite==0.22.1",
