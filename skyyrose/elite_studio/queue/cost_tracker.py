@@ -122,10 +122,11 @@ class CostTracker:
         if cap <= 0.0:
             return  # Cap explicitly disabled
 
+        # Check Redis availability directly — get_total_cost degrades gracefully to 0.0
+        # but the budget gate must fail closed on Redis loss to prevent runaway spend.
         try:
-            current = self.get_total_cost(since_hours=24)
+            self._get_redis()
         except RuntimeError as exc:
-            # Redis unavailable — fail closed unless degraded mode is explicitly allowed
             if os.getenv("ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED") == "1":
                 logger.warning(
                     "CostTracker: Redis unavailable but degraded mode allowed — skipping budget check"
@@ -139,6 +140,7 @@ class CostTracker:
                 "Set ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED=1 to allow degraded operation (NOT recommended)."
             ) from exc
 
+        current = self.get_total_cost(since_hours=24)
         if current + projected_cost_usd > cap:
             raise CostBudgetExceeded(
                 f"Cost cap exceeded: ${current:.2f} spent in last 24h "
@@ -208,16 +210,21 @@ class CostTracker:
     def get_total_cost(self, since_hours: int = 24) -> float:
         """Return total USD cost across all jobs in the last N hours.
 
+        Degrades gracefully when Redis is unavailable: logs a warning and
+        returns 0.0 rather than raising, consistent with the module-level
+        contract and ``get_job_cost`` behaviour.
+
         Args:
             since_hours: Look-back window in hours (default 24).
 
         Returns:
-            Summed cost in USD.
-
-        Raises:
-            RuntimeError: If Redis is unavailable.
+            Summed cost in USD, or 0.0 when Redis is unavailable.
         """
-        r = self._get_redis()  # Will raise RuntimeError if unavailable
+        try:
+            r = self._get_redis()
+        except RuntimeError:
+            logger.warning("CostTracker.get_total_cost: Redis unavailable — returning 0.0")
+            return 0.0
 
         try:
             cutoff = (datetime.now(UTC) - timedelta(hours=since_hours)).timestamp()
@@ -234,7 +241,7 @@ class CostTracker:
             return round(total, 6)
         except Exception as exc:
             logger.error("CostTracker.get_total_cost: Redis query failed: %s", exc)
-            raise RuntimeError("Failed to query total cost from Redis") from exc
+            return 0.0
 
     @staticmethod
     def estimate_cost(provider: str, tokens: int) -> float:
