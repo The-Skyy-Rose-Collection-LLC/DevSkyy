@@ -11,7 +11,6 @@ from PIL import Image
 
 from skyyrose.elite_studio.quality.brand_centroid import (
     BrandCentroid,
-    load_centroid,
     save_centroid,
 )
 
@@ -62,9 +61,12 @@ def test_compositor_calls_gemini_when_gate_accepts(
     """When the gate accepts, compositor proceeds to Gemini QA."""
     from skyyrose.elite_studio.agents import compositor_agent
 
-    centroid = load_centroid(fake_centroid_file)
-    centroid.threshold = -1.0  # force acceptance
-    save_centroid(centroid, fake_centroid_file)
+    rng = np.random.default_rng(0)
+    v = rng.standard_normal(512).astype(np.float32)
+    v = v / np.linalg.norm(v)
+    # Fresh instance at an accepting threshold — no mutation, survives frozen=True.
+    accepting = BrandCentroid(centroid=v, threshold=-1.0, sample_count=5, model_id="test")
+    save_centroid(accepting, fake_centroid_file)
 
     img = Image.new("RGB", (224, 224), color=(50, 50, 50))
     img_path = tmp_path / "shadow.png"
