@@ -18,8 +18,9 @@ from llm.router import LLMRouter
 
 @pytest.fixture(autouse=True)
 def _reset_tracker_and_ctx():
-    import core.token_tracker as _tt
+    import sys
 
+    _tt = sys.modules["core.token_tracker"]
     _tt._global_tracker = None
     _tt.current_agent_id.set(None)
     yield

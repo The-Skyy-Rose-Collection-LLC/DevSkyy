@@ -25,8 +25,9 @@ from monitoring.fleet_observer import (
 @pytest.fixture(autouse=True)
 def _reset_token_tracker():
     """Isolate the module-global tracker per test (mirrors tests/orchestration pattern)."""
-    import core.token_tracker as _tt
+    import sys
 
+    _tt = sys.modules["core.token_tracker"]
     _tt._global_tracker = None
     yield
     _tt.get_token_tracker().clear()

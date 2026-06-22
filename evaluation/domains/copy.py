@@ -254,7 +254,10 @@ class CopyAdapter:
     def load_ground_truth(self) -> list[dict]:
         if not self._review_state.exists():
             return []
-        state = json.loads(self._review_state.read_text(encoding="utf-8"))
+        try:
+            state = json.loads(self._review_state.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return []
         out: list[dict] = []
         for subject_id, entry in state.items():
             label_pass = bool(entry.get("approved")) and not bool(entry.get("flagged"))

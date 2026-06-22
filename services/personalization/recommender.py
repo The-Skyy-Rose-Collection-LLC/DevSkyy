@@ -152,7 +152,7 @@ class Recommender:
         similarity_weight: float = 8.0,
         similarity_k: int = 50,  # fanout per owned item when a similarity backend is wired
     ) -> None:
-        self.top_n = top_n
+        self.top_n = max(0, top_n)
         self.similarity_k = max(1, similarity_k)
         self.collection_match_weight = collection_match_weight
         self.tag_overlap_weight = tag_overlap_weight

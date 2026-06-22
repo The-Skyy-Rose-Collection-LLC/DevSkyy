@@ -40,12 +40,6 @@ reference_image: assets/products/references/br-005-signature-hoodie-real.jpeg
   treat the back as clean unless confirmed otherwise.)
 
 ### Sleeves / Collar / Hem / Other
-- **left-hip / left-side-body** (large, ~6–7in tall, on the wearer's
-  LEFT side at the hip / lower-side-body area, NOT on the sleeve): The
-  Black Rose logo embroidered onto the side of the hoodie body. Position
-  is explicitly the side body at hip level — Corey emphasized "NOT
-  SLEEVE." **Technique:** embroidered. **Color:** as rendered in the
-  canonical logo + reference image.
 - **hood-inside / inner-hood-lining**: GREY contrast lining inside the
   hood with the **Black Rose logo sublimated throughout** as a repeating /
   scattered pattern (the canonical three-rose-cluster art appears
@@ -67,9 +61,9 @@ reference_image: assets/products/references/br-005-signature-hoodie-real.jpeg
 - NO logo on the LEFT chest — the silicone patch is at the right-chest
   position only.
 - NO embroidered logo on either sleeve. Corey's explicit instruction:
-  the side-body logo is NOT on the sleeve, it is on the BODY at the
-  side-hip area.
-- NO Black Rose logo on the right hip — the embroidered side-body logo
+  the front-left-hip logo is NOT on the sleeve, it is on the BODY at the
+  front-left torso / hip area.
+- NO Black Rose logo on the right hip — the embroidered front-left-hip logo
   is on the LEFT side at the hip, not the right.
 - NO black drawstrings — the drawstrings are WHITE (signature detail of
   this edition).
@@ -95,7 +89,7 @@ reference_image: assets/products/references/br-005-signature-hoodie-real.jpeg
 ## Scene direction
 
 - **Pose:** Front view straight-on (or three-quarter front-left) showing
-  the right-chest silicone mark and the left-hip embroidered rose. The
+  the right-chest silicone mark and the front-left-hip embroidered rose. The
   hood relaxed back to reveal the grey sublimated-rose inner lining
   along the upper edge of the hood opening. Optional: a detail shot of
   the inside hood lining showing the rose-pattern sublimation.
