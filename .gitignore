@@ -503,3 +503,24 @@ wordpress-theme/skyyrose-flagship/assets/**/*.jpeg
 wordpress-theme/skyyrose-flagship/assets/**/*.png
 wordpress-theme/skyyrose-flagship/assets/**/*.gif
 wordpress-theme/skyyrose-flagship/assets/**/*.glb
+
+# Generated/scratch assets — untracked, kept on disk where pipeline needs them (2026-06-22)
+renders/**/*.webp
+renders/**/*.avif
+renders/**/*.jpg
+renders/**/*.jpeg
+renders/**/*.png
+renders/**/*.gif
+renders/**/*.glb
+renders/**/*.gltf
+datasets/**/*.jpg
+datasets/**/*.jpeg
+datasets/**/*.png
+datasets/**/*.webp
+datasets/**/*.safetensors
+datasets/**/*.pt
+generated_assets/
+round_table_outputs/
+hf_3d_cache/
+ci_mirror/
+graphify-out/
