@@ -26,7 +26,7 @@ export function CollectionHero({
       data-collection={collection}
       style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
     >
-      <img className="sr-hero__lockup" src={lockupImage} alt={`${collection.replace('-', ' ')} collection`} />
+      <img className="sr-hero__lockup" src={lockupImage} alt={`${collection.replace(/-/g, ' ')} collection`} />
       {tagline && <p className="sr-hero__tagline">{tagline}</p>}
       {cta && (
         <Button as="a" href={cta.href} variant="solid" size="lg">

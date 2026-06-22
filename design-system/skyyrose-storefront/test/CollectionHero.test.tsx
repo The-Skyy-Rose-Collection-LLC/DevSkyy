@@ -15,7 +15,7 @@ describe('CollectionHero', () => {
     expect(img).not.toBeNull()
     expect(img.getAttribute('src')).toBe(base.lockupImage)
     // No heading element renders the collection name as text.
-    expect(container.querySelector('h1')).toBeNull()
+    expect(container.querySelector('h1, h2, h3, h4, h5, h6')).toBeNull()
   })
 
   it('sets data-collection for palette theming and renders the tagline', () => {
