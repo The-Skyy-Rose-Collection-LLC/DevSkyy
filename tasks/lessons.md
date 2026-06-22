@@ -85,3 +85,20 @@ Patterns extracted from corrections. Review at session start.
 **Reality:** The dossier prose said "Black Rose three-rose-cluster (recolored to purple/blue/greyscale)" — the art is intentionally shared; `black-rose-logo.md` self-describes as the three-rose-cluster source of truth. Not a bug.
 **Fix:** Read the dossier branding prose (canon) BEFORE calling a reference wrong. Same class as the WebFetch/audit false-positive lessons — filename/label ≠ truth.
 **Outcome:** Founder chose the clean refactor → extracted shared `three-rose-cluster.md`, repointed 20 dossiers, kept `black-rose-logo.md` as a pointer. No prose rewritten.
+
+## 2026-06-22 — Check PR state (open/merged), not just mergeability
+- **Wrong:** drove #564 "to green/to merge" for several turns while it had ALREADY been merged (by founder, 2026-06-19). I queried `mergeable`/`mergeStateStatus` (got UNKNOWN) but never `state` — so later pushes (ac13d79ef) landed on a closed-PR branch, stranded off main.
+- **Prevention:** before any push/fix/merge work on a PR, FIRST run `gh pr view N --json state,mergedAt` — OPEN vs MERGED vs CLOSED is the gating fact; mergeStateStatus is secondary. A merged PR needs a NEW PR for follow-on fixes, not branch pushes.
+
+## 2026-06-22 — A trailing `echo` masks the real exit code of a background build
+- **Wrong:** ran `docker build ... > log 2>&1; echo "EXIT=$?"` as a background task. The task's completion status reflects the LAST command (`echo`, always exit 0), so it reported "completed exit 0" while `pip install` had actually failed (exit 1). I briefly believed the image built; `docker images` showed nothing.
+- **Prevention:** for a background command whose success matters, make the build the LAST (or only) command — `docker build ...` alone — so the task's exit code IS the build's. If you must chain, use `&&` not `;`, or `set -o pipefail` and inspect `${PIPESTATUS[@]}`. Then confirm the artifact exists (`docker images X`) before claiming success — never trust the harness "completed" status alone.
+- **Also (docker context):** `.dockerignore` for a junk-heavy monorepo should be an ALLOWLIST (`*` then `!pkg/`), not a denylist — junk dirs are unbounded (`.claude/` worktrees = 33GB, `backups/`, `ci_mirror/`, …) but the needed set is stable. And BuildKit `*.png` matches ROOT only; nested media needs `**/*.png`. Verify context with a busybox `COPY . /ctx && du -sh` probe.
+
+## 2026-06-22 — Adding an import in a separate edit from its first use trips format-on-write
+- **Wrong:** with the `python-format-on-write.sh` PostToolUse hook active, I added `import os` to `verify-collection-sot.py` in one Edit, then added the `os.environ.get(...)` usage in a *second* Edit. Between them, ruff's autofix deleted `import os` as unused (F401); the second edit's usage then failed `F821 Undefined name os` and the hook blocked.
+- **Prevention:** when a format/lint-on-write hook is active, never land an import in a separate step from its first usage. Introduce both in the **same atomic write** (rewrite the file whole, or one Edit whose old/new_string spans import + usage). Any autofix-removable construct (unused import/var) must not exist alone, even transiently, between two hook-linted edits.
+
+## 2026-06-22 — A flaky test that mutates a shared real file races the rest of the suite
+- **Wrong:** `test_stale_tokens_fail_and_verify_leaves_no_net_change` injected junk into the real `design-tokens.css`, then ran a verify subprocess whose staleness gate reads that same file. Under the full suite (`asyncio_mode=auto` + sibling token tests), a concurrent regen wiped the junk before verify read it → verify returned 0 → `assert 0 == 1`. Passed in isolation, so it first read as "not my bug."
+- **Prevention:** a test that mutates a shared on-disk artifact and shells out to a tool reading the same path is racy by construction. Give the tool a path-override seam (env var, defaults to the real file → zero prod change) and point the test at a private `tmp_path` copy. Isolation by construction beats "passes when I run it." Confirm the prod-default path is byte-for-byte unchanged with the env unset before claiming the fix is safe.

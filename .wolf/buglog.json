@@ -2176,6 +2176,49 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-21T00:35:00Z"
+    },
+    {
+      "id": "bug-152",
+      "timestamp": "2026-06-22T19:54:30Z",
+      "error_message": "gh pr merge <N> --merge --delete-branch on a Dependabot PR closed it UNMERGED (state=CLOSED, mergedAt=NULL) instead of merging. torch #515 lost its bump; main intact (torch stayed 2.9.1).",
+      "file": "(process \u2014 dependabot PR merge during batch)",
+      "root_cause": "PR's mergeable field was STALE (computed before 18 later merges moved main); the actual merge conflicted on pyproject.toml at merge time. --delete-branch then deleted the head branch despite the failed merge, and GitHub auto-closes a PR whose head branch is gone. Net: failed merge turned into a closed-unmerged PR.",
+      "fix": "Before each merge, re-check `gh pr view <N> --json state,mergeable` == OPEN/MERGEABLE *immediately* (not from a stale batch sweep), and merge with `gh pr merge <N> --merge` WITHOUT --delete-branch (dependabot deletes its own branch on a real merge). Verify result via mergedAt, not the gh stdout string. Recover a wrongly-closed dependabot PR with `@dependabot recreate` (came back as #587).",
+      "tags": [
+        "github",
+        "gh-cli",
+        "dependabot",
+        "merge",
+        "stale-mergeable",
+        "delete-branch",
+        "verify-before-claim"
+      ],
+      "related_bugs": [
+        "bug-150",
+        "bug-151"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T19:54:30Z"
+    },
+    {
+      "id": "bug-153",
+      "timestamp": "2026-06-22T20:37:53Z",
+      "error_message": "FAILED tests/collections/test_verify_drift.py::test_stale_tokens_fail_and_verify_leaves_no_net_change - AssertionError: assert 0 == 1 (verify returncode)",
+      "file": "tests/collections/test_verify_drift.py",
+      "root_cause": "Test injected a junk token block into the real shared design-tokens.css then ran verify-collection-sot.py whose staleness gate reads that same file. Under the full suite (asyncio_mode=auto + sibling token tests) a concurrent gen-design-tokens.py regen wiped the junk before verify read it, so verify returned 0 instead of 1. Flaky; passed in isolation (nothing raced it).",
+      "fix": "Added SKYYROSE_TOKENS_CSS path-override seam to gen-design-tokens.py + verify-collection-sot.py (defaults to the real file; verify's spawned gen subprocess inherits the env). Rewrote the stale-tokens test to operate on a private tmp_path copy. Race eliminated by construction; prod behavior unchanged when env unset (verified design-tokens.css net-unchanged + verify exit 0, lint clean).",
+      "tags": [
+        "flaky-test",
+        "test-isolation",
+        "design-tokens",
+        "race",
+        "asyncio",
+        "hermetic",
+        "stop-hook"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T20:37:53Z"
     }
   ]
 }
