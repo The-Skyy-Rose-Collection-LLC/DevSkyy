@@ -1,0 +1,13 @@
+{
+  "pkg": "@skyyrose/storefront-ds",
+  "globalName": "SkyyRoseDS",
+  "shape": "package",
+  "buildCmd": "npm --prefix design-system/skyyrose-storefront run build",
+  "cssEntry": "dist/skyyrose-ds.css",
+  "extraFonts": "src/fonts/fonts.css",
+  "overrides": {
+    "CollectionHero": {
+      "cardMode": "column"
+    }
+  }
+}

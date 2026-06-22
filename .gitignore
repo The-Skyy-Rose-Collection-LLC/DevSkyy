@@ -496,3 +496,9 @@ scripts/oai-render-review.py
 
 # Redacted — contained a live WooCommerce secret; keep out of git (rotate key, do not re-add)
 .serena/memories/woocommerce_api_credentials.md
+
+# design-sync converter (generated, not durable inputs)
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/node_modules/
