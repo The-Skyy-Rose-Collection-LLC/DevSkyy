@@ -1,0 +1,20 @@
+/* button.css — base box-model for the SkyyRose button. Variant skins (.btn-cta,
+   .btn-ghost) are SYNCED from the theme's commercial-polish.css; this only owns
+   the shared sizing/typography so the same classes render identically in WP. */
+.sr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+  letter-spacing: var(--tracking-wider, 0.1em);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+  transition: var(--transition-smooth, all 0.3s ease);
+}
+.sr-btn[aria-disabled='true'],
+.sr-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.sr-btn--sm { font-size: 12px; padding: 8px 16px; }
+.sr-btn--md { font-size: 14px; padding: 12px 24px; }
+.sr-btn--lg { font-size: 16px; padding: 16px 32px; }
