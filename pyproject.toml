@@ -181,7 +181,7 @@ mcp = [
     # SDK depend on aiofiles (verified via PyPI requires-dist), so the prior
     # ==25.1.0 pin was arbitrary and made .[all] unsatisfiable in Docker.
     "aiofiles>=24.1.0,<25.0",
-    "orjson==3.11.7",
+    "orjson==3.11.9",
     "python-dotenv==1.2.2",
     "structlog==25.5.0",
     "loguru==0.7.3",
