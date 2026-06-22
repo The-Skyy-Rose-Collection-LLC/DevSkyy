@@ -15,6 +15,13 @@
 # Usage: STOPSHOW_ACK=1 bash scripts/regen-boost-critical-css.sh   (production write — gated)
 set -euo pipefail
 
+# --- production-write gate ---------------------------------------------------
+if [[ "${STOPSHOW_ACK:-}" != "1" ]]; then
+  echo "STOP — This script writes to the production server (skyyrose.co)." >&2
+  echo "       Set STOPSHOW_ACK=1 to confirm you intend a production write." >&2
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="${ENV_FILE:-$ROOT/.env.wordpress}"
@@ -23,9 +30,23 @@ ENV_FILE="${ENV_FILE:-$ROOT/.env.wordpress}"
 source "$ENV_FILE"
 : "${SSH_USER:?missing in env}"; : "${SSH_HOST:?missing in env}"
 
-KEY="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
+SSH_KEY_PATH="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
 PORT="${SSH_PORT:-22}"
-SSH=(ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -p "$PORT" -i "$KEY")
+SSH_STRICT="${SSH_STRICT_HOST:-accept-new}"
+
+# Build SSH command — key preferred, sshpass fallback (mirrors
+# wp-cli-nextgen-backfill.sh pattern so both auth methods work).
+SSH_BASE=( ssh -o "StrictHostKeyChecking=$SSH_STRICT" -o ConnectTimeout=15 -p "$PORT" )
+if [[ -f "$SSH_KEY_PATH" ]]; then
+  SSH=( "${SSH_BASE[@]}" -i "$SSH_KEY_PATH" )
+elif [[ -n "${SSH_PASS:-}" ]] && command -v sshpass &>/dev/null; then
+  export SSHPASS="$SSH_PASS"
+  SSH=( sshpass -e "${SSH_BASE[@]}" )
+else
+  echo "FATAL: No SSH credentials (no key at $SSH_KEY_PATH and no SSH_PASS+sshpass)" >&2
+  exit 1
+fi
+
 HOST="${SSH_USER}@${SSH_HOST}"
 
 echo "==> [probe] Boost status + CLI surface + critical-css options (read-only)"
@@ -53,3 +74,5 @@ if [ "${HITS}" = "0" ]; then
 else
   echo "RESULT: PENDING — critical CSS may regenerate async on next requests; re-check in a minute" >&2
 fi
+
+unset SSHPASS
