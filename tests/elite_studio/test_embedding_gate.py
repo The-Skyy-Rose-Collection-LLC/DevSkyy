@@ -11,12 +11,6 @@ from PIL import Image
 from skyyrose.elite_studio.quality import embedding_gate
 from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid
 
-# Network/model-download integration tests — these pull CLIP/DINO weights from
-# HF Hub at runtime. Excluded from the fast gate (CI runs `-m "not slow and not
-# integration"`) so a transient HF outage cannot flake main red; run on demand
-# with `-m integration`.
-pytestmark = pytest.mark.integration
-
 
 @pytest.fixture
 def fake_centroid() -> BrandCentroid:
@@ -32,11 +26,13 @@ def render_image(tmp_path: Path) -> Path:
     return tmp_path / "render.png"
 
 
+@pytest.mark.integration
 def test_score_returns_cosine_in_range(fake_centroid: BrandCentroid, render_image: Path) -> None:
     score = embedding_gate.score_against_centroid(render_image, fake_centroid)
     assert -1.0 <= score <= 1.0
 
 
+@pytest.mark.unit
 def test_evaluate_accepts_when_above_threshold(
     fake_centroid: BrandCentroid, render_image: Path, monkeypatch
 ) -> None:
@@ -47,6 +43,7 @@ def test_evaluate_accepts_when_above_threshold(
     assert verdict.threshold == pytest.approx(0.65)
 
 
+@pytest.mark.unit
 def test_evaluate_rejects_below_threshold(
     fake_centroid: BrandCentroid, render_image: Path, monkeypatch
 ) -> None:
