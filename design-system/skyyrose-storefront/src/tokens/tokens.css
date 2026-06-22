@@ -1,0 +1,326 @@
+/**
+ * SkyyRose Design Tokens
+ *
+ * Canonical token surface — colors, spacing, typography, motion, depth.
+ * Loaded globally via `skyyrose_enqueue_global_styles()` (inc/enqueue.php).
+ *
+ * Architecture:
+ *   - Single :root block declares every base token.
+ *   - Per-collection palette overrides via [data-collection="<slug>"] cascade.
+ *   - Global concerns (view-transitions, focus-visible, reduced-motion,
+ *     Jetpack overlay quirk) declared as bare rules outside :root.
+ *
+ * NO component CSS belongs in this file. Component styles live in their
+ * own files (footer-cro.css, components.css, header.css, etc.).
+ *
+ * Canonical typography source: --skyyrose-font-display drives every legacy
+ * alias (--font-heading, --ff-brand, etc.) so per-collection font overrides
+ * cascade automatically to all consumers.
+ *
+ * @package SkyyRose
+ * @since   3.0.0
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   §0  Global Rules — view transitions, focus, third-party quirks
+   ═══════════════════════════════════════════════════════════════════ */
+
+@view-transition {
+	navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.3s;
+	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Jetpack Instant Search injects an invisible overlay (z-index max,
+   opacity 0, pointer-events auto) that blocks the custom cursor and
+   intercepts clicks site-wide. Force pointer-events:none. */
+.jetpack-instant-search__overlay {
+	pointer-events: none !important;
+}
+
+.jetpack-instant-search__overlay[aria-hidden="true"] {
+	display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   §1  :root — Canonical token surface
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+	/* --- §1.1  Layout ---------------------------------------------- */
+	--header-height:      72px;
+	--tab-bar-height:     48px;
+	--sidebar-width:      280px;
+	--container-narrow:   800px;
+	--container-content:  1200px;
+	--container-wide:     1400px;
+
+	/* --- §1.2  Z-Index scale --------------------------------------- */
+	--z-sticky:   200;
+	--z-overlay:  400;
+	--z-tooltip:  600;
+	--z-modal:    800;
+	--z-cursor:   9999;
+
+	/* --- §1.3  Border Radius --------------------------------------- */
+	--radius-sm:   4px;
+	--radius-md:   8px;
+	--radius-lg:   16px;
+	--radius-full: 9999px;
+
+	/* --- §1.4  Safe Area Insets (mobile viewport) ------------------ */
+	--safe-top:    env(safe-area-inset-top, 0px);
+	--safe-bottom: env(safe-area-inset-bottom, 0px);
+	--safe-left:   env(safe-area-inset-left, 0px);
+	--safe-right:  env(safe-area-inset-right, 0px);
+
+	/* --- §1.5  Color — Brand aliases (fallback to brand-variables.css) --- */
+	--color-rose-gold: var(--rose-gold, #B76E79);
+	--color-gold:      var(--gold, #D4AF37);
+	--color-gold-rgb:  212, 175, 55;
+	--color-crimson:   var(--crimson, #DC143C);
+	--color-silver:    var(--silver, #C0C0C0);
+	--color-white:     var(--white, #FFF);
+	--color-black:     var(--black, #000);
+
+	/* --- §1.6  Color — Semantic surfaces --------------------------- */
+	--color-page-bg:       #0A0A0A;
+	--color-card-bg:       #111;
+	--color-card-bg-hover: #161616;
+	--color-border:        #2A2A2A;
+	--color-border-hover:  rgba(183, 110, 121, 0.3);
+	--color-text-primary:   #FFF;
+	--color-text-secondary: #E0E0E0;
+	--color-text-muted:     #B3B3B3;
+	--color-text-dim:       #A0A0A0;
+	--skyyrose-surface-warm: #F5F1EB;
+
+	/* --- §1.7  Color — Semantic state (mapped to brand palette) ---- */
+	--color-success:      var(--color-gold, #D4AF37);
+	--color-danger:       var(--color-crimson, #DC143C);
+	--color-info:         var(--color-rose-gold, #B76E79);
+	--color-success-soft: rgba(212, 175, 55, 0.12);
+	--color-danger-soft:  rgba(220, 20, 60, 0.12);
+	--color-info-soft:    rgba(183, 110, 121, 0.12);
+
+	/* --- §1.8  Glass Effects --------------------------------------- */
+	--glass-bg:      rgba(17, 17, 17, 0.92);
+	--glass-bg-dark: rgba(10, 10, 10, 0.98);
+	--glass-border:  1px solid rgba(255, 255, 255, 0.06);
+	--glass-blur:    blur(24px) saturate(1.4);
+
+	/* --- §1.9  Shadows — Depth / Elevation ------------------------- */
+	--depth-1: 0 2px 8px rgba(0, 0, 0, 0.4);
+	--depth-2: 0 8px 24px rgba(0, 0, 0, 0.5);
+	--depth-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+	--depth-4: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 120px rgba(0, 0, 0, 0.3);
+
+	/* --- §1.10  Shadows — Brand glow ------------------------------- */
+	--shadow-crimson-glow: 0 0 20px rgba(220, 20, 60, 0.3);
+	--shadow-silver-glow:  0 0 20px rgba(192, 192, 192, 0.3);
+
+	/* --- §1.11  Gradients ------------------------------------------ */
+	--gradient-logo:    linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #C0C0C0 100%);
+	--gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+
+	/* --- §1.12  Typography — Font stacks (legacy aliases) ----------
+	   Single source of truth = --skyyrose-font-display (defined in §2).
+	   --font-heading / --font-headline / --ff-* are back-compat aliases
+	   consumed by woocommerce, footer, immersive, generic-pages, cart,
+	   checkout, search-results, homepage-v2/v7, product-grid. Do NOT
+	   add new declarations here — extend --skyyrose-font-* instead. */
+	--font-heading:  var(--skyyrose-font-display);
+	--font-headline: var(--font-heading);
+	--ff-brand:     var(--skyyrose-font-display);
+	--ff-editorial: var(--skyyrose-font-display);
+	--ff-body:      var(--skyyrose-font-body);
+	--ff-cta:       var(--skyyrose-font-ui);
+	--ff-mono:      var(--skyyrose-font-mono);
+	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
+
+	/* --- §1.13  Typography — Scale (canonical) --------------------- */
+	--text-xs:   0.8125rem;
+	--text-sm:   0.9375rem;
+	--text-base: 1.0625rem;
+	--text-lg:   1.1875rem;
+	--text-xl:   1.375rem;
+	--text-2xl:  1.625rem;
+	--text-3xl:  clamp(1.875rem, 2.8vw, 2.25rem);
+	--text-4xl:  clamp(2.25rem, 3.8vw, 2.875rem);
+	--text-5xl:  clamp(2.75rem, 5.5vw, 4rem);
+
+	/* --- §1.14  Typography — Decorative scale (oversized) ---------- */
+	--text-decorative-sm: clamp(2.25rem, 4vw, 4.5rem);
+	--text-decorative-md: clamp(3rem, 6vw, 6rem);
+	--text-decorative-lg: clamp(5rem, 14vw, 12.5rem);
+	--text-decorative-xl: clamp(5rem, 14vw, 13.75rem);
+
+	/* --- §1.15  Typography — Line heights -------------------------- */
+	--leading-tight:   1.15;
+	--leading-snug:    1.3;
+	--leading-normal:  1.6;
+	--leading-relaxed: 1.75;
+
+	/* --- §1.16  Typography — Letter spacing ------------------------ */
+	--tracking-tighter: -0.05em;
+	--tracking-tight:   -0.025em;
+	--tracking-normal:  0;
+	--tracking-wide:    0.05em;
+	--tracking-wider:   0.1em;
+	--tracking-widest:  0.2em;
+
+	/* --- §1.17  Motion — Durations --------------------------------- */
+	--motion-duration: 0.3s;
+	--motion-spring:   0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* --- §1.18  Motion — Cinematic easing library ------------------ */
+	--ease-cinematic:  cubic-bezier(0.22, 1, 0.36, 1);     /* hero entrances, page reveals */
+	--ease-magnetic:   cubic-bezier(0.03, 0.98, 0.52, 0.99); /* cursor-reactive follow */
+	--ease-whip:       cubic-bezier(0.75, 0, 0.25, 1);     /* snappy micro-interactions */
+	--ease-smooth-out: cubic-bezier(0.16, 1, 0.3, 1);      /* exit animations */
+	--ease-dramatic:   cubic-bezier(0.65, 0, 0.35, 1);     /* clip-path reveals */
+
+	/* --- §1.19  Motion — Reveal durations -------------------------- */
+	--reveal-fast:      0.5s;
+	--reveal-normal:    0.8s;
+	--reveal-slow:      1.2s;
+	--reveal-cinematic: 1.6s;
+
+	/* --- §1.20  Motion — Stagger (cascade delays) ------------------ */
+	--stagger-base:   60ms;
+	--stagger-medium: 100ms;
+	--stagger-long:   150ms;
+
+	/* --- §1.21  Motion — Split-text timing ------------------------- */
+	--split-char-delay: 25ms;
+	--split-word-delay: 70ms;
+	--split-line-delay: 120ms;
+
+	/* --- §1.22  Motion — Parallax multipliers ---------------------- */
+	--parallax-slow:   0.15;
+	--parallax-medium: 0.3;
+	--parallax-fast:   0.5;
+
+	/* --- §1.23  Transitions — compound ----------------------------- */
+	--transition-smooth: all 0.3s ease;
+	--transition-spring: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* --- §1.24  Interactive states --------------------------------- */
+	--focus-ring:    0 0 0 2px var(--color-rose-gold, #B76E79);
+	--hover-lift:    translateY(-2px);
+	--active-press:  scale(0.97);
+
+	/* --- §1.25  Content visibility / containment ------------------- */
+	--cv-auto:        auto;
+	--contain-paint:  paint;
+	--contain-layout: layout;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   §1.99  Global resets — must follow §1 root tokens
+   --------------------------------------------------------------------
+   scroll-padding-top: keeps in-page anchors (skip-link, jump-to-id)
+   from landing beneath the sticky header. WCAG SC 2.4.1 (Bypass Blocks).
+   ═══════════════════════════════════════════════════════════════════ */
+
+html {
+	scroll-padding-top: var(--header-height, 72px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   §2  Per-Collection Palette — [data-collection] cascade
+   --------------------------------------------------------------------
+   Single source of truth for collection-scoped colors, fonts, easings.
+   Consumed by feature CSS (landing-pages.css, animations-premium.css,
+   collection-pages.css, etc.) via var(--skyyrose-*).
+   Switch palette: set [data-collection="<slug>"] on any wrapper.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+	--skyyrose-accent:       #B76E79;
+	--skyyrose-accent-rgb:   183, 110, 121;
+	--skyyrose-accent-dark:  #9A5662;
+	--skyyrose-secondary:    #D4AF37;
+	--skyyrose-bg:           #0A0A0A;
+	--skyyrose-text:         #F5E6D3;
+	--skyyrose-text-muted:   rgba(245, 230, 211, 0.7);
+	--skyyrose-font-display: 'Playfair Display', serif;
+	--skyyrose-font-body:    'Cormorant Garamond', 'Inter', sans-serif;
+	--skyyrose-font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
+	--skyyrose-font-ui:      'Bebas Neue', sans-serif;
+	--skyyrose-ease:         cubic-bezier(0.16, 1, 0.3, 1);
+	--skyyrose-radius:       2px;
+}
+
+/* GENERATED:collection-tokens START — do not edit; run data/gen-design-tokens.py */
+[data-collection="black-rose"] {
+	--skyyrose-accent:       #C0C0C0;
+	--skyyrose-accent-rgb:   192, 192, 192;
+	--skyyrose-accent-dark:  #999999;
+	--skyyrose-secondary:    #FFFFFF;
+	--skyyrose-font-script:  'Yellowtail', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
+}
+
+[data-collection="kids-capsule"] {
+	--skyyrose-accent:       #D4AF37;
+	--skyyrose-accent-rgb:   212, 175, 55;
+	--skyyrose-accent-dark:  #B8960C;
+	--skyyrose-secondary:    #B76E79;
+	--skyyrose-font-script:  'Pinyon Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
+}
+
+[data-collection="love-hurts"] {
+	--skyyrose-accent:       #DC143C;
+	--skyyrose-accent-rgb:   220, 20, 60;
+	--skyyrose-accent-dark:  #9B0F2E;
+	--skyyrose-secondary:    #FFFFFF;
+	--skyyrose-font-script:  'Kaushan Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
+}
+
+[data-collection="signature"] {
+	--skyyrose-accent:       #D4AF37;
+	--skyyrose-accent-rgb:   212, 175, 55;
+	--skyyrose-accent-dark:  #B8960C;
+	--skyyrose-secondary:    #B76E79;
+	--skyyrose-font-script:  'Pinyon Script', cursive;
+	--skyyrose-font-caps:    'Cinzel', serif;
+	--skyyrose-font-display: var(--skyyrose-font-caps);
+}
+/* GENERATED:collection-tokens END */
+
+/* ═══════════════════════════════════════════════════════════════════
+   §3  Reduced Motion — Override duration tokens
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-duration:   0.01ms;
+		--motion-spring:     0.01ms linear;
+		--transition-smooth: all 0.01ms linear;
+		--transition-spring: all 0.01ms linear;
+	}
+
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: 0.01s;
+	}
+}
