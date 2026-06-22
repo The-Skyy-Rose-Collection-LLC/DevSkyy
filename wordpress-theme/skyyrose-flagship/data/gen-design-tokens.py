@@ -12,6 +12,7 @@ consumers so interior headings stay legible and uniform). font-gothic is dropped
 (no consumers). bg/text inherit from :root (unchanged behaviour).
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -19,7 +20,10 @@ DATA = Path(__file__).resolve().parent
 sys.path.insert(0, str(DATA))
 import sot_common  # noqa: E402
 
-CSS = DATA.parent / "assets/css/design-tokens.css"
+# CSS path is overridable via SKYYROSE_TOKENS_CSS so tests can run the generator
+# against a private tmp copy (hermetic isolation). Unset -> the real theme file.
+_CSS_OVERRIDE = os.environ.get("SKYYROSE_TOKENS_CSS")
+CSS = Path(_CSS_OVERRIDE) if _CSS_OVERRIDE else DATA.parent / "assets/css/design-tokens.css"
 START = "/* GENERATED:collection-tokens START"
 END = "/* GENERATED:collection-tokens END */"
 
