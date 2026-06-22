@@ -121,7 +121,6 @@ wordpress-theme/skyyrose-flagship/*
 **/*.eot
 **/*.zip
 **/*.tar
-**/*.tar.gz
 **/*.tgz
 **/*.7z
 **/*.rar

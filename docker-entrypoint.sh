@@ -26,37 +26,28 @@ python3 -c "import sys; print(f'Python {sys.version}')" || {
     exit 1
 }
 
-# Generate required secrets if not provided (BEFORE uvicorn startup)
+# Generate required secrets if not provided (BEFORE uvicorn startup). This keeps
+# the API + workers bootable without a committed .env; .env.docker is the
+# expected production source (see docs/DOCKER.md). Ephemeral keys rotate on
+# restart — set them explicitly for any real deployment.
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking secrets..."
-if [ -z "$JWT_SECRET_KEY" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating JWT_SECRET_KEY..."
-    JWT_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(64))" 2>&1) || {
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate JWT_SECRET_KEY: $JWT_KEY"
+ts() { date '+%Y-%m-%d %H:%M:%S'; }
+gen_secret() {
+    # $1 = env var name, $2 = python expression that prints the secret value
+    var="$1"
+    [ -n "$(eval "printf '%s' \"\${$var}\"")" ] && return 0
+    echo "[$(ts)] Generating $var..."
+    val=$(python3 -c "$2" 2>&1) || {
+        echo "[$(ts)] ERROR: Failed to generate $var: $val"
         exit 1
     }
-    export JWT_SECRET_KEY="$JWT_KEY"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] JWT_SECRET_KEY generated (length: ${#JWT_SECRET_KEY})"
-fi
+    export "$var=$val"
+    echo "[$(ts)] $var generated (length: $(eval "printf '%s' \"\${#$var}\""))"
+}
 
-if [ -z "$JWT_REFRESH_SECRET_KEY" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating JWT_REFRESH_SECRET_KEY..."
-    JWT_R=$(python3 -c "import secrets; print(secrets.token_urlsafe(64))" 2>&1) || {
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate JWT_REFRESH_SECRET_KEY: $JWT_R"
-        exit 1
-    }
-    export JWT_REFRESH_SECRET_KEY="$JWT_R"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] JWT_REFRESH_SECRET_KEY generated (length: ${#JWT_REFRESH_SECRET_KEY})"
-fi
-
-if [ -z "$ENCRYPTION_MASTER_KEY" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating ENCRYPTION_MASTER_KEY..."
-    ENC_KEY=$(python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())" 2>&1) || {
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate ENCRYPTION_MASTER_KEY: $ENC_KEY"
-        exit 1
-    }
-    export ENCRYPTION_MASTER_KEY="$ENC_KEY"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ENCRYPTION_MASTER_KEY generated (length: ${#ENCRYPTION_MASTER_KEY})"
-fi
+gen_secret JWT_SECRET_KEY "import secrets; print(secrets.token_urlsafe(64))"
+gen_secret JWT_REFRESH_SECRET_KEY "import secrets; print(secrets.token_urlsafe(64))"
+gen_secret ENCRYPTION_MASTER_KEY "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
 
 # Command dispatch: this one image serves the API *and* the background workers.
 # If compose (or `docker run`) passed a command, run THAT instead of uvicorn —
