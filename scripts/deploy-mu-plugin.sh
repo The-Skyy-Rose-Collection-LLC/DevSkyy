@@ -64,7 +64,7 @@ echo "==> flushing cache"
 "${SSH[@]}" "${SSH_USER}@${SSH_HOST}" "wp cache flush" >/dev/null 2>&1 || true
 
 echo "==> verifying nonce endpoint (should be clean JSON, no <head>/ea11y)"
-RESP="$(curl -s "https://skyyrose.co/?commercekit-ajax=commercekit_get_nonce&cb=$(date +%s)" 2>/dev/null)"
+RESP="$(curl -s --connect-timeout 10 --max-time 20 "https://skyyrose.co/?commercekit-ajax=commercekit_get_nonce&cb=$(date +%s)" 2>/dev/null)"
 # Redact the actual nonce value before printing — nonces are single-use but
 # logging them unnecessarily exposes replay-window material.
 REDACTED="$(printf '%s' "$RESP" | sed 's/"nonce":"[^"]*"/"nonce":"<redacted>"/g')"
