@@ -39,24 +39,11 @@ scrape_configs:
     metrics_path: '/metrics'
     scheme: 'http'
 
-  # Celery workers (if they expose metrics)
-  - job_name: 'celery-workers'
-    scrape_interval: 15s
-    static_configs:
-      - targets: ['celery-worker:9091']
-        labels:
-          service: 'celery'
-          component: 'worker'
-    # Note: Requires prometheus-client in worker.py
-
-  # Celery Flower monitoring
-  - job_name: 'celery-flower'
-    scrape_interval: 15s
-    static_configs:
-      - targets: ['celery-flower:5555']
-        labels:
-          service: 'celery'
-          component: 'flower'
+  # NOTE: the background workers (`worker`, `elite-worker`) are hand-rolled
+  # asyncio Redis pollers, not Celery, and do not yet expose a Prometheus
+  # metrics endpoint. Add prometheus-client to worker.py and a job here once
+  # they do. (Removed the stale celery-worker / celery-flower scrape jobs —
+  # those hosts never existed.)
 
   # Redis exporter (optional - requires redis_exporter sidecar)
   # - job_name: 'redis'

@@ -1,239 +1,263 @@
-services:
-  # Main application
-  devskyy-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: devskyy-app
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
-      - ENVIRONMENT=production
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - app_logs:/app/logs
-      - app_data:/app/data
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+# =============================================================================
+# DevSkyy — production-grade local / self-hosted stack.
+#
+#   Core (default):      postgres · redis · app · worker · elite-worker
+#   Monitoring profile:  prometheus · grafana   (--profile monitoring)
+#   Proxy profile:       nginx                  (--profile proxy)
+#
+# Secrets come from .env.docker (never committed). The `${VAR:?...}` syntax makes
+# compose FAIL LOUDLY if a required secret is missing — no silent "changeme".
+#
+#   make docker-secrets      # generate .env.docker with strong random secrets
+#   make docker-up           # build + start the core stack
+#   make docker-logs         # tail everything
+#   docker compose --env-file .env.docker --profile monitoring up -d
+#
+# One image (devskyy:local) serves all three Python roles; the compose
+# `command:` selects the role and the entrypoint dispatches it.
+# =============================================================================
 
-  # PostgreSQL database
+x-app-build: &app-build
+  context: .
+  dockerfile: Dockerfile
+  args:
+    INSTALL_TARGET: ${INSTALL_TARGET:-all}
+    BUILD_VERSION: ${BUILD_VERSION:-dev}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# Shared environment for every Python role. env_file (.env.docker) supplies the
+# API keys + the two stable security keys; these computed URLs point at the
+# in-network service names.
+x-app-env: &app-env
+  ENVIRONMENT: ${ENVIRONMENT:-production}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  # +asyncpg: database/db.py uses SQLAlchemy create_async_engine, which needs an
+  # async driver in the URL. Bare postgresql:// maps to psycopg2 (not installed).
+  DATABASE_URL: postgresql+asyncpg://devskyy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}@postgres:5432/devskyy
+  REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}@redis:6379/0
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL
+  # ---------------------------------------------------------------------------
   postgres:
     image: postgres:15-alpine
     container_name: devskyy-postgres
     environment:
-      - POSTGRES_DB=devskyy
-      - POSTGRES_USER=devskyy
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
-      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+      POSTGRES_DB: devskyy
+      POSTGRES_USER: devskyy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - devskyy-network
+    networks: [devskyy-network]
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U devskyy -d devskyy"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1G }
+    logging: *logging
 
-  # Redis cache
+  # ---------------------------------------------------------------------------
+  # Redis (task queue + cache)
+  # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     container_name: devskyy-redis
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}
     volumes:
       - redis_data:/data
-    networks:
-      - devskyy-network
+    networks: [devskyy-network]
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
       interval: 10s
       timeout: 3s
       retries: 5
-
-  # Background worker pool for async tasks (3D generation, marketing, ML)
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    container_name: devskyy-worker
-    command: python -m agent_sdk.worker
     environment:
-      # Core services
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
-      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
-      - ENVIRONMENT=production
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 512M }
+    logging: *logging
 
-      # 3D Generation APIs
-      - TRIPO_API_KEY=${TRIPO_API_KEY}
-      - FASHN_API_KEY=${FASHN_API_KEY}
-
-      # LLM Providers (for marketing agent)
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
-
-      # WordPress (for asset upload)
-      - WORDPRESS_URL=${WORDPRESS_URL}
-      - WOOCOMMERCE_KEY=${WOOCOMMERCE_KEY}
-      - WOOCOMMERCE_SECRET=${WOOCOMMERCE_SECRET}
-
-      # Worker configuration
-      - WORKER_PROCESSES=2
-      - WORKER_THREADS=4
-      - TASK_TIMEOUT=600
+  # ---------------------------------------------------------------------------
+  # API — FastAPI (REST + GraphQL + MCP mount)
+  # ---------------------------------------------------------------------------
+  app:
+    build: *app-build
+    image: devskyy:local
+    container_name: devskyy-app
+    env_file: [.env.docker]
+    environment: *app-env
+    ports:
+      - "${APP_PORT:-8000}:8000"
     depends_on:
-      redis:
-        condition: service_healthy
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - app_data:/app/data
       - app_logs:/app/logs
-    networks:
-      - devskyy-network
+      - app_data:/app/data
+    networks: [devskyy-network]
     restart: unless-stopped
-    deploy:
-      replicas: 2  # Run 2 worker instances for redundancy
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-        reservations:
-          cpus: '1.0'
-          memory: 2G
     healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+    logging: *logging
 
-  # Elite Studio render worker — processes async SKU render jobs
-  elite-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: devskyy-elite-worker
-    command: python -m skyyrose.elite_studio worker
-    environment:
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
-      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
-      - ENVIRONMENT=production
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
-      - ELITE_WORKER_CONCURRENCY=${ELITE_WORKER_CONCURRENCY:-1}
-      - ELITE_COST_TRACKING=${ELITE_COST_TRACKING:-true}
+  # ---------------------------------------------------------------------------
+  # Background worker — async task queue poller (3D gen, marketing, ML)
+  # ---------------------------------------------------------------------------
+  worker:
+    build: *app-build
+    image: devskyy:local
+    container_name: devskyy-worker
+    command: ["python", "-m", "agent_sdk.worker"]
+    env_file: [.env.docker]
+    environment: *app-env
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      app:
+        condition: service_started
     volumes:
       - app_data:/app/data
       - app_logs:/app/logs
-    networks:
-      - devskyy-network
+    networks: [devskyy-network]
     restart: unless-stopped
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-        reservations:
-          cpus: '0.5'
-          memory: 1G
     healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      test: ["CMD-SHELL", "python -c \"import os,redis; redis.from_url(os.environ['REDIS_URL']).ping()\""]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 30s
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+    logging: *logging
 
-  # Celery monitoring (Flower)
-  celery-flower:
-    build: .
-    command: celery -A agent_sdk.worker flower --port=5555
-    container_name: devskyy-flower
-    ports:
-      - "5555:5555"
+  # ---------------------------------------------------------------------------
+  # Elite Studio worker — async SKU render jobs
+  # ---------------------------------------------------------------------------
+  elite-worker:
+    build: *app-build
+    image: devskyy:local
+    container_name: devskyy-elite-worker
+    command: ["python", "-m", "skyyrose.elite_studio", "worker"]
+    env_file: [.env.docker]
     environment:
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
+      <<: *app-env
+      ELITE_WORKER_CONCURRENCY: ${ELITE_WORKER_CONCURRENCY:-1}
+      ELITE_COST_TRACKING: ${ELITE_COST_TRACKING:-true}
     depends_on:
-      - celery-worker
-    networks:
-      - devskyy-network
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      app:
+        condition: service_started
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    networks: [devskyy-network]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import os,redis; redis.from_url(os.environ['REDIS_URL']).ping()\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+    logging: *logging
 
-  # Nginx reverse proxy
+  # ---------------------------------------------------------------------------
+  # Nginx reverse proxy — opt-in: `--profile proxy`
+  # Serves :80 → app. (TLS is commented in nginx.conf; add certs + a 443 block
+  # there and mount them before exposing 443.)
+  # ---------------------------------------------------------------------------
   nginx:
     image: nginx:alpine
     container_name: devskyy-nginx
+    profiles: [proxy]
     ports:
-      - "80:80"
-      - "443:443"
+      - "${HTTP_PORT:-80}:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
       - nginx_logs:/var/log/nginx
     depends_on:
-      - devskyy-app
-    networks:
-      - devskyy-network
+      app:
+        condition: service_healthy
+    networks: [devskyy-network]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    logging: *logging
 
-  # Monitoring with Prometheus
+  # ---------------------------------------------------------------------------
+  # Prometheus — opt-in: `--profile monitoring`
+  # ---------------------------------------------------------------------------
   prometheus:
     image: prom/prometheus:latest
     container_name: devskyy-prometheus
+    profiles: [monitoring]
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    networks:
-      - devskyy-network
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    networks: [devskyy-network]
     restart: unless-stopped
+    logging: *logging
 
-  # Grafana for visualization
+  # ---------------------------------------------------------------------------
+  # Grafana — opt-in: `--profile monitoring`
+  # ---------------------------------------------------------------------------
   grafana:
     image: grafana/grafana:latest
     container_name: devskyy-grafana
+    profiles: [monitoring]
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env.docker}
+      GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana_data:/var/lib/grafana
-    networks:
-      - devskyy-network
+    depends_on:
+      - prometheus
+    networks: [devskyy-network]
     restart: unless-stopped
+    logging: *logging
 
 volumes:
   postgres_data:
@@ -243,7 +267,6 @@ volumes:
   nginx_logs:
   prometheus_data:
   grafana_data:
-  raganything_data:
 
 networks:
   devskyy-network:
