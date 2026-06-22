@@ -52,7 +52,7 @@ if __name__ == "__main__":
 \u2551   DevSkyy MCP Server v2.0.0 - Advanced Tool Use                 \u2551
 \u2551   Industry-First Multi-Agent AI Platform Integration            \u2551
 \u2551                                                                  \u2551
-\u2551   54 AI Agents \u2022 Enterprise Security \u2022 Multi-Model AI           \u2551
+\u2551   Agent Fleet \u2022 Enterprise Security \u2022 Multi-Model AI           \u2551
 \u2551                                                                  \u2551
 \u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
    \u2022 devskyy_lora_dataset_preview - Preview LoRA training dataset
    \u2022 devskyy_lora_version_info - Get LoRA version information
    \u2022 devskyy_lora_product_history - Get product LoRA training history
-   \u2022 devskyy_list_agents - View all 54 agents
+   \u2022 devskyy_list_agents - View all agents
 
 \ud83d\udcda Documentation: https://docs.devskyy.com/mcp
 \ud83d\udd17 API Reference: {API_BASE_URL}/docs
