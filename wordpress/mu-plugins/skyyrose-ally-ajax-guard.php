@@ -8,7 +8,7 @@
  *   can break cart/checkout. We remove Ally from the active-plugins list ONLY for
  *   AJAX / WC-AJAX / REST requests, so it never loads its buffer there. Normal
  *   front-end HTML pages are untouched — Ally still runs everywhere it should.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: SkyyRose Dev Team
  *
  * Why an MU-plugin: this must run before the `active_plugins` option is consumed
@@ -26,10 +26,16 @@ add_filter(
 			return $plugins;
 		}
 
-		$uri        = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+		$uri        = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( (string) $_SERVER['REQUEST_URI'] ) : '';
 		$is_ck_ajax = isset( $_GET['commercekit-ajax'] );
 		$is_wc_ajax = isset( $_GET['wc-ajax'] );
-		$is_rest    = ( '' !== $uri && false !== strpos( $uri, '/wp-json/' ) );
+
+		// Detect REST requests via two routing styles:
+		//   1. Pretty-permalink route:  /wp-json/...
+		//   2. Index-PHP route (WP.com Atomic / plain-permalink fallback):
+		//      index.php?rest_route=...  or  ?rest_route=...
+		$is_rest = ( '' !== $uri && false !== strpos( $uri, '/wp-json/' ) )
+		        || isset( $_GET['rest_route'] );
 
 		if ( ! ( $is_ck_ajax || $is_wc_ajax || $is_rest ) ) {
 			return $plugins;
