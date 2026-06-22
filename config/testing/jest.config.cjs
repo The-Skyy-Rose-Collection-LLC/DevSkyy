@@ -117,6 +117,8 @@ module.exports = {
     '\\.spec\\.(ts|js)$',
     // Plugin skill examples use vitest — not part of the Three.js Jest suite
     '/skyyrose-suite/',
+    // Design system packages use vitest — not part of the Three.js Jest suite
+    '/design-system/',
   ],
 
   // Transform node_modules that use ESM (like three.js)
