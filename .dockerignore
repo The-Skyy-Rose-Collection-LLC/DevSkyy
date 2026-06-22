@@ -1,53 +1,155 @@
-# Version control
-.git
-.gitignore
+# =============================================================================
+# DevSkyy .dockerignore — ALLOWLIST strategy.
+#
+# This is a sprawling monorepo with an UNBOUNDED amount of local scratch at the
+# repo root (backups/, ci_mirror/, editorial-staging/, graphify-out/, datasets/,
+# .claude/ worktrees @ 33GB, etc.). A denylist rots — new junk dirs appear every
+# week. So we invert it: ignore EVERYTHING, then re-include only the Python
+# packages + canonical text data the API/worker image actually needs, and finally
+# re-strip binary media inside those (last match wins).
+#
+# Note: BuildKit's `*.png`-style patterns only match the ROOT level, so the media
+# re-excludes below MUST use `**/` to reach nested files.
+# =============================================================================
 
-# Python cache
-__pycache__
-*.py[cod]
-*$py.class
-*.so
-.Python
-.mypy_cache
-.pytest_cache
-.coverage
-htmlcov/
+# --- Ignore everything by default --------------------------------------------
+*
 
-# Dependencies
-node_modules
-frontend/node_modules
-frontend/.next
-frontend/out
-
-# Environment
-.env
-.env.*
-!.env.example
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-
-# Build artifacts
-dist
-build
-*.egg-info
-
-# Logs
-*.log
-logs/
-
-# Testing
-.pytest_cache
-coverage/
-
-# Documentation
-docs/
-*.md
+# --- Re-include root entrypoints & build metadata ----------------------------
+!*.py
+!pyproject.toml
 !README.md
+!requirements*.txt
+!docker-entrypoint.sh
+!init.sql
 
-# CI/CD
-.github
-.circleci
+# --- Re-include every first-party Python package -----------------------------
+# (every root dir with an __init__.py, plus the sdk/ tree and canonical data/).
+# Including all of them means no `import X` can ever be missing from the image;
+# the media re-strip below keeps the heavy ones (renders/, skyyrose/) lean.
+!adk/
+!agents/
+!ai_3d/
+!aos/
+!api/
+!billing/
+!cli/
+!config/
+!core/
+!database/
+!devskyy_workflows/
+!evaluation/
+!grpc_server/
+!imagery/
+!integrations/
+!llm/
+!mcp_servers/
+!mcp_tools/
+!monitoring/
+!orchestration/
+!pipelines/
+!prompts/
+!renders/
+!scripts/
+!security/
+!services/
+!skyyrose/
+!sync/
+!tools/
+!utils/
+!wordpress/
+!sdk/
+!data/
+
+# Canonical product data lives under the (otherwise-excluded) PHP theme tree.
+# The runtime resolves repo/wordpress-theme/skyyrose-flagship/data/{skyyrose-catalog.csv,
+# dossiers/*.md} (see skyyrose/core/paths.py, elite_studio/sku_resolver.py). Re-include
+# ONLY that data subdir via the nested-allowlist idiom — include an ancestor, exclude its
+# siblings, descend — so we get the 1.3MB of text and not the 465MB theme.
+!wordpress-theme/
+wordpress-theme/*
+!wordpress-theme/skyyrose-flagship/
+wordpress-theme/skyyrose-flagship/*
+!wordpress-theme/skyyrose-flagship/data/
+
+# --- Re-strip caches inside the re-included trees ----------------------------
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.DS_Store
+
+# --- Re-strip binary media inside the re-included trees (NEVER needed at runtime)
+# Canonical TEXT data (csv/json/yaml/md — catalog, manifest, dossiers) is kept.
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.bmp
+**/*.tiff
+**/*.tif
+**/*.webp
+**/*.avif
+**/*.ico
+**/*.svg
+**/*.psd
+**/*.ai
+**/*.eps
+**/*.glb
+**/*.gltf
+**/*.obj
+**/*.fbx
+**/*.usdz
+**/*.blend
+**/*.stl
+**/*.ply
+**/*.mp4
+**/*.mov
+**/*.webm
+**/*.avi
+**/*.mkv
+**/*.wav
+**/*.mp3
+**/*.flac
+**/*.aac
+**/*.ogg
+**/*.woff
+**/*.woff2
+**/*.ttf
+**/*.otf
+**/*.eot
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.tgz
+**/*.7z
+**/*.rar
+**/*.gz
+
+# --- Re-strip ML weights & large binary data ---------------------------------
+**/*.safetensors
+**/*.pt
+**/*.pth
+**/*.ckpt
+**/*.bin
+**/*.onnx
+**/*.pkl
+**/*.pickle
+**/*.npy
+**/*.npz
+**/*.h5
+**/*.hdf5
+**/*.parquet
+**/*.feather
+**/*.arrow
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.pdf
+
+# --- Never bake secrets ------------------------------------------------------
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

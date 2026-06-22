@@ -38,6 +38,16 @@ if [ -z "$JWT_SECRET_KEY" ]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] JWT_SECRET_KEY generated (length: ${#JWT_SECRET_KEY})"
 fi
 
+if [ -z "$JWT_REFRESH_SECRET_KEY" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating JWT_REFRESH_SECRET_KEY..."
+    JWT_R=$(python3 -c "import secrets; print(secrets.token_urlsafe(64))" 2>&1) || {
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate JWT_REFRESH_SECRET_KEY: $JWT_R"
+        exit 1
+    }
+    export JWT_REFRESH_SECRET_KEY="$JWT_R"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] JWT_REFRESH_SECRET_KEY generated (length: ${#JWT_REFRESH_SECRET_KEY})"
+fi
+
 if [ -z "$ENCRYPTION_MASTER_KEY" ]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating ENCRYPTION_MASTER_KEY..."
     ENC_KEY=$(python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())" 2>&1) || {
@@ -46,6 +56,15 @@ if [ -z "$ENCRYPTION_MASTER_KEY" ]; then
     }
     export ENCRYPTION_MASTER_KEY="$ENC_KEY"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] ENCRYPTION_MASTER_KEY generated (length: ${#ENCRYPTION_MASTER_KEY})"
+fi
+
+# Command dispatch: this one image serves the API *and* the background workers.
+# If compose (or `docker run`) passed a command, run THAT instead of uvicorn —
+# the workers still inherit the secret bootstrap above. The API role passes no
+# command and falls through to the uvicorn default below.
+if [ "$#" -gt 0 ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Executing passed command: $*"
+    exec "$@"
 fi
 
 # Check if main_enterprise.py exists

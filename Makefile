@@ -6,7 +6,9 @@
 .PHONY: install dev lint format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
-        demo security docker-build docker-run \
+        demo security \
+        docker-secrets docker-build docker-up docker-up-monitoring \
+        docker-down docker-logs docker-ps docker-config docker-clean docker-run \
         validate-catalog sync-catalog sync-catalog-dry catalog-help \
         fresh fresh-fix
 
@@ -281,14 +283,50 @@ build: clean ts-build
 	$(PYTHON) -m build
 
 # ============================================================================
-# DOCKER
+# DOCKER  (production-grade stack — see docs/DOCKER.md)
 # ============================================================================
+# Flow:  make docker-secrets   → generate .env.docker (random secrets)
+#        (paste API keys into .env.docker)
+#        make docker-up         → build + start core stack (app/db/redis/workers)
+#        make docker-logs       → tail
+# All compose calls pass --env-file .env.docker for both secret interpolation
+# and in-container env.
 
-docker-build:
-	docker build -t devskyy:latest .
+COMPOSE := docker compose --env-file .env.docker
 
-docker-run:
-	docker run -p 8000:8000 devskyy:latest
+_require-docker-env:
+	@[ -f .env.docker ] || { echo "✋ Missing .env.docker — run 'make docker-secrets' first."; exit 1; }
+
+docker-secrets:  ## Generate .env.docker with strong random secrets (won't clobber)
+	bash scripts/docker-secrets.sh
+
+docker-config: _require-docker-env  ## Validate + render the merged compose config
+	$(COMPOSE) config
+
+docker-build: _require-docker-env  ## Build the devskyy:local image
+	$(COMPOSE) build
+
+docker-up: _require-docker-env  ## Build + start the core stack (detached)
+	$(COMPOSE) up -d --build
+
+docker-up-monitoring: _require-docker-env  ## Core + prometheus + grafana
+	$(COMPOSE) --profile monitoring up -d --build
+
+docker-down: _require-docker-env  ## Stop the stack (keeps volumes/data)
+	$(COMPOSE) down
+
+docker-clean: _require-docker-env  ## Stop the stack AND delete volumes (DESTROYS data)
+	$(COMPOSE) down -v
+
+docker-logs: _require-docker-env  ## Tail logs from all services
+	$(COMPOSE) logs -f --tail=100
+
+docker-ps: _require-docker-env  ## Show container status
+	$(COMPOSE) ps
+
+# Legacy single-container build (no compose, no deps wiring).
+docker-run: _require-docker-env
+	$(COMPOSE) up -d --build app
 
 # ============================================================================
 # CATALOG CONSISTENCY
