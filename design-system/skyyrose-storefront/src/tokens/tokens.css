@@ -257,10 +257,12 @@ html {
 	--skyyrose-bg:           #0A0A0A;
 	--skyyrose-text:         #F5E6D3;
 	--skyyrose-text-muted:   rgba(245, 230, 211, 0.7);
+	/* GENERATED:global-fonts START — do not edit; run gen-design-tokens.py */
 	--skyyrose-font-display: 'Playfair Display', serif;
 	--skyyrose-font-body:    'Cormorant Garamond', 'Inter', sans-serif;
 	--skyyrose-font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
 	--skyyrose-font-ui:      'Bebas Neue', sans-serif;
+/* GENERATED:global-fonts END */
 	--skyyrose-ease:         cubic-bezier(0.16, 1, 0.3, 1);
 	--skyyrose-radius:       2px;
 }
