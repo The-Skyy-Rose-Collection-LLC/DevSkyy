@@ -33,7 +33,7 @@ describe('HoloCard', () => {
     render(<HoloCard {...base} onAddToCart={onAddToCart} />)
     await userEvent.click(screen.getByRole('radio', { name: 'M' }))
     expect(screen.getByRole('radio', { name: 'M' })).toHaveAttribute('aria-checked', 'true')
-    await userEvent.click(screen.getByRole('button', { name: /add to cart/i }))
+    await userEvent.click(screen.getByRole('button', { name: /add .* to cart/i }))
     expect(onAddToCart).toHaveBeenCalledWith({ sku: 'br-012', size: 'M' })
   })
 

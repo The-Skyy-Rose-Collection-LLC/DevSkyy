@@ -79,7 +79,7 @@ export function HoloCard({
           </div>
 
           <div className="holo__info">
-            <span className="holo__collection">{collection.replace('-', ' ').toUpperCase()}</span>
+            <span className="holo__collection">{collection.replaceAll('-', ' ').toUpperCase()}</span>
             <h3 className="holo__name"><a href={permalink}>{title}</a></h3>
             <div className="holo__price-row"><span className="holo__price">{price}</span></div>
           </div>
@@ -103,7 +103,7 @@ export function HoloCard({
             <button
               type="button"
               className="holo__buy"
-              aria-label="Add to Cart"
+              aria-label={`Add ${title} to cart`}
               onClick={() => onAddToCart?.({ sku, size })}
             >
               Add to Cart
