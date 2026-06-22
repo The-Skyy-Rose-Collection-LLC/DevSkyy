@@ -417,7 +417,14 @@ You are a senior data analyst and business intelligence expert with expertise in
         ]
 
     def _register_tools(self) -> None:
-        """Register analytics tools with the global ToolRegistry for MCP integration."""
+        """Register analytics tool *capability metadata* with the global ToolRegistry.
+
+        These ToolSpecs are descriptive declarations (name/params/tags), not execution
+        handlers — the registry has no dispatch entry for them. Runtime execution happens via
+        this agent's async Python methods (``forecast_sales`` / ``segment_customers``) and the
+        canonical FastMCP tools in ``mcp_tools/tools/resources.py`` (e.g.
+        ``devskyy_demand_forecast`` for the deterministic forecaster).
+        """
         registry = ToolRegistry.get_instance()
 
         analytics_tools = [
@@ -792,9 +799,19 @@ Report Structure:
         )
 
     async def forecast_sales(
-        self, horizon_days: int = 30, granularity: str = "daily"
+        self,
+        horizon_days: int = 30,
+        granularity: str = "daily",
+        product: dict[str, Any] | None = None,
+        as_of: datetime | None = None,
     ) -> dict[str, Any]:
-        """Forecast sales using ML"""
+        """Forecast sales.
+
+        Uses the ML module when available; otherwise falls back to the deterministic
+        velocity/sellout forecaster (``services.forecasting.demand``) over ``product``'s
+        sales history — an always-available, explainable baseline (no "not available" dead end).
+        Pass ``as_of`` for reproducible scoring.
+        """
         if self.ml_module:
             prediction = await self.ml_module.predict(
                 "forecaster", {"horizon": horizon_days, "granularity": granularity}
@@ -806,10 +823,36 @@ Report Structure:
                 "granularity": granularity,
             }
 
-        return {"error": "ML module not available"}
+        if product is not None:
+            from services.forecasting.demand import DemandForecaster
 
-    async def segment_customers(self, method: str = "rfm") -> dict[str, Any]:
-        """Segment customers using clustering"""
+            forecast = DemandForecaster().forecast(product, as_of=as_of)
+            payload = forecast.as_dict()
+            payload["forecast_units_horizon"] = forecast.forecast_units(horizon_days)
+            payload["horizon_days"] = horizon_days
+            payload["granularity"] = granularity
+            payload["method"] = "deterministic_velocity"
+            return payload
+
+        return {
+            "forecast": None,
+            "note": "No ML module and no product sales data provided.",
+            "horizon_days": horizon_days,
+            "granularity": granularity,
+        }
+
+    async def segment_customers(
+        self,
+        method: str = "rfm",
+        customers: list[dict[str, Any]] | None = None,
+        as_of: datetime | None = None,
+    ) -> dict[str, Any]:
+        """Segment customers.
+
+        Uses the ML clusterer when available; otherwise, for the RFM method, falls back to the
+        deterministic lifecycle scorer (``services.lifecycle.retention``) over ``customers``.
+        Pass ``as_of`` for a reproducible batch (otherwise a single ``now`` is used for all rows).
+        """
         if self.ml_module:
             prediction = await self.ml_module.predict("clusterer", {"method": method})
             return {
@@ -818,7 +861,36 @@ Report Structure:
                 "confidence": prediction.confidence,
             }
 
-        return {"error": "ML module not available"}
+        if customers is not None:
+            if method.lower() != "rfm":
+                return {
+                    "segments": [],
+                    "note": f"Deterministic fallback supports only method='rfm'; got '{method}'. "
+                    "Wire ml_module for other clustering methods.",
+                    "method": method,
+                }
+            from services.lifecycle.retention import RetentionScorer
+
+            when = as_of or datetime.now(UTC)  # single timestamp -> reproducible batch
+            scorer = RetentionScorer()
+            assessments = [
+                scorer.assess(c, as_of=when).as_dict() for c in customers if isinstance(c, dict)
+            ]
+            counts: dict[str, int] = {}
+            for a in assessments:
+                counts[a["lifecycle_stage"]] = counts.get(a["lifecycle_stage"], 0) + 1
+            return {
+                "segments": assessments,
+                "segment_counts": counts,
+                "method": method,
+                "engine": "deterministic_rfm",
+            }
+
+        return {
+            "segments": [],
+            "note": "No ML module and no customer data provided.",
+            "method": method,
+        }
 
     async def analyze_ab_test(
         self, experiment_id: str, confidence_level: float = 0.95

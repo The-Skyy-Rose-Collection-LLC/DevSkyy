@@ -527,6 +527,9 @@ SEO Rules:
         # Parse structured response
         content = self._parse_gemini_response(response, request)
 
+        # Brand-copy quality gate — soft-signal, opt-in via COPY_EVAL_ENABLED. Never blocks.
+        content = await self._maybe_eval_copy(content, request)
+
         # Record for learning
         self._record_generation(content, request, response)
 
@@ -535,6 +538,71 @@ SEO Rules:
             f"[tokens={content.gemini_tokens_used}]"
         )
 
+        return content
+
+    def _build_copy_brief(self, content: GeneratedContent, request: ContentRequest) -> Any:
+        """Assemble the CopyBrief the evaluator scores against (pure field mapping)."""
+        from evaluation.domains.copy import CopyBrief
+
+        return CopyBrief(
+            collection=content.collection.value if content.collection else None,
+            content_type=request.content_type.value,
+            product_name=request.title or None,
+            brand_voice_context=(self._brand_dna.to_prompt_context() if self._brand_dna else ""),
+            additional_direction=request.additional_direction or "",
+        )
+
+    async def _maybe_eval_copy(
+        self,
+        content: GeneratedContent,
+        request: ContentRequest,
+        *,
+        evaluator: Any = None,
+    ) -> GeneratedContent:
+        """Soft-signal brand-copy quality gate.
+
+        Opt-in via the COPY_EVAL_ENABLED env flag. When enabled, scores the generated
+        body against brand canon with the Claude copy judge and records the verdict in
+        ``content.metadata['copy_eval']``. It NEVER blocks — failing copy is returned
+        unchanged (the judge is uncalibrated; promote to a hard gate only after a
+        calibration run, per evaluation.calibration.decide_mode). ``evaluator`` is a
+        dependency-injection seam for tests; production builds the real judge lazily.
+        """
+        if not os.getenv("COPY_EVAL_ENABLED"):
+            return content
+        if evaluator is None:
+            from evaluation.agents import CopyEvaluator
+            from evaluation.judge import ClaudeJudge, make_client
+
+            judge = ClaudeJudge(client=make_client(), model="claude-sonnet-4-6")
+            evaluator = CopyEvaluator(judge_fn=lambda req: judge.run(**req))
+
+        try:
+            brief = self._build_copy_brief(content, request)
+            verdict = await evaluator.evaluate(subject=content.body_html, ref=brief)
+            logger.info(
+                "%s: copy_eval passed=%s score=%.2f cost=$%.4f tags=%s",
+                self.AGENT_NAME,
+                verdict.passed,
+                verdict.score,
+                verdict.cost_usd,
+                list(verdict.failure_tags),
+            )
+            content.metadata["copy_eval"] = {
+                "passed": verdict.passed,
+                "score": verdict.score,
+                "failure_tags": list(verdict.failure_tags),
+                "reason": verdict.reason,
+                "cost_usd": verdict.cost_usd,
+            }
+        except Exception as exc:  # noqa: BLE001 — advisory gate must never block generation
+            logger.warning(
+                "%s: copy_eval skipped — evaluator raised %s: %s",
+                self.AGENT_NAME,
+                type(exc).__name__,
+                exc,
+            )
+            content.metadata["copy_eval"] = {"error": f"{type(exc).__name__}: {exc}"}
         return content
 
     def _build_generation_messages(self, request: ContentRequest) -> list[Message]:
