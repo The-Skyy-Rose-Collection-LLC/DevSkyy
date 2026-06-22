@@ -591,7 +591,7 @@ class GDPRService:
         if not hmac.compare_digest(confirmation_code or "", expected_code):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid confirmation code. Use: {expected_code}",
+                detail="Invalid confirmation code.",
             )
 
         # Log request

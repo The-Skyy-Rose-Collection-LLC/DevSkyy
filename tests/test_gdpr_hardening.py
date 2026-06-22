@@ -17,10 +17,10 @@ Testing Pattern:
 - Security tests for attack scenarios
 """
 
+import hashlib
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
-import hashlib
 import pytest
 
 from api.gdpr import (
@@ -174,7 +174,7 @@ class TestAuditLogging:
 
         await service.delete_user_data(
             user_id="test_user_123",
-            confirmation_code=hashlib.sha256("test_user_123_delete".encode()).hexdigest()[:8],
+            confirmation_code=hashlib.sha256(b"test_user_123_delete").hexdigest()[:8],
             anonymize=False,
             reason="User request",
             ip_address="192.168.1.100",
@@ -384,7 +384,7 @@ class TestEndToEndHardening:
 
         result = await service.delete_user_data(
             user_id="test_user_123",
-            confirmation_code=hashlib.sha256("test_user_123_delete".encode()).hexdigest()[:8],
+            confirmation_code=hashlib.sha256(b"test_user_123_delete").hexdigest()[:8],
             anonymize=False,
             reason="User requested account deletion",
             ip_address="192.168.1.100",

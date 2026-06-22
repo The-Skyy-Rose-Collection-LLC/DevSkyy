@@ -67,15 +67,17 @@ class CostTracker:
         try:
             import redis as sync_redis
 
-            self._redis = sync_redis.from_url(
+            client = sync_redis.from_url(
                 self._redis_url,
                 decode_responses=True,
                 socket_timeout=3.0,
                 socket_connect_timeout=3.0,
             )
-            self._redis.ping()
+            client.ping()
+            self._redis = client  # Only cache after successful ping
             return self._redis
         except Exception as exc:
+            self._redis = None  # Ensure broken client is not cached
             logger.error("CostTracker: Redis unavailable — cannot verify budget: %s", exc)
             raise RuntimeError("Redis unavailable for cost tracking") from exc
 
@@ -84,23 +86,15 @@ class CostTracker:
 
         Reads ELITE_STUDIO_COST_CAP_USD env var; defaults to DEFAULT_COST_CAP_USD.
         Returns 0.0 if the env var explicitly disables the cap.
-        Negative values are rejected as invalid.
+        Negative, NaN, and infinite values are rejected as invalid.
         """
+        import math
+
         raw = os.getenv("ELITE_STUDIO_COST_CAP_USD")
         if raw is None:
             return DEFAULT_COST_CAP_USD
         try:
             value = float(raw)
-            if value == 0.0:
-                return 0.0
-            if value < 0.0:
-                logger.warning(
-                    "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is negative/invalid; using default $%.2f",
-                    raw,
-                    DEFAULT_COST_CAP_USD,
-                )
-                return DEFAULT_COST_CAP_USD
-            return value
         except ValueError:
             logger.warning(
                 "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is not a number; using default $%.2f",
@@ -108,6 +102,24 @@ class CostTracker:
                 DEFAULT_COST_CAP_USD,
             )
             return DEFAULT_COST_CAP_USD
+
+        if not math.isfinite(value):
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is non-finite; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+        if value == 0.0:
+            return 0.0
+        if value < 0.0:
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is negative/invalid; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+        return value
 
     def check_budget(self, projected_cost_usd: float = 0.0) -> None:
         """Raise CostBudgetExceeded if rolling 24h spend (+ projected) crosses the cap.
@@ -117,7 +129,16 @@ class CostTracker:
 
         Fails closed (raises CostBudgetExceeded) when Redis is unavailable unless
         ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED=1 is set.
+
+        Args:
+            projected_cost_usd: Expected cost of the upcoming call. Must be >= 0.
         """
+        import math
+
+        if not math.isfinite(projected_cost_usd) or projected_cost_usd < 0.0:
+            raise ValueError(
+                f"projected_cost_usd must be a non-negative finite number; got {projected_cost_usd!r}"
+            )
         cap = self.get_cost_cap()
         if cap <= 0.0:
             return  # Cap explicitly disabled
