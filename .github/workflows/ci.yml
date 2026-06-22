@@ -551,10 +551,14 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: Run Playwright tests
-        # Cap the run so a slow/failing E2E suite fails fast (exit 124, absorbed by this job's
-        # continue-on-error) instead of hanging to the 30-min job timeout — a job timeout surfaces
-        # as a cancellation, which continue-on-error cannot absorb, so it would gate the pipeline.
-        run: timeout 900 ./node_modules/.bin/playwright test --reporter=html
+        # Use GHA step-level timeout-minutes (not shell `timeout`) because:
+        # - A shell timeout exits the process but the JOB keeps running until the outer
+        #   30-min job-level timeout fires, which surfaces as a job *cancellation*.
+        # - continue-on-error:true absorbs step *failures*, but NOT job cancellations.
+        # - A step timeout-minutes produces a step *failure* conclusion, which the job's
+        #   continue-on-error:true properly absorbs, letting the pipeline stay green.
+        timeout-minutes: 15
+        run: ./node_modules/.bin/playwright test --reporter=html
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
