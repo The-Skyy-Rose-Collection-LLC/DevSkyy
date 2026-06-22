@@ -1,6 +1,7 @@
 import { CollectionHero } from '@skyyrose/storefront-ds'
 
-// Canonical brand-script lockup images from skyyrose.co theme assets (all verified 200)
+// Canonical brand-script lockup images from skyyrose.co theme assets (all verified 200).
+// These are the foreground collection lockups — the hero name IS the image (never type-rendered).
 const BR_LOCKUP = 'https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/br-brand-script-logotype.webp'
 const LH_LOCKUP = 'https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/lh-logo-combined.png'
 const SG_LOCKUP = 'https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/images/hero-overlays/sig-brand-skyy-rose-gold.webp'
@@ -9,43 +10,39 @@ const KC_LOCKUP = 'https://skyyrose.co/wp-content/themes/skyyrose-flagship/asset
 export const BlackRose = () => (
   <CollectionHero
     collection="black-rose"
-    title="Black Rose"
-    subtitle="Armor for the ones who stood up."
-    ctaLabel="Shop Black Rose"
-    ctaHref="#"
-    backgroundImage={BR_LOCKUP}
+    lockupImage={BR_LOCKUP}
+    tagline="Armor for the ones who stood up."
+    cta={{ label: 'Shop Black Rose', href: '#' }}
+    align="center"
   />
 )
 
 export const LoveHurts = () => (
   <CollectionHero
     collection="love-hurts"
-    title="Love Hurts"
-    subtitle="Bloodline that raised me."
-    ctaLabel="Shop Love Hurts"
-    ctaHref="#"
-    backgroundImage={LH_LOCKUP}
+    lockupImage={LH_LOCKUP}
+    tagline="Bloodline that raised me."
+    cta={{ label: 'Shop Love Hurts', href: '#' }}
+    align="center"
   />
 )
 
 export const Signature = () => (
   <CollectionHero
     collection="signature"
-    title="Signature"
-    subtitle="Gold standard. Nothing less."
-    ctaLabel="Shop Signature"
-    ctaHref="#"
-    backgroundImage={SG_LOCKUP}
+    lockupImage={SG_LOCKUP}
+    tagline="Gold standard. Nothing less."
+    cta={{ label: 'Shop Signature', href: '#' }}
+    align="center"
   />
 )
 
 export const KidsCapsule = () => (
   <CollectionHero
     collection="kids-capsule"
-    title="Kids Capsule"
-    subtitle="Little roses. Same concrete."
-    ctaLabel="Shop Kids"
-    ctaHref="#"
-    backgroundImage={KC_LOCKUP}
+    lockupImage={KC_LOCKUP}
+    tagline="Little roses. Same concrete."
+    cta={{ label: 'Shop Kids', href: '#' }}
+    align="center"
   />
 )

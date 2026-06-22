@@ -2219,6 +2219,65 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T20:37:53Z"
+    },
+    {
+      "id": "bug-153",
+      "timestamp": "2026-06-22T21:10:00Z",
+      "error_message": "Stop-hook test suite FAILED: tests/gateway/test_api_gateway.py::TestCircuitBreaker::test_failure_in_half_open_reopens_circuit \u2014 AssertionError: CircuitState.HALF_OPEN == CircuitState.OPEN.",
+      "file": "tests/gateway/test_api_gateway.py",
+      "root_cause": "Flaky under heavy load, NOT a logic bug (passed 9/9 isolated; one trivial test took 17.5s = machine saturated by 2 concurrent workflows + ~20 agents). api/gateway.py CircuitBreaker.state is a PROPERTY that mutates (OPEN->HALF_OPEN) as a read side-effect after recovery_timeout. Test used recovery_timeout=0.01 (10ms); a HALF_OPEN failure correctly reopens (_opened_at=now), but if the assert's state read lands >10ms later (trivial under load), state() silently re-transitions back to HALF_OPEN.",
+      "fix": "Hardened the 2 timing-sensitive CB tests: recovery_timeout 0.01->0.05 (5x reopen-read margin), time.sleep 0.02->0.1. Assertions unchanged (not weakening). Deeper design smell (read-with-side-effect on the state property) left for a separate refactor.",
+      "tags": [
+        "flaky-test",
+        "circuit-breaker",
+        "timing",
+        "load",
+        "stop-hook",
+        "gateway",
+        "pre-existing"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T21:10:00Z"
+    },
+    {
+      "id": "bug-154",
+      "timestamp": "2026-06-22T15:20:00-07:00",
+      "error_message": "test_end_marker_before_start_exits_1: assert 'END marker before START' in stderr \u2014 got the global-fonts 'missing markers ... cannot regenerate the region' message instead",
+      "file": "tests/collections/test_gen_design_tokens.py",
+      "root_cause": "gen-design-tokens.py grew a 2nd marker region (global-fonts) regenerated BEFORE collection-tokens. The committed error-path test's fixture only had collection-tokens markers, so main() failed on the missing global-fonts region (stage 1) before reaching the collection-tokens END-before-START guard (stage 2) the test asserts. Stale fixture vs evolved (uncommitted-WIP) generator.",
+      "fix": "Fixture now carries a well-formed global-fonts region so main() reaches the collection-tokens ordering check; assertion tightened to 'collection-tokens END marker before START' (strengthened). Generator NOT changed \u2014 it was correct.",
+      "tags": [
+        "pytest",
+        "design-tokens",
+        "stale-fixture",
+        "markers",
+        "wordpress-theme"
+      ],
+      "related_bugs": [
+        "bug-153"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:20:00-07:00"
+    },
+    {
+      "id": "bug-155",
+      "timestamp": "2026-06-22T16:10:00-07:00",
+      "error_message": "CollectionHero rendered in claude.ai/design with blank foreground lockup images (<img class=\"sr-hero__lockup\" src=null>); tagline + CTA missing",
+      "file": ".design-sync/previews/CollectionHero.tsx",
+      "root_cause": "Preview authored against a GUESSED API, not the component's .d.ts contract. Passed title/subtitle/ctaLabel/ctaHref and shoved the lockup URL into backgroundImage. Real CollectionHeroProps require lockupImage (foreground), tagline, and cta:{label,href}. lockupImage was never set -> src undefined -> blank lockup; the URL rendered only as a background layer, so render-check passed (bad:false, non-blank PNG) and the stale screenshot looked like it had images. The mismatch only surfaced by mounting in a browser and reading img.src=null while alt (derived from collection) was set.",
+      "fix": "Rewrote CollectionHero.tsx to the .d.ts contract: lockupImage=<LOCKUP_URL>, tagline=<...>, cta={label,href}, align='center'; dropped non-existent title and the backgroundImage misuse. Rebuilt bundle, re-rendered: all 4 lockups decode (br/lh/sig 1600x900, kc monogram 720x720), taglines+CTAs present, render-check texts now populated, maxHeight 246->1175. Re-uploaded 35 files to claude.ai/design.",
+      "tags": [
+        "design-sync",
+        "claude.ai/design",
+        "preview-contract",
+        "prop-mismatch",
+        "render-verification",
+        "collectionhero"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:10:00-07:00"
     }
   ]
 }
