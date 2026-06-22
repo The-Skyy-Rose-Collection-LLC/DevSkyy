@@ -324,7 +324,7 @@ docker-logs: _require-docker-env  ## Tail logs from all services
 docker-ps: _require-docker-env  ## Show container status
 	$(COMPOSE) ps
 
-# Legacy single-container build (no compose, no deps wiring).
+# Start just the app service (still via compose, so postgres/redis deps are honored).
 docker-run: _require-docker-env
 	$(COMPOSE) up -d --build app
 

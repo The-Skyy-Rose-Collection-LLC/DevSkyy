@@ -62,6 +62,21 @@ class DatabaseConfig(BaseModel):
     echo: bool = os.getenv("DB_ECHO", "false").lower() == "true"
 
 
+def _normalize_async_url(url: str) -> str:
+    """Map a bare sync Postgres URL onto the async driver this engine needs.
+
+    create_async_engine requires an async driver; a plain ``postgresql://`` (what
+    most hosts/secret managers hand out) resolves to psycopg2, which isn't
+    installed. Rewrite it to ``postgresql+asyncpg://`` so any well-formed Postgres
+    URL works without callers having to know the driver. Already-qualified URLs
+    (``postgresql+asyncpg://``, ``sqlite+aiosqlite://``) pass through unchanged.
+    """
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+asyncpg://" + url[len(prefix) :]
+    return url
+
+
 # =============================================================================
 # Base Model
 # =============================================================================
@@ -287,6 +302,7 @@ class DatabaseManager:
             return
 
         config = config or DatabaseConfig()
+        config.url = _normalize_async_url(config.url)
 
         # Determine pool class based on database type
         is_sqlite = "sqlite" in config.url

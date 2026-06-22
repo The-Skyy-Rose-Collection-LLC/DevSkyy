@@ -30,6 +30,13 @@ x-logging: &logging
     max-size: "10m"
     max-file: "3"
 
+# Shared resource ceiling for the three Python roles (app + both workers).
+x-svc-resources: &svc-resources
+  resources:
+    limits:
+      cpus: "2.0"
+      memory: 4G
+
 # Shared environment for every Python role. env_file (.env.docker) supplies the
 # API keys + the two stable security keys; these computed URLs point at the
 # in-network service names.
@@ -118,9 +125,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    deploy:
-      resources:
-        limits: { cpus: "2.0", memory: 4G }
+    deploy: *svc-resources
     logging: *logging
 
   # ---------------------------------------------------------------------------
@@ -138,8 +143,6 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-      app:
-        condition: service_started
     volumes:
       - app_data:/app/data
       - app_logs:/app/logs
@@ -151,9 +154,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    deploy:
-      resources:
-        limits: { cpus: "2.0", memory: 4G }
+    deploy: *svc-resources
     logging: *logging
 
   # ---------------------------------------------------------------------------
@@ -174,8 +175,6 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-      app:
-        condition: service_started
     volumes:
       - app_data:/app/data
       - app_logs:/app/logs
@@ -187,9 +186,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    deploy:
-      resources:
-        limits: { cpus: "2.0", memory: 4G }
+    deploy: *svc-resources
     logging: *logging
 
   # ---------------------------------------------------------------------------
