@@ -46,7 +46,7 @@ const faces = woff2
     const family = f.replace(/\.woff2$/, '').replace(/[-_]/g, ' ')
     return `@font-face{font-family:'${family}';src:url('./${f}') format('woff2');font-display:swap;}`
   })
-  .join('\n')
+  .join('\n') + '\n'
 const fontsCssPath = resolve(FONT_DEST, 'fonts.css')
 let curFonts = ''
 try { curFonts = readFileSync(fontsCssPath, 'utf8') } catch { /* missing */ }

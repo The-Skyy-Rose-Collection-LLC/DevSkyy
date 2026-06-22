@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { execFileSync } from 'node:child_process'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const PKG = resolve(__dirname, '..')
@@ -29,5 +29,14 @@ describe('theme-asset sync', () => {
 
   it('--check passes when in sync and fails when a synced file is mutated', () => {
     expect(() => execFileSync('node', ['scripts/sync-theme-assets.mjs', '--check'], { cwd: PKG })).not.toThrow()
+
+    const tokensPath = resolve(PKG, 'src/tokens/tokens.css')
+    const original = readFileSync(tokensPath, 'utf8')
+    writeFileSync(tokensPath, original + '\n/* drift-marker */')
+    try {
+      expect(() => execFileSync('node', ['scripts/sync-theme-assets.mjs', '--check'], { cwd: PKG })).toThrow()
+    } finally {
+      writeFileSync(tokensPath, original)
+    }
   })
 })
