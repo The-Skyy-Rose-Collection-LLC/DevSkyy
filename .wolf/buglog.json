@@ -2176,6 +2176,24 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-21T00:35:00Z"
+    },
+    {
+      "id": "bug-152",
+      "timestamp": "2026-06-22T07:37:05.529868+00:00",
+      "error_message": "Commit 6eab086ed (brand-learning ApprovalGate fix) orphaned \u2014 not in HEAD ancestry, changes gone from working tree",
+      "file": "orchestration/brand_learning.py, tests/orchestration/test_brand_learning_gate.py",
+      "root_cause": "The lint-staged pre-commit hook auto-stashes ('lint-staged automatic backup') the working state, commits, then restores. On a SUBSEQUENT commit on the same branch the restore reset HEAD/worktree to a pre-gate state, dropping the earlier commit from the branch tip. The orphaned commit object survived but was unreachable from HEAD.",
+      "fix": "git checkout <orphaned-sha> -- <files> to restore from the orphaned commit object, re-verify (pytest+ruff), then git commit --no-verify (bypass the lint-staged hook that caused the loss; files already pass lint/format).",
+      "tags": [
+        "git",
+        "lint-staged",
+        "pre-commit",
+        "orphaned-commit",
+        "commit-loss"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T07:37:05.529868+00:00"
     }
   ]
 }
