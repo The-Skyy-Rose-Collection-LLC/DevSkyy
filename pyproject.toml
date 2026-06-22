@@ -128,7 +128,7 @@ dependencies = [
     "sentence-transformers>=3.3.1",
     "tiktoken>=0.8.0",
     "chromadb>=0.6.0",
-    "diffusers>=0.33.0",
+    "diffusers>=0.38.0",
 ]
 
 [project.optional-dependencies]
