@@ -8,9 +8,25 @@ in claude.ai/design.
 
 ## Font delivery
 
-Fonts do NOT ship via `dist/skyyrose-ds.css` (Vite would base64-inline all 20 woff2 ~580 KB).
+Fonts do NOT ship via `dist/skyyrose-ds.css` (Vite would base64-inline woff2 into the CSS).
 They ship via `cfg.extraFonts` → `design-system/skyyrose-storefront/src/fonts/fonts.css`.
 The converter copies woff2 files and the @font-face CSS into `ds-bundle/fonts/`.
+
+## Canon font set (11 woff2 files, 8 families)
+
+Only fonts referenced by DS components or tokens are included. Provenance:
+- `wordpress-theme/skyyrose-flagship/data/collections/<slug>/identity.json` `fonts` key
+  blesses: Cinzel (caps), Cormorant Garamond (body), Yellowtail/Pinyon Script/Kaushan Script
+  (per-collection scripts — Black Rose=Yellowtail, Love Hurts=Kaushan Script,
+  Signature=Pinyon Script, Kids Capsule=Pinyon Script)
+- `design-tokens.css` :root blesses: Playfair Display, Bebas Neue, Inter, Cormorant Garamond
+
+Excluded (legacy/retired — in theme.json but referenced by nothing in the DS):
+- Barlow, Oswald, Instrument Serif
+
+The `CANON_WOFF2` set in `scripts/sync-theme-assets.mjs` is the enforcement point.
+Sync copies only those 11 files and removes any others from `src/fonts/`. `sync:check`
+flags any legacy files that remain.
 
 If font family names drift (e.g., theme.json fontFamilies updated), run:
 ```
@@ -31,6 +47,6 @@ created in claude.ai/design. Do not add a placeholder value.
 
 ## Collection scripts
 
-Three script fonts (Yellowtail, Pinyon Script, Kaushan Script) are NOT in `theme.json`
-fontFamilies — they're covered by the `CURATED` map in `sync-theme-assets.mjs`. If new
-collection script fonts are added to the theme, add them there.
+Yellowtail, Pinyon Script, and Kaushan Script are NOT in `theme.json` fontFamilies —
+they are covered by the `CURATED` map in `sync-theme-assets.mjs` and are included in
+`CANON_WOFF2`. If a new collection script font is added, update both maps.
