@@ -34,4 +34,23 @@ describe('Button', () => {
     expect(btn).toHaveAttribute('aria-busy', 'true')
     expect(btn).toBeDisabled()
   })
+
+  it('disabled anchor drops href, sets aria-disabled, and blocks click', async () => {
+    const onClick = vi.fn()
+    render(<Button as="a" href="/shop" disabled onClick={onClick}>X</Button>)
+    const link = screen.getByRole('link', { name: 'X', hidden: true })
+    expect(link).not.toHaveAttribute('href')
+    expect(link).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(link)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('loading anchor sets aria-busy and blocks click', async () => {
+    const onClick = vi.fn()
+    render(<Button as="a" href="/shop" loading onClick={onClick}>X</Button>)
+    const link = screen.getByRole('link', { name: 'X', hidden: true })
+    expect(link).toHaveAttribute('aria-busy', 'true')
+    await userEvent.click(link)
+    expect(onClick).not.toHaveBeenCalled()
+  })
 })

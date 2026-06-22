@@ -37,8 +37,9 @@ export function Button({
       <a
         className={className}
         href={isDisabled ? undefined : href}
-        aria-disabled={isDisabled || undefined}
-        aria-busy={loading || undefined}
+        role="link"
+        aria-disabled={isDisabled ? true : undefined}
+        aria-busy={loading ? true : undefined}
         onClick={(e) => {
           if (isDisabled) { e.preventDefault(); return }
           onClick?.(e)
@@ -54,8 +55,8 @@ export function Button({
       type="button"
       className={className}
       disabled={isDisabled}
-      aria-busy={loading || undefined}
-      onClick={(e) => { if (!isDisabled) onClick?.(e) }}
+      aria-busy={loading ? true : undefined}
+      onClick={onClick}
     >
       {children}
     </button>
