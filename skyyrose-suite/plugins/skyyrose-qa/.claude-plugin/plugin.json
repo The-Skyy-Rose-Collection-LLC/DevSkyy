@@ -1,0 +1,9 @@
+{
+  "name": "skyyrose-qa",
+  "version": "1.0.0",
+  "description": "SkyyRose quality & verification: test-driven development, drive-to-green auto-fix loops, verification loops, audits (+ pass-2 verifier), evals, AI regression testing, diagnosis, and code review (requesting/receiving). Independently re-verifies every 'done' before it ships.",
+  "author": { "name": "SkyyRose / Corey Foster", "email": "skyyroseco@gmail.com" },
+  "license": "UNLICENSED",
+  "homepage": "https://skyyrose.co",
+  "keywords": ["skyyrose", "qa", "testing", "tdd", "verification", "drive-to-green", "audit", "eval", "regression", "code-review"]
+}

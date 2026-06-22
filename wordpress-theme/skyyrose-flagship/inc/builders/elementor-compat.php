@@ -322,12 +322,11 @@ function skyyrose_ee_press_bar_shortcode( $atts ) {
 	?>
 	<div class="lp-press lp-rv" aria-label="<?php echo esc_attr__( 'Featured in', 'skyyrose' ); ?>">
 		<div class="lp__container">
-			<span class="lp-press__label"><?php echo esc_html__( 'As Seen In', 'skyyrose' ); ?></span>
-			<ul class="lp-press__list">
+			<div class="lp-press__row">
 				<?php foreach ( $mentions as $outlet ) : ?>
-					<li><?php echo esc_html( $outlet ); ?></li>
+					<span class="lp-press__name"><?php echo esc_html( $outlet ); ?></span>
 				<?php endforeach; ?>
-			</ul>
+			</div>
 		</div>
 	</div>
 	<?php

@@ -212,16 +212,8 @@ class SkyyRose_Accessibility_Fix {
 	}
 }
 
-// /preorder/ → /pre-order/ redirect
-add_action(
-	'init',
-	function () {
-		$path = trim( parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ), PHP_URL_PATH ), '/' );
-		if ( 'preorder' === $path ) {
-			wp_safe_redirect( home_url( '/pre-order/' ), 301 );
-			exit;
-		}
-	}
-);
+// /preorder/ → /pre-order/ redirect lives in inc/redirects.php
+// (skyyrose_preorder_slug_redirect on template_redirect priority 1) — it
+// preserves query strings (UTM, etc.). Keep one source of truth.
 
 new SkyyRose_Accessibility_Fix();

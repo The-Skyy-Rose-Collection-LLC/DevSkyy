@@ -6,7 +6,9 @@
 .PHONY: install dev lint format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
-        demo security docker-build docker-run
+        demo security docker-build docker-run \
+        validate-catalog sync-catalog sync-catalog-dry catalog-help \
+        fresh fresh-fix
 
 # Python
 PYTHON := python3
@@ -90,6 +92,12 @@ format:
 	ruff check . --fix
 	black .
 
+fresh:  ## Check derived files are in sync (SOT, theme .min, version, retired refs)
+	bash scripts/freshness-guard.sh --all
+
+fresh-fix:  ## Regenerate SOT + rebuild theme .min, then re-stage for commit
+	bash scripts/freshness-guard.sh --fix
+
 test:
 	pytest tests/ -v --tb=short
 
@@ -98,6 +106,71 @@ test-cov:
 
 test-fast:
 	pytest tests/ -v --tb=short -x -q
+
+# ============================================================================
+# ADK RENDER PIPELINE COMMANDS
+# ============================================================================
+# Mock unit tests for the 9-step SequentialAgent. Uses .venv-agents/ (separate
+# from .venv/ — ADK + numpy conflict isolation). No API cost, target <5s.
+# Override the venv path via env var: `ADK_PYTHON=/path/to/python make adk-test`
+
+ADK_PYTHON ?= ../DevSkyy/.venv-agents/bin/python3
+
+adk-test:
+	@if [ ! -x "$(ADK_PYTHON)" ]; then \
+		echo "Error: $(ADK_PYTHON) not found."; \
+		echo "Install: $(ADK_PYTHON) -m pip install 'google-adk[extensions]' scipy pytest pytest-asyncio pytest-mock"; \
+		echo "Or override: ADK_PYTHON=/path/to/python make adk-test"; \
+		exit 1; \
+	fi
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ -v --tb=short
+
+adk-test-fast:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ --tb=line -q
+
+adk-lint:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m ruff check agents/render_pipeline/
+	$(ADK_PYTHON) -m black --check agents/render_pipeline/
+
+# Composite manual gate: lint + tests. Used by humans for one-shot
+# pre-commit checks. The pre-commit hooks invoke adk-lint and
+# adk-test-fast independently so they report separately.
+adk-check: adk-lint adk-test-fast
+
+# ADK AgentEvaluator harness run against agents/render_pipeline/eval/.
+# DEFAULT (adk-eval) skips the paid call — verifies the harness loads,
+# the eval set collects, and the agent imports cleanly. ~$0 cost, ~6s.
+# LIVE (adk-eval-live) sets EVAL_LIVE=1 to actually exercise the 9-step
+# pipeline against the canonical br-001 fixture. ~$0.20 cost per run.
+# Use adk-eval-live only after explicit STOP-AND-SHOW confirmation.
+adk-eval:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "Running ADK AgentEvaluator harness (test will SKIP without EVAL_LIVE=1)..."
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+adk-eval-live:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "WARNING: Live AgentEvaluator run — paid call (~\$$0.20)."
+	@echo "Pipeline: 9-step SequentialAgent against br-001 front canonical fixture."
+	EVAL_LIVE=1 $(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+# Generate a learning-loop report from data/agent-learning/ JSONL records.
+# Reads engine-winrate, template-scores, and failure-modes JSONL files
+# emitted by qa_tournament_fn during live runs. Produces a markdown
+# proposals file plus terminal output. No API cost — local file analysis.
+# See agents/render_pipeline/learning/LOOP.md for the recommended /loop prompt.
+adk-learning-report:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "=== Writing proposals markdown ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import write_proposals_markdown; print(f'Wrote: {write_proposals_markdown()}')"
+	@echo ""
+	@echo "=== Engine-override proposals (min 3 runs, min score 80) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import propose_engine_overrides; import json; props = propose_engine_overrides(); print(json.dumps(props, indent=2)) if props else print('(no proposals — need more runs)')"
+	@echo ""
+	@echo "=== Failure-mode digest (min 5 occurrences) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import digest_failure_modes; import json; modes = digest_failure_modes(); print(json.dumps(modes, indent=2)) if modes else print('(no patterns — need more failures)')"
 
 # ============================================================================
 # TYPESCRIPT COMMANDS
@@ -144,6 +217,16 @@ ci: lint-all test-all
 	@echo ""
 	@echo "🌹 CI Pipeline Complete"
 	@echo "========================"
+
+# ============================================================================
+# OAI IMAGE RENDER (gpt-image-2 product photography)
+# ============================================================================
+
+render-dry: ## Plan + cost manifest, NO API. make render-dry SKUS=br-010,br-001 [STYLE=ghost,on-model] [ALL=1]
+	$(PYTHON) scripts/oai-render-run.py dry-run $(if $(ALL),--all,--skus $(SKUS)) $(if $(STYLE),--style $(STYLE),)
+
+render: ## GENERATE renders (PAID, gated by manifest + cap). make render SKUS=br-010,br-001 [STYLE=...] [ALL=1]
+	$(PYTHON) scripts/oai-render-run.py generate $(if $(ALL),--all,--skus $(SKUS)) $(if $(STYLE),--style $(STYLE),) --yes
 
 # ============================================================================
 # 3D COLLECTION DEMOS
@@ -206,3 +289,41 @@ docker-build:
 
 docker-run:
 	docker run -p 8000:8000 devskyy:latest
+
+# ============================================================================
+# CATALOG CONSISTENCY
+# ============================================================================
+
+.PHONY: validate-catalog sync-catalog sync-catalog-dry catalog-help
+
+validate-catalog:
+	@$(PYTHON) scripts/validate_catalog_consistency.py
+
+sync-catalog:
+	@$(PYTHON) scripts/sync_catalog_downstream.py
+
+sync-catalog-dry:
+	@$(PYTHON) scripts/sync_catalog_downstream.py --dry-run
+
+catalog-help:
+	@echo ""
+	@echo "  🌹 Catalog Consistency Commands"
+	@echo "  ================================"
+	@echo ""
+	@echo "    make validate-catalog     Run all consistency checks (read-only, exit 1 on failure)"
+	@echo "    make sync-catalog-dry     Preview auto-fixes without writing any files"
+	@echo "    make sync-catalog         Apply auto-fixes (backs up changed files first)"
+	@echo "    make catalog-help         Show this help"
+	@echo ""
+	@echo "  Single check:  python scripts/validate_catalog_consistency.py --checks jersey_skus"
+	@echo "  All checks:    python scripts/validate_catalog_consistency.py --json"
+	@echo "  Pytest:        pytest skyyrose/elite_studio/tests/test_catalog_consistency.py -v"
+	@echo ""
+	@echo "  Auto-fix targets:"
+	@echo "    _JERSEY_SKUS in sku_resolver.py      (jersey garment_type_lock rows in CSV)"
+	@echo "    product-similarities.json             (remove stale/retired SKU refs)"
+	@echo "    logo-registry.json updated: field     (bump to today's date)"
+	@echo ""
+	@echo "  DOES NOT auto-edit:"
+	@echo "    data/dossiers/*.md  |  ProductCatalogTest.php  |  logo-registry.json content"
+	@echo ""

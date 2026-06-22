@@ -1,113 +1,277 @@
 <?php
 /**
  * Template Name: About
- * Impeccable Luxury Refinement
+ *
+ * Editorial scroll-cinema, streetwear-luxury register (KITH lookbook
+ * x Drake Related x FOG Eternal restraint).
+ *
+ * Sections: Hero (asymmetric metadata stack) -> Chapter I (Origin)
+ *           -> Mission Banner -> Chapter II (Collections grid)
+ *           -> Chapter III (Drop Calendar timeline) -> Oakland Manifesto
+ *           -> Chapter IV (Press Room newspaper).
+ *
+ * Content sources:
+ *   - knowledge-base/seed/press-features.md -> $press_features + $youtube_embed_id
+ *   - knowledge-base/seed/timeline.md       -> $timeline_milestones
+ *   - knowledge-base/seed/from-interview.md -> Oakland canon, brand voice
+ *   - .claude memory project_founder_voice.md -> founder bio voice register
+ *
+ * @package SkyyRose
+ * @since   1.3.0
  */
 
 defined( 'ABSPATH' ) || exit;
 get_header();
 
-// Hero Data
-$hero_img = get_theme_file_uri('assets/images/homepage-story-founder.webp');
+// wp_kses inline whitelist shared across partials.
+$allowed_inline = array(
+	'em'     => array(),
+	'strong' => array(),
+	'br'     => array(),
+);
+
+// Hero portrait (Skyy Rose). User-locked image — do not change file path
+// without explicit confirmation.
+$hero_img = get_theme_file_uri( 'assets/images/homepage-story-founder.webp' );
+
+// Hero metadata stack (KITH-style lookbook header).
+$hero_meta = array(
+	array(
+		'key' => 'Founded',
+		'val' => '2020',
+	),
+	array(
+		'key' => 'City',
+		'val' => 'Oakland, CA',
+	),
+	array(
+		'key' => 'Audience',
+		'val' => 'Gender Neutral',
+	),
+	array(
+		'key' => 'Chapters',
+		'val' => '4 Collections',
+	),
+);
+
+// Chapter I — origin paragraphs.
+// Quote: verbatim from collection-stories.md § Signature — The founding moment.
+$origin_quote      = '"I drew the first rose on a night I couldn\'t afford dinner. Broke, a baby on the way, every manufacturer I\'d worked with had scammed me. But I sat there sketching that script logo until 4 AM because something in me knew — if I could get this right, everything changes. Signature is that night made permanent."';
+$origin_cite       = 'Corey Foster — Founder & CEO';
+$origin_paragraphs = array(
+	'SkyyRose was never just a clothing brand. It was a promise &mdash; born in Deep East Oakland, forged by a single father who refused to let his circumstances write his daughter\'s story. <strong>Corey Foster</strong> named the brand after his reason for everything: his daughter, <strong>Skyy Rose</strong>.',
+	'The rebrand is the full realization of that promise. Four collections, each with its own world, its own story, its own identity &mdash; unified under one crown. Oakland-born luxury streetwear that doesn\'t apologize for where it came from. It <strong>celebrates</strong> it.',
+	'Fashion was always self-expression. Growing up in Oakland\'s toughest neighborhoods, what you wore said everything &mdash; who you were, where you were going, what you refused to accept. SkyyRose carries that energy into every thread, every stitch, every rose.',
+);
+
+// Chapter III — canonical timeline (knowledge-base/seed/timeline.md).
+$timeline_milestones = array(
+	array(
+		'year'  => '2020',
+		'event' => 'The Beginning',
+		'desc'  => 'Single father in Deep East Oakland. Searching for something his daughter could wear. Nothing fit the eye. He made it himself. The brand carries her name.',
+	),
+	array(
+		'year'  => '2021',
+		'event' => 'Three Chapters Drop',
+		'desc'  => 'Black Rose. Love Hurts. Signature. Three collections, one bloodline &mdash; not a launch, a declaration.',
+	),
+	array(
+		'year'  => '2023',
+		'event' => 'National Recognition',
+		'desc'  => 'Maxim names Corey Foster one of 14 game-changing entrepreneurs to watch. The work travels past the city limits.',
+	),
+	array(
+		'year'  => '2024',
+		'event' => 'The Year of Receipts',
+		'desc'  => 'San Francisco Post profile. Best Bay Area Clothing Line Award. CEO Weekly cover story. The Blox interview. Independent press confirms what Oakland already knew.',
+	),
+	array(
+		'year'  => '2026',
+		'event' => 'The Kids Capsule',
+		'desc'  => 'The fourth chapter. Same craftsmanship, smaller silhouettes. Passing the torch on the same terms that built the brand.',
+	),
+);
+
+// Oakland manifesto — neighborhoods/places. Brand canon (from-interview.md).
+$manifesto_places = array(
+	'Deep East',
+	'The Hills',
+	'Stone City',
+	'The 100s',
+	'Brookfield',
+	'Sobrante Park',
+	'Coliseum',
+	'Real Oakland',
+	'The Shows',
+	'Sequoyah Highlands',
+	'Lake Merritt',
+	'The 510',
+);
+
+$community_frame = 'The Town never asked permission to be itself. Neither did he. Lake Merritt at golden hour, the 510 humming under everything, Mac Dre on the speakers like a saint &mdash; that\'s the studio. The studio is also a laptop on a folding table at the airport lounge between shifts. Both things true. Both things the brand.';
+
+// Chapter IV — press features (knowledge-base/seed/press-features.md).
+$press_features = array(
+	array(
+		'src'      => 'Maxim',
+		'year'     => 'Feb 2023',
+		'headline' => '14 Game-Changing Entrepreneurs To Watch In 2023',
+		'excerpt'  => 'Corey Foster is an innovative entrepreneur and artist who has created a truly unique clothing line. The Skyy Rose Collection blends fashion with streetwear &mdash; high quality, beautiful, unique.',
+		'url'      => 'https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/',
+	),
+	array(
+		'src'      => 'San Francisco Post',
+		'year'     => 'Aug 2024',
+		'headline' => 'From Oakland\'s Streets to Fashion Heights',
+		'excerpt'  => 'A trailblazing gender-neutral clothing brand redefining fashion in the Bay Area and beyond. Established by Corey Foster, a single father with a dream &mdash; this Oakland-based brand embodies resilience and creativity.',
+		'url'      => 'https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/',
+	),
+	array(
+		'src'      => 'Best of Best Review',
+		'year'     => 'Aug 2024',
+		'headline' => 'Best Bay Area Clothing Line Award 2024',
+		'excerpt'  => 'The Skyy Rose Collection has been honored with the prestigious Best Bay Area Clothing Line Award 2024 &mdash; recognized for high-end, gender-neutral clothing that transcends age and gender boundaries.',
+		'url'      => 'https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024',
+	),
+	array(
+		'src'      => 'CEO Weekly',
+		'year'     => 'Oct 2024',
+		'headline' => 'The Unyielding Journey of a Single Father and Entrepreneur',
+		'excerpt'  => 'Despite numerous setbacks &mdash; failed website attempts, deceitful manufacturers &mdash; this indomitable spirit refused to be quenched. SkyyRose represents hope, hard work, and the relentless spirit of never giving up.',
+		'url'      => 'https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/',
+	),
+);
+
+// The Blox YouTube embed — verified via YouTube oEmbed 2026-05-13.
+$youtube_embed_id = 'Ja11W-g34Zo';
+
+// Arrow SVG for press "READ" affordance.
+$arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 1L13 5L9 9M13 5H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 ?>
 
 <main id="primary" class="site-main abt-page" role="main">
 
-	<!-- Hero -->
-	<section class="abt-hero">
-		<div class="abt-hero__img">
-			<img src="<?php echo esc_url($hero_img); ?>" alt="SkyyRose Origin" fetchpriority="high">
-		</div>
-		<div class="abt-hero__overlay"></div>
-		<div class="abt-hero__content">
-			<p class="abt-hero__eyebrow rv-blur-down">Oakland, California — Est. 2020</p>
-			<h1 class="abt-hero__title rv-clip-up">
-				<span>The Origin</span>
-				Luxury Grows<br>from Concrete.
-			</h1>
-			<p class="abt-hero__sub rv-blur">
-				Oakland-born luxury streetwear. Built by a father. Named after a daughter. Three collections, one bloodline — this is the birth of the rebrand.
-			</p>
-		</div>
-	</section>
-
-	<!-- Origin / Founder Story -->
-	<section class="abt-origin">
-		<div class="abt-origin__inner">
-			<div class="abt-origin__quote rv-clip-up">
-				<blockquote>“I didn’t start SkyyRose to be in fashion. I started it because my daughter deserved to see her father build something real — something that proved luxury doesn’t have to come from privilege. It can grow from concrete.”</blockquote>
-				<span class="abt-origin__cite">— Corey Foster, Founder & CEO</span>
+	<!-- Hero — Editorial Lookbook Header (asymmetric, no full-bleed bg) -->
+	<section class="abt-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose' ); ?>">
+		<div class="abt-hero__grid">
+			<div class="abt-hero__left">
+				<p class="abt-hero__doc rv-blur-down">
+					<span><?php esc_html_e( 'About', 'skyyrose' ); ?></span>
+					<span class="abt-hero__doc-sep" aria-hidden="true">/</span>
+					<span><?php esc_html_e( 'SR-001', 'skyyrose' ); ?></span>
+				</p>
+				<h1 class="abt-hero__title rv-clip-up">
+					<?php echo wp_kses( __( 'The<br>Story', 'skyyrose' ), $allowed_inline ); ?>
+				</h1>
+				<p class="abt-hero__tag rv-blur">
+					<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?>
+				</p>
+				<dl class="abt-hero__meta rv">
+					<?php foreach ( $hero_meta as $row ) : ?>
+						<div class="abt-hero__meta-row">
+							<dt><?php echo esc_html( $row['key'] ); ?></dt>
+							<dd><?php echo esc_html( $row['val'] ); ?></dd>
+						</div>
+					<?php endforeach; ?>
+				</dl>
 			</div>
-			<div class="abt-origin__prose rv-blur">
-				<p>SkyyRose was never just a clothing brand. It was a promise — born in Oakland, forged by a single father who refused to let his circumstances write his daughter's story. <strong>Corey Foster</strong> named the brand after his reason for everything: his daughter, <strong>Skyy Rose</strong>.</p>
-				<p>The rebrand is the full realization of that promise. Three collections, each with its own world, its own story, its own identity — unified under one crown. This is Oakland-born luxury streetwear that doesn't apologize for where it came from. It <strong>celebrates</strong> it.</p>
-				<p>Fashion was always self-expression for Corey. Growing up in Oakland's toughest neighborhoods, what you wore said everything — who you were, where you were going, what you refused to accept. SkyyRose carries that energy into every thread, every stitch, every rose.</p>
-				<p>This isn't a business strategy. It's a <strong>bloodline</strong>. The Hurts family name runs through every collection. A grandmother's legacy. A father's drive. A daughter's future. That's the foundation no competitor can replicate.</p>
-			</div>
-		</div>
-	</section>
-
-	<!-- 3D Collections Portals -->
-	<?php get_template_part('template-parts/about/collections-grid'); ?>
-
-	<!-- Timeline -->
-	<section class="abt-timeline">
-		<div class="abt-timeline__inner">
-			<div class="abt-col-header rv-clip-up">
-				<h2>The Blueprint</h2>
-				<p>From the streets to the runway.</p>
-			</div>
-			<div class="abt-timeline__grid">
-				<div class="abt-milestone rv-clip-up">
-					<div class="abt-milestone__year">2020</div>
-					<h3 class="abt-milestone__title">The Promise</h3>
-					<p class="abt-milestone__desc">With his daughter Skyy Rose on the way, Corey commits to building a brand that would support his family and inspire his community. The Skyy Rose Collection is born.</p>
-				</div>
-				<div class="abt-milestone rv-clip-up">
-					<div class="abt-milestone__year">2022</div>
-					<h3 class="abt-milestone__title">Three Worlds Emerge</h3>
-					<p class="abt-milestone__desc">The collection launches online. Three distinct collection identities crystallize: SIGNATURE, BLACK ROSE, and LOVE HURTS.</p>
-				</div>
-				<div class="abt-milestone rv-clip-up">
-					<div class="abt-milestone__year">2024</div>
-					<h3 class="abt-milestone__title">Award-Winning</h3>
-					<p class="abt-milestone__desc">Wins Best Oakland Clothing Line. Featured in San Francisco Post, CEO Weekly. The brand's story resonates nationally as proof that vision and fatherhood can coexist at the highest level.</p>
-				</div>
+			<div class="abt-hero__right">
+				<figure class="abt-hero__portrait">
+					<img src="<?php echo esc_url( $hero_img ); ?>"
+						alt="<?php esc_attr_e( 'SkyyRose origin portrait', 'skyyrose' ); ?>"
+						fetchpriority="high"
+						width="900" height="1125">
+					<figcaption class="abt-hero__portrait-cap" aria-hidden="true">
+						<?php esc_html_e( 'Skyy Rose &mdash; The Heir', 'skyyrose' ); ?>
+					</figcaption>
+				</figure>
 			</div>
 		</div>
-	</section>
-
-	<!-- Press -->
-	<section class="abt-press">
-		<div class="abt-col-header rv-clip-up">
-			<h2>Press</h2>
-		</div>
-		<div class="abt-press__grid">
-			<a href="https://www.maxim.com/" target="_blank" class="abt-press-card rv-clip-up">
-				<div class="abt-press-card__meta">
-					<span class="abt-press-card__src">Maxim</span>
-					<span>Feb 2023</span>
-				</div>
-				<h3 class="abt-press-card__title">“14 Game-Changing Entrepreneurs to Watch in 2023”</h3>
-				<p class="abt-press-card__desc">Maxim spotlighted Corey Foster alongside tech founders and multimillion-dollar CEOs as one of the year’s most compelling entrepreneurs.</p>
-				<span class="abt-press-card__link">Read Article →</span>
-			</a>
-			<a href="https://ceoweekly.com/" target="_blank" class="abt-press-card rv-clip-up">
-				<div class="abt-press-card__meta">
-					<span class="abt-press-card__src">CEO Weekly</span>
-					<span>Oct 2024</span>
-				</div>
-				<h3 class="abt-press-card__title">“The Unyielding Journey of a Single Father and Entrepreneur”</h3>
-				<p class="abt-press-card__desc">CEO Weekly profiled the full arc of Corey’s journey — from growing up in an environment where crime was the norm, to building a brand that embodies hope.</p>
-				<span class="abt-press-card__link">Read Article →</span>
-			</a>
+		<div class="abt-hero__scroll" aria-hidden="true">
+			<span><?php esc_html_e( 'Scroll', 'skyyrose' ); ?></span>
+			<span class="abt-hero__scroll-line"></span>
 		</div>
 	</section>
 
-	<!-- Mission -->
-	<section class="abt-mission rv-clip-up">
-		<h2>Luxury Grows<br>from Concrete.</h2>
-	</section>
+	<!-- Featured Video — The Blox interview (relocated above Chapter I) -->
+	<?php
+	get_template_part(
+		'template-parts/about/featured-video',
+		null,
+		array(
+			'youtube_embed_id' => $youtube_embed_id,
+		)
+	);
+	?>
+
+	<!-- Chapter I — The Rebrand -->
+	<?php
+	get_template_part(
+		'template-parts/about/chapter-origin',
+		null,
+		array(
+			'allowed_inline'    => $allowed_inline,
+			'origin_quote'      => $origin_quote,
+			'origin_cite'       => $origin_cite,
+			'origin_paragraphs' => $origin_paragraphs,
+		)
+	);
+	?>
+
+	<!-- Mission Banner -->
+	<?php
+	get_template_part(
+		'template-parts/about/mission',
+		null,
+		array(
+			'allowed_inline' => $allowed_inline,
+		)
+	);
+	?>
+
+	<!-- Chapter II — Collections Grid -->
+	<?php get_template_part( 'template-parts/about/collections-grid' ); ?>
+
+	<!-- Chapter III — Drop Calendar Timeline -->
+	<?php
+	get_template_part(
+		'template-parts/about/timeline',
+		null,
+		array(
+			'allowed_inline'      => $allowed_inline,
+			'timeline_milestones' => $timeline_milestones,
+		)
+	);
+	?>
+
+	<!-- Oakland Manifesto -->
+	<?php
+	get_template_part(
+		'template-parts/about/community',
+		null,
+		array(
+			'allowed_inline'   => $allowed_inline,
+			'manifesto_places' => $manifesto_places,
+			'frame_text'       => $community_frame,
+			'customer_photos'  => array(),
+		)
+	);
+	?>
+
+	<!-- Chapter IV — Press Room -->
+	<?php
+	get_template_part(
+		'template-parts/about/press-section',
+		null,
+		array(
+			'allowed_inline'   => $allowed_inline,
+			'youtube_embed_id' => '', // Relocated to featured-video partial below the hero; press grid keeps the Blox poster.
+			'press_features'   => $press_features,
+			'arrow_svg'        => $arrow_svg,
+		)
+	);
+	?>
 
 </main>
 

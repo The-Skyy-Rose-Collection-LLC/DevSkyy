@@ -2,7 +2,6 @@
 sku: sg-011
 name: Original Label Tee (White)
 collection: signature
-logo_reference: data/brand-logos/sr-monogram.md
 ---
 
 <!--
@@ -17,28 +16,28 @@ Authored from canonical product specification. Two-eyes review: Corey confirms e
 
 ## Branding — exactly what IS on this product
 
-> The SR monogram art is defined in `data/brand-logos/sr-monogram.md` and is identical across all products that reference it. Do NOT inline the monogram's visual description here — only the technique, region, dimensions, color/colorway, and any product-specific application notes.
+> **Founder-confirmed (2026-06-16): there are NO logos at all on the Original Label Tees.** No SR monogram, no chest mark, no sleeve badge, no print, no embroidery. The garment is a BLANK white tee whose only branding is the interior woven neck label (the "original label" the product is named for). A prior dossier revision invented a front-left-chest SR monogram — that mark does NOT exist on the product and must never be rendered.
 
 ### Front
-- **front-left-chest** (~1.5in wide × ~1.5in tall): SR monogram (see logo_reference). Small, minimal placement. **Technique:** embroidered. **Color/Colorway:** white thread on white fabric — tonal, only visible under directional light where thread texture catches.
+- **front-body**: Completely blank white fabric. No monogram, no graphic, no print, no embroidery. Clean tee front.
 
 ### Sleeves / Collar / Hem / Other
-- **collar-inside** (back neck, ~1.5in wide × ~0.5in tall): SkyyRose woven brand label. **Technique:** woven-label. **Color/Colorway:** white/silver label with woven brand text on white ground.
+- **collar-inside** (back neck, ~1.5in wide × ~0.5in tall): SkyyRose woven brand neck label, interior only — not visible from outside when worn. **Technique:** woven-label. **Color/Colorway:** white/silver label with woven brand text on white ground.
+- **sleeves**: Plain short sleeves — no badge, no patch, no print.
 
 ## Negative — what is NOT on this product (DO NOT render)
 
+- NO front-chest SR monogram — a prior dossier invented this; it does NOT exist. The front is BLANK.
+- NO sleeve badge, woven patch, or sewn logo of any kind — the source photo's apparent "sleeve badge" was a retail HANG TAG, not garment branding.
+- NO logo, graphic, monogram, or mark anywhere on the exterior — front, back, sleeves all blank white.
 - No back graphics of any kind — back is completely plain white fabric.
-- No chest graphics larger than 2 inches — the only front decoration is the small left-chest SR monogram.
 - No sleeve printing, embroidery, or decoration of any kind.
-- No embossed or debossed relief on the chest — the technique is embroidery, not tonal impression.
-- No contrasting colored thread — the front-left-chest embroidery is white-on-white tonal, not gold, black, or rose-gold.
 - No graphic fills, no printed rose illustrations, no screen-printed text anywhere on the body.
-- No front-right-chest decoration — the SR monogram is left-chest only.
-- No puff-print, heat-transfer, or vinyl decoration.
-- No visible label on the outside of the garment — only inside back collar.
-- No large center-chest logo — this is a minimal label tee, not a graphic tee.
+- No embossed/debossed relief, no puff-print, heat-transfer, or vinyl decoration.
+- No visible label on the outside of the garment — only the inside back-collar woven neck label.
+- No hang tags rendered as garment branding.
 
 ## Scene direction (optional — feeds the RAS prompt)
 
 - **Pose:** Standing facing forward, slight three-quarter angle, relaxed arms at sides.
-- **Setting:** Clean white studio backdrop, soft diffused lighting to reveal the subtle white-on-white thread texture of the left-chest monogram. Minimal shadow.
+- **Setting:** Clean white studio backdrop, soft diffused lighting on a pure blank white tee. Minimal shadow. No logo to highlight — the garment reads as a minimal blank white tee.

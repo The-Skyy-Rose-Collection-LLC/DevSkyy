@@ -1,0 +1,12 @@
+{
+  "sku": "br-004",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The rendered logo is not the correct Black Rose logo as specified; it shows an altered design. The logo placement is correct, but the identity and color do not match the ground truth specifications."
+}

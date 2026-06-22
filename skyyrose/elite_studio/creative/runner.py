@@ -44,10 +44,11 @@ def run_creative(
     )
 
     try:
+        from .._observability import langfuse_config
         from .router import get_creative_graph
 
         graph = get_creative_graph()
-        final_state = graph.invoke(initial_state)
+        final_state = graph.invoke(initial_state, config=langfuse_config())
         return dict(final_state)
     except Exception as exc:
         logger.exception("run_creative failed for intent=%s sku=%s: %s", intent, sku, exc)
@@ -86,8 +87,10 @@ async def arun_creative(
     config = {"configurable": {"thread_id": operation_id}}
 
     try:
+        from .._observability import langfuse_config
+
         graph = await get_creative_graph_async()
-        final_state = await graph.ainvoke(initial_state, config=config)
+        final_state = await graph.ainvoke(initial_state, config=langfuse_config(config))
         return dict(final_state)
     except Exception as exc:
         logger.exception("arun_creative failed for intent=%s sku=%s: %s", intent, sku, exc)
@@ -114,10 +117,12 @@ async def resume_creative(operation_id: str) -> dict:
     config = {"configurable": {"thread_id": operation_id}}
 
     try:
+        from .._observability import langfuse_config
+
         graph = await get_creative_graph_async()
         # Passing None tells LangGraph to resume from the last checkpoint
         # under this thread_id without any new input.
-        final_state = await graph.ainvoke(None, config=config)
+        final_state = await graph.ainvoke(None, config=langfuse_config(config))
         return dict(final_state)
     except Exception as exc:
         logger.exception("resume_creative failed for operation_id=%s: %s", operation_id, exc)

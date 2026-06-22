@@ -540,30 +540,15 @@ class ImageIngestionService:
         Returns:
             Processing job ID
         """
-        job_id = str(uuid.uuid4())
-
-        # TODO: Integrate with actual ProcessingQueue
-        # await processing_queue.submit_job(
-        #     job_id=job_id,
-        #     asset_id=asset_id,
-        #     r2_key=r2_key,
-        #     source=source.value,
-        #     product_id=product_id,
-        #     woocommerce_product_id=woocommerce_product_id,
-        #     metadata=metadata,
-        #     callback_url=callback_url,
-        # )
-
-        logger.info(
-            f"Queued job {job_id} for processing",
-            extra={
-                "asset_id": asset_id,
-                "source": source.value,
-                "correlation_id": correlation_id,
-            },
+        # P1 #11: ProcessingQueue integration is not implemented. Returning a
+        # job_id without submission silently dropped every queued asset. Raise
+        # so callers either wire the queue or make an explicit fallback.
+        raise NotImplementedError(
+            "ProcessingQueue integration is not yet wired. _queue_for_processing "
+            "previously generated a uuid and logged it without submitting any work, "
+            "silently losing every ingested asset. Wire to the real processing queue "
+            "or remove this call from ingest_*() entry points before relying on it."
         )
-
-        return job_id
 
     async def ingest_batch(
         self,

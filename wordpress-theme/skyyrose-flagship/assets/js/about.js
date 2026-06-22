@@ -69,7 +69,7 @@
 	function initHeroParallax() {
 		if (prefersReducedMotion) return;
 
-		var heroImg = document.querySelector('.abt-hero__img img');
+		var heroImg = document.querySelector('.abt-hero__portrait img');
 		if (!heroImg) return;
 
 		var ticking = false;

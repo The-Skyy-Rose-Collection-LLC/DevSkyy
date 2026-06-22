@@ -363,9 +363,15 @@ class TestDashboardCache:
         assert result == test_data
 
     @pytest.mark.asyncio
-    async def test_cache_expiry(self) -> None:
-        """Test that cached values expire."""
+    async def test_cache_expiry(self, monkeypatch) -> None:
+        """Test that cached values expire (in-memory path, no Redis)."""
         cache = DashboardCache()
+
+        # Disable Redis so we exercise only in-memory TTL logic.
+        async def _no_redis():
+            return None
+
+        monkeypatch.setattr(cache, "_get_redis", _no_redis)
         test_data = {"status": "healthy"}
 
         # Set with very short TTL

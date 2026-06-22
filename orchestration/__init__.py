@@ -135,6 +135,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "InsightCategory": ("orchestration.brand_learning", "InsightCategory"),
     "InsightConfidence": ("orchestration.brand_learning", "InsightConfidence"),
     "SignalType": ("orchestration.brand_learning", "SignalType"),
+    # Orchestration Mode (standing-consent fan-out loop)
+    "ModeAgent": ("orchestration.orchestration_mode", "ModeAgent"),
+    "ModeConfig": ("orchestration.orchestration_mode", "ModeConfig"),
+    "ReminderTransport": ("orchestration.orchestration_mode", "ReminderTransport"),
 }
 
 __all__ = list(_LAZY_IMPORTS.keys())

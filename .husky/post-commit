@@ -1,2 +1,62 @@
-command -v git-lfs >/dev/null 2>&1 || exit 0
-git lfs post-commit "$@"
+#!/usr/bin/env sh
+# post-commit hook: LFS + auto-regen of anatomy and Phase E manifest.
+#
+# Anatomy and manifest are kept in sync with `main` and `origin/main` ONLY.
+# On commits made to any other branch, the regen step is skipped — the
+# canonical state must come from main, not from a feature-branch's view.
+#
+# Regen output lands in the working tree as uncommitted changes. The next
+# commit on main picks them up. This avoids amending the just-made commit
+# (which would mutate the SHA you just pushed/shared).
+
+# --- 1. LFS passthrough (preserves prior behavior) ----------------------------
+if command -v git-lfs >/dev/null 2>&1; then
+  git lfs post-commit "$@"
+fi
+
+# --- 2. Auto-regen on main only ----------------------------------------------
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+[ -z "$REPO_ROOT" ] && exit 0
+
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+if [ "$BRANCH" != "main" ]; then
+  exit 0
+fi
+
+# Skip during rebase / cherry-pick / merge to avoid stuttering regens.
+if [ -d "$REPO_ROOT/.git/rebase-merge" ] || \
+   [ -d "$REPO_ROOT/.git/rebase-apply" ] || \
+   [ -f "$REPO_ROOT/.git/CHERRY_PICK_HEAD" ] || \
+   [ -f "$REPO_ROOT/.git/MERGE_HEAD" ]; then
+  exit 0
+fi
+
+cd "$REPO_ROOT" || exit 0
+
+# Regen anatomy.md scoped to main ∪ origin/main.
+if [ -x scripts/regen_anatomy_from_main.sh ]; then
+  bash scripts/regen_anatomy_from_main.sh >/dev/null 2>&1 || \
+    echo "post-commit: anatomy regen failed (non-blocking)" >&2
+fi
+
+# Regen the Phase E manifest auto-region.
+if [ -f scripts/regen_phase_e_manifest_auto.py ]; then
+  python3 scripts/regen_phase_e_manifest_auto.py >/dev/null 2>&1 || \
+    echo "post-commit: phase-e manifest regen failed (non-blocking)" >&2
+fi
+
+# Report drift so the user knows to stage + commit the regen output.
+#
+# Ignore the openwolf `Last scanned: <ISO>` timestamp line — it rewrites
+# on every scan and used to drive an infinite drift-commit loop. Real
+# content drift (file count, structural anatomy changes, phase-e manifest
+# updates) still surfaces normally. `regen_anatomy_from_main.sh` already
+# reverts timestamp-only drift; this `-I` filter is a second line of
+# defense in case the regen script is skipped or its revert fails.
+ANATOMY_TIMESTAMP_RE='^> Auto-maintained by OpenWolf\. Last scanned:'
+if ! git diff --quiet -I "$ANATOMY_TIMESTAMP_RE" -- .wolf/anatomy.md tasks/phase-e-manifest.md 2>/dev/null; then
+  echo "post-commit: anatomy / phase-e manifest were regenerated and now differ from HEAD."
+  echo "post-commit: run \`git add .wolf/anatomy.md tasks/phase-e-manifest.md && git commit -m 'chore: refresh auto-managed indexes'\` to publish."
+fi
+
+exit 0

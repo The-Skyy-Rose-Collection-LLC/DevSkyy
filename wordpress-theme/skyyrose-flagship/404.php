@@ -33,12 +33,12 @@ $skyyrose_quick_links = array(
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>',
 	),
 	array(
-		'label' => __( 'Contact Us', 'skyyrose' ),
+		'label' => __( 'Reach Out', 'skyyrose' ),
 		'path'  => '/contact/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
 	),
 	array(
-		'label' => __( 'About Us', 'skyyrose' ),
+		'label' => __( 'The Origin', 'skyyrose' ),
 		'path'  => '/about/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
 	),
@@ -85,8 +85,16 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Static fallback when WooCommerce is inactive or no products found.
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	// Only published products — br-001, br-007, and lh-004 are drafts.
-	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-002' );
+	// First four published products from the canonical catalog — no hardcoded SKU list.
+	$skyyrose_404_skus = array();
+	foreach ( skyyrose_get_product_catalog() as $skyyrose_404_candidate ) {
+		if ( ! empty( $skyyrose_404_candidate['published'] ) ) {
+			$skyyrose_404_skus[] = $skyyrose_404_candidate['sku'];
+			if ( count( $skyyrose_404_skus ) >= 4 ) {
+				break;
+			}
+		}
+	}
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
 		if ( $skyyrose_404_product ) {
@@ -131,23 +139,23 @@ if ( empty( $skyyrose_trending_products ) ) {
 		<!-- ============================
 			404 Display Number
 			============================ -->
-		<h1 class="error-404-number" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose' ); ?>">
+		<h1 class="error-404-number rv-clip-up" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose' ); ?>">
 			404
 		</h1>
 
 		<!-- ============================
 			Enhanced Message
 			============================ -->
-		<h2 class="error-404-title">
-			<?php esc_html_e( 'Lost in Style', 'skyyrose' ); ?>
+		<h2 class="error-404-title rv-clip-left">
+			<?php esc_html_e( 'Not Here.', 'skyyrose' ); ?>
 		</h2>
 
-		<p class="error-404-subtitle">
-			<?php esc_html_e( 'The page you\'re looking for has wandered off the runway', 'skyyrose' ); ?>
+		<p class="error-404-subtitle rv-blur">
+			<?php esc_html_e( 'That page doesn\'t exist. Oakland taught us to keep moving.', 'skyyrose' ); ?>
 		</p>
 
 		<p class="error-404-witty">
-			<?php esc_html_e( 'Even our best pieces go off-grid sometimes', 'skyyrose' ); ?>
+			<?php esc_html_e( 'The concrete\'s still here. So are the collections.', 'skyyrose' ); ?>
 		</p>
 
 		<!-- ============================
@@ -197,7 +205,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				?>
 				<img
 					src="<?php echo esc_url( $skyyrose_mascot_display ); ?>"
-					alt="<?php esc_attr_e( 'SkyyRose mascot looking lost — Oops! This page wandered off.', 'skyyrose' ); ?>"
+					alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot.', 'skyyrose' ); ?>"
 					class="error-404-mascot__image"
 					width="200"
 					height="250"
@@ -210,7 +218,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				</div>
 			<?php endif; ?>
 			<p class="error-404-mascot__speech">
-				<?php esc_html_e( "Oops! Even I can't find this page. Let's explore something amazing instead!", 'skyyrose' ); ?>
+				<?php esc_html_e( 'Nothing here. The shop still has you covered.', 'skyyrose' ); ?>
 			</p>
 		</div>
 
@@ -249,7 +257,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 					?>
 					<a href="<?php echo esc_url( $skyyrose_link ); ?>"
 						class="error-404-card"
-						style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
+						data-collection="<?php echo esc_attr( $skyyrose_collection['slug'] ); ?>">
 						<span class="error-404-card-border" aria-hidden="true"></span>
 						<span class="error-404-card-label">
 							<?php echo esc_html( $skyyrose_collection['label'] ); ?>
@@ -349,7 +357,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				<?php esc_html_e( 'While you\'re here, join the family', 'skyyrose' ); ?>
 			</h3>
 			<p class="error-404-newsletter-text">
-				<?php esc_html_e( 'Be the first to know about drops, exclusives, and events.', 'skyyrose' ); ?>
+				<?php esc_html_e( 'Be the first to know about drops, new arrivals, and events.', 'skyyrose' ); ?>
 			</p>
 			<form class="error-404-newsletter-form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose' ); ?>" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post">
 				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
@@ -375,11 +383,11 @@ if ( empty( $skyyrose_trending_products ) ) {
 		<!-- ============================
 			Dual CTA Buttons
 			============================ -->
-		<div class="error-404-cta-group">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="error-404-cta error-404-cta--primary">
+		<div class="error-404-cta-group stagger-grid">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="error-404-cta error-404-cta--primary magnetic btn-sweep">
 				<?php esc_html_e( 'Return Home', 'skyyrose' ); ?>
 			</a>
-			<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="error-404-cta error-404-cta--secondary">
+			<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="error-404-cta error-404-cta--secondary magnetic btn-border-draw">
 				<?php esc_html_e( 'Continue Shopping', 'skyyrose' ); ?>
 			</a>
 		</div>

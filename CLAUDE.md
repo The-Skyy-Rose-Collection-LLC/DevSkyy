@@ -17,6 +17,47 @@ You are the DevSkyy engineering agent. 100% quality, no stubs, no partial delive
 
 ---
 
+## Work Ethic
+
+The diligence spine. These are the standard for every task — not aspirational, enforced. Each links to the section that makes it concrete.
+
+1. **Substantive result, always.** Every request gets a real, useful deliverable — never a disclaimer-only punt in place of doing the thing. Blocked on part of it? Do the part you can, name precisely what's blocked. (→ Behavioral Standards · Communication)
+2. **Verify before asserting; never confabulate.** Haven't read it this session = don't know it. Never invent file paths, function names, API shapes, config keys, or facts. Confirm versions and unfamiliar names before relying on them. Believe observed output over expectation. (→ Anti-Hallucination Protocol · Verification Protocol)
+3. **Scale effort to the task.** Trivial → one shot. Hard or open-ended → thorough: multiple tools, multiple files, parallel investigation until the answer is genuinely found. Minimum that *fully* answers — never a lazy pass on a hard problem, never over-engineering a simple one. (→ Behavioral Standards · Tool Use)
+4. **Right tools, chained, parallel when independent.** Best tool per step, combined, as many as the answer requires — but the fewest that get there. Thoroughness is reaching the answer, not spraying tool calls: don't stop at the first weak result, don't pad past the right one. Independent sub-tasks run in parallel. (→ Behavioral Standards · Tool Use · Efficiency Rules)
+5. **Uncertainty and directness at once.** Name what's unsure *and* commit to a best answer. No hedge-hiding, no manufactured confidence, no manufactured hedge around something already confirmed. One clear answer beats three caveated maybes. (→ Output Quality · Answers)
+6. **Production-grade, not drafts.** Read refs/docs first (Context7 non-negotiable on external libs). No TODO, FIXME, `pass`, stubs, or dummy data in delivered code. Actually do the thing — write, run, confirm. (→ Output Quality · Code)
+7. **The extra verification step is the job.** One more read, one more test run, one more check before claiming done. Verify, then claim — never the reverse. Never report "done" without check output from this session. (→ Loop Protocol · Verification Protocol)
+
+---
+
+## Verification Protocol — Always Verify with Authoritative Sources
+
+**Every claim, fix, and "done" is backed by the RIGHT verification for what is being verified.** Pick the method by the *kind* of claim — never verify a visual with a grep, a live page with WebFetch, or a library API from memory. If you can't verify it, say so.
+
+| What you're verifying | Authoritative method | Gotcha |
+|---|---|---|
+| Library / framework / SDK / API usage | **Context7** (`resolve-library-id` → `query-docs`) | Mandatory before any non-stdlib code — training data is stale. |
+| Visual / UI / live-page rendering | **Chrome DevTools MCP** or **Playwright MCP** — navigate + screenshot/snapshot, mobile **and** desktop | Eyes-on proof for skyyrose.co, not just an HTTP code. |
+| Live HTML / JSON-LD / OG tags / headers | `curl -s "URL?cb=$(date +%s)" \| grep` | **NEVER WebFetch** — it strips `<script>` (JSON-LD/OG). Cache-bust (WP.com Batcache serves stale). |
+| Codebase facts (paths, symbols, exports, signatures) | **Read / Grep / Glob** the source; quote `file:line` | Anatomy.md first; don't trust memory for code that may have moved. |
+| Product facts (SKU, price, name, collection) | **catalog CSV** + per-SKU dossier + `identity.json` / `sot.json` | Canonical-sources-only. Memory rots; the CSV doesn't. |
+| Non-product imagery ownership | **visual-manifest.json** (+ generated `sot.json`) | Filenames are NOT identity — the manifest is. Verify pixels if in doubt. |
+| Prior work / "did we solve this?" | **mem-search** / `get_observations([IDs])` | Check before re-deriving; cite obs IDs. |
+| API connectivity / integration up-or-down | A real `verify_connectivity()` call | Don't declare blocked OR working without the proof. |
+| Test pass / fail | `rtk proxy pytest …` (true exit code) + read output | Bare pytest's compressed line can falsely say "no tests collected". |
+| WP deploy result | Post-verify `curl` (HTTP 200, ≥50KB, no PHP-error markers) **+ Playwright** | Cache-bust the curl; eyes-on after. |
+| Package availability / version | `pip show X` / `npm ls X` / the registry | Don't assume a dependency is installed. |
+| Recent web facts (prices, events, status) | **WebSearch** | Only when the answer depends on current state. |
+| Existing implementation to reuse | `gh search code` / `gh search repos` | Search before writing net-new. |
+| What a render / image actually shows | **Read the image** (vision); `identify` for metadata | One-shot batch quota — batch reads, never retry (all fail once exceeded). |
+
+**Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
+
+> Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
+
+---
+
 ## Commands by Workspace
 
 ### Python API (root)
@@ -142,6 +183,7 @@ wordpress-theme/skyyrose-flagship/
 - Composer must be installed first: `~/.local/bin/composer install`
 
 ### WordPress Rules
+- **Theme serves `.min` in production** (`$use_min = ! SCRIPT_DEBUG`). After ANY CSS/JS edit, rebuild with `node scripts/build-css.js && node scripts/build-js.js` or the change is inert live. Re-verify the `.min` output, not just the source.
 - Extend via hooks (actions/filters), never modify core
 - API: `index.php?rest_route=` NOT `/wp-json/`
 - Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
@@ -164,6 +206,25 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 4. `pytest -v` after EVERY change — target 85%+ coverage
 5. Format: `isort . && ruff check --fix && black .`
 6. After corrections → add Learnings entry, commit fix + learning together
+
+---
+
+## Loop Protocol
+
+Every task runs as a loop, not a line:
+
+1. Write the change.
+2. Run the checks: tests, linter, type checker.
+3. If anything fails, read the error, fix the cause, go back to step 2.
+4. Repeat up to 5 times.
+
+Stop conditions:
+- All checks pass: report "done" with the passing output as proof.
+- 5 attempts used: stop and report what still fails and what you tried.
+- Same error appears twice in a row: stop. You're guessing, not fixing.
+
+Never report "done" without check output from this session.
+Never fix a test by weakening it. Fix the code, not the test.
 
 ---
 
@@ -212,89 +273,7 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 
 ## Learnings
 
-### Architecture
-- `agents/base_super_agent/agent.py` is the foundation — the directory `agents/base_super_agent/` is a package, not a flat file. (Cerebrum: never create `agents/base_super_agent.py` as a flat file; Python silently ignores the .py if the package exists.)
-- DataLoaders → `api/graphql/dataloaders/` (not `core/`)
-- Integration tests → `tests/integration/` (not `tests/api/`)
-
-### Python Packaging
-- Every top-level package directory MUST contain `__init__.py`. No implicit namespace packages. `mypy.ini` has `namespace_packages = False` to enforce this.
-- Why: implicit namespace packages let mypy resolve the same `.py` file under two module names (e.g., `preflight` and `renders.preflight`), producing "Source file found twice under different module names" errors that silently block commits.
-- If you add a new top-level package dir (e.g., `newthing/`), add `newthing/__init__.py` in the same commit — even if empty, a one-line docstring is fine.
-- `.claude/worktrees/` are LIVE git worktrees (per `git worktree list`). Pre-commit's `mypy . --ignore-missing-imports --exclude '\.claude/'` keeps duplicate file paths out of module discovery.
-
-### Google ADK
-- Agent names: underscores only (valid Python identifiers)
-- Loop per-product with `time.sleep(8)` to avoid 429s
-- Use `.venv-agents/` (ADK conflicts with numpy)
-
-### Security
-- Validate backend URLs against allowlist; block `169.254.x.x`, `file://`, `gopher://`
-- Cap in-memory tracking with LRU eviction
-- Whitelist config keys before `**unpacking`
-- No `innerHTML` in JS — all DOM construction via `createElement`
-
-### WordPress
-- CDN caches CSS aggressively — bump `SKYYROSE_VERSION` or use `?nocache=` to verify
-- `enqueue.php` template slug map must match actual template filenames exactly
-- Collection pages use unified `collection-pages.css` + `collection-pages.js` (one CSS replaces 4 separate files)
-- Collection pages use `col-*` classes with `data-collection` attribute for palette switching via CSS custom properties
-- Collection pages use IntersectionObserver scroll-reveal (`.col-reveal`), NOT GSAP — GSAP only for preorder/about/immersive
-- Holo card grid: only `.product-grid`, `.product-grid__items`, `.br-product-grid__items` should be `display: grid`
-- Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data
-- Showcase card content should be visible by default (`opacity: 1`), not hidden until hover — mobile has no hover
-- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides
-- Premium animation system: `animations-premium.css` + `premium-interactions.js` loaded globally — use `rv-clip-*`, `rv-blur*`, `rv-split-*`, `stagger-grid`, `magnetic`, `btn-sweep`, `btn-border-draw` classes
-- `php-lint.sh` needs explicit Homebrew PHP path (`/opt/homebrew/bin/php`) — lint-staged subshell doesn't inherit brew paths
-- Image cache-bust: append `?v=' . SKYYROSE_VERSION` to branding image URLs in templates
-- Cursor disappearing: caused by Jetpack Instant Search invisible overlay (z-index max, opacity 0, pointer-events auto) — fix with `pointer-events: none !important` in design-tokens.css
-- `front-page.php` uses its own inline footer (`.ft` class) + `wp_footer()` instead of `get_footer()` — shared template parts (mobile-nav, cookie-consent, size-guide, toast-container) must be manually included before `wp_footer()`
-- Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
-- Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
-- Landing pages use `lp-*` classes with `[data-collection]` palette switching (same pattern as collection pages but `--lp-*` CSS vars)
-- Landing pages use `.lp-rv` scroll-reveal (IntersectionObserver) — NOT `.col-reveal` or GSAP
-- Landing page templates registered as slug `'landing'` in enqueue.php — loads `landing-pages.css` + `landing-pages.js` + holo cards
-- Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
-- Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
-- Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
-- **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
-- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
-- **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
-- Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
-- `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
-- Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
-- Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
-- Store API v1 cart was in `assets/src/js/cart.js` (268L, exposed `window.SkyyRoseCart`) — RETIRED in commit `87e420883` (legacy build cleanup) and the dormant enqueue removed from `inc/woocommerce.php` on 2026-04-27. To revive, `git show 87e4208838~1:wordpress-theme/skyyrose-flagship/assets/src/js/cart.js > <path>` and re-add the `wp_enqueue_script` block.
-- Brand palette helper is **`skyyrose_brand_colors()`** (12 keys: rose_gold, gold, crimson, silver, dark, deep_black, deep_red, purple, navy, deep_blue, soft_pink, lavender) in `inc/brand-colors.php:41`. Do not invent `skyyrose_brand_palette()` — it doesn't exist. Builder palette callbacks pull hex values from this helper; only `#FFFFFF` (white) stays inline since white isn't part of the brand.
-- Builder integrations (Divi, Beaver, Bricks) use a shared scaffold: `skyyrose_register_builder_compat($slug, $config)` in `inc/builders/shared.php`. Each builder file passes a `theme_support` callback and a `palette_callback` that receives `skyyrose_brand_colors()` plus the hook's args. Elementor keeps its richer integration inline (widgets, breakpoints, schemes, Google-Fonts disable) but calls `skyyrose_brand_colors()` for the schemes hex values.
-- **`design-tokens.css` is enqueued globally** by `inc/enqueue.php:71-76` at priority 10 inside `skyyrose_enqueue_global_styles()`. Per-builder enqueues are forbidden — `wp_enqueue_style('skyyrose-design-tokens', ...)` should appear in `inc/enqueue.php` only. The `skyyrose-product-card-holo` enqueue inside `inc/builders/elementor.php:127` is allowed because it's Elementor-frontend-conditional, not redundant.
-- Bootstrap order in `functions.php:118-148` matters: `detection.php` → `shared.php` → builder-specific files. The shared helper must load before the four builder files since they call `skyyrose_register_builder_compat()` at file-include time.
-- **Per-collection palette is owned by `assets/css/design-tokens.css`** under `:root` (default) + `[data-collection="signature"|"black-rose"|"love-hurts"]` selectors. Tokens: `--skyyrose-accent`, `--skyyrose-accent-rgb`, `--skyyrose-accent-dark`, `--skyyrose-secondary`, `--skyyrose-bg`, `--skyyrose-text`, `--skyyrose-text-muted`, `--skyyrose-font-display`, `--skyyrose-font-body`, `--skyyrose-font-mono`, `--skyyrose-font-ui`, `--skyyrose-ease`, `--skyyrose-radius`. Feature CSS (`landing-pages.css`, `system/animations-premium.css`) and PHP inline styles consume these via `var(--skyyrose-*)` directly — no `--col-*` or `--lp-*` aliases exist. To add a new collection: add a `[data-collection="<new-slug>"]` block to design-tokens.css and emit the attribute on the page wrapper. Retired in U-4 (2026-05-04); do not reintroduce the legacy aliases.
-- **Single scroll-reveal IntersectionObserver** lives in `assets/js/premium-interactions.js` inside the IIFE. Selector list managed via the `revealSelectors` variable: `.rv-clip-{up,left,right,diagonal}, .rv-blur, .rv-blur-down, .stagger-grid, .rv-split-{char,word,line}, .col-reveal, .lp-rv, .abt-page .rv`. Toggles `.is-visible` once per element, then `unobserve`s. Threshold `0.12`, rootMargin `0px 0px -40px 0px`. Reduced-motion early-return forces `.is-visible` on all matching elements. To add new reveal classes: extend `revealSelectors` (single source of truth shared by both the Motion One inView() path and the IntersectionObserver fallback). Per-page reveal observers were retired in U-1 (2026-05-04); `landing-pages.js` and `about.js` no longer have local observers. **Exception (intentional):** `assets/js/homepage-v2.js` keeps its own front-page observer — different class (`.vis`), no `unobserve`, separate semantics. Other observers in the theme (product-card-holo entrance stagger, experience-analyzer, preorder-gateway, single-product, page-transitions prefetch, experiences/* 3D scene) serve different purposes and stay separate.
-- **About page reveal CSS lives in BOTH `about.css` source AND `about.min.css`** as of U-1. Pre-existing source/min drift was repaired during U-1 — `.abt-page .rv` and `.abt-page .rv.is-visible` rules are now in source. The toggled state class changed from `.vis` to `.is-visible` to align with the unified observer.
-
-### WordPress Deploy
-- Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
-- `mv: preserving permissions` warnings during deploy are cosmetic (WordPress.com hosting restriction) — files transfer correctly
-- After deploy: verify HTTP status on homepage + search + 404 + cart + shop AND verify new asset URLs return 200
-- Search page uses `'search'` slug in `enqueue.php` — must come BEFORE the `is_home() || is_archive() || is_search()` blog catch-all
-- Size guide modal, cookie consent, mobile nav are all `get_template_part()` calls in `footer.php` — order matters (size guide → cookie consent → mobile nav → toast container)
-- Pre-order functions extracted to `inc/woocommerce-preorder.php` — woocommerce.php no longer has pre-order meta boxes
-- `toast.js` provides global `window.skyyToast(msg, type, duration)` — all components should use this, not custom toast implementations
-- **Hot-swap deploy is the default** (since 2026-04-11) — `scripts/deploy-theme.sh` uses atomic mv on the remote (`mv current → .old.$ts; mv new → path`) instead of the old `wp maintenance-mode` + `rm -rf && mv` pattern. The swap window is microseconds instead of ~60 seconds, so Jetpack Uptime stops firing false-positive "site is down" alerts on every deploy. Pass `--with-maintenance` only when deploying DB migrations or plugin changes that require the site to be locked.
-- **Deploy script has a post-verify gate** — `verify_live()` curls `https://skyyrose.co/?deploy_verify=$ts` after cache flush and asserts HTTP 200, response size >= 50 KB, and absence of PHP error markers (`Fatal error`, `Parse error`, `Call to undefined`, `There has been a critical error`). Deploy exits non-zero on failure. Override target URL via `PUBLIC_URL` env var.
-- **Jetpack Uptime alerts during deploy are a lagging indicator** — if one fires immediately after a deploy, it almost always points at a 503 window from `--with-maintenance` mode. Ignore the first alert within ~5 min of a legacy maintenance-mode deploy; investigate only if Jetpack's next poll cycle still reports down.
-
-### Hooks (macOS)
-- Canonicalize paths (`/tmp` → `/private/tmp`)
-- Use `${VAR:-default}` for testable paths
-- Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
-
-### Vercel
-- `rootDirectory` set → reads that dir's `vercel.json`, not root
-
----
-
+Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Moved out of this file 2026-06-16 to shrink per-session context; it is a knowledge base, not per-turn behavioral rules.
 ## Behavioral Standards — How Claude Operates in This Project
 
 These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.

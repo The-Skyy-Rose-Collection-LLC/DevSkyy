@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 
 from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
 
-CANONICAL_DIR = ROOT / "skyyrose" / "assets" / "images" / "source-products"
+CANONICAL_DIR = ROOT / "assets" / "products" / "source-photos"
 
 _MIN_DIM = 2048
 _VALID_ANGLES = {

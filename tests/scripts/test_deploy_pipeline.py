@@ -19,6 +19,12 @@ SCRIPT_PATH = PROJECT_ROOT / "scripts" / "deploy-pipeline.sh"
 def run_script(*args, env_overrides=None):
     """Run deploy-pipeline.sh with given arguments."""
     env = os.environ.copy()
+    # Isolate from real deploys: deploy-pipeline.sh invokes deploy-theme.sh,
+    # whose concurrency lock and log default to shared /tmp paths — an
+    # in-flight production deploy would otherwise fail these tests.
+    pid = os.getpid()
+    env.setdefault("DEPLOY_LOCK_FILE", f"/tmp/skyyrose-deploy-test-{pid}.lock")
+    env.setdefault("DEPLOY_LOG_FILE", f"/tmp/skyyrose-deploy-test-{pid}.log")
     if env_overrides:
         env.update(env_overrides)
     result = subprocess.run(

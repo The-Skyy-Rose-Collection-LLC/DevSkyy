@@ -82,26 +82,17 @@ $subject_options = array(
 	'other'             => __( 'Other', 'skyyrose' ),
 );
 
-// "How did you hear about us?" options.
-$referral_options = array(
-	''                => __( 'Please select', 'skyyrose' ),
-	'instagram'       => __( 'Instagram', 'skyyrose' ),
-	'tiktok'          => __( 'TikTok', 'skyyrose' ),
-	'twitter'         => __( 'Twitter / X', 'skyyrose' ),
-	'facebook'        => __( 'Facebook', 'skyyrose' ),
-	'youtube'         => __( 'YouTube', 'skyyrose' ),
-	'google-search'   => __( 'Google Search', 'skyyrose' ),
-	'friend-referral' => __( 'Friend or Family', 'skyyrose' ),
-	'press-article'   => __( 'Press / Article', 'skyyrose' ),
-	'event'           => __( 'Event or Pop-Up', 'skyyrose' ),
-	'other'           => __( 'Other', 'skyyrose' ),
-);
+// "What brought you to SkyyRose?" — placeholder + brand-voice options.
+// Keys + labels come from skyyrose_get_referral_options() in inc/ajax-handlers.php
+// so the form and the AJAX whitelist can never drift apart.
+$referral_options = array( '' => __( 'Pick one', 'skyyrose' ) )
+	+ skyyrose_get_referral_options();
 
 // FAQ items array for easy editing.
 $faq_items = array(
 	array(
 		'question' => __( 'How long does shipping take?', 'skyyrose' ),
-		'answer'   => __( 'Domestic orders ship within 1-2 business days. Standard shipping (5-7 business days) is free on orders over $150. Express (2-3 days) and overnight options are available at checkout. International orders typically take 7-14 business days depending on your location and customs processing times.', 'skyyrose' ),
+		'answer'   => __( 'Domestic orders ship within 1-2 business days. Standard shipping (5-7 business days) is $17, Express (2-3 days) is $22, and shipping is free on orders over $200. International orders typically take 7-14 business days depending on your location and customs processing times.', 'skyyrose' ),
 	),
 	array(
 		'question' => __( "What's your return policy?", 'skyyrose' ),
@@ -129,7 +120,7 @@ $faq_items = array(
 	),
 	array(
 		'question' => __( 'Are your products sustainable?', 'skyyrose' ),
-		'answer'   => __( 'Sustainability is at the heart of what we do. We use premium, ethically sourced materials including organic cotton, recycled polyester, and responsibly produced hardware. Our limited production runs minimize waste, and we partner with manufacturers who uphold fair labor practices. We are continuously working to reduce our environmental footprint through eco-friendly packaging and carbon-offset shipping options.', 'skyyrose' ),
+		'answer'   => __( 'Sustainability is at the heart of what we do. We use ethically sourced materials including organic cotton, recycled polyester, and responsibly produced hardware. Our limited production runs minimize waste, and we partner with manufacturers who uphold fair labor practices. We are continuously working to reduce our environmental footprint through eco-friendly packaging and carbon-offset shipping options.', 'skyyrose' ),
 	),
 	array(
 		'question' => __( 'Do you do collaborations?', 'skyyrose' ),
@@ -137,7 +128,7 @@ $faq_items = array(
 	),
 	array(
 		'question' => __( 'How can I join the SkyyRose community?', 'skyyrose' ),
-		'answer'   => __( 'There are many ways to be part of the SkyyRose family! Follow us on Instagram, TikTok, and Twitter @skyyrose for the latest drops, behind-the-scenes content, and styling inspiration. Sign up for our newsletter to get early access to new collections and exclusive member discounts. We also host pop-up events in Oakland and other cities throughout the year, so stay tuned for invitations.', 'skyyrose' ),
+		'answer'   => __( 'There are many ways to be part of the SkyyRose family! Follow us on Instagram, TikTok, and Twitter @skyyrose for the latest drops, behind-the-scenes content, and styling inspiration. Sign up for our newsletter to get early access to new collections and member-only drop alerts. We also host pop-up events in Oakland and other cities throughout the year, so stay tuned for invitations.', 'skyyrose' ),
 	),
 );
 ?>

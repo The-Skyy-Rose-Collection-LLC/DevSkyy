@@ -1,0 +1,2255 @@
+{
+  "_schema": "skyyrose-element-v1",
+  "_generated": "2026-06-13",
+  "_source_corpus": [
+    "scripts/oai_render/prompt.py",
+    "docs/brand/collection-stories.md",
+    "docs/brand/visual-references.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-crewneck.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-hoodie.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-sherpa-jacket.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-bomber-jacket.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/the-fannie.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/the-windbreaker-set.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/the-signature-beanie.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/mint-lavender-hoodie.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-white.md",
+    "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shirt.md"
+  ],
+  "element_count": 97,
+  "elements": [
+
+    {
+      "element_id": "common-presentation-ghost",
+      "prompt_fragment": "clean ghost-mannequin / invisible-form — the garment holds its 3D shape with NO visible person, no hanger, no mannequin. Exactly ONE garment — never a flat multi-panel technical diagram or multiple views in one frame.",
+      "grammatical_position": "presentation",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:PRESENTATIONS[ghost]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-presentation-on-model",
+      "prompt_fragment": "worn by a single full-body fashion model, natural confident pose, neutral expression, professional styling. Exactly ONE garment / one look — never a flat diagram or multiple views in one frame.",
+      "grammatical_position": "presentation",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:PRESENTATIONS[on-model]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-presentation-flatlay",
+      "prompt_fragment": "the single garment laid flat, top-down, neatly arranged on a seamless surface. Exactly ONE garment — never a multi-panel technical diagram.",
+      "grammatical_position": "presentation",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:PRESENTATIONS[flatlay]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-view-front",
+      "prompt_fragment": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "grammatical_position": "view",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:_VIEW_DIRECTIVES[front]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-view-back",
+      "prompt_fragment": "VIEW: render the BACK of the garment, rear-facing. Any FRONT tech-flat reference is construction-only — do NOT render a front view or a second panel; output a single BACK view.",
+      "grammatical_position": "view",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 9,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:_VIEW_DIRECTIVES[back]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-lighting-studio-soft",
+      "prompt_fragment": "soft, even studio light, gentle directional key, subtle natural drop shadow",
+      "grammatical_position": "lighting",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:_BASE_PROCEDURE[lighting]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-lighting-blue-hour-dramatic",
+      "prompt_fragment": "dramatic low light, blue-hour moody ambiance, roses in deep shadow, dark romantic luxury lighting",
+      "grammatical_position": "lighting",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[black-rose]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-lighting-candlelit-gothic",
+      "prompt_fragment": "candlelit gothic château interior, shadow-heavy, emotionally intense, ornate warm flame light",
+      "grammatical_position": "lighting",
+      "domain": "editorial",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[love-hurts]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-lighting-golden-hour",
+      "prompt_fragment": "golden hour warm sunlight, confident West-Coast street-luxury energy, effortless swag illumination",
+      "grammatical_position": "lighting",
+      "domain": "editorial",
+      "collection_tags": ["signature"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[signature]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-lighting-cinematic-warm",
+      "prompt_fragment": "warm cinematic light, opulent palace warmth, gold-and-velvet luminance, playful royal grandeur",
+      "grammatical_position": "lighting",
+      "domain": "editorial",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[kids-capsule]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-background-neutral-studio",
+      "prompt_fragment": "seamless, uncluttered neutral light-grey studio backdrop — no props, no text, no scene, no logos other than those physically on the garment. Clean product-card aesthetic.",
+      "grammatical_position": "background",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:GHOST_BACKGROUND",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-background-bay-bridge-blue-hour",
+      "prompt_fragment": "the Bay Bridge silhouetted behind, shot from the Oakland shore at blue hour, framed by a moody black-rose garden — dark romantic luxury, dramatic low light, roses in deep shadow",
+      "grammatical_position": "background",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[black-rose]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-background-gothic-chateau",
+      "prompt_fragment": "a darkly romantic Beauty-and-the-Beast setting seen from the Beast's point of view — a candlelit gothic château interior, ornate and brooding, shadow-heavy, emotionally intense",
+      "grammatical_position": "background",
+      "domain": "editorial",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[love-hurts]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-background-golden-gate-golden-hour",
+      "prompt_fragment": "the Golden Gate Bridge and Bay Area skyline at golden hour — confident West-Coast street-luxury energy, warm sunlight, effortless swag",
+      "grammatical_position": "background",
+      "domain": "editorial",
+      "collection_tags": ["signature"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[signature]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-background-throne-room",
+      "prompt_fragment": "a regal throne room, 'the heir to the throne' — opulent gold-and-velvet palace setting, playful young-royalty grandeur, warm cinematic light",
+      "grammatical_position": "background",
+      "domain": "editorial",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:COLLECTION_SCENES[kids-capsule]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-high-res-photorealistic",
+      "prompt_fragment": "ultra-high-resolution photorealistic product photography, fine fabric texture and thread detail visible, true-to-life color accuracy",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:_BASE_PROCEDURE[fidelity]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-embroidery-detail",
+      "prompt_fragment": "embroidery thread detail sharp and tactile, individual stitch rows visible, dimensional raised relief accurately captured",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 9,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-fabric-texture-visible",
+      "prompt_fragment": "fabric weave and surface texture faithful to source material — fleece pile visible, knit ribs defined, woven structure present",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 9,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-guardrails-standard",
+      "prompt_fragment": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics. BRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result. OUTPUT FORMAT: one single full-bleed photograph. No reference sheet. No multiple panels. No collage. No grid. No split-screen.",
+      "grammatical_position": "exclusion",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:NEGATIVE_GUARDRAILS",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-no-european-luxury",
+      "prompt_fragment": "DO NOT render European luxury fashion house aesthetics — no Bottega Veneta intrecciato weave, no Rick Owens drape-as-sculpture silhouettes, no Acne Studios minimalist-corporate palette, no Givenchy by Tisci rottweiler motifs, no 032c editorial coldness. West-Coast street-luxury only.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 9,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:locked-out",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-no-mannequin-seams",
+      "prompt_fragment": "DO NOT show mannequin form-seams, plastic shoulder joints, display stand hardware, or any visible mounting apparatus. Ghost form is invisible.",
+      "grammatical_position": "exclusion",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:PRESENTATIONS[ghost]",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-no-stock-photo-lighting",
+      "prompt_fragment": "DO NOT use stock-photo lighting: no ring flash catchlights, no white cyclorama blown-out corners, no flat shadowless beauty-dish product shot that reads generic e-commerce. Lighting must serve the collection's mood.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:locked-out",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-exclusion-no-pastels-cartoons",
+      "prompt_fragment": "DO NOT render pastel preppy colorways, cartoon graphic prints, children's costume aesthetics, or infantilizing silhouettes. Kids Capsule is scaled-down luxury, not a children's novelty brand.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 9,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:kids-capsule",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-exclusion-no-color-drift",
+      "prompt_fragment": "DO NOT introduce color outside the BLACK+WHITE+GREY palette on the crewneck. No warmth, no sepia, no color-shifted blacks. Palette is BLACK, WHITE, and neutral GREY only — no brown undertones, no navy.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 7,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:negatives",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-single-garment-only",
+      "prompt_fragment": "DO NOT render more than one garment, outfit, or model. ONE garment in ONE frame. No styling accessories unless specified in dossier. No background clothing racks or display items.",
+      "grammatical_position": "exclusion",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay", "product-card"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:NEGATIVE_GUARDRAILS",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-exclusion-no-color-on-hoodie",
+      "prompt_fragment": "DO NOT introduce color contrast elements on the black hoodie. Ribbing is TONAL BLACK — no white contrast ribbing, no silver trim. Completely monochrome silhouette.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:negatives",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-material-heavyweight-cotton-fleece",
+      "prompt_fragment": "heavyweight cotton fleece construction — thick, substantial hand feel visible in the drape, dense pile surface texture, structured ribbed trim at collar/cuffs/hem",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 7,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-material-satin-sherpa",
+      "prompt_fragment": "lustrous black satin exterior with high sheen and light-catching surface, plush black sherpa interior lining visible at collar and cuffs — dual-texture contrast between smooth shell and fluffy interior",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-sherpa-jacket.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-material-lightweight-nylon",
+      "prompt_fragment": "lightweight technical nylon shell — slight sheen, wind-resistant drape, smooth ripstop surface texture, packable weight visible in the hang",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 6,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-windbreaker-set.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-material-pu-faux-leather",
+      "prompt_fragment": "smooth black PU / faux-leather exterior — matte-to-satin sheen, clean stitched seams, structured body holds shape, hardware zipper and buckle details rendered in matte black",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-fannie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-material-ribbed-knit-beanie",
+      "prompt_fragment": "fine ribbed-knit construction — vertical rib channels clearly defined, cuffed hem folds neatly, knit density visible across the surface",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-signature-beanie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-material-cotton-jersey-tee",
+      "prompt_fragment": "100% cotton jersey crew-neck tee — medium weight, clean drape, flat seams, soft hand-feel conveyed through natural fabric fall",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature", "black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 7,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "original-label-tee-white.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-scene-armor-concrete",
+      "prompt_fragment": "Black Rose energy: armor worn for the life that required it, concrete answering back — the garment is a statement of survival, not performance. The model carries it like they already stood up.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:black-rose",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-scene-thorn-garden-night",
+      "prompt_fragment": "moody black-rose garden at night — thorned stems in silhouette, deep shadow pools, one bloom barely catching light. The scene holds grief and defiance simultaneously.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:black-rose",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-scene-beast-grief",
+      "prompt_fragment": "Love Hurts energy: grief worn as love — the model carries the weight of something that mattered. Not wounded performance, but someone who loved deeply and paid for it. 'They called me Beast. They were right.'",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:love-hurts",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-scene-heart-thorns",
+      "prompt_fragment": "heart-and-thorns emotional register — the beauty of the rose and the wound of the thorn coexist. Crimson blooms in deep purple shadow. Romanticism without sentimentality.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:love-hurts",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-scene-origin-blueprint",
+      "prompt_fragment": "Signature energy: origin as bedrock, not a backstory. The model wears it like a blueprint — not basics, not costume. Confidence drawn from where you started, not where you arrived. Bay Area as the starting point.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["signature"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:signature",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-scene-gold-script-west-coast",
+      "prompt_fragment": "gold-on-dark West Coast luxury — the SR script anchors the look like a signature on a document that already changed things. Warm Bay Area light, effortless authority, script anchor energy.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["signature"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:signature",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-scene-heir-legacy",
+      "prompt_fragment": "Kids Capsule energy: the heir, not a costume. Luxury runs in the family — scaled down but never dumbed down. The child model wears it with natural authority, not performance. Rose-gold legacy.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:kids-capsule",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-scene-young-royalty",
+      "prompt_fragment": "young royalty in a throne room — opulent setting at small scale, velvet and gold surrounding a child who belongs there. Playful grandeur without irony: the heir to the throne.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:kids-capsule",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-001-subject-crewneck-black",
+      "prompt_fragment": "heavyweight black cotton fleece pullover crewneck — WHITE ribbed neckband, WHITE ribbed cuffs, WHITE ribbed hem band providing strong contrast trim. Front-chest 3-rose-cluster embossed in RAISED RELIEF using BLACK+WHITE+GREY palette only. Back-neck SR monogram in gold thread, back-center panel completely clean.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-001-subject-rose-cluster-embossed",
+      "prompt_fragment": "3-rose-cluster at front-chest — EMBOSSED raised-relief carving effect, not embroidery. Three overlapping rose blooms with thorn detail, rendered in BLACK+WHITE+GREY palette only, approximately 4-5 inches wide. Dimensional depth visible — this is a relief, not a print.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-004-subject-hoodie-black-tonal",
+      "prompt_fragment": "heavyweight black cotton fleece pullover hoodie — TONAL BLACK ribbing at cuffs and waistband (no white contrast), single front kangaroo pocket, adjustable drawcord hood. Front-chest 3-rose-cluster embroidered. Back panel completely clean. Monochrome silhouette throughout.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-006-subject-sherpa-bomber-jacket",
+      "prompt_fragment": "black satin bomber-style jacket — lustrous exterior, plush black sherpa interior lining visible at collar roll and cuff inner edge. Zipper front with button-overlap storm flap. Black ribbed cuffs, black ribbed bomber waistband. Front-left-chest: white-thread rose embroidery ~3-4 inches. Back-center: large white-thread rose embroidery ~10 inches.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-sherpa-jacket.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-006-subject-large-back-rose",
+      "prompt_fragment": "large white-thread rose embroidery centered at back-yoke — approximately 10 inches tall, single rose bloom with stem and thorns, dense satin-stitch white thread against lustrous black satin exterior. This is the hero graphic of the back panel.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-sherpa-jacket.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-004-subject-bomber-jacket",
+      "prompt_fragment": "white body + black raglan sleeves + black hood button-front pullover bomber jacket. Front: 'Love' red cursive left-chest, 'Hurts' red cursive right-chest, both embroidered. Back: heart-and-thorns with red roses cluster, multi-color embroidery ~10-12 inches. Hood lining: red rose silhouettes sublimated on white interior. Cuffs and waistband: white+red+black alternating ribbed stripes.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-004-subject-split-word-chest",
+      "prompt_fragment": "'Love' in red cursive script at left-chest, 'Hurts' in matching red cursive script at right-chest — both words embroidered, split across the chest as a pair. Script is flowing, not block letters. Red thread, ~2.5-3 inches each.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-004-subject-back-heart-thorns",
+      "prompt_fragment": "heart-and-thorns graphic centered at back — multi-color embroidery featuring a heart wrapped in thorned rose stems, red rose blooms in cluster, approximately 10-12 inches tall. Colors: crimson red, deep green stems, black thorns. Center-back hero graphic.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-005-subject-fannie-fanny-pack",
+      "prompt_fragment": "black PU/faux-leather fanny pack — structured rectangular body with front zipper pocket, adjustable black nylon shoulder/waist strap with quick-release matte-black buckle. Front-center-bottom: 'FANNIE' in white cursive script embroidered plus small red rose embroidered beside it.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-fannie.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-015-subject-windbreaker-set",
+      "prompt_fragment": "white nylon windbreaker jacket + matching white nylon pants — worn as a coordinated set. Jacket: pink contrast hood, V-shape rainbow chevron (pink+green+lavender+yellow) at upper chest, large SR monogram at back yoke embroidered, rainbow stripe bands at cuffs. Pants: matching V-shape rainbow chevron at thighs, rainbow stripe at ankle cuffs and waistbands.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-windbreaker-set.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-015-subject-rainbow-chevron",
+      "prompt_fragment": "V-shape rainbow chevron graphic — pink, green, lavender, and yellow color bands arranged in downward-pointing V formation at upper chest. Colors vibrant, clean edge between bands, chevron spans full chest width. This same pattern appears on jacket chest and pants thighs.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-windbreaker-set.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-007-subject-black-beanie",
+      "prompt_fragment": "black ribbed-knit cuffed beanie — classic folded cuff silhouette, fine vertical rib channels across crown and cuff, matte black colorway throughout. Four variants exist by rose decoration placement on front cuff.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-signature-beanie.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-007-subject-beanie-single-red-rose",
+      "prompt_fragment": "single red rose embroidered on front cuff of the black ribbed-knit beanie — one bloom with short stem, red thread, approximately 1.5 inches, centered on the folded cuff panel.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-signature-beanie.md:variants",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-002-subject-colorblock-hoodie-purple",
+      "prompt_fragment": "lavender+medium-purple+deep-purple diagonal color-block pullover hoodie — left sleeve lavender, right sleeve medium purple (asymmetric), front-center diagonal color-block across chest. Front-left-chest: 'Authentic Collection' patch. Front-center: 3-rose-cluster greyscale graphic. Matching deep purple sweatpants.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "kids-colorblock-hoodie-set-purple-black.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-002-subject-asymmetric-sleeves",
+      "prompt_fragment": "asymmetric sleeve colorway — left sleeve is lavender, right sleeve is medium purple, creating intentional tonal mismatch. This is a design choice, not an error. Both sleeves are the same cut; only the color differs.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "kids-colorblock-hoodie-set-purple-black.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-006-subject-mint-lavender-zip-hoodie",
+      "prompt_fragment": "white zip-up hoodie with full center-front zipper — pink hood, V-chevron graphic (pink+green+lavender+yellow) at upper chest, small pink rose-cluster at front-center below chevron, SR monogram in dark grey at back-neck. Zipper pull visible at center.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "mint-lavender-hoodie.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-011-subject-white-tee-tonal-monogram",
+      "prompt_fragment": "white 100% cotton crew-neck tee — WHITE-ON-WHITE tonal SR monogram embroidery at front-left-chest, approximately 1.5 inches. The embroidery reads as texture and dimension, not color contrast — only visible under raking light. Back completely plain white.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "original-label-tee-white.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-002-subject-bridge-series-tee",
+      "prompt_fragment": "white cotton crew-neck tee — purple/violet rose-cluster sublimated at front-left-chest, approximately 3 inches, soft-edge graphic with petal detail. SR monogram at back-neck in dark grey/black embroidery thread.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-bridge-series-stay-golden-shirt.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-subject-sr-monogram-back-neck",
+      "prompt_fragment": "SR monogram in dark grey / black thread at back-neck — small scale, approximately 1 inch, centered just below the collar seam. This is the standard SkyyRose house signature placement.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature", "black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 8,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "original-label-tee-white.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-subject-sr-monogram-gold-back-neck",
+      "prompt_fragment": "SR monogram in GOLD thread at back-neck — small scale approximately 1 inch, centered below collar seam. Gold thread catches light subtly against dark backgrounds. Black Rose house signature in gold.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 7,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-004-subject-hood-lining-rose",
+      "prompt_fragment": "hood interior lining: red rose silhouettes sublimated on white fabric — the pattern is visible when the hood is open or slightly pulled back. Not visible when hood is closed and flat. The lining is a surprise detail, not a primary graphic.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-004-subject-striped-ribbing",
+      "prompt_fragment": "cuffs and waistband: alternating white+red+black ribbed stripe bands — three-color stripe runs around the full circumference of each cuff and waistband. Stripe width approximately equal. This is the primary color-pop detail on the jacket exterior.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-brand-alignment-kith",
+      "prompt_fragment": "monogram-led editorial composition — hero product occupies center frame, model presence is secondary to garment geometry. Campaign energy aligned with Kith: clean, brand-forward, deliberate spacing. Not fashion week; not streetwear chaos.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:kith",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-brand-alignment-oaklandish",
+      "prompt_fragment": "civic pride energy — worn by someone who belongs to a specific place, not a lifestyle category. Oaklandish 'For The Town' register: the garment represents origin, not aspiration. Real people, real place, real pride.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "signature"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:oaklandish",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-brand-alignment-fear-of-god",
+      "prompt_fragment": "cinematic desaturated register — Fear of God reference: sport DNA elevated to liturgical. Garment photographed like it has meaning. Muted palette, intentional frame, model as vessel not personality. The piece is the protagonist.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:fear-of-god",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-brand-alignment-palm-angels",
+      "prompt_fragment": "sport heritage motifs with embroidery close-up as hero shot — Palm Angels reference: the embroidered graphic earns a standalone close-crop frame. Texture and thread detail at macro scale shows craft. Embroidery IS the content.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:palm-angels",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-brand-alignment-culture-kings",
+      "prompt_fragment": "drop-density sport culture energy — Culture Kings reference: the garment is part of a specific cultural moment. Stack potential, mix-and-match visible. Worn with intention. Not a runway, a drop-day.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 5,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:culture-kings",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-scene-cinzel-restraint",
+      "prompt_fragment": "Cinzel restraint in the frame — no excess, no decoration outside the garment. Black Rose editorial energy: the absence of color IS the statement. Silence is luxury. The model holds still.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:black-rose",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-scene-ornate-brooding",
+      "prompt_fragment": "ornate and brooding frame — gothic architectural detail in soft focus behind the model, iron candlestick holders, stone wall texture, carved wood detail. The setting is the emotional context for the garment, not decoration.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 5,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:love-hurts",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-scene-bay-bridge-oakland-anchor",
+      "prompt_fragment": "Bay Bridge as Oakland anchor — the model shot from the Oakland shore, Bridge visible behind as civic reference. This is Oakland's bridge, Oakland's sky, Oakland's light. West-Coast authority rooted in a specific place.",
+      "grammatical_position": "scene",
+      "domain": "editorial",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 6,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:signature",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-no-hanger",
+      "prompt_fragment": "DO NOT show a hanger, hook, clothing rail, or any suspension hardware. The garment must appear supported by invisible form only — ghost mannequin or natural fabric drape.",
+      "grammatical_position": "exclusion",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:NEGATIVE_GUARDRAILS",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-exclusion-no-added-branding",
+      "prompt_fragment": "DO NOT invent logos, brand marks, or graphic elements not specified in the dossier. If the back panel shows no logo in reference, the back panel renders with NO logo. An added logo is a critical failure.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 10,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:NEGATIVE_GUARDRAILS",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-exclusion-no-gold-on-crewneck",
+      "prompt_fragment": "DO NOT apply gold color to any visible surface of the Black Rose crewneck front. The embossed rose cluster is BLACK+WHITE+GREY ONLY. Gold SR monogram exists only at back-neck — it must not appear on the front panel.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:negatives",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-015-exclusion-no-solo-jacket",
+      "prompt_fragment": "Windbreaker is a SET — jacket + pants together. DO NOT render the jacket as a solo standalone without the matching pants if photographing the full look. Pants and jacket are a coordinated unit.",
+      "grammatical_position": "exclusion",
+      "domain": "brand_canon",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-windbreaker-set.md:negatives",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-material-ribbed-trim-contrast-white",
+      "prompt_fragment": "ribbed trim at collar, cuffs, and hem — WHITE ribbed knit against a dark garment body, creating clean contrast banding. Rib channels vertical, trim width approximately 1.5-2 inches.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-crewneck.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-material-ribbed-trim-tonal-black",
+      "prompt_fragment": "tonal black ribbed trim at cuffs and waistband — same color family as garment body, rib channels defined by texture only (no color contrast). Monochrome silhouette maintained.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "love-hurts-material-raglan-construction",
+      "prompt_fragment": "raglan sleeve construction — sleeve panels extend to collar with no shoulder seam, creating a diagonal seam from underarm to neckline. White body panels contrast with black raglan sleeve panels at the seam line.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 4,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-sublimation-print",
+      "prompt_fragment": "sublimated print — color is dye-in-fabric, not sitting on top. Soft edges between colors, slight bleed at transition zones, fabric texture visible through the print. Not screenprint, not transfer — dyed into the weave.",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["love-hurts", "signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 6,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "love-hurts-bomber-jacket.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-white-on-white-tonal",
+      "prompt_fragment": "WHITE-ON-WHITE tonal embroidery — the mark reads as dimensional texture against the matching background, not as color contrast. Visible under directional light as raised relief; nearly invisible under flat light. Capture this subtlety accurately.",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "original-label-tee-white.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-view-front-clean-back",
+      "prompt_fragment": "FRONT VIEW: show front panel prominently. Back panel is NOT visible. The garment's clean back is a deliberate design feature — do not attempt to show back and front simultaneously.",
+      "grammatical_position": "view",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:negatives",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-view-three-quarter",
+      "prompt_fragment": "VIEW: 3/4 front angle — slight left or right rotation revealing garment depth and side seam without showing full back panel. Shoulder-to-hip dimensionality visible. Not a strict frontal; slight perspective adds volume.",
+      "grammatical_position": "view",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model"],
+      "reusability_score": 7,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "prompt_module",
+      "source_id": "prompt.py:_VIEW_DIRECTIVES",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-view-closeup-embroidery",
+      "prompt_fragment": "VIEW: close-crop detail shot of embroidered graphic — macro level, individual stitch rows visible, thread sheen captured, garment surface texture in context. This is a detail frame, not a full-garment frame.",
+      "grammatical_position": "view",
+      "domain": "editorial",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["editorial"],
+      "reusability_score": 7,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "visual-references.md:palm-angels",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "black-rose-subject-three-rose-cluster-embroidery",
+      "prompt_fragment": "3-rose-cluster embroidered at front-left-chest — three overlapping rose blooms with thorn-bearing stems, approximately 4 inches wide. Thread work is raised and dimensional. Monochrome: black, white, and grey thread only.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 4,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-subject-authentic-collection-patch",
+      "prompt_fragment": "'Authentic Collection' woven patch at front-left-chest — rectangular patch with border, text on face. Applied/sewn onto garment, not embroidered directly. Approximately 2 inches wide.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 4,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "kids-colorblock-hoodie-set-purple-black.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-subject-greyscale-rose-cluster",
+      "prompt_fragment": "3-rose-cluster graphic at front-center in greyscale — roses in grey tones (no color saturation), approximately 3-4 inches. Print or embroidery in neutral grey palette only, sitting below the chest on a colorblock hoodie.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "kids-colorblock-hoodie-set-purple-black.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-002-subject-purple-rose-sublimated",
+      "prompt_fragment": "purple/violet rose-cluster sublimated at front-left-chest — approximately 3 inches, soft dye-edge graphic with petal detail rendered in violet and purple hues. Dye-in-fabric feel, no raised surface. Single left-chest placement.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-bridge-series-stay-golden-shirt.md:branding",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-007-subject-beanie-purple-rose",
+      "prompt_fragment": "purple rose embroidered on front cuff of the black ribbed-knit beanie — one bloom in purple/violet thread, approximately 1.5 inches, centered on the folded cuff panel. Purple variant of the beanie.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-signature-beanie.md:variants",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-material-kangaroo-pocket",
+      "prompt_fragment": "front kangaroo pocket — pouch-style opening across lower front, seam-integrated, fabric continuous from front panel. Pocket opening horizontal, positioned below chest graphic. Present on pullover hoodies.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "kids-capsule"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 5,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-hoodie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "br-006-material-storm-flap",
+      "prompt_fragment": "zipper front with button-overlap storm flap — zipper pull visible along center, placket buttons closed over zipper to form double-layer weather seal. Both zipper teeth and button placket visible in correct layered position.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-sherpa-jacket.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "lh-005-material-quick-release-buckle",
+      "prompt_fragment": "adjustable nylon strap with matte-black quick-release buckle — press-and-pull mechanism, strap passes through bar-slide adjuster. Hardware is black, not silver. Clean functional strap with no padding.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["love-hurts"],
+      "mode_tags": ["ghost", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-fannie.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-background-gradient-dark-vignette",
+      "prompt_fragment": "subtle dark vignette at frame edges — center luminance higher, edges falling to near-black. Not a dramatic gradient; just a gentle light falloff that draws focus to the garment center. No visible background elements.",
+      "grammatical_position": "background",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts"],
+      "mode_tags": ["ghost", "product-card"],
+      "reusability_score": 6,
+      "collection_specificity": 1,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:black-rose",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "signature-background-warm-grey-studio",
+      "prompt_fragment": "warm grey studio backdrop — slightly warmer neutral than cold blue-grey, suggests California ambient. Clean and uncluttered, allows gold accent elements to read clearly. Product-card ready.",
+      "grammatical_position": "background",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "flatlay", "product-card"],
+      "reusability_score": 6,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:signature",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "kids-capsule-background-soft-warm-studio",
+      "prompt_fragment": "soft warm studio backdrop — creamy white to warm beige, gentle and inviting. Not bright white (too clinical), not dark (too serious for kids). Warm, welcoming, regal in a playful way.",
+      "grammatical_position": "background",
+      "domain": "render_pipeline",
+      "collection_tags": ["kids-capsule"],
+      "mode_tags": ["ghost", "flatlay", "product-card"],
+      "reusability_score": 6,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:kids-capsule",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-006-subject-pink-hood-zip-hoodie",
+      "prompt_fragment": "pink contrast hood on a white zip-up hoodie — hood panel is medium pink, all other panels white. Full center-front metal zipper, small pink rose-cluster embroidery at front-center chest, V-chevron rainbow graphic above it. Back-neck SR monogram dark grey.",
+      "grammatical_position": "subject",
+      "domain": "product",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 2,
+      "collection_specificity": 2,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "mint-lavender-hoodie.md",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-fidelity-zipper-hardware",
+      "prompt_fragment": "zipper hardware rendered accurately — metal teeth visible, pull tab detail present, teeth interlocked along closed track. YKK or equivalent quality. Matte black or nickel finish as specified per garment.",
+      "grammatical_position": "fidelity",
+      "domain": "render_pipeline",
+      "collection_tags": ["black-rose", "love-hurts", "signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 6,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "black-rose-sherpa-jacket.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "common-scene-luxury-grows-from-concrete",
+      "prompt_fragment": "Luxury Grows from Concrete — the brand's foundational energy. Not luxury as inherited privilege; luxury as what you build when the ground beneath you is hard. The garment is the proof.",
+      "grammatical_position": "scene",
+      "domain": "brand_canon",
+      "collection_tags": ["black-rose", "love-hurts", "signature", "kids-capsule"],
+      "mode_tags": ["on-model", "editorial"],
+      "reusability_score": 8,
+      "collection_specificity": 0,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "brand_doc",
+      "source_id": "collection-stories.md:brand-foundation",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    },
+
+    {
+      "element_id": "sg-015-material-rainbow-stripe-bands",
+      "prompt_fragment": "rainbow stripe bands at cuffs, waistbands, and ankle cuffs — pink, green, lavender, yellow stripes alternating in bands around the full circumference. Each stripe approximately equal width. Bright, saturated color pop against the white nylon body.",
+      "grammatical_position": "material",
+      "domain": "render_pipeline",
+      "collection_tags": ["signature"],
+      "mode_tags": ["ghost", "on-model", "flatlay"],
+      "reusability_score": 3,
+      "collection_specificity": 3,
+      "brand_alignment": 3,
+      "gpt_image2_compatibility": 3,
+      "brand_canon": {
+        "validated": true,
+        "violation_flags": []
+      },
+      "source_type": "dossier",
+      "source_id": "the-windbreaker-set.md:construction",
+      "added_date": "2026-06-13",
+      "version": 1,
+      "deprecated": false,
+      "superseded_by": null
+    }
+
+  ]
+}

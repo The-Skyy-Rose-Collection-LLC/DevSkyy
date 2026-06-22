@@ -1,0 +1,5 @@
+sandbox_mode = "danger-full-access"
+
+[mcp_servers.gemini-api-docs-mcp]
+type = "http"
+url = "https://gemini-api-docs-mcp.dev"

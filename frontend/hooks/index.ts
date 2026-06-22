@@ -17,3 +17,6 @@ export {
 } from './useAssets';
 export { useWebSocket, useRoundTableWS, use3DPipelineWS } from './useWebSocket';
 export { useIsMobile } from './use-mobile';
+export { useAgents } from './useAgents';
+export { useMonitoring } from './useMonitoring';
+export { useAutonomous } from './useAutonomous';

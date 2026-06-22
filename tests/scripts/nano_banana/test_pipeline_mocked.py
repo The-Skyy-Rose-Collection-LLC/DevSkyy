@@ -413,12 +413,13 @@ def test_run_single_logo_threshold_triggers_refinement(
         _make_tournament_result(score=88.0, text=90, logo=92),
     ]
     monkeypatch.setattr(tournament_mod, "run_tournament", lambda *a, **kw: qa_results.pop(0))
-    refine_calls = []
-    monkeypatch.setattr(
-        engine_fal_mod,
-        "refine_with_kontext",
-        lambda p, prompt: (refine_calls.append(prompt), _png_bytes())[1],
-    )
+    refine_calls: list[str] = []
+
+    def _track_refine(p, prompt):
+        refine_calls.append(prompt)
+        return _png_bytes()
+
+    monkeypatch.setattr(engine_fal_mod, "refine_with_kontext", _track_refine)
 
     pipe = _build_pipeline()
     result = pipe.run_single(_sample_product(), fake_source_image, view="front")
@@ -437,12 +438,13 @@ def test_run_single_hallucination_veto_triggers_refinement_even_with_high_scores
         _make_tournament_result(score=85.0, text=92, logo=92, veto=False),
     ]
     monkeypatch.setattr(tournament_mod, "run_tournament", lambda *a, **kw: qa_results.pop(0))
-    refine_calls = []
-    monkeypatch.setattr(
-        engine_fal_mod,
-        "refine_with_kontext",
-        lambda p, prompt: (refine_calls.append(prompt), _png_bytes())[1],
-    )
+    refine_calls: list[str] = []
+
+    def _track_refine(p, prompt):
+        refine_calls.append(prompt)
+        return _png_bytes()
+
+    monkeypatch.setattr(engine_fal_mod, "refine_with_kontext", _track_refine)
 
     pipe = _build_pipeline()
     result = pipe.run_single(_sample_product(), fake_source_image, view="front")

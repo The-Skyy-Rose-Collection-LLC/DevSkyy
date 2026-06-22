@@ -26,11 +26,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	centers the frame.
 	───────────────────────────────────────────────────────── */
 
+// SOT-wired scene image. skyyrose_sot_scene() returns imagery.scene_portrait.resolved
+// from data/collections/love-hurts/sot.json. basename() strips the directory prefix so
+// scene.php can safely prepend assets/images/immersive/.
+// Falls back to the original hand-maintained filename when the accessor returns ''.
+$_sot_scene_lh       = skyyrose_sot_scene( 'love-hurts' );
+$_lh_room1_image     = ( '' !== $_sot_scene_lh ) ? basename( $_sot_scene_lh ) : 'scene-love-hurts-cathedral.webp';
+
 $rooms = array(
 
 	array(
 		'name'     => esc_html__( 'The Cathedral', 'skyyrose' ),
-		'image'    => 'scene-love-hurts-cathedral.webp',
+		'image'    => $_lh_room1_image,
 		'products' => array(
 			skyyrose_immersive_product(
 				'lh-004',
@@ -84,7 +91,7 @@ get_header();
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 	<?php
 	get_template_part(
-		'template-parts/immersive-scene',
+		'template-parts/immersive/scene',
 		null,
 		array(
 			'collection_slug' => 'love-hurts',

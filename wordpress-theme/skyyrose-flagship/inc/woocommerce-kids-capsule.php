@@ -139,3 +139,45 @@ function skyyrose_save_kc_meta( $post_id ) {
 	}
 }
 add_action( 'save_post_product', 'skyyrose_save_kc_meta' );
+
+/*
+--------------------------------------------------------------
+ * Frontend — Matching Set Render
+ *--------------------------------------------------------------*/
+
+/**
+ * Render the kids-capsule matching-set partial after the single product
+ * summary on Kids Capsule product pages.
+ *
+ * Closes the half-shipped feature where admins enter `_kc_matching_adult_id`
+ * via meta box but the frontend never rendered the matching adult card.
+ *
+ * Defenses: skip self-references and circular meta loops.
+ *
+ * @since 1.3.0
+ * @return void
+ */
+function skyyrose_render_kc_matching_set() {
+	if ( ! is_product() || ! function_exists( 'has_term' ) ) {
+		return;
+	}
+	if ( ! has_term( 'kids-capsule', 'product_cat' ) ) {
+		return;
+	}
+
+	$current_id  = (int) get_the_ID();
+	$kc_adult_id = (int) get_post_meta( $current_id, '_kc_matching_adult_id', true );
+
+	// Defense 1: skip when no matching adult set OR self-reference.
+	if ( ! $kc_adult_id || $kc_adult_id === $current_id ) {
+		return;
+	}
+
+	// Defense 2: skip when the adult itself has a matching meta set (loop).
+	if ( get_post_meta( $kc_adult_id, '_kc_matching_adult_id', true ) ) {
+		return;
+	}
+
+	get_template_part( 'template-parts/kids-capsule/matching-set' );
+}
+add_action( 'woocommerce_after_single_product_summary', 'skyyrose_render_kc_matching_set', 25 );

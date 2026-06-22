@@ -46,18 +46,20 @@
 
 	function applyCartFragments(fragments) {
 		if (!fragments) return;
+		var parser = new DOMParser();
 		Object.keys(fragments).forEach(function (selector) {
 			var html = fragments[selector];
+			if (typeof html !== 'string' || !html) return;
+			// Parse in an inert HTML document so scripts and event handlers in
+			// the WC fragment cannot execute. The parsed nodes only become
+			// live when explicitly inserted via replaceChild below.
+			var parsedDoc = parser.parseFromString(html, 'text/html');
+			var fresh = parsedDoc.body.firstElementChild;
+			if (!fresh) return;
 			document.querySelectorAll(selector).forEach(function (node) {
-				// Use a sandboxed parse: build a temp container, take the first
-				// element, and replace the live node. Avoids innerHTML on the
-				// live DOM.
-				var tmp = document.createElement('div');
-				tmp.innerHTML = html;
-				var fresh = tmp.firstElementChild;
-				if (fresh && node.parentNode) {
-					node.parentNode.replaceChild(fresh, node);
-				}
+				if (!node.parentNode) return;
+				var clone = fresh.cloneNode(true);
+				node.parentNode.replaceChild(clone, node);
 			});
 		});
 	}

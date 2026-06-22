@@ -1,0 +1,577 @@
+{
+  "$schema_note": "Canonical visual-asset registry for SkyyRose. Same authority tier as skyyrose-catalog.csv: every page layout, prototype brief, and agent dispatch that places NON-PRODUCT imagery MUST resolve through this file. Product imagery resolves through the catalog CSV (image/front_model_image/back_model_image columns). Paths relative to assets/. An asset used for a collection it is not registered to is a canon violation. status: 'verified' = founder-confirmed or canon-derived; 'needs-founder-review' = best-evidence assignment awaiting Corey's confirmation.",
+  "version": "1.2.1",
+  "updated": "2026-06-13",
+  "collections": [
+    "black-rose",
+    "love-hurts",
+    "signature",
+    "kids-capsule"
+  ],
+  "brand_global": {
+    "lockups": [
+      {
+        "path": "images/hero-overlays/sig-brand-skyy-rose-gold",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "brand-lockup",
+        "status": "verified",
+        "notes": "THE Skyy Rose Collection gold script. Brand-level lockup AND the Signature collection lockup (dual duty). Use on multi-collection surfaces (pre-order gateway hero, homepage)."
+      },
+      {
+        "path": "images/logos/sr-monogram-gold",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "monogram",
+        "status": "verified",
+        "notes": "SR monogram, gold. Rhythm element: marquees, dividers, footers, seals. White-bg jpeg — prefer webp/avif with transparency check before light backgrounds."
+      },
+      {
+        "path": "images/logos/sr-monogram-rose-gold",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "monogram",
+        "status": "verified",
+        "notes": "SR monogram, rose gold. Default-chrome and Kids Capsule contexts (rose gold = global accent + kids accent)."
+      },
+      {
+        "path": "images/logos/skyy-rose-collection-circular-patch",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "seal-patch",
+        "status": "verified",
+        "notes": "Circular collection patch. Ships on a WHITE SQUARE background — circle-crop (border-radius:50% + object-fit:cover) before display on dark surfaces."
+      }
+    ],
+    "hero_backdrops": [
+      {
+        "path": "branding/hero/luxury-nighttime",
+        "formats": [
+          "480w.webp",
+          "768w.webp",
+          "1280w.webp",
+          "1680w.webp",
+          "1680w.jpg"
+        ],
+        "kind": "cinematic-backdrop",
+        "status": "verified",
+        "notes": "Oakland nighttime luxury scene. Brand-global hero backdrop; used by preorder gateway poster + signature editorial rows."
+      }
+    ],
+    "video": [
+      {
+        "path": "video/preorder-hero",
+        "formats": [
+          "mp4",
+          "webm"
+        ],
+        "kind": "hero-video",
+        "status": "verified",
+        "notes": "Purpose-made pre-order hero film (model in BR satin sherpa, Oakland night). Pair with luxury-nighttime poster. 6.9MB mp4 — preload=metadata, save-data guard mandatory."
+      },
+      {
+        "path": "images/branding/rose-gold-spin",
+        "formats": [
+          "mp4",
+          "webm"
+        ],
+        "kind": "brand-motion",
+        "status": "verified",
+        "notes": "Rose-gold rose spin loop. Accent/loader/brand-moment use."
+      }
+    ]
+  },
+  "black_rose": {
+    "lockup_primary": {
+      "path": "images/hero-overlays/br-brand-script-logotype",
+      "formats": [
+        "avif",
+        "webp",
+        "png"
+      ],
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "THE Black Rose Collection script with rose. BLACK lettering — on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
+    },
+    "lockup_display": {
+      "path": "images/lockups/black-rose-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/black-rose-script.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
+    "lockup_alt": {
+      "path": "images/hero-overlays/br-brand-script",
+      "formats": [
+        "avif",
+        "webp",
+        "png"
+      ],
+      "kind": "collection-lockup-alt",
+      "status": "verified",
+      "notes": "Script variant without 'Collection' line. Same black-lettering handling rules."
+    },
+    "atmospherics": [
+      {
+        "path": "images/logos/black-roses-cloud-cluster",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Black roses on clouds. Section backdrops at low opacity, BR surfaces only."
+      },
+      {
+        "path": "images/homepage-col-black-rose",
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "kind": "collection-portrait",
+        "status": "verified",
+        "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
+      },
+      {
+        "path": "branding/collection-logo-black-rose",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "BR collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "branding/sr-monogram-blackrose-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-hero-art",
+        "status": "verified",
+        "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
+      }
+    ],
+    "patches": [
+      {
+        "path": "images/hero-overlays/br-patch-hockey",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "jersey-patch-art",
+        "status": "verified",
+        "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
+      },
+      {
+        "path": "images/hero-overlays/br-patch-mlb-baseball",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "jersey-patch-art",
+        "status": "verified",
+        "notes": "Series patch (baseball, br-003/br-012)."
+      },
+      {
+        "path": "images/hero-overlays/br-patch-nba-basketball",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "jersey-patch-art",
+        "status": "verified",
+        "notes": "Series patch (basketball, br-010)."
+      },
+      {
+        "path": "images/hero-overlays/br-patch-nfl-football",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "jersey-patch-art",
+        "status": "verified",
+        "notes": "Series patch (football, br-008/br-009)."
+      }
+    ],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-black-rose-football",
+        "formats": [
+          "480w.avif",
+          "480w.webp",
+          "960w.avif",
+          "960w.webp"
+        ],
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "BIB football jersey editorial."
+      },
+      {
+        "path": "images/lookbook/lb-black-rose-hockey",
+        "formats": [
+          "480w.avif",
+          "480w.webp",
+          "960w.avif",
+          "960w.webp"
+        ],
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "BIB hockey jersey editorial."
+      }
+    ],
+    "hero_backdrops": [
+      {
+        "path": "branding/hero/forbidden-midnight",
+        "formats": [
+          "480w.webp",
+          "768w.webp",
+          "1280w.webp",
+          "1680w.webp",
+          "1680w.jpg"
+        ],
+        "kind": "cinematic-backdrop",
+        "status": "verified",
+        "notes": "Black Rose cinematic backdrop (founder-assigned 2026-06-11). BR heroes/manifesto surfaces."
+      }
+    ]
+  },
+  "love_hurts": {
+    "lockup_primary": {
+      "path": "images/hero-overlays/lh-logo-combined",
+      "formats": [
+        "avif",
+        "webp",
+        "png"
+      ],
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Love Hurts combined red script. The lockup IS the collection name."
+    },
+    "lockup_display": {
+      "path": "images/lockups/love-hurts-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/love-hurts-full-lettering.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
+    "lockup_parts": [
+      {
+        "path": "images/hero-overlays/lh-logo-love",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Love' script alone — stacked/split hero compositions."
+      },
+      {
+        "path": "images/hero-overlays/lh-logo-hurts",
+        "formats": [
+          "avif",
+          "webp",
+          "png"
+        ],
+        "kind": "collection-lockup-part",
+        "status": "verified",
+        "notes": "'Hurts' script alone."
+      }
+    ],
+    "lettering_alt": [
+      {
+        "path": "images/logos/love-hurts-full-lettering",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Full lettering raster. SVG masters exist: branding/vectorized/love-hurts-full-lettering.svg, love-lettering.svg, hurts-lettering.svg (use SVG when crispness at scale matters)."
+      },
+      {
+        "path": "images/logos/love-lettering",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Raster; SVG master available."
+      },
+      {
+        "path": "images/logos/hurts-lettering",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "lettering",
+        "status": "verified",
+        "notes": "Raster; SVG master available."
+      },
+      {
+        "path": "branding/love-hurts-love-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
+      },
+      {
+        "path": "branding/love-hurts-hurts-hero",
+        "formats": [
+          "webp"
+        ],
+        "kind": "collection-lockup-part-alt",
+        "status": "verified",
+        "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
+      }
+    ],
+    "atmospherics": [
+      {
+        "path": "images/logos/red-roses-cloud-cluster",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Red roses on clouds. LH surfaces only (red roses = Love Hurts register)."
+      },
+      {
+        "path": "images/logos/heart-rose-composite",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Heart + rose composite. LH emotional register."
+      },
+      {
+        "path": "images/homepage-col-love-hurts",
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "kind": "collection-portrait",
+        "status": "verified",
+        "notes": "LH world art. Collection cards/panels/portals."
+      },
+      {
+        "path": "images/immersive/scene-love-hurts-cathedral",
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "LH cathedral immersive scene still. Heavy atmospheric — hero/manifesto scale."
+      },
+      {
+        "path": "branding/collection-logo-love-hurts",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "LH collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "branding/love-hurts-neon-star-ref",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo-alt",
+        "status": "verified",
+        "notes": "Red neon star — ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
+      }
+    ],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-love-hurts-varsity",
+        "formats": [
+          "480w.avif",
+          "480w.webp",
+          "960w.avif",
+          "960w.webp"
+        ],
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "LH varsity jacket worn, editorial."
+      }
+    ],
+    "hero_backdrops": [
+      {
+        "path": "branding/hero/beauty-and-beast",
+        "formats": [
+          "480w.webp",
+          "768w.webp",
+          "1280w.webp",
+          "1680w.webp",
+          "1680w.jpg"
+        ],
+        "kind": "cinematic-backdrop",
+        "status": "verified",
+        "notes": "Love Hurts cinematic backdrop (founder-assigned 2026-06-11). LH heroes/manifesto surfaces."
+      }
+    ]
+  },
+  "signature": {
+    "lockup_primary": {
+      "path": "images/hero-overlays/sig-brand-skyy-rose-gold",
+      "formats": [
+        "avif",
+        "webp",
+        "png"
+      ],
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Gold script — doubles as brand lockup (see brand_global). The lockup IS the collection name."
+    },
+    "lockup_display": {
+      "path": "images/lockups/signature-lockup.webp",
+      "formats": [
+        "webp"
+      ],
+      "kind": "collection-lockup-display",
+      "status": "verified",
+      "notes": "CANONICAL display lockup — gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
+    },
+    "lockup_svg_master": {
+      "path": "branding/vectorized/signature-script.svg",
+      "formats": [
+        "svg"
+      ],
+      "kind": "collection-lockup-vector",
+      "status": "verified",
+      "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
+    },
+    "atmospherics": [
+      {
+        "path": "images/homepage-col-signature",
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "kind": "collection-portrait",
+        "status": "verified",
+        "notes": "Signature world art. Collection cards/panels/portals."
+      },
+      {
+        "path": "images/logos/rose-gold-rose",
+        "formats": [
+          "avif",
+          "webp",
+          "jpeg"
+        ],
+        "kind": "atmospheric-art",
+        "status": "verified",
+        "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
+      },
+      {
+        "path": "branding/collection-logo-signature",
+        "formats": [
+          "jpg"
+        ],
+        "kind": "collection-logo",
+        "status": "verified",
+        "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
+      }
+    ],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-rose-hoodie-beanie",
+        "formats": [
+          "480w.avif",
+          "480w.webp",
+          "960w.avif",
+          "960w.webp"
+        ],
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "Rose hoodie + beanie worn, editorial. Signature (founder-confirmed 2026-06-11)."
+      }
+    ]
+  },
+  "kids_capsule": {
+    "lockup_primary": {
+      "path": "images/logos/sr-monogram-rose-gold",
+      "formats": [
+        "avif",
+        "webp",
+        "jpeg"
+      ],
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Kids Capsule uses the rose-gold monogram as its mark (no dedicated script lockup exists yet). Launch-mode collection — empty grid by design."
+    },
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-kid-black-rose",
+        "formats": [
+          "480w.avif",
+          "480w.webp",
+          "960w.avif",
+          "960w.webp"
+        ],
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "Kid wearing Black Rose piece. Kids Capsule surfaces (founder-assigned 2026-06-11)."
+      }
+    ]
+  },
+  "usage_rules": [
+    "Product imagery (model shots, ghosts, flats) resolves through skyyrose-catalog.csv columns — never this file, never invented paths, never per-product subdirectory guesses.",
+    "Collection lockup images ARE the collection names. Never type-render a collection name as a hero or panel title.",
+    "Cross-collection imagery use (e.g., red roses on a Black Rose surface) is a canon violation unless this manifest registers the asset to that collection.",
+    "Black-lettering lockups (br-*) require the invert treatment or a light ground.",
+    "Filenames are NOT identity — this manifest is. If pixels contradict the registry entry, stop and flag (see the 2026-06-10 sherpa mis-file).",
+    "New imagery enters this manifest in the same commit that adds the files; status starts at needs-founder-review unless Corey assigns it."
+  ]
+}

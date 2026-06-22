@@ -219,21 +219,22 @@ class TestSSIMComparison:
 
 
 class TestCustomThreshold:
-    def test_custom_threshold_applied(self, tmp_path):
+    def test_instance_threshold_applies_when_angle_unmapped(self, tmp_path):
+        # Instance-level threshold is a fallback used only when the angle key is
+        # absent from THRESHOLDS_BY_ANGLE. For mapped angles (front/back/three-
+        # quarter/detail-1/detail-2) the table value wins by design.
         golden_base = tmp_path / "golden"
         reports_base = tmp_path / "reports"
         tester = VisualRegressionTester(
             golden_base=golden_base, reports_base=reports_base, threshold=0.95
         )
 
-        ref = golden_base / "sg-001"
-        ref.mkdir(parents=True)
-        _make_jpeg(ref / "reference.jpg")
+        (golden_base / "sg-001").mkdir(parents=True)
+        _make_jpeg(golden_base / "sg-001" / "custom.jpg")
         gen = _make_jpeg(tmp_path / "gen.jpg")
 
-        # SSIM 0.90 is below 0.95 threshold
         with patch.object(tester, "_compute_ssim", return_value=0.90):
-            result = tester.compare(str(gen), "sg-001")
+            result = tester.compare(str(gen), "sg-001", angle="custom")
 
         assert result.threshold == 0.95
         assert result.passed is False

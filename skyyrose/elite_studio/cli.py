@@ -359,6 +359,37 @@ def cmd_worker(args: argparse.Namespace) -> None:
     worker.run_forever()
 
 
+def cmd_catalog(args: argparse.Namespace) -> None:
+    """Print the loaded SkyyRose product catalog."""
+    from renders.config import PRODUCT_CATALOG
+
+    print(f"\nSkyyRose Product Catalog ({len(PRODUCT_CATALOG)} products)")
+    print("-" * 80)
+    print(f"{'SKU':<18} {'Collection':<14} {'Priority':<10} {'Source':<6} {'Name'}")
+    print("-" * 80)
+    for p in PRODUCT_CATALOG:
+        priority = p.get("render_priority", "low")
+        has_source = "YES" if p.get("existing_front") else "---"
+        print(
+            f"{p['sku']:<18} {p['collection']:<14} {priority:<10} "
+            f"{has_source:<6} {p.get('name', '')}"
+        )
+
+    by_collection: dict[str, int] = {}
+    by_priority: dict[str, int] = {}
+    with_source = 0
+    for p in PRODUCT_CATALOG:
+        by_collection[p["collection"]] = by_collection.get(p["collection"], 0) + 1
+        prio = p.get("render_priority", "low")
+        by_priority[prio] = by_priority.get(prio, 0) + 1
+        if p.get("existing_front"):
+            with_source += 1
+
+    print(f"\nCollections: {by_collection}")
+    print(f"Priorities:  {by_priority}")
+    print(f"With source: {with_source}/{len(PRODUCT_CATALOG)}")
+
+
 def main(argv: list[str] | None = None) -> None:
     """CLI main entry point."""
     parser = argparse.ArgumentParser(
@@ -508,6 +539,9 @@ def main(argv: list[str] | None = None) -> None:
         help='JSON string of additional parameters (e.g. \'{"collection": "black-rose"}\')',
     )
 
+    # catalog — print the loaded SkyyRose product catalog
+    sub.add_parser("catalog", help="Print the SkyyRose product catalog")
+
     args = parser.parse_args(argv)
 
     if not args.command:
@@ -536,3 +570,5 @@ def main(argv: list[str] | None = None) -> None:
         cmd_worker(args)
     elif args.command == "create":
         cmd_create(args)
+    elif args.command == "catalog":
+        cmd_catalog(args)

@@ -25,19 +25,23 @@ authority: PRIMARY SOURCE — these are Corey's own words, not derived from code
 
 ### Visual references (the brands SkyyRose triangulates against)
 
-| Brand | What SkyyRose borrows |
-|-------|----------------------|
-| **KITH** | Editorial product storytelling, drop choreography, Ronnie Fieg's unapologetic curation |
-| **Coach** | American luxury heritage reframed for street, leather craft authority |
-| **Palm Angels** | Streetwear that carries through into elevated tailoring without losing identity |
-| **Drake Related** | Personal narrative as product foundation, owner-as-author voice |
-| **Aimé Leon Dore** | Quiet luxury, neighborhood specificity (NYC for ALD = Oakland for SkyyRose), throwback editorial |
-| **Fear of God Eternal** | Restraint, monochrome, religious-grade craftsmanship language |
-| **The Row** | Pure luxury minimalism — proof that quiet *is* expensive |
-| **Jacquemus** | Cinematic campaigns, place-as-character (Provence for Jacquemus = Oakland for SkyyRose) |
-| **Document / i-D** | Editorial photography sensibility — model is a person not a hanger |
+> **Canon supersession 2026-05-25:** The active visual reference set is now locked at `docs/brand/visual-references.md` — **The Five: Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels.** The table below is preserved as founder-interview source material from 2026-05-13. Brands not in The Five (The Row, Jacquemus, Document/i-D, Coach, Drake Related) are retired from active reference; they remain here for historical context but are not pulled from in new design work. See the canon doc + `feedback_brand_visual_references.md` in memory for enforcement rules.
 
-**How to use this:** when generating imagery, copy, or layouts, ask "would this fit on KITH's product page or Aimé Leon Dore's lookbook?" If no, it's wrong. When triangulating in Phase 4 per WP §1.1 Pass 4, these are the primary three to study; the rest are tertiary.
+| Brand | What SkyyRose borrows | Active canon status |
+|-------|----------------------|--------------------|
+| **KITH** | Editorial product storytelling, drop choreography, Ronnie Fieg's unapologetic curation | **Active — The Five** |
+| **Palm Angels** | Streetwear that carries through into elevated tailoring without losing identity | **Active — The Five** |
+| **Fear of God Eternal** | Restraint, monochrome, religious-grade craftsmanship language | **Active — The Five (FOG)** |
+| **Aimé Leon Dore** | Quiet luxury, neighborhood specificity (NYC for ALD = Oakland for SkyyRose), throwback editorial | Active — acceptable adjacency |
+| **Coach** | American luxury heritage reframed for street, leather craft authority | Historical — retired from active reference 2026-05-25 |
+| **Drake Related** | Personal narrative as product foundation, owner-as-author voice | Historical — retired from active reference 2026-05-25 |
+| **The Row** | Pure luxury minimalism — proof that quiet *is* expensive | **RETIRED 2026-05-25** — European luxury house lineage locked out |
+| **Jacquemus** | Cinematic campaigns, place-as-character (Provence for Jacquemus = Oakland for SkyyRose) | **RETIRED 2026-05-25** — European reference locked out |
+| **Document / i-D** | Editorial photography sensibility — model is a person not a hanger | **RETIRED 2026-05-25** — European/UK editorial reference locked out |
+
+**Also added to canon 2026-05-25 (not in original interview):** **Oaklandish** (civic-pride parallel — Oakland brand) and **Culture Kings** (drop-density, hip-hop culture integration). Both are now part of The Five active set per `docs/brand/visual-references.md`.
+
+**How to use this:** when generating imagery, copy, or layouts, pull from The Five FIRST. Ask "would this fit on KITH's product page or Fear of God's lookbook?" If no, it's wrong. Aimé Leon Dore is the acceptable adjacency when retail-anchored editorial is the point. When triangulating in Phase 4 per WP §1.1 Pass 4, use brands from The Five — never the retired set.
 
 ### Anti-references (banned by default)
 

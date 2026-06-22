@@ -6,10 +6,17 @@
  * Features: dark #0A0A0A background, 150px product images, quantity controls,
  * sticky order summary sidebar, empty cart state.
  *
+ * Full custom override (not a markup patch of core). Verified against core
+ * cart.php 10.8.0: action/filter hooks and the woocommerce-cart nonce are
+ * preserved, with one deliberate exception — woocommerce_cart_collaterals is
+ * NOT fired. Core hooks woocommerce_cross_sell_display into it, and brand
+ * canon excludes cross-sells; the custom sticky order-summary sidebar renders
+ * totals directly instead. Plugins targeting that hook will not output here.
+ *
  * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose
  * @since   2.0.0
- * @version 10.1.0
+ * @version 10.8.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -37,14 +44,14 @@ do_action( 'woocommerce_before_cart' );
 					<circle cx="37" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 					<circle cx="53" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 				</svg>
-				<h1 class="skyy-cart__empty-title">
+				<h1 class="skyy-cart__empty-title rv-clip-up">
 					<?php esc_html_e( 'Your Cart is Empty', 'skyyrose' ); ?>
 				</h1>
-				<p class="skyy-cart__empty-text">
+				<p class="skyy-cart__empty-text rv-blur">
 					<?php esc_html_e( 'Explore our collections and find pieces that speak to you.', 'skyyrose' ); ?>
 				</p>
 				<a href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>"
-					class="skyy-cart__empty-cta">
+					class="skyy-cart__empty-cta magnetic btn-sweep">
 					<?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?>
 				</a>
 			</div>
@@ -53,7 +60,7 @@ do_action( 'woocommerce_before_cart' );
 	<?php else : ?>
 
 		<div class="skyy-cart__header">
-			<h1 class="skyy-cart__title">
+			<h1 class="skyy-cart__title rv-clip-up">
 				<?php esc_html_e( 'Shopping Cart', 'skyyrose' ); ?>
 			</h1>
 			<span class="skyy-cart__count">
@@ -65,6 +72,36 @@ do_action( 'woocommerce_before_cart' );
 				);
 				?>
 			</span>
+		</div>
+
+		<?php
+		// ── Free-Shipping Progress Bar ──────────────────────────────────
+		$skyy_cart_total = (float) WC()->cart->get_subtotal();
+		$skyy_threshold  = defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? (float) SKYYROSE_FREE_SHIPPING_THRESHOLD : 200;
+		$skyy_remaining  = max( 0, $skyy_threshold - $skyy_cart_total );
+		$skyy_progress   = $skyy_threshold > 0 ? min( 100, ( $skyy_cart_total / $skyy_threshold ) * 100 ) : 100;
+		$skyy_qualified  = $skyy_remaining <= 0;
+		?>
+		<div class="skyy-cart__shipping-bar rv-blur" role="progressbar"
+			aria-valuenow="<?php echo esc_attr( round( $skyy_progress ) ); ?>"
+			aria-valuemin="0" aria-valuemax="100"
+			aria-label="<?php esc_attr_e( 'Free shipping progress', 'skyyrose' ); ?>">
+			<div class="skyy-cart__shipping-track">
+				<div class="skyy-cart__shipping-fill" style="width: <?php echo esc_attr( round( $skyy_progress ) ); ?>%"></div>
+			</div>
+			<p class="skyy-cart__shipping-msg">
+				<?php if ( $skyy_qualified ) : ?>
+					<?php esc_html_e( 'You qualify for free shipping!', 'skyyrose' ); ?>
+				<?php else : ?>
+					<?php
+					printf(
+						/* translators: %s: dollar amount remaining */
+						esc_html__( 'Add $%s more for free shipping', 'skyyrose' ),
+						esc_html( number_format( $skyy_remaining, 0 ) )
+					);
+					?>
+				<?php endif; ?>
+			</p>
 		</div>
 
 		<div class="skyy-cart__layout">
@@ -79,7 +116,7 @@ do_action( 'woocommerce_before_cart' );
 					do_action( 'woocommerce_before_cart_table' );
 					?>
 
-					<div class="skyy-cart__items-list" data-skyy-cart-items>
+					<div class="skyy-cart__items-list stagger-grid" data-skyy-cart-items>
 						<?php do_action( 'woocommerce_before_cart_contents' ); ?>
 
 						<?php
@@ -145,6 +182,34 @@ do_action( 'woocommerce_before_cart' );
 												<?php echo wp_kses_post( $product_name ); ?>
 											<?php endif; ?>
 										</h3>
+
+										<?php
+										// Editorial labels from catalog.
+										$skyy_item_cat = function_exists( 'skyyrose_get_product' )
+											? skyyrose_get_product( $_product->get_sku() )
+											: null;
+										if ( $skyy_item_cat ) :
+											?>
+											<div class="skyy-cart__item-labels">
+												<?php if ( ! empty( $skyy_item_cat['collection'] ) ) : ?>
+													<span class="skyy-cart__item-collection">
+														<?php echo esc_html( ucwords( str_replace( '-', ' ', $skyy_item_cat['collection'] ) ) ); ?>
+													</span>
+												<?php endif; ?>
+												<?php if ( ! empty( $skyy_item_cat['garment_type_lock'] ) ) : ?>
+													<span class="skyy-cart__item-garment">
+														<?php
+														// Show first 40 chars of garment lock.
+														$skyy_gt       = $skyy_item_cat['garment_type_lock'];
+														$skyy_gt_short = mb_strlen( $skyy_gt ) > 40
+															? mb_substr( $skyy_gt, 0, 40 ) . '…'
+															: $skyy_gt;
+														echo esc_html( $skyy_gt_short );
+														?>
+													</span>
+												<?php endif; ?>
+											</div>
+										<?php endif; ?>
 
 										<?php if ( ! empty( $variation_data ) ) : ?>
 											<div class="skyy-cart__item-variations">
@@ -239,7 +304,7 @@ do_action( 'woocommerce_before_cart' );
 											apply_filters(
 												'woocommerce_cart_item_remove_link',
 												sprintf(
-													'<a role="button" href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
+													'<a href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
 													esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 													/* translators: %s: product name */
 													esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose' ), wp_strip_all_tags( $product_name ) ) ),
@@ -323,7 +388,7 @@ do_action( 'woocommerce_before_cart' );
 			<?php do_action( 'woocommerce_before_cart_collaterals' ); ?>
 
 			<!-- ORDER SUMMARY SIDEBAR (Sticky, 400px) -->
-			<aside class="skyy-cart__summary" data-skyy-cart-summary>
+			<aside class="skyy-cart__summary rv-clip-right" data-skyy-cart-summary>
 				<div class="skyy-cart__summary-inner">
 					<h2 class="skyy-cart__summary-title">
 						<?php esc_html_e( 'Order Summary', 'skyyrose' ); ?>
@@ -429,6 +494,29 @@ do_action( 'woocommerce_before_cart' );
 					do_action( 'woocommerce_after_cart_totals' );
 					?>
 
+					<!-- Express Pay Buttons (Stripe/Apple Pay/Google Pay slot) -->
+					<?php
+					/**
+					 * Buffer the hook so we only render the wrapper + divider when a
+					 * payment plugin (e.g. Stripe, Apple Pay) actually outputs content.
+					 *
+					 * @since 7.2.0
+					 */
+					ob_start();
+					do_action( 'skyyrose_cart_express_pay_buttons' );
+					$skyy_express_pay = trim( ob_get_clean() );
+					if ( $skyy_express_pay ) :
+						?>
+					<div class="skyy-cart__express-pay">
+						<div class="skyy-cart__express-pay-buttons">
+							<?php echo $skyy_express_pay; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized by payment gateway plugins; buffer output is trusted hook content. ?>
+						</div>
+						<div class="skyy-cart__express-pay-divider">
+							<span><?php esc_html_e( 'or', 'skyyrose' ); ?></span>
+						</div>
+					</div>
+					<?php endif; ?>
+
 					<!-- Proceed to Checkout -->
 					<div class="skyy-cart__summary-checkout">
 						<a href="<?php echo esc_url( wc_get_checkout_url() ); ?>"
@@ -449,10 +537,12 @@ do_action( 'woocommerce_before_cart' );
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 								<path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>
-							<span><?php
+							<span>
+							<?php
 								/* translators: %d: free shipping order minimum in dollars */
-								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) );
-								?></span>
+								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? SKYYROSE_FREE_SHIPPING_THRESHOLD : 200 ) );
+							?>
+								</span>
 						</div>
 						<div class="skyy-cart__trust-badge">
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">

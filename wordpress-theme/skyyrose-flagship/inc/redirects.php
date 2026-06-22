@@ -65,14 +65,14 @@ function skyyrose_preorder_slug_redirect() {
 	$request_uri = isset( $_SERVER['REQUEST_URI'] )
 		? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
 		: '';
-	$path = strtok( $request_uri, '?' );
+	$path        = strtok( $request_uri, '?' );
 
 	if ( '/preorder/' !== $path && '/preorder' !== $path ) {
 		return;
 	}
 
-	$target  = home_url( '/pre-order/' );
-	$qs_pos  = strpos( $request_uri, '?' );
+	$target = home_url( '/pre-order/' );
+	$qs_pos = strpos( $request_uri, '?' );
 	if ( false !== $qs_pos ) {
 		$target .= substr( $request_uri, $qs_pos );
 	}
@@ -80,3 +80,37 @@ function skyyrose_preorder_slug_redirect() {
 	exit;
 }
 add_action( 'template_redirect', 'skyyrose_preorder_slug_redirect', 1 );
+
+/**
+ * Redirect legacy /shop-2/ slug to /shop/.
+ *
+ * The shop-2 page is a Woo-created duplicate of /shop/ that drifted into
+ * production. P0·4 of the 2026-05-20 audit. Canonical shop is /shop/;
+ * shop-2 ships a 301 to it. The shop-2 page is also deleted via WP CLI
+ * after this redirect ships (so direct DB queries don't surface it),
+ * but this redirect remains as the source-of-truth slug map.
+ *
+ * Mirrors the structure of skyyrose_preorder_slug_redirect() above.
+ *
+ * @since 1.5.4
+ * @return void
+ */
+function skyyrose_shop2_slug_redirect() {
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+		: '';
+	$path        = strtok( $request_uri, '?' );
+
+	if ( '/shop-2/' !== $path && '/shop-2' !== $path ) {
+		return;
+	}
+
+	$target = home_url( '/shop/' );
+	$qs_pos = strpos( $request_uri, '?' );
+	if ( false !== $qs_pos ) {
+		$target .= substr( $request_uri, $qs_pos );
+	}
+	wp_safe_redirect( $target, 301 );
+	exit;
+}
+add_action( 'template_redirect', 'skyyrose_shop2_slug_redirect', 1 );

@@ -1,29 +1,37 @@
 /**
- * About Page — Impeccable Luxury Refinement
- * Editorial magazine layouts, technical concrete details.
+ * About Page — Streetwear Luxury Editorial
+ *
+ * Register: KITH lookbook x Drake Related editorial x FOG Eternal restraint.
+ *
+ * System:
+ *   - Two grounds alternate: deep black #0A0A0A (chapters) + concrete cream #F5F1EB (mission, oakland).
+ *   - Type: Cinzel display (massive, all-caps), Bebas Neue tags/years, Cormorant Garamond body, system mono date stamps.
+ *   - Lookbook chapter numbering (CH. 01 / CH. 02 / CH. 03 / CH. 04).
+ *   - Editorial moves: drop caps, full-bleed pull-quote breakouts, vertical-rule timeline, newspaper press grid.
+ *
+ * Reveal classes (.rv, .rv-d1..3, .rv-clip-up, .rv-blur, .rv-blur-down) are owned by
+ * the unified IntersectionObserver in assets/js/premium-interactions.js. Do NOT
+ * register a parallel observer here.
  */
 
 /* ==========================================================================
-   Scroll Reveal — toggled by the unified observer in
-   assets/js/premium-interactions.js (selector: ".abt-page .rv").
+   Reveal hooks
    ========================================================================== */
 .abt-page .rv {
 	opacity: 0;
-	transform: translateY(30px);
+	transform: translateY(28px);
 	transition:
-		opacity 0.8s cubic-bezier(.16, 1, .3, 1),
-		transform 0.8s cubic-bezier(.16, 1, .3, 1);
+		opacity 0.85s cubic-bezier(.16, 1, .3, 1),
+		transform 0.85s cubic-bezier(.16, 1, .3, 1);
 }
-
 .abt-page .rv.is-visible {
 	opacity: 1;
 	transform: translateY(0);
 }
-
-.abt-page .rv-d1 { transition-delay: 0.1s; }
-.abt-page .rv-d2 { transition-delay: 0.2s; }
-.abt-page .rv-d3 { transition-delay: 0.3s; }
-.abt-page .rv-d4 { transition-delay: 0.4s; }
+.abt-page .rv-d1 { transition-delay: 0.08s; }
+.abt-page .rv-d2 { transition-delay: 0.16s; }
+.abt-page .rv-d3 { transition-delay: 0.24s; }
+.abt-page .rv-d4 { transition-delay: 0.32s; }
 
 @media (prefers-reduced-motion: reduce) {
 	.abt-page .rv {
@@ -31,471 +39,973 @@
 		transform: none;
 		transition: none;
 	}
-}
-
-.abt-page {
-	background: transparent; /* Relies on global body background/grain */
-	color: #fff;
-	overflow-x: hidden;
+	.abt-hero__scroll-line {
+		animation: none;
+		transform: scaleX(1);
+	}
 }
 
 /* ==========================================================================
-   HERO (Cinematic Perfection)
+   Page shell
+   ========================================================================== */
+.abt-page {
+	background: var(--skyyrose-bg);
+	color: var(--skyyrose-surface-warm);
+	overflow-x: hidden;
+	font-feature-settings: "ss01", "kern";
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.abt-page section {
+	position: relative;
+}
+
+/* ==========================================================================
+   HERO — Editorial lookbook header (asymmetric, no full-bleed background)
    ========================================================================== */
 .abt-hero {
-	position: relative;
+	background: var(--skyyrose-bg);
+	padding: clamp(96px, 12vw, 200px) clamp(24px, 6vw, 120px) clamp(64px, 8vw, 140px);
 	min-height: 100vh;
-	min-height: 100dvh;
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	text-align: center;
-	overflow: hidden;
-	padding: 0 48px;
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
 }
 
-.abt-hero__img {
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-}
-
-.abt-hero__img img {
+.abt-hero__grid {
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	filter: grayscale(10%) contrast(1.1); /* Slightly harsher, technical look */
-}
-
-.abt-hero__overlay {
-	position: absolute;
-	inset: 0;
-	z-index: 2;
-	background: linear-gradient(180deg, rgba(5,5,5,0.4) 0%, rgba(5,5,5,0.7) 60%, #050505 100%);
-}
-
-.abt-hero__content {
-	position: relative;
-	z-index: 3;
-	max-width: 900px;
-	margin: 0 auto;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.abt-hero__eyebrow {
-	font-family: 'Space Mono', monospace;
-	font-size: 11px;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-	color: #B76E79; /* Solid Rose Gold */
-	margin-bottom: 32px;
-}
-
-.abt-hero__title {
-	font-family: 'Cinzel', serif;
-	font-size: clamp(48px, 8vw, 120px);
-	font-weight: 400;
-	letter-spacing: clamp(6px, 2vw, 16px);
-	line-height: 1.1;
-	text-transform: uppercase;
-	color: #fff; /* Stark white, no gradient */
-	margin-bottom: 40px;
-	filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.5));
-}
-.abt-hero__title span { display: block; opacity: 0.6; font-size: 0.6em; margin-bottom: 12px;}
-
-.abt-hero__sub {
-	font-family: 'Playfair Display', serif;
-	font-size: clamp(16px, 2vw, 22px);
-	font-style: italic;
-	color: rgba(255,255,255,0.7);
-	line-height: 1.8;
-	max-width: 600px;
-}
-
-/* ==========================================================================
-   CHAPTER I: ORIGIN (Editorial Text)
-   ========================================================================== */
-.abt-origin {
-	padding: clamp(120px, 15vw, 240px) 48px;
-	position: relative;
-	z-index: 5;
-	background: #050505;
-	border-top: 1px solid rgba(255,255,255,0.04);
-}
-
-.abt-origin__inner {
-	max-width: 1400px;
+	max-width: 1600px;
 	margin: 0 auto;
 	display: grid;
-	grid-template-columns: 1fr 1.2fr;
-	gap: clamp(80px, 10vw, 160px);
-	align-items: start;
+	grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+	gap: clamp(48px, 8vw, 160px);
+	align-items: end;
 }
 
-.abt-origin__quote {
-	position: sticky;
-	top: 160px;
-}
-
-.abt-origin__quote blockquote {
-	font-family: 'Playfair Display', serif;
-	font-size: clamp(28px, 4vw, 48px);
-	font-style: italic;
-	line-height: 1.4;
-	color: #fff;
-	margin: 0 0 32px;
-	position: relative;
-}
-
-.abt-origin__quote blockquote::before {
-	content: '“';
-	position: absolute;
-	top: -40px;
-	left: -20px;
-	font-size: 120px;
-	color: #B76E79;
-	opacity: 0.2;
-	font-family: serif;
-	line-height: 1;
-}
-
-.abt-origin__cite {
-	font-family: 'Space Mono', monospace;
-	font-size: 11px;
-	letter-spacing: 4px;
+/* Lookbook doc-id header */
+.abt-hero__doc {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 13px;
+	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: rgba(255,255,255,0.5);
-}
-
-.abt-origin__prose {
-	font-family: 'Cormorant Garamond', serif;
-	font-size: 1.3rem;
-	line-height: 2.1;
-	color: rgba(255,255,255,0.85);
-	max-width: 65ch; /* Strict editorial line length */
-}
-
-.abt-origin__prose p { margin-bottom: 32px; }
-.abt-origin__prose strong { color: #fff; font-weight: 500; font-family: 'Cinzel', serif; letter-spacing: 2px;}
-
-/* ==========================================================================
-   CHAPTER II: COLLECTIONS (3D Portals)
-   ========================================================================== */
-.abt-collections {
-	padding: clamp(120px, 15vw, 240px) 0;
-	background: #050505;
-	border-top: 1px solid rgba(255,255,255,0.04);
-	position: relative;
-}
-
-.abt-col-header {
-	text-align: center;
-	margin-bottom: clamp(80px, 10vw, 160px);
-	padding: 0 48px;
-}
-
-.abt-col-header h2 {
-	font-family: 'Cinzel', serif;
-	font-size: clamp(36px, 5vw, 72px);
-	font-weight: 400;
-	letter-spacing: 12px;
-	text-transform: uppercase;
-	color: #fff;
-}
-
-.abt-col-header p {
-	font-family: 'Playfair Display', serif;
-	font-size: 1.2rem;
-	font-style: italic;
-	color: rgba(255,255,255,0.6);
-	margin-top: 16px;
-}
-
-/* Technical 3D Portal List */
-.abt-portal-list {
-	max-width: 1400px;
-	margin: 0 auto;
-	padding: 0 48px;
-	display: flex;
-	flex-direction: column;
-	gap: 24px;
-}
-
-.abt-portal-item {
-	display: grid;
-	grid-template-columns: 1fr 1.5fr;
-	gap: 64px;
-	align-items: center;
-	padding: 64px;
-	border: 1px solid rgba(255,255,255,0.04);
-	background: rgba(255,255,255,0.01);
-	transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-	position: relative;
-	overflow: hidden;
-}
-
-.abt-portal-item:hover {
-	border-color: rgba(183, 110, 121, 0.3);
-	background: rgba(255,255,255,0.03);
-}
-
-.abt-portal-media {
-	aspect-ratio: 4 / 5;
-	position: relative;
-	background: #000;
-	overflow: hidden;
-}
-
-.abt-portal-media img {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	opacity: 0.6;
-	transition: opacity 1s ease, transform 2s cubic-bezier(0.16, 1, 0.3, 1);
-	filter: grayscale(20%);
-}
-
-.abt-portal-item:hover .abt-portal-media img {
-	opacity: 1;
-	transform: scale(1.05);
-	filter: grayscale(0%);
-}
-
-/* The actual 3D canvas container */
-.abt-portal-canvas {
-	position: absolute;
-	inset: 0;
-	z-index: 2;
-	pointer-events: none; /* Let clicks pass through to the link */
-}
-
-.abt-portal-content {
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	z-index: 3;
-}
-
-.abt-portal-icon {
-	color: #B76E79;
-	margin-bottom: 24px;
-}
-
-.abt-portal-title {
-	font-family: 'Cinzel', serif;
-	font-size: clamp(28px, 3.5vw, 48px);
-	font-weight: 400;
-	letter-spacing: 6px;
-	text-transform: uppercase;
-	color: #fff;
-	margin-bottom: 24px;
-}
-
-.abt-portal-desc {
-	font-family: 'Cormorant Garamond', serif;
-	font-size: 1.15rem;
-	line-height: 1.8;
-	color: rgba(255,255,255,0.7);
-	margin-bottom: 40px;
-}
-
-.abt-portal-cta {
-	font-family: 'Space Mono', monospace;
-	font-size: 11px;
-	letter-spacing: 4px;
-	text-transform: uppercase;
-	color: #fff;
+	color: rgba(245, 241, 235, 0.55);
+	margin: 0 0 clamp(40px, 6vw, 88px);
 	display: inline-flex;
 	align-items: center;
 	gap: 12px;
-	transition: color 0.4s ease;
+}
+.abt-hero__doc-sep {
+	color: var(--skyyrose-accent);
+	font-weight: 400;
 }
 
-.abt-portal-cta::after {
-	content: '→';
-	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* Massive Cinzel title */
+.abt-hero__title {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(64px, 14vw, 220px);
+	line-height: 0.92;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	margin: 0 0 clamp(24px, 3vw, 48px);
+}
+.abt-hero__title br { display: block; }
+
+.abt-hero__tag {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-style: italic;
+	font-weight: 400;
+	font-size: clamp(16px, 1.6vw, 22px);
+	letter-spacing: 0.06em;
+	color: rgba(245, 241, 235, 0.78);
+	margin: 0 0 clamp(40px, 5vw, 72px);
 }
 
-.abt-portal-item:hover .abt-portal-cta {
-	color: #B76E79;
-}
-.abt-portal-item:hover .abt-portal-cta::after {
-	transform: translateX(8px);
-}
-
-/* ==========================================================================
-   CHAPTER III: TIMELINE (Blueprint Style)
-   ========================================================================== */
-.abt-timeline {
-	padding: clamp(120px, 15vw, 240px) 48px;
-	background: #050505;
-	border-top: 1px solid rgba(255,255,255,0.04);
-}
-
-.abt-timeline__inner {
-	max-width: 1200px;
-	margin: 0 auto;
-}
-
-.abt-timeline__grid {
+/* Lookbook metadata stack */
+.abt-hero__meta {
+	margin: 0;
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 0;
-	border-left: 1px solid rgba(183, 110, 121, 0.3); /* Rose Gold spine */
-	padding-left: 64px;
+	border-top: 1px solid rgba(245, 241, 235, 0.18);
+	max-width: 480px;
+}
+.abt-hero__meta-row {
+	display: grid;
+	grid-template-columns: 120px 1fr;
+	gap: 24px;
+	padding: 14px 0;
+	border-bottom: 1px solid rgba(245, 241, 235, 0.10);
+}
+.abt-hero__meta-row dt,
+.abt-hero__meta-row dd {
+	margin: 0;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 13px;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+}
+.abt-hero__meta-row dt {
+	color: rgba(245, 241, 235, 0.55); /* raised from 0.45 → 0.55 for AA contrast */
+}
+.abt-hero__meta-row dd {
+	color: var(--skyyrose-surface-warm);
 }
 
-.abt-milestone {
+/* Right column — portrait */
+.abt-hero__right {
+	display: flex;
+	justify-content: flex-end;
+}
+.abt-hero__portrait {
+	margin: 0;
+	width: 100%;
+	max-width: 560px;
 	position: relative;
-	padding-bottom: 80px;
 }
-
-.abt-milestone::before {
-	content: '';
+.abt-hero__portrait img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	filter: grayscale(8%) contrast(1.05);
+}
+.abt-hero__portrait-cap {
 	position: absolute;
-	top: 12px;
-	left: -68px; /* Centered on the spine */
-	width: 7px;
-	height: 7px;
-	background: #B76E79;
-	border-radius: 50%;
-	box-shadow: 0 0 0 4px #050505;
+	bottom: -28px;
+	left: 0;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: rgba(245, 241, 235, 0.6);
 }
 
-.abt-milestone__year {
-	font-family: 'Space Mono', monospace;
-	font-size: 14px;
-	color: #B76E79;
-	margin-bottom: 12px;
+/* Scroll cue */
+.abt-hero__scroll {
+	position: absolute;
+	bottom: clamp(24px, 3vw, 48px);
+	right: clamp(24px, 6vw, 120px);
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 11px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: rgba(245, 241, 235, 0.5);
 }
-
-.abt-milestone__title {
-	font-family: 'Cinzel', serif;
-	font-size: clamp(24px, 3vw, 40px);
-	color: #fff;
-	letter-spacing: 4px;
-	margin-bottom: 16px;
+.abt-hero__scroll-line {
+	display: block;
+	width: 56px;
+	height: 1px;
+	background: rgba(245, 241, 235, 0.5);
+	transform-origin: left center;
+	animation: abtScrollLine 2.4s ease-in-out infinite;
 }
-
-.abt-milestone__desc {
-	font-family: 'Cormorant Garamond', serif;
-	font-size: 1.2rem;
-	color: rgba(255,255,255,0.6);
-	line-height: 1.8;
-	max-width: 60ch;
+@keyframes abtScrollLine {
+	0%, 100% { transform: scaleX(0.4); }
+	50%      { transform: scaleX(1); }
 }
 
 /* ==========================================================================
-   CHAPTER IV: PRESS (Concrete Grid)
+   CHAPTER PRIMITIVES — shared across CH. 01 / 03 / 04
    ========================================================================== */
-.abt-press {
-	padding: clamp(120px, 15vw, 240px) 48px;
-	background: #050505;
-	border-top: 1px solid rgba(255,255,255,0.04);
+.abt-chapter {
+	background: var(--skyyrose-bg);
+	padding: clamp(88px, 12vw, 200px) clamp(24px, 6vw, 120px);
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
 }
 
-.abt-press__grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 32px;
-	max-width: 1400px;
+.abt-chapter__container {
+	max-width: 720px;
 	margin: 0 auto;
 }
+.abt-chapter--press > .abt-chapter__container,
+.abt-chapter--timeline > .abt-chapter__container {
+	max-width: 1200px;
+}
 
-.abt-press-card {
-	padding: 48px;
-	border: 1px solid rgba(255,255,255,0.08);
-	background: transparent;
-	transition: border-color 0.4s ease;
+/* Lookbook chapter head: "CH. 01 ─── The Origin" */
+.abt-chapter__head {
 	display: flex;
-	flex-direction: column;
-}
-
-.abt-press-card:hover {
-	border-color: rgba(255,255,255,0.2);
-}
-
-.abt-press-card__meta {
-	display: flex;
-	justify-content: space-between;
-	font-family: 'Space Mono', monospace;
-	font-size: 10px;
-	text-transform: uppercase;
-	color: rgba(255,255,255,0.4);
-	margin-bottom: 32px;
-	padding-bottom: 16px;
-	border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.abt-press-card__src { color: #B76E79; }
-
-.abt-press-card__title {
-	font-family: 'Playfair Display', serif;
-	font-size: 1.5rem;
-	font-style: italic;
-	color: #fff;
-	line-height: 1.4;
-	margin-bottom: 24px;
-}
-
-.abt-press-card__desc {
-	font-family: 'Cormorant Garamond', serif;
-	font-size: 1.1rem;
-	color: rgba(255,255,255,0.6);
-	margin-bottom: 40px;
-	flex: 1;
-}
-
-.abt-press-card__link {
-	font-family: 'Space Mono', monospace;
-	font-size: 10px;
-	letter-spacing: 4px;
-	text-transform: uppercase;
-	color: #fff;
-	display: inline-flex;
 	align-items: center;
-	gap: 8px;
+	gap: 16px;
+	margin-bottom: clamp(32px, 5vw, 64px);
+}
+.abt-chapter__num {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 14px;
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	white-space: nowrap;
+}
+.abt-chapter__rule {
+	display: block;
+	flex: 1;
+	height: 1px;
+	background: rgba(245, 241, 235, 0.18);
+	max-width: 96px;
+}
+.abt-chapter__label {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 14px;
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: rgba(245, 241, 235, 0.65);
+}
+
+.abt-chapter__title {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(40px, 7vw, 96px);
+	line-height: 0.95;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	margin: 0 0 clamp(48px, 7vw, 96px);
 }
 
 /* ==========================================================================
-   MISSION (Brutalist Statement)
+   PROSE — body text with optional drop cap
    ========================================================================== */
-.abt-mission {
-	padding: clamp(120px, 15vw, 240px) 48px;
-	background: #050505;
-	border-top: 1px solid rgba(255,255,255,0.04);
-	text-align: center;
+.abt-prose {
+	font-family: var(--skyyrose-font-body);
+	font-size: clamp(18px, 1.4vw, 22px);
+	line-height: 1.75;
+	color: rgba(245, 241, 235, 0.86);
+}
+.abt-prose p {
+	margin: 0 0 1.6em;
+}
+.abt-prose strong {
+	color: var(--skyyrose-surface-warm);
+	font-weight: 500;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	letter-spacing: 0.06em;
+	font-size: 0.85em;
+	text-transform: uppercase;
+}
+.abt-prose em {
+	color: var(--skyyrose-accent);
+	font-style: italic;
 }
 
-.abt-mission h2 {
-	font-family: 'Cinzel', serif;
-	font-size: clamp(40px, 6vw, 100px);
+/* Drop cap on first paragraph */
+.abt-prose--dropcap > p:first-child::first-letter {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-size: 5em;
+	line-height: 0.85;
+	float: left;
+	margin: 0.04em 0.16em 0 -0.04em;
+	color: var(--skyyrose-accent);
 	font-weight: 400;
-	letter-spacing: clamp(6px, 2vw, 24px);
-	text-transform: uppercase;
-	color: #fff;
-	line-height: 1.1;
 }
+
+/* ==========================================================================
+   PULL QUOTE — full-bleed editorial breakout
+   ========================================================================== */
+.abt-pull {
+	background: var(--skyyrose-bg);
+	padding: clamp(64px, 10vw, 160px) clamp(24px, 6vw, 120px);
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+.abt-pull__rule {
+	display: block;
+	width: 80px;
+	height: 1px;
+	background: rgba(245, 241, 235, 0.4);
+	margin: 0 auto;
+}
+.abt-pull__text {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-style: italic;
+	font-weight: 400;
+	font-size: clamp(28px, 4vw, 56px);
+	line-height: 1.25;
+	letter-spacing: 0.02em;
+	color: var(--skyyrose-surface-warm);
+	margin: clamp(40px, 5vw, 72px) 0;
+	max-width: 1100px;
+}
+.abt-pull__cite {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: rgba(245, 241, 235, 0.55);
+	font-style: normal;
+	display: block;
+	margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+/* ==========================================================================
+   PHOTO DIVIDER — full-bleed editorial break
+   ========================================================================== */
+.abt-divider {
+	width: 100%;
+	height: clamp(280px, 50vw, 560px);
+	overflow: hidden;
+	background: #050505;
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
+}
+.abt-divider img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	filter: grayscale(15%) contrast(1.08);
+}
+
+/* ==========================================================================
+   MISSION BANNER — concrete cream ground (inverted)
+   ========================================================================== */
+.abt-mission {
+	background: var(--skyyrose-surface-warm);
+	color: var(--skyyrose-bg);
+	padding: clamp(120px, 18vw, 280px) clamp(24px, 6vw, 120px);
+	text-align: center;
+	border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+}
+.abt-mission .abt-chapter__label {
+	color: rgba(10, 10, 10, 0.55);
+	display: block;
+	margin-bottom: clamp(24px, 3vw, 40px);
+	text-align: center;
+}
+.abt-mission__tagline {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(48px, 9vw, 152px);
+	line-height: 0.92;
+	letter-spacing: clamp(0.04em, 1vw, 0.08em);
+	text-transform: uppercase;
+	color: var(--skyyrose-bg);
+	margin: 0 0 clamp(40px, 5vw, 72px);
+}
+.abt-mission__sub {
+	font-family: var(--skyyrose-font-ui);
+	font-size: clamp(14px, 1.4vw, 18px);
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: rgba(10, 10, 10, 0.7);
+	max-width: 800px;
+	margin: 0 auto clamp(48px, 6vw, 80px);
+}
+.abt-mission__cta {
+	display: inline-block;
+	padding: 18px 40px;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 13px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	background: var(--skyyrose-bg);
+	text-decoration: none;
+	transition: background 0.3s ease, color 0.3s ease;
+	border: 1px solid var(--skyyrose-bg);
+}
+.abt-mission__cta:hover,
+.abt-mission__cta:focus-visible {
+	background: transparent;
+	color: var(--skyyrose-bg);
+}
+
+/* ==========================================================================
+   TIMELINE — vertical rule, alternating year/event
+   ========================================================================== */
+.abt-chapter--timeline {
+	padding-bottom: clamp(120px, 16vw, 240px);
+}
+.abt-tl {
+	list-style: none;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 1200px;
+	position: relative;
+}
+.abt-tl::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	width: 1px;
+	background: rgba(245, 241, 235, 0.18);
+	transform: translateX(-0.5px);
+}
+.abt-tl__row {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(40px, 6vw, 96px);
+	align-items: center;
+	padding: clamp(48px, 6vw, 88px) 0;
+}
+.abt-tl__row::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 11px;
+	height: 11px;
+	background: var(--skyyrose-accent);
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 0 4px var(--skyyrose-bg);
+}
+.abt-tl__year {
+	font-family: var(--skyyrose-font-ui);
+	font-size: clamp(80px, 12vw, 200px);
+	line-height: 0.85;
+	letter-spacing: 0.02em;
+	color: var(--skyyrose-surface-warm);
+	text-align: right;
+	padding-right: clamp(32px, 4vw, 64px);
+}
+.abt-tl__body {
+	padding-left: clamp(32px, 4vw, 64px);
+}
+.abt-tl__year-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+.abt-tl__event {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(20px, 2vw, 28px);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	margin: 0 0 16px;
+}
+.abt-tl__desc {
+	font-family: var(--skyyrose-font-body);
+	font-size: clamp(16px, 1.2vw, 19px);
+	line-height: 1.7;
+	color: rgba(245, 241, 235, 0.7);
+	margin: 0;
+	max-width: 50ch;
+}
+
+/* Alternate sides — even rows put body on left, year on right */
+.abt-tl__row--right .abt-tl__year {
+	order: 2;
+	text-align: left;
+	padding-right: 0;
+	padding-left: clamp(32px, 4vw, 64px);
+}
+.abt-tl__row--right .abt-tl__body {
+	order: 1;
+	padding-left: 0;
+	padding-right: clamp(32px, 4vw, 64px);
+	text-align: right;
+}
+.abt-tl__row--right .abt-tl__desc {
+	margin-left: auto;
+}
+
+/* ==========================================================================
+   COMMUNITY — Oakland manifesto stack (cream ground)
+   ========================================================================== */
+.abt-community {
+	background: var(--skyyrose-surface-warm);
+	color: var(--skyyrose-bg);
+	padding: clamp(96px, 14vw, 220px) clamp(24px, 6vw, 120px);
+	border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+}
+.abt-community__inner {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+.abt-community__head {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: clamp(32px, 5vw, 64px);
+}
+.abt-community__label {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 14px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+}
+.abt-community__rule {
+	display: block;
+	flex: 1;
+	height: 1px;
+	background: rgba(10, 10, 10, 0.2);
+	max-width: 96px;
+}
+.abt-community__heading {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(64px, 14vw, 220px);
+	line-height: 0.9;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--skyyrose-bg);
+	margin: 0 0 clamp(48px, 7vw, 96px);
+}
+.abt-community__manifesto {
+	font-family: var(--skyyrose-font-ui);
+	font-size: clamp(20px, 2.4vw, 36px);
+	line-height: 1.4;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--skyyrose-bg);
+	margin: 0 0 clamp(48px, 6vw, 80px);
+	max-width: 1100px;
+}
+.abt-community__place {
+	display: inline;
+}
+.abt-community__dot {
+	display: inline-block;
+	margin: 0 0.6em;
+	color: var(--skyyrose-accent);
+	font-weight: 700;
+}
+.abt-community__frame {
+	font-family: var(--skyyrose-font-body);
+	font-size: clamp(18px, 1.4vw, 22px);
+	font-style: italic;
+	line-height: 1.7;
+	color: rgba(10, 10, 10, 0.78);
+	max-width: 720px;
+	margin: 0;
+}
+
+.abt-community__gallery {
+	margin-top: clamp(64px, 8vw, 120px);
+}
+.abt-community__gallery-label {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: rgba(10, 10, 10, 0.6);
+	margin: 0 0 24px;
+}
+.abt-community__photos {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 16px;
+}
+.abt-community__photo {
+	margin: 0;
+	overflow: hidden;
+	background: var(--skyyrose-bg);
+}
+.abt-community__photo img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	filter: grayscale(10%);
+	transition: filter 0.6s ease, transform 1.2s cubic-bezier(.16, 1, .3, 1);
+}
+.abt-community__photo:hover img {
+	filter: grayscale(0%);
+	transform: scale(1.04);
+}
+
+/* ==========================================================================
+   PRESS — Newspaper 2x2 column grid + Blox poster + video frame
+   ========================================================================== */
+.abt-press__poster {
+	margin: 0 0 clamp(40px, 5vw, 72px);
+	overflow: hidden;
+	background: #050505;
+	position: relative;
+}
+.abt-press__poster img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	filter: grayscale(10%) contrast(1.05);
+}
+.abt-press__poster-cap {
+	position: absolute;
+	bottom: 16px;
+	left: 16px;
+	padding: 8px 14px;
+	background: rgba(10, 10, 10, 0.78);
+	font-family: var(--skyyrose-font-ui);
+	font-size: 11px;
+	letter-spacing: 0.28em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+}
+
+/* Featured video — Blox interview relocated directly beneath the hero. */
+.abt-featured-video {
+	background: var(--skyyrose-bg);
+	padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 120px);
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
+}
+.abt-featured-video .abt-press__video {
+	margin-bottom: 0;
+}
+
+.abt-press__video {
+	margin: 0 auto clamp(64px, 8vw, 120px);
+	max-width: 1100px;
+}
+.abt-press__video-meta {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+.abt-press__video-label,
+.abt-press__video-source {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+}
+.abt-press__video-label { color: var(--skyyrose-accent); }
+.abt-press__video-source { color: rgba(245, 241, 235, 0.65); }
+.abt-press__video-rule {
+	display: block;
+	flex: 1;
+	height: 1px;
+	background: rgba(245, 241, 235, 0.2);
+	max-width: 200px;
+}
+.abt-press__video-frame {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	background: #050505;
+	overflow: hidden;
+}
+.abt-press__video-frame iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+/* Newspaper grid — no card chrome, rules between */
+.abt-press__paper {
+	max-width: 1200px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0;
+	border-top: 1px solid rgba(245, 241, 235, 0.18);
+	border-left: 1px solid rgba(245, 241, 235, 0.18);
+}
+.abt-press__col {
+	padding: clamp(32px, 4vw, 56px);
+	border-right: 1px solid rgba(245, 241, 235, 0.18);
+	border-bottom: 1px solid rgba(245, 241, 235, 0.18);
+	display: flex;
+	flex-direction: column;
+	min-height: 320px;
+	background: transparent;
+}
+.abt-press__col-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	margin: 0 0 24px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid rgba(245, 241, 235, 0.12);
+}
+.abt-press__col-src {
+	margin: 0;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 18px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+}
+.abt-press__col-date {
+	margin: 0;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 11px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(245, 241, 235, 0.5);
+}
+.abt-press__col-headline {
+	margin: 0 0 20px;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-style: italic;
+	font-weight: 400;
+	font-size: clamp(20px, 1.8vw, 26px);
+	line-height: 1.3;
+	color: var(--skyyrose-surface-warm);
+}
+.abt-press__col-excerpt {
+	margin: 0 0 32px;
+	font-family: var(--skyyrose-font-body);
+	font-size: clamp(16px, 1.2vw, 18px);
+	line-height: 1.65;
+	color: rgba(245, 241, 235, 0.72);
+	flex: 1;
+}
+.abt-press__col-link {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	transition: color 0.3s ease, gap 0.3s ease;
+	align-self: flex-start;
+}
+.abt-press__col-link:hover,
+.abt-press__col-link:focus-visible {
+	color: var(--skyyrose-accent);
+	gap: 16px;
+}
+.abt-press__col-link svg {
+	width: 14px;
+	height: 10px;
+}
+
+/* ==========================================================================
+   COLLECTIONS — Editorial index row list (CH. 02)
+   ========================================================================== */
+.abt-collections {
+	background: var(--skyyrose-bg);
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
+	padding: clamp(96px, 14vw, 220px) clamp(24px, 6vw, 120px);
+}
+
+.abt-coll-list {
+	list-style: none;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 1400px;
+	border-top: 1px solid rgba(245, 241, 235, 0.18);
+}
+
+.abt-coll-row {
+	border-bottom: 1px solid rgba(245, 241, 235, 0.18);
+	position: relative;
+	transition: background 0.6s cubic-bezier(.16, 1, .3, 1);
+}
+
+.abt-coll-row__link {
+	display: grid;
+	grid-template-columns: 80px minmax(220px, 320px) minmax(0, 1fr) auto;
+	gap: clamp(24px, 4vw, 80px);
+	align-items: center;
+	padding: clamp(24px, 3.5vw, 56px) clamp(8px, 1vw, 24px);
+	color: inherit;
+	text-decoration: none;
+	transition: padding 0.5s cubic-bezier(.16, 1, .3, 1);
+}
+
+.abt-coll-row:hover {
+	background: rgba(245, 241, 235, 0.02);
+}
+.abt-coll-row:hover .abt-coll-row__link {
+	padding-left: clamp(16px, 2vw, 32px);
+}
+
+/* Index number */
+.abt-coll-row__index {
+	font-family: var(--skyyrose-font-ui);
+	font-size: clamp(36px, 4vw, 64px);
+	letter-spacing: 0.04em;
+	color: rgba(245, 241, 235, 0.32);
+	line-height: 1;
+	transition: color 0.4s ease;
+}
+.abt-coll-row:hover .abt-coll-row__index {
+	color: var(--color-rose-gold); /* fixed rose-gold; --skyyrose-accent overrides per collection */
+}
+
+/* Hero portrait — small 4:5 left of body */
+.abt-coll-row__media {
+	margin: 0;
+	width: 100%;
+	max-width: 320px;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: #050505;
+}
+.abt-coll-row__media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	filter: grayscale(15%) contrast(1.05);
+	transition: filter 0.8s ease, transform 1.4s cubic-bezier(.16, 1, .3, 1);
+}
+.abt-coll-row:hover .abt-coll-row__media img {
+	filter: grayscale(0%);
+	transform: scale(1.04);
+}
+
+/* Body */
+.abt-coll-row__body {
+	max-width: 520px;
+}
+.abt-coll-row__tag {
+	display: block;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	margin: 0 0 12px;
+}
+.abt-coll-row__title {
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
+	font-weight: 400;
+	font-size: clamp(28px, 3.4vw, 48px);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	margin: 0 0 16px;
+	line-height: 1;
+}
+.abt-coll-row__desc {
+	font-family: var(--skyyrose-font-body);
+	font-size: clamp(16px, 1.2vw, 19px);
+	line-height: 1.7;
+	color: rgba(245, 241, 235, 0.72);
+	margin: 0;
+}
+
+/* CTA */
+.abt-coll-row__cta {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 13px;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+	color: var(--skyyrose-surface-warm);
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	transition: color 0.4s ease, gap 0.4s ease;
+	white-space: nowrap;
+}
+.abt-coll-row:hover .abt-coll-row__cta {
+	color: var(--color-rose-gold); /* fixed rose-gold; --skyyrose-accent overrides per collection */
+	gap: 18px;
+}
+.abt-coll-row__cta svg { width: 14px; height: 10px; }
+
+/* Per-collection accent on tag (uses data-collection) */
+.abt-coll-row[data-collection="black-rose"]   .abt-coll-row__tag { color: #C0C0C0; }
+.abt-coll-row[data-collection="love-hurts"]   .abt-coll-row__tag { color: #DC143C; }
+.abt-coll-row[data-collection="signature"]    .abt-coll-row__tag { color: #D4AF37; }
+.abt-coll-row[data-collection="kids-capsule"] .abt-coll-row__tag { color: var(--skyyrose-accent); }
 
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 1024px) {
-	.abt-origin__inner { grid-template-columns: 1fr; gap: 64px; }
-	.abt-origin__quote { position: relative; top: 0; }
-	.abt-portal-item { grid-template-columns: 1fr; gap: 32px; padding: 32px; }
-	.abt-press__grid { grid-template-columns: 1fr; }
+	.abt-hero {
+		min-height: auto;
+		padding-top: clamp(96px, 14vw, 160px);
+		padding-bottom: clamp(64px, 10vw, 120px);
+	}
+	.abt-hero__grid {
+		grid-template-columns: 1fr;
+		gap: 64px;
+		align-items: start;
+	}
+	.abt-hero__right {
+		justify-content: flex-start;
+	}
+	.abt-hero__portrait {
+		max-width: 100%;
+	}
+	.abt-hero__scroll { display: none; }
+
+	.abt-tl::before { left: 24px; transform: none; }
+	.abt-tl__row,
+	.abt-tl__row--right {
+		grid-template-columns: 80px 1fr;
+		gap: 24px;
+		align-items: start;
+	}
+	.abt-tl__row::before {
+		left: 24px;
+		top: 24px;
+		transform: translate(-50%, 0);
+	}
+	.abt-tl__year,
+	.abt-tl__row--right .abt-tl__year {
+		font-size: clamp(48px, 10vw, 88px);
+		text-align: left;
+		padding: 0;
+		order: 0;
+	}
+	.abt-tl__body,
+	.abt-tl__row--right .abt-tl__body {
+		padding: 0;
+		text-align: left;
+		order: 0;
+	}
+	.abt-tl__row--right .abt-tl__desc { margin-left: 0; }
+
+	.abt-press__paper { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
-	.abt-hero { padding: 0 24px; }
-	.abt-origin, .abt-collections, .abt-timeline, .abt-press, .abt-mission { padding: 80px 24px; }
-	.abt-timeline__grid { padding-left: 32px; }
-	.abt-milestone::before { left: -36px; }
-	.abt-portal-list { padding: 0; }
+@media (max-width: 900px) {
+	.abt-coll-row__link {
+		grid-template-columns: 56px 1fr;
+		grid-template-areas:
+			"index media"
+			"index body"
+			"index cta";
+		gap: 16px 20px;
+		padding: 28px 8px;
+	}
+	.abt-coll-row__index {
+		grid-area: index;
+		font-size: 36px;
+		align-self: start;
+	}
+	.abt-coll-row__media {
+		grid-area: media;
+		max-width: 100%;
+		aspect-ratio: 16 / 10;
+	}
+	.abt-coll-row__body { grid-area: body; max-width: 100%; }
+	.abt-coll-row__cta  { grid-area: cta; }
+	.abt-coll-row:hover .abt-coll-row__link { padding-left: 8px; }
+}
+
+@media (max-width: 720px) {
+	.abt-hero__doc { font-size: 11px; letter-spacing: 0.28em; }
+	.abt-hero__title { font-size: clamp(56px, 18vw, 96px); }
+	.abt-hero__meta-row { grid-template-columns: 96px 1fr; }
+	.abt-chapter { padding: clamp(64px, 12vw, 120px) 24px; }
+	.abt-chapter__title { font-size: clamp(36px, 10vw, 56px); }
+	.abt-mission { padding: clamp(96px, 16vw, 160px) 24px; }
+	.abt-mission__tagline { font-size: clamp(40px, 13vw, 72px); }
+	.abt-community__heading { font-size: clamp(56px, 18vw, 96px); }
+	.abt-community__manifesto { font-size: clamp(18px, 5vw, 24px); }
+	.abt-pull__text { font-size: clamp(22px, 6vw, 32px); }
+	.abt-collections { padding: clamp(64px, 12vw, 120px) 24px; }
+	.abt-coll-row__title { font-size: clamp(24px, 7vw, 32px); }
 }

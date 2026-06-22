@@ -25,6 +25,7 @@ from api.v1.analytics.business import router as business_router
 from api.v1.analytics.dashboard import router as analytics_dashboard_router
 from api.v1.approval import router as approval_router
 from api.v1.assets import router as assets_router
+from api.v1.autonomous import router as autonomous_router
 from api.v1.brand_assets import router as brand_assets_router
 from api.v1.catalog import router as catalog_router
 from api.v1.claude_sdk import router as claude_sdk_router
@@ -59,6 +60,7 @@ __all__ = [
     "marketing_router",
     "media_router",
     "ml_router",
+    "autonomous_router",
     "monitoring_router",
     "orchestration_router",
     "social_media_router",

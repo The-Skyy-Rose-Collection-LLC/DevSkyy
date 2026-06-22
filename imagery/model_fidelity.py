@@ -486,7 +486,6 @@ class ModelFidelityValidator:
             from skimage import img_as_float as _f
             from skimage.metrics import structural_similarity as _ssim
 
-
             ref_img = Image.open(self.reference_image_path).convert("RGB")
             target_size = (512, 512)
             ref_arr = np.array(ref_img.resize(target_size, Image.Resampling.LANCZOS))

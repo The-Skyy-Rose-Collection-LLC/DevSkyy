@@ -313,13 +313,20 @@ def test_clean_catalog_has_no_violations(tmp_path: Path, monkeypatch: pytest.Mon
 
 
 def test_live_catalog_passes_strict_validation() -> None:
-    """Sanity: the actual assets/product-masters/catalog.yaml should load strict-clean."""
+    """Sanity: the Catalog YAML fixture should load strict-clean when present.
+
+    NOTE (2026-06-16 SOT cutover): assets/product-masters/catalog.yaml was deleted; product
+    data is now authoritative in data/skyyrose-catalog.csv via skyyrose.core.catalog_loader.
+    This test skips when the legacy fixture is absent (the normal CI state).
+    """
     from pathlib import Path as P
 
     repo_root = P(__file__).resolve().parents[3]
     live = repo_root / "assets" / "product-masters" / "catalog.yaml"
     if not live.is_file():
-        pytest.skip("Live catalog.yaml not present in test environment")
+        pytest.skip(
+            "Legacy catalog.yaml not present — product data now in data/skyyrose-catalog.csv"
+        )
     cat = Catalog.load(path=live, strict=True)
     assert len(cat.violations) == 0
     assert len(cat.products_by_sku) > 0

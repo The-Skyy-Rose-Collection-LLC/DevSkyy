@@ -32,6 +32,7 @@ if ( empty( $questions ) ) {
 			<?php foreach ( $questions as $i => $item ) : ?>
 				<div class="lp-faq__item lp-rv" data-delay="<?php echo esc_attr( min( $i + 1, 5 ) ); ?>">
 					<button class="lp-faq__question" type="button"
+							id="lp-faq-q-<?php echo esc_attr( $i ); ?>"
 							aria-expanded="false"
 							aria-controls="lp-faq-a-<?php echo esc_attr( $i ); ?>">
 						<span><?php echo esc_html( $item['q'] ); ?></span>
@@ -40,7 +41,9 @@ if ( empty( $questions ) ) {
 							<line x1="5" y1="12" x2="19" y2="12"></line>
 						</svg>
 					</button>
-					<div class="lp-faq__answer" id="lp-faq-a-<?php echo esc_attr( $i ); ?>" role="region">
+					<div class="lp-faq__answer" id="lp-faq-a-<?php echo esc_attr( $i ); ?>"
+							role="region"
+							aria-labelledby="lp-faq-q-<?php echo esc_attr( $i ); ?>">
 						<div class="lp-faq__answer-inner">
 							<?php echo wp_kses_post( $item['a'] ); ?>
 						</div>

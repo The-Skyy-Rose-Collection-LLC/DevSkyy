@@ -1,0 +1,83 @@
+# Clothing 3D worker stack — drop-in compose file for the TRELLIS pipeline.
+#
+# Compose with the main DevSkyy stack:
+#   docker compose -f docker-compose.yml -f deploy/clothing_3d/docker-compose.yml up -d
+#
+# Standalone (queue + worker only, no main stack):
+#   docker compose -f deploy/clothing_3d/docker-compose.yml up -d
+
+version: "3.9"
+
+x-shared-env: &shared_env
+  REDIS_URL: redis://redis:6379/0
+  TRELLIS_BACKEND: ${TRELLIS_BACKEND:-hf_space}
+  TRELLIS_QUALITY: ${TRELLIS_QUALITY:-standard}
+  TRELLIS_EXPORT_USDZ: "true"
+  THREE_D_OUTPUT_DIR: /var/data/3d-models-generated
+  TRELLIS_CACHE_DIR: /var/cache/trellis
+  HUGGINGFACE_TOKEN: ${HUGGINGFACE_TOKEN:-}
+  REPLICATE_API_TOKEN: ${REPLICATE_API_TOKEN:-}
+  LOG_LEVEL: INFO
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - clothing3d-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  clothing-3d-worker:
+    build:
+      context: ../../
+      dockerfile: deploy/clothing_3d/Dockerfile
+    image: devskyy/clothing-3d-worker:latest
+    environment:
+      <<: *shared_env
+      CLOTHING_3D_CONCURRENCY: "${CLOTHING_3D_CONCURRENCY:-2}"
+    volumes:
+      - clothing3d-artifacts:/var/data/3d-models-generated
+      - clothing3d-cache:/var/cache/trellis
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: ${CLOTHING_3D_REPLICAS:-2}
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+
+  clothing-3d-api:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    image: devskyy/api:latest
+    command: ["uvicorn", "main_enterprise:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      <<: *shared_env
+    ports:
+      - "${CLOTHING_3D_API_PORT:-8000}:8000"
+    volumes:
+      - clothing3d-artifacts:/app/assets/3d-models-generated
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/v1/clothing-3d/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  clothing3d-redis:
+  clothing3d-artifacts:
+  clothing3d-cache:

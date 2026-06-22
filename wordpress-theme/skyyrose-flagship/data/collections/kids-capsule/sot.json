@@ -1,0 +1,139 @@
+{
+  "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
+  "_authority": "Single Source of Truth view for Kids Capsule. Canon = identity.json.",
+  "collection": "kids-capsule",
+  "name": "Kids Capsule",
+  "updated": "GENERATED",
+  "story": {
+    "seed": "The Heir to the throne.",
+    "doc_ref": "docs/brand/collection-stories.md#kids-capsule"
+  },
+  "palette": {
+    "gold": "#D4AF37",
+    "rose_gold": "#B76E79",
+    "accent": "#D4AF37",
+    "accent_dark": "#B8960C",
+    "secondary": "#B76E79",
+    "bg": "#0A0A0A",
+    "text": "#F5E6D3"
+  },
+  "fonts": {
+    "script": {
+      "family": "Pinyon Script",
+      "woff2": "assets/fonts/pinyon-script-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Cormorant Garamond",
+      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
+  },
+  "masters": {
+    "identity": "data/collections/kids-capsule/identity.json",
+    "products": "data/skyyrose-catalog.csv",
+    "imagery": "data/visual-manifest.json",
+    "logos": "data/logo-registry.json"
+  },
+  "lockup": {
+    "canonical": "images/logos/sr-monogram-rose-gold.webp",
+    "display_webp": null,
+    "svg_master": null,
+    "source_art": {
+      "path": "images/logos/sr-monogram-rose-gold",
+      "resolved": "images/logos/sr-monogram-rose-gold.webp",
+      "kind": "collection-lockup",
+      "status": "verified",
+      "notes": "Kids Capsule uses the rose-gold monogram as its mark (no dedicated script lockup exists yet). Launch-mode collection \u2014 empty grid by design."
+    },
+    "alt": null,
+    "rule": "The lockup IS the collection name; never type-render it."
+  },
+  "imagery": {
+    "scene_portrait": null,
+    "hero_backdrop": null,
+    "atmospherics": [],
+    "patches": [],
+    "lettering_alt": [],
+    "lockup_parts": [],
+    "lookbook": [
+      {
+        "path": "images/lookbook/lb-kid-black-rose",
+        "resolved": "images/lookbook/lb-kid-black-rose-480w.webp",
+        "kind": "lookbook",
+        "status": "verified",
+        "notes": "Kid wearing Black Rose piece. Kids Capsule surfaces (founder-assigned 2026-06-11)."
+      }
+    ],
+    "hero": {
+      "path": "branding/hero/luxury-nighttime",
+      "resolved": "branding/hero/luxury-nighttime-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "interim-pending-mj",
+      "notes": "Placeholder wide master. Dedicated Kids Capsule MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
+    }
+  },
+  "logos": [
+    {
+      "id": "skyy-rose-collection-circular-patch",
+      "file": "skyy-rose-collection-circular-patch.jpeg",
+      "resolved": "images/logos/skyy-rose-collection-circular-patch.jpeg",
+      "primary_color": "#FFFFFF",
+      "notes": "KIDS CAPSULE LOGO. 'SKYY ROSE COLLECTION' circular patch \u2014 white/gray ground with black 'SKYY ROSE' arched on top + 'COLLECTION' arched on bottom, detailed blac"
+    }
+  ],
+  "products": [
+    {
+      "sku": "kids-001",
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "price": "65",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/kids-001-red-set.jpeg",
+          "resolved": "images/products/kids-001-red-set.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/kids-001-onmodel.webp",
+          "resolved": "images/products/kids-001-onmodel.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/kids-red-set-back-model.webp",
+          "resolved": "images/products/kids-red-set-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/kids-colorblock-hoodie-set-red-black.md",
+      "dossier_exists": true
+    },
+    {
+      "sku": "kids-002",
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "price": "65",
+      "is_preorder": false,
+      "published": true,
+      "images": {
+        "image": {
+          "path": "assets/images/products/kids-002-purple-set.jpeg",
+          "resolved": "images/products/kids-002-purple-set.jpeg"
+        },
+        "front_model_image": {
+          "path": "assets/images/products/ghost/kids-002-ghost-front.webp",
+          "resolved": "images/products/ghost/kids-002-ghost-front.webp"
+        },
+        "back_model_image": {
+          "path": "assets/images/products/kids-purple-set-back-model.webp",
+          "resolved": "images/products/kids-purple-set-back-model.webp"
+        }
+      },
+      "dossier": "data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
+      "dossier_exists": true
+    }
+  ],
+  "unresolved_product_images": []
+}

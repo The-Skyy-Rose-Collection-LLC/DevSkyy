@@ -133,7 +133,8 @@ p, li {
         box-shadow var(--cp-dur-med) var(--cp-ease-luxe),
         background-color var(--cp-dur-fast) var(--cp-ease-luxe),
         color var(--cp-dur-fast) var(--cp-ease-luxe);
-    will-change: transform, box-shadow;
+    /* will-change omitted — set dynamically on :hover/focus by JS to avoid
+       permanent compositor layers on every button (premium-interactions.js pattern) */
 }
 
 .btn:hover, .button:hover,
@@ -190,7 +191,8 @@ button.wp-block-button__link:active, .wp-block-button__link:active {
     transition:
         transform var(--cp-dur-med) var(--cp-ease-luxe),
         box-shadow var(--cp-dur-med) var(--cp-ease-luxe);
-    will-change: transform, box-shadow;
+    /* will-change omitted — set dynamically; permanent compositor layers on
+       every card create GPU memory pressure (see premium-interactions.js pattern) */
     overflow: hidden;
 }
 
@@ -300,15 +302,18 @@ section + section {
  * 7. Focus states — accessible + luxurious
  * ═══════════════════════════════════════════════════════════════════════════ */
 
+/* :focus-visible color is owned by design-tokens.css (--color-rose-gold default).
+   Only the border-radius softening is added here — no color override. */
 :focus-visible {
-    outline: 2px solid var(--color-gold, #D4AF37);
-    outline-offset: 3px;
     border-radius: var(--cp-radius-sm);
 }
 
+/* Gold-ring enhancement for interactive CTA elements.
+   --color-gold-rgb is defined in design-tokens.css as 212, 175, 55. */
 button:focus-visible, a:focus-visible, .btn:focus-visible {
-    box-shadow: 0 0 0 3px rgba(var(--color-gold-rgb, 212, 175, 55), 0.35);
-    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-gold-rgb), 0.35);
+    outline: 2px solid var(--color-gold, #D4AF37);
+    outline-offset: 3px;
 }
 
 

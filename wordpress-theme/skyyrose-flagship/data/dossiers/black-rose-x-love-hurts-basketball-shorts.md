@@ -2,13 +2,13 @@
 sku: br-007
 name: BLACK Rose x Love Hurts Basketball Shorts
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/love-hurts-logo.md
-reference_image: data/product-references/br-007-shorts-real-front.jpeg
+reference_image: assets/products/references/br-007-shorts-real-front.jpeg
 extra_references:
-  - data/product-references/br-007-shorts-real-back.jpeg
-  - data/product-references/br-007-shorts-techflat.jpeg
+  - assets/products/references/br-007-shorts-real-back.jpeg
+  - assets/products/references/br-007-shorts-techflat.jpeg
 ---
 
 # BLACK Rose × Love Hurts Basketball Shorts
@@ -18,11 +18,11 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Love Hurts (wordmark + broken-heart-and-thorns lockup): `data/brand-logos/love-hurts-logo.md`
-> - Reference photos: `data/product-references/br-007-shorts-real-front.jpeg`,
->                     `data/product-references/br-007-shorts-real-back.jpeg`,
->                     `data/product-references/br-007-shorts-techflat.jpeg`
+> - Reference photos: `assets/products/references/br-007-shorts-real-front.jpeg`,
+>                     `assets/products/references/br-007-shorts-real-back.jpeg`,
+>                     `assets/products/references/br-007-shorts-techflat.jpeg`
 >
 > ### COLORWAY OVERRIDE — read this BEFORE rendering
 >

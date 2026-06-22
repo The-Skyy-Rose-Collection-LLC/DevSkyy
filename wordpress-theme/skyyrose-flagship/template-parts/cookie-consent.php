@@ -19,8 +19,10 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 <div id="skyyrose-cookie-consent"
 	class="cookie-consent cookie-consent--hidden"
 	role="dialog"
-	aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose' ); ?>">
-	<p class="cookie-consent__message">
+	aria-modal="true"
+	aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose' ); ?>"
+	aria-describedby="cookie-consent-message">
+	<p id="cookie-consent-message" class="cookie-consent__message">
 		<?php
 		printf(
 			/* translators: %1$s and %2$s wrap the privacy policy link */
@@ -43,16 +45,29 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 <script>
 (function() {
 	if ( localStorage.getItem( 'skyyrose_cookie_consent' ) ) return;
-	var banner  = document.getElementById( 'skyyrose-cookie-consent' );
-	var accept  = document.getElementById( 'skyyrose-cookie-accept' );
-	var decline = document.getElementById( 'skyyrose-cookie-decline' );
+	var banner      = document.getElementById( 'skyyrose-cookie-consent' );
+	var accept      = document.getElementById( 'skyyrose-cookie-accept' );
+	var decline     = document.getElementById( 'skyyrose-cookie-decline' );
+	var returnFocus = document.activeElement || document.body;
 	if ( ! banner || ! accept || ! decline ) return;
 	banner.classList.remove( 'cookie-consent--hidden' );
+	// Move focus to accept button so keyboard users reach the dialog immediately.
+	setTimeout( function() { accept.focus(); }, 100 );
 	function dismiss( value ) {
 		localStorage.setItem( 'skyyrose_cookie_consent', value );
 		banner.classList.add( 'cookie-consent--hidden' );
+		// Return focus to where it was before the dialog appeared.
+		if ( returnFocus && typeof returnFocus.focus === 'function' ) {
+			returnFocus.focus();
+		}
 	}
 	accept.addEventListener( 'click', function() { dismiss( 'accepted' ); } );
 	decline.addEventListener( 'click', function() { dismiss( 'declined' ); } );
+	// Escape key: treat as decline (hides banner without storing acceptance).
+	document.addEventListener( 'keydown', function( e ) {
+		if ( e.key === 'Escape' && ! banner.classList.contains( 'cookie-consent--hidden' ) ) {
+			dismiss( 'declined' );
+		}
+	} );
 })();
 </script>

@@ -12,16 +12,17 @@ import logging
 from pathlib import Path
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 # Paths
 PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
 
 # Hallucinated targets
-ACCESSORY_SKUS = ["lh-005", "sg-007"] # Fanny pack and Beanie should not have human model shots
-PO_COLLECTION_PREFIX = "po-" # Non-existent collection
-SUSPECT_UNOPTIMIZED_SIZE_LIMIT = 1.5 * 1024 * 1024 # 1.5MB
+ACCESSORY_SKUS = ["lh-005", "sg-007"]  # Fanny pack and Beanie should not have human model shots
+PO_COLLECTION_PREFIX = "po-"  # Non-existent collection
+SUSPECT_UNOPTIMIZED_SIZE_LIMIT = 1.5 * 1024 * 1024  # 1.5MB
+
 
 def purge():
     if not PRODUCTS_DIR.exists():
@@ -44,14 +45,19 @@ def purge():
 
         # Rule 3: Identify unoptimized massive files (>1.5MB) that are specifically 'model' shots
         # These are usually the result of unconstrained AI generation without web-optimization
-        is_massive_hallucination = item.stat().st_size > SUSPECT_UNOPTIMIZED_SIZE_LIMIT and "model" in name
+        is_massive_hallucination = (
+            item.stat().st_size > SUSPECT_UNOPTIMIZED_SIZE_LIMIT and "model" in name
+        )
 
         if is_accessory_model or is_po_hallucination or is_massive_hallucination:
-            logger.info(f"Purging hallucination: {item.name} ({item.stat().st_size / 1024 / 1024:.2f} MB)")
+            logger.info(
+                f"Purging hallucination: {item.name} ({item.stat().st_size / 1024 / 1024:.2f} MB)"
+            )
             item.unlink()
             deleted_count += 1
 
     logger.info(f"Cleanup complete. Deleted {deleted_count} hallucinated assets.")
+
 
 if __name__ == "__main__":
     purge()

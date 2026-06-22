@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "description": "SkyyRose gpt-image-2 render presets. Each template is a partial output-contract object. Merge with per-call inputs (call wins on conflict) before emitting the final contract. All templates set ready_to_render: false — the STOP-AND-SHOW gate always fires before the downstream runner executes.",
+    "schema": "references/element-schema.md",
+    "pipeline": "scripts/oai_render/prompt.py",
+    "api_call": "client.images.edit(model='gpt-image-2', image=[...refs], prompt=..., size='1024x1536', quality='high', background='auto', n=1)",
+    "notes": [
+      "No negative_prompt field exists in gpt-image-2 API — negatives are baked into NEGATIVE_GUARDRAILS as DO NOT sentences.",
+      "No seed field exists in gpt-image-2 API.",
+      "Edit mode always requires at least one reference image.",
+      "ready_to_render is always false from design-master; flips true only after STOP-AND-SHOW y."
+    ]
+  },
+  "templates": [
+    {
+      "template_id": "skyyrose_pdp_product_shot",
+      "template_name": "SkyyRose PDP Product Shot",
+      "description": "Clean ghost-mannequin studio shot for product-detail pages and WooCommerce catalog. Collection-agnostic — works across all four collections. The standard pipeline default.",
+      "mode": "ghost",
+      "view": "front",
+      "collection": null,
+      "presentation_block": "PRESENTATION: clean ghost-mannequin / invisible-form — the garment holds its 3D shape with NO visible person, no hanger, no mannequin. Exactly ONE garment — never a flat multi-panel technical diagram or multiple views in one frame.",
+      "view_directive": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "background": "BACKGROUND: seamless, uncluttered neutral light-grey studio backdrop — no props, no text, no scene, no logos other than those physically on the garment. Clean product-card aesthetic.",
+      "palette": {
+        "accent": null,
+        "note": "Collection-agnostic; accent resolved from collection at merge time."
+      },
+      "style_anchors": ["Kith", "Culture Kings"],
+      "lighting_note": "Soft, even studio light, gentle directional key, subtle natural drop shadow. No dramatic rim, no colored gel.",
+      "negative_guardrails": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics.\nBRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel (for example the back) shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result.\nOUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen.",
+      "size": "1024x1536",
+      "quality": "high",
+      "background_api": "auto",
+      "estimated_cost_usd": 0.06,
+      "ready_to_render": false
+    },
+    {
+      "template_id": "skyyrose_black_rose_campaign",
+      "template_name": "SkyyRose Black Rose Campaign Shot",
+      "description": "On-model campaign render for the Black Rose collection. Bay Bridge / blue-hour / black-rose garden environment. Armor aesthetic, dark romantic luxury, silver accent.",
+      "mode": "on-model",
+      "view": "front",
+      "collection": "black-rose",
+      "presentation_block": "PRESENTATION: worn by a single full-body fashion model, natural confident pose, neutral expression, professional styling. Exactly ONE garment / one look — never a flat diagram or multiple views in one frame.",
+      "view_directive": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "background": "BACKGROUND / SCENE: the Bay Bridge silhouetted behind, shot from the Oakland shore at blue hour, framed by a moody black-rose garden — dark romantic luxury, dramatic low light, roses in deep shadow. The model is photographed within this environment; keep the garment sharp, correctly lit, and fully unobstructed — the scene is atmosphere, never covering or recoloring the product.",
+      "palette": {
+        "accent": "#C0C0C0",
+        "accent_name": "silver",
+        "aesthetic_keywords": ["armor", "Oakland concrete", "dark-on-dark", "thorn motif", "Cinzel restraint"]
+      },
+      "style_anchors": ["Fear of God", "Oaklandish"],
+      "lighting_note": "Dramatic blue-hour ambient from the bay; subtle fill from front to keep garment readable. Deep shadows in scene, garment detail preserved.",
+      "negative_guardrails": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics.\nBRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result.\nOUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen.",
+      "size": "1024x1536",
+      "quality": "high",
+      "background_api": "auto",
+      "estimated_cost_usd": 0.06,
+      "ready_to_render": false
+    },
+    {
+      "template_id": "skyyrose_love_hurts_editorial",
+      "template_name": "SkyyRose Love Hurts Editorial",
+      "description": "On-model editorial render for the Love Hurts collection. Candlelit gothic château interior, Beast's POV. Grief-as-love aesthetic, heart-and-thorns, crimson accent.",
+      "mode": "on-model",
+      "view": "front",
+      "collection": "love-hurts",
+      "presentation_block": "PRESENTATION: worn by a single full-body fashion model, natural confident pose, neutral expression, professional styling. Exactly ONE garment / one look — never a flat diagram or multiple views in one frame.",
+      "view_directive": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "background": "BACKGROUND / SCENE: a darkly romantic Beauty-and-the-Beast setting seen from the Beast's point of view — a candlelit gothic château interior, ornate and brooding, shadow-heavy, emotionally intense. The model is photographed within this environment; keep the garment sharp, correctly lit, and fully unobstructed — the scene is atmosphere, never covering or recoloring the product.",
+      "palette": {
+        "accent": "#DC143C",
+        "accent_name": "crimson",
+        "aesthetic_keywords": ["Beast and rose", "grief-as-love", "heart and thorns", "crimson/purple/burgundy", "emotionally intense"]
+      },
+      "style_anchors": ["Palm Angels", "Fear of God"],
+      "lighting_note": "Candlelight warm ambient from left, deep shadows right and background. Garment must remain fully legible — candle warmth in scene, not on product color.",
+      "negative_guardrails": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics.\nBRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result.\nOUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen.",
+      "size": "1024x1536",
+      "quality": "high",
+      "background_api": "auto",
+      "estimated_cost_usd": 0.06,
+      "ready_to_render": false
+    },
+    {
+      "template_id": "skyyrose_signature_lifestyle",
+      "template_name": "SkyyRose Signature Lifestyle Shot",
+      "description": "On-model lifestyle render for the Signature collection. Golden Gate Bridge at golden hour, confident West-Coast street-luxury energy. Gold accent, origin/bedrock aesthetic.",
+      "mode": "on-model",
+      "view": "front",
+      "collection": "signature",
+      "presentation_block": "PRESENTATION: worn by a single full-body fashion model, natural confident pose, neutral expression, professional styling. Exactly ONE garment / one look — never a flat diagram or multiple views in one frame.",
+      "view_directive": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "background": "BACKGROUND / SCENE: the Golden Gate Bridge and Bay Area skyline at golden hour — confident West-Coast street-luxury energy, warm sunlight, effortless swag. The model is photographed within this environment; keep the garment sharp, correctly lit, and fully unobstructed — the scene is atmosphere, never covering or recoloring the product.",
+      "palette": {
+        "accent": "#D4AF37",
+        "accent_name": "gold",
+        "aesthetic_keywords": ["origin/bedrock", "confident West-Coast street-luxury", "gold-on-dark", "script anchor"]
+      },
+      "style_anchors": ["Kith", "Culture Kings"],
+      "lighting_note": "Golden-hour warm side-light from right (sun position over bay). Warm fill on face and garment. Long shadows. No artificial studio feel.",
+      "negative_guardrails": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics.\nBRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result.\nOUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen.",
+      "size": "1024x1536",
+      "quality": "high",
+      "background_api": "auto",
+      "estimated_cost_usd": 0.06,
+      "ready_to_render": false
+    },
+    {
+      "template_id": "skyyrose_kids_capsule_bright",
+      "template_name": "SkyyRose Kids Capsule Throne Room",
+      "description": "On-model campaign render for the Kids Capsule collection. Regal throne room, heir to the throne. Rose-gold accent, warm cinematic light, playful young-royalty grandeur. No pastels, no cartoons.",
+      "mode": "on-model",
+      "view": "front",
+      "collection": "kids-capsule",
+      "presentation_block": "PRESENTATION: worn by a single full-body fashion model, natural confident pose, neutral expression, professional styling. Exactly ONE garment / one look — never a flat diagram or multiple views in one frame.",
+      "view_directive": "VIEW: render the FRONT of the garment, front-facing. Any BACK tech-flat reference is construction-only — do NOT render a back view or a second panel; output a single FRONT view.",
+      "background": "BACKGROUND / SCENE: a regal throne room, 'the heir to the throne' — opulent gold-and-velvet palace setting, playful young-royalty grandeur, warm cinematic light. The model is photographed within this environment; keep the garment sharp, correctly lit, and fully unobstructed — the scene is atmosphere, never covering or recoloring the product.",
+      "palette": {
+        "accent": "#B76E79",
+        "accent_name": "rose-gold",
+        "aesthetic_keywords": ["legacy/heir", "regal scaled-down", "no pastels", "no cartoons", "young-royalty grandeur"]
+      },
+      "style_anchors": ["Kith", "Palm Angels"],
+      "lighting_note": "Warm cinematic ambient from overhead chandelier, gold-tone fill, rich velvet shadows. Garment must stay sharp and fully readable — the throne environment is atmosphere only.",
+      "negative_guardrails": "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, collage panels, or any branding not physically present on the garment. DO NOT crop out any part of the garment or its graphics.\nBRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment carries. If a panel shows no logo in its reference, render that panel with NO logo — a blank panel is correct; an added logo is an invalid result.\nOUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen.\nDO NOT render pastel, cartoon, illustrated, or vector-styled imagery — Kids Capsule is luxury streetwear for young royalty, not childrenswear clip art.",
+      "size": "1024x1536",
+      "quality": "high",
+      "background_api": "auto",
+      "estimated_cost_usd": 0.06,
+      "ready_to_render": false
+    }
+  ]
+}

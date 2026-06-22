@@ -1,7 +1,10 @@
 ---
 logo_id: hockey-championship-patch
 collection: black-rose
-image_path: wordpress-theme/skyyrose-flagship/assets/images/logos/hockey-championship-card.jpeg
+image_path: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey/hockey-championship-card.jpeg
+image_resolution: per_sku
+sku_paths:
+  br-011: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey/hockey-championship-card.jpeg
 sibling_of: data/brand-logos/black-rose-authentic-collection-patch.md
 ---
 
@@ -70,6 +73,6 @@ A portrait-oriented patch in a **grey / silver tonal palette** only:
 
 ## Reference Image
 
-Image file: `wordpress-theme/skyyrose-flagship/assets/images/logos/hockey-championship-card.jpeg`.
+Image file: `wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey/hockey-championship-card.jpeg`.
 Pipelines that build RAS prompts attach this image as an additional reference
 when rendering any product whose dossier names this patch.

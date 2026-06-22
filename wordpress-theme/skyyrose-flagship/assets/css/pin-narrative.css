@@ -1,0 +1,151 @@
+/**
+ * Pin-Narrative — scroll-pinned brand manifesto.
+ *
+ * Ported from the v2 design reference. Vanilla; the scroll driver lives in
+ * premium-interactions.js. Palette switches per [data-collection] via the
+ * --skyyrose-* custom properties declared in design-tokens.css, so this file
+ * never hardcodes a per-collection colour.
+ *
+ * @package SkyyRose
+ */
+
+.pin-track {
+	position: relative;
+	height: 400vh; /* fallback; the JS driver sets --pin-track-height = beats * 100vh */
+	height: var(--pin-track-height, 400vh);
+}
+
+.pin-stage {
+	position: sticky;
+	top: 0;
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--skyyrose-bg);
+	overflow: hidden;
+}
+
+@supports (height: 100dvh) {
+	.pin-stage { height: 100dvh; }
+}
+
+/* corner-tick bevel frame */
+.pin-corner {
+	position: absolute;
+	width: 2.5rem;
+	height: 2.5rem;
+	border: 0 solid rgba(255, 255, 255, 0.22);
+	pointer-events: none;
+	z-index: 3;
+}
+.pin-corner--tl { top: 1.5rem; left: 1.5rem; border-top-width: 1px; border-left-width: 1px; }
+.pin-corner--tr { top: 1.5rem; right: 1.5rem; border-top-width: 1px; border-right-width: 1px; }
+.pin-corner--bl { bottom: 1.5rem; left: 1.5rem; border-bottom-width: 1px; border-left-width: 1px; }
+.pin-corner--br { bottom: 1.5rem; right: 1.5rem; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* beats stacked in one grid cell, cross-fade on scroll */
+.pin-beats {
+	display: grid;
+	grid-template-areas: 'beat';
+	place-items: center;
+	text-align: center;
+	padding: 2rem;
+	max-width: 1100px;
+	position: relative;
+	z-index: 1;
+}
+
+.pin-beat {
+	grid-area: beat;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity 0.25s var(--skyyrose-ease, ease), transform 0.25s var(--skyyrose-ease, ease);
+	pointer-events: none;
+}
+.pin-beat.is-active {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.pin-beat__label,
+.pin-beat__sub {
+	font-family: var(--skyyrose-font-mono);
+	text-transform: uppercase;
+	letter-spacing: 0.3em;
+	color: var(--skyyrose-text-muted);
+}
+.pin-beat__label { font-size: 0.6875rem; }
+.pin-beat__sub { font-size: 0.625rem; letter-spacing: 0.32em; }
+
+.pin-beat__chrome {
+	width: 3rem;
+	height: 1px;
+	background: linear-gradient(90deg, var(--skyyrose-accent), rgba(var(--skyyrose-accent-rgb), 0));
+}
+
+.pin-beat__headline {
+	font-family: var(--skyyrose-font-display);
+	font-weight: 700;
+	font-size: clamp(2.25rem, 6vw, 4.75rem);
+	line-height: 1.04;
+	color: var(--skyyrose-text);
+	max-width: 18ch;
+}
+.pin-beat__accent { color: var(--skyyrose-accent); font-style: italic; }
+
+/* progress pips + counter */
+.pin-progress {
+	position: absolute;
+	bottom: 2rem;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 0.75rem;
+	z-index: 3;
+}
+.pin-pip {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	background: transparent;
+	transition: background 0.25s var(--skyyrose-ease, ease), border-color 0.25s var(--skyyrose-ease, ease);
+}
+.pin-pip.is-active { background: var(--skyyrose-accent); border-color: var(--skyyrose-accent); }
+
+.pin-counter {
+	position: absolute;
+	bottom: 2rem;
+	right: 2rem;
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.6875rem;
+	letter-spacing: 0.25em;
+	color: var(--skyyrose-text-muted);
+	z-index: 3;
+}
+
+.pin-sr-live {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pin-track { height: auto; }
+	.pin-stage { position: static; height: auto; padding: 6rem 2rem; }
+	.pin-beats { display: flex; flex-direction: column; gap: 4rem; }
+	.pin-beat { opacity: 1; transform: none; pointer-events: auto; }
+	.pin-corner,
+	.pin-progress,
+	.pin-counter { display: none; }
+}

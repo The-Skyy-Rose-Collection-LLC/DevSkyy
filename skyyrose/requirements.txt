@@ -11,18 +11,18 @@
 #   python3 -c "import rembg; print('ok')"
 
 # ── Core background removal ────────────────────────────────────────────────
-rembg==2.0.72
+rembg==2.0.75
 pymatting==1.1.15
 numba==0.63.1
 llvmlite==0.46.0
 
 # ── Image processing ───────────────────────────────────────────────────────
-Pillow==12.1.1
+Pillow==12.2.0
 scipy==1.17.0
 scikit-image==0.26.0
 
 # ── AI model inference ─────────────────────────────────────────────────────
-onnxruntime==1.24.1
+onnxruntime==1.26.0
 
 # ── File system watcher ────────────────────────────────────────────────────
 watchdog==6.0.0

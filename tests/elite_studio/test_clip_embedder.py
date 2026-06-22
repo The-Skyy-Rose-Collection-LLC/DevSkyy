@@ -10,6 +10,12 @@ from PIL import Image
 
 from skyyrose.core import clip_embedder
 
+# Network/model-download integration tests — these pull CLIP/DINO weights from
+# HF Hub at runtime. Excluded from the fast gate (CI runs `-m "not slow and not
+# integration"`) so a transient HF outage cannot flake main red; run on demand
+# with `-m integration`.
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def red_image(tmp_path: Path) -> Path:

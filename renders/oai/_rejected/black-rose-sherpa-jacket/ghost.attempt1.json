@@ -1,0 +1,11 @@
+{
+  "sku": "br-006",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "flat_render"
+  ],
+  "reason": "The branding is correctly placed and matches the specified color and art. However, the overall render appears flat and does not exhibit the dimensionality expected of a photorealistic garment, which results in a False verdict for the photorealistic gate."
+}

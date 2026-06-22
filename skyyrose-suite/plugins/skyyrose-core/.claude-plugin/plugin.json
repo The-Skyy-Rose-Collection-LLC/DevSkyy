@@ -1,0 +1,9 @@
+{
+  "name": "skyyrose-core",
+  "version": "1.0.0",
+  "description": "SkyyRose engineering core: FastAPI/Python backend patterns, Postgres/Redis, Alembic migrations, Docker, API design, error handling, behavior & token discipline (token-aware-behavior + efficient-production, the canonical agent-embed pair), planning (writing/executing plans, brainstorming), and memory & self-healing.",
+  "author": { "name": "SkyyRose / Corey Foster", "email": "skyyroseco@gmail.com" },
+  "license": "UNLICENSED",
+  "homepage": "https://skyyrose.co",
+  "keywords": ["skyyrose", "backend", "fastapi", "python", "postgres", "redis", "alembic", "docker", "planning", "memory", "self-healing", "token-discipline"]
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevSkyy Skill Audit — 2026-06-13</title>
+<style>
+  body { font: 15px/1.6 -apple-system, system-ui, sans-serif; max-width: 1040px; margin: 2rem auto; padding: 0 1.25rem; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .3rem; }
+  h2 { margin-top: 2.2rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  code { background: #f4f4f4; padding: .1rem .35rem; border-radius: 3px; font-size: .88em; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 13.5px; }
+  th, td { border: 1px solid #ccc; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #0A0A0A; color: #fff; }
+  .keep { color: #1a7f37; font-weight: 600; }
+  .trim { color: #b35900; font-weight: 600; }
+  .safe { color: #0a66c2; font-weight: 600; }
+  .note { background: #fff8e6; border-left: 4px solid #B76E79; padding: .6rem 1rem; margin: 1rem 0; }
+  .big { font-size: 1.4rem; font-weight: 700; color: #B76E79; }
+  small { color: #666; }
+</style>
+</head>
+<body>
+<h1>DevSkyy Skill Audit</h1>
+<p><small>2026-06-13. Scope: all skills across user-level (<code>~/.claude/skills</code>), project-level (<code>.claude/skills</code>), and the <code>skyyrose-elite</code> plugin. Agents audited separately (no stray skyyrose agents found; plugin owns the 7-agent set).</small></p>
+
+<p class="big">377 skills total</p>
+<table>
+  <tr><th>Source</th><th>Count</th><th>Notes</th></tr>
+  <tr><td><code>~/.claude/skills</code> (user)</td><td>243</td><td>Cross-project; includes the 67-skill gsd system</td></tr>
+  <tr><td><code>.claude/skills</code> (project, gitignored)</td><td>98</td><td>DevSkyy-local; 25 shadow user-level skills</td></tr>
+  <tr><td><code>skyyrose-elite</code> plugin</td><td>36</td><td>Consolidated 2026-06-13 (was 9 + 27 social migrated in)</td></tr>
+</table>
+
+<h2>Domain distribution (341 non-skyyrose)</h2>
+<table>
+  <tr><th>Domain</th><th>~Count</th><th>Verdict</th></tr>
+  <tr><td><strong>gsd-*</strong> (Get-Shit-Done system)</td><td>67</td><td class="keep">KEEP — one coherent framework (pinned v1.42.3). Biggest context-surface load but not waste. Do not split.</td></tr>
+  <tr><td>frontend / design / taste</td><td>~30</td><td class="trim">TRIM — heaviest real overlap. Many near-duplicate "taste/design" skills.</td></tr>
+  <tr><td>qa / test / verify / audit</td><td>~32 (incl ~10 gsd)</td><td class="trim">TRIM the non-gsd overlaps (3 TDD skills, 2 verification, 3 audit).</td></tr>
+  <tr><td>ai / agent / prompt</td><td>~25</td><td class="trim">TRIM the 7-skill prompt cluster.</td></tr>
+  <tr><td>per-language patterns/testing (kotlin, cpp, go, rust, java, perl, django, laravel, springboot)</td><td>~16</td><td class="keep">KEEP — coherent per-language sets, used on demand. Not overlapping each other.</td></tr>
+  <tr><td>wordpress / woocommerce</td><td>~16</td><td class="keep">KEEP — distinct WP capabilities; minor review only.</td></tr>
+  <tr><td>backend / infra (fastapi, postgres, redis, docker, sqlalchemy)</td><td>~15</td><td class="keep">KEEP — distinct.</td></tr>
+  <tr><td>misc utilities</td><td>~116</td><td>Mixed — one-off tools; spot-review for dead ones.</td></tr>
+</table>
+
+<h2>1. Cross-source duplicates (25 — user ∩ project)</h2>
+<p>Project shadows user. <strong>11 are byte-identical</strong> (safe to delete project copy — zero behavior change); <strong>14 differ</strong> (intentional DevSkyy overrides — keep).</p>
+<table>
+  <tr><th>Class</th><th>Skills</th><th>Action</th></tr>
+  <tr><td class="safe">IDENTICAL (11)</td><td><code>api-design, backend-patterns, building-pydantic-ai-agents, coding-standards, e2e-testing, frontend-patterns, immersive-interactive-architect, mcp-server-patterns, setup-matt-pocock-skills, token-aware-behavior, verification-loop</code></td><td class="safe">Delete project copy → falls through to identical user-level. <strong>-11, safe.</strong></td></tr>
+  <tr><td class="keep">DIFFER (14)</td><td><code>ai-regression-testing, continuous-learning, eval-harness, frontend-design, frontend-slides, impeccable, learned, python-patterns, security-review, strategic-compact, tdd-workflow, to-issues, to-prd, ui-ux-pro-max</code></td><td class="keep">Keep — project versions are customized overrides (correct layering).</td></tr>
+</table>
+
+<h2>2. Overlap clusters (the real consolidation opportunity)</h2>
+<table>
+  <tr><th>Cluster</th><th>Members</th><th>Recommendation</th></tr>
+  <tr><td><strong>Prompt (7)</strong></td><td><code>intelligent-prompt-generator, prompt-analyzer, prompt-extractor, prompt-generator, prompt-master, prompt-optimizer, prompt-xray</code></td><td class="trim">Collapse to 2: one <em>author/optimize</em> (prompt-master) + one <em>analyze/extract</em> (prompt-xray). <strong>~-5.</strong></td></tr>
+  <tr><td><strong>TDD trio (3)</strong></td><td><code>tdd, tdd-workflow, test-driven-development</code></td><td class="trim">Three skills, one concept. Keep <code>tdd-workflow</code>; drop 2. <strong>-2.</strong></td></tr>
+  <tr><td><strong>Verification (2)</strong></td><td><code>verification-loop, verification-before-completion</code></td><td class="trim">Overlapping; keep one. <strong>-1.</strong></td></tr>
+  <tr><td><strong>Audit (3)</strong></td><td><code>audit, audit-pass2-verifier, audit-resolution-loop</code></td><td class="keep">Keep — these are a <em>pipeline</em> (audit → verify → resolve), not dupes.</td></tr>
+  <tr><td><strong>Design / taste (~30)</strong></td><td><code>design-master, design-system, design-taste-frontend, frontend-design, frontend-design-direction, frontend-patterns, frontend-a11y, frontend-slides, frontend-launchpad, gpt-taste, high-end-visual-design, image-taste-frontend, stitch-design-taste, liquid-glass-design, minimalist-ui, industrial-brutalist-ui, motion-ui, ui-ux-pro-max, ui-demo, aidesigner-frontend, bolder, colorize, delight, polish, layout, redesign-existing-projects, extract-design, impeccable</code></td><td class="trim">Biggest sprawl. <em>Style</em> skills (liquid-glass, brutalist, minimalist, motion) are legitimately distinct registers — keep. But the <em>generic</em> ones (design-master vs frontend-design vs ui-ux-pro-max vs design-taste-frontend vs gpt-taste vs high-end-visual-design) heavily overlap → pick 1-2 canonical, drop ~6-8. <strong>~-8.</strong></td></tr>
+</table>
+
+<h2>3. Non-issues (verified, no action)</h2>
+<ul>
+  <li><strong>"No-description" skills are false alarms</strong> — <code>ui-ux-pro-max</code> (272L), <code>vercel-composition-patterns</code> (65L), <code>superpowers</code>, <code>claude-mem</code> just use non-standard frontmatter. Real content, keep.</li>
+  <li><strong>per-language families</strong> (kotlin/cpp/go/rust/java/perl + framework tdd/verification) — coherent, on-demand, no cross-overlap. Keep.</li>
+  <li><strong>gsd (67)</strong> — one system. Leave intact.</li>
+</ul>
+
+<h2>4. Tiered action plan</h2>
+<table>
+  <tr><th>Tier</th><th>Action</th><th>Reduction</th><th>Risk</th></tr>
+  <tr><td>A</td><td>Delete 11 byte-identical project dups</td><td>-11</td><td class="safe">None (identical fallthrough)</td></tr>
+  <tr><td>B</td><td>Collapse prompt cluster 7→2</td><td>-5</td><td>Low (merge content)</td></tr>
+  <tr><td>C</td><td>TDD trio 3→1, verification 2→1</td><td>-3</td><td>Low</td></tr>
+  <tr><td>D</td><td>Design/taste generic overlap ~30→~22</td><td>~-8</td><td class="trim">Med — needs canonical picks per register</td></tr>
+  <tr><td>—</td><td>Spot-check <code>misc</code> (116) for dead one-offs</td><td>?</td><td>Investigate</td></tr>
+</table>
+<p><strong>Realistic trim: ~27 skills</strong> (377 → ~350) without losing any capability — coherent systems (gsd, per-language, wordpress) stay intact. The win is less in raw count than in removing <em>ambiguous duplicates</em> that make skill-selection noisier.</p>
+
+<div class="note">
+<strong>Selection-noise is the real cost, not disk.</strong> 377 skills mostly cost nothing at rest — but when 7 prompt skills and 6 generic "design/taste" skills all match a task, Claude's auto-selection gets noisier and less predictable. Consolidating the <em>overlapping</em> clusters (prompt, generic-design, TDD) sharpens routing more than deleting the coherent systems ever would.
+</div>
+</body>
+</html>

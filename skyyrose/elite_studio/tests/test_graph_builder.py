@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -63,11 +63,11 @@ class TestGraphIntegration:
         qc = make_quality_verification(success=True, recommendation=qc_recommendation)
 
         mock_vision = MagicMock()
-        mock_vision.analyze.return_value = vision
+        mock_vision.analyze = AsyncMock(return_value=vision)
         mock_gen = MagicMock()
-        mock_gen.generate.return_value = gen
+        mock_gen.generate = AsyncMock(return_value=gen)
         mock_qc = MagicMock()
-        mock_qc.verify.return_value = qc
+        mock_qc.verify = AsyncMock(return_value=qc)
 
         return mock_vision, mock_gen, mock_qc
 

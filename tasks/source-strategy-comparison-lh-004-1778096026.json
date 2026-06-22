@@ -1,0 +1,25 @@
+{
+  "sku": "lh-004",
+  "name": "Love Hurts Bomber Jacket",
+  "results": [
+    {
+      "strategy": "render",
+      "source_image": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-bomber.png",
+      "qa_score": 0.0,
+      "qa_passed": false,
+      "engine_used": "flux-pro",
+      "attempts": 1,
+      "cost_usd": 0.07500000000000001,
+      "refinement_applied": true,
+      "issues": [
+        "Vision Judge 1 (gpt-5.5-pro) failed with connection error \u2014 no evaluation data returned",
+        "Vision Judge 2 (gemini-3.1-pro-preview) failed with 504 DEADLINE_EXCEEDED \u2014 no evaluation data returned",
+        "No visual evidence available to verify garment type, colorway, wordmark placement, back graphic, or hallucination status against spec lh-004",
+        "judge error: Connection error.",
+        "judge error: 504 DEADLINE_EXCEEDED. {'error': {'code': 504, 'message': 'Deadline expired before operation could complete.', 'status': 'DEADLINE_EXCEEDED'}}"
+      ],
+      "elapsed_seconds": 482.6512252090033,
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-front-render.webp"
+    }
+  ]
+}

@@ -324,10 +324,12 @@ async def get_alert_history(
         where_clause = " AND ".join(conditions) if conditions else "1=1"
 
         # Count total
-        count_query = text(f"""
+        count_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT COUNT(*) FROM alert_history ah
             WHERE {where_clause}
-        """)
+        """
+        )
         count_result = await db.execute(count_query, params)
         total = count_result.scalar() or 0
 
@@ -336,7 +338,8 @@ async def get_alert_history(
         params["limit"] = page_size
         params["offset"] = offset
 
-        data_query = text(f"""
+        data_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 ah.id,
                 ah.alert_config_id,
@@ -362,7 +365,8 @@ async def get_alert_history(
             WHERE {where_clause}
             ORDER BY ah.triggered_at DESC
             LIMIT :limit OFFSET :offset
-        """)
+        """
+        )
 
         result = await db.execute(data_query, params)
         rows = result.fetchall()
@@ -459,7 +463,8 @@ async def get_active_alerts(
         where_clause = " AND ".join(conditions)
 
         # Get active alerts
-        data_query = text(f"""
+        data_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 ah.id,
                 ah.alert_config_id,
@@ -490,7 +495,8 @@ async def get_active_alerts(
                     WHEN 'info' THEN 3
                 END,
                 ah.triggered_at DESC
-        """)
+        """
+        )
 
         result = await db.execute(data_query, params)
         rows = result.fetchall()

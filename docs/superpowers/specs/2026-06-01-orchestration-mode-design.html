@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orchestration Mode — Design Spec (2026-06-01)</title>
+<style>
+  :root { --rose:#B76E79; --dark:#0A0A0A; --ink:#1a1a1a; --mut:#666; --bg:#fafafa; --code:#f4f0f1; --line:#e2dcde; }
+  body { font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); max-width:980px; margin:0 auto; padding:2rem 1.5rem 6rem; }
+  h1 { font-size:2rem; border-bottom:3px solid var(--rose); padding-bottom:.4rem; }
+  h2 { font-size:1.35rem; margin-top:2.4rem; color:var(--dark); border-left:4px solid var(--rose); padding-left:.6rem; }
+  h3 { font-size:1.08rem; margin-top:1.4rem; color:var(--rose); }
+  code { background:var(--code); padding:.1em .35em; border-radius:4px; font:13.5px/1.4 "SF Mono",Menlo,monospace; }
+  pre { background:var(--dark); color:#eee; padding:1rem 1.2rem; border-radius:8px; overflow-x:auto; font:13px/1.5 "SF Mono",Menlo,monospace; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; font-size:14.5px; }
+  th,td { border:1px solid var(--line); padding:.5rem .65rem; text-align:left; vertical-align:top; }
+  th { background:var(--rose); color:#fff; }
+  tr:nth-child(even) td { background:#f3eef0; }
+  .nav { background:#fff; border:1px solid var(--line); border-radius:8px; padding:1rem 1.3rem; columns:2; font-size:14px; }
+  .nav a { color:var(--rose); text-decoration:none; }
+  .badge { display:inline-block; background:var(--rose); color:#fff; font-size:11px; padding:.15em .5em; border-radius:3px; vertical-align:middle; }
+  .note { background:#fff8f0; border-left:4px solid #d4a017; padding:.7rem 1rem; border-radius:0 6px 6px 0; margin:1rem 0; }
+  .kill { background:#fdf0f0; border-left:4px solid #c0392b; padding:.7rem 1rem; border-radius:0 6px 6px 0; margin:1rem 0; }
+  .meta { color:var(--mut); font-size:14px; }
+  ul li { margin:.25rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Orchestration Mode — Design Spec</h1>
+<p class="meta"><strong>Date:</strong> 2026-06-01 &middot; <strong>Status:</strong> Design — awaiting founder approval &middot; <strong>Author:</strong> DevSkyy engineering agent &middot; <strong>Source:</strong> Anthropic "Build an orchestration mode" reference, refactored into DevSkyy house idiom.</p>
+
+<nav class="nav">
+  <a href="#goal">1. Goal &amp; scope</a><br>
+  <a href="#decisions">2. Decision record</a><br>
+  <a href="#findings">3. Codebase findings</a><br>
+  <a href="#arch">4. Architecture</a><br>
+  <a href="#mechanisms">5. Three mechanisms → runs-today</a><br>
+  <a href="#loop">6. The loop (semantics)</a><br>
+  <a href="#concurrency">7. Concurrency model</a><br>
+  <a href="#house">8. House-idiom conformance</a><br>
+  <a href="#api">9. Public API surface</a><br>
+  <a href="#tools">10. Tool schemas</a><br>
+  <a href="#tests">11. Test plan</a><br>
+  <a href="#wiring">12. Module-wiring checklist</a><br>
+  <a href="#sequence">13. Build sequence</a><br>
+  <a href="#scope">14. Out of scope (YAGNI)</a><br>
+  <a href="#risks">15. Risks &amp; next-opus seams</a>
+</nav>
+
+<h2 id="goal">1. Goal &amp; scope</h2>
+<p>Refactor the Anthropic "orchestration mode" loop theory into DevSkyy as a real, tested module. An <strong>orchestration mode</strong> is a session-level switch: when on, the agent runs every substantive request at maximum effort and fans work out to parallel subagents by default; when off, the same fan-out tool reverts to per-request opt-in. The mode is built from three documented pieces — an <strong>effort level</strong>, a <strong>mid-conversation mode reminder</strong>, and <strong>standing consent</strong> written into the fan-out tool's description — never an API flag.</p>
+<p>The founder's steer: <em>"I like the loop theory so refactor it to our codebase."</em> Keep the raw-API <code>ModeAgent</code> loop mechanics intact; make it idiomatic DevSkyy; runs today on <code>anthropic 0.83.0</code>.</p>
+
+<h2 id="decisions">2. Decision record</h2>
+<table>
+  <tr><th>Decision</th><th>Choice</th><th>Why</th></tr>
+  <tr><td>Placement</td><td><code>orchestration/</code> (two flat files)</td><td>Raw-API streaming, tool-use, and effort precedents all live here/adjacent. Matches <code>llm_orchestrator.py</code> neighbors.</td></tr>
+  <tr><td>Paradigm</td><td>Raw <code>AsyncAnthropic.messages.stream</code> agentic loop</td><td>The loop theory. <span class="badge">founder-chosen</span> Set aside agent-1's <code>ClaudeSDKClient</code> rec — it abandons the loop theory and mixes the CLI-spawning paradigm.</td></tr>
+  <tr><td>Effort default</td><td><code>"xhigh"</code></td><td><span class="badge">founder-chosen</span> Matches shipping house precedent <code>scripts/nano_banana/tournament.py:522</code>; reaches the API as a raw dict.</td></tr>
+  <tr><td>Subagent backend</td><td>Self-contained async raw-API nested loop</td><td><span class="badge">founder-chosen</span> Preserves the loop theory; one paradigm; no coupling.</td></tr>
+  <tr><td>Sync vs async</td><td>Async (<code>AsyncAnthropic</code>)</td><td><code>orchestration/</code> is async-only by convention; fan-out uses <code>asyncio.gather</code>.</td></tr>
+  <tr><td>Reminder transport</td><td><code>&lt;system-reminder&gt;</code> folded into the user turn's content (default); standalone <code>role:"system"</code> behind a config seam</td><td>Messages train on alternating user/assistant turns — a separate user message would create consecutive user turns. Folding into the user turn's content keeps alternation valid and the cached prefix intact. <code>SYSTEM_ROLE</code> emits standalone system messages (outside alternation) for the newer SDK that types them.</td></tr>
+  <tr><td>Spec format</td><td>HTML</td><td>Project always-on rule: structured docs with 3+ sections are HTML.</td></tr>
+</table>
+
+<h2 id="findings">3. Codebase findings</h2>
+<p>Four parallel read-only agents mapped the relevant surface (2026-06-01).</p>
+<h3>The orchestration landscape</h3>
+<table>
+  <tr><th>System</th><th>Paradigm</th><th>Fan-out primitive</th><th>Role here</th></tr>
+  <tr><td><code>skyyrose/multi_agent/orchestrator.py</code></td><td>claude-agent-sdk (<code>ClaudeSDKClient</code>, spawns <code>claude</code> CLI)</td><td>LLM-decided <code>Agent</code> tool</td><td>Different paradigm — not the loop theory</td></tr>
+  <tr><td><code>llm/round_table.py:1323</code></td><td>raw provider SDKs</td><td><code>asyncio.gather(return_exceptions=True)</code></td><td>Canonical parallel fan-out idiom</td></tr>
+  <tr><td><code>agents/elite_web_builder/director.py:603</code></td><td>raw SDK + ModelRouter</td><td><code>gather</code> + <code>Semaphore(4)</code></td><td>Bounded-concurrency template</td></tr>
+  <tr><td><code>orchestration/catalog_retriever.py:408</code></td><td><code>AsyncAnthropic.messages.stream</code></td><td>—</td><td>Streaming skeleton to copy</td></tr>
+  <tr><td><code>agents/render_pipeline/tools/articulate_layer0.py:188</code></td><td>sync <code>Anthropic</code> + <code>tools=</code>/<code>tool_choice=</code></td><td>—</td><td>Tool-use skeleton to copy</td></tr>
+  <tr><td><code>scripts/nano_banana/tournament.py:522</code></td><td>sync <code>Anthropic</code> + <code>output_config</code>+<code>thinking</code></td><td>—</td><td>effort/<code>xhigh</code> precedent</td></tr>
+</table>
+<div class="note"><strong>No streaming tool-use feedback loop exists anywhere in the repo.</strong> The three skeletons above are scattered across three files; none compose them. <code>ModeAgent</code> is the first real agentic loop here — that is its novel value, not a re-implementation.</div>
+<h3>SDK reality (<code>anthropic 0.83.0</code>, Python 3.14)</h3>
+<ul>
+  <li><code>output_config={"effort": ...}</code> — stable <code>OutputConfigParam.effort = Literal["low","medium","high","max"]</code>. <code>"xhigh"</code> is not typed but is passed as a raw dict (bypasses the type check) and is already shipped in <code>tournament.py</code>.</li>
+  <li><code>thinking={"type":"adaptive"}</code> — supported in stable 0.83.0 (<code>thinking_config_adaptive_param.py</code>).</li>
+  <li>Mid-conversation <code>role:"system"</code> — not in pinned <strong>0.83.0</strong> (<code>MessageParam.role = Literal["user","assistant"]</code>). <strong>But the latest anthropic-sdk-python (main) DOES type it</strong>: <code>role = Literal["user","assistant","system"]</code> plus a <code>MidConversationSystemBlockParam</code> content block (verified via Context7, 2026-06-01). So mid-conversation system messages are a real shipped feature, just newer than our pin — the <code>SYSTEM_ROLE</code> seam is forward-compatible, not hypothetical.</li>
+  <li>Message roles are trained to alternate user/assistant. A reminder as a separate <em>user</em> message would create consecutive user turns; the runs-today transport therefore <strong>folds the reminder into the user turn's content</strong> as a second text block.</li>
+  <li>Client + key: <code>try: from config import ANTHROPIC_API_KEY / except ImportError: os.getenv("ANTHROPIC_API_KEY","")</code>. (<code>config</code> is a package; there is no root <code>config.py</code>.)</li>
+</ul>
+
+<h2 id="arch">4. Architecture</h2>
+<p>Two focused files (&lt;800 lines each; functions &lt;50 lines).</p>
+<h3><code>orchestration/orchestration_mode.py</code></h3>
+<ul>
+  <li><code>SYSTEM_PROMPT</code> — static top-level <code>system</code> string, never mutated (cache-prefix integrity).</li>
+  <li><code>MODE_ENTER</code>, <code>MODE_REFRESH</code>, <code>MODE_EXIT</code> — the three reminder strings.</li>
+  <li><code>ReminderTransport</code> — <code>StrEnum</code>: <code>USER_REMINDER</code> (default) | <code>SYSTEM_ROLE</code>.</li>
+  <li><code>@dataclass(frozen=True) ModeConfig</code> — models (from <code>model_ids</code>), <code>effort="xhigh"</code>, <code>reminder_transport</code>, <code>max_tokens</code>, turn caps, <code>turns_between_refreshers</code>.</li>
+  <li><code>ModeAgent</code> — the async loop: <code>set_mode</code>, <code>_due_system_messages</code>, <code>turn</code>. Injectable <code>AsyncAnthropic</code> (test seam).</li>
+</ul>
+<h3><code>orchestration/orchestration_mode_tools.py</code></h3>
+<ul>
+  <li><code>WORKFLOW_TOOL</code>, <code>BASH_TOOL</code>, <code>REPORT_TOOL</code> — tool schemas (§10).</li>
+  <li><code>normalize_subtasks(raw)</code> — accepts array | JSON-string | newline list.</li>
+  <li><code>handle_bash_block(block)</code> + <code>run_bash(cmd)</code> — local <code>bash_20250124</code>, timeout + truncation. <strong>No sandbox.</strong></li>
+  <li><code>run_subagent(client, prompt, config)</code> — nested async loop, <code>SUBAGENT_MODEL</code>, bash + <code>report_findings</code>.</li>
+  <li><code>run_workflow(client, raw_subtasks, config)</code> — <code>gather</code>+<code>Semaphore</code> fan-out, per-subagent failure isolation, dropped-overflow note.</li>
+</ul>
+<div class="note"><strong>Why two files, not one:</strong> the loop and the tool/fan-out layer have distinct responsibilities and distinct test surfaces. Splitting keeps each &lt;400 lines, lets the tools layer be tested without instantiating <code>ModeAgent</code>, and matches the project's "many small files" rule.</div>
+
+<h2 id="mechanisms">5. Three mechanisms → runs-today mapping</h2>
+<table>
+  <tr><th>Mechanism</th><th>Doc (next-opus)</th><th>Runs-today (0.83.0)</th><th>Forward seam</th></tr>
+  <tr><td>Effort level</td><td><code>effort:"xhigh"</code></td><td><code>output_config={"effort":"xhigh"}</code> — raw dict, per tournament.py precedent</td><td><code>ModeConfig.effort</code> constant</td></tr>
+  <tr><td>Mode reminder</td><td>mid-convo <code>role:"system"</code></td><td><code>&lt;system-reminder&gt;…&lt;/system-reminder&gt;</code> folded into the user turn's content (alternation-safe)</td><td><code>ModeConfig.reminder_transport</code> → flip to <code>SYSTEM_ROLE</code> (typed in newer SDK)</td></tr>
+  <tr><td>Standing consent</td><td>tool description text</td><td>identical — verbatim in <code>WORKFLOW_TOOL["description"]</code></td><td>none</td></tr>
+  <tr><td>Thinking</td><td><code>{"type":"adaptive"}</code></td><td>identical — valid in 0.83.0</td><td>none</td></tr>
+</table>
+<p>The top-level <code>system</code> field never changes across turns, so the cached prefix stays intact — the entire point of the design. Reminders ride in the <code>messages</code> array, placed <em>after</em> the user turn they apply to.</p>
+
+<h2 id="loop">6. The loop (semantics)</h2>
+<p>Faithful to the reference, adapted to async. Pseudocode for <code>ModeAgent.turn</code>:</p>
+<pre><code>async def turn(self, user_input: str) -> str:
+    # reminder rides WITH the user turn (folded into its content under
+    # USER_REMINDER) → alternation preserved, cached prefix untouched
+    reminder_texts = self._due_reminder_texts()
+    self.messages.extend(self._build_user_messages(user_input, reminder_texts))
+    self._turns_since_reminder += 1
+
+    for _ in range(self.config.max_main_turns):
+        async with self._client.messages.stream(
+            model=self._model,
+            max_tokens=self.config.max_tokens,
+            system=SYSTEM_PROMPT,                       # static for the whole session
+            thinking={"type": "adaptive"},
+            output_config={"effort": self.config.effort},
+            tools=[WORKFLOW_TOOL, BASH_TOOL],
+            messages=self.messages,
+        ) as stream:
+            response = await stream.get_final_message()
+        self.messages.append({"role": "assistant", "content": response.content})
+
+        if response.stop_reason == "pause_turn":
+            continue
+        if response.stop_reason != "tool_use":
+            text = "".join(b.text for b in response.content if b.type == "text")
+            if response.stop_reason == "max_tokens":
+                self.messages.pop()                     # drop truncated turn
+                text += "\n\n(warning: response truncated at max_tokens)"
+            return text
+
+        tool_results = []
+        for block in response.content:
+            if block.type != "tool_use":
+                continue
+            if block.name == "Workflow":
+                out, is_err = await run_workflow(self._client, block.input.get("subtasks", []), self.config)
+            elif block.name == "bash":
+                out, is_err = await handle_bash_block(block)
+            else:
+                out, is_err = f"unknown tool: {block.name}", True
+            tool_results.append({"type": "tool_result", "tool_use_id": block.id,
+                                 "content": out, "is_error": is_err})
+        self.messages.append({"role": "user", "content": tool_results})
+    return "(hit the main loop turn limit before finishing)"</code></pre>
+<h3>State machine + transport (two methods)</h3>
+<p><code>_due_reminder_texts() -&gt; list[str]</code> — pure state machine, no transport:</p>
+<ul>
+  <li>EXIT pending → emit <code>MODE_EXIT</code> once, clear <code>_mode_announced</code>.</li>
+  <li>Mode on &amp; not announced → emit <code>MODE_ENTER</code> once, reset refresh counter.</li>
+  <li>Mode on &amp; <code>_turns_since_reminder &gt;= turns_between_refreshers</code> → emit <code>MODE_REFRESH</code>, reset counter.</li>
+</ul>
+<p><code>_build_user_messages(user_input, reminder_texts) -&gt; list[dict]</code> — attaches reminders per transport:</p>
+<ul>
+  <li>No reminders → <code>[{"role":"user","content":user_input}]</code>.</li>
+  <li><code>USER_REMINDER</code> → ONE user turn whose content is a list of text blocks: the input first, then one <code>&lt;system-reminder&gt;</code>-wrapped block per reminder. No consecutive same-role turns.</li>
+  <li><code>SYSTEM_ROLE</code> → the user turn followed by standalone <code>{"role":"system","content":text}</code> messages (outside user/assistant alternation).</li>
+</ul>
+
+<h2 id="concurrency">7. Concurrency model</h2>
+<p>Fan-out follows the repo idiom (<code>director.py:603</code>, <code>round_table.py:1323</code>), not the doc's <code>ThreadPoolExecutor</code>:</p>
+<pre><code>sem = asyncio.Semaphore(config.max_parallel_agents)
+async def _bounded(prompt):
+    async with sem:
+        return await run_subagent(client, prompt, config)
+results = await asyncio.gather(*(_bounded(p) for p in subtasks), return_exceptions=True)
+# isolation: any Exception → "(subagent failed: <type>: <msg>)" string, never raises</code></pre>
+<p>Overflow beyond <code>max_parallel_agents</code> is logged via <code>structlog</code> and noted in the joined output ("N subtasks not run; rerun in a follow-up Workflow call") — no silent truncation.</p>
+
+<h2 id="house">8. House-idiom conformance</h2>
+<pre><code>from __future__ import annotations
+import asyncio, json, os
+from dataclasses import dataclass
+
+import structlog                                   # NOT stdlib logging
+
+try:
+    from config import ANTHROPIC_API_KEY
+except ImportError:
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+
+from anthropic import AsyncAnthropic
+from llm.model_ids import ORCHESTRATOR_MODEL, SUBAGENT_MODEL   # never hardcode strings
+
+logger = structlog.get_logger(__name__)</code></pre>
+<ul>
+  <li><strong>Frozen config</strong> — <code>@dataclass(frozen=True)</code>, tuples not lists for sequences (per <code>elite_studio/models.py:13</code>).</li>
+  <li><strong>Client seam</strong> — constructor injection with a default (Protocol not needed; mirror <code>elite_studio/coordinator.py</code> <code>logger or PrintLogger()</code>). Tests inject an <code>AsyncMock</code>.</li>
+  <li><strong>Errors</strong> — explicit handling at every external call; generic strings to the model, detailed context to <code>structlog</code>.</li>
+</ul>
+
+<h2 id="api">9. Public API surface</h2>
+<pre><code>class ModeAgent:
+    def __init__(self, model: str = ORCHESTRATOR_MODEL,
+                 config: ModeConfig = ModeConfig(),
+                 client: AsyncAnthropic | None = None,
+                 mode_on: bool = True) -> None: ...
+    def set_mode(self, mode_on: bool) -> None: ...
+    async def turn(self, user_input: str) -> str: ...
+
+@dataclass(frozen=True)
+class ModeConfig:
+    orchestrator_model: str = ORCHESTRATOR_MODEL
+    subagent_model: str = SUBAGENT_MODEL
+    effort: str = "xhigh"
+    reminder_transport: ReminderTransport = ReminderTransport.USER_REMINDER
+    max_tokens: int = 64000
+    max_main_turns: int = 30
+    max_subagent_turns: int = 15
+    max_parallel_agents: int = 10
+    turns_between_refreshers: int = 10
+    bash_timeout_seconds: int = 60
+    tool_result_max_chars: int = 8000</code></pre>
+
+<h2 id="tools">10. Tool schemas</h2>
+<ul>
+  <li><code>WORKFLOW_TOOL</code> — <code>{name, description, input_schema}</code>; description carries the verbatim <strong>Opt-in</strong>, <strong>Quality patterns</strong>, and <strong>Standing consent</strong> paragraphs from the reference. <code>input_schema</code>: <code>{subtasks: array&lt;string&gt;}</code> required.</li>
+  <li><code>BASH_TOOL</code> — <code>{"type": "bash_20250124", "name": "bash"}</code> (Anthropic-defined, executed locally).</li>
+  <li><code>REPORT_TOOL</code> — <code>report_findings</code>: <code>{summary: string, findings: array&lt;{claim, evidence, severity∈[high,medium,low,info]}&gt;}</code> required; ends a subagent's task.</li>
+</ul>
+
+<h2 id="tests">11. Test plan</h2>
+<p><code>tests/orchestration/test_orchestration_mode.py</code> — <code>@pytest.mark.unit</code> + <code>@pytest.mark.asyncio</code>. Inject an <code>AsyncMock</code> client (mirror <code>tests/llm/test_verification.py:59</code> multi-turn <code>side_effect</code>). <strong>No live API calls, no spend.</strong></p>
+<table>
+  <tr><th>Test</th><th>Asserts</th></tr>
+  <tr><td>mode toggle</td><td>ENTER once on first turn; REFRESH every <code>turns_between_refreshers</code>; EXIT once after <code>set_mode(False)</code>; nothing while off</td></tr>
+  <tr><td>reminder placement</td><td>reminder message appears <em>after</em> the user turn in <code>messages</code></td></tr>
+  <tr><td>cache-prefix integrity</td><td>the <code>system=</code> argument is byte-identical across every <code>stream</code> call</td></tr>
+  <tr><td>transport</td><td><code>USER_REMINDER</code> → role <code>user</code> + <code>&lt;system-reminder&gt;</code> wrap; <code>SYSTEM_ROLE</code> → role <code>system</code></td></tr>
+  <tr><td>standing consent</td><td><code>WORKFLOW_TOOL["description"]</code> contains the standing-consent sentence</td></tr>
+  <tr><td><code>normalize_subtasks</code></td><td>array / JSON-string / newline list all normalize; junk → <code>[]</code></td></tr>
+  <tr><td>fan-out cap + isolation</td><td>caps at <code>max_parallel_agents</code> (overflow noted); one raising subagent → error string, others succeed</td></tr>
+  <tr><td>tool dispatch</td><td>Workflow → <code>run_workflow</code>; bash → <code>handle_bash_block</code>; unknown → <code>is_error</code></td></tr>
+  <tr><td>bash handler</td><td>timeout, truncation at <code>tool_result_max_chars</code>, <code>restart</code>, missing-command error</td></tr>
+  <tr><td>max_tokens</td><td>truncated assistant turn dropped from history + warning appended</td></tr>
+</table>
+<p>One <code>@pytest.mark.integration</code> live smoke test (single real <code>turn</code> at low effort) — excluded by default <code>addopts</code>, runs only under <code>-m integration</code> with a key present. Gated by STOP-AND-SHOW (costs money) — not run during the build.</p>
+
+<h2 id="wiring">12. Module-wiring checklist</h2>
+<ul>
+  <li><code>orchestration/__init__.py</code> — add <code>ModeAgent</code>, <code>ModeConfig</code>, <code>ReminderTransport</code> to <code>_LAZY_IMPORTS</code> + <code>__all__</code>.</li>
+  <li><code>orchestration/CLAUDE.md</code> — add architecture-table rows for both new files.</li>
+  <li>No <code>tests/orchestration/__init__.py</code> (dir convention is no init); no sub-conftest (root conftest provides <code>mock_api_keys</code>).</li>
+  <li>No <code>__main__.py</code>/<code>cli.py</code> in <code>orchestration/</code> (CLI lives in <code>cli/</code>); a CLI entry is out of scope for v1.</li>
+</ul>
+
+<h2 id="sequence">13. Build sequence</h2>
+<ol>
+  <li>Commit this spec (on a feature branch — working tree is dirty on <code>main</code>).</li>
+  <li>RED: write <code>tests/orchestration/test_orchestration_mode.py</code> against the API in §9–§10; confirm failures.</li>
+  <li>GREEN: <code>orchestration/orchestration_mode_tools.py</code> (tools, bash, subagent, fan-out).</li>
+  <li>GREEN: <code>orchestration/orchestration_mode.py</code> (config, reminders, <code>ModeAgent</code>).</li>
+  <li>Wire <code>__init__.py</code> + <code>orchestration/CLAUDE.md</code>.</li>
+  <li>Verify the exact footprint: <code>ruff check --fix</code> + <code>black</code> + <code>isort</code> + <code>mypy</code> + <code>pytest tests/orchestration/test_orchestration_mode.py -v</code>. Independently re-verify (per <code>feedback_independent_reverify</code>): re-run, lint the precise files, check <code>git diff --name-only</code> scope.</li>
+  <li>Memory + cerebrum: record the loop pattern, the xhigh precedent link, the spec path.</li>
+</ol>
+
+<h2 id="scope">14. Out of scope (YAGNI)</h2>
+<ul>
+  <li>No wiring into <code>skyyrose/multi_agent</code> (CLI paradigm) or any existing orchestrator.</li>
+  <li>No hexagonal AI-port abstraction — constructor injection of the client is the entire seam. This is a focused capability module, not a vendor-swappable subsystem.</li>
+  <li>No real MCP / external subagent backend; subagents are self-contained raw-API loops.</li>
+  <li>No persistent shell session for bash (each call is a fresh subshell — documented limitation).</li>
+  <li>No <code>role:"system"</code> transport until next-opus + a newer SDK; the seam is present, the path is dormant.</li>
+</ul>
+
+<h2 id="risks">15. Risks &amp; next-opus seams</h2>
+<table>
+  <tr><th>Risk</th><th>Mitigation</th></tr>
+  <tr><td><code>effort="xhigh"</code> may be rejected at runtime</td><td><strong>RESOLVED — live smoke PASSED 2026-06-01.</strong> A real <code>claude-opus-4-7</code> call on <code>messages.stream</code> with <code>output_config={"effort":"xhigh"}</code> + adaptive thinking + the folded <code>&lt;system-reminder&gt;</code> transport returned successfully — no <code>roles must alternate</code> 400, no effort rejection. Config seam → <code>effort="max"</code> remains the guaranteed-safe fallback.</td></tr>
+  <tr><td>Key resolution — module gets an empty key from <code>config</code></td><td>Root <code>.env</code> is 0 bytes and <code>config</code> does not surface <code>ANTHROPIC_API_KEY</code> (the key lives in purpose env files like <code>.env.judge-opus-thinking</code> / <code>.env.production</code>). The module relies on the SDK's env fallback, so the <strong>runtime entrypoint must export <code>ANTHROPIC_API_KEY</code></strong> into the environment — <code>from config import ANTHROPIC_API_KEY</code> alone yields empty in this repo state.</td></tr>
+  <tr><td>Local bash tool runs model-written commands with no sandbox</td><td>Documented loud warning; timeout + output truncation; intended for trusted local experimentation only. Sandboxing is a follow-up before any non-local use.</td></tr>
+  <tr><td>Fan-out multiplies token spend</td><td><code>max_parallel_agents</code> + <code>max_subagent_turns</code> caps; <code>structlog</code> logs every fan-out width; overflow surfaced, never silent.</td></tr>
+  <tr><td>SDK ships typed <code>role:"system"</code> / <code>xhigh</code> later</td><td>Flip <code>reminder_transport</code> to <code>SYSTEM_ROLE</code>; effort already <code>xhigh</code>. No structural change.</td></tr>
+</table>
+
+<p class="meta">End of spec. Approve to proceed to TDD build (steps 2–7).</p>
+
+</body>
+</html>

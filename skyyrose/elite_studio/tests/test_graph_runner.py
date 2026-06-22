@@ -127,7 +127,7 @@ class TestRunBatch:
     def test_batch_delay_between_items(self):
         graph = _mock_graph()
         with patch("skyyrose.elite_studio.graph.runner.time") as mock_time:
-            run_batch(skus=["br-001", "br-002"], graph=graph)
+            run_batch(skus=["br-001", "br-002"], graph=graph, skip_existing=False)
             mock_time.sleep.assert_called_once()
 
     def test_empty_skus_returns_empty(self):

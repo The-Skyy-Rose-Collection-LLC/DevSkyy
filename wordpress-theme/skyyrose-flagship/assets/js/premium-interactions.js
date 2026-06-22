@@ -28,7 +28,7 @@
 		'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
 		'.rv-blur,.rv-blur-down,.stagger-grid,' +
 		'.rv-split-char,.rv-split-word,.rv-split-line,' +
-		'.col-reveal,.lp-rv,.abt-page .rv';
+		'.col-reveal,.lp-rv,.rv';
 
 	if (prefersReduced) {
 		document.querySelectorAll(revealSelectors)
@@ -105,6 +105,23 @@
 	document.querySelectorAll('.rv-split-line').forEach(splitLines);
 
 	/* ══════════════════════════════════════════════════════════════════
+	   1.5 ABOVE-FOLD IMMEDIATE REVEAL (S650 fix, 2026-05-24)
+	   IO fires after first paint; elements already in viewport stay at
+	   opacity:0 briefly. Force-show anything intersecting the viewport
+	   at load so above-fold content never flashes empty for reduced-motion
+	   users, in-app browsers, or slow JS engines.
+	   ══════════════════════════════════════════════════════════════════ */
+	rAF(function () {
+		var vh = window.innerHeight || document.documentElement.clientHeight;
+		document.querySelectorAll(revealSelectors).forEach(function (el) {
+			var rect = el.getBoundingClientRect();
+			if (rect.top < vh && rect.bottom > 0) {
+				el.classList.add('is-visible');
+			}
+		});
+	});
+
+	/* ══════════════════════════════════════════════════════════════════
 	   2. SCROLL REVEALS
 	   Single observer for the entire theme. Subsumes the per-page observers
 	   that previously lived in landing-pages.js and about.js (retired in U-1).
@@ -114,8 +131,11 @@
 	   ══════════════════════════════════════════════════════════════════ */
 
 	if (mInView) {
-		mInView(revealSelectors, function (el) {
-			el.classList.add('is-visible');
+		mInView(revealSelectors, function (entry) {
+			// Motion One v11 passes the IntersectionObserverEntry to the callback,
+			// not the element (v10 passed the element). Dereference .target; the
+			// `|| entry` keeps it safe if the lib is ever pinned back to v10.
+			(entry.target || entry).classList.add('is-visible');
 		}, { amount: 0.12, margin: '0px 0px -40px 0px' });
 	} else {
 		var revealEls = document.querySelectorAll(revealSelectors);
@@ -260,5 +280,62 @@
 		document.body.classList.add('page-exit');
 		setTimeout(function () { window.location.href = href; }, 300);
 	});
+
+	/* ══════════════════════════════════════════════════════════════════
+	   PIN-NARRATIVE — scroll-pinned brand manifesto
+	   Sticky stage holds while collection beats cross-fade. Data-driven
+	   off the DOM; self-skips under reduced motion (CSS shows beats static).
+	   ══════════════════════════════════════════════════════════════════ */
+	(function () {
+		var track = document.querySelector('.pin-track');
+		if (!track || prefersReduced) { return; }
+		var stage = track.querySelector('.pin-stage');
+		var beats = Array.prototype.slice.call(track.querySelectorAll('.pin-beat'));
+		var pips = Array.prototype.slice.call(track.querySelectorAll('.pin-pip'));
+		var counter = track.querySelector('.pin-counter');
+		var live = track.querySelector('.pin-sr-live');
+		var n = beats.length;
+		if (!n) { return; }
+
+		track.style.setProperty('--pin-track-height', (n * 100) + 'vh');
+
+		function pad(x) { return (x < 10 ? '0' : '') + x; }
+		var current = -1;
+		var pinTicking = false;
+
+		function setBeat(idx) {
+			if (idx === current) { return; }
+			current = idx;
+			for (var i = 0; i < n; i++) {
+				beats[i].classList.toggle('is-active', i === idx);
+				if (pips[i]) { pips[i].classList.toggle('is-active', i === idx); }
+			}
+			if (counter) { counter.textContent = pad(idx + 1) + ' / ' + pad(n); }
+			if (live) {
+				var h = beats[idx].querySelector('.pin-beat__headline');
+				live.textContent = h ? h.textContent.replace(/\s+/g, ' ').trim() : '';
+			}
+		}
+
+		function onPinScroll() {
+			pinTicking = false;
+			var rect = track.getBoundingClientRect();
+			var runway = track.offsetHeight - (stage ? stage.offsetHeight : window.innerHeight);
+			if (runway <= 0) { setBeat(0); return; }
+			var progress = (-rect.top) / runway;
+			progress = progress < 0 ? 0 : (progress > 1 ? 1 : progress);
+			setBeat(Math.min(n - 1, Math.floor(progress * n)));
+		}
+
+		function requestPin() {
+			if (pinTicking) { return; }
+			pinTicking = true;
+			requestAnimationFrame(onPinScroll);
+		}
+
+		window.addEventListener('scroll', requestPin, { passive: true });
+		window.addEventListener('resize', requestPin, { passive: true });
+		onPinScroll();
+	})();
 
 })();

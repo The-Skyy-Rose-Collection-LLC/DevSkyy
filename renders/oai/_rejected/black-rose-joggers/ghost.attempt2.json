@@ -1,0 +1,11 @@
+{
+  "sku": "br-002",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The branding is not correct; the logo does not feature the full multi-color art as specified, and appears monochromatic instead."
+}

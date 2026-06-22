@@ -214,7 +214,7 @@ generated_3d_models/
 # Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
 # Source-of-truth registries (small text YAML/JSON) are re-included below.
 /assets/*
-!/assets/product-masters/
+!/assets/products/
 !/assets/prompts/
 !/assets/brand/
 datasets/
@@ -316,11 +316,53 @@ open-claude-code/
 .aidesigner/
 .mcp.json
 
+# Third-party AI coding-assistant config dirs. Each contains ONLY symlinks
+# mirroring skills from .agents/skills/ (gitignored) — so they are DEAD on a
+# fresh clone. Untracked in the repo-cleanup pass; kept on disk locally.
+.adal/
+.augment/
+.bob/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
 # OpenWolf session-local state (churns every action — not content, ignore)
 .wolf/memory.md
 .wolf/token-ledger.json
 .wolf/hooks/_session.json
 .wolf/claude-mem-digest.md
+
+# claude-mem per-folder context injection → CLAUDE.local.md (FOLDER_USE_LOCAL_MD=true).
+# Claude Code still loads it as local context; git ignores it so the sync gathers
+# info without churning tracked CLAUDE.md files (matches at any depth, no slash).
+CLAUDE.local.md
+
+# Prototype scratch tree (61MB; founder-picked variants are PORTED into the theme,
+# the scratch itself is not tracked). Also avoids duplicate build-standalone.py
+# module collisions in mypy. Un-ignore deliberately if a variant must be preserved.
+prototypes/
 
 # Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
 /*.ipynb
@@ -329,8 +371,11 @@ open-claude-code/
 wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
 scripts/nano-banana-composite-results.json
 
-# Vendored third-party repos (cloned via git, not authored here)
-vendor/
+# Vendored third-party repos (cloned via git, not authored here).
+# Track the scaffolding (README + .gitignore) so contributors can bootstrap.
+vendor/*
+!vendor/.gitignore
+!vendor/README.md
 
 # === Added by Claude optimization pass (20260424-190053) ===
 # These were missing from the original .gitignore.
@@ -349,6 +394,8 @@ renders/cache/
 renders/output/
 renders/manifest_archive/
 renders/3d/
+renders/_quarantine/
+renders/gated/
 generated_3d_models/
 
 # User PII data
@@ -406,3 +453,42 @@ renders/quarantine/
 graphify-out/.graphify_*
 graphify-out/cache/
 graphify-out/manifest.json
+
+# ADK render pipeline run artifacts (regenerable, run-specific, large)
+# Pipeline outputs are reproducible from the catalog + dossiers; only the
+# pipeline source code under agents/render_pipeline/ is canonical.
+agents/render_pipeline/output/
+data/agent-learning/
+data/vision-consensus/
+tasks/render-pipeline-cli-*.json
+
+# Catalog auto-sync + ad-hoc backups (sync scripts and one-off cleanups)
+*.bak-*
+
+# Visual Companion brainstorming artifacts (skill: superpowers/brainstorming)
+.superpowers/
+
+# OpenWolf derived artifacts — regenerated on every scan, hash-only churn pollutes diffs
+.wolf/memory-audit.json
+
+# L5 tidy hook log (per-machine, observe-mode proposals)
+.claude/tidy-log.jsonl
+
+# Golden-photo uploader backups (auto-created by scripts/golden_uploader.py)
+**/front.jpg.bak.*
+**/back.jpg.bak.*
+
+wordpress-theme/skyyrose-flagship/data/product-references/techflat-review.json
+wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analysis.json
+
+# Autonomous coding agent scratch/demo output dir
+my_project/
+renders/oai/
+scripts/oai_render/CLAUDE.md
+scripts/oai-render-review.py
+
+# ci-local stopgap: per-worktree opt-in sentinel (not version-controlled)
+.ci-local-gate
+
+# Redacted — contained a live WooCommerce secret; keep out of git (rotate key, do not re-add)
+.serena/memories/woocommerce_api_credentials.md

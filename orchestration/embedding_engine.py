@@ -320,7 +320,11 @@ class OpenAIEmbeddingEngine(BaseEmbeddingEngine):
     async def initialize(self) -> None:
         """Initialize OpenAI client."""
         try:
-            from openai import AsyncOpenAI
+            # langfuse drop-in wrapper auto-traces embedding calls (graceful fallback if extra not installed)
+            try:
+                from langfuse.openai import AsyncOpenAI
+            except ImportError:
+                from openai import AsyncOpenAI
 
             api_key = self.config.openai_api_key or os.getenv("OPENAI_API_KEY")
             if not api_key:

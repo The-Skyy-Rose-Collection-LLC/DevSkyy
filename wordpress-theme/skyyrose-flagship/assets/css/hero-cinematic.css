@@ -1,0 +1,177 @@
+/**
+ * Cinematic Hero — template-parts/hero-cinematic.php
+ *
+ * Brand-adapted port of the 21st.dev "prisma-hero" pattern.
+ * Consumes design-tokens.css custom properties; palette switches via
+ * [data-collection]. No JS required — video sits above the still with the
+ * still as poster, and is removed entirely under reduced-motion.
+ *
+ * @package SkyyRose
+ */
+
+.cine-hero {
+	width: 100%;
+	padding: clamp(0px, 2vw, 24px);
+	background: var(--skyyrose-bg, #0a0a0a);
+}
+
+.cine-hero__frame {
+	position: relative;
+	width: 100%;
+	height: clamp(560px, 92vh, 1080px);
+	overflow: hidden;
+	border-radius: clamp(16px, 2vw, 32px);
+	isolation: isolate;
+	background: radial-gradient(120% 120% at 50% 0%, #1a1a1a 0%, var(--skyyrose-bg, #0a0a0a) 70%);
+}
+
+/* Background layers — still is the LCP element, video is enhancement above it. */
+.cine-hero__media,
+.cine-hero__video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.cine-hero__img,
+.cine-hero__video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cine-hero__media {
+	z-index: 0;
+}
+
+.cine-hero__video {
+	z-index: 1;
+}
+
+/* Legibility scrim — pure rgba (no external asset, CSP-safe). */
+.cine-hero__scrim {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	background: linear-gradient(
+		to bottom,
+		rgba(0, 0, 0, 0.30) 0%,
+		rgba(0, 0, 0, 0) 38%,
+		rgba(0, 0, 0, 0.62) 100%
+	);
+}
+
+/* Foreground content — bottom-anchored 12-col grid (matches the source layout). */
+.cine-hero__content {
+	position: absolute;
+	inset: auto 0 0 0;
+	z-index: 3;
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	align-items: end;
+	gap: clamp(16px, 2vw, 32px);
+	padding: clamp(20px, 4vw, 56px);
+}
+
+.cine-hero__lockup-wrap {
+	grid-column: 1 / -1;
+}
+
+.cine-hero__lockup {
+	display: block;
+	width: min(78vw, 760px);
+	max-width: 100%;
+	height: auto;
+	filter: drop-shadow(0 8px 40px rgba(0, 0, 0, 0.45));
+}
+
+.cine-hero__aside {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(14px, 1.5vw, 22px);
+	max-width: 52ch;
+}
+
+.cine-hero__eyebrow {
+	margin: 0;
+	font-family: var(--skyyrose-font-ui, sans-serif);
+	font-size: 0.72rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent, #b76e79);
+}
+
+.cine-hero__body {
+	margin: 0;
+	font-family: var(--skyyrose-font-body, serif);
+	font-size: clamp(0.95rem, 1.05vw, 1.12rem);
+	line-height: 1.55;
+	color: var(--skyyrose-text, #f5f3ee);
+	opacity: 0.86;
+}
+
+/* CTA — branded pill with arrow capsule (tokens, not the source indigo). */
+.cine-hero__cta {
+	display: inline-flex;
+	align-items: center;
+	align-self: start;
+	gap: 0.6rem;
+	padding: 0.55rem 0.55rem 0.55rem 1.4rem;
+	border-radius: 999px;
+	background: var(--skyyrose-accent, #b76e79);
+	color: var(--skyyrose-bg, #0a0a0a);
+	font-family: var(--skyyrose-font-ui, sans-serif);
+	font-size: 0.82rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition:
+		gap 0.3s var(--skyyrose-ease, ease),
+		transform 0.3s var(--skyyrose-ease, ease);
+}
+
+.cine-hero__cta:hover,
+.cine-hero__cta:focus-visible {
+	gap: 0.9rem;
+}
+
+.cine-hero__cta-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 999px;
+	background: var(--skyyrose-bg, #0a0a0a);
+	color: var(--skyyrose-accent, #b76e79);
+	transition: transform 0.3s var(--skyyrose-ease, ease);
+}
+
+.cine-hero__cta:hover .cine-hero__cta-icon,
+.cine-hero__cta:focus-visible .cine-hero__cta-icon {
+	transform: scale(1.08);
+}
+
+/* Desktop: lockup spans 8 cols, aside the right 4 — the source's editorial split. */
+@media (min-width: 1024px) {
+	.cine-hero__lockup-wrap {
+		grid-column: 1 / 9;
+	}
+
+	.cine-hero__aside {
+		grid-column: 9 / -1;
+		padding-bottom: clamp(10px, 2vw, 32px);
+	}
+}
+
+/* Reduced motion: drop the video layer; the still is the hero. */
+@media (prefers-reduced-motion: reduce) {
+	.cine-hero__video {
+		display: none !important;
+	}
+}

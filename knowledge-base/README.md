@@ -133,7 +133,7 @@ Curated extracts from existing memory systems, written during Phase 0 KB seeding
 
 **Seed entries (read in this order when context is needed):**
 
-1. **`from-interview.md`** — autobiographical canon from Corey: visual references (KITH, Coach, Palm Angels, Drake Related, ALD, FOG Eternal, The Row, Jacquemus, Document/i-D), anti-references (no blue, no clichés, no dry reveals, no lackluster, no dated, no gendered framing), Oakland canon (Deep East, Hills, Stone City, The 100s, Brookfield, Sobrante Park, Coliseum, Real Oakland, The Shows, Sequoyah Highlands), engineering rules, reality check (imagery is #1 blocker)
+1. **`from-interview.md`** — autobiographical canon from Corey. **Active reference set as of 2026-05-25 is The Five** (`docs/brand/visual-references.md`): Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels, with Aimé Leon Dore as acceptable adjacency. The historical interview list (which included The Row / Jacquemus / Document-i-D / Coach / Drake Related) is preserved in-doc but those entries are retired; see the in-file canon-supersession note. Plus anti-references (no blue, no clichés, no dry reveals, no lackluster, no dated, no gendered framing), Oakland canon (Deep East, Hills, Stone City, The 100s, Brookfield, Sobrante Park, Coliseum, Real Oakland, The Shows, Sequoyah Highlands), engineering rules, reality check (imagery is #1 blocker)
 2. **`from-serena.md`** — index of Serena memories that matter for which task type
 3. **`from-gsd.md`** — index of GSD `.planning/` artifacts that matter
 4. **`from-claude-mem.md`** — categorized index of high-leverage claude-mem `[cmem #NNN]` IDs by domain

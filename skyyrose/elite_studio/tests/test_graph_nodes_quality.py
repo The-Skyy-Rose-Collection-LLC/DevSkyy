@@ -14,7 +14,7 @@ Tests cover:
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from skyyrose.elite_studio.graph.edges import after_quality_v2
 from skyyrose.elite_studio.graph.nodes import human_review_node, quality_node
@@ -217,7 +217,7 @@ class TestQualityNodeLowConfidence:
             recommendation="approve",
         )
         mock_llm = MagicMock()
-        mock_llm.verify.return_value = mock_qc
+        mock_llm.verify = AsyncMock(return_value=mock_qc)
 
         with (
             patch(
@@ -237,12 +237,14 @@ class TestQualityNodeLowConfidence:
         mock_classifier.predict.return_value = low_conf
 
         mock_llm = MagicMock()
-        mock_llm.verify.return_value = QualityVerification(
-            success=True,
-            provider="anthropic",
-            model="claude-sonnet-4",
-            overall_status="pass",
-            recommendation="approve",
+        mock_llm.verify = AsyncMock(
+            return_value=QualityVerification(
+                success=True,
+                provider="anthropic",
+                model="claude-sonnet-4",
+                overall_status="pass",
+                recommendation="approve",
+            )
         )
 
         with (

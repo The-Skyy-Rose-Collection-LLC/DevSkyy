@@ -462,6 +462,44 @@ function skyyrose_breadcrumb() {
 add_action( 'skyyrose_after_header', 'skyyrose_breadcrumb', 10 );
 
 /**
+ * Resolve collection SEO context for immersive and landing page templates.
+ *
+ * The four collection page templates have their own explicit branches. This
+ * maps the immersive (3D experience) and landing (conversion) templates to
+ * their collection so OG / title / description / Twitter / schema output stays
+ * consistent instead of falling through to the generic article handling.
+ *
+ * @since 1.6.4
+ *
+ * @return array|null array{slug:string,label:string,type:string} or null when
+ *                    the current request is not an immersive/landing template.
+ */
+function skyyrose_collection_template_context() {
+	$templates = array(
+		'template-immersive-black-rose.php'   => array( 'black-rose', 'Black Rose', 'immersive' ),
+		'template-immersive-love-hurts.php'   => array( 'love-hurts', 'Love Hurts', 'immersive' ),
+		'template-immersive-signature.php'    => array( 'signature', 'Signature', 'immersive' ),
+		'template-immersive-kids-capsule.php' => array( 'kids-capsule', 'Kids Capsule', 'immersive' ),
+		'template-landing-black-rose.php'     => array( 'black-rose', 'Black Rose', 'landing' ),
+		'template-landing-love-hurts.php'     => array( 'love-hurts', 'Love Hurts', 'landing' ),
+		'template-landing-signature.php'      => array( 'signature', 'Signature', 'landing' ),
+		'template-landing-kids-capsule.php'   => array( 'kids-capsule', 'Kids Capsule', 'landing' ),
+	);
+
+	foreach ( $templates as $tpl_file => $data ) {
+		if ( is_page_template( $tpl_file ) ) {
+			return array(
+				'slug'  => $data[0],
+				'label' => $data[1],
+				'type'  => $data[2],
+			);
+		}
+	}
+
+	return null;
+}
+
+/**
  * Add Open Graph tags.
  *
  * Skips output when Yoast SEO is active to prevent duplicate meta tags.
@@ -499,6 +537,8 @@ function skyyrose_open_graph_tags() {
 		}
 	}
 
+	$collection_ctx = skyyrose_collection_template_context();
+
 	if ( $active_collection_template ) {
 		$col_label = $active_collection_template[0];
 		echo '<meta property="og:type" content="website" />' . "\n";
@@ -512,7 +552,26 @@ function skyyrose_open_graph_tags() {
 		} else {
 			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 		}
-	} elseif ( is_singular() ) {
+	} elseif ( null !== $collection_ctx ) {
+		if ( 'landing' === $collection_ctx['type'] ) {
+			$ctx_title = 'Shop ' . $collection_ctx['label'] . ' | ' . $site_name;
+			$ctx_desc  = 'Shop the ' . $collection_ctx['label'] . ' collection from SkyyRose. Luxury Grows from Concrete.';
+		} else {
+			$ctx_title = $collection_ctx['label'] . ' — Immersive Experience | ' . $site_name;
+			$ctx_desc  = 'Step inside the ' . $collection_ctx['label'] . ' world — an immersive SkyyRose experience. Luxury Grows from Concrete.';
+		}
+		echo '<meta property="og:type" content="website" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( $ctx_title ) . '" />' . "\n";
+		echo '<meta property="og:description" content="' . esc_attr( $ctx_desc ) . '" />' . "\n";
+		echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '" />' . "\n";
+		if ( has_post_thumbnail() ) {
+			echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( get_the_ID(), 'full' ) ) . '" />' . "\n";
+			echo '<meta property="og:image:width" content="1200" />' . "\n";
+			echo '<meta property="og:image:height" content="630" />' . "\n";
+		} else {
+			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
+		}
+	} elseif ( is_singular() && ! is_front_page() ) {
 		global $post;
 
 		echo '<meta property="og:type" content="' . esc_attr( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
@@ -619,6 +678,8 @@ function skyyrose_twitter_card_tags() {
 		}
 	}
 
+	$twitter_ctx = skyyrose_collection_template_context();
+
 	if ( $active_twitter_collection ) {
 		$tc_label = $active_twitter_collection[0];
 		echo '<meta name="twitter:title" content="' . esc_attr( 'Shop ' . $tc_label . ' | SkyyRose' ) . '" />' . "\n";
@@ -628,7 +689,22 @@ function skyyrose_twitter_card_tags() {
 		} else {
 			echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
 		}
-	} elseif ( is_singular() ) {
+	} elseif ( null !== $twitter_ctx ) {
+		if ( 'landing' === $twitter_ctx['type'] ) {
+			$tw_title = 'Shop ' . $twitter_ctx['label'] . ' | SkyyRose';
+			$tw_desc  = 'Shop the ' . $twitter_ctx['label'] . ' collection from SkyyRose. Luxury Grows from Concrete.';
+		} else {
+			$tw_title = $twitter_ctx['label'] . ' — Immersive Experience | SkyyRose';
+			$tw_desc  = 'Step inside the ' . $twitter_ctx['label'] . ' world — an immersive SkyyRose experience.';
+		}
+		echo '<meta name="twitter:title" content="' . esc_attr( $tw_title ) . '" />' . "\n";
+		echo '<meta name="twitter:description" content="' . esc_attr( $tw_desc ) . '" />' . "\n";
+		if ( has_post_thumbnail() ) {
+			echo '<meta name="twitter:image" content="' . esc_url( get_the_post_thumbnail_url( get_the_ID(), 'full' ) ) . '" />' . "\n";
+		} else {
+			echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
+		}
+	} elseif ( is_singular() && ! is_front_page() ) {
 		echo '<meta name="twitter:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 
@@ -704,7 +780,7 @@ function skyyrose_meta_description() {
 
 	$description = '';
 
-	if ( is_singular() ) {
+	if ( is_singular() && ! is_front_page() ) {
 		// Custom template meta descriptions (155 chars max, CTA-driven).
 		if ( is_page() ) {
 			$template     = get_page_template_slug();
@@ -714,12 +790,21 @@ function skyyrose_meta_description() {
 				'template-collection-signature.php'  => 'Browse the full Signature Collection. Everyday luxury — windbreakers, shorts, beanies, and essentials from SkyyRose.',
 				'template-about.php'                 => 'The SkyyRose story — Luxury Grows from Concrete. Founded in Oakland, building premium streetwear for the culture.',
 				'template-preorder-gateway.php'      => 'Secure your SkyyRose pieces before they drop. Pre-order limited edition streetwear and luxury fashion.',
-				'template-contact.php'               => 'Get in touch with SkyyRose. Questions about orders, sizing, collaborations, or press inquiries? We are here to help.',
+				'template-contact.php'               => 'Reach SkyyRose directly. Oakland-made, founder-led. Questions about orders, sizing, collaborations, or press — we read every message.',
 				'template-faq.php'                   => 'Frequently asked questions about SkyyRose orders, shipping, returns, sizing, and pre-orders. Everything you need to know.',
 				'template-shipping-returns.php'      => 'SkyyRose shipping rates, delivery times, 30-day return policy, free exchanges, and pre-order cancellation details.',
 			);
 			if ( $template && isset( $descriptions[ $template ] ) ) {
 				$description = $descriptions[ $template ];
+			}
+
+			if ( empty( $description ) ) {
+				$collection_ctx = skyyrose_collection_template_context();
+				if ( null !== $collection_ctx ) {
+					$description = ( 'landing' === $collection_ctx['type'] )
+						? 'Shop the ' . $collection_ctx['label'] . ' collection from SkyyRose. Premium streetwear and luxury fashion — Luxury Grows from Concrete.'
+						: 'Step inside the ' . $collection_ctx['label'] . ' world. An immersive SkyyRose experience — Luxury Grows from Concrete.';
+				}
 			}
 		}
 
@@ -781,7 +866,7 @@ function skyyrose_pre_document_title( $title ) {
 			'template-collection-signature.php'  => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
 			'template-about.php'                 => 'Our Story — Luxury Grows from Concrete | ' . $brand,
 			'template-preorder-gateway.php'      => 'Pre-Order — Secure Your Pieces | ' . $brand,
-			'template-contact.php'               => 'Contact Us | ' . $brand,
+			'template-contact.php'               => 'Reach Out | ' . $brand,
 			'page-wishlist.php'                  => 'Your Wishlist | ' . $brand,
 			'template-faq.php'                   => 'FAQ — Orders, Shipping, Returns & Sizing | ' . $brand,
 			'template-shipping-returns.php'      => 'Shipping & Returns Policy | ' . $brand,
@@ -789,6 +874,14 @@ function skyyrose_pre_document_title( $title ) {
 
 		if ( $template && isset( $titles[ $template ] ) ) {
 			return $titles[ $template ];
+		}
+
+		$collection_ctx = skyyrose_collection_template_context();
+		if ( null !== $collection_ctx ) {
+			if ( 'landing' === $collection_ctx['type'] ) {
+				return 'Shop ' . $collection_ctx['label'] . ' — Luxury Streetwear | ' . $brand;
+			}
+			return $collection_ctx['label'] . ' — Immersive Experience | ' . $brand;
 		}
 	}
 
@@ -920,6 +1013,22 @@ function skyyrose_collection_itemlist_schema() {
 			'slug'  => 'kids-capsule',
 			'label' => 'Kids Capsule Collection',
 		),
+		'template-landing-black-rose.php'      => array(
+			'slug'  => 'black-rose',
+			'label' => 'Black Rose Collection',
+		),
+		'template-landing-love-hurts.php'      => array(
+			'slug'  => 'love-hurts',
+			'label' => 'Love Hurts Collection',
+		),
+		'template-landing-signature.php'       => array(
+			'slug'  => 'signature',
+			'label' => 'Signature Collection',
+		),
+		'template-landing-kids-capsule.php'    => array(
+			'slug'  => 'kids-capsule',
+			'label' => 'Kids Capsule Collection',
+		),
 	);
 
 	$matched = null;
@@ -1007,7 +1116,7 @@ function skyyrose_favicon_tags() {
 	$uri = get_template_directory_uri();
 	?>
 	<link rel="icon" type="image/webp" sizes="32x32" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-rose-icon-favicon.webp' ); ?>">
-	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>">
+	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/images/logos/sr-monogram-rose-gold.webp?v=' . SKYYROSE_VERSION ); ?>">
 	<?php
 }
 add_action( 'wp_head', 'skyyrose_favicon_tags', 2 );

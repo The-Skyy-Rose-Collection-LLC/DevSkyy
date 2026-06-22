@@ -31,10 +31,20 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from llama_index.core.base.llms.types import ChatMessage, MessageRole
-from llama_index.core.multi_modal_llms import MultiModalLLM
-from llama_index.llms.openai import OpenAI
-from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
+# LlamaIndex is an optional dependency declared in pyproject.toml[ml]. Module
+# stays importable without it; runtime methods that touch these classes will
+# raise sensible TypeErrors if called without the extra installed.
+try:
+    from llama_index.core.base.llms.types import ChatMessage, MessageRole
+    from llama_index.core.multi_modal_llms import MultiModalLLM
+    from llama_index.llms.openai import OpenAI
+    from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
+except ImportError:
+    ChatMessage = None  # type: ignore[assignment,misc]
+    MessageRole = None  # type: ignore[assignment,misc]
+    MultiModalLLM = None  # type: ignore[assignment,misc]
+    OpenAI = None  # type: ignore[assignment,misc]
+    AnthropicMultiModal = None  # type: ignore[assignment,misc]
 
 from llm.model_ids import CLAUDE_SONNET_MODEL, OPENAI_VISION_MODEL
 

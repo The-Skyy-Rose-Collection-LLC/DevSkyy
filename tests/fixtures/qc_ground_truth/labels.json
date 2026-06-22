@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "purpose": "Ground-truth QC eval set \u2014 Fable-audited BR product-card renders. Run the QC judge against this before any paid batch; a judge that misranks these is unfit.",
+    "created": "2026-06-12",
+    "source": "session Fable vision audit of the BR re-run",
+    "colorway_resolved": "2026-06-12 Fable workflow: greyscale confirmed br-001/002/004/005/006; br-007 side-panel green (minor).",
+    "correction_2026_06_12": "br-006 flipped FAIL->PASS after direct pixel re-audit: the fixture render DOES show black sherpa/fleece lining inside the hood opening (plus ribbed cuffs, satin shell, greyscale cluster on wearer's left chest) matching the real garment. The earlier 'sherpa lining absent / plain satin bomber' reason is contradicted by the file. Supersedes the br-006 row in validation-2026-06-12.json, which scored judges against the wrong label."
+  },
+  "labels": [
+    {
+      "sku": "br-001",
+      "render": "tests/fixtures/qc_ground_truth/br-001.png",
+      "expect": "PASS",
+      "confidence": "high",
+      "source_render": "renders/oai/_rejected/black-rose-crewneck/ghost.attempt3.png",
+      "fable_reason": "Fable: two-rose cluster correct (not peony), black crewneck + white ringer, correct placement; only painterly-vs-embroidered style diff. Shippable."
+    },
+    {
+      "sku": "br-004",
+      "render": "tests/fixtures/qc_ground_truth/br-004.png",
+      "expect": "PASS",
+      "confidence": "high",
+      "source_render": "renders/oai/_rejected/black-rose-hoodie/ghost.attempt3.png",
+      "fable_reason": "Fable: garment+color+silhouette+logo art+placement all match real photo. Shippable."
+    },
+    {
+      "sku": "br-005",
+      "render": "tests/fixtures/qc_ground_truth/br-005.png",
+      "expect": "FAIL",
+      "confidence": "high",
+      "source_render": "renders/oai/_rejected/black-rose-hoodie-signature/ghost.attempt3.png",
+      "fable_reason": "Fable: JUSTIFIED-FAIL \u2014 body is black, real garment is forest green; branding placement mirrored. Wrong colorway."
+    },
+    {
+      "sku": "br-006",
+      "render": "tests/fixtures/qc_ground_truth/br-006.png",
+      "expect": "PASS",
+      "confidence": "high",
+      "source_render": "renders/oai/black-rose-sherpa-jacket/ghost.png",
+      "fable_reason": "Fable pixel re-audit 2026-06-12: sherpa IS present \u2014 black fleece lining clearly visible inside the hood opening; satin shell, ribbed knit cuffs/hem, snap placket, greyscale three-rose cluster on wearer's left chest all match the real garment (real has sherpa in hood only; cuffs are ribbed knit, not sherpa). Earlier 'sherpa absent / plain satin bomber' label was wrong. Shippable."
+    },
+    {
+      "sku": "br-002",
+      "render": "tests/fixtures/qc_ground_truth/br-002.png",
+      "expect": "PASS",
+      "confidence": "high",
+      "source_render": "renders/oai/_rejected/black-rose-joggers/ghost.attempt3.png",
+      "fable_reason": "Fable colorway-truth: real garment logo is GREYSCALE (no green); greyscale render matches -> shippable. (Resolves the earlier dossier/judge green-vs-grey conflict.)"
+    },
+    {
+      "sku": "br-007",
+      "render": "tests/fixtures/qc_ground_truth/br-007.png",
+      "expect": "PASS",
+      "confidence": "high",
+      "source_render": "renders/oai/_rejected/black-rose-love-hurts-bb-shorts/ghost.attempt2.png",
+      "fable_reason": "Fable colorway-truth: allover print greyscale (correct); left mesh side-panel patch has a real green stem the render renders grey -> minor colorway miss on a small patch, still shippable per Fable audit. Dossier \"NO green\" override is wrong for this placement."
+    }
+  ]
+}

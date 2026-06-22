@@ -2,7 +2,7 @@
 sku: br-001
 name: BLACK Rose Crewneck
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
 ---
@@ -14,17 +14,51 @@ extra_logos:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (gold lettermark): `data/brand-logos/sr-monogram.md`
 
 ### Front
 - **front-chest** (~10in tall × proportional width): The Black Rose logo,
-  **physically embossed/debossed into the fabric surface** as a tonal raised
-  relief. The full art (three roses + stems + thorny vines + cloud) is impressed
-  into the fabric — viewer sees the *shapes* in 3D relief but the colors are
-  flattened to the base fabric color (no greyscale petals, no green stems, no
-  white cloud — all tonal black-on-black). Subtle 3D texture visible only in
-  directional/raking light. **Technique:** embossed. **Color:** tonal black-on-black.
+  **physically embossed onto the fabric surface as a raised dimensional
+  relief** — visibly 3D and tactile, sitting proud of the fabric. NOT
+  debossed/sunken. NOT a flat print. NOT tone-on-tone.
+
+  **Composition** — vertical teardrop cluster, widest at the top where the
+  rose blooms are, narrowing down where stems converge, anchored at the
+  bottom by a single small cumulus cloud. The cloud is a SINGLE PEDESTAL
+  AT THE BASE ONLY — it does NOT split, wrap, or fan around the roses.
+  Stems emerge UPWARD from the top of the cloud — stems do NOT extend
+  below the cloud. The thorny vines wrap around the stems and twist
+  between the blooms.
+
+  **Art elements** (all preserved from the canonical Black Rose logo at
+  data/brand-logos/three-rose-cluster.md):
+  - **Three roses** in illustrated comic-book style with hard ink edges
+    and soft tonal shading: one large fully-open bloom dominant in the
+    upper portion, one medium three-quarter-angle bloom upper-left, one
+    smaller bud or partially-open rose lower in the cluster. A few leaves
+    behind / between the blooms.
+  - **Stems** running vertically from the blooms down to the cloud.
+  - **Thorny vines** with clearly visible short sharp dark spikes wrapping
+    the stems.
+  - **Single cumulus cloud** at the very base, soft pillowy lobes, sitting
+    directly under the cluster like a pedestal.
+
+  **Embossed colorway** — reduced 3-color palette of **BLACK + WHITE + GREY**:
+  - Rose petals: GREYSCALE shading (light-grey highlights, dark-grey
+    shadows) with **bold BLACK ink outlines**. NOT solid black silhouettes.
+    NOT solid grey shapes. They are illustrated greyscale roses with
+    visible petal detail and tonal shading — the same petal rendering as
+    the canonical art tile, just without any green or blue.
+  - Cloud: WHITE with subtle light-grey shading on the underside lobes.
+  - Stems, leaves, thorny vines: GREY (mid-tone grey), with darker-grey
+    shading on undersides. NO green anywhere.
+  - Bold black outlines/ink lines throughout (rose edges, leaf veins,
+    cloud lobe outlines, vine outlines) — the illustrated comic-book
+    line-art style is preserved in the embossing.
+
+  **Technique:** embossed (raised, dimensional, color-preserved).
+  **Colors:** black, white, grey only.
 
 ### Back
 - **back-neck** (small, ~2in wide, top-center just below the white-ribbed
@@ -46,14 +80,23 @@ extra_logos:
 
 ## Negative — what is NOT on this product (DO NOT render)
 
-- NO printed graphics anywhere — not on chest, not on back, not on sleeves, not on hem.
-- NO printed text — no "BLACK IS BEAUTIFUL" arched text, no other printed words.
-- NO full-color rendering of the rose logo on the front chest — the front-chest
-  logo is tonal embossed only. NO kelly-green stems visible. NO white-and-blue
-  cloud color visible. NO greyscale rose petals visible. The embossing flattens
-  all colors to the base fabric color.
+- NO flat-print, screen-print, or DTG print on the front chest — the front-
+  chest logo is an embossed raised relief, not a flat print.
+- NO printed text — no "BLACK IS BEAUTIFUL" arched text, no other printed
+  words on the body fabric.
+- NO debossed/sunken treatment of the chest logo — the technique is embossed
+  (RAISED), not debossed.
+- NO tonal/flatten-to-base black-on-black treatment of the chest logo — the
+  embossed art is rendered in a 3-color palette (BLACK / WHITE / GREY), not
+  monochrome black.
+- NO kelly-green stems on this product — the embossed colorway uses GREY
+  for stems/leaves/vines. (Kelly-green only appears on Black Rose products
+  that use techniques preserving the full canonical color, e.g., silicone
+  appliqué or screen-print — NOT this crewneck.)
+- NO blue-tinted cloud shading on this product — the embossed cloud is
+  WHITE only.
 - NO embroidered Black Rose logo on the front chest (the front is embossed,
-  NOT embroidered — embroidery would render visible thread color).
+  NOT embroidered — embroidery would have visible thread texture).
 - NO embroidered patches on the lower right front (this is NOT a baseball jersey).
 - NO SR monogram on the front chest. NO SR monogram on the sleeves. NO SR
   monogram at the back-center. The SR monogram is at the back-neck only.

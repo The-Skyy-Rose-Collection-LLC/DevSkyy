@@ -128,9 +128,11 @@ def test_list_failed_returns_empty_when_dlq_empty(dlq):
     assert dlq.list_failed() == []
 
 
-def test_list_failed_returns_empty_when_redis_unavailable():
+def test_list_failed_returns_empty_when_redis_unavailable(monkeypatch):
     d = DeadLetterQueue()
-    d._redis = None
+    # Patch _get_redis to simulate total unavailability (setting _redis=None
+    # alone doesn't prevent reconnection when a live Redis is present in CI).
+    monkeypatch.setattr(d, "_get_redis", lambda: None)
     assert d.list_failed() == []
 
 
@@ -180,9 +182,11 @@ def test_retry_raises_key_error_for_unknown_job(dlq):
         dlq.retry("elite:nonexistent:000")
 
 
-def test_retry_raises_runtime_error_when_redis_unavailable():
+def test_retry_raises_runtime_error_when_redis_unavailable(monkeypatch):
     d = DeadLetterQueue()
-    d._redis = None
+    # Patch _get_redis to simulate total unavailability (setting _redis=None
+    # alone doesn't prevent reconnection when a live Redis is present in CI).
+    monkeypatch.setattr(d, "_get_redis", lambda: None)
     with pytest.raises(RuntimeError, match="Redis unavailable"):
         d.retry("elite:br-001:any")
 

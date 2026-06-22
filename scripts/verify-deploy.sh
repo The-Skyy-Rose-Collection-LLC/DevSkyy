@@ -40,7 +40,7 @@ NC='\033[0m' # No color
 
 log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-# shellcheck disable=SC2329  # Part of standard logging interface (used by deploy-pipeline.sh)
+# shellcheck disable=SC2329,SC2317  # Part of standard logging interface (used by deploy-pipeline.sh)
 log_warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error()   { echo -e "${RED}[FAIL]${NC} $1"; }
 

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.1.0' );
+define( 'SKYYROSE_VERSION', '1.6.5' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -26,6 +26,19 @@ define( 'SKYYROSE_URI', get_template_directory_uri() );
 define( 'SKYYROSE_THEME_DIR', SKYYROSE_DIR );
 define( 'SKYYROSE_THEME_URI', SKYYROSE_URI );
 define( 'SKYYROSE_ASSETS_URI', SKYYROSE_URI . '/assets' );
+
+/*
+--------------------------------------------------------------
+ * Coming-Soon (Veil) Mode
+ *
+ * When true, inc/maintenance.php routes every public request to
+ * template-coming-soon.php and responds HTTP 503. Logged-in editors
+ * + admin + AJAX + REST + assets bypass automatically. Flip to false
+ * and redeploy to lift the veil.
+ *--------------------------------------------------------------*/
+if ( ! defined( 'SKYYROSE_COMING_SOON_MODE' ) ) {
+	define( 'SKYYROSE_COMING_SOON_MODE', false );
+}
 
 /*
 --------------------------------------------------------------
@@ -54,6 +67,7 @@ $skyyrose_core_includes = array(
 	'/inc/collections-config.php',
 	'/inc/enqueue.php',
 	'/inc/enqueue-performance.php',
+	'/inc/enqueue-phases.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
@@ -62,19 +76,23 @@ $skyyrose_core_includes = array(
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',
 	'/inc/collection-content.php',
+	'/inc/collection-sot-reader.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
+	'/inc/maintenance.php',
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
 	'/inc/klaviyo-integration.php',
 	'/inc/experience-engine.php',
 	'/inc/fastapi-client.php',
+	'/inc/mcp-bridge.php',
 	'/inc/rest-api-experience.php',
 	'/inc/personalization.php',
 	'/inc/performance-guardian.php',
+	'/inc/image-placements.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
 );
@@ -94,6 +112,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	$skyyrose_woo_includes = array(
 		'/inc/woocommerce.php',
 		'/inc/woocommerce-preorder.php',
+		'/inc/skyyrose-product-meta.php',
 		'/inc/wc-product-functions.php',
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',

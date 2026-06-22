@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from skyyrose.elite_studio.agents.generator_agent import GeneratorAgent
 
@@ -9,17 +9,18 @@ def _make_agent(tmp_path):
         return GeneratorAgent(output_dir=str(tmp_path))
 
 
-def test_generate_returns_generation_result(tmp_path):
+async def test_generate_returns_generation_result(tmp_path):
     agent = _make_agent(tmp_path)
 
     fake_img = b"\x89PNG\r\n\x1a\n" + b"\x00" * 200  # fake PNG bytes
 
     with (
-        patch.object(agent, "_generate_gpt_image", return_value=fake_img),
-        patch.object(agent, "_generate_gemini_image", return_value=fake_img),
+        patch.object(agent, "_generate_gpt_image", new=AsyncMock(return_value=fake_img)),
+        patch.object(agent, "_generate_gemini_image", new=AsyncMock(return_value=fake_img)),
         patch.object(agent, "_pick_winner", return_value="a"),
+        patch.object(agent, "execute", new=AsyncMock(return_value=None)),
     ):
-        result = agent.generate(
+        result = await agent.generate(
             sku="br-004",
             view="front",
             generation_spec="black hoodie ghost mannequin spec",
@@ -30,14 +31,19 @@ def test_generate_returns_generation_result(tmp_path):
     assert Path(result.output_path).exists()
 
 
-def test_generate_fails_if_both_models_fail(tmp_path):
+async def test_generate_fails_if_both_models_fail(tmp_path):
     agent = _make_agent(tmp_path)
 
     with (
-        patch.object(agent, "_generate_gpt_image", side_effect=RuntimeError("quota")),
-        patch.object(agent, "_generate_gemini_image", side_effect=RuntimeError("503")),
+        patch.object(
+            agent, "_generate_gpt_image", new=AsyncMock(side_effect=RuntimeError("quota"))
+        ),
+        patch.object(
+            agent, "_generate_gemini_image", new=AsyncMock(side_effect=RuntimeError("503"))
+        ),
+        patch.object(agent, "execute", new=AsyncMock(return_value=None)),
     ):
-        result = agent.generate(sku="br-004", view="front", generation_spec="spec")
+        result = await agent.generate(sku="br-004", view="front", generation_spec="spec")
 
     assert not result.success
     assert "quota" in result.error or "503" in result.error

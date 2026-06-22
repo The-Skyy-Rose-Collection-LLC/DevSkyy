@@ -41,11 +41,17 @@ class ColorCorrectionAgent(BaseSuperAgent):
         logger.info(f"Running Legendary Color Correction for {image_path} via ADK...")
         adk_result = await self.execute(adk_prompt)
 
+        # P1 #7: Pass-through stub. No actual color correction is performed.
+        # The "auto-levels" / "brand-white-balance" labels were misleading.
+        logger.warning(
+            "ColorCorrectionAgent.correct is a stub: returning input image unchanged. "
+            "Wire to a real color-correction backend before relying on output."
+        )
         metadata = adk_result.to_dict() if hasattr(adk_result, "to_dict") else {}
 
         return ColorCorrectionResult(
-            success=True,
+            success=False,
             output_path=image_path,
-            adjustments_applied=("auto-levels", "brand-white-balance"),
-            metadata=metadata,
+            adjustments_applied=(),
+            metadata={**metadata, "stub": True, "reason": "color_correction_not_implemented"},
         )

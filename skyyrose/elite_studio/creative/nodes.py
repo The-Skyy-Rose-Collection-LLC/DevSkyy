@@ -570,6 +570,67 @@ def collection_plan_node(state: dict) -> dict:
         }
 
 
+def tripo_generate_node(state: dict) -> dict:
+    """Generate multiview product imagery via Tripo3D for a single SKU.
+
+    Expects params to contain:
+      - image_path (str): absolute path to source garment flat image
+
+    STOP-AND-SHOW confirmation must be obtained before invoking this node.
+    Use scripts/tripo_dispatch.py which enforces the gate at the dispatch layer.
+
+    Returns tripo_result matching render_result shape plus a views list.
+    """
+    import asyncio
+
+    start = time.monotonic()
+    sku = state.get("sku", "")
+    params = state.get("params", {})
+    image_path = params.get("image_path", "")
+
+    if not image_path:
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": {"success": False, "error": "params.image_path is required"},
+            "status": "error",
+            "error": "tripo_generate_node requires params.image_path",
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
+        }
+
+    try:
+        from skyyrose.elite_studio.agents.tripo_agent import TripoGenerateAgent
+
+        agent = TripoGenerateAgent()
+        result = asyncio.run(agent.generate_multiview(sku=sku, image_path=image_path))
+
+        tripo_result = {
+            "success": result.success,
+            "sku": result.sku,
+            "view": "multiview",
+            "status": "success" if result.success else "error",
+            "output_path": result.output_dir,
+            "views": result.views,
+            "task_id": result.task_id,
+            "credits_used": result.credits_used,
+            "error": result.error,
+        }
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": tripo_result,
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
+        }
+
+    except Exception as exc:
+        logger.exception("tripo_generate_node failed: %s", exc)
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": {"success": False, "error": str(exc)},
+            "status": "error",
+            "error": f"tripo_generate failed: {exc}",
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
+        }
+
+
 def finalize_node(state: dict) -> dict:
     """Set final status and log stage timings."""
     if state.get("status") == "error":

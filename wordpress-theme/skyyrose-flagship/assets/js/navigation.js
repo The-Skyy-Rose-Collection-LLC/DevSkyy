@@ -158,7 +158,10 @@
 
 	if (searchClose) searchClose.addEventListener('click', closeSearchOverlay);
 	document.addEventListener('keydown', function (e) {
-		if (e.key === 'Escape') closeSearchOverlay();
+		if (e.key === 'Escape') {
+			closeSearchOverlay();
+			closeMobileMenu();
+		}
 	});
 
 	/* --------------------------------------------------
