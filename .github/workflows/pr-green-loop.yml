@@ -30,10 +30,13 @@ concurrency:
 
 jobs:
   green-loop:
-    # Internal, non-draft PRs only. (labeled events also pass when an `auto-merge` label is added.)
+    # Internal, non-draft, non-Dependabot PRs only. Dependabot has its own rebase/merge
+    # flow (`@dependabot rebase`/`recreate`); the code-fix loop adds nothing to a dep bump
+    # and would burn a run on every one. (labeled events still pass for the `auto-merge` gate.)
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.draft == false
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
