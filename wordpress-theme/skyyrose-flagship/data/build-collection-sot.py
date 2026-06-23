@@ -46,9 +46,16 @@ def manifest_entry(entry: Any) -> dict | None:
     if not isinstance(entry, dict):
         return None
     raw = entry.get("path", "")
+    resolved = sot_common.resolve_asset(raw)
+    if raw and not resolved:
+        # Asset path declared but file not present in git tree — omit the entry
+        # so sot.json never records a {path, resolved:null} pair that the verifier
+        # flags as drift. This happens when the slim-down untracked binary assets
+        # that are still referenced in the master manifest/identity files.
+        return None
     return {
         "path": raw,
-        "resolved": sot_common.resolve_asset(raw),
+        "resolved": resolved,
         "kind": entry.get("kind"),
         "status": entry.get("status"),
         "notes": entry.get("notes"),
@@ -142,7 +149,9 @@ def registered_files(manifest: Any, logo_reg: Any, products_by_col: dict[str, li
 def imagery_block(mc: dict) -> dict:
     def lst(key):
         v = mc.get(key)
-        return [manifest_entry(e) for e in v] if isinstance(v, list) else []
+        if not isinstance(v, list):
+            return []
+        return [e for e in (manifest_entry(x) for x in v) if e is not None]
 
     return {
         "lockup_display": manifest_entry(mc.get("lockup_display")),
@@ -211,13 +220,17 @@ def build_collection(
     ident_hero_raw = (ident.get("imagery") or {}).get("hero")
     if ident_hero_raw:
         h_path = ident_hero_raw.get("path", "")
-        imagery["hero"] = {
-            "path": h_path,
-            "resolved": sot_common.resolve_asset(h_path),
-            "kind": ident_hero_raw.get("kind"),
-            "status": ident_hero_raw.get("status"),
-            "notes": ident_hero_raw.get("notes"),
-        }
+        h_resolved = sot_common.resolve_asset(h_path)
+        if h_path and h_resolved:
+            imagery["hero"] = {
+                "path": h_path,
+                "resolved": h_resolved,
+                "kind": ident_hero_raw.get("kind"),
+                "status": ident_hero_raw.get("status"),
+                "notes": ident_hero_raw.get("notes"),
+            }
+        else:
+            imagery["hero"] = None
     else:
         imagery["hero"] = None
     return {

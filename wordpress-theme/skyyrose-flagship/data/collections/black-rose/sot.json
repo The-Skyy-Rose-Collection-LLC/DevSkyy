@@ -42,14 +42,8 @@
     "logos": "data/logo-registry.json"
   },
   "lockup": {
-    "canonical": "images/lockups/black-rose-lockup.webp",
-    "display_webp": {
-      "path": "images/lockups/black-rose-lockup.webp",
-      "resolved": "images/lockups/black-rose-lockup.webp",
-      "kind": "collection-lockup-display",
-      "status": "verified",
-      "notes": "CANONICAL display lockup \u2014 high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
-    },
+    "canonical": null,
+    "display_webp": null,
     "svg_master": {
       "path": "branding/vectorized/black-rose-script.svg",
       "resolved": "branding/vectorized/black-rose-script.svg",
@@ -57,121 +51,25 @@
       "status": "verified",
       "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
     },
-    "source_art": {
-      "path": "images/hero-overlays/br-brand-script-logotype",
-      "resolved": "images/hero-overlays/br-brand-script-logotype.webp",
-      "kind": "collection-lockup",
-      "status": "verified",
-      "notes": "THE Black Rose Collection script with rose. BLACK lettering \u2014 on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
-    },
-    "alt": {
-      "path": "images/hero-overlays/br-brand-script",
-      "resolved": "images/hero-overlays/br-brand-script.webp",
-      "kind": "collection-lockup-alt",
-      "status": "verified",
-      "notes": "Script variant without 'Collection' line. Same black-lettering handling rules."
-    },
+    "source_art": null,
+    "alt": null,
     "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
-    "scene_portrait": {
-      "path": "images/homepage-col-black-rose",
-      "resolved": "images/homepage-col-black-rose.webp",
-      "kind": "collection-portrait",
-      "status": "verified",
-      "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
-    },
-    "hero_backdrop": {
-      "path": "branding/hero/forbidden-midnight",
-      "resolved": "branding/hero/forbidden-midnight-1280w.webp",
-      "kind": "cinematic-backdrop",
-      "status": "verified",
-      "notes": "Black Rose cinematic backdrop (founder-assigned 2026-06-11). BR heroes/manifesto surfaces."
-    },
-    "atmospherics": [
-      {
-        "path": "images/logos/black-roses-cloud-cluster",
-        "resolved": "images/logos/black-roses-cloud-cluster.webp",
-        "kind": "atmospheric-art",
-        "status": "verified",
-        "notes": "Black roses on clouds. Section backdrops at low opacity, BR surfaces only."
-      },
-      {
-        "path": "branding/collection-logo-black-rose",
-        "resolved": "branding/collection-logo-black-rose.jpg",
-        "kind": "collection-logo",
-        "status": "verified",
-        "notes": "BR collection logo badge (founder-kept 2026-06-13)."
-      },
-      {
-        "path": "branding/sr-monogram-blackrose-hero",
-        "resolved": "branding/sr-monogram-blackrose-hero.webp",
-        "kind": "collection-hero-art",
-        "status": "verified",
-        "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
-      }
-    ],
-    "patches": [
-      {
-        "path": "images/hero-overlays/br-patch-hockey",
-        "resolved": "images/hero-overlays/br-patch-hockey.webp",
-        "kind": "jersey-patch-art",
-        "status": "verified",
-        "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
-      },
-      {
-        "path": "images/hero-overlays/br-patch-mlb-baseball",
-        "resolved": "images/hero-overlays/br-patch-mlb-baseball.webp",
-        "kind": "jersey-patch-art",
-        "status": "verified",
-        "notes": "Series patch (baseball, br-003/br-012)."
-      },
-      {
-        "path": "images/hero-overlays/br-patch-nba-basketball",
-        "resolved": "images/hero-overlays/br-patch-nba-basketball.webp",
-        "kind": "jersey-patch-art",
-        "status": "verified",
-        "notes": "Series patch (basketball, br-010)."
-      },
-      {
-        "path": "images/hero-overlays/br-patch-nfl-football",
-        "resolved": "images/hero-overlays/br-patch-nfl-football.webp",
-        "kind": "jersey-patch-art",
-        "status": "verified",
-        "notes": "Series patch (football, br-008/br-009)."
-      }
-    ],
+    "scene_portrait": null,
+    "hero_backdrop": null,
+    "atmospherics": [],
+    "patches": [],
     "lettering_alt": [],
     "lockup_parts": [],
-    "lookbook": [
-      {
-        "path": "images/lookbook/lb-black-rose-football",
-        "resolved": "images/lookbook/lb-black-rose-football-480w.webp",
-        "kind": "lookbook",
-        "status": "verified",
-        "notes": "BIB football jersey editorial."
-      },
-      {
-        "path": "images/lookbook/lb-black-rose-hockey",
-        "resolved": "images/lookbook/lb-black-rose-hockey-480w.webp",
-        "kind": "lookbook",
-        "status": "verified",
-        "notes": "BIB hockey jersey editorial."
-      }
-    ],
-    "hero": {
-      "path": "branding/hero/forbidden-midnight",
-      "resolved": "branding/hero/forbidden-midnight-1280w.webp",
-      "kind": "cinematic-backdrop",
-      "status": "interim-pending-mj",
-      "notes": "Interim wide master. Dedicated Black Rose MJ hero (docs/brand/immersive-hero-prompts.md) replaces this once generated."
-    }
+    "lookbook": [],
+    "hero": null
   },
   "logos": [
     {
       "id": "black-roses-cloud-cluster",
       "file": "black-roses-cloud-cluster.jpeg",
-      "resolved": "images/logos/black-roses-cloud-cluster.jpeg",
+      "resolved": null,
       "primary_color": "#2F2F2F",
       "notes": "BLACK ROSE COLLECTION LOGO. Cluster of gray/black roses with green thorns emerging from clouds. 'Black Is Beautiful Series' signature rose imagery \u2014 used on NBA"
     }
@@ -183,20 +81,7 @@
       "price": "35",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-001-crewneck.png",
-          "resolved": "images/products/br-001-crewneck.png"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-001-onmodel.webp",
-          "resolved": "images/products/br-001-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-crewneck-back-model.webp",
-          "resolved": "images/products/black-rose-crewneck-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-crewneck.md",
       "dossier_exists": true
     },
@@ -206,24 +91,7 @@
       "price": "50",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-002-joggers.png",
-          "resolved": "images/products/br-002-joggers.png"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/ghost/br-002-ghost-front.webp",
-          "resolved": "images/products/ghost/br-002-ghost-front.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-rose-joggers-back-model.webp",
-          "resolved": "images/products/black-rose-joggers-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-joggers-back-model.webp",
-          "resolved": "images/products/black-rose-joggers-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-joggers.md",
       "dossier_exists": true
     },
@@ -233,24 +101,7 @@
       "price": "100",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-003-baseball-classic.jpeg",
-          "resolved": "images/products/br-003-baseball-classic.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-003-onmodel.webp",
-          "resolved": "images/products/br-003-onmodel.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic.md",
       "dossier_exists": true
     },
@@ -260,24 +111,7 @@
       "price": "40",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-004-black-rose-hoodie.jpeg",
-          "resolved": "images/products/br-004-black-rose-hoodie.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-004-onmodel.webp",
-          "resolved": "images/products/br-004-onmodel.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-rose-hoodie-back-model.webp",
-          "resolved": "images/products/black-rose-hoodie-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-hoodie-back-model.webp",
-          "resolved": "images/products/black-rose-hoodie-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-hoodie.md",
       "dossier_exists": true
     },
@@ -287,24 +121,7 @@
       "price": "65",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-005-signature-hoodie.jpeg",
-          "resolved": "images/products/br-005-signature-hoodie.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/ghost/br-005-ghost-front.webp",
-          "resolved": "images/products/ghost/br-005-ghost-front.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-rose-hoodie-signature-edition-back-model.webp",
-          "resolved": "images/products/black-rose-hoodie-signature-edition-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-hoodie-signature-back-model.webp",
-          "resolved": "images/products/black-rose-hoodie-signature-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-hoodie-signature-edition.md",
       "dossier_exists": true
     },
@@ -314,24 +131,7 @@
       "price": "95",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-006-sherpa-jacket.jpeg",
-          "resolved": "images/products/br-006-sherpa-jacket.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-006-onmodel.webp",
-          "resolved": "images/products/br-006-onmodel.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
-          "resolved": "images/products/black-rose-sherpa-jacket-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
-          "resolved": "images/products/black-rose-sherpa-jacket-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-sherpa-jacket.md",
       "dossier_exists": true
     },
@@ -341,24 +141,7 @@
       "price": "65",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-007.jpg",
-          "resolved": "images/products/br-007.jpg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/ghost/br-007-ghost-front.webp",
-          "resolved": "images/products/ghost/br-007-ghost-front.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/br-007-real-back.jpg",
-          "resolved": "images/products/br-007-real-back.jpg"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-rose-love-hurts-basketball-shorts-back-model.webp",
-          "resolved": "images/products/black-rose-love-hurts-basketball-shorts-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-rose-x-love-hurts-basketball-shorts.md",
       "dossier_exists": true
     },
@@ -368,20 +151,7 @@
       "price": "115",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-008-sf-inspired.jpg",
-          "resolved": "images/products/br-008-sf-inspired.jpg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-008-onmodel.webp",
-          "resolved": "images/products/br-008-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp",
-          "resolved": "images/products/jersey-sf-inspired-football-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-1-sf-inspired-football.md",
       "dossier_exists": true
     },
@@ -391,20 +161,7 @@
       "price": "115",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-009-last-oakland-football.jpg",
-          "resolved": "images/products/br-009-last-oakland-football.jpg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-009-onmodel.webp",
-          "resolved": "images/products/br-009-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/jersey-last-oakland-football-back-model.webp",
-          "resolved": "images/products/jersey-last-oakland-football-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
       "dossier_exists": true
     },
@@ -414,20 +171,7 @@
       "price": "100",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-010-the-bay-basketball.jpeg",
-          "resolved": "images/products/br-010-the-bay-basketball.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-010-onmodel.webp",
-          "resolved": "images/products/br-010-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp",
-          "resolved": "images/products/jersey-the-bay-basketball-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-3-the-bay-basketball.md",
       "dossier_exists": true
     },
@@ -437,24 +181,7 @@
       "price": "115",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-011-the-rose-hockey.png",
-          "resolved": "images/products/br-011-the-rose-hockey.png"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-011-onmodel.webp",
-          "resolved": "images/products/br-011-onmodel.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-hockey-jersey-back-model.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/jersey-the-rose-hockey-back-model.webp",
-          "resolved": "images/products/jersey-the-rose-hockey-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md",
       "dossier_exists": true
     },
@@ -464,24 +191,7 @@
       "price": "100",
       "is_preorder": true,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-012-last-oakland-baseball-front.jpeg",
-          "resolved": "images/products/br-012-last-oakland-baseball-front.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/jersey-last-oakland-baseball-front-model.webp",
-          "resolved": "images/products/jersey-last-oakland-baseball-front-model.webp"
-        },
-        "back_image": {
-          "path": "assets/images/products/br-012-last-oakland-baseball-back.jpeg",
-          "resolved": "images/products/br-012-last-oakland-baseball-back.jpeg"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/jersey-last-oakland-baseball-back-model.webp",
-          "resolved": "images/products/jersey-last-oakland-baseball-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-5-last-oakland-baseball.md",
       "dossier_exists": true
     },
@@ -491,20 +201,7 @@
       "price": "100",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-014-baseball-classic-giants.jpeg",
-          "resolved": "images/products/br-014-baseball-classic-giants.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-014-onmodel.webp",
-          "resolved": "images/products/br-014-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-giants-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-giants-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-giants.md",
       "dossier_exists": true
     },
@@ -514,20 +211,7 @@
       "price": "100",
       "is_preorder": false,
       "published": true,
-      "images": {
-        "image": {
-          "path": "assets/images/products/br-015-baseball-classic-white.jpeg",
-          "resolved": "images/products/br-015-baseball-classic-white.jpeg"
-        },
-        "front_model_image": {
-          "path": "assets/images/products/br-015-onmodel.webp",
-          "resolved": "images/products/br-015-onmodel.webp"
-        },
-        "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-white-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-white-back-model.webp"
-        }
-      },
+      "images": {},
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",
       "dossier_exists": true
     }
