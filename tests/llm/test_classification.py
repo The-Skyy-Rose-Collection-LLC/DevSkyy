@@ -77,21 +77,22 @@ async def test_groq_classification_speed(mock_api_keys):
         output_tokens=10,
     )
 
-    # Simulate fast response (~50ms)
+    # Mock returns immediately. A unit test with a mocked client must measure the
+    # classifier's OWN overhead, not an artificial sleep. The prior 50ms sleep ate
+    # the wall-clock budget and made this assert flaky under CI scheduler jitter
+    # (observed 125ms > 100ms on a loaded runner). A real perf regression (a sync
+    # or blocking call in the hot path) would be seconds, still caught by <100ms.
     async def mock_complete(*args, **kwargs):
-        await asyncio.sleep(0.05)  # 50ms
         return mock_response
 
     mock_client.complete = mock_complete
     classifier._client = mock_client
 
-    import asyncio
-
     start = time.monotonic()
     result = await classifier.classify_intent("test", ["intent1", "intent2"])
     elapsed_ms = (time.monotonic() - start) * 1000
 
-    # Should be sub-100ms (with mock: ~50ms)
+    # Classifier overhead only (mock is instant) — robustly sub-100ms.
     assert elapsed_ms < 100
     assert result.latency_ms < 100
 

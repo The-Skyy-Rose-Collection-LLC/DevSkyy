@@ -218,6 +218,7 @@ generated_3d_models/
 !/assets/products/
 !/assets/prompts/
 !/assets/brand/
+!/assets/marketing-keepers/
 datasets/
 generated_3d_models_color_accurate/
 
@@ -502,3 +503,34 @@ scripts/oai-render-review.py
 ds-bundle/
 .design-sync/.cache/
 .design-sync/node_modules/
+# Theme binary assets (2026-06-22): kept on disk, untracked from git.
+# The theme is packaged from disk (not git), so the live site is unchanged.
+# Fonts (*.woff2) stay TRACKED (tiny, GDPR/zero-CDN-critical).
+wordpress-theme/skyyrose-flagship/assets/**/*.webp
+wordpress-theme/skyyrose-flagship/assets/**/*.avif
+wordpress-theme/skyyrose-flagship/assets/**/*.jpg
+wordpress-theme/skyyrose-flagship/assets/**/*.jpeg
+wordpress-theme/skyyrose-flagship/assets/**/*.png
+wordpress-theme/skyyrose-flagship/assets/**/*.gif
+wordpress-theme/skyyrose-flagship/assets/**/*.glb
+
+# Generated/scratch assets — untracked, kept on disk where pipeline needs them (2026-06-22)
+renders/**/*.webp
+renders/**/*.avif
+renders/**/*.jpg
+renders/**/*.jpeg
+renders/**/*.png
+renders/**/*.gif
+renders/**/*.glb
+renders/**/*.gltf
+datasets/**/*.jpg
+datasets/**/*.jpeg
+datasets/**/*.png
+datasets/**/*.webp
+datasets/**/*.safetensors
+datasets/**/*.pt
+generated_assets/
+round_table_outputs/
+hf_3d_cache/
+ci_mirror/
+graphify-out/

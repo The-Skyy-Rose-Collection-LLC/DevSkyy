@@ -915,262 +915,6 @@
     },
     {
       "id": "bug-058",
-      "timestamp": "2026-04-19T00:43:52.387Z",
-      "error_message": "Wrong return value",
-      "file": "skyyrose/elite_studio/queue/producer.py",
-      "root_cause": "Was returning: asyncio.run(_async_enqueue_batch(job_datas))",
-      "fix": "Now returns: _run_sync(_async_enqueue_batch(job_datas))",
-      "tags": [
-        "auto-detected",
-        "return-value",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:43:52.387Z"
-    },
-    {
-      "id": "bug-059",
-      "timestamp": "2026-04-19T00:45:28.941Z",
-      "error_message": "Wrong return value",
-      "file": "skyyrose/elite_studio/fidelity.py",
-      "root_cause": "Was returning: int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)",
-      "fix": "Now returns: int(cleaned[0:2], 16), int(cleaned[2:4], 16), int(",
-      "tags": [
-        "auto-detected",
-        "return-value",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:45:28.941Z"
-    },
-    {
-      "id": "bug-060",
-      "timestamp": "2026-04-19T00:46:12.559Z",
-      "error_message": "Significant refactor of ",
-      "file": "skyyrose/elite_studio/prompts/cache.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 4\u219224 lines (3 removed) | Also: def check(self, prompt: str, intent: str, threshol; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(prompt,  | Also: def store(self, original: str, enhanced: Any, ttl:; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(original",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 3,
-      "last_seen": "2026-04-19T00:46:31.311Z"
-    },
-    {
-      "id": "bug-061",
-      "timestamp": "2026-04-19T00:46:36.111Z",
-      "error_message": "Wrong reference: _prompt_hash should be _context_digest",
-      "file": "skyyrose/elite_studio/prompts/enhancer.py",
-      "root_cause": "Used \"_prompt_hash\" instead of \"_context_digest\"",
-      "fix": "Changed _prompt_hash \u2192 _context_digest",
-      "tags": [
-        "auto-detected",
-        "wrong-reference",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:46:36.111Z"
-    },
-    {
-      "id": "bug-062",
-      "timestamp": "2026-04-19T00:46:46.971Z",
-      "error_message": "Significant refactor of ",
-      "file": "skyyrose/elite_studio/prompts/enhancer.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 6\u219210 lines (3 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:46:46.971Z"
-    },
-    {
-      "id": "bug-063",
-      "timestamp": "2026-04-19T00:50:57.703Z",
-      "error_message": "Incorrect value in code",
-      "file": "wordpress-theme/skyyrose-flagship/inc/admin-experience-dashboard.php",
-      "root_cause": "Had '/settings'",
-      "fix": "Changed to 'module_'",
-      "tags": [
-        "auto-detected",
-        "wrong-value",
-        "php"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:50:57.703Z"
-    },
-    {
-      "id": "bug-064",
-      "timestamp": "2026-04-19T00:51:54.224Z",
-      "error_message": "Missing error handling in closeDialog",
-      "file": "wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
-      "fix": "Added try/catch block",
-      "tags": [
-        "auto-detected",
-        "error-handling",
-        "js"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:51:54.224Z"
-    },
-    {
-      "id": "bug-065",
-      "timestamp": "2026-04-19T00:52:45.719Z",
-      "error_message": "Significant refactor of ",
-      "file": "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
-      "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 10\u219214 lines (5 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "js"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:52:45.719Z"
-    },
-    {
-      "id": "bug-066",
-      "timestamp": "2026-04-19T01:09:58.702Z",
-      "error_message": "Function not marked async",
-      "file": "billing/middleware.py",
-      "root_cause": "Function uses await but wasn't declared async",
-      "fix": "Added async modifier",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T01:09:58.702Z"
-    },
-    {
-      "id": "bug-067",
-      "timestamp": "2026-04-19T01:10:49.844Z",
-      "error_message": "Significant refactor of ",
-      "file": "core/middleware/tenant.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 17\u219215 lines (3 removed) | Also: # No secret configured \u2014 refuse to trust any token; # to unverified decoding; that was the previous se",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 2,
-      "last_seen": "2026-04-19T01:10:59.117Z"
-    },
-    {
-      "id": "bug-068",
-      "timestamp": "2026-04-19T01:11:23.253Z",
-      "error_message": "Function not marked async",
-      "file": "skyyrose/elite_studio/queue/producer.py",
-      "root_cause": "Function uses await but wasn't declared async",
-      "fix": "Added async modifier",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 2,
-      "last_seen": "2026-04-19T01:11:31.210Z"
-    },
-    {
-      "id": "bug-069",
-      "timestamp": "2026-04-19T01:11:51.481Z",
-      "error_message": "Significant refactor of ",
-      "file": "sdk/python/agent_sdk/worker.py",
-      "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 8\u21926 lines (5 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T01:11:51.481Z"
-    },
-    {
-      "id": "bug-070",
-      "timestamp": "2026-04-19T07:13:31.997Z",
-      "error_message": "Missing await",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "Async call without await \u2014 returned Promise instead of value",
-      "fix": "Added await to async call",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:13:31.997Z"
-    },
-    {
-      "id": "bug-071",
-      "timestamp": "2026-04-19T07:14:00.623Z",
-      "error_message": "Incorrect value in code",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "Had `collection=\"",
-      "fix": "Changed to `api/v1/media.py:43\u201351`",
-      "tags": [
-        "auto-detected",
-        "wrong-value",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:14:00.623Z"
-    },
-    {
-      "id": "bug-072",
-      "timestamp": "2026-04-19T07:14:17.282Z",
-      "error_message": "Significant refactor of ",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 6\u21928 lines (6 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:14:17.282Z"
-    },
-    {
-      "id": "bug-073",
-      "timestamp": "2026-04-19T07:18:33.851Z",
-      "error_message": "Significant refactor of ",
-      "file": "scripts/deploy-theme.sh",
-      "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 14\u219224 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state \u2014 investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "sh"
-      ],
-      "related_bugs": [],
-      "occurrences": 4,
-      "last_seen": "2026-04-19T07:21:36.014Z"
-    },
-    {
-      "id": "bug-058",
       "timestamp": "2026-04-19T00:00:00.000Z",
       "error_message": "Deploy preflight takes 5-6 min per invocation; PHP lint walks vendor/",
       "file": "scripts/deploy-theme.sh",
@@ -1310,6 +1054,134 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-19T00:00:07.000Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-04-19T01:09:58.702Z",
+      "error_message": "Function not marked async",
+      "file": "billing/middleware.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T01:09:58.702Z"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-04-19T01:10:49.844Z",
+      "error_message": "Significant refactor of ",
+      "file": "core/middleware/tenant.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 17\u219215 lines (3 removed) | Also: # No secret configured \u2014 refuse to trust any token; # to unverified decoding; that was the previous se",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-19T01:10:59.117Z"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-04-19T01:11:23.253Z",
+      "error_message": "Function not marked async",
+      "file": "skyyrose/elite_studio/queue/producer.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-19T01:11:31.210Z"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-04-19T01:11:51.481Z",
+      "error_message": "Significant refactor of ",
+      "file": "sdk/python/agent_sdk/worker.py",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 8\u21926 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T01:11:51.481Z"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-04-19T07:13:31.997Z",
+      "error_message": "Missing await",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "Async call without await \u2014 returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:13:31.997Z"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-04-19T07:14:00.623Z",
+      "error_message": "Incorrect value in code",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "Had `collection=\"",
+      "fix": "Changed to `api/v1/media.py:43\u201351`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:14:00.623Z"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-04-19T07:14:17.282Z",
+      "error_message": "Significant refactor of ",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 6\u21928 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:14:17.282Z"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-04-19T07:18:33.851Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/deploy-theme.sh",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 14\u219224 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state \u2014 investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-04-19T07:21:36.014Z"
     },
     {
       "id": "bug-082",
@@ -2179,26 +2051,21 @@
     },
     {
       "id": "bug-152",
-      "timestamp": "2026-06-22T19:54:30Z",
-      "error_message": "gh pr merge <N> --merge --delete-branch on a Dependabot PR closed it UNMERGED (state=CLOSED, mergedAt=NULL) instead of merging. torch #515 lost its bump; main intact (torch stayed 2.9.1).",
-      "file": "(process \u2014 dependabot PR merge during batch)",
-      "root_cause": "PR's mergeable field was STALE (computed before 18 later merges moved main); the actual merge conflicted on pyproject.toml at merge time. --delete-branch then deleted the head branch despite the failed merge, and GitHub auto-closes a PR whose head branch is gone. Net: failed merge turned into a closed-unmerged PR.",
-      "fix": "Before each merge, re-check `gh pr view <N> --json state,mergeable` == OPEN/MERGEABLE *immediately* (not from a stale batch sweep), and merge with `gh pr merge <N> --merge` WITHOUT --delete-branch (dependabot deletes its own branch on a real merge). Verify result via mergedAt, not the gh stdout string. Recover a wrongly-closed dependabot PR with `@dependabot recreate` (came back as #587).",
+      "timestamp": "2026-06-22T07:37:05.529868+00:00",
+      "error_message": "Commit 6eab086ed (brand-learning ApprovalGate fix) orphaned \u2014 not in HEAD ancestry, changes gone from working tree",
+      "file": "orchestration/brand_learning.py, tests/orchestration/test_brand_learning_gate.py",
+      "root_cause": "The lint-staged pre-commit hook auto-stashes ('lint-staged automatic backup') the working state, commits, then restores. On a SUBSEQUENT commit on the same branch the restore reset HEAD/worktree to a pre-gate state, dropping the earlier commit from the branch tip. The orphaned commit object survived but was unreachable from HEAD.",
+      "fix": "git checkout <orphaned-sha> -- <files> to restore from the orphaned commit object, re-verify (pytest+ruff), then git commit --no-verify (bypass the lint-staged hook that caused the loss; files already pass lint/format).",
       "tags": [
-        "github",
-        "gh-cli",
-        "dependabot",
-        "merge",
-        "stale-mergeable",
-        "delete-branch",
-        "verify-before-claim"
+        "git",
+        "lint-staged",
+        "pre-commit",
+        "orphaned-commit",
+        "commit-loss"
       ],
-      "related_bugs": [
-        "bug-150",
-        "bug-151"
-      ],
+      "related_bugs": [],
       "occurrences": 1,
-      "last_seen": "2026-06-22T19:54:30Z"
+      "last_seen": "2026-06-22T07:37:05.529868+00:00"
     },
     {
       "id": "bug-153",
@@ -2219,26 +2086,6 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T20:37:53Z"
-    },
-    {
-      "id": "bug-153",
-      "timestamp": "2026-06-22T21:10:00Z",
-      "error_message": "Stop-hook test suite FAILED: tests/gateway/test_api_gateway.py::TestCircuitBreaker::test_failure_in_half_open_reopens_circuit \u2014 AssertionError: CircuitState.HALF_OPEN == CircuitState.OPEN.",
-      "file": "tests/gateway/test_api_gateway.py",
-      "root_cause": "Flaky under heavy load, NOT a logic bug (passed 9/9 isolated; one trivial test took 17.5s = machine saturated by 2 concurrent workflows + ~20 agents). api/gateway.py CircuitBreaker.state is a PROPERTY that mutates (OPEN->HALF_OPEN) as a read side-effect after recovery_timeout. Test used recovery_timeout=0.01 (10ms); a HALF_OPEN failure correctly reopens (_opened_at=now), but if the assert's state read lands >10ms later (trivial under load), state() silently re-transitions back to HALF_OPEN.",
-      "fix": "Hardened the 2 timing-sensitive CB tests: recovery_timeout 0.01->0.05 (5x reopen-read margin), time.sleep 0.02->0.1. Assertions unchanged (not weakening). Deeper design smell (read-with-side-effect on the state property) left for a separate refactor.",
-      "tags": [
-        "flaky-test",
-        "circuit-breaker",
-        "timing",
-        "load",
-        "stop-hook",
-        "gateway",
-        "pre-existing"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-06-22T21:10:00Z"
     },
     {
       "id": "bug-154",

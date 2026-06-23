@@ -255,3 +255,38 @@ def test_parse_dt_accepts_datetime_objects():
     sales = [{"date": AS_OF - timedelta(days=d), "units": 2} for d in range(1, 15)]
     f = DemandForecaster().forecast(_product(sales), as_of=AS_OF)
     assert f.daily_velocity == pytest.approx(2.0)
+
+
+# --------------------------------------------------------------------------- #
+# Regression: #18004 lead/horizon clamp
+# --------------------------------------------------------------------------- #
+
+
+def test_sellout_high_reachable_when_lead_exceeds_horizon():
+    """Misconfig lead > horizon must not collapse the HIGH band (was unreachable pre-fix)."""
+    # lead=45, horizon=30 -> clamped to lead=45, horizon=46. velocity 2/day, inventory 91
+    # -> days_to_sellout=45.5, which lands in the HIGH band (45 < 45.5 <= 46).
+    f = DemandForecaster(lead_time_days=45, sellout_horizon_days=30).forecast(
+        _product(_daily(2, 1, 28), inventory=91), as_of=AS_OF
+    )
+    assert f.days_to_sellout == pytest.approx(45.5)
+    assert f.sellout_risk is SelloutRisk.HIGH
+    assert f.recommended_action == "reorder_soon"
+
+
+def test_sellout_critical_reachable_with_nonpositive_lead():
+    """lead<=0 must not make CRITICAL unreachable (was a silent under-alert pre-fix)."""
+    # lead=0 -> clamped to 1. velocity 2/day, inventory 1 -> days_to_sellout=0.5 <= 1 -> CRITICAL.
+    f = DemandForecaster(lead_time_days=0).forecast(
+        _product(_daily(2, 1, 28), inventory=1), as_of=AS_OF
+    )
+    assert f.days_to_sellout == pytest.approx(0.5)
+    assert f.sellout_risk is SelloutRisk.CRITICAL
+    assert f.recommended_action == "reorder_now"
+
+
+def test_constructor_clamps_lead_and_horizon():
+    """Constructor clamps lead>=1 and horizon>=lead+1 regardless of input."""
+    fc = DemandForecaster(lead_time_days=0, sellout_horizon_days=-5)
+    assert fc.lead_time_days == 1
+    assert fc.sellout_horizon_days == 2

@@ -38,6 +38,10 @@ _TOOL_MODULES = (
     "wc_client",
     "wordpress",
     "wp_deploy",
+    # Mined from the retired mcp_servers/ fleet (2026-06-22)
+    "external_mcp",
+    "rag",
+    "orchestration",
 )
 
 for _module_name in _TOOL_MODULES:
