@@ -18,7 +18,10 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from tripo3d import TripoClient
+try:  # tripo3d is an optional, API-key-gated SDK; a soft import keeps test
+    from tripo3d import TripoClient  # collection and non-3D paths from hard-requiring it.
+except ImportError:  # pragma: no cover - exercised only when the SDK is absent
+    TripoClient = None  # type: ignore[assignment,misc]
 
 from ..models import Artifact, Stage
 from .base import StageContext
@@ -93,6 +96,11 @@ class TripoAdapter:
                 raise ValueError(f"{stage.value} requires a prior Tripo task_id to chain")
 
         self._output_dir.mkdir(parents=True, exist_ok=True)
+
+        if TripoClient is None:  # SDK absent — fail loud with an install hint, never silently.
+            raise RuntimeError(
+                "tripo3d SDK not installed; run `pip install tripo3d>=0.4.1` to use the Tripo adapter"
+            )
 
         async with TripoClient(api_key=self._api_key) as client:
             if stage == Stage.IMAGE_TO_3D:
