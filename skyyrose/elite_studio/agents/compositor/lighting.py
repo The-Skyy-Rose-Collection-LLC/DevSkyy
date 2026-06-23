@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 # Scene SKU lookbook (legacy export for callers that import it).
 SCENE_LOOKBOOK: dict[str, str] = {
-    "black-rose-bay-bridge-night": "br-",
-    "love-hurts-enchanted-rose-dome": "lh-",
-    "signature-golden-gate-golden-hour": "sg-",
+    "black-rose-bay-bridge-sf-side-night": "br-",
+    "love-hurts-enchanted-rose-cathedral": "lh-",
+    "signature-oakland-waterfront-bay-bridge-day": "sg-",
     "kids-capsule-urban-playground": "kids-",
 }
 

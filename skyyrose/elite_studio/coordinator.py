@@ -12,6 +12,7 @@ Handles batch processing, rate limiting, and result reporting.
 from __future__ import annotations
 
 import json
+import re
 import time
 from typing import Any, Protocol
 
@@ -19,9 +20,23 @@ from .agents.compositor_agent import CompositorAgent
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
 from .agents.vision_agent import DualVisionGate as VisionAgent
+from .budget import BudgetExceededError, RunBudget
 from .config import BATCH_DELAY_SECONDS, OUTPUT_DIR
 from .models import ProductionResult
 from .utils import discover_all_skus
+
+# Worst-case per-stage cost estimates (USD). Pre-check ceilings use these so the
+# budget gate fires BEFORE money is spent. Actual spend is recorded post-call
+# from the engine response when available, otherwise these estimates.
+_GENERATOR_EST_COST_USD = 0.12  # GPT $0.08 + Gemini $0.04 (dual-path)
+_COMPOSITOR_EST_COST_USD = 0.115  # mirrors graph/nodes/_shared.py
+
+# SKU format guard — the catalog enforces this shape (e.g. "br-001", "sig-014").
+# Validating BEFORE any path construction defeats traversal attacks via
+# malicious SKU values like "../../../etc/passwd" or absolute paths. Mirrors
+# the regex used in skyyrose/elite_studio/upload.py — kept locally to avoid a
+# circular-import dependency between coordinator and upload.
+_SKU_RE = re.compile(r"^[a-z]{2,4}-\d{3}$")
 
 # ---------------------------------------------------------------------------
 # Logger protocol — decouples presentation from orchestration
@@ -35,6 +50,7 @@ class Logger(Protocol):
     def step(self, step_num: int, total: int, label: str) -> None: ...
     def ok(self, msg: str) -> None: ...
     def fail(self, msg: str) -> None: ...
+    def error(self, msg: str) -> None: ...
     def separator(self) -> None: ...
 
 
@@ -53,6 +69,9 @@ class PrintLogger:
     def fail(self, msg: str) -> None:
         print(f"  FAIL: {msg}")
 
+    def error(self, msg: str) -> None:
+        print(f"  ERROR: {msg}")
+
     def separator(self) -> None:
         print(f"{'=' * 60}")
 
@@ -70,6 +89,9 @@ class NullLogger:
         pass
 
     def fail(self, msg: str) -> None:
+        pass
+
+    def error(self, msg: str) -> None:
         pass
 
     def separator(self) -> None:
@@ -102,12 +124,18 @@ class Coordinator:
         quality: QualityAgent | None = None,
         compositor: CompositorAgent | None = None,
         logger: Logger | None = None,
+        budget: RunBudget | None = None,
     ):
         self.vision = vision or VisionAgent()
         self.generator = generator or GeneratorAgent()
         self.quality = quality or QualityAgent()
         self.compositor = compositor
         self.log = logger or PrintLogger()
+        # Shared per-run cost ceiling. Each paid stage pre-checks via
+        # ``ensure_within_budget`` and increments via ``spend`` after success.
+        # When None, paid stages run uncapped — caller MUST pass a budget for
+        # production batch runs to avoid runaway spend.
+        self.budget = budget
 
     def produce(self, sku: str, view: str = "front") -> ProductionResult:
         """Run full production pipeline for a single product.
@@ -143,12 +171,27 @@ class Coordinator:
         providers = ", ".join(vision_result.providers_used)
         self.log.ok(f"{vision_result.provider_count} providers ({providers})")
 
-        # Step 2: Image Generation
+        # Step 2: Image Generation — budget-gated before paid dispatch
         self.log.step(2, 3, "Image Generation")
+        if self.budget is not None:
+            try:
+                self.budget.ensure_within_budget(_GENERATOR_EST_COST_USD, stage="generation")
+            except BudgetExceededError as exc:
+                self.log.fail(f"budget exceeded before generation: {exc}")
+                return ProductionResult(
+                    sku=sku,
+                    view=view,
+                    status="error",
+                    step="generation",
+                    error=f"budget exceeded: {exc}",
+                    vision=vision_result,
+                )
+
         gen_result = self.generator.generate(
             sku=sku,
             view=view,
             generation_spec=vision_result.unified_spec,
+            budget=self.budget,
         )
 
         if not gen_result.success:
@@ -177,13 +220,18 @@ class Coordinator:
         else:
             self.log.info(f"QC skipped ({qc_result.error})")
 
-        # Step 4: Scene Compositing (optional)
+        # Step 4: Scene Compositing (optional) — budget-gated paid dispatch
         comp_result = None
         if self.compositor and gen_result.success:
             self.log.step(4, 4, "Scene Compositing")
             try:
                 from .agents.compositor_agent import SCENE_LOOKBOOK
                 from .utils import discover_scene_images
+
+                # Pre-check budget once before scanning lookbook so a doomed
+                # batch doesn't fire even the cheap discovery work.
+                if self.budget is not None:
+                    self.budget.ensure_within_budget(_COMPOSITOR_EST_COST_USD, stage="compositing")
 
                 # Find scenes for this SKU
                 for scene_name, sku_map in SCENE_LOOKBOOK.items():
@@ -200,14 +248,17 @@ class Coordinator:
                                 model_image_path=gen_result.output_path,
                                 collection=scene_name.rsplit("-", 2)[0],
                                 scene_name=scene_name,
+                                budget=self.budget,
                             )
                             if comp_result.success:
                                 self.log.ok(f"Composited: {comp_result.output_path}")
                             else:
-                                self.log.info(f"Compositing skipped: {comp_result.error}")
+                                self.log.error(f"Compositing failed: {comp_result.error}")
                         break
+            except BudgetExceededError as exc:
+                self.log.error(f"Compositing skipped — budget exceeded: {exc}")
             except Exception as exc:
-                self.log.info(f"Compositing skipped: {exc}")
+                self.log.error(f"Compositing raised {type(exc).__name__}: {exc}")
 
         self.log.separator()
         self.log.info(f"COMPLETE: {sku.upper()}")
@@ -229,6 +280,7 @@ class Coordinator:
         skus: list[str] | None = None,
         view: str = "front",
         skip_existing: bool = True,
+        ceiling_usd: float | None = None,
     ) -> list[ProductionResult]:
         """Run production for multiple products.
 
@@ -236,16 +288,33 @@ class Coordinator:
             skus: List of SKUs to process. None = all products.
             view: Image view angle.
             skip_existing: Skip products that already have generated images.
+            ceiling_usd: Override cost ceiling for this batch. When set,
+                a fresh ``RunBudget`` is created and replaces ``self.budget``
+                for the duration of the batch. When None and ``self.budget``
+                is also None, a ``RunBudget`` with the env-default ceiling
+                (``ELITE_STUDIO_BUDGET_USD``) is created — production batch
+                MUST run with a budget anchor to prevent runaway spend.
 
         Returns:
             List of ProductionResult for each product.
         """
         all_skus = skus or discover_all_skus()
 
-        # Filter out already-generated products
+        # Ensure a budget anchor exists for the whole batch. Once exceeded,
+        # remaining SKUs short-circuit with a clean error per-iteration.
+        if ceiling_usd is not None:
+            self.budget = RunBudget(ceiling_usd=ceiling_usd)
+        elif self.budget is None:
+            self.budget = RunBudget()
+
+        # Filter out already-generated products. SKU is validated before path
+        # construction so a malformed catalog entry cannot escape OUTPUT_DIR.
         if skip_existing:
             remaining = []
             for sku in all_skus:
+                if not _SKU_RE.fullmatch(sku):
+                    self.log.error(f"[skip] invalid SKU {sku!r} (must match {_SKU_RE.pattern})")
+                    continue
                 output = OUTPUT_DIR / sku / f"{sku}-model-{view}-gemini.jpg"
                 if output.exists():
                     self.log.info(f"[skip] {sku} — already generated")

@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 """
-Composite product photos INTO immersive scene backgrounds using FAL AI Bria Product Shot.
+Composite product photos INTO immersive scene backgrounds via FAL AI Bria Product Shot.
+
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
+
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh} --sku <sku>
+
+Elite-team CompositorAgent runs the same FAL Bria flow but with 6 hardened
+stages (matte → relight → FLUX → cleanup → shadows → QA), per-stage budget
+gates, and Stage G visual quality scoring with auto-regen if score < 90.
+This script remains runnable for quick iteration but lacks all of that.
+
+Composites real product photos INTO scene backgrounds via FAL Bria Product
+Shot API. Scenes are pre-rendered (Stage 1), products composite over them
+(Stage 2). Real product pixels preserved — no garment hallucination.
 
 Usage:
     source .venv-imagery/bin/activate
-    python scripts/composite_products.py --scene black-rose-rooftop-garden
+    python scripts/composite_products.py --scene black-rose-bay-bridge-sf-side-night
     python scripts/composite_products.py --all
     python scripts/composite_products.py --list
     python scripts/composite_products.py --all --dry-run
@@ -96,24 +110,29 @@ SCENES = {
             },
         ],
     },
-    "signature-golden-gate-showroom": {
+    "signature-oakland-waterfront-bay-bridge-day": {
         "collection": "signature",
-        "background": "signature-golden-gate-showroom-v2.png",
+        "background": "signature-oakland-waterfront-bay-bridge-day-v2.png",
         "products": [
-            {"sku": "sg-012", "placement": "hanging on wall-mounted clothing rack, left side"},
-            {"sku": "sg-005", "placement": "featured on center marble display table"},
-            {"sku": "sg-007", "placement": "on marble pedestal, left-center"},
-            {"sku": "sg-011", "placement": "hanging on wall-mounted clothing rack, right side"},
             {
-                "sku": "sg-002",
-                "placement": "displayed on acrylic mannequin bust near window, center",
+                "sku": "sg-001",
+                "placement": "displayed on the weathered wooden crate beside the drafting paper, center-foreground",
             },
-            {"sku": "sg-003", "placement": "hanging from gold clothing rail, left alcove"},
-            {"sku": "sg-004", "placement": "draped over marble display cube, center-right"},
-            {"sku": "sg-006", "placement": "folded on marble shelf display, right wall niche"},
-            {"sku": "sg-008", "placement": "on marble pedestal display, right-center near window"},
-            {"sku": "sg-009", "placement": "draped over designer chair, far left of showroom"},
-            {"sku": "sg-010", "placement": "laid flat on marble counter display, far right"},
+            {"sku": "sg-002", "placement": "draped over the brass mooring cleat, foreground-left"},
+            {"sku": "sg-005", "placement": "laid flat on the wooden pier planks at center-left"},
+            {
+                "sku": "sg-007",
+                "placement": "resting beside the drafting paper on the wooden crate, center-foreground",
+            },
+            {"sku": "sg-009", "placement": "folded across the far-right end of the wooden crate"},
+            {"sku": "sg-011", "placement": "laid flat on the pier planks at right-foreground"},
+            {
+                "sku": "sg-012",
+                "placement": "draped over a coil of weathered rope at left-foreground",
+            },
+            {"sku": "sg-013", "placement": "folded near the pier piling at center-right"},
+            {"sku": "sg-014", "placement": "laid flat beside sg-013 on the pier planks"},
+            {"sku": "sg-015", "placement": "draped over a wooden piling at far-left foreground"},
         ],
     },
 }

@@ -18,20 +18,29 @@ logger = logging.getLogger(__name__)
 
 _COLLECTION_DNA: dict[str, str] = {
     "br": (
-        "black-rose collection | Oakland street luxury aesthetic | "
-        "Luxury Grows from Concrete | concrete textures | urban night atmosphere"
+        "black-rose collection | East Oakland Deep East industrial canon | "
+        "armor not flower — a conviction | concrete is the only soil that matters | "
+        "beauty forces through cracks | silver-on-black palette | midnight tones | "
+        "Luxury Grows from Concrete | Bay Bridge night seen from Oakland side | "
+        "cinematic FOG-style restraint, no warm tones"
     ),
     "lh": (
-        "love-hurts collection | gothic cathedral atmosphere | enchanted rose dome | "
-        "passionate romantic darkness | Beauty and the Beast perspective"
+        "love-hurts collection | gothic cathedral atmosphere | "
+        "enchanted rose under glass dome — protected, fragile, kept | "
+        "Beauty and the Beast cadence — Cocteau not Disney | "
+        "crimson #DC143C accent, deep purple bruises-that-became-wisdom, burgundy | "
+        "three generations of Hurts | passionate romantic darkness"
     ),
     "sg": (
-        "signature collection | Golden Gate Bridge San Francisco | "
-        "golden hour runway fashion | Bay Area refined luxury | fog through cables"
+        "signature collection | Bay Bridge from the Oakland side — the bridge is Oakland's | "
+        "golden hour, gold #D4AF37 accent, neutral palette | "
+        "foundation wardrobe, blueprints not basics | gender-neutral by default | "
+        "Kith editorial framing, magazine-grid restraint | "
+        "the origin chapter — drew the first rose at 4 AM"
     ),
     "kids": (
         "kids-capsule collection | playful vibrant energy | bright optimistic palette | "
-        "youthful luxury streetwear"
+        "youthful luxury streetwear | the heir chapter"
     ),
 }
 
