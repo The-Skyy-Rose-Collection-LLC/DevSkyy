@@ -85,10 +85,7 @@ def products(sot: dict) -> str:
 
 def page(ident: dict, sot: dict, copy_md: str) -> str:
     name = e(ident["name"])
-    lockup = sot.get("lockup", {})
-    # Use canonical webp if present; fall back to svg_master when canonical is unresolved.
-    lock_rel = lockup.get("canonical") or ((lockup.get("svg_master") or {}).get("resolved"))
-    lock = asset(lock_rel)
+    lock = asset(sot.get("lockup", {}).get("canonical"))
     pal = ident["palette"]
     header = f'<img src="{lock}" alt="{name} lockup">' if lock else f"<h1>{name}</h1>"
     return f"""<!DOCTYPE html>
