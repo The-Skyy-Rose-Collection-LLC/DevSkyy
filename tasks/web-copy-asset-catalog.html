@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Web-Copy Asset Salvage Catalog</title>
+<style>
+  :root{--rose:#B76E79;--gold:#D4AF37;--crimson:#DC143C;--ink:#1a1a1a;--bg:#faf8f5;--panel:#fff;--line:#e7e1d8;--muted:#6b6257;--ok:#2e7d32;--warn:#b8860b;--bad:#c0392b}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{padding:34px 6vw 22px;border-bottom:3px solid var(--rose);background:linear-gradient(180deg,#fff,var(--bg))}
+  h1{font-family:"Playfair Display",Georgia,serif;font-size:30px;margin:0 0 6px}
+  h1 .s{color:var(--rose)}
+  .tag{color:var(--muted);font-size:13px}
+  main{max-width:1180px;margin:0 auto;padding:0 6vw 70px}
+  nav{position:sticky;top:0;background:rgba(250,248,245,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:9px 0;margin:0 0 22px;z-index:5;font-size:13px}
+  nav a{color:var(--muted);text-decoration:none;margin-right:15px}
+  nav a:hover{color:var(--rose)}
+  section{margin:34px 0;scroll-margin-top:50px}
+  h2{font-family:"Playfair Display",Georgia,serif;font-size:23px;border-left:4px solid var(--rose);padding-left:12px;margin:0 0 12px}
+  h3{font-size:16px;margin:20px 0 6px;color:#3a352e}
+  code{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12px;background:#f0ece5;border-radius:4px;padding:1px 5px;color:#5a3a40}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f3eee7;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:#4a443c}
+  tr:last-child td{border-bottom:none}
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+  @media(max-width:780px){.statrow{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;text-align:center}
+  .big{font-size:27px;font-weight:800;font-family:"Playfair Display",Georgia,serif;color:var(--rose);line-height:1}
+  .muted{color:var(--muted)}
+  .q5{color:var(--ok);font-weight:700}.q4{color:#3a7d3a;font-weight:700}.q3{color:var(--warn)}.qlow{color:var(--bad)}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff}
+  .p-hero{background:#8a5a8a}.p-pdp{background:#5e8a76}.p-look{background:#c08368}.p-social{background:#6f6f9e}.p-email{background:#7d7568}
+  .callout{border-radius:10px;padding:13px 15px;margin:14px 0;border-left:5px solid}
+  .c-danger{background:#fdecea;border-color:var(--bad)}.c-note{background:#fff8e6;border-color:var(--gold)}.c-ok{background:#eaf5ea;border-color:var(--ok)}
+  footer{max-width:1180px;margin:0 auto;padding:22px 6vw;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>SkyyRose — <span class="s">Web-Copy Asset Salvage Catalog</span></h1>
+  <div class="tag">5 vision agents · 81 deduped high-res candidates reviewed · 2026-06-22 · part of the repo slim-down (nothing deleted before cataloging)</div>
+</header>
+<main>
+<nav>
+  <a href="#sum">Summary</a><a href="#winners">Salvage Winners</a><a href="#flags">Action Flags</a>
+  <a href="#products">Products</a><a href="#collections">Collections</a><a href="#enhanced">Enhanced</a><a href="#renders">Renders</a><a href="#live">Live Theme</a>
+</nav>
+
+<section id="sum">
+  <h2>Summary</h2>
+  <p>Of 2,178 raster images in the repo, metadata triage isolated <strong>1,157 web-copy candidates</strong>; this pass vision-reviewed the <strong>81 highest-value, deduped</strong> across products, collection archives, enhancement outputs, renders, and live theme imagery.</p>
+  <div class="statrow">
+    <div class="stat"><div class="big">81</div><div class="muted">vision-reviewed</div></div>
+    <div class="stat"><div class="big">~44</div><div class="muted">web-copy usable (q≥3)</div></div>
+    <div class="stat"><div class="big">~10</div><div class="muted">exact pixel-dupes (slim further)</div></div>
+    <div class="stat"><div class="big">3</div><div class="muted">flagged for founder review</div></div>
+  </div>
+  <p class="muted">Usable = quality ≥ 3 AND a real surface (not NONE). The richest untapped pool is the older real-photography archive in <code>assets/3d-models/</code> (genuine product shots from 2022–2023, never put on the live site).</p>
+</section>
+
+<section id="winners">
+  <h2>Salvage Winners — by surface</h2>
+  <table>
+    <tr><th>Surface</th><th>Top picks (file)</th><th>Why</th></tr>
+    <tr><td><span class="pill p-hero">HERO / EMAIL</span></td><td><code>SIG_PROD_FCCB8B16_retina.jpg</code> (q5) · <code>homepage-hero-bg.webp</code> (q4)</td><td>White-bg gold "Skyy Rose Collection" lockup — drop-in for email headers/hero overlays. Palatial rose ballroom = editorial email masthead.</td></tr>
+    <tr><td><span class="pill p-pdp">PDP GALLERY</span></td><td><code>sg-003-stay-golden-shorts</code> · <code>sg-001-bay-bridge-shorts</code> (q4) · <code>BR baseball jersey front+back</code> (q4 pair) · <code>_Signature_ Cotton Candy Shorts.jpg</code> (q5) · <code>br-001-crewneck-front-hq.png</code> (q4)</td><td>Clean white-bg flatlays with bold all-over prints; Kith-level thumbnail impact. The BR jersey front/back is a ready PDP carousel.</td></tr>
+    <tr><td><span class="pill p-look">LOOKBOOK</span></td><td><code>black-rose-sherpa-jacket/ghost.png</code> (q4) · <code>The BLACK Rose Sherpa Back.jpg</code> (q4) · <code>lb-black-rose-hockey-960w.webp</code> (q4)</td><td>Only clean Black Rose outerwear representation; silver-on-black rose embroidery is the collection signature.</td></tr>
+    <tr><td><span class="pill p-social">SOCIAL</span></td><td><code>IMG_0115.jpeg</code> (Kids lifestyle, q4) · <code>LH_PROD_A461E90A_retina.jpg</code> (Kids, q4) · <code>patch-hockey-championship.jpeg</code> (q4)</td><td><strong>The only real-world, in-motion Kids Capsule content</strong> — disproportionately valuable for social storytelling.</td></tr>
+    <tr><td><span class="pill p-email">EMAIL / ACCESSORY</span></td><td><code>sg-007-signature-beanie-black.png</code> · <code>SIG_DEC..._transparent.png</code> · <code>enhanced_vis_52d30ef1cb58.png</code> (q4 beanies) · <code>PhotoRoom_005...</code> (tote, q4)</td><td>Clean transparent/ghost accessory cutouts — composite straight into email styling grids.</td></tr>
+  </table>
+</section>
+
+<section id="flags">
+  <h2>Action Flags</h2>
+  <div class="callout c-note">
+    <strong>① Founder review — possibly hero-grade, currently rejected.</strong> The 3 <code>renders/oai/_rejected/pair__br-001__br-002/on-model.attempt{1,2,3}.png</code> shots are the most cinematic images in the entire batch — a model in the BR crewneck+joggers against a dusk-lit Bay Bridge. All agents flagged them as q4 and likely rejected on <em>spec</em> (pairing/crop), not quality. <code>attempt3</code> is a legitimate hero candidate. Confirm the rejection reason before these are discarded.
+  </div>
+  <div class="callout c-danger">
+    <strong>② Danger — never ship.</strong> <code>renders/oai/_rejected/black-rose-sherpa-jacket/ghost.FALSE-PASS-missing-sherpa.png</code> looks clean at a glance but is missing the defining sherpa lining — it would misrepresent the product. Keep quarantined.
+  </div>
+  <div class="callout c-ok">
+    <strong>③ Dedup opportunity (feeds the slim).</strong> Confirmed exact pixel-duplicates to consolidate: in <code>assets/3d-models/signature/</code> — <code>PhotoRoom_000=Orchid tee</code>, <code>Photo Dec 18=Stay Golden</code>, <code>product_12=PhotoRoom_005 tote</code>, <code>PhotoRoom_002≈Cotton Candy</code>; in <code>love-hurts/</code> — <code>The Fannie 2 = The FANNIE Pack = _Fannie_ Pack</code> (3 copies); in <code>enhanced-images/</code> — <code>LH_309E1DFA=LH_DD7FFCFD</code>, <code>SIG_5EFB374D=SIG_FCCB8B16</code> (×2). ~10 files removable with zero salvage loss.
+  </div>
+  <div class="callout c-note">
+    <strong>④ AVIF re-read needed.</strong> 4 live-theme AVIFs (<code>lb-kid-black-rose</code>, <code>lb-black-rose-football</code>, <code>homepage-story-founder</code>, <code>homepage-col-black-rose</code>) couldn't be vision-decoded this pass — convert to webp or re-read in a fresh session to assess.
+  </div>
+</section>
+
+<section id="products">
+  <h2>Products (assets/products/) — 16/20 usable</h2>
+  <table>
+    <tr><th>File</th><th>Depicts</th><th>Q</th><th>Use</th></tr>
+    <tr><td>sg-003-stay-golden-shorts</td><td>Golden Gate mesh shorts, purple — Signature</td><td class="q4">4</td><td>PDP</td></tr>
+    <tr><td>sg-001-bay-bridge-shorts</td><td>Bay Bridge mesh shorts, blue/teal — Signature</td><td class="q4">4</td><td>PDP</td></tr>
+    <tr><td>br-001-crewneck-front-hq.png</td><td>Black Rose crewneck — Black Rose</td><td class="q4">4</td><td>PDP</td></tr>
+    <tr><td>sg-007-signature-beanie-black.png</td><td>Rose-patch beanie — Signature</td><td class="q4">4</td><td>PDP / email</td></tr>
+    <tr><td>patch-hockey-championship.jpeg</td><td>Hockey Championship silver badge — Black Rose</td><td class="q4">4</td><td>social</td></tr>
+    <tr><td>sg-005 / sg-002 graphic tees</td><td>Bay Bridge / Stay Golden tees — Signature</td><td class="q3">3</td><td>PDP (de-wrinkle)</td></tr>
+    <tr><td>sg-003-crop-hoodie-coral.jpg</td><td>Coral crop hoodie — Signature</td><td class="q3">3</td><td>PDP (crop tag)</td></tr>
+    <tr><td>br-002-joggers / br-001-authentic</td><td>Black Rose joggers / crewneck backup</td><td class="q3">3</td><td>PDP</td></tr>
+    <tr><td>br-011-sharks-jersey-front.png</td><td>Low-res vendor mockup</td><td class="qlow">2</td><td>NONE</td></tr>
+    <tr><td>lh-004-bomber-back.png</td><td>Folded, garment obscured</td><td class="qlow">2</td><td>NONE</td></tr>
+  </table>
+  <p class="muted">3 reference AVIFs (slides/Signature-T/Mint-Lavender) are high-res but were not vision-decoded — confirm before publishing.</p>
+</section>
+
+<section id="collections">
+  <h2>Collection archive (assets/3d-models/) — 12/20 usable, richest untapped pool</h2>
+  <table>
+    <tr><th>File</th><th>Depicts</th><th>Q</th><th>Use</th></tr>
+    <tr><td>_Signature_ Cotton Candy Shorts.jpg</td><td>Mint shorts + rose embroidery</td><td class="q5">5</td><td>PDP/social/email</td></tr>
+    <tr><td>PhotoRoom_004 (royal blue shorts)</td><td>Royal blue + gold rose — strongest color story</td><td class="q4">4</td><td>PDP/social</td></tr>
+    <tr><td>The BLACK Rose Sherpa Back.jpg</td><td>Black Rose outerwear back, silver embroidery</td><td class="q4">4</td><td>PDP/lookbook</td></tr>
+    <tr><td>IMG_0115.jpeg</td><td>Kids Capsule on-model lifestyle (only one)</td><td class="q4">4</td><td>lookbook/social</td></tr>
+    <tr><td>Original Label Tee (orchid + white) · Stay Golden Tee · tote · Red Rose Beanie · Fannie Pack</td><td>Signature/LH product flatlays</td><td class="q4">4</td><td>PDP/social</td></tr>
+    <tr><td>PhotoRoom_003/004 LH shorts</td><td>Love Hurts allover shorts (soft)</td><td class="q3">3</td><td>PDP gallery</td></tr>
+    <tr><td>5 PhotoRoom/Photo-Dec/product_12 files</td><td>Exact duplicates of above</td><td class="qlow">2</td><td>NONE → dedup</td></tr>
+  </table>
+</section>
+
+<section id="enhanced">
+  <h2>Enhancement outputs (enhanced-images/ + visual-generated/) — 11/16 usable</h2>
+  <table>
+    <tr><th>File</th><th>Depicts</th><th>Q</th><th>Use</th></tr>
+    <tr><td>SIG_PROD_FCCB8B16_retina.jpg</td><td>White-bg gold brand lockup — most versatile asset</td><td class="q5">5</td><td>hero/email/social</td></tr>
+    <tr><td>LH_PROD_A461E90A_retina.jpg</td><td>Kids wind-suit lifestyle, full garment</td><td class="q4">4</td><td>PDP/lookbook/social</td></tr>
+    <tr><td>BR baseball jersey front + back (transparent)</td><td>"Black Is Beautiful" Oakland jersey</td><td class="q4">4</td><td>PDP carousel</td></tr>
+    <tr><td>SIG_FCCB8B16_transparent · SIG beanie · charcoal beanie · enhanced_vis_108a</td><td>Lockup + accessory ghost cutouts</td><td class="q4">4</td><td>PDP/email/social</td></tr>
+    <tr><td>LH tee transparent (×2) · enhanced_vis hoodie</td><td>Background not removed / tag visible</td><td class="qlow">2-3</td><td>social or NONE</td></tr>
+  </table>
+</section>
+
+<section id="renders">
+  <h2>Render pipeline (renders/) — 3/16 usable (mostly QC scratch)</h2>
+  <table>
+    <tr><th>File</th><th>Depicts</th><th>Q</th><th>Use</th></tr>
+    <tr><td>black-rose-sherpa-jacket/ghost.png</td><td>Passed-QC sherpa jacket ghost</td><td class="q4">4</td><td>PDP/lookbook</td></tr>
+    <tr><td>3d/br-008-sf-inspired_preprocessed.png</td><td>Red jersey dual front/back</td><td class="q3">3</td><td>PDP (crop)</td></tr>
+    <tr><td>3d/sg-012-orchid-tee_preprocessed.png</td><td>Orchid tee, clean render</td><td class="q3">3</td><td>PDP (approve)</td></tr>
+    <tr><td>_rejected/pair on-model ×3</td><td>Bay Bridge dusk on-model — see Flag ①</td><td class="q4">4*</td><td>HERO? (review)</td></tr>
+    <tr><td>other _preprocessed / _rejected</td><td>3D-prep frames, QC failures</td><td class="qlow">1-2</td><td>NONE</td></tr>
+  </table>
+</section>
+
+<section id="live">
+  <h2>Live theme imagery (already on site) — 2/9 reusable elsewhere</h2>
+  <table>
+    <tr><th>File</th><th>Depicts</th><th>Q</th><th>Reuse</th></tr>
+    <tr><td>homepage-hero-bg.webp</td><td>Rose ballroom atmospheric</td><td class="q4">4</td><td>email masthead / blog header</td></tr>
+    <tr><td>lb-black-rose-hockey-960w.webp</td><td>Hockey jersey ghost render</td><td class="q4">4</td><td>PDP / email / IG grid</td></tr>
+    <tr><td>lb-love-hurts-varsity · lb-rose-hoodie-beanie</td><td>Raw low-light selfies</td><td class="qlow">2</td><td>stay-as-is (reshoot)</td></tr>
+    <tr><td>4 AVIF (kids/football/founder/col-black-rose)</td><td>Not decoded — see Flag ④</td><td class="muted">—</td><td>convert + re-read</td></tr>
+  </table>
+</section>
+</main>
+<footer>
+  Generated by 5 parallel vision agents over a deduped candidate set (81 of 1,157 metadata-triaged web-copy candidates). Full candidate manifest: <code>tasks/_webcopy_candidates.json</code>. Quality 1–5; surfaces hero/PDP/lookbook/social/email. Nothing flagged useful was deleted in the slim-down. 2026-06-22.
+</footer>
+</body>
+</html>

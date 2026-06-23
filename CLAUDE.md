@@ -239,7 +239,7 @@ Never fix a test by weakening it. Fix the code, not the test.
 - Python line length: 100 (black + ruff + isort)
 - Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
 - Fix everything in one batch, test all pages, deploy ONCE (no back-and-forth)
-- When cleaning up: update EVERY file that references deleted code
+- **Deletion policy (supersedes the retired "NO deletions, refactor only" stance, 2026-06-21):** stale, dead, duplicate, or conflicting code SHOULD be deleted — not left to rot. Rule is **repoint-first / census-gated**: never delete an artifact until a census (grep importers incl. tests + downstream consumers) proves zero live consumers. Then delete it AND every now-dead consumer + dangling reference in the SAME change. A deletion that leaves a surviving import is a regression, not a cleanup. Irreversible ops (rm of untracked files, git history rewrite) still require STOP-AND-SHOW.
 
 ---
 

@@ -1,2 +1,0 @@
-# The CI toolchain venv is machine-local; rebuild it with `bash ci-env/setup.sh`.
-.venv/

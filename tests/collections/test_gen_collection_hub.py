@@ -14,7 +14,9 @@ def test_hub_renders_all_sections_and_escapes():
     assert "Black Rose" in html
     assert "#C0C0C0" in html  # palette swatch
     assert "Yellowtail" in html  # font specimen
-    assert "black-rose-lockup" in html  # lockup reference
+    assert (
+        "black-rose-script" in html
+    )  # lockup reference (svg_master fallback when canonical webp absent)
     assert "../../assets/" in html  # image refs into canonical tree
     # no unescaped script injection from data
     assert "<script>alert" not in html

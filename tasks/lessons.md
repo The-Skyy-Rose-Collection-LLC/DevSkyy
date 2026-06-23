@@ -85,3 +85,13 @@ Patterns extracted from corrections. Review at session start.
 **Reality:** The dossier prose said "Black Rose three-rose-cluster (recolored to purple/blue/greyscale)" — the art is intentionally shared; `black-rose-logo.md` self-describes as the three-rose-cluster source of truth. Not a bug.
 **Fix:** Read the dossier branding prose (canon) BEFORE calling a reference wrong. Same class as the WebFetch/audit false-positive lessons — filename/label ≠ truth.
 **Outcome:** Founder chose the clean refactor → extracted shared `three-rose-cluster.md`, repointed 20 dossiers, kept `black-rose-logo.md` as a pointer. No prose rewritten.
+
+## 2026-06-19 — Skill dedup: hash the whole dir, not just SKILL.md
+- **Wrong:** judged skill dirs "byte-identical duplicates" by `SKILL.md` md5 alone, then deleted. 4 project copies (api-design, coding-standards, e2e-testing, frontend-patterns) carried a unique `agents/openai.yaml` the global twin lacked — not true dups.
+- **Caught:** post-delete full-dir identity check (file-set + per-file md5) flagged the mismatch; restored all 4 via `git checkout` (git-tracked = recoverable). Net removed: 15 true dups.
+- **Prevention:** dedup identity = hash the ENTIRE directory tree (all files), never a single representative file. Verify full-dir BEFORE the destructive op, not after.
+
+## 2026-06-20 — Stop-hook fix: read the script; change method on repeat error
+- **Wrong diagnosis (2 turns):** claimed the Stop hook "git stash"-es and tested a phantom committed state — built on the manifest pattern, NEVER read the hook. Reading it: it just runs `pytest tests/ -x -q`, no stash. Real cause = untracked stranded-WIP tests failing under full-suite import-order.
+- **Repeated edit (6x):** kept rewriting the hook command from scratch and dropped the `cd PREFIX` every time (my string literal started with empty `''`). Loop Protocol: same error twice = STOP + change method. Fix that worked: TRANSFORM the known-good original (from backup) via targeted `.replace()`, preserving cd, instead of re-authoring.
+- **Prevention:** (1) never diagnose from an unread file — read the actual hook before claiming its mechanism. (2) when a re-sent "fix" fails identically, diff against the requirement and switch technique rather than resending.
