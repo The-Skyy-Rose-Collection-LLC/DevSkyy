@@ -179,11 +179,20 @@ class TestICLightRelighting:
         assert Path(result).exists()
         assert "relit" in result
 
+    @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._run_iclight_replicate")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._run_iclight")
-    def test_relight_fallback_to_alpha(self, mock_iclight, compositor, tmp_path):
-        """When IC-Light fails, fall back to using the alpha-matted image directly."""
+    def test_relight_fails_closed_when_all_providers_fail(
+        self, mock_iclight, mock_replicate, compositor, tmp_path
+    ):
+        """When both IC-Light providers fail, relight fails CLOSED (raises) rather
+        than silently returning the unrelit alpha — which would poison downstream QC.
+        See Phase 1 / P-failclosed-C."""
+        import pytest
         from PIL import Image
 
+        from skyyrose.elite_studio.agents.compositor.stage_c_relight import RelightStageError
+
+        mock_replicate.return_value = None
         mock_iclight.side_effect = Exception("IC-Light unavailable")
 
         alpha_path = str(tmp_path / "alpha.png")
@@ -191,12 +200,8 @@ class TestICLightRelighting:
         Image.new("RGBA", (100, 150)).save(alpha_path)
         Image.new("RGB", (100, 100)).save(scene_path)
 
-        result = compositor._relight_subject(
-            alpha_path, scene_path, "prompt", "br-001", str(tmp_path)
-        )
-
-        # Should fall back to alpha path
-        assert result == alpha_path
+        with pytest.raises(RelightStageError):
+            compositor._relight_subject(alpha_path, scene_path, "prompt", "br-001", str(tmp_path))
 
 
 # ---------------------------------------------------------------------------
@@ -359,7 +364,9 @@ class TestVisualQA:
         mock_gemini.assert_called_once()
 
     @patch("skyyrose.elite_studio.agents.compositor_agent.analyze_vision")
-    def test_qa_failure_returns_warn(self, mock_gemini, compositor, tmp_path):
+    def test_qa_failure_returns_fail(self, mock_gemini, compositor, tmp_path):
+        """A QA-provider error fails CLOSED (status='fail' + error_type), not 'warn' —
+        a transient oracle outage must not silently pass the gate. Phase 1 / P-failclosed-G."""
         from PIL import Image
 
         composite_path = str(tmp_path / "composite.png")
@@ -369,7 +376,8 @@ class TestVisualQA:
 
         result = compositor._visual_qa(composite_path, "scene", "collection")
 
-        assert result["status"] == "warn"
+        assert result["status"] == "fail"
+        assert result["error_type"] == "qa_provider_error"
         assert "error" in result
 
 
