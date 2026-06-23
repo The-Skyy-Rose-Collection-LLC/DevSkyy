@@ -34,6 +34,8 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking secrets..."
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 gen_secret() {
     # $1 = env var name, $2 = python expression that prints the secret value.
+    # SECURITY: $2 is fed to `python3 -c`, so CALL SITES MUST PASS A LITERAL — never
+    # a variable / env-expanded value (that would be arbitrary code at startup).
     # printenv reads the named var without eval (call sites pass literal names).
     var="$1"
     [ -n "$(printenv "$var")" ] && return 0
@@ -83,10 +85,10 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] ======================================"
 # - proxy-headers: enabled for X-Forwarded-* from Fly.io proxy
 exec python3 -m uvicorn main_enterprise:app \
     --host 0.0.0.0 \
-    --port 8000 \
+    --port "${PORT:-8000}" \
     --workers 1 \
     --timeout-keep-alive 65 \
     --lifespan on \
     --proxy-headers \
-    --forwarded-allow-ips '*' \
+    --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1}" \
     --access-log 2>&1
