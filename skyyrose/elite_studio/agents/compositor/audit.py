@@ -6,12 +6,28 @@ whether successful or not.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+
+def _scored_fingerprint(output_path: Any) -> dict[str, Any]:
+    """SHA-256 + byte size of the scored image — tamper-evident provenance.
+
+    Without these the audit log cannot prove the logged file is the one that was
+    actually evaluated; a stale-file swap would be undetectable after the run.
+    """
+    if output_path and Path(output_path).is_file():
+        data = Path(output_path).read_bytes()
+        return {
+            "scored_image_sha256": hashlib.sha256(data).hexdigest(),
+            "scored_image_size_bytes": len(data),
+        }
+    return {"scored_image_sha256": "", "scored_image_size_bytes": 0}
 
 
 def write_audit_log(
@@ -46,6 +62,7 @@ def write_audit_log(
             "provider": result.provider,
             "model": result.model,
             "output_path": result.output_path,
+            **_scored_fingerprint(result.output_path),
             "alpha_path": result.alpha_path,
             "qa_status": result.qa_status,
             "qa_details": result.qa_details,
