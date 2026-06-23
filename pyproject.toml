@@ -377,6 +377,7 @@ exclude = [
     "dev/",
     "editorial-staging/",
     "hf-spaces/",
+    "skyyrose/cli_harnesses/",  # vendored CLI tooling (relocated from vendor/) — not host-linted
 ]
 
 [tool.ruff.lint]
@@ -449,6 +450,7 @@ exclude = '''
     | build
     | dist
     | legacy
+    | cli_harnesses
 )/
 '''
 
