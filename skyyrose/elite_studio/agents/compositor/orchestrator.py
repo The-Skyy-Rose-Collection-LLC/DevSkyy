@@ -61,6 +61,7 @@ from .infra import (
     upload_to_fal,
 )
 from .lighting import SCENE_LOOKBOOK, load_lighting_spec
+from .stage_c_relight import RelightStageError
 from .stage_e_cleanup import gimp_pixel_cleanup
 from .stage_f_shadows import generate_shadows
 
@@ -560,7 +561,12 @@ class CompositorAgent(FluxProviderMixin):
         except Exception as exc:
             logger.warning("IC-Light local fallback failed for %s: %s", sku, exc)
 
-        return alpha_path
+        # Both providers failed — fail closed (see RelightStageError). The old
+        # `return alpha_path` let an unrelit composite pass QC silently.
+        raise RelightStageError(
+            f"_relight_subject: all providers failed for SKU {sku!r} "
+            "(Replicate IC-Light + local libcom both unavailable)"
+        )
 
     def _run_iclight_replicate(
         self,
