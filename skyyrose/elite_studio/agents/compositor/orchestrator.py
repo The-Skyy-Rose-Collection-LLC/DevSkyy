@@ -275,7 +275,6 @@ class CompositorAgent(FluxProviderMixin):
                 stages["relight"] = {
                     "path": relit_path,
                     "duration_s": round(time.perf_counter() - started, 3),
-                    "fallback_to_alpha": relit_path == alpha_path,
                 }
                 stages_done = 3
 
@@ -339,10 +338,12 @@ class CompositorAgent(FluxProviderMixin):
                 # for the shadow/QA stages to read.
                 _fd, _tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
                 try:
-                    os.write(_fd, composite_bytes)
-                finally:
-                    os.close(_fd)
-                os.replace(_tmp, composite_path)
+                    with os.fdopen(_fd, "wb") as _f:
+                        _f.write(composite_bytes)
+                    os.replace(_tmp, composite_path)
+                except Exception:
+                    Path(_tmp).unlink(missing_ok=True)
+                    raise
                 stages["composite"] = {
                     "path": composite_path,
                     "provider": provider,
@@ -377,12 +378,12 @@ class CompositorAgent(FluxProviderMixin):
             started = time.perf_counter()
             qa = self._maybe_apply_gate(shadow_path, scene_name, collection)
             stages["qa"] = {
-                "status": qa.get("status", "warn"),
+                "status": qa.get("status", "fail"),
                 "details": qa,
                 "duration_s": round(time.perf_counter() - started, 3),
             }
             stages_done = 6
-            result_kwargs["qa_status"] = qa.get("status", "warn")
+            result_kwargs["qa_status"] = qa.get("status", "fail")
             result_kwargs["qa_details"] = qa
             result_kwargs["output_path"] = shadow_path
             result_kwargs["alpha_path"] = alpha_path

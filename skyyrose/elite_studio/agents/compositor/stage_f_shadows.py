@@ -101,9 +101,13 @@ def generate_shadows(
         # Atomic write: render to a temp file then os.replace, so a crash
         # mid-write can't leave a truncated PNG the QA gate reads as garbage.
         fd, tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
-        os.close(fd)
-        final.save(tmp, format="PNG")
-        os.replace(tmp, dest)
+        try:
+            os.close(fd)
+            final.save(tmp, format="PNG")
+            os.replace(tmp, dest)
+        except Exception:
+            Path(tmp).unlink(missing_ok=True)
+            raise
         return str(dest)
     except Exception as exc:
         raise ShadowStageError(f"Shadow stage failed for {sku}: {exc}") from exc
