@@ -180,6 +180,16 @@ class CompositorAgent(FluxProviderMixin):
         budget: Any = None,
     ) -> CompositorResult:
         """Run the 6-stage compositing pipeline."""
+        from skyyrose.core.catalog_loader import CATALOG_CSV, read_catalog_rows
+
+        # Validate the SKU against the canonical catalog before any filesystem
+        # mutation or paid stage — a typo must fail fast, not run the whole
+        # pipeline and score an unapprovable render. read_catalog_rows is
+        # @cache-d, so this parses the CSV at most once per process.
+        known_skus = frozenset(row.get("sku", "").strip() for row in read_catalog_rows())
+        if sku not in known_skus:
+            raise ValueError(f"unknown SKU {sku!r} — not in catalog {CATALOG_CSV}")
+
         out = Path(output_dir or self.DEFAULT_OUTPUT_DIR)
         out.mkdir(parents=True, exist_ok=True)
 
