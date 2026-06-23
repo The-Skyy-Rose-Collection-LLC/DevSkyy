@@ -10,6 +10,7 @@ bytes on mismatch — so verify never leaves a net change in the working tree.
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -23,7 +24,12 @@ import sot_common  # noqa: E402
 from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
 
 OUT = DATA / "collections"
-CSS = DATA.parent / "assets/css/design-tokens.css"
+# CSS path is overridable via SKYYROSE_TOKENS_CSS so the staleness gate can run
+# against a private tmp copy in tests (hermetic isolation). The gen subprocess
+# this script spawns inherits the env, so both halves of the gate use the same
+# file. Unset -> the real theme file.
+_CSS_OVERRIDE = os.environ.get("SKYYROSE_TOKENS_CSS")
+CSS = Path(_CSS_OVERRIDE) if _CSS_OVERRIDE else DATA.parent / "assets/css/design-tokens.css"
 HERO_MIN_WIDTH = 2560  # MJ masters target; interim files are < 2560 (warn, not fail)
 
 
