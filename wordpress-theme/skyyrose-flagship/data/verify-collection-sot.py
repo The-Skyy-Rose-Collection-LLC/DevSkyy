@@ -116,6 +116,7 @@ def main() -> int:
                 " (interim asset — file missing from this checkout)"
             )
         else:
+            h_resolved = hero["resolved"]
             w = _hero_pixel_width(h_resolved)
             if w is not None and w < HERO_MIN_WIDTH:
                 warn.append(
