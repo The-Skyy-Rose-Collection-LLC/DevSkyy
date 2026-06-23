@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevSkyy — Lifecycle Architecture Redesign</title>
+<style>
+  :root{
+    --rose:#B76E79; --gold:#D4AF37; --crimson:#DC143C; --silver:#9aa0a6;
+    --ink:#1a1a1a; --bg:#faf8f5; --panel:#fff; --line:#e7e1d8; --muted:#6b6257;
+    --proto:#cfc8bd; --design:#a89f93; --build:#e8c4b8; --deploy:#aec8bd; --support:#bcbcd6;
+    --ok:#2e7d32; --warn:#b8860b; --bad:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{padding:40px 6vw 28px;border-bottom:3px solid var(--rose);background:linear-gradient(180deg,#fff,var(--bg))}
+  h1{font-family:"Playfair Display",Georgia,serif;font-size:34px;margin:0 0 6px;letter-spacing:.3px}
+  h1 .sub{color:var(--rose)}
+  .tag{color:var(--muted);font-size:14px}
+  main{max-width:1180px;margin:0 auto;padding:0 6vw 80px}
+  nav{position:sticky;top:0;background:rgba(250,248,245,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px 0;margin:0 0 24px;z-index:5;font-size:13px}
+  nav a{color:var(--muted);text-decoration:none;margin-right:16px;white-space:nowrap}
+  nav a:hover{color:var(--rose)}
+  section{margin:42px 0;scroll-margin-top:54px}
+  h2{font-family:"Playfair Display",Georgia,serif;font-size:25px;border-left:4px solid var(--rose);padding-left:12px;margin:0 0 14px}
+  h3{font-size:18px;margin:26px 0 8px;color:#3a352e}
+  p{margin:8px 0}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:#f0ece5;border-radius:4px;padding:1px 5px;color:#5a3a40}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f3eee7;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:#4a443c}
+  tr:last-child td{border-bottom:none}
+  .pipe{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap;margin:18px 0}
+  .stage{flex:1;min-width:150px;border-radius:12px;padding:16px 14px;color:#1c1c1c;position:relative}
+  .stage h4{margin:0 0 6px;font-family:"Playfair Display",Georgia,serif;font-size:18px}
+  .stage small{display:block;font-size:11.5px;line-height:1.45;opacity:.85}
+  .s1{background:var(--proto)} .s2{background:var(--design)} .s3{background:var(--build)} .s4{background:var(--deploy)} .s5{background:var(--support)}
+  .arrow{align-self:center;color:var(--rose);font-size:22px;font-weight:700}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff}
+  .b-proto{background:#8a8273}.b-design{background:#7d7568}.b-build{background:#c08368}.b-deploy{background:#5e8a76}.b-support{background:#6f6f9e}.b-found{background:#555}.b-cross{background:#888}
+  .sev-low{color:var(--ok);font-weight:700}.sev-med{color:var(--warn);font-weight:700}.sev-high{color:var(--bad);font-weight:700}
+  .ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}.warn{color:var(--warn);font-weight:700}
+  .callout{border-radius:10px;padding:14px 16px;margin:16px 0;border-left:5px solid}
+  .c-danger{background:#fdecea;border-color:var(--bad)}
+  .c-note{background:#fff8e6;border-color:var(--gold)}
+  .c-ok{background:#eaf5ea;border-color:var(--ok)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:780px){.grid2{grid-template-columns:1fr}}
+  .big{font-size:30px;font-weight:800;font-family:"Playfair Display",Georgia,serif;color:var(--rose);line-height:1}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+  @media(max-width:780px){.statrow{grid-template-columns:repeat(2,1fr)}}
+  .muted{color:var(--muted)}
+  .strike{text-decoration:line-through;color:var(--bad)}
+  footer{max-width:1180px;margin:0 auto;padding:24px 6vw;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>DevSkyy — Structural Redesign <span class="sub">around the 5-Stage Agent Lifecycle</span></h1>
+  <div class="tag">Prototype → Design → Build → Deploy → Support &nbsp;·&nbsp; 2026-06-21 &nbsp;·&nbsp; dissection of 18-agent ultracode workflow, adversarially verified</div>
+</header>
+<main>
+<nav>
+  <a href="#tldr">TL;DR</a>
+  <a href="#now">Current State</a>
+  <a href="#dupe">Duplication Map</a>
+  <a href="#spine">Target Spine</a>
+  <a href="#org">Agent Org</a>
+  <a href="#gates">Stage Gates</a>
+  <a href="#migrate">Migration Plan</a>
+  <a href="#dead">Dead Weight</a>
+  <a href="#risk">Risks &amp; #1 Fix</a>
+  <a href="#next">Next Step</a>
+</nav>
+
+<section id="tldr">
+  <h2>TL;DR</h2>
+  <p>DevSkyy already has the <em>capability</em> for all five lifecycle stages — it lacks a <strong>stage spine</strong> that says which agent owns which stage and what hands off between them. The disease is <strong>duplication, not absence</strong>: imagery generation exists 6 ways, WP-theme build 3 ways, LLM routing 3 ways, agent base classes 2 lineages, QC 2 implementations. Two stages have <strong>no agent owner at all</strong> (Prototype, customer-Support). The redesign is mostly <strong>consolidation + ownership assignment</strong>, plus removing ~1 GB of generated artifacts living in git.</p>
+  <div class="statrow">
+    <div class="stat"><div class="big">80+</div><div class="muted">top-level dirs</div></div>
+    <div class="stat"><div class="big">6→1</div><div class="muted">imagery pipelines</div></div>
+    <div class="stat"><div class="big">981MB</div><div class="muted"><code>renders/</code> tracked in git</div></div>
+    <div class="stat"><div class="big">2</div><div class="muted">stages with no owner</div></div>
+  </div>
+  <div class="callout c-note">
+    <strong>Provenance &amp; honesty.</strong> This design came from a 10-agent parallel dissection → 5 stage-mappers → 1 lead architect → 2 adversarial verifiers (18 agents, 1.36 M tokens). The architect's draft mixed <em>aspirational</em> claims with verified facts; verdict&nbsp;#2 returned <span class="bad">confirmed:false</span>. Every fabricated gate and path below has been <strong>corrected</strong> against the real repo — corrections are marked <span class="strike">struck</span> → fixed.
+  </div>
+</section>
+
+<section id="now">
+  <h2>Current State — the Dissection</h2>
+  <p>Ten read-only agents mapped each subsystem to the lifecycle. File counts (Python): <code>skyyrose/</code> 288 · <code>scripts/</code> 281 · <code>agents/</code> 219 · <code>api/</code> 83 · <code>services/</code> 61 · <code>core/</code> 51 · <code>orchestration/</code> 34 · <code>security/</code> 32 · <code>llm/</code> 29.</p>
+  <table>
+    <tr><th>Layer</th><th>Lives in</th><th>Role</th><th>State</th></tr>
+    <tr><td><span class="pill b-found">FOUNDATION</span></td><td><code>core/</code> <code>security/</code> <code>database/</code> <code>evaluation/</code></td><td>Hexagonal kernel, 30-module security, async SQLAlchemy + Alembic, single QC authority</td><td class="ok">solid</td></tr>
+    <tr><td><span class="pill b-cross">CROSS-CUTTING</span></td><td><code>llm/</code> <code>orchestration/</code> <code>agents/core/base.py</code> <code>agents/core/orchestrator.py</code></td><td>LLM router + RAG + brand injector + keyword task router</td><td class="warn">3 rival routers; 2 base lineages</td></tr>
+    <tr><td><span class="pill b-proto">PROTOTYPE</span></td><td><span class="bad">— no home —</span></td><td>Dry-run, variant gen, spike, pre-paid gate</td><td class="bad">absent</td></tr>
+    <tr><td><span class="pill b-design">DESIGN</span></td><td><code>agents/core/creative/</code> <code>agents/core/content/</code> <code>design-system/</code></td><td>Brand canon, dossiers, tokens, copy</td><td class="warn">3 token namespaces, no MCP surface</td></tr>
+    <tr><td><span class="pill b-build">BUILD</span></td><td><code>skyyrose/elite_studio/</code> + 5 rival imagery paths, 3 theme builders</td><td>Render / theme / product generation</td><td class="bad">6-way imagery dup</td></tr>
+    <tr><td><span class="pill b-deploy">DEPLOY</span></td><td><code>scripts/deploy-theme.sh</code> <code>mcp_tools/</code> <code>api/v1/</code> <code>frontend/</code></td><td>WP SFTP, WC publish, Vercel, MCP mount</td><td class="warn">5 WP-deploy entry points, no rollback</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td><code>services/{forecasting,lifecycle,risk,personalization,analytics}</code> <code>monitoring/</code></td><td>Forecast, retention, fraud, personalization, telemetry</td><td class="bad">fraud + personalization MCP-only, no agent owner</td></tr>
+  </table>
+</section>
+
+<section id="dupe">
+  <h2>The Duplication Map — what "one canonical home" must collapse</h2>
+  <table>
+    <tr><th>Concern</th><th>Exists today in (verified paths)</th><th>Target single owner</th></tr>
+    <tr><td><strong>Image / 3D generation</strong> (6×)</td><td><code>agents/visual_generation/</code>, <code>agents/render_pipeline/</code>, <code>skyyrose/elite_studio/</code>, <code>agents/core/imagery/sub_agents/</code>, <code>services/three_d/</code>, <code>ai_3d/</code></td><td><code>skyyrose/elite_studio/</code> (2D/render) + <code>services/three_d/</code> (3D)</td></tr>
+    <tr><td><strong>WP theme build</strong> (3×)</td><td><code>agents/elite_web_builder/agents/theme_builder.py</code>, <code>agents/wordpress_theme_builder/agent.ts</code>, <code>agents/core/web_builder/agent.py</code></td><td><code>agents/core/web_builder/</code></td></tr>
+    <tr><td><strong>LLM router</strong> (3×)</td><td><code>orchestration/llm_orchestrator.py</code>, <code>orchestration/domain_router.py</code>, <code>agents/elite_web_builder/core/model_router.py</code></td><td><code>llm/router.py</code> (active)</td></tr>
+    <tr><td><strong>Agent base class</strong> (2 lineages)</td><td><code>agents/base_super_agent/</code> (EnhancedSuperAgent: 17 techniques + learning) vs <code>agents/core/base.py</code> (CoreAgent: circuit-breaker + healing)</td><td>merge → <code>agents/core/base.py</code></td></tr>
+    <tr><td><strong>QC / fidelity judge</strong> (2×)</td><td><code>evaluation/core.py</code> (Anthropic ClaudeJudge) vs <code>scripts/oai_render/qc.py</code> (OpenAI JSON-schema)</td><td><code>evaluation/</code> — <code>qc.py</code> delegates</td></tr>
+    <tr><td><strong>Catalog loader</strong> (2×)</td><td><code>skyyrose/core/catalog_loader.py</code> vs <code>skyyrose/elite_studio/catalog.py</code></td><td><code>skyyrose/core/catalog_loader.py</code></td></tr>
+  </table>
+  <p class="muted">Note: <code>core/paths.py</code> / <code>skyyrose/core/paths.py</code> are the <strong>already-locked</strong> single path authority — the pattern to replicate for every other concern.</p>
+</section>
+
+<section id="spine">
+  <h2>Target Architecture — the Stage Spine</h2>
+  <div class="pipe">
+    <div class="stage s1"><h4>Prototype</h4><small>dry-run · variants · spikes · <b>pre-paid gate</b></small></div>
+    <div class="arrow">→</div>
+    <div class="stage s2"><h4>Design</h4><small>brand canon · dossiers · tokens · copy</small></div>
+    <div class="arrow">→</div>
+    <div class="stage s3"><h4>Build</h4><small>render · theme · product · QC</small></div>
+    <div class="arrow">→</div>
+    <div class="stage s4"><h4>Deploy</h4><small>WP SFTP · WC publish · Vercel · MCP</small></div>
+    <div class="arrow">→</div>
+    <div class="stage s5"><h4>Support</h4><small>forecast · fraud · retention · self-heal</small></div>
+  </div>
+  <p>Stages own work and consume two shared layers they never mutate: <span class="pill b-found">FOUNDATION</span> (<code>core/ security/ database/ evaluation/</code>) and <span class="pill b-cross">CROSS-CUTTING</span> (<code>llm/ orchestration/ agents/core/{base,orchestrator}.py</code>).</p>
+  <table>
+    <tr><th>Stage</th><th>Canonical home</th><th>Purpose</th></tr>
+    <tr><td><span class="pill b-proto">PROTOTYPE</span></td><td><code>agents/core/prototype/</code> <span class="bad">(NEW — does not exist)</span></td><td>Variant manifest, cost estimate, go/no-go before any paid API</td></tr>
+    <tr><td><span class="pill b-design">DESIGN</span></td><td><code>agents/core/creative/</code> + <code>agents/core/content/</code></td><td>Brand canon + design tokens + dossiers + copy</td></tr>
+    <tr><td><span class="pill b-build">BUILD</span></td><td><code>agents/core/imagery/</code>→<code>skyyrose/elite_studio/</code>, <code>agents/core/commerce/</code>, <code>agents/core/web_builder/</code></td><td>Renders, DRAFT product records, theme + <code>.min</code></td></tr>
+    <tr><td><span class="pill b-deploy">DEPLOY</span></td><td><code>agents/core/web_builder/</code> (theme), <code>agents/core/commerce/</code> (WC publish), <code>agents/core/marketing/</code> (announce), <code>mcp_tools/</code>+<code>api/v1/</code></td><td>Ship to skyyrose.co + devskyy.app; STOP-AND-SHOW gated</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td><code>agents/core/analytics/</code>, <code>agents/core/operations/</code>, <code>agents/core/support/</code> <span class="bad">(NEW)</span></td><td>Forecast/retention/telemetry, self-heal, fraud/personalization/churn</td></tr>
+  </table>
+  <div class="callout c-note"><strong>Design principle that drives everything:</strong> one canonical home per concern, one stage label and one owning agent per module. Foundation/Cross-cutting are read-only to stages. Every paid-API call is gated at the PROTOTYPE→BUILD boundary. <code>evaluation/</code> is the single QC authority. <code>skyyrose/elite_studio/</code> is the single render execution hub.</p></div>
+</section>
+
+<section id="org">
+  <h2>Agent Org — collapse the sprawling fleet into a per-stage roster</h2>
+  <table>
+    <tr><th>Stage</th><th>Agent</th><th>Maps from</th><th>Responsibility</th></tr>
+    <tr><td><span class="pill b-proto">PROTOTYPE</span></td><td><code>PrototypeCoreAgent</code></td><td class="bad">NEW <code>agents/core/prototype/</code></td><td>Dry-run, variant gen, cost estimate, ApprovalGate before paid API</td></tr>
+    <tr><td><span class="pill b-proto">PROTOTYPE</span></td><td><code>ApprovalGate</code></td><td><code>aos/governance/approval.py</code> (dead capital → activate)</td><td>Blocks stage transitions + gates <code>brand_learning</code></td></tr>
+    <tr><td><span class="pill b-design">DESIGN</span></td><td><code>CreativeCoreAgent</code></td><td><code>agents/core/creative/</code></td><td>Brand canon, design tokens, collection-story attribution</td></tr>
+    <tr><td><span class="pill b-design">DESIGN</span></td><td><code>ContentCoreAgent</code></td><td><code>agents/core/content/</code></td><td>Copy, dossier authoring, CopyEvaluator soft-signal</td></tr>
+    <tr><td><span class="pill b-build">BUILD</span></td><td><code>ImageryCoreAgent</code> → <code>EliteStudio</code></td><td><code>agents/core/imagery/</code> + <code>skyyrose/elite_studio/</code></td><td>Route all render jobs to elite_studio LangGraph (validate→generate→upscale→qa→store)</td></tr>
+    <tr><td><span class="pill b-build">BUILD</span></td><td><code>CommerceCoreAgent</code></td><td><code>agents/core/commerce/</code></td><td>DRAFT product records, SKU lifecycle, WC sync</td></tr>
+    <tr><td><span class="pill b-build">BUILD</span></td><td><code>WebBuilderCoreAgent</code></td><td><code>agents/core/web_builder/</code></td><td>Theme PHP/CSS/JS + <code>.min</code> rebuild; sole <code>deploy-theme.sh</code> owner</td></tr>
+    <tr><td><span class="pill b-deploy">DEPLOY</span></td><td><code>MarketingCoreAgent</code></td><td><code>agents/core/marketing/</code></td><td>Campaign dispatch, email triage, post-deploy announce (Klaviyo)</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td><code>AnalyticsCoreAgent</code></td><td><code>agents/core/analytics/</code></td><td>DemandForecaster, RetentionScorer, TokenTracker + FleetObserver aggregation</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td><code>SupportCoreAgent</code></td><td class="bad">NEW <code>agents/core/support/</code></td><td>FraudScorer + Recommender + churn Klaviyo push (promote MCP-only → agent-wired)</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td><code>OperationsCoreAgent</code></td><td><code>agents/core/operations/</code></td><td>Self-heal diagnose→heal→circuit-break→escalate, AuditLog</td></tr>
+    <tr><td><span class="pill b-cross">CROSS</span></td><td><code>Orchestrator</code></td><td><code>agents/core/orchestrator.py</code></td><td>Keyword router → all CoreAgents (needs NEW PROTOTYPE + SUPPORT routing rules)</td></tr>
+  </table>
+  <div class="callout c-danger">
+    <strong>Verifier correction — the base-class merge has NOT started.</strong> The architect described <code>agents/base_super_agent/</code> as a "compatibility shim during migration." Reality: <strong>11+ production agents still import it directly</strong> (analytics, content, security_ops, wordpress_asset, collection_content, creative, operations, coding_doctor, commerce, marketing, support). The <code>CoreAgent ← EnhancedSuperAgent</code> merge is a real, large, not-yet-begun migration — sequence it one agent at a time with full pytest between each.
+  </div>
+</section>
+
+<section id="gates">
+  <h2>Stage Gates — CORRECTED against the real repo</h2>
+  <p>A gate that cites a non-existent check is worse than no gate. The architect fabricated several; here they are fixed.</p>
+  <table>
+    <tr><th>Stage gate</th><th>Architect draft</th><th>Corrected (real)</th></tr>
+    <tr><td><span class="pill b-proto">PROTOTYPE → BUILD</span></td><td class="strike">env <code>PROTOTYPE_APPROVED=1</code> (0 occurrences in codebase)</td><td>STOP-AND-SHOW manual <code>y</code> + cost manifest; WP autodeploy uses real <code>STOPSHOW_ACK=1</code>. Verify: dry-run logs zero spend in LLM router.</td></tr>
+    <tr><td><span class="pill b-design">DESIGN → BUILD</span></td><td class="strike">pytest <code>tests/agents/test_creative.py</code> + <code>test_content.py</code> (neither exists)</td><td>Real files: <code>test_copy_eval_wiring.py</code>, <code>test_skyyrose_agents.py</code>, <code>test_validation_scoring.py</code>, <code>test_wordpress_bridge.py</code>, <code>test_analytics_forecast_wiring.py</code>. Gate = <code>es_validate_dossier</code> MCP tool + CopyEvaluator score. <span class="warn">Creative/Content gate tests must be written.</span></td></tr>
+    <tr><td><span class="pill b-build">BUILD → DEPLOY</span></td><td class="strike">root <code>scripts/build-css.js</code> / <code>build-js.js</code></td><td>Real path: <code>wordpress-theme/skyyrose-flagship/scripts/build-css.js</code> + <code>build-js.js</code>. QC via <code>evaluation/core.py</code> QCGate. <span class="warn">Calibration never run — thresholds uncalibrated.</span> WC records DRAFT only.</td></tr>
+    <tr><td><span class="pill b-deploy">DEPLOY</span></td><td><code>wp_verify_live</code> + Playwright (correct concept, wrong file)</td><td>Tools live in <code>mcp_tools/tools/wp_deploy.py</code> + <code>elite_studio.py</code> — <strong>not</strong> <code>devskyy_mcp.py</code>. Gate: cache-busted curl 200 + ≥50 KB + Playwright mobile+desktop snapshot.</td></tr>
+    <tr><td><span class="pill b-support">SUPPORT</span></td><td class="strike">Prometheus <code>agent_llm_tokens_total</code> (does not exist)</td><td>Real counter: <code>mcp_llm_tokens</code> in <code>monitoring/prometheus_metrics.py</code>. <span class="ok">TokenTracker is ALREADY wired</span> (<code>record_llm_usage</code> at 3 callsites in <code>llm/router.py</code>) — architect's "zero-callsite" claim was wrong.</td></tr>
+  </table>
+</section>
+
+<section id="migrate">
+  <h2>Migration Plan — git-safe, risk-ordered</h2>
+  <h3>Phase 1 — Low risk: delete dead code &amp; collapse stale routers</h3>
+  <table>
+    <tr><th>Action</th><th>From → To</th><th>Risk</th></tr>
+    <tr><td>delete</td><td><code>orchestration/llm_orchestrator.py</code>, <code>orchestration/domain_router.py</code>, <code>agents/elite_web_builder/core/model_router.py</code> (3 stale routers, 0 importers)</td><td class="sev-low">low</td></tr>
+    <tr><td>delete</td><td><code>agents/enhanced_base.py</code>, <code>mcp_servers/</code> (never launched), <code>src/</code> (superseded by <code>frontend/</code>)</td><td class="sev-low">low</td></tr>
+    <tr><td>delete</td><td>4 DISABLED workflows: <code>.github/workflows/{fly-deploy,dast-scan,workflows,claude-code-action-official}.yml</code></td><td class="sev-low">low</td></tr>
+    <tr><td>merge</td><td><code>skyyrose/elite_studio/catalog.py</code> → <code>skyyrose/core/catalog_loader.py</code></td><td class="sev-low">low</td></tr>
+    <tr><td>fix</td><td><code>devskyy_mcp.py</code> banner "54 agents" (fabricated static count) → count <code>@mcp.tool</code> decorators dynamically</td><td class="sev-low">low</td></tr>
+  </table>
+
+  <h3>Phase 2 — Medium: consolidate &amp; wire dead capital</h3>
+  <table>
+    <tr><th>Action</th><th>From → To</th><th>Risk</th></tr>
+    <tr><td>merge</td><td><code>scripts/oai_render/qc.py</code> → delegate to <code>evaluation/core.py</code> (single QC authority). <span class="warn">Run calibration first — provider changes OpenAI→Anthropic.</span></td><td class="sev-med">med</td></tr>
+    <tr><td>merge</td><td>imagery: <code>agents/visual_generation/</code> + <code>agents/render_pipeline/</code> + <code>agents/core/imagery/sub_agents/</code> → <code>skyyrose/elite_studio/</code>. <span class="bad">Verifier: ImageryCoreAgent currently dispatches to 5 local sub_agents — this delegation does NOT exist yet; it's the work, not the state.</span></td><td class="sev-med">med</td></tr>
+    <tr><td>merge</td><td><code>ai_3d/</code> → <code>services/three_d/</code> (canonical 3D)</td><td class="sev-med">med</td></tr>
+    <tr><td>create</td><td><code>agents/core/prototype/</code> (PrototypeCoreAgent) + <code>agents/core/support/</code> (SupportCoreAgent); add <code>CoreAgentType.PROTOTYPE</code>/<code>SUPPORT</code> + Orchestrator routing rules</td><td class="sev-med">med</td></tr>
+    <tr><td>wire</td><td><code>services/risk/fraud.py</code> + <code>services/personalization/recommender.py</code> → SupportCoreAgent lazy-import (same pattern as analytics_agent). Today MCP-only.</td><td class="sev-med">med</td></tr>
+    <tr><td>wire</td><td><span class="bad">⚠ <code>orchestration/brand_learning.py</code> <code>store_adaptation()</code> → <code>aos/governance/approval.py</code> ApprovalGate</span> — see #1 Fix</td><td class="sev-med">med</td></tr>
+    <tr><td>delete</td><td><code>skyyrose/elite_team/</code> + <code>skyyrose/steward/</code> (<code>.pyc</code>-only, source gone — restore from history or remove)</td><td class="sev-med">med</td></tr>
+  </table>
+
+  <h3>Phase 3 — High: base-class merge + DB reconciliation</h3>
+  <table>
+    <tr><th>Action</th><th>From → To</th><th>Risk</th></tr>
+    <tr><td>merge</td><td><code>agents/base_super_agent/</code> EnhancedSuperAgent (17 techniques + SelfLearningModule) → <code>agents/core/base.py</code> CoreAgent. Migrate 11+ agents one at a time, pytest between each.</td><td class="sev-high">high</td></tr>
+    <tr><td>move</td><td><code>agents/base_legacy.py</code> SuperAgent (fashn/meshy/tripo/anigen) → CoreAgent subclasses, then delete</td><td class="sev-med">med</td></tr>
+    <tr><td>merge</td><td><code>agents/models.py</code> → <code>database/db.py</code>. <span class="bad">Generate Alembic migration FIRST — OrderItem/EventRecord/AgentTask tables exist in ORM but in zero migration versions.</span></td><td class="sev-med">med</td></tr>
+  </table>
+</section>
+
+<section id="dead">
+  <h2>Dead Weight — the repo-bloat the architect missed</h2>
+  <p>Independent <code>git ls-files</code> + <code>du</code> audit. The biggest structural liability is <strong>generated artifacts committed to git</strong>.</p>
+  <h3>Tracked in git — needs history rewrite (BFG / <code>git filter-repo</code>) + <code>.gitignore</code></h3>
+  <table>
+    <tr><th>Path</th><th>Size (tracked)</th><th>What</th><th>Action</th></tr>
+    <tr><td><code>renders/</code></td><td class="bad">981 MB · 186 files</td><td>Generated render PNGs</td><td>Purge from history, gitignore, store in R2/artifact bucket</td></tr>
+    <tr><td><code>ci_mirror/</code></td><td class="bad">152 MB</td><td>CI mirror snapshot</td><td>Purge + gitignore</td></tr>
+    <tr><td><code>graphify-out/</code></td><td class="warn">64 MB</td><td>graphify tool output</td><td>Purge + gitignore</td></tr>
+    <tr><td><code>datasets/</code></td><td class="warn">19 MB · 100 files</td><td>ML datasets</td><td>Move to data bucket / Git-LFS</td></tr>
+    <tr><td><code>archive/</code></td><td>3.6 MB · 151 files</td><td>Old archived code</td><td>Audit then delete</td></tr>
+    <tr><td><code>skyyrose-suite/</code></td><td>3.3 MB · 328 files</td><td>Likely a 2nd copy of the <code>.claude</code> plugin suite</td><td><span class="warn">Confirm vs <code>.claude/</code> — dedupe</span></td></tr>
+    <tr><td><code>scraped_docs/</code> <code>dist/</code></td><td>1.1 MB / 1.5 MB</td><td>Context7 cache / compiled output</td><td>Delete + gitignore (use Context7 MCP live)</td></tr>
+  </table>
+  <h3>Untracked in working tree — safe local delete + confirm gitignored (~1.8 GB)</h3>
+  <table>
+    <tr><th>Path</th><th>Size</th><th></th><th>Path</th><th>Size</th></tr>
+    <tr><td><code>TRELLIS.2/</code></td><td>816 MB</td><td></td><td><code>prototypes/</code></td><td>77 MB</td></tr>
+    <tr><td><code>backups/</code></td><td>626 MB</td><td></td><td><code>temporal-project/</code></td><td>58 MB</td></tr>
+    <tr><td><code>editorial-staging/</code></td><td>136 MB</td><td></td><td><code>coverage/ logs/</code></td><td>5.6/2 MB</td></tr>
+    <tr><td><code>skyyrose-photo-scan/</code></td><td>105 MB</td><td></td><td><code>backups,temporal,etc</code></td><td>—</td></tr>
+  </table>
+  <div class="callout c-danger">
+    <strong>Verifier correction — <code>TRELLIS.2/</code> is NOT a git submodule.</strong> The architect's "keep as submodule, use <code>git submodule deinit</code>" is wrong — there is no <code>.gitmodules</code>, no <code>.git/modules/</code>, <code>git submodule status</code> is empty. It's an <strong>embedded standalone git repo (816 MB, untracked)</strong> — almost certainly a clone of Microsoft TRELLIS. Decision: either vendor it properly (pin a commit, document) or <code>rm -rf TRELLIS.2</code> and <code>pip install</code> the dependency. Do not run submodule commands.
+  </div>
+  <p class="muted">Also confirmed dead/MCP-only-unreachable: <code>mcp_servers/</code> (5-server fleet ~72 tools, never in docker-compose / main_enterprise), <code>aos/</code> (kernel/cognition/healing/observability = dead capital except <code>governance/</code> which we activate).</p>
+</section>
+
+<section id="risk">
+  <h2>Top Risks &amp; the #1 Fix to do first</h2>
+  <div class="callout c-danger">
+    <h3 style="margin-top:0">🚨 #1 — Brand-learning loop is ungated (low cost, very high blast radius)</h3>
+    <p><code>orchestration/brand_learning.py</code> → <code>BrandLearningLoop.store_adaptation()</code> writes brand DNA into <code>BrandContextInjector</code>, which is injected into <strong>every agent prompt across all stages</strong>. There is <strong>no approval gate</strong>. A confused or rogue LLM adaptation silently corrupts brand canon everywhere. <code>aos/governance/approval.py</code> ApprovalGate exists but is unwired. <strong>Double-confirmed unfixed at current HEAD.</strong> Fix: import ApprovalGate, gate <code>store_adaptation()</code>. This is the cheapest, highest-leverage change in the whole plan.</p>
+  </div>
+  <table>
+    <tr><th>Risk</th><th>Mitigation</th></tr>
+    <tr><td>Base-class merge touches every stage agent — silent capability regression</td><td>Feature branch, migrate 1 agent at a time, full pytest between each</td></tr>
+    <tr><td>QC consolidation switches OpenAI→Anthropic judge; distributions uncalibrated; calibration never run</td><td>Run <code>calibration/</code> on held-out renders before switching the prod gate</td></tr>
+    <tr><td>DB schema drift — OrderItem/EventRecord/AgentTask in ORM, absent from all 3 Alembic versions; circuit-breaker state in-memory only</td><td>New Alembic migration adding missing tables BEFORE model merge</td></tr>
+    <tr><td>Single-owner deploy — WebBuilderCoreAgent sole owner of <code>deploy-theme.sh</code></td><td>OperationsCoreAgent keeps emergency bypass, STOP-AND-SHOW + explicit emergency flag</td></tr>
+    <tr><td>Prometheus/TokenTracker emit on LLM hot path</td><td>Wrap emit in try/except + log fallback; unit-test emit in isolation (note: TokenTracker already wired)</td></tr>
+    <tr><td>Two independent deploy targets (skyyrose.co WP / devskyy.app Vercel) must never cross-wire</td><td>Keep <code>frontend/</code> isolated from root Python workspace; separate gates</td></tr>
+  </table>
+</section>
+
+<section id="next">
+  <h2>Recommended Execution Order</h2>
+  <ol>
+    <li><strong>#1 safety fix</strong> — wire ApprovalGate into <code>brand_learning.py</code>. One file, huge blast radius. <span class="muted">(no money, no prod — autonomous)</span></li>
+    <li><strong>Phase 1</strong> — delete 3 stale routers + dead dirs + 4 disabled workflows; fix MCP banner. Mechanical, low risk, shrinks confusion surface.</li>
+    <li><strong>Repo-bloat purge</strong> — gitignore + history-rewrite <code>renders/ ci_mirror/ graphify-out/</code>; local-delete the ~1.8 GB untracked cruft. <span class="warn">History rewrite is irreversible → STOP-AND-SHOW before any <code>filter-repo</code>.</span></li>
+    <li><strong>Phase 2</strong> — create PrototypeCoreAgent + SupportCoreAgent; wire fraud/personalization to agents; collapse imagery to elite_studio; delegate QC to <code>evaluation/</code>.</li>
+    <li><strong>Phase 3</strong> — base-class merge + Alembic reconciliation (the big one, do last, incrementally).</li>
+  </ol>
+  <div class="callout c-ok">
+    <strong>What I can start now, autonomously (no money / no prod):</strong> the #1 brand-learning gate fix, Phase-1 deletions, and writing the missing DESIGN-gate tests. Say the word and I'll open a branch and drive each through TDD + pytest. The bloat purge and any history rewrite stay behind STOP-AND-SHOW.
+  </div>
+</section>
+</main>
+<footer>
+  Generated from the <code>devskyy-lifecycle-redesign</code> ultracode workflow (18 agents · 10 dissectors → 5 stage-mappers → 1 architect → 2 adversarial verifiers · 1.36 M tokens · 36 min). Architect verdict #2 returned <code>confirmed:false</code>; all fabricated gates/paths corrected against the live repo before publication. Paths verified via Read/Grep/Glob + <code>git ls-files</code> on <code>/Users/theceo/DevSkyy</code>, 2026-06-21.
+</footer>
+</body>
+</html>
