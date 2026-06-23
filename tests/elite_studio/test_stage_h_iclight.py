@@ -15,6 +15,28 @@ from skyyrose.elite_studio.agents.compositor.stage_h_iclight import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _isolate_iclight_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Redirect Stage H's relight cache to a per-test tmp dir so the suite is
+    hermetic.
+
+    ``relight_composite`` returns early on a cache hit (before calling
+    ``_invoke_iclight_v2``). Without isolation it reads the *real* cache dir, where
+    a stale ``{cache_key}.png`` from a past run makes the relight tests hit that
+    early return — so the FAL-invocation mock never runs and ``captured`` is empty
+    (KeyError: 'prompt'). ``stage_h_iclight`` binds ``_cache_dir`` locally
+    (``from .infra import _cache_dir``), so we patch it on THIS module, not on
+    ``.infra``. autouse → every relight test is isolated and this can't regress.
+    """
+
+    def _fake_cache_dir(name: str) -> Path:
+        d = tmp_path / "iclight-cache" / name
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    monkeypatch.setattr(stage_h_iclight, "_cache_dir", _fake_cache_dir)
+
+
 @pytest.fixture
 def composite_image(tmp_path: Path) -> Path:
     """64x64 RGB composite stand-in (would be Stage D output)."""
