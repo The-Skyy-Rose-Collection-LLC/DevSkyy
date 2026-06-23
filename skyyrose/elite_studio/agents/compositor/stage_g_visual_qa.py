@@ -50,9 +50,11 @@ def visual_qa(
     """Score the composite via Gemini using a structured rubric.
 
     Returns a dict with at minimum a ``status`` key (``pass`` / ``warn`` /
-    ``fail``). Soft-fails to ``warn`` rather than blocking the pipeline
-    when the QA provider itself is unavailable — the audit log captures
-    the failure mode.
+    ``fail``). **Fails closed**: a provider error or an unparseable response
+    returns ``status="fail"`` with an ``error_type`` discriminator
+    (``qa_provider_error`` / ``qa_parse_error``) so a transient oracle outage
+    cannot silently pass the QA gate. A parseable low-confidence rubric
+    ``warn`` is preserved.
 
     Args:
         composite_path: Path to the shadow-composited image.
@@ -86,7 +88,8 @@ def visual_qa(
 
     if not result.get("success"):
         return {
-            "status": "warn",
+            "status": "fail",
+            "error_type": "qa_provider_error",
             "error": result.get("error", "QA provider returned no body"),
             "model": COMPOSITOR_QA_MODEL,
         }
@@ -98,7 +101,8 @@ def visual_qa(
         return {**parsed, "status": status, "model": COMPOSITOR_QA_MODEL}
     except Exception:
         return {
-            "status": "warn",
+            "status": "fail",
+            "error_type": "qa_parse_error",
             "error": f"could not parse QA JSON: {text[:120]}",
             "model": COMPOSITOR_QA_MODEL,
         }

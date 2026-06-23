@@ -710,7 +710,8 @@ class CompositorAgent(FluxProviderMixin):
 
         if not result.get("success"):
             return {
-                "status": "warn",
+                "status": "fail",
+                "error_type": "qa_provider_error",
                 "error": result.get("error", "QA provider returned no body"),
                 "model": COMPOSITOR_QA_MODEL,
             }
@@ -722,7 +723,8 @@ class CompositorAgent(FluxProviderMixin):
             return {**parsed, "status": status, "model": COMPOSITOR_QA_MODEL}
         except Exception:
             return {
-                "status": "warn",
+                "status": "fail",
+                "error_type": "qa_parse_error",
                 "error": f"could not parse QA JSON: {text[:120]}",
                 "model": COMPOSITOR_QA_MODEL,
             }
