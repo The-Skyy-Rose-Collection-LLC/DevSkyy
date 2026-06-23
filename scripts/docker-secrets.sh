@@ -24,9 +24,13 @@ PG=$(gen 24); RD=$(gen 24); GF=$(gen 18); JWT=$(gen 64); JWTR=$(gen 64); ENC=$(e
 
 cp "$TEMPLATE" "$OUT"
 
-python3 - "$OUT" "$PG" "$RD" "$GF" "$JWT" "$JWTR" "$ENC" <<'PY'
+# Secrets go via stdin (newline-delimited), not argv — argv is world-readable in
+# /proc/<pid>/cmdline and `ps` while the process runs.
+printf '%s\n' "$PG" "$RD" "$GF" "$JWT" "$JWTR" "$ENC" | python3 - "$OUT" <<'PY'
 import sys
-path, pg, rd, gf, jwt, jwtr, enc = sys.argv[1:8]
+
+path = sys.argv[1]
+pg, rd, gf, jwt, jwtr, enc = sys.stdin.read().splitlines()
 repl = {
     "POSTGRES_PASSWORD": pg,
     "REDIS_PASSWORD": rd,
@@ -35,11 +39,14 @@ repl = {
     "JWT_REFRESH_SECRET_KEY": jwtr,
     "ENCRYPTION_MASTER_KEY": enc,
 }
+with open(path) as f:
+    src = f.readlines()
 lines = []
-for line in open(path):
+for line in src:
     key = line.split("=", 1)[0].strip()
     lines.append(f"{key}={repl[key]}\n" if key in repl else line)
-open(path, "w").writelines(lines)
+with open(path, "w") as f:
+    f.writelines(lines)
 PY
 
 chmod 600 "$OUT"

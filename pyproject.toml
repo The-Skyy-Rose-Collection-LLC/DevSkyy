@@ -259,10 +259,13 @@ ml = [
     "category-encoders==2.9.0",
     "optuna==4.9.0",
     "hyperopt==0.2.7",
-    # Removed 2026-06-22 — all imported in 0 files (runtime + tests) AND they
-    # forced source builds that break a clean py3.12 install:
+    # Removed 2026-06-22 — all force source builds that break a clean py3.12
+    # install, and all are unused EXCEPT prophet:
     #   librosa, shap → numba → llvmlite 0.36 (no py3.12 support)
-    #   prophet, statsmodels → cmdstan/compile
+    #   prophet, statsmodels → cmdstan/compile. prophet is imported only behind a
+    #     try/except ImportError in agents/base_super_agent/ml_module.py with a
+    #     TrendExtrapolationWrapper fallback, so removal degrades gracefully (and
+    #     prophet's cmdstan build never succeeded in the py3.12 image anyway).
     #   gymnasium, stable-baselines3, soundfile, lime → dead RL/audio/explainability
     # This unbreaks `uv pip install .[all]` on Python 3.12.
     "polars==1.41.2",

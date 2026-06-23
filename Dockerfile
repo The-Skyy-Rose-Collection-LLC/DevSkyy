@@ -81,9 +81,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PORT=8000
 
 # Runtime-only system libs: libpq5 (postgres clients), curl (healthcheck),
-# tini (PID1), libgl1 + libglib2.0-0 (OpenCV/cv2 needs them — the imagery &
-# render-QC pipeline imports cv2; without these the slim image silently disables
-# color-histogram comparison).
+# tini (PID1), libgl1 + libglib2.0-0 (OpenCV/cv2 — imagery & render-QC pipeline),
+# libfreetype6 (Pillow text rendering on arm64 source builds), fonts-dejavu-core
+# (TrueType font the imagery overlays load by path — otherwise a bitmap fallback).
 RUN apt-get update --fix-missing || apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
         libpq5 \
@@ -92,6 +92,8 @@ RUN apt-get update --fix-missing || apt-get update --fix-missing && \
         tini \
         libgl1 \
         libglib2.0-0 \
+        libfreetype6 \
+        fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 

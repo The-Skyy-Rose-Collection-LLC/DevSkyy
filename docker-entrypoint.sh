@@ -33,16 +33,17 @@ python3 -c "import sys; print(f'Python {sys.version}')" || {
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking secrets..."
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 gen_secret() {
-    # $1 = env var name, $2 = python expression that prints the secret value
+    # $1 = env var name, $2 = python expression that prints the secret value.
+    # printenv reads the named var without eval (call sites pass literal names).
     var="$1"
-    [ -n "$(eval "printf '%s' \"\${$var}\"")" ] && return 0
+    [ -n "$(printenv "$var")" ] && return 0
     echo "[$(ts)] Generating $var..."
     val=$(python3 -c "$2" 2>&1) || {
         echo "[$(ts)] ERROR: Failed to generate $var: $val"
         exit 1
     }
     export "$var=$val"
-    echo "[$(ts)] $var generated (length: $(eval "printf '%s' \"\${#$var}\""))"
+    echo "[$(ts)] $var generated (length: ${#val})"
 }
 
 gen_secret JWT_SECRET_KEY "import secrets; print(secrets.token_urlsafe(64))"

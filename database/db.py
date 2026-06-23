@@ -71,8 +71,10 @@ def _normalize_async_url(url: str) -> str:
     URL works without callers having to know the driver. Already-qualified URLs
     (``postgresql+asyncpg://``, ``sqlite+aiosqlite://``) pass through unchanged.
     """
+    if not url:
+        return url
     for prefix in ("postgresql://", "postgres://"):
-        if url.startswith(prefix):
+        if url.lower().startswith(prefix):
             return "postgresql+asyncpg://" + url[len(prefix) :]
     return url
 
@@ -281,7 +283,7 @@ class DatabaseManager:
     Async database manager with connection pooling
 
     Features:
-    - Connection pooling (QueuePool for PostgreSQL)
+    - Connection pooling (AsyncAdaptedQueuePool for PostgreSQL)
     - Async session management
     - Automatic reconnection
     - Query logging
@@ -302,11 +304,12 @@ class DatabaseManager:
             return
 
         config = config or DatabaseConfig()
-        config.url = _normalize_async_url(config.url)
+        # Normalize locally — don't mutate the caller's config object.
+        db_url = _normalize_async_url(config.url)
 
         # Determine pool class based on database type
-        is_sqlite = "sqlite" in config.url
-        is_memory = ":memory:" in config.url
+        is_sqlite = "sqlite" in db_url
+        is_memory = ":memory:" in db_url
 
         # Use StaticPool for in-memory SQLite (keeps single connection alive)
         # Use NullPool for file-based SQLite (allows multiple processes)
@@ -341,7 +344,7 @@ class DatabaseManager:
                 }
             )
 
-        self._engine = create_async_engine(config.url, **engine_kwargs)
+        self._engine = create_async_engine(db_url, **engine_kwargs)
 
         # Create session factory
         self._session_factory = async_sessionmaker(
@@ -356,9 +359,7 @@ class DatabaseManager:
         async with self._engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-        logger.info(
-            f"Database initialized: {config.url.split('@')[-1] if '@' in config.url else config.url}"
-        )
+        logger.info(f"Database initialized: {db_url.split('@')[-1] if '@' in db_url else db_url}")
 
     async def close(self):
         """Close database connection"""
