@@ -223,7 +223,8 @@ services:
     container_name: devskyy-prometheus
     profiles: [monitoring]
     ports:
-      - "9090:9090"
+      # loopback-only: Prometheus has no auth and exposes the full metrics tree.
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -244,7 +245,8 @@ services:
     container_name: devskyy-grafana
     profiles: [monitoring]
     ports:
-      - "3000:3000"
+      # loopback-only by default; front with a TLS proxy to expose externally.
+      - "127.0.0.1:3000:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env.docker}
       GF_USERS_ALLOW_SIGN_UP: "false"
