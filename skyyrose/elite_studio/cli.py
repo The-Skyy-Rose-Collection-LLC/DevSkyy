@@ -432,7 +432,7 @@ def cmd_home_spread(args: argparse.Namespace) -> None:
 
     budget = RunBudget(ceiling_usd=args.budget_usd)
     print("=" * 72)
-    print(f" Home-Spread Pipeline — elite team")
+    print(" Home-Spread Pipeline — elite team")
     print(f" Budget cap     : ${args.budget_usd:.2f} USD")
     print(f" Collections    : {', '.join(collections)}")
     print(f" Dry run        : {args.dry_run}")
@@ -473,11 +473,11 @@ def cmd_home_spread(args: argparse.Namespace) -> None:
             print(f"  founder_directed : {spec.get('founder_directed')}")
             print(f"  scene_image_path : {scene_image_path}")
             print(f"  scene_exists     : {scene_image_path.exists()}")
-            print(f"  est. scene cost  : $0.08")
+            print("  est. scene cost  : $0.08")
             if args.sku:
                 print(f"  composite_sku    : {args.sku}")
-                print(f"  est. composite   : ~$0.15 (FAL Bria)")
-            print(f"\n  PROMPT PREVIEW (first 600 chars):")
+                print("  est. composite   : ~$0.15 (FAL Bria)")
+            print("\n  PROMPT PREVIEW (first 600 chars):")
             print("  " + "\n  ".join(scene_prompt_preview[:600].split("\n")))
             return {
                 "collection": collection,

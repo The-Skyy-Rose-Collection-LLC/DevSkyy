@@ -12,7 +12,6 @@ Tests cover:
 
 from __future__ import annotations
 
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -70,9 +69,9 @@ class TestFailSafeReject:
         gate = HumanReviewGate()
         with patch.object(gate, "_get_manager", side_effect=ImportError("no pydantic")):
             review_id = gate.submit_for_review("br-001", "/tmp/img.jpg", "job-1")
-        assert review_id.startswith("auto-reject:"), (
-            "Default fail-safe must reject — set SKYYROSE_AUTO_CONFIRM=1 to opt back in"
-        )
+        assert review_id.startswith(
+            "auto-reject:"
+        ), "Default fail-safe must reject — set SKYYROSE_AUTO_CONFIRM=1 to opt back in"
 
     def test_get_decision_on_reject_sentinel_returns_reject(self):
         gate = HumanReviewGate()
