@@ -5,8 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from llm.model_ids import CLAUDE_SONNET_MODEL
-from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
+# NOTE: llm.model_ids and skyyrose.elite_studio.coordinator are imported lazily
+# inside the fixtures/factories that need them (see make_quality_verification +
+# silent_coordinator). Importing them at module top pulls the heavy provider SDK
+# chain (httpx/openai/transformers) at collection time, which breaks minimal-env
+# jobs (e.g. Catalog Consistency Validation) that only collect the stdlib-only
+# catalog tests sharing this conftest. elite_studio.models is light, kept here.
 from skyyrose.elite_studio.models import (
     GenerationResult,
     ProductData,
@@ -81,6 +85,8 @@ def make_quality_verification(
     **kwargs,
 ) -> QualityVerification:
     """Create a test QualityVerification."""
+    from llm.model_ids import CLAUDE_SONNET_MODEL
+
     return QualityVerification(
         success=success,
         provider="anthropic",
@@ -119,6 +125,8 @@ def make_production_result(
 def silent_coordinator():
     """Coordinator with silent logger for clean test output."""
     from unittest.mock import MagicMock
+
+    from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
 
     return Coordinator(
         vision=MagicMock(),
