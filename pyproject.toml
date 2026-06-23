@@ -462,7 +462,7 @@ exclude = '''
 profile = "black"
 line_length = 100
 known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
-skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/"]
+skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/", "skyyrose/cli_harnesses/"]
 
 # =============================================================================
 # MyPy Configuration — canonical config lives in mypy.ini (not here)
