@@ -2125,6 +2125,45 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T16:10:00-07:00"
+    },
+    {
+      "id": "bug-131",
+      "timestamp": "2026-06-22T16:05:00-07:00",
+      "error_message": "Cleanup classifier marked all 81 untracked files as 'on main, differs' (KEEP=0) \u2014 would have recommended deleting 76 genuine local files = data loss",
+      "file": "ad-hoc bash classifier (this session)",
+      "root_cause": "Used `git rev-parse origin/main:$f` as an existence test. For a path NOT in the tree, git rev-parse ECHOES the unparseable string to stdout (errors on stderr) instead of returning empty, so every file looked present. Real blob hash never matched the echoed string -> universal false 'differs'.",
+      "fix": "Use `git cat-file -e origin/main:$f` (or `git ls-tree`) for path existence \u2014 does not echo. Re-classified: only 4 (deleted) + regen-boost (deleted) were truly on main; 76 are genuine local work, kept.",
+      "tags": [
+        "git",
+        "rev-parse",
+        "existence-test",
+        "cleanup",
+        "data-loss-averted",
+        "false-classification"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:05:00-07:00"
+    },
+    {
+      "id": "bug-156",
+      "timestamp": "2026-06-22T16:58:00-07:00",
+      "error_message": "make sync-catalog proposed '_JERSEY_SKUS: remove [br-011]' \u2014 would drop the hooded Jersey-Series member from the render roster and break validate-catalog jersey_skus (8 vs 7)",
+      "file": "scripts/sync_catalog_downstream.py",
+      "root_cause": "sync_jersey_skus derived the jersey-SERIES roster from CSV garment_type_lock (_csv_jersey_skus), which encodes garment GEOMETRY not roster membership. br-011 is correctly locked 'hoodie' (a hooded Jersey-Series piece per dossier \u2014 drives the FLUX hood clause + PDP label), so geometry-based derivation wrongly excluded it. The validator (check_jersey_skus) already used the authoritative registry sku_folders roster; sync used a different, wrong source \u2014 the two tools encoded opposite truth sources for br-011, and the validator's 'known data error' note was itself factually wrong (br-011 IS a hoodie).",
+      "fix": "Redirected sync_jersey_skus to derive from registry sku_folders via new _registry_jersey_skus() (matching the validator) + empty-registry guard so a bad read can't wipe the roster. Removed dead _csv_jersey_skus + _JERSEY_GARMENT_TYPES. Corrected the validator's false 'known data error' docstring. NO canonical data changed (CSV/dossier/sku_resolver untouched; _JERSEY_SKUS stays 8). Verified: sync-catalog-dry 'already in sync', validate-catalog 13/13, 39 tests pass, lint clean.",
+      "tags": [
+        "catalog",
+        "jersey",
+        "br-011",
+        "sync",
+        "garment_type_lock",
+        "roster",
+        "divergent-master"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:58:00-07:00"
     }
   ]
 }
