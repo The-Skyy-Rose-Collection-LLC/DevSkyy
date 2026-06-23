@@ -50,10 +50,12 @@ _PROMPT = (
 
 
 def _prompt_for(collection: str) -> str:
-    scene = COLLECTION_SCENE.get(collection)
-    if scene is None:
+    # Validate collection is from our allowed set to prevent injection
+    if collection not in COLLECTION_SCENE:
         raise KeyError(f"unknown collection: {collection}")
-    return _PROMPT.format(scene=scene)
+    scene = COLLECTION_SCENE[collection]
+    # scene is from a hardcoded dict, but use template string for safety
+    return _PROMPT.replace("{scene}", scene)
 
 
 def _generate_one(collection: str, dest: Path) -> bytes:
@@ -130,7 +132,15 @@ def main(argv: list[str] | None = None) -> int:
 
     failures = 0
     for coll in collections:
-        dest = OUT_DIR / f"_scene-preview-{coll}.png"
+        # Sanitize collection name to prevent path traversal
+        safe_coll = coll.replace("/", "_").replace("\\", "_").replace("..", "_")
+        dest = OUT_DIR / f"_scene-preview-{safe_coll}.png"
+        # Validate dest is within OUT_DIR to prevent path traversal
+        try:
+            dest.resolve().relative_to(OUT_DIR.resolve())
+        except ValueError:
+            _log.error("[%s] ABORT: path traversal attempt", coll)
+            return 2
         try:
             _log.info("[%s] rendering backdrop ...", coll)
             data = _generate_one(coll, dest)
