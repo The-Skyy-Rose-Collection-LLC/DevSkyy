@@ -40,6 +40,7 @@ import io
 import json
 import logging
 import os
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -333,8 +334,15 @@ class CompositorAgent(FluxProviderMixin):
                     prompt=prompt,
                     budget=budget,
                 )
-                composite_path = str(out / f"{sku}-composite.png")
-                Path(composite_path).write_bytes(composite_bytes)
+                composite_path = str(out / f"{sku}-{scene_name}-composite.png")
+                # Atomic write so a crash mid-write can't leave a truncated PNG
+                # for the shadow/QA stages to read.
+                _fd, _tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
+                try:
+                    os.write(_fd, composite_bytes)
+                finally:
+                    os.close(_fd)
+                os.replace(_tmp, composite_path)
                 stages["composite"] = {
                     "path": composite_path,
                     "provider": provider,
@@ -358,7 +366,7 @@ class CompositorAgent(FluxProviderMixin):
 
             # ------------------------------ Stage 5: shadows
             started = time.perf_counter()
-            shadow_path = self._generate_shadows(composite_path, sku, str(out))
+            shadow_path = self._generate_shadows(composite_path, sku, str(out), scene_name)
             stages["shadow"] = {
                 "path": shadow_path,
                 "duration_s": round(time.perf_counter() - started, 3),
@@ -682,8 +690,10 @@ class CompositorAgent(FluxProviderMixin):
 
     # --------------------------------------------------- Stage 5: shadows
 
-    def _generate_shadows(self, composite_path: str, sku: str, output_dir: str) -> str:
-        return generate_shadows(composite_path, sku, output_dir)
+    def _generate_shadows(
+        self, composite_path: str, sku: str, output_dir: str, scene_name: str = ""
+    ) -> str:
+        return generate_shadows(composite_path, sku, output_dir, scene_name)
 
     # --------------------------------------------------- Stage 6: visual QA
 
