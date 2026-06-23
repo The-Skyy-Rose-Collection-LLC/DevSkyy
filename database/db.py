@@ -312,7 +312,9 @@ class DatabaseManager:
         # to avoid misclassification when "sqlite" appears in credentials/db names
         parsed_url = make_url(db_url)
         is_sqlite = parsed_url.drivername.startswith("sqlite")
-        is_memory = is_sqlite and (":memory:" in str(parsed_url.database) or parsed_url.database is None)
+        is_memory = is_sqlite and (
+            ":memory:" in str(parsed_url.database) or parsed_url.database is None
+        )
 
         # Use StaticPool for in-memory SQLite (keeps single connection alive)
         # Use NullPool for file-based SQLite (allows multiple processes)

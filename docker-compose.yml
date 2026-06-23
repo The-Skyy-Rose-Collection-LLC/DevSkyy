@@ -45,8 +45,8 @@ x-app-env: &app-env
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   # +asyncpg: database/db.py uses SQLAlchemy create_async_engine, which needs an
   # async driver in the URL. Bare postgresql:// maps to psycopg2 (not installed).
-  DATABASE_URL: postgresql+asyncpg://devskyy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}@postgres:5432/devskyy
-  REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}@redis:6379/0
+  DATABASE_URL: postgresql+asyncpg://devskyy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}@postgres:5432/devskyy  # ggignore
+  REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}@redis:6379/0  # ggignore
   # Cryptographic keys — MUST be set or compose fails (prevent booting with unstable placeholder material)
   JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env.docker}
   JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY:?set JWT_REFRESH_SECRET_KEY in .env.docker}
@@ -62,7 +62,7 @@ services:
     environment:
       POSTGRES_DB: devskyy
       POSTGRES_USER: devskyy
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}  # ggignore
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -85,7 +85,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: devskyy-redis
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}  # ggignore
     volumes:
       - redis_data:/data
     networks: [devskyy-network]
@@ -252,7 +252,7 @@ services:
       # loopback-only by default; front with a TLS proxy to expose externally.
       - "127.0.0.1:3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env.docker}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env.docker}  # ggignore
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana_data:/var/lib/grafana
