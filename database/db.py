@@ -34,6 +34,7 @@ from sqlalchemy import (
     func,
     select,
 )
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -307,9 +308,11 @@ class DatabaseManager:
         # Normalize locally — don't mutate the caller's config object.
         db_url = _normalize_async_url(config.url)
 
-        # Determine pool class based on database type
-        is_sqlite = "sqlite" in db_url
-        is_memory = ":memory:" in db_url
+        # Determine pool class based on database type using proper URL parsing
+        # to avoid misclassification when "sqlite" appears in credentials/db names
+        parsed_url = make_url(db_url)
+        is_sqlite = parsed_url.drivername.startswith("sqlite")
+        is_memory = is_sqlite and (":memory:" in str(parsed_url.database) or parsed_url.database is None)
 
         # Use StaticPool for in-memory SQLite (keeps single connection alive)
         # Use NullPool for file-based SQLite (allows multiple processes)

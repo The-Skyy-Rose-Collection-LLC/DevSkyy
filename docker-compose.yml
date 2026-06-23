@@ -47,6 +47,10 @@ x-app-env: &app-env
   # async driver in the URL. Bare postgresql:// maps to psycopg2 (not installed).
   DATABASE_URL: postgresql+asyncpg://devskyy:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}@postgres:5432/devskyy
   REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD in .env.docker}@redis:6379/0
+  # Cryptographic keys — MUST be set or compose fails (prevent booting with unstable placeholder material)
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env.docker}
+  JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY:?set JWT_REFRESH_SECRET_KEY in .env.docker}
+  ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:?set ENCRYPTION_MASTER_KEY in .env.docker}
 
 services:
   # ---------------------------------------------------------------------------

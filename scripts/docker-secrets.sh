@@ -24,13 +24,14 @@ PG=$(gen 24); RD=$(gen 24); GF=$(gen 18); JWT=$(gen 64); JWTR=$(gen 64); ENC=$(e
 
 cp "$TEMPLATE" "$OUT"
 
-# Secrets go via stdin (newline-delimited), not argv — argv is world-readable in
-# /proc/<pid>/cmdline and `ps` while the process runs.
-printf '%s\n' "$PG" "$RD" "$GF" "$JWT" "$JWTR" "$ENC" | python3 - "$OUT" <<'PY'
+# Secrets go via env vars (not argv — argv is world-readable in /proc/<pid>/cmdline
+# and `ps` while the process runs).
+PG="$PG" RD="$RD" GF="$GF" JWT="$JWT" JWTR="$JWTR" ENC="$ENC" python3 - "$OUT" <<'PY'
 import sys
+import os
 
 path = sys.argv[1]
-pg, rd, gf, jwt, jwtr, enc = sys.stdin.read().splitlines()
+pg, rd, gf, jwt, jwtr, enc = os.environ["PG"], os.environ["RD"], os.environ["GF"], os.environ["JWT"], os.environ["JWTR"], os.environ["ENC"]
 repl = {
     "POSTGRES_PASSWORD": pg,
     "REDIS_PASSWORD": rd,

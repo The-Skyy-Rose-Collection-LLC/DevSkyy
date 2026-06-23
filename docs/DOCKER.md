@@ -24,7 +24,7 @@ One image — `devskyy:local` — serves three roles, selected by the compose
 | `app`          | FastAPI REST + GraphQL + MCP      | *(default)* → uvicorn `main_enterprise:app` |
 | `worker`       | async task queue poller (3D/ML)   | `python -m agent_sdk.worker`              |
 | `elite-worker` | Elite Studio render jobs          | `python -m skyyrose.elite_studio worker`  |
-| `postgres`     | PostgreSQL 15 (schema in `init.sql`) | —                                      |
+| `postgres`     | PostgreSQL 15 (extensions only; schema via `create_all`) | —                     |
 | `redis`        | task queue + cache (authed)       | —                                         |
 
 Opt-in profiles:
