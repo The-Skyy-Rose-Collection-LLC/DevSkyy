@@ -198,7 +198,7 @@ mcp = [
     "python-dateutil==2.9.0.post0",
     "tiktoken>=0.8.0",
     "transformers>=4.53.0",
-    "sentence-transformers==3.3.1",
+    "sentence-transformers==5.6.0",
     "langchain>=0.3.18",
     "langchain-openai>=0.3.0",
     "langchain-anthropic>=0.3.0",
