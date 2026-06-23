@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-23T00:11:29+00:00",
-  "catalog_sha": "sha256:c6b5f699322481f1b9647cbe4d1c4a84d5f21ad0dc69417e4ac92fc923c02af0",
+  "generated_at": "2026-06-23T01:27:20+00:00",
+  "catalog_sha": "sha256:367c47144eb4863341cccd9b85f82fc0303d6c5739aeb0634bc8f0ab2fbf3ffa",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -9,6 +9,11 @@
       "collection": "black-rose",
       "garment_type": "crewneck",
       "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-001-crewneck.png",
+          "sha256": "sha256:c9cd0614f52f8c9a6f8bcfb098acd89bcca15ea612cb62a48bba5d48697123c2"
+        },
         {
           "role": "garment",
           "path": "assets/products/techflats/split/black-rose/br-crewneck-front.jpeg",
@@ -37,6 +42,11 @@
       "collection": "black-rose",
       "garment_type": "joggers",
       "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-002-joggers.png",
+          "sha256": "sha256:f7596bbcee6a189aac561b60261bb313ff063cc62722a8f13fe721f0ac7a9928"
+        },
         {
           "role": "garment",
           "path": "assets/products/techflats/split/black-rose/br-joggers-front.jpeg",
@@ -104,6 +114,11 @@
           "sha256": "sha256:bf34e9283fe404e14a0d0ce4cfc3aeb5e51689de695685b3365662335e095699"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-source.jpg",
+          "sha256": "sha256:d75878bc6980710d686039054c5be9429ac13d7d91a39c5e925415e3992f664e"
+        },
+        {
           "role": "logo",
           "path": "assets/products/logos/three-rose-cluster-greyscale.png",
           "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
@@ -125,6 +140,11 @@
           "role": "garment",
           "path": "assets/products/references/br-005-signature-hoodie-real.jpeg",
           "sha256": "sha256:26e37c6897ef47a870e89e89adf2188595de27e26033cc4cfedf491df91bdaa4"
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+          "sha256": "sha256:40117ab01b79d9b5e9a4f3aba78c1c0a728b80fe0df5582cdcee684a2e099ed8"
         },
         {
           "role": "logo",
@@ -150,6 +170,16 @@
           "sha256": "sha256:8d36bb2d462f4e2145667021f06e9cad4150f9da886dda81488f6f78a1fd6793"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-sherpa-product.jpg",
+          "sha256": "sha256:b7c3d91431884e2b3f40dd8e4fab84dba4981864ce39e2fd1a0250cc3fa79a79"
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-back.jpg",
+          "sha256": "sha256:ef980d90ac3beb786a16351cbb523222cf909c3c74c3b10165e929fd1aa881ce"
+        },
+        {
           "role": "logo",
           "path": "assets/products/logos/three-rose-cluster-greyscale.png",
           "sha256": "sha256:fd4738f50bca8aea436e5ae2c8fdb7bb8ce8a1528738a587a6c1eeafdf930ba7"
@@ -171,6 +201,11 @@
           "role": "garment",
           "path": "assets/products/references/br-007-shorts-real-front.jpeg",
           "sha256": "sha256:2da1309689439041ce8a53a23a7c5d6eeac1b80ecbf8822efbb796361a37c285"
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-real-back.jpg",
+          "sha256": "sha256:f1245ae31b688f0e1a830da7e9eaa09411219caeede13569d3a9cb90d8f286b9"
         },
         {
           "role": "logo",
@@ -326,6 +361,16 @@
           "role": "garment",
           "path": "assets/products/references/br-012-techflat.jpeg",
           "sha256": "sha256:4a9f47e7a08f9b5aef43d721a442534d3938aff356b2e6738633adc2e8a6befb"
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/last-oakland-baseball-jersey-front.jpeg",
+          "sha256": "sha256:1749fbf270ac2b040446c2f94c63e0175f675157a4a9c6e46c59dae199fbaa2a"
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.jpeg",
+          "sha256": "sha256:a5121d4275d493ab6ebb0e22fed896cbbcc2ca355856c4aca9fb33c0bf7dbb85"
         },
         {
           "role": "patch",
@@ -501,6 +546,16 @@
           "sha256": "sha256:81b0490dbaffa22d5b2236eae800a2cff4d60eb4fd34e6a07433c9937f0a4447"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-front.jpg",
+          "sha256": "sha256:2d33ddf6e9747049f7b6580f613a59818dc65ec6a953fa307d16c7434bf7d8ab"
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-back.jpg",
+          "sha256": "sha256:0a2b6b2a09634ff88affa644b880b949af4ad926d4f39fc09e75aaae67151030"
+        },
+        {
           "role": "logo",
           "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
           "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d"
@@ -557,6 +612,11 @@
           "sha256": "sha256:a81ea0ddde232a07253ba53168580bc36fba6b0c61622e172b65e8b161c36213"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-pack-photo.jpg",
+          "sha256": "sha256:b70ab3937f1991ef02c2e5f91ecf42dfbb9803be77d60eea9446065789eb14bf"
+        },
+        {
           "role": "logo",
           "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
           "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d"
@@ -578,6 +638,11 @@
           "role": "garment",
           "path": "assets/products/references/lh-006-techflat-front.jpeg",
           "sha256": "sha256:a85fbed9da1d7cc1dd8b7ce913b97b50c1f85274f328def457386abc40c97649"
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-006-joggers-white.jpeg",
+          "sha256": "sha256:c48bd2e8e764859dee048e3c8f4af955e32bce041fd2975e5948ec700fcc0417"
         },
         {
           "role": "logo",
@@ -726,6 +791,11 @@
       "assets": [
         {
           "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-006-mint-lavender-hoodie.png",
+          "sha256": "sha256:0f47125187736a1089a42fa5f2f92987cbae5ac00c77bd41225697160afac4ea"
+        },
+        {
+          "role": "garment",
           "path": "assets/products/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg",
           "sha256": "sha256:a1a7fcc38870766c8dbe55b30e9f86cc5d15f9ac24a01e777ebec2ce0868ee13"
         },
@@ -781,6 +851,11 @@
           "sha256": "sha256:d19b59e25007817a2a95300ca632c58e7c0206647f74ab758fde60b60fd14de6"
         },
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sherpa-jacket-front.jpg",
+          "sha256": "sha256:ac5343f88b6a1ac3513d14d8a81aa06f77abf583feea71365609a1e3e89b7cc7"
+        },
+        {
           "role": "logo",
           "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
           "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
@@ -799,6 +874,16 @@
       "garment_type": "shirt",
       "assets": [
         {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-onmodel.webp",
+          "sha256": "sha256:b278f4abfc7127ef62c97db79e21bd65d1f7506d18e44686325b1953dec89f06"
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-white-front.webp",
+          "sha256": "sha256:87a41b8ad37c9214d2b52be933c96f0b9d5fdeeca769eedd0f0087c5daeade75"
+        },
+        {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-white.md",
           "sha256": "sha256:0d2fd02c684cc717e165734925f6198ed119812b5cb9eda1ffbe3b523a2df4a2"
@@ -811,6 +896,16 @@
       "collection": "signature",
       "garment_type": "shirt",
       "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-onmodel.webp",
+          "sha256": "sha256:5cd91f17c0bbd77633be628e76b7d0100c2572f76b2912add5022b9831262f87"
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-orchid-front.webp",
+          "sha256": "sha256:c2b7b172a6c459652343da31ad96fa9c6598f56e10b763219a84b6c70776f46b"
+        },
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-orchid.md",

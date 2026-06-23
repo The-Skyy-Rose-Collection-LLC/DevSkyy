@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Skyy Compare</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0a0a; display:flex; }
+.pane { flex:1; position:relative; }
+canvas { display:block; width:100%; height:100vh; }
+.label { position:absolute; top:10px; left:50%; transform:translateX(-50%); color:#B76E79; font:bold 12px sans-serif; letter-spacing:1px; z-index:2; }
+.loading { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#B76E79; font:13px sans-serif; z-index:2; }
+</style>
+</head>
+<body>
+<div class="pane"><div class="label">REMESH</div><div class="loading" id="l1">Loading...</div></div>
+<div class="pane"><div class="label">NEW GEN</div><div class="loading" id="l2">Loading...</div></div>
+<div class="pane"><div class="label">TRELLIS</div><div class="loading" id="l3">Loading...</div></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+function fitCamera(camera, controls, model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxSize = Math.max(size.x, size.y, size.z);
+  const distance = 1.4 * maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+  const direction = new THREE.Vector3(0, 0, 1);
+  controls.target.copy(new THREE.Vector3(center.x, center.y * 0.75, center.z));
+  camera.near = distance / 100;
+  camera.far = distance * 100;
+  camera.updateProjectionMatrix();
+  camera.position.copy(controls.target).add(direction.multiplyScalar(distance));
+  controls.update();
+}
+
+function makePane(idx, modelFile, loadingId) {
+  const container = document.querySelectorAll('.pane')[idx];
+  const canvas = document.createElement('canvas');
+  container.appendChild(canvas);
+  const w = container.clientWidth, h = window.innerHeight;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(w, h);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(45, w/h, 0.001, 1000);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.05;
+  const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+  dir.position.set(2,4,3); scene.add(dir);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshStandardMaterial({color:0x111111,roughness:1}));
+  ground.rotation.x = -Math.PI/2; scene.add(ground);
+  new GLTFLoader().load(modelFile, gltf => {
+    document.getElementById(loadingId).remove();
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    model.position.y -= box.min.y;
+    scene.add(model);
+    fitCamera(camera, controls, model);
+  }, undefined, err => { document.getElementById(loadingId).textContent = 'Error'; console.error(err); });
+  return { renderer, scene, camera, controls };
+}
+
+const panes = [
+  makePane(0, './skyy-remesh.glb', 'l1'),
+  makePane(1, './skyy-new-gen.glb', 'l2'),
+  makePane(2, './skyy-trellis.glb', 'l3'),
+];
+function animate() {
+  requestAnimationFrame(animate);
+  panes.forEach(p => { p.controls.update(); p.renderer.render(p.scene, p.camera); });
+}
+animate();
+</script>
+</body>
+</html>
