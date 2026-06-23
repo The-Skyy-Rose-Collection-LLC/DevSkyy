@@ -10,6 +10,7 @@ on:
       - "scripts/validate_catalog_consistency.py"
       - "scripts/sync_catalog_downstream.py"
       - "skyyrose/elite_studio/tests/test_catalog_consistency.py"
+      - "skyyrose/elite_studio/tests/conftest.py"
   push:
     branches: [main]
     paths:
