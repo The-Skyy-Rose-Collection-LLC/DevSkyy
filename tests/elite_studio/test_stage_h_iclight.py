@@ -90,6 +90,8 @@ def test_relight_calls_fal_with_correct_endpoint_and_denoise(
         return buf.getvalue()
 
     monkeypatch.setenv("ELITE_STUDIO_ICLIGHT_DENOISE", "0.35")
+    # Mock fal_client as available
+    monkeypatch.setattr(stage_h_iclight, "fal_client", object())
     monkeypatch.setattr(stage_h_iclight, "upload_to_fal", fake_upload)
     monkeypatch.setattr(stage_h_iclight, "_invoke_iclight_v2", fake_invoke)
 
@@ -123,6 +125,8 @@ def test_relight_explicit_denoise_overrides_env(
         return buf.getvalue()
 
     monkeypatch.setenv("ELITE_STUDIO_ICLIGHT_DENOISE", "0.9")
+    # Mock fal_client as available
+    monkeypatch.setattr(stage_h_iclight, "fal_client", object())
     monkeypatch.setattr(stage_h_iclight, "upload_to_fal", lambda p: "https://fake/u.png")
     monkeypatch.setattr(stage_h_iclight, "_invoke_iclight_v2", fake_invoke)
 
@@ -144,6 +148,8 @@ def test_relight_falls_back_to_input_on_fal_error(
     def boom(p):
         raise RuntimeError("FAL is down")
 
+    # Mock fal_client as available
+    monkeypatch.setattr(stage_h_iclight, "fal_client", object())
     monkeypatch.setattr(stage_h_iclight, "upload_to_fal", boom)
 
     out_path = relight_composite(
@@ -162,6 +168,8 @@ def test_relight_falls_back_on_empty_result(
     composite_image: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """If FAL returns no images, pass-through with warning."""
+    # Mock fal_client as available
+    monkeypatch.setattr(stage_h_iclight, "fal_client", object())
     monkeypatch.setattr(stage_h_iclight, "upload_to_fal", lambda p: "https://fake/u.png")
     monkeypatch.setattr(stage_h_iclight, "_invoke_iclight_v2", lambda **kw: None)
 
