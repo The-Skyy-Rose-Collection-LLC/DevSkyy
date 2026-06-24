@@ -534,3 +534,6 @@ round_table_outputs/
 hf_3d_cache/
 ci_mirror/
 graphify-out/
+
+# Superseded binary render artifacts (dot-prefixed; _archive/ already covered)
+.archive/
