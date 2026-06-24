@@ -76,6 +76,7 @@ class OAIImageClient:
             "size": config.SIZE,
             "output_format": config.OUTPUT_FORMAT,
             "background": config.BACKGROUND,
+            "input_fidelity": config.INPUT_FIDELITY,
             "n": config.N,
         }
         if mask_path is not None:

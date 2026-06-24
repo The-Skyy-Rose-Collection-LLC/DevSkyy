@@ -17,6 +17,7 @@ from . import config, cost, references
 from .cost import CostManifest, ManifestEntry
 from .prompt import SceneError, build_pair_prompt, build_prompt, extract_view_branding, read_dossier
 from .references import MissingReferenceError, Pair, ReferenceImage
+from .scene_schema import build_scene
 
 if TYPE_CHECKING:
     from .client import RenderClient
@@ -149,8 +150,14 @@ def plan_sku(
     *,
     style: str = "ghost",
     view: str = "front",
+    style_reference: Path | None = None,
 ) -> SkuPlan:
-    """Resolve references + dossier + prompt for a (SKU, style, view). Never raises for missing refs."""
+    """Resolve references + dossier + prompt for a (SKU, style, view). Never raises for missing refs.
+
+    ``style_reference`` is an optional environment/mood anchor image (e.g. a lookbook
+    frame). When given, it is appended as the FINAL reference and the prompt restricts
+    it to scene/lighting/mood — never a garment source.
+    """
     info = catalog.get(sku, {})
     name = info.get("name", sku)
     collection = info.get("collection", "")
@@ -158,8 +165,20 @@ def plan_sku(
 
     try:
         refs = references.build_references(sku, collection, view=view)
+        use_style_ref = style_reference is not None and Path(style_reference).is_file()
+        if use_style_ref:
+            refs = [
+                *refs,
+                ReferenceImage(
+                    label="STYLE & COMPOSITION REFERENCE (environment / lighting / mood only "
+                    "— NOT a garment source)",
+                    path=Path(style_reference),
+                    kind="style",
+                ),
+            ]
         is_patch = references.requires_patch(sku)
         dossier_text = read_dossier(dossier_index.get(sku))
+        scene = build_scene(sku=sku, name=name, collection=collection, style=style)
         prompt = build_prompt(
             name=name,
             sku=sku,
@@ -169,6 +188,8 @@ def plan_sku(
             is_patch=is_patch,
             style=style,
             view=view,
+            scene=scene,
+            style_reference=use_style_ref,
         )
     except (MissingReferenceError, SceneError) as exc:
         return SkuPlan(
@@ -507,6 +528,7 @@ def run(
     client=None,
     verify_assets: bool = True,
     front_only: bool = False,
+    style_reference: Path | None = None,
 ) -> dict:
     """Plan the render matrix for all targets; render them when not dry-run (client required).
 
@@ -527,9 +549,27 @@ def run(
     for s in targets:
         for st in use_styles:
             if st == "ghost":
-                plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="front"))
+                plans.append(
+                    plan_sku(
+                        s,
+                        catalog,
+                        dossier_index,
+                        style="ghost",
+                        view="front",
+                        style_reference=style_reference,
+                    )
+                )
                 if not front_only and references.has_back_source(s):
-                    plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="back"))
+                    plans.append(
+                        plan_sku(
+                            s,
+                            catalog,
+                            dossier_index,
+                            style="ghost",
+                            view="back",
+                            style_reference=style_reference,
+                        )
+                    )
             elif st == "on-model":
                 # A pair is only renderable when NO member is excluded — an excluded
                 # member's dossier is known-bad and would corrupt the paired look.
@@ -554,10 +594,26 @@ def run(
                         plans.append(plan_pair(pr, catalog, dossier_index))
                 else:  # no renderable pair → solo on-model so the SKU still gets a hero
                     plans.append(
-                        plan_sku(s, catalog, dossier_index, style="on-model", view="front")
+                        plan_sku(
+                            s,
+                            catalog,
+                            dossier_index,
+                            style="on-model",
+                            view="front",
+                            style_reference=style_reference,
+                        )
                     )
             else:  # flatlay or any other explicit style
-                plans.append(plan_sku(s, catalog, dossier_index, style=st, view="front"))
+                plans.append(
+                    plan_sku(
+                        s,
+                        catalog,
+                        dossier_index,
+                        style=st,
+                        view="front",
+                        style_reference=style_reference,
+                    )
+                )
 
     keepers = _keeper_skips()
     if keepers:

@@ -350,8 +350,15 @@ def build_prompt(
     is_patch: bool,
     style: str | None = None,
     view: str = "front",
+    scene: dict | None = None,
+    style_reference: bool = False,
 ) -> str:
-    """Assemble the full edit prompt for one SKU in the chosen style + view."""
+    """Assemble the full edit prompt for one SKU in the chosen style + view.
+
+    When ``style_reference`` is True, the FINAL reference image is treated as an
+    environment/lighting/mood anchor only (e.g. a lookbook frame) — never a source
+    of garments, graphics, or text.
+    """
     style_key = style or DEFAULT_STYLE
     if style_key not in PRESENTATIONS:
         raise ValueError(f"Unknown style {style_key!r}. Valid: {sorted(PRESENTATIONS)}")
@@ -359,7 +366,23 @@ def build_prompt(
         raise ValueError(f"Unknown view {view!r}. Valid: {sorted(_VIEW_DIRECTIVES)}")
     presentation = PRESENTATIONS[style_key]
     view_directive = _VIEW_DIRECTIVES[view]
-    background = _background_for(style_key, collection)
+    if scene is not None and style_key == "on-model":
+        # On-model: the scene JSON carries the founder-approved collection
+        # environment, so it is authoritative for environment + lighting + camera.
+        background = (
+            "OVERRIDE — ENVIRONMENT, LIGHTING, AND CAMERA: the SCENE SPEC (JSON) block "
+            "below is the authoritative source for all three. The generic LIGHTING directive "
+            "at the top of this prompt is superseded by the 'lighting' object in the SCENE SPEC."
+        )
+    elif scene is not None:
+        # Ghost / flatlay: keep the clean product-card BACKGROUND guardrails
+        # (no props, no scene); the scene JSON still drives lighting + camera.
+        background = (
+            f"{GHOST_BACKGROUND} The SCENE SPEC (JSON) 'lighting' and 'camera' objects below "
+            "are authoritative for light and lens; keep this clean product-card background."
+        )
+    else:
+        background = _background_for(style_key, collection)
     parts: list[str] = [
         _BASE_PROCEDURE.format(
             presentation=presentation, view_directive=view_directive, background=background
@@ -372,12 +395,29 @@ def build_prompt(
     )
     parts.append("")
 
+    if scene is not None:
+        from .scene_schema import scene_to_prompt_block
+
+        parts.append(scene_to_prompt_block(scene))
+        parts.append("")
+
     if reference_labels:
         parts.append(
             'REFERENCE IMAGES — provided in this exact order; "image 1" is the first '
             'image attached, "image 2" the second, and so on:'
         )
         parts.extend(f"  {label}" for label in reference_labels)
+        parts.append("")
+
+    if style_reference:
+        parts.append(
+            "STYLE & COMPOSITION REFERENCE: the FINAL reference image is an ENVIRONMENT, "
+            "LIGHTING, PALETTE, and MOOD anchor ONLY. Match its setting, atmosphere, color "
+            "grade, camera feel, and overall composition. Do NOT copy, trace, or borrow any "
+            "garment, logo, graphic, text, person, or product from it — every garment comes "
+            "SOLELY from the product reference image(s) above and the SCENE SPEC. Treat it as "
+            "the mood board for the scene, never as a source of what is worn."
+        )
         parts.append("")
 
     if dossier_text:
