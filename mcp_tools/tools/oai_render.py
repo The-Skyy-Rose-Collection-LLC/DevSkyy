@@ -8,6 +8,7 @@ incurs OpenAI charges, and the hard cost cap is enforced before any spend.
 """
 
 import asyncio
+from pathlib import Path
 
 from pydantic import Field
 
@@ -45,6 +46,13 @@ class OAIRenderPlanInput(BaseAgentInput):
         description="Presentation styles per SKU: ghost (product card), on-model (collection "
         "scene), flatlay. Default ['ghost', 'on-model'].",
         max_length=3,
+    )
+    style_reference_path: str | None = Field(
+        default=None,
+        description="Optional path to an environment/mood anchor image (e.g. a lookbook frame). "
+        "Passed as the FINAL reference image; the model matches its setting, lighting, palette, "
+        "and mood but takes NO garment, logo, or text from it.",
+        max_length=500,
     )
 
 
@@ -87,7 +95,20 @@ def _plan(params: OAIRenderPlanInput) -> dict | str:
     if not targets:
         return "ERROR: no SKUs matched. Provide skus, collection, or all_skus=true."
 
-    dry = pipeline.run(targets, catalog, dossier_index, styles=styles, dry_run=True)
+    style_reference = None
+    if params.style_reference_path:
+        style_reference = Path(params.style_reference_path)
+        if not style_reference.is_file():
+            return f"ERROR: style_reference_path not found: {style_reference}"
+
+    dry = pipeline.run(
+        targets,
+        catalog,
+        dossier_index,
+        styles=styles,
+        dry_run=True,
+        style_reference=style_reference,
+    )
     return dry
 
 
