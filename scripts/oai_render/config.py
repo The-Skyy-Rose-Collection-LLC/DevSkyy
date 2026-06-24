@@ -28,9 +28,13 @@ OUTPUT_FORMAT = "png"  # lossless
 BACKGROUND = "auto"  # "transparent" | "opaque" | "auto"
 N = 1
 MAX_REFERENCE_IMAGES = 16  # gpt-image edit hard limit
-# NOTE: input_fidelity is intentionally NOT sent. Context7 (OpenAI API docs):
-# for gpt-image-2 the model auto-processes every input at high fidelity and
-# the parameter cannot be set.
+# input_fidelity controls how hard the model matches the reference images'
+# style/features. Verified via Context7 (openai-python image_edit_params.py,
+# 2026-06-24): supported for gpt-image-1.5+ (incl. gpt-image-2), values
+# "high" | "low", DEFAULT "low". We send "high" so garment graphics, logos,
+# and the style-reference anchor are reproduced as faithfully as possible.
+# Cost note: "high" raises per-image input-token cost vs the "low" default.
+INPUT_FIDELITY = "high"
 
 # ── Networking / resilience ─────────────────────────────────────────────────
 REQUEST_TIMEOUT_S = 180.0

@@ -181,6 +181,25 @@ class TestStartTraining:
         assert payload["input"]["input_images"] == "https://example.com/dataset.zip"
         assert "lr_scheduler" not in payload["input"]
 
+    def test_accepts_http_200_success(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Replicate's trainings doc labels success as 200 — it must NOT raise on 200."""
+        monkeypatch.setenv("REPLICATE_API_TOKEN", "test-token-abc")
+        zip_path = tmp_path / "dataset.zip"
+        zip_path.write_bytes(b"PK")
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"id": "train-200", "status": "starting"}
+
+        with patch("scripts.flux_lora.trainer.httpx.post", return_value=mock_response):
+            result = start_training(
+                manifest, confirmed=True, input_images_url="https://example.com/dataset.zip"
+            )
+        assert result["id"] == "train-200"
+
     def test_rejects_non_https_input_images_url(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

@@ -253,8 +253,11 @@ def start_training(
     except httpx.RequestError as exc:
         raise TrainingError(f"HTTP request failed: {exc}") from exc
 
-    # Replicate's create-training endpoint returns 201 for a queued training.
-    if response.status_code != 201:
+    # Replicate's HTTP reference documents the create-training success code as 200
+    # (verified via Context7, 2026-06-24); async resource creation may also yield
+    # 201. Accept BOTH — requiring only one would raise on a documented-valid code
+    # and lose the training id on the success path.
+    if response.status_code not in (200, 201):
         raise TrainingError(f"Replicate API returned {response.status_code}: {response.text}")
 
     return response.json()
