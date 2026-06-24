@@ -1915,6 +1915,8 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_marketing_sub_agents_import_error(self):
+        import agents.core.marketing.agent as mod
+
         with patch.dict(
             "sys.modules",
             {
@@ -1922,8 +1924,6 @@ class TestImportErrorBranches:
                 "agents.core.marketing.sub_agents.campaign_ops": None,
             },
         ):
-            import agents.core.marketing.agent as mod
-
             importlib.reload(mod)
             a = mod.MarketingCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -1943,6 +1943,8 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_operations_sub_agents_import_error(self):
+        import agents.core.operations.agent as mod
+
         with patch.dict(
             "sys.modules",
             {
@@ -1951,8 +1953,6 @@ class TestImportErrorBranches:
                 "agents.core.operations.sub_agents.coding_doctor": None,
             },
         ):
-            import agents.core.operations.agent as mod
-
             importlib.reload(mod)
             a = mod.OperationsCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -2007,6 +2007,8 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_commerce_sub_agents_import_error(self):
+        import agents.core.commerce.agent as mod
+
         with patch.dict(
             "sys.modules",
             {
@@ -2015,8 +2017,6 @@ class TestImportErrorBranches:
                 "agents.core.commerce.sub_agents.wordpress_bridge": None,
             },
         ):
-            import agents.core.commerce.agent as mod
-
             importlib.reload(mod)
             a = mod.CommerceCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -2037,12 +2037,12 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_web_builder_sub_agents_import_error(self):
+        import agents.core.web_builder.agent as mod
+
         with patch.dict(
             "sys.modules",
             {"agents.core.web_builder.sub_agents.web_dev": None},
         ):
-            import agents.core.web_builder.agent as mod
-
             importlib.reload(mod)
             a = mod.WebBuilderCoreAgent()
             # Legacy sub-agent should be absent; SDK agents may still register
