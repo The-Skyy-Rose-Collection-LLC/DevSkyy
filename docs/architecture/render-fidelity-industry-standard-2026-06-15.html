@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>AI Product-Render Fidelity — Industry Standard & SkyyRose Reconciliation (2026-06-15)</title>
+<style>
+  body{font:15px/1.6 -apple-system,Segoe UI,sans-serif;max-width:980px;margin:2rem auto;padding:0 1.2rem;color:#1a1a1a;background:#fafafa}
+  h1{font-size:25px;border-bottom:3px solid #B76E79;padding-bottom:.4rem}
+  h2{font-size:19px;margin-top:2rem;color:#8a4d57;border-bottom:1px solid #e0d5d7;padding-bottom:.25rem}
+  h3{font-size:16px;margin-top:1.3rem;color:#333}
+  code{background:#f0eaeb;padding:1px 5px;border-radius:3px;font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:13.5px}
+  th,td{border:1px solid #d8cccd;padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:#f3e9ea}
+  .tldr{background:#fff7ed;border:1px solid #e0b070;border-radius:8px;padding:.8rem 1.1rem}
+  .win{background:#eefaf0;border:1px solid #8ccfa0;border-radius:8px;padding:.7rem 1rem}
+  .warn{background:#fdeef0;border:1px solid #dca0a8;border-radius:8px;padding:.7rem 1rem}
+  a{color:#8a4d57}
+  ol.src li{margin-bottom:.4rem;font-size:13px}
+  .tag{display:inline-block;background:#B76E79;color:#fff;font-size:11px;padding:1px 7px;border-radius:10px}
+</style></head><body>
+
+<h1>AI Product-Render Fidelity: Industry Standard &amp; SkyyRose Reconciliation</h1>
+<p><em>2026-06-15 · Sources: 50+ across 4 parallel research agents + Context7 (OpenAI Python SDK, Pillow) · Confidence: High</em></p>
+
+<div class="tldr">
+<strong>TL;DR — the one rule.</strong> The production-proven way to keep an exact logo/embroidery on an AI product render is to <strong>never let the generative model draw the logo</strong>. Generate the garment; apply the real brand asset deterministically (composite the PNG, or feed a colorway-exact reference the model copies). Every production vendor (Photoroom, Botika, WearView) preserves the garment surface as source pixels and generates only the parts that must be generated (background, model body, collar interior). Diffusion/autoregressive models <em>sample a plausible logo from a distribution</em> — they cannot reproduce an exact mark by construction.
+<br><br>
+<strong>For QC:</strong> a VLM judge at <code>detail:"low"</code> on small embroidery is a documented double anti-pattern (512×512 squash → ~28px logo → unreadable → false "missing logo"). The standard is deterministic checks → embedding similarity → template/OCR for logos → a capable VLM (Claude or GPT-4o/4.1 at <code>detail:"high"</code>) only as tiebreak, with logo-presence excluded from the VLM's scope.
+</div>
+
+<div class="win">
+<strong>Reconciliation finding (most important):</strong> SkyyRose has <em>already converged on this standard</em>. The canonical pipeline on branch <code>fix/sg-mint-dossier-decontamination</code> (commit <code>2d67c8340</code>) ships a <strong>proven Claude QC judge scoring 6/6 ×3 on a labeled ground-truth set</strong>, plus Tier-2 colorway-correct reference PNGs (commit <code>24524ddc8</code>) so gpt-image-2 copies the exact rose color instead of inferring it, plus an asset-integrity gate. This research <strong>validates the team's direction</strong> and adds the deterministic-compositing upgrade as the next milestone. The paused $4.40 run on 2026-06-15 was fired from a <strong>stale branch</strong> (<code>feat/mcp-http-surfaces</code>) carrying the OLD <code>gpt-4o-mini</code>/<code>detail:low</code> judge — that broken gate, not the renders, caused the false rejections.
+</div>
+
+<h2>1. The problem we had</h2>
+<p>gpt-image-2 ghost-mannequin / on-model renders intermittently <strong>drop, mangle, or hallucinate</strong> the embroidered rose logo, jersey numerals, beanie patch, and other fine branding; render flat tech-flat-looking garments; mis-render material (satin rendered as nylon); and add logos to panels that should be blank. Separately, the OpenAI <code>gpt-4o-mini</code> QC judge at <code>detail:"low"</code> false-rejected good renders, triggering 3× retries + quarantine and burning budget for near-zero accepted output.</p>
+
+<h2>2. Root cause — why generative models break logos &amp; fine text</h2>
+<table>
+<tr><th>Mechanism</th><th>Explanation</th><th>Source</th></tr>
+<tr><td>Latent dilution</td><td>A small logo patch occupies few tokens vs the garment/background; its signal is diluted during denoising, so the model reconstructs a <em>plausible guess</em>. DALL-E 2 logo accuracy ~30%, DALL-E 3 ~61%.</td><td>[1]</td></tr>
+<tr><td>Text-as-pattern</td><td>Characters/marks learned as statistical visual clusters, not rule-governed glyphs → gibberish/morphed logos across <em>all</em> diffusion architectures.</td><td>[2]</td></tr>
+<tr><td>Mode-interpolation hallucination</td><td>Models interpolate between training modes, generating samples <em>between</em> real data points — a specific embroidery motif blends toward neighbors.</td><td>[3][4]</td></tr>
+<tr><td>Local generation bias</td><td>Models over-weight nearby spatial context when generating small text/logo regions → drift toward what "fits" the fabric, not the reference mark.</td><td>[5]</td></tr>
+<tr><td>Material BSDF averaging</td><td>Satin (anisotropic specular), sherpa (volumetric fiber), nylon (moderate spec) learned as averages; model defaults to idealized texture → "satin looks like plastic."</td><td>[14][15]</td></tr>
+</table>
+<p><strong>Bottom line:</strong> the model is not drawing your logo; it is sampling from its distribution over what logos look like, biased by garment context. The only structural fix is to prevent it from touching the logo region, or to re-apply the exact asset.</p>
+
+<h2>3. Industry-standard fix — ranked by production-provenness</h2>
+<table>
+<tr><th>#</th><th>Approach</th><th>Notes</th><th>Source</th></tr>
+<tr><td>1</td><td><strong>Generate garment → composite real logo asset (deterministic)</strong></td><td>Gold standard. Prompt excludes the logo; render produces body/fabric/drape; the real logo PNG is composited via perspective-warp + displacement map + Multiply blend (embroidery via duplicate Overlay layer). Pixel-deterministic — cannot hallucinate.</td><td>[10][11][12]</td></tr>
+<tr><td>2</td><td>Colorway-/asset-correct REFERENCE the model copies</td><td>Feed a colorway-exact logo PNG as a labeled reference so the model copies color/shape instead of inferring. Weaker than compositing but big improvement; <strong>SkyyRose already ships this (Tier-2 three-rose-cluster refs).</strong></td><td>[6][7]</td></tr>
+<tr><td>3</td><td>Mask-based inpainting to EXCLUDE the logo region</td><td><span class="tag">caveat</span> For gpt-image models the mask is <strong>advisory, not hard</strong> (OpenAI-confirmed limitation) — cannot reliably lock a region. Works reliably only on DALL-E 2 / FLUX Fill / ComfyUI inpaint.</td><td>[6][8] · mask limit [22][23]</td></tr>
+<tr><td>4</td><td>ControlNet-constrained synthesis (FLUX + IC-TRY-ON LoRA + Alimama inpainting)</td><td>ControlNet preserves logo geometry while the model fills fabric. Closest to "model draws the logo accurately"; ComfyUI-only; single-source.</td><td>[9]</td></tr>
+</table>
+
+<h3>Material accuracy</h3>
+<p>Prompt material <em>physics</em>, not just names ("anisotropic specular sheen, silk-like highlights" vs "matte volumetric pile fiber, no specular"); a sharp well-lit source photo is the primary lever (the model inherits material from the source); correct shadows in post. [14][15][16]</p>
+
+<h2>4. gpt-image-2 / OpenAI Images API specifics (Context7 + docs)</h2>
+<table>
+<tr><th>Fact</th><th>Detail</th><th>Source</th></tr>
+<tr><td>Endpoint</td><td><code>POST /v1/images/edits</code>; default model 2026 = <code>gpt-image-1.5</code>; supports gpt-image-1/1.5/2, dall-e-2.</td><td>[17][18]</td></tr>
+<tr><td><code>input_fidelity</code></td><td>Supported on gpt-image-1 / 1.5 (<code>"high"</code> preserves faces/logos/geometry). <strong>NOT a param on gpt-image-2</strong> — it auto-applies high fidelity; passing it <em>fails</em>. (Our config correctly omits it.)</td><td>[8][11]</td></tr>
+<tr><td>Reference ordering</td><td><strong>First image = highest preservation fidelity</strong> ("only the first one is preserved with extra richness in texture"). Put the garment-with-logo first; reference each input by index in the prompt.</td><td>[8][16]</td></tr>
+<tr><td>Mask semantics</td><td>RGBA PNG, alpha 0 = regenerate, 255 = preserve, same dims, &lt;4MB. But mask is <strong>guidance only</strong> for gpt-image — not pixel-hard.</td><td>[17][22][23]</td></tr>
+<tr><td>Edit prompt formula</td><td><code>[what to change] + [what to keep] + [how it should look]</code>; restate preservation list every iteration; enumerate elements explicitly ("preserve the rose embroidery on the left chest, the woven hem label").</td><td>[16]</td></tr>
+</table>
+
+<h2>5. Automated QC — the proven gate</h2>
+<div class="warn"><strong>Anti-pattern (what we had):</strong> GPT-4o-<strong>mini</strong> at <code>detail:"low"</code>. Low detail forces 512×512 (85 tokens); a 60px logo → ~28px → unreadable. Benchmarks: logo detection collapses to ~17% (cars 0.44%) on modified images, 75% of errors bias-aligned (model answers the memorized canonical logo, not what's present). GPT-4o-mini is also the weakest vision tier. [S1][S3][S4]</div>
+<h3>Proven gate architecture</h3>
+<table>
+<tr><th>Stage</th><th>Check</th><th>Cost</th></tr>
+<tr><td>1</td><td>Deterministic: dimensions, file size, color entropy, collage/panel band detection</td><td>free</td></tr>
+<tr><td>2</td><td>Perceptual hash (pHash Hamming) vs reference — catches wholly-wrong renders</td><td>free</td></tr>
+<tr><td>3</td><td>Embedding similarity: DINOv2 (global garment identity, ~0.7 cosine) / Marqo-FashionSigLIP (garment attributes)</td><td>~50ms GPU</td></tr>
+<tr><td>4</td><td>Logo verification: OpenCV template-match / ORB on the logo ROI, or OCR for text logos, or Δ-E color on fixed-placement region</td><td>cheap</td></tr>
+<tr><td>5</td><td>VLM judge — <strong>Claude or GPT-4o/4.1 at <code>detail:"high"</code></strong>, structured rubric, temp 0, CoT-before-verdict, "only FAIL if certain", <strong>logo-presence excluded from scope</strong> — tiebreak only</td><td>~$0.01–0.05</td></tr>
+<tr><td>6</td><td>Human review board (the <code>renders/oai/_review/</code> pattern) — founder final call</td><td>—</td></tr>
+</table>
+<p><strong>Compositing collapses the QC burden:</strong> if the logo is a deterministic composite, "is the logo present/correct?" becomes a file-existence + placement check — no VLM needed for the most failure-prone question. [S15][S17]</p>
+
+<h2>6. What SkyyRose already has (canonical branch <code>fix/sg-mint-dossier-decontamination</code>)</h2>
+<table>
+<tr><th>Component</th><th>Status</th><th>Commit</th></tr>
+<tr><td>Proven Claude QC judge (claude-sonnet-4-6, CoT visual_analysis, 1500-token budget), gpt-4.1 high-detail fallback</td><td>✅ 6/6 ×3 on ground-truth eval</td><td><code>2d67c8340</code></td></tr>
+<tr><td>Ground-truth eval harness + labeled fixtures (br-001..007 + labels.json)</td><td>✅</td><td><code>2d67c8340</code></td></tr>
+<tr><td>Live run monitor + runlog</td><td>✅</td><td><code>2d67c8340</code></td></tr>
+<tr><td>Tier-2 colorway-correct reference PNGs (three-rose-cluster per SKU)</td><td>✅ shipped to main</td><td><code>24524ddc8</code></td></tr>
+<tr><td>Asset-integrity gate (verify_plan_assets) — blocks bug-119 wrong-product</td><td>✅</td><td>—</td></tr>
+<tr><td>Founder-correction injection (render-corrections.json) + flat_render gate + sg-006/sg-014 exclusions</td><td>✅</td><td><code>409187921</code></td></tr>
+<tr><td>6-stage compositor (elite_studio/compositor_agent.py) + logo registry</td><td>⚠ exists, NOT wired into oai_render</td><td>—</td></tr>
+<tr><td>Deterministic logo composite stage inside oai_render</td><td>❌ not built (the upgrade)</td><td>—</td></tr>
+</table>
+
+<h2>7. Recommended pipeline for SkyyRose</h2>
+<ol>
+<li><strong>Now (already true):</strong> gpt-image-2 edit from garment + colorway-correct logo reference (first image, high fidelity) → 6-gate QC with the Claude judge (or gpt-4.1 high fallback) → quarantine + founder review board. Run <strong>per collection</strong> (dedicated manifest, cost cap, resume).</li>
+<li><strong>Next milestone (the deterministic-composite upgrade):</strong> add a post-generation compositor to oai_render that overlays the real logo PNG at a per-SKU placement spec (perspective-warp + displacement + Multiply/Overlay), reusing <code>elite_studio/compositor_agent.py</code> + the logo registry. This eliminates the logo-drift class entirely (jersey numerals, beanie patch, added/blank-panel logos) and collapses the logo-QC burden to a placement check. Requires per-SKU placement coordinates (one-time authoring).</li>
+</ol>
+
+<h2>8. Per-collection run plan (4 dedicated runs)</h2>
+<p>Run from the canonical branch. Each is a separate STOP-AND-SHOW paid action.</p>
+<table>
+<tr><th>Collection</th><th>Command</th><th>Rows</th><th>Est.</th></tr>
+<tr><td>Black Rose</td><td><code>generate --collection black-rose --yes</code></td><td>37</td><td>~$14.80</td></tr>
+<tr><td>Love Hurts</td><td><code>generate --collection love-hurts --yes</code></td><td>11</td><td>~$4.40</td></tr>
+<tr><td>Signature</td><td><code>generate --collection signature --yes</code></td><td>23</td><td>~$9.20</td></tr>
+<tr><td>Kids Capsule</td><td><code>generate --collection kids-capsule --yes</code></td><td>6</td><td>~$2.40</td></tr>
+</table>
+<p><strong>Blockers to resolve first:</strong> (a) add <code>ANTHROPIC_API_KEY</code> for the proven Claude judge (else gpt-4.1 high-detail fallback — acceptable); (b) <strong>lh-005 (The Fannie) has no source_map entry</strong> → errors on the love-hurts batch (non-fatal, skipped) until a source is wired; (c) the canonical worktree is actively in use by another session — coordinate before running to avoid collision.</p>
+
+<h2>Sources</h2>
+<p><strong>Logo fidelity &amp; compositing</strong></p>
+<ol class="src">
+<li>[1] ResearchGate 2024 — DALL-E logo accuracy benchmarks</li>
+<li>[2] arXiv 2308.13142 — diffusion failure-mode survey (text/logo)</li>
+<li>[3] arXiv 2510.13080 — mode-interpolation hallucination</li>
+<li>[4] arXiv 2510.05356 — hallucination mitigation</li>
+<li>[5] arXiv 2503.03595 — local generation bias for text/logos</li>
+<li>[6] fal.ai — GPT Image 2 vs FLUX (mask inpainting, logo handling)</li>
+<li>[7] fal.ai — GPT Image 2 prompting guide (multi-image, constraints)</li>
+<li>[8] OpenAI Cookbook — high input fidelity (first-image richness, model matrix)</li>
+<li>[9] RunningHub — FLUX + IC-TRY-ON + Alimama ControlNet logo migration</li>
+<li>[10] PhotoshopCAFE — logo on shirt (displacement + Multiply)</li>
+<li>[11] PhotoshopCAFE — displacement maps</li>
+<li>[12] CreativePro — artwork on wrinkled surface</li>
+<li>[14] Rewarx — AI clothing texture mismatch</li>
+<li>[15] Rewarx — AI fabric shadows wrong</li>
+<li>[16] OpenAI Cookbook — image-gen prompting guide (edit best practices)</li>
+<li>[17] OpenAI API reference — images.edit params/mask</li>
+<li>[18] OpenAI docs — image generation guide</li>
+<li>[22][23] OpenAI community — gpt-image mask is advisory (known limitation)</li>
+<li>Vendor practice: Photoroom ghost-mannequin API · Botika · WearView (garment-source-as-ground-truth)</li>
+</ol>
+<p><strong>QC standard</strong></p>
+<ol class="src">
+<li>[S1] vlmsarebiased.github.io — VLMs 100%→17% on modified images; logo 0.44–17%</li>
+<li>[S3] arXiv 2507.09950 — GPT-4o-mini fine-grained fashion attribute weakness</li>
+<li>[S4] OpenAI vision docs — detail:low = 512×512/85 tokens, "misses small text"</li>
+<li>[S9] DINOv2 vs CLIP image similarity (DISC21)</li>
+<li>[S13] Marqo-FashionSigLIP — fashion embedding SOTA</li>
+<li>[S15] arXiv 2605.16748 — compound-AI brand-compliance gate 42%→89%</li>
+<li>[S16] MJ-Bench — GPT-4o best VLM judge; CLIP best for alignment</li>
+<li>[S17] arXiv 2512.21560 — deterministic logo placement simplifies QC</li>
+<li>[S19] Langfuse — validate judge vs golden set (75–90% agreement) before production</li>
+</ol>
+<p><strong>Pipeline architecture</strong></p>
+<ol class="src">
+<li>Photta, fashn.ai, rajatgautam.com, dev.to/lucylll, designkit, prodshot, apatero — 6-7 stage apparel pipeline, per-collection batching, resume/idempotency, FASHN/IDM-VTON/CatVTON on-model (CC BY-NC-SA — non-commercial), RMBG-2.0 background removal</li>
+</ol>
+</body></html>
