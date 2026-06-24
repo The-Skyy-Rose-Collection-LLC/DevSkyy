@@ -16,8 +16,7 @@ Public API:
 from __future__ import annotations
 
 import json
-import os
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +25,6 @@ import httpx
 from scripts.flux_lora import (
     RequiresConfirmationError,
     TrainingError,
-    UserAbortError,
 )
 from scripts.flux_lora.config import (
     DEFAULT_AUTOCAPTION,
@@ -34,7 +32,6 @@ from scripts.flux_lora.config import (
     DEFAULT_BATCH_SIZE,
     DEFAULT_LEARNING_RATE,
     DEFAULT_LORA_RANK,
-    DEFAULT_LR_SCHEDULER,
     DEFAULT_OPTIMIZER,
     DEFAULT_RESOLUTION,
     DEFAULT_STEPS,
@@ -63,7 +60,6 @@ def build_manifest(
     optimizer: str = DEFAULT_OPTIMIZER,
     batch_size: int = DEFAULT_BATCH_SIZE,
     resolution: str = DEFAULT_RESOLUTION,
-    lr_scheduler: str = DEFAULT_LR_SCHEDULER,
     learning_rate: float = DEFAULT_LEARNING_RATE,
     autocaption: bool = DEFAULT_AUTOCAPTION,
     autocaption_prefix: str = DEFAULT_AUTOCAPTION_PREFIX,
@@ -75,14 +71,18 @@ def build_manifest(
     Args:
         dataset_zip:       Local path to the packed dataset zip (for reference only;
                            the caller must upload it and supply the URL separately).
-        destination_model: Replicate model slug to push the trained LoRA to
-                           (e.g. "myuser/skyyrose-lora"). Optional.
+        destination_model: REQUIRED. Replicate model slug to push the trained LoRA
+                           to, in "{owner}/{name}" form (e.g. "skyyrose/skyyrose-lora").
+                           Replicate's create-training endpoint requires `destination`;
+                           omitting it returns HTTP 422.
 
     Returns:
-        Manifest dict with keys: model, version, training_input, cost_usd, dataset_zip.
+        Manifest dict with keys: model_owner, model_name, version, training_input,
+        destination_model, cost_usd, dataset_zip.
 
     Raises:
-        ValueError: if estimated cost exceeds HARD_COST_CAP_USD.
+        ValueError: if estimated cost exceeds HARD_COST_CAP_USD, or if
+                    destination_model is missing/malformed.
     """
     estimated_cost = EST_COST_PER_RUN_USD
     if estimated_cost > HARD_COST_CAP_USD:
@@ -91,6 +91,16 @@ def build_manifest(
             f"${HARD_COST_CAP_USD:.2f}. Aborting."
         )
 
+    if not destination_model or "/" not in destination_model:
+        raise ValueError(
+            "destination_model is required and must be '{owner}/{name}' "
+            "(Replicate pushes the trained LoRA there; the API rejects trainings "
+            f"without a destination). Got: {destination_model!r}"
+        )
+
+    # Field names verified against the live ostris/flux-dev-lora-trainer
+    # TrainingInput schema on 2026-06-24. Do NOT add fields absent from that
+    # schema (e.g. lr_scheduler) — Replicate 422s on unknown input keys.
     training_input: dict[str, Any] = {
         "trigger_word": trigger_word,
         "steps": steps,
@@ -98,7 +108,6 @@ def build_manifest(
         "optimizer": optimizer,
         "batch_size": batch_size,
         "resolution": resolution,
-        "lr_scheduler": lr_scheduler,
         "learning_rate": learning_rate,
         "autocaption": autocaption,
         "autocaption_prefix": autocaption_prefix,
@@ -133,7 +142,7 @@ def show_stopandshow(manifest: dict[str, Any]) -> None:
     print("=" * 60)
     print("STOP — Confirm before proceeding:")
     print()
-    print(f"  Action  : Replicate FLUX LoRA training")
+    print("  Action  : Replicate FLUX LoRA training")
     print(f"  Model   : {manifest['model_owner']}/{manifest['model_name']}")
     if manifest.get("version"):
         print(f"  Version : {manifest['version']}")
@@ -157,12 +166,24 @@ def show_stopandshow(manifest: dict[str, Any]) -> None:
 
 
 def _build_training_url(version: str | None) -> str:
+    """
+    Build the Replicate create-training URL.
+
+    Replicate REQUIRES the version id in the path:
+      POST /v1/models/{owner}/{model}/versions/{version_id}/trainings
+    There is no version-less trainings endpoint — omitting the version yields a
+    404. We therefore refuse to construct an invalid URL.
+    """
+    if not version:
+        raise TrainingError(
+            "REPLICATE_VERSION is not set. Replicate trainings require a pinned "
+            "version id in the URL path; set config.REPLICATE_VERSION to the "
+            "trainer's version SHA (GET /v1/models/{owner}/{model} → latest_version.id)."
+        )
     owner = REPLICATE_MODEL_OWNER
     model = REPLICATE_MODEL_NAME
     base = REPLICATE_BASE_URL.rstrip("/")
-    if version:
-        return f"{base}/v1/models/{owner}/{model}/versions/{version}/trainings"
-    return f"{base}/v1/models/{owner}/{model}/trainings"
+    return f"{base}/v1/models/{owner}/{model}/versions/{version}/trainings"
 
 
 def start_training(
@@ -199,14 +220,20 @@ def start_training(
     token = get_api_key()
     url = _build_training_url(manifest.get("version"))
 
+    destination = manifest.get("destination_model")
+    if not destination:
+        raise TrainingError(
+            "manifest is missing destination_model; Replicate trainings require a "
+            "destination. Build the manifest via build_manifest(..., destination_model=...)."
+        )
+
     payload: dict[str, Any] = {
+        "destination": destination,
         "input": {
             **manifest["training_input"],
             "input_images": input_images_url,
-        }
+        },
     }
-    if manifest.get("destination_model"):
-        payload["destination"] = manifest["destination_model"]
 
     headers = {
         "Authorization": f"Bearer {token}",
@@ -245,7 +272,7 @@ def save_run_record(
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
 
     training_id: str = training_resp.get("id", "unknown")
-    ts = datetime.now(tz=timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ts = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
     filename = f"training-run-{training_id}-{ts}.json"
     dest = RUNS_DIR / filename
 

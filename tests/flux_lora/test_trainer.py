@@ -1,5 +1,5 @@
 """
-tests.flux_lora.test_trainer — 3 tests covering trainer.py public API.
+tests.flux_lora.test_trainer — covers trainer.py public API + Replicate contract.
 
 No real Replicate API calls are made. httpx is mocked at the transport level.
 """
@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import httpx
 import pytest
 
 from scripts.flux_lora import RequiresConfirmationError
@@ -31,7 +30,7 @@ class TestBuildManifest:
         zip_path = tmp_path / "dataset.zip"
         zip_path.write_bytes(b"PK")  # fake zip
 
-        manifest = build_manifest(zip_path)
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
 
         assert manifest["model_owner"] == "ostris"
         assert manifest["model_name"] == "flux-dev-lora-trainer"
@@ -57,6 +56,50 @@ class TestBuildManifest:
         assert manifest["training_input"]["lora_rank"] == 8
         assert manifest["destination_model"] == "myuser/my-lora"
 
+    def test_destination_model_is_required(self, tmp_path: Path) -> None:
+        """Replicate trainings require a destination; build_manifest must enforce it."""
+        zip_path = tmp_path / "dataset.zip"
+        zip_path.write_bytes(b"PK")
+
+        with pytest.raises(ValueError, match="destination_model is required"):
+            build_manifest(zip_path)
+        with pytest.raises(ValueError, match="destination_model is required"):
+            build_manifest(zip_path, destination_model="no-slash")
+
+    def test_training_input_has_no_unknown_fields(self, tmp_path: Path) -> None:
+        """
+        Guard against the lr_scheduler regression: every key in training_input must
+        exist in the ostris/flux-dev-lora-trainer TrainingInput schema (verified
+        live 2026-06-24). lr_scheduler is NOT a valid field — its presence 422s.
+        """
+        zip_path = tmp_path / "dataset.zip"
+        zip_path.write_bytes(b"PK")
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
+
+        allowed = {
+            "autocaption",
+            "autocaption_prefix",
+            "autocaption_suffix",
+            "batch_size",
+            "cache_latents_to_disk",
+            "caption_dropout_rate",
+            "gradient_checkpointing",
+            "hf_repo_id",
+            "hf_token",
+            "input_images",
+            "layers_to_optimize_regex",
+            "learning_rate",
+            "lora_rank",
+            "optimizer",
+            "resolution",
+            "skip_training_and_use_pretrained_hf_lora_url",
+            "steps",
+            "trigger_word",
+        }
+        unknown = set(manifest["training_input"]) - allowed
+        assert not unknown, f"unknown TrainingInput fields would 422: {unknown}"
+        assert "lr_scheduler" not in manifest["training_input"]
+
 
 class TestStartTraining:
     def test_raises_requires_confirmation_when_confirmed_false(
@@ -68,7 +111,7 @@ class TestStartTraining:
 
         zip_path = tmp_path / "dataset.zip"
         zip_path.write_bytes(b"PK")
-        manifest = build_manifest(zip_path)
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
 
         with pytest.raises(RequiresConfirmationError):
             start_training(
@@ -85,7 +128,7 @@ class TestStartTraining:
 
         zip_path = tmp_path / "dataset.zip"
         zip_path.write_bytes(b"PK")
-        manifest = build_manifest(zip_path)
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
 
         with patch("scripts.flux_lora.trainer.httpx.post") as mock_post:
             with pytest.raises(RequiresConfirmationError):
@@ -104,7 +147,7 @@ class TestStartTraining:
 
         zip_path = tmp_path / "dataset.zip"
         zip_path.write_bytes(b"PK")
-        manifest = build_manifest(zip_path)
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
 
         fake_response_data = {
             "id": "train-abc123",
@@ -124,15 +167,19 @@ class TestStartTraining:
 
         mock_post.assert_called_once()
         call_kwargs = mock_post.call_args
-        # Verify token in headers
-        headers = (
-            call_kwargs.kwargs.get("headers") or call_kwargs.args[1]
-            if len(call_kwargs.args) > 1
-            else {}
-        )
         assert "Authorization" in str(call_kwargs)
         assert result["id"] == "train-abc123"
         assert result["status"] == "starting"
+
+        # Contract: URL must carry the version id in the path (Replicate requires it).
+        url = call_kwargs.args[0] if call_kwargs.args else call_kwargs.kwargs["url"]
+        assert "/versions/" in url and url.endswith("/trainings"), url
+
+        # Contract: payload must include destination + input_images, and no lr_scheduler.
+        payload = call_kwargs.kwargs["json"]
+        assert payload["destination"] == "skyyrose/skyyrose-lora"
+        assert payload["input"]["input_images"] == "https://example.com/dataset.zip"
+        assert "lr_scheduler" not in payload["input"]
 
 
 class TestSaveRunRecord:
@@ -144,7 +191,7 @@ class TestSaveRunRecord:
 
         zip_path = tmp_path / "dataset.zip"
         zip_path.write_bytes(b"PK")
-        manifest = build_manifest(zip_path)
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
 
         training_resp = {
             "id": "train-xyz999",

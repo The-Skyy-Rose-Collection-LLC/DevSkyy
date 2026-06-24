@@ -29,11 +29,14 @@ from scripts.flux_lora.status import list_runs
 DEFAULT_NUM_OUTPUTS: int = 1
 DEFAULT_ASPECT_RATIO: str = "1:1"
 DEFAULT_OUTPUT_FORMAT: str = "png"
-DEFAULT_GUIDANCE_SCALE: float = 3.5
+DEFAULT_GUIDANCE: float = 3.5
 DEFAULT_NUM_INFERENCE_STEPS: int = 28
 
-# Replicate model for FLUX.1-dev inference (supports LoRA via extra_lora)
-FLUX_INFERENCE_MODEL: str = "black-forest-labs/flux-dev"
+# Replicate model for FLUX.1-dev inference WITH LoRA support.
+# Field names (lora_weights, lora_scale, guidance, ...) verified against this
+# model's live Input schema on 2026-06-24. The base black-forest-labs/flux-dev
+# model has NO lora_weights/extra_lora fields — it must be the -lora variant.
+FLUX_INFERENCE_MODEL: str = "black-forest-labs/flux-dev-lora"
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +94,7 @@ def generate(
     num_outputs: int = DEFAULT_NUM_OUTPUTS,
     aspect_ratio: str = DEFAULT_ASPECT_RATIO,
     output_format: str = DEFAULT_OUTPUT_FORMAT,
-    guidance_scale: float = DEFAULT_GUIDANCE_SCALE,
+    guidance: float = DEFAULT_GUIDANCE,
     num_inference_steps: int = DEFAULT_NUM_INFERENCE_STEPS,
     lora_scale: float = 1.0,
 ) -> list[str]:
@@ -108,9 +111,9 @@ def generate(
         num_outputs:          Number of images to generate (1-4).
         aspect_ratio:         Image aspect ratio (e.g. "1:1", "2:3", "3:4").
         output_format:        "png" | "webp" | "jpg".
-        guidance_scale:       CFG guidance scale.
+        guidance:             FLUX guidance value (the model's `guidance` field).
         num_inference_steps:  Denoising steps.
-        lora_scale:           LoRA weight scale (0.0-1.0).
+        lora_scale:           Trained-LoRA weight scale (0.0-1.0).
 
     Returns:
         List of output image URLs.
@@ -133,12 +136,12 @@ def generate(
     payload: dict[str, Any] = {
         "input": {
             "prompt": prompt,
-            "extra_lora": lora_url,
-            "extra_lora_scale": lora_scale,
+            "lora_weights": lora_url,
+            "lora_scale": lora_scale,
             "num_outputs": num_outputs,
             "aspect_ratio": aspect_ratio,
             "output_format": output_format,
-            "guidance_scale": guidance_scale,
+            "guidance": guidance,
             "num_inference_steps": num_inference_steps,
         }
     }

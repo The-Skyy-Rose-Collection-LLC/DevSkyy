@@ -30,8 +30,11 @@ except Exception:
 REPLICATE_MODEL_OWNER: str = "ostris"
 REPLICATE_MODEL_NAME: str = "flux-dev-lora-trainer"
 
-# Set to a pinned version SHA to lock behaviour; None = use latest.
-REPLICATE_VERSION: str | None = None
+# Pinned trainer version SHA — REQUIRED by Replicate's create-training endpoint
+# (POST /v1/models/{owner}/{name}/versions/{version_id}/trainings). Verified live
+# 2026-06-24 via GET /v1/models/ostris/flux-dev-lora-trainer (latest_version.id).
+# Pinning locks reproducibility; bump only after re-verifying the TrainingInput schema.
+REPLICATE_VERSION: str = "26dce37af90b9d997eeb970d92e47de3064d46c300504ae376c75bef6a9022d2"
 
 REPLICATE_BASE_URL: str = "https://api.replicate.com"
 
@@ -44,8 +47,9 @@ DEFAULT_LORA_RANK: int = 16
 DEFAULT_OPTIMIZER: str = "adamw8bit"
 DEFAULT_BATCH_SIZE: int = 1
 DEFAULT_RESOLUTION: str = "512,768,1024"
-DEFAULT_LR_SCHEDULER: str = "constant"
 DEFAULT_LEARNING_RATE: float = 4e-4
+# NOTE: ostris/flux-dev-lora-trainer TrainingInput has NO lr_scheduler field
+# (verified live 2026-06-24). The scheduler is fixed internally by the trainer.
 
 # Autocaptioning is disabled; we supply hand-crafted captions.
 DEFAULT_AUTOCAPTION: bool = False

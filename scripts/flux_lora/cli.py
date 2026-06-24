@@ -33,7 +33,6 @@ from scripts.flux_lora.config import (
     DEFAULT_BATCH_SIZE,
     DEFAULT_LEARNING_RATE,
     DEFAULT_LORA_RANK,
-    DEFAULT_LR_SCHEDULER,
     DEFAULT_OPTIMIZER,
     DEFAULT_RESOLUTION,
     DEFAULT_STEPS,
@@ -41,7 +40,7 @@ from scripts.flux_lora.config import (
     api_key_present,
 )
 from scripts.flux_lora.dataset import dataset_summary, pack_zip, validate_dataset
-from scripts.flux_lora.inference import generate, load_latest_lora
+from scripts.flux_lora.inference import DEFAULT_NUM_OUTPUTS, generate, load_latest_lora
 from scripts.flux_lora.status import format_status, get_status, list_runs
 from scripts.flux_lora.trainer import (
     build_manifest,
@@ -131,9 +130,8 @@ def cmd_train(args: argparse.Namespace) -> None:
             optimizer=args.optimizer,
             batch_size=args.batch_size,
             resolution=args.resolution,
-            lr_scheduler=args.lr_scheduler,
             learning_rate=args.learning_rate,
-            destination_model=args.destination_model or None,
+            destination_model=args.destination_model,
         )
     except ValueError as exc:
         print(f"Manifest error: {exc}", file=sys.stderr)
@@ -292,9 +290,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_train.add_argument("--optimizer", default=DEFAULT_OPTIMIZER)
     p_train.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
     p_train.add_argument("--resolution", default=DEFAULT_RESOLUTION)
-    p_train.add_argument("--lr-scheduler", default=DEFAULT_LR_SCHEDULER)
     p_train.add_argument("--learning-rate", type=float, default=DEFAULT_LEARNING_RATE)
-    p_train.add_argument("--destination-model", default=None)
+    p_train.add_argument(
+        "--destination-model",
+        required=True,
+        help="REQUIRED. Replicate model slug to push the LoRA to, e.g. 'skyyrose/skyyrose-lora'.",
+    )
     p_train.add_argument(
         "--input-images-url",
         default=None,
@@ -306,7 +307,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_gen = sub.add_parser("generate", help="Run FLUX inference with a trained LoRA.")
     p_gen.add_argument("prompt", help="Text prompt (include trigger word).")
     p_gen.add_argument("--lora-url", default=None, help="Override LoRA URL.")
-    p_gen.add_argument("--num-outputs", type=int, default=DEFAULT_NUM_OUTPUTS if False else 1)
+    p_gen.add_argument("--num-outputs", type=int, default=DEFAULT_NUM_OUTPUTS)
     p_gen.set_defaults(func=cmd_generate)
 
     # status
