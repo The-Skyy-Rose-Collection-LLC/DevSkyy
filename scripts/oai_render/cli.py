@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+from pathlib import Path
 
 from . import config, cost, pipeline
 from .prompt import PRESENTATIONS
@@ -43,6 +44,16 @@ def _add_target_args(p: argparse.ArgumentParser) -> None:
             "Render ONLY ghost-front (the product card) — no ghost-back, no "
             "on-model/paired looks. Fast, cheap full-catalog product-card pass. "
             "Overrides --style."
+        ),
+    )
+    p.add_argument(
+        "--style-reference",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Optional environment/mood anchor image (e.g. a lookbook frame). Passed as the "
+            "FINAL reference; the model matches its setting, lighting, palette, and mood but "
+            "takes NO garment, logo, or text from it."
         ),
     )
 
@@ -101,10 +112,23 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: invalid --style {bad or '(empty)'}. Choose from: {', '.join(PRESENTATIONS)}")
         return 1
 
+    style_reference: Path | None = None
+    if getattr(args, "style_reference", None):
+        style_reference = Path(args.style_reference)
+        if not style_reference.is_file():
+            print(f"ERROR: --style-reference not found: {style_reference}")
+            return 1
+
     # Always plan first (no API) and show the manifest. --front-only is registered
     # on every subparser via _add_target_args, so args.front_only is always present.
     dry = pipeline.run(
-        targets, catalog, dossier_index, styles=styles, dry_run=True, front_only=args.front_only
+        targets,
+        catalog,
+        dossier_index,
+        styles=styles,
+        dry_run=True,
+        front_only=args.front_only,
+        style_reference=style_reference,
     )
     manifest = dry["manifest"]
     print(cost.format_manifest(manifest))

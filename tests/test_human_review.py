@@ -18,6 +18,14 @@ from skyyrose.elite_studio.quality.human_review import (
     ReviewDecision,
 )
 
+
+@pytest.fixture(autouse=True)
+def _clear_auto_confirm_env(monkeypatch):
+    """Default-fail-safe: tests run without the legacy auto-approve flag set."""
+    monkeypatch.delenv("SKYYROSE_AUTO_CONFIRM", raising=False)
+    yield
+
+
 # ---------------------------------------------------------------------------
 # ReviewDecision dataclass
 # ---------------------------------------------------------------------------
@@ -40,13 +48,31 @@ class TestReviewDecision:
 
 
 class TestAutoApprove:
-    def test_submit_returns_auto_approve_when_queue_unavailable(self):
+    """Default fail-safe = reject; legacy auto-approve gated by SKYYROSE_AUTO_CONFIRM=1.
+
+    The class name is preserved for git-blame continuity but the assertions
+    now exercise the security-correct default (reject) plus the opt-in
+    legacy path (approve). See ``HumanReviewGate`` docstring for policy.
+    """
+
+    def test_submit_returns_auto_approve_when_queue_unavailable(self, monkeypatch):
+        """Opt-in: with SKYYROSE_AUTO_CONFIRM=1, queue failure → approve sentinel."""
+        monkeypatch.setenv("SKYYROSE_AUTO_CONFIRM", "1")
         gate = HumanReviewGate()
 
         with patch.object(gate, "_get_manager", side_effect=ImportError("no services")):
             review_id = gate.submit_for_review("br-001", "/tmp/img.jpg", "job-1")
 
         assert review_id.startswith("auto-approve:")
+
+    def test_submit_returns_auto_reject_by_default(self):
+        """Default fail-safe: queue failure → reject sentinel (no env opt-in)."""
+        gate = HumanReviewGate()
+
+        with patch.object(gate, "_get_manager", side_effect=ImportError("no services")):
+            review_id = gate.submit_for_review("br-001", "/tmp/img.jpg", "job-1")
+
+        assert review_id.startswith("auto-reject:")
 
     def test_get_decision_on_auto_approve_sentinel(self):
         gate = HumanReviewGate()
@@ -56,13 +82,33 @@ class TestAutoApprove:
         assert decision.reviewer == "system"
         assert "Auto-approved" in decision.notes
 
-    def test_get_decision_defaults_to_approve_on_queue_error(self):
+    def test_get_decision_on_auto_reject_sentinel(self):
+        gate = HumanReviewGate()
+        decision = gate.get_decision("auto-reject:job-1:ImportError")
+
+        assert decision.decision == "reject"
+        assert decision.reviewer == "system"
+        assert "Fail-safe" in decision.notes
+
+    def test_get_decision_defaults_to_approve_on_queue_error(self, monkeypatch):
+        """Opt-in: with SKYYROSE_AUTO_CONFIRM=1, poll error → approve."""
+        monkeypatch.setenv("SKYYROSE_AUTO_CONFIRM", "1")
         gate = HumanReviewGate()
 
         with patch.object(gate, "_get_manager", side_effect=RuntimeError("queue crashed")):
             decision = gate.get_decision("real-review-id-123", timeout=0.01)
 
         assert decision.decision == "approve"
+        assert decision.reviewer == "system"
+
+    def test_get_decision_defaults_to_reject_on_queue_error_by_default(self):
+        """Default fail-safe: poll error → reject."""
+        gate = HumanReviewGate()
+
+        with patch.object(gate, "_get_manager", side_effect=RuntimeError("queue crashed")):
+            decision = gate.get_decision("real-review-id-123", timeout=0.01)
+
+        assert decision.decision == "reject"
         assert decision.reviewer == "system"
 
 
@@ -149,12 +195,12 @@ class TestSubmitPollCycle:
         assert decision.decision == "reject"
         assert decision.reviewer == "reviewer_2"
 
-    def test_get_decision_times_out_and_defaults_to_timeout(self):
-        """When the item stays pending past the timeout window, decision is 'timeout'."""
+    def test_get_decision_times_out_and_defaults_to_timeout(self, monkeypatch):
+        """Opt-in: with SKYYROSE_AUTO_CONFIRM=1, deadline elapsed → 'timeout'."""
+        monkeypatch.setenv("SKYYROSE_AUTO_CONFIRM", "1")
         item = _FakeApprovalItem("review-pending", "pending")
         manager = self._make_manager(item)
 
-        # Very short timeout and poll interval to keep test fast
         gate = HumanReviewGate(poll_interval=0.001)
 
         with patch.object(gate, "_get_manager", return_value=manager):
@@ -170,6 +216,28 @@ class TestSubmitPollCycle:
 
         assert decision.decision == "timeout"
         assert decision.reviewer == "system"
+
+    def test_get_decision_times_out_to_reject_by_default(self):
+        """Default fail-safe: deadline elapsed → reject (not 'timeout', not approve)."""
+        item = _FakeApprovalItem("review-pending", "pending")
+        manager = self._make_manager(item)
+
+        gate = HumanReviewGate(poll_interval=0.001)
+
+        with patch.object(gate, "_get_manager", return_value=manager):
+            with patch(
+                "skyyrose.elite_studio.quality.human_review.asyncio.get_event_loop"
+            ) as mock_loop:
+                loop = asyncio.new_event_loop()
+                mock_loop.return_value = loop
+                try:
+                    decision = gate.get_decision("review-pending", timeout=0.005)
+                finally:
+                    loop.close()
+
+        assert decision.decision == "reject"
+        assert decision.reviewer == "system"
+        assert "timeout" in decision.notes.lower() or "fail-safe" in decision.notes.lower()
 
 
 # ---------------------------------------------------------------------------
