@@ -17,6 +17,7 @@ from . import config, cost, references
 from .cost import CostManifest, ManifestEntry
 from .prompt import SceneError, build_pair_prompt, build_prompt, extract_view_branding, read_dossier
 from .references import MissingReferenceError, Pair, ReferenceImage
+from .scene_schema import build_scene
 
 if TYPE_CHECKING:
     from .client import RenderClient
@@ -160,6 +161,7 @@ def plan_sku(
         refs = references.build_references(sku, collection, view=view)
         is_patch = references.requires_patch(sku)
         dossier_text = read_dossier(dossier_index.get(sku))
+        scene = build_scene(sku=sku, name=name, collection=collection, style=style)
         prompt = build_prompt(
             name=name,
             sku=sku,
@@ -169,6 +171,7 @@ def plan_sku(
             is_patch=is_patch,
             style=style,
             view=view,
+            scene=scene,
         )
     except (MissingReferenceError, SceneError) as exc:
         return SkuPlan(

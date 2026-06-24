@@ -350,6 +350,7 @@ def build_prompt(
     is_patch: bool,
     style: str | None = None,
     view: str = "front",
+    scene: dict | None = None,
 ) -> str:
     """Assemble the full edit prompt for one SKU in the chosen style + view."""
     style_key = style or DEFAULT_STYLE
@@ -359,7 +360,14 @@ def build_prompt(
         raise ValueError(f"Unknown view {view!r}. Valid: {sorted(_VIEW_DIRECTIVES)}")
     presentation = PRESENTATIONS[style_key]
     view_directive = _VIEW_DIRECTIVES[view]
-    background = _background_for(style_key, collection)
+    if scene is not None:
+        background = (
+            "OVERRIDE — ENVIRONMENT, LIGHTING, AND CAMERA: the SCENE SPEC (JSON) block "
+            "below is the authoritative source for all three. The generic LIGHTING directive "
+            "at the top of this prompt is superseded by the 'lighting' object in the SCENE SPEC."
+        )
+    else:
+        background = _background_for(style_key, collection)
     parts: list[str] = [
         _BASE_PROCEDURE.format(
             presentation=presentation, view_directive=view_directive, background=background
@@ -371,6 +379,12 @@ def build_prompt(
         f"{collection.replace('-', ' ').title()} collection."
     )
     parts.append("")
+
+    if scene is not None:
+        from .scene_schema import scene_to_prompt_block
+
+        parts.append(scene_to_prompt_block(scene))
+        parts.append("")
 
     if reference_labels:
         parts.append(
