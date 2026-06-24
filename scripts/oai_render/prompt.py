@@ -351,8 +351,14 @@ def build_prompt(
     style: str | None = None,
     view: str = "front",
     scene: dict | None = None,
+    style_reference: bool = False,
 ) -> str:
-    """Assemble the full edit prompt for one SKU in the chosen style + view."""
+    """Assemble the full edit prompt for one SKU in the chosen style + view.
+
+    When ``style_reference`` is True, the FINAL reference image is treated as an
+    environment/lighting/mood anchor only (e.g. a lookbook frame) — never a source
+    of garments, graphics, or text.
+    """
     style_key = style or DEFAULT_STYLE
     if style_key not in PRESENTATIONS:
         raise ValueError(f"Unknown style {style_key!r}. Valid: {sorted(PRESENTATIONS)}")
@@ -401,6 +407,17 @@ def build_prompt(
             'image attached, "image 2" the second, and so on:'
         )
         parts.extend(f"  {label}" for label in reference_labels)
+        parts.append("")
+
+    if style_reference:
+        parts.append(
+            "STYLE & COMPOSITION REFERENCE: the FINAL reference image is an ENVIRONMENT, "
+            "LIGHTING, PALETTE, and MOOD anchor ONLY. Match its setting, atmosphere, color "
+            "grade, camera feel, and overall composition. Do NOT copy, trace, or borrow any "
+            "garment, logo, graphic, text, person, or product from it — every garment comes "
+            "SOLELY from the product reference image(s) above and the SCENE SPEC. Treat it as "
+            "the mood board for the scene, never as a source of what is worn."
+        )
         parts.append("")
 
     if dossier_text:

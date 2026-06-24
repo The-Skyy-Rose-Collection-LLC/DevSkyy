@@ -2,11 +2,13 @@
 scripts.flux_lora.cli — Command-line interface for FLUX LoRA operations.
 
 Commands:
-  train          Pack dataset, show manifest, gate on 'y', submit training.
-  generate       Run inference with latest (or specified) LoRA.
-  status         Fetch live status of a training run by ID.
-  list           List all saved training run records.
-  dataset-info   Validate dataset and print summary.
+  train            Pack dataset, show manifest, gate on 'y', submit training.
+  generate         Run inference with latest (or specified) LoRA.
+  status           Fetch live status of a training run by ID.
+  list             List all saved training run records.
+  dataset-info     Validate dataset and print summary.
+  build-dataset    Assemble a training dataset dir from a JSON source list.
+  upload-dataset   Upload a dataset zip to HuggingFace Hub.
 
 Usage:
   python -m scripts.flux_lora.cli train [--dataset-dir PATH] [--steps N] ...
@@ -14,11 +16,14 @@ Usage:
   python -m scripts.flux_lora.cli status TRAINING_ID
   python -m scripts.flux_lora.cli list
   python -m scripts.flux_lora.cli dataset-info [--dataset-dir PATH]
+  python -m scripts.flux_lora.cli build-dataset --from SOURCES.json --dest DIR [--overwrite]
+  python -m scripts.flux_lora.cli upload-dataset --zip PATH --repo REPO_ID [--private]
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -246,6 +251,94 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Subcommand: build-dataset
+# ---------------------------------------------------------------------------
+
+
+def cmd_build_dataset(args: argparse.Namespace) -> None:
+    """
+    Assemble a training dataset directory from a JSON source list.
+
+    The JSON file must be a list of objects with keys:
+      - "image"   : path to source image (required)
+      - "caption" : author-written caption (optional, mutually exclusive with garment)
+      - "garment" : garment description (optional, caption preferred)
+    """
+    from scripts.flux_lora.dataset import dataset_summary
+    from scripts.flux_lora.dataset_builder import build_dataset
+
+    sources_path = Path(args.from_file)
+    if not sources_path.exists():
+        print(f"Error: sources file not found: '{sources_path}'", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        sources = json.loads(sources_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Error: invalid JSON in '{sources_path}': {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    if not isinstance(sources, list):
+        print("Error: sources JSON must be a list of objects.", file=sys.stderr)
+        sys.exit(1)
+
+    dest_dir = Path(args.dest)
+
+    try:
+        result = build_dataset(sources, dest_dir, overwrite=args.overwrite)
+    except DatasetError as exc:
+        print(f"Dataset error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    summary = dataset_summary(result)
+    print(f"Dataset dir   : {summary['dataset_dir']}")
+    print(f"Images        : {summary['image_count']}")
+    print(f"Captions      : {summary['caption_count']}")
+    print(f"Total size    : {summary['total_bytes']:,} bytes")
+    print("Validation    : OK")
+
+
+# ---------------------------------------------------------------------------
+# Subcommand: upload-dataset
+# ---------------------------------------------------------------------------
+
+
+def cmd_upload_dataset(args: argparse.Namespace) -> None:
+    """
+    Upload a dataset zip to HuggingFace Hub.
+
+    Prints STOP-AND-SHOW, gates on 'y', then calls upload_zip(confirmed=True).
+    """
+    from scripts.flux_lora.upload import show_upload_stopandshow, upload_zip
+
+    zip_path = Path(args.zip)
+    if not zip_path.exists():
+        print(f"Error: zip file not found: '{zip_path}'", file=sys.stderr)
+        sys.exit(1)
+
+    show_upload_stopandshow(zip_path, args.repo)
+
+    if not _confirm():
+        raise UserAbortError("Upload cancelled by user.")
+
+    try:
+        url = upload_zip(
+            zip_path,
+            args.repo,
+            private=args.private,
+            confirmed=True,
+        )
+    except FluxLoraError as exc:
+        print(f"Upload error: {exc}", file=sys.stderr)
+        sys.exit(1)
+    except RuntimeError as exc:
+        print(f"Upload error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Uploaded: {url}")
+
+
+# ---------------------------------------------------------------------------
 # Subcommand: list
 # ---------------------------------------------------------------------------
 
@@ -334,6 +427,57 @@ def build_parser() -> argparse.ArgumentParser:
     # list
     p_list = sub.add_parser("list", help="List all saved training run records.")
     p_list.set_defaults(func=cmd_list)
+
+    # build-dataset
+    p_build = sub.add_parser(
+        "build-dataset",
+        help="Assemble a training dataset directory from a JSON source list.",
+    )
+    p_build.add_argument(
+        "--from",
+        dest="from_file",
+        required=True,
+        metavar="SOURCES_JSON",
+        help="JSON file listing source images (list of {image, caption?, garment?}).",
+    )
+    p_build.add_argument(
+        "--dest",
+        required=True,
+        metavar="DIR",
+        help="Destination directory to write the dataset into.",
+    )
+    p_build.add_argument(
+        "--overwrite",
+        action="store_true",
+        default=False,
+        help="Clear existing dataset files in --dest before building.",
+    )
+    p_build.set_defaults(func=cmd_build_dataset)
+
+    # upload-dataset
+    p_upload = sub.add_parser(
+        "upload-dataset",
+        help="Upload a dataset zip to HuggingFace Hub.",
+    )
+    p_upload.add_argument(
+        "--zip",
+        required=True,
+        metavar="PATH",
+        help="Path to the dataset zip file to upload.",
+    )
+    p_upload.add_argument(
+        "--repo",
+        required=True,
+        metavar="REPO_ID",
+        help="HuggingFace dataset repo ID (e.g. 'skyyrose/skyyrose-lora-dataset').",
+    )
+    p_upload.add_argument(
+        "--private",
+        action="store_true",
+        default=False,
+        help="Create / upload to a private repo (default: public).",
+    )
+    p_upload.set_defaults(func=cmd_upload_dataset)
 
     return parser
 

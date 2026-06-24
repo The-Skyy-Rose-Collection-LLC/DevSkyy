@@ -207,3 +207,30 @@ def test_collection_env_sources_share_landmarks() -> None:
         solo = str(_ONMODEL_DEFAULTS[collection]["environment"]).lower()
         assert landmark in paired, f"{collection}: {landmark!r} missing from COLLECTION_SCENES"
         assert landmark in solo, f"{collection}: {landmark!r} missing from _ONMODEL_DEFAULTS"
+
+
+# ---------------------------------------------------------------------------
+# Test 9 — style-reference lever: directive present only when requested
+# ---------------------------------------------------------------------------
+
+
+def test_style_reference_directive_toggles() -> None:
+    base = dict(
+        name="The Black Rose Varsity",
+        sku="br-001",
+        collection="black-rose",
+        reference_labels=["image 1: front reference", "STYLE & COMPOSITION REFERENCE (env only)"],
+        dossier_text=None,
+        is_patch=False,
+        style="on-model",
+    )
+    with_ref = build_prompt(**base, style_reference=True)
+    without_ref = build_prompt(**base, style_reference=False)
+
+    assert "STYLE & COMPOSITION REFERENCE:" in with_ref
+    assert (
+        "take NO garment" not in without_ref and "STYLE & COMPOSITION REFERENCE:" not in without_ref
+    )
+    # the directive must forbid lifting garments from the anchor
+    assert "FINAL reference image" in with_ref
+    assert "garment" in with_ref.split("STYLE & COMPOSITION REFERENCE:")[1][:400].lower()
