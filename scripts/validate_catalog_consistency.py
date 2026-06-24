@@ -34,8 +34,10 @@ Available check names (pass comma-separated to --checks):
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
-    The garment_type_lock column has a known data error for br-011 (shows 'hoodie', is a hockey
-    jersey). The authoritative jersey set is sku_folders keys in logo-registry.json.
+    The jersey roster is a product-LINE concept (the "BLACK is Beautiful Jersey Series"), not a
+    garment-geometry one: br-011 is a roster member whose garment_type_lock is correctly 'hoodie'
+    (a hooded Jersey-Series piece — the render pipeline draws its hood), so garment_type_lock is
+    the wrong signal for roster membership. The authoritative roster is sku_folders keys.
   sku_folders: Ignores keys starting with '_' (JSON comment convention).
   retired_sku_guard: Excludes logo-registry.json changelog text and this script's own
     _RETIRED_SKUS definition from the scan — those are documentation, not live references.
@@ -289,9 +291,10 @@ def check_registry_changelog() -> CheckResult:
 def check_jersey_skus() -> CheckResult:
     """Verify _JERSEY_SKUS in sku_resolver.py matches the sku_folders block in logo-registry.json.
 
-    sku_folders is the authoritative jersey list. The CSV garment_type_lock column has a known
-    data error for br-011 (shows 'hoodie' but is a hockey jersey), so we do NOT use CSV as
-    the source of truth for this check.
+    sku_folders is the authoritative jersey-series roster. We do NOT derive it from the CSV
+    garment_type_lock column: that column is garment geometry, not roster membership. br-011 is
+    a roster member correctly locked 'hoodie' (a hooded Jersey-Series piece), so a
+    garment_type_lock-based check would wrongly exclude it.
     """
     name = "jersey_skus"
     reg = _load_registry()

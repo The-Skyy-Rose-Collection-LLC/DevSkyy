@@ -915,262 +915,6 @@
     },
     {
       "id": "bug-058",
-      "timestamp": "2026-04-19T00:43:52.387Z",
-      "error_message": "Wrong return value",
-      "file": "skyyrose/elite_studio/queue/producer.py",
-      "root_cause": "Was returning: asyncio.run(_async_enqueue_batch(job_datas))",
-      "fix": "Now returns: _run_sync(_async_enqueue_batch(job_datas))",
-      "tags": [
-        "auto-detected",
-        "return-value",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:43:52.387Z"
-    },
-    {
-      "id": "bug-059",
-      "timestamp": "2026-04-19T00:45:28.941Z",
-      "error_message": "Wrong return value",
-      "file": "skyyrose/elite_studio/fidelity.py",
-      "root_cause": "Was returning: int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)",
-      "fix": "Now returns: int(cleaned[0:2], 16), int(cleaned[2:4], 16), int(",
-      "tags": [
-        "auto-detected",
-        "return-value",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:45:28.941Z"
-    },
-    {
-      "id": "bug-060",
-      "timestamp": "2026-04-19T00:46:12.559Z",
-      "error_message": "Significant refactor of ",
-      "file": "skyyrose/elite_studio/prompts/cache.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 4\u219224 lines (3 removed) | Also: def check(self, prompt: str, intent: str, threshol; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(prompt,  | Also: def store(self, original: str, enhanced: Any, ttl:; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(original",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 3,
-      "last_seen": "2026-04-19T00:46:31.311Z"
-    },
-    {
-      "id": "bug-061",
-      "timestamp": "2026-04-19T00:46:36.111Z",
-      "error_message": "Wrong reference: _prompt_hash should be _context_digest",
-      "file": "skyyrose/elite_studio/prompts/enhancer.py",
-      "root_cause": "Used \"_prompt_hash\" instead of \"_context_digest\"",
-      "fix": "Changed _prompt_hash \u2192 _context_digest",
-      "tags": [
-        "auto-detected",
-        "wrong-reference",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:46:36.111Z"
-    },
-    {
-      "id": "bug-062",
-      "timestamp": "2026-04-19T00:46:46.971Z",
-      "error_message": "Significant refactor of ",
-      "file": "skyyrose/elite_studio/prompts/enhancer.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 6\u219210 lines (3 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:46:46.971Z"
-    },
-    {
-      "id": "bug-063",
-      "timestamp": "2026-04-19T00:50:57.703Z",
-      "error_message": "Incorrect value in code",
-      "file": "wordpress-theme/skyyrose-flagship/inc/admin-experience-dashboard.php",
-      "root_cause": "Had '/settings'",
-      "fix": "Changed to 'module_'",
-      "tags": [
-        "auto-detected",
-        "wrong-value",
-        "php"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:50:57.703Z"
-    },
-    {
-      "id": "bug-064",
-      "timestamp": "2026-04-19T00:51:54.224Z",
-      "error_message": "Missing error handling in closeDialog",
-      "file": "wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
-      "fix": "Added try/catch block",
-      "tags": [
-        "auto-detected",
-        "error-handling",
-        "js"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:51:54.224Z"
-    },
-    {
-      "id": "bug-065",
-      "timestamp": "2026-04-19T00:52:45.719Z",
-      "error_message": "Significant refactor of ",
-      "file": "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
-      "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 10\u219214 lines (5 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "js"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T00:52:45.719Z"
-    },
-    {
-      "id": "bug-066",
-      "timestamp": "2026-04-19T01:09:58.702Z",
-      "error_message": "Function not marked async",
-      "file": "billing/middleware.py",
-      "root_cause": "Function uses await but wasn't declared async",
-      "fix": "Added async modifier",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T01:09:58.702Z"
-    },
-    {
-      "id": "bug-067",
-      "timestamp": "2026-04-19T01:10:49.844Z",
-      "error_message": "Significant refactor of ",
-      "file": "core/middleware/tenant.py",
-      "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 17\u219215 lines (3 removed) | Also: # No secret configured \u2014 refuse to trust any token; # to unverified decoding; that was the previous se",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 2,
-      "last_seen": "2026-04-19T01:10:59.117Z"
-    },
-    {
-      "id": "bug-068",
-      "timestamp": "2026-04-19T01:11:23.253Z",
-      "error_message": "Function not marked async",
-      "file": "skyyrose/elite_studio/queue/producer.py",
-      "root_cause": "Function uses await but wasn't declared async",
-      "fix": "Added async modifier",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 2,
-      "last_seen": "2026-04-19T01:11:31.210Z"
-    },
-    {
-      "id": "bug-069",
-      "timestamp": "2026-04-19T01:11:51.481Z",
-      "error_message": "Significant refactor of ",
-      "file": "sdk/python/agent_sdk/worker.py",
-      "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 8\u21926 lines (5 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "py"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T01:11:51.481Z"
-    },
-    {
-      "id": "bug-070",
-      "timestamp": "2026-04-19T07:13:31.997Z",
-      "error_message": "Missing await",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "Async call without await \u2014 returned Promise instead of value",
-      "fix": "Added await to async call",
-      "tags": [
-        "auto-detected",
-        "async-fix",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:13:31.997Z"
-    },
-    {
-      "id": "bug-071",
-      "timestamp": "2026-04-19T07:14:00.623Z",
-      "error_message": "Incorrect value in code",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "Had `collection=\"",
-      "fix": "Changed to `api/v1/media.py:43\u201351`",
-      "tags": [
-        "auto-detected",
-        "wrong-value",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:14:00.623Z"
-    },
-    {
-      "id": "bug-072",
-      "timestamp": "2026-04-19T07:14:17.282Z",
-      "error_message": "Significant refactor of ",
-      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 6\u21928 lines (6 removed)",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "md"
-      ],
-      "related_bugs": [],
-      "occurrences": 1,
-      "last_seen": "2026-04-19T07:14:17.282Z"
-    },
-    {
-      "id": "bug-073",
-      "timestamp": "2026-04-19T07:18:33.851Z",
-      "error_message": "Significant refactor of ",
-      "file": "scripts/deploy-theme.sh",
-      "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 14\u219224 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state \u2014 investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
-      "tags": [
-        "auto-detected",
-        "refactor",
-        "sh"
-      ],
-      "related_bugs": [],
-      "occurrences": 4,
-      "last_seen": "2026-04-19T07:21:36.014Z"
-    },
-    {
-      "id": "bug-058",
       "timestamp": "2026-04-19T00:00:00.000Z",
       "error_message": "Deploy preflight takes 5-6 min per invocation; PHP lint walks vendor/",
       "file": "scripts/deploy-theme.sh",
@@ -1310,6 +1054,134 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-19T00:00:07.000Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-04-19T01:09:58.702Z",
+      "error_message": "Function not marked async",
+      "file": "billing/middleware.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T01:09:58.702Z"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-04-19T01:10:49.844Z",
+      "error_message": "Significant refactor of ",
+      "file": "core/middleware/tenant.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 17\u219215 lines (3 removed) | Also: # No secret configured \u2014 refuse to trust any token; # to unverified decoding; that was the previous se",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-19T01:10:59.117Z"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-04-19T01:11:23.253Z",
+      "error_message": "Function not marked async",
+      "file": "skyyrose/elite_studio/queue/producer.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-19T01:11:31.210Z"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-04-19T01:11:51.481Z",
+      "error_message": "Significant refactor of ",
+      "file": "sdk/python/agent_sdk/worker.py",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 8\u21926 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T01:11:51.481Z"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-04-19T07:13:31.997Z",
+      "error_message": "Missing await",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "Async call without await \u2014 returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:13:31.997Z"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-04-19T07:14:00.623Z",
+      "error_message": "Incorrect value in code",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "Had `collection=\"",
+      "fix": "Changed to `api/v1/media.py:43\u201351`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:14:00.623Z"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-04-19T07:14:17.282Z",
+      "error_message": "Significant refactor of ",
+      "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 6\u21928 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-19T07:14:17.282Z"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-04-19T07:18:33.851Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/deploy-theme.sh",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 14\u219224 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state \u2014 investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-04-19T07:21:36.014Z"
     },
     {
       "id": "bug-082",
@@ -2194,6 +2066,221 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T07:37:05.529868+00:00"
+    },
+    {
+      "id": "bug-153",
+      "timestamp": "2026-06-22T20:37:53Z",
+      "error_message": "FAILED tests/collections/test_verify_drift.py::test_stale_tokens_fail_and_verify_leaves_no_net_change - AssertionError: assert 0 == 1 (verify returncode)",
+      "file": "tests/collections/test_verify_drift.py",
+      "root_cause": "Test injected a junk token block into the real shared design-tokens.css then ran verify-collection-sot.py whose staleness gate reads that same file. Under the full suite (asyncio_mode=auto + sibling token tests) a concurrent gen-design-tokens.py regen wiped the junk before verify read it, so verify returned 0 instead of 1. Flaky; passed in isolation (nothing raced it).",
+      "fix": "Added SKYYROSE_TOKENS_CSS path-override seam to gen-design-tokens.py + verify-collection-sot.py (defaults to the real file; verify's spawned gen subprocess inherits the env). Rewrote the stale-tokens test to operate on a private tmp_path copy. Race eliminated by construction; prod behavior unchanged when env unset (verified design-tokens.css net-unchanged + verify exit 0, lint clean).",
+      "tags": [
+        "flaky-test",
+        "test-isolation",
+        "design-tokens",
+        "race",
+        "asyncio",
+        "hermetic",
+        "stop-hook"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T20:37:53Z"
+    },
+    {
+      "id": "bug-154",
+      "timestamp": "2026-06-22T15:20:00-07:00",
+      "error_message": "test_end_marker_before_start_exits_1: assert 'END marker before START' in stderr \u2014 got the global-fonts 'missing markers ... cannot regenerate the region' message instead",
+      "file": "tests/collections/test_gen_design_tokens.py",
+      "root_cause": "gen-design-tokens.py grew a 2nd marker region (global-fonts) regenerated BEFORE collection-tokens. The committed error-path test's fixture only had collection-tokens markers, so main() failed on the missing global-fonts region (stage 1) before reaching the collection-tokens END-before-START guard (stage 2) the test asserts. Stale fixture vs evolved (uncommitted-WIP) generator.",
+      "fix": "Fixture now carries a well-formed global-fonts region so main() reaches the collection-tokens ordering check; assertion tightened to 'collection-tokens END marker before START' (strengthened). Generator NOT changed \u2014 it was correct.",
+      "tags": [
+        "pytest",
+        "design-tokens",
+        "stale-fixture",
+        "markers",
+        "wordpress-theme"
+      ],
+      "related_bugs": [
+        "bug-153"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:20:00-07:00"
+    },
+    {
+      "id": "bug-155",
+      "timestamp": "2026-06-22T16:10:00-07:00",
+      "error_message": "CollectionHero rendered in claude.ai/design with blank foreground lockup images (<img class=\"sr-hero__lockup\" src=null>); tagline + CTA missing",
+      "file": ".design-sync/previews/CollectionHero.tsx",
+      "root_cause": "Preview authored against a GUESSED API, not the component's .d.ts contract. Passed title/subtitle/ctaLabel/ctaHref and shoved the lockup URL into backgroundImage. Real CollectionHeroProps require lockupImage (foreground), tagline, and cta:{label,href}. lockupImage was never set -> src undefined -> blank lockup; the URL rendered only as a background layer, so render-check passed (bad:false, non-blank PNG) and the stale screenshot looked like it had images. The mismatch only surfaced by mounting in a browser and reading img.src=null while alt (derived from collection) was set.",
+      "fix": "Rewrote CollectionHero.tsx to the .d.ts contract: lockupImage=<LOCKUP_URL>, tagline=<...>, cta={label,href}, align='center'; dropped non-existent title and the backgroundImage misuse. Rebuilt bundle, re-rendered: all 4 lockups decode (br/lh/sig 1600x900, kc monogram 720x720), taglines+CTAs present, render-check texts now populated, maxHeight 246->1175. Re-uploaded 35 files to claude.ai/design.",
+      "tags": [
+        "design-sync",
+        "claude.ai/design",
+        "preview-contract",
+        "prop-mismatch",
+        "render-verification",
+        "collectionhero"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:10:00-07:00"
+    },
+    {
+      "id": "bug-131",
+      "timestamp": "2026-06-22T16:05:00-07:00",
+      "error_message": "Cleanup classifier marked all 81 untracked files as 'on main, differs' (KEEP=0) \u2014 would have recommended deleting 76 genuine local files = data loss",
+      "file": "ad-hoc bash classifier (this session)",
+      "root_cause": "Used `git rev-parse origin/main:$f` as an existence test. For a path NOT in the tree, git rev-parse ECHOES the unparseable string to stdout (errors on stderr) instead of returning empty, so every file looked present. Real blob hash never matched the echoed string -> universal false 'differs'.",
+      "fix": "Use `git cat-file -e origin/main:$f` (or `git ls-tree`) for path existence \u2014 does not echo. Re-classified: only 4 (deleted) + regen-boost (deleted) were truly on main; 76 are genuine local work, kept.",
+      "tags": [
+        "git",
+        "rev-parse",
+        "existence-test",
+        "cleanup",
+        "data-loss-averted",
+        "false-classification"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:05:00-07:00"
+    },
+    {
+      "id": "bug-156",
+      "timestamp": "2026-06-22T16:58:00-07:00",
+      "error_message": "make sync-catalog proposed '_JERSEY_SKUS: remove [br-011]' \u2014 would drop the hooded Jersey-Series member from the render roster and break validate-catalog jersey_skus (8 vs 7)",
+      "file": "scripts/sync_catalog_downstream.py",
+      "root_cause": "sync_jersey_skus derived the jersey-SERIES roster from CSV garment_type_lock (_csv_jersey_skus), which encodes garment GEOMETRY not roster membership. br-011 is correctly locked 'hoodie' (a hooded Jersey-Series piece per dossier \u2014 drives the FLUX hood clause + PDP label), so geometry-based derivation wrongly excluded it. The validator (check_jersey_skus) already used the authoritative registry sku_folders roster; sync used a different, wrong source \u2014 the two tools encoded opposite truth sources for br-011, and the validator's 'known data error' note was itself factually wrong (br-011 IS a hoodie).",
+      "fix": "Redirected sync_jersey_skus to derive from registry sku_folders via new _registry_jersey_skus() (matching the validator) + empty-registry guard so a bad read can't wipe the roster. Removed dead _csv_jersey_skus + _JERSEY_GARMENT_TYPES. Corrected the validator's false 'known data error' docstring. NO canonical data changed (CSV/dossier/sku_resolver untouched; _JERSEY_SKUS stays 8). Verified: sync-catalog-dry 'already in sync', validate-catalog 13/13, 39 tests pass, lint clean.",
+      "tags": [
+        "catalog",
+        "jersey",
+        "br-011",
+        "sync",
+        "garment_type_lock",
+        "roster",
+        "divergent-master"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:58:00-07:00"
+    },
+    {
+      "id": "bug-157",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "FLUX LoRA generate() returned [] on every call \u2014 no images ever delivered",
+      "file": "scripts/flux_lora/inference.py",
+      "root_cause": "POST used Prefer: respond-async, so Replicate returned 201 with output:null immediately; code read data['output'] or [] with no polling loop and discarded the prediction id, so output was always null.",
+      "fix": "Switched to Prefer: wait; if the returned prediction is non-terminal, poll urls.get until status in TERMINAL_STATUSES; check status explicitly and raise InferenceError on failed/canceled; extract output only on succeeded. Response contract verified vs Replicate HTTP docs.",
+      "tags": [
+        "flux-lora",
+        "replicate",
+        "inference",
+        "polling",
+        "async",
+        "critical"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-158",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "flatlay render carried a standing-on-model SCENE SPEC contradicting the top-down flatlay PRESENTATION",
+      "file": "scripts/oai_render/scene_schema.py",
+      "root_cause": "build_scene only special-cased style=='ghost'; 'flatlay' fell through to the on-model branch (model + collection environment).",
+      "fix": "Route ghost AND flatlay through the clean-studio branch; flatlay gets its own top-down camera (_FLATLAY_CAMERA) matching the PRESENTATION; build_prompt keeps GHOST_BACKGROUND for both.",
+      "tags": [
+        "oai-render",
+        "scene-schema",
+        "flatlay",
+        "prompt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-159",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "build_scene silently substituted 'signature' scenery for unknown collections \u2014 paid render of wrong scene; defeated no-fallback SceneError guard",
+      "file": "scripts/oai_render/scene_schema.py",
+      "root_cause": "Used _ONMODEL_DEFAULTS.get(col_key, _ONMODEL_DEFAULTS['signature']); since plan_sku always passes the scene to build_prompt, the SceneError raised by _background_for became unreachable for solo on-model renders.",
+      "fix": "build_scene now raises SceneError for an unknown on-model collection, mirroring prompt._background_for. No silent fallback.",
+      "tags": [
+        "oai-render",
+        "scene-schema",
+        "no-silent-fallback",
+        "sceneerror"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-160",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "FLUX LoRA Replicate API contract bugs would 404/422 on first real call (lr_scheduler, guidance_scale, flux-dev model, version-less URL, missing destination)",
+      "file": "scripts/flux_lora/trainer.py, scripts/flux_lora/inference.py, scripts/flux_lora/config.py",
+      "root_cause": "Payloads/endpoints were written from memory, not the live schema: lr_scheduler & guidance_scale are not valid fields; base flux-dev lacks LoRA fields; trainings require /versions/{id}/trainings and a destination.",
+      "fix": "Diffed real payloads against live Replicate schemas (read-only GET): pinned version SHA + require it in path; require destination; drop lr_scheduler; inference model -> flux-dev-lora with lora_weights/lora_scale/guidance. Plus SSRF https guards + training_id path-traversal sanitize.",
+      "tags": [
+        "flux-lora",
+        "replicate",
+        "api-contract",
+        "422",
+        "404",
+        "ssrf",
+        "security"
+      ],
+      "related_bugs": [
+        "bug-157"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-161",
+      "timestamp": "2026-06-24T12:32:00-07:00",
+      "error_message": "Turbopack build failed: Route segment config \"dynamic\" is not compatible with nextConfig.cacheComponents. Please remove it.",
+      "file": "frontend/app/api/catalog/route.ts, frontend/app/api/catalog/[sku]/route.ts",
+      "root_cause": "Added `export const dynamic = 'force-dynamic'` to new catalog API routes, but frontend/next.config.ts sets cacheComponents:true, which forbids route-segment config exports (routes are dynamic by default; opt into caching with 'use cache').",
+      "fix": "Removed the `export const dynamic` exports. For GET /api/catalog (which had no inherent dynamism and built as Static \u25cb, risking a stale snapshot after a CSV write) added `await connection()` from next/server to force request-time execution \u2192 route flipped to dynamic \u0192. Context7-confirmed API.",
+      "tags": [
+        "nextjs",
+        "cacheComponents",
+        "route-handler",
+        "connection",
+        "build-error",
+        "catalog-editor"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:32:00-07:00"
+    },
+    {
+      "id": "bug-162",
+      "timestamp": "2026-06-24T13:55:00-07:00",
+      "error_message": "Build error: Both middleware file \"./middleware.ts\" and proxy file \"./proxy.ts\" are detected. Please use \"./proxy.ts\" only.",
+      "file": "frontend/middleware.ts (deleted), frontend/proxy.ts (extended)",
+      "root_cause": "Created frontend/middleware.ts to add an API auth gate, not knowing Next 16 renamed middleware->proxy. The project's gate already lived in frontend/proxy.ts (renamed during the Next 16 migration). The two files conflict \u2014 Next 16 forbids both.",
+      "fix": "Deleted frontend/middleware.ts; extended the existing frontend/proxy.ts instead \u2014 added an /api/* 401-JSON branch and widened the matcher from ['/admin/:path*'] to ['/admin/:path*','/api/((?!auth|checkout).*)']. Excludes /api/auth (NextAuth) and /api/checkout (public) so login + checkout keep working.",
+      "tags": [
+        "nextjs",
+        "next16",
+        "middleware",
+        "proxy",
+        "auth",
+        "next-auth",
+        "build-error",
+        "dashboard"
+      ],
+      "related_bugs": [
+        "bug-161"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T13:55:00-07:00"
     }
   ]
 }

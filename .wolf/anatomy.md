@@ -2174,7 +2174,17 @@
 - `api.ts` — TypeScript resolves `@/lib/api` to this file before the `api/` directory. (~62 tok)
 - `auth.d.ts` — NextAuth.js type augmentations for custom JWT fields (~146 tok)
 - `auth.ts` — NextAuth.js v4 Configuration (~798 tok)
-- `catalog.ts` — Canonical product catalog reader (server-only). (~1334 tok)
+- `catalog.ts` — Canonical product catalog reader (server-only). Exposes resolveRepoFile/resolveCsvPath/resetCatalogCache; reuses splitCsvRow from catalog-csv.ts. (~1334 tok)
+- `catalog-csv.ts` — PURE CSV transforms (no fs / no server-only): splitCsvRow, serializeCsvRow, applyPatch (lossless single-line splice — preserves all 24 cols incl. render_*), parseDataRows, EDITABLE_COLUMNS. Unit-testable; shared by catalog.ts + catalog-write.ts.
+- `catalog-write.ts` — Server-only CSV write path: updateProductRow(sku, patch) → applyPatch → atomic temp-write+rename → resetCatalogCache. Editable commerce fields only; image cols are SOT-governed (not writable).
+- `sot-images.ts` — Server-only reader of generated data/sot-images.json (front-first SOT contract): getSotImagesForSku. DO-NOT-EDIT manifest.
+- `app/admin/catalog/page.tsx` — /admin/catalog SKU editor (client): searchable list + per-SKU edit of 9 commerce fields, read-only SOT imagery, honesty banner. Writes via PUT /api/catalog/:sku.
+- `app/api/catalog/route.ts` — GET raw catalog (CatalogProduct + sot per SKU); `await connection()` keeps it dynamic. `app/api/catalog/[sku]/route.ts` — PUT single-SKU update (Zod strict).
+- `renders-pure.ts` — PURE render-review helpers (no fs/server-only): isSafeSegment (traversal guard), stableStringify (Python json.dump parity for the shared review-state.json), parseVerdicts (run-JSONL attempt→qc_verdict→accepted correlation + sku/slug fallback). Unit-testable.
+- `renders.ts` — Server-only OAI render-review data layer: getRenderQueue (list renders/oai/* + review-state + QC verdicts), resolveRenderImage (realpathSync + containment guard), saveReviewEntry (atomic, Python-parity), loadReviewState.
+- `app/api/renders/route.ts` — GET render queue (`await connection()`). `app/api/renders/image/route.ts` — guarded image proxy (25MB cap → 413). `app/api/renders/review/route.ts` — POST approve/flag/comment → review-state.json (Zod strict).
+- `app/admin/renders/review/page.tsx` — /admin/renders/review approval queue (client): grouped-by-slug render cards, real previews, QC verdict badges, approve/flag/comment, SOT-promotion CLI surfaced read-only.
+- `proxy.ts` — Next 16 auth gate (renamed from middleware.ts). `getToken` → pages redirect to /login, /api/* get 401 JSON. Matcher: `/admin/:path*` + `/api/((?!auth|checkout).*)`. **Editing the auth gate = edit proxy.ts, never create middleware.ts (build fails).**
 - `CLAUDE.md` (~11 tok)
 - `collections.ts` — Exports CollectionSlug, CollectionProduct, CollectionScene, CollectionConfig + 4 more (~3122 tok)
 - `elite-studio-client.ts` — ENVIRONMENT (~2467 tok)
