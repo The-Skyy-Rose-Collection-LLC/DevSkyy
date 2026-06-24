@@ -16,7 +16,8 @@ Public API:
 from __future__ import annotations
 
 import json
-from datetime import datetime, UTC
+import re
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,7 @@ from scripts.flux_lora.config import (
     REPLICATE_VERSION,
     RUNS_DIR,
     get_api_key,
+    is_https_url,
 )
 
 # ---------------------------------------------------------------------------
@@ -130,12 +132,13 @@ def build_manifest(
 # ---------------------------------------------------------------------------
 
 
-def show_stopandshow(manifest: dict[str, Any]) -> None:
+def show_stopandshow(manifest: dict[str, Any], input_images_url: str | None = None) -> None:
     """
     Print the STOP-AND-SHOW confirmation block to stdout.
 
     This MUST be called and the user MUST type 'y' before start_training()
-    is called with confirmed=True.
+    is called with confirmed=True. `input_images_url` is the URL Replicate will
+    actually fetch — shown here so the user confirms exactly what is submitted.
     """
     inp = manifest["training_input"]
     print()
@@ -149,6 +152,7 @@ def show_stopandshow(manifest: dict[str, Any]) -> None:
     else:
         print("  Version : latest")
     print(f"  Dataset : {manifest['dataset_zip']}")
+    print(f"  Upload  : {input_images_url or '(not set — required before submit)'}")
     print(f"  Trigger : {inp['trigger_word']}")
     print(f"  Steps   : {inp['steps']}")
     print(f"  LoRA rank: {inp['lora_rank']}")
@@ -217,6 +221,9 @@ def start_training(
             "then call start_training(..., confirmed=True)."
         )
 
+    if not is_https_url(input_images_url):
+        raise TrainingError(f"input_images_url must be an https:// URL, got: {input_images_url!r}")
+
     token = get_api_key()
     url = _build_training_url(manifest.get("version"))
 
@@ -246,7 +253,8 @@ def start_training(
     except httpx.RequestError as exc:
         raise TrainingError(f"HTTP request failed: {exc}") from exc
 
-    if response.status_code not in (200, 201):
+    # Replicate's create-training endpoint returns 201 for a queued training.
+    if response.status_code != 201:
         raise TrainingError(f"Replicate API returned {response.status_code}: {response.text}")
 
     return response.json()
@@ -273,8 +281,13 @@ def save_run_record(
 
     training_id: str = training_resp.get("id", "unknown")
     ts = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
-    filename = f"training-run-{training_id}-{ts}.json"
-    dest = RUNS_DIR / filename
+
+    # training_id comes from the API response — sanitize before using it in a
+    # filename so a spoofed/MITM'd id like "../../etc/x" cannot escape RUNS_DIR.
+    safe_id = re.sub(r"[^A-Za-z0-9_-]", "_", training_id)[:128] or "unknown"
+    dest = RUNS_DIR / f"training-run-{safe_id}-{ts}.json"
+    if not dest.resolve().is_relative_to(RUNS_DIR.resolve()):
+        raise TrainingError("Refusing to write run record outside RUNS_DIR.")
 
     record: dict[str, Any] = {
         "training_id": training_id,

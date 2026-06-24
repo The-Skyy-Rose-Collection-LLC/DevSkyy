@@ -84,3 +84,13 @@ def get_api_key() -> str:
 def api_key_present() -> bool:
     """Return True if REPLICATE_API_TOKEN is set (for dry-run checks)."""
     return bool(os.environ.get("REPLICATE_API_TOKEN"))
+
+
+def is_https_url(url: object) -> bool:
+    """
+    Return True only for an https:// URL string.
+
+    Used to guard the URLs Replicate fetches server-side (dataset zip, LoRA
+    weights) against SSRF / non-https schemes before any paid call.
+    """
+    return isinstance(url, str) and url.lower().startswith("https://")

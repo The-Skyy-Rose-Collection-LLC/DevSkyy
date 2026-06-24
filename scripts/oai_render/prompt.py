@@ -360,11 +360,20 @@ def build_prompt(
         raise ValueError(f"Unknown view {view!r}. Valid: {sorted(_VIEW_DIRECTIVES)}")
     presentation = PRESENTATIONS[style_key]
     view_directive = _VIEW_DIRECTIVES[view]
-    if scene is not None:
+    if scene is not None and style_key == "on-model":
+        # On-model: the scene JSON carries the founder-approved collection
+        # environment, so it is authoritative for environment + lighting + camera.
         background = (
             "OVERRIDE — ENVIRONMENT, LIGHTING, AND CAMERA: the SCENE SPEC (JSON) block "
             "below is the authoritative source for all three. The generic LIGHTING directive "
             "at the top of this prompt is superseded by the 'lighting' object in the SCENE SPEC."
+        )
+    elif scene is not None:
+        # Ghost / flatlay: keep the clean product-card BACKGROUND guardrails
+        # (no props, no scene); the scene JSON still drives lighting + camera.
+        background = (
+            f"{GHOST_BACKGROUND} The SCENE SPEC (JSON) 'lighting' and 'camera' objects below "
+            "are authoritative for light and lens; keep this clean product-card background."
         )
     else:
         background = _background_for(style_key, collection)

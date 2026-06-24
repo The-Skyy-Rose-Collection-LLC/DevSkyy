@@ -40,7 +40,15 @@ from scripts.flux_lora.config import (
     api_key_present,
 )
 from scripts.flux_lora.dataset import dataset_summary, pack_zip, validate_dataset
-from scripts.flux_lora.inference import DEFAULT_NUM_OUTPUTS, generate, load_latest_lora
+from scripts.flux_lora.inference import (
+    DEFAULT_ASPECT_RATIO,
+    DEFAULT_GUIDANCE,
+    DEFAULT_NUM_INFERENCE_STEPS,
+    DEFAULT_NUM_OUTPUTS,
+    DEFAULT_OUTPUT_FORMAT,
+    generate,
+    load_latest_lora,
+)
 from scripts.flux_lora.status import format_status, get_status, list_runs
 from scripts.flux_lora.trainer import (
     build_manifest,
@@ -61,11 +69,6 @@ def _confirm(prompt: str = "Proceed? [y/N] ") -> bool:
     except (EOFError, KeyboardInterrupt):
         return False
     return answer in ("y", "yes")
-
-
-def _abort(msg: str = "Aborted.") -> None:
-    print(msg, file=sys.stderr)
-    sys.exit(1)
 
 
 # ---------------------------------------------------------------------------
@@ -97,7 +100,18 @@ def cmd_dataset_info(args: argparse.Namespace) -> None:
 def cmd_train(args: argparse.Namespace) -> None:
     dataset_dir = Path(args.dataset_dir)
 
-    # Validate first — fast fail before spending money.
+    # Fast-fail on missing args BEFORE any I/O or user prompt (the zip pack, the
+    # manifest, and the STOP-AND-SHOW all assume a valid upload URL exists).
+    input_images_url = (args.input_images_url or "").strip()
+    if not input_images_url:
+        print(
+            "Error: --input-images-url is required. Upload the zip to a public "
+            "https URL and supply it.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # Validate dataset — fast fail before spending money.
     try:
         validate_dataset(dataset_dir)
     except DatasetError as exc:
@@ -137,19 +151,10 @@ def cmd_train(args: argparse.Namespace) -> None:
         print(f"Manifest error: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    # STOP-AND-SHOW
-    show_stopandshow(manifest)
+    # STOP-AND-SHOW (includes the exact upload URL Replicate will fetch)
+    show_stopandshow(manifest, input_images_url=input_images_url)
     if not _confirm():
         raise UserAbortError("Training cancelled by user.")
-
-    # Require upload URL
-    input_images_url = (args.input_images_url or "").strip()
-    if not input_images_url:
-        print(
-            "Error: --input-images-url is required. Upload the zip to a public URL and supply it.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
 
     # Submit
     print("Submitting training job …")
@@ -191,16 +196,21 @@ def cmd_generate(args: argparse.Namespace) -> None:
         )
         sys.exit(1)
 
+    gen_kwargs: dict[str, object] = {
+        "num_outputs": args.num_outputs,
+        "aspect_ratio": args.aspect_ratio,
+        "output_format": args.output_format,
+        "guidance": args.guidance,
+        "num_inference_steps": args.num_inference_steps,
+        "lora_scale": args.lora_scale,
+        "seed": args.seed,
+    }
+
     # STOP-AND-SHOW is printed inside generate() when confirmed=False.
     # We call with confirmed=False first so the user sees the manifest,
     # then re-call with confirmed=True after 'y'.
     try:
-        generate(
-            args.prompt,
-            lora_url,
-            confirmed=False,
-            num_outputs=args.num_outputs,
-        )
+        generate(args.prompt, lora_url, confirmed=False, **gen_kwargs)
     except RequiresConfirmationError:
         pass  # Expected — manifest was printed, now gate on user input.
 
@@ -208,13 +218,11 @@ def cmd_generate(args: argparse.Namespace) -> None:
         raise UserAbortError("Generation cancelled by user.")
 
     try:
-        urls = generate(
-            args.prompt,
-            lora_url,
-            confirmed=True,
-            num_outputs=args.num_outputs,
-        )
+        urls = generate(args.prompt, lora_url, confirmed=True, **gen_kwargs)
     except FluxLoraError as exc:
+        print(f"Inference error: {exc}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as exc:
         print(f"Inference error: {exc}", file=sys.stderr)
         sys.exit(1)
 
@@ -306,8 +314,16 @@ def build_parser() -> argparse.ArgumentParser:
     # generate
     p_gen = sub.add_parser("generate", help="Run FLUX inference with a trained LoRA.")
     p_gen.add_argument("prompt", help="Text prompt (include trigger word).")
-    p_gen.add_argument("--lora-url", default=None, help="Override LoRA URL.")
+    p_gen.add_argument("--lora-url", default=None, help="Override LoRA URL (https).")
     p_gen.add_argument("--num-outputs", type=int, default=DEFAULT_NUM_OUTPUTS)
+    p_gen.add_argument("--aspect-ratio", default=DEFAULT_ASPECT_RATIO)
+    p_gen.add_argument(
+        "--output-format", choices=["png", "webp", "jpg"], default=DEFAULT_OUTPUT_FORMAT
+    )
+    p_gen.add_argument("--guidance", type=float, default=DEFAULT_GUIDANCE)
+    p_gen.add_argument("--num-inference-steps", type=int, default=DEFAULT_NUM_INFERENCE_STEPS)
+    p_gen.add_argument("--lora-scale", type=float, default=1.0)
+    p_gen.add_argument("--seed", type=int, default=None, help="Fixed seed for reproducible output.")
     p_gen.set_defaults(func=cmd_generate)
 
     # status

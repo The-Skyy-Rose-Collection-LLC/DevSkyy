@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from scripts.flux_lora import RequiresConfirmationError
+from scripts.flux_lora import RequiresConfirmationError, TrainingError
 from scripts.flux_lora.config import (
     DEFAULT_STEPS,
     DEFAULT_TRIGGER_WORD,
@@ -181,6 +181,24 @@ class TestStartTraining:
         assert payload["input"]["input_images"] == "https://example.com/dataset.zip"
         assert "lr_scheduler" not in payload["input"]
 
+    def test_rejects_non_https_input_images_url(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SSRF guard: a non-https input_images_url must raise before any POST."""
+        monkeypatch.setenv("REPLICATE_API_TOKEN", "test-token-abc")
+        zip_path = tmp_path / "dataset.zip"
+        zip_path.write_bytes(b"PK")
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
+
+        with patch("scripts.flux_lora.trainer.httpx.post") as mock_post:
+            with pytest.raises(TrainingError, match="https"):
+                start_training(
+                    manifest,
+                    confirmed=True,
+                    input_images_url="http://evil.local/dataset.zip",
+                )
+            mock_post.assert_not_called()
+
 
 class TestSaveRunRecord:
     def test_saves_json_file_with_correct_keys(
@@ -207,3 +225,25 @@ class TestSaveRunRecord:
         assert "timestamp" in record
         assert record["manifest"]["model_name"] == "flux-dev-lora-trainer"
         assert record["replicate_response"]["status"] == "starting"
+
+    def test_sanitizes_malicious_training_id_in_filename(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A spoofed training_id with path separators must not escape RUNS_DIR."""
+        runs_dir = tmp_path / "runs"
+        monkeypatch.setattr("scripts.flux_lora.trainer.RUNS_DIR", runs_dir)
+
+        zip_path = tmp_path / "dataset.zip"
+        zip_path.write_bytes(b"PK")
+        manifest = build_manifest(zip_path, destination_model="skyyrose/skyyrose-lora")
+
+        record_path = save_run_record({"id": "../../etc/evil", "status": "x"}, manifest)
+
+        # File stays inside RUNS_DIR; separators were sanitized out of the name.
+        assert record_path.parent == runs_dir
+        assert record_path.resolve().is_relative_to(runs_dir.resolve())
+        assert "/" not in record_path.name.replace(".json", "")
+        # Original id preserved inside the record for fidelity.
+        assert (
+            json.loads(record_path.read_text(encoding="utf-8"))["training_id"] == "../../etc/evil"
+        )

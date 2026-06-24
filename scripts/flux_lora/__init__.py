@@ -6,7 +6,8 @@ Error hierarchy:
     DatasetError                dataset validation / loading failures
     RequiresConfirmationError   STOP-AND-SHOW gate: call raised when confirmed=False
     UserAbortError              user typed 'n' at confirmation prompt
-    TrainingError               Replicate API / training job failures
+    TrainingError               Replicate training API / training job failures
+    InferenceError              Replicate prediction API / inference failures
 """
 
 
@@ -32,4 +33,8 @@ class UserAbortError(FluxLoraError):
 
 
 class TrainingError(FluxLoraError):
-    """Replicate API error or training job failure."""
+    """Replicate training API error or training job failure."""
+
+
+class InferenceError(FluxLoraError):
+    """Replicate prediction API error or inference job failure."""

@@ -17,8 +17,10 @@ Schema keys:
 
 from __future__ import annotations
 
+from .prompt import SceneError
+
 # ---------------------------------------------------------------------------
-# Ghost / flatlay per-collection defaults
+# Ghost / flatlay studio defaults
 # ---------------------------------------------------------------------------
 
 _GHOST_LIGHTING: dict[str, str] = {
@@ -32,6 +34,16 @@ _GHOST_CAMERA: dict[str, str | float] = {
     "aperture": "f/8",
     "angle": "straight-on eye-level",
     "depth_of_field": "full garment sharp, background soft",
+}
+
+# Flatlay is a top-down shot — its camera angle MUST match the flatlay
+# PRESENTATION ("laid flat, top-down"); reusing the ghost eye-level camera would
+# contradict it inside the same prompt.
+_FLATLAY_CAMERA: dict[str, str | float] = {
+    "lens": "50mm",
+    "aperture": "f/8",
+    "angle": "top-down overhead, lens perpendicular to the surface",
+    "depth_of_field": "entire garment evenly sharp",
 }
 
 _GHOST_ENVIRONMENT: str = "seamless studio cyclorama"
@@ -146,8 +158,8 @@ def build_scene(
     sku:             Product SKU (e.g. "br-001").
     name:            Sanitized garment name (e.g. "The Black Rose Varsity").
     collection:      Collection slug (e.g. "black-rose").
-    style:           Render style key — "ghost" for ghost-mannequin / flatlay,
-                     any other value for on-model editorial.
+    style:           Render style key — "ghost" or "flatlay" → clean studio
+                     (no model); any other value → on-model editorial.
     garment_color:   Primary garment colorway if known (optional).
     garment_details: Brief garment description for subject field (optional).
 
@@ -155,14 +167,20 @@ def build_scene(
     -------
     dict following the SkyyRose scene schema. Always a new object; no shared
     state with module-level constants.
+
+    Raises
+    ------
+    SceneError: for an on-model render of a collection with no defined scene —
+                mirrors prompt._background_for; never silently substitutes one.
     """
     color_desc = garment_color or "as shown in references"
     details_desc = garment_details or name
 
-    if style == "ghost":
+    if style in ("ghost", "flatlay"):
+        is_flatlay = style == "flatlay"
         return {
             "subject": {
-                "type": "ghost-mannequin",
+                "type": "flatlay" if is_flatlay else "ghost-mannequin",
                 "garment": details_desc,
                 "color": color_desc,
                 "sku": sku,
@@ -170,7 +188,7 @@ def build_scene(
             "model": None,
             "environment": _GHOST_ENVIRONMENT,
             "lighting": dict(_GHOST_LIGHTING),
-            "camera": dict(_GHOST_CAMERA),
+            "camera": dict(_FLATLAY_CAMERA if is_flatlay else _GHOST_CAMERA),
             "style": "clean commercial product photography",
             "mood": "precise, editorial, luxury retail",
             "color_palette": ["#B76E79", "#FFFFFF", "#0A0A0A"],
@@ -178,7 +196,12 @@ def build_scene(
         }
 
     col_key = collection.lower()
-    defaults = _ONMODEL_DEFAULTS.get(col_key, _ONMODEL_DEFAULTS["signature"])
+    defaults = _ONMODEL_DEFAULTS.get(col_key)
+    if defaults is None:
+        raise SceneError(
+            f"No on-model scene for collection {collection!r}; refusing a generic "
+            f"fallback. Add it to _ONMODEL_DEFAULTS. Known: {sorted(_ONMODEL_DEFAULTS)}"
+        )
 
     return {
         "subject": {

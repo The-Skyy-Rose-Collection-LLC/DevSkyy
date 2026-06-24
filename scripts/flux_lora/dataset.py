@@ -23,8 +23,12 @@ MIN_IMAGES: int = 5
 
 
 def _image_files(dataset_dir: Path) -> list[Path]:
-    """Return sorted list of image files in dataset_dir."""
-    return sorted(p for p in dataset_dir.iterdir() if p.suffix.lower() in IMAGE_EXTENSIONS)
+    """Return sorted list of image FILES in dataset_dir (skips dirs named e.g. x.png)."""
+    if not dataset_dir.is_dir():
+        raise DatasetError(f"Dataset path is not a directory: {dataset_dir}")
+    return sorted(
+        p for p in dataset_dir.iterdir() if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS
+    )
 
 
 def load_dataset(dataset_dir: Path = DATASET_DIR) -> dict[str, Any]:
@@ -40,7 +44,8 @@ def load_dataset(dataset_dir: Path = DATASET_DIR) -> dict[str, Any]:
         }
 
     Raises:
-        DatasetError: if directory absent or no metadata file present.
+        DatasetError: if dataset_dir does not exist or is not a directory.
+                      (metadata.jsonl is optional; absent => metadata is None.)
     """
     if not dataset_dir.exists():
         raise DatasetError(f"Dataset directory not found: {dataset_dir}")
@@ -81,7 +86,8 @@ def validate_dataset(dataset_dir: Path = DATASET_DIR) -> None:
       - Every caption begins with DEFAULT_TRIGGER_WORD
 
     Raises:
-        DatasetError: with a descriptive message on first failure found.
+        DatasetError: with all caption problems collected into one message
+                      (missing sidecars AND wrong trigger words together).
     """
     if not dataset_dir.exists():
         raise DatasetError(f"Dataset directory not found: {dataset_dir}")
@@ -104,13 +110,16 @@ def validate_dataset(dataset_dir: Path = DATASET_DIR) -> None:
         if not caption.startswith(DEFAULT_TRIGGER_WORD):
             bad_trigger.append(img.name)
 
+    errors: list[str] = []
     if missing_captions:
-        raise DatasetError(f"Missing caption sidecars for: {', '.join(missing_captions)}")
+        errors.append(f"Missing caption sidecars for: {', '.join(missing_captions)}")
     if bad_trigger:
-        raise DatasetError(
+        errors.append(
             f"Captions must start with trigger word '{DEFAULT_TRIGGER_WORD}'. "
             f"Offending images: {', '.join(bad_trigger)}"
         )
+    if errors:
+        raise DatasetError(" | ".join(errors))
 
 
 def pack_zip(dataset_dir: Path = DATASET_DIR, dest: Path | None = None) -> Path:
