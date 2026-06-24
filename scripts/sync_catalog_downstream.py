@@ -52,10 +52,6 @@ _SIMILARITIES_JSON: Path = (
 )
 _SKU_RESOLVER_PY: Path = _REPO_ROOT / "skyyrose" / "elite_studio" / "sku_resolver.py"
 
-_JERSEY_GARMENT_TYPES: frozenset[str] = frozenset(
-    {"baseball-jersey", "football-jersey", "basketball-jersey", "hockey-jersey", "jersey"}
-)
-
 # Backup suffix pattern: .bak-pre-sync-YYYYMMDD-HHMMSS
 _BACKUP_SUFFIX_FMT = ".bak-pre-sync-%Y%m%d-%H%M%S"
 
@@ -95,12 +91,28 @@ def _load_csv() -> list[dict[str, str]]:
         return list(csv.DictReader(fh))
 
 
-def _csv_jersey_skus(rows: list[dict[str, str]]) -> frozenset[str]:
-    return frozenset(
-        row["sku"].strip()
-        for row in rows
-        if row.get("garment_type_lock", "").strip().lower() in _JERSEY_GARMENT_TYPES
-    )
+def _registry_jersey_skus() -> frozenset[str]:
+    """Authoritative jersey-series roster = sku_folders keys in logo-registry.json.
+
+    The jersey roster is a product-LINE concept (the "BLACK is Beautiful Jersey
+    Series"), NOT a garment-geometry one, so it is deliberately NOT derived from the
+    CSV ``garment_type_lock`` column. That column encodes garment shape — e.g. br-011
+    (a hooded Jersey-Series piece) is locked ``hoodie`` so the render pipeline draws
+    its hood, yet it is still a roster member; deriving from garment_type_lock would
+    wrongly drop it. ``validate_catalog_consistency.check_jersey_skus`` uses this same
+    source, so the two tools agree by construction.
+
+    Returns an empty frozenset when the registry is missing or unreadable — callers
+    MUST treat empty as "cannot determine" and skip, never as "roster is empty".
+    """
+    if not _LOGO_REGISTRY.exists():
+        return frozenset()
+    try:
+        reg = json.loads(_LOGO_REGISTRY.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return frozenset()
+    folders = reg.get("sku_folders", {})
+    return frozenset(k for k in folders if isinstance(k, str) and not k.startswith("_"))
 
 
 def _csv_all_skus(rows: list[dict[str, str]]) -> frozenset[str]:
@@ -149,10 +161,13 @@ def _extract_jersey_skus_block(src: str) -> tuple[int, int] | None:
 
 
 def sync_jersey_skus(
-    rows: list[dict[str, str]],
     dry_run: bool = False,
 ) -> SyncAction:
-    """Sync _JERSEY_SKUS frozenset in sku_resolver.py to match CSV jersey rows."""
+    """Sync _JERSEY_SKUS in sku_resolver.py to the authoritative jersey-series roster.
+
+    Roster source is registry sku_folders (see ``_registry_jersey_skus``), NOT the CSV
+    garment_type_lock column — that column is garment geometry, not roster membership.
+    """
     target = str(_SKU_RESOLVER_PY.relative_to(_REPO_ROOT))
     if not _SKU_RESOLVER_PY.exists():
         return SyncAction(
@@ -162,8 +177,16 @@ def sync_jersey_skus(
             error="File missing",
         )
 
+    roster = _registry_jersey_skus()
+    if not roster:
+        return SyncAction(
+            target=target,
+            action="skip",
+            description="Cannot derive jersey roster — registry sku_folders empty/unreadable",
+            error="registry unavailable",
+        )
+
     src = _SKU_RESOLVER_PY.read_text(encoding="utf-8")
-    csv_jerseys = _csv_jersey_skus(rows)
 
     # Parse current frozenset via AST
     try:
@@ -214,16 +237,16 @@ def sync_jersey_skus(
             error="Pattern not found",
         )
 
-    if current_skus == csv_jerseys:
+    if current_skus == roster:
         return SyncAction(
             target=target,
             action="noop",
-            description="_JERSEY_SKUS already in sync with CSV jersey rows",
+            description="_JERSEY_SKUS already in sync with the registry jersey roster",
             applied=True,
         )
 
-    added = csv_jerseys - current_skus
-    removed = current_skus - csv_jerseys
+    added = roster - current_skus
+    removed = current_skus - roster
     desc_parts = []
     if added:
         desc_parts.append(f"add {sorted(added)}")
@@ -239,7 +262,7 @@ def sync_jersey_skus(
         )
 
     # Build new frozenset block preserving indentation
-    sorted_skus = sorted(csv_jerseys)
+    sorted_skus = sorted(roster)
     indent = "        "  # 8-space indent (matches existing style)
     sku_lines = "\n".join(f'{indent}    "{s}",' for s in sorted_skus)
     new_block = f"_JERSEY_SKUS: frozenset[str] = frozenset(\n{indent}{{\n{sku_lines}\n{indent}}}\n)"
@@ -500,7 +523,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # Run sync targets
     sync_fns = [
-        lambda r=rows, d=dry_run: sync_jersey_skus(r, dry_run=d),
+        lambda d=dry_run: sync_jersey_skus(dry_run=d),
         lambda r=rows, d=dry_run: sync_similarities_json(r, dry_run=d),
         lambda d=dry_run: sync_registry_updated(dry_run=d),
     ]
