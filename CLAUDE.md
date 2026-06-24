@@ -43,8 +43,8 @@ The diligence spine. These are the standard for every task — not aspirational,
 | Visual / UI / live-page rendering | **Chrome DevTools MCP** or **Playwright MCP** — navigate + screenshot/snapshot, mobile **and** desktop | Eyes-on proof for skyyrose.co, not just an HTTP code. |
 | Live HTML / JSON-LD / OG tags / headers | `curl -s "URL?cb=$(date +%s)" \| grep` | **NEVER WebFetch** — it strips `<script>` (JSON-LD/OG). Cache-bust (WP.com Batcache serves stale). |
 | Codebase facts (paths, symbols, exports, signatures) | **Read / Grep / Glob** the source; quote `file:line` | Anatomy.md first; don't trust memory for code that may have moved. |
-| Product facts (SKU, price, name, collection) | **catalog CSV** + per-SKU dossier + `identity.json` / `sot.json` | Canonical-sources-only. Memory rots; the CSV doesn't. |
-| Non-product imagery ownership | **visual-manifest.json** (+ generated `sot.json`) | Filenames are NOT identity — the manifest is. Verify pixels if in doubt. |
+| Product facts (SKU, price, name, collection) | **catalog CSV** + per-SKU **dossier** | Canonical-sources-only (`SOT.md`). Memory rots; the CSV doesn't. |
+| Imagery ownership | product → **sot-images.json** (generated, `make sot-manifest`); non-product → **visual-manifest.json** | Filenames are NOT identity — the manifest is. Verify pixels if in doubt. |
 | Prior work / "did we solve this?" | **mem-search** / `get_observations([IDs])` | Check before re-deriving; cite obs IDs. |
 | API connectivity / integration up-or-down | A real `verify_connectivity()` call | Don't declare blocked OR working without the proof. |
 | Test pass / fail | `rtk proxy pytest …` (true exit code) + read output | Bare pytest's compressed line can falsely say "no tests collected". |
@@ -110,7 +110,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.0.0 — commercial)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (commercial; version in style.css)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -120,7 +120,7 @@ scripts/        → Deploy, sync, generation scripts
 | File | Purpose |
 |------|---------|
 | `main_enterprise.py` | FastAPI app — REST + GraphQL + webhooks |
-| `devskyy_mcp.py` | MCP server — 20+ tools |
+| `devskyy_mcp.py` | MCP server — agents, WooCommerce, imagery, RAG tools |
 | `frontend/` | Next.js 16 + React 19 dashboard |
 | `wordpress-theme/skyyrose-flagship/` | Production WordPress theme |
 | `skyyrose/elite_studio/` | Multi-agent image pipeline |
@@ -133,31 +133,25 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery (Nano Banana 2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `source .venv/bin/activate && python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
+| **Imagery (OAI gpt-image-2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `python scripts/oai-render-run.py dry-run --sku br-001` — paid `generate` needs `--yes` (STOP-AND-SHOW). Engine: `scripts/oai_render/` |
 | **ADK Agents** | Python (isolated) | `.venv-agents/` (create as needed) | `pip install google-adk` | — |
 
-**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Nano Banana shares the main `.venv/`; `.venv-imagery/` was an earlier design that was never created.
+**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Imagery shares the main `.venv/`.
 
 ---
 
-## WordPress Theme (SkyyRose v1.0.0)
+## WordPress Theme (SkyyRose)
 
 **Commercial marketplace theme. Production at skyyrose.co**
 **Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
 
 ```
-wordpress-theme/skyyrose-flagship/
-├── assets/css/      43 files (page CSS, holo cards, tokens, components)
-├── assets/js/       23 files (holo cards, navigation, page-specific)
-├── assets/fonts/    19 files (self-hosted woff2, zero Google Fonts CDN)
-├── inc/             21 modules (enqueue, security, WC, ajax, SEO)
-├── inc/builders/    6 files (detection, elementor, divi, beaver, bricks)
-├── template-parts/  37 partials (product-card-holo.php = holo card system)
-├── patterns/        4 collection hero block patterns
-├── woocommerce/     5 overrides (cart, checkout, single-product)
-├── blueprints/      WC Blueprints for one-click demo import
-├── docs/            11 HTML documentation files (ThemeForest submission)
-└── *.php            24 page templates + 3 builder templates
+wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
+  assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
+  inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
+  template-parts/          product-card-holo.php = holo card system
+  patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
+  *.php                    collection + landing + immersive + builder templates
 ```
 
 **Active templates:**
@@ -176,7 +170,7 @@ wordpress-theme/skyyrose-flagship/
 - `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
 - `inc/patterns.php` — Block pattern registration for all collections
 - `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
-- `functions.php` — Theme constants, includes array (v1.0.0)
+- `functions.php` — Theme constants (`SKYYROSE_VERSION`), includes array
 
 **PHPCS compliance:**
 - `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
@@ -241,7 +235,7 @@ Never fix a test by weakening it. Fix the code, not the test.
 - Python line length: 100 (black + ruff + isort)
 - Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
 - Fix everything in one batch, test all pages, deploy ONCE (no back-and-forth)
-- **Deletion policy (supersedes the retired "NO deletions, refactor only" stance, 2026-06-21):** stale, dead, duplicate, or conflicting code SHOULD be deleted — not left to rot. Rule is **repoint-first / census-gated**: never delete an artifact until a census (grep importers incl. tests + downstream consumers) proves zero live consumers. Then delete it AND every now-dead consumer + dangling reference in the SAME change. A deletion that leaves a surviving import is a regression, not a cleanup. Irreversible ops (rm of untracked files, git history rewrite) still require STOP-AND-SHOW.
+- **Deletion policy — repoint-first / census-gated.** Stale, dead, duplicate, or conflicting code SHOULD be deleted, not left to rot. Never delete until a census (grep importers incl. tests + downstream + cross-language string refs) proves zero live consumers; then delete the artifact AND every now-dead consumer + dangling reference in the SAME change. A deletion that leaves a surviving import is a regression, not a cleanup. **Pick the lane by two axes — reversibility × regeneration cost:** (a) census-clean *tracked code* → delete now (git restores it); (b) untracked build/cache junk → **gitignore, don't `rm`**; (c) any **expensive/paid asset** (renders, 3D models, datasets, paid PNGs) → STOP-AND-SHOW, never autonomous — the regeneration cost is real money. `rm` of untracked files and git-history rewrites are always STOP-AND-SHOW.
 
 ---
 
@@ -275,7 +269,7 @@ Never fix a test by weakening it. Fix the code, not the test.
 
 ## Learnings
 
-Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Moved out of this file 2026-06-16 to shrink per-session context; it is a knowledge base, not per-turn behavioral rules.
+Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Knowledge base, not per-turn behavioral rules.
 ## Behavioral Standards — How Claude Operates in This Project
 
 These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.
@@ -425,7 +419,7 @@ Before taking any of the actions below, Claude MUST stop, print exactly what it 
 - Reading from Photos Library or `~/Pictures/` paths is ALLOWED when the user has shared a specific file path in the current conversation (pasted or attached). Confirmation is implicit in the share.
 - Using any file as the source image for a PAID API call (FASHN, Gemini generation, FLUX, Replicate, etc.) — must confirm the file is the correct garment before dispatch.
 - Uploading any file to WooCommerce, the live WordPress site, or any external destination — must confirm.
-- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/` — must confirm.
+- Deleting/overwriting/renaming real data, untracked files, or any expensive/paid asset (renders, 3D models, datasets) — must confirm. Census-clean *tracked dead code* is git-reversible: delete it per the Deletion policy without asking.
 
 ### What the confirmation must look like:
 
