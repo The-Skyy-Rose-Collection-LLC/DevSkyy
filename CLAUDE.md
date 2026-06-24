@@ -4,6 +4,8 @@
 
 This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
 
+**Source of Truth:** the canonical sources (product catalog, imagery, brand canon, OpenWolf memory) are registered in **`SOT.md`** at the repo root, each surfaced as a root symlink (`skyyrose-catalog.csv`, `sot-images.json`, `cerebrum.md`, `anatomy.md`, …). Read `SOT.md` before caching any product / imagery / brand fact. Never fork or introduce a second copy of a SOT.
+
 
 # DevSkyy — Claude Code Configuration
 
