@@ -24,6 +24,7 @@ display layer is fully SOT-sourced.
 
 from __future__ import annotations
 
+import functools
 import re
 import subprocess
 from pathlib import Path
@@ -48,7 +49,8 @@ ALLOWLIST = {
 }
 
 
-def _tracked_files() -> list[str]:
+@functools.lru_cache(maxsize=1)
+def _tracked_files() -> tuple[str, ...]:
     out = subprocess.run(
         ["git", "ls-files", "*.ts", "*.tsx", "*.js", "*.jsx"],
         cwd=REPO,
@@ -56,7 +58,7 @@ def _tracked_files() -> list[str]:
         text=True,
         check=True,
     ).stdout
-    return [f for f in out.splitlines() if f]
+    return tuple(f for f in out.splitlines() if f)
 
 
 def test_no_fabricated_scene_product_images():

@@ -27,12 +27,11 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from skyyrose.core.catalog_loader import CATALOG_CSV
+# Anchor on the canonical path registry (skyyrose.core.paths) — never recompute
+# repo/theme roots locally (paths.py is the single place that answers "where").
+from skyyrose.core.paths import REPO_ROOT, THEME_ROOT
 
-# THEME_ROOT = wordpress-theme/skyyrose-flagship (CATALOG_CSV is .../data/skyyrose-catalog.csv)
-THEME_ROOT: Path = CATALOG_CSV.parent.parent
 COLLECTIONS_DIR: Path = THEME_ROOT / "data" / "collections"
-COLLECTIONS: tuple[str, ...] = ("black-rose", "love-hurts", "signature", "kids-capsule")
 
 Role = Literal["front", "back", "packshot"]
 
@@ -49,10 +48,10 @@ _ROLE_KEYS: dict[str, tuple[str, ...]] = {
 def _index() -> dict[str, dict]:
     """Build ``sku -> product`` from every collection's ``sot.json`` (cached)."""
     idx: dict[str, dict] = {}
-    for slug in COLLECTIONS:
-        sot_path = COLLECTIONS_DIR / slug / "sot.json"
-        if not sot_path.is_file():
-            continue
+    # Enumerate collections from the filesystem so a newly-added collection is
+    # picked up automatically — never a hardcoded slug list that silently omits it.
+    for sot_path in sorted(COLLECTIONS_DIR.glob("*/sot.json")):
+        slug = sot_path.parent.name
         sot = json.loads(sot_path.read_text())
         for prod in sot.get("products", []):
             sku = prod.get("sku")
@@ -107,13 +106,18 @@ def build_manifest() -> dict[str, dict[str, str]]:
     non-Python surfaces (the Next.js dashboard, any JS/PHP consumer). Generated —
     regenerate via :func:`write_manifest`; never hand-edit.
     """
+    # Single pass over the cached index, reusing the same _ROLE_KEYS fallback
+    # chain resolve_image() applies (one authority for the front-first rule).
     manifest: dict[str, dict[str, str]] = {}
-    for sku in all_skus():
+    for sku, prod in sorted(_index().items()):
+        images = prod.get("images", {})
         entry: dict[str, str] = {}
-        for role in ("front", "back", "packshot"):
-            path = resolve_image(sku, role)  # type: ignore[arg-type]
-            if path:
-                entry[role] = path
+        for role, keys in _ROLE_KEYS.items():
+            for key in keys:
+                e = images.get(key)
+                if isinstance(e, dict) and e.get("path"):
+                    entry[role] = e["path"]
+                    break
         if entry:
             manifest[sku] = entry
     return manifest
@@ -121,11 +125,15 @@ def build_manifest() -> dict[str, dict[str, str]]:
 
 # Default emit location: repo-root data/sot-images.json (a generated artifact
 # both systems can read without cross-wiring the WP theme tree).
-MANIFEST_PATH: Path = THEME_ROOT.parents[1] / "data" / "sot-images.json"
+MANIFEST_PATH: Path = REPO_ROOT / "data" / "sot-images.json"
 
 
-def write_manifest(out_path: Path | None = None) -> Path:
-    """Write the manifest to ``out_path`` (default :data:`MANIFEST_PATH`)."""
+def write_manifest(out_path: Path | None = None, manifest: dict | None = None) -> Path:
+    """Write the manifest to ``out_path`` (default :data:`MANIFEST_PATH`).
+
+    Pass an already-built ``manifest`` to avoid rebuilding it (e.g. when the caller
+    also needs the count); otherwise it is built here.
+    """
     out = out_path or MANIFEST_PATH
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -133,12 +141,13 @@ def write_manifest(out_path: Path | None = None) -> Path:
         "Regenerate after build-collection-sot.py.",
         "_authority": "SOT product-imagery contract. Front-first fallback "
         "(on-model render before flat packshot).",
-        "images": build_manifest(),
+        "images": build_manifest() if manifest is None else manifest,
     }
     out.write_text(json.dumps(payload, indent=2) + "\n")
     return out
 
 
 if __name__ == "__main__":
-    p = write_manifest()
-    print(f"wrote {p} ({len(build_manifest())} skus)")
+    images = build_manifest()
+    p = write_manifest(manifest=images)
+    print(f"wrote {p} ({len(images)} skus)")
