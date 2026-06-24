@@ -48,7 +48,7 @@ class TestCircuitBreaker:
     def test_success_in_half_open_closes_circuit(self):
         """A success in HALF_OPEN state transitions circuit back to CLOSED."""
         cb = CircuitBreaker(
-            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01
+            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.05
         )
 
         # Trip circuit
@@ -57,7 +57,7 @@ class TestCircuitBreaker:
         assert cb.state == CircuitState.OPEN
 
         # Wait for recovery timeout
-        time.sleep(0.02)
+        time.sleep(0.1)
         assert cb.state == CircuitState.HALF_OPEN
 
         # One success closes it
@@ -67,7 +67,7 @@ class TestCircuitBreaker:
     def test_failure_in_half_open_reopens_circuit(self):
         """A failure in HALF_OPEN state re-opens the circuit immediately."""
         cb = CircuitBreaker(
-            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01
+            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.05
         )
 
         # Trip circuit
@@ -75,7 +75,7 @@ class TestCircuitBreaker:
             cb.record_failure()
 
         # Wait for half-open
-        time.sleep(0.02)
+        time.sleep(0.1)
         assert cb.state == CircuitState.HALF_OPEN
 
         # Failure in half-open → stays or goes back to OPEN
