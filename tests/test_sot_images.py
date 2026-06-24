@@ -10,14 +10,27 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from skyyrose.core import sot_images
+
+
+@pytest.fixture(autouse=True)
+def _clear_sot_cache():
+    """Drop the lru_cached index around every test so monkeypatched/synthetic
+    indices never leak into a later test (the cache is process-global)."""
+    sot_images.refresh()
+    yield
+    sot_images.refresh()
 
 
 def test_resolve_front_prefers_on_model_render():
     # br-004 has both front_model_image (on-model) and image (flat packshot).
     path = sot_images.resolve_image("br-004", "front")
     assert path is not None
-    assert "onmodel" in path or "model" in path
+    # Returns the SOT's front_model_image value exactly — assert on the contract,
+    # not on a filename substring (which would break on a differently-named asset).
+    assert path == sot_images._index()["br-004"]["images"]["front_model_image"]["path"]
     # Never the flat packshot when an on-model render exists.
     assert path != sot_images.resolve_image("br-004", "packshot")
 
@@ -74,3 +87,22 @@ def test_manifest_is_json_serializable():
     # The dashboard consumes this as data/sot-images.json — must round-trip.
     manifest = sot_images.build_manifest()
     assert json.loads(json.dumps(manifest)) == manifest
+
+
+def test_back_falls_back_to_back_image_when_no_back_model(monkeypatch):
+    # In live data every SKU with back_image also has back_model_image, so the
+    # second fallback key is otherwise unexercised. Synthesize the gap.
+    synthetic = {
+        "xx-001": {"images": {"back_image": {"path": "assets/images/products/xx-001-back.webp"}}}
+    }
+    monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
+    assert sot_images.resolve_image("xx-001", "back") == "assets/images/products/xx-001-back.webp"
+
+
+def test_resolve_rejects_path_traversal(monkeypatch):
+    # Defense-in-depth: a poisoned SOT path that escapes the assets tree must raise,
+    # never silently return a climbing path a consumer might open()/serve.
+    synthetic = {"xx-002": {"images": {"front_model_image": {"path": "../../etc/passwd"}}}}
+    monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
+    with pytest.raises(ValueError, match="escapes the assets tree"):
+        sot_images.resolve_image("xx-002", "front")

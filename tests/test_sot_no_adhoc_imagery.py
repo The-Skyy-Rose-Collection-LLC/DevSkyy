@@ -32,7 +32,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 
 # Fabricated scene-placeholder images — banned outright, anywhere.
-SCENE_FAKE = re.compile(r"/images/scenes/[\w-]*product[\w-]*\.(?:jpg|jpeg|png|webp)")
+SCENE_FAKE = re.compile(r"/images/scenes/[\w-]*product[\w-]*\.(?:jpg|jpeg|png|webp|avif)")
 
 # Hardcoded product-image path literals (the render tree) in display code.
 PRODUCT_PATH_LITERAL = re.compile(

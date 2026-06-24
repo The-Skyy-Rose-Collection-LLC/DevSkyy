@@ -70,6 +70,31 @@ def all_skus() -> list[str]:
     return sorted(_index())
 
 
+def _validated_path(raw: str, sku: str) -> str:
+    """Enforce the theme-relative contract — reject absolute paths / ``..`` escapes.
+
+    The SOT is repo-tracked and generated, so this is defense-in-depth (matching
+    ``paths.golden_path`` / ``paths.wp_product_path``): a consumer that ``open()``s
+    or serves the returned path must never receive one that climbs out of the tree.
+    """
+    if raw.startswith("/") or ".." in Path(raw).parts:
+        raise ValueError(f"sot.json image path escapes the assets tree for {sku!r}: {raw!r}")
+    return raw
+
+
+def _first_path(images: dict, keys: tuple[str, ...], sku: str) -> str | None:
+    """First present, validated ``path`` among ``keys`` — the front-first fallback.
+
+    Single authority for the fallback loop (used by both :func:`resolve_image` and
+    :func:`build_manifest`).
+    """
+    for key in keys:
+        entry = images.get(key)
+        if isinstance(entry, dict) and entry.get("path"):
+            return _validated_path(entry["path"], sku)
+    return None
+
+
 def resolve_image(sku: str, role: Role = "front") -> str | None:
     """Return the theme-relative path (``assets/images/products/...``) for a SKU's
     image in ``role``, applying the front-first fallback chain.
@@ -86,17 +111,21 @@ def resolve_image(sku: str, role: Role = "front") -> str | None:
     prod = _index().get(sku)
     if not prod:
         return None
-    images = prod.get("images", {})
-    for key in _ROLE_KEYS.get(role, ()):
-        entry = images.get(key)
-        if isinstance(entry, dict) and entry.get("path"):
-            return entry["path"]
-    return None
+    return _first_path(prod.get("images", {}), _ROLE_KEYS.get(role, ()), sku)
 
 
 def has_render(sku: str) -> bool:
-    """True when the SOT has at least a front image for this SKU."""
-    return resolve_image(sku, "front") is not None
+    """True when the SOT has an actual on-model FRONT render (``front_model_image``).
+
+    Distinct from ``resolve_image(sku, "front") is not None`` — that falls back to the
+    flat ``image`` packshot so a card always shows *something*. ``has_render`` answers
+    the narrower "is there a real render", so it must NOT honor the packshot fallback.
+    """
+    prod = _index().get(sku)
+    if not prod:
+        return False
+    entry = prod.get("images", {}).get("front_model_image")
+    return isinstance(entry, dict) and bool(entry.get("path"))
 
 
 def build_manifest() -> dict[str, dict[str, str]]:
@@ -113,11 +142,9 @@ def build_manifest() -> dict[str, dict[str, str]]:
         images = prod.get("images", {})
         entry: dict[str, str] = {}
         for role, keys in _ROLE_KEYS.items():
-            for key in keys:
-                e = images.get(key)
-                if isinstance(e, dict) and e.get("path"):
-                    entry[role] = e["path"]
-                    break
+            path = _first_path(images, keys, sku)
+            if path:
+                entry[role] = path
         if entry:
             manifest[sku] = entry
     return manifest
@@ -135,6 +162,9 @@ def write_manifest(out_path: Path | None = None, manifest: dict | None = None) -
     also needs the count); otherwise it is built here.
     """
     out = out_path or MANIFEST_PATH
+    # Never let a caller-supplied out_path write outside the repo.
+    if out_path is not None and not str(out.resolve()).startswith(str(REPO_ROOT)):
+        raise ValueError(f"write_manifest: out_path must be within the repo: {out_path}")
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "_generated_by": "skyyrose.core.sot_images.write_manifest — DO NOT EDIT. "
