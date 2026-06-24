@@ -2164,6 +2164,123 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T16:58:00-07:00"
+    },
+    {
+      "id": "bug-157",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "FLUX LoRA generate() returned [] on every call \u2014 no images ever delivered",
+      "file": "scripts/flux_lora/inference.py",
+      "root_cause": "POST used Prefer: respond-async, so Replicate returned 201 with output:null immediately; code read data['output'] or [] with no polling loop and discarded the prediction id, so output was always null.",
+      "fix": "Switched to Prefer: wait; if the returned prediction is non-terminal, poll urls.get until status in TERMINAL_STATUSES; check status explicitly and raise InferenceError on failed/canceled; extract output only on succeeded. Response contract verified vs Replicate HTTP docs.",
+      "tags": [
+        "flux-lora",
+        "replicate",
+        "inference",
+        "polling",
+        "async",
+        "critical"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-158",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "flatlay render carried a standing-on-model SCENE SPEC contradicting the top-down flatlay PRESENTATION",
+      "file": "scripts/oai_render/scene_schema.py",
+      "root_cause": "build_scene only special-cased style=='ghost'; 'flatlay' fell through to the on-model branch (model + collection environment).",
+      "fix": "Route ghost AND flatlay through the clean-studio branch; flatlay gets its own top-down camera (_FLATLAY_CAMERA) matching the PRESENTATION; build_prompt keeps GHOST_BACKGROUND for both.",
+      "tags": [
+        "oai-render",
+        "scene-schema",
+        "flatlay",
+        "prompt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-159",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "build_scene silently substituted 'signature' scenery for unknown collections \u2014 paid render of wrong scene; defeated no-fallback SceneError guard",
+      "file": "scripts/oai_render/scene_schema.py",
+      "root_cause": "Used _ONMODEL_DEFAULTS.get(col_key, _ONMODEL_DEFAULTS['signature']); since plan_sku always passes the scene to build_prompt, the SceneError raised by _background_for became unreachable for solo on-model renders.",
+      "fix": "build_scene now raises SceneError for an unknown on-model collection, mirroring prompt._background_for. No silent fallback.",
+      "tags": [
+        "oai-render",
+        "scene-schema",
+        "no-silent-fallback",
+        "sceneerror"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-160",
+      "timestamp": "2026-06-24T12:30:00Z",
+      "error_message": "FLUX LoRA Replicate API contract bugs would 404/422 on first real call (lr_scheduler, guidance_scale, flux-dev model, version-less URL, missing destination)",
+      "file": "scripts/flux_lora/trainer.py, scripts/flux_lora/inference.py, scripts/flux_lora/config.py",
+      "root_cause": "Payloads/endpoints were written from memory, not the live schema: lr_scheduler & guidance_scale are not valid fields; base flux-dev lacks LoRA fields; trainings require /versions/{id}/trainings and a destination.",
+      "fix": "Diffed real payloads against live Replicate schemas (read-only GET): pinned version SHA + require it in path; require destination; drop lr_scheduler; inference model -> flux-dev-lora with lora_weights/lora_scale/guidance. Plus SSRF https guards + training_id path-traversal sanitize.",
+      "tags": [
+        "flux-lora",
+        "replicate",
+        "api-contract",
+        "422",
+        "404",
+        "ssrf",
+        "security"
+      ],
+      "related_bugs": [
+        "bug-157"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:30:00Z"
+    },
+    {
+      "id": "bug-161",
+      "timestamp": "2026-06-24T12:32:00-07:00",
+      "error_message": "Turbopack build failed: Route segment config \"dynamic\" is not compatible with nextConfig.cacheComponents. Please remove it.",
+      "file": "frontend/app/api/catalog/route.ts, frontend/app/api/catalog/[sku]/route.ts",
+      "root_cause": "Added `export const dynamic = 'force-dynamic'` to new catalog API routes, but frontend/next.config.ts sets cacheComponents:true, which forbids route-segment config exports (routes are dynamic by default; opt into caching with 'use cache').",
+      "fix": "Removed the `export const dynamic` exports. For GET /api/catalog (which had no inherent dynamism and built as Static \u25cb, risking a stale snapshot after a CSV write) added `await connection()` from next/server to force request-time execution \u2192 route flipped to dynamic \u0192. Context7-confirmed API.",
+      "tags": [
+        "nextjs",
+        "cacheComponents",
+        "route-handler",
+        "connection",
+        "build-error",
+        "catalog-editor"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T12:32:00-07:00"
+    },
+    {
+      "id": "bug-162",
+      "timestamp": "2026-06-24T13:55:00-07:00",
+      "error_message": "Build error: Both middleware file \"./middleware.ts\" and proxy file \"./proxy.ts\" are detected. Please use \"./proxy.ts\" only.",
+      "file": "frontend/middleware.ts (deleted), frontend/proxy.ts (extended)",
+      "root_cause": "Created frontend/middleware.ts to add an API auth gate, not knowing Next 16 renamed middleware->proxy. The project's gate already lived in frontend/proxy.ts (renamed during the Next 16 migration). The two files conflict \u2014 Next 16 forbids both.",
+      "fix": "Deleted frontend/middleware.ts; extended the existing frontend/proxy.ts instead \u2014 added an /api/* 401-JSON branch and widened the matcher from ['/admin/:path*'] to ['/admin/:path*','/api/((?!auth|checkout).*)']. Excludes /api/auth (NextAuth) and /api/checkout (public) so login + checkout keep working.",
+      "tags": [
+        "nextjs",
+        "next16",
+        "middleware",
+        "proxy",
+        "auth",
+        "next-auth",
+        "build-error",
+        "dashboard"
+      ],
+      "related_bugs": [
+        "bug-161"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T13:55:00-07:00"
     }
   ]
 }
