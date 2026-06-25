@@ -1,8 +1,12 @@
-"""OpenAI gpt-image-2 edit client — hardened, no silent fallback.
+"""OpenAI gpt-image-2 image client — hardened, no silent fallback.
 
-Wraps ``client.images.edit`` with explicit timeout, bounded exponential-backoff
-retry on transient errors (429 / timeout / connection / 5xx), and clear failure
-propagation. gpt-image models always return base64; this decodes to PNG bytes.
+Wraps ``client.images.edit`` (reference-guided product renders) and
+``client.images.generate`` (text-to-image scene backgrounds, no references)
+with explicit timeout, bounded exponential-backoff retry on transient errors
+(429 / timeout / connection / 5xx), and clear failure propagation. gpt-image
+models always return base64 and never accept ``response_format`` (Context7-
+verified against openai-python image_generate_params.py, 2026-06-24) — so it is
+never sent; the returned base64 is decoded to image bytes.
 """
 
 from __future__ import annotations
@@ -36,7 +40,7 @@ def _as_upload(path: Path) -> tuple[str, bytes, str]:
 
 
 class OAIImageClient:
-    """Thin, retrying wrapper around OpenAI image edits for gpt-image-2."""
+    """Thin, retrying wrapper around OpenAI image edit + generate for gpt-image-2."""
 
     def __init__(self) -> None:
         try:
@@ -55,7 +59,7 @@ class OAIImageClient:
         return errs or (Exception,)
 
     def edit(self, *, prompt: str, image_paths: list[Path], mask_path: Path | None = None) -> bytes:
-        """Run one gpt-image-2 edit and return decoded PNG bytes.
+        """Run one gpt-image-2 edit and return decoded image bytes.
 
         Retries transient failures with exponential backoff + jitter; re-raises
         after ``config.MAX_RETRIES``. Never returns a partial/placeholder image.
@@ -82,20 +86,63 @@ class OAIImageClient:
         if mask_path is not None:
             kwargs["mask"] = _as_upload(mask_path)
 
+        return self._run_with_retry(lambda: self._client.images.edit(**kwargs))
+
+    def generate(
+        self,
+        *,
+        prompt: str,
+        size: str | None = None,
+        quality: str | None = None,
+        output_format: str | None = None,
+        background: str = "opaque",
+    ) -> bytes:
+        """Run one gpt-image-2 text-to-image generation; return decoded bytes.
+
+        Unlike :meth:`edit`, sends NO reference image — used for scene
+        backgrounds. gpt-image models always return base64 and reject
+        ``response_format`` (Context7-verified), so it is never sent. ``size``
+        accepts any gpt-image-2 ``WIDTHxHEIGHT`` (both divisible by 16, aspect
+        1:3..3:1); defaults to ``config.SIZE``. ``background`` defaults to
+        ``"opaque"`` (scenes are full backdrops, not cut-outs). Retries
+        transient failures with the same backoff as :meth:`edit`.
+        """
+        kwargs: dict = {
+            "model": config.MODEL,
+            "prompt": prompt,
+            "size": size or config.SIZE,
+            "quality": quality or config.QUALITY,
+            "output_format": output_format or config.OUTPUT_FORMAT,
+            "background": background,
+            "n": config.N,
+        }
+        return self._run_with_retry(lambda: self._client.images.generate(**kwargs))
+
+    def _decode_first(self, resp) -> bytes:
+        """Decode the first image of an OpenAI images response to raw bytes."""
+        b64 = resp.data[0].b64_json
+        if not b64:
+            raise RuntimeError("OpenAI returned an empty image payload.")
+        return base64.b64decode(b64)
+
+    def _run_with_retry(self, do_call) -> bytes:
+        """Run ``do_call()`` (one image API call) with bounded backoff retry.
+
+        Retries only transient OpenAI errors (429 / timeout / connection /
+        5xx); re-raises after ``config.MAX_RETRIES``. Non-transient errors
+        (including an empty payload) propagate immediately. Never returns a
+        partial/placeholder image.
+        """
         transient = self._transient_errors()
         attempt = 0
         while True:
             try:
-                resp = self._client.images.edit(**kwargs)
-                b64 = resp.data[0].b64_json
-                if not b64:
-                    raise RuntimeError("OpenAI returned an empty image payload.")
-                return base64.b64decode(b64)
+                return self._decode_first(do_call())
             except transient as exc:
                 attempt += 1
                 if attempt > config.MAX_RETRIES:
                     log.error(
-                        "gpt-image-2 edit failed after %d retries: %s", config.MAX_RETRIES, exc
+                        "gpt-image-2 call failed after %d retries: %s", config.MAX_RETRIES, exc
                     )
                     raise
                 delay = min(

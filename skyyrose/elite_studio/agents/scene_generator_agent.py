@@ -2,13 +2,16 @@
 
 Generates atmospheric scene backgrounds (no products in frame) by reading
 canonical scene specs from ``SCENES_DIR/{collection}/{scene_name}/scene.json``
-and dispatching a text-only prompt to Gemini's image API. Designed as the
-Stage-1 step that precedes ``CompositorAgent.composite()`` — real products
-composite onto the generated scene in Stage 2.
+and dispatching a text-only prompt to OpenAI gpt-image-2 (the founder-locked
+imagery engine, 2026-06-08), with Gemini as a fallback retained until OAI scene
+renders are validated. Designed as the Stage-1 step that precedes
+``CompositorAgent.composite()`` — real products composite onto the generated
+scene in Stage 2.
 
 Replaces the bespoke ``scripts/gemini_scene_gen.py`` direct-API path. All scene
 generation now flows through the elite team for consistent budget enforcement,
-quality scoring (via QualityAgent), and canon anchoring (via scene.json).
+quality scoring (via QualityAgent), and canon anchoring (via scene.json). The
+gpt-image-2 call reuses the hardened root client ``scripts/oai_render/client``.
 
 Usage::
 
@@ -27,10 +30,11 @@ Usage::
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
@@ -41,11 +45,17 @@ from ..gemini_rest import generate_image as gemini_generate_image
 from ..models import GenerationResult
 from .compositor.lighting import SCENE_LOOKBOOK, load_lighting_spec
 
+if TYPE_CHECKING:
+    from scripts.oai_render.client import OAIImageClient
+
 logger = logging.getLogger(__name__)
 
-# Per-image cost (gemini-3-pro-image-preview). Pre-checked against budget
-# before each dispatch.
-_SCENE_GENERATION_COST_USD = 0.08
+# Per-image cost estimates (USD), ensured against budget BEFORE each paid call
+# and recorded only AFTER success. gpt-image-2 "high" text-to-image at
+# ~1024x1536 (no reference-image tokens) is cheaper than the edit path; treated
+# as a conservative floor for the gate. Gemini is the fallback engine.
+_OAI_SCENE_COST_USD = 0.30
+_GEMINI_SCENE_COST_USD = 0.08
 
 # Output directory for generated scenes. Mirrors SCENES_DIR layout so
 # downstream agents resolve scene PNGs via the same canonical path.
@@ -58,7 +68,7 @@ class SceneGeneratorAgent(BaseSuperAgent):
     Reads ``scene_description``, ``color_palette``, ``lighting``, ``camera``,
     ``skyyrose_dna``, ``focal_anchor``, ``negative_prompts``, and atmospheric
     fields from ``scene.json``, composes a single prompt, and dispatches one
-    text-to-image call to the Gemini image model.
+    text-to-image call to OpenAI gpt-image-2 (Gemini fallback).
 
     The result is a PNG written to::
 
@@ -82,6 +92,10 @@ class SceneGeneratorAgent(BaseSuperAgent):
                 ),
             )
         super().__init__(config)
+        # Lazily constructed gpt-image-2 client (validates OPENAI_API_KEY on
+        # first use). Kept off __init__ so importing/constructing the agent
+        # never requires an OpenAI key.
+        self._oai: OAIImageClient | None = None
 
     async def generate_scene(
         self,
@@ -132,21 +146,6 @@ class SceneGeneratorAgent(BaseSuperAgent):
                 metadata={"scene_name": scene_name, "collection": collection},
             )
 
-        # Pre-check budget before any paid call.
-        if budget is not None:
-            try:
-                budget.ensure_within_budget(
-                    _SCENE_GENERATION_COST_USD, stage="scene_generator_agent"
-                )
-            except BudgetExceededError as exc:
-                logger.error("budget exceeded before scene generation for %s: %s", scene_name, exc)
-                return GenerationResult(
-                    success=False,
-                    provider="none",
-                    error=f"budget exceeded: {exc}",
-                    metadata={"budget_blocked": True, "scene_name": scene_name},
-                )
-
         # Build the prompt from spec fields.
         prompt = self._build_scene_prompt(spec)
 
@@ -156,17 +155,124 @@ class SceneGeneratorAgent(BaseSuperAgent):
         filename = spec.get("expected_filename") or f"{scene_name}.png"
         output_path = output_dir / filename
 
-        # Dispatch generation. Scenes are text-only (no reference images).
-        # Gemini accepts only pure aspect ratios: 1:1, 1:4, 1:8, 2:3, 3:2, 3:4, 4:1, 4:3
-        # Strip trailing descriptors (e.g. "3:4 portrait" → "3:4").
+        # Target size for gpt-image-2 + the pure aspect token Gemini still needs.
         raw_aspect = str(spec.get("render_aspect", "3:4"))
-        aspect_ratio = raw_aspect.split()[0] if raw_aspect else "3:4"
+        size = self._aspect_to_size(raw_aspect)
+        aspect_ratio = raw_aspect.split()[0] if raw_aspect.strip() else "3:4"
 
-        # Model fallback chain (2026-05-26): gemini-3.1-flash-image-preview
-        # safety filter rejects fairy-tale gothic content as "No image in response"
-        # even with softened prompts. gemini-2.5-flash-image (original Nano Banana)
-        # has a looser safety profile suitable for cathedral/dark-fantasy scenes.
-        # Try primary model first, fall back to 2.5 on safety rejection.
+        image_bytes: bytes | str | None = None
+        provider = ""
+        model_used = ""
+        cost_spent = 0.0
+        errors: list[str] = []
+        budget_blocked = False
+
+        # Primary engine: OpenAI gpt-image-2 (founder-locked, 2026-06-08).
+        try:
+            image_bytes, model_used, cost_spent = await self._dispatch_oai(prompt, size, budget)
+            provider = "openai/gpt-image-2"
+        except BudgetExceededError as exc:
+            budget_blocked = True
+            errors.append(f"openai/gpt-image-2 budget: {exc}")
+            logger.warning("OAI scene budget block for %s: %s", scene_name, exc)
+        except Exception as exc:  # noqa: BLE001 — any OAI failure falls back to Gemini
+            errors.append(f"openai/gpt-image-2: {exc}")
+            logger.warning(
+                "OAI scene generation failed for %s: %s — falling back to Gemini",
+                scene_name,
+                exc,
+            )
+
+        # Fallback engine: Gemini, retained until OAI scene renders are validated
+        # (the locked policy erases nano-banana/Gemini AFTER validation).
+        if image_bytes is None:
+            try:
+                image_bytes, model_used, cost_spent = await self._dispatch_gemini(
+                    prompt, aspect_ratio, scene_name, budget
+                )
+                provider = "google/gemini"
+            except BudgetExceededError as exc:
+                budget_blocked = True
+                errors.append(f"google/gemini budget: {exc}")
+            except Exception as exc:  # noqa: BLE001
+                errors.append(f"google/gemini: {exc}")
+
+        if image_bytes is None:
+            return GenerationResult(
+                success=False,
+                provider="none",
+                model="",
+                error="all scene engines failed: " + " | ".join(errors),
+                metadata={
+                    "scene_name": scene_name,
+                    "collection": collection,
+                    "budget_blocked": budget_blocked,
+                },
+            )
+
+        # Write image bytes (Gemini may return a base64 str; OAI returns bytes).
+        if isinstance(image_bytes, str):
+            image_bytes = base64.b64decode(image_bytes)
+        output_path.write_bytes(image_bytes)
+
+        return GenerationResult(
+            success=True,
+            provider=provider,
+            model=model_used,
+            output_path=str(output_path),
+            metadata={
+                "scene_name": scene_name,
+                "collection": collection,
+                "canon_lock_date": spec.get("canon_lock_date"),
+                "founder_directed": spec.get("founder_directed"),
+                "render_aspect": spec.get("render_aspect"),
+                "size": size if provider.startswith("openai") else None,
+                "cost_usd": cost_spent,
+            },
+        )
+
+    async def _dispatch_oai(
+        self, prompt: str, size: str, budget: RunBudget | None
+    ) -> tuple[bytes, str, float]:
+        """Generate a scene via OpenAI gpt-image-2. Raises on any failure.
+
+        Budget is ensured BEFORE the call and recorded only AFTER success, so a
+        failed call never spends. The blocking SDK call runs off the event loop.
+        """
+        from scripts.oai_render import config as oai_config
+
+        if budget is not None:
+            budget.ensure_within_budget(_OAI_SCENE_COST_USD, stage="scene_generator_agent.oai")
+        image_bytes = await asyncio.to_thread(
+            self._oai_client().generate, prompt=prompt[:4000], size=size, background="opaque"
+        )
+        if budget is not None:
+            budget.spend(_OAI_SCENE_COST_USD, stage="scene_generator_agent.oai")
+        return image_bytes, oai_config.MODEL, _OAI_SCENE_COST_USD
+
+    def _oai_client(self) -> OAIImageClient:
+        """Lazily construct the gpt-image-2 client (validates OPENAI_API_KEY)."""
+        if self._oai is None:
+            from scripts.oai_render.client import OAIImageClient
+
+            self._oai = OAIImageClient()
+        return self._oai
+
+    async def _dispatch_gemini(
+        self, prompt: str, aspect_ratio: str, scene_name: str, budget: RunBudget | None
+    ) -> tuple[str | bytes, str, float]:
+        """Generate a scene via Gemini (fallback). Raises RuntimeError on failure.
+
+        Model fallback chain (2026-05-26): the primary Gemini image model's
+        safety filter rejects gothic/dark-fantasy content as "no image in
+        response"; gemini-2.5-flash-image has a looser profile. Try primary,
+        then 2.5. Gemini accepts only pure aspect ratios (e.g. "3:4").
+        """
+        if budget is not None:
+            budget.ensure_within_budget(
+                _GEMINI_SCENE_COST_USD, stage="scene_generator_agent.gemini"
+            )
+
         model_chain = [self.config.model]
         if "2.5-flash-image" not in self.config.model:
             model_chain.append("gemini-2.5-flash-image")
@@ -183,7 +289,7 @@ class SceneGeneratorAgent(BaseSuperAgent):
                     aspect_ratio=aspect_ratio,
                     mime_type="image/png",
                 )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 last_error = f"raised on {model_id}: {exc}"
                 logger.warning("Gemini image generation raised on %s: %s", model_id, exc)
                 continue
@@ -192,52 +298,57 @@ class SceneGeneratorAgent(BaseSuperAgent):
             if result.get("success") and result.get("image_data"):
                 break
 
-            err_msg = result.get("error", "no image in response")
-            last_error = f"{model_id}: {err_msg}"
+            last_error = f"{model_id}: {result.get('error', 'no image in response')}"
             logger.warning(
                 "Scene %s rejected by %s (%s); trying next model in chain",
                 scene_name,
                 model_id,
-                err_msg[:120],
+                last_error[:120],
             )
 
         if not result or not result.get("success") or not result.get("image_data"):
-            return GenerationResult(
-                success=False,
-                provider="google/gemini",
-                model=model_used or self.config.model,
-                error=f"all models in fallback chain failed. last: {last_error}",
-                metadata={
-                    "scene_name": scene_name,
-                    "collection": collection,
-                    "model_chain_tried": model_chain,
-                },
-            )
+            raise RuntimeError(f"all Gemini models failed. last: {last_error}")
 
-        # Record spend AFTER successful API call.
         if budget is not None:
-            budget.spend(_SCENE_GENERATION_COST_USD, stage="scene_generator_agent.gemini")
+            budget.spend(_GEMINI_SCENE_COST_USD, stage="scene_generator_agent.gemini")
+        return result["image_data"], model_used, _GEMINI_SCENE_COST_USD
 
-        # Write image bytes.
-        image_bytes = result["image_data"]
-        if isinstance(image_bytes, str):
-            image_bytes = base64.b64decode(image_bytes)
-        output_path.write_bytes(image_bytes)
+    @staticmethod
+    def _aspect_to_size(raw_aspect: str) -> str:
+        """Map a scene.json ``render_aspect`` to a gpt-image-2 size string.
 
-        return GenerationResult(
-            success=True,
-            provider="google/gemini",
-            model=self.config.model,
-            output_path=str(output_path),
-            metadata={
-                "scene_name": scene_name,
-                "collection": collection,
-                "canon_lock_date": spec.get("canon_lock_date"),
-                "founder_directed": spec.get("founder_directed"),
-                "render_aspect": spec.get("render_aspect"),
-                "cost_usd": _SCENE_GENERATION_COST_USD,
-            },
-        )
+        gpt-image-2 accepts arbitrary ``WIDTHxHEIGHT`` with both dims divisible
+        by 16 and aspect within 1:3..3:1 (Context7-verified). Targets a 1536
+        long edge for quality. Falls back to ``1024x1536`` (portrait) when the
+        aspect can't be parsed.
+
+        ``"3:4 portrait"`` → ``"1152x1536"``; ``"1:1"`` → ``"1536x1536"``;
+        ``"16:9"`` → ``"1536x864"``.
+        """
+        token = raw_aspect.strip().split()[0] if raw_aspect and raw_aspect.strip() else ""
+        ratio: float | None = None
+        if ":" in token:
+            w_str, _, h_str = token.partition(":")
+            try:
+                w, h = float(w_str), float(h_str)
+                if w > 0 and h > 0:
+                    ratio = w / h
+            except ValueError:
+                ratio = None
+        if ratio is None:
+            return "1024x1536"
+        ratio = max(1 / 3, min(3.0, ratio))  # clamp to gpt-image-2 allowed band
+
+        long_edge = 1536
+
+        def _round16(value: float) -> int:
+            return max(256, int(round(value / 16)) * 16)
+
+        if ratio >= 1.0:  # landscape or square
+            width, height = long_edge, _round16(long_edge / ratio)
+        else:  # portrait
+            width, height = _round16(long_edge * ratio), long_edge
+        return f"{width}x{height}"
 
     @staticmethod
     def _collection_from_scene_name(scene_name: str) -> str:
