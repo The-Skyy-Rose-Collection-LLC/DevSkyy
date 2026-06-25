@@ -397,10 +397,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Root project has a committed package-lock.json; use `npm ci` to
-      # install exact locked versions and prevent version drift in CI.
+      # Root project has no committed package-lock.json (gitignored); use
+      # `npm install` and rely on overrides in package.json to pin exact
+      # versions of packages (e.g. jest-runtime) that cause test failures
+      # when npm resolves newer minor/patch releases.
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Three.js collection tests
         run: npm run test:collections
