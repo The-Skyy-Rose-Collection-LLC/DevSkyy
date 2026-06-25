@@ -45,3 +45,29 @@ def test_edit_sends_input_fidelity_high(tmp_path: Path, monkeypatch: pytest.Monk
     assert kwargs["model"] == "gpt-image-2"
     assert kwargs["input_fidelity"] == "high"  # the fix: not omitted, not "low"
     assert config.INPUT_FIDELITY == "high"
+
+
+def test_generate_text_to_image_contract(monkeypatch: pytest.MonkeyPatch) -> None:
+    """generate() is text-to-image: no reference image, never sends response_format.
+
+    gpt-image models reject ``response_format`` (Context7-verified) and always
+    return base64 — this locks the call shape so the scene path can't regress.
+    """
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-abc")
+    client = OAIImageClient()
+    fake_sdk = MagicMock()
+    fake_sdk.images.generate.return_value = MagicMock(
+        data=[MagicMock(b64_json=base64.b64encode(b"scene-bytes").decode())]
+    )
+    client._client = fake_sdk
+
+    out = client.generate(prompt="gothic cathedral at night", size="1152x1536")
+
+    assert out == b"scene-bytes"
+    fake_sdk.images.generate.assert_called_once()
+    kwargs = fake_sdk.images.generate.call_args.kwargs
+    assert kwargs["model"] == "gpt-image-2"
+    assert kwargs["size"] == "1152x1536"
+    assert kwargs["background"] == "opaque"  # scenes are full backdrops
+    assert "response_format" not in kwargs  # rejected by gpt-image models
+    assert "image" not in kwargs  # text-to-image: no reference
