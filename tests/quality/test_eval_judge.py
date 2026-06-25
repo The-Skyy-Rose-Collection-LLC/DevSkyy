@@ -1,6 +1,6 @@
 import pytest
 
-from evaluation.judge import ClaudeJudge, anthropic_cost_usd, image_block
+from evaluation.judge import DEFAULT_JUDGE_MODEL, ClaudeJudge, anthropic_cost_usd, image_block
 
 
 class _Block:
@@ -60,6 +60,19 @@ def test_judge_returns_tool_input_and_cost():
         "name": "render_qc_verdict",
         "disable_parallel_tool_use": True,
     }
+
+
+def test_judge_pins_default_model_and_temperature_zero():
+    """Q-modelpin: model defaults to Sonnet (not Opus) + temperature=0 (deterministic)."""
+    client = _Client({"ok": True})
+    judge = ClaudeJudge(client=client)  # no model passed -> default
+    judge.run(
+        messages=[{"role": "user", "content": [{"type": "text", "text": "x"}]}],
+        tool={"name": "render_qc_verdict", "input_schema": {"type": "object"}},
+    )
+    sent = client.messages.calls[0]
+    assert sent["model"] == DEFAULT_JUDGE_MODEL == "claude-sonnet-4-6"
+    assert sent["temperature"] == 0.0
 
 
 def test_cost_formula():

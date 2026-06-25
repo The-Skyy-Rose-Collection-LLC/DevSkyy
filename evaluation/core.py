@@ -17,6 +17,7 @@ from dataclasses import replace
 from typing import Any
 
 from evaluation.adapter import DomainAdapter
+from evaluation.budget import DEFAULT_EST_JUDGE_COST_USD, CostCapExceeded, EvalBudget
 from evaluation.contracts import Verdict
 
 # wrap ClaudeJudge as: lambda req: judge.run(**req)
@@ -52,11 +53,28 @@ class EvaluationCore:
         ref: Any,
         producer: Callable[[Any], Awaitable[Any]],
         cap: int = 2,
+        *,
+        budget: EvalBudget | None = None,
+        est_call_cost_usd: float = DEFAULT_EST_JUDGE_COST_USD,
     ) -> Verdict:
+        """producer -> judge -> revise loop, capped at ``cap`` revisions.
+
+        When ``budget`` is supplied, the per-call estimate is checked BEFORE every
+        paid judge call (the initial score and each revision); if the next call
+        would exceed the cap, ``CostCapExceeded`` is raised before producing or
+        judging — so a batch never loops past its ceiling. Actual per-call cost is
+        accumulated into ``budget`` and reported as the returned verdict's
+        ``cost_usd`` (the loop total, not just the last call).
+        """
+        self._ensure_affordable(budget, est_call_cost_usd)
         subject = await producer(ref)
         verdict = await self.score(adapter, subject, ref)
+        total_cost = verdict.cost_usd
+        if budget is not None:
+            budget.add(verdict.cost_usd)
         attempts = 0
         while not verdict.passed and attempts < cap:
+            self._ensure_affordable(budget, est_call_cost_usd)
             attempts += 1
             critique = {
                 "failure_tags": verdict.failure_tags,
@@ -65,6 +83,19 @@ class EvaluationCore:
             }
             subject = await adapter.revise(ref, critique)
             verdict = await self.score(adapter, subject, ref)
+            total_cost += verdict.cost_usd
+            if budget is not None:
+                budget.add(verdict.cost_usd)
             if verdict.passed:
                 break
-        return replace(verdict, attempts=attempts)
+        return replace(verdict, attempts=attempts, cost_usd=total_cost)
+
+    @staticmethod
+    def _ensure_affordable(budget: EvalBudget | None, est_call_cost_usd: float) -> None:
+        """Raise ``CostCapExceeded`` before a paid judge call that would exceed the cap."""
+        if budget is not None and not budget.can_afford(est_call_cost_usd):
+            raise CostCapExceeded(
+                f"Eval budget exhausted: spent ${budget.spent_usd:.4f} of "
+                f"${budget.cap_usd:.4f}; next judge call (est ${est_call_cost_usd:.4f}) "
+                f"would exceed the cap. No paid call made."
+            )
