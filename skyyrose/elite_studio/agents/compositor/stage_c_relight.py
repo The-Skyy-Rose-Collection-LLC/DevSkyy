@@ -39,10 +39,9 @@ def relight_subject(
 ) -> str:
     """Match subject lighting to scene via IC-Light.
 
-    Tries Replicate IC-Light first, then a local libcom path, then falls back
-    to the alpha image unchanged so the pipeline never blocks on a single
-    missing provider. The fallback is logged in the audit so downstream QA can
-    be stricter.
+    Tries Replicate IC-Light first, then a local libcom path. If every provider
+    fails, raises RelightStageError — it never returns the unrelit alpha
+    unchanged, which would silently poison downstream QC.
 
     Args:
         alpha_path: Path to the Stage A alpha matte.

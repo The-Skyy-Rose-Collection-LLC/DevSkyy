@@ -41,8 +41,9 @@ def test_evaluate_rejects_missing_path_without_encoder(tmp_path):
 
 
 def test_evaluate_rejects_missing_str_path(tmp_path):
-    with patch("skyyrose.elite_studio.quality.embedding_gate.score_against_centroid"):
+    with patch("skyyrose.elite_studio.quality.embedding_gate.score_against_centroid") as scorer:
         verdict = evaluate(str(tmp_path / "nope.jpg"), _centroid())
+    scorer.assert_not_called()
     assert verdict.accepted is False
 
 
