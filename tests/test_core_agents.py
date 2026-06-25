@@ -2010,7 +2010,8 @@ class TestImportErrorBranches:
             a = mod.AnalyticsCoreAgent()
             # Legacy sub-agent should be absent; SDK agents may still register
             assert "analytics_ops" not in a._sub_agents
-        importlib.reload(mod)
+        # patch.dict restores sys.modules on exit — the module and its parent package are
+        # removed automatically. No cleanup reload needed; subsequent imports start fresh.
 
     @pytest.mark.asyncio
     async def test_analytics_legacy_import_error(self):
@@ -2050,7 +2051,8 @@ class TestImportErrorBranches:
             assert "product_ops" not in a._sub_agents
             assert "wordpress_assets" not in a._sub_agents
             assert "wordpress_bridge" not in a._sub_agents
-        importlib.reload(mod)
+        # patch.dict restores sys.modules on exit — the module and its parent package are
+        # removed automatically. No cleanup reload needed; subsequent imports start fresh.
 
     @pytest.mark.asyncio
     async def test_commerce_legacy_import_error(self):
