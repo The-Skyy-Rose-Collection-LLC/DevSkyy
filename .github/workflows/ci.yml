@@ -397,10 +397,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Root project has no committed package-lock.json; use `npm install`
-      # (not `npm ci`) and skip npm cache, which requires a lockfile to key on.
+      # Root project has a committed package-lock.json; use `npm ci` to
+      # install exact locked versions and prevent version drift in CI.
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run Three.js collection tests
         run: npm run test:collections

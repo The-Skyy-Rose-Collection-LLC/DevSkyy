@@ -119,6 +119,19 @@ module.exports = {
     '/skyyrose-suite/',
     // design-system uses Vitest, not Jest
     '/design-system/skyyrose-storefront/test/',
+    // Agent worktrees contain duplicate mocks that confuse jest-haste-map
+    '/\\.claude/worktrees/',
+  ],
+
+  // Prevent jest-haste-map from scanning worktrees for manual mocks,
+  // which causes duplicate-mock collisions (three, three-examples, ModelAssetLoader).
+  modulePathIgnorePatterns: [
+    '<rootDir>/\\.claude/worktrees/',
+  ],
+
+  // Also exclude worktrees from watch mode
+  watchPathIgnorePatterns: [
+    '<rootDir>/\\.claude/worktrees/',
   ],
 
   // Transform node_modules that use ESM (like three.js)
