@@ -34,6 +34,7 @@ from sqlalchemy import (
     func,
     select,
 )
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -41,7 +42,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, selectinload
-from sqlalchemy.pool import NullPool, QueuePool, StaticPool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool, StaticPool
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,23 @@ class DatabaseConfig(BaseModel):
     pool_timeout: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
     pool_recycle: int = int(os.getenv("DB_POOL_RECYCLE", "1800"))
     echo: bool = os.getenv("DB_ECHO", "false").lower() == "true"
+
+
+def _normalize_async_url(url: str) -> str:
+    """Map a bare sync Postgres URL onto the async driver this engine needs.
+
+    create_async_engine requires an async driver; a plain ``postgresql://`` (what
+    most hosts/secret managers hand out) resolves to psycopg2, which isn't
+    installed. Rewrite it to ``postgresql+asyncpg://`` so any well-formed Postgres
+    URL works without callers having to know the driver. Already-qualified URLs
+    (``postgresql+asyncpg://``, ``sqlite+aiosqlite://``) pass through unchanged.
+    """
+    if not url:
+        return url
+    for prefix in ("postgresql://", "postgres://"):
+        if url.lower().startswith(prefix):
+            return "postgresql+asyncpg://" + url[len(prefix) :]
+    return url
 
 
 # =============================================================================
@@ -266,7 +284,7 @@ class DatabaseManager:
     Async database manager with connection pooling
 
     Features:
-    - Connection pooling (QueuePool for PostgreSQL)
+    - Connection pooling (AsyncAdaptedQueuePool for PostgreSQL)
     - Async session management
     - Automatic reconnection
     - Query logging
@@ -287,20 +305,28 @@ class DatabaseManager:
             return
 
         config = config or DatabaseConfig()
+        # Normalize locally — don't mutate the caller's config object.
+        db_url = _normalize_async_url(config.url)
 
-        # Determine pool class based on database type
-        is_sqlite = "sqlite" in config.url
-        is_memory = ":memory:" in config.url
+        # Determine pool class based on database type using proper URL parsing
+        # to avoid misclassification when "sqlite" appears in credentials/db names
+        parsed_url = make_url(db_url)
+        is_sqlite = parsed_url.drivername.startswith("sqlite")
+        is_memory = is_sqlite and (
+            ":memory:" in str(parsed_url.database) or parsed_url.database is None
+        )
 
         # Use StaticPool for in-memory SQLite (keeps single connection alive)
         # Use NullPool for file-based SQLite (allows multiple processes)
-        # Use QueuePool for PostgreSQL (connection pooling)
+        # Use AsyncAdaptedQueuePool for PostgreSQL — the engine is async
+        # (create_async_engine), so the sync QueuePool raises
+        # "Pool class QueuePool cannot be used with asyncio engine".
         if is_memory:
             pool_class = StaticPool
         elif is_sqlite:
             pool_class = NullPool
         else:
-            pool_class = QueuePool
+            pool_class = AsyncAdaptedQueuePool
 
         # Create engine with connection pooling
         engine_kwargs = {
@@ -323,7 +349,7 @@ class DatabaseManager:
                 }
             )
 
-        self._engine = create_async_engine(config.url, **engine_kwargs)
+        self._engine = create_async_engine(db_url, **engine_kwargs)
 
         # Create session factory
         self._session_factory = async_sessionmaker(
@@ -338,9 +364,7 @@ class DatabaseManager:
         async with self._engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-        logger.info(
-            f"Database initialized: {config.url.split('@')[-1] if '@' in config.url else config.url}"
-        )
+        logger.info(f"Database initialized: {db_url.split('@')[-1] if '@' in db_url else db_url}")
 
     async def close(self):
         """Close database connection"""

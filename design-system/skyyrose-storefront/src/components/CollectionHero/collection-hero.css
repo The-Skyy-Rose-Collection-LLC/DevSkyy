@@ -1,0 +1,23 @@
+/* collection-hero.css — AUTHORED layout glue (no single theme file owns the
+   lockup hero). All values come from design tokens (the single source). */
+.sr-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: clamp(48px, 8vw, 120px) var(--container-narrow, 24px);
+  background: var(--skyyrose-bg, #0a0a0a);
+  background-size: cover;
+  background-position: center;
+  color: var(--skyyrose-text, #f5e6d3);
+}
+.sr-hero--center { align-items: center; text-align: center; }
+.sr-hero--left { align-items: flex-start; text-align: left; }
+.sr-hero__lockup { max-width: min(680px, 80vw); height: auto; }
+.sr-hero__tagline {
+  font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+  font-size: var(--text-xl, 1.375rem);
+  line-height: var(--leading-normal, 1.6);
+  color: var(--skyyrose-text-muted, rgba(245, 230, 211, 0.7));
+  max-width: 60ch;
+}

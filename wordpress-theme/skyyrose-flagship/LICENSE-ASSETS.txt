@@ -1,26 +1,59 @@
 # SkyyRose Theme — Third-Party Asset Licenses
 
-## Fonts (all locally served via WordPress Font Library)
+## Fonts — Core UI (all locally served via assets/fonts/)
 
-| Font             | License    | URL                                          |
-|------------------|------------|----------------------------------------------|
-| Inter            | OFL 1.1    | https://github.com/rsms/inter                |
-| Playfair Display | OFL 1.1    | https://github.com/clauseggers/Playfair      |
-| Bebas Neue       | OFL 1.1    | https://github.com/dharmatype/Bebas-Neue     |
-| DM Sans          | OFL 1.1    | https://github.com/googlefonts/dm-fonts      |
-| Cinzel           | OFL 1.1    | https://github.com/nicholasjdavies           |
-| Cormorant Garamond | OFL 1.1  | https://github.com/CatharsisFonts/Cormorant  |
-| Barlow           | OFL 1.1    | https://github.com/jpt/barlow                |
-| Oswald           | OFL 1.1    | https://github.com/googlefonts/OswaldFont    |
-| Instrument Serif | OFL 1.1    | https://github.com/nicholasjdavies           |
-| Space Mono       | OFL 1.1    | https://github.com/nicholasjdavies           |
+All core fonts are licensed under the SIL Open Font License 1.1.
+Full OFL 1.1 text: https://scripts.sil.org/OFL
+
+| Font                | License | URL                                              |
+|---------------------|---------|--------------------------------------------------|
+| Inter               | OFL 1.1 | https://github.com/rsms/inter                    |
+| Playfair Display    | OFL 1.1 | https://github.com/clauseggers/Playfair-Display  |
+| Bebas Neue          | OFL 1.1 | https://github.com/dharmatype/Bebas-Neue         |
+| DM Sans             | OFL 1.1 | https://github.com/googlefonts/dm-fonts          |
+| Cinzel              | OFL 1.1 | https://github.com/nicholasgross/Cinzel          |
+| Cormorant Garamond  | OFL 1.1 | https://github.com/CatharsisFonts/Cormorant      |
+| Barlow              | OFL 1.1 | https://github.com/jpt/barlow                    |
+| Oswald              | OFL 1.1 | https://github.com/googlefonts/OswaldFont        |
+| Instrument Serif    | OFL 1.1 | https://fonts.google.com/specimen/Instrument+Serif |
+| Space Mono          | OFL 1.1 | https://github.com/googlefonts/spacemono         |
+
+## Fonts — Collection Script Accents (all locally served via assets/fonts/)
+
+Per-collection interior heading/accent voice. All licensed under SIL Open Font License 1.1.
+
+| Font          | License | Usage                             | URL                                              |
+|---------------|---------|-----------------------------------|--------------------------------------------------|
+| Yellowtail    | OFL 1.1 | Black Rose script accent          | https://fonts.google.com/specimen/Yellowtail     |
+| Kaushan Script| OFL 1.1 | Love Hurts script accent          | https://fonts.google.com/specimen/Kaushan+Script |
+| Pinyon Script | OFL 1.1 | Signature + Kids Capsule accent   | https://fonts.google.com/specimen/Pinyon+Script  |
 
 ## JavaScript Libraries
 
-| Library          | License              | URL                                    |
-|------------------|----------------------|----------------------------------------|
-| Three.js r128    | MIT                  | https://github.com/mrdoob/three.js     |
-| GSAP 3.12.5      | Standard GSAP License| https://gsap.com/community/licensing/  |
+| Library             | Version   | License              | URL                                             |
+|---------------------|-----------|----------------------|-------------------------------------------------|
+| Three.js            | r128      | MIT                  | https://github.com/mrdoob/three.js              |
+| GSAP                | 3.12.5    | Standard GSAP License| https://gsap.com/community/licensing/           |
+| Lenis               | 1.3.23    | MIT                  | https://github.com/darkroomengineering/lenis    |
+| Motion One          | 11.18.2   | MIT                  | https://motion.dev/                             |
+
+### GSAP License Note
+
+GSAP is NOT open source. The Standard GSAP License permits use in unlimited commercial
+projects including those sold on marketplaces. Redistribution of GSAP source files
+outside of this theme package is not permitted under the Standard License.
+See https://gsap.com/community/licensing/ for full terms.
+
+### MIT License (applies to Three.js, Lenis, Motion One)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files, to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 ## Images
 

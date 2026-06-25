@@ -17,12 +17,14 @@ ASSETS_DIR = THEME_DIR / "assets"
 PRODUCT_DATA_DIR = REPO_DIR / "skyyrose" / "assets" / "data"
 
 # ---------------------------------------------------------------------------
-# Models
+# Models — re-exported from llm.model_ids (single source of truth)
 # ---------------------------------------------------------------------------
 
-ORCHESTRATOR_MODEL = "claude-opus-4-6"
-SUBAGENT_MODEL = "claude-sonnet-4-6"  # Cost-efficient for subagents
-FAST_MODEL = "claude-haiku-4-5"  # Classification, simple tasks
+from llm.model_ids import (  # noqa: E402, F401  -- re-exported for legacy importers
+    FAST_MODEL,
+    ORCHESTRATOR_MODEL,
+    SUBAGENT_MODEL,
+)
 
 # ---------------------------------------------------------------------------
 # Agent defaults

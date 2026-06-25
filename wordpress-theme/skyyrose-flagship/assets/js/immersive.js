@@ -24,7 +24,7 @@
 	var layers        = viewport ? Array.from(viewport.querySelectorAll('.scene-layer')) : [];
 	var hotspotGroups = scene ? Array.from(scene.querySelectorAll('.hotspot-container')) : [];
 	var allHotspots   = scene ? Array.from(scene.querySelectorAll('.hotspot')) : [];
-	var titleOverlay  = document.querySelector('.scene-title-overlay');
+	// .scene-title-overlay is owned by immersive-core.js (reveal + fade); not referenced here.
 
 	// Product panel
 	var panelOverlay  = document.querySelector('.product-panel-overlay');
@@ -82,18 +82,12 @@
 	}
 
 	/* --------------------------------------------------
-	   Title Auto-Hide
+	   Title Auto-Hide — REMOVED (owned by immersive-core.js)
+	   The lockup is now the room title (Phase 1 canon fix). immersive-core.js
+	   reveals it and schedules its fade relative to intro completion, so the
+	   timing no longer races a fixed 4s timer (which, on heavy pages where the
+	   intro finishes ~6s, hid the title before it was ever seen).
 	   -------------------------------------------------- */
-
-	var titleHideTimer = null;
-
-	function initTitleAutoHide() {
-		if (!titleOverlay) return;
-		titleHideTimer = setTimeout(function () {
-			titleOverlay.classList.add('hidden');
-			titleHideTimer = null;
-		}, 4000);
-	}
 
 	/* --------------------------------------------------
 	   Product Panel
@@ -648,7 +642,6 @@
 		if (!scene) return;
 
 		initLoading();
-		initTitleAutoHide();
 		initPanel();
 		initHotspots();
 		initRoomNav();

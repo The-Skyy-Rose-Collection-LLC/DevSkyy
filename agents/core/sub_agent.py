@@ -27,6 +27,7 @@ from abc import abstractmethod
 from typing import Any
 
 from agents.errors import AgentError, ErrorCategory
+from core.token_tracker import current_agent_id
 
 from .base import CoreAgentType, SelfHealingMixin
 
@@ -154,7 +155,13 @@ class SubAgent(SelfHealingMixin):
             correlation_id=self.correlation_id,
         )
 
-        response = await client.complete(request)
+        # Attribute the LLM call to this agent so the router-level telemetry emitter
+        # (core.token_tracker.record_llm_usage) buckets usage under self.name.
+        token = current_agent_id.set(self.name)
+        try:
+            response = await client.complete(request)
+        finally:
+            current_agent_id.reset(token)
 
         return {
             "success": True,

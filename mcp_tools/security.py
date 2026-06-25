@@ -85,11 +85,18 @@ def secure_tool(tool_name: str) -> Callable[[Callable[P, T]], Callable[P, T]]:
                         f"{tool_name}:{sorted(param_dict.items())}".encode()
                     ).hexdigest()[:16]
 
-                    # Check for duplicate request
+                    # Check for duplicate request. The real deduplicate_request
+                    # signature is (endpoint, method, request_func, data, params)
+                    # not (request_id, handler, ttl_seconds) — fixed 2026-05-22
+                    # when the wp_deploy MCP tests first exercised this path.
+                    async def _noop():
+                        return None
+
                     dedup_result = await deduplicate_request(
-                        request_id=request_hash,
-                        handler=lambda: None,  # Placeholder, actual execution below
-                        ttl_seconds=5,
+                        endpoint=f"tool:{tool_name}",
+                        method="invoke",
+                        request_func=_noop,
+                        data={"request_hash": request_hash},
                     )
                     if dedup_result is not None and dedup_result != "":
                         logger.info(

@@ -1,0 +1,222 @@
+{
+  "summary": {
+    "n_skus": 11,
+    "mean_scores": {
+      "front_full": 0.22759090909090907,
+      "front_simplified": 0.23228181818181817,
+      "flux_compact": 0.26096363636363634,
+      "minimal_baseline": 0.28309090909090906
+    }
+  },
+  "rows": [
+    {
+      "sku": "br-004",
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-front-model.webp",
+      "scores": {
+        "front_full": 0.2249,
+        "front_simplified": 0.2267,
+        "flux_compact": 0.2574,
+        "minimal_baseline": 0.2619,
+        "back": 0.1982
+      },
+      "prompt_lengths": {
+        "front_full": 2396,
+        "front_simplified": 2346,
+        "flux_compact": 397,
+        "minimal_baseline": 27
+      }
+    },
+    {
+      "sku": "br-006",
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-front-model.webp",
+      "scores": {
+        "front_full": 0.2369,
+        "front_simplified": 0.2491,
+        "flux_compact": 0.2791,
+        "minimal_baseline": 0.2592,
+        "back": 0.2183
+      },
+      "prompt_lengths": {
+        "front_full": 2396,
+        "front_simplified": 2346,
+        "flux_compact": 404,
+        "minimal_baseline": 34
+      }
+    },
+    {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-front-model.webp",
+      "scores": {
+        "front_full": 0.2276,
+        "front_simplified": 0.2344,
+        "flux_compact": 0.2576,
+        "minimal_baseline": 0.2931,
+        "back": 0.1912
+      },
+      "prompt_lengths": {
+        "front_full": 2401,
+        "front_simplified": 2340,
+        "flux_compact": 398,
+        "minimal_baseline": 28
+      }
+    },
+    {
+      "sku": "lh-003",
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-front-model.webp",
+      "scores": {
+        "front_full": 0.2119,
+        "front_simplified": 0.216,
+        "flux_compact": 0.2318,
+        "minimal_baseline": 0.2647,
+        "back": 0.1777
+      },
+      "prompt_lengths": {
+        "front_full": 2401,
+        "front_simplified": 2340,
+        "flux_compact": 408,
+        "minimal_baseline": 38
+      }
+    },
+    {
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-front-model.webp",
+      "scores": {
+        "front_full": 0.2396,
+        "front_simplified": 0.2437,
+        "flux_compact": 0.2787,
+        "minimal_baseline": 0.2591,
+        "back": 0.2079
+      },
+      "prompt_lengths": {
+        "front_full": 2401,
+        "front_simplified": 2340,
+        "flux_compact": 390,
+        "minimal_baseline": 31
+      }
+    },
+    {
+      "sku": "sg-006",
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-front-model.webp",
+      "scores": {
+        "front_full": 0.2023,
+        "front_simplified": 0.2112,
+        "flux_compact": 0.2312,
+        "minimal_baseline": 0.2938,
+        "back": 0.1724
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 402,
+        "minimal_baseline": 43
+      }
+    },
+    {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-sherpa-jacket-front-model.webp",
+      "scores": {
+        "front_full": 0.2519,
+        "front_simplified": 0.2587,
+        "flux_compact": 0.2538,
+        "minimal_baseline": 0.262,
+        "back": 0.2095
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 397,
+        "minimal_baseline": 38
+      }
+    },
+    {
+      "sku": "sg-011",
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-white-front-model.webp",
+      "scores": {
+        "front_full": 0.2428,
+        "front_simplified": 0.2465,
+        "flux_compact": 0.294,
+        "minimal_baseline": 0.2856,
+        "back": 0.2022
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 406,
+        "minimal_baseline": 47
+      }
+    },
+    {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-orchid-front-model.webp",
+      "scores": {
+        "front_full": 0.2248,
+        "front_simplified": 0.225,
+        "flux_compact": 0.2649,
+        "minimal_baseline": 0.3023,
+        "back": 0.1905
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 407,
+        "minimal_baseline": 48
+      }
+    },
+    {
+      "sku": "sg-013",
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-crewneck-front-model.webp",
+      "scores": {
+        "front_full": 0.2058,
+        "front_simplified": 0.2061,
+        "flux_compact": 0.2307,
+        "minimal_baseline": 0.3106,
+        "back": 0.1791
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 404,
+        "minimal_baseline": 45
+      }
+    },
+    {
+      "sku": "sg-014",
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-sweatpants-front-model.webp",
+      "scores": {
+        "front_full": 0.235,
+        "front_simplified": 0.2377,
+        "flux_compact": 0.2914,
+        "minimal_baseline": 0.3217,
+        "back": 0.203
+      },
+      "prompt_lengths": {
+        "front_full": 2380,
+        "front_simplified": 2322,
+        "flux_compact": 406,
+        "minimal_baseline": 47
+      }
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 import { ApiError } from '../errors';
 import { API_URL } from '../config';
 import { getAuthToken, getAuthHeaders, fetchWithTimeout, handleResponse } from '../client';
-import { AssetListResponseSchema, AssetSchema } from '../schemas';
-import type { AssetListResponse, Asset, AssetFilters, AssetUpdateRequest } from '../types';
+import { AssetListResponseSchema, AssetSchema, SkuImageCountsSchema, HfDatasetsResponseSchema } from '../schemas';
+import type { AssetListResponse, Asset, AssetFilters, AssetUpdateRequest, SkuImageCounts, HfDatasetsResponse } from '../types';
 
 export const assets = {
     getList: async (filters?: AssetFilters): Promise<AssetListResponse> => {
@@ -83,5 +83,19 @@ export const assets = {
         });
         const data = await res.json();
         return data as Record<string, number>;
+    },
+
+    perSku: async (): Promise<SkuImageCounts> => {
+        const res = await fetchWithTimeout(`${API_URL}/api/v1/assets/per-sku`, {
+            headers: await getAuthHeaders(),
+        });
+        return handleResponse(res, SkuImageCountsSchema);
+    },
+
+    datasets: async (): Promise<HfDatasetsResponse> => {
+        const res = await fetchWithTimeout(`${API_URL}/api/v1/assets/datasets`, {
+            headers: await getAuthHeaders(),
+        });
+        return handleResponse(res, HfDatasetsResponseSchema);
     },
 };

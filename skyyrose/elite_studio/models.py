@@ -118,6 +118,7 @@ class TryOnResult:
     provider: str = "fashn"
     latency_s: float = 0.0
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

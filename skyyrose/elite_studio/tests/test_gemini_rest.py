@@ -24,17 +24,24 @@ class TestGetKey:
     @patch.dict("os.environ", {"GEMINI_API_KEY": "", "GOOGLE_API_KEY": ""}, clear=False)
     def test_returns_empty_if_no_key(self):
         # We need to make sure none of the other keys are set in the environment either
-        with patch.dict("os.environ", {
-            "GEMINI_API_KEY": "", "GOOGLE_AI_API_KEY": "", "GOOGLE_API_KEY": "",
-            **{f"GEMINI_API_KEY_{i}": "" for i in range(1, 11)},
-            **{f"GOOGLE_AI_API_KEY_{i}": "" for i in range(1, 11)},
-            **{f"GOOGLE_API_KEY_{i}": "" for i in range(1, 11)},
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "GEMINI_API_KEY": "",
+                "GOOGLE_AI_API_KEY": "",
+                "GOOGLE_API_KEY": "",
+                **{f"GEMINI_API_KEY_{i}": "" for i in range(1, 11)},
+                **{f"GOOGLE_AI_API_KEY_{i}": "" for i in range(1, 11)},
+                **{f"GOOGLE_API_KEY_{i}": "" for i in range(1, 11)},
+            },
+        ):
             assert gemini_rest._get_keys() == []
 
     def test_key_rotation(self):
-        with patch("skyyrose.elite_studio.gemini_rest._get_keys", return_value=["key1", "key2"]):
-            # Reset index for test
+        # The frozen module-level _KEYS list is the rotation source. Patch it
+        # directly to verify round-robin order without relying on _get_keys
+        # (which is now a backward-compat alias that re-reads env each call).
+        with patch("skyyrose.elite_studio.gemini_rest._KEYS", ["key1", "key2"]):
             gemini_rest._KEY_INDEX = 0
             assert gemini_rest._get_active_key() == "key1"
             assert gemini_rest._get_active_key() == "key2"
@@ -42,16 +49,20 @@ class TestGetKey:
 
 
 class TestEndpoint:
-    @patch.object(gemini_rest, "_get_active_key", return_value="abc123")
-    def test_builds_url(self, _mock_key):
+    def test_builds_url(self):
+        # Auth moved from URL querystring to x-goog-api-key header to prevent
+        # key leakage via HTTPError strings / OpenTelemetry span attributes.
         url = gemini_rest._endpoint("gemini-2.0-flash")
-        assert "models/gemini-2.0-flash:generateContent" in url
-        assert "key=abc123" in url
+        assert url == (
+            "https://generativelanguage.googleapis.com"
+            "/v1beta/models/gemini-2.0-flash:generateContent"
+        )
+        assert "key=" not in url, "API key MUST NOT appear in URL"
 
-    @patch.object(gemini_rest, "_get_active_key", return_value="abc123")
-    def test_custom_method(self, _mock_key):
+    def test_custom_method(self):
         url = gemini_rest._endpoint("gemini-2.0-pro", method="streamGenerateContent")
         assert "streamGenerateContent" in url
+        assert "key=" not in url
 
 
 class TestGenerateText:
@@ -102,7 +113,11 @@ class TestAnalyzeVision:
 
         # Verify payload includes image data
         call_args, call_kwargs = mock_post.call_args
-        payload = call_kwargs.get("json") or call_args[1] if len(call_args) > 1 else call_kwargs.get("json")
+        payload = (
+            call_kwargs.get("json") or call_args[1]
+            if len(call_args) > 1
+            else call_kwargs.get("json")
+        )
         if not payload and call_args:
             payload = call_args[1] if isinstance(call_args[1], dict) else None
 

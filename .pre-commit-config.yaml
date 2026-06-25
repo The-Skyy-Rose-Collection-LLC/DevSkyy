@@ -136,6 +136,40 @@ repos:
         name: Validate commit message
         stages: [commit-msg]
 
+  # ==========================================================================
+  # ADK Render Pipeline — Scoped Mock Tests
+  # ==========================================================================
+  # Runs only when files under agents/render_pipeline/ are staged.
+  # Uses make target to share venv-detection logic with manual runs.
+  # Mock tests only — no API cost. Target <5s. Skipped on pre-commit.ci
+  # because the .venv-agents Python is local-only.
+
+  - repo: local
+    hooks:
+      - id: adk-pipeline-lint
+        name: ADK render pipeline lint (ruff + black --check)
+        entry: make adk-lint
+        language: system
+        files: ^agents/render_pipeline/.*\.py$
+        pass_filenames: false
+        require_serial: true
+
+      - id: adk-pipeline-tests
+        name: ADK render pipeline mock tests (.venv-agents)
+        entry: make adk-test-fast
+        language: system
+        files: ^agents/render_pipeline/
+        pass_filenames: false
+        require_serial: true
+
+      - id: strip-claude-mem-stubs
+        name: Strip empty <claude-mem-context> stubs from CLAUDE.md
+        entry: bash scripts/hooks/strip-claude-mem-stubs.sh
+        language: system
+        files: (^|/)CLAUDE\.md$
+        pass_filenames: false
+        require_serial: true
+
 # =============================================================================
 # CI Configuration (pre-commit.ci)
 # =============================================================================
@@ -149,5 +183,5 @@ ci:
   autoupdate_branch: main
   autoupdate_commit_msg: 'chore: update pre-commit hooks'
   autoupdate_schedule: monthly  # Changed from weekly to reduce noise
-  skip: []  # Run all hooks in CI
+  skip: [adk-pipeline-lint, adk-pipeline-tests]  # Local-only: depend on .venv-agents/ Python
   submodules: false

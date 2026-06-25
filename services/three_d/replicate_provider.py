@@ -36,7 +36,22 @@ from services.three_d.provider_interface import (
     ThreeDTimeoutError,
 )
 
+from security.ssrf_protection import SSRFProtection
+
 logger = logging.getLogger(__name__)
+
+# Services-layer SSRF guard: blocks private IPs, localhost, and cloud metadata
+# services (169.254.169.254, etc.) but imposes NO domain allowlist so that
+# Replicate CDN URLs (e.g. replicate.delivery, pbxt.cdn.replicate.com) are
+# accepted.  Do NOT replace this with the global `ssrf_protection` singleton
+# from security/ssrf_protection.py — that instance restricts to a narrow
+# OpenAI/Anthropic/Google allowlist which would reject provider-returned URLs.
+_services_ssrf = SSRFProtection(
+    allowed_domains=None,  # no domain allowlist — accept any non-private host
+    block_private_ips=True,
+    block_localhost=True,
+    block_metadata_services=True,
+)
 
 
 # =============================================================================
@@ -147,7 +162,23 @@ class ReplicateProvider:
         output_format: OutputFormat,
         correlation_id: str,
     ) -> str:
-        """Download generated model to local storage."""
+        """Download generated model to local storage.
+
+        The URL is sourced from Replicate's API response and must be validated
+        before fetching to prevent SSRF attacks (e.g. a compromised/spoofed
+        provider response redirecting to 169.254.169.254 or an internal host).
+        """
+        # SSRF guard: validate before any network I/O
+        try:
+            _services_ssrf.validate_url(url)
+        except ValueError as exc:
+            raise ThreeDProviderError(
+                f"Model download URL failed SSRF validation: {exc}",
+                provider=self.name,
+                correlation_id=correlation_id,
+                retryable=False,
+            ) from exc
+
         http_client = await self._get_http_client()
 
         try:

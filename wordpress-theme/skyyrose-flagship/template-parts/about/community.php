@@ -1,62 +1,63 @@
 <?php
 /**
- * About page — Community section (Oakland Roots).
+ * About page — Oakland manifesto.
+ *
+ * Replaces the prior 3-pillar card grid with an editorial manifesto stack:
+ * an all-caps Bebas list of Oakland places (no explanation) followed by a
+ * short Cormorant frame paragraph. Customer-photo gallery preserved with
+ * defensive file-existence skip.
  *
  * Called via get_template_part( 'template-parts/about/community', null, $args ).
  *
  * @param array $args {
- *     @type array $allowed_inline  wp_kses whitelist for em/strong/br.
- *     @type array $customer_photos Array of customer photo data (file, alt).
+ *     @type array  $allowed_inline   wp_kses whitelist for em/strong/br.
+ *     @type array  $manifesto_places Array of place-name strings (rendered all-caps, dot-separated).
+ *     @type string $frame_text       Short framing paragraph beneath the manifesto.
+ *     @type array  $customer_photos  Array of customer photo data (file, alt) — optional gallery.
  * }
  *
  * @package SkyyRose
- * @since   6.5.0
+ * @since   1.3.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$allowed_inline  = $args['allowed_inline'] ?? array();
-$customer_photos = $args['customer_photos'] ?? array();
+$allowed_inline   = $args['allowed_inline'] ?? array();
+$manifesto_places = $args['manifesto_places'] ?? array();
+$frame_text       = $args['frame_text'] ?? '';
+$customer_photos  = $args['customer_photos'] ?? array();
 ?>
 
-<!-- Community — Oakland Roots -->
-<section class="abt-community" aria-label="<?php esc_attr_e( 'Our Community', 'skyyrose' ); ?>">
+<!-- Oakland Manifesto -->
+<section class="abt-community" id="oakland" aria-label="<?php esc_attr_e( 'Oakland', 'skyyrose' ); ?>">
 	<div class="abt-community__inner">
-		<div class="abt-community__content rv">
-			<h2 class="abt-community__heading">
-				<?php esc_html_e( 'Rooted in Oakland, Built for the World', 'skyyrose' ); ?>
-			</h2>
-			<p class="abt-community__text">
+		<div class="abt-community__head rv">
+			<span class="abt-community__label"><?php esc_html_e( 'The Town', 'skyyrose' ); ?></span>
+			<span class="abt-community__rule" aria-hidden="true"></span>
+		</div>
+		<h2 class="abt-community__heading rv rv-clip-up rv-d1">
+			<?php esc_html_e( 'Oakland', 'skyyrose' ); ?>
+		</h2>
+
+		<?php if ( ! empty( $manifesto_places ) ) : ?>
+			<p class="abt-community__manifesto rv rv-split-line rv-d2" aria-label="<?php esc_attr_e( 'Oakland places', 'skyyrose' ); ?>">
 				<?php
-				echo wp_kses(
-					__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Fashion was always self-expression here. What you wear says who you are, where you\'re going, what you refuse to accept.', 'skyyrose' ),
-					$allowed_inline
-				);
+				$last = count( $manifesto_places ) - 1;
+				foreach ( $manifesto_places as $i => $place ) {
+					echo '<span class="abt-community__place">' . esc_html( $place ) . '</span>';
+					if ( $i < $last ) {
+						echo '<span class="abt-community__dot" aria-hidden="true">&middot;</span>';
+					}
+				}
 				?>
 			</p>
-			<p class="abt-community__text">
-				<?php
-				echo wp_kses(
-					__( 'SkyyRose is family-driven at its core. The Hurts bloodline, a grandmother\'s legacy, a father\'s promise to his daughter&mdash;that\'s the foundation. We give back because it\'s in our DNA. Whether partnering with local Oakland artists, supporting youth programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us.', 'skyyrose' ),
-					$allowed_inline
-				);
-				?>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $frame_text ) ) : ?>
+			<p class="abt-community__frame rv rv-blur rv-d3">
+				<?php echo wp_kses( $frame_text, $allowed_inline ); ?>
 			</p>
-		</div>
-		<div class="abt-community__pillars rv rv-d2">
-			<div class="abt-community__pillar">
-				<h3><?php esc_html_e( 'Local Artists', 'skyyrose' ); ?></h3>
-				<p><?php esc_html_e( 'Collaborating with Oakland creatives to bring fresh perspectives to every collection and campaign.', 'skyyrose' ); ?></p>
-			</div>
-			<div class="abt-community__pillar">
-				<h3><?php esc_html_e( 'Youth Programs', 'skyyrose' ); ?></h3>
-				<p><?php esc_html_e( 'Supporting the next generation of designers and entrepreneurs through mentorship and creative workshops.', 'skyyrose' ); ?></p>
-			</div>
-			<div class="abt-community__pillar">
-				<h3><?php esc_html_e( 'Luxury Runs in the Family', 'skyyrose' ); ?></h3>
-				<p><?php esc_html_e( 'From the Kids Capsule to every mainline collection, SkyyRose proves that quality, vision, and ambition are inherited. The next generation wears the crown too.', 'skyyrose' ); ?></p>
-			</div>
-		</div>
+		<?php endif; ?>
 	</div>
 
 	<?php
@@ -70,7 +71,7 @@ $customer_photos = $args['customer_photos'] ?? array();
 
 	if ( $has_photos ) :
 		?>
-		<div class="abt-community__gallery rv rv-d3">
+		<div class="abt-community__gallery rv">
 			<p class="abt-community__gallery-label"><?php esc_html_e( 'The SkyyRose Family', 'skyyrose' ); ?></p>
 			<div class="abt-community__photos">
 				<?php

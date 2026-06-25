@@ -70,13 +70,44 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
-    log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
+    # Langfuse LLM observability (optional — requires LANGFUSE_PUBLIC_KEY/SECRET_KEY/HOST)
+    app.state.langfuse = None
+    if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):
+        try:
+            from langfuse import get_client
 
-    yield
+            langfuse_client = get_client()
+            if langfuse_client.auth_check():
+                app.state.langfuse = langfuse_client
+                log.info("langfuse_initialized", host=os.getenv("LANGFUSE_HOST", "default"))
+            else:
+                log.warning("langfuse_auth_check_failed")
+        except Exception as exc:  # noqa: BLE001 — observability is non-critical
+            log.warning("langfuse_init_failed", error=str(exc))
+
+    # Run the MCP streamable-HTTP session manager for the app lifetime so the
+    # mounted /mcp endpoint can serve sessions to the dashboard + WordPress.
+    from mcp_tools.http_mount import mcp_session_manager
+
+    async with mcp_session_manager().run():
+        log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
+        yield
 
     # Shutdown
     log.info("platform_shutting_down")
     await db_manager.close()
+    try:
+        from skyyrose.elite_studio.creative.checkpointer import close_checkpointer
+
+        await close_checkpointer()
+    except Exception as exc:  # noqa: BLE001 — non-critical cleanup
+        log.warning("creative_checkpointer_close_failed", error=str(exc))
+    # Flush any buffered Langfuse traces before exit
+    if getattr(app.state, "langfuse", None) is not None:
+        try:
+            app.state.langfuse.flush()
+        except Exception as exc:  # noqa: BLE001 — non-critical cleanup
+            log.warning("langfuse_flush_failed", error=str(exc))
     log.info("platform_shutdown_complete")
 
 
@@ -96,6 +127,14 @@ app = FastAPI(
     redoc_url=_redoc_url,
     lifespan=lifespan,
 )
+
+# Mount the DevSkyy MCP server (streamable HTTP, Bearer-auth) at /mcp so the
+# Next.js dashboard and WordPress site can consume the same tools the stdio
+# server exposes. build_mcp_app() also constructs mcp.session_manager, which the
+# lifespan above runs. See mcp_tools/http_mount.py.
+from mcp_tools.http_mount import MCP_MOUNT_PATH, build_mcp_app  # noqa: E402
+
+app.mount(MCP_MOUNT_PATH, build_mcp_app())
 
 # =============================================================================
 # Middleware
@@ -136,10 +175,13 @@ async def correlation_id_middleware(request: Request, call_next):
 async def timing_middleware(request: Request, call_next):
     import time
 
+    from api.v1.monitoring import track_request
+
     start = time.time()
     response = await call_next(request)
     ms = (time.time() - start) * 1000
     response.headers["X-Response-Time"] = f"{ms:.2f}ms"
+    track_request(ms, response.status_code < 400)
     return response
 
 
@@ -217,6 +259,8 @@ app.include_router(ws_router)
 
 # API v1 MCP routers
 from api.v1 import (
+    autonomous_router,
+    catalog_router,
     code_router,
     commerce_router,
     hf_spaces_router,
@@ -231,12 +275,14 @@ from api.v1 import (
     wordpress_theme_router,
 )
 
+app.include_router(catalog_router, prefix="/api/v1")
 app.include_router(code_router, prefix="/api/v1")
 app.include_router(commerce_router, prefix="/api/v1")
 app.include_router(hf_spaces_router, prefix="/api/v1")
 app.include_router(marketing_router, prefix="/api/v1")
 app.include_router(media_router, prefix="/api/v1")
 app.include_router(ml_router, prefix="/api/v1")
+app.include_router(autonomous_router, prefix="/api/v1")
 app.include_router(monitoring_router, prefix="/api/v1")
 app.include_router(orchestration_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")
@@ -429,7 +475,7 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "main_enterprise:app",
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104 — 0.0.0.0 required in containerized/cloud deployment; network isolation at infra layer
         port=8000,
         reload=True,
         log_level="info",

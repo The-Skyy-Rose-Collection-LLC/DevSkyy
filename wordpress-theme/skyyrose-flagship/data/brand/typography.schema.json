@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./typography.schema.json",
+  "title": "SkyyRose Typography SOT",
+  "description": "Canonical font definitions for the SkyyRose brand. Universal roles drive :root CSS vars; collection scripts live in per-collection identity.json.",
+  "type": "object",
+  "required": ["universal", "caps", "system", "collection_scripts"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "universal": {
+      "type": "object",
+      "description": "Global font roles emitted into :root by gen-design-tokens.py",
+      "required": ["display", "body", "mono", "ui"],
+      "additionalProperties": false,
+      "properties": {
+        "display": { "$ref": "#/$defs/fontRole" },
+        "body":    { "$ref": "#/$defs/fontRole" },
+        "mono":    { "$ref": "#/$defs/fontRole" },
+        "ui":      { "$ref": "#/$defs/fontRole" }
+      }
+    },
+    "caps": {
+      "type": "object",
+      "description": "Caps/eyebrow font; also each collection's caps override in identity.json",
+      "required": ["family", "woff2"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string" },
+        "woff2":  { "type": ["string", "null"] },
+        "note":   { "type": "string" }
+      }
+    },
+    "system": {
+      "type": "object",
+      "description": "System/utility font — --ff-system and body fallback",
+      "required": ["family", "woff2"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string" },
+        "woff2":  { "type": ["string", "null"] },
+        "note":   { "type": "string" }
+      }
+    },
+    "collection_scripts": {
+      "type": "object",
+      "description": "Per-collection script fonts — authoritative names only; full specs live in identity.json",
+      "required": ["black-rose", "signature", "kids-capsule", "love-hurts"],
+      "properties": {
+        "note":          { "type": "string" },
+        "black-rose":    { "type": "string" },
+        "signature":     { "type": "string" },
+        "kids-capsule":  { "type": "string" },
+        "love-hurts":    { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "fontRole": {
+      "type": "object",
+      "required": ["family", "stack", "woff2"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string", "description": "Display name of the primary family" },
+        "stack":  { "type": "string", "description": "Full CSS font-family stack value" },
+        "woff2":  { "type": ["string", "null"], "description": "Path relative to theme root; null for system fonts" }
+      }
+    }
+  }
+}

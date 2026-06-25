@@ -2,12 +2,26 @@
 Direct REST client for Gemini API — bypasses the Python SDK.
 
 Enhanced with OpenTelemetry for "Back Data" observability.
+
+Security posture:
+    - API key passed via x-goog-api-key HEADER (never in URL querystring).
+      Prior bug (CRIT): key-in-URL leaked via httpx HTTPError strings,
+      OpenTelemetry span attributes, and server access logs.
+    - Key list frozen at import time. Prior bug (HIGH #7984):
+      sorted(set(_load_keys())) re-derived ordering on every call,
+      silently breaking the round-robin when env vars changed.
+    - Fail-fast on 400/401/403 — retrying auth errors burns quota and
+      delays the real failure.
+    - All exception strings are scrubbed for key-shaped tokens before
+      they enter logs or return values (defense in depth).
 """
 
 from __future__ import annotations
 
 import base64
+import logging
 import os
+import re
 import threading
 import time
 from typing import Any
@@ -18,82 +32,144 @@ from core.telemetry.tracer import get_tracer
 
 from .config import GEMINI_TIMEOUT
 
-# Gemini REST API base URL
+logger = logging.getLogger(__name__)
+
 _API_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
-# API Key Rotation state
+
+def _load_keys() -> list[str]:
+    """Discover configured Gemini API keys from env, preserving discovery order.
+
+    Reads primary names first, then numbered fallbacks. Deduplicates while
+    preserving the order each key was first seen so round-robin rotation is
+    deterministic across process restarts (given identical env).
+    """
+    keys: list[str] = []
+    seen: set[str] = set()
+
+    def _add(val: str | None) -> None:
+        if val and val not in seen:
+            seen.add(val)
+            keys.append(val)
+
+    for primary in ("GEMINI_API_KEY", "GOOGLE_AI_API_KEY", "GOOGLE_API_KEY"):
+        _add(os.getenv(primary))
+
+    for i in range(1, 11):
+        for fmt in ("GEMINI_API_KEY_{}", "GOOGLE_AI_API_KEY_{}", "GOOGLE_API_KEY_{}"):
+            _add(os.getenv(fmt.format(i)))
+
+    return keys
+
+
+def _get_keys() -> list[str]:
+    """Read keys from env on each call. Backward-compat alias used by tests
+    and diagnostic tooling. The hot path uses the frozen module-level
+    ``_KEYS`` list (see ``_get_active_key``) — that's the only path that
+    rotation order depends on. This re-reads env each invocation so
+    monkeypatch.setenv-style tests can verify env discovery.
+    """
+    return _load_keys()
+
+
+# Frozen once at import. Mutating env after import does NOT affect rotation —
+# fix the env, then restart the process. This is the only way to make rotation
+# index meaningful across calls.
+_KEYS: list[str] = _load_keys()
 _KEY_INDEX = 0
 _KEY_LOCK = threading.Lock()
 
 tracer = get_tracer(__name__)
 
+# Status codes worth retrying — transient or rate-limited.
+_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 
-def _get_keys() -> list[str]:
-    """Get all available Gemini API keys from environment."""
-    keys = []
-    # Check for primary keys
-    for primary in ["GEMINI_API_KEY", "GOOGLE_AI_API_KEY", "GOOGLE_API_KEY"]:
-        val = os.getenv(primary)
-        if val:
-            keys.append(val)
+# Status codes that must NOT be retried — auth failures, malformed requests.
+_NON_RETRYABLE_STATUS = frozenset({400, 401, 403, 404})
 
-    # Check for numbered keys (GEMINI_API_KEY_1, GEMINI_API_KEY_2, etc.)
-    for i in range(1, 11):
-        for fmt in ["GEMINI_API_KEY_{}", "GOOGLE_AI_API_KEY_{}", "GOOGLE_API_KEY_{}"]:
-            val = os.getenv(fmt.format(i))
-            if val:
-                keys.append(val)
+# Match anything shaped like a Google API key. Used to scrub keys that may
+# have leaked into exception strings from older clients, downstream libraries,
+# or third-party error reporters.
+_KEY_SCRUB_RE = re.compile(r"AIza[0-9A-Za-z_\-]{30,}")
 
-    return sorted(set(keys))  # Unique keys
+
+def _scrub(text: str) -> str:
+    """Strip Gemini-shaped API key tokens from a string before logging."""
+    return _KEY_SCRUB_RE.sub("AIza<scrubbed>", text)
 
 
 def _get_active_key() -> str:
-    """Get the next key in the rotation."""
+    """Round-robin next key from the frozen list."""
     global _KEY_INDEX
-    keys = _get_keys()
-    if not keys:
+    if not _KEYS:
         return ""
-
     with _KEY_LOCK:
-        key = keys[_KEY_INDEX % len(keys)]
+        key = _KEYS[_KEY_INDEX % len(_KEYS)]
         _KEY_INDEX += 1
     return key
 
 
 def _endpoint(model: str, method: str = "generateContent") -> str:
-    """Build API endpoint URL."""
-    key = _get_active_key()
-    return f"{_API_BASE}/models/{model}:{method}?key={key}"
+    """Build endpoint URL. Auth via x-goog-api-key header, never querystring."""
+    return f"{_API_BASE}/models/{model}:{method}"
 
 
 def _post_with_retry(model: str, method: str, payload: dict) -> dict[str, Any]:
-    """Post to Gemini with automatic key rotation on 429 and OTel tracing."""
+    """Post to Gemini with key rotation on 429/5xx and OpenTelemetry tracing.
+
+    Auth: x-goog-api-key header. Fail-fast on 400/401/403/404; otherwise rotate
+    to the next key with exponential backoff. Caps total attempts at len(_KEYS).
+    All errors returned to the caller are scrubbed of key-shaped tokens.
+    """
     with tracer.start_as_current_span(f"gemini_api_{method}") as span:
         span.set_attribute("model", model)
         span.set_attribute("method", method)
 
-        keys = _get_keys()
-        max_attempts = len(keys) if keys else 1
+        if not _KEYS:
+            return {"success": False, "error": "No Gemini API keys configured"}
+
+        url = _endpoint(model, method)
+        max_attempts = len(_KEYS)
 
         for attempt in range(max_attempts):
-            url = _endpoint(model, method)
+            key = _get_active_key()
             try:
                 start_time = time.monotonic()
-                resp = requests.post(url, json=payload, timeout=GEMINI_TIMEOUT)
+                resp = requests.post(
+                    url,
+                    json=payload,
+                    timeout=GEMINI_TIMEOUT,
+                    headers={
+                        "x-goog-api-key": key,
+                        "Content-Type": "application/json",
+                    },
+                )
                 duration = time.monotonic() - start_time
 
                 span.add_event(
                     f"api_attempt_{attempt}",
-                    attributes={"status_code": resp.status_code, "duration_s": duration},
+                    attributes={
+                        "status_code": resp.status_code,
+                        "duration_s": duration,
+                    },
                 )
 
-                if resp.status_code == 429 and attempt < max_attempts - 1:
+                if resp.status_code in _NON_RETRYABLE_STATUS:
+                    span.set_attribute("error.kind", "non_retryable")
+                    body = _scrub((resp.text or "")[:200])
+                    return {
+                        "success": False,
+                        "error": f"HTTP {resp.status_code} (non-retryable): {body}",
+                    }
+
+                if resp.status_code in _RETRYABLE_STATUS and attempt < max_attempts - 1:
+                    backoff = min(1.0 * (2**attempt), 8.0)
+                    time.sleep(backoff)
                     continue
 
                 resp.raise_for_status()
                 data = resp.json()
 
-                # Record token usage if available
                 usage = data.get("usageMetadata", {})
                 if usage:
                     span.set_attribute("prompt_tokens", usage.get("promptTokenCount", 0))
@@ -101,12 +177,14 @@ def _post_with_retry(model: str, method: str, payload: dict) -> dict[str, Any]:
 
                 return {"success": True, "data": data}
             except Exception as exc:
-                if attempt < max_attempts - 1:
-                    continue
+                msg = _scrub(str(exc))
                 span.record_exception(exc)
-                return {"success": False, "error": str(exc)}
+                if attempt < max_attempts - 1:
+                    time.sleep(min(1.0 * (2**attempt), 8.0))
+                    continue
+                return {"success": False, "error": msg}
 
-        return {"success": False, "error": "All API keys exhausted or rate limited."}
+        return {"success": False, "error": "All API keys exhausted or rate limited"}
 
 
 def generate_text(model: str, prompt: str) -> dict[str, Any]:
@@ -121,7 +199,7 @@ def generate_text(model: str, prompt: str) -> dict[str, Any]:
         text = result["data"]["candidates"][0]["content"]["parts"][0]["text"]
         return {"success": True, "text": text}
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        return {"success": False, "error": _scrub(str(exc))}
 
 
 def analyze_vision(
@@ -155,7 +233,7 @@ def analyze_vision(
         text = result["data"]["candidates"][0]["content"]["parts"][0]["text"]
         return {"success": True, "text": text}
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        return {"success": False, "error": _scrub(str(exc))}
 
 
 def generate_image(
@@ -166,7 +244,7 @@ def generate_image(
     mime_type: str = "image/jpeg",
 ) -> dict[str, Any]:
     """Generate image using Gemini image model with one or more reference images."""
-    parts = [{"text": prompt}]
+    parts: list[dict[str, Any]] = [{"text": prompt}]
 
     if isinstance(reference_images_b64, str):
         # Backward compatibility for single string
@@ -180,7 +258,6 @@ def generate_image(
                 }
             )
     else:
-        # Support for list of base64 images
         for b64 in reference_images_b64:
             if b64:
                 parts.append(
@@ -207,7 +284,6 @@ def generate_image(
 
     try:
         data = result["data"]
-        # Extract image from response
         for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
             if "inlineData" in part:
                 image_b64_str = part["inlineData"]["data"]
@@ -217,6 +293,6 @@ def generate_image(
                     "mime_type": part["inlineData"].get("mimeType", "image/jpeg"),
                 }
 
-        return {"success": False, "error": "No image in response."}
+        return {"success": False, "error": "No image in response"}
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        return {"success": False, "error": _scrub(str(exc))}

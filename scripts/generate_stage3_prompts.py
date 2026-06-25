@@ -374,7 +374,9 @@ def main() -> None:
     parser.add_argument("--slug", help="Process only this dossier slug (e.g. black-rose-crewneck)")
     args = parser.parse_args()
 
-    dossier_files = sorted(DOSSIER_DIR.glob("*.md"))
+    dossier_files = sorted(
+        f for f in DOSSIER_DIR.glob("*.md") if not f.name.startswith("_") and f.name != "CLAUDE.md"
+    )
     dossier_files = [f for f in dossier_files if f.name != "_template.md"]
 
     if args.slug:

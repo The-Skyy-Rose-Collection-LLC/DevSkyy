@@ -31,10 +31,22 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from llama_index.core.base.llms.types import ChatMessage, MessageRole
-from llama_index.core.multi_modal_llms import MultiModalLLM
-from llama_index.llms.openai import OpenAI
-from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
+# LlamaIndex is an optional dependency declared in pyproject.toml[ml]. Module
+# stays importable without it; runtime methods that touch these classes will
+# raise sensible TypeErrors if called without the extra installed.
+try:
+    from llama_index.core.base.llms.types import ChatMessage, MessageRole
+    from llama_index.core.multi_modal_llms import MultiModalLLM
+    from llama_index.llms.openai import OpenAI
+    from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
+except ImportError:
+    ChatMessage = None  # type: ignore[assignment,misc]
+    MessageRole = None  # type: ignore[assignment,misc]
+    MultiModalLLM = None  # type: ignore[assignment,misc]
+    OpenAI = None  # type: ignore[assignment,misc]
+    AnthropicMultiModal = None  # type: ignore[assignment,misc]
+
+from llm.model_ids import CLAUDE_SONNET_MODEL, OPENAI_VISION_MODEL
 
 # Optional: HuggingFace multimodal (requires torch - only in requirements-full.txt)
 try:
@@ -106,8 +118,8 @@ class MultimodalCapabilities:
     def __init__(
         self,
         default_provider: MultimodalProvider = MultimodalProvider.ANTHROPIC,
-        anthropic_model: str = "claude-3-5-sonnet-20241022",
-        openai_model: str = "gpt-4o",
+        anthropic_model: str = CLAUDE_SONNET_MODEL,
+        openai_model: str = OPENAI_VISION_MODEL,
         max_tokens: int = 2048,
     ):
         """

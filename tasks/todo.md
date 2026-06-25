@@ -1,5 +1,152 @@
 # Current Tasks
 
+## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
+
+Branch `feat/embeddings-phase2` off `origin/main`. Spec: `docs/superpowers/specs/2026-06-22-embeddings-reframe-design.md` §Track E.
+Base: Phase 0 (frozen contract + golden gate) IS in main; Phase 1 (Track P) is NOT (open PR #604) — Track E is orthogonal.
+
+**Approach (decided):** Shim migration — `skyyrose/core/clip_embedder.py` + `dino_embedder.py` become thin facades over the new
+package → zero consumer churn (6 in-repo sites + `capability.py` importlib string-probe + 2 scripts unchanged). `store.py`
+(sqlite LocalVectorStore) DEFERRED — no current consumer (YAGNI); E-store covered by atomic-centroid + space-guard on the
+live `.npz` path. All tests model-free (CI red on HF Hub 429 — never download a model in a test).
+
+Foundation: [x] errors.py [x] device.py [x] space.py [x] config.py [x] base.py
+Encoders:   [x] clip.py [x] dino.py [x] cache.py
+Wire:       [x] embedding_gate (E-encoder-gate) [x] brand_centroid (E-space/E-store) [x] shims
+Migrate:    [x] repoint visual_product_recognition [x] delete scripts/image_embeddings (E-delete)
+Verify:     [x] new unit suite green (50) [x] Phase-0 golden+contract still green (11) [x] elite_studio CI-mode green (185) + lint clean
+            [~] adversarial 5-lens review running (wf_5bc8945c-3d3) → triage + fix → commit
+DEFER:      store.py (sqlite LocalVectorStore) — no consumer, YAGNI; E-store covered by atomic centroid + dim guard.
+
+## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
+
+Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
+the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
+Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
+`/mcp` (→ `api.devskyy.app/mcp/`); reuse the backend both surfaces already call.
+
+- [x] P0 Research — Context7 confirmed `app.mount("/mcp", mcp.streamable_http_app())` +
+      `session_manager.run()` in lifespan + Bearer auth. SDK FastMCP already has the methods.
+- [x] P1 HTTP mount — `api/mcp_mount.py` + lifespan wrap + mount in main_enterprise.
+      Fixed double-path (`streamable_http_path="/"`). Verified: `/mcp/` → 200 + session.
+- [x] P2 Auth — `BearerAuthMiddleware` (MCP_SERVICE_TOKEN). Verified 401 without/wrong token,
+      200 with. Enforced when token set; warns if unset in non-dev.
+- [x] P3a fly.toml pinned to 1 always-on machine (commit 624631520); MCP_SERVICE_TOKEN generated.
+- [x] P3b Backend deploy — LIVE at https://devskyy-api.fly.dev/mcp/ (Fly app `devskyy-api`, 1 machine,
+      MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
+      (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
+      ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
+      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
+- [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
+      console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
+      Vercel deploy ⚠️ PENDING.
+- [x] P5 WP-admin console — `inc/mcp-bridge.php` (PHP streamable-HTTP client: initialize →
+      notifications/initialized → tools/call, SSE-frame parse, session DELETE teardown;
+      SSRF-guarded via `skyyrose_see_is_safe_url`; Bearer from SKYYROSE_MCP_TOKEN const/env/option).
+      Tools → DevSkyy MCP page + `assets/js/admin-mcp-console.js` (createElement only, no innerHTML),
+      nonce + `manage_options` gated AJAX relay. Wired in functions.php after fastapi-client.php.
+      WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
+      (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
+      php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
+- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
+  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
+    redeploy frontend. ⚠️
+  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
+    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
+    + DNS records); then the committed default URLs work without per-surface overrides.
+  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+
+## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
+
+Source: `~/.claude-mem/STANDUP.md` (10-agent standup; all decisions founder-approved 2026-06-10).
+Context: org Actions block = ALL PR checks red regardless of code. Gate every merge on
+LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
+
+### Phase 1 — Independent quick lands — DONE 2026-06-10
+- [x] 1.1 Merge PR #537 — gate 20/20 tests green; merged `9169db1d`
+- [x] 1.2 Merge PR #539 — php -l + ast + import gates clean; merged `dfe5254c`
+- [x] 1.3 Land fix/ci-bandit-debt (consolidated assets + hook fix; PR #546)
+      [this session: fad555a50 landed via PR #543; PR #546 = parallel session's follow-up, still OPEN]
+- [x] 1.4 Close PR #501 — CLOSED with superseded comment
+
+### Phase 2 — oai_render pipeline — DONE 2026-06-10 (with recovery)
+- [x] 2.1 Pushed 409187921 → feat/oai-render-pipeline. CORRECTION: commit order was inverted —
+      2b2ab382a was the TIP (child of 409187921), not parent; it was stranded by the push.
+- [x] 2.2 PR #540 merged `948b59b25` (51/51 tests + dry-run smoke: 75 imgs/30 SKUs, 3 excluded).
+      Stranded tip recovered via PR #544, merged `0f0ea0c43`, 52/52 tests. Both SHAs verified
+      ancestors of origin/main. Lesson logged as buglog bug-124 (push tips, not assumed parents).
+- [x] 2.3 render-fixes worktree + feat/legal-policies-shipping-sync branch deleted;
+      be3a072c (.claude/-deletion hazard) now unreachable.
+
+### Phase 3 — WP theme — DONE/DEFERRED 2026-06-10
+- [x] 3.1 PR #534 CLOSED; partition B re-cut as PR #545, merged `6fb5350d4`.
+      php -l clean; buglog merged additively (4 entries renumbered bug-120..123); webps carried.
+- [x] 3.2 DEFERRED (founder call 2026-06-10): refactor/wp-template-consolidation is a stale
+      reference snapshot (own commit message says "not mergeable code"); 9 main commits rewrote
+      the 4 landing templates since branch point — merging would wipe brand/a11y/perf work.
+      Branch kept as pattern reference. Redo on current main when templates stabilize.
+- [x] 3.3 Not triggered: #545 = docblocks/artifacts only, no CSS/JS source changes this sweep.
+      NOTE: #539's PDP size-chip JS (min rebuilt in-branch) is on main but NOT yet deployed
+      to skyyrose.co — rides the next deploy train.
+
+### Phase 4 — Holds + hygiene
+- [ ] 4.1 HOLD wip/codex-homepage-v2 (51ee222a2). Trigger: OAI render batch re-run + validated
+      (sections hard-reference deleted render image paths). Then cherry-pick onto theme branch.
+- [ ] 4.2 HOLD PR #538 (pipeline3d draft). Trigger: founder picks 3D path (tasks/3d-pipeline-handoff.md).
+- [x] 4.3 Main-checkout cleanup — DONE 2026-06-12 (landed on main via 525c6799a):
+      frontend/.next.stale-20260609/ (252MB) DELETED (commit 76acaa98e);
+      claude-mem CLAUDE.md churn ROOT-FIXED — redirected to gitignored CLAUDE.local.md
+      (FOLDER_USE_LOCAL_MD=true) + worker restarted; 265 stub CLAUDE.md deleted, 77
+      stripped, 0 blocks left tracked (commit 525c6799a); prototypes/ gitignored.
+      Doctrine: docs/memory-architecture.html. clip bug-128 + theme v1.6.2 also landed.
+
+**Done when:** main = #537 + #539 + #540(+2 commits) + #534-partition-B + wp-templates + fad555a50;
+#501 + #534 closed; render-fixes worktree gone; every merge locally verified.
+
+---
+
+## ACTIVE — 3D products on skyyrose.co PDPs (2026-05-31)
+
+**Decisions (founder):** Balanced KTX2+meshopt · Cloudflare R2 hosting · PDP-only · Google `<model-viewer>`.
+**Verified:** 33 GLBs `renders/3d/{sku}.glb`, avg 7.5MB / ~74% textures. No viewer in theme (April mascot stripped). `.glb` not upload-allowed (only AVIF in `inc/performance.php`). PDP = `woocommerce/single-product.php`. No R2 creds / no compression tool yet.
+
+### Phase 1 — Compress (local, no gate)
+- [ ] Install `gltfpack` (meshoptimizer; bundles Basis/KTX2)
+- [ ] Validate on br-003 (smallest): `-cc -tc`, confirm ~1–2MB + integrity
+- [ ] Batch all 33 → `renders/3d/web/{sku}.glb`
+- [ ] Report per-SKU before/after; flag non-shrinkers / degraded
+
+### Phase 2 — Theme integration (local, deploy-gated by sweep)
+- [ ] Self-host `model-viewer.min.js` → `assets/js/vendor/`
+- [ ] `SKYYROSE_3D_CDN_BASE` constant (functions.php), empty = viewer off
+- [ ] Enqueue model-viewer (`is_product()` only, ES module)
+- [ ] Inject `<model-viewer>` in `woocommerce/single-product.php`: SKU→`{CDN_BASE}/{sku}.glb`, poster=product image, lazy, reveal=interaction, camera-controls, ar
+- [ ] Graceful: no GLB for SKU → render nothing
+- [ ] `assets/css/product-3d.css` + build `.min`
+- [ ] Sweep: php -l + phpcs + WP health + /wp-simplify + animation verify
+
+### Phase 3 — R2 hosting (BLOCKED on founder; STOP-AND-SHOW on upload)
+- [ ] **NEEDS FOUNDER:** Cloudflare → R2 bucket `skyyrose-3d` → public (r2.dev or `cdn.skyyrose.co`) → API token
+- [ ] Creds → `.env.secrets` (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, SKYYROSE_3D_CDN_BASE)
+- [ ] CORS: allow `https://skyyrose.co` GET
+- [ ] Upload script (boto3/rclone), dry-run first → **STOP-AND-SHOW** → real upload
+- [ ] Set `SKYYROSE_3D_CDN_BASE` live → viewers activate
+
+### Phase 4 — Verify live
+- [ ] Cache-busted PDP curl: `<model-viewer>` present + GLB 200 + correct MIME
+- [ ] WebGL renders desktop + mobile; poster pre-interaction
+- [ ] Docs + lessons + memory updated
+
+**Order:** Phase 1+2 now (no creds). Phase 3 waits on R2. Code ships complete; 3D activates when `SKYYROSE_3D_CDN_BASE` set.
+
+---
+
 ## Session Summary (Apr 6, 2026)
 
 ### Completed This Session
@@ -115,3 +262,41 @@
 - [ ] Run build.sh to generate missing .min.css/.min.js for new files
 - [ ] Lighthouse audit: target Performance >90, Accessibility >90
 - [ ] Mobile viewport test (375px)
+
+# WP Port — Landing v3 + Pre-Order Flagship (2026-06-12)
+
+Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-scrollytell; pre-order = prototypes/preorder-page/flagship-full-throttle (video hero, conversion-led order).
+
+- [ ] 1. Two parallel port builders (landing v3 → 3 landing templates + landing-scrollytell.css/js; pre-order flagship → template-preorder-gateway.php + preorder-gateway.css/js rewrite, hero-cinematic part with preorder-hero.mp4, WC cart wiring, meters OFF until real stock — edition chips only)
+- [ ] 2. Verify: php -l, PHPCS, escaping/nonces, visual-manifest compliance, .min rebuild, grep source+min
+- [ ] 3. Full sweep clean
+- [ ] 4. STOP-AND-SHOW manifest → deploy (standing auth) → post-verify curl+Playwright mobile+desktop
+- [ ] 5. Logs: memory/cerebrum/anatomy
+
+Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.
+
+# Collection Identity SOT (2026-06-14)
+
+Spec: `docs/superpowers/specs/2026-06-14-collection-identity-sot-design.md` (approved). Branch: `feat/collection-identity-sot`.
+Per-collection folders `data/collections/<slug>/` = single source: `identity.json` (canon) + `copy.md` + generated `sot.json` + `index.html`. Canon-driven design-tokens rebuild + OFL fonts (Yellowtail/Kaushan/Pinyon, specimen-confirm). Hard cut-over: repoint all refs → delete all old.
+
+- [x] P0 Canon scaffold — schema + 4 identity.json + load_identity() (7e4ad264c, df25936f4, 232225497)
+- [x] P1 Fonts — Yellowtail/Kaushan/Pinyon self-hosted woff2 + @font-face (f3b1a4ad0)
+- [x] P2 design-tokens rebuild — generated [data-collection] blocks; palettes fixed, accent-rgb preserved, 2-role fonts, font-gothic dropped, LH secondary fixed (5cfe4fc92, 8e90f601d)
+- [x] P3/SOT builder — sot_common.py loader + ext-pref resolver + responsive-aware builder → per-folder sot.json + global _orphans.json (3026518dc, 421984f7d, b528b0536, e32f008eb)
+- [x] P4 Designer bundle — 4 copy.md (verbatim canon) + generated index.html hub (62bfd5ef1)
+- [x] P5 Verify + tests — full drift gate + golden test; 20 unit tests green; verifier 33/33 SKUs, 0 broken refs (78678d44f). [catalog-drift-guard hook re-point deferred to P6]
+- [x] P6 census — DONE (non-destructive). FINDING: ZERO repoint work — no production PHP/JS/Python reads the flat JSONs or data/collections/. Cut-over = pure deletion w/ proof of zero consumers.
+- [x] **P6 ⛔ GATE — FOUNDER WALKTHROUGH.** APPROVED 2026-06-14 ("Yes — run cut-over + P7").
+- [x] P6 Cut-over — deleted flat JSONs + retired woff2 + old fonts.css block → rebuilt .min → re-pointed catalog-drift-guard hook (identity.json trigger) → updated README/docs (commit 56bb9a898).
+- [x] P7 Verify + review gate — 20 unit tests green · drift gate 33/33 SKUs 0 broken refs · holistic review VERDICT ship · CSS-injection fix landed (font.family schema pattern, 02ca2b7fc) · 4 LOW/INFO follow-ups logged on PR #550.
+
+Standing rules (§14): authoritative sources only (trace every value to a master); new SOT is the single reference post cut-over; repoint-first deletion (census proves zero live refs); no "done" without P7 proof.
+
+## P6 DELETION CENSUS (running list — for the founder walkthrough; NOTHING deleted until sign-off)
+- Flat `data/collections/{black-rose,love-hurts,signature,kids-capsule}.json` — superseded by per-folder `sot.json`.
+- `assets/css/fonts.css` OLD `collections/` @font-face section: `Italiana` + `UnifrakturMaguntia` (NOT in canon — dead), and the superseded `Yellowtail`/`Pinyon Script` blocks pointing at `../fonts/collections/` (now duplicated by the canonical root-path blocks added in P1; root wins via cascade so site is correct, but the old blocks are dead weight).
+- `assets/fonts/collections/{italiana,unifraktur-maguntia,yellowtail,pinyon-script}-latin.woff2` — old placeholder/duplicate font files (canon now uses root `assets/fonts/{yellowtail,kaushan-script,pinyon-script}-latin.woff2`).
+- `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
+- Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
+- NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.

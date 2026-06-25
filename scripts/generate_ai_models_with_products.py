@@ -90,12 +90,12 @@ def setup_pipeline(device: str = "mps") -> tuple:
     """Setup SDXL pipeline with IP-Adapter Plus."""
 
     print("Loading CLIP Vision Model...")
-    image_encoder = CLIPVisionModelWithProjection.from_pretrained(
+    image_encoder = CLIPVisionModelWithProjection.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "h94/IP-Adapter", subfolder="models/image_encoder", torch_dtype=torch.float16
     )
 
     print("Loading SDXL Base Model (Juggernaut-XL-v9)...")
-    pipeline = AutoPipelineForText2Image.from_pretrained(
+    pipeline = AutoPipelineForText2Image.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         "RunDiffusion/Juggernaut-XL-v9",
         image_encoder=image_encoder,
         torch_dtype=torch.float16,

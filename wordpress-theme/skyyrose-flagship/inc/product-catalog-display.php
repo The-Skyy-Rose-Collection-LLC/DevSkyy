@@ -198,9 +198,9 @@ function skyyrose_get_featured_catalog_products( $limit = 8 ) {
 	// Curated featured rotation — one or two flagships per collection, in
 	// a natural browsing order (signature → black rose → love hurts → kids).
 	$default_skus = array(
+		'br-001',  // BLACK Rose Crewneck
 		'sg-015',  // The Windbreaker Set
 		'br-004',  // BLACK Rose Hoodie
-		'br-008',  // SF Inspired Football Jersey
 		'lh-004',  // Love Hurts Bomber Jacket
 		'sg-006',  // Mint & Lavender Hoodie
 		'br-010',  // The Bay Basketball Jersey
@@ -284,9 +284,9 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 
 	// Tier 2 — cross-request transient cache holding lightweight descriptors.
 	$transient_key = 'skyyrose_featured_display_' . $key;
-	$descriptors   = get_transient( $transient_key );
+	$descriptors   = isset( $_GET['nocache'] ) ? false : get_transient( $transient_key ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only cache-bypass debug flag; no write action, no CSRF surface.
 
-	if ( false === $descriptors || ! is_array( $descriptors ) ) {
+	if ( false === $descriptors || ! is_array( $descriptors ) || empty( $descriptors ) ) {
 		$resolved    = skyyrose_resolve_display_products(
 			skyyrose_get_featured_catalog_products( $key )
 		);

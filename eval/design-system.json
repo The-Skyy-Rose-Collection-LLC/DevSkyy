@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json.schemastore.org/design-tokens",
+  "_meta": {
+    "name": "Skyyrose Design System Tokens",
+    "specified_by": ["wp: §5.1", "wp: §5.2"],
+    "phase": "0 (initial extraction); extended in Phase 4",
+    "last_updated": "2026-05-03",
+    "last_updated_by": "eval-harness",
+    "notes": "Source of truth for assets/css/design-tokens.css. The CSS is generated from this JSON. Repo convention is 'design-tokens.css' (existing file with min + sourcemap), not 'tokens.css' as WP §5.1 originally specified. PLAN_INDEX.md resolves the conflict.",
+    "implementation_target": "wordpress-theme/skyyrose-flagship/assets/css/design-tokens.css"
+  },
+  "color": {
+    "brand": {
+      "dark": { "value": "#0A0A0A", "description": "Brand black — only black used; backgrounds, body text on light surfaces" },
+      "rose_gold": { "value": "#B76E79", "description": "Global accent + Kids Capsule signature" },
+      "silver": { "value": "#C0C0C0", "description": "Black Rose collection accent" },
+      "crimson": { "value": "#DC143C", "description": "Love Hurts collection accent" },
+      "gold": { "value": "#D4AF37", "description": "Signature collection accent" }
+    },
+    "neutral": {
+      "_note": "5 grays — populated in Phase 4 from existing design-tokens.css analysis. Do NOT introduce arbitrary grays.",
+      "gray-50": { "value": "TBD Phase 4 audit" },
+      "gray-100": { "value": "TBD" },
+      "gray-300": { "value": "TBD" },
+      "gray-500": { "value": "TBD" },
+      "gray-900": { "value": "TBD" }
+    },
+    "semantic": {
+      "success": { "value": "TBD Phase 4 audit" },
+      "warning": { "value": "TBD" },
+      "error": { "value": "TBD" }
+    }
+  },
+  "typography": {
+    "_note": "5 type families per WP §5.1 + brand-story.md. All declared in theme.json Font Library. Zero Google Fonts CDN.",
+    "family": {
+      "display_br": { "value": "Cinzel", "use": "Black Rose collection headings" },
+      "display_general": { "value": "Playfair Display", "use": "Signature / Love Hurts / Kids Capsule headings" },
+      "body": { "value": "Cormorant Garamond", "use": "Body copy" },
+      "ui": { "value": "Bebas Neue", "use": "UI elements (buttons, labels — designed for caps)" },
+      "system": { "value": "Inter", "use": "System / fallback" }
+    },
+    "scale": {
+      "_note": "8 levels per WP §5.1 — populated Phase 4 with measured rem values from existing design-tokens.css",
+      "display": { "value": "TBD" },
+      "h1": { "value": "TBD" },
+      "h2": { "value": "TBD" },
+      "h3": { "value": "TBD" },
+      "h4": { "value": "TBD" },
+      "h5": { "value": "TBD" },
+      "h6": { "value": "TBD" },
+      "body_lg": { "value": "TBD" },
+      "body": { "value": "TBD" },
+      "body_sm": { "value": "TBD" },
+      "caption": { "value": "TBD" }
+    },
+    "weight": {
+      "_note": "Specified weights only per type family — populated Phase 4"
+    },
+    "line_height": {
+      "body": { "value": ">= 1.5", "rule": "WP §5.3 #1 — typography breathes" }
+    }
+  },
+  "spacing": {
+    "_rule": "WP §5.1 — token scale only, no arbitrary values",
+    "scale": {
+      "1": { "value": "4px" },
+      "2": { "value": "8px" },
+      "3": { "value": "12px" },
+      "4": { "value": "16px" },
+      "6": { "value": "24px" },
+      "8": { "value": "32px" },
+      "12": { "value": "48px" },
+      "16": { "value": "64px" },
+      "24": { "value": "96px" },
+      "32": { "value": "128px" }
+    }
+  },
+  "radius": {
+    "_rule": "WP §5.1 — most surfaces 0 or 2; 8+ only when intentional",
+    "scale": {
+      "0": { "value": "0px" },
+      "1": { "value": "2px" },
+      "2": { "value": "4px" },
+      "3": { "value": "8px" },
+      "4": { "value": "16px" },
+      "full": { "value": "9999px" }
+    }
+  },
+  "shadow": {
+    "_rule": "WP §5.1 + §5.3 #6 — premium = restrained shadows. No drop-shadow stacks.",
+    "none": { "value": "none" },
+    "subtle": { "value": "TBD Phase 4 audit (from existing design-tokens.css)" },
+    "soft": { "value": "TBD" },
+    "lifted": { "value": "TBD" }
+  },
+  "motion": {
+    "_rule": "WP §5.1 + §5.3 #4 — slow motion (default 400ms), 4 named easing curves",
+    "duration": {
+      "fast": { "value": "150ms", "use": "instantaneous-feeling state changes (active, focus)" },
+      "default_short": { "value": "250ms", "use": "small UI transitions" },
+      "default": { "value": "400ms", "use": "WP §5.3 default — most transitions" },
+      "slow": { "value": "800ms", "use": "scroll-driven cinematic moments (Three.js scenes, hero reveals)" }
+    },
+    "easing": {
+      "_note": "4 named curves — populated Phase 4 from existing audit",
+      "out": { "value": "TBD" },
+      "in_out": { "value": "TBD" },
+      "smooth": { "value": "TBD" },
+      "subtle": { "value": "TBD" }
+    }
+  },
+  "breakpoints": {
+    "_rule": "WP §5.1 — mobile-first",
+    "sm": { "value": "480px" },
+    "md": { "value": "768px" },
+    "lg": { "value": "1024px" },
+    "xl": { "value": "1280px" },
+    "2xl": { "value": "1536px" }
+  },
+  "z_index": {
+    "_rule": "WP §5.1 — named layers, not arbitrary numbers",
+    "base": { "value": 1 },
+    "above": { "value": 10 },
+    "dropdown": { "value": 100 },
+    "modal": { "value": 1000 },
+    "toast": { "value": 10000 }
+  },
+  "_phase_4_actions": [
+    "Audit existing wordpress-theme/skyyrose-flagship/assets/css/design-tokens.css for all TBD-marked values",
+    "Pull theme.json presets via mcp__claude_ai_WordPress_com__wpcom-mcp-site-editor-context (per cost-cap-policy.md autonomous tier)",
+    "Reconcile CSS variables with this JSON; update both atomically when any token changes",
+    "Generate the 9 design system component primitives (Phase 0 Deliverable H) using these tokens"
+  ]
+}

@@ -18,7 +18,7 @@
 	--contact-card-bg: rgba(17, 17, 17, 0.95);
 	--contact-rose-gold: var(--color-rose-gold, #B76E79);
 	--contact-gold: var(--color-gold, #D4AF37);
-	--contact-dark-rose: #8B0000; /* intentional off-brand gradient color — flagged, not brand-token */
+	--contact-dark-rose: var(--skyyrose-accent-dark, #9A5662);
 	--contact-text-primary: #FFFFFF;
 	--contact-text-secondary: rgba(255, 255, 255, 0.7);
 	--contact-text-muted: rgba(255, 255, 255, 0.5);
@@ -28,19 +28,6 @@
 	--contact-focus-ring: 0 0 0 3px rgba(183, 110, 121, 0.3);
 	--contact-transition: all 0.3s ease;
 	--contact-transition-spring: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ==========================================================================
-   Film Grain Overlay
-   ========================================================================== */
-
-.contact-page .film-grain {
-	position: fixed;
-	inset: 0;
-	z-index: 9999;
-	pointer-events: none;
-	opacity: 0.03;
-	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 /* ==========================================================================
@@ -103,7 +90,7 @@
 }
 
 .contact-hero__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(2.5rem, 5vw, 3.5rem);
 	font-weight: 700;
 	margin-bottom: 1rem;
@@ -144,7 +131,7 @@
    ========================================================================== */
 
 .contact-info__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 2rem;
 	font-weight: 600;
 	margin-bottom: 2rem;
@@ -160,8 +147,6 @@
 	background: var(--contact-card-bg);
 	border: 1px solid var(--contact-border);
 	border-radius: 8px;
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
 	transition: var(--contact-transition);
 }
 
@@ -189,7 +174,7 @@
 }
 
 .contact-card__title {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	font-weight: 600;
 	margin-bottom: 0.3rem;
@@ -219,12 +204,10 @@
 	background: var(--contact-card-bg);
 	border: 1px solid var(--contact-border);
 	border-radius: 8px;
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
 }
 
 .contact-social__heading {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	font-weight: 600;
 	margin-bottom: 0.4rem;
@@ -288,7 +271,7 @@
    ========================================================================== */
 
 .contact-form__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 2rem;
 	font-weight: 600;
 	margin-bottom: 2rem;
@@ -346,7 +329,7 @@
 	border: 1px solid var(--contact-border);
 	border-radius: 4px;
 	color: var(--contact-text-primary);
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	transition: var(--contact-transition);
 	appearance: none;
@@ -506,7 +489,7 @@
 	color: #fff;
 	border: none;
 	border-radius: 4px;
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.9rem;
 	font-weight: 600;
 	letter-spacing: 2px;
@@ -519,7 +502,7 @@
 
 .contact-form__submit:hover:not(:disabled) {
 	transform: translateY(-2px);
-	box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+	box-shadow: 0 10px 30px rgba(183, 110, 121, 0.3);
 }
 
 .contact-form__submit:active:not(:disabled) {
@@ -590,7 +573,7 @@
 }
 
 .response-promise__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(1.5rem, 3vw, 2rem);
 	font-weight: 600;
 	color: var(--contact-text-primary);
@@ -660,7 +643,7 @@
 }
 
 .faq-section__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(2rem, 4vw, 2.5rem);
 	font-weight: 600;
 	text-align: center;
@@ -700,7 +683,7 @@
 	background: none;
 	border: none;
 	color: var(--contact-text-primary);
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1.1rem;
 	font-weight: 500;
 	text-align: left;
@@ -802,8 +785,6 @@
 	border: 1px solid var(--contact-border);
 	border-radius: 12px;
 	overflow: hidden;
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
 }
 
 .contact-map__placeholder {
@@ -888,7 +869,7 @@
 }
 
 .contact-map__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 1.4rem;
 	font-weight: 600;
 	margin-bottom: 1rem;
@@ -948,9 +929,7 @@
 	align-items: center;
 	gap: 0.75rem;
 	padding: 1rem 1.5rem;
-	background: rgba(17, 17, 17, 0.95);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
+	background: rgba(17, 17, 17, 0.98);
 	border: 1px solid var(--contact-border);
 	border-radius: 8px;
 	color: var(--contact-text-primary);

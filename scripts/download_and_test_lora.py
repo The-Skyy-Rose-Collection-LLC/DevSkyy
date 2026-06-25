@@ -65,7 +65,7 @@ def download_lora_model():
         print()
 
         # Download entire model repository
-        snapshot_download(
+        snapshot_download(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             repo_id=model_id,
             local_dir=str(local_dir),
             token=HF_TOKEN,
@@ -123,7 +123,7 @@ def test_lora_inference(model_dir: Path):
         print("🔧 Loading Stable Diffusion XL + LoRA...")
 
         # Load base SDXL model
-        pipe = DiffusionPipeline.from_pretrained(
+        pipe = DiffusionPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
             use_safetensors=True,

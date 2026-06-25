@@ -7,6 +7,6 @@ Models:
     gemini-3-pro-image-preview  — Pro quality, text rendering (--pro)
 """
 
-from nano_banana.client import get_genai_client, get_openai_client, get_together_client
+from .client import get_genai_client, get_openai_client, get_together_client
 
 __all__ = ["get_genai_client", "get_openai_client", "get_together_client"]

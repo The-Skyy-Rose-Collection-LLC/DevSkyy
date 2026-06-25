@@ -19,17 +19,17 @@ $allowed_inline = $args['allowed_inline'] ?? array();
 
 <!-- Mission Banner -->
 <section class="abt-mission" aria-label="<?php esc_attr_e( 'Our Mission', 'skyyrose' ); ?>">
-	<div class="rv">
+	<div>
 		<p class="abt-chapter__label" style="text-align:center;margin-bottom:24px">
 			<?php esc_html_e( 'The Mission', 'skyyrose' ); ?>
 		</p>
-		<h2 class="abt-mission__tagline">
+		<h2 class="abt-mission__tagline rv rv-clip-up">
 			<?php echo wp_kses( __( 'Luxury Grows<br>from Concrete.', 'skyyrose' ), $allowed_inline ); ?>
 		</h2>
-		<p class="abt-mission__sub">
-			<?php esc_html_e( 'Luxury grows from concrete. Oakland roots, family-driven, fashion as self-expression. Three collections, one bloodline, one crown. This is SkyyRose.', 'skyyrose' ); ?>
+		<p class="abt-mission__sub rv rv-blur">
+			<?php esc_html_e( 'Four Collections, A Bloodline, and the Heir to the Throne.', 'skyyrose' ); ?>
 		</p>
-		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="abt-mission__cta">
+		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="abt-mission__cta magnetic btn-sweep">
 			<?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?>
 		</a>
 	</div>

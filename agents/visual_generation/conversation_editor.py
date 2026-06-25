@@ -27,6 +27,7 @@ from typing import Literal
 from PIL import Image
 
 from core.errors.production_errors import DevSkyError, DevSkyErrorCode, DevSkyErrorSeverity
+from llm.model_ids import GEMINI_VISION_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +193,7 @@ class ConversationEditor:
         self,
         image: Image.Image | str,
         prompt: str | None = None,
-        model: str = "gemini-pro-vision",
+        model: str = GEMINI_VISION_MODEL,
     ) -> tuple[str, GeneratedImage | None]:
         """
         Start a new conversation session.

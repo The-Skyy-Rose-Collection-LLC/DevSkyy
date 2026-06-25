@@ -5,7 +5,7 @@ collection: signature
 logo_reference: data/brand-logos/sr-monogram.md
 extra_logos:
   - data/brand-logos/red-roses-cloud-cluster.md
-reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
+reference_image: assets/products/references/sg-015-windbreaker-set-techflat.jpeg
 ---
 
 # The Windbreaker Set
@@ -18,16 +18,16 @@ reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
 > - SR monogram (large back-yoke logo on the jacket): `data/brand-logos/sr-monogram.md`
 > - Canonical rose-cluster art (recolored to pink per COLORWAY OVERRIDE — small chest accent): `data/brand-logos/red-roses-cloud-cluster.md`
 > - Product reference techflat (jacket front-and-back + pants front-and-back, all four views visible):
->   `data/product-references/sg-015-windbreaker-set-techflat.jpeg`
+>   `assets/products/references/sg-015-windbreaker-set-techflat.jpeg`
 >
-> ### COLORWAY — Mint & Lavender chevron palette in nylon
+> ### COLORWAY — rainbow chevron palette in nylon
 >
-> Same multi-color rainbow chevron palette as the sg-006 hoodie + sg-014
-> sweatpants set: **PINK + GREEN + LAVENDER + YELLOW** stripes arranged
-> in V/chevron formation. Body fabric is WHITE; the chevron is the accent.
-> Hood is solid PINK (matching the sg-006 contrast hood). The small chest
+> Multi-color rainbow chevron palette unique to this set: **PINK + GREEN +
+> LAVENDER + YELLOW** stripes arranged in V/chevron formation. Body fabric
+> is WHITE; the chevron is the accent. Hood is solid PINK. The small chest
 > rose-cluster uses the canonical rose-cluster composition recolored to
-> a **PINK** palette (matching the sg-006 small chest rose).
+> a **PINK** palette. (The sg-006 hoodie + sg-014 sweatpants are the solid
+> MINT cotton-fleece cousins — no chevron, no white body, no pink hood.)
 >
 > ### CATALOG NOTE
 >
@@ -88,7 +88,7 @@ reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
 - NO half-zip placket on the jacket — the zipper runs the FULL body length.
 - NO additional pockets on the back of the jacket, pants, or sleeves — only the two front slash hand pockets per piece.
 - NO sherpa lining (this is a windbreaker, not a sherpa-lined jacket — sg-009 is the sherpa-lined sibling).
-- NO solid back yoke without the SR monogram — the back yoke MUST carry the large SR monogram embroidery (this is the main back-decoration distinguishing the windbreaker set from the sg-006 fleece hoodie which has only a small back-neck SR).
+- NO solid back yoke without the SR monogram — the back yoke MUST carry the large SR monogram embroidery (this is the main back-decoration distinguishing the windbreaker set from the sg-006 fleece hoodie, whose back is blank).
 
 ## Scene direction
 

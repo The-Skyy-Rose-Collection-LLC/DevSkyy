@@ -1,7 +1,10 @@
 ---
 logo_id: nba-authentic-collection-patch
 collection: black-rose
-image_path: wordpress-theme/skyyrose-flagship/assets/images/logos/nba-authentic-collection-card.jpeg
+image_path: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-basketball-jersey/nba-authentic-collection-card.jpeg
+image_resolution: per_sku
+sku_paths:
+  br-010: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-basketball-jersey/nba-authentic-collection-card.jpeg
 sibling_of: data/brand-logos/black-rose-authentic-collection-patch.md
 ---
 
@@ -65,6 +68,6 @@ thin red diamond divider strip:
 
 ## Reference Image
 
-Image file: `wordpress-theme/skyyrose-flagship/assets/images/logos/nba-authentic-collection-card.jpeg`.
+Image file: `wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-basketball-jersey/nba-authentic-collection-card.jpeg`.
 Pipelines that build RAS prompts attach this image as an additional reference
 when rendering any product whose dossier names this patch.

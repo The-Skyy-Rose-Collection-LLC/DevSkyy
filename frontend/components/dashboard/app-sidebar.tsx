@@ -10,7 +10,6 @@ import {
   Settings,
   Activity,
   LogOut,
-  ChevronDown,
   FolderOpen,
   Workflow,
   CheckCircle2,
@@ -26,6 +25,8 @@ import {
   Compass,
   UserCircle2,
   Sparkles,
+  ShoppingBag,
+  ScanEye,
 } from 'lucide-react';
 
 import {
@@ -57,6 +58,11 @@ const mainNavItems = [
     title: 'Agents',
     url: '/admin/agents',
     icon: Users,
+  },
+  {
+    title: 'Catalog',
+    url: '/admin/catalog',
+    icon: ShoppingBag,
   },
   {
     title: '3D Pipeline',
@@ -92,6 +98,11 @@ const mainNavItems = [
     title: 'Fidelity QA',
     url: '/admin/qa',
     icon: CheckCircle2,
+  },
+  {
+    title: 'Renders Review',
+    url: '/admin/renders/review',
+    icon: ScanEye,
   },
   {
     title: 'Tasks',

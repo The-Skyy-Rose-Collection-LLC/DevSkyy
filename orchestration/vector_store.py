@@ -231,6 +231,12 @@ class VectorStoreConfig(BaseModel):
     pinecone_environment: str = Field(default="us-east-1")
     pinecone_index_name: str = Field(default="devskyy-rag")
 
+    # Embedding dimension — must match the embedding model in use.
+    # 1024 = Voyage 3-large / Cohere embed-english-v3
+    # 1536 = OpenAI text-embedding-3-small / ada-002
+    # 384  = sentence-transformers/all-MiniLM-L6-v2
+    dimension: int = Field(default=1024, ge=64, le=4096)
+
     # Search settings
     default_top_k: int = Field(default=5, ge=1, le=100)
     similarity_threshold: float = Field(
@@ -257,9 +263,16 @@ class BaseVectorStore(ABC):
 
     @abstractmethod
     async def add_documents(
-        self, documents: list[Document], embeddings: list[list[float]]
+        self,
+        documents: list[Document],
+        embeddings: list[list[float]],
+        namespace: str | None = None,
     ) -> list[str]:
-        """Add documents with embeddings."""
+        """Add documents with embeddings to the given namespace.
+
+        Pinecone uses native namespaces; Chroma emulates via `_namespace`
+        metadata. `None` means "default partition".
+        """
         pass
 
     @abstractmethod
@@ -268,13 +281,14 @@ class BaseVectorStore(ABC):
         query_embedding: list[float],
         top_k: int | None = None,
         filter_metadata: dict[str, Any] | None = None,
+        namespace: str | None = None,
     ) -> list[SearchResult]:
-        """Search for similar documents."""
+        """Search for similar documents within the given namespace."""
         pass
 
     @abstractmethod
-    async def delete_documents(self, document_ids: list[str]) -> int:
-        """Delete documents by ID."""
+    async def delete_documents(self, document_ids: list[str], namespace: str | None = None) -> int:
+        """Delete documents by ID from the given namespace."""
         pass
 
     @abstractmethod
@@ -349,22 +363,34 @@ class ChromaVectorStore(BaseVectorStore):
             raise
 
     async def add_documents(
-        self, documents: list[Document], embeddings: list[list[float]]
+        self,
+        documents: list[Document],
+        embeddings: list[list[float]],
+        namespace: str | None = None,
     ) -> list[str]:
         """Add documents with embeddings to ChromaDB using batch operations.
 
         For large ingestion, batches documents in chunks of 1000 (ChromaDB optimal)
-        to prevent memory issues and improve throughput.
+        to prevent memory issues and improve throughput. Namespace is encoded
+        per-document as `_namespace` metadata to emulate Pinecone-style isolation.
         """
         if not self._initialized or not self._collection:
             raise RuntimeError("ChromaDB not initialized")
 
         ids = [doc.id for doc in documents]
         contents = [doc.content for doc in documents]
-        metadatas = [
-            {**doc.metadata, "source": doc.source, "created_at": doc.created_at.isoformat()}
-            for doc in documents
-        ]
+
+        def _build_metadata(doc: Document) -> dict[str, Any]:
+            meta = {
+                **doc.metadata,
+                "source": doc.source,
+                "created_at": doc.created_at.isoformat(),
+            }
+            if namespace is not None:
+                meta["_namespace"] = namespace
+            return meta
+
+        metadatas = [_build_metadata(doc) for doc in documents]
 
         # Use batch operations for large document sets
         if len(documents) > CHROMA_BATCH_SIZE:
@@ -386,7 +412,8 @@ class ChromaVectorStore(BaseVectorStore):
                 metadatas=metadatas,
             )
 
-        logger.info(f"Added {len(documents)} documents to ChromaDB")
+        ns_suffix = f" (ns={namespace})" if namespace else ""
+        logger.info(f"Added {len(documents)} documents to ChromaDB{ns_suffix}")
         return ids
 
     async def search(
@@ -394,9 +421,12 @@ class ChromaVectorStore(BaseVectorStore):
         query_embedding: list[float],
         top_k: int | None = None,
         filter_metadata: dict[str, Any] | None = None,
+        namespace: str | None = None,
     ) -> list[SearchResult]:
         """Search for similar documents in ChromaDB with caching.
 
+        Namespace is enforced via metadata filter (`_namespace` key) and is
+        merged into the effective filter so cache keys are namespace-aware.
         Results are cached by embedding hash for faster repeated queries.
         """
         if not self._initialized or not self._collection:
@@ -404,9 +434,22 @@ class ChromaVectorStore(BaseVectorStore):
 
         k = top_k or self.config.default_top_k
 
-        # Check cache first
+        # Merge namespace into filter so it participates in cache keying AND querying.
+        # Chroma `where` requires exactly one top-level operator, so multi-key dicts
+        # must be wrapped with `$and` (a flat dict like {"a": 1, "b": 2} is rejected).
+        ns_clause = {"_namespace": namespace} if namespace is not None else None
+        if filter_metadata and ns_clause:
+            effective_filter: dict[str, Any] | None = {"$and": [dict(filter_metadata), ns_clause]}
+        elif filter_metadata:
+            effective_filter = dict(filter_metadata)
+        elif ns_clause:
+            effective_filter = ns_clause
+        else:
+            effective_filter = None
+
+        # Check cache first (namespace-aware via effective_filter)
         cache = get_vector_search_cache()
-        cached = await cache.get(query_embedding, k, filter_metadata)
+        cached = await cache.get(query_embedding, k, effective_filter)
         if cached is not None:
             # Reconstruct SearchResult from cached data
             return [
@@ -424,15 +467,10 @@ class ChromaVectorStore(BaseVectorStore):
                 for r in cached
             ]
 
-        # Build where filter
-        where_filter = None
-        if filter_metadata:
-            where_filter = dict(filter_metadata.items())
-
         results = self._collection.query(
             query_embeddings=[query_embedding],
             n_results=k,
-            where=where_filter,
+            where=effective_filter,
             include=["documents", "metadatas", "distances"],
         )
 
@@ -459,7 +497,7 @@ class ChromaVectorStore(BaseVectorStore):
                 )
                 search_results.append(SearchResult(document=doc, score=score, distance=distance))
 
-        # Cache results
+        # Cache results (effective_filter participates in cache key for namespace correctness)
         cache_data = [
             {
                 "id": r.document.id,
@@ -471,17 +509,27 @@ class ChromaVectorStore(BaseVectorStore):
             }
             for r in search_results
         ]
-        await cache.put(query_embedding, k, filter_metadata, cache_data)
+        await cache.put(query_embedding, k, effective_filter, cache_data)
 
         return search_results
 
-    async def delete_documents(self, document_ids: list[str]) -> int:
-        """Delete documents from ChromaDB."""
+    async def delete_documents(self, document_ids: list[str], namespace: str | None = None) -> int:
+        """Delete documents from ChromaDB.
+
+        When `namespace` is provided, the delete is scoped to that namespace
+        via a `_namespace` metadata filter — preventing cross-namespace deletes
+        when document IDs collide across namespaces.
+        """
         if not self._initialized or not self._collection:
             raise RuntimeError("ChromaDB not initialized")
 
-        self._collection.delete(ids=document_ids)
-        logger.info(f"Deleted {len(document_ids)} documents from ChromaDB")
+        if namespace is not None:
+            self._collection.delete(ids=document_ids, where={"_namespace": namespace})
+        else:
+            self._collection.delete(ids=document_ids)
+
+        ns_suffix = f" (ns={namespace})" if namespace else ""
+        logger.info(f"Deleted {len(document_ids)} documents from ChromaDB{ns_suffix}")
         return len(document_ids)
 
     async def get_document(self, document_id: str) -> Document | None:
@@ -546,7 +594,7 @@ class PineconeVectorStore(BaseVectorStore):
         self._pc = None
 
     async def initialize(self) -> None:
-        """Initialize Pinecone connection."""
+        """Initialize Pinecone connection (serverless, native namespace support)."""
         try:
             from pinecone import Pinecone, ServerlessSpec
 
@@ -556,31 +604,45 @@ class PineconeVectorStore(BaseVectorStore):
 
             self._pc = Pinecone(api_key=api_key)
 
-            # Check if index exists, create if not
+            # Check if index exists, create if not — dimension comes from config
+            # so callers can provision indexes for whichever embedding model they use.
             existing_indexes = [idx.name for idx in self._pc.list_indexes()]
 
             if self.config.pinecone_index_name not in existing_indexes:
                 self._pc.create_index(
                     name=self.config.pinecone_index_name,
-                    dimension=384,  # all-MiniLM-L6-v2 dimension
+                    dimension=self.config.dimension,
                     metric="cosine",
                     spec=ServerlessSpec(cloud="aws", region=self.config.pinecone_environment),
                 )
 
             self._index = self._pc.Index(self.config.pinecone_index_name)
             self._initialized = True
-            logger.info(f"Pinecone initialized: {self.config.pinecone_index_name}")
+            logger.info(
+                f"Pinecone initialized: {self.config.pinecone_index_name} "
+                f"(dim={self.config.dimension}, region={self.config.pinecone_environment})"
+            )
 
         except ImportError:
-            raise ImportError("pinecone-client not installed. Run: pip install pinecone-client")
+            raise ImportError(
+                "pinecone not installed. Run: pip install pinecone "
+                "(NOTE: pinecone-client is deprecated — use the new pinecone package)"
+            )
         except Exception as e:
             logger.error(f"Pinecone initialization failed: {e}")
             raise
 
     async def add_documents(
-        self, documents: list[Document], embeddings: list[list[float]]
+        self,
+        documents: list[Document],
+        embeddings: list[list[float]],
+        namespace: str | None = None,
     ) -> list[str]:
-        """Add documents with embeddings to Pinecone."""
+        """Add documents with embeddings to Pinecone (native namespace support).
+
+        Namespaces are created implicitly on first upsert; no separate
+        `create_namespace` call is required.
+        """
         if not self._initialized or not self._index:
             raise RuntimeError("Pinecone not initialized")
 
@@ -605,11 +667,16 @@ class PineconeVectorStore(BaseVectorStore):
 
         # Batch upsert (Pinecone limit is 100 vectors per request)
         batch_size = 100
+        upsert_kwargs: dict[str, Any] = {}
+        if namespace is not None:
+            upsert_kwargs["namespace"] = namespace
+
         for i in range(0, len(vectors), batch_size):
             batch = vectors[i : i + batch_size]
-            self._index.upsert(vectors=batch)
+            self._index.upsert(vectors=batch, **upsert_kwargs)
 
-        logger.info(f"Added {len(documents)} documents to Pinecone")
+        ns_suffix = f" (ns={namespace})" if namespace else ""
+        logger.info(f"Added {len(documents)} documents to Pinecone{ns_suffix}")
         return [doc.id for doc in documents]
 
     async def search(
@@ -617,19 +684,24 @@ class PineconeVectorStore(BaseVectorStore):
         query_embedding: list[float],
         top_k: int | None = None,
         filter_metadata: dict[str, Any] | None = None,
+        namespace: str | None = None,
     ) -> list[SearchResult]:
-        """Search for similar documents in Pinecone."""
+        """Search for similar documents in Pinecone within a namespace."""
         if not self._initialized or not self._index:
             raise RuntimeError("Pinecone not initialized")
 
         k = top_k or self.config.default_top_k
 
-        results = self._index.query(
-            vector=query_embedding,
-            top_k=k,
-            include_metadata=True,
-            filter=filter_metadata,
-        )
+        query_kwargs: dict[str, Any] = {
+            "vector": query_embedding,
+            "top_k": k,
+            "include_metadata": True,
+            "filter": filter_metadata,
+        }
+        if namespace is not None:
+            query_kwargs["namespace"] = namespace
+
+        results = self._index.query(**query_kwargs)
 
         search_results = []
         for match in results.matches:
@@ -653,13 +725,18 @@ class PineconeVectorStore(BaseVectorStore):
 
         return search_results
 
-    async def delete_documents(self, document_ids: list[str]) -> int:
-        """Delete documents from Pinecone."""
+    async def delete_documents(self, document_ids: list[str], namespace: str | None = None) -> int:
+        """Delete documents from Pinecone within a namespace."""
         if not self._initialized or not self._index:
             raise RuntimeError("Pinecone not initialized")
 
-        self._index.delete(ids=document_ids)
-        logger.info(f"Deleted {len(document_ids)} documents from Pinecone")
+        delete_kwargs: dict[str, Any] = {"ids": document_ids}
+        if namespace is not None:
+            delete_kwargs["namespace"] = namespace
+        self._index.delete(**delete_kwargs)
+
+        ns_suffix = f" (ns={namespace})" if namespace else ""
+        logger.info(f"Deleted {len(document_ids)} documents from Pinecone{ns_suffix}")
         return len(document_ids)
 
     async def get_document(self, document_id: str) -> Document | None:

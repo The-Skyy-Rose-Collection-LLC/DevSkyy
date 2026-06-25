@@ -13,13 +13,15 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from llm.model_ids import NANO_BANANA_PRO_MODEL, OPENAI_IMAGE_15_MODEL
+
 log = logging.getLogger(__name__)
 
 COST_TABLE = {
-    "gemini-pro": 0.04,  # per image
-    "gemini-flash": 0.01,
+    "gemini-pro": 0.04,  # NB Pro (gemini-3-pro-image-preview) — 4K luxury tier
+    "gemini-flash": 0.04,  # NB Pro everywhere as of 2026-05-06 (Option A — luxury default)
     "gpt-image": 0.08,
-    "flux-pro": 0.035,
+    "flux-pro": 0.075,  # observed actual cost from multi-SKU validator runs
     "flux-kontext": 0.04,
 }
 
@@ -120,14 +122,14 @@ def route_product(
         return [
             RouteDecision(
                 "gemini-pro",
-                "gemini-3-pro-image-preview",
+                NANO_BANANA_PRO_MODEL,
                 "Editorial scene composition — Gemini Pro excels at cinematic environments",
                 COST_TABLE["gemini-pro"],
                 1,
             ),
             RouteDecision(
                 "gpt-image",
-                "gpt-image-1.5",
+                OPENAI_IMAGE_15_MODEL,
                 "Fallback for editorial — strong commercial aesthetics",
                 COST_TABLE["gpt-image"],
                 2,
@@ -139,14 +141,14 @@ def route_product(
         return [
             RouteDecision(
                 "gpt-image",
-                "gpt-image-1.5",
+                OPENAI_IMAGE_15_MODEL,
                 f"Text/logo product ({sku}) — GPT Image has 96%+ text accuracy",
                 COST_TABLE["gpt-image"],
                 1,
             ),
             RouteDecision(
                 "gemini-pro",
-                "gemini-3-pro-image-preview",
+                NANO_BANANA_PRO_MODEL,
                 "Fallback — good text rendering with superior fabric physics",
                 COST_TABLE["gemini-pro"],
                 2,
@@ -159,7 +161,7 @@ def route_product(
         return [
             RouteDecision(
                 "gemini-pro",
-                "gemini-3-pro-image-preview",
+                NANO_BANANA_PRO_MODEL,
                 f"Complex fabric ({fabric}) — Gemini Pro best at material physics",
                 COST_TABLE["gemini-pro"],
                 1,
@@ -185,7 +187,7 @@ def route_product(
             ),
             RouteDecision(
                 "gemini-pro",
-                "gemini-3-pro-image-preview",
+                NANO_BANANA_PRO_MODEL,
                 "Fallback — premium quality",
                 COST_TABLE["gemini-pro"],
                 2,
@@ -203,7 +205,7 @@ def route_product(
         ),
         RouteDecision(
             "gemini-pro",
-            "gemini-3-pro-image-preview",
+            NANO_BANANA_PRO_MODEL,
             "Fallback — premium quality for retries",
             COST_TABLE["gemini-pro"],
             2,

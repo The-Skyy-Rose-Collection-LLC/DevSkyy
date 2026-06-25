@@ -1,7 +1,7 @@
 """Phase 1: Map WordPress media images to product catalog SKUs.
 
 Reads:
-  - data/product-catalog.csv (34 products)
+  - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv (canonical)
   - wordpress/webp_image_mapping.json (74 uploaded WP images)
 
 Outputs:
@@ -15,13 +15,13 @@ Algorithm:
 
 from __future__ import annotations
 
-import csv
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-CATALOG_CSV = ROOT / "data" / "product-catalog.csv"
+sys.path.insert(0, str(ROOT))
 IMAGE_MAP_JSON = ROOT / "wordpress" / "webp_image_mapping.json"
 OUTPUT_JSON = ROOT / "scripts" / "launch" / "sku_image_map.json"
 
@@ -39,9 +39,9 @@ MANUAL_OVERRIDES: dict[str, str] = {
     "br-001": "BR_000_20230616_170635_main",
     "br-002": "BR_003_20230616_170635_main",
     "br-003": "BR_266AD7B0_88A6_4489_AA58_AB72A5_main",
-    "br-003-oakland": "BR_5A8946B1_B51F_4144_BCBB_F02846_main",
-    "br-003-giants": "BR_DEC_18_2023_6_09_21_PM_2_main",
-    "br-003-white": "BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main",
+    "br-013": "BR_5A8946B1_B51F_4144_BCBB_F02846_main",
+    "br-014": "BR_DEC_18_2023_6_09_21_PM_2_main",
+    "br-015": "BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main",
     "br-004": "BR_007_20230616_170635_1_main",
     "br-005": "BR_THE_BLACK_ROSE_SHERPA_main",
     "br-006": "BR_BLACK_ROSE_SHERPA_main",
@@ -131,12 +131,10 @@ def score_match(product_name: str, product_slug: str, image_key: str) -> float:
 
 def map_images() -> dict[str, dict]:
     """Build SKU → image mapping."""
+    from skyyrose.core.catalog_loader import read_catalog_rows
+
     # Load catalog
-    products: list[dict] = []
-    with open(CATALOG_CSV, newline="") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            products.append(row)
+    products: list[dict] = list(read_catalog_rows())
 
     # Load image mapping
     with open(IMAGE_MAP_JSON) as f:
@@ -154,7 +152,7 @@ def map_images() -> dict[str, dict]:
         sku = product["sku"].strip().strip('"')
         name = product["name"].strip().strip('"')
         slug = product.get("render_output_slug", "").strip()
-        collection_slug = product.get("collection_slug", "").strip()
+        collection_slug = product.get("collection", "").strip()
 
         # Check manual overrides first
         if sku in MANUAL_OVERRIDES:

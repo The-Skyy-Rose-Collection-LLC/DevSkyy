@@ -1,0 +1,36 @@
+# Path globs that BLOCK auto-merge unconditionally — there is no label override.
+# PRs touching any path matched here require a manual human merge.
+# One fnmatch pattern per line. Lines starting with `#` and blank lines are ignored.
+# Matched against every file path returned by `gh pr diff --name-only` (or the
+# local-git fallback when the PR exceeds GitHub's 300-file API limit).
+
+# Database schema — irreversible if wrong, must be reviewed by a human.
+database/migrations/**
+alembic/versions/**
+
+# WordPress production storefront surfaces.
+wordpress-theme/skyyrose-flagship/woocommerce/**
+wordpress-theme/skyyrose-flagship/inc/security.php
+
+# FastAPI entry point + main app wiring.
+main_enterprise.py
+
+# Dependency surface — env breakage risk.
+requirements*.txt
+pyproject.toml
+package.json
+package-lock.json
+frontend/package.json
+frontend/package-lock.json
+
+# Deploy + CI configuration.
+frontend/vercel.json
+frontend/next.config.*
+.github/workflows/**
+scripts/deploy-theme.sh
+scripts/deploy_*
+
+# Anything that smells like secrets.
+.env*
+*.pem
+*.key

@@ -42,7 +42,7 @@
 	align-items: center;
 	gap: 8px;
 	color: rgba(255, 255, 255, 0.6);
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
@@ -61,10 +61,31 @@
 	border-radius: 2px;
 }
 
-/* CENTER: Logo */
+/* CENTER: Brand Primary Logo (rose-gold SR monogram) */
 .navbar__brand {
 	justify-self: center;
 }
+.navbar__logo-link {
+	display: inline-flex;
+	align-items: center;
+	text-decoration: none;
+	transition: transform 0.4s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)), filter 0.4s ease;
+}
+.navbar__logo-link:hover {
+	transform: scale(1.04);
+	filter: drop-shadow(0 0 12px rgba(183, 110, 121, 0.45));
+}
+.navbar__logo-img {
+	display: block;
+	width: 44px;
+	height: 44px;
+	object-fit: contain;
+	transition: filter 0.4s ease;
+}
+@media (min-width: 768px) {
+	.navbar__logo-img { width: 52px; height: 52px; }
+}
+/* Legacy text title — retained as fallback when JS strips picture (rare) */
 .navbar__site-title {
 	font-family: 'Cinzel', serif;
 	font-size: 18px;
@@ -84,7 +105,7 @@
 	margin: 0; padding: 0;
 }
 .navbar__menu > li > a {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -100,6 +121,87 @@
 	outline: 2px solid var(--color-rose-gold, #B76E79);
 	outline-offset: 4px;
 	border-radius: 2px;
+}
+
+/* Desktop dropdown sub-menus (Collections, Experiences) */
+.navbar__menu li {
+	position: relative;
+}
+.navbar__menu > li.menu-item-has-children > a::after {
+	content: '';
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	margin-left: 7px;
+	border-right: 1px solid currentColor;
+	border-bottom: 1px solid currentColor;
+	transform: translateY(-2px) rotate(45deg);
+	transition: transform 0.25s ease;
+	vertical-align: middle;
+	opacity: 0.7;
+}
+.navbar__menu > li.menu-item-has-children:hover > a::after,
+.navbar__menu > li.menu-item-has-children:focus-within > a::after {
+	transform: translateY(0) rotate(45deg);
+	opacity: 1;
+}
+.navbar__menu .sub-menu {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%) translateY(8px);
+	min-width: 210px;
+	margin: 0;
+	padding: 12px 0;
+	list-style: none;
+	background: rgba(5, 5, 5, 0.97);
+	backdrop-filter: blur(24px) saturate(180%);
+	-webkit-backdrop-filter: blur(24px) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: var(--skyyrose-radius, 4px);
+	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+	z-index: 1100;
+}
+/* invisible hover-bridge spans the gap so the cursor never drops the menu */
+.navbar__menu .sub-menu::before {
+	content: '';
+	position: absolute;
+	top: -10px;
+	left: 0;
+	right: 0;
+	height: 10px;
+}
+.navbar__menu > li.menu-item-has-children:hover > .sub-menu,
+.navbar__menu > li.menu-item-has-children:focus-within > .sub-menu {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transform: translateX(-50%) translateY(0);
+}
+.navbar__menu .sub-menu li a {
+	display: block;
+	padding: 10px 24px;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 11px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	white-space: nowrap;
+	color: rgba(255, 255, 255, 0.65);
+	text-decoration: none;
+	transition: color 0.25s ease, background 0.25s ease;
+}
+.navbar__menu .sub-menu li a:hover,
+.navbar__menu .sub-menu li a:focus-visible {
+	color: var(--color-rose-gold, #B76E79);
+	background: rgba(183, 110, 121, 0.08);
+}
+.navbar__menu .sub-menu li a:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: -2px;
 }
 
 /* MOBILE */
@@ -128,7 +230,10 @@
 }
 
 /* Mobile Menu Slide */
-.mobile-menu { position: fixed; inset: 0; z-index: 1500; pointer-events: none; }
+/* overflow:hidden is load-bearing: the panel parks off-canvas via
+   translateX(100%), and without clipping here the transformed panel
+   widens document scrollWidth by 400px on every page (bug-109). */
+.mobile-menu { position: fixed; inset: 0; z-index: 1500; pointer-events: none; overflow: hidden; }
 .mobile-menu[aria-hidden="false"] { pointer-events: auto; }
 .mobile-menu__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); opacity: 0; transition: opacity .4s;}
 .mobile-menu[aria-hidden="false"] .mobile-menu__overlay { opacity: 1; }
@@ -165,6 +270,26 @@
 	outline-offset: -2px;
 	color: var(--color-rose-gold, #B76E79);
 }
+/* Mobile dropdown sub-menus — always expanded (no hover on touch) */
+.mobile-menu__nav .sub-menu {
+	list-style: none;
+	margin: 0;
+	padding: 0 0 8px 0;
+	background: rgba(255, 255, 255, 0.02);
+}
+.mobile-menu__nav .sub-menu li a {
+	display: block;
+	padding: 14px 32px 14px 52px;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 15px;
+	letter-spacing: 2px;
+	color: rgba(255, 255, 255, 0.55);
+	text-decoration: none;
+}
+.mobile-menu__nav .sub-menu li a:hover,
+.mobile-menu__nav .sub-menu li a:focus-visible {
+	color: var(--color-rose-gold, #B76E79);
+}
 .navbar__hamburger:focus-visible {
 	outline: 2px solid var(--color-rose-gold, #B76E79);
 	outline-offset: 4px;
@@ -175,5 +300,20 @@
 .search-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(5,5,5,0.98); backdrop-filter: blur(32px); display: flex; justify-content: center; padding-top: 20vh; opacity: 0; visibility: hidden; transition: opacity 0.5s;}
 .search-overlay.open { opacity: 1; visibility: visible; }
 .search-overlay__form { border-bottom: 1px solid var(--color-rose-gold, #B76E79); width: 80vw; max-width: 800px; padding-bottom: 16px;}
-.search-overlay__input { width: 100%; background: transparent; border: none; color: #fff; font-family: 'Space Mono', monospace; font-size: 24px; outline: none; text-align: center;}
+.search-overlay__input { width: 100%; background: transparent; border: none; color: #fff; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 24px; outline: none; text-align: center;}
+.search-overlay__input:focus-visible { outline: 2px solid var(--color-rose-gold, #B76E79); outline-offset: 8px; }
 .search-overlay__close { position: absolute; top: 40px; right: 40px; background: none; border: none; color: #fff; cursor: pointer;}
+
+/* Accessibility: respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+	.site-header,
+	.navbar,
+	.navbar__container,
+	.mobile-menu__panel,
+	.mobile-menu__overlay,
+	.navbar__logo-link,
+	.navbar__menu .sub-menu,
+	.search-overlay {
+		transition: none;
+	}
+}

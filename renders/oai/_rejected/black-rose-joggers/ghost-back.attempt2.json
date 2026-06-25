@@ -1,0 +1,13 @@
+{
+  "sku": "br-002",
+  "style": "ghost",
+  "view": "back",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "wrong_garment",
+    "wrong_view",
+    "branding_drift"
+  ],
+  "reason": "The render shows the back view but is missing the required gold-tone embroidered SR monogram on the right thigh. Additionally, the overall design does not match the references provided for the BLACK Rose Joggers."
+}

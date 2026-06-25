@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import logging
+import math
 import urllib.request
 from pathlib import Path
 
@@ -18,6 +19,49 @@ log = logging.getLogger(__name__)
 
 FLUX_PRO_MODEL = "fal-ai/flux-pro/v1.1"
 FLUX_KONTEXT_MODEL = "fal-ai/flux-pro/kontext"
+
+# Kontext Pro's `aspect_ratio` accepts only this fixed enum (verified
+# 2026-05-04 against fal.ai/models/fal-ai/flux-pro/kontext docs). We map
+# input dimensions to the closest entry to preserve output framing —
+# without it, Kontext silently chose ~1:1 and shrank our 2000×1800
+# inputs to 1104×944 in the Layer 1 validation run.
+_KONTEXT_ASPECT_RATIOS: list[tuple[str, float]] = [
+    ("21:9", 21 / 9),
+    ("16:9", 16 / 9),
+    ("4:3", 4 / 3),
+    ("3:2", 3 / 2),
+    ("1:1", 1.0),
+    ("2:3", 2 / 3),
+    ("3:4", 3 / 4),
+    ("9:16", 9 / 16),
+    ("9:21", 9 / 21),
+]
+
+
+def _closest_kontext_aspect_ratio(width: int, height: int) -> str:
+    """Pick the closest Kontext-supported aspect ratio for input dims.
+
+    Compares input ratio against the 9 enum values and returns the
+    string with minimum log-ratio distance. Log distance is the right
+    metric here (a 2× over-tall mistake is equally bad as 2× over-wide),
+    not absolute distance.
+    """
+    if width <= 0 or height <= 0:
+        return "1:1"
+    target = width / height
+    best_label = "1:1"
+    best_distance = float("inf")
+    for label, ratio in _KONTEXT_ASPECT_RATIOS:
+        distance = abs(math.log(target / ratio))
+        if distance < best_distance:
+            best_distance = distance
+            best_label = label
+    return best_label
+
+
+def _is_png_bytes(data: bytes) -> bool:
+    """Validate PNG magic header. First 8 bytes are 0x89 P N G \\r \\n 0x1a \\n."""
+    return len(data) >= 8 and data[:8] == b"\x89PNG\r\n\x1a\n"
 
 
 def _fal_available() -> bool:
@@ -35,7 +79,9 @@ def _fal_available() -> bool:
 def _download_image(url: str) -> bytes | None:
     """Download image from fal.ai result URL."""
     try:
-        with urllib.request.urlopen(url, timeout=60) as resp:
+        with urllib.request.urlopen(
+            url, timeout=60
+        ) as resp:  # nosec B310 — URL from controlled API response, not user input
             return resp.read()
     except Exception as exc:
         log.error("Failed to download fal.ai image: %s", exc)
@@ -124,18 +170,13 @@ def refine_with_kontext(
 ) -> bytes | None:
     """Refine an image using FLUX Kontext Pro — reference-guided editing.
 
-    Best for fixing logos/text on an otherwise good render.
-    Sends the source image as reference and a prompt describing what to fix.
-
-    Args:
-        source_path: The image to refine (the AI render with issues)
-        prompt: Description of what to fix
-
-    Returns:
-        WebP image bytes on success, None on failure.
+    Sends the source image as reference and a prompt describing what to
+    fix. Returns PNG bytes — `output_format="png"` is set explicitly
+    because Kontext defaults to JPEG, and the bytes are returned
+    untouched (no re-encode that would corrupt the format).
+    Aspect-ratio matches the closest enum to the input dimensions
+    (Kontext Pro accepts only fixed enum values, not "match input").
     """
-    from nano_banana.utils import to_webp
-
     if not _fal_available():
         log.warning("fal.ai not available for Kontext refinement")
         return None
@@ -153,13 +194,38 @@ def refine_with_kontext(
         "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/webp"
     )
 
+    # Compute closest aspect ratio from the bytes we already loaded —
+    # avoid a second open() of the same file.
+    aspect_ratio = "1:1"
+    input_dims: tuple[int, int] | None = None
     try:
-        log.info("Refining via FLUX Kontext Pro...")
+        import io
+
+        from PIL import Image
+
+        with Image.open(io.BytesIO(img_bytes)) as im:
+            input_dims = im.size  # (width, height)
+            aspect_ratio = _closest_kontext_aspect_ratio(*im.size)
+    except Exception as exc:
+        log.warning(
+            "Could not read input dimensions from %s; defaulting aspect_ratio=1:1 (%s)",
+            source_path.name,
+            exc,
+        )
+
+    try:
+        log.info(
+            "Refining via FLUX Kontext Pro (input=%s, aspect=%s, format=png)...",
+            input_dims,
+            aspect_ratio,
+        )
         result = fal_client.subscribe(
             model,
             arguments={
                 "prompt": prompt,
                 "image_url": f"data:{mime};base64,{b64}",
+                "aspect_ratio": aspect_ratio,
+                "output_format": "png",
             },
         )
     except Exception as exc:
@@ -170,7 +236,8 @@ def refine_with_kontext(
         log.warning("Empty Kontext response")
         return None
 
-    image_url = result["images"][0].get("url")
+    image_obj = result["images"][0]
+    image_url = image_obj.get("url")
     if not image_url:
         return None
 
@@ -178,4 +245,32 @@ def refine_with_kontext(
     if not raw_bytes:
         return None
 
-    return to_webp(raw_bytes)
+    # Validate the bytes match what we asked for. PNG magic header is
+    # 8 bytes; if Kontext returned anything else despite output_format=png,
+    # log it loudly so the storefront doesn't ship mislabeled WebP/JPEG.
+    if not _is_png_bytes(raw_bytes):
+        log.warning(
+            "Kontext returned non-PNG bytes despite output_format=png "
+            "(first 16 bytes: %s). Check fal_client/Kontext version.",
+            raw_bytes[:16].hex(),
+        )
+
+    out_w = image_obj.get("width")
+    out_h = image_obj.get("height")
+    if input_dims and out_w and out_h:
+        in_w, in_h = input_dims
+        shrink_x = out_w / in_w if in_w else 1.0
+        shrink_y = out_h / in_h if in_h else 1.0
+        if shrink_x < 0.6 or shrink_y < 0.6:
+            log.warning(
+                "Kontext output %dx%d is much smaller than input %dx%d "
+                "(scale x=%.2f y=%.2f). Storefront images may need upscaling.",
+                out_w,
+                out_h,
+                in_w,
+                in_h,
+                shrink_x,
+                shrink_y,
+            )
+
+    return raw_bytes

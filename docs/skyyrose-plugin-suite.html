@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose Plugin Suite — 4-Plugin Architecture</title>
+<style>
+  body { font: 15px/1.6 -apple-system, system-ui, sans-serif; max-width: 1060px; margin: 2rem auto; padding: 0 1.25rem; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .3rem; }
+  h2 { margin-top: 2.2rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  h3 { margin-top: 1.4rem; }
+  code { background: #f4f4f4; padding: .1rem .35rem; border-radius: 3px; font-size: .88em; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 13px; }
+  th, td { border: 1px solid #ccc; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #0A0A0A; color: #fff; }
+  .p1 { border-left: 5px solid #D4AF37; } .p2 { border-left: 5px solid #B76E79; }
+  .p3 { border-left: 5px solid #C0C0C0; } .p4 { border-left: 5px solid #DC143C; }
+  .box { padding: .8rem 1rem; margin: 1rem 0; background:#fafafa; }
+  .note { background: #fff8e6; border-left: 4px solid #B76E79; padding: .6rem 1rem; margin: 1rem 0; }
+  small { color:#666; }
+</style>
+</head>
+<body>
+<h1>SkyyRose Plugin Suite</h1>
+<p><small>2026-06-13. Splits the single <code>skyyrose-elite</code> plugin into 4 themed, cross-calling plugins under one marketplace. Each plugin = skills + embedded repo agents + a routing skill that hands off to siblings.</small></p>
+
+<h2>Marketplace structure</h2>
+<div class="box">
+<pre>
+skyyrose-suite/                          (marketplace root — was skyyrose-elite/)
+  .claude-plugin/marketplace.json        (lists all 4 plugins)
+  CROSS-PLUGIN.md                        (handoff doctrine — shared)
+  plugins/
+    skyyrose-market/   .claude-plugin/plugin.json  skills/  agents/
+    skyyrose-design/   .claude-plugin/plugin.json  skills/  agents/
+    skyyrose-core/     .claude-plugin/plugin.json  skills/  agents/
+    skyyrose-qa/       .claude-plugin/plugin.json  skills/  agents/
+</pre>
+One local marketplace, 4 installable plugins. All skills/agents from installed plugins are globally invocable — so cross-plugin calling is native; the routing skills make it <em>intentional</em>.
+</div>
+
+<h2>The 4 plugins</h2>
+
+<table class="p1">
+<tr><th colspan="2">1 · skyyrose-market — SEO / Marketing / Brand / Content / Social</th></tr>
+<tr><td><b>Skills (~46)</b></td><td>9 SkyyRose core (brand-dna, content-engine, email-flows, influencer-growth, launch-commander, paid-media, photography-brief, product-copy, seo-commerce) · 27 <code>skyyrose-social-*</code> · general: brand-voice, seo, social-publisher, email-ops, market-research, marketing-campaign, crosspost, article-writing, investor-materials, investor-outreach, to-prd, to-issues</td></tr>
+<tr><td><b>Agents (6)</b></td><td>skyyrose-content-engine, skyyrose-email-strategist, skyyrose-influencer-lead, skyyrose-launch-commander, skyyrose-paid-media-buyer, skyyrose-seo-commerce</td></tr>
+<tr><td><b>Calls →</b></td><td><b>design</b> for mockups/graphics/imagery · <b>core</b> for memory/token-budget · <b>qa</b> to verify campaign assets</td></tr>
+</table>
+
+<table class="p2">
+<tr><th colspan="2">2 · skyyrose-design — Design / Imagery / WordPress</th></tr>
+<tr><td><b>Skills (~55)</b></td><td>ALL 26 design/taste (design-master, high-end-visual-design, liquid-glass-design, minimalist-ui, industrial-brutalist-ui, motion-ui, ui-ux-pro-max, frontend-design, stitch-design-taste, gpt-taste, image-taste-frontend, polish, impeccable, …) · imagery: ai-image-generation, fal-ai-media, luxury-mockup-pipeline · FE structure: frontend-patterns, shadcn, interactive-web-development, immersive-architect, immersive-interactive-architect · threejs-* (10) · WordPress: woocommerce, wordpress-woocommerce-automation, wp-performance, wp-rest-api, wp-block-themes, wp-block-development, wp-plugin-development, wordpress-router, woocommerce-backend-dev/-code-review/-webhooks · optimize, prototype, accessibility/frontend-a11y</td></tr>
+<tr><td><b>Agents (5)</b></td><td>skyyrose-photography-director, frontend-developer, deploy-and-verify, theme-heal-doctor, wp-code-simplifier</td></tr>
+<tr><td><b>Calls →</b></td><td><b>qa</b> to verify builds/visual regressions · <b>core</b> for FE↔backend wiring + token budget · <b>market</b> for brand canon/copy</td></tr>
+</table>
+
+<table class="p3">
+<tr><th colspan="2">3 · skyyrose-core — Back-end / Memory-loops</th></tr>
+<tr><td><b>Skills (~25)</b></td><td>backend: fastapi-patterns/-async/-python, postgres-patterns, redis-patterns, docker-patterns, sqlalchemy-*, api-design, database-migrations, error-handling, backend-patterns, python-patterns · <b>memory/self-learn/heal</b>: continuous-learning-v2, universal-learner, stalled-agent-recovery, learned · <b>behavior</b>: token-aware-behavior, efficient-production, strategic-compact, context-budget, token-budget-advisor, full-output-enforcement · <b>planning/process</b>: writing-plans, executing-plans, brainstorming, parallel-prototyping</td></tr>
+<tr><td><b>Agents (8)</b></td><td>architect, python-reviewer, database-reviewer, build-error-resolver, refactor-cleaner, doc-updater, loop-operator, planner</td></tr>
+<tr><td><b>Calls →</b></td><td><b>qa</b> to run the test→fix→verify loop · <b>design</b> for FE patterns · <b>market</b> rarely</td></tr>
+</table>
+
+<table class="p4">
+<tr><th colspan="2">4 · skyyrose-qa — Testing / Verification / Audit</th></tr>
+<tr><td><b>Skills (~18)</b></td><td><b>loops</b>: drive-to-green, audit-resolution-loop, verification-loop, verification-before-completion · tdd-workflow, tdd, test-driven-development, e2e-testing, eval-harness, agent-eval, ai-regression-testing · audit, audit-pass2-verifier, systematic-debugging, critique, diagnose · requesting-code-review, receiving-code-review</td></tr>
+<tr><td><b>Agents (5)</b></td><td>code-reviewer, security-reviewer, tdd-guide, e2e-runner, fixer</td></tr>
+<tr><td><b>Calls →</b></td><td><b>core</b> for the fix (backend) · <b>design</b> for the fix (frontend/WP) · feeds findings back to whoever called it</td></tr>
+</table>
+
+<h2>Cross-plugin calling — the mechanism</h2>
+<p>Claude Code exposes every installed plugin's skills/agents globally, namespaced <code>&lt;plugin&gt;:&lt;skill&gt;</code>. To make handoffs <em>intentional</em> rather than accidental:</p>
+<ol>
+  <li><b>Naming convention</b> — <code>skyyrose-market:</code>, <code>skyyrose-design:</code>, <code>skyyrose-core:</code>, <code>skyyrose-qa:</code>. Predictable, greppable.</li>
+  <li><b>Per-plugin router skill</b> — each plugin ships a top-level <code>&lt;name&gt;-dispatch</code> skill whose SKILL.md has a "When to hand off" table pointing at sibling plugins (the "Calls →" rows above).</li>
+  <li><b>Shared <code>CROSS-PLUGIN.md</code></b> — one doctrine doc at the marketplace root, referenced by every plugin's README, defining the handoff graph: market→design→qa→core→qa.</li>
+</ol>
+<div class="note">There is no hard plugin-to-plugin API in Claude Code — "calling" = Claude invoking a sibling plugin's named skill/agent. The router skills + naming + doctrine make that behavior reliable and documented, which is the real deliverable.</div>
+
+<h2>Migration mechanics</h2>
+<ul>
+  <li>Restructure <code>skyyrose-elite/</code> → <code>skyyrose-suite/</code> with 4 <code>plugins/&lt;name&gt;/</code> subdirs (marketplace.json lists all 4).</li>
+  <li>Current 36 skills + 7 agents redistribute: 36 skills + 6 agents → <b>market</b>; photography-director → <b>design</b>.</li>
+  <li>Copy general skills from <code>~/.claude/skills</code> / <code>.claude/skills</code> into the right plugin (snapshots; general copies stay canonical).</li>
+  <li>Embed 17 repo agents (<code>.claude/agents</code>) across the 4 per the tables.</li>
+  <li>Update <code>installed_plugins.json</code> + <code>known_marketplaces.json</code>; reinstall the 4 plugins (local marketplace).</li>
+</ul>
+<p><small>Totals: ~144 skills + 24 agents across 4 plugins. Coherent systems (gsd, per-language) stay OUT — they're not SkyyRose-ops.</small></p>
+</body>
+</html>

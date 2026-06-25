@@ -37,7 +37,8 @@ ENHANCED_SUFFIX = (
     " CRITICAL: Copy the reference photo exactly. "
     "Preserve every pixel of color, pattern, design element, text character, logo, and patch. "
     "All text must be character-perfect (spelling, case, kerning). "
-    "All patches and badges must appear at the exact location and size specified." + ANTI_HALLUCINATION
+    "All patches and badges must appear at the exact location and size specified."
+    + ANTI_HALLUCINATION
 )
 
 # -- Collection lighting profiles --------------------------------------------
@@ -106,8 +107,7 @@ def front_prompt(product: dict) -> str:
         f"- {lighting['shadow']}.\n"
         f"- Photorealistic fabric texture.\n\n"
         f"FIDELITY: Copy the reference photo exactly. Same colors, same graphics, same construction."
-        f"{_branding_block(treatment)}"
-        + ANTI_HALLUCINATION
+        f"{_branding_block(treatment)}" + ANTI_HALLUCINATION
     )
 
 
@@ -129,8 +129,7 @@ def back_prompt(product: dict) -> str:
         f"- {lighting['light']}.\n"
         f"- Photorealistic fabric texture.\n\n"
         f"FIDELITY: Copy the reference photo exactly."
-        f"{_branding_block(treatment)}"
-        + ANTI_HALLUCINATION
+        f"{_branding_block(treatment)}" + ANTI_HALLUCINATION
     )
 
 
@@ -151,8 +150,7 @@ def accessory_prompt(product: dict) -> str:
         f"- {lighting['light']}.\n"
         f"- Tight framing — the accessory fills the frame.\n\n"
         f"FIDELITY: Copy the reference photo exactly."
-        f"{_branding_block(treatment)}"
-        + ANTI_HALLUCINATION
+        f"{_branding_block(treatment)}" + ANTI_HALLUCINATION
     )
 
 

@@ -62,7 +62,7 @@ $faq_categories = array(
 		'items' => array(
 			array(
 				'q' => __( 'How do your pieces fit?', 'skyyrose' ),
-				'a' => __( 'Most pieces run true to size with a relaxed, gender-neutral fit. Each product page includes a detailed size chart with measurements. When in doubt, check our Size Guide or contact us — we\'re happy to help you find the right fit.', 'skyyrose' ),
+				'a' => __( 'Most pieces run true to size with a relaxed, gender-neutral fit. Each product page includes a detailed size chart with measurements. When in doubt, check our Size Guide or reach out — we\'ll point you right.', 'skyyrose' ),
 			),
 			array(
 				'q' => __( 'Are your products unisex?', 'skyyrose' ),
@@ -74,7 +74,7 @@ $faq_categories = array(
 			),
 			array(
 				'q' => __( 'What materials do you use?', 'skyyrose' ),
-				'a' => __( 'We source premium heavyweight cotton (280–320 GSM), reinforced stitching, and colorfast dyes. Our materials are chosen for longevity — these are investment pieces, not fast fashion. Specific material details are listed on each product page.', 'skyyrose' ),
+				'a' => __( 'We source heavyweight cotton (280–320 GSM), reinforced stitching, and colorfast dyes. Our materials are chosen for longevity — these are investment pieces, not fast fashion. Specific material details are listed on each product page.', 'skyyrose' ),
 			),
 		),
 	),
@@ -102,7 +102,7 @@ $faq_categories = array(
 		'items' => array(
 			array(
 				'q' => __( 'Who is behind SkyyRose?', 'skyyrose' ),
-				'a' => __( 'SkyyRose was founded by Corey Foster in Oakland, California. The brand is named after his daughter, Skyy Rose. What started as a father\'s promise became a luxury streetwear label built on authenticity, premium quality, and the belief that luxury grows from concrete.', 'skyyrose' ),
+				'a' => __( 'SkyyRose was founded by Corey Foster in Oakland, California. The brand is named after his daughter, Skyy Rose. What started as a father\'s promise became a luxury streetwear label built on authenticity, uncompromising craft, and the belief that luxury grows from concrete.', 'skyyrose' ),
 			),
 			array(
 				'q' => __( 'Where are your pieces made?', 'skyyrose' ),
@@ -160,8 +160,8 @@ get_header();
 		<!-- Contact CTA -->
 		<section class="info-page__cta rv-blur">
 			<h2><?php esc_html_e( 'Still have questions?', 'skyyrose' ); ?></h2>
-			<p><?php esc_html_e( 'Our team is here to help. Reach out anytime.', 'skyyrose' ); ?></p>
-			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="info-page__cta-btn btn-sweep btn-press"><?php esc_html_e( 'Contact Us', 'skyyrose' ); ?></a>
+			<p><?php esc_html_e( 'Questions live here. For everything else — reach out.', 'skyyrose' ); ?></p>
+			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="info-page__cta-btn btn-sweep btn-press"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a>
 		</section>
 
 	</div>

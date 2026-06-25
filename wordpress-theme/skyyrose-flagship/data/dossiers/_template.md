@@ -2,7 +2,7 @@
 sku: REPLACE-WITH-SKU
 name: Replace With Product Display Name
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 ---
 
 <!--
@@ -29,7 +29,7 @@ Allowed `collection` values:
 
 Allowed `logo_reference` values (one per dossier — the canonical brand logo
 used on this product):
-  - data/brand-logos/black-rose-logo.md
+  - data/brand-logos/three-rose-cluster.md
   - data/brand-logos/love-hurts-logo.md       (TBD)
   - data/brand-logos/signature-logo.md        (TBD)
   - data/brand-logos/kids-capsule-logo.md     (TBD)

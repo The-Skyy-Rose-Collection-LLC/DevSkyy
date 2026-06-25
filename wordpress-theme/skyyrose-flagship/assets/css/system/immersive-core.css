@@ -1,0 +1,198 @@
+/**
+ * SkyyRose Immersive Core
+ *
+ * Intro overlay, scene lockup, dust canvas, tagline states, and media
+ * hover-warp (Phase 2 additions: §8 Lenis enqueue, §9 SVG warp filter).
+ *
+ * All GSAP-driven values: no CSS transitions here. GSAP sets inline styles
+ * per frame; transitions fight it. This file declares initial states and
+ * structural rules only. GSAP owns opacity, clip-path, filter, scaleX, y.
+ *
+ * Class contract (must match immersive-core.js + scene.php exactly):
+ *   .ic-overlay        — fullscreen intro curtain (JS-built via createElement)
+ *   .ic-dust           — particle canvas layer (JS-built via createElement)
+ *   .scene-lockup      — collection identity image block (scene.php)
+ *   .scene-lockup img  — targets .scene-lockup__img (BEM element, only child)
+ *   .scene-hairline    — accent rule beneath lockup (scene.php, JS queries)
+ *   .scene-tagline     — "Luxury Grows from Concrete." line (scene.php, JS queries)
+ *   .scene-subtitle    — collection name line (scene.php) — in immersive.css
+ *   [data-warp]        — opt-in hover-warp target; filter injected via JS (Phase 2)
+ *
+ * Token surface: var(--skyyrose-accent), var(--skyyrose-bg),
+ *   var(--skyyrose-text), var(--skyyrose-font-display),
+ *   var(--skyyrose-radius), var(--skyyrose-ease).
+ * Per-collection palette resolves automatically via [data-collection]
+ * set on the page wrapper (design-tokens.css §2).
+ *
+ * OCCLUSION RESOLVED (clone architecture, immersive-core.js):
+ *   The .ic-overlay is an opaque z-9999 curtain. To keep the step-2/step-3
+ *   beats visible, immersive-core.js clones .scene-lockup / .scene-hairline /
+ *   .scene-tagline into the overlay (buildIntroComposition) and animates the
+ *   clones there; the flex-centering on .ic-overlay below centers them. The
+ *   room's real elements stay in place and are revealed at the wipe
+ *   (revealRoomTitle), so the room title is present the instant the curtain
+ *   clips away. Click-skip is bound at document-capture level because the
+ *   overlay carries `inert` (overlay-bound clicks never fire).
+ *
+ * @package SkyyRose
+ * @since   7.0.0
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   1. OVERLAY — Fullscreen intro curtain; GSAP drives opacity/clip-path
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ic-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	background: var(--skyyrose-bg);
+	pointer-events: auto;        /* absorb stray clicks; JS skip via document capture */
+	will-change: clip-path, opacity;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. DUST CANVAS — Particle layer; GSAP drives opacity
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ic-dust {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	opacity: 0;                 /* GSAP drives */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. SCENE LOCKUP — Collection identity image; GSAP drives opacity + filter
+   ═══════════════════════════════════════════════════════════════════ */
+
+.scene-lockup {
+	display: block;
+	max-width: min(480px, 80vw);
+	width: 100%;
+	height: auto;
+	margin: 0 auto;
+	opacity: 0;                 /* GSAP drives opacity and filter */
+	will-change: opacity, filter;
+	pointer-events: none;
+}
+
+/* Targets .scene-lockup__img BEM element — <img> is always a direct child of <picture> */
+.scene-lockup img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. HAIRLINE — Accent rule beneath lockup; GSAP drives scaleX
+   ═══════════════════════════════════════════════════════════════════ */
+
+.scene-hairline {
+	display: block;
+	height: 1px;
+	width: 120px;               /* GSAP drives scaleX (not width) — needs a target width */
+	background: var(--skyyrose-accent);
+	margin: 1.5rem auto 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   5. TAGLINE — "Luxury Grows from Concrete." line; GSAP drives opacity + y
+   ═══════════════════════════════════════════════════════════════════ */
+
+.scene-tagline {
+	opacity: 0;                 /* GSAP drives */
+	font-family: var(--skyyrose-font-display);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--skyyrose-text);
+	font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+	text-align: center;
+	margin-top: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. REDUCED MOTION
+   Hide the overlay entirely; force the lockup visible so the in-flow
+   scene from scene.php is readable without JS firing GSAP. Two separate
+   declarations intentional — .ic-overlay is the JS-built intro curtain;
+   .scene-lockup is the persistent in-flow image emitted by scene.php.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+	.ic-overlay {
+		display: none !important;
+	}
+
+	.scene-lockup {
+		opacity: 1 !important;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   7. SCENE LAYER FALLBACK
+   Token-driven background for rooms whose scene image asset is absent;
+   scene.php emits .scene-layer--missing on that layer. Co-located here
+   because immersive-core.css is the Phase-1 stylesheet reliably served
+   (no .min variant) on the immersive + preorder slugs, and resolves the
+   per-collection accent via the [data-collection] scope on the wrapper.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.scene-layer--missing {
+	background: radial-gradient(
+		ellipse at center,
+		rgba( var(--skyyrose-accent-rgb), 0.14 ),
+		var(--skyyrose-bg)
+	);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. MEDIA HOVER-WARP (Phase 2, Capability C)
+   Opt-in via [data-warp] attribute. SVG feTurbulence+feDisplacementMap
+   filter injected once to <body> by immersive-core.js (id: ic-warp-filter).
+   Displacement scale is tweened 0→5px on mouseenter / 5→0px on mouseleave
+   via a tiny GSAP gsap.to() on the feDisplacementMap DOM attribute.
+   CSS below gates the filter reference on :hover (hover devices only);
+   JS owns the intensity ramp so the transition is smooth, not a snap.
+
+   Note: CSS cannot interpolate url() filter references — `transition:filter`
+   on a url() value is a discrete jump, so no transition property is declared
+   here. Easing is entirely attribute-driven by JS.
+
+   Active only on:
+     - pointer/mouse devices: @media (hover: hover)
+     - full-motion: NOT @media (prefers-reduced-motion: reduce)
+   JS also guards init on these conditions; CSS is defense in depth.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Apply the SVG warp filter when JS sets the active state.
+   JS adds [data-warp-active] on mouseenter, removes on mouseleave,
+   so the filter url is present during the tween window and absent after.
+   @media (hover:hover) prevents the attribute from applying on touch. */
+@media (hover: hover) {
+	[data-warp][data-warp-active] {
+		filter: url(#ic-warp-filter);
+	}
+}
+
+/* Hard-disable on reduced-motion regardless of hover capability */
+@media (prefers-reduced-motion: reduce) {
+	[data-warp],
+	[data-warp][data-warp-active] {
+		filter: none !important;
+	}
+}
+
+/* Hard-disable on touch/no-hover devices — warp is decorative, never functional */
+@media (hover: none) {
+	[data-warp],
+	[data-warp][data-warp-active] {
+		filter: none !important;
+	}
+}

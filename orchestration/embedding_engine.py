@@ -139,6 +139,7 @@ class EmbeddingProvider(StrEnum):
     SENTENCE_TRANSFORMERS = "sentence_transformers"
     OPENAI = "openai"
     COHERE = "cohere"
+    VOYAGE = "voyage"
 
 
 class EmbeddingConfig(BaseModel):
@@ -162,6 +163,13 @@ class EmbeddingConfig(BaseModel):
     cohere_input_type: str = Field(
         default="search_document"
     )  # search_document, search_query, classification, clustering
+
+    # Voyage AI settings (asymmetric: input_type=document for indexing, query for retrieval)
+    voyage_model: str = Field(default="voyage-3-large")
+    voyage_api_key: str | None = Field(default=None)
+    voyage_output_dimension: int | None = Field(
+        default=None
+    )  # None = native model dim (1024 for voyage-3-large); supports MRL truncation
 
     # Batch settings
     batch_size: int = Field(default=32, ge=1, le=256)
@@ -312,7 +320,11 @@ class OpenAIEmbeddingEngine(BaseEmbeddingEngine):
     async def initialize(self) -> None:
         """Initialize OpenAI client."""
         try:
-            from openai import AsyncOpenAI
+            # langfuse drop-in wrapper auto-traces embedding calls (graceful fallback if extra not installed)
+            try:
+                from langfuse.openai import AsyncOpenAI
+            except ImportError:
+                from openai import AsyncOpenAI
 
             api_key = self.config.openai_api_key or os.getenv("OPENAI_API_KEY")
             if not api_key:
@@ -527,6 +539,145 @@ class CohereEmbeddingEngine(BaseEmbeddingEngine):
 
 
 # =============================================================================
+# Voyage AI Embeddings Implementation
+# =============================================================================
+
+
+class VoyageEmbeddingEngine(BaseEmbeddingEngine):
+    """Voyage AI embeddings engine (cloud, asymmetric document/query embeddings).
+
+    Voyage uses input_type='document' for indexing and input_type='query' for retrieval.
+    Mismatching the type degrades retrieval quality measurably (~5-10% on MTEB).
+    Supports MRL output dimension truncation (e.g. 256/512/1024/2048 for voyage-3-large).
+    """
+
+    # Native dimensions per model (defaults when output_dimension is None)
+    MODEL_DIMS = {
+        "voyage-3-large": 1024,
+        "voyage-3": 1024,
+        "voyage-3-lite": 512,
+        "voyage-code-3": 1024,
+        "voyage-finance-2": 1024,
+        "voyage-law-2": 1024,
+        "voyage-multilingual-2": 1024,
+    }
+
+    def __init__(self, config: EmbeddingConfig):
+        super().__init__(config)
+        self._client = None
+
+    async def initialize(self) -> None:
+        """Initialize Voyage sync client (voyageai SDK has no AsyncClient — we
+        wrap the sync .embed() with ``asyncio.to_thread`` so the event loop
+        stays unblocked while Voyage's HTTP request runs in a worker thread).
+        """
+        try:
+            import voyageai
+
+            api_key = self.config.voyage_api_key or os.getenv("VOYAGE_API_KEY")
+            if not api_key:
+                raise ValueError("Voyage API key required (set VOYAGE_API_KEY)")
+
+            self._client = voyageai.Client(api_key=api_key)
+
+            base_dim = self.MODEL_DIMS.get(self.config.voyage_model, 1024)
+            self._dimension = self.config.voyage_output_dimension or base_dim
+            self._initialized = True
+            logger.info(
+                f"Voyage Embeddings initialized: {self.config.voyage_model} "
+                f"(dim={self._dimension}, asymmetric=True)"
+            )
+
+        except ImportError:
+            raise ImportError("voyageai not installed. Run: pip install voyageai")
+        except Exception as e:
+            logger.error(f"Voyage Embeddings initialization failed: {e}")
+            raise
+
+    def _embed_kwargs(self, texts: list[str], input_type: str) -> dict[str, Any]:
+        """Build embed() kwargs, honoring optional output_dimension truncation."""
+        kwargs: dict[str, Any] = {
+            "texts": texts,
+            "model": self.config.voyage_model,
+            "input_type": input_type,
+        }
+        if self.config.voyage_output_dimension:
+            kwargs["output_dimension"] = self.config.voyage_output_dimension
+        return kwargs
+
+    async def embed_text(self, text: str) -> list[float]:
+        """Generate document embedding (input_type='document')."""
+        if not self._initialized or not self._client:
+            raise RuntimeError("Voyage client not initialized")
+
+        if len(text) > self.config.max_length * 4:
+            text = text[: self.config.max_length * 4]
+
+        result = await asyncio.to_thread(
+            self._client.embed, **self._embed_kwargs([text], "document")
+        )
+        return result.embeddings[0]
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Generate document embeddings (input_type='document') with parallel batches.
+
+        Voyage allows up to 1000 texts per request; we cap at 128 for safety
+        and parallelize via asyncio.gather() when input exceeds batch_size.
+        """
+        if not self._initialized or not self._client:
+            raise RuntimeError("Voyage client not initialized")
+
+        truncated = [t[: self.config.max_length * 4] for t in texts]
+        batch_size = min(self.config.batch_size, 128)
+
+        async def _embed_chunk(batch: list[str]) -> list[list[float]]:
+            result = await asyncio.to_thread(
+                self._client.embed, **self._embed_kwargs(batch, "document")
+            )
+            return result.embeddings
+
+        tasks = [
+            _embed_chunk(truncated[i : i + batch_size])
+            for i in range(0, len(truncated), batch_size)
+        ]
+        batch_results = await asyncio.gather(*tasks)
+
+        all_embeddings: list[list[float]] = []
+        for batch_embeddings in batch_results:
+            all_embeddings.extend(batch_embeddings)
+        return all_embeddings
+
+    async def embed_query(self, query: str) -> list[float]:
+        """Generate query embedding (input_type='query') with cache.
+
+        Cache key includes model + output_dimension so config changes don't
+        return stale embeddings from prior runs.
+        """
+        cache = get_embedding_cache()
+        cache_key = (
+            f"voyage_query:{self.config.voyage_model}:"
+            f"{self.config.voyage_output_dimension or 'native'}:{query}"
+        )
+        cached = await cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        if not self._initialized or not self._client:
+            raise RuntimeError("Voyage client not initialized")
+
+        truncated = query
+        if len(query) > self.config.max_length * 4:
+            truncated = query[: self.config.max_length * 4]
+
+        result = await asyncio.to_thread(
+            self._client.embed, **self._embed_kwargs([truncated], "query")
+        )
+        embedding = result.embeddings[0]
+        await cache.put(cache_key, embedding)
+        return embedding
+
+
+# =============================================================================
 # Factory
 # =============================================================================
 
@@ -554,5 +705,7 @@ def create_embedding_engine(config: EmbeddingConfig | None = None) -> BaseEmbedd
         return OpenAIEmbeddingEngine(config)
     elif config.provider == EmbeddingProvider.COHERE:
         return CohereEmbeddingEngine(config)
+    elif config.provider == EmbeddingProvider.VOYAGE:
+        return VoyageEmbeddingEngine(config)
     else:
         return SentenceTransformerEngine(config)

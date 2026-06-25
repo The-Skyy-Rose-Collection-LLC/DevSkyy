@@ -95,7 +95,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 							<?php esc_html_e( 'We\'ll use this email for order updates and tracking.', 'skyyrose' ); ?>
 						</p>
 
-						<div class="skyy-checkout__field-group">
+						<div class="skyy-checkout__field-group stagger-grid">
 							<?php
 							woocommerce_form_field(
 								'billing_email',
@@ -348,7 +348,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								do_action( 'woocommerce_checkout_before_order_review_heading' );
 								?>
 
-								<ul class="skyy-checkout__payment-methods wc_payment_methods payment_methods methods">
+								<ul class="skyy-checkout__payment-methods rv-blur wc_payment_methods payment_methods methods">
 									<?php
 									if ( ! empty( $available_gateways = WC()->payment_gateways->get_available_payment_gateways() ) ) :
 										$first = true;
@@ -385,7 +385,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									else :
 										?>
 										<li class="skyy-checkout__payment-method--none">
-											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Sorry, it seems that there are no available payment methods. Please contact us for assistance.', 'skyyrose' ) ) ); ?></p>
+											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Payment options unavailable right now. Reach us at support@skyyrose.co and we will sort it.', 'skyyrose' ) ) ); ?></p>
 										</li>
 									<?php endif; ?>
 								</ul>
@@ -504,7 +504,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								apply_filters(
 									'woocommerce_order_button_html',
 									'<button type="submit"
-										 class="skyy-checkout__place-order-btn button alt"
+										 class="skyy-checkout__place-order-btn magnetic btn-sweep button alt"
 										 name="woocommerce_checkout_place_order"
 										 id="place_order"
 										 value="' . esc_attr__( 'Place Order', 'skyyrose' ) . '"
@@ -532,7 +532,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 		</div>
 
 		<!-- STICKY ORDER SUMMARY SIDEBAR (420px) -->
-		<aside class="skyy-checkout__sidebar" data-skyy-checkout-sidebar>
+		<aside class="skyy-checkout__sidebar rv-clip-right" data-skyy-checkout-sidebar>
 			<div class="skyy-checkout__sidebar-inner">
 				<h2 class="skyy-checkout__sidebar-title">
 					<?php esc_html_e( 'Order Summary', 'skyyrose' ); ?>

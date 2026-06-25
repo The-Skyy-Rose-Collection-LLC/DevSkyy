@@ -1,0 +1,73 @@
+/**
+ * View Transitions — cross-collection navigation choreography
+ *
+ * F1 (v1.5.4): when a user navigates from one /collection-{slug}/ page
+ * to another (e.g. Black Rose → Love Hurts via the col-crossnav), the
+ * View Transitions API morphs the shared hero elements (background
+ * image, brand logo, accent rule) instead of cutting hard.
+ *
+ * Requires `@view-transition { navigation: auto; }` AND elements that
+ * share a view-transition-name across pages. Progressive enhancement:
+ * browsers without support fall back to normal page loads, no JS shim.
+ *
+ * Reduced-motion respected — entire feature short-circuited under
+ * prefers-reduced-motion: reduce.
+ *
+ * Depends on: design-tokens.css (--skyyrose-ease)
+ *
+ * @package SkyyRose
+ * @since   1.5.4
+ */
+
+/* Opt the document into automatic cross-document view transitions.
+   The browser pairs elements by `view-transition-name` across the
+   outgoing and incoming page. */
+@view-transition {
+	navigation: auto;
+}
+
+/* Shared elements across all collection pages — these morph between
+   pages instead of cross-fading. The names are assigned via the
+   PHP markup, gated to /collection-{slug}/ pages only. */
+.col-hero__bg    { view-transition-name: skyyrose-collection-hero-bg; }
+.col-hero__logo  { view-transition-name: skyyrose-collection-hero-logo; }
+.col-hero__title { view-transition-name: skyyrose-collection-hero-title; }
+.col-hero__rule  { view-transition-name: skyyrose-collection-hero-rule; }
+
+/* Note: .col-hero__logo and .col-hero__title are mutually exclusive at the
+   PHP layer (template-parts/collection/page.php emits one or the other based
+   on $has_logo), so only one of the two `view-transition-name` values will
+   appear in a given page snapshot. Distinct names defensively prevent a
+   future template change from breaking the morph silently. */
+
+/* Choreography — root cross-fade plus calmer durations on the hero pair.
+   ::view-transition-old/new are the two snapshots the browser captures;
+   targeting them with class names keeps the rule scoped. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 420ms;
+	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(skyyrose-collection-hero-bg),
+::view-transition-new(skyyrose-collection-hero-bg),
+::view-transition-old(skyyrose-collection-hero-logo),
+::view-transition-new(skyyrose-collection-hero-logo),
+::view-transition-old(skyyrose-collection-hero-title),
+::view-transition-new(skyyrose-collection-hero-title) {
+	animation-duration: 620ms;
+	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reduced motion — turn the feature off entirely. Browser falls back to
+   a hard cut, which is exactly what users with this preference want. */
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+	.col-hero__bg,
+	.col-hero__logo,
+	.col-hero__title,
+	.col-hero__rule {
+		view-transition-name: none;
+	}
+}

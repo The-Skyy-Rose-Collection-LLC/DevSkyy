@@ -80,7 +80,7 @@ function skyyrose_pg_localize_personalization(): void {
 	// Resolve current collection from page template slug.
 	$collection = '';
 	if ( is_page() ) {
-		$tpl_map = array(
+		$tpl_map    = array(
 			'template-collection-black-rose.php'   => 'black-rose',
 			'template-collection-love-hurts.php'   => 'love-hurts',
 			'template-collection-signature.php'    => 'signature',

@@ -1,0 +1,52 @@
+{
+  "name": "skyyrose-suite",
+  "owner": {
+    "name": "SkyyRose",
+    "url": "https://skyyrose.co"
+  },
+  "metadata": {
+    "description": "SkyyRose private marketplace — the autonomous luxury-streetwear suite: an orchestrator plus marketing, design, core-engineering, and QA plugins, each grounded in verified vendor docs and wired to the SkyyRose Elite Studio runtime + dev-team pipeline."
+  },
+  "plugins": [
+    {
+      "name": "skyyrose",
+      "description": "Orchestrator — classifies a task and routes it to the right SkyyRose plugin(s); runs the dev-team workflow for multi-step work. Front door: /skyyrose <task>.",
+      "source": "./plugins/skyyrose",
+      "category": "orchestration",
+      "author": { "name": "SkyyRose" },
+      "homepage": "https://skyyrose.co"
+    },
+    {
+      "name": "skyyrose-market",
+      "description": "Marketing & commerce team: brand DNA, product copy, WooCommerce SEO, Klaviyo email flows, paid media, influencer growth, photography briefs, launch orchestration, and 30+ social skills.",
+      "source": "./plugins/skyyrose-market",
+      "category": "marketing",
+      "author": { "name": "SkyyRose" },
+      "homepage": "https://skyyrose.co"
+    },
+    {
+      "name": "skyyrose-design",
+      "description": "Design & build: imagery (gpt-image-2 prompt composition + brand-native element library), frontend, Three.js, immersive 3D, WordPress/WooCommerce theming, accessibility, and layout.",
+      "source": "./plugins/skyyrose-design",
+      "category": "design",
+      "author": { "name": "SkyyRose" },
+      "homepage": "https://skyyrose.co"
+    },
+    {
+      "name": "skyyrose-core",
+      "description": "Engineering core: FastAPI/Python backend, Postgres/Redis, Alembic migrations, Docker, API design, behavior/token discipline, planning, and memory & self-healing.",
+      "source": "./plugins/skyyrose-core",
+      "category": "engineering",
+      "author": { "name": "SkyyRose" },
+      "homepage": "https://skyyrose.co"
+    },
+    {
+      "name": "skyyrose-qa",
+      "description": "Quality & verification: TDD, drive-to-green, verification loops, audits, evals, regression testing, and code review.",
+      "source": "./plugins/skyyrose-qa",
+      "category": "testing",
+      "author": { "name": "SkyyRose" },
+      "homepage": "https://skyyrose.co"
+    }
+  ]
+}

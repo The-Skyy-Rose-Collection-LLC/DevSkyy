@@ -21,6 +21,11 @@ import {
   Film,
   Layers,
   Loader2,
+  HardDrive,
+  Database,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from 'lucide-react';
 import {
   useAssets,
@@ -29,7 +34,8 @@ import {
   type Collection,
   type AssetType,
 } from '@/hooks';
-import { type Asset } from '@/lib/api';
+import { api, type Asset } from '@/lib/api';
+import type { SkuImageCounts, HfDatasetsResponse } from '@/lib/api/types';
 
 // Extracted Components
 import { AssetCard } from '@/components/admin/assets/AssetCard';
@@ -88,6 +94,10 @@ export default function AssetsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const [perSkuCounts, setPerSkuCounts] = useState<SkuImageCounts | null>(null);
+  const [hfDatasets, setHfDatasets] = useState<HfDatasetsResponse | null>(null);
+  const [skuBreakdownOpen, setSkuBreakdownOpen] = useState(false);
+
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
 
@@ -95,6 +105,12 @@ export default function AssetsPage() {
   useEffect(() => {
     setSearch(debouncedSearch);
   }, [debouncedSearch, setSearch]);
+
+  // Fetch per-SKU image counts and HF datasets on mount
+  useEffect(() => {
+    api.assets.perSku().then(setPerSkuCounts).catch(() => null);
+    api.assets.datasets().then(setHfDatasets).catch(() => null);
+  }, []);
 
   const { job: batchJob } = useBatchJob(batchJobId);
 
@@ -151,8 +167,8 @@ export default function AssetsPage() {
         </div>
       </div>
 
-      {/* Collection Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      {/* Collection Stats + Disk Images */}
+      <div className="grid gap-4 md:grid-cols-6">
         {COLLECTIONS.map((col) => {
           const count = collectionStats[col.id] || 0;
           const isActive = filters.collection === col.id;
@@ -177,7 +193,54 @@ export default function AssetsPage() {
             </Card>
           );
         })}
+        {/* Disk images tile */}
+        <Card
+          className="cursor-pointer transition-all bg-gray-900/80 border-gray-700 hover:border-emerald-600"
+          onClick={() => setSkuBreakdownOpen((o) => !o)}
+        >
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <HardDrive className="h-3 w-3 text-emerald-400" />
+                <span className="text-sm font-medium text-white">Disk</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-bold text-white">
+                  {perSkuCounts ? perSkuCounts.total : '—'}
+                </span>
+                {skuBreakdownOpen
+                  ? <ChevronUp className="h-3 w-3 text-gray-400" />
+                  : <ChevronDown className="h-3 w-3 text-gray-400" />
+                }
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Per-SKU breakdown panel */}
+      {skuBreakdownOpen && perSkuCounts && (
+        <Card className="bg-gray-900/80 border-gray-700">
+          <CardContent className="py-4">
+            <p className="text-xs text-gray-500 mb-3">
+              Disk images per product slug · scanned {new Date(perSkuCounts.scanned_at).toLocaleTimeString()}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              {Object.entries(perSkuCounts.counts).map(([slug, count]) => (
+                <div
+                  key={slug}
+                  className="flex items-center justify-between bg-gray-800 rounded px-2 py-1"
+                >
+                  <span className="text-xs text-gray-300 truncate mr-2">{slug}</span>
+                  <Badge variant="secondary" className="bg-emerald-900/40 text-emerald-300 shrink-0">
+                    {count}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-4 bg-gray-900/80 rounded-lg p-4 border border-gray-700">
@@ -396,6 +459,78 @@ export default function AssetsPage() {
               : 'Upload your first product images to get started'}
           </p>
         </div>
+      )}
+
+      {/* HuggingFace Datasets */}
+      {hfDatasets && (
+        <Card className="bg-gray-900/80 border-gray-700">
+          <CardContent className="py-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Database className="h-4 w-4 text-orange-400" />
+              <h3 className="text-white font-semibold">HuggingFace Datasets</h3>
+              <Badge variant="outline" className="border-gray-600 text-gray-300 ml-auto">
+                {hfDatasets.count} dataset{hfDatasets.count !== 1 ? 's' : ''}
+              </Badge>
+              <span className="text-xs text-gray-500">{hfDatasets.author}</span>
+            </div>
+            {hfDatasets.datasets.length === 0 ? (
+              <p className="text-gray-500 text-sm">No datasets found for author &quot;{hfDatasets.author}&quot;.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="text-left py-2 px-3 text-gray-400 font-medium">ID</th>
+                      <th className="text-right py-2 px-3 text-gray-400 font-medium">Downloads</th>
+                      <th className="text-right py-2 px-3 text-gray-400 font-medium">Likes</th>
+                      <th className="text-left py-2 px-3 text-gray-400 font-medium">Last Modified</th>
+                      <th className="text-left py-2 px-3 text-gray-400 font-medium">Tags</th>
+                      <th className="py-2 px-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800">
+                    {hfDatasets.datasets.map((ds) => (
+                      <tr key={ds.id} className="hover:bg-gray-800/50 transition-colors">
+                        <td className="py-2 px-3 text-white font-mono text-xs">{ds.id}</td>
+                        <td className="py-2 px-3 text-right text-gray-300">{ds.downloads.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-right text-gray-300">{ds.likes}</td>
+                        <td className="py-2 px-3 text-gray-400 text-xs">
+                          {ds.last_modified ? new Date(ds.last_modified).toLocaleDateString() : '—'}
+                        </td>
+                        <td className="py-2 px-3">
+                          <div className="flex flex-wrap gap-1">
+                            {ds.tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-400 text-xs px-1 py-0">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {ds.tags.length > 3 && (
+                              <span className="text-xs text-gray-500">+{ds.tags.length - 3}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3">
+                          {ds.private ? (
+                            <Badge variant="outline" className="border-gray-700 text-gray-500 text-xs">private</Badge>
+                          ) : (
+                            <a
+                              href={`https://huggingface.co/datasets/${ds.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-orange-400 hover:text-orange-300 transition-colors"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Preview Modal */}

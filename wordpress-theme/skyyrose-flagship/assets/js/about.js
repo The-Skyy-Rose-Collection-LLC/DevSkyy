@@ -1,10 +1,12 @@
 /**
- * SkyyRose About Page JavaScript (v4.0.0)
+ * SkyyRose About Page JavaScript
  *
  * Features:
- * 1. IntersectionObserver scroll-reveal (.rv → .vis)
- * 2. Press card horizontal drag-to-scroll
- * 3. Hero image parallax (subtle, on scroll)
+ * 1. Press card horizontal drag-to-scroll
+ * 2. Hero image parallax (subtle, on scroll)
+ *
+ * Scroll-reveal for .abt-page .rv is handled by the unified observer in
+ * premium-interactions.js (retired local copy in U-1, 2026-05-04).
  *
  * Respects prefers-reduced-motion.
  * No external dependencies.
@@ -19,46 +21,7 @@
 	var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	/* ------------------------------------------------------------------
-	 * 1. Scroll Reveal — IntersectionObserver
-	 * ------------------------------------------------------------------ */
-	function initScrollReveal() {
-		if (prefersReducedMotion) {
-			// Immediately reveal all elements if reduced motion is preferred.
-			var els = document.querySelectorAll('.abt-page .rv');
-			for (var i = 0; i < els.length; i++) {
-				els[i].classList.add('vis');
-			}
-			return;
-		}
-
-		if (!('IntersectionObserver' in window)) {
-			// Fallback: reveal everything if IO is unsupported.
-			var fallback = document.querySelectorAll('.abt-page .rv');
-			for (var j = 0; j < fallback.length; j++) {
-				fallback[j].classList.add('vis');
-			}
-			return;
-		}
-
-		var observer = new IntersectionObserver(
-			function (entries) {
-				entries.forEach(function (entry) {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('vis');
-						observer.unobserve(entry.target);
-					}
-				});
-			},
-			{ threshold: 0.06, rootMargin: '0px 0px -40px 0px' }
-		);
-
-		document.querySelectorAll('.abt-page .rv').forEach(function (el) {
-			observer.observe(el);
-		});
-	}
-
-	/* ------------------------------------------------------------------
-	 * 2. Press Card Horizontal Drag-to-Scroll
+	 * 1. Press Card Horizontal Drag-to-Scroll
 	 * ------------------------------------------------------------------ */
 	function initPressScroll() {
 		var ps = document.getElementById('pressScroll');
@@ -101,12 +64,12 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * 3. Hero Parallax (subtle slow-scroll on hero image)
+	 * 2. Hero Parallax (subtle slow-scroll on hero image)
 	 * ------------------------------------------------------------------ */
 	function initHeroParallax() {
 		if (prefersReducedMotion) return;
 
-		var heroImg = document.querySelector('.abt-hero__img img');
+		var heroImg = document.querySelector('.abt-hero__portrait img');
 		if (!heroImg) return;
 
 		var ticking = false;
@@ -136,7 +99,6 @@
 	}
 
 	function init() {
-		initScrollReveal();
 		initPressScroll();
 		initHeroParallax();
 	}

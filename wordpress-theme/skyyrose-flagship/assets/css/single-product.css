@@ -62,7 +62,7 @@
 }
 
 .sr-thumb:hover, .sr-thumb-active {
-	border-color: var(--color-rose-gold, #B76E79);
+	border-color: var(--skyyrose-accent);
 }
 
 .sr-thumb img {
@@ -73,15 +73,15 @@
    PRODUCT INFO
    ========================================================================== */
 .sr-info-collection {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 	margin-bottom: 16px;
 }
 
 .sr-info-name {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(32px, 4vw, 56px);
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -90,7 +90,7 @@
 }
 
 .sr-info-price {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 24px;
 	color: var(--color-text-primary, #fff);
 	margin-bottom: 40px;
@@ -99,7 +99,7 @@
 }
 
 .sr-info-desc {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: 1.25rem;
 	line-height: 1.8;
 	color: rgba(255, 255, 255, 0.7);
@@ -123,15 +123,15 @@
 }
 
 .sr-spec-label {
-	font-family: 'Space Mono', monospace;
-	font-size: 10px;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 12px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.6);
 }
 
 .sr-spec-value {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	color: var(--color-text-primary, #fff);
 }
@@ -146,7 +146,7 @@
 	width: 100% !important;
 	background: var(--color-white, #fff) !important;
 	color: var(--color-black, #000) !important;
-	font-family: 'Bebas Neue', sans-serif !important;
+	font-family: var(--skyyrose-font-ui) !important;
 	font-size: 16px !important;
 	letter-spacing: 8px !important;
 	text-transform: uppercase !important;
@@ -156,7 +156,7 @@
 }
 
 .single_add_to_cart_button:hover {
-	background: var(--color-rose-gold, #B76E79) !important;
+	background: var(--skyyrose-accent) !important;
 	color: var(--color-white, #fff) !important;
 }
 
@@ -164,4 +164,49 @@
 @media (max-width: 1024px) {
 	.sr-hero-grid { grid-template-columns: 1fr; gap: 48px; }
 	.sr-container { padding: 0 24px; }
+}
+
+/* ==========================================================================
+   NUMBERED AUTHENTICATION BADGE — Black Rose PDPs (v1.5.4, F4)
+   Editorial badge surfacing the "hand-numbered" brand pillar.
+   Hairline border, no shadows, no gradients. Cinzel display per BR canon.
+   ========================================================================== */
+.sr-ed__edition-badge {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: clamp(20px, 3vw, 32px) 0 clamp(24px, 4vw, 40px);
+	padding: clamp(16px, 2.5vw, 24px) clamp(20px, 3vw, 32px);
+	border: 1px solid var(--skyyrose-accent, #C0C0C0);
+	background: transparent;
+	max-width: 28rem;
+}
+.sr-ed__edition-badge-label {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 11px;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent, #C0C0C0);
+	line-height: 1;
+}
+.sr-ed__edition-badge-value {
+	font-family: var(--skyyrose-font-display);
+	font-style: italic;
+	font-weight: 500;
+	font-size: clamp(22px, 3vw, 30px);
+	color: var(--skyyrose-text, #FFFFFF);
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+}
+.sr-ed__edition-badge-note {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.55));
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+	.sr-ed__edition-badge { width: 100%; max-width: 100%; }
 }

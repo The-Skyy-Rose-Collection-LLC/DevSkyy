@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "render_pipeline_live_eval",
+  "name": "RenderPipeline live integration eval",
+  "description": "End-to-end live API eval. Gated by EVAL_LIVE=1. Currently exercises br-001 (the F3-verified gemini-pro=88 datapoint) — passes when QA score >= 80, no hallucination_veto, no infra_failures.",
+  "eval_cases": [
+    {
+      "eval_id": "br_001_front_canonical_mode",
+      "conversation": [
+        {
+          "invocation_id": "00000000-0000-0000-0000-000000000001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "{\"sku\": \"br-001\", \"view\": \"front\"}"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Render shipped: br-001 front view, NB Pro engine (catalog-pinned per F3), QA passed with score >= 80, no hallucination_veto, no infra_failures."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {"name": "load_dossier_fn", "args": {"sku": "br-001"}},
+              {"name": "resolve_source_fn", "args": {"sku": "br-001"}},
+              {"name": "vision_consensus_fn", "args": {"sku": "br-001"}},
+              {"name": "route_engine_fn", "args": {"sku": "br-001", "view": "front"}},
+              {"name": "build_prompt_fn", "args": {"sku": "br-001", "view": "front"}},
+              {"name": "generate_image_fn", "args": {"sku": "br-001", "view": "front"}},
+              {"name": "qa_tournament_fn", "args": {"sku": "br-001"}}
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "render_pipeline",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    }
+  ]
+}

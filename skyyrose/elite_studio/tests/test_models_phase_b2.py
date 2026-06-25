@@ -1,8 +1,9 @@
 from skyyrose.elite_studio.models import (
     DualAgentResult,
-    PreflightResult,
     GhostMannequinCompositeResult,
+    PreflightResult,
 )
+
 
 def test_dual_agent_result_fields():
     r = DualAgentResult(
@@ -15,6 +16,7 @@ def test_dual_agent_result_fields():
     assert r.verdict == "consensus"
     assert r.winner is None
 
+
 def test_preflight_result_blocked():
     r = PreflightResult(
         passed=False,
@@ -24,6 +26,7 @@ def test_preflight_result_blocked():
         blocking_reason="Agent A: baseball jersey, not hockey",
     )
     assert not r.passed
+
 
 def test_ghost_mannequin_composite_result():
     r = GhostMannequinCompositeResult(

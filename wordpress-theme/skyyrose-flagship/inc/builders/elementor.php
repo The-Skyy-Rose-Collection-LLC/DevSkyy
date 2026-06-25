@@ -117,9 +117,15 @@ add_action( 'elementor/editor/after_enqueue_styles', 'skyyrose_elementor_editor_
 /**
  * Enqueue Elementor frontend scripts.
  *
+ * Design-tokens.css is enqueued globally by inc/enqueue.php; only the
+ * Elementor-conditional product-card-holo stylesheet lives here.
+ *
  * @since 1.0.0
  */
 function skyyrose_elementor_frontend_scripts() {
+	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
 	wp_enqueue_style(
 		'skyyrose-product-card-holo',
 		SKYYROSE_ASSETS_URI . '/css/product-card-holo.css',
@@ -127,10 +133,15 @@ function skyyrose_elementor_frontend_scripts() {
 		SKYYROSE_VERSION
 	);
 
+	// Elementor widget styles — covers col-feat__*, col-card__*, col-hero__*,
+	// col-nl__* selectors and bridges --col-accent → --skyyrose-accent tokens.
+	// Depends on design-tokens (enqueued globally at priority 10).
+	$widgets_file = $use_min && file_exists( $base_css_dir . '/elementor-widgets.min.css' )
+		? 'elementor-widgets.min.css' : 'elementor-widgets.css';
 	wp_enqueue_style(
-		'skyyrose-design-tokens',
-		SKYYROSE_ASSETS_URI . '/css/design-tokens.css',
-		array(),
+		'skyyrose-elementor-widgets',
+		SKYYROSE_ASSETS_URI . '/css/' . $widgets_file,
+		array( 'skyyrose-design-tokens' ),
 		SKYYROSE_VERSION
 	);
 }
@@ -187,29 +198,37 @@ add_action( 'elementor/page_templates/canvas/after_content', 'skyyrose_elementor
  * @since 3.3.0 Updated to SkyyRose brand colors and typography.
  */
 function skyyrose_set_elementor_default_schemes() {
+	$colors = skyyrose_brand_colors();
+
 	update_option(
 		'elementor_scheme_color',
 		array(
-			'1' => '#0A0A0A', // Primary — dark base.
-			'2' => '#B76E79', // Secondary — rose gold.
-			'3' => '#FFFFFF', // Text — white on dark.
-			'4' => '#D4AF37', // Accent — gold.
+			'1' => $colors['dark'],      // Primary — dark base.
+			'2' => $colors['rose_gold'], // Secondary — rose gold.
+			'3' => '#FFFFFF',            // Text — white on dark.
+			'4' => $colors['gold'],      // Accent — gold.
 		)
 	);
 
+	// Elementor scheme defaults are written once on theme activation and persist
+	// in wp_options. They cannot read CSS custom properties, so we pin them to
+	// the collection-agnostic Playfair Display headline. Black Rose pages with
+	// `[data-collection="black-rose"]` already override to Cinzel at the CSS
+	// token layer (design-tokens.css), so Elementor widgets on BR pages still
+	// render in Cinzel via `var(--skyyrose-font-display)` in elementor-widgets.css.
 	update_option(
 		'elementor_scheme_typography',
 		array(
 			'1' => array( // Primary Headline.
-				'font_family' => 'Cinzel',
-				'font_weight' => '900',
-			),
-			'2' => array( // Secondary Headline.
-				'font_family' => 'Cinzel',
+				'font_family' => 'Playfair Display',
 				'font_weight' => '700',
 			),
+			'2' => array( // Secondary Headline.
+				'font_family' => 'Playfair Display',
+				'font_weight' => '600',
+			),
 			'3' => array( // Body Text.
-				'font_family' => 'Inter',
+				'font_family' => 'Cormorant Garamond',
 				'font_weight' => '400',
 			),
 			'4' => array( // Accent / Labels.

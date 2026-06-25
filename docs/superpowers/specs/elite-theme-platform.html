@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Elite Theme Platform — Provider-Agnostic Autonomous Commercial Theme Agents</title>
+<style>
+  body { font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 60rem; margin: 2rem auto; padding: 0 1.5rem; color: #1a1a1a; }
+  h1 { font-size: 1.7rem; border-bottom: 2px solid #B76E79; padding-bottom: .4rem; }
+  h2 { font-size: 1.25rem; margin-top: 2.2rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+  h3 { font-size: 1.05rem; margin-top: 1.4rem; }
+  code { background: #f4f4f4; padding: .1em .35em; border-radius: 3px; font-size: .9em; }
+  pre { background: #0a0a0a; color: #eee; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: .82rem; line-height: 1.45; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .9rem; }
+  th, td { border: 1px solid #ddd; padding: .5rem .65rem; text-align: left; vertical-align: top; }
+  th { background: #faf6f7; }
+  .done { color: #1a7a3a; font-weight: 600; }
+  .next { color: #B76E79; font-weight: 600; }
+  .later { color: #888; }
+  blockquote { border-left: 3px solid #B76E79; margin: 1rem 0; padding: .3rem 1rem; color: #555; background: #faf6f7; }
+  .status-pill { display: inline-block; font-size: .75rem; padding: .1em .5em; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Elite Theme Platform</h1>
+<p><strong>Provider-agnostic autonomous agents that build and self-heal commercial-grade e-commerce themes on any platform.</strong> The theme-building counterpart to Elite Studio (imagery). Status: <span class="done">WordPress reference + self-healing loop in build (2026-05-29)</span>. Spec of record — supersedes ad-hoc chat scope.</p>
+
+<blockquote>Founder direction (2026-05-29): "these agents should be able to build commercial level themes on any provider" · autonomy = brief → full theme, fully autonomous · provider priority = Next.js headless, then Shopify.</blockquote>
+
+<h2 id="vision">1. Vision</h2>
+<p>A brand owner supplies a <strong>brand brief</strong> (identity, collections, voice, references, commerce config). The agent team autonomously produces a <strong>complete, commercial-grade theme</strong> for the chosen provider — designed, built, quality-gated, deployed — then <strong>monitors it live and self-heals + self-improves</strong> regressions without human triggering. The same core targets any provider through swappable adapters.</p>
+
+<h2 id="architecture">2. Architecture — Agnostic Core + Provider Adapters</h2>
+<p>The agent team and quality bar are <strong>provider-neutral</strong>. Only emit / deploy / commerce-bind differ per platform. Build the core once; add one adapter per provider.</p>
+<pre>
+brand brief
+   │
+   ▼
+┌─ AGNOSTIC CORE (build once) ──────────────────────────────────┐
+│ intake → design-system → plan → build → review → heal+improve+learn │
+│   (tokens/type/motion/canon)        (a11y · perf · commerce · canon) │
+└───────────────────────────┬───────────────────────────────────┘
+                            │  adapter contract
+        ┌───────────┬───────┼────────────┬──────────────┐
+   WordPress     Next.js      Shopify       Webflow / BigCommerce …
+   /WooCommerce  headless      OS 2.0        (later, demand-driven)
+   ✅ reference   ◀ #2          ◀ #3
+</pre>
+
+<h3>2.1 Adapter contract</h3>
+<p>Every provider implements the same interface against the shared core:</p>
+<table>
+  <tr><th><code>method</code></th><th>Responsibility</th><th>WordPress</th><th>Next.js headless</th><th>Shopify OS 2.0</th></tr>
+  <tr><td><code>scaffold(brief)</code></td><td>Provider project skeleton</td><td>theme dir + <code>style.css</code>/<code>functions.php</code></td><td>Next app + commerce SDK</td><td>theme dir + <code>config/</code> + sections</td></tr>
+  <tr><td><code>build(designSystem)</code></td><td>Emit theme in provider language</td><td>PHP templates + CSS/JS</td><td>JSX/RSC + Tailwind/CSS</td><td>Liquid sections/blocks + JSON templates</td></tr>
+  <tr><td><code>deploy()</code></td><td>Ship to provider host (gated)</td><td><code>deploy-theme.sh</code> SFTP hot-swap</td><td>Vercel deploy</td><td>Shopify CLI <code>theme push</code></td></tr>
+  <tr><td><code>monitor()</code></td><td>Curl-reliable live signals</td><td>HTTP/size/PHP-err/canon</td><td>HTTP/RSC/console/canon</td><td>HTTP/Liquid-render/canon</td></tr>
+  <tr><td><code>commerceBind()</code></td><td>Wire products/cart/checkout</td><td>WooCommerce</td><td>Shopify/Medusa/Stripe API</td><td>native Shopify</td></tr>
+  <tr><td><code>heal(regression)</code></td><td>Root-cause fix + improve</td><td><code>theme-heal-doctor</code></td><td>same agent, JSX rules</td><td>same agent, Liquid rules</td></tr>
+</table>
+
+<h2 id="quality">3. Commercial-grade quality bar (provider-neutral)</h2>
+<table>
+  <tr><th>Axis</th><th>Gate</th></tr>
+  <tr><td>Accessibility</td><td>WCAG 2.2 AA — contrast, keyboard, ARIA, reduced-motion, no hover-only content</td></tr>
+  <tr><td>Performance</td><td>Core Web Vitals budget — LCP, CLS, bundle ceiling; lazy/responsive media</td></tr>
+  <tr><td>Commerce-correctness</td><td>cart/checkout/PDP flows resolve; no hardcoded IDs; coupon/shipping wired</td></tr>
+  <tr><td>Brand-canon</td><td>brief-derived tokens + voice honored; no invented copy/data; lockups not type</td></tr>
+  <tr><td>Conversion</td><td>clear CTA hierarchy, mobile-first, trust signals, no dead conversion paths</td></tr>
+  <tr><td>Code quality</td><td>/efficient-production bar — no TODO/mock/placeholder; escaped output; no innerHTML</td></tr>
+</table>
+
+<h2 id="autonomy">4. Autonomy model — fully autonomous, system-de-risked</h2>
+<p>Founder chose <strong>brief → full theme, no checkpoints</strong>. Safety comes from the system, not a human watching:</p>
+<ol>
+  <li><strong>Quality gate blocks bad output</strong> — a build failing any §3 axis does not advance.</li>
+  <li><strong>Self-healing loop catches post-deploy regressions</strong> — monitor → detect → heal+improve → re-deploy.</li>
+  <li><strong>Deploy keyhole</strong> — the one human-granted gate per provider: an <code>autoMode.allow</code> permission line authorizing the provider's deploy command. Granted once by the owner; everything before it is autonomous. (WP: <code>STOPSHOW_ACK=1 bash scripts/deploy-theme.sh</code>; Vercel: project deploy; Shopify: <code>theme push</code>.)</li>
+</ol>
+<p>So "fully autonomous" = autonomous up to the deploy keyhole, which the owner opens once. The agent never self-grants it (self-modification guardrail — by design).</p>
+
+<h2 id="learning">5. Self-improvement + learning</h2>
+<p>Defined in <code>self-healing-theme-loop.html</code>. Key cross-provider property: the learning knowledge base (<code>.claude/state/heal-knowledge.json</code>) is <strong>mostly provider-neutral</strong> — a11y/contrast/canon/perf fix-patterns transfer. Each new adapter <strong>inherits accumulated intelligence</strong>; the platform compounds, never resets. Self-improvement metric: regression recurrence trending down + preventions (new monitor signals + permanent structural fixes) added per cycle. ML upgrade path: an offline risk/fix-ranking model trained on the JSONL logs once enough cycles accrue (schemas are model-ready now).</p>
+
+<h2 id="roadmap">6. Roadmap &amp; milestones</h2>
+<table>
+  <tr><th>Milestone</th><th>Scope</th><th>Status</th></tr>
+  <tr><td>M0 — WP reference + self-heal loop</td><td>WordPress/WooCommerce adapter; monitor + heal-doctor + learning KB; proven on live skyyrose.co (72-fix sweep + immersive P1/P2 shipped v1.5.25)</td><td><span class="done">in build (wf_635d71f9-d0a)</span></td></tr>
+  <tr><td>M1 — Extract agnostic core</td><td>Lift the provider-neutral team + quality bar + adapter contract out of the WP-specific build; define the <code>scaffold/build/deploy/monitor/commerceBind/heal</code> interface as code</td><td><span class="next">next</span></td></tr>
+  <tr><td>M2 — Next.js headless adapter</td><td>brief → JSX/RSC theme on Vercel, Shopify/Medusa/Stripe commerce-bind; matches devskyy.app stack; the premium/bespoke lane</td><td><span class="next">queued #2</span></td></tr>
+  <tr><td>M3 — Shopify OS 2.0 adapter</td><td>brief → Liquid sections/blocks + JSON templates; <code>theme push</code> deploy; largest commercial-theme market</td><td><span class="next">queued #3</span></td></tr>
+  <tr><td>M4 — Brief intake + design-system generator</td><td>structured brand-brief schema → tokens/type/motion/voice; the autonomous front-door</td><td class="later">after M1</td></tr>
+  <tr><td>M5 — Webflow / BigCommerce / others</td><td>demand-driven adapters</td><td class="later">backlog</td></tr>
+  <tr><td>M6 — ML scoring model</td><td>offline-trained risk/fix-ranking on accumulated heal logs</td><td class="later">data-gated</td></tr>
+</table>
+
+<h2 id="files">7. Canonical files</h2>
+<table>
+  <tr><th>File</th><th>Role</th></tr>
+  <tr><td><code>docs/superpowers/specs/elite-theme-platform.html</code></td><td>this — platform spec of record</td></tr>
+  <tr><td><code>docs/superpowers/specs/self-healing-theme-loop.html</code></td><td>the self-heal + learn loop contract (WP M0)</td></tr>
+  <tr><td><code>.claude/workflows/self-healing-theme-loop.js</code></td><td>the loop engine</td></tr>
+  <tr><td><code>.claude/agents/theme-heal-doctor.md</code></td><td>the heal+improve agent (provider-parametrized)</td></tr>
+  <tr><td><code>.claude/state/heal-knowledge.json</code></td><td>cross-provider learning store</td></tr>
+  <tr><td><code>.claude/state/theme-health-baseline.json</code></td><td>per-site monitor baseline</td></tr>
+</table>
+
+<h2 id="decisions">8. Key decisions</h2>
+<ul>
+  <li><strong>Make-it-work-then-general</strong>: WP reference proves the loop on a live site before abstracting. No speculative multi-provider code before the core is extracted.</li>
+  <li><strong>Curl-core monitoring</strong>: headless/cron-safe; MCP (Lighthouse/console) is best-effort enhancement, never a cycle-blocker.</li>
+  <li><strong>Deploy gated per provider</strong>: owner grants one <code>autoMode.allow</code> line; agent never self-grants.</li>
+  <li><strong>Learning compounds across providers</strong>: neutral fix-patterns transfer; the platform gets smarter per adapter.</li>
+  <li><strong>Providers: Next.js → Shopify</strong> (founder priority 2026-05-29), WordPress as reference.</li>
+</ul>
+
+</body>
+</html>

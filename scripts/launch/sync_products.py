@@ -1,7 +1,7 @@
 """Phase 2: Sync all 34 catalog products to WooCommerce.
 
 Reads:
-  - data/product-catalog.csv (source of truth)
+  - the canonical skyyrose-catalog.csv via skyyrose.core.catalog_loader (source of truth)
   - scripts/launch/sku_image_map.json (from Phase 1)
 
 Uses WooCommerce REST API v3 with consumer key/secret auth.
@@ -10,7 +10,6 @@ Creates or updates products with images, prices, categories, and attributes.
 
 from __future__ import annotations
 
-import csv
 import json
 import os
 import sys
@@ -19,8 +18,9 @@ from pathlib import Path
 
 import httpx
 
+from skyyrose.core.catalog_loader import read_catalog_rows
+
 ROOT = Path(__file__).resolve().parent.parent.parent
-CATALOG_CSV = ROOT / "data" / "product-catalog.csv"
 IMAGE_MAP_JSON = ROOT / "scripts" / "launch" / "sku_image_map.json"
 
 # Load from .env or environment
@@ -195,11 +195,8 @@ def sync_all():
     with open(IMAGE_MAP_JSON) as f:
         image_map: dict[str, dict] = json.load(f)
 
-    # Load catalog
-    products: list[dict] = []
-    with open(CATALOG_CSV, newline="") as f:
-        for row in csv.DictReader(f):
-            products.append(row)
+    # Load catalog (canonical CSV via the shared, memoized loader)
+    products: list[dict] = list(read_catalog_rows())
 
     print(f"Catalog: {len(products)} products")
     print(f"Images:  {len(image_map)} mapped")
@@ -224,7 +221,7 @@ def sync_all():
     for row in products:
         sku = row["sku"].strip().strip('"')
         name = row["name"].strip().strip('"')
-        collection_slug = row.get("collection_slug", "").strip()
+        collection_slug = row.get("collection", "").strip()
         category_id = CATEGORY_MAP.get(collection_slug, 19)  # Default to signature
 
         image_info = image_map.get(sku)

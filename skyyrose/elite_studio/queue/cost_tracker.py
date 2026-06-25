@@ -28,6 +28,19 @@ _TOTAL_COST_SORTED_SET = "elite_studio:costs:timeline"
 # TTL for individual job cost records: 7 days
 _COST_TTL_SECONDS = 604_800
 
+# Hard cost ceiling — kill-switch for runaway retry loops. The previous
+# implementation had only tier alerts ($5/$10/$20/$50) with no automatic
+# stop, so a stuck retry loop on a paid provider could incur unbounded
+# spend. CostBudgetExceeded is raised when the rolling 24h total crosses
+# this ceiling. Override via ELITE_STUDIO_COST_CAP_USD env var (default
+# 100.0). Set to 0 to disable the cap entirely (NOT recommended).
+# [P0 cleanup, bug-100]
+DEFAULT_COST_CAP_USD: float = 100.0
+
+
+class CostBudgetExceeded(RuntimeError):
+    """Raised when the rolling 24h cost crosses the configured cap."""
+
 
 class CostTracker:
     """Records API token usage and estimated cost per job.
@@ -47,24 +60,114 @@ class CostTracker:
         self._redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/0")
         self._redis: Any = None
 
-    def _get_redis(self) -> Any | None:
-        """Lazy-connect to Redis synchronously. Returns None on failure."""
+    def _get_redis(self) -> Any:
+        """Lazy-connect to Redis synchronously. Raises on failure."""
         if self._redis is not None:
             return self._redis
         try:
             import redis as sync_redis
 
-            self._redis = sync_redis.from_url(
+            client = sync_redis.from_url(
                 self._redis_url,
                 decode_responses=True,
                 socket_timeout=3.0,
                 socket_connect_timeout=3.0,
             )
-            self._redis.ping()
+            client.ping()
+            self._redis = client  # Only cache after successful ping
             return self._redis
         except Exception as exc:
-            logger.warning("CostTracker: Redis unavailable — cost tracking degraded: %s", exc)
-            return None
+            self._redis = None  # Ensure broken client is not cached
+            logger.error("CostTracker: Redis unavailable — cannot verify budget: %s", exc)
+            raise RuntimeError("Redis unavailable for cost tracking") from exc
+
+    def get_cost_cap(self) -> float:
+        """Return the configured rolling-24h cost ceiling in USD.
+
+        Reads ELITE_STUDIO_COST_CAP_USD env var; defaults to DEFAULT_COST_CAP_USD.
+        Returns 0.0 if the env var explicitly disables the cap.
+        Negative, NaN, and infinite values are rejected as invalid.
+        """
+        import math
+
+        raw = os.getenv("ELITE_STUDIO_COST_CAP_USD")
+        if raw is None:
+            return DEFAULT_COST_CAP_USD
+        try:
+            value = float(raw)
+        except ValueError:
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is not a number; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+
+        if not math.isfinite(value):
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is non-finite; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+        if value == 0.0:
+            return 0.0
+        if value < 0.0:
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is negative/invalid; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+        return value
+
+    def check_budget(self, projected_cost_usd: float = 0.0) -> None:
+        """Raise CostBudgetExceeded if rolling 24h spend (+ projected) crosses the cap.
+
+        Call before kicking off any paid API request. Set ELITE_STUDIO_COST_CAP_USD=0
+        in the environment to disable the cap entirely (not recommended for prod).
+
+        Fails closed (raises CostBudgetExceeded) when Redis is unavailable unless
+        ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED=1 is set.
+
+        Args:
+            projected_cost_usd: Expected cost of the upcoming call. Must be >= 0.
+        """
+        import math
+
+        if not math.isfinite(projected_cost_usd) or projected_cost_usd < 0.0:
+            raise ValueError(
+                f"projected_cost_usd must be a non-negative finite number; got {projected_cost_usd!r}"
+            )
+        cap = self.get_cost_cap()
+        if cap <= 0.0:
+            return  # Cap explicitly disabled
+
+        # Check Redis availability directly — get_total_cost degrades gracefully to 0.0
+        # but the budget gate must fail closed on Redis loss to prevent runaway spend.
+        try:
+            self._get_redis()
+        except RuntimeError as exc:
+            if os.getenv("ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED") == "1":
+                logger.warning(
+                    "CostTracker: Redis unavailable but degraded mode allowed — skipping budget check"
+                )
+                return
+            logger.critical(
+                "CostTracker: Redis unavailable and no degraded mode flag — failing closed to prevent runaway spend"
+            )
+            raise CostBudgetExceeded(
+                "Budget check failed: Redis unavailable. "
+                "Set ELITE_STUDIO_COST_CAP_ALLOW_DEGRADED=1 to allow degraded operation (NOT recommended)."
+            ) from exc
+
+        current = self.get_total_cost(since_hours=24)
+        if current + projected_cost_usd > cap:
+            raise CostBudgetExceeded(
+                f"Cost cap exceeded: ${current:.2f} spent in last 24h "
+                f"+ ${projected_cost_usd:.4f} projected > ${cap:.2f} cap. "
+                f"Set ELITE_STUDIO_COST_CAP_USD to raise the limit."
+            )
 
     def record(self, job_id: str, provider: str, tokens: int, cost_usd: float) -> None:
         """Record token usage and cost for a provider call in a job.
@@ -75,8 +178,9 @@ class CostTracker:
             tokens: Number of tokens consumed.
             cost_usd: Estimated cost in USD.
         """
-        r = self._get_redis()
-        if r is None:
+        try:
+            r = self._get_redis()
+        except RuntimeError:
             logger.warning("CostTracker.record: Redis unavailable, skipping cost record")
             return
 
@@ -110,8 +214,10 @@ class CostTracker:
 
         Returns 0.0 if Redis is unavailable or job not found.
         """
-        r = self._get_redis()
-        if r is None:
+        try:
+            r = self._get_redis()
+        except RuntimeError:
+            logger.warning("CostTracker.get_job_cost: Redis unavailable")
             return 0.0
 
         try:
@@ -125,14 +231,20 @@ class CostTracker:
     def get_total_cost(self, since_hours: int = 24) -> float:
         """Return total USD cost across all jobs in the last N hours.
 
+        Degrades gracefully when Redis is unavailable: logs a warning and
+        returns 0.0 rather than raising, consistent with the module-level
+        contract and ``get_job_cost`` behaviour.
+
         Args:
             since_hours: Look-back window in hours (default 24).
 
         Returns:
-            Summed cost in USD, or 0.0 on Redis failure.
+            Summed cost in USD, or 0.0 when Redis is unavailable.
         """
-        r = self._get_redis()
-        if r is None:
+        try:
+            r = self._get_redis()
+        except RuntimeError:
+            logger.warning("CostTracker.get_total_cost: Redis unavailable — returning 0.0")
             return 0.0
 
         try:
@@ -149,7 +261,7 @@ class CostTracker:
                         pass
             return round(total, 6)
         except Exception as exc:
-            logger.warning("CostTracker.get_total_cost: %s", exc)
+            logger.error("CostTracker.get_total_cost: Redis query failed: %s", exc)
             return 0.0
 
     @staticmethod

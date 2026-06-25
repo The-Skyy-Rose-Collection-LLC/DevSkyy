@@ -36,8 +36,13 @@ import cohere
 from anthropic import AsyncAnthropic
 from google import genai
 from groq import AsyncGroq
+
+# langfuse drop-in wrapper auto-traces model + tokens + cost (graceful fallback if extra not installed)
+try:
+    from langfuse.openai import AsyncOpenAI
+except ImportError:
+    from openai import AsyncOpenAI
 from mistralai import Mistral
-from openai import AsyncOpenAI
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 

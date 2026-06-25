@@ -4,24 +4,63 @@ Human Review Gate — pause the graph for manual approval.
 Submits generated images to the existing ApprovalQueueManager and
 polls for a decision within a configurable timeout window.
 
-If the approval queue is unavailable (import error, service error)
-the gate defaults to "approve" with a warning log so production
-pipelines are never blocked indefinitely.
+Failure mode policy (changed 2026-05-25):
+    Error and timeout paths default to ``reject`` so a broken queue
+    cannot silently approve every image (the previous "auto-approve
+    on failure" behavior turned the quality gate into a no-op under
+    any failure condition).
 
-Timeout defaults to "approve" as well — never block production.
+    Operators who explicitly want the legacy "never block production"
+    behavior must set ``SKYYROSE_AUTO_CONFIRM=1`` in the environment.
+    That flag tells the gate to default to approve on queue errors
+    and timeouts. Without it, fail-safe = reject.
+
+Concurrency note: ``submit_for_review`` and ``get_decision`` are
+synchronous methods that bridge into the async ApprovalQueueManager.
+They are called from sync graph nodes that themselves run inside an
+asyncio loop, so calling ``asyncio.run`` directly would raise
+``RuntimeError: asyncio.run() cannot be called from a running event
+loop``. ``_run_sync_safe`` detects the running-loop case and dispatches
+the coroutine in a worker thread to avoid the nesting violation.
 """
 
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import logging
+import os
 import time
+from collections.abc import Awaitable
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
 _DEFAULT_POLL_INTERVAL = 5.0  # seconds between queue polls
 _DEFAULT_TIMEOUT = 300.0  # 5 minutes
+
+
+def _auto_confirm_enabled() -> bool:
+    """True when operators have explicitly opted into auto-approve-on-failure."""
+    return os.environ.get("SKYYROSE_AUTO_CONFIRM", "").strip().lower() in {"1", "true", "yes"}
+
+
+def _run_sync_safe[T](coro: Awaitable[T]) -> T:
+    """Run an async coroutine from a sync caller, regardless of loop state.
+
+    When no event loop is running, ``asyncio.run`` is safe. When a loop is
+    already running (graph nodes invoke this gate via ``run_sync`` which
+    drives its own loop), nesting ``asyncio.run`` raises ``RuntimeError``;
+    we dispatch the coroutine into a worker thread so it gets its own loop.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)  # type: ignore[arg-type]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(asyncio.run, coro)
+        return future.result()
 
 
 @dataclass(frozen=True)
@@ -66,13 +105,27 @@ class HumanReviewGate:
         """
         try:
             manager = self._get_manager()
-            item = asyncio.run(self._submit_async(manager, sku, image_path, job_id))
+            item = _run_sync_safe(self._submit_async(manager, sku, image_path, job_id))
             logger.info("Submitted %s for human review: review_id=%s", sku, item.id)
             return item.id
         except Exception as exc:
-            logger.warning("Approval queue unavailable (%s) — auto-approving %s", exc, sku)
-            # Return a sentinel that get_decision() will recognise as auto-approve
-            return f"auto-approve:{job_id}"
+            # The legacy "auto-approve on queue error" behavior is now
+            # opt-in (SKYYROSE_AUTO_CONFIRM=1) so a broken queue cannot
+            # silently approve every image.
+            if _auto_confirm_enabled():
+                logger.warning(
+                    "Approval queue unavailable (%s) — SKYYROSE_AUTO_CONFIRM=1, auto-approving %s",
+                    exc,
+                    sku,
+                )
+                return f"auto-approve:{job_id}"
+            logger.error(
+                "Approval queue unavailable (%s) — fail-safe rejecting %s "
+                "(set SKYYROSE_AUTO_CONFIRM=1 to revert to auto-approve)",
+                exc,
+                sku,
+            )
+            return f"auto-reject:{job_id}:{type(exc).__name__}"
 
     def get_decision(
         self,
@@ -97,14 +150,21 @@ class HumanReviewGate:
                 review_id=review_id,
                 decision="approve",
                 reviewer="system",
-                notes="Auto-approved: approval queue unavailable",
+                notes="Auto-approved: SKYYROSE_AUTO_CONFIRM=1 + queue unavailable",
+            )
+        if review_id.startswith("auto-reject:"):
+            return ReviewDecision(
+                review_id=review_id,
+                decision="reject",
+                reviewer="system",
+                notes=f"Fail-safe rejected: {review_id.split(':', 2)[-1]}",
             )
 
         deadline = time.monotonic() + timeout
         try:
             manager = self._get_manager()
             while time.monotonic() < deadline:
-                item = asyncio.run(manager.get_item(review_id))
+                item = _run_sync_safe(manager.get_item(review_id))
                 decision = self._map_status(item.status.value)
                 if decision in ("approve", "reject"):
                     return ReviewDecision(
@@ -115,25 +175,57 @@ class HumanReviewGate:
                     )
                 time.sleep(self._poll_interval)
         except Exception as exc:
-            logger.warning("Error polling approval queue (%s) — defaulting to approve", exc)
+            # Default to reject so a broken queue can never silently approve.
+            # Auto-approve-on-error is opt-in via SKYYROSE_AUTO_CONFIRM=1.
+            if _auto_confirm_enabled():
+                logger.warning(
+                    "Error polling approval queue (%s) — SKYYROSE_AUTO_CONFIRM=1, "
+                    "defaulting to approve",
+                    exc,
+                )
+                return ReviewDecision(
+                    review_id=review_id,
+                    decision="approve",
+                    reviewer="system",
+                    notes=f"Auto-approved due to queue error (opt-in): {exc}",
+                )
+            logger.error(
+                "Error polling approval queue (%s) — fail-safe rejecting "
+                "(set SKYYROSE_AUTO_CONFIRM=1 to revert)",
+                exc,
+            )
             return ReviewDecision(
                 review_id=review_id,
-                decision="approve",
+                decision="reject",
                 reviewer="system",
-                notes=f"Auto-approved due to queue error: {exc}",
+                notes=f"Fail-safe reject due to queue error: {exc}",
             )
 
-        # Timeout reached
-        logger.warning(
-            "Human review timeout after %.0fs for review_id=%s — defaulting to approve",
+        # Timeout reached — default to reject unless explicit opt-in.
+        if _auto_confirm_enabled():
+            logger.warning(
+                "Human review timeout after %.0fs for review_id=%s — "
+                "SKYYROSE_AUTO_CONFIRM=1, defaulting to approve",
+                timeout,
+                review_id,
+            )
+            return ReviewDecision(
+                review_id=review_id,
+                decision="timeout",
+                reviewer="system",
+                notes=f"Timed out after {timeout:.0f}s — auto-approved (opt-in)",
+            )
+        logger.error(
+            "Human review timeout after %.0fs for review_id=%s — fail-safe rejecting "
+            "(set SKYYROSE_AUTO_CONFIRM=1 to revert)",
             timeout,
             review_id,
         )
         return ReviewDecision(
             review_id=review_id,
-            decision="timeout",
+            decision="reject",
             reviewer="system",
-            notes=f"Timed out after {timeout:.0f}s — auto-approved",
+            notes=f"Fail-safe reject after {timeout:.0f}s timeout",
         )
 
     # ------------------------------------------------------------------

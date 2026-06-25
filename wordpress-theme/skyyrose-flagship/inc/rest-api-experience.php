@@ -24,133 +24,157 @@ function skyyrose_see_register_rest_routes(): void {
 	$namespace = 'skyyrose/v1';
 
 	// POST /analytics/events — Public, anonymous event ingestion.
-	register_rest_route( $namespace, '/analytics/events', array(
+	register_rest_route(
+		$namespace,
+		'/analytics/events',
 		array(
-			'methods'             => WP_REST_Server::CREATABLE,
-			'callback'            => 'skyyrose_see_rest_receive_events',
-			'permission_callback' => '__return_true',
-			'args'                => array(
-				'events' => array(
-					'required'          => true,
-					'validate_callback' => function ( $param ) {
-						return is_array( $param );
-					},
-					'sanitize_callback' => function ( $param ) {
-						return array_slice( (array) $param, 0, 50 );
-					},
-				),
-				'visitorHash' => array(
-					'default'           => '',
-					'sanitize_callback' => 'sanitize_text_field',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => 'skyyrose_see_rest_receive_events',
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'events'      => array(
+						'required'          => true,
+						'validate_callback' => function ( $param ) {
+							return is_array( $param );
+						},
+						'sanitize_callback' => function ( $param ) {
+							return array_slice( (array) $param, 0, 50 );
+						},
+					),
+					'visitorHash' => array(
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
 				),
 			),
-		),
-	) );
+		)
+	);
 
 	// GET /analytics/summary — Admin-only dashboard data.
-	register_rest_route( $namespace, '/analytics/summary', array(
+	register_rest_route(
+		$namespace,
+		'/analytics/summary',
 		array(
-			'methods'             => WP_REST_Server::READABLE,
-			'callback'            => 'skyyrose_see_rest_get_summary',
-			'permission_callback' => 'skyyrose_see_rest_admin_check',
-			'args'                => array(
-				'days' => array(
-					'default'           => 30,
-					'validate_callback' => function ( $param ) {
-						return is_numeric( $param ) && $param >= 1 && $param <= 90;
-					},
-					'sanitize_callback' => 'absint',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => 'skyyrose_see_rest_get_summary',
+				'permission_callback' => 'skyyrose_see_rest_admin_check',
+				'args'                => array(
+					'days' => array(
+						'default'           => 30,
+						'validate_callback' => function ( $param ) {
+							return is_numeric( $param ) && $param >= 1 && $param <= 90;
+						},
+						'sanitize_callback' => 'absint',
+					),
 				),
 			),
-		),
-	) );
+		)
+	);
 
 	// GET /personalization/{hash} — Public, product recommendations.
-	register_rest_route( $namespace, '/personalization/(?P<hash>[a-f0-9]{8,64})', array(
+	register_rest_route(
+		$namespace,
+		'/personalization/(?P<hash>[a-f0-9]{8,64})',
 		array(
-			'methods'             => WP_REST_Server::READABLE,
-			'callback'            => 'skyyrose_see_rest_get_recommendations',
-			'permission_callback' => '__return_true',
-			'args'                => array(
-				'hash' => array(
-					'required'          => true,
-					'sanitize_callback' => 'sanitize_text_field',
-				),
-				'collection' => array(
-					'default'           => '',
-					'sanitize_callback' => 'sanitize_text_field',
-				),
-				'limit' => array(
-					'default'           => 8,
-					'validate_callback' => function ( $param ) {
-						return is_numeric( $param ) && $param >= 1 && $param <= 20;
-					},
-					'sanitize_callback' => 'absint',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => 'skyyrose_see_rest_get_recommendations',
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'hash'       => array(
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'collection' => array(
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'limit'      => array(
+						'default'           => 8,
+						'validate_callback' => function ( $param ) {
+							return is_numeric( $param ) && $param >= 1 && $param <= 20;
+						},
+						'sanitize_callback' => 'absint',
+					),
 				),
 			),
-		),
-	) );
+		)
+	);
 
 	// POST /settings/narrative — Admin-only, submit design narrative.
-	register_rest_route( $namespace, '/settings/narrative', array(
+	register_rest_route(
+		$namespace,
+		'/settings/narrative',
 		array(
-			'methods'             => WP_REST_Server::CREATABLE,
-			'callback'            => 'skyyrose_see_rest_submit_narrative',
-			'permission_callback' => 'skyyrose_see_rest_admin_check',
-			'args'                => array(
-				'description' => array(
-					'required'          => true,
-					'sanitize_callback' => 'sanitize_textarea_field',
-				),
-				'target' => array(
-					'default'           => 'all',
-					'sanitize_callback' => 'sanitize_text_field',
-				),
-				'config' => array(
-					'default'           => array(),
-					'validate_callback' => function ( $param ) {
-						return is_array( $param );
-					},
-				),
-				'priority' => array(
-					'default'           => 5,
-					'validate_callback' => function ( $param ) {
-						return is_numeric( $param ) && $param >= 1 && $param <= 10;
-					},
-					'sanitize_callback' => 'absint',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => 'skyyrose_see_rest_submit_narrative',
+				'permission_callback' => 'skyyrose_see_rest_admin_check',
+				'args'                => array(
+					'description' => array(
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_textarea_field',
+					),
+					'target'      => array(
+						'default'           => 'all',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'config'      => array(
+						'default'           => array(),
+						'validate_callback' => function ( $param ) {
+							return is_array( $param );
+						},
+					),
+					'priority'    => array(
+						'default'           => 5,
+						'validate_callback' => function ( $param ) {
+							return is_numeric( $param ) && $param >= 1 && $param <= 10;
+						},
+						'sanitize_callback' => 'absint',
+					),
 				),
 			),
-		),
-	) );
+		)
+	);
 
 	// GET /settings — Admin-only, current settings + module status.
-	register_rest_route( $namespace, '/settings', array(
+	register_rest_route(
+		$namespace,
+		'/settings',
 		array(
-			'methods'             => WP_REST_Server::READABLE,
-			'callback'            => 'skyyrose_see_rest_get_settings',
-			'permission_callback' => 'skyyrose_see_rest_admin_check',
-		),
-	) );
-
-	// PUT /settings — Admin-only, update settings.
-	register_rest_route( $namespace, '/settings', array(
-		array(
-			'methods'             => WP_REST_Server::EDITABLE,
-			'callback'            => 'skyyrose_see_rest_update_settings',
-			'permission_callback' => 'skyyrose_see_rest_admin_check',
-		),
-	) );
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => 'skyyrose_see_rest_get_settings',
+				'permission_callback' => 'skyyrose_see_rest_admin_check',
+			),
+			array(
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => 'skyyrose_see_rest_update_settings',
+				'permission_callback' => 'skyyrose_see_rest_admin_check',
+			),
+		)
+	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Permission Callbacks
  *--------------------------------------------------------------*/
 
+/**
+ * Permission callback: restrict admin-only REST endpoints to users with
+ * `manage_options` capability.
+ *
+ * @return bool True if current user can manage options.
+ */
 function skyyrose_see_rest_admin_check(): bool {
 	return current_user_can( 'manage_options' );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Route Handlers
  *--------------------------------------------------------------*/
 
@@ -158,9 +182,11 @@ function skyyrose_see_rest_admin_check(): bool {
  * Receive and store behavioral events.
  */
 function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_Response {
-	// Rate limiting: 10 requests per minute per IP.
-	$ip        = sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' );
-	$rate_key  = 'skyyrose_see_rate_' . md5( $ip );
+	// Rate limiting: 10 requests per minute per IP. REMOTE_ADDR only — sites
+	// behind a reverse proxy should add an X-Forwarded-For allowlist before
+	// trusting that header.
+	$ip         = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
+	$rate_key   = 'skyyrose_see_rate_' . md5( $ip );
 	$rate_count = (int) get_transient( $rate_key );
 
 	if ( $rate_count >= 10 ) {
@@ -172,10 +198,20 @@ function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_R
 	$events       = $request->get_param( 'events' );
 	$visitor_hash = $request->get_param( 'visitorHash' );
 
+	// Guard: experience-analyzer.php defines skyyrose_see_store_events() but is
+	// loaded inside a WooCommerce-gated block in functions.php. When WooCommerce
+	// is inactive the function is undefined and calling it would produce a fatal
+	// error that WordPress translates into a 404 rest_no_route response.
+	if ( ! function_exists( 'skyyrose_see_store_events' ) ) {
+		return new WP_REST_Response( array( 'stored' => 0, 'note' => 'analytics_unavailable' ), 200 );
+	}
+
 	$stored = skyyrose_see_store_events( $events, $visitor_hash );
 
-	// Relay to FastAPI backend (non-blocking).
-	skyyrose_see_relay_analytics( $events );
+	// Relay to FastAPI backend (non-blocking) — guarded for same reason.
+	if ( function_exists( 'skyyrose_see_relay_analytics' ) ) {
+		skyyrose_see_relay_analytics( $events );
+	}
 
 	return new WP_REST_Response( array( 'stored' => $stored ), 200 );
 }
@@ -184,7 +220,14 @@ function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_R
  * Return analytics summary for the admin dashboard.
  */
 function skyyrose_see_rest_get_summary( WP_REST_Request $request ): WP_REST_Response {
-	$days    = $request->get_param( 'days' );
+	$days = $request->get_param( 'days' );
+
+	// Guard: skyyrose_see_get_summary() defined in experience-analyzer.php which
+	// is WooCommerce-gated; return an empty summary rather than a fatal error.
+	if ( ! function_exists( 'skyyrose_see_get_summary' ) ) {
+		return new WP_REST_Response( array(), 200 );
+	}
+
 	$summary = skyyrose_see_get_summary( $days );
 
 	return new WP_REST_Response( $summary, 200 );
@@ -208,10 +251,13 @@ function skyyrose_see_rest_get_recommendations( WP_REST_Request $request ): WP_R
 	}
 
 	// Try ML recommendations from FastAPI.
-	$ml_recs = skyyrose_see_get_recommendations( $hash, array(
-		'collection' => $collection,
-		'limit'      => $limit,
-	) );
+	$ml_recs = skyyrose_see_get_recommendations(
+		$hash,
+		array(
+			'collection' => $collection,
+			'limit'      => $limit,
+		)
+	);
 
 	if ( $ml_recs && ! empty( $ml_recs['products'] ) ) {
 		// Validate all product URLs.
@@ -266,8 +312,8 @@ function skyyrose_see_rest_get_settings( WP_REST_Request $request ): WP_REST_Res
 		$settings = array();
 	}
 
-	$settings['version']          = SKYYROSE_SEE_VERSION;
-	$settings['active_modules']   = skyyrose_see_get_active_modules();
+	$settings['version']           = SKYYROSE_SEE_VERSION;
+	$settings['active_modules']    = skyyrose_see_get_active_modules();
 	$settings['fastapi_available'] = skyyrose_see_fastapi_is_available();
 
 	return new WP_REST_Response( $settings, 200 );
@@ -307,7 +353,8 @@ function skyyrose_see_rest_update_settings( WP_REST_Request $request ): WP_REST_
 	return new WP_REST_Response( array( 'updated' => array_keys( $update ) ), 200 );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Helpers
  *--------------------------------------------------------------*/
 
@@ -318,21 +365,24 @@ function skyyrose_see_rest_update_settings( WP_REST_Request $request ): WP_REST_
  * @return array Products with validated URLs.
  */
 function skyyrose_see_validate_product_urls( array $products ): array {
-	return array_map( function ( $product ) {
-		if ( ! is_array( $product ) ) {
-			return $product;
-		}
-		foreach ( array( 'permalink', 'image', 'url' ) as $url_field ) {
-			if ( ! empty( $product[ $url_field ] ) ) {
-				$url = $product[ $url_field ];
-				$scheme = wp_parse_url( $url, PHP_URL_SCHEME );
-				if ( 'http' !== $scheme && 'https' !== $scheme ) {
-					$product[ $url_field ] = '';
+	return array_map(
+		function ( $product ) {
+			if ( ! is_array( $product ) ) {
+					return $product;
+			}
+			foreach ( array( 'permalink', 'image', 'url' ) as $url_field ) {
+				if ( ! empty( $product[ $url_field ] ) ) {
+					$url    = $product[ $url_field ];
+					$scheme = wp_parse_url( $url, PHP_URL_SCHEME );
+					if ( 'http' !== $scheme && 'https' !== $scheme ) {
+						$product[ $url_field ] = '';
+					}
 				}
 			}
-		}
-		return $product;
-	}, $products );
+			return $product;
+		},
+		$products
+	);
 }
 
 /**

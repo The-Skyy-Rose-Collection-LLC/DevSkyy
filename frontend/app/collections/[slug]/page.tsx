@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  getCollection,
-  getAllCollectionSlugs,
-  type CollectionSlug,
-} from '@/lib/collections';
+import { getAllCollectionSlugs } from '@/lib/collections';
+import { getEnrichedCollection } from '@/lib/catalog-server';
 import CollectionExperience from './CollectionExperience';
 
 interface PageProps {
@@ -17,7 +14,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const collection = getCollection(slug);
+  const collection = getEnrichedCollection(slug);
   if (!collection) return {};
 
   const totalProducts = collection.scenes.reduce(
@@ -43,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CollectionPage({ params }: PageProps) {
   const { slug } = await params;
-  const collection = getCollection(slug);
+  const collection = getEnrichedCollection(slug);
 
   if (!collection) {
     notFound();

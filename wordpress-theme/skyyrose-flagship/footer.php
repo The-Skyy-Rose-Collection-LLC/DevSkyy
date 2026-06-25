@@ -65,11 +65,11 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand__logo-link" rel="home">
 						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>"
-							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose' ); ?>"
+							src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram-footer.webp?v=' . SKYYROSE_VERSION ); ?>"
+							alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>"
 							class="footer-brand__monogram"
-							width="40"
-							height="40"
+							width="60"
+							height="60"
 							loading="lazy"
 						>
 						<span class="footer-brand__text navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>
@@ -179,7 +179,7 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--help">
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Help', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
-						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/contact/#size-guide' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>
@@ -195,6 +195,7 @@ defined( 'ABSPATH' ) || exit;
 						<li><a href="<?php echo esc_url( home_url( '/terms-of-service/' ) ); ?>"><?php esc_html_e( 'Terms of Service', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/refund-policy/' ) ); ?>"><?php esc_html_e( 'Refund Policy', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/accessibility/' ) ); ?>"><?php esc_html_e( 'Accessibility', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/cookie-policy/' ) ); ?>"><?php esc_html_e( 'Cookie Policy', 'skyyrose' ); ?></a></li>
 					</ul>
 				</div>
 
@@ -203,7 +204,7 @@ defined( 'ABSPATH' ) || exit;
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Connect', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
 						<?php
-						$connect_links = skyyrose_get_social_links();
+						$connect_links = $social_links;
 						foreach ( $connect_links as $data ) :
 							?>
 							<li>
@@ -236,7 +237,7 @@ defined( 'ABSPATH' ) || exit;
 								'menu_class'     => 'footer-copyright__menu',
 								'container'      => false,
 								'depth'          => 1,
-								'fallback_cb'    => false,
+								'fallback_cb'    => 'skyyrose_nav_fallback',
 							)
 						);
 						?>
@@ -251,7 +252,9 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/size-guide-modal' ); ?>
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
-<?php get_template_part( 'template-parts/skyy-mascot' ); ?>
+<?php // Skyy mascot disabled — re-enable when character art is finalized. ?>
+<?php // phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- intentional suspension, not dead code. ?>
+<?php // get_template_part( 'template-parts/skyy-mascot' ); ?>
 
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>

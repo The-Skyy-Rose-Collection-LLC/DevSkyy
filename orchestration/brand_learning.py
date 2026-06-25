@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 import statistics
 import uuid
@@ -972,7 +973,7 @@ class BrandLearningLoop:
             content="Premium heavyweight crewneck...",
             agent_id="content_core",
             provider="anthropic",
-            model="claude-sonnet-4",
+            model="claude-sonnet-4-6",
             accepted=True,
             quality_score=92.0,
         ))
@@ -993,6 +994,8 @@ class BrandLearningLoop:
         db_path: str = "./data/brand_learning.db",
         signal_threshold: int = 10,
         lookback_hours: int = 168,  # 7 days
+        approval_gate: Any | None = None,
+        approval_timeout: float | None = 300.0,
     ):
         self._memory = BrandMemory(db_path=db_path)
         self._extractor = PatternExtractor()
@@ -1002,12 +1005,17 @@ class BrandLearningLoop:
         self._state = LoopState()
         self._event_bus = None
         self._brand_dict = None  # Reference to live SKYYROSE_BRAND dict
+        # STOP-AND-SHOW gate for brand-DNA adaptations. None => fail closed
+        # (insights are recorded but never propagated to the live brand dict).
+        self._approval_gate = approval_gate
+        self._approval_timeout = approval_timeout
 
     def connect(
         self,
         *,
         brand_dict: dict[str, Any] | None = None,
         event_bus: Any | None = None,
+        approval_gate: Any | None = None,
     ) -> None:
         """
         Connect the loop to live systems.
@@ -1015,9 +1023,15 @@ class BrandLearningLoop:
         Args:
             brand_dict: Reference to SKYYROSE_BRAND dict (mutated in place)
             event_bus: core.events.event_bus for subscribing/emitting
+            approval_gate: aos.governance.approval.ApprovalGate that must approve
+                each brand-DNA adaptation before it propagates. Without it, the
+                loop fails closed and never mutates the live brand context.
         """
         if brand_dict is not None:
             self._brand_dict = brand_dict
+
+        if approval_gate is not None:
+            self._approval_gate = approval_gate
 
         if event_bus is not None:
             self._event_bus = event_bus
@@ -1092,14 +1106,9 @@ class BrandLearningLoop:
             self._memory.store_insight(insight)
             self._state.total_insights += 1
 
-        # ADAPT — apply high-confidence insights to brand context
+        # ADAPT — apply high-confidence insights to brand context (approval-gated)
         self._state.phase = LoopPhase.ADAPTING
-        total_adaptations = 0
-        if self._brand_dict is not None:
-            for insight in new_insights:
-                adaptations = self._adaptor.apply_insight(insight, self._brand_dict)
-                total_adaptations += len(adaptations)
-                self._state.total_adaptations += len(adaptations)
+        total_adaptations = await self._apply_adaptations(new_insights)
 
         # EMIT — broadcast events
         self._state.phase = LoopPhase.EMITTING
@@ -1202,6 +1211,67 @@ class BrandLearningLoop:
     # -------------------------------------------------------------------------
     # Internals
     # -------------------------------------------------------------------------
+
+    async def _apply_adaptations(self, insights: list[BrandInsight]) -> int:
+        """Apply insights to the live brand dict, gated by human approval.
+
+        Brand adaptations mutate the brand context injected into every agent
+        prompt across all stages. Each adaptation must clear the approval gate
+        first. Returns the number of adaptations actually applied.
+        """
+        if self._brand_dict is None:
+            return 0
+
+        total = 0
+        for insight in insights:
+            if not await self._approve_adaptation(insight):
+                logger.warning(
+                    "[brand_learning] Adaptation from insight '%s' NOT applied — approval gate %s.",
+                    insight.title,
+                    "denied/expired" if self._approval_gate is not None else "absent (fail-closed)",
+                )
+                continue
+            adaptations = self._adaptor.apply_insight(insight, self._brand_dict)
+            total += len(adaptations)
+            self._state.total_adaptations += len(adaptations)
+        return total
+
+    async def _approve_adaptation(self, insight: BrandInsight) -> bool:
+        """Decide whether a brand-DNA adaptation may propagate to the live context.
+
+        Fail closed: insights at or above the adaptor's confidence threshold are
+        blocked unless an approval gate is wired AND approves them. Insights below
+        the threshold are no-ops in the adaptor, so they pass through unchanged.
+        """
+        confidence_order = ["low", "medium", "high", "verified"]
+        if confidence_order.index(insight.confidence.value) < confidence_order.index(
+            BrandAdaptor.MIN_CONFIDENCE_FOR_ADAPTATION.value
+        ):
+            # Adaptor would return [] for these — no live mutation, no gate needed.
+            return True
+
+        if self._approval_gate is None:
+            return False  # fail closed — no ungated brand-DNA writes
+
+        from aos.governance.approval import ApprovalRequest, RiskLevel
+
+        request = ApprovalRequest(
+            requester_pid=os.getpid(),
+            action="brand_dna_adaptation",
+            description=f"Apply brand adaptation from insight: {insight.title}",
+            risk=RiskLevel.HIGH,
+            details={
+                "insight_id": insight.insight_id,
+                "category": insight.category.value,
+                "confidence": insight.confidence.value,
+                "recommendations": insight.recommendations,
+                "affected_collections": insight.affected_collections,
+            },
+        )
+        decision = await self._approval_gate.request_and_wait(
+            request, timeout_seconds=self._approval_timeout
+        )
+        return decision.is_approved
 
     def _deduplicate_insights(self, raw_insights: list[BrandInsight]) -> list[BrandInsight]:
         """

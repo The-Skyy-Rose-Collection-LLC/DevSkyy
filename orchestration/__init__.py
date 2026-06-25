@@ -5,25 +5,21 @@ DevSkyy Orchestration Module
 Multi-agent orchestration and LLM management:
 - LLM Registry: Model definitions and routing
 - LLM Clients: Provider-specific API clients
-- LLM Orchestrator: Intelligent model selection
 - Tool Registry: Tool definitions and validation
 - Prompt Engineering: Advanced prompting techniques
 - LangGraph Integration: Multi-agent workflows
 
-Usage:
-    from orchestration import LLMOrchestrator, ToolRegistry
+Note: active multi-provider LLM routing lives in llm/router.py (LLMRouter).
 
-    # Get optimal model for task
-    orchestrator = LLMOrchestrator()
-    response = await orchestrator.complete(
-        prompt="Analyze this fashion trend...",
-        task_type="analysis",
-        requirements={"speed": "fast", "quality": "high"}
-    )
+Usage:
+    from orchestration import LLMRegistry, ToolRegistry
+
+    # Inspect available models
+    registry = LLMRegistry()
 
     # Register and use tools
-    registry = ToolRegistry()
-    tool = registry.get_tool("web_search")
+    tools = ToolRegistry()
+    tool = tools.get_tool("web_search")
     result = await tool.execute(query="luxury streetwear trends")
 """
 
@@ -60,9 +56,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "ChunkMetadata": ("orchestration.document_ingestion", "ChunkMetadata"),
     "DocumentType": ("orchestration.document_ingestion", "DocumentType"),
     "ingest_docs_directory": ("orchestration.document_ingestion", "ingest_docs_directory"),
-    # Domain Router
-    "DomainRouter": ("orchestration.domain_router", "DomainRouter"),
-    "TaskDomain": ("orchestration.domain_router", "TaskDomain"),
     # Embedding Engine
     "BaseEmbeddingEngine": ("orchestration.embedding_engine", "BaseEmbeddingEngine"),
     "EmbeddingConfig": ("orchestration.embedding_engine", "EmbeddingConfig"),
@@ -70,11 +63,13 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "OpenAIEmbeddingEngine": ("orchestration.embedding_engine", "OpenAIEmbeddingEngine"),
     "SentenceTransformerEngine": ("orchestration.embedding_engine", "SentenceTransformerEngine"),
     "create_embedding_engine": ("orchestration.embedding_engine", "create_embedding_engine"),
-    # LangGraph
-    "AgentNode": ("orchestration.langgraph_integration", "AgentNode"),
+    # LangGraph (data types and re-exports — engine is real langgraph library)
     "WorkflowEdge": ("orchestration.langgraph_integration", "WorkflowEdge"),
-    "WorkflowManager": ("orchestration.langgraph_integration", "WorkflowManager"),
     "WorkflowState": ("orchestration.langgraph_integration", "WorkflowState"),
+    "WorkflowStatus": ("orchestration.langgraph_integration", "WorkflowStatus"),
+    "StateGraph": ("orchestration.langgraph_integration", "StateGraph"),
+    "END": ("orchestration.langgraph_integration", "END"),
+    "START": ("orchestration.langgraph_integration", "START"),
     # LLM Clients
     "AnthropicClient": ("orchestration.llm_clients", "AnthropicClient"),
     "BaseLLMClient": ("orchestration.llm_clients", "BaseLLMClient"),
@@ -83,11 +78,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "GroqClient": ("orchestration.llm_clients", "GroqClient"),
     "MistralClient": ("orchestration.llm_clients", "MistralClient"),
     "OpenAIClient": ("orchestration.llm_clients", "OpenAIClient"),
-    # LLM Orchestrator
-    "CompletionResult": ("orchestration.llm_orchestrator", "CompletionResult"),
-    "LLMOrchestrator": ("orchestration.llm_orchestrator", "LLMOrchestrator"),
-    "RoutingStrategy": ("orchestration.llm_orchestrator", "RoutingStrategy"),
-    "TaskType": ("orchestration.llm_orchestrator", "TaskType"),
     # LLM Registry
     "LLMRegistry": ("orchestration.llm_registry", "LLMRegistry"),
     "ModelCapability": ("orchestration.llm_registry", "ModelCapability"),
@@ -133,6 +123,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "InsightCategory": ("orchestration.brand_learning", "InsightCategory"),
     "InsightConfidence": ("orchestration.brand_learning", "InsightConfidence"),
     "SignalType": ("orchestration.brand_learning", "SignalType"),
+    # Orchestration Mode (standing-consent fan-out loop)
+    "ModeAgent": ("orchestration.orchestration_mode", "ModeAgent"),
+    "ModeConfig": ("orchestration.orchestration_mode", "ModeConfig"),
+    "ReminderTransport": ("orchestration.orchestration_mode", "ReminderTransport"),
 }
 
 __all__ = list(_LAZY_IMPORTS.keys())

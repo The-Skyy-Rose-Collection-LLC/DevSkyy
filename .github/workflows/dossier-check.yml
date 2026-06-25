@@ -28,15 +28,17 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.12"
 
-      - name: Install minimal dependencies
-        run: pip install --quiet pyyaml
+      - name: Install dependencies
+        run: |
+          pip install --quiet pyyaml
+          pip install --quiet -e ".[dev]" || pip install --quiet -e . || pip install --quiet httpx pydantic
 
       - name: Coverage — every active SKU has a dossier
         run: python scripts/check_dossier_coverage.py

@@ -61,21 +61,18 @@ class SklearnModelWrapper:
             X_arr = X_arr.reshape(1, -1)
 
         if not self.fitted:
-            # Auto-fit with synthetic data for demo purposes
-            logger.warning(f"Model not fitted, using synthetic training for {self.task}")
-            n_features = X_arr.shape[1]
-            synthetic_X = np.random.randn(100, n_features)
-            if self.task in ("clustering", "anomaly"):
-                self.model.fit(synthetic_X)
-            else:
-                synthetic_y = (
-                    np.random.randn(100)
-                    if self.task == "regression"
-                    else np.random.randint(0, 2, 100)
-                )
-                self.model.fit(synthetic_X, synthetic_y)
-            self.fitted = True
-            self._last_confidence = 0.6  # Lower confidence for auto-fitted
+            # P1 #10: previously auto-fit with np.random.randn(100, n_features)
+            # synthetic data and returned predictions with confidence=0.6.
+            # This silently produced random output that flowed into production
+            # scoring paths. Fail fast instead — callers must explicitly fit
+            # before predict, or fall back to a non-ML heuristic.
+            raise RuntimeError(
+                f"SklearnModelWrapper({self.task}) is not fitted. "
+                f"Refusing to auto-fit on np.random synthetic data — that path "
+                f"silently produced random predictions with confidence=0.6. "
+                f"Call .fit(X, y) with real training data before .predict(), "
+                f"or branch on .fitted in the caller."
+            )
 
         result = self.model.predict(X_arr)
 
@@ -127,19 +124,16 @@ class ProphetModelWrapper:
 
     def predict(self, periods: int = 30, **kwargs) -> Any:
         """Generate forecasts for future periods."""
-        import pandas as pd
-
         if not self.fitted:
-            # Create synthetic historical data for demo
-            logger.warning("Prophet not fitted, using synthetic data")
-            dates = pd.date_range(start="2024-01-01", periods=365, freq="D")
-            import numpy as np
-
-            values = 100 + np.cumsum(np.random.randn(365) * 2)
-            df = pd.DataFrame({"ds": dates, "y": values})
-            self.model.fit(df)
-            self.fitted = True
-            self._last_confidence = 0.6
+            # P1 #10: previously synthesized 365 days of cumulative random-walk
+            # data and fit Prophet on it, then returned a forecast with
+            # confidence=0.6. The forecast was random noise, not a signal.
+            raise RuntimeError(
+                "ProphetModelWrapper is not fitted. Refusing to auto-fit on "
+                "synthetic random-walk data — that path silently produced random "
+                "forecasts with confidence=0.6. Call .fit(df) with real time-series "
+                "data (DataFrame with 'ds' and 'y' columns) before .predict()."
+            )
 
         freq = kwargs.get("freq", "D")
         future = self.model.make_future_dataframe(periods=periods, freq=freq)

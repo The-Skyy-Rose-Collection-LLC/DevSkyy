@@ -52,7 +52,23 @@ function skyyrose_preload_fonts() {
 	?>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cormorant-garamond-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/bebas-neue-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<?php
+	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
+	// templates). Skip the preload elsewhere so non-BR pages don't waste
+	// bandwidth on a font they never render.
+	$slug = function_exists( 'skyyrose_get_current_template_slug' ) ? skyyrose_get_current_template_slug() : '';
+	if ( in_array( $slug, array( 'collection', 'collection-standalone', 'immersive' ), true ) ) {
+		$queried = get_queried_object();
+		$is_br   = $queried && isset( $queried->post_name )
+			&& false !== strpos( (string) $queried->post_name, 'black-rose' );
+		if ( $is_br ) {
+			?>
+			<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cinzel-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+			<?php
+		}
+	}
 }
 
 /**
@@ -163,12 +179,25 @@ function skyyrose_preload_hero_image() {
 		$image_url = get_theme_mod( 'skyyrose_hero_image', '' );
 	} elseif ( function_exists( 'is_product' ) && is_product() ) {
 		// Single product: the main gallery image is the LCP element.
+		// $GLOBALS['product'] can hold non-WC_Product values when third-party
+		// callbacks fire before wp_head priority 4 — only adopt a fresh
+		// resolution when the helper returns a valid WC_Product so we never
+		// write null/false back to the global.
 		global $product;
-		if ( ! $product && function_exists( 'wc_get_product' ) ) {
-			$product = wc_get_product( get_the_ID() );
+		if ( ! $product instanceof WC_Product ) {
+			$resolved = skyyrose_current_wc_product();
+			if ( $resolved instanceof WC_Product ) {
+				$product = $resolved;
+			}
 		}
-		if ( $product && $product->get_image_id() ) {
-			$image_url = wp_get_attachment_url( $product->get_image_id() );
+		if ( $product instanceof WC_Product && $product->get_image_id() ) {
+			// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
+			// of wp_get_attachment_url() which returns the raw original
+			// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
+			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+			if ( ! $image_url ) {
+				$image_url = wp_get_attachment_url( $product->get_image_id() );
+			}
 		}
 	} elseif ( is_page() ) {
 		// Collection and immersive pages: preload featured image if set.
@@ -195,30 +224,6 @@ function skyyrose_preload_hero_image() {
 			esc_url( $image_url )
 		);
 	}
-}
-
-/**
- * Add Subresource Integrity (SRI) hashes to CDN-loaded scripts.
- *
- * Ensures that CDN-delivered files have not been tampered with.
- * If the hash doesn't match, the browser refuses to execute the script.
- *
- * @since 6.4.0
- * @param  string $tag    Full script tag HTML.
- * @param  string $handle Script handle.
- * @return string Modified tag.
- */
-function skyyrose_add_sri_hashes( $tag, $handle ) {
-	$sri_map = array(
-		'skyyrose-gsap'    => 'sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug==',
-		'skyyrose-gsap-st' => 'sha512-Ic9xkERjyZ1xgJ5svx3y0u3xrvfT/uPkV99LBwe68xjy/mGtO+4eURHZBW2xW4SZbFrF1Tf090XqB+EVgXnVjw==',
-	);
-
-	if ( isset( $sri_map[ $handle ] ) ) {
-		$tag = str_replace( ' src=', ' integrity="' . $sri_map[ $handle ] . '" crossorigin="anonymous" src=', $tag );
-	}
-
-	return $tag;
 }
 
 /**
@@ -292,9 +297,6 @@ add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );
 
 // Preload hero image on front page for better LCP.
 add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );
-
-// Add SRI hashes to CDN scripts for defense-in-depth.
-add_filter( 'script_loader_tag', 'skyyrose_add_sri_hashes', 20, 2 );
 
 // Remove jQuery Migrate on frontend (not needed since WC 9.0+ / WP 6.0+).
 add_action( 'wp_default_scripts', 'skyyrose_remove_jquery_migrate' );

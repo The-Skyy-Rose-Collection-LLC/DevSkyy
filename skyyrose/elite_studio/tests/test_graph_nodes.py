@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from skyyrose.elite_studio.graph.nodes import (
     compositor_node,
@@ -29,7 +29,7 @@ class TestVisionNode:
     def test_success_returns_vision_result(self):
         vision = make_synthesized_vision(success=True)
         mock_agent = MagicMock()
-        mock_agent.analyze.return_value = vision
+        mock_agent.analyze = AsyncMock(return_value=vision)
 
         with patch("skyyrose.elite_studio.graph.nodes.VisionAgent", return_value=mock_agent):
             result = vision_node(_state())
@@ -41,7 +41,7 @@ class TestVisionNode:
     def test_failure_sets_error_status(self):
         vision = make_synthesized_vision(success=False, error="API timeout")
         mock_agent = MagicMock()
-        mock_agent.analyze.return_value = vision
+        mock_agent.analyze = AsyncMock(return_value=vision)
 
         with patch("skyyrose.elite_studio.graph.nodes.VisionAgent", return_value=mock_agent):
             result = vision_node(_state())
@@ -53,7 +53,7 @@ class TestVisionNode:
     def test_timing_recorded(self):
         vision = make_synthesized_vision(success=True)
         mock_agent = MagicMock()
-        mock_agent.analyze.return_value = vision
+        mock_agent.analyze = AsyncMock(return_value=vision)
 
         with patch("skyyrose.elite_studio.graph.nodes.VisionAgent", return_value=mock_agent):
             result = vision_node(_state())
@@ -69,7 +69,7 @@ class TestGeneratorNode:
     def test_success_returns_generation_result(self):
         gen = make_generation_result(success=True)
         mock_agent = MagicMock()
-        mock_agent.generate.return_value = gen
+        mock_agent.generate = AsyncMock(return_value=gen)
 
         with patch("skyyrose.elite_studio.graph.nodes.GeneratorAgent", return_value=mock_agent):
             result = generator_node(self._state_with_vision())
@@ -89,7 +89,7 @@ class TestGeneratorNode:
     def test_generation_failure_sets_error(self):
         gen = make_generation_result(success=False, error="Blocked by safety filter")
         mock_agent = MagicMock()
-        mock_agent.generate.return_value = gen
+        mock_agent.generate = AsyncMock(return_value=gen)
 
         with patch("skyyrose.elite_studio.graph.nodes.GeneratorAgent", return_value=mock_agent):
             result = generator_node(self._state_with_vision())
@@ -109,7 +109,7 @@ class TestQualityNode:
     def test_success_returns_quality_result(self):
         qc = make_quality_verification(success=True, recommendation="approve")
         mock_agent = MagicMock()
-        mock_agent.verify.return_value = qc
+        mock_agent.verify = AsyncMock(return_value=qc)
 
         with patch("skyyrose.elite_studio.graph.nodes.QualityAgent", return_value=mock_agent):
             result = quality_node(self._state_with_gen())
@@ -155,4 +155,4 @@ class TestFinalizeNode:
 
     def test_preserves_error_status(self):
         result = finalize_node(_state(status="error"))
-        assert result == {}
+        assert result["status"] == "error"

@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "date": "2026-06-12",
+    "method": "production _judge_instructions executed on a real Claude model (Agent model=fable) vs the 6-render ground-truth set",
+    "note": "SDK plumbing proven separately by tests/pipelines/test_claude_judge_adapter.py (5 mocked tests). In-process claude-sonnet-4-6 via qc.py needs ANTHROPIC_API_KEY but is mechanically identical."
+  },
+  "judge_fit": "6/6",
+  "passing": true,
+  "verdicts": {
+    "br-001": {
+      "expect": "PASS",
+      "gates_all_true": true,
+      "got": "PASS",
+      "reason": "greyscale rose-cluster matches real garment"
+    },
+    "br-002": {
+      "expect": "PASS",
+      "gates_all_true": true,
+      "got": "PASS",
+      "reason": "logo on left thigh, correct placement"
+    },
+    "br-004": {
+      "expect": "PASS",
+      "gates_all_true": true,
+      "got": "PASS",
+      "reason": "multi-rose cluster greyscale, correct"
+    },
+    "br-005": {
+      "expect": "FAIL",
+      "got": "FAIL",
+      "failed_gate": "garment_matches_reference",
+      "reason": "body color mismatch (real is dark/green, render black)"
+    },
+    "br-006": {
+      "expect": "FAIL",
+      "got": "FAIL",
+      "failed_gate": "garment_matches_reference,branding_legible_and_correct",
+      "reason": "missing sherpa lining \u2014 materially different garment; gpt-4o-mini/4.1/5.1 all false-passed this"
+    },
+    "br-007": {
+      "expect": "PASS",
+      "gates_all_true": true,
+      "got": "PASS",
+      "reason": "all-over print + OAKLAND + side panels match"
+    }
+  }
+}

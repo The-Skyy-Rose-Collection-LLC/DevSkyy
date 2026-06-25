@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check for existing token on mount
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('access_token');
     const userStr = localStorage.getItem('user');
 
     if (token && userStr) {
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
       } catch {
         // Invalid stored data, clear it
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         dispatch({ type: 'LOGOUT' });
       }
@@ -125,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { user, token } = data;
 
       // Persist
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('access_token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
       dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
@@ -138,9 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('token_type');
     localStorage.removeItem('user');
-    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'access_token=; path=/; max-age=0';
     dispatch({ type: 'LOGOUT' });
   }, []);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { use } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -123,7 +123,25 @@ function ResultPanel({ intent, result }: { intent: string; result: Record<string
   );
 }
 
+function OperationDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-10 w-48 bg-gray-800" />
+      <Skeleton className="h-40 w-full bg-gray-800" />
+      <Skeleton className="h-64 w-full bg-gray-800" />
+    </div>
+  );
+}
+
 export default function OperationDetailPage({ params }: Props) {
+  return (
+    <Suspense fallback={<OperationDetailSkeleton />}>
+      <OperationDetailContent params={params} />
+    </Suspense>
+  );
+}
+
+function OperationDetailContent({ params }: Props) {
   const { id } = use(params);
   const [showRaw, setShowRaw] = useState(false);
 

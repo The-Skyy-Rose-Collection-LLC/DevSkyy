@@ -436,19 +436,23 @@ add_filter( 'excerpt_more', 'skyyrose_excerpt_more' );
  *--------------------------------------------------------------*/
 
 /**
- * Get the post thumbnail URL or a placeholder.
+ * Get the post thumbnail URL, or empty string when no thumbnail is set.
+ *
+ * Returning an empty string lets callers decide their own brand-appropriate
+ * fallback (skip the <img>, render a CSS gradient placeholder, swap to a
+ * collection hero, etc.) instead of shipping a generic stock placeholder.
  *
  * @since  1.0.0
  *
  * @param  string $size WordPress image size name.
- * @return string Image URL.
+ * @return string Image URL or empty string when none is available.
  */
 function skyyrose_get_post_thumbnail( $size = 'skyyrose-featured' ) {
 	if ( has_post_thumbnail() ) {
 		return get_the_post_thumbnail_url( get_the_ID(), $size );
 	}
 
-	return SKYYROSE_ASSETS_URI . '/images/placeholder.jpg';
+	return '';
 }
 
 /*
@@ -729,6 +733,53 @@ function skyyrose_svg_kses_allowed() {
 			'rx'     => true,
 		),
 	);
+}
+
+/*
+--------------------------------------------------------------
+ * Component Primitive Helpers (used by template-parts/components/)
+ *--------------------------------------------------------------*/
+
+/**
+ * Build an HTML attribute string from an associative array.
+ *
+ * Used by every primitive in template-parts/components/ to render the
+ * caller-supplied $args['attrs'] array. Centralised so a future change
+ * to escaping or attribute ordering propagates to every primitive.
+ *
+ * @since 3.2.4
+ * @param array $attrs Key/value pairs. Values are passed through esc_attr().
+ * @return string HTML attribute string (leading space included when non-empty).
+ */
+function skyyrose_build_attr_string( $attrs ) {
+	if ( empty( $attrs ) || ! is_array( $attrs ) ) {
+		return '';
+	}
+	$parts = array();
+	foreach ( $attrs as $name => $value ) {
+		$parts[] = sprintf( '%s="%s"', sanitize_html_class( $name ), esc_attr( $value ) );
+	}
+	return ' ' . implode( ' ', $parts );
+}
+
+/**
+ * Sanitize a space-separated class string while preserving the space delimiter.
+ *
+ * `sanitize_html_class()` strips spaces, collapsing 'foo bar' to 'foobar'.
+ * This helper splits, sanitizes each token, then rejoins — supporting the
+ * common $args['extra_classes'] = 'foo bar baz' pattern.
+ *
+ * @since 3.2.4
+ * @param string $classes Space-separated class names (caller-supplied).
+ * @return string Sanitized space-separated class string (empty when input is empty).
+ */
+function skyyrose_sanitize_class_list( $classes ) {
+	if ( empty( $classes ) || ! is_string( $classes ) ) {
+		return '';
+	}
+	$tokens = preg_split( '/\s+/', trim( $classes ) );
+	$clean  = array_filter( array_map( 'sanitize_html_class', $tokens ) );
+	return implode( ' ', $clean );
 }
 
 /*

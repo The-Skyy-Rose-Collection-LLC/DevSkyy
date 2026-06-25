@@ -38,6 +38,7 @@ from core.runtime.tool_registry import (
     ToolSeverity,
     ToolSpec,
 )
+from llm.model_ids import OPENAI_MINI_MODEL
 from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
@@ -97,7 +98,7 @@ class OperationsAgent(EnhancedSuperAgent):
             config = AgentConfig(
                 name="operations_agent",
                 provider=ADKProvider.PYDANTIC,
-                model="gpt-4o-mini",
+                model=OPENAI_MINI_MODEL,
                 system_prompt=self._build_system_prompt(),
                 capabilities=[
                     AgentCapability.WORDPRESS,

@@ -2,14 +2,26 @@
 """
 Iterative Scene Compositor — ALL products into ONE scene per collection.
 
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
+
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh,all}
+
+Elite-team CompositorAgent has 6 production-hardened stages plus per-stage
+FAL budget gates, retry-on-failure, embedding-gate + Gemini visual QA, and
+canonical scene.json anchoring. This iterative BiRefNet + Opus + Kontext
+script remains runnable for experiments but lacks all of that. Per cerebrum
+observation 1359 (2026-05-04): this script is "a standalone duplicate of
+elite_studio CompositorAgent" — explicit migration path documented above.
+
 Builds up each collection scene by compositing products one at a time:
   Scene → +product1 → +product2 → ... → final lookbook scene
 
 3 output images total (one per collection), each with all products placed
 naturally throughout the scene at different positions.
 
-Pipeline per product: BiRefNet (bg removal) → Opus (prompt) → Kontext (ref-guided inpaint)
-Each iteration uses the PREVIOUS composite as the base for the next product.
+Pipeline per product: BiRefNet (bg removal) → Opus (prompt) → Kontext
+(ref-guided inpaint). Each iteration uses the PREVIOUS composite as base.
 
 Usage:
     source .venv-imagery/bin/activate
@@ -192,8 +204,8 @@ COLLECTIONS = {
         ],
     },
     "signature": {
-        "scene_file": "signature-golden-gate-showroom-v2.png",
-        "output_file": "signature-golden-gate-showroom-lookbook.webp",
+        "scene_file": "signature-waterfront-runway.png",
+        "output_file": "signature-waterfront-runway-lookbook.webp",
         "products": [
             {
                 "sku": "sg-002",

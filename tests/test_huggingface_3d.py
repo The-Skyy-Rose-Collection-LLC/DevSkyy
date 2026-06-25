@@ -21,7 +21,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from orchestration.asset_pipeline import AssetPipelineResult, PipelineConfig, ProductAssetPipeline
+from orchestration.asset_pipeline import PipelineConfig, ProductAssetPipeline
 from orchestration.huggingface_3d_client import (
     HF3DFormat,
     HF3DModel,
@@ -272,88 +272,16 @@ class TestAssetPipelineHFIntegration:
 
         assert isinstance(client, HuggingFace3DClient)
 
-    @pytest.mark.asyncio
-    async def test_hf_3d_generation_in_pipeline(self, pipeline, tmp_path):
-        """Test HuggingFace 3D generation in asset pipeline."""
-        # Create a test image
-        image_path = tmp_path / "product.jpg"
-        image_path.write_bytes(b"fake image data")
-
-        result = AssetPipelineResult(product_id="test_product", status="processing")
-
-        # Call the HF generation method
-        with patch.object(
-            pipeline.huggingface_client,
-            "generate_from_image",
-            new_callable=AsyncMock,
-        ) as mock_gen:
-            mock_result = HF3DResult(
-                task_id="hf_test",
-                model_used=HF3DModel.SHAP_E_IMG,
-                format=HF3DFormat.PLY,
-                quality_score=85.0,
-                polycount=50000,
-            )
-            mock_gen.return_value = mock_result
-
-            hf_result = await pipeline._generate_3d_with_huggingface(
-                result=result,
-                title="Test Product",
-                images=[str(image_path)],
-            )
-
-            assert hf_result is not None
-            assert hf_result.quality_score == 85.0
-
-    @pytest.mark.asyncio
-    async def test_hf_fallback_on_error(self, pipeline, tmp_path):
-        """Test pipeline falls back gracefully if HF fails."""
-        image_path = tmp_path / "product.jpg"
-        image_path.write_bytes(b"fake image data")
-
-        result = AssetPipelineResult(product_id="test_product", status="processing")
-
-        # Mock HF client to raise error
-        with patch.object(
-            pipeline.huggingface_client,
-            "generate_from_image",
-            new_callable=AsyncMock,
-            side_effect=Exception("HF generation failed"),
-        ):
-            hf_result = await pipeline._generate_3d_with_huggingface(
-                result=result,
-                title="Test Product",
-                images=[str(image_path)],
-            )
-
-            # Should return None but not fail pipeline
-            assert hf_result is None
-            # Should log warning/error but continue
-            assert len(result.errors) > 0
-
-    @pytest.mark.asyncio
-    async def test_pipeline_disable_hf(self, tmp_path):
-        """Test pipeline with HF disabled."""
-        config = PipelineConfig(
-            enable_huggingface_3d=False,
-            enable_3d_generation=True,
-        )
-        pipeline = ProductAssetPipeline(config=config)
-
-        image_path = tmp_path / "product.jpg"
-        image_path.write_bytes(b"fake image data")
-
-        result = AssetPipelineResult(product_id="test_product", status="processing")
-
-        # HF generation should be skipped
-        hf_result = await pipeline._generate_3d_with_huggingface(
-            result=result,
-            title="Test Product",
-            images=[str(image_path)],
-        )
-
-        # Should complete without calling HF
-        assert hf_result is None
+    # Tests previously here — test_hf_3d_generation_in_pipeline,
+    # test_hf_fallback_on_error, test_pipeline_disable_hf — were targeting the
+    # deprecated _generate_3d_with_huggingface method (Stage-0 hint generator
+    # behind the enable_huggingface_3d flag). That method was removed in the
+    # Pathfinder Plan D cleanup pass (D6); the active path is now
+    # _generate_3d_with_huggingface_primary, which has a different contract
+    # (mutates result.assets_3d, returns None) and is exercised through
+    # higher-level integration paths. New tests covering the active path
+    # belong in a dedicated F8/asset-pipeline integration test module rather
+    # than this F9-focused HF-client test file.
 
     @pytest.mark.asyncio
     async def test_pipeline_close(self, pipeline):

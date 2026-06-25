@@ -1,0 +1,11 @@
+{
+  "sku": "br-003",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The branding gate fails because the Black Rose Authentic Collection patch is missing from the front-left-hem. It must be present and visible as per specifications."
+}

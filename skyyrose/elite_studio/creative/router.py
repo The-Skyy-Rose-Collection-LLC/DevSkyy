@@ -3,12 +3,24 @@ Creative Operations Hub LangGraph router.
 
 Builds the unified StateGraph for all 14 creative intents.
 
+The graph supports optional PostgreSQL checkpointing via
+`get_creative_graph_async()`. When a Postgres `DATABASE_URL` is
+configured, the graph persists state after every node — letting a
+failed run (e.g., a Tripo3D 5xx) resume from the last successful node
+instead of silently losing the whole pipeline. Without `DATABASE_URL`,
+the graph runs without checkpointing (the original behaviour).
+
 "Luxury Grows from Concrete."
 """
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from langgraph.graph import END, StateGraph
+
+if TYPE_CHECKING:
+    from langgraph.checkpoint.base import BaseCheckpointSaver
 
 from .edges import (
     CHARACTER,
@@ -21,6 +33,7 @@ from .edges import (
     SCENE_COMPOSITE,
     SOCIAL_PACK,
     THREE_D_MODEL,
+    TRIPO_GENERATE,
     after_any,
     after_render,
     route_intent,
@@ -36,12 +49,18 @@ from .nodes import (
     scene_composite_node,
     social_pack_node,
     three_d_model_node,
+    tripo_generate_node,
 )
 from .state import CreativeOperationState
 
 
-def build_creative_graph():  # type: ignore[return]
+def build_creative_graph(checkpointer: BaseCheckpointSaver | None = None):  # type: ignore[return]
     """Build and compile the unified creative operations graph.
+
+    Args:
+        checkpointer: Optional LangGraph checkpoint saver. When provided,
+            the graph persists state after every node so failed runs can
+            resume. Pass `None` (default) for the legacy in-memory mode.
 
     Topology:
         entry
@@ -71,6 +90,7 @@ def build_creative_graph():  # type: ignore[return]
     graph.add_node(SCENE_COMPOSITE, scene_composite_node)
     graph.add_node(DESIGN_IDEATION, design_ideation_node)
     graph.add_node(COLLECTION_PLAN, collection_plan_node)
+    graph.add_node(TRIPO_GENERATE, tripo_generate_node)
     graph.add_node(FINALIZE, finalize_node)
 
     # Entry point
@@ -89,6 +109,7 @@ def build_creative_graph():  # type: ignore[return]
             SCENE_COMPOSITE: SCENE_COMPOSITE,
             DESIGN_IDEATION: DESIGN_IDEATION,
             COLLECTION_PLAN: COLLECTION_PLAN,
+            TRIPO_GENERATE: TRIPO_GENERATE,
             FINALIZE: FINALIZE,
         },
     )
@@ -109,22 +130,56 @@ def build_creative_graph():  # type: ignore[return]
         SCENE_COMPOSITE,
         DESIGN_IDEATION,
         COLLECTION_PLAN,
+        TRIPO_GENERATE,
     ):
         graph.add_conditional_edges(node, after_any, {FINALIZE: FINALIZE})
 
     # Terminal edge
     graph.add_edge(FINALIZE, END)
 
+    if checkpointer is not None:
+        return graph.compile(checkpointer=checkpointer)
     return graph.compile()
 
 
-# Module-level singleton — compiled once, reused across all requests
+# Module-level singletons — compiled once, reused across all requests.
+# Two cache slots: one for the no-checkpointer path (sync entry point),
+# one for the PG-checkpointed path (async entry point).
 _CREATIVE_GRAPH = None
+_CREATIVE_GRAPH_CHECKPOINTED = None
 
 
 def get_creative_graph():
-    """Return the cached compiled graph, building it on first call."""
+    """Return the cached compiled graph (no checkpointing, building on first call).
+
+    Use this entry point for short, in-process runs that do not need
+    to survive a process restart. For production runs, prefer
+    `get_creative_graph_async()` which auto-attaches the PG checkpointer
+    when `DATABASE_URL` is configured.
+    """
     global _CREATIVE_GRAPH
     if _CREATIVE_GRAPH is None:
         _CREATIVE_GRAPH = build_creative_graph()
     return _CREATIVE_GRAPH
+
+
+async def get_creative_graph_async():
+    """Return the cached compiled graph, attaching PG checkpointing when available.
+
+    On first call:
+      - If `DATABASE_URL` points at Postgres, lazy-create an
+        `AsyncPostgresSaver` (singleton pool) and compile the graph
+        with it as the checkpointer.
+      - Otherwise, fall back to the no-checkpointer compile.
+
+    Subsequent calls return the cached graph.
+    """
+    global _CREATIVE_GRAPH_CHECKPOINTED
+    if _CREATIVE_GRAPH_CHECKPOINTED is not None:
+        return _CREATIVE_GRAPH_CHECKPOINTED
+
+    from .checkpointer import get_checkpointer
+
+    checkpointer = await get_checkpointer()
+    _CREATIVE_GRAPH_CHECKPOINTED = build_creative_graph(checkpointer=checkpointer)
+    return _CREATIVE_GRAPH_CHECKPOINTED

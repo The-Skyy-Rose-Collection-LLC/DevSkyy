@@ -319,23 +319,6 @@ def temp_catalog_dir(tmp_path):
 
 
 @pytest.fixture
-def sample_mcp_server_definition():
-    """Sample MCP server definition."""
-    from mcp_servers.process_manager import MCPServerDefinition, RestartPolicy
-
-    return MCPServerDefinition(
-        server_id="test-server",
-        name="Test MCP Server",
-        description="Test server for unit tests",
-        entrypoint="test_server.py",
-        runtime="python3.11",
-        port=9999,
-        health_endpoint="/health",
-        restart_policy=RestartPolicy.ON_FAILURE,
-    )
-
-
-@pytest.fixture
 def performance_timer():
     """Simple performance timer for benchmark tests."""
     import time

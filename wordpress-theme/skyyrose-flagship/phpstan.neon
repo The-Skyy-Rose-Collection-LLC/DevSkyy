@@ -1,0 +1,58 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - inc/
+        - template-parts/
+        - woocommerce/
+        - patterns/
+        - functions.php
+        - front-page.php
+        - template-collection-signature.php
+        - template-collection-black-rose.php
+        - template-collection-love-hurts.php
+        - template-collection-kids-capsule.php
+        - template-landing-black-rose.php
+        - template-landing-love-hurts.php
+        - template-landing-signature.php
+        - template-preorder-gateway.php
+        - template-about.php
+        - template-immersive-signature.php
+        - template-immersive-black-rose.php
+        - template-immersive-love-hurts.php
+        - template-immersive-kids-capsule.php
+        - template-elementor-canvas.php
+        - template-elementor-fullwidth.php
+        - template-elementor-editorial.php
+        - template-faq.php
+        - template-shipping-returns.php
+        - template-contact.php
+        - template-landing-kids-capsule.php
+        - page-wishlist.php
+        - comments.php
+        - archive.php
+        - index.php
+        - header.php
+        - footer.php
+        - sidebar.php
+        - searchform.php
+        - search.php
+        - single.php
+        - page.php
+        - 404.php
+
+    excludePaths:
+        - vendor/
+        - node_modules/
+        - tests/
+        - blueprints/
+        - docs/
+
+    stubFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+
+    ignoreErrors:
+        # Elementor — optional integration, not present in analysis environment
+        - '#.*(unknown class|invalid type|call to method .* on an unknown class) Elementor\\.*#'

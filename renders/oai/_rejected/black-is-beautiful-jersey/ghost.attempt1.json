@@ -1,0 +1,11 @@
+{
+  "sku": "br-003",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The rendered jersey is missing the complete embroidered Black Rose Authentic Collection patch as specified, impacting the branding gate."
+}

@@ -1,0 +1,148 @@
+{
+  "$schema": "../schemas/agent-brief.schema.json",
+  "agent": "Brand Guardian",
+  "mode": "refine",
+  "platform": "standalone-html",
+  "criteria": "luxury",
+  "mission": {
+    "objective": "Audit the home surface for canon violations: asset misattribution (BR-specific scene on home), lockup misuse (collection lockup as homepage centerpiece), wrong tile content (brand logos + jersey patch instead of collection scenes), copy attribution.",
+    "founder_feedback": "the hero shouldnt be the same image as the collection, why is the jersey patched displayed. each collection card should be a image of the scene i want.",
+    "success_metric": "Every violation cited with file:line + canon-doc quote. Per-tile asset attribution table produced. Kids patch question resolved with verdict."
+  },
+  "scope": {
+    "_scope_policy": "FULL-SITE coverage. Brand Guardian audits canon across every surface — header monogram placement, mega-menu copy tone, hero lockup attribution, body component voice consistency, footer founder signature, every widget's brand-mark use. Narrow focus = canon drift in surfaces nobody is watching.",
+    "header": {
+      "navbar": true,
+      "mobile_nav": true,
+      "announcement_bar": true,
+      "search": true,
+      "account_menu": true,
+      "cart_indicator": true
+    },
+    "page_body": {
+      "pages": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"],
+      "components": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"],
+      "widgets": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"],
+      "layouts": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+    },
+    "footer": {
+      "primary_footer": true,
+      "newsletter_block": true,
+      "link_columns": true,
+      "social_strip": true,
+      "payment_icons": true,
+      "legal_strip": true,
+      "founder_signature": true,
+      "back_to_top": true
+    },
+    "primary_focus_surfaces": ["home"],
+    "scope_note": "primary_focus_surfaces lists what the current fix sprint targets. Even so, Brand Guardian reviews the full site map for canon ripples — collection lockup misuse on PDP, founder voice drift on About, palette inconsistencies across cart/checkout, etc."
+  },
+  "performance_baseline": {
+    "lcp_seconds": 2.5,
+    "cls": 0.1,
+    "inp_ms": 200,
+    "lighthouse_performance": 95,
+    "lighthouse_accessibility": 100,
+    "lighthouse_seo": 100,
+    "lighthouse_best_practices": 100,
+    "wcag_level": "AA",
+    "image_format_priority": ["avif", "webp", "jpg"],
+    "font_loading": "self-hosted woff2",
+    "js_budget_kb": 200,
+    "css_budget_kb": 100
+  },
+  "deliverables": [
+    {
+      "name": "Canon audit (home surface)",
+      "path": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-canon-audit-home.md",
+      "format": "markdown",
+      "sections": [
+        "Violations (CV-H-NN: ID / Severity P0-P2 / File:line / Current state / Canon source verbatim / Required state / Rationale)",
+        "Per-tile asset attribution table",
+        "Kids patch reconciliation verdict",
+        "ROI Upgrade Proposal (mandatory)"
+      ]
+    }
+  ],
+  "roi_upgrade": {
+    "mandate": "Propose exactly 1 high-ROI canon-signature touch per the Upgrade Mandate.",
+    "category_options": [
+      "Rose-gold accent pulse on hover/focus for --sr-accent elements (1.5s ease loop, 0.4→1.0 opacity)",
+      "Monogram emergence pattern on initial load (clip-path reveal, 800ms)",
+      "Signature copy beat — staggered line entrance with letter-spacing animation",
+      "Brand-mark micro-interaction on navbar (rotate + scale on hover, GPU-accelerated)",
+      "Per-collection palette inheritance via data-collection attribute + CSS custom property cascade",
+      "Color-mix() palette derivation — tints/shades from --sr-accent at runtime",
+      "Cinzel-to-Playfair font crossfade between cover and hero sections (collection-coded)"
+    ],
+    "constraints": {
+      "self_contained": true,
+      "production_grade": true,
+      "prefers_reduced_motion_safe": true,
+      "browser_fallback_required": true,
+      "single_commit_scope": true
+    }
+  },
+  "constraints": {
+    "no_three_js": true,
+    "no_cdn_dependencies": true,
+    "no_modify_target": true,
+    "canon_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/visual-references.md",
+      "/Users/theceo/DevSkyy/docs/brand/collection-stories.md",
+      "/Users/theceo/DevSkyy/docs/brand/asset-hierarchy.md",
+      "/Users/theceo/DevSkyy/docs/CLAUDE.md",
+      "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/feedback_brand_visual_references.md",
+      "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/feedback_collection_canon_attribution.md",
+      "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/feedback_collection_lockup_assets.md"
+    ],
+    "locked_out_references": [
+      "Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"
+    ],
+    "working_directory": "/Users/theceo/DevSkyy"
+  },
+  "inputs": {
+    "mockup": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+    "home_surface_line_refs": {
+      "home_cover": "587-625",
+      "home_hero": "626-667",
+      "home_voice": "668-677",
+      "home_spread": "678-728"
+    },
+    "violation_candidates": [
+      "forbidden-midnight used on home cover (BR-specific asset per asset-hierarchy.md)",
+      "forbidden-midnight reused on home hero (duplicate w/ cover)",
+      "br-brand-script lockup on home hero (collection lockup not brand-primary)",
+      "Spread tile 4 uses skyy-rose-collection-circular-patch (jersey patch / brand mark, not collection scene)",
+      "Voice quote attribution verification needed"
+    ],
+    "tile_attribution_table_columns": ["Tile", "Current asset", "Canon-correct asset", "Source rule"]
+  },
+  "return_format": {
+    "max_words": 180,
+    "required_fields": [
+      "violation_count_by_severity",
+      "top_3_violations",
+      "kids_patch_verdict",
+      "roi_upgrade_name",
+      "roi_upgrade_one_line_pitch",
+      "deliverable_file_path"
+    ],
+    "format": "markdown"
+  },
+  "html_reference_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/references/full-theme-skeleton.html",
+  "memory": {
+    "read_paths": [
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/_shared/INDEX.md",
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/brand-guardian/INDEX.md"
+    ],
+    "write_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/brand-guardian/",
+    "write_mandate": "Write at least 1 memory entry per dispatch when canon doc evolves, founder locks a new attribution rule (e.g., 'forbidden-midnight is BR-only'), OR a violation pattern recurs across audits. Cite the canon doc + verbatim quote in body.",
+    "previous_entries": [
+      "_shared/the-five.md",
+      "_shared/scope-policy.md",
+      "_shared/audit-verification.md"
+    ]
+  }
+}

@@ -17,9 +17,10 @@ npx lint-staged
 if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   if command -v mypy >/dev/null 2>&1; then
     echo "Running mypy type check..."
-    # --exclude '\.claude/' belt-and-suspenders: keeps git worktree duplicates out of
-    # the discovery scan even if mypy.ini exclude filtering runs too late.
-    mypy . --ignore-missing-imports --exclude '\.claude/'
+    # --exclude belt-and-suspenders: keeps git worktree duplicates AND the gitignored
+    # autonomous-agent scratch dir (my_project/) out of the discovery scan even if
+    # mypy.ini exclude filtering runs too late. gitignore is invisible to mypy's walk.
+    mypy . --ignore-missing-imports --exclude '(\.claude/|my_project/|prototypes/|skyyrose-suite/)'
   fi
 fi
 
@@ -29,4 +30,12 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
     echo "Running fast unit tests..."
     pytest tests/unit/ -x -q
   fi
+fi
+
+# Freshness guard: derived files (SOT sot.json/design-tokens, theme .min,
+# theme version, retired-master refs) must not be committed stale. Scoped to
+# staged files, so it is a no-op unless you touched a source whose derived file
+# drifted. Fix with: bash scripts/freshness-guard.sh --fix
+if [ -f "$REPO_ROOT/scripts/freshness-guard.sh" ]; then
+  bash "$REPO_ROOT/scripts/freshness-guard.sh" || exit 1
 fi

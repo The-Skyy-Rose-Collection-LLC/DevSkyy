@@ -1,0 +1,57 @@
+{
+  "sku": "br-001",
+  "name": "BLACK Rose Crewneck",
+  "results": [
+    {
+      "strategy": "render",
+      "source_image": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-crewneck.png",
+      "qa_score": 88.0,
+      "qa_passed": true,
+      "engine_used": "gemini-pro",
+      "attempts": 1,
+      "cost_usd": 0.04,
+      "refinement_applied": false,
+      "issues": [
+        "Background is dark/black instead of the specified pure white studio backdrop",
+        "Lighting environment does not match the soft directional studio setup with subtle floor drop shadow",
+        "judge error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+      ],
+      "elapsed_seconds": 101.3024451250094,
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp"
+    },
+    {
+      "strategy": "techflat",
+      "source_image": "/private/tmp/multi-sku-wt/data/product-bundles/BLACK Rose Crewneck/techflat-front.jpeg",
+      "qa_score": 85.0,
+      "qa_passed": true,
+      "engine_used": "gemini-pro",
+      "attempts": 1,
+      "cost_usd": 0.04,
+      "refinement_applied": false,
+      "issues": [
+        "Background is dark/black instead of the specified pure white studio backdrop.",
+        "Embossed front-chest rose logo is missing the 'cloud' element at the base of the canonical three-rose-cluster art.",
+        "judge error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+      ],
+      "elapsed_seconds": 103.39536412499729,
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp"
+    },
+    {
+      "strategy": "source-photo",
+      "source_image": "/private/tmp/multi-sku-wt/data/product-bundles/BLACK Rose Crewneck/source-photo.jpg",
+      "qa_score": 88.0,
+      "qa_passed": true,
+      "engine_used": "gemini-pro",
+      "attempts": 1,
+      "cost_usd": 0.04,
+      "refinement_applied": false,
+      "issues": [
+        "Background is a dark gradient instead of the specified pure white studio backdrop with subtle floor shadow.",
+        "Presentation is a ghost mannequin rather than a live model standing three-quarter with hands relaxed at sides.",
+        "judge error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}"
+      ],
+      "elapsed_seconds": 63.7939959159994,
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp"
+    }
+  ]
+}

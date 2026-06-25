@@ -2,42 +2,44 @@
 
 Automatically analyze and group product images using AI-powered visual similarity.
 
-## Features
+Embeddings come from the unified CLIP encoder in `skyyrose.core.embeddings`
+(`openai/clip-vit-base-patch32`, 512-d, revision-pinned). Per-image vectors are
+cached by content hash, so re-runs skip unchanged images and a changed image is
+recomputed even at the same path.
 
-- **Option 1 (Active)**: CLIP embeddings - Zero-shot, pre-trained, fast
-- **Option 2 (Pre-configured)**: ResNet fine-tuning - Higher accuracy after labeling
+> The previous `scripts/image_embeddings/` OOP package (and its never-trained
+> ResNet embedder) was removed in the Phase 2 embeddings reframe. The embedder is
+> now CLIP-only via the shared core package.
 
-### Capabilities
+## Capabilities
 
-✅ **Auto-Gallery Builder**: Group front/back/detail views into product galleries
-✅ **Duplicate Detection**: Find identical/near-identical uploads
-✅ **Variant Matching**: Detect same product in different colors/angles
-✅ **Cross-Sell Recommendations**: Find visually similar products
-✅ **WooCommerce Integration**: Generate gallery mappings + CSV import
+- **Auto-Gallery Builder**: Group front/back/detail views into product galleries
+- **Duplicate Detection**: Find identical/near-identical uploads
+- **Variant Matching**: Detect same product in different colors/angles
+- **Cross-Sell Recommendations**: Find visually similar products
+- **WooCommerce Integration**: Generate gallery mappings + CSV import
 
 ## Quick Start
 
 ### Installation
 
 ```bash
-# Install dependencies
-pip install transformers torch torchvision pillow numpy scipy tqdm
-
-# Or use pip install from requirements
-pip install -r scripts/requirements_visual_recognition.txt
+# The skyyrose package + ML deps install with the repo:
+make install
+# (CLIP runs on transformers + torch, already in the project deps.)
 ```
 
 ### Run Analysis on WordPress Catalog
 
 ```bash
-# Analyze all 102 uploaded products
 python scripts/visual_product_recognition.py
 
 # Output: wordpress/product_analysis/
 #   - product_galleries.json (WooCommerce mappings)
 #   - woocommerce_import.csv (bulk import)
 #   - similarity_report.json (duplicates/variants)
-#   - embeddings.npy (cached for future runs)
+#   - embeddings.npy (stacked matrix artifact)
+#   - emb_cache/ (per-image content-hash cache; reused across runs)
 ```
 
 ### Custom Image Directory
@@ -53,95 +55,35 @@ python scripts/visual_product_recognition.py \
 ### Find Duplicate Products
 
 ```bash
-# Run analysis
 python scripts/visual_product_recognition.py
-
-# Check similarity_report.json → "duplicates" section
-# Shows pairs with similarity >= 0.95
-```
-
-### Build Product Galleries
-
-```bash
-# Generate WooCommerce galleries
-python scripts/visual_product_recognition.py
-
-# Import to WooCommerce:
-# 1. Upload woocommerce_import.csv
-# 2. Or use product_galleries.json with REST API
+# Check similarity_report.json -> "duplicates" section (similarity >= 0.95)
 ```
 
 ### Get Product Recommendations
 
 ```python
 from clustering import GalleryBuilder
-from image_embeddings import get_embedder
 import numpy as np
 
-# Load embeddings
+# Reuse the matrix artifact written by a prior run.
 embeddings = np.load("wordpress/product_analysis/embeddings.npy")
 
-# Find similar products
 gallery_builder = GalleryBuilder("wordpress/webp_image_mapping.json")
 recommendations = gallery_builder.get_product_recommendations(
     product_slug="LH_FANNIE_2_main",
     image_paths=image_paths,
     embeddings=embeddings,
-    top_k=5
+    top_k=5,
 )
 ```
 
-## Option 2: Fine-Tuned ResNet (Future)
-
-When ready to fine-tune on SkyyRose catalog:
-
-### Step 1: Label Products
-
-```bash
-# Interactive labeling tool
-python scripts/training/prepare_dataset.py \
-    --image-dir /tmp/full_catalog_processing/webp_optimized/webp \
-    --output-dir data/product_dataset
-
-# Assigns each image to a product group
-# Minimum 100+ groups recommended
-```
-
-### Step 2: Train ResNet
-
-```bash
-# Fine-tune ResNet-50 (requires GPU)
-python scripts/training/train_resnet.py \
-    --dataset-dir data/product_dataset \
-    --output-dir data/models \
-    --epochs 50
-
-# ~2-4 hours on GPU
-# Output: resnet50_skyyrose_v1.pth
-```
-
-### Step 3: Switch to ResNet
+To embed ad-hoc images directly from the core encoder:
 
 ```python
-# Edit scripts/image_embeddings/config.py
+from skyyrose.core.embeddings.clip import ClipEncoder
 
-DEFAULT_CONFIG = EmbedderConfig(
-    embedder_type="resnet",  # Changed from "clip"
-    resnet_model_path=Path("data/models/resnet50_skyyrose_v1.pth"),
-    device="cuda",
-)
-```
-
-### Step 4: Re-run Analysis
-
-```bash
-# Now uses fine-tuned ResNet
-python scripts/visual_product_recognition.py
-
-# Expect higher accuracy for:
-# - Fabric textures (cotton vs fleece)
-# - Color variants (same design, different colors)
-# - SkyyRose-specific styles
+encoder = ClipEncoder()
+matrix = encoder.embed_images([path_a, path_b, path_c])  # (N, 512), L2-normalized
 ```
 
 ## Configuration
@@ -150,21 +92,16 @@ python scripts/visual_product_recognition.py
 
 ```bash
 python scripts/visual_product_recognition.py \
-    --duplicate-threshold 0.95 \  # Exact duplicates
-    --variant-threshold 0.85 \     # Same product, different angle
-    --cluster-threshold 0.70       # Related products
+    --duplicate-threshold 0.95 \  # exact duplicates
+    --variant-threshold 0.85 \    # same product, different angle
+    --cluster-threshold 0.70      # related products
 ```
 
-### Embedder Selection
+### Caching
 
 ```bash
-# CLIP (default, fast)
-python scripts/visual_product_recognition.py --embedder clip
-
-# ResNet (after training)
-python scripts/visual_product_recognition.py \
-    --embedder resnet \
-    --model-path data/models/resnet50_skyyrose_v1.pth
+# Disable the on-disk content-hash cache (always recompute):
+python scripts/visual_product_recognition.py --no-cache
 ```
 
 ## Output Files
@@ -177,10 +114,7 @@ python scripts/visual_product_recognition.py \
   "galleries": [
     {
       "product_slug": "LH_FANNIE_2_main",
-      "main_image": {
-        "id": 8622,
-        "url": "https://skyyrose.co/.../LH_FANNIE_2_main.webp"
-      },
+      "main_image": {"id": 8622, "url": "https://skyyrose.co/.../LH_FANNIE_2_main.webp"},
       "gallery": [
         {"id": 8623, "url": "...LH_FANNIE_2_back.webp"},
         {"id": 8624, "url": "...LH_FANNIE_2_detail.webp"}
@@ -203,91 +137,49 @@ LH_FANNIE_2_main,8622,"8623,8624"
 
 ```json
 {
-  "summary": {
-    "total_images": 102,
-    "duplicate_pairs": 3,
-    "variant_pairs": 24,
-    "clusters": 45
-  },
+  "summary": {"total_images": 102, "duplicate_pairs": 3, "variant_pairs": 24, "clusters": 45},
   "duplicates": [
-    {
-      "image1": "BR_SHERPA_main.webp",
-      "image2": "BR_SHERPA_main_v2.webp",
-      "similarity": 0.978
-    }
+    {"image1": "BR_SHERPA_main.webp", "image2": "BR_SHERPA_main_v2.webp", "similarity": 0.978}
   ]
 }
 ```
 
-## Performance
+## Performance (CLIP)
 
-### CLIP (Option 1)
-
-- **Speed**: ~2s per image (CPU), ~0.5s (GPU)
-- **Accuracy**: 85-90% for general similarity
-- **Training**: None required
+- **Speed**: ~2s per image (CPU), ~0.5s (GPU); batched in one forward pass per chunk
+- **Accuracy**: 85-90% for general visual similarity
 - **Embedding dim**: 512
-
-### ResNet (Option 2, after training)
-
-- **Speed**: ~1s per image (CPU), ~0.2s (GPU)
-- **Accuracy**: 92-96% for SkyyRose products
-- **Training**: 2-4 hours (50 epochs)
-- **Embedding dim**: 2048
+- **First run** downloads the pinned CLIP weights; subsequent images hit the content-hash cache
 
 ## Troubleshooting
-
-### Out of Memory (CPU)
-
-```bash
-# Process in smaller batches (edit visual_product_recognition.py)
-# Or use GPU if available
-```
 
 ### CLIP Model Download Fails
 
 ```bash
-# Pre-download model
-python -c "from transformers import CLIPModel; CLIPModel.from_pretrained('openai/clip-vit-base-patch32')"
+# Pre-download the pinned revision:
+python -c "from skyyrose.core.embeddings.clip import ClipEncoder; ClipEncoder().embed_image"
 ```
 
-### ResNet Training Requires Labels
+### Out of Memory (CPU)
 
-```bash
-# Use prepare_dataset.py to label products first
-# Minimum 100 product groups recommended
-# Each group needs 2+ images
-```
+Lower the batch size in `generate_embeddings` (default 32) or run on GPU.
 
 ## Architecture
 
 ```
 scripts/
-├── visual_product_recognition.py    # Main CLI
-├── image_embeddings/
-│   ├── clip_embedder.py            # CLIP implementation (active)
-│   ├── resnet_embedder.py          # ResNet implementation (future)
-│   └── config.py                   # Model selection
+├── visual_product_recognition.py    # Main CLI (CLIP via skyyrose.core.embeddings)
 ├── clustering/
-│   ├── similarity_matcher.py       # Cosine similarity clustering
-│   └── gallery_builder.py          # WooCommerce gallery generation
-└── training/
-    ├── prepare_dataset.py          # Interactive labeling
-    └── train_resnet.py            # Fine-tune ResNet
+│   ├── similarity_matcher.py        # Cosine similarity clustering
+│   └── gallery_builder.py           # WooCommerce gallery generation
+skyyrose/core/embeddings/            # Unified encoder package
+├── clip.py                          # ClipEncoder (revision-pinned, 512-d)
+├── base.py                          # shared device/normalize/bomb-guard/batch
+└── cache.py                         # content-hash read-through cache
 ```
-
-## Next Steps
-
-1. ✅ Run CLIP analysis on WordPress catalog
-2. ⏳ Review product_galleries.json recommendations
-3. ⏳ Import galleries to WooCommerce
-4. ⏳ Label products for ResNet training (when needed)
 
 ---
 
-**Version**: 1.0.0
-**Created**: 2026-01-16
-**Status**: CLIP Active, ResNet Pre-configured
+**Status**: CLIP active via `skyyrose.core.embeddings` (Phase 2 reframe).
 
 **For**: SkyyRose LLC
-**Contact**: support@skyyrose.com

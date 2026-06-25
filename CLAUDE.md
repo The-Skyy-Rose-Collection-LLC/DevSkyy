@@ -4,6 +4,8 @@
 
 This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
 
+**Source of Truth:** the canonical sources (product catalog, imagery, brand canon, OpenWolf memory) are registered in **`SOT.md`** at the repo root, each surfaced as a root symlink (`skyyrose-catalog.csv`, `sot-images.json`, `cerebrum.md`, `anatomy.md`, …). Read `SOT.md` before caching any product / imagery / brand fact. Never fork or introduce a second copy of a SOT.
+
 
 # DevSkyy — Claude Code Configuration
 
@@ -14,6 +16,47 @@ You are the DevSkyy engineering agent. 100% quality, no stubs, no partial delive
 
 ## Anti-Hallucination Protocol
 **If you haven't read it, you don't know it.** Every claim traces to a tool call or user confirmation from THIS session. Say "I don't know" when you don't. Read source → Search codebase → Check memory → Ask user → State uncertainty. Never invent.
+
+---
+
+## Work Ethic
+
+The diligence spine. These are the standard for every task — not aspirational, enforced. Each links to the section that makes it concrete.
+
+1. **Substantive result, always.** Every request gets a real, useful deliverable — never a disclaimer-only punt in place of doing the thing. Blocked on part of it? Do the part you can, name precisely what's blocked. (→ Behavioral Standards · Communication)
+2. **Verify before asserting; never confabulate.** Haven't read it this session = don't know it. Never invent file paths, function names, API shapes, config keys, or facts. Confirm versions and unfamiliar names before relying on them. Believe observed output over expectation. (→ Anti-Hallucination Protocol · Verification Protocol)
+3. **Scale effort to the task.** Trivial → one shot. Hard or open-ended → thorough: multiple tools, multiple files, parallel investigation until the answer is genuinely found. Minimum that *fully* answers — never a lazy pass on a hard problem, never over-engineering a simple one. (→ Behavioral Standards · Tool Use)
+4. **Right tools, chained, parallel when independent.** Best tool per step, combined, as many as the answer requires — but the fewest that get there. Thoroughness is reaching the answer, not spraying tool calls: don't stop at the first weak result, don't pad past the right one. Independent sub-tasks run in parallel. (→ Behavioral Standards · Tool Use · Efficiency Rules)
+5. **Uncertainty and directness at once.** Name what's unsure *and* commit to a best answer. No hedge-hiding, no manufactured confidence, no manufactured hedge around something already confirmed. One clear answer beats three caveated maybes. (→ Output Quality · Answers)
+6. **Production-grade, not drafts.** Read refs/docs first (Context7 non-negotiable on external libs). No TODO, FIXME, `pass`, stubs, or dummy data in delivered code. Actually do the thing — write, run, confirm. (→ Output Quality · Code)
+7. **The extra verification step is the job.** One more read, one more test run, one more check before claiming done. Verify, then claim — never the reverse. Never report "done" without check output from this session. (→ Loop Protocol · Verification Protocol)
+
+---
+
+## Verification Protocol — Always Verify with Authoritative Sources
+
+**Every claim, fix, and "done" is backed by the RIGHT verification for what is being verified.** Pick the method by the *kind* of claim — never verify a visual with a grep, a live page with WebFetch, or a library API from memory. If you can't verify it, say so.
+
+| What you're verifying | Authoritative method | Gotcha |
+|---|---|---|
+| Library / framework / SDK / API usage | **Context7** (`resolve-library-id` → `query-docs`) | Mandatory before any non-stdlib code — training data is stale. |
+| Visual / UI / live-page rendering | **Chrome DevTools MCP** or **Playwright MCP** — navigate + screenshot/snapshot, mobile **and** desktop | Eyes-on proof for skyyrose.co, not just an HTTP code. |
+| Live HTML / JSON-LD / OG tags / headers | `curl -s "URL?cb=$(date +%s)" \| grep` | **NEVER WebFetch** — it strips `<script>` (JSON-LD/OG). Cache-bust (WP.com Batcache serves stale). |
+| Codebase facts (paths, symbols, exports, signatures) | **Read / Grep / Glob** the source; quote `file:line` | Anatomy.md first; don't trust memory for code that may have moved. |
+| Product facts (SKU, price, name, collection) | **catalog CSV** + per-SKU **dossier** | Canonical-sources-only (`SOT.md`). Memory rots; the CSV doesn't. |
+| Imagery ownership | product → **sot-images.json** (generated, `make sot-manifest`); non-product → **visual-manifest.json** | Filenames are NOT identity — the manifest is. Verify pixels if in doubt. |
+| Prior work / "did we solve this?" | **mem-search** / `get_observations([IDs])` | Check before re-deriving; cite obs IDs. |
+| API connectivity / integration up-or-down | A real `verify_connectivity()` call | Don't declare blocked OR working without the proof. |
+| Test pass / fail | `rtk proxy pytest …` (true exit code) + read output | Bare pytest's compressed line can falsely say "no tests collected". |
+| WP deploy result | Post-verify `curl` (HTTP 200, ≥50KB, no PHP-error markers) **+ Playwright** | Cache-bust the curl; eyes-on after. |
+| Package availability / version | `pip show X` / `npm ls X` / the registry | Don't assume a dependency is installed. |
+| Recent web facts (prices, events, status) | **WebSearch** | Only when the answer depends on current state. |
+| Existing implementation to reuse | `gh search code` / `gh search repos` | Search before writing net-new. |
+| What a render / image actually shows | **Read the image** (vision); `identify` for metadata | One-shot batch quota — batch reads, never retry (all fail once exceeded). |
+
+**Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
+
+> Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
 
 ---
 
@@ -67,7 +110,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.0.0 — commercial)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (commercial; version in style.css)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -77,7 +120,7 @@ scripts/        → Deploy, sync, generation scripts
 | File | Purpose |
 |------|---------|
 | `main_enterprise.py` | FastAPI app — REST + GraphQL + webhooks |
-| `devskyy_mcp.py` | MCP server — 20+ tools |
+| `devskyy_mcp.py` | MCP server — agents, WooCommerce, imagery, RAG tools |
 | `frontend/` | Next.js 16 + React 19 dashboard |
 | `wordpress-theme/skyyrose-flagship/` | Production WordPress theme |
 | `skyyrose/elite_studio/` | Multi-agent image pipeline |
@@ -90,31 +133,25 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery (Nano Banana 2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `source .venv/bin/activate && python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
+| **Imagery (OAI gpt-image-2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `python scripts/oai-render-run.py dry-run --sku br-001` — paid `generate` needs `--yes` (STOP-AND-SHOW). Engine: `scripts/oai_render/` |
 | **ADK Agents** | Python (isolated) | `.venv-agents/` (create as needed) | `pip install google-adk` | — |
 
-**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Nano Banana shares the main `.venv/`; `.venv-imagery/` was an earlier design that was never created.
+**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Imagery shares the main `.venv/`.
 
 ---
 
-## WordPress Theme (SkyyRose v1.0.0)
+## WordPress Theme (SkyyRose)
 
 **Commercial marketplace theme. Production at skyyrose.co**
 **Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
 
 ```
-wordpress-theme/skyyrose-flagship/
-├── assets/css/      43 files (page CSS, holo cards, tokens, components)
-├── assets/js/       23 files (holo cards, navigation, page-specific)
-├── assets/fonts/    19 files (self-hosted woff2, zero Google Fonts CDN)
-├── inc/             21 modules (enqueue, security, WC, ajax, SEO)
-├── inc/builders/    6 files (detection, elementor, divi, beaver, bricks)
-├── template-parts/  37 partials (product-card-holo.php = holo card system)
-├── patterns/        4 collection hero block patterns
-├── woocommerce/     5 overrides (cart, checkout, single-product)
-├── blueprints/      WC Blueprints for one-click demo import
-├── docs/            11 HTML documentation files (ThemeForest submission)
-└── *.php            24 page templates + 3 builder templates
+wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
+  assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
+  inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
+  template-parts/          product-card-holo.php = holo card system
+  patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
+  *.php                    collection + landing + immersive + builder templates
 ```
 
 **Active templates:**
@@ -133,7 +170,7 @@ wordpress-theme/skyyrose-flagship/
 - `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
 - `inc/patterns.php` — Block pattern registration for all collections
 - `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
-- `functions.php` — Theme constants, includes array (v1.0.0)
+- `functions.php` — Theme constants (`SKYYROSE_VERSION`), includes array
 
 **PHPCS compliance:**
 - `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
@@ -142,6 +179,7 @@ wordpress-theme/skyyrose-flagship/
 - Composer must be installed first: `~/.local/bin/composer install`
 
 ### WordPress Rules
+- **Theme serves `.min` in production** (`$use_min = ! SCRIPT_DEBUG`). After ANY CSS/JS edit, rebuild with `node scripts/build-css.js && node scripts/build-js.js` or the change is inert live. Re-verify the `.min` output, not just the source.
 - Extend via hooks (actions/filters), never modify core
 - API: `index.php?rest_route=` NOT `/wp-json/`
 - Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
@@ -167,6 +205,25 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 
 ---
 
+## Loop Protocol
+
+Every task runs as a loop, not a line:
+
+1. Write the change.
+2. Run the checks: tests, linter, type checker.
+3. If anything fails, read the error, fix the cause, go back to step 2.
+4. Repeat up to 5 times.
+
+Stop conditions:
+- All checks pass: report "done" with the passing output as proof.
+- 5 attempts used: stop and report what still fails and what you tried.
+- Same error appears twice in a row: stop. You're guessing, not fixing.
+
+Never report "done" without check output from this session.
+Never fix a test by weakening it. Fix the code, not the test.
+
+---
+
 ## Critical Rules
 
 - Files <800 lines, functions <50 lines
@@ -178,7 +235,7 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 - Python line length: 100 (black + ruff + isort)
 - Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
 - Fix everything in one batch, test all pages, deploy ONCE (no back-and-forth)
-- When cleaning up: update EVERY file that references deleted code
+- **Deletion policy — repoint-first / census-gated.** Stale, dead, duplicate, or conflicting code SHOULD be deleted, not left to rot. Never delete until a census (grep importers incl. tests + downstream + cross-language string refs) proves zero live consumers; then delete the artifact AND every now-dead consumer + dangling reference in the SAME change. A deletion that leaves a surviving import is a regression, not a cleanup. **Pick the lane by two axes — reversibility × regeneration cost:** (a) census-clean *tracked code* → delete now (git restores it); (b) untracked build/cache junk → **gitignore, don't `rm`**; (c) any **expensive/paid asset** (renders, 3D models, datasets, paid PNGs) → STOP-AND-SHOW, never autonomous — the regeneration cost is real money. `rm` of untracked files and git-history rewrites are always STOP-AND-SHOW.
 
 ---
 
@@ -212,82 +269,7 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 
 ## Learnings
 
-### Architecture
-- `agents/base_super_agent/agent.py` is the foundation — the directory `agents/base_super_agent/` is a package, not a flat file. (Cerebrum: never create `agents/base_super_agent.py` as a flat file; Python silently ignores the .py if the package exists.)
-- DataLoaders → `api/graphql/dataloaders/` (not `core/`)
-- Integration tests → `tests/integration/` (not `tests/api/`)
-
-### Python Packaging
-- Every top-level package directory MUST contain `__init__.py`. No implicit namespace packages. `mypy.ini` has `namespace_packages = False` to enforce this.
-- Why: implicit namespace packages let mypy resolve the same `.py` file under two module names (e.g., `preflight` and `renders.preflight`), producing "Source file found twice under different module names" errors that silently block commits.
-- If you add a new top-level package dir (e.g., `newthing/`), add `newthing/__init__.py` in the same commit — even if empty, a one-line docstring is fine.
-- `.claude/worktrees/` are LIVE git worktrees (per `git worktree list`). Pre-commit's `mypy . --ignore-missing-imports --exclude '\.claude/'` keeps duplicate file paths out of module discovery.
-
-### Google ADK
-- Agent names: underscores only (valid Python identifiers)
-- Loop per-product with `time.sleep(8)` to avoid 429s
-- Use `.venv-agents/` (ADK conflicts with numpy)
-
-### Security
-- Validate backend URLs against allowlist; block `169.254.x.x`, `file://`, `gopher://`
-- Cap in-memory tracking with LRU eviction
-- Whitelist config keys before `**unpacking`
-- No `innerHTML` in JS — all DOM construction via `createElement`
-
-### WordPress
-- CDN caches CSS aggressively — bump `SKYYROSE_VERSION` or use `?nocache=` to verify
-- `enqueue.php` template slug map must match actual template filenames exactly
-- Collection pages use unified `collection-pages.css` + `collection-pages.js` (one CSS replaces 4 separate files)
-- Collection pages use `col-*` classes with `data-collection` attribute for palette switching via CSS custom properties
-- Collection pages use IntersectionObserver scroll-reveal (`.col-reveal`), NOT GSAP — GSAP only for preorder/about/immersive
-- Holo card grid: only `.product-grid`, `.product-grid__items`, `.br-product-grid__items` should be `display: grid`
-- Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data
-- Showcase card content should be visible by default (`opacity: 1`), not hidden until hover — mobile has no hover
-- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides
-- Premium animation system: `animations-premium.css` + `premium-interactions.js` loaded globally — use `rv-clip-*`, `rv-blur*`, `rv-split-*`, `stagger-grid`, `magnetic`, `btn-sweep`, `btn-border-draw` classes
-- `php-lint.sh` needs explicit Homebrew PHP path (`/opt/homebrew/bin/php`) — lint-staged subshell doesn't inherit brew paths
-- Image cache-bust: append `?v=' . SKYYROSE_VERSION` to branding image URLs in templates
-- Cursor disappearing: caused by Jetpack Instant Search invisible overlay (z-index max, opacity 0, pointer-events auto) — fix with `pointer-events: none !important` in design-tokens.css
-- `front-page.php` uses its own inline footer (`.ft` class) + `wp_footer()` instead of `get_footer()` — shared template parts (mobile-nav, cookie-consent, size-guide, toast-container) must be manually included before `wp_footer()`
-- Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
-- Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
-- Landing pages use `lp-*` classes with `[data-collection]` palette switching (same pattern as collection pages but `--lp-*` CSS vars)
-- Landing pages use `.lp-rv` scroll-reveal (IntersectionObserver) — NOT `.col-reveal` or GSAP
-- Landing page templates registered as slug `'landing'` in enqueue.php — loads `landing-pages.css` + `landing-pages.js` + holo cards
-- Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
-- Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
-- Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
-- **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
-- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
-- **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
-- Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
-- `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
-- Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
-- Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
-- Store API v1 cart was in `assets/src/js/cart.js` (268L, exposed `window.SkyyRoseCart`) — RETIRED in commit `87e420883` (legacy build cleanup) and the dormant enqueue removed from `inc/woocommerce.php` on 2026-04-27. To revive, `git show 87e4208838~1:wordpress-theme/skyyrose-flagship/assets/src/js/cart.js > <path>` and re-add the `wp_enqueue_script` block.
-
-### WordPress Deploy
-- Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
-- `mv: preserving permissions` warnings during deploy are cosmetic (WordPress.com hosting restriction) — files transfer correctly
-- After deploy: verify HTTP status on homepage + search + 404 + cart + shop AND verify new asset URLs return 200
-- Search page uses `'search'` slug in `enqueue.php` — must come BEFORE the `is_home() || is_archive() || is_search()` blog catch-all
-- Size guide modal, cookie consent, mobile nav are all `get_template_part()` calls in `footer.php` — order matters (size guide → cookie consent → mobile nav → toast container)
-- Pre-order functions extracted to `inc/woocommerce-preorder.php` — woocommerce.php no longer has pre-order meta boxes
-- `toast.js` provides global `window.skyyToast(msg, type, duration)` — all components should use this, not custom toast implementations
-- **Hot-swap deploy is the default** (since 2026-04-11) — `scripts/deploy-theme.sh` uses atomic mv on the remote (`mv current → .old.$ts; mv new → path`) instead of the old `wp maintenance-mode` + `rm -rf && mv` pattern. The swap window is microseconds instead of ~60 seconds, so Jetpack Uptime stops firing false-positive "site is down" alerts on every deploy. Pass `--with-maintenance` only when deploying DB migrations or plugin changes that require the site to be locked.
-- **Deploy script has a post-verify gate** — `verify_live()` curls `https://skyyrose.co/?deploy_verify=$ts` after cache flush and asserts HTTP 200, response size >= 50 KB, and absence of PHP error markers (`Fatal error`, `Parse error`, `Call to undefined`, `There has been a critical error`). Deploy exits non-zero on failure. Override target URL via `PUBLIC_URL` env var.
-- **Jetpack Uptime alerts during deploy are a lagging indicator** — if one fires immediately after a deploy, it almost always points at a 503 window from `--with-maintenance` mode. Ignore the first alert within ~5 min of a legacy maintenance-mode deploy; investigate only if Jetpack's next poll cycle still reports down.
-
-### Hooks (macOS)
-- Canonicalize paths (`/tmp` → `/private/tmp`)
-- Use `${VAR:-default}` for testable paths
-- Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
-
-### Vercel
-- `rootDirectory` set → reads that dir's `vercel.json`, not root
-
----
-
+Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Knowledge base, not per-turn behavioral rules.
 ## Behavioral Standards — How Claude Operates in This Project
 
 These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.
@@ -437,7 +419,7 @@ Before taking any of the actions below, Claude MUST stop, print exactly what it 
 - Reading from Photos Library or `~/Pictures/` paths is ALLOWED when the user has shared a specific file path in the current conversation (pasted or attached). Confirmation is implicit in the share.
 - Using any file as the source image for a PAID API call (FASHN, Gemini generation, FLUX, Replicate, etc.) — must confirm the file is the correct garment before dispatch.
 - Uploading any file to WooCommerce, the live WordPress site, or any external destination — must confirm.
-- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/` — must confirm.
+- Deleting/overwriting/renaming real data, untracked files, or any expensive/paid asset (renders, 3D models, datasets) — must confirm. Census-clean *tracked dead code* is git-reversible: delete it per the Deletion policy without asking.
 
 ### What the confirmation must look like:
 

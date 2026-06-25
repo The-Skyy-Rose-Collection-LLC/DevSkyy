@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue self-hosted fonts (all brand typography).
  *
  * GDPR-compliant: zero external requests to Google Fonts.
- * All 9 font families served locally from assets/fonts/ as woff2.
- * Fonts: Inter, Playfair Display, Cinzel, Cormorant Garamond,
- *        Oswald, Barlow, Bebas Neue, Space Mono, Instrument Serif.
+ * 5 universal families + 3 collection scripts served locally from assets/fonts/ as woff2.
+ * Universal: Inter, Playfair Display, Cinzel, Cormorant Garamond, Bebas Neue.
+ * Collection scripts: Yellowtail, Kaushan Script, Pinyon Script.
  *
  * @since 3.2.1
  * @updated 4.1.0 — self-hosted all Google Fonts families
@@ -118,19 +118,9 @@ function skyyrose_enqueue_global_styles() {
 		}
 	}
 
-	// Commercial polish — premium presentation layer. Loaded LAST so it can
-	// refine typography rhythm, button/card polish, spacing, and focus states
-	// across every page. Backed by tokens declared in this file.
-	$polish_file = $use_min && file_exists( $base_dir . '/commercial-polish.min.css' )
-		? 'commercial-polish.min.css' : 'commercial-polish.css';
-	if ( file_exists( $base_dir . '/' . $polish_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-commercial-polish',
-			$base_uri . '/' . $polish_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// Commercial polish is now enqueued at priority 25 via
+	// skyyrose_enqueue_commercial_polish() to guarantee it loads AFTER
+	// all template-specific stylesheets (priority 20).
 
 	// Header: navbar, search overlay, mobile menu, dropdowns.
 	$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
@@ -175,8 +165,17 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Size guide modal (global — trigger via [data-open-size-guide] or .js-size-guide-trigger).
-	if ( file_exists( $base_dir . '/size-guide.css' ) ) {
+	// Lightweight slugs skip optional CSS bundles (size guide, luxury cursor,
+	// skeleton). Cart / checkout / 404 / search / blog / single never trigger
+	// these features, so shipping their CSS is dead bytes. v1.5.12 audit.
+	$skip_optional_css = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		true
+	);
+
+	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/size-guide.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-size-guide',
 			$base_uri . '/size-guide.css',
@@ -186,7 +185,7 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
-	if ( file_exists( $base_dir . '/luxury-cursor.css' ) ) {
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/luxury-cursor.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-luxury-cursor',
 			$base_uri . '/luxury-cursor.css',
@@ -196,7 +195,7 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Skeleton loading states — shimmer placeholders for images and cards.
-	if ( file_exists( $base_dir . '/skeleton.css' ) ) {
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/skeleton.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-skeleton',
 			$base_uri . '/skeleton.css',
@@ -205,22 +204,33 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Skyy living character widget — base styles (speech bubble, chips, recall pill).
-	if ( file_exists( $base_dir . '/mascot.min.css' ) ) {
-		wp_enqueue_style(
-			'skyyrose-mascot',
-			$base_uri . '/mascot.min.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// Skyy mascot CSS disabled — character widget is not rendered until art is finalized.
+	// Re-enable mascot.min.css and skyy-walk.css when get_template_part('skyy-mascot')
+	// is restored in footer.php and front-page.php.
 
-	// Skyy Pixar-like walk cycle enhancements — layered on top of mascot.min.css.
-	if ( file_exists( $base_dir . '/skyy-walk.css' ) ) {
+	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
+	wp_enqueue_style(
+		'skyyrose-agency-visuals',
+		$base_uri . '/agency-tier-visuals.css',
+		array( 'skyyrose-design-tokens', 'skyyrose-components' ),
+		SKYYROSE_VERSION
+	);
+
+	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
+	// collection lockup. Loaded in <head> on content templates so this above-the-fold
+	// part never flashes unstyled. Skipped on lightweight slugs that never host it.
+	$hero_file = $use_min && file_exists( $base_dir . '/hero-cinematic.min.css' )
+		? 'hero-cinematic.min.css' : 'hero-cinematic.css';
+	$hero_skip = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' ),
+		true
+	);
+	if ( ! $hero_skip && file_exists( $base_dir . '/' . $hero_file ) ) {
 		wp_enqueue_style(
-			'skyyrose-skyy-walk',
-			$base_uri . '/skyy-walk.css',
-			array( 'skyyrose-mascot' ),
+			'skyyrose-hero-cinematic',
+			$base_uri . '/' . $hero_file,
+			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
 	}
@@ -240,6 +250,15 @@ function skyyrose_enqueue_global_scripts() {
 	$css_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
+	// Lightweight slugs (cart/checkout/404/search) don't trigger premium
+	// animations. Skip Motion One + premium-interactions to save ~60KB parse.
+	// v1.5.12 audit. Same skip list as global_styles.
+	$skip_premium_js = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		true
+	);
+
 	// Navigation script (hamburger toggle, keyboard nav, dropdowns).
 	$nav_file = $use_min && file_exists( $js_dir . '/navigation.min.js' ) ? 'navigation.min.js' : 'navigation.js';
 	if ( file_exists( $js_dir . '/' . $nav_file ) ) {
@@ -248,7 +267,10 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $nav_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
@@ -260,43 +282,61 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $toast_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
-	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
-	$cursor_file = $use_min && file_exists( $js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
-	if ( file_exists( $js_dir . '/' . $cursor_file ) ) {
+	// Footer CRO — FAQ accordion (extracted from inline <script> in v1.5.3).
+	$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
+	if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
 		wp_enqueue_script(
-			'skyyrose-luxury-cursor',
-			$js_uri . '/' . $cursor_file,
+			'skyyrose-footer-cro',
+			$js_uri . '/' . $fcro_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
+	// Self-hosted from assets/js/lib/ to eliminate jsDelivr CDN supply-chain risk.
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
-	wp_enqueue_script(
-		'motion-one',
-		'https://cdn.jsdelivr.net/npm/motion@11/dist/motion.min.js',
-		array(),
-		'11',
-		true
-	);
-
-	// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
-	$prem_js = $use_min && file_exists( $js_dir . '/premium-interactions.min.js' )
-		? 'premium-interactions.min.js' : 'premium-interactions.js';
-	if ( file_exists( $js_dir . '/' . $prem_js ) ) {
+	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
+	// DOMContentLoaded. premium-interactions.js depends on it and self-defers.
+	// v1.5.12: skip on lightweight slugs (cart/checkout/404/search) — saves ~65KB.
+	if ( ! $skip_premium_js ) {
 		wp_enqueue_script(
-			'skyyrose-premium-interactions',
-			$js_uri . '/' . $prem_js,
-			array( 'motion-one' ),
-			SKYYROSE_VERSION,
-			true
+			'motion-one',
+			SKYYROSE_ASSETS_URI . '/js/lib/motion.min.js',
+			array(),
+			'11',
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
+
+		// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
+		$prem_js = $use_min && file_exists( $js_dir . '/premium-interactions.min.js' )
+			? 'premium-interactions.min.js' : 'premium-interactions.js';
+		if ( file_exists( $js_dir . '/' . $prem_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-premium-interactions',
+				$js_uri . '/' . $prem_js,
+				array( 'motion-one' ),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+		}
 	}
 
 	// Page transitions + skeleton screens + scarcity bars.
@@ -308,7 +348,10 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $pt_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
@@ -317,38 +360,9 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	// Skyy living character widget JS — state machine, walk-on, speech bubbles, chips.
-	if ( file_exists( $js_dir . '/mascot.min.js' ) ) {
-		wp_enqueue_script(
-			'skyyrose-mascot',
-			$js_uri . '/mascot.min.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Skyy 3D walking character — Three.js GLB viewer driven by mascot state events.
-	// Only enqueued when the .glb model file is present on disk.
-	$model_rel  = '/assets/models/skyy.glb';
-	$model_file = SKYYROSE_DIR . $model_rel;
-	if ( file_exists( $js_dir . '/skyy-3d.js' ) && file_exists( $model_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-skyy-3d',
-			$js_uri . '/skyy-3d.js',
-			array( 'skyyrose-mascot' ),
-			SKYYROSE_VERSION,
-			true
-		);
-		wp_localize_script(
-			'skyyrose-skyy-3d',
-			'SKYY_3D_CONFIG',
-			array(
-				'modelUrl' => SKYYROSE_ASSETS_URI . $model_rel,
-			)
-		);
-	}
-
+	// Skyy mascot JS disabled — character widget is not rendered until art is finalized.
+	// Re-enable mascot.min.js and skyy-3d.js when get_template_part('skyy-mascot')
+	// is restored in footer.php and front-page.php.
 }
 
 /**
@@ -423,14 +437,16 @@ function skyyrose_get_current_template_slug() {
 			'template-preorder-gateway.php'        => 'preorder-gateway',
 			'template-faq.php'                     => 'faq',
 			'template-shipping-returns.php'        => 'shipping-returns',
+			'template-experiences.php'             => 'experiences',
 			'template-landing-black-rose.php'      => 'landing',
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
+			'template-landing-kids-capsule.php'    => 'landing',
 			'template-elementor-editorial.php'     => 'elementor-editorial',
 			'template-elementor-canvas.php'        => 'elementor-canvas',
 			'template-elementor-fullwidth.php'     => 'elementor-fullwidth',
 		);
-		$slug = isset( $template_map[ $page_template ] ) ? $template_map[ $page_template ] : null;
+		$slug         = isset( $template_map[ $page_template ] ) ? $template_map[ $page_template ] : null;
 	}
 
 	if ( null === $slug ) {
@@ -480,12 +496,13 @@ function skyyrose_enqueue_template_styles() {
 		'search'              => 'search-results.css',
 		'faq'                 => 'info-pages.css',
 		'shipping-returns'    => 'info-pages.css',
-		'landing'             => 'landing-pages.css',
+		'landing'             => 'landing-scrollytell.css',
 		'elementor-editorial' => 'landing-pages.css',
 		'single'              => 'generic-pages.css',
 		'blog'                => 'generic-pages.css',
 		'page'                => 'generic-pages.css',
 		'kc-launch'           => 'kids-capsule.css',
+		'experiences'         => 'experiences.css',
 	);
 
 	if ( isset( $template_styles[ $slug ] ) ) {
@@ -508,6 +525,20 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Scroll-pinned brand-narrative styles — collection + landing templates.
+	if ( in_array( $slug, array( 'collection-standalone', 'landing' ), true ) ) {
+		$pin_css = $use_min && file_exists( $base_css_dir . '/pin-narrative.min.css' )
+			? 'pin-narrative.min.css' : 'pin-narrative.css';
+		if ( file_exists( $base_css_dir . '/' . $pin_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-pin-narrative',
+				$base_css_uri . '/' . $pin_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Immersive scene images — overlays, tab bar, cinematic toggle, particles.
 	if ( 'immersive' === $slug ) {
 		$scenes_file = $use_min && file_exists( $base_css_dir . '/immersive-scenes.min.css' )
@@ -522,29 +553,47 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
-	// Homepage v7 "Concrete" theme — supplemental styles loaded after homepage-v2.
 	if ( 'front-page' === $slug ) {
-		$v7_css = $use_min && file_exists( $base_css_dir . '/homepage-v7.min.css' )
-			? 'homepage-v7.min.css' : 'homepage-v7.css';
-		if ( file_exists( $base_css_dir . '/' . $v7_css ) ) {
-			wp_enqueue_style(
-				'skyyrose-homepage-v7',
-				$base_css_uri . '/' . $v7_css,
-				array( 'skyyrose-template-homepage-v2' ),
-				SKYYROSE_VERSION
-			);
-		}
+		// LCP: preload hero image so the browser prioritises it in the
+		// high-priority fetch queue alongside critical CSS, improving LCP score.
+		//
+		// v1.5.17: preload AVIF (broadest 2026 browser coverage, smaller payload).
+		// v1.5.19: derive path + URL atomically via skyyrose_avif_sibling_pair()
+		// so existence probe + emitted preload URL cannot drift apart.
+		// Non-AVIF browsers fall through to WebP via the <picture> element's
+		// normal source negotiation (not preloaded, but still high-priority).
+		add_action(
+			'wp_head',
+			function () {
+				$webp_url = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
+				$avif     = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
+				if ( $avif && file_exists( $avif['path'] ) ) {
+					echo '<link rel="preload" as="image" href="' . esc_url( $avif['url'] ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				} else {
+					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
+			},
+			2
+		);
 	}
 
-	// Unified collection page CSS — single stylesheet for all 4 collection templates.
+	// Unified collection page CSS + cross-collection View Transitions choreography.
 	if ( 'collection-standalone' === $slug ) {
-		$col_css = $use_min && file_exists( $base_css_dir . '/collection-pages.min.css' )
-			? 'collection-pages.min.css' : 'collection-pages.css';
-		if ( file_exists( $base_css_dir . '/' . $col_css ) ) {
+		skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_min, $global_deps );
+	}
+
+	// Product grid bento layout — landing pages, preorder gateway, and
+	// collection pages (their shared product-grid part renders
+	// .product-grid__items, which lays out as full-width stacked blocks
+	// without this stylesheet — bug-112).
+	if ( in_array( $slug, array( 'landing', 'elementor-editorial', 'preorder-gateway', 'collection-standalone' ), true ) ) {
+		$grid_css = $use_min && file_exists( $base_css_dir . '/product-grid.min.css' )
+			? 'product-grid.min.css' : 'product-grid.css';
+		if ( file_exists( $base_css_dir . '/' . $grid_css ) ) {
 			wp_enqueue_style(
-				'skyyrose-collection-pages',
-				$base_css_uri . '/' . $col_css,
-				$global_deps,
+				'skyyrose-product-grid',
+				$base_css_uri . '/' . $grid_css,
+				array( 'skyyrose-design-tokens' ),
 				SKYYROSE_VERSION
 			);
 		}
@@ -595,14 +644,53 @@ function skyyrose_enqueue_template_scripts() {
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	// Landing pages JS — countdown, parallax, FAQ accordion, scroll reveal.
-	if ( in_array( $slug, array( 'landing', 'elementor-editorial' ), true ) ) {
-		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-pages.min.js' )
-			? 'landing-pages.min.js' : 'landing-pages.js';
+	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
+	// CURS-03: Immersive templates intentionally hide cursor to keep focus on the 3D scene.
+	// Skip enqueue entirely on immersive slugs so the JS isn't downloaded for hidden UI.
+	if ( 'immersive' !== $slug ) {
+		$cursor_file = $use_min && file_exists( $base_js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
+		if ( file_exists( $base_js_dir . '/' . $cursor_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-luxury-cursor',
+				$base_js_uri . '/' . $cursor_file,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+		}
+	}
+
+	// Landing pages JS — split scrollytell (IntersectionObserver scroll-sync, no GSAP).
+	if ( 'landing' === $slug ) {
+		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-scrollytell.min.js' )
+			? 'landing-scrollytell.min.js' : 'landing-scrollytell.js';
 		if ( file_exists( $base_js_dir . '/' . $lp_js ) ) {
 			wp_enqueue_script(
-				'skyyrose-landing-pages',
+				'skyyrose-landing-scrollytell',
 				$base_js_uri . '/' . $lp_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+			wp_localize_script(
+				'skyyrose-landing-scrollytell',
+				'skyyRoseData',
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
+				)
+			);
+		}
+	}
+
+	// Elementor editorial templates keep the legacy landing-pages layout + JS.
+	if ( 'elementor-editorial' === $slug ) {
+		$lp_legacy_js = $use_min && file_exists( $base_js_dir . '/landing-pages.min.js' )
+			? 'landing-pages.min.js' : 'landing-pages.js';
+		if ( file_exists( $base_js_dir . '/' . $lp_legacy_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-landing-pages',
+				$base_js_uri . '/' . $lp_legacy_js,
 				array(),
 				SKYYROSE_VERSION,
 				true
@@ -622,14 +710,86 @@ function skyyrose_enqueue_template_scripts() {
 				SKYYROSE_VERSION,
 				true
 			);
+			wp_localize_script(
+				'skyyrose-collection-pages',
+				'skyyRoseNewsletter',
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
+				)
+			);
 		}
 	}
 
-	// GSAP — loaded on pages that use scroll animations (NOT collection pages — they use IntersectionObserver).
-	$gsap_slugs = array( 'preorder-gateway', 'about', 'immersive', 'kc-launch' );
+	// GSAP — self-hosted from assets/js/lib/ so animations don't depend on
+	// Cloudflare CDN reachability. Loaded on pages that use scroll animations
+	// (NOT collection pages — they use IntersectionObserver).
+	// 'about' removed in 1.5.8: about.js uses prefers-reduced-motion query only,
+	// no gsap/ScrollTrigger API calls (audit: grep returns 0 hits). Was shipping
+	// 114KB of dead lib bytes to every About visitor.
+	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
-		wp_enqueue_script( 'skyyrose-gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), '3.12.2', true );
-		wp_enqueue_script( 'skyyrose-gsap-st', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
+		wp_enqueue_script( 'skyyrose-gsap', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js', array(), '3.12.2', true );
+	}
+
+	// ScrollTrigger — only on slugs whose scripts call the ScrollTrigger API.
+	// Immersive rooms animate via gsap.timeline/fromTo/set only (immersive-core.js
+	// + immersive.js, 0 ScrollTrigger refs), so shipping ScrollTrigger there was
+	// ~40KB of dead main-thread parse during the scene intro. preorder-gateway.js
+	// (5 refs) and kids-capsule-launch.js (3 refs) genuinely use it.
+	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch' );
+	if ( in_array( $slug, $gsap_st_slugs, true ) ) {
+		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
+	}
+
+	// Phase 2 — Lenis smooth-scroll lib: preorder gateway only.
+	// Immersive rooms are 100vh/overflow:hidden (nothing to scroll) — no dead bytes.
+	// Enqueued before the immersive-core block so window.Lenis is defined when
+	// initLenis() runs. cf. CURS-03 lesson: slug-gated to avoid waste on other templates.
+	if ( 'preorder-gateway' === $slug && file_exists( $base_js_dir . '/lib/lenis.min.js' ) ) {
+		wp_enqueue_script(
+			'skyyrose-lenis',
+			$base_js_uri . '/lib/lenis.min.js',
+			array(),    // Lenis itself has no WP deps.
+			'1.3.23',
+			true
+		);
+	}
+
+	// Phase 1+2 — Immersive Core: scene intro, lockup, dust canvas, Lenis init, warp.
+	// Loaded on: immersive rooms (4×) + preorder gateway.
+	if ( in_array( $slug, array( 'immersive', 'preorder-gateway' ), true ) ) {
+		$ic_css = $use_min && file_exists( $base_css_dir . '/system/immersive-core.min.css' )
+			? 'system/immersive-core.min.css' : 'system/immersive-core.css';
+		if ( file_exists( $base_css_dir . '/' . $ic_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-immersive-core',
+				$base_css_uri . '/' . $ic_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		// On preorder, add lenis as a dep so WP prints it before immersive-core.
+		// On immersive rooms lenis is not enqueued — omit it from deps there.
+		$ic_js_deps = array( 'skyyrose-gsap' );
+		if ( 'preorder-gateway' === $slug && wp_script_is( 'skyyrose-lenis', 'enqueued' ) ) {
+			$ic_js_deps[] = 'skyyrose-lenis';
+		}
+
+		$ic_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
+			? 'system/immersive-core.min.js' : 'system/immersive-core.js';
+		if ( file_exists( $base_js_dir . '/' . $ic_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-immersive-core',
+				$base_js_uri . '/' . $ic_js,
+				// GSAP core + optional lenis dep (preorder only).
+				// immersive-core uses gsap.timeline/fromTo/set, not ScrollTrigger API.
+				$ic_js_deps,
+				SKYYROSE_VERSION,
+				true
+			);
+		}
 	}
 
 	$template_scripts = array(
@@ -642,6 +802,7 @@ function skyyrose_enqueue_template_scripts() {
 		'preorder-gateway' => 'preorder-gateway.js',
 		'about'            => 'about.js',
 		'kc-launch'        => 'kids-capsule-launch.js',
+		'experiences'      => 'experiences.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
@@ -687,14 +848,46 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// "Complete the Look" cross-sell removed 2026-05-27 per founder canon.
+		// Enqueue, template, function, and hook all retired in the same commit.
+
+		// Localize immersive scenes + load the WC bridge that wires the
+		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.
+		if ( 'immersive' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
+			wp_localize_script(
+				$handle,
+				'skyyRoseImmersive',
+				array(
+					'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+					'wcActive' => class_exists( 'WooCommerce' ),
+					'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+				)
+			);
+
+			$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
+				? 'immersive-wc-bridge.min.js'
+				: 'immersive-wc-bridge.js';
+
+			if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-wc-bridge',
+					$base_js_uri . '/' . $bridge_file,
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
+
 		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */
 	}
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial' ), true ) ) {
-			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-grid.css' )
-				? 'product-grid.css' : 'product-card-holo.css';
+	if ( in_array( $slug, array( 'collection-standalone', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial', 'single-product' ), true ) ) {
+			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
+				? 'product-card-holo.min.css' : 'product-card-holo.css';
 		if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {
 			wp_enqueue_style(
 				'skyyrose-product-card-holo',
@@ -716,7 +909,6 @@ function skyyrose_enqueue_template_scripts() {
 		}
 	}
 }
-
 
 /**
  * Enqueue admin styles and scripts.
@@ -755,377 +947,12 @@ function skyyrose_admin_scripts() {
 	}
 }
 
-/*
---------------------------------------------------------------
- * Collection Experience Scenes — Three.js Per-Collection Worlds
- *
- * Loads Three.js r160 + add-ons + experience base class + per-collection
- * scene on immersive template pages. Each collection gets its own world.
- *
- * @since 5.2.0
- *--------------------------------------------------------------*/
-
-/**
- * Enqueue collection-specific Three.js experience scenes.
- *
- * @since 5.2.0
- * @return void
- */
-function skyyrose_enqueue_collection_experiences() {
-	if ( is_admin() ) {
-		return;
-	}
-
-	$experience_map = array(
-		'template-immersive-black-rose.php' => 'experiences/blackrose-experience',
-		'template-immersive-love-hurts.php' => 'experiences/lovehurts-experience',
-		'template-immersive-signature.php'  => 'experiences/signature-experience',
-	);
-
-	$current_template = get_page_template_slug();
-
-	if ( ! $current_template || ! isset( $experience_map[ $current_template ] ) ) {
-		return;
-	}
-
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$js_dir  = SKYYROSE_DIR . '/assets/js';
-	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
-
-	// Three.js r147 via CDN with add-on scripts.
-	// r147 is the last release that ships /examples/js/ UMD add-ons which attach
-	// classes to window.THREE.*  r148+ removed that directory — pinned here to
-	// avoid 404s on OrbitControls, GLTFLoader, postprocessing, etc.
-	$threejs_ver = '0.147.0';
-	$threejs_cdn = 'https://cdn.jsdelivr.net/npm/three@' . $threejs_ver;
-
-	if ( ! wp_script_is( 'threejs', 'enqueued' ) ) {
-		wp_enqueue_script( 'threejs', $threejs_cdn . '/build/three.min.js', array(), $threejs_ver, true );
-	}
-
-	$addons = array(
-		'threejs-orbit-controls'  => '/examples/js/controls/OrbitControls.js',
-		'threejs-gltf-loader'     => '/examples/js/loaders/GLTFLoader.js',
-		'threejs-draco-loader'    => '/examples/js/loaders/DRACOLoader.js',
-		'threejs-rgbe-loader'     => '/examples/js/loaders/RGBELoader.js',
-		'threejs-effect-composer' => '/examples/js/postprocessing/EffectComposer.js',
-		'threejs-render-pass'     => '/examples/js/postprocessing/RenderPass.js',
-		'threejs-unreal-bloom'    => '/examples/js/postprocessing/UnrealBloomPass.js',
-		'threejs-shader-pass'     => '/examples/js/postprocessing/ShaderPass.js',
-		'threejs-copy-shader'     => '/examples/js/shaders/CopyShader.js',
-	);
-
-	foreach ( $addons as $handle => $path ) {
-		if ( ! wp_script_is( $handle, 'enqueued' ) ) {
-			wp_enqueue_script( $handle, $threejs_cdn . $path, array( 'threejs' ), $threejs_ver, true );
-		}
-	}
-
-	// Experience base class.
-	$base_file = $use_min && file_exists( $js_dir . '/experiences/experience-base.min.js' )
-		? 'experiences/experience-base.min.js' : 'experiences/experience-base.js';
-	if ( file_exists( $js_dir . '/' . $base_file ) ) {
-		wp_enqueue_script( 'skyyrose-experience-base', $js_uri . '/' . $base_file, array( 'threejs' ), SKYYROSE_VERSION, true );
-	}
-
-	// Luxury animations.
-	$anim_file = $use_min && file_exists( $js_dir . '/experiences/luxury-animations.min.js' )
-		? 'experiences/luxury-animations.min.js' : 'experiences/luxury-animations.js';
-	if ( file_exists( $js_dir . '/' . $anim_file ) ) {
-		wp_enqueue_script( 'skyyrose-luxury-animations', $js_uri . '/' . $anim_file, array( 'skyyrose-experience-base' ), SKYYROSE_VERSION, true );
-	}
-
-	// Collection-specific scene.
-	$scene_slug = $experience_map[ $current_template ];
-	$scene_file = $use_min && file_exists( $js_dir . '/' . $scene_slug . '.min.js' )
-		? $scene_slug . '.min.js' : $scene_slug . '.js';
-	if ( file_exists( $js_dir . '/' . $scene_file ) ) {
-		wp_enqueue_script( 'skyyrose-collection-experience', $js_uri . '/' . $scene_file, array( 'skyyrose-experience-base', 'skyyrose-luxury-animations' ), SKYYROSE_VERSION, true );
-	}
-
-	// Init-3D orchestrator.
-	$init_file = $use_min && file_exists( $js_dir . '/experiences/init-3d.min.js' )
-		? 'experiences/init-3d.min.js' : 'experiences/init-3d.js';
-	if ( file_exists( $js_dir . '/' . $init_file ) ) {
-		wp_enqueue_script( 'skyyrose-3d-init', $js_uri . '/' . $init_file, array( 'skyyrose-collection-experience' ), SKYYROSE_VERSION, true );
-
-		// Provide runtime config that init-3d.js reads from window.skyyrose3D.
-		wp_localize_script(
-			'skyyrose-3d-init',
-			'skyyrose3D',
-			array(
-				'debug'    => defined( 'WP_DEBUG' ) && WP_DEBUG,
-				'lazyLoad' => true,
-				'isMobile' => wp_is_mobile(),
-				'siteUrl'  => esc_url( home_url() ),
-				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'skyyrose_3d_nonce' ),
-			)
-		);
-	}
-}
-
-/*
---------------------------------------------------------------
- * Hook Registration
- *
- * Performance hooks → inc/enqueue-performance.php
- *--------------------------------------------------------------*/
-
-// Self-hosted fonts (priority 5 so they load before template styles).
-/**
- * Enqueue Phase 2 Experience Engine assets.
- *
- * - performance-guardian.js loads globally on every page (priority 30).
- * - brand-atmosphere.css + brand-atmosphere.js load on collection pages only.
- *
- * Both checks respect the Experience Engine module activation state so the
- * feature can be toggled from the WP admin without a code deploy.
- */
-function skyyrose_enqueue_phase2_assets(): void {
-	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {
-		return;
-	}
-
-	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
-	$base_css_dir = SKYYROSE_DIR . '/assets/css';
-	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
-	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
-
-	// ------------------------------------------------------------------
-	// Performance Guardian — all pages.
-	// ------------------------------------------------------------------
-	if ( skyyrose_see_is_module_active( 'performance_guardian' ) ) {
-		if ( file_exists( $base_js_dir . '/performance-guardian.js' ) ) {
-			wp_enqueue_script(
-				'skyyrose-performance-guardian',
-				$js_uri . '/performance-guardian.js',
-				array(),
-				SKYYROSE_VERSION,
-				array(
-					'strategy'  => 'defer',
-					'in_footer' => true,
-				)
-			);
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// Brand Atmosphere — collection pages only.
-	// ------------------------------------------------------------------
-	if ( skyyrose_see_is_module_active( 'brand_atmosphere' ) ) {
-		$slug             = skyyrose_get_current_template_slug();
-		$collection_slugs = array( 'collection-standalone', 'collection', 'collection-v4' );
-
-		if ( in_array( $slug, $collection_slugs, true ) ) {
-			if ( file_exists( $base_css_dir . '/brand-atmosphere.css' ) ) {
-				wp_enqueue_style(
-					'skyyrose-brand-atmosphere',
-					$css_uri . '/brand-atmosphere.css',
-					array( 'skyyrose-design-tokens' ),
-					SKYYROSE_VERSION
-				);
-			}
-
-			if ( file_exists( $base_js_dir . '/brand-atmosphere.js' ) ) {
-				wp_enqueue_script(
-					'skyyrose-brand-atmosphere',
-					$js_uri . '/brand-atmosphere.js',
-					array( 'skyyrose-performance-guardian' ),
-					SKYYROSE_VERSION,
-					array(
-						'strategy'  => 'defer',
-						'in_footer' => true,
-					)
-				);
-			}
-		}
-	}
-}
-
-/**
- * Enqueue Phase 3 Experience Engine assets.
- *
- * Loads experience-analyzer, smart-showcase, and micro-interactions on any
- * page that renders product cards (collection, shop, search, front page, landing).
- * All three scripts depend on skyyrose-performance-guardian (Phase 2).
- */
-function skyyrose_enqueue_phase3_assets(): void {
-	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {
-		return;
-	}
-
-	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
-	$base_css_dir = SKYYROSE_DIR . '/assets/css';
-	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
-	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
-
-	$product_slugs = array(
-		'collection-standalone',
-		'collection',
-		'collection-v4',
-		'collections-shop',
-		'shop-archive',
-		'search',
-		'front-page',
-		'landing',
-		'preorder-gateway',
-	);
-
-	$slug = skyyrose_get_current_template_slug();
-	if ( ! in_array( $slug, $product_slugs, true ) ) {
-		return;
-	}
-
-	$phase2_dep = array( 'skyyrose-performance-guardian' );
-
-	// ------------------------------------------------------------------
-	// Experience Analyzer — behavioral tracking & event relay.
-	// ------------------------------------------------------------------
-	if ( skyyrose_see_is_module_active( 'experience_analyzer' ) ) {
-		if ( file_exists( $base_js_dir . '/experience-analyzer.js' ) ) {
-			wp_enqueue_script(
-				'skyyrose-experience-analyzer',
-				$js_uri . '/experience-analyzer.js',
-				$phase2_dep,
-				SKYYROSE_VERSION,
-				array(
-					'strategy'  => 'defer',
-					'in_footer' => true,
-				)
-			);
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// Smart Showcase — quick-view dialog + CSS.
-	// ------------------------------------------------------------------
-	if ( skyyrose_see_is_module_active( 'smart_showcase' ) ) {
-		if ( file_exists( $base_css_dir . '/smart-showcase.css' ) ) {
-			wp_enqueue_style(
-				'skyyrose-smart-showcase',
-				$css_uri . '/smart-showcase.css',
-				array( 'skyyrose-design-tokens' ),
-				SKYYROSE_VERSION
-			);
-		}
-
-		if ( file_exists( $base_js_dir . '/smart-showcase.js' ) ) {
-			wp_enqueue_script(
-				'skyyrose-smart-showcase',
-				$js_uri . '/smart-showcase.js',
-				$phase2_dep,
-				SKYYROSE_VERSION,
-				array(
-					'strategy'  => 'defer',
-					'in_footer' => true,
-				)
-			);
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// Micro-Interactions — cart fly-to & wishlist burst.
-	// ------------------------------------------------------------------
-	if ( skyyrose_see_is_module_active( 'micro_interactions' ) ) {
-		if ( file_exists( $base_js_dir . '/micro-interactions.js' ) ) {
-			wp_enqueue_script(
-				'skyyrose-micro-interactions',
-				$js_uri . '/micro-interactions.js',
-				$phase2_dep,
-				SKYYROSE_VERSION,
-				array(
-					'strategy'  => 'defer',
-					'in_footer' => true,
-				)
-			);
-		}
-	}
-}
-
-/**
- * Enqueue Phase 4 Experience Engine assets — Personalization.
- *
- * personalization.js + personalization.css load on pages that render product
- * grids or single products. Runs at priority 42 so personalization.php's
- * localize (priority 45) attaches to the already-registered handle.
- */
-function skyyrose_enqueue_phase4_assets(): void {
-	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {
-		return;
-	}
-
-	$product_slugs = array(
-		'collection-standalone',
-		'collection',
-		'collection-v4',
-		'collections-shop',
-		'shop-archive',
-		'search',
-		'front-page',
-		'landing',
-		'preorder-gateway',
-		'single-product',
-	);
-
-	if ( ! in_array( skyyrose_get_current_template_slug(), $product_slugs, true ) ) {
-		return;
-	}
-
-	if ( ! skyyrose_see_is_module_active( 'personalization' ) ) {
-		return;
-	}
-
-	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
-	$base_css_dir = SKYYROSE_DIR . '/assets/css';
-	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
-	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
-
-	if ( file_exists( $base_css_dir . '/personalization.css' ) ) {
-		wp_enqueue_style(
-			'skyyrose-personalization',
-			$css_uri . '/personalization.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	if ( file_exists( $base_js_dir . '/personalization.js' ) ) {
-		wp_enqueue_script(
-			'skyyrose-personalization',
-			$js_uri . '/personalization.js',
-			array(),
-			SKYYROSE_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
-	}
-}
-
+// Hook registration. Priority order: 5 fonts → 10 globals → 15 localize → 20 templates.
+// Phase 2/3/4 + commercial polish (priorities 25/30/40/42) live in inc/enqueue-phases.php.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
-
-// Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
-
-// Global scripts (priority 10).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_scripts', 10 );
-
-// Localize scripts (priority 15, after scripts are registered).
 add_action( 'wp_enqueue_scripts', 'skyyrose_localize_scripts', 15 );
-
-// Template-specific styles (priority 20, after globals).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
-
-// Template-specific scripts (priority 20).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase2_assets', 30 );
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase3_assets', 40 );
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase4_assets', 42 );
-
-// Collection experience scenes (priority 65, after all template assets).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_collection_experiences', 65 );
-
-// Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

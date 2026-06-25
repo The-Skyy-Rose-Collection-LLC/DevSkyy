@@ -20,6 +20,7 @@ CHARACTER = "character"
 SCENE_COMPOSITE = "scene_composite"
 DESIGN_IDEATION = "design_ideation"
 COLLECTION_PLAN = "collection_plan"
+TRIPO_GENERATE = "tripo_generate"
 FINALIZE = "finalize"
 
 # Intent → node name routing map
@@ -38,6 +39,7 @@ _INTENT_TO_NODE: dict[str, str] = {
     CreativeIntent.TECH_PACK: DESIGN_IDEATION,  # tech pack via design agent
     CreativeIntent.MOODBOARD: DESIGN_IDEATION,  # moodboard via design agent
     CreativeIntent.COLORWAY_EXPLORE: DESIGN_IDEATION,  # colorway via design agent
+    CreativeIntent.TRIPO_GENERATE: TRIPO_GENERATE,
 }
 
 

@@ -14,6 +14,7 @@ References:
 """
 
 import hashlib
+import hmac
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
@@ -581,13 +582,16 @@ class GDPRService:
         request_id = f"gdpr_del_{secrets.token_urlsafe(16)}"
         now = datetime.now(UTC)
 
-        # Verify confirmation code (should match user-specific code)
+        # Verify confirmation code — must be the user-specific sha256 derivation.
+        # Constant-time comparison prevents timing oracle on the 8-char prefix.
+        # Removed legacy bypass strings ("CONFIRM_DELETE", "CONFIRM_DELETE_GDPR_REQUEST")
+        # that allowed any authenticated user to trigger deletion without proof of
+        # the issued code — GDPR Article 17 compliance violation. [P0 cleanup, bug-099]
         expected_code = hashlib.sha256(f"{user_id}_delete".encode()).hexdigest()[:8]
-        valid_codes = [expected_code, "CONFIRM_DELETE", "CONFIRM_DELETE_GDPR_REQUEST"]
-        if confirmation_code not in valid_codes:
+        if not hmac.compare_digest(confirmation_code or "", expected_code):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid confirmation code. Use: {expected_code}",
+                detail="Invalid confirmation code.",
             )
 
         # Log request

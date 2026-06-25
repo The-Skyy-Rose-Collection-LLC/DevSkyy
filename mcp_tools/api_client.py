@@ -63,10 +63,14 @@ async def _make_api_request(
         """Inner function for actual request execution"""
 
         headers = {
-            "Authorization": f"Bearer {API_KEY}",
             "Content-Type": "application/json",
             "X-Correlation-ID": correlation_id,  # Track across services
         }
+        # Only send Authorization when a key is configured. An empty key would
+        # produce the malformed header "Bearer " — httpx rejects it with
+        # LocalProtocolError before the request is even sent.
+        if API_KEY:
+            headers["Authorization"] = f"Bearer {API_KEY}"
 
         url = f"{API_BASE_URL}/api/v1/{endpoint}"
 

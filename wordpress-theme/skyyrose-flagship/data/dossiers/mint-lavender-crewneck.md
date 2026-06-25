@@ -3,7 +3,7 @@ sku: sg-013
 name: Mint & Lavender Crewneck
 collection: signature
 logo_reference: data/brand-logos/red-roses-cloud-cluster.md
-reference_image: data/product-references/sg-013-mint-lavender-crewneck-set-techflat.jpeg
+reference_image: assets/products/references/sg-013-techflat-front.jpeg
 ---
 
 # Mint & Lavender Crewneck
@@ -15,7 +15,7 @@ reference_image: data/product-references/sg-013-mint-lavender-crewneck-set-techf
 > Logo art canonical references:
 > - Canonical rose-cluster art (recolored to lavender / purple per COLORWAY OVERRIDE): `data/brand-logos/red-roses-cloud-cluster.md`
 > - Product reference techflat (crewneck top + matching pants visible together):
->   `data/product-references/sg-013-mint-lavender-crewneck-set-techflat.jpeg`
+>   `assets/products/references/sg-013-techflat-front.jpeg`
 >
 > ### COLORWAY OVERRIDE — Lavender / Purple rose-cluster on mint ground
 >
@@ -53,9 +53,9 @@ reference_image: data/product-references/sg-013-mint-lavender-crewneck-set-techf
 
 - NO hood — this is a CREWNECK, not a hoodie. The Mint & Lavender Hoodie (sg-006) is the hooded sibling; this is the no-hood variant.
 - NO zipper — pullover construction, no closure.
-- NO chevron rainbow stripes — the sg-006 hoodie has multi-color V-shape rainbow chevron stripes; this crewneck does NOT. The body is solid mint front and back.
-- NO multi-color stripe band on cuffs, collar, or waistband — those are SOLID MINT to match the body. The sg-006 hoodie has multi-color stripe cuffs/waistband; this crewneck does NOT.
-- NO white body — the body is solid MINT green. (The sg-006 hoodie body is white with mint as a stripe color; this crewneck is the inverse — solid mint body.)
+- NO chevron rainbow stripes — the rainbow-chevron garment is the sg-015 Windbreaker Set, a different product; this crewneck (and the sg-006 hoodie sibling) is solid mint. The body is solid mint front and back.
+- NO multi-color stripe band on cuffs, collar, or waistband — those are SOLID MINT to match the body (same self-color ribbing as the sg-006 hoodie).
+- NO white body — the body is solid MINT green (the sg-006 hoodie is solid mint too; the white-body garment is the sg-015 windbreaker set).
 - NO solid lavender body — body is MINT; lavender is the rose-cluster accent only.
 - NO red rose-cluster — the rose-cluster is RECOLORED LAVENDER / PURPLE, not the canonical red.
 - NO greyscale rose-cluster — the rose-cluster is RECOLORED LAVENDER / PURPLE, not the canonical Black Rose greyscale.

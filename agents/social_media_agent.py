@@ -19,7 +19,6 @@ Version: 2.0.0
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
 import logging
@@ -29,7 +28,6 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
-from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -282,19 +280,25 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
 }
 
 
-# Product catalog — loaded from data/product-catalog.csv (single source of truth)
+# Product catalog — loaded from the canonical skyyrose-catalog.csv (single source of truth)
 def _load_catalog() -> dict[str, dict[str, str]]:
+    from skyyrose.core.catalog_loader import CATALOG_CSV, read_catalog_rows
+
     catalog: dict[str, dict[str, str]] = {}
-    csv_path = Path(__file__).resolve().parent.parent / "data" / "product-catalog.csv"
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            sku = row["sku"].strip()
-            if not sku or row["render_variant_of"].strip():
-                continue
-            catalog[sku] = {
+    try:
+        # read_catalog_rows() opens the canonical CSV and skips blank-SKU rows;
+        # it is @cache-memoized, so repeated callers share one parse.
+        for row in read_catalog_rows():
+            catalog[row["sku"].strip()] = {
                 "name": row["name"].strip(),
-                "collection": row["collection_slug"].strip(),
+                "collection": row["collection"].strip(),
             }
+    except FileNotFoundError:
+        logger.warning(
+            "PRODUCT_CATALOG empty — %s not generated. Run 'make sync-catalog' or "
+            "rely on external product data at skyyrose/assets/data/product-content.json.",
+            CATALOG_CSV,
+        )
     return catalog
 
 
@@ -565,7 +569,9 @@ class SocialMediaAgent:
         hooks = collection.get("caption_hooks", [])
         if hooks:
             # Deterministic selection based on product name hash
-            hook_idx = int(hashlib.md5(name.encode()).hexdigest()[:8], 16) % len(hooks)
+            hook_idx = int(
+                hashlib.md5(name.encode(), usedforsecurity=False).hexdigest()[:8], 16
+            ) % len(hooks)
             caption_parts.append(hooks[hook_idx])
 
         # Platform-specific formatting
