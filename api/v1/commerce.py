@@ -17,8 +17,10 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from agents.commerce_agent import CommerceAgent
 from core.task_status_store import TaskStatusStore, get_initialized_task_status_store
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from skyyrose.core.catalog_loader import read_catalog_rows
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -92,7 +94,7 @@ class PriceOptimization(BaseModel):
     optimized_price: float
     price_change: float
     price_change_pct: float
-    estimated_revenue_impact: float
+    estimated_revenue_impact: float | None = None
     confidence: float
 
 
@@ -398,6 +400,27 @@ async def get_bulk_operation_status(
     )
 
 
+def _coerce_price(value: Any) -> float | None:
+    """Best-effort float coercion for a price; None if missing or not positive."""
+    if value is None or value == "":
+        return None
+    try:
+        price = float(value)
+    except (TypeError, ValueError):
+        return None
+    return price if price > 0 else None
+
+
+def _catalog_price_map() -> dict[str, float]:
+    """Map SKU -> current price from the canonical catalog CSV (the SOT)."""
+    prices: dict[str, float] = {}
+    for row in read_catalog_rows():
+        price = _coerce_price(row.get("price"))
+        if price is not None:
+            prices[row["sku"]] = price
+    return prices
+
+
 @router.post(
     "/pricing/optimize",
     response_model=DynamicPricingResponse,
@@ -439,54 +462,75 @@ async def optimize_pricing(
         f"{request.strategy} ({len(request.product_ids)} products)"
     )
 
+    price_by_sku = _catalog_price_map()
+
+    agent = CommerceAgent()
     try:
-        # TODO: Integrate with agents/commerce_agent.py CommerceAgent
-        # For now, return mock data demonstrating the structure
-
-        optimizations = []
-        total_revenue_impact = 0.0
-
-        for product_id in request.product_ids:
-            current_price = 89.99  # Mock current price
-            optimized_price = 79.99  # Mock optimized price
-            price_change = optimized_price - current_price
-            price_change_pct = (price_change / current_price) * 100
-            revenue_impact = 450.0  # Mock estimated impact
-
-            optimizations.append(
-                PriceOptimization(
-                    product_id=product_id,
-                    current_price=current_price,
-                    optimized_price=optimized_price,
-                    price_change=price_change,
-                    price_change_pct=price_change_pct,
-                    estimated_revenue_impact=revenue_impact,
-                    confidence=0.85,
-                )
-            )
-            total_revenue_impact += revenue_impact
-
-        aggregate_metrics = {
-            "total_revenue_impact": total_revenue_impact,
-            "avg_price_change_pct": -11.1,
-            "products_with_price_increase": 2,
-            "products_with_price_decrease": len(request.product_ids) - 2,
-            "estimated_conversion_lift": 0.15,
-        }
-
-        return DynamicPricingResponse(
-            optimization_id=optimization_id,
-            status="completed",
-            timestamp=datetime.now(UTC).isoformat(),
-            strategy=request.strategy,
-            total_products=len(request.product_ids),
-            optimizations=optimizations,
-            aggregate_metrics=aggregate_metrics,
-        )
-
+        await agent.initialize()
     except Exception as e:
-        logger.error(f"Price optimization failed: {e}", exc_info=True)
+        logger.exception("Pricing agent initialization failed for %s", optimization_id)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Price optimization failed: {str(e)}",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Pricing engine is unavailable",
+        ) from e
+
+    optimizations: list[PriceOptimization] = []
+    skipped: list[dict[str, str]] = []
+
+    for product_id in request.product_ids:
+        current_price = price_by_sku.get(product_id)
+        if current_price is None:
+            skipped.append({"product_id": product_id, "reason": "not in catalog"})
+            continue
+
+        try:
+            result = await agent.optimize_price(product_id, factors=request.constraints)
+        except Exception:
+            logger.exception("optimize_price failed for %s", product_id)
+            skipped.append({"product_id": product_id, "reason": "optimization error"})
+            continue
+
+        optimized_price = _coerce_price(result.get("recommended_price"))
+        if optimized_price is None:
+            skipped.append(
+                {"product_id": product_id, "reason": result.get("error", "no recommendation")}
+            )
+            continue
+
+        price_change = optimized_price - current_price
+        price_change_pct = (price_change / current_price * 100.0) if current_price else 0.0
+        optimizations.append(
+            PriceOptimization(
+                product_id=product_id,
+                current_price=round(current_price, 2),
+                optimized_price=round(optimized_price, 2),
+                price_change=round(price_change, 2),
+                price_change_pct=round(price_change_pct, 2),
+                estimated_revenue_impact=None,
+                confidence=float(result.get("confidence") or 0.0),
+            )
         )
+
+    if not optimizations:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No prices could be optimized (pricing model unavailable or unknown SKUs)",
+        )
+
+    avg_change = sum(o.price_change_pct for o in optimizations) / len(optimizations)
+    aggregate_metrics = {
+        "optimized_count": len(optimizations),
+        "skipped_count": len(skipped),
+        "skipped": skipped,
+        "avg_price_change_pct": round(avg_change, 2),
+    }
+
+    return DynamicPricingResponse(
+        optimization_id=optimization_id,
+        status="completed",
+        timestamp=datetime.now(UTC).isoformat(),
+        strategy=request.strategy,
+        total_products=len(request.product_ids),
+        optimizations=optimizations,
+        aggregate_metrics=aggregate_metrics,
+    )
