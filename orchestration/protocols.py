@@ -33,10 +33,20 @@ class AssetWorkflowAgent(Protocol):
         context: Any | None = None,
     ) -> dict[str, Any]: ...
 
+    async def close(self) -> None: ...
+
 
 @runtime_checkable
 class WordPressUploadAgent(AssetWorkflowAgent, Protocol):
-    """WordPress asset agent — `run()` plus a direct 3D upload entry point."""
+    """WordPress asset agent — `run()` plus a direct 3D upload entry point.
+
+    Note: `upload_3d_model` uses `*args/**kwargs` to remain decoupled from
+    the concrete agent's evolving parameter list.  The pipeline passes named
+    kwargs (`glb_path`, `usdz_path`, `thumbnail_path`, `product_id`, `title`,
+    `alt_text`) and the concrete agent may accept fewer of them — excess kwargs
+    are silently ignored by the implementation.  Static type-checkers will flag
+    call sites, but at runtime the duck-typed dispatch is safe.
+    """
 
     async def upload_3d_model(
         self,
@@ -55,3 +65,5 @@ class PreviewGateAgent(Protocol):
         product_name: str = ...,
         minimum_fidelity: float = ...,
     ) -> dict[str, Any]: ...
+
+    async def close(self) -> None: ...
