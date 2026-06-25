@@ -13,6 +13,7 @@ Routes:
 import asyncio
 import json
 import logging
+import math
 import os
 import re
 from datetime import datetime
@@ -22,6 +23,7 @@ from typing import Annotated, Any, Literal
 import aiofiles
 from fastapi import APIRouter, HTTPException
 from fastapi import Path as FastAPIPath
+from huggingface_hub import HfApi
 from prometheus_client import Counter, Gauge, Histogram
 from pydantic import BaseModel, Field, field_validator
 
@@ -77,6 +79,11 @@ training_router = APIRouter(prefix="/training", tags=["Training"])
 # Configuration
 TRAINING_OUTPUT_DIR = Path(os.getenv("TRAINING_OUTPUT_DIR", "models/training-runs"))
 ROUND_TABLE_RESULTS_PATH = Path("assets/ai-enhanced-images/ROUND_TABLE_ELITE_RESULTS.json")
+EXPORT_DIR = Path("assets/exports")
+
+# HuggingFace upload config (same env convention as api/v1/hf_spaces.py)
+HF_TOKEN = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_ACCESS_TOKEN")
+HF_USERNAME = os.getenv("HF_USERNAME", "damBruh")
 
 
 # =============================================================================
@@ -99,7 +106,9 @@ class TrainingProgressResponse(BaseModel):
     loss: float = Field(default=0.0, description="Current loss")
     learning_rate: float = Field(default=0.0, description="Current learning rate")
     avg_loss: float = Field(default=0.0, description="Average loss")
-    best_loss: float = Field(default=float("inf"), description="Best loss achieved")
+    best_loss: float | None = Field(
+        default=None, description="Best loss achieved (None until a checkpoint sets it)"
+    )
     started_at: str | None = Field(None, description="Training start timestamp")
     updated_at: str | None = Field(None, description="Last update timestamp")
     estimated_completion: str | None = Field(None, description="Estimated completion time")
@@ -112,6 +121,23 @@ class TrainingProgressResponse(BaseModel):
     checkpoint_step: int = Field(default=0, description="Checkpoint step")
     message: str = Field(default="", description="Status message")
     error: str = Field(default="", description="Error message if failed")
+
+    @field_validator("best_loss", mode="before")
+    @classmethod
+    def _nullify_non_finite_best_loss(cls, v: Any) -> float | None:
+        """Coerce non-finite floats (inf/-inf/nan) to None.
+
+        Training writers seed ``best_loss`` with ``inf`` to mean "no checkpoint
+        yet"; ``inf``/``nan`` are not JSON compliant and would 500 on response
+        serialization. ``None`` is the honest, serializable representation.
+        """
+        if v is None:
+            return None
+        try:
+            f = float(v)
+        except (TypeError, ValueError):
+            return None
+        return f if math.isfinite(f) else None
 
 
 class TrainingJobInfo(BaseModel):
@@ -333,7 +359,7 @@ async def get_training_status():
     try:
         logger.info("Fetching current training status")
 
-        versions = _find_training_versions()
+        versions = await _find_training_versions()
 
         if not versions:
             logger.info("No training jobs found")
@@ -344,7 +370,7 @@ async def get_training_status():
 
         # Find active training or latest
         for version in versions:
-            progress_data = _load_progress_file(version)
+            progress_data = await _load_progress_file(version)
             if progress_data:
                 status = progress_data.get("status", "unknown")
                 if status == "training":
@@ -361,7 +387,7 @@ async def get_training_status():
 
         # No active training, return latest
         latest_version = versions[0]
-        progress_data = _load_progress_file(latest_version)
+        progress_data = await _load_progress_file(latest_version)
 
         if progress_data:
             logger.info(f"Returning latest training: {latest_version}")
@@ -387,7 +413,7 @@ async def list_training_jobs():
     try:
         logger.info("Listing all training jobs")
 
-        versions = _find_training_versions()
+        versions = await _find_training_versions()
         jobs: list[TrainingJobInfo] = []
 
         running = 0
@@ -396,8 +422,8 @@ async def list_training_jobs():
 
         for version in versions:
             # Try status file first (has final info)
-            status_data = _load_status_file(version)
-            progress_data = _load_progress_file(version)
+            status_data = await _load_status_file(version)
+            progress_data = await _load_progress_file(version)
 
             data = status_data or progress_data or {}
             status = data.get("status", "unknown")
@@ -479,7 +505,7 @@ async def get_training_job(
         _validate_job_id(job_id)
         logger.info(f"Fetching training job: {job_id}")
 
-        progress_data = _load_progress_file(job_id)
+        progress_data = await _load_progress_file(job_id)
 
         if not progress_data:
             logger.warning(f"Training job not found: {job_id}")
@@ -513,7 +539,7 @@ async def export_round_table_to_hf(request: ExportRequest):
         logger.info(f"Export Round Table to HF requested: {request.dataset_name}")
 
         # Load Round Table results
-        rt_results = _load_round_table_results()
+        rt_results = await _load_round_table_results()
 
         if not rt_results:
             logger.error("Round Table results not found")
@@ -575,9 +601,9 @@ async def export_round_table_to_hf(request: ExportRequest):
                 message=f"Dry run complete. Would export {len(export_items)} winning scene specs.",
             )
 
-        # TODO: Implement actual HuggingFace upload using huggingface_hub
-        # For now, save to local export file using async I/O
-        export_path = Path("assets/exports") / f"{request.dataset_name}.json"
+        # Persist a local export artifact first. This is real work and doubles
+        # as the file uploaded to HuggingFace below.
+        export_path = EXPORT_DIR / f"{request.dataset_name}.json"
         export_path.parent.mkdir(parents=True, exist_ok=True)
 
         export_data = {
@@ -592,9 +618,54 @@ async def export_round_table_to_hf(request: ExportRequest):
 
         logger.info(f"Exported {len(export_items)} items to {export_path}")
 
-        # Construct expected HF URL
-        hf_username = os.getenv("HF_USERNAME", "damBruh")
-        dataset_url = f"https://huggingface.co/datasets/{hf_username}/{request.dataset_name}"
+        # Honest fallback: without a HuggingFace token we cannot upload. The local
+        # export is genuine, so report success with no remote URL rather than a
+        # fabricated dataset link.
+        if not HF_TOKEN:
+            logger.warning("HF_TOKEN not configured - skipping HuggingFace upload")
+            return ExportResponse(
+                success=True,
+                dataset_url=None,
+                exported_count=len(export_items),
+                collections_exported=exported_collections,
+                dry_run=False,
+                message=(
+                    f"Exported {len(export_items)} scene specs to {export_path}. "
+                    "HF_TOKEN not configured; skipped HuggingFace upload."
+                ),
+            )
+
+        # Real upload: create (or reuse) the dataset repo and push the export
+        # file. HfApi is synchronous, so run it off the event loop.
+        repo_id = f"{HF_USERNAME}/{request.dataset_name}"
+        try:
+            api = HfApi()
+            repo_url = await asyncio.to_thread(
+                api.create_repo,
+                repo_id,
+                repo_type="dataset",
+                exist_ok=True,
+                token=HF_TOKEN,
+            )
+            await asyncio.to_thread(
+                api.upload_file,
+                path_or_fileobj=str(export_path),
+                path_in_repo=f"{request.dataset_name}.json",
+                repo_id=repo_id,
+                repo_type="dataset",
+                token=HF_TOKEN,
+                commit_message=f"Add {len(export_items)} SkyyRose scene specs",
+            )
+        except Exception as hf_err:  # noqa: BLE001 - surface any HF failure as 502
+            logger.error(f"HuggingFace upload failed for {repo_id}: {hf_err}", exc_info=True)
+            raise HTTPException(
+                status_code=502,
+                detail=f"HuggingFace upload failed: {hf_err}",
+            ) from hf_err
+
+        # dataset_url comes only from a real create_repo result (RepoUrl is a str).
+        dataset_url = str(repo_url)
+        logger.info(f"Uploaded {len(export_items)} scene specs to {dataset_url}")
 
         return ExportResponse(
             success=True,
@@ -603,7 +674,8 @@ async def export_round_table_to_hf(request: ExportRequest):
             collections_exported=exported_collections,
             dry_run=False,
             message=(
-                f"Exported {len(export_items)} scene specs. Local export saved to {export_path}"
+                f"Uploaded {len(export_items)} scene specs to {dataset_url}. "
+                f"Local export saved to {export_path}."
             ),
         )
 
@@ -623,7 +695,7 @@ async def training_health_check():
         Health status and diagnostics
     """
     try:
-        versions = _find_training_versions()
+        versions = await _find_training_versions()
         has_rt_results = ROUND_TABLE_RESULTS_PATH.exists()
 
         return {
