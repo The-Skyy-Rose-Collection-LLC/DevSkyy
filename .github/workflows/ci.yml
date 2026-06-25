@@ -397,10 +397,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Root project has no committed package-lock.json (gitignored); use
-      # `npm install` and rely on overrides in package.json to pin exact
-      # versions of packages (e.g. jest-runtime) that cause test failures
-      # when npm resolves newer minor/patch releases.
+      # Root project has no committed package-lock.json; use `npm install`
+      # (not `npm ci`) and skip npm cache, which requires a lockfile to key on.
       - name: Install dependencies
         run: npm install
 

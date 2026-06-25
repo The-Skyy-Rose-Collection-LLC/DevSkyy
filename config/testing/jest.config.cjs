@@ -119,19 +119,6 @@ module.exports = {
     '/skyyrose-suite/',
     // design-system uses Vitest, not Jest
     '/design-system/skyyrose-storefront/test/',
-    // Agent worktrees contain duplicate mocks that confuse jest-haste-map
-    '/\\.claude/worktrees/',
-  ],
-
-  // Prevent jest-haste-map from scanning worktrees for manual mocks,
-  // which causes duplicate-mock collisions (three, three-examples, ModelAssetLoader).
-  modulePathIgnorePatterns: [
-    '<rootDir>/\\.claude/worktrees/',
-  ],
-
-  // Also exclude worktrees from watch mode
-  watchPathIgnorePatterns: [
-    '<rootDir>/\\.claude/worktrees/',
   ],
 
   // Transform node_modules that use ESM (like three.js)
@@ -145,9 +132,8 @@ module.exports = {
   // Clear mocks between tests
   clearMocks: true,
 
-  // Restore mocks after each test - disabled due to Jest 29.7.0 compatibility issue
-  // with clearMocksOnScope not being available in _moduleMocker
-  // restoreMocks: true,
+  // Restore mocks after each test
+  restoreMocks: true,
 
   // Verbose output
   verbose: true,
