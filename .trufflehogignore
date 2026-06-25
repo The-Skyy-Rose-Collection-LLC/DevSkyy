@@ -1,0 +1,45 @@
+# TruffleHog Exclusions
+# Binary files and large artifacts that cause scan timeouts
+
+# PyTorch model checkpoints (binary)
+skyyrose-brand-voice-lora/checkpoint-*/optimizer.pt
+skyyrose-brand-voice-lora/checkpoint-*/pytorch_model.bin
+skyyrose-brand-voice-lora/**/*.bin
+skyyrose-brand-voice-lora/**/*.safetensors
+
+# Other ML artifacts
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.pb
+*.onnx
+
+# Binary archives
+*.tar.gz
+*.zip
+*.7z
+
+# Media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+
+# Image binaries (not text-based formats)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+
+# Build artifacts
+node_modules/
+.next/
+dist/
+build/
+*.pyc
+__pycache__/
