@@ -69,7 +69,13 @@ log = logging.getLogger("skyy-rig")
 
 
 async def _probe_key_on_region(key: str, is_global: bool) -> dict:
-    """Try a single key against a single region. Return diagnostic dict."""
+    """Try a single key against a single region. Return diagnostic dict.
+
+    NOTE: the raw API key is intentionally NOT stored in the returned dict —
+    callers that need the key should track it separately (e.g. alongside the
+    index into the candidate_keys list). Keeping the key out of the dict
+    prevents CodeQL from tainting the numeric `balance` field via data-flow.
+    """
     from tripo3d import TripoClient
 
     region = "global (.ai)" if is_global else "china (.com)"
@@ -80,7 +86,6 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
             available = float(getattr(balance, "balance", 0))
             frozen = float(getattr(balance, "frozen", 0))
             return {
-                "api_key": key,
                 "key_suffix": suffix,
                 "region": region,
                 "is_global": is_global,
@@ -91,7 +96,6 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
             }
     except Exception as exc:
         return {
-            "api_key": key,
             "key_suffix": suffix,
             "region": region,
             "is_global": is_global,
@@ -102,21 +106,29 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
         }
 
 
-async def discover_credit_holding_account(keys: list[str]) -> dict | None:
-    """Try every (key × region) combo. Return the first with non-zero balance.
+async def discover_credit_holding_account(
+    keys: list[str],
+) -> tuple[str, dict] | tuple[None, None]:
+    """Try every (key × region) combo. Return (key, result_dict) for the first with non-zero balance.
+
+    Returns (None, None) when no key+region combo has credits.
 
     Per ENFORCED PROJECT RULE: verify connectivity + account state before any
     paid operation. The user maintains MULTIPLE Tripo accounts across the .ai
     and .com regions; we don't assume which key holds credits.
+
+    The raw API key is tracked separately from the diagnostic dict so that
+    CodeQL cannot taint the numeric balance field via data-flow from the key.
     """
     log.info("=== Multi-account / multi-region Tripo discovery ===")
     log.info("Trying %d key(s) × 2 regions = %d probes", len(keys), len(keys) * 2)
 
-    all_results = []
-    for i, key in enumerate(keys, 1):
+    # all_results stores (key, result_dict) — key kept separate from the dict
+    all_results: list[tuple[str, dict]] = []
+    for key in keys:
         for is_global in (True, False):
             result = await _probe_key_on_region(key, is_global)
-            all_results.append(result)
+            all_results.append((key, result))
             status = "✓" if result["auth_ok"] else "✗"
             log.info(
                 "  [%d/%d] key ***%s on %s: %s auth, balance=%.2f, frozen=%.2f%s",
@@ -131,7 +143,7 @@ async def discover_credit_holding_account(keys: list[str]) -> dict | None:
             )
 
     # Find the winner: first key+region combo with auth_ok AND balance > 0
-    for r in all_results:
+    for winning_key, r in all_results:
         if r["auth_ok"] and r["balance"] > 0:
             log.info(
                 "✓ FOUND credit-holding account: key ***%s on %s (balance=%.2f)",
@@ -139,10 +151,10 @@ async def discover_credit_holding_account(keys: list[str]) -> dict | None:
                 r["region"],
                 r["balance"],
             )
-            return r
+            return winning_key, r
 
     log.error("✗ NO key+region combo has credits. Tried:")
-    for r in all_results:
+    for _key, r in all_results:
         log.error(
             "  - ***%s on %s: auth=%s balance=%.2f",
             r["key_suffix"],
@@ -150,7 +162,7 @@ async def discover_credit_holding_account(keys: list[str]) -> dict | None:
             r["auth_ok"],
             r["balance"],
         )
-    return None
+    return None, None
 
 
 async def verify_connectivity(agent: TripoAssetAgent) -> dict | None:
@@ -329,7 +341,7 @@ async def main() -> int:
         log.error("No tsk_* keys found. Set TRIPO_API_KEYS (comma-separated) or TRIPO_API_KEY.")
         return 1
 
-    winner = await discover_credit_holding_account(candidate_keys)
+    winner_key, winner = await discover_credit_holding_account(candidate_keys)
     if winner is None:
         log.error(
             "Aborting — no Tripo account with credits found across %d keys × 2 regions. "
@@ -340,10 +352,10 @@ async def main() -> int:
         return 1
 
     # Configure the agent with the winning key + region.
-    # winner["api_key"] holds the full key set by discover_credit_holding_account so we
-    # never reconstruct by suffix (which can collide when multiple keys share a suffix).
+    # winner_key is tracked separately from the diagnostic dict — never read back
+    # from the dict — so the key never co-mingles with numeric balance values.
     config = TripoConfig.from_env()
-    config.api_key = winner["api_key"]
+    config.api_key = winner_key
     config.is_global = winner["is_global"]
     if not config.is_global:
         config.base_url = "https://api.tripo3d.com/v2"
