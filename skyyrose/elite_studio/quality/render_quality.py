@@ -33,7 +33,11 @@ from pathlib import Path
 from PIL import Image
 
 from skyyrose.core import clip_embedder, dino_embedder
-from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid, load_centroid
+from skyyrose.elite_studio.quality.brand_centroid import (
+    BrandCentroid,
+    is_dino_model,
+    load_centroid,
+)
 
 
 class Verdict(StrEnum):
@@ -84,7 +88,7 @@ def _score_centroid(image: Path | Image.Image, centroid: BrandCentroid) -> float
     is scored with DINOv2 embeddings and a CLIP centroid with CLIP
     embeddings — never cross-encoder (would be meaningless).
     """
-    if "dinov2" in (centroid.model_id or "").lower():
+    if is_dino_model(centroid.model_id):
         embedding = dino_embedder.embed_image(image)
     else:
         embedding = clip_embedder.embed_image(image)

@@ -1,5 +1,23 @@
 # Current Tasks
 
+## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
+
+Branch `feat/embeddings-phase2` off `origin/main`. Spec: `docs/superpowers/specs/2026-06-22-embeddings-reframe-design.md` §Track E.
+Base: Phase 0 (frozen contract + golden gate) IS in main; Phase 1 (Track P) is NOT (open PR #604) — Track E is orthogonal.
+
+**Approach (decided):** Shim migration — `skyyrose/core/clip_embedder.py` + `dino_embedder.py` become thin facades over the new
+package → zero consumer churn (6 in-repo sites + `capability.py` importlib string-probe + 2 scripts unchanged). `store.py`
+(sqlite LocalVectorStore) DEFERRED — no current consumer (YAGNI); E-store covered by atomic-centroid + space-guard on the
+live `.npz` path. All tests model-free (CI red on HF Hub 429 — never download a model in a test).
+
+Foundation: [x] errors.py [x] device.py [x] space.py [x] config.py [x] base.py
+Encoders:   [x] clip.py [x] dino.py [x] cache.py
+Wire:       [x] embedding_gate (E-encoder-gate) [x] brand_centroid (E-space/E-store) [x] shims
+Migrate:    [x] repoint visual_product_recognition [x] delete scripts/image_embeddings (E-delete)
+Verify:     [x] new unit suite green (50) [x] Phase-0 golden+contract still green (11) [x] elite_studio CI-mode green (185) + lint clean
+            [~] adversarial 5-lens review running (wf_5bc8945c-3d3) → triage + fix → commit
+DEFER:      store.py (sqlite LocalVectorStore) — no consumer, YAGNI; E-store covered by atomic centroid + dim guard.
+
 ## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
 
 Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js

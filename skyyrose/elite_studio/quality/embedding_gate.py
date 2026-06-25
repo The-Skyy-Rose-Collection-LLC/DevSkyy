@@ -16,10 +16,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
-from skyyrose.core import clip_embedder
-from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid
+from skyyrose.core import clip_embedder, dino_embedder
+from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid, is_dino_model
 
 
 @dataclass
@@ -31,9 +32,19 @@ class GateVerdict:
 
 
 def score_against_centroid(image: Path | str | Image.Image, centroid: BrandCentroid) -> float:
-    """Cosine similarity between image embedding and brand centroid."""
-    embedding = clip_embedder.embed_image(image)
-    return clip_embedder.cosine_similarity(embedding, centroid.centroid)
+    """Cosine similarity between image embedding and brand centroid.
+
+    Dispatches the encoder by the centroid's ``model_id`` so a DINOv2 centroid is
+    scored with DINOv2 embeddings and a CLIP centroid with CLIP — never
+    cross-encoder, which would yield a confident but meaningless cosine
+    (E-encoder-gate). Mirrors ``render_quality._score_centroid``.
+    """
+    if is_dino_model(centroid.model_id):
+        embedding = dino_embedder.embed_image(image)
+    else:
+        embedding = clip_embedder.embed_image(image)
+    # Both encoders L2-normalize, so cosine == dot.
+    return float(np.dot(embedding, centroid.centroid))
 
 
 def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVerdict:

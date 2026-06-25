@@ -1,8 +1,8 @@
 """Tests for skyyrose.core.dino_embedder.
 
 DINOv2 (Meta's self-supervised vision transformer) is a stronger
-image-only encoder than CLIP-base for visual similarity tasks. Same
-shape (512-d after pooling), L2-normalized for direct cosine comparison.
+image-only encoder than CLIP-base for visual similarity tasks. 768-d
+(DINOv2-base CLS token), L2-normalized for direct cosine comparison.
 """
 
 from __future__ import annotations
@@ -59,8 +59,8 @@ def test_different_images_below_one(red_image: Path, blue_image: Path) -> None:
 
 
 def test_singleton_does_not_reload(red_image: Path) -> None:
-    dino_embedder.get_dino()
-    state = dino_embedder._STATE
-    first_id = id(state.model)
+    # The shim exposes an lru_cached encoder singleton (no get_dino/_STATE anymore).
+    enc_before = dino_embedder._encoder()
     dino_embedder.embed_image(red_image)
-    assert id(state.model) == first_id
+    enc_after = dino_embedder._encoder()
+    assert enc_before is enc_after

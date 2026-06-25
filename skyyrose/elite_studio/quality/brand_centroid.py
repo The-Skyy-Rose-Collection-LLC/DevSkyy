@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import zipfile
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -32,6 +34,8 @@ from typing import Literal
 import numpy as np
 
 from skyyrose.core import clip_embedder, dino_embedder
+from skyyrose.core.embeddings.config import get_config
+from skyyrose.core.embeddings.errors import EmbeddingError, EmbeddingSpaceMismatch
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -63,6 +67,31 @@ def _embed(encoder: EncoderName, path: Path) -> np.ndarray:
 
 def _model_id(encoder: EncoderName) -> str:
     return dino_embedder.MODEL_ID if encoder == "dino" else clip_embedder.MODEL_ID
+
+
+def is_dino_model(model_id: str | None) -> bool:
+    """True if ``model_id`` denotes a DINOv2 encoder (vs CLIP).
+
+    Single source of truth for encoder dispatch — imported by ``embedding_gate``
+    and ``render_quality`` so they cannot diverge (they previously used ``"dino"``
+    vs ``"dinov2"``, which silently mis-routed any id containing one but not the
+    other).
+    """
+    return "dino" in (model_id or "").lower()
+
+
+def _expected_dim(model_id: str) -> int | None:
+    """Centroid dimension implied by ``model_id``, or None when unknown.
+
+    Synthetic ids (e.g. ``"test"``) return None so the load-time guard is skipped
+    rather than rejecting a legitimately-shaped synthetic centroid.
+    """
+    cfg = get_config()
+    if is_dino_model(model_id):
+        return cfg.dino_dim
+    if "clip" in (model_id or "").lower():
+        return cfg.clip_dim
+    return None
 
 
 def build_centroid(
@@ -107,23 +136,67 @@ def build_centroid(
 
 
 def save_centroid(c: BrandCentroid, path: Path) -> None:
+    """Write the centroid ``.npz`` atomically (tmp + ``os.replace``).
+
+    A crash mid-write would otherwise leave a truncated ``.npz`` that passes
+    ``exists()`` but fails ``np.load`` — routing a paid render into a crash
+    instead of the graceful fallback (E-store). ``dim`` is stamped for provenance
+    and load-time validation (E-space). Written via a file handle so ``np.savez``
+    does not append a second ``.npz`` to the tmp name and break the rename.
+    """
+    path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(
-        path,
-        centroid=c.centroid,
-        threshold=np.array(c.threshold, dtype=np.float32),
-        sample_count=np.array(c.sample_count, dtype=np.int64),
-        model_id=np.array(c.model_id),
-    )
+    tmp = path.with_name(path.name + ".tmp")
+    try:
+        with open(tmp, "wb") as fh:
+            np.savez(
+                fh,
+                centroid=c.centroid,
+                threshold=np.array(c.threshold, dtype=np.float32),
+                sample_count=np.array(c.sample_count, dtype=np.int64),
+                model_id=np.array(c.model_id),
+                dim=np.array(int(c.centroid.shape[0]), dtype=np.int64),
+            )
+        os.replace(tmp, path)
+    except OSError:
+        Path(tmp).unlink(missing_ok=True)
+        raise
 
 
 def load_centroid(path: Path) -> BrandCentroid:
-    data = np.load(path, allow_pickle=False)
+    """Load a centroid ``.npz``, guarding corruption and embedding-space mismatch.
+
+    Raises :class:`EmbeddingError` on an unreadable/corrupt/incomplete file and
+    :class:`EmbeddingSpaceMismatch` when the stored dimension disagrees with the
+    encoder implied by ``model_id`` (e.g. a 512-d CLIP centroid mislabeled as
+    DINOv2) — a clear typed failure instead of a cryptic numpy shape error on a
+    paid render (E-space).
+    """
+    path = Path(path)
+    try:
+        data = np.load(path, allow_pickle=False)
+    except (OSError, ValueError, EOFError, zipfile.BadZipFile) as exc:
+        raise EmbeddingError(f"corrupt or unreadable centroid {path}: {exc}") from exc
+    try:
+        centroid = data["centroid"]
+        model_id = str(data["model_id"])
+        threshold = float(data["threshold"])
+        sample_count = int(data["sample_count"])
+    except KeyError as exc:
+        raise EmbeddingError(f"centroid {path} missing required key {exc}") from exc
+
+    expected = _expected_dim(model_id)
+    actual = int(centroid.shape[0])
+    if expected is not None and actual != expected:
+        raise EmbeddingSpaceMismatch(
+            f"centroid dim {actual} != {expected} expected for model {model_id!r} ({path})"
+        )
+
     return BrandCentroid(
-        centroid=data["centroid"],
-        threshold=float(data["threshold"]),
-        sample_count=int(data["sample_count"]),
-        model_id=str(data["model_id"]),
+        centroid=centroid,
+        threshold=threshold,
+        sample_count=sample_count,
+        model_id=model_id,
     )
 
 
