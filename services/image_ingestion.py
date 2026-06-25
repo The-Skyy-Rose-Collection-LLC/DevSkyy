@@ -28,6 +28,7 @@ from services.image_deduplication import (
     ImageDeduplicator,
     get_deduplicator,
 )
+from services.ml.processing_queue import ProcessingQueue, TaskType
 
 logger = logging.getLogger(__name__)
 
@@ -167,6 +168,7 @@ class ImageIngestionService:
         r2_client: Any | None = None,
         deduplicator: ImageDeduplicator | None = None,
         timeout: float = 30.0,
+        processing_queue: ProcessingQueue | None = None,
     ) -> None:
         """Initialize ingestion service.
 
@@ -174,10 +176,14 @@ class ImageIngestionService:
             r2_client: R2 storage client (optional, for testing)
             deduplicator: Image deduplicator (optional)
             timeout: HTTP timeout for downloads
+            processing_queue: ML processing queue (optional; in-memory default)
         """
         self._r2_client = r2_client
         self._deduplicator = deduplicator or get_deduplicator()
         self._timeout = timeout
+        # ProcessingQueue is in-memory (no external infra); default-construct one
+        # so ingested assets are actually submitted, not silently dropped.
+        self._queue = processing_queue or ProcessingQueue()
         self._http_client: httpx.AsyncClient | None = None
 
     async def _get_http_client(self) -> httpx.AsyncClient:
@@ -540,15 +546,23 @@ class ImageIngestionService:
         Returns:
             Processing job ID
         """
-        # P1 #11: ProcessingQueue integration is not implemented. Returning a
-        # job_id without submission silently dropped every queued asset. Raise
-        # so callers either wire the queue or make an explicit fallback.
-        raise NotImplementedError(
-            "ProcessingQueue integration is not yet wired. _queue_for_processing "
-            "previously generated a uuid and logged it without submitting any work, "
-            "silently losing every ingested asset. Wire to the real processing queue "
-            "or remove this call from ingest_*() entry points before relying on it."
+        # P1 #11: submit the asset to the (in-memory) ProcessingQueue and return
+        # the real job_id. The queue's task handlers are registered by the ML
+        # pipeline; ingestion's job is only to enqueue, not to process.
+        job_id = await self._queue.submit_job(
+            TaskType.BACKGROUND_REMOVAL,
+            {
+                "asset_id": asset_id,
+                "r2_key": r2_key,
+                "source": source.value,
+                "product_id": product_id,
+                "woocommerce_product_id": woocommerce_product_id,
+                "metadata": metadata,
+                "callback_url": callback_url,
+            },
+            correlation_id=correlation_id,
         )
+        return job_id
 
     async def ingest_batch(
         self,
