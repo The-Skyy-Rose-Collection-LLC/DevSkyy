@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { training } from '@/lib/api/endpoints/training';
 import type { TrainingProgress, TrainingJobsList } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -315,8 +315,8 @@ export default function HuggingFacePage() {
     setTrainingLoading(true);
     try {
       const [status, jobs] = await Promise.all([
-        api.training.getStatus(),
-        api.training.getJobs(),
+        training.getStatus(),
+        training.getJobs(),
       ]);
       setTrainingStatus(status);
       setTrainingJobs(jobs);

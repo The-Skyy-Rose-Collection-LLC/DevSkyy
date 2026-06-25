@@ -11,6 +11,7 @@ import type {
 } from '../types';
 
 const JOB_ID_RE = /^[a-zA-Z0-9_-]+$/;
+const MAX_JOB_ID_LENGTH = 128;
 
 export const training = {
     getStatus: async (): Promise<TrainingProgress> => {
@@ -28,7 +29,7 @@ export const training = {
     },
 
     getJob: async (jobId: string): Promise<TrainingProgress> => {
-        if (!JOB_ID_RE.test(jobId)) {
+        if (!JOB_ID_RE.test(jobId) || jobId.length > MAX_JOB_ID_LENGTH) {
             throw new ApiError('Invalid job ID format', 400, 'INVALID_INPUT');
         }
         const res = await fetchWithTimeout(
