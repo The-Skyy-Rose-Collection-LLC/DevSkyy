@@ -7,6 +7,9 @@ import pytest
 import torch
 from PIL import Image
 
+# Skip these tests if torchvision is unavailable (transformers AutoImageProcessor requires it)
+pytest.importorskip("torchvision")
+
 from skyyrose.core.embeddings import dino as dino_mod
 from skyyrose.core.embeddings.config import EmbeddingConfig
 from skyyrose.core.embeddings.device import dtype_load_kwargs
