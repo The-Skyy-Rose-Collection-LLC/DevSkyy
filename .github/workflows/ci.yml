@@ -551,6 +551,10 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: Run Playwright tests
+        # Step-level cap: a slow/failing E2E suite fails HERE (step failure, absorbed by this
+        # job's continue-on-error) instead of running to the 30-min JOB timeout, which fires as
+        # a cancellation that continue-on-error cannot absorb — that gated the pipeline.
+        timeout-minutes: 15
         run: ./node_modules/.bin/playwright test --reporter=html
         working-directory: frontend
         env:
