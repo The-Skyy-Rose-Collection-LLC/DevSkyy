@@ -24,8 +24,8 @@ The pipeline:
   9. Print verification (clip names, file size, bone count)
 
 This script lives outside agents/ but uses the TripoAssetAgent's tool methods
-to satisfy the agent CLAUDE.md rule that all Tripo API calls flow through the
-agent (no direct SDK access from script code).
+for the main generation pipeline. _probe_key_on_region() calls TripoClient
+directly for pre-flight balance probing only, before any agent is constructed.
 """
 
 from __future__ import annotations
@@ -76,7 +76,10 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
     index into the candidate_keys list). Keeping the key out of the dict
     prevents CodeQL from tainting the numeric `balance` field via data-flow.
     """
-    from tripo3d import TripoClient
+    try:
+        from tripo3d import TripoClient
+    except ImportError as exc:
+        raise ImportError("tripo3d SDK not installed. Run: pip install 'tripo3d>=0.4.1'") from exc
 
     region = "global (.ai)" if is_global else "china (.com)"
     suffix = key[-4:] if len(key) >= 4 else "(short)"
@@ -109,7 +112,7 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
 async def discover_credit_holding_account(
     keys: list[str],
 ) -> tuple[str, dict] | tuple[None, None]:
-    """Try every (key × region) combo. Return (key, result_dict) for the first with non-zero balance.
+    """Try every (key × region) combo. Return (key, result_dict) for first with non-zero balance.
 
     Returns (None, None) when no key+region combo has credits.
 
@@ -256,7 +259,10 @@ def rename_animation_clips(src: Path, dst: Path) -> dict[str, str]:
 
     Returns dict mapping original_name -> new_name for everything renamed.
     """
-    from pygltflib import GLTF2
+    try:
+        from pygltflib import GLTF2
+    except ImportError as exc:
+        raise ImportError("pygltflib not installed. Run: pip install 'pygltflib>=1.16.5'") from exc
 
     gltf = GLTF2().load(str(src))
     if not gltf.animations:
@@ -441,11 +447,6 @@ async def main() -> int:
             actual,
         )
         return 7
-
-    final_balance = await get_balance(agent)
-    if final_balance is not None and starting_balance is not None:
-        spent = starting_balance - final_balance
-        log.info("Tripo credits used: %.2f (balance now %.2f)", spent, final_balance)
 
     log.info("✓ Saved rigged + animated Skyy avatar to %s", args.output)
     return 0

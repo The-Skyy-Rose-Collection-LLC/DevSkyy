@@ -35,7 +35,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from pygltflib import GLTF2, Animation, AnimationChannel, AnimationSampler  # noqa: E402
+try:
+    from pygltflib import GLTF2, Animation, AnimationChannel, AnimationSampler  # noqa: E402
+except ImportError as _pygltflib_err:
+    raise ImportError(
+        "pygltflib not installed. Run: pip install 'pygltflib>=1.16.5'"
+    ) from _pygltflib_err
 
 DEFAULT_OUTPUT = (
     REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "models" / "skyy.glb"
