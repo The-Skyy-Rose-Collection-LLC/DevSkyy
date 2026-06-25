@@ -48,11 +48,21 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, Field, ValidationError
 
-from agents.fashn_agent import FashnConfig, FashnTryOnAgent, GarmentCategory
-from agents.meshy_agent import MeshyAgent, MeshyConfig
-from agents.tripo_agent import TripoAssetAgent, TripoConfig
-from agents.wordpress_asset_agent import WordPressAssetAgent, WordPressAssetConfig
+# Configs and shared enums are pure-data — importing them does not couple
+# orchestration to agent *behavior*. Agent *classes* themselves are imported
+# lazily inside the @property methods to keep this module's top-level
+# dependency graph free of L4 (agents) imports, satisfying the project's
+# layer rule (orchestration L3 must not depend on agents L4).
+from agents.fashn_agent import FashnConfig, GarmentCategory
+from agents.meshy_agent import MeshyConfig
+from agents.tripo_agent import TripoConfig
+from agents.wordpress_asset_agent import WordPressAssetConfig
 from orchestration.huggingface_3d_client import HuggingFace3DClient, HuggingFace3DConfig
+from orchestration.protocols import (
+    AssetWorkflowAgent,
+    PreviewGateAgent,
+    WordPressUploadAgent,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -400,16 +410,27 @@ class ProductAssetPipeline:
     def __init__(
         self,
         config: PipelineConfig | None = None,
+        *,
+        tripo_agent: AssetWorkflowAgent | None = None,
+        fashn_agent: AssetWorkflowAgent | None = None,
+        wordpress_agent: WordPressUploadAgent | None = None,
+        meshy_agent: PreviewGateAgent | None = None,
     ) -> None:
-        """Initialize pipeline with configuration."""
+        """Initialize pipeline with configuration.
+
+        Agents may be injected directly for testing or alternate
+        implementations. When omitted, the default concrete agents
+        (Tripo / FASHN / WordPress / Meshy) are constructed lazily on
+        first access — see the `@property` methods below.
+        """
         self.config = config or PipelineConfig.from_env()
 
-        # Initialize agents (lazy - created on first use)
+        # Lazy storage — None means "construct default on first access".
         self._huggingface_client: HuggingFace3DClient | None = None
-        self._tripo_agent: TripoAssetAgent | None = None
-        self._fashn_agent: FashnTryOnAgent | None = None
-        self._wordpress_agent: WordPressAssetAgent | None = None
-        self._meshy_agent: MeshyAgent | None = None
+        self._tripo_agent: AssetWorkflowAgent | None = tripo_agent
+        self._fashn_agent: AssetWorkflowAgent | None = fashn_agent
+        self._wordpress_agent: WordPressUploadAgent | None = wordpress_agent
+        self._meshy_agent: PreviewGateAgent | None = meshy_agent
 
         # Stage 4.7.2: Batch processing semaphore
         self._semaphore = asyncio.Semaphore(self.config.batch_concurrency)
@@ -436,30 +457,38 @@ class ProductAssetPipeline:
         return self._huggingface_client
 
     @property
-    def tripo_agent(self) -> TripoAssetAgent:
-        """Get or create Tripo3D agent."""
+    def tripo_agent(self) -> AssetWorkflowAgent:
+        """Get or create Tripo3D agent (default impl loaded lazily to avoid layer coupling)."""
         if self._tripo_agent is None:
+            from agents.tripo_agent import TripoAssetAgent
+
             self._tripo_agent = TripoAssetAgent(config=self.config.tripo_config)
         return self._tripo_agent
 
     @property
-    def fashn_agent(self) -> FashnTryOnAgent:
-        """Get or create FASHN agent."""
+    def fashn_agent(self) -> AssetWorkflowAgent:
+        """Get or create FASHN agent (default impl loaded lazily to avoid layer coupling)."""
         if self._fashn_agent is None:
+            from agents.fashn_agent import FashnTryOnAgent
+
             self._fashn_agent = FashnTryOnAgent(config=self.config.fashn_config)
         return self._fashn_agent
 
     @property
-    def wordpress_agent(self) -> WordPressAssetAgent:
-        """Get or create WordPress agent."""
+    def wordpress_agent(self) -> WordPressUploadAgent:
+        """Get or create WordPress agent (default impl loaded lazily to avoid layer coupling)."""
         if self._wordpress_agent is None:
+            from agents.wordpress_asset_agent import WordPressAssetAgent
+
             self._wordpress_agent = WordPressAssetAgent(config=self.config.wordpress_config)
         return self._wordpress_agent
 
     @property
-    def meshy_agent(self) -> MeshyAgent:
-        """Get or create Meshy agent (used for the cheap preview gate before Tripo3D)."""
+    def meshy_agent(self) -> PreviewGateAgent:
+        """Get or create Meshy agent for the cheap preview gate before Tripo3D."""
         if self._meshy_agent is None:
+            from agents.meshy_agent import MeshyAgent
+
             self._meshy_agent = MeshyAgent(config=self.config.meshy_config)
         return self._meshy_agent
 

@@ -195,3 +195,13 @@ class WordPressAssetAgent(EnhancedSuperAgent):
             media_id=result.media_id,
             cdn_url=result.url,
         )
+
+    async def close(self) -> None:
+        """Release any async resources held by this agent.
+
+        WordPress asset agent holds no persistent async connections, so this
+        is a no-op. It exists to satisfy the ``WordPressUploadAgent`` protocol
+        (which inherits ``close()`` from ``AssetWorkflowAgent``), ensuring
+        ``ProductAssetPipeline.close()`` can safely call it on all agents
+        without an ``AttributeError``.
+        """
