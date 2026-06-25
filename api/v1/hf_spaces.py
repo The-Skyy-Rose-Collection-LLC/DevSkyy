@@ -9,6 +9,7 @@ Routes:
 - POST /api/v1/hf-spaces/{space_id}/refresh - Refresh Space
 """
 
+import asyncio
 import logging
 import os
 import time
@@ -17,6 +18,7 @@ from typing import Literal
 
 import aiohttp
 from fastapi import APIRouter, HTTPException
+from huggingface_hub import HfApi
 from prometheus_client import Counter, Gauge, Histogram
 from pydantic import BaseModel, Field
 
@@ -326,16 +328,28 @@ async def refresh_space(space_id: str):
                 detail="HuggingFace token not configured. Set HF_TOKEN environment variable.",
             )
 
-        # TODO: Implement Space refresh via HuggingFace API
-        # This requires using the HuggingFace Hub API to trigger a rebuild
-        # For now, return success message
+        # repo_id is the "owner/space" segment of the canonical Space URL.
+        repo_id = space["url"].split("/spaces/", 1)[-1]
+        try:
+            runtime = await asyncio.to_thread(HfApi().restart_space, repo_id, token=HF_TOKEN)
+        except Exception as e:
+            logger.error("HF restart_space failed for %s: %s", repo_id, e, exc_info=True)
+            raise HTTPException(
+                status_code=502,
+                detail="Failed to trigger Space rebuild on HuggingFace",
+            ) from e
 
-        logger.info(f"Refresh initiated for Space: {space['name']} ({space_id})")
+        stage = getattr(runtime, "stage", None)
+        logger.info(
+            "Refresh initiated for Space: %s (%s), stage=%s", space["name"], space_id, stage
+        )
 
         return {
             "message": f"Refresh initiated for Space: {space['name']}",
             "space_id": space_id,
+            "repo_id": repo_id,
             "url": space["url"],
+            "stage": str(stage) if stage is not None else None,
         }
 
     except HTTPException:

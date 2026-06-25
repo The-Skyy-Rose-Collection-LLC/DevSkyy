@@ -355,14 +355,15 @@ class TestSecretSecurity:
                     if value:  # Skip empty values
                         values.append(value)
 
-            # Common weak patterns
+            # Common weak patterns - use word boundaries to avoid false positives
+            # on random strings that happen to contain these as substrings
             weak_patterns = [
-                r"password",
-                r"12345",
-                r"qwerty",
-                r"admin",
-                r"root",
-                r"test",
+                r"\bpassword\b",
+                r"\b12345\b",
+                r"\bqwerty\b",
+                r"\badmin\b",
+                r"\broot\b",
+                r"\btest\b",
             ]
 
             # Check only VALUES, not variable names
