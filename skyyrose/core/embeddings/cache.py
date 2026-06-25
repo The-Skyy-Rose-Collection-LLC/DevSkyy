@@ -103,16 +103,34 @@ class EmbeddingCache:
 
         key = self._key(self._hash_bytes(data))
 
+        # OBS-wire: record cache HITS here (latency ~0, cache_hit=True). MISSES fall
+        # through to encoder.embed_image -> BaseEncoder.embed_images, which records
+        # its own cache_hit=False row — so each encode is counted exactly once.
         cached = self._mem.get(key)
         if cached is not None:
+            self._record_hit()
             return cached
 
         disk = self._load_disk(key)
         if disk is not None:
             self._mem[key] = disk
+            self._record_hit()
             return disk
 
         vector = self._encoder.embed_image(source)
         self._mem[key] = vector
         self._store_disk(key, vector)
         return vector
+
+    def _record_hit(self) -> None:
+        """Emit one cache-hit telemetry row (lazy import; never raises)."""
+        from core.token_tracker import record_embedding_usage
+
+        record_embedding_usage(
+            model=self._encoder.space.model_id,
+            latency_ms=0.0,
+            success=True,
+            cache_hit=True,
+            dim=self._encoder.space.dim,
+            count=1,
+        )

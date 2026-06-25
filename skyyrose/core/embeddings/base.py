@@ -20,6 +20,7 @@ lives here.
 from __future__ import annotations
 
 import logging
+import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 from threading import Lock
@@ -104,13 +105,40 @@ class BaseEncoder(ABC):
         if batch_size < 1:
             raise EmbedError(f"batch_size must be >= 1, got {batch_size}")
         self._ensure_loaded()
-        out: list[np.ndarray] = []
-        for start in range(0, len(sources), batch_size):
-            chunk = sources[start : start + batch_size]
-            images = [self._open(s) for s in chunk]
-            raw = self._encode_pils(images)
-            out.extend(self._l2_normalize(row) for row in raw)
-        return np.stack(out)
+        # OBS-wire: one telemetry row per encode (latency, success, count). Imported
+        # lazily so the package still imports without core/ side effects; the helper
+        # never raises, so telemetry cannot break the encode path.
+        from core.token_tracker import record_embedding_usage
+
+        started = time.perf_counter()
+        try:
+            out: list[np.ndarray] = []
+            for start in range(0, len(sources), batch_size):
+                chunk = sources[start : start + batch_size]
+                images = [self._open(s) for s in chunk]
+                raw = self._encode_pils(images)
+                out.extend(self._l2_normalize(row) for row in raw)
+            result = np.stack(out)
+        except Exception as exc:
+            record_embedding_usage(
+                model=self.space.model_id,
+                latency_ms=(time.perf_counter() - started) * 1000.0,
+                success=False,
+                cache_hit=False,
+                dim=self.space.dim,
+                count=len(sources),
+                error=str(exc),
+            )
+            raise
+        record_embedding_usage(
+            model=self.space.model_id,
+            latency_ms=(time.perf_counter() - started) * 1000.0,
+            success=True,
+            cache_hit=False,
+            dim=self.space.dim,
+            count=len(sources),
+        )
+        return result
 
     def cosine_similarity(self, a: np.ndarray, b: np.ndarray) -> float:
         """Dot product of two same-shape L2-normalized vectors."""
