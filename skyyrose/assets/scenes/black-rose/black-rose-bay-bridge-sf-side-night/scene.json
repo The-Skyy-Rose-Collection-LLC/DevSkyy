@@ -1,0 +1,104 @@
+{
+  "$schema": "skyyrose.elite_studio.scene.v1",
+  "name": "black-rose-bay-bridge-sf-side-night",
+  "collection": "black-rose",
+  "canon_lock_date": "2026-05-26",
+  "founder_directed": true,
+  "founder_lock_quote": "realistic night scene from the San Francisco side of the bay bridge facing oakland",
+
+  "scene_description": "Photorealistic cinematic night scene from the western (San Francisco) end of the San Francisco-Oakland Bay Bridge, looking eastward across the Bay toward Oakland. The Bay Bridge's iconic self-anchored suspension cables and steel girders extend into the foreground and middle distance, lit by amber sodium-vapor bridge lights along the deck. Bay water below shimmers with rippling reflections of bridge lights. Oakland skyline rises in the far distance — Port of Oakland's massive white container cranes silhouetted against the dark Oakland Hills, low-rise downtown Oakland buildings to the north, the warm lights of Jack London Square along the East Bay waterfront. A waxing moon casts cool silver light across the scene. Wet bridge deck and steel cables catch the moonlight. Atmospheric depth — distant Oakland softly fading into cool night haze. Single black rose with stem laid across the bridge railing at center-foreground, droplets of bay mist on its petals — armor and conviction made tangible.",
+
+  "color_palette": {
+    "primary_bg": "#0A0A0A",
+    "primary_accent": "#C0C0C0",
+    "secondary_accent": "#1A1A1A",
+    "highlight": "amber sodium-vapor bridge deck lights",
+    "shadow": "#000000",
+    "atmospheric_haze": "cool blue-grey",
+    "city_lights_distance": "warm-amber pinpoints",
+    "water_reflection": "rippled silver on navy"
+  },
+
+  "lighting": {
+    "key_light": "waxing moon overhead, slightly behind camera — cool silver direct",
+    "fill_light": "ambient bay haze diffuse",
+    "rim_light": "amber bridge deck sodium-vapor along cables",
+    "color_temperature_kelvin": 4200,
+    "time_of_day": "night",
+    "exposure_mood": "FOG cinematic restraint, no warm tones except distant city lights",
+    "shadows": "deep, hard-edged on bridge steel, soft on water"
+  },
+
+  "camera": {
+    "perspective": "from western SF end of Bay Bridge deck looking east toward Oakland",
+    "angle": "eye-level from bridge walkway/deck",
+    "lens_mood": "35mm cinematic, slight depth compression",
+    "depth_cues": [
+      "Bay Bridge cables/girders foreground vanishing-point",
+      "Bay water midground",
+      "Oakland skyline + Port of Oakland cranes far distance",
+      "Oakland Hills horizon background"
+    ],
+    "composition": "3:4 portrait, strong vertical with bridge cables leading eye",
+    "atmospheric_fog": "subtle bay mist receding into distance"
+  },
+
+  "skyyrose_dna": "BR canon: armor not flower — a conviction. Concrete is the only soil that matters. Oakland Deep East. The Bay Bridge looked at from the SF side facing home. Beauty forces through cracks. Silver on near-black, no warm tones except the city you came from. FOG cinematic restraint.",
+
+  "focal_anchor": {
+    "object": "single deep-black rose with stem and leaves",
+    "position": "center-foreground, resting across the bridge railing",
+    "detail": "single bead of bay mist on topmost petal catching moonlight",
+    "rationale": "BR canon — armor and conviction made tangible at the bridge railing"
+  },
+
+  "product_staging_zones": [
+    {
+      "zone": "center-foreground railing",
+      "x_pct": 0.5,
+      "y_pct": 0.72,
+      "scale": 0.22,
+      "fit": "draped over or beside the railing focal area",
+      "lighting_match_directive": "match cool silver moonlight + amber bridge underlighting"
+    },
+    {
+      "zone": "left foreground bridge deck",
+      "x_pct": 0.18,
+      "y_pct": 0.78,
+      "scale": 0.18,
+      "fit": "laid on wet bridge deck reflecting silver"
+    },
+    {
+      "zone": "right foreground bridge railing",
+      "x_pct": 0.82,
+      "y_pct": 0.72,
+      "scale": 0.18,
+      "fit": "hung from railing post"
+    }
+  ],
+
+  "negative_prompts": [
+    "no people, no human figures, no silhouettes",
+    "no traffic, no vehicles, no headlights on bridge",
+    "no warm tones in foreground (warm only in distant Oakland city)",
+    "no flower-garden context (BR is armor, not flora-decorative)",
+    "no Golden Gate Bridge (Bay Bridge ONLY — locked canon)",
+    "no Disney-polish, no soft pastels, no neon"
+  ],
+
+  "reference_brands": ["Kith editorial restraint", "Fear of God cinematic sepia/cool restraint", "Oaklandish civic anchoring", "Palm Angels sport heritage"],
+
+  "anti_references": ["Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"],
+
+  "atmospheric": {
+    "weather": "clear night, light bay mist",
+    "season": "autumn/winter cool",
+    "mood": "armor, refusal, dignity, deep East coming home",
+    "sound_implied": "distant foghorn, bridge cable hum, bay water"
+  },
+
+  "render_aspect": "3:4 portrait",
+  "master_resolution_px": "1024x1408 minimum, 1536x2048 preferred for hero-class",
+  "render_format_priority": ["AVIF q80", "WebP q85", "PNG"],
+  "expected_filename": "black-rose-bay-bridge-sf-side-night-v2.png"
+}

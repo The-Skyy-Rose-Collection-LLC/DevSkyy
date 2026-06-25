@@ -3,7 +3,7 @@
  * Template Name: Immersive - Signature
  *
  * "The Golden Gate Runway" — San Francisco waterfront, golden hour,
- * Golden Gate Bridge showroom. Bay Area luxury.
+ * Golden Gate Bridge showroom. Oakland luxury.
  *
  * AI-composited scene images with beacon-style product discovery.
  * Built on the shared immersive engine (immersive.css + immersive.js).
@@ -24,12 +24,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	Products use skyyrose_immersive_product() from product-catalog.php.
 	───────────────────────────────────────────────────────── */
 
+// SOT-wired scene image for Room 1. skyyrose_sot_scene() returns imagery.scene_portrait.resolved
+// from data/collections/signature/sot.json. Signature has no hero_backdrop in sot.json (null);
+// the scene_portrait is the canonical SOT image for Room 1.
+// basename() strips the directory prefix so scene.php can safely prepend assets/images/immersive/.
+// Falls back to the original hand-maintained filename when the accessor returns ''.
+$_sot_scene_sg       = skyyrose_sot_scene( 'signature' );
+$_sg_room1_image     = ( '' !== $_sot_scene_sg ) ? basename( $_sot_scene_sg ) : 'scene-signature-golden-gate.webp';
+
 $rooms = array(
 
 	// Room 1 — The Golden Gate.
 	array(
 		'name'     => esc_html__( 'The Golden Gate', 'skyyrose' ),
-		'image'    => 'scene-signature-golden-gate.webp',
+		'image'    => $_sg_room1_image,
 		'products' => array(
 			skyyrose_immersive_product(
 				'sg-009',
@@ -136,7 +144,7 @@ get_header();
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 	<?php
 	get_template_part(
-		'template-parts/immersive-scene',
+		'template-parts/immersive/scene',
 		null,
 		array(
 			'collection_slug' => 'signature',

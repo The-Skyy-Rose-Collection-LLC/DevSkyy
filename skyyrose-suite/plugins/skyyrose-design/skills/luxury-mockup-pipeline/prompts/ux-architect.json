@@ -1,0 +1,144 @@
+{
+  "$schema": "../schemas/agent-brief.schema.json",
+  "agent": "UX Architect",
+  "mode": "refine",
+  "platform": "standalone-html",
+  "criteria": "luxury",
+  "mission": {
+    "objective": "Diagnose why the v2 mockup feels lame versus the live homepage and propose amplitude lifts that turn it into an experience.",
+    "founder_feedback": "the hero image quality is still terrible. the collection cards so be 4 evenly aligned sections. the hero shouldnt be the same image as the collection, why is the jersey patched displayed. each collection card should be a image of the scene i want. why did you look at me regular page is you didnt add any of the excitement. your lame as fuck at making extrodinary websites i see",
+    "success_metric": "Mockup feels 'extraordinary' on first scroll — distinct hero, evenly aligned scene cards, motion moments, no duplicate imagery."
+  },
+  "scope": {
+    "_scope_policy": "FULL-SITE coverage. Agent sees and addresses every surface. Even when a fix sprint targets one page (e.g., home), the agent must verify ripple effects across header/footer/widgets/other-pages and call them out.",
+    "header": {
+      "navbar": true,
+      "mobile_nav": true,
+      "announcement_bar": true,
+      "search": true,
+      "account_menu": true,
+      "cart_indicator": true
+    },
+    "page_body": {
+      "pages": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"],
+      "components": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"],
+      "widgets": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"],
+      "layouts": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+    },
+    "footer": {
+      "primary_footer": true,
+      "newsletter_block": true,
+      "link_columns": true,
+      "social_strip": true,
+      "payment_icons": true,
+      "legal_strip": true,
+      "founder_signature": true,
+      "back_to_top": true
+    },
+    "primary_focus_surfaces": ["home"],
+    "scope_note": "primary_focus_surfaces lists what the current fix sprint targets. The agent reports on ripple effects across all other surfaces in a brief 'Cross-surface implications' section."
+  },
+  "performance_baseline": {
+    "lcp_seconds": 2.5,
+    "cls": 0.1,
+    "inp_ms": 200,
+    "lighthouse_performance": 95,
+    "lighthouse_accessibility": 100,
+    "lighthouse_seo": 100,
+    "lighthouse_best_practices": 100,
+    "wcag_level": "AA",
+    "image_format_priority": ["avif", "webp", "jpg"],
+    "font_loading": "self-hosted woff2, font-display: swap, preload Cinzel + Playfair Display",
+    "js_budget_kb": 200,
+    "css_budget_kb": 100
+  },
+  "deliverables": [
+    {
+      "name": "Amplitude audit",
+      "path": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-amplitude-audit.md",
+      "format": "markdown",
+      "sections": [
+        "A — What live page has that mockup doesn't (5-8 elements w/ file:line refs)",
+        "B — The Five amplitude patterns (Kith / Oaklandish / Culture Kings / FOG / Palm Angels)",
+        "C — Image quality root-cause diagnosis (filter vs asset vs layout vs duplication)",
+        "D — Top 8 amplitude additions ranked by impact (name / source / difficulty / tier T1-T3)",
+        "E — ROI Upgrade Proposal (mandatory)"
+      ]
+    }
+  ],
+  "roi_upgrade": {
+    "mandate": "Propose exactly 1 high-ROI motion/interaction upgrade per the Upgrade Mandate.",
+    "category_options": [
+      "Scroll-driven scene takeover with cinematic crossfade between sections",
+      "Hero video-loop spec (silent muted autoplay, 1MB max, fallback to still)",
+      "View-transitions API choreography between cover → hero → spread",
+      "Parallax depth system (3 layers: bg / mid / fg) with rAF batching",
+      "Scroll-snap section with magnetic settle + scroll-driven CSS animations",
+      "Section-edge marquee strip with infinite scroll (CSS-only, no JS)",
+      "Cinematic letterbox-reveal on hero entrance (clip-path animation)"
+    ],
+    "constraints": {
+      "self_contained": true,
+      "production_grade": true,
+      "prefers_reduced_motion_safe": true,
+      "browser_fallback_required": true,
+      "single_commit_scope": true
+    }
+  },
+  "constraints": {
+    "no_three_js": true,
+    "no_cdn_dependencies": true,
+    "no_modify_target": true,
+    "canon_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/visual-references.md",
+      "/Users/theceo/DevSkyy/docs/brand/collection-stories.md",
+      "/Users/theceo/DevSkyy/docs/CLAUDE.md"
+    ],
+    "locked_out_references": [
+      "Bottega Veneta",
+      "Numéro",
+      "Hedi Slimane",
+      "Rick Owens",
+      "032c",
+      "Acne FW24",
+      "Givenchy by Tisci",
+      "Khaite",
+      "Bode",
+      "The Row"
+    ],
+    "working_directory": "/Users/theceo/DevSkyy"
+  },
+  "inputs": {
+    "mockup": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+    "live_url": "https://skyyrose.co/",
+    "source_template": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/front-page.php",
+    "css_root": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/",
+    "skill_root": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/"
+  },
+  "return_format": {
+    "max_words": 180,
+    "required_fields": [
+      "top_3_amplitude_levers",
+      "image_quality_verdict",
+      "roi_upgrade_name",
+      "roi_upgrade_one_line_pitch",
+      "deliverable_file_path"
+    ],
+    "format": "markdown"
+  },
+  "html_reference_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/references/full-theme-skeleton.html",
+  "memory": {
+    "read_paths": [
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/_shared/INDEX.md",
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/ux-architect/INDEX.md"
+    ],
+    "write_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/ux-architect/",
+    "write_mandate": "Write at least 1 memory entry per dispatch when you discover a non-obvious motion/IA pattern, the founder corrects a recommendation, OR a polish layer from live page proves portable to mockup. Append slug to INDEX.md as `- [Title](slug.md) — one-line hook`.",
+    "previous_entries": [
+      "_shared/the-five.md",
+      "_shared/scope-policy.md",
+      "_shared/saas-gate.md",
+      "_shared/audit-verification.md"
+    ]
+  }
+}

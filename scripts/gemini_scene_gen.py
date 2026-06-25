@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
 """
-Gemini Immersive Scene Generator — SkyyRose v1
+Gemini Immersive Scene Generator — SkyyRose v1.
 
-Generates drakerelated.com-style immersive scene backgrounds where products
-are rendered INTO the environment as a single unified cinematic image.
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
 
-Uses Gemini 3 Pro Image for 4K cinematic quality ($0.08/image).
-Text-to-image generation (no reference images needed for scenes).
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh,all}
+
+The elite-team path adds: PromptEnrichmentAgent canon enforcement, RunBudget
+gates, Stage G visual QA, automatic retry-on-low-score, and SceneGeneratorAgent
+that reads canonical scene.json configs from SCENES_DIR. This script remains
+runnable for quick iteration but does NOT enforce any of those guardrails.
+
+Migration map:
+    python scripts/gemini_scene_gen.py --scene X
+        → python -m skyyrose.elite_studio home-spread --scene X --collection Y
+
+Generates immersive scene backgrounds where products are rendered INTO the
+environment as a single unified cinematic image. Gemini 3 Pro Image
+($0.08/image). Text-to-image generation (no reference images for scenes).
 
 Usage:
     source .venv-imagery/bin/activate
     python scripts/gemini_scene_gen.py --list
-    python scripts/gemini_scene_gen.py --scene black-rose-moonlit-courtyard
+    python scripts/gemini_scene_gen.py --scene black-rose-bay-bridge-sf-side-night
     python scripts/gemini_scene_gen.py --collection black-rose
     python scripts/gemini_scene_gen.py --all
     python scripts/gemini_scene_gen.py --all --variants 3
@@ -54,143 +66,140 @@ RETRY_DELAY_SEC = 8
 MIN_FILE_SIZE_KB = 100  # Scenes should be larger than product shots
 
 # =============================================================================
-# Scene Definitions — 6 rooms across 3 collections
+# Scene Definitions — 3 founder-directed canon-locked scenes (2026-05-26)
+#
+# Each scene anchors a SkyyRose DNA focal object — no catalog products in the
+# Stage 1 generation. Real products composite via Stage 2 (composite_products.py
+# or gemini_lookbook.py). Founder lock 2026-05-26:
+#   BR  = Night from SF side of Bay Bridge facing Oakland
+#   SIG = Daytime from Oakland to SF with Bay Bridge in back
+#   LH  = Beauty & Beast, enchanted rose focal
 # =============================================================================
 
 SCENES = {
-    # ── BLACK ROSE: "The Garden" ──────────────────────────────────────────
-    "black-rose-rooftop-garden": {
+    # ── BLACK ROSE — Night, SF side of Bay Bridge looking toward Oakland ──
+    "black-rose-bay-bridge-sf-side-night": {
         "collection": "black-rose",
-        "filename": "black-rose-rooftop-garden-v2",
+        "filename": "black-rose-bay-bridge-sf-side-night-v2",
         "scene_description": (
-            "Luxury rooftop garden at night under a clear sky full of stars. "
-            "The San Francisco Bay Bridge is lit up in the background, its "
-            "lights reflecting on the dark water below. The rooftop has modern "
-            "dark planters overflowing with black roses and deep green foliage. "
-            "Sleek black lounge furniture — a low-profile couch and accent "
-            "chairs. A matte black clothing rack stands near the edge. Silver "
-            "hanging pendant lights cast pools of cool light. Polished dark "
-            "concrete floor with subtle wet reflections."
+            "Photorealistic cinematic night scene from the western (San "
+            "Francisco) end of the San Francisco-Oakland Bay Bridge, looking "
+            "eastward across the Bay toward Oakland. The Bay Bridge's iconic "
+            "self-anchored suspension cables and steel girders extend into the "
+            "foreground and middle distance, lit by amber sodium-vapor bridge "
+            "lights along the deck. Bay water below shimmers with rippling "
+            "reflections of bridge lights. Oakland skyline rises in the far "
+            "distance — Port of Oakland's massive white container cranes "
+            "silhouetted against the dark Oakland Hills, low-rise downtown "
+            "Oakland buildings to the north, the warm lights of Jack London "
+            "Square along the East Bay waterfront. A waxing moon casts cool "
+            "silver light across the scene. Wet bridge deck and steel cables "
+            "catch the moonlight. Atmospheric depth — distant Oakland softly "
+            "fading into cool night haze. Single black rose with stem laid "
+            "across the bridge railing at center-foreground, droplets of bay "
+            "mist on its petals — armor and conviction made tangible. "
+            "Photorealistic, FOG-cinematic restraint, no warm tones except "
+            "distant city lights. Eye-level perspective from the bridge deck "
+            "looking east with strong vanishing-point depth. No people, no "
+            "traffic visible. Ultra-detailed: rivet patterns on steel, "
+            "individual cable strands, water surface texture, distant "
+            "container crane geometry. 3:4 portrait composition."
         ),
         "products_in_scene": [
-            "A BLACK sherpa jacket (black satin with sherpa lining, embroidered "
-            "rose on chest) draped over the arm of a sleek black lounge chair "
-            "on the left side",
-            "A premium BLACK hoodie with rose embroidery folded neatly on the "
-            "seat of the low-profile couch at center-left, rose detail visible",
-            "BLACK joggers with small embroidered roses folded on a side table "
-            "next to a planter of black roses at center-right",
-            "Another BLACK hoodie with rose embroidery hanging from the matte "
-            "black clothing rack on the right side, Bay Bridge visible behind it",
+            "Single deep black rose with stem and leaves resting across the "
+            "bridge railing at center-foreground, single bead of bay mist on "
+            "the topmost petal catching moonlight — the SkyyRose monogram "
+            "object, no catalog product in this Stage-1 scene."
         ],
-        "color_palette": "Clear night sky, Bay Bridge blue-white lights, silver (#C0C0C0) pendant lights, near-black (#0A0A0A) furniture, dark green foliage",
+        "color_palette": "Deep black #0A0A0A base, silver #C0C0C0 moonlight on cables, amber sodium-vapor bridge deck lights, distant Oakland warm-amber city windows, Bay water dark navy with rippled silver reflections",
+        "skyyrose_dna": "BR canon: armor not flower — a conviction. Concrete is the only soil that matters. Oakland Deep East. The Bay Bridge looked at from the SF side facing home. Beauty forces through cracks. Silver on near-black, no warm tones except the city you came from. FOG cinematic restraint.",
     },
-    "black-rose-rooftop-lounge": {
-        "collection": "black-rose",
-        "filename": "black-rose-rooftop-lounge-v2",
-        "scene_description": (
-            "Different angle of the same luxury rooftop — closer, more intimate. "
-            "A dark marble bar counter with silver stools in the foreground. "
-            "Black rose arrangements in silver vases line the bar top. The Bay "
-            "Bridge glows in the distance through a clear night sky. Modern "
-            "black display pedestals with silver bases are arranged near the "
-            "rooftop edge. String lights overhead create a warm canopy effect "
-            "against the night sky."
-        ),
-        "products_in_scene": [
-            "A BLACK hoodie with rose embroidery displayed on a dark mannequin "
-            "bust on the center display pedestal",
-            "A BLACK crewneck with rose embroidery laid flat on the dark marble "
-            "bar counter at right-center, next to a silver vase of black roses",
-            "A gothic BLACK hooded dress with rose embroidery draped elegantly "
-            "over a silver bar stool on the right",
-            "A BLACK luxury athletic jersey hanging from a minimal wall hook "
-            "on a dark partition at center-left",
-        ],
-        "color_palette": "Bay Bridge blue-white glow, warm string lights, silver (#C0C0C0) accents, near-black (#0A0A0A) marble, clear starry sky",
-    },
-    # ── LOVE HURTS: "The Ballroom" ────────────────────────────────────────
-    "love-hurts-cathedral-rose-chamber": {
-        "collection": "love-hurts",
-        "filename": "love-hurts-cathedral-rose-chamber-v2",
-        "scene_description": (
-            "Gothic cathedral interior with vaulted ceilings. A glowing "
-            "enchanted rose floats under a glass dome at center (Beauty and "
-            "the Beast style). Stained glass windows cast red and pink light. "
-            "Ornate candelabras with lit candles. Crimson rose petals scattered "
-            "on the stone floor. Purple and crimson fabric draped from arches."
-        ),
-        "products_in_scene": [
-            "A BLACK satin varsity jacket with fire-red script lettering and "
-            "rose garden embroidery draped beside the enchanted rose glass "
-            "dome at center-left",
-            "A luxury BLACK fanny pack with rose detail hung from a gothic "
-            "candelabra stand on the right",
-            "BLACK mesh basketball shorts with rose design displayed on a "
-            "stone ledge in a stained glass alcove at center",
-        ],
-        "color_palette": "Crimson (#DC143C), pink rose petals, purple fabrics, warm candlelight",
-    },
-    "love-hurts-gothic-ballroom": {
-        "collection": "love-hurts",
-        "filename": "love-hurts-gothic-ballroom-v2",
-        "scene_description": (
-            "Vast gothic ballroom with soaring arched ceiling. Purple velvet "
-            "drapes frame tall windows. A glowing enchanted rose under glass "
-            "dome sits on a marble pedestal. Pink rose petals cover the stone "
-            "floor. Candlelit crystal chandeliers cast warm flickering light. "
-            "Dark romantic atmosphere with deep shadows."
-        ),
-        "products_in_scene": [
-            "BLACK joggers with embroidered rose detail folded neatly on a "
-            "purple velvet chair at center-left",
-            "A blush PINK windbreaker with rose detailing displayed beside "
-            "the glass dome on a marble stand on the right",
-        ],
-        "color_palette": "Purple velvet, crimson (#DC143C), pink petals, warm candlelight amber",
-    },
-    # ── SIGNATURE: "The Runway" ───────────────────────────────────────────
-    "signature-waterfront-runway": {
+    # ── SIGNATURE — Daytime, Oakland to SF, Bay Bridge in the back ────────
+    "signature-oakland-waterfront-bay-bridge-day": {
         "collection": "signature",
-        "filename": "signature-waterfront-runway-v2",
+        "filename": "signature-oakland-waterfront-bay-bridge-day-v2",
         "scene_description": (
-            "San Francisco Bay Bridge at night in the background. A floating "
-            "black marble platform extends over dark water. Gold LED trim "
-            "lighting edges the platform. Glass orb display case on the left. "
-            "Three gold-lit LED display frames at center. Stepped marble "
-            "pedestals on the right. Reflective black marble floor mirrors "
-            "the city lights. Gold accent lighting throughout."
+            "Photorealistic cinematic daytime scene from the Oakland "
+            "waterfront — Jack London Square / Embarcadero Cove area — "
+            "looking southwest across the Bay toward San Francisco. The "
+            "San Francisco-Oakland Bay Bridge spans the middle ground from "
+            "left to right, its eastern span and self-anchored suspension "
+            "section visible in full — the bridge is Oakland's, anchoring "
+            "the East Bay to the western shore. San Francisco skyline rises "
+            "in the far distance: Transamerica Pyramid, Salesforce Tower, "
+            "Coit Tower, and the cluster of downtown SF financial district "
+            "buildings as soft silhouettes. Golden hour late-morning light "
+            "— warm amber on the water, soft blue-to-amber gradient sky "
+            "overhead, light filtering through high cirrus clouds. Weathered "
+            "wooden pier planks in the immediate foreground with brass "
+            "mooring cleats, frayed weathered ropes, gentle Bay water lapping "
+            "the pier pilings. Centered on the pier foreground: a small "
+            "weathered wooden crate serving as an impromptu drafting "
+            "surface, holding a partially-unfurled sheet of cream-colored "
+            "drafting paper with the first SkyyRose rose script drawn in "
+            "rich gold ink — edges curled, paper slightly weathered, a "
+            "single fresh deep-red rose laid beside it. The 4 AM origin "
+            "sketch brought into daylight. Photorealistic, Kith editorial "
+            "restraint, magazine-grid framing. Slight low angle from the "
+            "pier with strong depth toward the SF skyline. No people in "
+            "frame. Ultra-detailed: wood grain on pier planks, ink texture "
+            "on drafting paper, individual rose petals, water surface "
+            "reflections, distant bridge cable detail, soft skyline "
+            "atmospheric haze. 3:4 portrait composition."
         ),
         "products_in_scene": [
-            "A luxury BLACK duffle bag displayed inside a glass orb case on the far left",
-            "A gold-colorway streetwear set hanging in a gold-lit LED display frame at center-left",
-            "Bay Area inspired athletic shorts hanging in a gold-lit LED display frame at center",
-            "A pastel mint-and-lavender colorblock hoodie hanging in a "
-            "gold-lit LED display frame at center-right",
-            "A blue-rose Bay Area streetwear ensemble featured on the top "
-            "stepped marble pedestal on the right",
-            "A forest green beanie on the lower marble pedestal step at far right",
+            "Cream-colored drafting paper at center-foreground on a weathered "
+            "wooden crate, partially unfurled, showing the first SkyyRose "
+            "rose script hand-drawn in gold ink — the origin sketch made "
+            "permanent. Single fresh deep-red rose laid across the paper's "
+            "edge. The SkyyRose monogram object, no catalog product in this "
+            "Stage-1 scene."
         ],
-        "color_palette": "Gold (#D4AF37) accents, warm amber LEDs, near-black marble, Bay Bridge blue lights",
+        "color_palette": "Warm gold #D4AF37 morning light, cream drafting paper neutrals, weathered wood brown tones, Bay water blue-teal with gold reflections, soft amber-to-blue gradient sky, distant SF skyline grey-white silhouettes",
+        "skyyrose_dna": "SIG canon: drew first rose at 4 AM, broke, a baby on the way. The Bay Bridge is Oakland's; the city on the other end is Frisco. The origin chapter. Foundation wardrobe, blueprints not basics. Kith editorial restraint. Gold accent on neutral palette. Gender-neutral by default.",
     },
-    "signature-golden-gate-showroom": {
-        "collection": "signature",
-        "filename": "signature-golden-gate-showroom-v2",
+    # ── LOVE HURTS — Beauty & Beast, enchanted rose focal ─────────────────
+    "love-hurts-enchanted-rose-cathedral": {
+        "collection": "love-hurts",
+        "filename": "love-hurts-enchanted-rose-cathedral-v2",
         "scene_description": (
-            "Luxury showroom interior with floor-to-ceiling panoramic windows "
-            "showing the Golden Gate Bridge at sunset. Black marble floor and "
-            "walls. Gold LED strip lighting runs along ceiling edges and "
-            "display areas. Minimalist clothing racks on left and right walls. "
-            "A marble display table at center. Marble pedestals flanking the "
-            "table. Reflective black marble floor captures the sunset glow."
+            "Photorealistic cinematic Beauty and the Beast inspired scene — "
+            "Cocteau intensity, NOT Disney polish. Shadowed gothic cathedral "
+            "interior at night, vast vaulted stone arches receding into "
+            "darkness, ribbed stone columns disappearing into deep shadow on "
+            "both sides. Center-foreground: ornate stone pedestal carved with "
+            "intertwined thorns and roses, holding a tall hand-blown glass "
+            "dome containing a single perfect deep-red enchanted rose — lit "
+            "from within by an ethereal warm-amber glow, the rose is the only "
+            "fully-lit object in the entire frame, the spotlight of the "
+            "scene. Faint glow halo emanates from the dome into the "
+            "surrounding shadow. A single shaft of deep crimson light pours "
+            "through a high stained-glass rose window in the upper-right of "
+            "the frame, dust motes drifting in the beam. Crimson velvet "
+            "curtains line the stone columns, receding into deep shadow at "
+            "the edges. Scattered deep-red rose petals on the polished dark "
+            "stone floor around the pedestal base, some petals slightly "
+            "wilted as if from the rose's slow magic. Wrought-iron candelabra "
+            "in the mid-background hold lit candles casting small pools of "
+            "amber warmth. The polished dark stone floor reflects the rose's "
+            "ethereal glow as a soft crimson smear. Photorealistic, cinematic, "
+            "fairy-tale gothic. Slight upward hero angle on the rose pedestal "
+            "so the dome reads as monumental. Atmospheric: incense haze in "
+            "the shafts of light. Ultra-detailed: glass refraction on dome, "
+            "individual rose petals, thorn carving on pedestal, stone grain, "
+            "stained glass color refraction, dust motes. 3:4 portrait "
+            "composition. NO catalog products in this scene — products "
+            "composite Stage 2."
         ),
         "products_in_scene": [
-            "An orchid-purple colorway tee hanging on a wall-mounted clothing rack on the left",
-            "A gold colorway tee featured on the center marble display table",
-            "A black beanie on a marble pedestal at left-center",
-            "A white tee hanging on a wall-mounted clothing rack on the right",
+            "Single perfect deep-red enchanted rose under a tall hand-blown "
+            "glass dome on ornate carved stone pedestal at center-foreground "
+            "— the rose lit from within by ethereal warm-amber glow, the "
+            "spotlight of the entire scene. The SkyyRose monogram object, "
+            "no catalog product in this Stage-1 scene."
         ],
-        "color_palette": "Gold (#D4AF37) sunset light, warm amber, black marble, San Francisco sky",
+        "color_palette": "Deep crimson #DC143C accent on the rose and stained-glass shaft, burgundy curtains, near-black stone, ethereal warm-amber glow from inside the dome, candle-amber highlights in midground, dust-motes warm only in light beams",
+        "skyyrose_dna": "LH canon: Hurts is the bloodline that raised me. Three generations of Hurts. The rose under glass — protected, fragile, kept. Beauty and the Beast cadence — Cocteau intensity, NOT Disney polish. The Beast didn't hide from ugliness, he hid because he loved something fragile.",
     },
 }
 

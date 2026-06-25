@@ -158,14 +158,30 @@ class PipelineConfig:
     huggingface_config: HuggingFace3DConfig = field(default_factory=HuggingFace3DConfig.from_env)
     meshy_config: MeshyConfig = field(default_factory=MeshyConfig.from_env)
 
-    # Primary 3D generator selection (NEW)
+    # Primary 3D generator selection.
+    #
+    # Default is HUGGINGFACE: routes through HF Spaces (Hunyuan3D 2.0 -> InstantMesh -> TripoSR
+    # via orchestration/huggingface_3d_client.py). Cheap, no preview gate, no Tripo3D production.
+    #
+    # Set to HYBRID or TRIPO3D to enable the documented "Meshy preview gate -> TripoAssetAgent
+    # production" pattern. In HUGGINGFACE mode the Meshy gate and TripoAssetAgent below are
+    # bypassed entirely; their flags only take effect in HYBRID/TRIPO3D modes.
+    #
+    # Override at runtime via env var: PIPELINE_PRIMARY_3D_GENERATOR={huggingface,hybrid,tripo3d}
     primary_3d_generator: Primary3DGenerator = Primary3DGenerator.HUGGINGFACE
 
     # Pipeline settings
-    enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation (DEPRECATED — use Meshy gate)
-    enable_meshy_preview_gate: bool = True  # Cheap preview + trimesh fidelity gate before Tripo3D
-    meshy_preview_min_fidelity: float = 60.0  # 0-100; below this = abort production run
-    enable_3d_generation: bool = True  # Stage 1: Tripo3D generation
+    # NOTE: enable_huggingface_3d is legacy; the active selector is primary_3d_generator above.
+    enable_huggingface_3d: bool = (
+        True  # Stage 0: HF 3D generation (legacy flag — see primary_3d_generator)
+    )
+    enable_meshy_preview_gate: bool = (
+        True  # Only consulted when primary_3d_generator in {HYBRID, TRIPO3D}
+    )
+    meshy_preview_min_fidelity: float = (
+        60.0  # 0-100; below this = abort production run (HYBRID/TRIPO3D only)
+    )
+    enable_3d_generation: bool = True  # Stage 1: Tripo3D generation (HYBRID/TRIPO3D only)
     enable_virtual_tryon: bool = True  # Stage 2: Virtual try-on
     enable_wordpress_upload: bool = True  # Stage 3: WordPress upload
 
@@ -1193,9 +1209,7 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1
-            for _, r, _ in results
-            if r and r.duration_seconds < 1.0  # Cached results are fast
+            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize
@@ -1343,82 +1357,27 @@ class ProductAssetPipeline:
                 # The gate runs a cheap (~$0.20) Meshy generation, downloads the
                 # GLB, validates with trimesh, and only proceeds to Tripo3D if it
                 # passes. Saves $0.50-1.00 per rejected production run.
-                gate_passed = True
-                if images:
-                    gate_passed = await self._run_meshy_preview_gate(
-                        result=result,
-                        product_id=product_id,
-                        image_path=images[0],
-                    )
-
-                # Generate with Tripo3D only if gate passed
-                if gate_passed and self.config.enable_3d_generation and images:
-                    result.stage = PipelineStage.GENERATING_3D
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_STARTED,
-                            product_id=product_id,
-                            stage=PipelineStage.GENERATING_3D.value,
-                            progress_percent=20.0,
-                            message="Generating 3D models with Tripo3D (Meshy-gated)",
-                        )
-                    )
-                    await self._generate_3d_models(
-                        result=result,
-                        title=title,
-                        images=images,
-                        collection=collection,
-                        garment_type=garment_type,
-                        hf_3d_result=None,  # HF Shap-E hints retired in Phase A4
-                    )
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_COMPLETED,
-                            product_id=product_id,
-                            stage=PipelineStage.GENERATING_3D.value,
-                            progress_percent=40.0,
-                            message=f"3D models generated: {len(result.assets_3d)}",
-                        )
-                    )
+                await self._dispatch_meshy_gated_3d(
+                    mode=Primary3DGenerator.HYBRID,
+                    result=result,
+                    product_id=product_id,
+                    title=title,
+                    images=images,
+                    collection=collection,
+                    garment_type=garment_type,
+                )
 
             else:
                 # TRIPO3D: Tripo3D only — also gated by Meshy preview (Phase A4)
-                gate_passed = True
-                if images:
-                    gate_passed = await self._run_meshy_preview_gate(
-                        result=result,
-                        product_id=product_id,
-                        image_path=images[0],
-                    )
-
-                if gate_passed and self.config.enable_3d_generation and images:
-                    result.stage = PipelineStage.GENERATING_3D
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_STARTED,
-                            product_id=product_id,
-                            stage=PipelineStage.GENERATING_3D.value,
-                            progress_percent=20.0,
-                            message="Generating 3D models with Tripo3D",
-                        )
-                    )
-                    await self._generate_3d_models(
-                        result=result,
-                        title=title,
-                        images=images,
-                        collection=collection,
-                        garment_type=garment_type,
-                        hf_3d_result=None,
-                    )
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_COMPLETED,
-                            product_id=product_id,
-                            stage=PipelineStage.GENERATING_3D.value,
-                            progress_percent=40.0,
-                            message=f"3D models generated: {len(result.assets_3d)}",
-                        )
-                    )
+                await self._dispatch_meshy_gated_3d(
+                    mode=Primary3DGenerator.TRIPO3D,
+                    result=result,
+                    product_id=product_id,
+                    title=title,
+                    images=images,
+                    collection=collection,
+                    garment_type=garment_type,
+                )
 
             # Stage 2: Generate virtual try-on (apparel only)
             if (
@@ -1568,6 +1527,64 @@ class ProductAssetPipeline:
 
         return result
 
+    async def _dispatch_meshy_gated_3d(
+        self,
+        mode: Primary3DGenerator,
+        result: AssetPipelineResult,
+        product_id: str,
+        title: str,
+        images: list[str],
+        collection: str,
+        garment_type: str,
+    ) -> None:
+        """
+        Run Meshy preview gate then Tripo3D production. Used by HYBRID and TRIPO3D modes.
+
+        HYBRID and TRIPO3D dispatch through identical Meshy-preview → Tripo3D plumbing.
+        They differ only in the user-visible progress-message suffix ("(Meshy-gated)"
+        appended for HYBRID), so consumers of the WebSocket progress stream can
+        distinguish the two paths without changing the underlying flow.
+        """
+        gate_passed = True
+        if images:
+            gate_passed = await self._run_meshy_preview_gate(
+                result=result,
+                product_id=product_id,
+                image_path=images[0],
+            )
+
+        if not (gate_passed and self.config.enable_3d_generation and images):
+            return
+
+        suffix = " (Meshy-gated)" if mode == Primary3DGenerator.HYBRID else ""
+        result.stage = PipelineStage.GENERATING_3D
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.STAGE_STARTED,
+                product_id=product_id,
+                stage=PipelineStage.GENERATING_3D.value,
+                progress_percent=20.0,
+                message=f"Generating 3D models with Tripo3D{suffix}",
+            )
+        )
+        await self._generate_3d_models(
+            result=result,
+            title=title,
+            images=images,
+            collection=collection,
+            garment_type=garment_type,
+            hf_3d_result=None,  # HF Shap-E hints retired in Phase A4
+        )
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.STAGE_COMPLETED,
+                product_id=product_id,
+                stage=PipelineStage.GENERATING_3D.value,
+                progress_percent=40.0,
+                message=f"3D models generated: {len(result.assets_3d)}",
+            )
+        )
+
     async def _generate_3d_with_huggingface_primary(
         self,
         result: AssetPipelineResult,
@@ -1674,79 +1691,6 @@ class ProductAssetPipeline:
                         "image": image_path,
                     }
                 )
-
-    async def _generate_3d_with_huggingface(
-        self,
-        result: AssetPipelineResult,
-        title: str,
-        images: list[str],
-    ) -> Any:
-        """
-        Generate initial 3D model using HuggingFace Shap-E.
-
-        This is Stage 0 of the hybrid pipeline. HF generates a quick,
-        lower-quality 3D model that we analyze for optimization hints
-        to enhance the Tripo3D prompt.
-
-        Returns:
-            HF3DResult or None if generation fails or HF is disabled
-        """
-        # Early return if HuggingFace 3D generation is disabled
-        if not self.config.enable_huggingface_3d:
-            logger.debug("HuggingFace 3D generation disabled, skipping")
-            return None
-
-        logger.info("Generating 3D model with HuggingFace Shap-E", title=title)
-
-        for image_path in images[:1]:  # Use first image only
-            try:
-                # Generate from image
-                hf_result = await self.huggingface_client.generate_from_image(
-                    image_path=image_path,
-                )
-
-                if hf_result:
-                    # Get optimization hints for Tripo3D
-                    if self.config.huggingface_config.enable_optimization_hints:
-                        hints = await self.huggingface_client.get_optimization_hints(hf_result)
-                        logger.info(
-                            "HF optimization hints generated",
-                            geometry=hints.detected_geometry,
-                            complexity=hints.detected_complexity,
-                            tripo_prompt=hints.suggested_tripo_prompt[:50],
-                        )
-
-                    # Store in result metadata for later use
-                    result.errors.append(
-                        {
-                            "stage": "hf_3d_generation",
-                            "type": "info",
-                            "message": "HF 3D generation successful",
-                            "hf_quality_score": hf_result.quality_score,
-                            "hf_model": hf_result.model_used.value,
-                            "hf_polycount": hf_result.polycount,
-                        }
-                    )
-
-                    return hf_result
-
-            except Exception as e:
-                logger.warning(
-                    "HuggingFace 3D generation failed (will fallback to Tripo3D only)",
-                    image=image_path,
-                    error=str(e),
-                )
-                # Don't fail pipeline - HF is optional enhancement
-                result.errors.append(
-                    {
-                        "stage": "hf_3d_generation",
-                        "type": "warning",
-                        "error": str(e),
-                        "message": "HF 3D generation failed, will use Tripo3D only",
-                    }
-                )
-
-        return None
 
     async def _generate_3d_models(
         self,

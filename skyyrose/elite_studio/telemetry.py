@@ -83,6 +83,43 @@ def emit(event: dict[str, Any]) -> None:
         pass
 
 
+def _run_summary_dir() -> Path:
+    """Directory where per-run summary JSON files land.
+
+    Override via ELITE_STUDIO_RUN_SUMMARY_DIR. Defaults to
+    ``skyyrose/elite_studio/logs/runs/`` so it sits next to the existing
+    stage-event JSONL.
+    """
+    override = os.environ.get("ELITE_STUDIO_RUN_SUMMARY_DIR")
+    if override:
+        return Path(override)
+    return _log_dir() / "runs"
+
+
+def write_run_summary(run_id: str, summary: dict[str, Any]) -> Path | None:
+    """Persist a per-SKU run summary to disk for downstream auditing.
+
+    Called by ``finalize_node`` (and equivalent terminal nodes) once a
+    pipeline run completes — success OR failure. The summary should
+    contain at minimum: sku, view, status, generation_engine, qa_score,
+    cost rollup (from RunBudget.snapshot), top_issues, infra_failures.
+
+    Returns the written path on success, None on any I/O failure (never
+    raises — telemetry must not break a finished run).
+    """
+    try:
+        out_dir = _run_summary_dir()
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / f"{run_id}.json"
+        out_path.write_text(
+            json.dumps(summary, default=str, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        return out_path
+    except Exception:
+        return None
+
+
 _FIELDS = ("provider", "model", "tokens_in", "tokens_out", "bytes_in", "bytes_out")
 
 

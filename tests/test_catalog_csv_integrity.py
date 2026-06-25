@@ -1,7 +1,7 @@
 """Integrity smoke tests for the canonical product catalog CSV.
 
 Covers the schema, row count, and hard rules that must never regress:
-  - 30 active SKUs
+  - 32 active SKUs (post sg-d04 / sg-017 / sg-018 retirement + sg-001/005 consolidation)
   - No duplicate SKU codes
   - Every product has a name, collection, and price > 0
   - No retired SKU code appears as an active row
@@ -47,6 +47,7 @@ EXPECTED_COLUMNS = {
     "render_is_tech_flat",
     "render_is_accessory",
     "garment_type_lock",
+    "engine_override",
 }
 
 VALID_COLLECTIONS = {"black-rose", "love-hurts", "signature", "kids-capsule"}
@@ -108,9 +109,9 @@ def test_required_text_fields_non_empty(rows: list[dict[str, str]], field: str) 
 def test_collections_are_valid(rows: list[dict[str, str]]) -> None:
     for r in rows:
         slug = r["collection"].strip()
-        assert slug in VALID_COLLECTIONS, (
-            f"{r['sku']}: unknown collection {slug!r} (valid: {sorted(VALID_COLLECTIONS)})"
-        )
+        assert (
+            slug in VALID_COLLECTIONS
+        ), f"{r['sku']}: unknown collection {slug!r} (valid: {sorted(VALID_COLLECTIONS)})"
 
 
 def test_prices_are_positive(rows: list[dict[str, str]]) -> None:
@@ -129,9 +130,9 @@ def test_edition_size_is_positive_when_set(rows: list[dict[str, str]]) -> None:
 def test_status_derivation_produces_valid_enum(rows: list[dict[str, str]]) -> None:
     for r in rows:
         status = status_from_row(r)
-        assert status in PRODUCT_STATUS, (
-            f"{r['sku']}: status {status!r} not in {sorted(PRODUCT_STATUS)}"
-        )
+        assert (
+            status in PRODUCT_STATUS
+        ), f"{r['sku']}: status {status!r} not in {sorted(PRODUCT_STATUS)}"
 
 
 def test_boolean_columns_are_one_or_zero(rows: list[dict[str, str]]) -> None:
@@ -155,6 +156,33 @@ def test_primary_image_paths_resolve(rows: list[dict[str, str]]) -> None:
     assert not missing, f"primary image paths do not exist: {missing[:5]}"
 
 
+ALL_IMAGE_COLUMNS = ("image", "front_model_image", "back_image", "back_model_image")
+
+
+def test_all_image_columns_resolve(rows: list[dict[str, str]]) -> None:
+    """Every non-empty image cell across all 4 columns resolves to a real file.
+
+    Covers ``front_model_image`` — the PRIMARY product-card image since the
+    on-model render wiring (consumed by template-parts/product-card-holo.php,
+    which overrides the WC featured image). The narrower
+    ``test_primary_image_paths_resolve`` only checks the ``image`` column; this
+    guards the on-model + back + back-model columns the holo cards actually
+    serve. A render referenced in the CSV but missing on disk (e.g. a render
+    committed to the catalog but whose webp was never git-added) is a broken
+    product card — this test fails closed on exactly that.
+    """
+    theme_root = CATALOG_CSV.parent.parent  # wordpress-theme/skyyrose-flagship/
+    missing: list[str] = []
+    for r in rows:
+        for col in ALL_IMAGE_COLUMNS:
+            rel = (r.get(col) or "").strip()
+            if not rel:
+                continue
+            if not (theme_root / rel).is_file():
+                missing.append(f"{r['sku']}:{col} → {rel}")
+    assert not missing, f"image cells that do not resolve on disk: {missing}"
+
+
 def test_python_loaders_agree_on_sku_set() -> None:
     """nano_banana.load_catalog() and elite_studio.Catalog.load() must see the same SKUs."""
     import sys
@@ -170,9 +198,9 @@ def test_python_loaders_agree_on_sku_set() -> None:
 
     only_in_nano = nano_skus - elite_skus
     only_in_elite = elite_skus - nano_skus
-    assert not only_in_nano and not only_in_elite, (
-        f"SKU mismatch — nano-only: {only_in_nano}, elite-only: {only_in_elite}"
-    )
+    assert (
+        not only_in_nano and not only_in_elite
+    ), f"SKU mismatch — nano-only: {only_in_nano}, elite-only: {only_in_elite}"
 
 
 def test_bool_col_helper_parses_1_as_true() -> None:
@@ -228,9 +256,9 @@ def test_garment_type_lock_values_are_in_allowed_set(rows: list[dict[str, str]])
     for r in rows:
         val = (r.get("garment_type_lock") or "").strip()
         if val:
-            assert val in ALLOWED_GARMENT_TYPES, (
-                f"{r['sku']}: garment_type_lock {val!r} not in {ALLOWED_GARMENT_TYPES}"
-            )
+            assert (
+                val in ALLOWED_GARMENT_TYPES
+            ), f"{r['sku']}: garment_type_lock {val!r} not in {ALLOWED_GARMENT_TYPES}"
 
 
 def test_all_28_in_scope_garments_have_garment_type_lock(rows: list[dict[str, str]]) -> None:
@@ -244,6 +272,6 @@ def test_all_28_in_scope_garments_have_garment_type_lock(rows: list[dict[str, st
     assert not missing, f"{len(missing)} garment row(s) with empty garment_type_lock: {missing}"
     # Cross-check: total with values must equal total non-accessory rows
     count_with_value = sum(1 for r in rows if (r.get("garment_type_lock") or "").strip())
-    assert count_with_value == len(garment_rows), (
-        f"expected {len(garment_rows)} garment_type_lock values, got {count_with_value}"
-    )
+    assert count_with_value == len(
+        garment_rows
+    ), f"expected {len(garment_rows)} garment_type_lock values, got {count_with_value}"

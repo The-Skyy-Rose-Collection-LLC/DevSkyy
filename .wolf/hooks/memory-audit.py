@@ -175,11 +175,7 @@ BINARY_EXTS = {
 
 # Extract backtick-quoted things that look like file paths.
 # Must contain / OR end with a known extension (2-4 alphanumeric chars after final .).
-PATH_RE = re.compile(
-    r"`([A-Za-z0-9_\-./]*?"
-    r"(?:/[A-Za-z0-9_\-.]+"
-    r"|\.[a-zA-Z0-9]{2,4}))`"
-)
+PATH_RE = re.compile(r"`([A-Za-z0-9_\-./]*?" r"(?:/[A-Za-z0-9_\-.]+" r"|\.[a-zA-Z0-9]{2,4}))`")
 LINECOUNT_RE = re.compile(r"\(\s*(\d+)\s*(?:L|lines?)\b", re.IGNORECASE)
 VERIFIED_RE = re.compile(r"verified\s+(\d{4}-\d{2}-\d{2})", re.IGNORECASE)
 
@@ -383,15 +379,20 @@ def audit_file(src: Path, repo: Path, index: dict[str, list[str]]) -> dict:
         path_match_list = list(PATH_RE.finditer(line))
         linecount_match_list = list(LINECOUNT_RE.finditer(line))
 
-        def _claimed_count_for(path_match) -> int | None:
+        def _claimed_count_for(
+            path_match,
+            _line=line,
+            _pml=path_match_list,
+            _lcml=linecount_match_list,
+        ) -> int | None:
             path_end = path_match.end()
             # Determine the binding window: from path_end to the start of the next path.
-            next_path_start = len(line)
-            for next_p in path_match_list:
+            next_path_start = len(_line)
+            for next_p in _pml:
                 if next_p.start() > path_end:
                     next_path_start = next_p.start()
                     break
-            for lc in linecount_match_list:
+            for lc in _lcml:
                 if path_end <= lc.start() < next_path_start:
                     return int(lc.group(1))
             return None

@@ -65,8 +65,9 @@ class FactoryConfig:
     text_to_3d_order: list[str] = field(
         default_factory=lambda: ["tripo", "replicate", "huggingface"]
     )
+    # TRELLIS is the primary image-to-3D path — best mesh + texture quality for garments.
     image_to_3d_order: list[str] = field(
-        default_factory=lambda: ["tripo", "huggingface", "replicate"]
+        default_factory=lambda: ["trellis", "tripo", "huggingface", "replicate"]
     )
     # Image generation order (Gemini Nano Banana Pro is primary - no rate limits)
     image_generation_order: list[str] = field(
@@ -155,6 +156,23 @@ class ThreeDProviderFactory:
         from services.three_d.huggingface_provider import HuggingFaceProvider
         from services.three_d.replicate_provider import ReplicateProvider
         from services.three_d.tripo_provider import TripoProvider
+
+        # TRELLIS — primary for image-to-3D (best mesh quality for garments)
+        try:
+            from services.three_d.trellis.provider import TrellisProvider
+
+            self._register_provider(
+                "trellis",
+                TrellisProvider(),
+                ProviderConfig(
+                    provider_type="trellis",
+                    priority=ProviderPriority.PRIMARY,
+                    weight=110,
+                ),
+            )
+            logger.info("TRELLIS provider registered (image-to-3D primary)")
+        except Exception as e:  # noqa: BLE001 — provider must not block factory init
+            logger.warning(f"Failed to register TRELLIS provider: {e}")
 
         # Register providers
         self._register_provider(

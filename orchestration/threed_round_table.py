@@ -36,6 +36,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import random
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -58,6 +59,57 @@ from orchestration.huggingface_3d_client import (
 logger = structlog.get_logger(__name__)
 
 T = TypeVar("T")
+
+
+# SKU token = prefix-digits, plus an optional known variant suffix.
+# Known catalog editions (br-013, br-014, br-015) are independent SKUs;
+# other trailing tokens (e.g. "crewneck", "joggers") are PRODUCT TYPE
+# slugs in image filenames, NOT part of the SKU. Tightening the regex
+# to known variants prevents false-positive matches like
+# "br-001-crewneck" being treated as a variant SKU.
+_SKU_PREFIX_RE = re.compile(r"\b(?:br|lh|sg|kids)-\d{3}", re.IGNORECASE)
+_SKU_VARIANTS: tuple[str, ...] = ("oakland", "giants", "white")
+_SKU_VARIANT_RE = re.compile(r"\b(?:" + "|".join(_SKU_VARIANTS) + r")\b", re.IGNORECASE)
+
+
+def _extract_sku_parts(value: str) -> tuple[str | None, str | None]:
+    """Return ``(prefix, variant)`` lowercased.
+
+    Prefix = ``br|lh|sg|kids`` + 3 digits. Variant = known catalog suffix
+    (oakland/giants/white) found anywhere in the string after the prefix.
+    Either part may be None if not present.
+    """
+    prefix_match = _SKU_PREFIX_RE.search(value)
+    if not prefix_match:
+        return None, None
+    tail = value[prefix_match.end() :]
+    variant_match = _SKU_VARIANT_RE.search(tail)
+    return (
+        prefix_match.group(0).lower(),
+        variant_match.group(0).lower() if variant_match else None,
+    )
+
+
+def _sku_tokens_consistent(task_id: str, image_path: str) -> bool:
+    """True if SKU tokens detected in task_id and image_path agree.
+
+    Returns True when:
+      - no SKU prefix is detected in either side (permits smoke/ad-hoc runs)
+      - both prefixes match AND (no task-side variant required, OR image
+        also names that variant somewhere after the prefix)
+
+    Returns False when prefixes match but the task asked for a variant
+    the image filename does not name — protects against accidentally
+    rendering the base SKU when a variant edition was requested.
+    """
+    task_prefix, task_variant = _extract_sku_parts(task_id)
+    image_prefix, image_variant = _extract_sku_parts(image_path)
+    if task_prefix is None or image_prefix is None:
+        return True
+    if task_prefix != image_prefix:
+        return False
+    # Same prefix. If the task names a variant, the image must too.
+    return not (task_variant is not None and image_variant != task_variant)
 
 
 # =============================================================================
@@ -259,6 +311,10 @@ class ThreeDProvider(StrEnum):
     # External APIs
     TRIPO3D = "tripo3d"
     ANIGEN = "anigen"
+    MESHY = "meshy"
+
+    # Local GPU (conda-isolated)
+    TRELLIS_2 = "trellis_2"
 
     # Custom/Community
     CUSTOM = "custom"
@@ -291,7 +347,15 @@ class GenerationType(StrEnum):
 
 @dataclass(slots=True)
 class ThreeDQualityScores:
-    """Quality scoring breakdown for a 3D model. Memory-optimized."""
+    """Quality scoring breakdown for a 3D model. Memory-optimized.
+
+    The original 6 metrics are weighted at 0.80 (proportionally rebalanced
+    from their previous 1.00) to make room for ``clip_alignment_score``
+    (a 0..1 CLIP cosine similarity between the prompt and a render of the
+    mesh) at weight 0.20. A model with all old metrics at 100 and full
+    alignment (1.0) still totals 100; a model that's geometrically perfect
+    but ignores the prompt now caps at 80.
+    """
 
     geometry_quality: float = 0.0
     texture_quality: float = 0.0
@@ -299,18 +363,22 @@ class ThreeDQualityScores:
     file_format_score: float = 0.0
     generation_speed: float = 0.0
     web_readiness: float = 0.0
+    clip_alignment_score: float = 0.0  # 0..1 CLIP prompt-to-render similarity
     enhancement_bonus: float = 0.0  # Bonus for quality enhancement
 
     @property
     def total(self) -> float:
         """Weighted total score (0-100)."""
+        # Original weights * 0.80 leave 0.20 for clip alignment.
+        # Sum: 0.24 + 0.20 + 0.12 + 0.08 + 0.08 + 0.08 + 0.20 = 1.00
         base_score = (
-            self.geometry_quality * 0.30
-            + self.texture_quality * 0.25
-            + self.polycount_efficiency * 0.15
-            + self.file_format_score * 0.10
-            + self.generation_speed * 0.10
-            + self.web_readiness * 0.10
+            self.geometry_quality * 0.24
+            + self.texture_quality * 0.20
+            + self.polycount_efficiency * 0.12
+            + self.file_format_score * 0.08
+            + self.generation_speed * 0.08
+            + self.web_readiness * 0.08
+            + self.clip_alignment_score * 100.0 * 0.20  # 0..1 -> 0..100, weighted 0.20
         )
         return min(base_score + self.enhancement_bonus, 100.0)
 
@@ -323,6 +391,7 @@ class ThreeDQualityScores:
             "file_format_score": self.file_format_score,
             "generation_speed": self.generation_speed,
             "web_readiness": self.web_readiness,
+            "clip_alignment_score": self.clip_alignment_score,
             "enhancement_bonus": self.enhancement_bonus,
             "total": self.total,
         }
@@ -439,6 +508,39 @@ class RoundTableResult:
 
 
 # =============================================================================
+# Provider quality reputation (geometry + texture scores per provider)
+# =============================================================================
+
+
+@dataclass(frozen=True, slots=True)
+class ProviderQuality:
+    """Per-provider geometry + texture reputation scores used by `_score_response`.
+
+    `geo` always applies. `tex_textured` only applies when `response.has_textures`
+    is True; without textures, `_score_response` uses a fixed fallback of 30 for
+    every provider. The `tex_textured` default of 75 matches the previous
+    `dict.get(provider, 75)` behavior for providers not in the texture lookup.
+    """
+
+    geo: int
+    tex_textured: int = 75
+
+
+PROVIDER_QUALITY: dict[ThreeDProvider, ProviderQuality] = {
+    ThreeDProvider.TRELLIS_2: ProviderQuality(geo=98, tex_textured=95),
+    ThreeDProvider.HUNYUAN3D_2: ProviderQuality(geo=95, tex_textured=95),
+    ThreeDProvider.TRIPO3D: ProviderQuality(geo=92, tex_textured=92),
+    ThreeDProvider.ANIGEN: ProviderQuality(geo=90, tex_textured=88),
+    ThreeDProvider.TRIPOSR: ProviderQuality(geo=88),  # default tex_textured=75
+    ThreeDProvider.INSTANTMESH: ProviderQuality(geo=85, tex_textured=85),
+    ThreeDProvider.LGM: ProviderQuality(geo=80, tex_textured=80),
+    ThreeDProvider.MESHY: ProviderQuality(geo=82, tex_textured=82),
+    ThreeDProvider.SHAP_E: ProviderQuality(geo=70),  # default tex_textured=75
+    ThreeDProvider.POINT_E: ProviderQuality(geo=60),  # default tex_textured=75
+}
+
+
+# =============================================================================
 # 3D Model Round Table - Production Implementation
 # =============================================================================
 
@@ -478,6 +580,8 @@ class ThreeDRoundTable:
         ThreeDProvider.POINT_E: 45.0,
         ThreeDProvider.TRIPO3D: 300.0,  # External API, allow for high quality
         ThreeDProvider.ANIGEN: 240.0,  # 52s preview + 18s extract + cold-start buffer
+        ThreeDProvider.MESHY: 300.0,  # External API, poll-based
+        ThreeDProvider.TRELLIS_2: 600.0,  # Local GPU, heavy inference + GLB postprocess
     }
 
     # Default providers for text-to-3D
@@ -493,6 +597,7 @@ class ThreeDRoundTable:
         ThreeDProvider.INSTANTMESH,
         ThreeDProvider.LGM,
         ThreeDProvider.ANIGEN,
+        ThreeDProvider.MESHY,
     ]
 
     def __init__(
@@ -504,6 +609,8 @@ class ThreeDRoundTable:
         output_dir: str = "./round_table_outputs",
         enable_tripo3d: bool = True,
         enable_anigen: bool = True,
+        enable_meshy: bool = True,
+        enable_trellis: bool = False,
         concurrent_limit: int = 4,
     ) -> None:
         """
@@ -519,6 +626,9 @@ class ThreeDRoundTable:
             output_dir: Directory for generated models
             enable_tripo3d: Whether to include Tripo3D
             enable_anigen: Whether to include AniGen garment rigging
+            enable_meshy: Whether to include Meshy image-to-3D
+            enable_trellis: Whether to include local TRELLIS.2 (GPU-only,
+                requires the ``trellis2`` conda env; defaults to False)
             concurrent_limit: Max concurrent generation tasks
         """
         # Override HF config for highest quality
@@ -535,6 +645,8 @@ class ThreeDRoundTable:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.enable_tripo3d = enable_tripo3d
         self.enable_anigen = enable_anigen
+        self.enable_meshy = enable_meshy
+        self.enable_trellis = enable_trellis
         self._semaphore = asyncio.Semaphore(concurrent_limit)
 
         # Initialize health tracking for each provider
@@ -549,6 +661,14 @@ class ThreeDRoundTable:
         # AniGen agent (lazy loaded)
         self._anigen_agent = None
         self._anigen_agent_loaded = False
+
+        # Meshy agent (lazy loaded)
+        self._meshy_agent = None
+        self._meshy_agent_loaded = False
+
+        # TRELLIS.2 agent (lazy loaded — local GPU, conda-isolated)
+        self._trellis_agent = None
+        self._trellis_agent_loaded = False
 
         logger.info(
             "3D Round Table initialized with HIGHEST QUALITY settings",
@@ -573,6 +693,47 @@ class ThreeDRoundTable:
                     logger.warning("Tripo3D agent not available", error=str(e))
                     self.enable_tripo3d = False
         return self._tripo_agent
+
+    def _get_meshy_agent(self) -> Any:
+        """Lazy load Meshy image-to-3D agent."""
+        if not self._meshy_agent_loaded:
+            self._meshy_agent_loaded = True
+            if self.enable_meshy:
+                try:
+                    from agents.meshy_agent import MeshyAgent
+
+                    self._meshy_agent = MeshyAgent()
+                    logger.info("Meshy agent loaded for image-to-3D generation")
+                except (ImportError, Exception) as e:
+                    logger.warning("Meshy agent not available", error=str(e))
+                    self.enable_meshy = False
+        return self._meshy_agent
+
+    def _get_trellis_agent(self) -> Any:
+        """Lazy load local TRELLIS.2 image-to-3D agent.
+
+        TRELLIS.2 lives in an isolated conda env (``trellis2``). The agent
+        probes for the env at load time; if it cannot find conda + the
+        TRELLIS repo, this disables the provider for the lifetime of the
+        round-table instance.
+        """
+        if not self._trellis_agent_loaded:
+            self._trellis_agent_loaded = True
+            if self.enable_trellis:
+                try:
+                    from agents.trellis_agent import TrellisAgent
+
+                    candidate = TrellisAgent()
+                    if not candidate.is_available():
+                        logger.warning("TRELLIS.2 agent unavailable — conda env or repo missing")
+                        self.enable_trellis = False
+                    else:
+                        self._trellis_agent = candidate
+                        logger.info("TRELLIS.2 agent loaded for local GPU image-to-3D")
+                except (ImportError, Exception) as e:
+                    logger.warning("TRELLIS.2 agent not available", error=str(e))
+                    self.enable_trellis = False
+        return self._trellis_agent
 
     def _get_anigen_agent(self) -> Any:
         """Lazy load AniGen garment rigging agent."""
@@ -669,6 +830,12 @@ class ThreeDRoundTable:
         if self.enable_anigen and ThreeDProvider.ANIGEN not in providers:
             providers.append(ThreeDProvider.ANIGEN)
 
+        if self.enable_meshy and ThreeDProvider.MESHY not in providers:
+            providers.append(ThreeDProvider.MESHY)
+
+        if self.enable_trellis and ThreeDProvider.TRELLIS_2 not in providers:
+            providers.append(ThreeDProvider.TRELLIS_2)
+
         image_hash = hashlib.sha256(image_path.encode()).hexdigest()[:16]
 
         return await self._run_competition(
@@ -700,6 +867,22 @@ class ThreeDRoundTable:
         """Internal competition runner with quality enhancement."""
         task_id = task_id or str(uuid4())[:8]
         competition_id = str(uuid4())[:12]
+
+        # SKU-token cross-check — when both task_id and image_path are SKU-bearing,
+        # reject mismatches BEFORE any provider call to prevent cross-SKU image
+        # leakage into the round-table (a wrong source image silently produces
+        # a wrong product 3D model). Zero-cost guard: pure string check.
+        if (
+            generation_type == GenerationType.IMAGE_TO_3D
+            and image_path
+            and task_id
+            and not _sku_tokens_consistent(task_id, image_path)
+        ):
+            raise ValueError(
+                f"SKU mismatch between task_id={task_id!r} and "
+                f"image_path={image_path!r} — refusing dispatch to avoid "
+                f"cross-SKU generation"
+            )
 
         # Filter unhealthy providers
         active_providers = providers.copy()
@@ -788,7 +971,8 @@ class ThreeDRoundTable:
                 response = await self._enhance_quality(response)
 
             entry = RoundTableEntry(provider=provider, response=response)
-            entry.scores = self._score_response(response)
+            # Pass the prompt so CLIP alignment can score prompt-to-preview.
+            entry.scores = self._score_response(response, prompt=prompt)
             entries.append(entry)
 
         # Add skipped provider entries
@@ -876,9 +1060,23 @@ class ThreeDRoundTable:
         - Mesh optimization
         - Normal map generation
         - Format optimization
+
+        WARNING: this method is a STUB. It records metadata flags only — it
+        does not run trimesh/pymeshlab/etc. The "enhancement_bonus" added by
+        _score_response is therefore a no-op signal until this is implemented.
         """
         if not self.quality_config.enable_enhancement:
             return response
+
+        if not getattr(self.__class__, "_enhance_quality_stub_warned", False):
+            logger.warning(
+                "_enhance_quality is a stub - records metadata flags only, "
+                "does not perform mesh processing, texture upscaling, or LOD "
+                "generation. Replace with real trimesh/pymeshlab integration "
+                "before treating the enhancement_bonus score component as "
+                "meaningful signal."
+            )
+            self.__class__._enhance_quality_stub_warned = True
 
         enhancement_details = {}
 
@@ -1047,6 +1245,22 @@ class ThreeDRoundTable:
                 task_id=task_id,
             )
 
+        if provider == ThreeDProvider.MESHY:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("Meshy requires an image (image-to-3D only)")
+            return await self._generate_with_meshy(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
+        if provider == ThreeDProvider.TRELLIS_2:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("TRELLIS.2 requires an image (image-to-3D only)")
+            return await self._generate_with_trellis(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
         hf_model = self.PROVIDER_MODEL_MAP.get(provider)
         if not hf_model:
             raise ValueError(f"Unknown provider: {provider}")
@@ -1116,6 +1330,70 @@ class ThreeDRoundTable:
             metadata=result,
         )
 
+    async def _generate_with_meshy(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using Meshy API (image-to-3D only)."""
+        agent = self._get_meshy_agent()
+        if not agent:
+            raise ValueError("Meshy agent not available")
+
+        start_time = time.time()
+
+        result = await agent._tool_image_to_3d(
+            image_url=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.MESHY,
+            model_id=result.get("task_id", "meshy-api"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb") or model_urls.get("fbx"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
+            has_textures=True,
+            metadata=result,
+        )
+
+    async def _generate_with_trellis(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using local TRELLIS.2 (image-to-3D only, GPU-only)."""
+        agent = self._get_trellis_agent()
+        if not agent:
+            raise ValueError("TRELLIS.2 agent not available")
+
+        start_time = time.time()
+
+        result = await agent.image_to_3d(
+            image_path=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.TRELLIS_2,
+            model_id=result.get("task_id", "trellis-local"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
+            has_textures=True,
+            metadata=result,
+        )
+
     async def _generate_with_anigen(
         self,
         image_path: str,
@@ -1177,39 +1455,32 @@ class ThreeDRoundTable:
             error=result.error_message if result.status == "failed" else None,
         )
 
-    def _score_response(self, response: ThreeDResponse) -> ThreeDQualityScores:
-        """Score a 3D generation response."""
+    def _score_response(
+        self,
+        response: ThreeDResponse,
+        prompt: str | None = None,
+    ) -> ThreeDQualityScores:
+        """Score a 3D generation response.
+
+        ``prompt`` is the original text prompt for text-to-3D runs. When
+        provided alongside a provider preview image (``response.metadata``
+        ``thumbnail_url`` / ``preview_url`` / ``rendered_image``), this
+        method computes CLIP text-to-image alignment and stores it on
+        ``scores.clip_alignment_score``. Failure to compute alignment
+        (no preview, network error, CLIP unavailable) silently degrades
+        to 0.0 so the rest of the score is unaffected.
+        """
         if response.error:
             return ThreeDQualityScores()
 
         scores = ThreeDQualityScores()
         polycount = response.polycount or 50000
 
-        # Provider reputation scores (highest quality focused)
-        provider_geo_scores = {
-            ThreeDProvider.HUNYUAN3D_2: 95,
-            ThreeDProvider.TRIPOSR: 88,
-            ThreeDProvider.INSTANTMESH: 85,
-            ThreeDProvider.TRIPO3D: 92,
-            ThreeDProvider.ANIGEN: 90,  # SIGGRAPH-grade garment reconstruction
-            ThreeDProvider.LGM: 80,
-            ThreeDProvider.SHAP_E: 70,
-            ThreeDProvider.POINT_E: 60,
-        }
-        scores.geometry_quality = provider_geo_scores.get(response.provider, 70)
-
-        # Texture quality
-        if response.has_textures:
-            provider_tex_scores = {
-                ThreeDProvider.HUNYUAN3D_2: 95,
-                ThreeDProvider.TRIPO3D: 92,
-                ThreeDProvider.ANIGEN: 88,  # texture from source image projection
-                ThreeDProvider.INSTANTMESH: 85,
-                ThreeDProvider.LGM: 80,
-            }
-            scores.texture_quality = provider_tex_scores.get(response.provider, 75)
-        else:
-            scores.texture_quality = 30
+        # Provider reputation scores — single source of truth at module level.
+        # See PROVIDER_QUALITY definition above. Adding a provider = one entry.
+        quality = PROVIDER_QUALITY.get(response.provider, ProviderQuality(geo=70))
+        scores.geometry_quality = quality.geo
+        scores.texture_quality = quality.tex_textured if response.has_textures else 30
 
         # Polycount efficiency
         if 30000 <= polycount <= 80000:
@@ -1258,10 +1529,68 @@ class ThreeDRoundTable:
         scores.web_readiness = min(web_ready, 100)
 
         # Enhancement bonus
+        # P1 #8: previously +5.0 when response.enhanced was True. But .enhanced
+        # is set by _enhance_quality(), which is a stub that records metadata
+        # flags only — no actual mesh/texture processing happens. Awarding +5
+        # for fake enhancement made tournament rankings systematically optimistic
+        # for any provider whose response went through the stub. Zeroed until
+        # real trimesh/pymeshlab integration lands. Re-enable then.
         if response.enhanced:
-            scores.enhancement_bonus = 5.0
+            scores.enhancement_bonus = 0.0
+
+        # CLIP text-to-image alignment (Stage 9 wiring) — opt-in: requires a
+        # text prompt and a preview image URL/path on the response. Failure
+        # is silent: returns 0.0 contribution so total degrades gracefully.
+        scores.clip_alignment_score = self._maybe_score_alignment(prompt, response)
 
         return scores
+
+    def _maybe_score_alignment(
+        self,
+        prompt: str | None,
+        response: ThreeDResponse,
+    ) -> float:
+        """Compute CLIP text-image alignment for a 3D response's preview shot.
+
+        Looks for a preview image at one of the documented metadata keys
+        (``thumbnail_url``, ``preview_url``, ``rendered_image``,
+        ``preview_path``). Returns the cosine similarity ``[0, 1]`` between
+        the prompt and that preview, or 0.0 if alignment can't be computed.
+        """
+        if not prompt:
+            return 0.0
+        # Provider conventions vary — try the documented keys in order.
+        meta = response.metadata or {}
+        preview_path = meta.get("preview_path")
+        preview_url = (
+            meta.get("thumbnail_url") or meta.get("preview_url") or meta.get("rendered_image")
+        )
+        image_source = preview_path or preview_url
+        if not image_source:
+            return 0.0
+
+        try:
+            import io
+
+            import httpx
+            from PIL import Image
+
+            from skyyrose.elite_studio.quality.clip_alignment import score_alignment
+
+            if str(image_source).startswith(("http://", "https://")):
+                resp = httpx.get(str(image_source), timeout=10.0)
+                resp.raise_for_status()
+                img = Image.open(io.BytesIO(resp.content))
+            else:
+                img = Image.open(str(image_source))
+            return float(score_alignment(prompt, img))
+        except Exception as exc:
+            logger.warning(
+                "CLIP alignment failed",
+                provider=response.provider.value if response.provider else "unknown",
+                error=str(exc),
+            )
+            return 0.0
 
     def _rank_entries(self, entries: list[RoundTableEntry]) -> list[RoundTableEntry]:
         """Rank entries by total score."""

@@ -7,6 +7,7 @@ import json
 import logging
 from pathlib import Path
 
+from llm.model_ids import OPENAI_VISION_MODEL
 from skyyrose.elite_studio.config import get_openai_client
 from skyyrose.elite_studio.models import SafetyResult
 
@@ -55,7 +56,7 @@ class SafetyAgent:
         media_type = "image/jpeg" if suffix in ("jpg", "jpeg") else f"image/{suffix}"
 
         vision_response = client.chat.completions.create(
-            model="gpt-4o",
+            model=OPENAI_VISION_MODEL,
             max_tokens=256,
             messages=[
                 {

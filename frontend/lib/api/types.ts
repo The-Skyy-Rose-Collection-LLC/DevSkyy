@@ -17,6 +17,17 @@ export type AssetListResponse = z.infer<typeof schemas.AssetListResponseSchema>;
 export type QAReview = z.infer<typeof schemas.QAReviewSchema>;
 export type QAReviewListResponse = z.infer<typeof schemas.QAReviewListResponseSchema>;
 export type BatchJob = z.infer<typeof schemas.BatchJobSchema>;
+export type Settings = z.infer<typeof schemas.SettingsSchema>;
+export type Task = z.infer<typeof schemas.TaskSchema>;
+export type TaskMetrics = z.infer<typeof schemas.TaskMetricsSchema>;
+export type AgentInfo = z.infer<typeof schemas.AgentInfoSchema>;
+export type AgentListResponse = z.infer<typeof schemas.AgentListResponseSchema>;
+export type ServiceHealthStatus = z.infer<typeof schemas.ServiceHealthStatusSchema>;
+export type SystemStats = z.infer<typeof schemas.SystemStatsSchema>;
+export type HealthEvent = z.infer<typeof schemas.HealthEventSchema>;
+export type MonitoringHealthResponse = z.infer<typeof schemas.MonitoringHealthResponseSchema>;
+
+
 
 // Request Interfaces
 export interface CompetitionRequest {
@@ -73,3 +84,11 @@ export interface RegenerateRequest {
         lighting?: number;
     };
 }
+
+export type AutonomousOperation = z.infer<typeof schemas.AutonomousOperationSchema>;
+export type AutonomousHistoryEntry = z.infer<typeof schemas.AutonomousHistoryEntrySchema>;
+export type AutonomousOperationsResponse = z.infer<typeof schemas.AutonomousOperationsResponseSchema>;
+
+export type SkuImageCounts = z.infer<typeof schemas.SkuImageCountsSchema>;
+export type HfDatasetInfo = z.infer<typeof schemas.HfDatasetInfoSchema>;
+export type HfDatasetsResponse = z.infer<typeof schemas.HfDatasetsResponseSchema>;

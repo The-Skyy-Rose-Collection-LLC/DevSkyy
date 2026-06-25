@@ -376,3 +376,32 @@ function skyyrose_product_body_class( $classes ) {
 	return $classes;
 }
 add_filter( 'body_class', 'skyyrose_product_body_class' );
+
+/**
+ * Resolve the current page's WC_Product safely, or null on failure.
+ *
+ * Encapsulates the safe-fetch pattern duplicated across enqueue-performance.php,
+ * seo.php, 404.php, and search.php. Guards against:
+ *   - WooCommerce not being loaded (function_exists check)
+ *   - Missing/invalid post ID (get_the_ID returning false outside the loop)
+ *   - wc_get_product returning false on draft / trashed / non-product posts
+ *
+ * Returns null (not false) so callers can use `?:` fallbacks idiomatically and
+ * type-hint the result against `?WC_Product`.
+ *
+ * @since 6.7.0
+ *
+ * @param int|null $post_id Optional. Post ID. Defaults to current loop ID via get_the_ID().
+ * @return WC_Product|null
+ */
+function skyyrose_current_wc_product( $post_id = null ) {
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return null;
+	}
+	$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+	if ( ! $post_id ) {
+		return null;
+	}
+	$product = wc_get_product( $post_id );
+	return $product instanceof WC_Product ? $product : null;
+}

@@ -1,0 +1,209 @@
+{
+  "baseline": {
+    "candidate_path": "/private/tmp/v2-phase-0-5-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-crewneck.png",
+    "aggregate_score": 38.0,
+    "vision_pair_mean": 51.0,
+    "synthesis_overall": 38.0,
+    "passed_98": false,
+    "top_issues": [
+      "Front chest Black Rose logo is rendered in full color (grey petals, green/grey stems, blue/white cloud) instead of the required tonal black-on-black flattened relief \u2014 direct negative-prompt violation.",
+      "Front chest logo technique appears to be embroidery, print, or appliqu\u00e9 rather than the specified physically embossed/debossed tonal relief.",
+      "Back-neck gold SR monogram is unverifiable \u2014 no back or back-three-quarter view provided, so required rear branding cannot be confirmed.",
+      "White waist hem does not read as a true ribbed-knit waistband; it looks like a layered white underlayer/panel rather than contrast rib trim matching the cuffs and neckband.",
+      "Heavyweight cotton fleece body and ribbed-knit texture on neckband, cuffs, and hem are not clearly conveyed."
+    ],
+    "all_fixes": [
+      "Replace the visible colored chest artwork with a subtle tonal black-on-black embossed Black Rose relief at the correct chest size and position.",
+      "Remove all contrasting colors from the front logo; no gray petals, green/gray stems, or white/blue cloud should be visible.",
+      "Add a small gold-tone embroidered SR monogram only at the back-neck, just below the white collar, and provide a rear/back-neck view.",
+      "Render the waist hem as a white ribbed-knit band, not a layered white shirt/panel.",
+      "Use matte heavyweight cotton fleece with clear ribbing on the white neckband, cuffs, and hem.",
+      "Remove all colors (grey, green, blue, white) from the front chest logo.",
+      "Change the front chest logo technique to a tonal black-on-black 3D embossing/debossing, so it blends entirely into the black body fabric and is only visible via relief shadows.",
+      "Replace the colored chest artwork with a subtle tonal black-on-black embossed Black Rose relief \u2014 full art (three roses, thorny vines, cloud) impressed into the fabric with shapes visible only via raking-light shadow, no pigment or thread color.",
+      "Strip all non-black colors (grey, green, blue, white) from the front chest entirely; the embossing must flatten all canonical logo colors to the base black fabric.",
+      "Add a back or back-three-quarter render showing the small gold-tone embroidered SR monogram at the back-neck just below the white collar, with no other back-center decoration."
+    ],
+    "judges": [
+      {
+        "judge": "gpt-5.5-pro",
+        "overall": 52,
+        "scores": {
+          "garment_type": 88,
+          "color_accuracy": 70,
+          "text_accuracy": 100,
+          "logo_accuracy": 18,
+          "construction_accuracy": 65,
+          "no_hallucinations": 38
+        },
+        "issues": [
+          "Front Black Rose logo is rendered as visible gray/white/blue artwork, likely embroidery or print, instead of tonal black-on-black embossed/debossed relief.",
+          "Front logo art does not match the required canonical tonal three-rose cluster with thorny vines/cloud flattened to base fabric color; the cloud and stems/leaves are visibly colored.",
+          "Back-neck gold SR monogram is missing/not shown; only a front view is provided.",
+          "White waist hem is not a clean ribbed waistband and appears more like an added white underlayer beneath the black body.",
+          "Heavyweight cotton fleece and rib-knit texture on collar, cuffs, and hem are not clearly represented.",
+          "Required back/back-three-quarter render to verify rear branding is absent."
+        ],
+        "suggested_fixes": [
+          "Replace the visible colored chest artwork with a subtle tonal black-on-black embossed Black Rose relief at the correct chest size and position.",
+          "Remove all contrasting colors from the front logo; no gray petals, green/gray stems, or white/blue cloud should be visible.",
+          "Add a small gold-tone embroidered SR monogram only at the back-neck, just below the white collar, and provide a rear/back-neck view.",
+          "Render the waist hem as a white ribbed-knit band, not a layered white shirt/panel.",
+          "Use matte heavyweight cotton fleece with clear ribbing on the white neckband, cuffs, and hem."
+        ]
+      },
+      {
+        "judge": "gemini-3.1-pro-preview",
+        "overall": 50,
+        "scores": {
+          "garment_type": 100,
+          "color_accuracy": 100,
+          "text_accuracy": 100,
+          "logo_accuracy": 20,
+          "construction_accuracy": 95,
+          "no_hallucinations": 40
+        },
+        "issues": [
+          "The front chest logo is rendered in full color (greyscale petals, greenish stems, blue/white cloud), directly violating the negative prompt to avoid full-color rendering.",
+          "The front chest logo appears to be embroidered or an appliqu\u00e9 patch, whereas the spec strictly requires it to be a physically embossed/debossed tonal black-on-black texture."
+        ],
+        "suggested_fixes": [
+          "Remove all colors (grey, green, blue, white) from the front chest logo.",
+          "Change the front chest logo technique to a tonal black-on-black 3D embossing/debossing, so it blends entirely into the black body fabric and is only visible via relief shadows."
+        ]
+      },
+      {
+        "judge": "claude-opus-4-7",
+        "overall": 38,
+        "scores": {
+          "garment_type": 90,
+          "color_accuracy": 65,
+          "text_accuracy": 100,
+          "logo_accuracy": 18,
+          "construction_accuracy": 72,
+          "no_hallucinations": 35
+        },
+        "issues": [
+          "Front chest Black Rose logo is rendered in full color (grey petals, green/grey stems, blue/white cloud) instead of the required tonal black-on-black flattened relief \u2014 direct negative-prompt violation.",
+          "Front chest logo technique appears to be embroidery, print, or appliqu\u00e9 rather than the specified physically embossed/debossed tonal relief.",
+          "Back-neck gold SR monogram is unverifiable \u2014 no back or back-three-quarter view provided, so required rear branding cannot be confirmed.",
+          "White waist hem does not read as a true ribbed-knit waistband; it looks like a layered white underlayer/panel rather than contrast rib trim matching the cuffs and neckband.",
+          "Heavyweight cotton fleece body and ribbed-knit texture on neckband, cuffs, and hem are not clearly conveyed."
+        ],
+        "suggested_fixes": [
+          "Replace the colored chest artwork with a subtle tonal black-on-black embossed Black Rose relief \u2014 full art (three roses, thorny vines, cloud) impressed into the fabric with shapes visible only via raking-light shadow, no pigment or thread color.",
+          "Strip all non-black colors (grey, green, blue, white) from the front chest entirely; the embossing must flatten all canonical logo colors to the base black fabric.",
+          "Add a back or back-three-quarter render showing the small gold-tone embroidered SR monogram at the back-neck just below the white collar, with no other back-center decoration.",
+          "Render the waist hem as a clean white ribbed-knit band integrated with the body (matching the white ribbed neckband and cuffs), not a layered white garment underneath.",
+          "Use matte heavyweight cotton fleece for the body with clearly visible vertical ribbing on the white neckband, cuffs, and hem."
+        ],
+        "synthesis": {
+          "rationale": "Both judges strongly agree the front-chest logo is catastrophically wrong \u2014 rendered as full-color artwork (grey petals, green stems, blue/white cloud) instead of the required tonal black-on-black embossed relief, which is an explicit negative-prompt violation. I sided with Judge 1's lower color and construction scores because the colored logo art does compromise overall color fidelity and the hem appears to be a layered white panel rather than a true ribbed waistband; I also penalized for the missing back view that prevents verification of the gold SR monogram. Hallucinated colored logo elements on a luxury garment trigger the veto and cap the overall well below the vision pair's averages.",
+          "vision_consensus": "partial",
+          "hallucination_veto": true
+        }
+      }
+    ]
+  },
+  "refine_prompt": "This is a Black Rose Crewneck (br-001) product render that scored 38/100 in QA review and needs correction.\n\nCRITICAL: This render contains hallucinated decorative elements not in the spec. These must be completely removed. Do not introduce any new decorations, motifs, logos, text, or details that are not explicitly listed in the corrections below.\n\nDEFECTS PRESENT IN CURRENT RENDER:\n  - Front chest Black Rose logo is rendered in full color (grey petals, green/grey stems, blue/white cloud) instead of the required tonal black-on-black flattened relief \u2014 direct negative-prompt violation.\n  - Front chest logo technique appears to be embroidery, print, or appliqu\u00e9 rather than the specified physically embossed/debossed tonal relief.\n  - Back-neck gold SR monogram is unverifiable \u2014 no back or back-three-quarter view provided, so required rear branding cannot be confirmed.\n  - White waist hem does not read as a true ribbed-knit waistband; it looks like a layered white underlayer/panel rather than contrast rib trim matching the cuffs and neckband.\n  - Heavyweight cotton fleece body and ribbed-knit texture on neckband, cuffs, and hem are not clearly conveyed.\n\nREQUIRED CORRECTIONS:\n  - Replace the colored chest artwork with a subtle tonal black-on-black embossed Black Rose relief \u2014 full art (three roses, thorny vines, cloud) impressed into the fabric with shapes visible only via raking-light shadow, no pigment or thread color.\n  - Strip all non-black colors (grey, green, blue, white) from the front chest entirely; the embossing must flatten all canonical logo colors to the base black fabric.\n  - Add a back or back-three-quarter render showing the small gold-tone embroidered SR monogram at the back-neck just below the white collar, with no other back-center decoration.\n  - Render the waist hem as a clean white ribbed-knit band integrated with the body (matching the white ribbed neckband and cuffs), not a layered white garment underneath.\n  - Use matte heavyweight cotton fleece for the body with clearly visible vertical ribbing on the white neckband, cuffs, and hem.\n\nApply these corrections precisely. Preserve all unrelated elements unchanged. Do not add any decorations, text, logos, or details beyond what is explicitly required.",
+  "post_refine": {
+    "candidate_path": "/tmp/br-001-refined.png",
+    "aggregate_score": 62.0,
+    "vision_pair_mean": 90.0,
+    "synthesis_overall": 62.0,
+    "passed_98": false,
+    "top_issues": [
+      "Front Black Rose reads as a printed/flocked patch rather than tonal black-on-black embossed relief \u2014 violates the 'NO printed graphics' negative spec and the embossed-only technique lock.",
+      "Back view not provided, so the required small gold-embroidered SR monogram at the outside back-neck cannot be verified.",
+      "Front rose art is simplified \u2014 full canonical three-rose cluster with stems, thorny vines, and cloud in 3D relief is not clearly rendered at the specified ~10in scale.",
+      "Fabric reads smoother/glossier than heavyweight cotton fleece.",
+      "Pose and presentation deviate from the specified standing three-quarter studio shot; no back/back-three-quarter render is included."
+    ],
+    "all_fixes": [
+      "Add a back or back-three-quarter view showing the gold-tone embroidered SR monogram centered just below the white collar.",
+      "Render the front logo as true tonal black-on-black embossed/debossed relief with subtle raking-light texture, not a visible print or patch.",
+      "Use the complete canonical Black Rose artwork at approximately 10 inches tall on the front chest.",
+      "Improve material to read as heavyweight cotton fleece while keeping the black body and white ribbed neckband, cuffs, and waist hem.",
+      "Use the specified white studio model pose or provide front and back product views with no extra logos, text, or sleeve decoration.",
+      "Re-render the front rose as true tonal black-on-black emboss/deboss with raking-light shadow only \u2014 remove any ink, sheen, or patch edge that reads as print or appliqu\u00e9.",
+      "Include the full canonical three-rose cluster (roses + stems + thorny vines + cloud) at ~10in tall, shapes-only in 3D relief, no color fills.",
+      "Add a back or back-three-quarter view showing the small gold-tone embroidered SR monogram centered just below the white ribbed collar, with no other back-center decoration.",
+      "Adjust material shader to heavyweight brushed cotton fleece (matte, soft hand) while preserving the white ribbed neckband, cuffs, and waist hem against the black body.",
+      "Conform to the spec scene: standing three-quarter pose, pure white studio backdrop, soft front-left key light to reveal the emboss texture, subtle floor shadow."
+    ],
+    "judges": [
+      {
+        "judge": "gpt-5.5-pro",
+        "overall": 80,
+        "scores": {
+          "garment_type": 94,
+          "color_accuracy": 90,
+          "text_accuracy": 95,
+          "logo_accuracy": 58,
+          "construction_accuracy": 84,
+          "no_hallucinations": 88
+        },
+        "issues": [
+          "Only a front flat-lay is shown; the required small gold embroidered SR monogram at the outside back-neck is not visible or verified.",
+          "The front Black Rose artwork appears more like a tonal print/flocked patch than subtle physical embossing/debossing integrated into the fabric.",
+          "The front rose art detail is somewhat simplified and does not clearly show the full canonical three-rose cluster with thorny vines, stems, and cloud in 3D relief.",
+          "Presentation does not follow the specified standing three-quarter studio pose and lacks a back/back-three-quarter render.",
+          "Fabric surface appears smoother/glossier than heavyweight cotton fleece."
+        ],
+        "suggested_fixes": [
+          "Add a back or back-three-quarter view showing the gold-tone embroidered SR monogram centered just below the white collar.",
+          "Render the front logo as true tonal black-on-black embossed/debossed relief with subtle raking-light texture, not a visible print or patch.",
+          "Use the complete canonical Black Rose artwork at approximately 10 inches tall on the front chest.",
+          "Improve material to read as heavyweight cotton fleece while keeping the black body and white ribbed neckband, cuffs, and waist hem.",
+          "Use the specified white studio model pose or provide front and back product views with no extra logos, text, or sleeve decoration."
+        ]
+      },
+      {
+        "judge": "gemini-3.1-pro-preview",
+        "overall": 100,
+        "scores": {
+          "garment_type": 100,
+          "color_accuracy": 100,
+          "text_accuracy": 100,
+          "logo_accuracy": 100,
+          "construction_accuracy": 100,
+          "no_hallucinations": 100
+        },
+        "issues": [],
+        "suggested_fixes": []
+      },
+      {
+        "judge": "claude-opus-4-7",
+        "overall": 62,
+        "scores": {
+          "garment_type": 90,
+          "color_accuracy": 86,
+          "text_accuracy": 90,
+          "logo_accuracy": 50,
+          "construction_accuracy": 72,
+          "no_hallucinations": 65
+        },
+        "issues": [
+          "Front Black Rose reads as a printed/flocked patch rather than tonal black-on-black embossed relief \u2014 violates the 'NO printed graphics' negative spec and the embossed-only technique lock.",
+          "Back view not provided, so the required small gold-embroidered SR monogram at the outside back-neck cannot be verified.",
+          "Front rose art is simplified \u2014 full canonical three-rose cluster with stems, thorny vines, and cloud in 3D relief is not clearly rendered at the specified ~10in scale.",
+          "Fabric reads smoother/glossier than heavyweight cotton fleece.",
+          "Pose and presentation deviate from the specified standing three-quarter studio shot; no back/back-three-quarter render is included."
+        ],
+        "suggested_fixes": [
+          "Re-render the front rose as true tonal black-on-black emboss/deboss with raking-light shadow only \u2014 remove any ink, sheen, or patch edge that reads as print or appliqu\u00e9.",
+          "Include the full canonical three-rose cluster (roses + stems + thorny vines + cloud) at ~10in tall, shapes-only in 3D relief, no color fills.",
+          "Add a back or back-three-quarter view showing the small gold-tone embroidered SR monogram centered just below the white ribbed collar, with no other back-center decoration.",
+          "Adjust material shader to heavyweight brushed cotton fleece (matte, soft hand) while preserving the white ribbed neckband, cuffs, and waist hem against the black body.",
+          "Conform to the spec scene: standing three-quarter pose, pure white studio backdrop, soft front-left key light to reveal the emboss texture, subtle floor shadow."
+        ],
+        "synthesis": {
+          "rationale": "Judge 2's flat 100/100 across all dimensions is not credible given Judge 1's specific, spec-grounded findings (front art reads as a print/flocked patch rather than tonal emboss, no back view to verify the gold SR monogram, glossy fabric vs. heavyweight fleece, simplified rose art, missing required pose/back render). Judge 1's report is the more reliable signal. Because the spec explicitly forbids printed graphics on the front and requires the rose to be tonal black-on-black embossed relief, the apparent printed/flocked front rose constitutes a hallucinated technique that violates the negative spec \u2014 triggering the luxury hallucination cap.",
+          "vision_consensus": "disagree",
+          "hallucination_veto": true
+        }
+      }
+    ]
+  },
+  "delta_aggregate": 24.0
+}

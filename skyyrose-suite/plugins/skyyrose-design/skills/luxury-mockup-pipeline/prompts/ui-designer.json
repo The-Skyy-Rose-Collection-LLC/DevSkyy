@@ -1,0 +1,157 @@
+{
+  "$schema": "../schemas/agent-brief.schema.json",
+  "agent": "UI Designer",
+  "mode": "refine",
+  "platform": "standalone-html",
+  "criteria": "luxury",
+  "mission": {
+    "objective": "Produce exact CSS/HTML fixes that resolve founder pain: distinct home hero, 4 evenly aligned collection scene cards, removed jersey patch, sharper image quality, raised visual amplitude.",
+    "founder_feedback": "the hero image quality is still terrible. the collection cards so be 4 evenly aligned sections. the hero shouldnt be the same image as the collection, why is the jersey patched displayed. each collection card should be a image of the scene i want.",
+    "success_metric": "Each fix has exact before/after diff. Spread renders 4 evenly aligned scene tiles. Hero quality verdict named with root cause."
+  },
+  "scope": {
+    "_scope_policy": "FULL-SITE coverage. Agent sees and addresses every surface. Even when a fix sprint targets one page (e.g., home), the agent must verify ripple effects across header/footer/widgets/other-pages and call them out.",
+    "header": {
+      "navbar": true,
+      "mobile_nav": true,
+      "announcement_bar": true,
+      "search": true,
+      "account_menu": true,
+      "cart_indicator": true
+    },
+    "page_body": {
+      "pages": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"],
+      "components": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"],
+      "widgets": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"],
+      "layouts": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+    },
+    "footer": {
+      "primary_footer": true,
+      "newsletter_block": true,
+      "link_columns": true,
+      "social_strip": true,
+      "payment_icons": true,
+      "legal_strip": true,
+      "founder_signature": true,
+      "back_to_top": true
+    },
+    "primary_focus_surfaces": ["home"],
+    "scope_note": "primary_focus_surfaces lists what the current fix sprint targets. The agent reports on ripple effects across all other surfaces in a brief 'Cross-surface implications' section."
+  },
+  "performance_baseline": {
+    "lcp_seconds": 2.5,
+    "cls": 0.1,
+    "inp_ms": 200,
+    "lighthouse_performance": 95,
+    "lighthouse_accessibility": 100,
+    "lighthouse_seo": 100,
+    "lighthouse_best_practices": 100,
+    "wcag_level": "AA",
+    "image_format_priority": ["avif", "webp", "jpg"],
+    "font_loading": "self-hosted woff2, font-display: swap",
+    "js_budget_kb": 200,
+    "css_budget_kb": 100
+  },
+  "deliverables": [
+    {
+      "name": "Visual fixes manifest",
+      "path": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2-visual-fixes-v2.md",
+      "format": "markdown",
+      "sections": [
+        "Fix list (FIX-V2-01 through FIX-V2-NN)",
+        "Per-fix: Title / Symptom / Root cause file:line / Before / After / CSS diff / Verification / Tier P0-P2 / Commit message",
+        "Image quality verdict",
+        "ROI Upgrade Proposal (mandatory)"
+      ]
+    }
+  ],
+  "roi_upgrade": {
+    "mandate": "Propose exactly 1 high-ROI luxury detail system per the Upgrade Mandate.",
+    "category_options": [
+      "Magnetic cursor on .spread__tile — 24px attraction radius, 80ms lag follow, GPU-accelerated",
+      "Ambient grain canvas overlay — fixed, z-90, mix-blend-mode overlay, 5% opacity",
+      "Type-rhythm escalator — modular scale rooted to viewport (clamp() across breakpoints)",
+      "Magnetic hover on tiles — transform: translate3d() following cursor with cubic-bezier ease",
+      "Frame-transition micro-interaction — section edge bleed-in on enter",
+      "Custom cursor with hover-state expansion (16px → 56px on interactive)",
+      "Drop-shadow color-mixing with brand accent on lockups",
+      "Letterspacing animation on titles (closed → open on reveal)"
+    ],
+    "constraints": {
+      "self_contained": true,
+      "production_grade": true,
+      "prefers_reduced_motion_safe": true,
+      "browser_fallback_required": true,
+      "single_commit_scope": true
+    }
+  },
+  "constraints": {
+    "no_three_js": true,
+    "no_cdn_dependencies": true,
+    "no_modify_target": true,
+    "canon_docs": [
+      "/Users/theceo/DevSkyy/docs/brand/visual-references.md",
+      "/Users/theceo/DevSkyy/docs/brand/asset-hierarchy.md"
+    ],
+    "locked_out_references": [
+      "Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"
+    ],
+    "working_directory": "/Users/theceo/DevSkyy"
+  },
+  "inputs": {
+    "mockup": "/Users/theceo/DevSkyy/docs/brand/design-mockups/v2.html",
+    "critical_line_refs": {
+      "home_cover": "587-625",
+      "home_hero": "626-667",
+      "home_spread": "678-728",
+      "spread_tile_css": "409",
+      "spread_tile_lg_css": "424",
+      "spread_tile_brand_css": "425",
+      "editorial_filter": "527"
+    },
+    "purpose_built_assets": {
+      "home_hero_candidates": [
+        "wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.{avif,webp}",
+        "wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg-alt.{avif,webp}"
+      ],
+      "collection_scene_cards": {
+        "BR": "wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.{avif,webp}",
+        "LH": "wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.{avif,webp}",
+        "SIG": "wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.{avif,webp}",
+        "Kids_fallback": "wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.{avif,webp}"
+      }
+    },
+    "grid_specification": {
+      "desktop_columns": 4,
+      "tablet_columns": 2,
+      "mobile_columns": 1,
+      "tile_aspect_ratio": "3 / 4",
+      "remove_modifiers": ["--lg", "--brand"]
+    }
+  },
+  "return_format": {
+    "max_words": 180,
+    "required_fields": [
+      "top_5_fixes",
+      "image_quality_verdict",
+      "roi_upgrade_name",
+      "roi_upgrade_one_line_pitch",
+      "deliverable_file_path"
+    ],
+    "format": "markdown"
+  },
+  "html_reference_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/references/full-theme-skeleton.html",
+  "memory": {
+    "read_paths": [
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/_shared/INDEX.md",
+      "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/ui-designer/INDEX.md"
+    ],
+    "write_path": "/Users/theceo/.claude/skills/luxury-mockup-pipeline/memory/ui-designer/",
+    "write_mandate": "Write at least 1 memory entry per dispatch when you discover a tuning value (filter intensity, hover lag ms, magnetic radius px), the founder corrects a CSS choice, OR a luxury detail pattern proves out (cursor, grain, type scale). One fact per file with YAML frontmatter.",
+    "previous_entries": [
+      "_shared/the-five.md",
+      "_shared/scope-policy.md",
+      "_shared/saas-gate.md"
+    ]
+  }
+}

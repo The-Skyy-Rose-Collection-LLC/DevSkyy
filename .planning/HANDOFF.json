@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-12T20:41:29.188Z",
+  "phase": null,
+  "phase_name": "/claude-mem:learn-codebase corpus priming",
+  "phase_dir": null,
+  "plan": null,
+  "task": 3,
+  "total_tasks": 6,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Wave A — entry points + core foundation (~62 files)", "status": "done"},
+    {"id": 2, "name": "Wave B — agents + services (~80 files of ~150)", "status": "done"},
+    {"id": 3, "name": "Wave C — api + orchestration + llm + security + database", "status": "in_progress", "progress": "directory listed only, no files read"}
+  ],
+  "remaining_tasks": [
+    {"id": 3, "name": "Wave C — api + orchestration + llm + security + database", "status": "in_progress"},
+    {"id": 4, "name": "Wave D — frontend Next.js dashboard", "status": "not_started"},
+    {"id": 5, "name": "Wave E — WordPress theme PHP", "status": "not_started"},
+    {"id": 6, "name": "Wave F — scripts + utils + tests + remainder", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Context window at 79% — system-reminder hooks add ~3-5k tokens per Read, making exhaustive read of remaining ~1850 files infeasible in single session", "type": "technical", "workaround": "Split across multiple sessions or rely on .wolf/anatomy.md descriptions for non-architecture files"}
+  ],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Skip trivial __init__.py re-exports (<30 lines, pure re-exports)", "rationale": "Advisor guidance — adds no new info beyond parent module"},
+    {"decision": "Drop ★ Insight blocks between batches inside a wave", "rationale": "Advisor guidance — competes with file content for tokens"},
+    {"decision": "Mark Wave B done at ~80 files instead of all 150", "rationale": "Architecture patterns now well-understood (CoreAgent, SubAgent, SuperAgent, SDK mixin all primed); sub-agent variants follow same pattern"}
+  ],
+  "uncommitted_files": [
+    ".wolf/memory.md (wave A+B log lines appended)",
+    ".planning/HANDOFF.json (this file)",
+    ".planning/.continue-here.md"
+  ],
+  "next_action": "Run /claude-mem:learn-codebase again in a fresh session (after /clear) starting at Wave C — api/v1/* + orchestration/* + llm/* + security/jwt_oauth2_auth.py + database/db.py",
+  "context_notes": "DevSkyy corpus is ~2000 source files (1338 .py + 237 .ts + 123 .tsx + 141 .js + 162 .php after excluding vendor/node_modules/worktrees/archives). Each main-thread Read costs ~3-5k tokens (claude-mem observations + CLAUDE.md memory + frontmatter). Exhaustive read across one session is infeasible — but claude-mem captures observations from each Read regardless of context retention, so partial coverage still builds long-term cache. Architecture-critical Python is now primed: foundation (core/**), all 8 core agents, all 6 SuperAgents, render_pipeline ADK, claude_sdk integration, wordpress_bridge MCP, visual_generation."
+}

@@ -22,12 +22,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, TypeVar
 
+from llm.model_ids import GEMINI_VISION_MODEL
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
 # Default fallback when all else fails
-_ULTIMATE_FALLBACK = ("google", "gemini-2.0-flash")
+_ULTIMATE_FALLBACK = ("google", GEMINI_VISION_MODEL)
 
 
 # ---------------------------------------------------------------------------

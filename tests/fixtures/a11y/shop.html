@@ -1,0 +1,1860 @@
+
+<div class="see-dashboard wrap">
+
+	<div class="see-dashboard__head">
+		<div class="see-dashboard__title-row">
+			<h1 class="see-dashboard__title">
+				<span class="see-dashboard__title-icon" aria-hidden="true">✦</span>
+				Experience Engine			</h1>
+			<span class="see-dashboard__version">v1.0 · Phase 5</span>
+		</div>
+		<p class="see-dashboard__desc">
+			Real-time UX orchestration for SkyyRose digital properties.		</p>
+	</div>
+
+	<!-- ===== Analytics Summary ===== -->
+	<div class="see-dashboard__section">
+		<h2 class="see-dashboard__section-title">
+			Analytics			<span class="see-dashboard__period">
+				Last 30 days			</span>
+		</h2>
+
+		<div class="see-dashboard__stats-grid">
+			<div class="see-dashboard__stat">
+				<span class="see-dashboard__stat-value">0</span>
+				<span class="see-dashboard__stat-label">Total Events</span>
+			</div>
+			<div class="see-dashboard__stat">
+				<span class="see-dashboard__stat-value">0</span>
+				<span class="see-dashboard__stat-label">Unique Visitors</span>
+			</div>
+					</div>
+
+			</div>
+
+	<!-- ===== Module Controls ===== -->
+	<div class="see-dashboard__section">
+		<h2 class="see-dashboard__section-title">
+			Modules		</h2>
+		<p class="see-dashboard__section-desc">
+			Toggle modules without a code deploy. Changes take effect immediately.		</p>
+
+		<div class="see-dashboard__modules" id="see-modules">
+						<div class="see-dashboard__module" data-module="performance_guardian">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Performance Guardian					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 10					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Performance Guardian"
+					data-module-slug="performance_guardian"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+						<div class="see-dashboard__module" data-module="experience_analyzer">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Experience Analyzer					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 20					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Experience Analyzer"
+					data-module-slug="experience_analyzer"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+						<div class="see-dashboard__module" data-module="brand_atmosphere">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Brand Atmosphere					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 30					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Brand Atmosphere"
+					data-module-slug="brand_atmosphere"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+						<div class="see-dashboard__module" data-module="smart_showcase">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Smart Showcase					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 40					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Smart Showcase"
+					data-module-slug="smart_showcase"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+						<div class="see-dashboard__module" data-module="micro_interactions">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Micro-Interactions					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 50					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Micro-Interactions"
+					data-module-slug="micro_interactions"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+						<div class="see-dashboard__module" data-module="personalization">
+				<div class="see-dashboard__module-info">
+					<span class="see-dashboard__module-name">
+						Personalization					</span>
+					<span class="see-dashboard__module-priority">
+						Priority 60					</span>
+				</div>
+				<button
+					class="see-dashboard__toggle see-dashboard__toggle--on"
+					type="button"
+					aria-pressed="true"
+					aria-label="Disable Personalization"
+					data-module-slug="personalization"
+					data-active="1">
+					<span class="see-dashboard__toggle-knob"></span>
+				</button>
+			</div>
+					</div>
+
+		<p class="see-dashboard__save-status" id="see-save-status" aria-live="polite"></p>
+	</div>
+
+	<!-- ===== Design Narrative Directives ===== -->
+	<div class="see-dashboard__section">
+		<h2 class="see-dashboard__section-title">
+			Design Narratives		</h2>
+		<p class="see-dashboard__section-desc">
+			Active directives shape the Experience Engine&#039;s UX decisions.		</p>
+
+				<p class="see-dashboard__empty">No active directives.</p>
+		
+		<form class="see-dashboard__narrative-form" id="see-narrative-form" novalidate>
+			<h3 class="see-dashboard__subsection-title">
+				Add Directive			</h3>
+			<div class="see-dashboard__form-row">
+				<label for="see-narrative-desc" class="see-dashboard__label">
+					Description				</label>
+				<input
+					type="text"
+					id="see-narrative-desc"
+					name="description"
+					class="see-dashboard__input"
+					placeholder="e.g. Emphasise scarcity on Black Rose pre-orders"
+					required
+					maxlength="280">
+			</div>
+			<div class="see-dashboard__form-row see-dashboard__form-row--inline">
+				<div>
+					<label for="see-narrative-target" class="see-dashboard__label">
+						Target					</label>
+					<select id="see-narrative-target" name="target" class="see-dashboard__select">
+						<option value="global">Global</option>
+						<option value="black-rose">Black Rose</option>
+						<option value="love-hurts">Love Hurts</option>
+						<option value="signature">Signature</option>
+						<option value="kids-capsule">Kids Capsule</option>
+					</select>
+				</div>
+				<div>
+					<label for="see-narrative-priority" class="see-dashboard__label">
+						Priority (1–10)					</label>
+					<input
+						type="number"
+						id="see-narrative-priority"
+						name="priority"
+						class="see-dashboard__input see-dashboard__input--short"
+						value="5" min="1" max="10">
+				</div>
+			</div>
+			<button type="submit" class="see-dashboard__submit" id="see-narrative-submit">
+				Add Directive			</button>
+			<p class="see-dashboard__save-status" id="see-narrative-status" aria-live="polite"></p>
+		</form>
+	</div>
+
+</div><!-- .see-dashboard -->
+
+<style>
+.see-dashboard { max-width: 900px; padding: 0 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.see-dashboard__head { margin-bottom: 28px; }
+.see-dashboard__title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.see-dashboard__title { font-size: 1.5rem; margin: 0; color: #1d2327; }
+.see-dashboard__title-icon { color: #B76E79; }
+.see-dashboard__version { font-size: 0.72rem; background: #f6f7f7; border: 1px solid #ddd; border-radius: 4px; padding: 2px 8px; color: #646970; }
+.see-dashboard__desc { color: #646970; margin: 0; }
+.see-dashboard__section { background: #fff; border: 1px solid #e2e4e7; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+.see-dashboard__section-title { font-size: 1rem; font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+.see-dashboard__period { font-size: 0.72rem; font-weight: 400; color: #999; background: #f6f7f7; padding: 2px 8px; border-radius: 4px; }
+.see-dashboard__section-desc { color: #646970; font-size: 0.85rem; margin: 0 0 18px; }
+.see-dashboard__subsection-title { font-size: 0.88rem; font-weight: 600; margin: 24px 0 14px; color: #1d2327; border-top: 1px solid #f0f0f1; padding-top: 20px; }
+/* Stats */
+.see-dashboard__stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.see-dashboard__stat { background: #f6f7f7; border-radius: 6px; padding: 16px; }
+.see-dashboard__stat-value { display: block; font-size: 1.5rem; font-weight: 700; color: #1d2327; line-height: 1; }
+.see-dashboard__stat-label { display: block; font-size: 0.72rem; color: #646970; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+/* Bars */
+.see-dashboard__collection-bars { display: flex; flex-direction: column; gap: 10px; }
+.see-dashboard__bar-row { display: grid; grid-template-columns: 120px 1fr 60px; align-items: center; gap: 10px; }
+.see-dashboard__bar-label { font-size: 0.72rem; color: #646970; text-transform: uppercase; letter-spacing: 0.06em; }
+.see-dashboard__bar-track { height: 6px; background: #f0f0f1; border-radius: 3px; overflow: hidden; }
+.see-dashboard__bar-fill { height: 100%; background: #B76E79; border-radius: 3px; transition: width 0.6s ease; }
+.see-dashboard__bar-count { font-size: 0.72rem; color: #999; text-align: right; }
+/* Modules */
+.see-dashboard__modules { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+.see-dashboard__module { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f1; }
+.see-dashboard__module:last-child { border-bottom: none; }
+.see-dashboard__module-info { display: flex; flex-direction: column; gap: 2px; }
+.see-dashboard__module-name { font-size: 0.9rem; font-weight: 500; color: #1d2327; }
+.see-dashboard__module-priority { font-size: 0.72rem; color: #999; }
+/* Toggle */
+.see-dashboard__toggle { position: relative; width: 40px; height: 22px; border-radius: 11px; border: none; background: #ddd; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+.see-dashboard__toggle--on { background: #B76E79; }
+.see-dashboard__toggle-knob { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.see-dashboard__toggle--on .see-dashboard__toggle-knob { transform: translateX(18px); }
+/* Save status */
+.see-dashboard__save-status { font-size: 0.8rem; color: #646970; min-height: 20px; margin: 0; transition: color 0.2s; }
+.see-dashboard__save-status--success { color: #00a32a; }
+.see-dashboard__save-status--error { color: #d63638; }
+/* Directives */
+.see-dashboard__directives { margin: 0 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.see-dashboard__directive { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 10px 12px; background: #f6f7f7; border-radius: 4px; font-size: 0.85rem; }
+.see-dashboard__directive-badge { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 3px; background: #e8d5da; color: #7a3040; }
+.see-dashboard__directive-badge--global { background: #e2e4e7; color: #1d2327; }
+.see-dashboard__directive-desc { color: #1d2327; }
+.see-dashboard__directive-priority { font-size: 0.72rem; color: #999; white-space: nowrap; }
+.see-dashboard__empty { color: #999; font-style: italic; font-size: 0.85rem; }
+/* Form */
+.see-dashboard__form-row { margin-bottom: 14px; }
+.see-dashboard__form-row--inline { display: flex; gap: 20px; flex-wrap: wrap; }
+.see-dashboard__label { display: block; font-size: 0.8rem; font-weight: 500; color: #1d2327; margin-bottom: 5px; }
+.see-dashboard__input { width: 100%; max-width: 500px; padding: 8px 10px; border: 1px solid #c3c4c7; border-radius: 4px; font-size: 0.88rem; color: #1d2327; box-sizing: border-box; }
+.see-dashboard__input--short { width: 80px; }
+.see-dashboard__select { padding: 8px 10px; border: 1px solid #c3c4c7; border-radius: 4px; font-size: 0.88rem; color: #1d2327; }
+.see-dashboard__submit { background: #B76E79; color: #fff; border: none; border-radius: 4px; padding: 10px 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.see-dashboard__submit:hover { opacity: 0.85; }
+.see-dashboard__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+
+<script>
+( function () {
+	'use strict';
+
+	var REST_BASE  = "\/?rest_route=\/skyyrose\/v1";
+	var REST_NONCE = "716d880aa1";
+
+	function apiPost( url, data ) {
+		return fetch( url, {
+			method:      'POST',
+			headers:     { 'Content-Type': 'application/json', 'X-WP-Nonce': REST_NONCE },
+			credentials: 'same-origin',
+			body:        JSON.stringify( data ),
+		} ).then( function ( r ) { return r.ok ? r.json() : Promise.reject( r.status ); } );
+	}
+
+	function setStatus( el, msg, type ) {
+		el.textContent = msg;
+		el.className = 'see-dashboard__save-status' + ( type ? ' see-dashboard__save-status--' + type : '' );
+		if ( type === 'success' ) setTimeout( function () { el.textContent = ''; el.className = 'see-dashboard__save-status'; }, 3000 );
+	}
+
+	// Module toggles
+	var saveStatus = document.getElementById( 'see-save-status' );
+	document.querySelectorAll( '.see-dashboard__toggle' ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () {
+			var slug   = btn.dataset.moduleSlug;
+			var active = btn.dataset.active === '1';
+			var next   = ! active;
+
+			btn.disabled = true;
+			var payload = {};
+			payload[ 'module_' + slug ] = next;
+			apiPost( REST_BASE + '/settings', payload )
+				.then( function () {
+					btn.dataset.active = next ? '1' : '0';
+					btn.setAttribute( 'aria-pressed', String( next ) );
+					btn.classList.toggle( 'see-dashboard__toggle--on', next );
+					setStatus( saveStatus, next ? slug + ' enabled.' : slug + ' disabled.', 'success' );
+				} )
+				.catch( function () {
+					setStatus( saveStatus, 'Save failed — please try again.', 'error' );
+				} )
+				.finally( function () { btn.disabled = false; } );
+		} );
+	} );
+
+	// Narrative form
+	var narrativeForm   = document.getElementById( 'see-narrative-form' );
+	var narrativeStatus = document.getElementById( 'see-narrative-status' );
+	if ( narrativeForm ) {
+		narrativeForm.addEventListener( 'submit', function ( e ) {
+			e.preventDefault();
+			var desc     = narrativeForm.querySelector( '[name="description"]' ).value.trim();
+			var target   = narrativeForm.querySelector( '[name="target"]' ).value;
+			var priority = parseInt( narrativeForm.querySelector( '[name="priority"]' ).value, 10 );
+			var btn      = document.getElementById( 'see-narrative-submit' );
+
+			if ( ! desc ) return;
+			btn.disabled = true;
+			setStatus( narrativeStatus, 'Saving…', '' );
+
+			apiPost( REST_BASE + '/settings/narrative', {
+				id:          'directive_' + Date.now(),
+				description: desc,
+				target:      target,
+				priority:    priority,
+				config:      {},
+			} )
+				.then( function () {
+					narrativeForm.reset();
+					setStatus( narrativeStatus, 'Directive added. Reload to see it in the list.', 'success' );
+				} )
+				.catch( function () {
+					setStatus( narrativeStatus, 'Submit failed — please try again.', 'error' );
+				} )
+				.finally( function () { btn.disabled = false; } );
+		} );
+	}
+} )();
+</script>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<style id="jetpack-boost-critical-css">@media all{.woocommerce img,.woocommerce-page img{height:auto;max-width:100%}.woocommerce ul.products,.woocommerce-page ul.products{clear:both}.woocommerce ul.products::after,.woocommerce ul.products::before,.woocommerce-page ul.products::after,.woocommerce-page ul.products::before{content:" ";display:table}.woocommerce ul.products::after,.woocommerce-page ul.products::after{clear:both}.woocommerce ul.products li.product,.woocommerce-page ul.products li.product{float:left;margin:0 3.8% 2.992em 0;padding:0;position:relative;width:22.05%;margin-left:0}.woocommerce ul.products li.first,.woocommerce-page ul.products li.first{clear:both}}@media all{.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;overflow-wrap:normal!important;padding:0;position:absolute;width:1px}}@media all{.ea11y-skip-to-content-link{clip:rect(1px,1px,1px,1px);align-items:center;background-color:#fff;border:1px solid #2563eb;border-radius:12px;clip-path:inset(50%);color:#0c0d0e;display:flex;gap:8px;height:1px;margin:-1px;overflow:hidden;padding:0;position:fixed;text-decoration:none;width:1px;word-wrap:normal!important}}@media all{*,::after,::before{box-sizing:border-box}html{line-height:1.15;-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{margin:0}main{display:block}a{background-color:transparent}img{border-style:none;height:auto;max-width:100%}button,input,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button{text-transform:none}[type=button],[type=submit],button{-webkit-appearance:button}fieldset{padding:.35em .75em .625em}textarea{overflow:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[hidden]{display:none}body{font-family:var(--font-body,"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);font-size:var(--text-base,1rem);font-weight:var(--weight-regular,400);line-height:var(--leading-normal,1.6);color:var(--color-text-primary,#fff);background-color:var(--color-page-bg,#0a0a0a);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}body,button,input,textarea{font-family:var(--font-body,"Inter",sans-serif);color:var(--color-text-primary,#fff)}p{margin-bottom:var(--space-sm,1rem);color:var(--color-text-secondary,#ccc);line-height:var(--leading-normal,1.6)}blockquote{margin:0 0 var(--space-md,1.5rem);padding:var(--space-sm,1rem) var(--space-md,1.5rem);border-left:4px solid var(--color-rose-gold,#b76e79);color:var(--color-text-secondary,#ccc);font-family:var(--font-heading,"Playfair Display",serif);font-style:italic}mark{background:rgba(212,175,55,.2);color:var(--color-gold,#d4af37);text-decoration:none}a{color:var(--color-rose-gold,#b76e79);text-decoration:none}h1,h2,h3{clear:both;font-family:var(--font-heading,"Playfair Display",Georgia,serif);font-weight:var(--weight-bold,700);line-height:var(--leading-snug,1.3);margin:0 0 var(--space-sm,1rem);color:var(--color-text-primary,#fff)}h1{font-size:var(--text-4xl);line-height:var(--leading-tight,1.15);letter-spacing:var(--tracking-tight,-.025em);margin-bottom:var(--space-lg,2rem)}h2{font-size:var(--text-3xl);line-height:1.2;letter-spacing:var(--tracking-tight,-.025em);margin-bottom:var(--space-md,1.5rem)}h3{font-size:var(--text-2xl)}input[type=submit]{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;font-family:var(--font-body,"Inter",sans-serif);font-size:var(--text-sm);font-weight:var(--weight-semibold,600);letter-spacing:var(--tracking-wide,.05em);text-transform:uppercase;text-align:center;text-decoration:none;border:none;border-radius:var(--radius-sm,4px);background:var(--color-rose-gold,#b76e79);color:var(--color-white,#fff);box-shadow:var(--shadow-md)}input[type=search],input[type=text],textarea{width:100%;padding:var(--space-sm,1rem);font-family:var(--font-body,"Inter",sans-serif);font-size:var(--text-base);color:var(--color-text-primary,#fff);background-color:var(--color-card-bg,#111);border:1px solid var(--color-border,#2a2a2a);border-radius:var(--radius-md,8px)}label{display:block;margin-bottom:var(--space-xs,.5rem);font-weight:var(--weight-medium,500);color:var(--color-text-secondary,#ccc);font-size:var(--text-sm)}.site{max-width:100%;margin:0 auto}.site-content{padding:var(--space-lg,2rem) 0;padding-top:var(--header-height,72px)}}.content-area{width:100%}.site-header{position:fixed;top:0;left:0;right:0;z-index:var(--z-sticky,200);background:var(--glass-bg,rgba(17,17,17,.95));backdrop-filter:var(--glass-blur,blur(20px));-webkit-backdrop-filter:var(--glass-blur,blur(20px));border-bottom:var(--glass-border,1px solid rgba(255,255,255,.06))}.site-footer{background:var(--color-black,#000);color:var(--color-text-muted,#999);padding:var(--space-3xl,6rem) 0 var(--space-lg,2rem);border-top:1px solid var(--color-border,#2a2a2a)}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute!important;width:1px;word-wrap:normal!important}.skip-link{position:absolute;top:-40px;left:0;background:var(--color-rose-gold,#b76e79);color:var(--color-white,#fff);padding:var(--space-xs,.5rem) var(--space-sm,1rem);text-decoration:none;z-index:var(--z-tooltip,600)}@media (prefers-reduced-motion:reduce){*,::after,::before{scroll-behavior:auto!important}body::after{display:none}}@media screen and (min-width:768px){.site-content{padding:var(--space-xl,3rem) 0;padding-top:var(--header-height,72px)}}@media screen and (max-width:768px){h1{font-size:var(--text-3xl)}h2{font-size:var(--text-2xl)}}@media screen and (max-width:480px){input[type=submit]{padding:12px 20px;font-size:var(--text-xs)}}.navbar{background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}.navbar__container{display:flex;align-items:center;justify-content:space-between;max-width:1400px;margin:0 auto;padding:0 clamp(1rem,3vw,2.5rem);height:72px}.navbar__brand{flex-shrink:0}.navbar__logo-link{display:flex;align-items:center;gap:.75rem;text-decoration:none}.navbar__site-title{margin:0;font-size:clamp(.9rem,1.5vw,1.1rem);font-weight:700;letter-spacing:.2em;line-height:1}.navbar__nav-wrapper{flex:1;display:flex;justify-content:center}.navbar__menu{display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0}.navbar__menu>li{position:relative}.navbar__menu>li>a{display:flex;align-items:center;gap:.35rem;padding:.5rem 1.15rem;font-family:Cinzel,"Playfair Display",Georgia,serif;font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;white-space:nowrap;position:relative}.navbar__menu>li>a::after{content:"";position:absolute;bottom:0;left:1.15rem;right:1.15rem;height:1px;background:#b76e79;transform:scaleX(0);transform-origin:right}.navbar__menu>li.menu-item-has-children>a::before{content:"";order:99;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:.5;margin-left:.2rem}.navbar__menu .sub-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(8px);min-width:200px;background:rgba(17,17,17,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem 0;list-style:none;margin:0;opacity:0;visibility:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:100}.navbar__menu .sub-menu li a{display:block;padding:.625rem 1.25rem;font-family:"Cormorant Garamond",Georgia,serif;font-size:.9rem;font-weight:500;color:rgba(255,255,255,.6);text-decoration:none;letter-spacing:.03em}.navbar__actions{display:flex;align-items:center;gap:.25rem;flex-shrink:0}.navbar__action-btn{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;width:44px;height:44px;border-radius:50%;border:none;background:0 0;color:rgba(255,255,255,.7);text-decoration:none}.navbar__action-btn svg{flex-shrink:0}.navbar__cart-badge{display:none;position:absolute;top:4px;right:0;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#b76e79;color:#fff;font-size:.6875rem;font-weight:700;line-height:18px;text-align:center}.navbar__cart-btn{position:relative}.navbar__hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:44px;min-height:44px;width:44px;height:44px;border:none;background:0 0;padding:8px;border-radius:8px}.navbar__hamburger-line{display:block;width:22px;height:2px;background:rgba(255,255,255,.8);border-radius:1px}.search-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:flex-start;justify-content:center;padding-top:20vh;opacity:0;visibility:hidden}.search-overlay__container{position:relative;width:90%;max-width:600px}.search-overlay__form{display:flex;border-bottom:2px solid rgba(255,255,255,.15);padding-bottom:.5rem}.search-overlay__input{flex:1;background:0 0;border:none;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(1.25rem,3vw,2rem);font-weight:400;font-style:italic;color:#fff;padding:.5rem 0}.search-overlay__input::placeholder{color:rgba(255,255,255,.35)}.search-overlay__close{position:absolute;top:-60px;right:0;background:0 0;border:none;color:rgba(255,255,255,.5);padding:.5rem}.mobile-menu{position:fixed;inset:0;z-index:1500}.mobile-menu__overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0}.mobile-menu__panel{position:absolute;top:0;right:0;bottom:0;width:min(85vw,380px);background:#0a0a0a;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;transform:translateX(100%);overflow-y:auto}.mobile-menu__header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.06)}.mobile-menu__brand{font-size:.9rem;font-weight:700;letter-spacing:.2em}.mobile-menu__close{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;background:0 0;color:rgba(255,255,255,.6);border-radius:8px}.mobile-menu__nav{flex:1;padding:1.5rem 0}.mobile-menu__nav ul{list-style:none;margin:0;padding:0}.mobile-menu__nav>ul>li>a{display:block;padding:1rem 1.5rem;min-height:44px;font-family:Cinzel,"Playfair Display",Georgia,serif;font-size:.8125rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.04)}.mobile-menu__nav>ul>li:last-child>a{border-bottom:none}.mobile-menu__nav ul .sub-menu{list-style:none;margin:0;padding:0}.mobile-menu__nav ul .sub-menu a{display:flex;align-items:center;padding:.75rem 1.5rem .75rem 2.5rem;min-height:44px;font-family:"Cormorant Garamond",Georgia,serif;font-size:.9rem;font-weight:500;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.02em}@media (max-width:1024px){.navbar__nav-wrapper{display:none}.navbar__hamburger{display:flex}}@media (max-width:1024px) and (min-width:769px){.navbar__container{height:64px;padding:0 1.5rem}.navbar__site-title{font-size:.9rem}}@media (max-width:480px){.navbar__container{height:60px;padding:0 1rem}.navbar__site-title{font-size:.8rem}}h1,h2,h3{letter-spacing:-.015em;line-height:1.12;text-wrap:balance}h1{font-size:clamp(2.25rem,6vw,4.5rem);letter-spacing:-.025em}h2{font-size:clamp(1.75rem,4vw,3rem);letter-spacing:-.02em}h3{font-size:clamp(1.25rem,2.5vw,1.875rem);letter-spacing:-.01em}li,p{line-height:1.65;max-width:68ch;text-wrap:pretty}.product,.woocommerce ul.products li.product{border-radius:var(--cp-radius-lg);box-shadow:var(--cp-shadow-sm);will-change:transform,box-shadow;overflow:hidden}.product img,.woocommerce ul.products li.product img{aspect-ratio:4/5;object-fit:cover;width:100%;height:auto}section{padding-block:var(--cp-space-2xl)}@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}@media (max-width:768px){h1{font-size:clamp(2rem,9vw,3rem)}h2{font-size:clamp(1.5rem,6vw,2.25rem)}section{padding-block:var(--cp-space-xl)}}:root{--header-height:72px;--color-page-bg:#0A0A0A;--color-card-bg:#111111;--color-border:#2A2A2A;--color-text-primary:#FFFFFF;--color-text-secondary:#E0E0E0;--color-text-muted:#B3B3B3;--color-rose-gold:var(--rose-gold,#B76E79);--color-gold:var(--gold,#D4AF37);--color-white:var(--white,#FFFFFF);--color-black:var(--black,#000000);--glass-bg:rgba(17,17,17,0.92);--glass-border:1px solid rgba(255,255,255,0.06);--glass-blur:blur(24px) saturate(1.4);--leading-tight:1.15;--leading-snug:1.3;--leading-normal:1.6;--tracking-tight:-0.025em;--tracking-wide:0.05em;--text-xs:0.8125rem;--text-sm:0.9375rem;--text-base:1.0625rem;--text-2xl:1.625rem;--text-3xl:clamp(1.875rem,2.8vw,2.25rem);--text-4xl:clamp(2.25rem,3.8vw,2.875rem)}:root{--z-sticky:200;--z-tooltip:600}.ft-cro__container{max-width:1200px;margin:0 auto;padding:0 2rem}.ft-cro__heading{font-family:var(--font-heading,"Cinzel",serif);font-size:1.6rem;font-weight:400;letter-spacing:.15em;text-transform:uppercase;margin:0 0 .75rem;text-align:center}.ft-cro-banner{padding:3rem 5%;text-align:center;border-top:1px solid rgba(212,175,55,.08);border-bottom:1px solid rgba(212,175,55,.08)}.ft-cro-banner p{font-family:var(--font-heading,"Cinzel",serif);font-size:1.3rem;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin:0}.ft-cro-reviews{padding:4rem 5% 3rem}.ft-cro-reviews__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}.ft-cro-reviews__card{padding:1.5rem;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.02)}.ft-cro-reviews__stars{display:flex;gap:.15rem;margin-bottom:.75rem}.ft-cro-reviews__stars svg{width:13px;height:13px;color:#d4af37}.ft-cro-reviews__card blockquote{margin:0 0 .75rem;padding:0}.ft-cro-reviews__card blockquote p{font-size:.85rem;line-height:1.6;color:rgba(255,255,255,.65);margin:0;font-style:italic}@media (max-width:768px){.ft-cro-reviews__grid{grid-template-columns:1fr}.ft-cro-banner p{font-size:1rem;letter-spacing:.1em}}.sg-panel{position:relative;width:92vw;max-width:640px;max-height:85vh;overflow-y:auto;padding:36px 32px 32px;background:rgba(15,15,15,.98);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(183,110,121,.18);border-radius:12px;color:#e8e8e8;transform:translateY(24px)}.sg-close{position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;background:0 0;border:none;color:#fff;border-radius:50%}.sg-heading{margin:0 0 4px;font-family:Cinzel,serif;font-size:22px;font-weight:600;letter-spacing:.06em;color:#fff}.sg-subheading{margin:0 0 20px;font-family:Inter,sans-serif;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em}.sg-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.08)}.sg-tab{flex:1;padding:10px 0;background:0 0;border:none;border-bottom:2px solid transparent;font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.45)}.sg-tab--active{color:#b76e79;border-bottom-color:#b76e79}.sg-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.sg-table{width:100%;border-collapse:collapse;font-family:Inter,sans-serif;font-size:13px}.sg-table th{padding:10px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b76e79;text-align:center;border-bottom:1px solid rgba(183,110,121,.2)}.sg-table td{padding:10px 12px;text-align:center;color:rgba(255,255,255,.75);border-bottom:1px solid rgba(255,255,255,.04)}.sg-table tbody tr:nth-child(2n){background:rgba(255,255,255,.03)}.sg-table td:first-child{font-weight:600;color:#fff}.sg-measure{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06)}.sg-measure__heading{margin:0 0 12px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.7)}.sg-measure__content{display:flex;gap:16px;align-items:flex-start}.sg-measure__icon{flex-shrink:0;color:rgba(183,110,121,.5)}.sg-measure__list{margin:0;padding:0;list-style:none;font-family:Inter,sans-serif;font-size:12px;line-height:1.7;color:rgba(255,255,255,.55)}.sg-measure__list li+li{margin-top:4px}@media (max-width:480px){.sg-panel{padding:28px 18px 24px;max-height:90vh}.sg-heading{font-size:18px}.sg-measure__content{flex-direction:column;align-items:center;text-align:center}}@media (prefers-reduced-motion:reduce){.sg-panel{transform:none}}.skyyrose-mascot{position:fixed;bottom:20px;right:20px;z-index:9990;display:flex;flex-direction:row-reverse;align-items:flex-end;gap:12px;transform:translateX(140%);opacity:0}.skyyrose-mascot--hidden{display:none!important}.skyyrose-mascot__character{background:0 0;border:none;padding:0;position:relative;flex-shrink:0}.skyyrose-mascot__image{width:220px;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 12px 32px rgba(0,0,0,.35))}.skyy-bubble{position:relative;background:rgba(14,14,14,.97);border:1.5px solid rgba(183,110,121,.5);border-radius:1rem;padding:.875rem 1rem .75rem;max-width:240px;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 24px rgba(183,110,121,.08);opacity:0;transform:translateX(12px) scale(.95);align-self:flex-end;margin-bottom:48px}.skyy-bubble::after{content:"";position:absolute;right:-8px;bottom:24px;width:14px;height:14px;background:rgba(14,14,14,.97);border-top:1.5px solid rgba(183,110,121,.5);border-right:1.5px solid rgba(183,110,121,.5);transform:rotate(45deg);border-radius:0 2px 0 0}.skyy-bubble__text{font-size:.85rem;line-height:1.55;color:rgba(255,255,255,.92);margin:0;font-family:inherit}.skyy-chips{display:flex;flex-wrap:wrap;gap:.375rem;margin-top:.625rem}.skyyrose-mascot__minimize{position:absolute;top:0;right:-8px;width:22px;height:22px;border-radius:50%;background:rgba(30,30,30,.92);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.55);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;opacity:0;z-index:2}.skyyrose-mascot__recall{position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:8px;padding:7px 14px 7px 7px;background:linear-gradient(135deg,rgba(20,20,20,.97),rgba(32,32,32,.97));border:1px solid rgba(183,110,121,.4);border-radius:999px;color:rgba(255,255,255,.85);font-size:.8rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:9990;font-family:inherit}.skyyrose-mascot__recall img{border-radius:50%;width:32px;height:32px;object-fit:cover}@media (max-width:768px){.skyyrose-mascot{bottom:16px;right:16px;flex-direction:column;align-items:flex-end;gap:8px}.skyyrose-mascot__image{width:140px}.skyy-bubble{max-width:210px;margin-bottom:0;align-self:flex-end}.skyy-bubble::after{right:24px;bottom:-8px;top:auto;transform:rotate(135deg)}.skyy-chips{flex-direction:column}}@media (prefers-reduced-motion:reduce){.skyyrose-mascot__image{filter:drop-shadow(0 12px 32px rgba(0,0,0,.35))}}html{scroll-behavior:smooth}body{-webkit-font-smoothing:antialiased;overflow-x:hidden;font-family:var(--font-body,"Cormorant Garamond",Georgia,serif);font-size:var(--text-base,1rem);line-height:1.6;background:#000;color:#fff}img{max-width:100%;display:block}a{color:inherit;text-decoration:none}button{font-family:inherit;border:none;background:0 0;color:inherit}.sr-scroll-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:10000;background:0 0}.sr-scroll-progress__bar{height:100%;width:0;background:linear-gradient(90deg,#b76e79,#d4af37,#b76e79);background-size:200% 100%;will-change:width}.sr-back-to-top{position:fixed;bottom:32px;right:32px;z-index:9400;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(183,110,121,.3);background:rgba(10,10,10,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#b76e79;opacity:0;visibility:hidden;transform:translateY(12px)}@media (max-width:480px){.sr-back-to-top{bottom:20px;right:20px;width:44px;height:44px}}@media (prefers-reduced-motion:reduce){.sr-back-to-top{transform:none}}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}.cookie-consent--hidden{transform:translateY(100%);opacity:0}.cookie-consent__message{margin:0;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.5;color:rgba(255,255,255,.8)}.cookie-consent__link{color:#b76e79;text-decoration:none}@media (max-width:599px){.cookie-consent{flex-direction:column;align-items:stretch;gap:12px;padding:14px 16px;bottom:calc(64px + env(safe-area-inset-bottom))}}@media (prefers-reduced-motion:reduce){.rv-clip-up{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important}}@media (max-width:768px){.mobile-nav{display:flex}body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}}.mobile-nav__item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#ffffff80;text-decoration:none;width:20%;padding:6px 0}.mobile-nav__item--active{color:#b76e79}.mobile-nav__icon{position:relative;display:flex;align-items:center;justify-content:center}.mobile-nav__icon svg{width:22px;height:22px;stroke-width:1.5px}.mobile-nav__item--active .mobile-nav__icon svg{transform:translateY(-2px)}.mobile-nav__label{font-family:Space Mono,monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase}.swiper-wrapper{box-sizing:initial;display:flex;height:100%;position:relative;width:100%;z-index:1}.swiper-wrapper{transform:translateZ(0)}.swiper-button-prev{align-items:center;color:#007aff;display:flex;height:44px;justify-content:center;position:absolute;width:44px;z-index:10}svg{fill:currentColor;height:100%;-o-object-fit:contain;object-fit:contain;pointer-events:none;transform-origin:center;width:100%}.swiper-button-prev{margin-top:-22px;top:50%}.swiper-button-prev{left:4px;right:auto}.swiper-pagination{position:absolute;text-align:center;transform:translateZ(0);z-index:10}.jp-carousel-wrap *{line-height:inherit}.jp-carousel-wrap.swiper{height:auto;width:100vw}.jp-carousel-overlay .swiper-button-next,.jp-carousel-overlay .swiper-button-prev{opacity:.5;height:initial;width:initial;padding:20px 40px;background-image:none}.jp-carousel-overlay .swiper-button-next::after,.jp-carousel-overlay .swiper-button-prev::after{content:none}.jp-carousel-overlay .swiper-button-next svg,.jp-carousel-overlay .swiper-button-prev svg{height:30px;width:28px;background:var(--jp-carousel-bg-color);border-radius:4px}.jp-carousel-overlay{font-family:"Helvetica Neue",sans-serif!important;z-index:2147483647;overflow-x:hidden;overflow-y:auto;direction:ltr;position:fixed;top:0;right:0;bottom:0;left:0;background:var(--jp-carousel-bg-color)}.jp-carousel-overlay *{box-sizing:border-box}.jp-carousel-overlay h2::before,.jp-carousel-overlay h3::before{content:none;display:none}.jp-carousel-overlay .swiper .swiper-button-prev{left:0;right:auto}.jp-carousel-overlay .swiper .swiper-button-next{right:0;left:auto}.jp-carousel-container{display:grid;grid-template-rows:1fr 64px;height:100%}.jp-carousel-info{display:flex;flex-direction:column;text-align:left!important;-webkit-font-smoothing:subpixel-antialiased!important;z-index:100;background-color:var(--jp-carousel-bg-color);opacity:1}.jp-carousel-info-footer{position:relative;background-color:var(--jp-carousel-bg-color);height:64px;display:flex;align-items:center;justify-content:space-between;width:100vw}.jp-carousel-info-extra{display:none;background-color:var(--jp-carousel-bg-color);padding:35px;width:100vw;border-top:1px solid var(--jp-carousel-bg-faded-color)}.jp-carousel-title-and-caption{margin-bottom:15px}.jp-carousel-photo-info{left:0!important;width:100%!important}.jp-carousel-comments-wrapper{padding:0;width:100%!important;display:none}.jp-carousel-close-hint{letter-spacing:0!important;position:fixed;top:20px;right:30px;padding:10px;text-align:right;width:45px;height:45px;z-index:15;color:var(--jp-carousel-primary-color)}.jp-carousel-close-hint svg{padding:3px 2px;background:var(--jp-carousel-bg-color);border-radius:4px}.jp-carousel-pagination-container{flex:1;margin:0 15px 0 35px}.jp-carousel-pagination,.jp-swiper-pagination{color:var(--jp-carousel-primary-color);font-size:15px;font-weight:400;white-space:nowrap;display:none;position:static!important}.jp-carousel-pagination-container .swiper-pagination{text-align:left;line-height:8px}.jp-carousel-pagination{padding-left:5px}.jp-carousel-info-footer .jp-carousel-photo-title-container{flex:4;justify-content:center;overflow:hidden;margin:0}.jp-carousel-photo-caption,.jp-carousel-photo-title{background:0 0!important;border:none!important;display:inline-block;font:400 20px/1.3em"Helvetica Neue",sans-serif;line-height:normal;letter-spacing:0!important;margin:0 0 10px 0;padding:0;overflow:hidden;text-shadow:none!important;text-transform:none!important;color:var(--jp-carousel-primary-color)}.jp-carousel-info-footer .jp-carousel-photo-caption{text-align:center;font-size:15px;white-space:nowrap;color:var(--jp-carousel-primary-subtle-color);margin:0;text-overflow:ellipsis}.jp-carousel-photo-title{font-size:32px;margin-bottom:2px}.jp-carousel-photo-description{color:var(--jp-carousel-primary-subtle-color);font-size:16px;margin:25px 0;width:100%;overflow:hidden;overflow-wrap:break-word}.jp-carousel-caption{font-size:14px;font-weight:400;margin:0}.jp-carousel-image-meta{color:var(--jp-carousel-primary-color);font:12px/1.4"Helvetica Neue",sans-serif!important;width:100%;display:none}.jp-carousel-image-meta ul{margin:0!important;padding:0!important;list-style:none!important}a.jp-carousel-image-download{display:inline-block;clear:both;color:var(--jp-carousel-primary-subtle-color);line-height:1;font-weight:400;font-size:14px;text-decoration:none}a.jp-carousel-image-download svg{display:inline-block;vertical-align:middle;margin:0 3px;padding-bottom:2px}.jp-carousel-comments{font:15px/1.7"Helvetica Neue",sans-serif!important;font-weight:400;background:none transparent;width:100%;bottom:10px;margin-top:20px}#jp-carousel-comment-form{margin:0 0 10px!important;width:100%}textarea#jp-carousel-comment-form-comment-field{background:var(--jp-carousel-bg-faded-color);border:1px solid var(--jp-carousel-border-color);color:var(--jp-carousel-primary-subtle-color);font:16px/1.4"Helvetica Neue",sans-serif!important;width:100%;padding:10px 10px 5px;margin:0;float:none;height:147px;box-shadow:inset 2px 2px 2px rgba(0,0,0,.1);border-radius:3px;overflow:hidden;box-sizing:border-box}textarea#jp-carousel-comment-form-comment-field::-webkit-input-placeholder{color:#555}#jp-carousel-loading-overlay{display:none;position:fixed;top:0;bottom:0;left:0;right:0}#jp-carousel-loading-wrapper{display:flex;align-items:center;justify-content:center;height:100vh;width:100vw}#jp-carousel-library-loading{color:var(--jp-carousel-primary-color)}#jp-carousel-comment-form-spinner{display:none;position:absolute;margin:0 auto;top:calc(50% - 10px);left:0;bottom:0;right:0;color:var(--jp-carousel-primary-color);text-align:center}.jp-carousel-info-content-wrapper{max-width:800px;margin:auto}#jp-carousel-comment-form-submit-and-info-wrapper{display:none;overflow:hidden;width:100%}#jp-carousel-comment-form-commenting-as input{background:var(--jp-carousel-bg-color);border:1px solid var(--jp-carousel-border-color);color:var(--jp-carousel-primary-subtle-color);font:16px/1.4"Helvetica Neue",sans-serif!important;padding:10px;float:left;box-shadow:inset 2px 2px 2px rgba(0,0,0,.2);border-radius:2px;width:285px}#jp-carousel-comment-form-commenting-as fieldset{float:left;border:none;margin:20px 0 0 0;padding:0;clear:both}#jp-carousel-comment-form-commenting-as label{font:400 13px/1.7"Helvetica Neue",sans-serif!important;margin:0 20px 3px 0;float:left;width:100px}#jp-carousel-comment-form-button-submit{margin-top:20px;margin-left:auto;display:block;border:solid 1px var(--jp-carousel-primary-color);background:var(--jp-carousel-bg-color);border-radius:3px;padding:8px 16px;font-size:14px;color:var(--jp-carousel-primary-color)}#jp-carousel-comment-form-container{margin-bottom:15px;width:100%;margin-top:20px;color:var(--jp-carousel-primary-subtle-color);position:relative;overflow:hidden}#jp-carousel-comment-post-results{display:none;overflow:auto;width:100%}#jp-carousel-comments-loading{font:400 15px/1.7"Helvetica Neue",sans-serif!important;display:none;color:var(--jp-carousel-primary-subtle-color);text-align:left;margin-bottom:20px;width:100%;bottom:10px;margin-top:20px}.jp-carousel-photo-icons-container{flex:1;display:block;text-align:right;margin:0 20px 0 30px;white-space:nowrap}.jp-carousel-icon-btn{padding:16px;text-decoration:none;border:none;background:0 0;display:inline-block;height:64px}.jp-carousel-icon{border:none;display:inline-block;line-height:0;font-weight:400;font-style:normal;border-radius:4px;width:31px;padding:4px 3px 3px}.jp-carousel-icon svg{display:inline-block}.jp-carousel-overlay rect{fill:var(--jp-carousel-primary-color)}.jp-carousel-icon .jp-carousel-has-comments-indicator{display:none;font-size:12px;vertical-align:top;margin-left:-16px;line-height:1;padding:2px 4px;border-radius:4px;background:var(--jp-carousel-primary-color);color:var(--jp-carousel-bg-color);font-weight:400;font-family:"Helvetica Neue",sans-serif!important;position:relative}@media only screen and (max-width:760px){.jp-carousel-overlay .swiper .swiper-button-next,.jp-carousel-overlay .swiper .swiper-button-prev{display:none!important}.jp-carousel-image-meta{float:none!important;width:100%!important;box-sizing:border-box;margin-left:0}.jp-carousel-close-hint{font-size:26px!important;position:fixed!important;top:10px;right:10px}.jp-carousel-wrap{background-color:var(--jp-carousel-bg-color)}.jp-carousel-caption{overflow:visible!important}.jp-carousel-info-footer .jp-carousel-photo-title-container{display:none}.jp-carousel-photo-icons-container{margin:0 10px 0 0;white-space:nowrap}.jp-carousel-icon-btn{padding-left:20px}.jp-carousel-pagination{padding-left:5px}.jp-carousel-pagination-container{margin-left:25px}#jp-carousel-comment-form-commenting-as fieldset,#jp-carousel-comment-form-commenting-as input{width:100%;float:none}}.screen-reader-text{clip:rect(1px,1px,1px,1px);word-wrap:normal!important;border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;overflow-wrap:normal!important;padding:0;position:absolute!important;width:1px}</style><title>Shop</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel="dns-prefetch" href="//www.google-analytics.com">
+<script data-jetpack-boost="ignore" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://skyyrose.co/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://skyyrose.co/shop/"}]}</script>
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="The Skyy Rose Collection" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Shop | The Skyy Rose Collection" />
+<meta property="og:description" content="Premium streetwear and luxury fashion. Luxury Grows from Concrete." />
+<meta property="og:url" content="https://skyyrose.co/shop/" />
+<meta property="og:image" content="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/branding/sr-primary-hero.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@skyyroseco" />
+<meta name="twitter:title" content="Shop | SkyyRose" />
+<meta name="twitter:description" content="Premium streetwear and luxury fashion. Luxury Grows from Concrete." />
+<meta name="twitter:image" content="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/branding/sr-primary-hero.webp" />
+<link rel="canonical" href="https://skyyrose.co/shop/" />
+<meta name="description" content="Shop premium streetwear and luxury fashion from SkyyRose. Luxury Grows from Concrete. Oakland, CA." />
+<script data-jetpack-boost="ignore" type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Products","description":"Luxury Grows from Concrete. Premium streetwear from Oakland, CA.","url":"https://skyyrose.co/shop/"}</script>
+
+<link rel='dns-prefetch' href='//stats.wp.com' />
+<link rel='dns-prefetch' href='//cdn.elementor.com' />
+<link rel='dns-prefetch' href='//cdn.jsdelivr.net' />
+<link rel='dns-prefetch' href='//widgets.wp.com' />
+<link rel='dns-prefetch' href='//jetpack.wordpress.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//public-api.wordpress.com' />
+<link rel='dns-prefetch' href='//secure.gravatar.com' />
+<link rel='dns-prefetch' href='//0.gravatar.com' />
+<link rel='dns-prefetch' href='//1.gravatar.com' />
+<link rel='dns-prefetch' href='//2.gravatar.com' />
+<link rel='preconnect' href='//i0.wp.com' />
+<link href='https://cdn.jsdelivr.net' crossorigin='anonymous' rel='preconnect' />
+<link rel='preconnect' href='//c0.wp.com' />
+	<link rel="preload" href="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<style id='wp-img-auto-sizes-contain-inline-css'>
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<noscript>
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='litespeed-cache-dummy-css' href='https://skyyrose.co/wp-content/plugins/litespeed-cache/assets/css/litespeed-dummy.css' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-fonts-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/fonts.css?ver=1.1.1' media='all' fetchpriority='high' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-fonts-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/fonts.css?ver=1.1.1' media="not all" fetchpriority='high' />
+<noscript><link rel='stylesheet' id='jetpack-forms-layout-css' href='https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-forms/src/../dist/contact-form/css/jetpack-forms-layout.css?ver=15.9-a.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='jetpack-forms-layout-css' href='https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-forms/src/../dist/contact-form/css/jetpack-forms-layout.css?ver=15.9-a.1' media="not all" />
+<noscript><link rel='stylesheet' id='wp-block-code-css' href='https://skyyrose.co/wp-content/mu-plugins/wpcomsh/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/wpcom-blocks-code-style/wpcom-blocks-code-style.css?ver=5dff9e7f252a6222b8a0' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='wp-block-code-css' href='https://skyyrose.co/wp-content/mu-plugins/wpcomsh/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/wpcom-blocks-code-style/wpcom-blocks-code-style.css?ver=5dff9e7f252a6222b8a0' media="not all" />
+<noscript><link rel='stylesheet' id='jetpack-layout-grid-css' href='https://skyyrose.co/wp-content/plugins/layout-grid/style.css?ver=1743174953' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='jetpack-layout-grid-css' href='https://skyyrose.co/wp-content/plugins/layout-grid/style.css?ver=1743174953' media="not all" />
+<noscript><link rel='stylesheet' id='mediaelement-css' href='https://skyyrose.co/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='mediaelement-css' href='https://skyyrose.co/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17' media="not all" />
+<noscript><link rel='stylesheet' id='wp-mediaelement-css' href='https://skyyrose.co/wp-includes/js/mediaelement/wp-mediaelement.min.css' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='wp-mediaelement-css' href='https://skyyrose.co/wp-includes/js/mediaelement/wp-mediaelement.min.css' media="not all" />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+/*# sourceURL=https://skyyrose.co/wp-content/plugins/jetpack/_inc/blocks/sharing-buttons/view.css */
+</style>
+<noscript><link rel='stylesheet' id='woocommerce-layout-css' href='https://skyyrose.co/wp-content/plugins/woocommerce/assets/css/woocommerce-layout.css?ver=10.7.0' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='woocommerce-layout-css' href='https://skyyrose.co/wp-content/plugins/woocommerce/assets/css/woocommerce-layout.css?ver=10.7.0' media="not all" />
+<style id='woocommerce-layout-inline-css'>
+
+	.infinite-scroll .woocommerce-pagination {
+		display: none;
+	}
+/*# sourceURL=woocommerce-layout-inline-css */
+</style>
+<style id='woocommerce-inline-inline-css'>
+.woocommerce form .form-row .required { visibility: visible; }
+/*# sourceURL=woocommerce-inline-inline-css */
+</style>
+<noscript><link rel='stylesheet' id='jetpack-instant-search-css' href='https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-search/build/instant-search/jp-search.chunk-main-payload.css?minify=false&#038;ver=52dbe7cc70e522fe47c0' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='jetpack-instant-search-css' href='https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-search/build/instant-search/jp-search.chunk-main-payload.css?minify=false&#038;ver=52dbe7cc70e522fe47c0' media="not all" />
+<noscript><link rel='stylesheet' id='ea11y-widget-fonts-css' href='https://skyyrose.co/wp-content/plugins/pojo-accessibility/assets/build/fonts.css?ver=4.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='ea11y-widget-fonts-css' href='https://skyyrose.co/wp-content/plugins/pojo-accessibility/assets/build/fonts.css?ver=4.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='ea11y-skip-link-css' href='https://skyyrose.co/wp-content/plugins/pojo-accessibility/assets/build/skip-link.css?ver=4.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='ea11y-skip-link-css' href='https://skyyrose.co/wp-content/plugins/pojo-accessibility/assets/build/skip-link.css?ver=4.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-style-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/style.css?ver=1.1.1' media='all' fetchpriority='high' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-style-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/style.css?ver=1.1.1' media="not all" fetchpriority='high' />
+<noscript><link rel='stylesheet' id='skyyrose-main-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/main.min.css?ver=1.1.1' media='all' fetchpriority='high' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-main-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/main.min.css?ver=1.1.1' media="not all" fetchpriority='high' />
+<noscript><link rel='stylesheet' id='skyyrose-design-tokens-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/design-tokens.min.css?ver=1.1.1' media='all' fetchpriority='high' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-design-tokens-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/design-tokens.min.css?ver=1.1.1' media="not all" fetchpriority='high' />
+<style id='skyyrose-design-tokens-inline-css'>
+
+		/* Performance Guardian — CLS Prevention */
+		.product-grid__items,
+		.br-product-grid__items,
+		.col-product-grid {
+			contain: layout style;
+		}
+		.product-card-holo {
+			min-height: 380px;
+			contain: content;
+		}
+		.skyy-hero,
+		.col-hero,
+		.lp-hero {
+			min-height: 60vh;
+			contain: layout;
+		}
+		.skyy-atmosphere-canvas {
+			contain: strict;
+		}
+
+		/* Throttle non-critical animations when FPS drops below threshold */
+		.skyy-motion-reduced .magnetic,
+		.skyy-motion-reduced .btn-sweep,
+		.skyy-motion-reduced .btn-border-draw {
+			transition: none !important;
+		}
+		.skyy-motion-reduced .rv-clip-left,
+		.skyy-motion-reduced .rv-clip-right,
+		.skyy-motion-reduced .rv-blur-in,
+		.skyy-motion-reduced .rv-split-word,
+		.skyy-motion-reduced .col-reveal,
+		.skyy-motion-reduced .lp-rv {
+			opacity: 1 !important;
+			transform: none !important;
+			clip-path: none !important;
+		}
+
+		/* OS-level reduced motion: disable all non-essential animation */
+		@media (prefers-reduced-motion: reduce) {
+			.skyy-atmosphere-canvas { display: none !important; }
+			.magnetic,
+			.btn-sweep,
+			.btn-border-draw,
+			.rv-clip-left,
+			.rv-clip-right,
+			.rv-blur-in,
+			.rv-split-word,
+			.col-reveal,
+			.lp-rv {
+				transition: none !important;
+				animation: none !important;
+				opacity: 1 !important;
+				transform: none !important;
+				clip-path: none !important;
+			}
+		}
+	
+/*# sourceURL=skyyrose-design-tokens-inline-css */
+</style>
+<noscript><link rel='stylesheet' id='skyyrose-components-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/components.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-components-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/components.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-animations-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/system/animations.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-animations-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/system/animations.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-animations-premium-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/system/animations-premium.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-animations-premium-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/system/animations-premium.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-header-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/header.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-header-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/header.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-footer-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/footer.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-footer-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/footer.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-mobile-nav-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/mobile-bottom-nav.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-mobile-nav-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/mobile-bottom-nav.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-cookie-consent-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/cookie-consent.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-cookie-consent-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/cookie-consent.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-size-guide-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/size-guide.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-size-guide-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/size-guide.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-luxury-cursor-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/luxury-cursor.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-luxury-cursor-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/luxury-cursor.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-skeleton-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/skeleton.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-skeleton-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/skeleton.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-agency-visuals-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/agency-tier-visuals.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-agency-visuals-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/agency-tier-visuals.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-a11y-css-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/accessibility.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-a11y-css-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/accessibility.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='jetpack-swiper-library-css' href='https://skyyrose.co/wp-content/plugins/jetpack/_inc/blocks/swiper.css?ver=15.9-a.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='jetpack-swiper-library-css' href='https://skyyrose.co/wp-content/plugins/jetpack/_inc/blocks/swiper.css?ver=15.9-a.1' media="not all" />
+<noscript><link rel='stylesheet' id='jetpack-carousel-css' href='https://skyyrose.co/wp-content/plugins/jetpack/modules/carousel/jetpack-carousel.css?ver=15.9-a.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='jetpack-carousel-css' href='https://skyyrose.co/wp-content/plugins/jetpack/modules/carousel/jetpack-carousel.css?ver=15.9-a.1' media="not all" />
+<noscript><link rel='stylesheet' id='tiled-gallery-css' href='https://skyyrose.co/wp-content/plugins/jetpack/modules/tiled-gallery/tiled-gallery/tiled-gallery.css?ver=2023-08-21' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='tiled-gallery-css' href='https://skyyrose.co/wp-content/plugins/jetpack/modules/tiled-gallery/tiled-gallery/tiled-gallery.css?ver=2023-08-21' media="not all" />
+<style id='jetpack_likes-inline-css'>
+#jp-post-flair{padding-top:.5em}#content div.sharedaddy,#main div.sharedaddy,div.sharedaddy{clear:both}div.sharedaddy h3.sd-title{display:inline-block;font-size:9pt;font-weight:700;line-height:1.2;margin:0 0 1em}div.sharedaddy h3.sd-title:before{border-top:1px solid #dcdcde;content:"";display:block;margin-bottom:1em;min-width:30px;width:100%}div.jetpack-likes-widget-wrapper{min-height:50px;position:relative;width:100%}div.jetpack-likes-widget-wrapper .sd-link-color{font-size:12px}div.jetpack-comment-likes-widget-wrapper{min-height:31px;position:relative;width:100%}div.jetpack-comment-likes-widget-wrapper iframe{margin-bottom:0}#likes-other-gravatars{background-color:#fff;border:1px solid #dcdcde;border-radius:4px;box-shadow:none;display:none;height:auto;max-height:240px;min-width:220px;overflow:auto;padding:9px 12px 10px;position:absolute;z-index:1000}#likes-other-gravatars *{line-height:normal}#likes-other-gravatars .likes-text{color:#101517;font-size:12px;font-weight:500;padding-bottom:8px}#likes-other-gravatars li,#likes-other-gravatars ul{list-style-type:none;margin:0;padding:0;text-indent:0}#likes-other-gravatars li:before{content:""}#likes-other-gravatars ul.wpl-avatars{display:block;max-height:190px;overflow:auto}#likes-other-gravatars ul.wpl-avatars li{float:none;height:28px;margin:0 0 4px;width:196px}#likes-other-gravatars ul.wpl-avatars li a{align-items:center;border-bottom:none!important;display:flex;gap:8px;margin:0 2px 0 0;text-decoration:none}#likes-other-gravatars ul.wpl-avatars li a span{color:#2c3338;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#likes-other-gravatars ul.wpl-avatars li a img{background:none;border:none;border-radius:50%;box-sizing:border-box;margin:0!important;padding:1px!important;position:static}div.sd-box{border-top:1px solid #00000021}.jetpack-likes-widget-loaded iframe,.jetpack-likes-widget-loading .likes-widget-placeholder,.jetpack-likes-widget-unloaded .likes-widget-placeholder{display:block}.jetpack-likes-widget-loaded .likes-widget-placeholder,.jetpack-likes-widget-loading iframe,.jetpack-likes-widget-unloaded iframe{display:none}.comment-likes-widget,.entry-content .post-likes-widget,.post-likes-widget{border-width:0;margin:0}.comment-likes-widget-placeholder,.post-likes-widget-placeholder{border-width:0;margin:0;position:relative}.comment-likes-widget-placeholder{display:flex;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;height:18px;position:absolute}.comment-likes-widget-placeholder:before{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath fill='%232ea2cc' d='m12 2 2.582 6.953L22 9.257l-5.822 4.602L18.18 21 12 16.89 5.82 21l2.002-7.14L2 9.256l7.418-.304'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:16px 16px;color:#2ea2cc;content:"";display:inline-block;height:16px;padding-right:5px;position:relative;top:3px;width:16px}.post-likes-widget-placeholder .button{display:none}.comment-likes-widget-placeholder .loading,.post-likes-widget-placeholder .loading{color:#999;font-size:12px}.comment-likes-widget-placeholder .loading{align-self:center;color:#4e4e4e;margin-top:4px;padding-left:5px}div.sharedaddy.sd-like-enabled .sd-like h3{display:none}div.sharedaddy.sd-like-enabled .sd-like .post-likes-widget{float:none;position:absolute;top:0;width:100%}.comment-likes-widget{width:100%}.cs-rating,.pd-rating{display:block!important}.sd-gplus .sd-title{display:none}@media print{.jetpack-likes-widget-wrapper{display:none}}
+/*# sourceURL=https://skyyrose.co/wp-content/plugins/jetpack/_inc/build/likes/style.min.css */
+</style>
+<noscript><link rel='stylesheet' id='wp-calypso-bridge-masterbar-css' href='https://skyyrose.co/wp-content/mu-plugins/wpcomsh/vendor/automattic/wc-calypso-bridge/store-on-wpcom/assets/css/masterbar.css?ver=2.11.6' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='wp-calypso-bridge-masterbar-css' href='https://skyyrose.co/wp-content/mu-plugins/wpcomsh/vendor/automattic/wc-calypso-bridge/store-on-wpcom/assets/css/masterbar.css?ver=2.11.6' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-template-woocommerce-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/woocommerce.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-template-woocommerce-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/woocommerce.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-product-card-holo-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/product-card-holo.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-product-card-holo-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/product-card-holo.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-commercial-polish-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/commercial-polish.min.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-commercial-polish-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/commercial-polish.min.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-smart-showcase-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/smart-showcase.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-smart-showcase-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/smart-showcase.css?ver=1.1.1' media="not all" />
+<noscript><link rel='stylesheet' id='skyyrose-personalization-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/personalization.css?ver=1.1.1' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='skyyrose-personalization-css' href='https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/personalization.css?ver=1.1.1' media="not all" />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+/*# sourceURL=jetpack-global-styles-frontend-style-inline-css */
+</style>
+
+<script data-jetpack-boost="ignore" src="https://skyyrose.co/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+
+
+
+
+
+
+
+
+	
+		<style>img#wpstats{display:none}</style>
+		<meta name="og:url" content="https://skyyrose.co/product/br-003/" />	<noscript><style>.woocommerce-product-gallery{ opacity: 1 !important; }</style></noscript>
+	<meta name="generator" content="Elementor 4.0.7; features: e_font_icon_svg, additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-swap">
+<meta name="description" content="Luxury Grows from Concrete. Premium streetwear from Oakland, CA." />
+			<style>
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload),
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload) * {
+					background-image: none !important;
+				}
+				@media screen and (max-height: 1024px) {
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+				@media screen and (max-height: 640px) {
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+			</style>
+			
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Shop" />
+<meta property="og:url" content="https://skyyrose.co/shop/" />
+<meta property="og:description" content="This is where you can browse products in this store." />
+<meta property="og:site_name" content="The Skyy Rose Collection" />
+<meta property="og:image" content="https://s0.wp.com/_si/?t=eyJpbWciOiJodHRwczpcL1wvaTAud3AuY29tXC9za3l5cm9zZS5jb1wvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDJcL2Nyb3BwZWQtUGhvdG9yb29tXzIwMjYwMjAxXzE0MzYzOC53ZWJwP2ZpdD01MTIlMkM1MTImc3NsPTEiLCJ0eHQiOiJUaGUgU2t5eSBSb3NlIENvbGxlY3Rpb24iLCJ0ZW1wbGF0ZSI6ImVkZ2UiLCJmb250IjoiIiwiYmxvZ19pZCI6MjM4NTEwODk0fQ._3mxpynvvVYVGLUY4SWJr4dymbQ1Cds8eYforEI9g7IMQ" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="icon" href="https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/02/cropped-Photoroom_20260201_143638.webp?fit=32%2C32&#038;ssl=1" sizes="32x32" />
+<link rel="icon" href="https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/02/cropped-Photoroom_20260201_143638.webp?fit=192%2C192&#038;ssl=1" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/02/cropped-Photoroom_20260201_143638.webp?fit=180%2C180&#038;ssl=1" />
+<meta name="msapplication-TileImage" content="https://i0.wp.com/skyyrose.co/wp-content/uploads/2026/02/cropped-Photoroom_20260201_143638.webp?fit=270%2C270&#038;ssl=1" />
+<style type="text/css" id="wp-custom-css">/* CURSOR/SCROLL FIX - mobile menu overlay blocking page */
+.mobile-menu { pointer-events: none; visibility: hidden; }
+.mobile-menu.is-open, .mobile-menu.active { pointer-events: auto; visibility: visible; }
+.search-overlay { pointer-events: none; }
+.search-overlay.is-open, .search-overlay.active { pointer-events: auto; visibility: visible; }</style>        <style id="skyyrose-ally-fixes-css">
+            /* Skip Navigation — visible on focus only */
+            .skyy-skip-nav {
+                position: absolute;
+                top: -100%;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 100000;
+                padding: 0.75rem 1.5rem;
+                background: #B76E79;
+                color: #000;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 0.8rem;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                text-decoration: none;
+                border-radius: 0 0 4px 4px;
+                transition: top 0.2s ease;
+            }
+            .skyy-skip-nav:focus {
+                top: 0;
+                outline: 2px solid #D4AF37;
+                outline-offset: 2px;
+            }
+
+            /* Fix empty modal heading visibility */
+            .col-modal__name:empty::after {
+                content: "Product Details";
+                opacity: 0; /* Screen readers only */
+            }
+
+            /* Fix any lingering $0 display */
+            .col-hero__meta span:empty,
+            .col-catalog__count:empty {
+                display: none;
+            }
+        </style>
+        <style id="kirki-inline-styles"></style></head>
+<body class="archive post-type-archive post-type-archive-product wp-embed-responsive wp-theme-skyyrose-flagship theme-skyyrose-flagship woocommerce-shop woocommerce woocommerce-page woocommerce-no-js jps-theme-skyyrose-flagship hfeed has-mobile-nav elementor-default elementor-kit-13">
+<a class="skyy-skip-nav" href="#main-content">Skip to main content</a>
+		
+		<nav aria-label="Skip to content navigation">
+			<a class="ea11y-skip-to-content-link"
+				href="#content"
+				tabindex="-1"
+				onclick="onSkipLinkClick()"
+			>
+				Skip to content
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" role="presentation">
+					<path d="M18 6V12C18 12.7956 17.6839 13.5587 17.1213 14.1213C16.5587 14.6839 15.7956 15 15 15H5M5 15L9 11M5 15L9 19"
+								stroke="black"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+					/>
+				</svg>
+			</a>
+			<div class="ea11y-skip-to-content-backdrop"></div>
+		</nav>
+
+		
+<a class="skip-link" href="#primary">Skip to the story</a>
+
+<div class="grain-overlay" aria-hidden="true"></div>
+
+
+<div id="page" class="site">
+	<header id="masthead" class="site-header" role="banner">
+		<nav class="navbar" id="navbar" aria-label="Primary Navigation">
+			<div class="navbar__container">
+
+				<!-- LEFT: Actions (Search, Account, Bag) -->
+								<div class="navbar__actions">
+					<button class="navbar__action-btn" id="search-toggle" aria-expanded="false" type="button">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+						<span>Search</span>
+					</button>
+
+										<a href="https://skyyrose.co/my-account/" class="navbar__action-btn">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						<span>Account</span>
+					</a>
+
+											<a href="https://skyyrose.co/cart/" class="navbar__action-btn navbar__cart-btn">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+							<span>Bag</span>
+							<span class="navbar__cart-badge">0</span>
+						</a>
+									</div>
+
+				<!-- CENTER: Logo -->
+				<div class="navbar__brand">
+					<a href="https://skyyrose.co/" class="navbar__logo-link">
+						<span class="navbar__site-title">SKYY ROSE</span>
+					</a>
+				</div>
+
+				<!-- RIGHT: Desktop Navigation -->
+				<div class="navbar__nav-wrapper">
+					<ul id="menu-primary-menu" class="navbar__menu"><li id="menu-item-9723" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-9723"><a href="https://skyyrose.co/" role="menuitem">Home</a></li>
+<li id="menu-item-9904" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9904"><a href="https://skyyrose.co/spatial/" role="menuitem">Enter the Universe</a></li>
+<li id="menu-item-9724" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9724"><a href="https://skyyrose.co/collections/" role="menuitem">Collections</a>
+<ul class="sub-menu">
+	<li id="menu-item-9729" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-9729"><a href="https://skyyrose.co/#" role="menuitem">Experiences</a></li>
+</ul>
+</li>
+<li id="menu-item-9733" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9733"><a href="https://skyyrose.co/preorder/" role="menuitem">Pre-Order</a></li>
+<li id="menu-item-9734" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9734"><a href="https://skyyrose.co/about/" role="menuitem">About</a></li>
+<li id="menu-item-9735" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9735"><a href="https://skyyrose.co/contact/" role="menuitem">Contact</a></li>
+<li id="menu-item-9911" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9911"><a href="https://skyyrose.co/experience/" role="menuitem">Immersive Experiences</a></li>
+<li id="menu-item-9973" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9973"><a href="https://skyyrose.co/faq-2/" role="menuitem">FAQ</a></li>
+<li id="menu-item-9976" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9976"><a href="https://skyyrose.co/shipping-returns-2/" role="menuitem">Shipping &#038; Returns</a></li>
+<li id="menu-item-10056" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10056"><a href="https://skyyrose.co/landing-kids-capsule/" role="menuitem">Landing — Kids Capsule</a></li>
+</ul>				</div>
+                
+                <!-- Mobile Menu Toggle (Right aligned on Mobile) -->
+                <button class="navbar__hamburger" id="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <span class="navbar__hamburger-line"></span>
+                    <span class="navbar__hamburger-line"></span>
+                    <span class="navbar__hamburger-line"></span>
+                </button>
+
+			</div>
+		</nav>
+
+		<!-- Mobile Menu Slide-In -->
+		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
+			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
+			<div class="mobile-menu__panel">
+				<div class="mobile-menu__header">
+					<span class="mobile-menu__brand">SKYY ROSE</span>
+					<button class="mobile-menu__close" id="mobile-menu-close" type="button" aria-label="Close navigation menu">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+					</button>
+				</div>
+				<div class="mobile-menu__nav">
+					<ul id="menu-primary-menu-1" class="menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-9723"><a href="https://skyyrose.co/" role="menuitem">Home</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9904"><a href="https://skyyrose.co/spatial/" role="menuitem">Enter the Universe</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9724"><a href="https://skyyrose.co/collections/" role="menuitem">Collections</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-has-children menu-item-9729"><a href="https://skyyrose.co/#" role="menuitem">Experiences</a>
+	<ul class="sub-menu">
+		<li id="menu-item-9730" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9730"><a href="https://skyyrose.co/experience-black-rose/" role="menuitem">The Garden</a>
+		<ul class="sub-menu">
+			<li id="menu-item-9725" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9725"><a href="https://skyyrose.co/collection-black-rose/" role="menuitem">Black Rose</a></li>
+		</ul>
+</li>
+		<li id="menu-item-9731" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9731"><a href="https://skyyrose.co/experience-love-hurts/" role="menuitem">The Cathedral</a>
+		<ul class="sub-menu">
+			<li id="menu-item-9726" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9726"><a href="https://skyyrose.co/collection-love-hurts/" role="menuitem">Love Hurts</a></li>
+		</ul>
+</li>
+		<li id="menu-item-9732" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9732"><a href="https://skyyrose.co/experience-signature/" role="menuitem">The Runway</a>
+		<ul class="sub-menu">
+			<li id="menu-item-9727" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9727"><a href="https://skyyrose.co/collection-signature/" role="menuitem">Signature</a></li>
+		</ul>
+</li>
+		<li id="menu-item-9728" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9728"><a href="https://skyyrose.co/collection-kids-capsule/" role="menuitem">Kids Capsule</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9733"><a href="https://skyyrose.co/preorder/" role="menuitem">Pre-Order</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9734"><a href="https://skyyrose.co/about/" role="menuitem">About</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9735"><a href="https://skyyrose.co/contact/" role="menuitem">Contact</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9911"><a href="https://skyyrose.co/experience/" role="menuitem">Immersive Experiences</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9973"><a href="https://skyyrose.co/faq-2/" role="menuitem">FAQ</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9976"><a href="https://skyyrose.co/shipping-returns-2/" role="menuitem">Shipping &#038; Returns</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10056"><a href="https://skyyrose.co/landing-kids-capsule/" role="menuitem">Landing — Kids Capsule</a></li>
+</ul>				</div>
+			</div>
+		</div>
+
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="search-overlay" aria-hidden="true" inert>
+            <div class="search-overlay__container">
+                <form role="search" method="get" class="search-overlay__form" action="https://skyyrose.co/">
+                    <input type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">
+                </form>
+                <button class="search-overlay__close" id="search-close" type="button" aria-label="Close search">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+	</header>
+	<div id="content" class="site-content">
+<div id="primary" class="content-area"><main id="main" class="site-main" role="main"><div id="primary" class="content-area"><main id="main" class="site-main" role="main"><header class="woocommerce-products-header">
+			<h1 class="woocommerce-products-header__title page-title">Shop</h1>
+	
+	</header>
+<div class="woocommerce-notices-wrapper"></div><ul class="products columns-4">
+<li class="product-category product first">
+	<a aria-label="Visit product category Shop" href="https://skyyrose.co/product-category/shop/"><img loading="lazy" fetchpriority="high" src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/images/placeholder.webp" alt="Shop" width="400" height="533" />		<h2 class="woocommerce-loop-category__title">
+			Shop <mark class="count">(32)</mark>		</h2>
+		</a></li>
+</ul>
+</main></div></main></div>
+	</div><!-- #content -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+
+		
+<!-- Scarcity Banner -->
+<div class="ft-cro-banner rv-clip-up">
+	<p>Limited Edition. Individually Numbered. Never Restocked.</p>
+</div>
+
+<!-- Customer Reviews -->
+<section class="ft-cro-reviews rv-clip-up" aria-label="Customer reviews">
+	<div class="ft-cro__container">
+		<h2 class="ft-cro__heading">What Customers Say</h2>
+		<div class="ft-cro-reviews__grid">
+							<div class="ft-cro-reviews__card">
+					<div class="ft-cro-reviews__stars" aria-label="5 out of 5 stars">
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+											</div>
+					<blockquote><p>The quality is insane. I&#039;ve washed my hoodie 20+ times and it still looks brand new.</p></blockquote>
+					<cite>— Marcus T., Oakland</cite>
+				</div>
+							<div class="ft-cro-reviews__card">
+					<div class="ft-cro-reviews__stars" aria-label="5 out of 5 stars">
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+											</div>
+					<blockquote><p>The numbered tag makes it feel truly exclusive. Exceeded expectations.</p></blockquote>
+					<cite>— Jade W., San Francisco</cite>
+				</div>
+							<div class="ft-cro-reviews__card">
+					<div class="ft-cro-reviews__stars" aria-label="5 out of 5 stars">
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+													<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+											</div>
+					<blockquote><p>This isn&#039;t just a brand, it&#039;s a movement. The craftsmanship is unmatched.</p></blockquote>
+					<cite>— Devon L., Los Angeles</cite>
+				</div>
+					</div>
+	</div>
+</section>
+
+<!-- Value Props -->
+<section class="ft-cro-craft rv-clip-up" aria-label="Why SkyyRose">
+	<div class="ft-cro__container">
+		<h2 class="ft-cro__heading">Why SkyyRose</h2>
+		<p class="ft-cro__subheading">Every dollar goes into the product. No influencer budgets. No middlemen. Just quality you can feel.</p>
+		<div class="ft-cro-craft__grid">
+							<div class="ft-cro-craft__card">
+					<span class="ft-cro-craft__icon" aria-hidden="true">380gsm</span>
+					<h3>380gsm French Terry</h3>
+					<p>Premium heavyweight fabric. Most brands use 220gsm. We use nearly double.</p>
+				</div>
+							<div class="ft-cro-craft__card">
+					<span class="ft-cro-craft__icon" aria-hidden="true">#</span>
+					<h3>Numbered Authentication</h3>
+					<p>Every piece is hand-numbered. You know exactly which one is yours.</p>
+				</div>
+							<div class="ft-cro-craft__card">
+					<span class="ft-cro-craft__icon" aria-hidden="true">//</span>
+					<h3>Made-to-Order</h3>
+					<p>We produce what is ordered. No waste, no overstock. Made for you.</p>
+				</div>
+							<div class="ft-cro-craft__card">
+					<span class="ft-cro-craft__icon" aria-hidden="true">////</span>
+					<h3>Double-Stitched Seams</h3>
+					<p>Reinforced at every stress point. Built to last years, not seasons.</p>
+				</div>
+					</div>
+	</div>
+</section>
+
+<!-- FAQ -->
+<section class="ft-cro-faq rv-clip-up" id="faq" aria-label="Frequently asked questions">
+	<div class="ft-cro__container">
+		<h2 class="ft-cro__heading">Frequently Asked</h2>
+		<div class="ft-cro-faq__list">
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-0">
+						<span>How does the sizing run?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-0" role="region">
+						<div class="ft-cro-faq__answer-inner">True to size, S through 3XL. Check the size guide on any product page for exact measurements.</div>
+					</div>
+				</div>
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-1">
+						<span>Is this really limited edition?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-1" role="region">
+						<div class="ft-cro-faq__answer-inner">Yes. Every style is produced in a numbered run of 80-250 pieces. Once sold out, never restocked or reprinted.</div>
+					</div>
+				</div>
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-2">
+						<span>When do pre-orders ship?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-2" role="region">
+						<div class="ft-cro-faq__answer-inner">Pre-orders ship Spring 2026. You will receive tracking via email. We update timelines on our social channels.</div>
+					</div>
+				</div>
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-3">
+						<span>What is your return policy?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-3" role="region">
+						<div class="ft-cro-faq__answer-inner">30-day return and exchange on unworn items. Contact us and we will make it right.</div>
+					</div>
+				</div>
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-4">
+						<span>How does payment work for pre-orders?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-4" role="region">
+						<div class="ft-cro-faq__answer-inner">Full payment at checkout to secure your numbered piece. Cancel any time before shipping for a full refund.</div>
+					</div>
+				</div>
+							<div class="ft-cro-faq__item">
+					<button class="ft-cro-faq__question" type="button"
+					        aria-expanded="false"
+					        aria-controls="ft-faq-a-5">
+						<span>How long does shipping take?</span>
+						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+							<line x1="12" y1="5" x2="12" y2="19"></line>
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+						</svg>
+					</button>
+					<div class="ft-cro-faq__answer" id="ft-faq-a-5" role="region">
+						<div class="ft-cro-faq__answer-inner">Orders ship within 5-7 business days. You receive a tracking number via email.</div>
+					</div>
+				</div>
+					</div>
+	</div>
+</section>
+
+
+
+		<!-- Newsletter Signup Bar -->
+		<div class="footer-newsletter rv-clip-up">
+			<div class="footer-newsletter__container">
+				<div class="footer-newsletter__content">
+					<h3 class="footer-newsletter__title rv-split-word">
+						Join the Inner Circle					</h3>
+					<p class="footer-newsletter__text">
+						Exclusive drops, early access, and luxury delivered to your inbox.					</p>
+				</div>
+				<form class="footer-newsletter__form" action="https://skyyrose.co/wp-admin/admin-ajax.php" method="post" aria-label="Newsletter signup">
+					<input type="hidden" id="skyyrose_newsletter_nonce" name="skyyrose_newsletter_nonce" value="749ed73df4" /><input type="hidden" name="_wp_http_referer" value="/shop/" />					<input type="hidden" name="action" value="skyyrose_newsletter_subscribe">
+					<div class="footer-newsletter__input-group">
+						<label for="footer-newsletter-email" class="screen-reader-text">
+							Email address						</label>
+						<input
+							type="email"
+							id="footer-newsletter-email"
+							name="email"
+							class="footer-newsletter__input"
+							placeholder="Enter your email"
+							required
+							autocomplete="email"
+						>
+						<button type="submit" class="footer-newsletter__submit btn-sweep btn-press" name="skyyrose_newsletter_submit">
+							Subscribe							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+								<path d="M5 12h14"/>
+								<path d="m12 5 7 7-7 7"/>
+							</svg>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 5-Column Footer Grid -->
+		<div class="footer-grid rv-clip-up">
+			<div class="footer-grid__container stagger-grid">
+
+				<!-- Column 1: Brand (2fr) -->
+				<div class="footer-grid__col footer-grid__col--brand">
+					<a href="https://skyyrose.co/" class="footer-brand__logo-link" rel="home">
+						<img
+							src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/branding/skyyrose-monogram-footer.webp"
+							alt="SR Monogram"
+							class="footer-brand__monogram"
+							width="40"
+							height="40"
+							loading="lazy"
+						>
+						<span class="footer-brand__text navbar__gradient-text">SKYY ROSE</span>
+					</a>
+					<p class="footer-brand__tagline">
+						Luxury Grows from Concrete.					</p>
+					<p class="footer-brand__description">
+						Oakland luxury streetwear. Gender-neutral, limited edition pieces — built by a father, named after a daughter.					</p>
+					<nav class="footer-brand__social" aria-label="Social Media Links">
+													<a
+								href="https://instagram.com/theskyyrosecollection"
+								class="footer-brand__social-link footer-brand__social-link--instagram"
+								aria-label="Instagram"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+									<path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Z" /><circle cx="12" cy="12" r="3.5" /><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />								</svg>
+							</a>
+													<a
+								href="https://tiktok.com/@skyyrosecollection"
+								class="footer-brand__social-link footer-brand__social-link--tiktok"
+								aria-label="TikTok"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+									<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />								</svg>
+							</a>
+													<a
+								href="https://twitter.com/skyyrosellc"
+								class="footer-brand__social-link footer-brand__social-link--twitter"
+								aria-label="X (Twitter)"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+									<path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />								</svg>
+							</a>
+													<a
+								href="https://facebook.com/skyyrosecollection"
+								class="footer-brand__social-link footer-brand__social-link--facebook"
+								aria-label="Facebook"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+									<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />								</svg>
+							</a>
+											</nav>
+				</div>
+
+				<!-- Column 2: Shop (1fr) -->
+				<div class="footer-grid__col footer-grid__col--shop">
+					<h4 class="footer-grid__heading">Shop</h4>
+					<ul class="footer-grid__list">
+													<li>
+								<a href="https://skyyrose.co/collection-black-rose/">
+									Black Rose								</a>
+							</li>
+													<li>
+								<a href="https://skyyrose.co/collection-love-hurts/">
+									Love Hurts								</a>
+							</li>
+													<li>
+								<a href="https://skyyrose.co/collection-signature/">
+									Signature								</a>
+							</li>
+													<li>
+								<a href="https://skyyrose.co/collection-kids-capsule/">
+									Kids Capsule								</a>
+							</li>
+												<li><a href="https://skyyrose.co/pre-order/">Pre-Order</a></li>
+													<li><a href="https://skyyrose.co/shop/">All Products</a></li>
+											</ul>
+				</div>
+
+				<!-- Column 3: Help (1fr) -->
+				<div class="footer-grid__col footer-grid__col--help">
+					<h4 class="footer-grid__heading">Help</h4>
+					<ul class="footer-grid__list">
+						<li><a href="https://skyyrose.co/contact/">Contact Us</a></li>
+						<li><a href="https://skyyrose.co/faq/">FAQ</a></li>
+						<li><a href="https://skyyrose.co/shipping-returns/">Shipping &amp; Returns</a></li>
+						<li><a href="https://skyyrose.co/contact/#size-guide">Size Guide</a></li>
+						<li><a href="https://skyyrose.co/contact/#care-instructions">Care Instructions</a></li>
+					</ul>
+				</div>
+
+				<!-- Column 4: Legal (1fr) -->
+				<div class="footer-grid__col footer-grid__col--legal">
+					<h4 class="footer-grid__heading">Legal</h4>
+					<ul class="footer-grid__list">
+						<li><a href="https://skyyrose.co/privacy-policy/">Privacy Policy</a></li>
+						<li><a href="https://skyyrose.co/terms-of-service/">Terms of Service</a></li>
+						<li><a href="https://skyyrose.co/refund-policy/">Refund Policy</a></li>
+						<li><a href="https://skyyrose.co/accessibility/">Accessibility</a></li>
+					</ul>
+				</div>
+
+				<!-- Column 5: Social / Connect (1fr) -->
+				<div class="footer-grid__col footer-grid__col--social">
+					<h4 class="footer-grid__heading">Connect</h4>
+					<ul class="footer-grid__list">
+													<li>
+								<a href="https://instagram.com/theskyyrosecollection" target="_blank" rel="noopener noreferrer">
+									Instagram								</a>
+							</li>
+													<li>
+								<a href="https://tiktok.com/@skyyrosecollection" target="_blank" rel="noopener noreferrer">
+									TikTok								</a>
+							</li>
+													<li>
+								<a href="https://twitter.com/skyyrosellc" target="_blank" rel="noopener noreferrer">
+									X (Twitter)								</a>
+							</li>
+													<li>
+								<a href="https://facebook.com/skyyrosecollection" target="_blank" rel="noopener noreferrer">
+									Facebook								</a>
+							</li>
+													<li>
+								<a href="https://youtube.com/@skyyrosecollection" target="_blank" rel="noopener noreferrer">
+									YouTube								</a>
+							</li>
+													<li>
+								<a href="https://pinterest.com/skyyrosecollection" target="_blank" rel="noopener noreferrer">
+									Pinterest								</a>
+							</li>
+											</ul>
+				</div>
+
+			</div><!-- .footer-grid__container -->
+		</div><!-- .footer-grid -->
+
+		<!-- Copyright Bar -->
+		<div class="footer-copyright">
+			<div class="footer-copyright__container">
+				<p class="footer-copyright__text">
+					&copy; 2026 The Skyy Rose Collection LLC. All rights reserved.				</p>
+									<nav class="footer-copyright__nav" aria-label="Footer Legal Navigation">
+						<ul id="footer-legal-menu" class="footer-copyright__menu"><li id="menu-item-9736" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9736"><a href="https://skyyrose.co/about/" role="menuitem">About</a></li>
+<li id="menu-item-9737" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9737"><a href="https://skyyrose.co/contact/" role="menuitem">Contact</a></li>
+<li id="menu-item-9738" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9738"><a rel="privacy-policy" href="https://skyyrose.co/faq/" role="menuitem">FAQ</a></li>
+<li id="menu-item-9739" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9739"><a href="https://skyyrose.co/shipping-returns/" role="menuitem">Shipping &amp; Returns</a></li>
+<li id="menu-item-9740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9740"><a href="https://skyyrose.co/privacy-policy/" role="menuitem">Privacy Policy</a></li>
+<li id="menu-item-9741" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9741"><a href="https://skyyrose.co/terms-of-service/" role="menuitem">Terms of Service</a></li>
+</ul>					</nav>
+							</div>
+		</div><!-- .footer-copyright -->
+
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<div id="size-guide-modal" class="sg-overlay" role="dialog" aria-labelledby="sg-heading" aria-modal="true" aria-hidden="true" inert>
+<div class="sg-panel">
+	<button type="button" class="sg-close" aria-label="Close size guide">
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+	</button>
+	<h2 id="sg-heading" class="sg-heading">Size Guide</h2>
+	<p class="sg-subheading">All measurements in inches</p>
+
+	<div class="sg-tabs" role="tablist" aria-label="Size categories">
+					<button type="button" role="tab" id="sg-tab-tops" class="sg-tab sg-tab--active" aria-selected="true" aria-controls="sg-panel-tops" data-sg-tab="tops">Tops</button>
+						<button type="button" role="tab" id="sg-tab-bottoms" class="sg-tab" aria-selected="false" aria-controls="sg-panel-bottoms" data-sg-tab="bottoms">Bottoms</button>
+						<button type="button" role="tab" id="sg-tab-kids" class="sg-tab" aria-selected="false" aria-controls="sg-panel-kids" data-sg-tab="kids">Kids</button>
+				</div>
+
+			<div id="sg-panel-tops" class="sg-tabpanel" role="tabpanel" aria-labelledby="sg-tab-tops">
+			<div class="sg-table-wrap"><table class="sg-table">
+				<thead><tr>
+									<th>Size</th>					<th>Chest</th>					<th>Waist</th>					<th>Length</th>					<th>Sleeve</th></tr></thead>
+				<tbody>
+											<tr>
+													<td>XS</td>							<td>34</td>							<td>28</td>							<td>27</td>							<td>32</td></tr>
+											<tr>
+													<td>S</td>							<td>36</td>							<td>30</td>							<td>28</td>							<td>33</td></tr>
+											<tr>
+													<td>M</td>							<td>38</td>							<td>32</td>							<td>29</td>							<td>34</td></tr>
+											<tr>
+													<td>L</td>							<td>40</td>							<td>34</td>							<td>30</td>							<td>35</td></tr>
+											<tr>
+													<td>XL</td>							<td>42</td>							<td>36</td>							<td>31</td>							<td>35.5</td></tr>
+											<tr>
+													<td>2XL</td>							<td>44</td>							<td>38</td>							<td>32</td>							<td>36</td></tr>
+									</tbody>
+			</table></div>
+		</div>
+				<div id="sg-panel-bottoms" class="sg-tabpanel" role="tabpanel" aria-labelledby="sg-tab-bottoms" hidden>
+			<div class="sg-table-wrap"><table class="sg-table">
+				<thead><tr>
+									<th>Size</th>					<th>Waist</th>					<th>Hip</th>					<th>Inseam</th>					<th>Length</th></tr></thead>
+				<tbody>
+											<tr>
+													<td>XS</td>							<td>28</td>							<td>34</td>							<td>30</td>							<td>38</td></tr>
+											<tr>
+													<td>S</td>							<td>30</td>							<td>36</td>							<td>31</td>							<td>39</td></tr>
+											<tr>
+													<td>M</td>							<td>32</td>							<td>38</td>							<td>32</td>							<td>40</td></tr>
+											<tr>
+													<td>L</td>							<td>34</td>							<td>40</td>							<td>32</td>							<td>41</td></tr>
+											<tr>
+													<td>XL</td>							<td>36</td>							<td>42</td>							<td>33</td>							<td>42</td></tr>
+											<tr>
+													<td>2XL</td>							<td>38</td>							<td>44</td>							<td>33</td>							<td>43</td></tr>
+									</tbody>
+			</table></div>
+		</div>
+				<div id="sg-panel-kids" class="sg-tabpanel" role="tabpanel" aria-labelledby="sg-tab-kids" hidden>
+			<div class="sg-table-wrap"><table class="sg-table">
+				<thead><tr>
+									<th>Size</th>					<th>Age</th>					<th>Chest</th>					<th>Waist</th>					<th>Height</th></tr></thead>
+				<tbody>
+											<tr>
+													<td>2T</td>							<td>2</td>							<td>21</td>							<td>20</td>							<td>33-36</td></tr>
+											<tr>
+													<td>3T</td>							<td>3</td>							<td>22</td>							<td>20.5</td>							<td>36-39</td></tr>
+											<tr>
+													<td>4T</td>							<td>4</td>							<td>23</td>							<td>21</td>							<td>39-42</td></tr>
+											<tr>
+													<td>5</td>							<td>5-6</td>							<td>24</td>							<td>21.5</td>							<td>42-45</td></tr>
+											<tr>
+													<td>6</td>							<td>6-7</td>							<td>25</td>							<td>22</td>							<td>45-48</td></tr>
+									</tbody>
+			</table></div>
+		</div>
+		
+	<div class="sg-measure">
+		<h3 class="sg-measure__heading">How to Measure</h3>
+		<div class="sg-measure__content">
+			<svg class="sg-measure__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="24" cy="10" rx="6" ry="7"/><path d="M14 22c0-2 4-4 10-4s10 2 10 4v2c0 1-2 3-10 3s-10-2-10-3z"/><path d="M18 27v18M30 27v18"/><path d="M18 34h12"/></svg>
+			<ul class="sg-measure__list">
+				<li>Chest: Measure around the fullest part, keeping the tape level.</li>
+				<li>Waist: Measure around your natural waistline, just above the navel.</li>
+				<li>Hip: Measure around the widest part of your hips.</li>
+				<li>Inseam: Measure from the crotch seam to the ankle bone.</li>
+			</ul>
+		</div>
+	</div>
+</div>
+</div>
+
+
+
+<div id="skyyrose-cookie-consent"
+	class="cookie-consent cookie-consent--hidden"
+	role="dialog"
+	aria-label="Cookie consent">
+	<p class="cookie-consent__message">
+		Cookies keep this site fast and personal. Stay to accept, or <a href="https://skyyrose.co/privacy-policy/" class="cookie-consent__link">read how we handle your data</a>.	</p>
+	<div class="cookie-consent__actions">
+		<button id="skyyrose-cookie-accept" class="cookie-consent__btn cookie-consent__btn--accept" type="button">
+			Accept		</button>
+		<button id="skyyrose-cookie-decline" class="cookie-consent__btn cookie-consent__btn--decline" type="button">
+			Decline		</button>
+	</div>
+</div>
+
+
+
+<nav class="mobile-nav" aria-label="Mobile navigation">
+			<a href="https://skyyrose.co/"
+			class="mobile-nav__item"
+			>
+			<span class="mobile-nav__icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5z" /><path d="M9 21V14h6v7" />				</svg>
+							</span>
+			<span class="mobile-nav__label">Home</span>
+		</a>
+			<a href="https://skyyrose.co/shop/"
+			class="mobile-nav__item mobile-nav__item--active"
+			aria-current="page">
+			<span class="mobile-nav__icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />				</svg>
+							</span>
+			<span class="mobile-nav__label">Collections</span>
+		</a>
+			<a href="https://skyyrose.co/?s="
+			class="mobile-nav__item"
+			>
+			<span class="mobile-nav__icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" />				</svg>
+							</span>
+			<span class="mobile-nav__label">Search</span>
+		</a>
+			<a href="https://skyyrose.co/cart/"
+			class="mobile-nav__item"
+			>
+			<span class="mobile-nav__icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />				</svg>
+							</span>
+			<span class="mobile-nav__label">Cart</span>
+		</a>
+			<a href="https://skyyrose.co/my-account/"
+			class="mobile-nav__item"
+			>
+			<span class="mobile-nav__icon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<circle cx="12" cy="8" r="4" /><path d="M20 21a8 8 0 0 0-16 0" />				</svg>
+							</span>
+			<span class="mobile-nav__label">Account</span>
+		</a>
+	</nav>
+
+<!-- Toast Notification Container -->
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Luxury Cursor elements created dynamically by luxury-cursor.js -->
+
+<!-- Scroll Progress Indicator -->
+<div class="sr-scroll-progress" aria-hidden="true">
+	<div class="sr-scroll-progress__bar"></div>
+</div>
+
+<!-- Back to Top -->
+<button class="sr-back-to-top" aria-label="Back to top" type="button">
+	<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+		<polyline points="18 15 12 9 6 15"/>
+	</svg>
+</button>
+
+<!--  -->
+
+<meta id="bilmur" property="bilmur:data" content="" data-customproperties="{&quot;woo_active&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;skyyrose-flagship&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="atomic"  data-site-tz="America/Los_Angeles" >
+
+<input type="hidden" id="commercekit_nonce" name="commercekit_nonce" value="ed0307fd4d" /><input type="hidden" name="_wp_http_referer" value="/shop/" />
+			<div class="jetpack-instant-search__widget-area" style="display: none">
+					</div>
+					
+			<div id="skyyrose-announcer-polite" class="aria-live-region" aria-live="polite" aria-atomic="true"></div><div id="skyyrose-announcer-assertive" class="aria-live-region" aria-live="assertive" aria-atomic="true"></div>			
+					
+				<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading"><svg class="jetpack-spinner" width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><circle cx="50" cy="50" r="46" fill="none" stroke="#ddd" stroke-width="8"/><path d="M 50 4 A 46 46 0 0 1 96 50" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" dur="1.4s" from="0 50 50" to="360 50 50" repeatCount="indefinite"/></path></svg></span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div
+				class="jp-carousel-wrap swiper jp-carousel-swiper-container jp-carousel-transitions"
+				itemscope
+				itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"/>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"/>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Loading Comments...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner"><svg class="jetpack-spinner" width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><circle cx="50" cy="50" r="46" fill="none" stroke="#ddd" stroke-width="8"/><path d="M 50 4 A 46 46 0 0 1 96 50" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" dur="1.4s" from="0 50 50" to="360 50 50" repeatCount="indefinite"/></path></svg></span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Write a Comment...</label>
+												<textarea
+													name="comment"
+													class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea"
+													id="jp-carousel-comment-form-comment-field"
+													placeholder="Write a Comment..."
+												></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Email (Required)</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Name (Required)</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Website</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field" />
+															</fieldset>
+																											</div>
+													<input
+														type="submit"
+														name="submit"
+														class="jp-carousel-comment-form-button"
+														id="jp-carousel-comment-form-button-submit"
+														value="Post Comment" />
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"/>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+			
+	<noscript><link rel='stylesheet' id='wc-stripe-blocks-checkout-style-css' href='https://skyyrose.co/wp-content/plugins/woocommerce-gateway-stripe/build/upe-blocks.css?ver=f2371901e73cb7e29721' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='wc-stripe-blocks-checkout-style-css' href='https://skyyrose.co/wp-content/plugins/woocommerce-gateway-stripe/build/upe-blocks.css?ver=f2371901e73cb7e29721' media="not all" />
+<noscript><link rel='stylesheet' id='wc-blocks-style-css' href='https://skyyrose.co/wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.7.0' media='all' />
+</noscript><link data-media="all" onload="this.media=this.dataset.media; delete this.dataset.media; this.removeAttribute( &apos;onload&apos; );" rel='stylesheet' id='wc-blocks-style-css' href='https://skyyrose.co/wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.7.0' media="not all" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style class='wp-fonts-local'>
+@font-face{font-family:Inter;font-style:normal;font-weight:100;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyeMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:200;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyfMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:300;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuOKfMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:400;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:500;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:600;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:700;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:800;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyYMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:900;font-display:fallback;src:url('https://fonts.wp.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuBWYMZ1rib2Bg-4.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:400;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:500;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKd3vUDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:600;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKebukDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:800;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKfFukDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:900;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKfsukDVZNLo_U2r.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:400;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_qiTbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:500;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_pqTbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:600;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_naUbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:700;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_k-UbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:800;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_iiUbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:900;font-display:fallback;src:url('https://fonts.wp.com/s/playfairdisplay/v36/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_gGUbtPK-F2rA0s.woff2') format('woff2');}
+@font-face{font-family:Inter;font-style:normal;font-weight:300 700;font-display:swap;src:url('https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:Inter;font-style:normal;font-weight:300 700;font-display:swap;src:url('https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/inter-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:400 800;font-display:swap;src:url('https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/playfair-display-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:400 800;font-display:swap;src:url('https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/fonts/playfair-display-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+</style>
+		
+		
+<script>window._wca = window._wca || [];</script><script id="WCPAY_ASSETS-js-extra">
+var wcpayAssets = {"url":"https://skyyrose.co/wp-content/plugins/woocommerce-payments/dist/"};
+//# sourceURL=WCPAY_ASSETS-js-extra
+</script><script id="jetpack-mu-wpcom-settings-js-before">
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https://skyyrose.co/wp-content/mu-plugins/wpcomsh/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/"};
+//# sourceURL=jetpack-mu-wpcom-settings-js-before
+</script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min.js?ver=2.7.0-wc.10.7.0" id="wc-jquery-blockui-js" defer data-wp-strategy="defer"></script><script id="wc-add-to-cart-js-extra">
+var wc_add_to_cart_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/?wc-ajax=%%endpoint%%","i18n_view_cart":"View cart","cart_url":"https://skyyrose.co/cart/","is_cart":"","cart_redirect_after_add":"no"};
+//# sourceURL=wc-add-to-cart-js-extra
+</script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/frontend/add-to-cart.min.js?ver=10.7.0" id="wc-add-to-cart-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/js-cookie/js.cookie.min.js?ver=2.1.4-wc.10.7.0" id="wc-js-cookie-js" defer data-wp-strategy="defer"></script><script id="woocommerce-js-extra">
+var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/?wc-ajax=%%endpoint%%","i18n_password_show":"Show password","i18n_password_hide":"Hide password"};
+//# sourceURL=woocommerce-js-extra
+</script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/frontend/woocommerce.min.js?ver=10.7.0" id="woocommerce-js" defer data-wp-strategy="defer"></script><script src="https://stats.wp.com/s-202620.js" id="woocommerce-analytics-js" defer data-wp-strategy="defer"></script><script type="text/javascript"> var commercekit_ajs = {"ajax_url":"\/?commercekit-ajax","ajax_nonce":0}; var commercekit_pdp = []; var commercekit_as = []; </script><script>
+			const onSkipLinkClick = () => {
+				const htmlElement = document.querySelector('html');
+
+				htmlElement.style['scroll-behavior'] = 'smooth';
+
+				setTimeout( () => htmlElement.style['scroll-behavior'] = null, 1000 );
+			}
+			document.addEventListener("DOMContentLoaded", () => {
+				if (!document.querySelector('#content')) {
+					document.querySelector('.ea11y-skip-to-content-link').remove();
+				}
+			});
+		</script><script>
+(function(){
+	var btns=document.querySelectorAll('.ft-cro-faq__question');
+	btns.forEach(function(btn){
+		btn.addEventListener('click',function(){
+			var exp=btn.getAttribute('aria-expanded')==='true';
+			var aid=btn.getAttribute('aria-controls');
+			var ans=aid?document.getElementById(aid):null;
+			btns.forEach(function(o){if(o!==btn){o.setAttribute('aria-expanded','false');var oa=o.getAttribute('aria-controls');var oe=oa?document.getElementById(oa):null;if(oe)oe.style.maxHeight='0';}});
+			btn.setAttribute('aria-expanded',exp?'false':'true');
+			if(ans)ans.style.maxHeight=exp?'0':ans.scrollHeight+'px';
+		});
+	});
+})();
+</script><script>
+(function(){
+	var o=document.getElementById('size-guide-modal');if(!o)return;
+	var p=o.querySelector('.sg-panel'),c=o.querySelector('.sg-close'),
+		ts=o.querySelectorAll('[data-sg-tab]'),ps=o.querySelectorAll('.sg-tabpanel'),lf=null;
+	function open(){lf=document.activeElement;o.setAttribute('aria-hidden','false');o.removeAttribute('inert');c.focus();}
+	function close(){o.setAttribute('aria-hidden','true');o.setAttribute('inert','');if(lf&&lf.focus)lf.focus();}
+	function sw(k){for(var i=0;i<ts.length;i++){var a=ts[i].getAttribute('data-sg-tab')===k;ts[i].classList.toggle('sg-tab--active',a);ts[i].setAttribute('aria-selected',a?'true':'false');}for(var j=0;j<ps.length;j++){if(ps[j].id==='sg-panel-'+k)ps[j].removeAttribute('hidden');else ps[j].setAttribute('hidden','');}}
+	o.addEventListener('keydown',function(e){if(e.key==='Escape'){close();return;}if(e.key!=='Tab')return;var els=p.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');if(!els.length)return;var f=els[0],l=els[els.length-1];if(e.shiftKey&&document.activeElement===f){e.preventDefault();l.focus();}else if(!e.shiftKey&&document.activeElement===l){e.preventDefault();f.focus();}});
+	o.addEventListener('click',function(e){if(e.target===o)close();});
+	c.addEventListener('click',close);
+	for(var i=0;i<ts.length;i++)ts[i].addEventListener('click',function(){sw(this.getAttribute('data-sg-tab'));});
+	document.addEventListener('click',function(e){var t=e.target.closest('[data-open-size-guide],.js-size-guide-trigger');if(t){e.preventDefault();open();}});
+})();
+</script><script>
+(function() {
+	if ( localStorage.getItem( 'skyyrose_cookie_consent' ) ) return;
+	var banner  = document.getElementById( 'skyyrose-cookie-consent' );
+	var accept  = document.getElementById( 'skyyrose-cookie-accept' );
+	var decline = document.getElementById( 'skyyrose-cookie-decline' );
+	if ( ! banner || ! accept || ! decline ) return;
+	banner.classList.remove( 'cookie-consent--hidden' );
+	function dismiss( value ) {
+		localStorage.setItem( 'skyyrose_cookie_consent', value );
+		banner.classList.add( 'cookie-consent--hidden' );
+	}
+	accept.addEventListener( 'click', function() { dismiss( 'accepted' ); } );
+	decline.addEventListener( 'click', function() { dismiss( 'declined' ); } );
+})();
+</script><script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/skyyrose-flagship/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script><script defer src="https://s0.wp.com/wp-content/js/bilmur.min.js?m=202620"></script><script type="text/javascript">
+/* <![CDATA[ */
+document.addEventListener( 'DOMContentLoaded', function() {
+	var cgkit_nonce_ustate = 0;
+	var cgkit_nonce_cvalue = Cookies.get( 'commercekit-nonce-value' );
+	var cgkit_nonce_cstate = Cookies.get( 'commercekit-nonce-state' );
+	var cgkit_user_switched = 0;
+	if ( cgkit_nonce_cvalue == '' || cgkit_nonce_cstate != cgkit_nonce_ustate || cgkit_user_switched == 1 ) {
+		var timestamp = new Date().getTime();
+		fetch( commercekit_ajs.ajax_url + '=commercekit_get_nonce&v=' + timestamp, {
+			method: 'GET',
+		} ).then( response => response.json() ).then( json => {
+			if ( json.status == 1 ) {
+				var twohrs = new Date( new Date().getTime() + 120 * 60 * 1000 );
+				if ( window.Cookiebot ) { /* Cookiebot compatible */
+					if ( window.Cookiebot.consent.preferences || window.Cookiebot.consent.statistics || window.Cookiebot.consent.marketing ) {
+						Cookies.set( 'commercekit-nonce-value', json.nonce, { expires: twohrs } );
+						Cookies.set( 'commercekit-nonce-state', json.state, { expires: twohrs } );
+					} else {
+						Cookies.remove( 'commercekit-nonce-value' );
+						Cookies.remove( 'commercekit-nonce-state' );
+					}
+				} else {
+					Cookies.set( 'commercekit-nonce-value', json.nonce, { expires: twohrs } );
+					Cookies.set( 'commercekit-nonce-state', json.state, { expires: twohrs } );
+				}
+				cgkit_nonce_ustate = json.state;
+				commercekit_update_nonce( json.nonce );
+			}
+		} );
+	} else {
+		commercekit_update_nonce( cgkit_nonce_cvalue );
+	}
+} );
+function commercekit_update_nonce( nonce ) {
+	var nonce_input = document.querySelector( '#commercekit_nonce' );
+	if ( nonce_input ) {
+		nonce_input.value = nonce;
+	} else {
+		document.body.insertAdjacentHTML( 'beforeend', '<input type="hidden" id="commercekit_nonce_2" name="commercekit_nonce" value="' + nonce + '" />' );
+	}
+	commercekit_ajs.ajax_nonce = 1;
+	if ( typeof cgkit_update_order_bump_views == 'function' ) {
+		cgkit_update_order_bump_views();
+	}
+}
+/* ]]> */
+</script><script id='kirki-viewport-lists'>var kirkiViewports = {"md":{"value":1200,"scale":1,"minWidth":1200,"maxWidth":1200,"title":"Desktop","icon":"desktop","activeIcon":"desktop-hover","id":"md","type":"max"},"tablet":{"value":991,"scale":1,"minWidth":991,"maxWidth":991,"title":"Tablet","icon":"tablet-default","activeIcon":"tablet-hover","type":"max","id":"tablet"},"mobileLandscape":{"value":767,"scale":1,"minWidth":767,"maxWidth":767,"title":"Landscape","icon":"phone-hr-default","activeIcon":"phone-hr-hover","type":"max","id":"mobileLandscape"},"mobile":{"value":575,"scale":1,"minWidth":575,"maxWidth":575,"title":"Mobile","icon":"phone-vr-default","activeIcon":"phone-vr-hover","type":"max","id":"mobile"}};</script><script id='kirki-variable-lists'>var kirkiCSSVariable = {"data":[{"title":"Colors","key":"color","modes":[{"title":"Default","key":"default"}],"variables":[]},{"title":"Numbers","key":"size","modes":[{"title":"Default","key":"default"}],"variables":[]},{"title":"Text Styles","key":"text-style","modes":[{"title":"Default","key":"default"}],"variables":[]},{"title":"Font Family","key":"font-family","modes":[{"title":"Default","key":"default"}],"variables":[]}]};</script><script id="kirki-api-and-nonce">
+    window.wp_kirki = {
+        ajaxUrl: "https://skyyrose.co/wp-admin/admin-ajax.php",
+        restUrl: "https://skyyrose.co/wp-json/",
+        siteUrl: "https://skyyrose.co",
+        apiVersion: "v1",
+        postId: "9866",
+        nonce: "716d880aa1",
+        call_from: "",
+        templateId: "",
+        context: []
+    };
+    </script><script>
+				const registerAllyAction = () => {
+					if ( ! window?.ElementorProFrontendConfig || ! window?.elementorFrontend?.utils?.urlActions ) {
+						return;
+					}
+
+					elementorFrontend.utils.urlActions.addAction( 'allyWidget:open', () => {
+						if (window?.ea11yWidget?.widget?.open) {
+							return window.ea11yWidget.widget.isOpen()
+								? window.ea11yWidget.widget.close()
+								: window.ea11yWidget.widget.open();
+						}
+					} );
+				};
+
+				const waitingLimit = 30;
+				let retryCounter = 0;
+
+				const waitForElementorPro = () => {
+					return new Promise( ( resolve ) => {
+						const intervalId = setInterval( () => {
+							if ( retryCounter === waitingLimit ) {
+								resolve( null );
+							}
+
+							retryCounter++;
+
+							if ( window.elementorFrontend && window?.elementorFrontend?.utils?.urlActions ) {
+								clearInterval( intervalId );
+								resolve( window.elementorFrontend );
+							}
+								}, 100 ); // Check every 100 milliseconds for availability of elementorFrontend
+					});
+				};
+
+				waitForElementorPro().then( () => { registerAllyAction(); });
+			</script><script>
+				const lazyloadRunObserver = () => {
+					const lazyloadBackgrounds = document.querySelectorAll( `.e-con.e-parent:not(.e-lazyloaded)` );
+					const lazyloadBackgroundObserver = new IntersectionObserver( ( entries ) => {
+						entries.forEach( ( entry ) => {
+							if ( entry.isIntersecting ) {
+								let lazyloadBackground = entry.target;
+								if( lazyloadBackground ) {
+									lazyloadBackground.classList.add( 'e-lazyloaded' );
+								}
+								lazyloadBackgroundObserver.unobserve( entry.target );
+							}
+						});
+					}, { rootMargin: '200px 0px 200px 0px' } );
+					lazyloadBackgrounds.forEach( ( lazyloadBackground ) => {
+						lazyloadBackgroundObserver.observe( lazyloadBackground );
+					} );
+				};
+				const events = [
+					'DOMContentLoaded',
+					'elementor/lazyload/observe',
+				];
+				events.forEach( ( event ) => {
+					document.addEventListener( event, lazyloadRunObserver );
+				} );
+			</script><script>window.addEventListener( 'load', function() {
+				document.querySelectorAll( 'link' ).forEach( function( e ) {'not all' === e.media && e.dataset.media && ( e.media = e.dataset.media, delete e.dataset.media );} );
+				var e = document.getElementById( 'jetpack-boost-critical-css' );
+				e && ( e.media = 'not all' );
+			} );</script><script>
+		(function () {
+			var c = document.body.className;
+			c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
+			document.body.className = c;
+		})();
+	</script><script src="https://skyyrose.co/wp-content/plugins/commercegurus-commercekit/assets/js/js.cookie.min.js?ver=3.0.5" id="js-cookie-js"></script><script src="https://skyyrose.co/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1" id="wp-hooks-js"></script><script src="https://skyyrose.co/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375" id="wp-i18n-js"></script><script id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+//# sourceURL=wp-i18n-js-after
+</script><script src="https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-assets/build/i18n-loader.js?minify=true&amp;ver=5ba5dddc04be2306aaf0" id="wp-jp-i18n-loader-js"></script><script id="wp-jp-i18n-loader-js-after">
+wp.jpI18nLoader.state = {"baseUrl":"https://skyyrose.co/wp-content/languages/","locale":"en_US","domainMap":{"jetpack-admin-ui":"plugins/jetpack","jetpack-assets":"plugins/jetpack","jetpack-boost-core":"plugins/jetpack","jetpack-boost-speed-score":"plugins/jetpack","jetpack-config":"plugins/jetpack","jetpack-connection":"plugins/jetpack","jetpack-explat":"plugins/jetpack","jetpack-image-cdn":"plugins/jetpack","jetpack-ip":"plugins/jetpack","jetpack-jitm":"plugins/jetpack","jetpack-licensing":"plugins/jetpack","jetpack-my-jetpack":"plugins/jetpack","jetpack-password-checker":"plugins/jetpack","jetpack-plugin-deactivation":"plugins/jetpack-boost","jetpack-plugins-installer":"plugins/jetpack","jetpack-protect-models":"plugins/jetpack","jetpack-protect-status":"plugins/jetpack","jetpack-schema":"plugins/jetpack-boost","jetpack-sync":"plugins/jetpack","jetpack-wp-js-data-sync":"plugins/jetpack-boost","jetpack-account-protection":"plugins/jetpack","jetpack-activity-log":"plugins/jetpack","jetpack-backup-pkg":"plugins/jetpack","jetpack-blaze":"plugins/jetpack","jetpack-block-delimiter":"plugins/jetpack","jetpack-classic-theme-helper":"plugins/jetpack","jetpack-compat":"plugins/jetpack","jetpack-external-connections":"plugins/jetpack","jetpack-external-media":"plugins/jetpack","jetpack-forms":"plugins/jetpack","jetpack-import":"plugins/jetpack","jetpack-jwt":"plugins/jetpack","jetpack-masterbar":"plugins/jetpack","jetpack-newsletter":"plugins/jetpack","jetpack-paypal-payments":"plugins/jetpack","jetpack-podcast":"plugins/jetpack","jetpack-post-list":"plugins/jetpack","jetpack-post-media":"plugins/jetpack","jetpack-publicize-pkg":"plugins/jetpack","jetpack-scan-page":"plugins/jetpack","jetpack-search-pkg":"plugins/jetpack","jetpack-stats":"plugins/jetpack","jetpack-stats-admin":"plugins/jetpack","jetpack-subscribers-dashboard":"plugins/jetpack","jetpack-videopress-pkg":"plugins/jetpack","jetpack-waf":"plugins/jetpack","jetpack-wp-abilities":"plugins/jetpack","jetpack-wp-build-polyfills":"plugins/jetpack"},"domainPaths":{"jetpack-admin-ui":"jetpack_vendor/automattic/jetpack-admin-ui/","jetpack-assets":"jetpack_vendor/automattic/jetpack-assets/","jetpack-boost-core":"jetpack_vendor/automattic/jetpack-boost-core/","jetpack-boost-speed-score":"jetpack_vendor/automattic/jetpack-boost-speed-score/","jetpack-config":"jetpack_vendor/automattic/jetpack-config/","jetpack-connection":"jetpack_vendor/automattic/jetpack-connection/","jetpack-explat":"jetpack_vendor/automattic/jetpack-explat/","jetpack-image-cdn":"jetpack_vendor/automattic/jetpack-image-cdn/","jetpack-ip":"jetpack_vendor/automattic/jetpack-ip/","jetpack-jitm":"jetpack_vendor/automattic/jetpack-jitm/","jetpack-licensing":"jetpack_vendor/automattic/jetpack-licensing/","jetpack-my-jetpack":"jetpack_vendor/automattic/jetpack-my-jetpack/","jetpack-password-checker":"jetpack_vendor/automattic/jetpack-password-checker/","jetpack-plugin-deactivation":"jetpack_vendor/automattic/jetpack-plugin-deactivation/","jetpack-plugins-installer":"jetpack_vendor/automattic/jetpack-plugins-installer/","jetpack-protect-models":"jetpack_vendor/automattic/jetpack-protect-models/","jetpack-protect-status":"jetpack_vendor/automattic/jetpack-protect-status/","jetpack-schema":"jetpack_vendor/automattic/jetpack-schema/","jetpack-sync":"jetpack_vendor/automattic/jetpack-sync/","jetpack-wp-js-data-sync":"jetpack_vendor/automattic/jetpack-wp-js-data-sync/","jetpack-account-protection":"jetpack_vendor/automattic/jetpack-account-protection/","jetpack-activity-log":"jetpack_vendor/automattic/jetpack-activity-log/","jetpack-backup-pkg":"jetpack_vendor/automattic/jetpack-backup/","jetpack-blaze":"jetpack_vendor/automattic/jetpack-blaze/","jetpack-block-delimiter":"jetpack_vendor/automattic/block-delimiter/","jetpack-classic-theme-helper":"jetpack_vendor/automattic/jetpack-classic-theme-helper/","jetpack-compat":"jetpack_vendor/automattic/jetpack-compat/","jetpack-external-connections":"jetpack_vendor/automattic/jetpack-external-connections/","jetpack-external-media":"jetpack_vendor/automattic/jetpack-external-media/","jetpack-forms":"jetpack_vendor/automattic/jetpack-forms/","jetpack-import":"jetpack_vendor/automattic/jetpack-import/","jetpack-jwt":"jetpack_vendor/automattic/jetpack-jwt/","jetpack-masterbar":"jetpack_vendor/automattic/jetpack-masterbar/","jetpack-newsletter":"jetpack_vendor/automattic/jetpack-newsletter/","jetpack-paypal-payments":"jetpack_vendor/automattic/jetpack-paypal-payments/","jetpack-podcast":"jetpack_vendor/automattic/jetpack-podcast/","jetpack-post-list":"jetpack_vendor/automattic/jetpack-post-list/","jetpack-post-media":"jetpack_vendor/automattic/jetpack-post-media/","jetpack-publicize-pkg":"jetpack_vendor/automattic/jetpack-publicize/","jetpack-scan-page":"jetpack_vendor/automattic/jetpack-scan-page/","jetpack-search-pkg":"jetpack_vendor/automattic/jetpack-search/","jetpack-stats":"jetpack_vendor/automattic/jetpack-stats/","jetpack-stats-admin":"jetpack_vendor/automattic/jetpack-stats-admin/","jetpack-subscribers-dashboard":"jetpack_vendor/automattic/jetpack-subscribers-dashboard/","jetpack-videopress-pkg":"jetpack_vendor/automattic/jetpack-videopress/","jetpack-waf":"jetpack_vendor/automattic/jetpack-waf/","jetpack-wp-abilities":"jetpack_vendor/automattic/jetpack-wp-abilities/","jetpack-wp-build-polyfills":"jetpack_vendor/automattic/jetpack-wp-build-polyfills/"}};
+//# sourceURL=wp-jp-i18n-loader-js-after
+</script><script src="https://skyyrose.co/wp-includes/js/dist/vendor/wp-polyfill.min.js?ver=3.15.0" id="wp-polyfill-js"></script><script src="https://skyyrose.co/wp-includes/js/dist/url.min.js?ver=9e178c9516d1222dc834" id="wp-url-js"></script><script id="jetpack-instant-search-js-before">
+var JetpackInstantSearchOptions={"overlayOptions":{"colorTheme":"light","enableInfScroll":true,"enableFilteringOpensOverlay":true,"enablePostDate":true,"enableProductPrice":true,"enableSort":true,"highlightColor":"#FFC","overlayTrigger":"submit","resultFormat":"expanded","showPoweredBy":true,"defaultSort":"relevance","excludedPostTypes":[],"fallbackImageUrl":"","enableFallbackImage":false},"homeUrl":"https://skyyrose.co","locale":"en-US","postsPerPage":10,"siteId":238510894,"postTypes":{"post":{"singular_name":"Post","name":"Posts"},"page":{"singular_name":"Page","name":"Pages"},"attachment":{"singular_name":"Media","name":"Media"},"e-floating-buttons":{"singular_name":"Floating Element","name":"Floating Elements"},"product":{"singular_name":"Product","name":"Products"},"ckit_size_guide":{"singular_name":"Size Guide","name":"Size Guides"}},"webpackPublicPath":"https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-search/build/instant-search/","isPhotonEnabled":true,"isFreePlan":true,"apiRoot":"https://skyyrose.co/wp-json/","apiNonce":"716d880aa1","isPrivateSite":false,"isWpcom":false,"hasOverlayWidgets":false,"widgets":[],"widgetsOutsideOverlay":[],"hasNonSearchWidgets":false,"preventTrackingCookiesReset":false,"disableTracking":false};
+//# sourceURL=jetpack-instant-search-js-before
+</script><script src="https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/jetpack-search/build/instant-search/jp-search.js?minify=false&amp;ver=52dbe7cc70e522fe47c0" id="jetpack-instant-search-js"></script><script src="//stats.wp.com/w.js?ver=202620" id="jp-tracks-js"></script><script id="ea11y-widget-js-extra">
+var ea11yWidget = {"iconSettings":{"style":{"icon":"person","size":"medium","color":"#2563eb"},"position":{"desktop":{"hidden":false,"enableExactPosition":false,"exactPosition":{"horizontal":{"direction":"right","value":10,"unit":"px"},"vertical":{"direction":"bottom","value":10,"unit":"px"}},"position":"bottom-right"},"mobile":{"hidden":false,"enableExactPosition":false,"exactPosition":{"horizontal":{"direction":"right","value":10,"unit":"px"},"vertical":{"direction":"bottom","value":10,"unit":"px"}},"position":"bottom-right"}}},"toolsSettings":{"bigger-text":{"enabled":true},"bigger-line-height":{"enabled":true},"text-align":{"enabled":true},"readable-font":{"enabled":true},"grayscale":{"enabled":true},"contrast":{"enabled":true},"page-structure":{"enabled":true},"sitemap":{"enabled":false,"url":"https://skyyrose.co/wp-sitemap.xml"},"reading-mask":{"enabled":true},"hide-images":{"enabled":true},"pause-animations":{"enabled":true},"highlight-links":{"enabled":true},"focus-outline":{"enabled":true},"screen-reader":{"enabled":false},"remove-elementor-label":{"enabled":false}},"accessibilityStatementURL":"","analytics":{"enabled":false,"url":null}};
+//# sourceURL=ea11y-widget-js-extra
+</script><script src="https://cdn.elementor.com/a11y/widget.js?api_key=ea11y-bc1cbe5d-8878-4079-95a0-5d9d8c99e319&amp;ver=4.1.1" id="ea11y-widget-js"referrerPolicy="origin"></script><script id="skyyrose-navigation-js-extra">
+var skyyRoseData = {"ajaxUrl":"https://skyyrose.co/wp-admin/admin-ajax.php","nonce":"2b9f42eb78","themeUri":"https://skyyrose.co/wp-content/themes/skyyrose-flagship","assetsUri":"https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets"};
+//# sourceURL=skyyrose-navigation-js-extra
+</script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/navigation.min.js?ver=1.1.1" id="skyyrose-navigation-js"></script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/toast.min.js?ver=1.1.1" id="skyyrose-toast-js"></script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/luxury-cursor.min.js?ver=1.1.1" id="skyyrose-luxury-cursor-js"></script><script src="https://cdn.jsdelivr.net/npm/motion@11/dist/motion.min.js?ver=11" id="motion-one-js" data-wp-strategy="defer"></script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/premium-interactions.min.js?ver=1.1.1" id="skyyrose-premium-interactions-js"></script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/page-transitions.min.js?ver=1.1.1" id="skyyrose-page-transitions-js"></script><script id="skyyrose-wishlist-js-extra">
+var skyyRoseWishlist = {"ajaxUrl":"https://skyyrose.co/wp-admin/admin-ajax.php","nonce":"0cb5a80fa3","count":"0","wishlistUrl":"https://skyyrose.co/wishlist/","i18n":{"addedToWishlist":"Added to wishlist","removedFromWishlist":"Removed from wishlist","movedToCart":"Moved to cart","error":"An error occurred"}};
+//# sourceURL=skyyrose-wishlist-js-extra
+</script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/wishlist.js?ver=1.1.1" id="skyyrose-wishlist-js"></script><script id="jetpack-carousel-js-extra">
+var jetpackSwiperLibraryPath = {"url":"https://skyyrose.co/wp-content/plugins/jetpack/_inc/blocks/swiper.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https://skyyrose.co/wp-admin/admin-ajax.php","nonce":"e853b2c89a","display_exif":"1","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","image_label":"Open image in full-screen.","download_original":"View full size \u003Cspan class=\"photo-size\"\u003E{0}\u003Cspan class=\"photo-size-times\"\u003E\u00d7\u003C/span\u003E{1}\u003C/span\u003E","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","copyright":"Copyright","comment_registration":"0","require_name_email":"1","login_url":"https://skyyrose.co/wp-login.php?redirect_to=https%3A%2F%2Fskyyrose.co%2Fproduct%2Fbr-003%2F","blog_id":"1","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"]};
+//# sourceURL=jetpack-carousel-js-extra
+</script><script src="https://skyyrose.co/wp-content/plugins/jetpack/_inc/build/carousel/jetpack-carousel.min.js?ver=15.9-a.1" id="jetpack-carousel-js"></script><script src="https://skyyrose.co/wp-content/plugins/jetpack/_inc/build/tiled-gallery/tiled-gallery/tiled-gallery.min.js?ver=15.9-a.1" id="tiled-gallery-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/woocommerce-analytics/build/woocommerce-analytics-client.js?minify=false&amp;ver=8d8bb846cc19ac858460" id="woocommerce-analytics-client-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/sourcebuster/sourcebuster.min.js?ver=10.7.0" id="sourcebuster-js-js"></script><script id="wc-order-attribution-js-extra">
+var wc_order_attribution = {"params":{"lifetime":1.0e-5,"session":30,"base64":false,"ajaxurl":"https://skyyrose.co/wp-admin/admin-ajax.php","prefix":"wc_order_attribution_","allowTracking":true},"fields":{"source_type":"current.typ","referrer":"current_add.rf","utm_campaign":"current.cmp","utm_source":"current.src","utm_medium":"current.mdm","utm_content":"current.cnt","utm_id":"current.id","utm_term":"current.trm","utm_source_platform":"current.plt","utm_creative_format":"current.fmt","utm_marketing_tactic":"current.tct","session_entry":"current_add.ep","session_start_time":"current_add.fd","session_pages":"session.pgs","session_count":"udata.vst","user_agent":"udata.uag"}};
+//# sourceURL=wc-order-attribution-js-extra
+</script><script src="https://skyyrose.co/wp-content/plugins/woocommerce/assets/js/frontend/order-attribution.min.js?ver=10.7.0" id="wc-order-attribution-js"></script><script defer src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/product-card-holo.min.js?ver=1.1.1" id="skyyrose-product-card-holo-js"></script><script id="skyyrose-performance-guardian-js-extra">
+var SkyyPerformanceBudget = {"fpsThreshold":"30","maxConcurrentAnims":"8","checkInterval":"2000","throttleDuration":"5000","debug":""};
+//# sourceURL=skyyrose-performance-guardian-js-extra
+</script><script src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/performance-guardian.js?ver=1.1.1" id="skyyrose-performance-guardian-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/experience-analyzer.js?ver=1.1.1" id="skyyrose-experience-analyzer-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/smart-showcase.js?ver=1.1.1" id="skyyrose-smart-showcase-js" defer data-wp-strategy="defer"></script><script src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/micro-interactions.js?ver=1.1.1" id="skyyrose-micro-interactions-js" defer data-wp-strategy="defer"></script><script id="skyyrose-personalization-js-extra">
+var SkyyCurated = {"visitorHash":"1002f0f16b935296","collection":"","restBase":"/?rest_route=/skyyrose/v1","restNonce":"716d880aa1","limit":"4"};
+//# sourceURL=skyyrose-personalization-js-extra
+</script><script src="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/personalization.js?ver=1.1.1" id="skyyrose-personalization-js" defer data-wp-strategy="defer"></script><script id="jetpack-stats-js-before">
+_stq = window._stq || [];
+_stq.push([ "view", {"v":"ext","blog":"238510894","post":"0","tz":"-7","srv":"skyyrose.co","arch_results":"12","hp":"atomic","ac":"2","amp":"0","j":"1:15.9-a.1"} ]);
+_stq.push([ "clickTrackerInit", "238510894", "0" ]);
+//# sourceURL=jetpack-stats-js-before
+</script><script src="https://stats.wp.com/e-202620.js" id="jetpack-stats-js" defer data-wp-strategy="defer"></script><script type="text/javascript">
+			(function() {
+				window.wcAnalytics = window.wcAnalytics || {};
+				const wcAnalytics = window.wcAnalytics;
+
+				// Set the assets URL for webpack to find the split assets.
+				wcAnalytics.assets_url = 'https://skyyrose.co/wp-content/plugins/jetpack/jetpack_vendor/automattic/woocommerce-analytics/src/../build/';
+
+				// Set the REST API tracking endpoint URL.
+								wcAnalytics.trackEndpoint = "https://skyyrose.co/wp-json/woocommerce-analytics/v1/track";
+
+				// Set common properties for all events.
+				wcAnalytics.commonProps = {"session_id":null,"landing_page":null,"is_engaged":null,"ui":0,"blog_id":238510894,"store_id":"3639372b-23d7-46ba-95ef-0e103559ecfc","url":"https://skyyrose.co","woo_version":"10.7.0","wp_version":"6.9.4","store_admin":0,"device":"desktop","store_currency":"USD","timezone":"America/Los_Angeles","is_guest":1,"_via_ua":"curl/8.7.1","_via_ip":"67.180.187.84","_lg":"","_dr":"","_dl":"","_via_ref":"","host":"bizplan-wp-admin"};
+
+				// Set the event queue.
+				wcAnalytics.eventQueue = [];
+
+				// Features.
+				wcAnalytics.features = {
+					ch: false,
+					sessionTracking: false,
+					proxy: false,
+				};
+
+				wcAnalytics.breadcrumbs = ["Shop"];
+
+				// Page context flags.
+				wcAnalytics.pages = {
+					isAccountPage: false,
+					isCart: false,
+				};
+			})();
+		</script></body>
+</html>

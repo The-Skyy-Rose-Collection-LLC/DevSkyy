@@ -128,6 +128,8 @@
         for (var j = 0; j < allItems.length; j++) {
           if (allItems[j] !== item) {
             allItems[j].classList.remove('open');
+            var otherBtn = allItems[j].querySelector('.lp-faq__question');
+            if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
             var otherAnswer = allItems[j].querySelector('.lp-faq__answer');
             if (otherAnswer) otherAnswer.style.maxHeight = '0';
           }
@@ -136,53 +138,19 @@
         // Toggle current
         if (isOpen) {
           item.classList.remove('open');
+          this.setAttribute('aria-expanded', 'false');
           answer.style.maxHeight = '0';
         } else {
           item.classList.add('open');
+          this.setAttribute('aria-expanded', 'true');
           answer.style.maxHeight = answer.scrollHeight + 'px';
         }
       });
     }
   }
 
-  /* ──────────────────────────────────────────────────────────────────
-     4. Scroll Reveal — IntersectionObserver on .lp-rv
-     ────────────────────────────────────────────────────────────────── */
-  function initScrollReveal() {
-    if (reducedMotion) {
-      // Force all visible immediately
-      var all = document.querySelectorAll('.lp-rv');
-      for (var i = 0; i < all.length; i++) {
-        all[i].classList.add('is-visible');
-      }
-      return;
-    }
-
-    if (!('IntersectionObserver' in window)) {
-      var fallback = document.querySelectorAll('.lp-rv');
-      for (var k = 0; k < fallback.length; k++) {
-        fallback[k].classList.add('is-visible');
-      }
-      return;
-    }
-
-    var observer = new IntersectionObserver(
-      function (entries) {
-        for (var j = 0; j < entries.length; j++) {
-          if (entries[j].isIntersecting) {
-            entries[j].target.classList.add('is-visible');
-            observer.unobserve(entries[j].target);
-          }
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    var elements = document.querySelectorAll('.lp-rv');
-    for (var m = 0; m < elements.length; m++) {
-      observer.observe(elements[m]);
-    }
-  }
+  /* Scroll reveal for .lp-rv handled by premium-interactions.js
+     (unified observer across the theme — retired local copy in U-1). */
 
   /* ──────────────────────────────────────────────────────────────────
      5. Smooth Scroll for Anchor Links
@@ -208,7 +176,6 @@
     initCountdown();
     initParallax();
     initFAQ();
-    initScrollReveal();
     initSmoothScroll();
   }
 

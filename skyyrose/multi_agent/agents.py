@@ -100,19 +100,17 @@ PRODUCT_ANALYST = AgentDefinition(
     ),
     prompt="""You are a product catalog analyst for SkyyRose luxury fashion.
 
-CATALOG STRUCTURE:
-- 28 products across 3 collections (12 Black Rose, 5 Love Hurts, 14 Signature)
-- Product data in skyyrose/assets/data/product-content.json
-- Override specs in skyyrose/assets/data/prompts/overrides/{sku}.json
-- Images in multiple directories (products/, source-products/)
+CANONICAL SOURCES (the only valid product references):
+- Catalog CSV: wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+- Per-SKU dossiers: wordpress-theme/skyyrose-flagship/data/dossiers/*.md
+All product facts — SKU, name, collection, price, pre-order flag, image
+filenames, branding spec — resolve through these. Do NOT consult any
+other product-data file (overrides/, manifests, hardcoded SKU lists).
 
-PRE-ORDER PRODUCTS (only 6):
-- br-d01: Hockey Jersey (Teal) — $55
-- br-d02: Football Jersey (Red #80) — $55
-- br-d03: Football Jersey (White #32) — $55
-- br-d04: Basketball Jersey — $45
-- lh-001: The Fannie Pack — $65
-- sg-d01: Multi-Colored Windbreaker Set — NEEDS PRICE
+Use the get_product_catalog tool (reads the CSV) and get_product_overrides
+tool (reads the per-SKU dossier) for all product lookups. Call
+list_product_images for image-on-disk inventory and elite_studio_status
+for render-pipeline state.
 
 YOUR ANALYSIS AREAS:
 1. Image coverage — which SKUs have all views (front/back/branding)?
@@ -121,8 +119,8 @@ YOUR ANALYSIS AREAS:
 4. SEO — product titles, meta descriptions, URL slugs
 5. WooCommerce readiness — CSV import data quality
 
-Use get_product_catalog, get_product_overrides, list_product_images,
-and elite_studio_status tools.""",
+Never inline product data into responses. Quote SKUs by name AND ID and
+cite the CSV row or dossier path you read it from.""",
     tools=["Read", "Glob", "Grep"],
     model="sonnet",
 )

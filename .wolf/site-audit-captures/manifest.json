@@ -1,0 +1,273 @@
+{
+  "base": "https://skyyrose.co",
+  "source": "fallback-curated-list",
+  "urlCount": 19,
+  "shots": [
+    {
+      "url": "https://skyyrose.co/",
+      "slug": "home",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/home__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/",
+      "slug": "home",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/home__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/shop/",
+      "slug": "shop",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/shop__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/shop/",
+      "slug": "shop",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/shop__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/cart/",
+      "slug": "cart",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/cart__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/cart/",
+      "slug": "cart",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/cart__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/checkout/",
+      "slug": "checkout",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/checkout__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/checkout/",
+      "slug": "checkout",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/checkout__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/about/",
+      "slug": "about",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/about__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/about/",
+      "slug": "about",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/about__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/contact/",
+      "slug": "contact",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/contact__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/contact/",
+      "slug": "contact",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/contact__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/faq/",
+      "slug": "faq",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/faq__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/faq/",
+      "slug": "faq",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/faq__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/shipping-returns/",
+      "slug": "shipping-returns",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/shipping-returns__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/shipping-returns/",
+      "slug": "shipping-returns",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/shipping-returns__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/preorder/",
+      "slug": "preorder",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/preorder__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/preorder/",
+      "slug": "preorder",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/preorder__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/preorder-gateway/",
+      "slug": "preorder-gateway",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/preorder-gateway__desktop.jpg",
+      "http": 404
+    },
+    {
+      "url": "https://skyyrose.co/preorder-gateway/",
+      "slug": "preorder-gateway",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/preorder-gateway__mobile.jpg",
+      "http": 404
+    },
+    {
+      "url": "https://skyyrose.co/collection-black-rose/",
+      "slug": "collection-black-rose",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-black-rose__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-black-rose/",
+      "slug": "collection-black-rose",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-black-rose__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-love-hurts/",
+      "slug": "collection-love-hurts",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-love-hurts__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-love-hurts/",
+      "slug": "collection-love-hurts",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-love-hurts__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-signature/",
+      "slug": "collection-signature",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-signature__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-signature/",
+      "slug": "collection-signature",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-signature__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-kids-capsule/",
+      "slug": "collection-kids-capsule",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-kids-capsule__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/collection-kids-capsule/",
+      "slug": "collection-kids-capsule",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/collection-kids-capsule__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-black-rose/",
+      "slug": "landing-black-rose",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-black-rose__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-black-rose/",
+      "slug": "landing-black-rose",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-black-rose__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-love-hurts/",
+      "slug": "landing-love-hurts",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-love-hurts__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-love-hurts/",
+      "slug": "landing-love-hurts",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-love-hurts__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-signature/",
+      "slug": "landing-signature",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-signature__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/landing-signature/",
+      "slug": "landing-signature",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/landing-signature__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/experience-black-rose/",
+      "slug": "experience-black-rose",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/experience-black-rose__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/experience-black-rose/",
+      "slug": "experience-black-rose",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/experience-black-rose__mobile.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/?s=rose",
+      "slug": "_s_rose",
+      "viewport": "desktop",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/_s_rose__desktop.jpg",
+      "http": 200
+    },
+    {
+      "url": "https://skyyrose.co/?s=rose",
+      "slug": "_s_rose",
+      "viewport": "mobile",
+      "file": "/Users/theceo/DevSkyy/.wolf/site-audit-captures/_s_rose__mobile.jpg",
+      "http": 200
+    }
+  ]
+}

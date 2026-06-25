@@ -93,7 +93,9 @@ class MeshyWebhookHandler(BaseHTTPRequestHandler):
         print(f"Downloading to: {output_path}")
 
         try:
-            urllib.request.urlretrieve(glb_url, str(output_path))
+            urllib.request.urlretrieve(
+                glb_url, str(output_path)
+            )  # nosec B310 — URL from controlled API response, not user input
             size_mb = output_path.stat().st_size / (1024 * 1024)
             print(f"Downloaded: {size_mb:.1f} MB")
 
@@ -110,7 +112,9 @@ class MeshyWebhookHandler(BaseHTTPRequestHandler):
                     for name, url in tex.items():
                         if url and url.startswith("http"):
                             tex_path = OUTPUT_DIR / f"{task_id}_{name}.png"
-                            urllib.request.urlretrieve(url, str(tex_path))
+                            urllib.request.urlretrieve(
+                                url, str(tex_path)
+                            )  # nosec B310 — URL from controlled API response, not user input
                             print(f"Texture saved: {tex_path.name}")
 
         except Exception as e:

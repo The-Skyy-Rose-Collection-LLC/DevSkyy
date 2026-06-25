@@ -1,0 +1,112 @@
+{
+  "$schema": "skyyrose.elite_studio.scene.v1",
+  "name": "love-hurts-enchanted-rose-cathedral",
+  "collection": "love-hurts",
+  "canon_lock_date": "2026-05-26",
+  "founder_directed": true,
+  "founder_lock_quote": "Love Hurts should be Beauty and the beast inspired with the enchanted rose as a focal point",
+
+  "scene_description": "Photorealistic cinematic enchanted-cathedral scene — fairy-tale romantic atmosphere inspired by classic Beauty and the Beast storybook illustrations. Beautiful gothic cathedral interior in soft evening light, elegant vaulted stone arches and ribbed columns with romantic shadowed depth on both sides. Center-foreground: ornate stone pedestal sculpted with delicate intertwined rose motifs, holding a tall hand-blown glass dome containing a single perfect red rose — softly lit from within by a warm amber inner glow, the rose serves as the gentle spotlight of the scene. A soft warm halo radiates from the dome. A delicate shaft of warm amber and rose-pink light filters through a high stained-glass rose window in the upper-right of the frame, with dust motes drifting in the beam. Soft burgundy velvet drapery lines the stone columns. Scattered red rose petals rest on the polished stone floor around the pedestal base. Wrought-iron candelabra in the mid-background hold lit candles casting small pools of warm amber light. The polished stone floor gently reflects the warm rose glow.",
+
+  "color_palette": {
+    "primary_bg": "#0A0A0A (near-black stone)",
+    "primary_accent": "#DC143C",
+    "secondary_accent": "burgundy curtains",
+    "highlight": "ethereal warm-amber glow from inside dome + candle amber",
+    "shadow": "deep cathedral shadow",
+    "stained_glass": "crimson + deep magenta refraction",
+    "petals": "deep blood-red scattered, some wilted purple-edge"
+  },
+
+  "lighting": {
+    "key_light": "rose-under-dome internal glow (warm-amber from within)",
+    "fill_light": "stained-glass rose window shaft (deep crimson directional)",
+    "rim_light": "candelabra amber pools in mid-background",
+    "color_temperature_kelvin": 2400,
+    "time_of_day": "night, indoor cathedral",
+    "exposure_mood": "Cocteau Beauty/Beast intensity — fairy-tale gothic, NOT Disney polish",
+    "shadows": "deep, vast, swallowing edges of frame; rose dome reverses shadow only at its glow halo"
+  },
+
+  "camera": {
+    "perspective": "interior gothic cathedral nave, looking down central aisle toward pedestal",
+    "angle": "slight upward hero angle on rose pedestal so dome reads monumental",
+    "lens_mood": "85mm cinematic, shallow depth, dome in razor-sharp focus, columns softly receding",
+    "depth_cues": [
+      "rose dome + pedestal foreground (sharp)",
+      "scattered petals + stone floor near-foreground",
+      "stone columns + crimson curtains midground (soft)",
+      "vaulted arches + candelabra far background (deep shadow)",
+      "stained-glass rose window upper-right (dramatic shaft of light)"
+    ],
+    "composition": "3:4 portrait, vertical stone columns + arches frame the centered rose dome",
+    "atmospheric_fog": "incense haze in shafts of stained-glass light, dust motes in candle pools"
+  },
+
+  "skyyrose_dna": "Love Hurts collection — heritage of love and protection. The rose under glass: protected, fragile, kept. Romantic fairy-tale cathedral atmosphere with classic storybook elegance. Crimson and burgundy palette with warm candlelight.",
+
+  "focal_anchor": {
+    "object": "single perfect red rose under a tall hand-blown glass dome",
+    "position": "center-foreground, on ornate stone pedestal sculpted with rose motifs",
+    "detail": "softly lit from within by warm amber glow, the gentle focal point of the frame with a soft halo of warm light",
+    "rationale": "The enchanted rose under glass — the romantic centerpiece of the cathedral chamber"
+  },
+
+  "product_staging_zones": [
+    {
+      "zone": "left of rose pedestal, mid-ground",
+      "x_pct": 0.25,
+      "y_pct": 0.62,
+      "scale": 0.22,
+      "fit": "draped over a smaller adjacent stone pedestal or carved wooden stand, receding into shadow",
+      "lighting_match_directive": "let product receive amber candelabra rim light + reflected crimson glow from rose dome; do NOT overpower the rose"
+    },
+    {
+      "zone": "right of rose pedestal, mid-ground",
+      "x_pct": 0.75,
+      "y_pct": 0.62,
+      "scale": 0.22,
+      "fit": "draped over candelabra arm or stone ledge, in candle-amber pool"
+    },
+    {
+      "zone": "foreground floor scattered petals area",
+      "x_pct": 0.45,
+      "y_pct": 0.88,
+      "scale": 0.16,
+      "fit": "laid flat on polished stone floor among scattered petals, near pedestal base"
+    },
+    {
+      "zone": "back-left stone column shadow",
+      "x_pct": 0.12,
+      "y_pct": 0.45,
+      "scale": 0.18,
+      "fit": "hung from wrought-iron candelabra against column, deep shadow"
+    }
+  ],
+
+  "negative_prompts": [
+    "no people, no human figures, no silhouettes",
+    "no oversaturated Disney-style polish, no cartoon stylization",
+    "no sparkles or starburst effects",
+    "no daylight, no outdoor scene, no exterior",
+    "no products outshining the rose under glass (rose is the focal point)",
+    "no modern objects (cathedral period-piece only)",
+    "no faces in stained glass (abstract floral patterns only)"
+  ],
+
+  "reference_brands": ["classic storybook illustration aesthetic", "fairy-tale romantic cinema", "Palm Angels emotional graphic intensity"],
+
+  "anti_references": [],
+
+  "atmospheric": {
+    "weather": "interior cathedral, no weather",
+    "season": "timeless fairy-tale ambiance",
+    "mood": "enchanted, romantic, gentle, the rose softly illuminates the cathedral chamber",
+    "sound_implied": "soft candle wick warmth, gentle hush of large stone interior"
+  },
+
+  "render_aspect": "3:4 portrait",
+  "master_resolution_px": "1024x1408 minimum, 1536x2048 preferred for hero-class",
+  "render_format_priority": ["AVIF q80", "WebP q85", "PNG"],
+  "expected_filename": "love-hurts-enchanted-rose-cathedral-v2.png"
+}

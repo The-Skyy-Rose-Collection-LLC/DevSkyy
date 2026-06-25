@@ -56,7 +56,7 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 			),
 			'signature'  => array(
 				'name'    => 'Signature',
-				'tagline' => 'Bay Area luxury in every stitch',
+				'tagline' => 'Oakland luxury in every stitch',
 				'number'  => 'Collection 03',
 				'accent'  => '#D4AF37',
 				'image'   => 'assets/scenes/signature/scene-city.webp',

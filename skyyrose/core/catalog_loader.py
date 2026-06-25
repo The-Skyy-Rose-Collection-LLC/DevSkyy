@@ -17,6 +17,7 @@ status-derivation rules documented in both places when they change.
 from __future__ import annotations
 
 import csv
+from functools import cache
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -28,10 +29,14 @@ CATALOG_CSV = (
 PRODUCT_STATUS = {"draft", "pre-order", "live", "retired"}
 
 
+@cache
 def read_catalog_rows(path: Path | None = None) -> list[dict[str, str]]:
     """Read the canonical catalog CSV into a list of column-name dicts.
 
     Skips blank rows and rows with no SKU.
+
+    Memoized: callers should treat the returned list and its dicts as
+    read-only — mutating them mutates the shared cache.
     """
     csv_path = path or CATALOG_CSV
     with csv_path.open(newline="", encoding="utf-8") as f:

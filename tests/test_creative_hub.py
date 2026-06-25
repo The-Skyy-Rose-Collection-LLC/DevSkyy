@@ -15,7 +15,7 @@ import pytest
 
 
 class TestCreativeIntent:
-    def test_all_14_intents_present(self):
+    def test_all_intents_present(self):
         from skyyrose.elite_studio.creative.state import CreativeIntent
 
         intents = {e.value for e in CreativeIntent}
@@ -34,6 +34,7 @@ class TestCreativeIntent:
             "tech-pack",
             "moodboard",
             "colorway-explore",
+            "tripo-generate",
         }
         assert intents == expected
 

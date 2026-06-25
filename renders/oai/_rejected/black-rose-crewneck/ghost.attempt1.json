@@ -1,0 +1,12 @@
+{
+  "sku": "br-001",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The rendered garment shows an incorrect logo design compared to the specifications, particularly the colorway and dimensionality of the logo. The placement and style do not match the required embossed detail."
+}

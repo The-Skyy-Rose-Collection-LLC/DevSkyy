@@ -211,7 +211,7 @@
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: var(--col-accent, var(--color-rose-gold, #B76E79));
+	background: var(--skyyrose-accent);
 	transform: translateX(-101%);
 	transition: transform 0.5s var(--ease-cinematic);
 	z-index: -1;
@@ -248,13 +248,13 @@
 }
 .btn-border-draw:hover::before {
 	width: 100%; height: 100%;
-	border-top-color: var(--col-accent, var(--color-rose-gold));
-	border-left-color: var(--col-accent, var(--color-rose-gold));
+	border-top-color: var(--skyyrose-accent);
+	border-left-color: var(--skyyrose-accent);
 }
 .btn-border-draw:hover::after {
 	width: 100%; height: 100%;
-	border-bottom-color: var(--col-accent, var(--color-rose-gold));
-	border-right-color: var(--col-accent, var(--color-rose-gold));
+	border-bottom-color: var(--skyyrose-accent);
+	border-right-color: var(--skyyrose-accent);
 }
 
 /* Scale press feedback (ui-ux-pro-max §7 scale-feedback) */
@@ -323,7 +323,7 @@
 	inset: 0;
 	background: radial-gradient(
 		600px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-		rgba(var(--col-accent-rgb, 183, 110, 121), 0.06) 0%,
+		rgba(var(--skyyrose-accent-rgb), 0.06) 0%,
 		transparent 60%
 	);
 	pointer-events: none;
@@ -370,13 +370,58 @@
 }
 
 @keyframes pulseGlow {
-	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--col-accent-rgb, 183, 110, 121), 0.4); }
-	50% { box-shadow: 0 0 20px 5px rgba(var(--col-accent-rgb, 183, 110, 121), 0.12); }
+	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--skyyrose-accent-rgb), 0.4); }
+	50% { box-shadow: 0 0 20px 5px rgba(var(--skyyrose-accent-rgb), 0.12); }
 }
 
 @keyframes lineReveal {
 	from { width: 0; }
 	to { width: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   12.5 SAFETY NET — Force-show reveal elements after 0.8s
+   IntersectionObserver can miss elements that scroll past fast, are
+   inside transformed parents, or appear after a layout shift. This
+   safety animation snaps the final state at 0.8s so content stays
+   legible even when the observer doesn't fire. If `.is-visible`
+   activates first, the existing transition handles the entrance
+   normally — this animation only matters as a fallback.
+   Was 2.5s — reduced 2026-05-24 (S650) to close the stutter window
+   for reduced-motion users, in-app browsers, and slow JS engines.
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes srRevealSafety {
+	to {
+		opacity: 1;
+		filter: none;
+		transform: none;
+		clip-path: none;
+	}
+}
+.rv-clip-up, .rv-clip-left, .rv-clip-right, .rv-clip-diagonal,
+.rv-blur, .rv-blur-down,
+.stagger-grid > *,
+.col-reveal, .lp-rv, .rv {
+	animation: srRevealSafety 0.01s linear 0.8s forwards;
+}
+.rv-split-char .sr-char,
+.rv-split-word .sr-word,
+.rv-split-line .sr-line {
+	animation: srRevealSafety 0.01s linear 0.8s forwards;
+}
+/* Cancel safety net once IO confirms visibility — prevents 2.5s stutter
+   when observer fires near the safety timeout (animation snap vs.
+   transition fight). `.is-visible` already drives the entrance, so the
+   fallback animation is redundant and must release. */
+.rv-clip-up.is-visible, .rv-clip-left.is-visible,
+.rv-clip-right.is-visible, .rv-clip-diagonal.is-visible,
+.rv-blur.is-visible, .rv-blur-down.is-visible,
+.stagger-grid.is-visible > *,
+.col-reveal.is-visible, .lp-rv.is-visible, .rv.is-visible,
+.rv-split-char.is-visible .sr-char,
+.rv-split-word.is-visible .sr-word,
+.rv-split-line.is-visible .sr-line {
+	animation: none !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -390,7 +435,8 @@
 	.stagger-grid > *,
 	.rv-split-char .sr-char,
 	.rv-split-word .sr-word,
-	.rv-split-line .sr-line {
+	.rv-split-line .sr-line,
+	.rv {
 		opacity: 1 !important;
 		transform: none !important;
 		filter: none !important;
@@ -406,4 +452,24 @@
 	.parallax-slow, .parallax-medium, .parallax-fast, .parallax-ken-burns { transform: none !important; }
 	[data-scroll-fade] > * { transform: none !important; opacity: 1 !important; }
 	.page-enter, .page-exit { animation: none; opacity: 1; transform: none; }
+	.rv-scroll-bloom { animation: none !important; opacity: 1; transform: none; filter: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   14. SCROLL-TIMELINE BLOOM (v1.5.4, F3)
+   Couples a reveal animation to scroll position via animation-timeline:
+   view() — modern Chromium/Firefox 2026 baseline. In browsers without
+   support, the @supports gate hides the rule and the element renders
+   normally (opacity:1, no transform). Reduced-motion handled above.
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes srScrollBloom {
+	from { opacity: 0; filter: blur(12px); transform: scale(0.96); }
+	to   { opacity: 1; filter: blur(0);    transform: scale(1);    }
+}
+@supports (animation-timeline: view()) {
+	.rv-scroll-bloom {
+		animation: srScrollBloom auto linear;
+		animation-timeline: view();
+		animation-range: entry 0% cover 35%;
+	}
 }

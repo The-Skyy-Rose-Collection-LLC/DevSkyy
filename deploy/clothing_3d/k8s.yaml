@@ -1,0 +1,190 @@
+# Clothing 3D pipeline — Kubernetes manifests.
+#
+# Apply:
+#   kubectl apply -f deploy/clothing_3d/k8s.yaml
+#
+# Configures three resources:
+#   1. ConfigMap   — non-secret env knobs (backend, quality, dirs).
+#   2. Deployment  — clothing-3d-worker, scaled by HPA.
+#   3. HPA         — autoscales on queue_depth (custom metric) + CPU.
+#
+# Secrets (REPLICATE_API_TOKEN, HUGGINGFACE_TOKEN, REDIS_URL) MUST already
+# exist as `clothing-3d-secrets` in the namespace.
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clothing-3d-config
+  labels:
+    app: clothing-3d
+data:
+  TRELLIS_BACKEND: "hf_space"
+  TRELLIS_QUALITY: "standard"
+  TRELLIS_EXPORT_USDZ: "true"
+  THREE_D_OUTPUT_DIR: "/var/data/3d-models-generated"
+  TRELLIS_CACHE_DIR: "/var/cache/trellis"
+  CLOTHING_3D_CONCURRENCY: "2"
+  CLOTHING_3D_QUEUE: "redis"
+  CLOTHING_3D_JOB_STORE: "redis"
+  LOG_LEVEL: "INFO"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clothing-3d-worker
+  labels:
+    app: clothing-3d
+    component: worker
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: clothing-3d
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: clothing-3d
+        component: worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/v1/clothing-3d/metrics"
+    spec:
+      terminationGracePeriodSeconds: 60  # let in-flight jobs drain
+      containers:
+        - name: worker
+          image: devskyy/clothing-3d-worker:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: clothing-3d-config
+            - secretRef:
+                name: clothing-3d-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          volumeMounts:
+            - name: artifacts
+              mountPath: /var/data/3d-models-generated
+            - name: cache
+              mountPath: /var/cache/trellis
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -m
+                - pipelines.clothing_3d.cli
+                - health
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - |
+                  import asyncio
+                  from pipelines.clothing_3d.queue import build_queue
+                  asyncio.run(build_queue().depth())
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: artifacts
+          persistentVolumeClaim:
+            claimName: clothing-3d-artifacts
+        - name: cache
+          emptyDir: {}
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: clothing-3d-worker
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: clothing-3d-worker
+  minReplicas: 2
+  maxReplicas: 12
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # don't thrash; allow soak time
+      policies:
+        - type: Percent
+          value: 25
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 30   # respond fast to burst load
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 4
+          periodSeconds: 30
+        - type: Pods   # pick the faster of the two
+          value: 4
+          periodSeconds: 30
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Pods
+      pods:
+        metric:
+          name: clothing_3d_queue_depth_per_pod  # exposed via Prometheus adapter
+        target:
+          type: AverageValue
+          averageValue: "5"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clothing-3d-artifacts
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  # storageClassName intentionally omitted — pick per-cluster.
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clothing-3d-api
+  labels:
+    app: clothing-3d
+    component: api
+spec:
+  selector:
+    app: clothing-3d
+    component: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+    - name: metrics
+      port: 9090
+      targetPort: 8000

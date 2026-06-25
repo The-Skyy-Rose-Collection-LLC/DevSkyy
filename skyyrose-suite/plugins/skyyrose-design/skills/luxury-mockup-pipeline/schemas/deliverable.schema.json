@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "luxury-mockup-pipeline/deliverable.schema.json",
+  "title": "Agent Deliverable Contract",
+  "description": "Machine-checkable shape for every agent's deliverable. The orchestrator validates against this before the deliverable enters Stage 2 synthesis. Sub-schema deliverables get rejected.",
+  "type": "object",
+  "required": ["agent", "deliverable_path", "saas_gate", "sections", "roi_upgrade", "return_summary"],
+  "properties": {
+    "agent": {
+      "type": "string",
+      "enum": ["UX Architect", "UI Designer", "Brand Guardian", "Frontend Developer", "Senior Developer"]
+    },
+    "deliverable_path": {
+      "type": "string",
+      "description": "Absolute path to the deliverable markdown / html / json file"
+    },
+    "saas_gate": {
+      "type": "object",
+      "required": ["mobile_verified", "images_optimized", "sales_presentation_grade", "accessibility_verified", "performance_verified", "self_contained_reading", "conversion_ready_ctas"],
+      "properties": {
+        "mobile_verified": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "viewports_tested": {"type": "array", "items": {"type": "integer"}},
+            "horizontal_scroll_any_breakpoint": {"type": "boolean"},
+            "touch_targets_min_44px": {"type": "boolean"},
+            "type_clamps": {"type": "boolean"}
+          },
+          "required": ["passed"]
+        },
+        "images_optimized": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "avif_coverage_percent": {"type": "number"},
+            "webp_coverage_percent": {"type": "number"},
+            "fallback_coverage_percent": {"type": "number"},
+            "variant_coverage_percent": {"type": "number"},
+            "upscale_blur_assets": {"type": "array", "items": {"type": "string"}},
+            "missing_alpha_assets": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["passed"]
+        },
+        "sales_presentation_grade": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "first_200_words_close_sale": {"type": "boolean"},
+            "no_placeholder_text": {"type": "boolean"},
+            "every_claim_cited_file_line": {"type": "boolean"}
+          },
+          "required": ["passed"]
+        },
+        "accessibility_verified": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "wcag_level": {"type": "string", "enum": ["AA", "AAA"]},
+            "prefers_reduced_motion_honored": {"type": "boolean"},
+            "focus_visible_complete": {"type": "boolean"},
+            "color_contrast_body_min_4_5": {"type": "boolean"},
+            "heading_hierarchy_intact": {"type": "boolean"}
+          },
+          "required": ["passed"]
+        },
+        "performance_verified": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "lcp_image_preloaded": {"type": "boolean"},
+            "no_blocking_js": {"type": "boolean"},
+            "critical_css_inlined": {"type": "boolean"},
+            "fonts_preloaded": {"type": "boolean"},
+            "js_bundle_kb_compressed": {"type": "number"},
+            "css_bundle_kb_compressed": {"type": "number"}
+          },
+          "required": ["passed"]
+        },
+        "self_contained_reading": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "new_reader_test": {"type": "boolean"}
+          },
+          "required": ["passed"]
+        },
+        "conversion_ready_ctas": {
+          "type": "object",
+          "properties": {
+            "passed": {"type": "boolean"},
+            "commit_messages_present": {"type": "boolean"},
+            "verification_commands_present": {"type": "boolean"},
+            "ship_it_call_present": {"type": "boolean"}
+          },
+          "required": ["passed"]
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "passed"],
+        "properties": {
+          "name": {"type": "string"},
+          "passed": {"type": "boolean"},
+          "summary": {"type": "string"}
+        }
+      },
+      "description": "One entry per section listed in agent-brief.json deliverables[].sections"
+    },
+    "roi_upgrade": {
+      "type": "object",
+      "required": ["proposed", "name", "category", "implementation_diff_lines", "browser_support", "fallback_strategy", "prefers_reduced_motion_safe"],
+      "properties": {
+        "proposed": {"type": "boolean"},
+        "name": {"type": "string"},
+        "category": {"type": "string"},
+        "implementation_diff_lines": {"type": "integer"},
+        "browser_support": {
+          "type": "object",
+          "properties": {
+            "chrome": {"type": "string"},
+            "safari": {"type": "string"},
+            "firefox": {"type": "string"},
+            "edge": {"type": "string"}
+          }
+        },
+        "fallback_strategy": {"type": "string"},
+        "prefers_reduced_motion_safe": {"type": "boolean"},
+        "single_commit_scope": {"type": "boolean"}
+      }
+    },
+    "return_summary": {
+      "type": "object",
+      "required": ["word_count", "required_fields_present", "format"],
+      "properties": {
+        "word_count": {"type": "integer", "maximum": 280},
+        "required_fields_present": {"type": "boolean"},
+        "format": {"type": "string", "enum": ["json", "markdown"]}
+      }
+    },
+    "deferred_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["item", "reason", "founder_approval_needed"],
+        "properties": {
+          "item": {"type": "string"},
+          "reason": {"type": "string"},
+          "founder_approval_needed": {"type": "boolean"},
+          "exact_command": {"type": "string"}
+        }
+      }
+    },
+    "memory_writes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string"},
+          "agent_scope": {"type": "string", "enum": ["_shared", "ux-architect", "ui-designer", "brand-guardian", "frontend-developer", "senior-developer"]},
+          "fact_summary": {"type": "string"}
+        }
+      },
+      "description": "New memory entries the agent wrote during this dispatch"
+    }
+  }
+}

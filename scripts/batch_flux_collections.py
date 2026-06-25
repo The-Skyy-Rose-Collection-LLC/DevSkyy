@@ -28,7 +28,7 @@ import json
 import logging
 import sys
 import time
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 # skyyrose is not in the editable-install MAPPING — add project root so scripts/

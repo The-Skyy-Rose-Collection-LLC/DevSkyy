@@ -1,0 +1,12 @@
+# Slim MCP HTTP service dependencies (mcp_service.py / Dockerfile.mcp).
+# Intentionally minimal — NO torch/transformers/ML stack. Tool modules whose
+# optional deps are absent skip registration via mcp_tools.tools' resilient
+# loader. Heavy SDKs (openai/anthropic/google-genai) are lazy-imported inside
+# tool handlers, so they are not required to boot or to list tools.
+mcp>=1.23.0
+fastapi>=0.104
+uvicorn[standard]>=0.24
+httpx>=0.25
+pydantic>=2.5
+structlog>=25.5.0
+python-dotenv>=1.0

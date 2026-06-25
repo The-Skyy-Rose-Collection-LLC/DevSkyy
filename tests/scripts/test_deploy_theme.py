@@ -42,6 +42,13 @@ def fake_env(tmp_path):
 def run_script(*args, env_overrides=None):
     """Run deploy-theme.sh with given arguments."""
     env = os.environ.copy()
+    # Isolate from real deploys: the script's concurrency lock and log default
+    # to shared /tmp paths, so an in-flight production deploy fails these tests
+    # ("Another deploy is already running") and test runs pollute /tmp with
+    # skyyrose-deploy-*.log files.
+    pid = os.getpid()
+    env.setdefault("DEPLOY_LOCK_FILE", f"/tmp/skyyrose-deploy-test-{pid}.lock")
+    env.setdefault("DEPLOY_LOG_FILE", f"/tmp/skyyrose-deploy-test-{pid}.log")
     if env_overrides:
         env.update(env_overrides)
     result = subprocess.run(

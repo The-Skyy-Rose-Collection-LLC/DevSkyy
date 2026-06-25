@@ -26,6 +26,11 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, ConfigDict, Field
 
+from orchestration.embedding_engine import (
+    BaseEmbeddingEngine,
+    EmbeddingConfig,
+    create_embedding_engine,
+)
 from orchestration.query_rewriter import (
     AdvancedQueryRewriter,
     QueryRewriterConfig,
@@ -178,6 +183,7 @@ class RAGContextManager:
         config: RAGContextConfig | None = None,
         query_rewriter: AdvancedQueryRewriter | None = None,
         reranker: BaseReranker | None = None,
+        embedder: BaseEmbeddingEngine | None = None,
     ):
         """
         Initialize RAG context manager.
@@ -187,11 +193,16 @@ class RAGContextManager:
             config: RAG context configuration
             query_rewriter: Optional query rewriter instance
             reranker: Optional reranker instance
+            embedder: STRONGLY RECOMMENDED. The embedding engine used to embed
+                queries — must match the engine that built the index, otherwise
+                you get dimension mismatches at query time. Falls back to a
+                local 384-dim SentenceTransformer with a warning if omitted.
         """
         self.vector_store = vector_store
         self.config = config or RAGContextConfig()
         self.query_rewriter = query_rewriter
         self.reranker = reranker
+        self.embedder = embedder
 
         # Cache for context (in-memory)
         self._cache: dict[str, RAGContext] = {}
@@ -287,6 +298,7 @@ class RAGContextManager:
         query: str,
         filter_metadata: dict[str, Any] | None = None,
         correlation_id: str | None = None,
+        namespace: str | None = None,
     ) -> RAGContext:
         """
         Retrieve RAG context for a query.
@@ -303,6 +315,8 @@ class RAGContextManager:
             query: User query
             filter_metadata: Optional metadata filters for vector search
             correlation_id: Optional correlation ID for logging
+            namespace: Optional namespace partition (e.g. "catalog",
+                "brand", "memory:agent:foo"). Passed through to vector_store.
 
         Returns:
             RAGContext with retrieved documents
@@ -350,10 +364,11 @@ class RAGContextManager:
         all_results: list[SearchResult] = []
         for q in queries_to_search:
             try:
-                # Get embedding for query (assuming vector_store has embedding model)
-                # For now, we'll need to get embeddings externally
-                # This is a placeholder - actual implementation depends on vector store setup
-                results = await self._search_with_embedding(q, filter_metadata, correlation_id)
+                # Embed query via the configured engine and search the vector store
+                # within the optional namespace partition.
+                results = await self._search_with_embedding(
+                    q, filter_metadata, correlation_id, namespace
+                )
                 all_results.extend(results)
             except Exception as e:
                 logger.error(f"[{correlation_id}] Vector search failed for query '{q}': {e}")
@@ -434,33 +449,44 @@ class RAGContextManager:
         query: str,
         filter_metadata: dict[str, Any] | None,
         correlation_id: str,
+        namespace: str | None = None,
     ) -> list[SearchResult]:
-        """
-        Search vector store with query embedding.
+        """Search vector store with query embedding via the configured engine.
 
-        This is a helper that handles embedding generation.
+        Uses the injected BaseEmbeddingEngine (preferred — guarantees the query
+        is embedded with the SAME model used to build the index). Falls back to
+        a local SentenceTransformer only when no embedder was provided, and logs
+        a warning since that path is dimension-fragile and produces 384-dim
+        vectors which fail against any index built with a different model.
         """
         try:
-            # Generate embedding using sentence-transformers (default)
-            from sentence_transformers import SentenceTransformer
+            if self.embedder is not None:
+                query_embedding = await self.embedder.embed_query(query)
+            else:
+                logger.warning(
+                    f"[{correlation_id}] No embedder configured — falling back to "
+                    "local SentenceTransformer('all-MiniLM-L6-v2'). This is "
+                    "dimension-fragile; pass `embedder=` to RAGContextManager."
+                )
+                from sentence_transformers import SentenceTransformer
 
-            # Use same model as ingestion (all-MiniLM-L6-v2)
-            model = SentenceTransformer("all-MiniLM-L6-v2")
-            query_embedding = model.encode(query).tolist()
+                model = SentenceTransformer("all-MiniLM-L6-v2")
+                query_embedding = model.encode(query).tolist()
 
-            # Search vector store
+            # Search vector store with namespace passthrough
             results = await self.vector_store.search(
                 query_embedding=query_embedding,
                 top_k=self.config.top_k,
                 filter_metadata=filter_metadata,
+                namespace=namespace,
             )
 
             return results
 
         except ImportError:
             logger.error(
-                f"[{correlation_id}] sentence-transformers not installed. "
-                "Run: pip install sentence-transformers"
+                f"[{correlation_id}] embedding engine unavailable and "
+                "sentence-transformers fallback not installed."
             )
             return []
         except Exception as e:
@@ -476,6 +502,7 @@ class RAGContextManager:
 async def create_rag_context_manager(
     vector_store_config: VectorStoreConfig | None = None,
     rag_config: RAGContextConfig | None = None,
+    embedding_config: EmbeddingConfig | None = None,
     enable_rewriting: bool = False,
     enable_reranking: bool = False,
 ) -> RAGContextManager:
@@ -485,6 +512,10 @@ async def create_rag_context_manager(
     Args:
         vector_store_config: Vector store configuration
         rag_config: RAG context configuration
+        embedding_config: STRONGLY RECOMMENDED — embedding engine configuration.
+            Wires up the engine used to embed queries. Skipping falls back to a
+            local 384-dim SentenceTransformer that will fail against any index
+            built with a different embedding model.
         enable_rewriting: Enable query rewriting
         enable_reranking: Enable reranking
 
@@ -494,6 +525,16 @@ async def create_rag_context_manager(
     # Create vector store
     vector_store = create_vector_store(vector_store_config)
     await vector_store.initialize()
+
+    # Create embedding engine (recommended — engine MUST match index dimension)
+    embedder: BaseEmbeddingEngine | None = None
+    if embedding_config is not None:
+        try:
+            embedder = create_embedding_engine(embedding_config)
+            await embedder.initialize()
+            logger.info("Embedding engine initialized")
+        except Exception as e:
+            logger.warning(f"Embedding engine initialization failed: {e}")
 
     # Create RAG config
     if rag_config is None:
@@ -535,6 +576,7 @@ async def create_rag_context_manager(
         config=rag_config,
         query_rewriter=query_rewriter,
         reranker=reranker,
+        embedder=embedder,
     )
 
 

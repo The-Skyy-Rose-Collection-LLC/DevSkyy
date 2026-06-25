@@ -1,354 +1,533 @@
 /**
  * Pre-Order Gateway Interactions
  *
- * Rolling 72h countdown, GSAP hero entrance + ScrollTrigger grid reveals,
- * IntersectionObserver scroll-reveal, FAQ accordion, cart summary bar,
- * and smooth-scroll anchor links.
+ * IIFE — no global scope pollution except window.skyyRoseData (WP-injected).
+ * Server-rendered product cards; no client catalog fetch.
+ * No innerHTML — all DOM via createElement + textContent.
  *
  * @package SkyyRose
- * @since   2.0.0
- * @updated 7.0.0 — CRO transformation
+ * @since   7.1.0
  */
-
 (function () {
-	'use strict';
+  'use strict';
 
-	/* --------------------------------------------------
-	   Rolling 72h Countdown
-	   -------------------------------------------------- */
+  /* ──────────────────────────────────────────────
+     UTILITY
+  ────────────────────────────────────────────── */
+  var raf = window.requestAnimationFrame || function (fn) { setTimeout(fn, 16); };
 
-	function initCountdown() {
-		var el = document.querySelector('.po-hero__countdown');
-		if (!el) return;
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
 
-		var mode = (el.dataset.countdown || '72h').trim();
-		var target;
+  function saveDataOn() {
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+      if (conn.saveData) { return true; }
+      if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') { return true; }
+    }
+    return false;
+  }
 
-		if (mode.match(/^\d+h$/)) {
-			// Rolling countdown: always shows X hours from page load.
-			// Uses sessionStorage so the target persists within a visit
-			// but resets each new session (keeps urgency fresh).
-			var hours = parseInt(mode, 10);
-			var key = 'po_countdown_target';
-			var stored = sessionStorage.getItem(key);
+  function byId(id) { return document.getElementById(id); }
+  function qs(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function qsa(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
 
-			if (stored && parseInt(stored, 10) > Date.now()) {
-				target = parseInt(stored, 10);
-			} else {
-				target = Date.now() + hours * 3600000;
-				sessionStorage.setItem(key, String(target));
-			}
-		} else {
-			// Fixed ISO date.
-			target = new Date(mode).getTime();
-		}
+  function makeEl(tag, attrs, text) {
+    var el = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === 'className') { el.className = attrs[k]; }
+        else { el.setAttribute(k, attrs[k]); }
+      });
+    }
+    if (text !== undefined) { el.textContent = text; }
+    return el;
+  }
 
-		var dEl = el.querySelector('[data-cd="d"]');
-		var hEl = el.querySelector('[data-cd="h"]');
-		var mEl = el.querySelector('[data-cd="m"]');
-		var sEl = el.querySelector('[data-cd="s"]');
+  /* ──────────────────────────────────────────────
+     VIDEO — remove if reduced-motion or save-data
+  ────────────────────────────────────────────── */
+  function initVideo() {
+    var video = byId('po-hero-video');
+    if (!video) { return; }
 
-		function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    if (prefersReducedMotion() || saveDataOn()) {
+      var poster = byId('po-hero-poster');
+      if (poster) { poster.style.display = 'block'; }
+      video.parentNode.removeChild(video);
+      return;
+    }
 
-		var intervalId;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('loop', '');
+    video.setAttribute('autoplay', '');
+    video.muted = true;
+    video.play().catch(function () { /* autoplay blocked — poster already showing */ });
+  }
 
-		function tick() {
-			var diff = Math.max(0, target - Date.now());
-			var d = Math.floor(diff / 86400000);
-			var h = Math.floor((diff % 86400000) / 3600000);
-			var m = Math.floor((diff % 3600000) / 60000);
-			var s = Math.floor((diff % 60000) / 1000);
+  /* ──────────────────────────────────────────────
+     HERO ENTRANCE SEQUENCE
+  ────────────────────────────────────────────── */
+  function initHeroSequence() {
+    if (prefersReducedMotion()) {
+      qsa('.po-hero__eyebrow, .po-hero__body').forEach(function (el) {
+        el.classList.add('is-visible');
+      });
+      return;
+    }
 
-			if (dEl) dEl.textContent = pad(d);
-			if (hEl) hEl.textContent = pad(h);
-			if (mEl) mEl.textContent = pad(m);
-			if (sEl) sEl.textContent = pad(s);
+    var delays = [
+      ['po-hero-eyebrow', 80],
+      ['po-hero-lockup',  260],
+      ['po-hero-body',    420],
+      ['po-hero-cta',     580]
+    ];
 
-			if (diff === 0 && intervalId) {
-				clearInterval(intervalId);
-				// Reset for next cycle so it never shows zeros.
-				sessionStorage.removeItem('po_countdown_target');
-			}
-		}
+    delays.forEach(function (pair) {
+      var el = byId(pair[0]);
+      if (!el) { return; }
+      setTimeout(function () { el.classList.add('is-visible'); }, pair[1]);
+    });
+  }
 
-		tick();
-		intervalId = setInterval(tick, 1000);
+  /* ──────────────────────────────────────────────
+     SCROLL CUE (fades out on scroll)
+  ────────────────────────────────────────────── */
+  function initScrollCue() {
+    var cue = qs('.po-hero__scroll-hint');
+    if (!cue) { return; }
 
-		// Pause when tab is hidden to avoid unnecessary work.
-		document.addEventListener('visibilitychange', function () {
-			if (document.hidden) {
-				if (intervalId) { clearInterval(intervalId); intervalId = null; }
-			} else {
-				tick();
-				if (!intervalId) { intervalId = setInterval(tick, 1000); }
-			}
-		});
-	}
+    var ticking = false;
+    function onScroll() {
+      if (ticking) { return; }
+      ticking = true;
+      raf(function () {
+        var opacity = Math.max(0, 1 - window.scrollY / 180);
+        cue.style.opacity = String(opacity);
+        ticking = false;
+        if (opacity === 0) {
+          window.removeEventListener('scroll', onScroll);
+          cue.style.visibility = 'hidden';
+        }
+      });
+    }
 
-	/* --------------------------------------------------
-	   GSAP Hero Entrance Animations
-	   -------------------------------------------------- */
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
 
-	function initHeroAnimations() {
-		if (typeof gsap === 'undefined') return;
+  /* ──────────────────────────────────────────────
+     PARALLAX — manifesto bg only
+  ────────────────────────────────────────────── */
+  function initParallax() {
+    if (prefersReducedMotion()) { return; }
 
-		gsap.from('.po-hero__badge', {
-			opacity: 0, y: 20, duration: 0.8, delay: 0.2, ease: 'power3.out'
-		});
-		gsap.from('.po-hero__title', {
-			opacity: 0, y: 30, duration: 1, delay: 0.4, ease: 'power3.out'
-		});
-		gsap.from('.po-hero__tagline', {
-			opacity: 0, y: 20, duration: 0.8, delay: 0.7, ease: 'power3.out'
-		});
-		gsap.from('.po-hero__countdown', {
-			opacity: 0, y: 20, duration: 0.8, delay: 0.9, ease: 'power3.out'
-		});
-		gsap.from('.po-hero__ctas', {
-			opacity: 0, y: 20, duration: 0.8, delay: 1.1, ease: 'power3.out'
-		});
-	}
+    var bg = qs('.po-manifesto__bg');
+    if (!bg) { return; }
 
-	/* --------------------------------------------------
-	   GSAP ScrollTrigger — Collection Grid Reveals
-	   -------------------------------------------------- */
+    var ticking = false;
+    function onScroll() {
+      if (ticking) { return; }
+      ticking = true;
+      raf(function () {
+        var rect = bg.closest('.po-manifesto').getBoundingClientRect();
+        var progress = -rect.top / window.innerHeight;
+        bg.style.transform = 'translateY(' + (progress * 30).toFixed(2) + 'px)';
+        ticking = false;
+      });
+    }
 
-	function initGridReveals() {
-		if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
 
-		gsap.registerPlugin(ScrollTrigger);
+  /* ──────────────────────────────────────────────
+     MARQUEE — clone track for seamless loop
+  ────────────────────────────────────────────── */
+  function initMarquee() {
+    var track = qs('.po-marquee__track');
+    if (!track) { return; }
+    if (prefersReducedMotion()) { return; }
 
-		var sections = document.querySelectorAll('.po-collection');
-		sections.forEach(function (section) {
-			var cards = section.querySelectorAll('.holo');
-			if (cards.length === 0) return;
+    var clone = track.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    track.parentNode.appendChild(clone);
+  }
 
-			// Set initial state.
-			gsap.set(cards, { opacity: 0, y: 40 });
+  /* ──────────────────────────────────────────────
+     GATEWAY — collection switching
+     Shows/hides server-rendered .po-grid[data-collection]
+     and sets data-collection on <body> for CSS palette morphing.
+  ────────────────────────────────────────────── */
+  function initGateway() {
+    var panels = qsa('[data-gateway-panel]');
+    if (!panels.length) {
+      /* fallback: use .po-panel buttons */
+      panels = qsa('.po-panel[data-collection]');
+    }
 
-			ScrollTrigger.create({
-				trigger: section,
-				start: 'top 80%',
-				once: true,
-				onEnter: function () {
-					gsap.to(cards, {
-						opacity: 1, y: 0,
-						duration: 0.7, stagger: 0.08,
-						ease: 'power3.out',
-						onComplete: function () {
-							// Remove inline styles so CSS hover effects work normally.
-							cards.forEach(function (card) {
-								card.style.opacity = '';
-								card.style.transform = '';
-								card.classList.add('holo--visible');
-							});
-						}
-					});
-				}
-			});
-		});
-	}
+    if (!panels.length) {
+      /* last-resort fallback: grids exist but no panel buttons — activate first grid directly */
+      var grids = qsa('.po-grid[data-collection]');
+      if (grids.length) {
+        var firstCol = grids[0].getAttribute('data-collection');
+        if (firstCol) { document.body.setAttribute('data-collection', firstCol); }
+        grids[0].classList.add('is-active');
+      }
+      return;
+    }
 
-	/* --------------------------------------------------
-	   IntersectionObserver Scroll Reveal (.po-rv)
-	   -------------------------------------------------- */
+    /* activate first collection on load */
+    var first = panels[0];
+    var firstCollection = first.getAttribute('data-collection') ||
+                          first.getAttribute('data-gateway-panel');
+    if (firstCollection) {
+      switchCollection(firstCollection);
+    }
 
-	function initScrollReveal() {
-		// Handle both po-rv (preorder sections) and lp-rv (FAQ template part).
-		var elements = document.querySelectorAll('.po-rv, .preorder-gateway .lp-rv');
-		if (elements.length === 0) return;
+    panels.forEach(function (panel) {
+      panel.addEventListener('click', function () {
+        var col = panel.getAttribute('data-collection') ||
+                  panel.getAttribute('data-gateway-panel');
+        if (col) { switchCollection(col); }
+      });
+    });
 
-		// Skip if prefers-reduced-motion.
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-			elements.forEach(function (el) {
-				el.classList.add('po-rv--visible');
-				el.classList.add('lp-rv--visible');
-			});
-			return;
-		}
+    /* tab buttons (.po-products__tabs buttons with data-collection) */
+    var tabBtns = qsa('.po-products__tabs [data-collection]');
+    tabBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var col = btn.getAttribute('data-collection');
+        if (col) { switchCollection(col); }
+      });
+    });
+  }
 
-		var observer = new IntersectionObserver(function (entries) {
-			entries.forEach(function (entry) {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('po-rv--visible');
-					entry.target.classList.add('lp-rv--visible');
-					observer.unobserve(entry.target);
-				}
-			});
-		}, { threshold: 0.15 });
+  function switchCollection(col) {
+    /* palette morph */
+    document.body.setAttribute('data-collection', col);
 
-		elements.forEach(function (el) { observer.observe(el); });
-	}
+    /* show/hide server-rendered grids */
+    var grids = qsa('.po-grid[data-collection]');
+    grids.forEach(function (g) {
+      if (g.getAttribute('data-collection') === col) {
+        g.classList.add('is-active');
+      } else {
+        g.classList.remove('is-active');
+      }
+    });
 
-	/* --------------------------------------------------
-	   FAQ Accordion (for landing/faq.php template part)
-	   -------------------------------------------------- */
+    /* update panel pressed state */
+    var panels = qsa('[data-gateway-panel], .po-panel[data-collection]');
+    panels.forEach(function (p) {
+      var pCol = p.getAttribute('data-collection') || p.getAttribute('data-gateway-panel');
+      p.setAttribute('aria-pressed', pCol === col ? 'true' : 'false');
+    });
 
-	function initFaqAccordion() {
-		var questions = document.querySelectorAll('.lp-faq__question');
-		if (questions.length === 0) return;
+    /* update tab active state */
+    var tabBtns = qsa('.po-products__tabs [data-collection]');
+    tabBtns.forEach(function (btn) {
+      if (btn.getAttribute('data-collection') === col) {
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+      } else {
+        btn.classList.remove('is-active');
+        btn.setAttribute('aria-selected', 'false');
+      }
+    });
 
-		questions.forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				var expanded = btn.getAttribute('aria-expanded') === 'true';
-				var answerId = btn.getAttribute('aria-controls');
-				var answer = answerId ? document.getElementById(answerId) : null;
+    /* update capsule title if present */
+    var title = byId('po-capsule-title');
+    if (title) {
+      var labels = {
+        'black-rose': 'Black Rose',
+        'love-hurts': 'Love Hurts',
+        'signature':  'Signature'
+      };
+      title.textContent = labels[col] || col;
+    }
+  }
 
-				// Close all others first (accordion behavior).
-				questions.forEach(function (other) {
-					if (other !== btn) {
-						other.setAttribute('aria-expanded', 'false');
-						var otherId = other.getAttribute('aria-controls');
-						var otherAnswer = otherId ? document.getElementById(otherId) : null;
-						if (otherAnswer) otherAnswer.style.maxHeight = '0';
-					}
-				});
+  /* ──────────────────────────────────────────────
+     JOURNEY STEPS — IntersectionObserver
+  ────────────────────────────────────────────── */
+  function initJourneyObserver() {
+    var steps = qsa('.po-journey__step');
+    var header = qs('.po-journey__header');
+    var items = header ? [header].concat(steps) : steps;
+    if (!items.length) { return; }
 
-				// Toggle this one.
-				btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-				if (answer) {
-					if (expanded) {
-						answer.style.maxHeight = '0';
-					} else {
-						answer.style.maxHeight = answer.scrollHeight + 'px';
-					}
-				}
-			});
-		});
-	}
+    if (prefersReducedMotion()) {
+      items.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
 
-	/* --------------------------------------------------
-	   Cart Summary Bar
-	   -------------------------------------------------- */
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-	function initCartSummaryBar() {
-		var bar = document.getElementById('cart-summary');
-		if (!bar) return;
+    items.forEach(function (el) { observer.observe(el); });
+  }
 
-		var countEl = document.getElementById('cart-summary-count');
+  /* ──────────────────────────────────────────────
+     LOOKBOOK — IntersectionObserver
+  ────────────────────────────────────────────── */
+  function initLookbookObserver() {
+    var figs = qsa('.po-lookbook__figure');
+    if (!figs.length) { return; }
 
-		function update() {
-			// Check WooCommerce cart count from nav badge.
-			var navCount = document.querySelector('.nav-cart-count, .cart-contents .count');
-			var count = navCount ? parseInt(navCount.textContent, 10) || 0 : 0;
+    if (prefersReducedMotion()) {
+      figs.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
 
-			if (count > 0) {
-				bar.classList.add('po-cart-summary--visible');
-				if (countEl) {
-					var word = count === 1 ? 'item' : 'items';
-					countEl.textContent = count + ' ' + word;
-				}
-			} else {
-				bar.classList.remove('po-cart-summary--visible');
-			}
-		}
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
 
-		// Listen for WooCommerce AJAX cart updates.
-		if (typeof jQuery !== 'undefined') {
-			jQuery(document.body).on(
-				'added_to_cart removed_from_cart wc_fragments_refreshed',
-				update
-			);
-		}
+    figs.forEach(function (el, i) {
+      el.style.transitionDelay = (i * 60) + 'ms';
+      observer.observe(el);
+    });
+  }
 
-		update();
-	}
+  /* ──────────────────────────────────────────────
+     GENERIC REVEAL — .po-rv
+  ────────────────────────────────────────────── */
+  function initRevealObserver() {
+    var els = qsa('.po-rv, .po-gateway__header, .po-manifesto__content');
+    if (!els.length) { return; }
 
-	/* --------------------------------------------------
-	   Smooth Scroll for Anchor Links
-	   -------------------------------------------------- */
+    if (prefersReducedMotion()) {
+      els.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
 
-	function initSmoothScroll() {
-		var links = document.querySelectorAll('.po-btn[href^="#"], .po-hero__scroll');
-		links.forEach(function (link) {
-			link.addEventListener('click', function (e) {
-				var href = link.getAttribute('href');
-				if (!href || href.charAt(0) !== '#') return;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-				var target = document.getElementById(href.substring(1));
-				if (!target) return;
+    els.forEach(function (el) { observer.observe(el); });
+  }
 
-				e.preventDefault();
-				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			});
-		});
-	}
+  /* ──────────────────────────────────────────────
+     STICKY CART BAR
+     Shows after hero scrolls out of view.
+     Reads WC cart fragment data if available.
+  ────────────────────────────────────────────── */
+  function initCartBar() {
+    var bar = qs('.po-cart-bar');
+    var hero = qs('.po-hero');
+    if (!bar || !hero) { return; }
 
-	/* --------------------------------------------------
-	   Email CTA Form
-	   -------------------------------------------------- */
+    var sentinel = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          bar.classList.add('is-visible');
+        } else {
+          bar.classList.remove('is-visible');
+        }
+      });
+    }, { threshold: 0 });
 
-	function initEmailForm() {
-		var form = document.querySelector('.po-cta__form');
-		if (!form) return;
+    sentinel.observe(hero);
 
-		form.addEventListener('submit', function (e) {
-			e.preventDefault();
+    /* update count/total from WC cart cookie if available */
+    updateCartBarData();
 
-			var submitBtn = form.querySelector('.po-cta__submit');
-			var emailInput = form.querySelector('.po-cta__input');
-			if (!emailInput || !emailInput.value) return;
+    /* listen for WC cart_fragment_refresh event */
+    document.body.addEventListener('wc_fragments_refreshed', function () {
+      updateCartBarData();
+    });
+    document.body.addEventListener('wc_cart_button_updated', function () {
+      updateCartBarData();
+    });
+  }
 
-			if (submitBtn) {
-				submitBtn.textContent = 'Joining...';
-				submitBtn.disabled = true;
-			}
+  function updateCartBarData() {
+    var countEl = qs('.po-cart-count');
+    var totalEl = qs('.po-cart-total');
 
-			var ajaxUrl = window.skyyRoseData && window.skyyRoseData.ajaxUrl;
-			if (!ajaxUrl) {
-				// No AJAX endpoint — show success anyway (email captured client-side).
-				if (submitBtn) submitBtn.textContent = 'Welcome!';
-				return;
-			}
+    /* Try to read cart count from WC fragment DOM (most reliable client-side source).
+       woocommerce_items_in_cart cookie is a presence flag (0 or 1), not a count — do not use it. */
+    var countFromFragment = null;
+    var countNode = document.querySelector('.cart-contents-count, .woocommerce-cart-count');
+    if (countNode) {
+      var parsed = parseInt(countNode.textContent, 10);
+      if (!isNaN(parsed)) { countFromFragment = parsed; }
+    }
 
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', ajaxUrl, true);
-			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    if (countEl) {
+      if (countFromFragment !== null) {
+        countEl.textContent = String(countFromFragment);
+        countEl.removeAttribute('hidden');
+      } else {
+        /* count unavailable — hide badge rather than show wrong number */
+        countEl.setAttribute('hidden', '');
+      }
+    }
 
-			xhr.onload = function () {
-				try {
-					var resp = JSON.parse(xhr.responseText);
-					if (resp && resp.success) {
-						if (submitBtn) submitBtn.textContent = 'Welcome to the Inner Circle!';
-					} else {
-						if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
-					}
-				} catch (err) {
-					if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
-				}
-			};
+    /* cart total is harder to get client-side without an AJAX call;
+       leave as rendered by PHP unless WC fires the fragment event with data */
+  }
 
-			xhr.onerror = function () {
-				if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
-			};
+  /* ──────────────────────────────────────────────
+     FAQ ACCORDION
+  ────────────────────────────────────────────── */
+  function initAccordions() {
+    var btns = qsa('.po-accordion-btn');
+    if (!btns.length) { return; }
 
-			var nonce = form.querySelector('[name="po_nonce"]');
-			var params = 'action=skyyrose_newsletter_signup'
-				+ '&email=' + encodeURIComponent(emailInput.value)
-				+ '&nonce=' + encodeURIComponent(nonce ? nonce.value : '');
-			xhr.send(params);
-		});
-	}
+    btns.forEach(function (btn) {
+      var panelId = btn.getAttribute('aria-controls');
+      var accordionEl = btn.closest('.po-accordion');
+      var panel = panelId ? byId(panelId) : (accordionEl ? accordionEl.querySelector('.po-accordion-panel') : null);
+      if (!panel) { return; }
 
-	/* --------------------------------------------------
-	   Init
-	   -------------------------------------------------- */
+      /* ensure proper initial aria state */
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      panel.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+      if (!expanded) { panel.classList.remove('is-open'); }
+      else           { panel.classList.add('is-open'); }
 
-	function init() {
-		initCountdown();
-		initHeroAnimations();
-		initGridReveals();
-		initScrollReveal();
-		initFaqAccordion();
-		initCartSummaryBar();
-		initSmoothScroll();
-		initEmailForm();
-	}
+      btn.addEventListener('click', function () {
+        var isOpen = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        panel.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
+        if (isOpen) { panel.classList.remove('is-open'); }
+        else        { panel.classList.add('is-open'); }
+      });
+    });
+  }
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', init);
-	} else {
-		init();
-	}
-})();
+  /* ──────────────────────────────────────────────
+     EMAIL CAPTURE — WP AJAX newsletter signup
+  ────────────────────────────────────────────── */
+  function initEmailCapture() {
+    var form = byId('po-email-form');
+    if (!form) { return; }
+
+    var statusEl = byId('po-email-status') || qs('.po-email-status', form.parentNode);
+    var ajaxUrl = (window.skyyRoseData && window.skyyRoseData.ajaxUrl) ||
+                  (window.ajaxurl) || '/wp-admin/admin-ajax.php';
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var inputEl = form.querySelector('.po-email-input, .po-email-form__input, [type="email"]');
+      if (!inputEl) { return; }
+      var email = inputEl.value.trim();
+      if (!email) { return; }
+
+      var submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; }
+
+      var data = new FormData();
+      data.append('action', 'skyyrose_newsletter_signup');
+      data.append('email', email);
+      var nonce = form.querySelector('[name="nonce"]') || byId('po-email-nonce');
+      if (nonce) { data.append('nonce', nonce.value || nonce.getAttribute('data-nonce') || ''); }
+
+      fetch(ajaxUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (statusEl) {
+            statusEl.textContent = res.data && res.data.message
+              ? res.data.message
+              : (res.success ? 'You\'re in.' : 'Something went wrong — try again.');
+          }
+          if (res.success) { form.reset(); }
+        })
+        .catch(function () {
+          if (statusEl) { statusEl.textContent = 'Network error — please try again.'; }
+        })
+        .finally(function () {
+          if (submitBtn) { submitBtn.disabled = false; }
+        });
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     MAGNETIC CTA
+     rAF-throttled mousemove on .po-btn[data-magnetic]
+  ────────────────────────────────────────────── */
+  function initMagneticCTA() {
+    if (prefersReducedMotion()) { return; }
+
+    var magnets = qsa('.po-btn[data-magnetic], .po-btn--reserve[data-magnetic]');
+    if (!magnets.length) { return; }
+
+    magnets.forEach(function (btn) {
+      var rect;
+      var pending = false;
+      var mx = 0, my = 0;
+
+      btn.addEventListener('mouseenter', function () {
+        rect = btn.getBoundingClientRect();
+      });
+
+      btn.addEventListener('mousemove', function (e) {
+        mx = e.clientX;
+        my = e.clientY;
+        if (!pending) {
+          pending = true;
+          raf(function () {
+            pending = false;
+            if (!rect) { return; }
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top  + rect.height / 2;
+            var dx = (mx - cx) * 0.28;
+            var dy = (my - cy) * 0.28;
+            btn.style.transform = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px)';
+          });
+        }
+      });
+
+      btn.addEventListener('mouseleave', function () {
+        rect = null;
+        btn.style.transform = '';
+      });
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     INIT
+  ────────────────────────────────────────────── */
+  function init() {
+    initVideo();
+    initHeroSequence();
+    initScrollCue();
+    initParallax();
+    initMarquee();
+    initGateway();
+    initJourneyObserver();
+    initLookbookObserver();
+    initRevealObserver();
+    initCartBar();
+    initAccordions();
+    initEmailCapture();
+    initMagneticCTA();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+}());

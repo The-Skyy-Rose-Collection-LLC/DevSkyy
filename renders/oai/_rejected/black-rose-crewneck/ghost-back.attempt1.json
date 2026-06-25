@@ -1,0 +1,13 @@
+{
+  "sku": "br-001",
+  "style": "ghost",
+  "view": "back",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "wrong_view",
+    "branding_drift"
+  ],
+  "reason": "The branding on the garment shows 'BR' instead of the specified 'SR' monogram in gold-tone thread at the back neck, which fails the branding gate. Additionally, the view is incorrect as it is not a true back facing; the layout suggests it is more of a mirrored front."
+}

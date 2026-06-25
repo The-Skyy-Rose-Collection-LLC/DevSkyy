@@ -24,25 +24,26 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Black Rose ─────────────────────────────────────────── */
 		'black-rose'   => array(
 			'hero_badge'          => __( 'The Original Collection', 'skyyrose' ),
-			'hero_logo'           => '/branding/black-rose-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/black-rose-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The Black Rose Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,
-			'hero_bg'             => '/branding/sr-collection-black-rose.webp',
+			'hero_bg'             => '/branding/hero/forbidden-midnight-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/forbidden-midnight',
 			'hero_bg_alt'         => __( 'Black Rose Collection — rose from concrete', 'skyyrose' ),
 			'hero_tagline'        => __( 'The beauty of the color black through the rose and high-end fashion design.', 'skyyrose' ),
-			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Masculine elegance distilled into every fiber. Every man would wear a black rose.', 'skyyrose' ),
+			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Elegance distilled into every fiber. You don\'t wear it to stand out. You wear it because you already stood up.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Discover', 'skyyrose' ),
 			'hero_3d_label'       => __( 'View 3D Experience', 'skyyrose' ),
 			'experience_url'      => '/experience-black-rose/',
 			'marquee'             => array(
 				__( 'Dark Elegance', 'skyyrose' ),
-				__( 'Masculine Power', 'skyyrose' ),
+				__( 'Quiet Authority', 'skyyrose' ),
 			),
 			'marquee_icon'        => '&#x25C6;',
 			'story_label'         => __( 'From the Concrete', 'skyyrose' ),
 			'story_title'         => __( 'Born from a Single Question', 'skyyrose' ),
-			'story_text_1'        => __( 'Someone asked what SkyyRose made for men. The answer came before the question finished: every man would wear a black rose. Not a flower — a conviction. In Oakland, where concrete is the only soil that matters, beauty doesn\'t ask for permission. It forces its way through the cracks.', 'skyyrose' ),
+			'story_text_1'        => __( 'Someone asked who Black Rose was for. The answer came before the question finished: a black rose is a posture. Not a flower — a conviction. In Oakland, where concrete is the only soil that matters, beauty doesn\'t ask for permission. It forces its way through the cracks.', 'skyyrose' ),
 			'story_quote'         => __( '"They said luxury can\'t come from the Town. We said watch. Every piece in Black Rose is the concrete answering back."', 'skyyrose' ),
 			'story_text_2'        => __( 'Black Rose is what happens when you stop apologizing for where you\'re from. Monochrome because silence speaks louder. Dark-on-dark because depth is earned, not given. These aren\'t clothes that announce themselves — they command presence the way Oakland taught us. Quiet. Unshakable.', 'skyyrose' ),
 			'story_visual_text'   => __( 'BLACK ROSE', 'skyyrose' ),
@@ -73,18 +74,39 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Wear the Darkness', 'skyyrose' ),
 			'cta_text'            => __( 'The thorn protects what the world tries to take. Every piece in Black Rose carries that Oakland lesson: be beautiful, be sharp, never be soft where it counts.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Black Rose', 'skyyrose' ),
-			'newsletter_text'     => __( 'First access to new drops, exclusive content, and the stories behind the darkness.', 'skyyrose' ),
+			'newsletter_text'     => __( 'First access to new drops, behind-the-scenes stories, and the darkness behind each piece.', 'skyyrose' ),
 			'email_id'            => 'br-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE POSTURE', 'skyyrose' ),
+					'lead'   => __( 'Not a flower —', 'skyyrose' ),
+					'accent' => __( 'a conviction.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / Oakland', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — THE ANSWER', 'skyyrose' ),
+					'lead'   => __( 'Every piece in Black Rose is', 'skyyrose' ),
+					'accent' => __( 'the concrete answering back.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / The Town', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE STAND', 'skyyrose' ),
+					'lead'   => __( 'You wear it because', 'skyyrose' ),
+					'accent' => __( 'you already stood up.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / Collection I', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Love Hurts ─────────────────────────────────────────── */
 		'love-hurts'   => array(
 			'hero_badge'          => __( 'The Hurts Bloodline', 'skyyrose' ),
-			'hero_logo'           => '/branding/love-hurts-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/love-hurts-logo-hero.webp',
 			'hero_logo_alt'       => __( 'Love Hurts', 'skyyrose' ),
 			'hero_logo_w'         => 400,
 			'hero_logo_h'         => 400,
-			'hero_bg'             => '/branding/sr-collection-love-hurts.webp',
+			'hero_bg'             => '/branding/hero/beauty-and-beast-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/beauty-and-beast',
 			'hero_bg_alt'         => __( 'Love Hurts Collection — enchanted rose under glass', 'skyyrose' ),
 			'hero_tagline'        => __( 'They called me Beast. They were right.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'But even the Beast kept a rose under glass — protecting the most fragile thing he ever loved. This collection carries the weight of three generations of Hurts.', 'skyyrose' ),
@@ -131,16 +153,37 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_btn'             => __( 'Shop Love Hurts', 'skyyrose' ),
 			'newsletter_text'     => __( 'First access to new drops and the stories behind every petal.', 'skyyrose' ),
 			'email_id'            => 'lh-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE BEAST', 'skyyrose' ),
+					'lead'   => __( 'They called me Beast.', 'skyyrose' ),
+					'accent' => __( 'They were right.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / Collection II', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — THE GLASS', 'skyyrose' ),
+					'lead'   => __( 'even the Beast kept a rose under glass —', 'skyyrose' ),
+					'accent' => __( 'protecting the most fragile thing he ever loved.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / The Rose', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE TURN', 'skyyrose' ),
+					'lead'   => __( 'From concrete to runway.', 'skyyrose' ),
+					'accent' => __( 'From grief to grace.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / The Bloodline', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Signature ──────────────────────────────────────────── */
 		'signature'    => array(
 			'hero_badge'          => __( 'Where It All Began', 'skyyrose' ),
-			'hero_logo'           => '/branding/signature-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/signature-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The SkyyRose Signature Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,
-			'hero_bg'             => '/branding/sr-collection-signature.webp',
+			'hero_bg'             => '/branding/hero/luxury-nighttime-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/luxury-nighttime',
 			'hero_bg_alt'         => __( 'Signature Collection — Oakland skyline', 'skyyrose' ),
 			'hero_tagline'        => __( 'The origin. The main event. The birth of it all.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation.', 'skyyrose' ),
@@ -167,7 +210,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'features'            => array(
 				array(
 					'icon'  => '&#x2726;',
-					'title' => __( 'Premium Materials', 'skyyrose' ),
+					'title' => __( 'Sourced Without Compromise', 'skyyrose' ),
 					'text'  => __( 'Italian leathers, Japanese denim, Egyptian cotton — sourced from the finest mills worldwide.', 'skyyrose' ),
 				),
 				array(
@@ -185,14 +228,42 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Wear the Foundation', 'skyyrose' ),
 			'cta_text'            => __( 'This is where it all started. A father in Oakland with a daughter\'s name and a dream that wouldn\'t die. When you wear Signature, you wear the origin story — and you help write the next chapter.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Signature', 'skyyrose' ),
-			'newsletter_text'     => __( 'Early access to new drops, exclusive content, and the stories behind each piece.', 'skyyrose' ),
+			'newsletter_text'     => __( 'Early access to new drops, behind-the-scenes stories, and first dibs on each piece.', 'skyyrose' ),
 			'email_id'            => 'sig-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE ORIGIN', 'skyyrose' ),
+					'lead'   => __( 'The origin. The main event.', 'skyyrose' ),
+					'accent' => __( 'The birth of it all.', 'skyyrose' ),
+					'sub'    => __( 'Signature / Collection I', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — PERMANENT', 'skyyrose' ),
+					'lead'   => __( 'Signature is that night', 'skyyrose' ),
+					'accent' => __( 'made permanent.', 'skyyrose' ),
+					'sub'    => __( 'Signature / Oakland', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE CONCRETE', 'skyyrose' ),
+					'lead'   => __( 'luxury grows from concrete —', 'skyyrose' ),
+					'accent' => __( 'and I meant that literally.', 'skyyrose' ),
+					'sub'    => __( 'Signature / The Founder', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Kids Capsule ───────────────────────────────────────── */
 		'kids-capsule' => array(
 			'hero_badge'          => __( 'New Collection', 'skyyrose' ),
-			'hero_title'          => __( 'KIDS CAPSULE', 'skyyrose' ),
+			// Interim hero mark: SR monogram (branding tier, 2048×2048 square) until the
+			// founder creates a custom Kids Capsule lockup. asset-hierarchy.md canon:
+			// assets/branding/ is "USE THIS for theme chrome + page templates"; logos/
+			// is "Not for page chrome." AVIF variant exists only in logos/; <picture>
+			// format-switching deferred to a future template enhancement.
+			'hero_logo'           => '/branding/skyyrose-monogram.webp',
+			'hero_logo_alt'       => __( 'SkyyRose Kids Capsule', 'skyyrose' ),
+			'hero_logo_w'         => 400,
+			'hero_logo_h'         => 400,
 			'hero_tagline'        => __( 'Luxury runs in the family.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'Premium streetwear for the next generation — powerful, elevated, and born into legacy. Because legacy is not inherited. It is worn.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Explore', 'skyyrose' ),
@@ -212,12 +283,12 @@ function skyyrose_get_collection_content( $slug ) {
 			'quote_text'          => __( '"I built SkyyRose so my daughter would never have to wonder if she was enough. Every piece in Kids Capsule carries that — a father\'s promise that she can be anything, wear anything, own any room she walks into."', 'skyyrose' ),
 			'quote_cite'          => __( 'Corey Foster, Father & Founder', 'skyyrose' ),
 			'features_heading'    => __( 'Built Different', 'skyyrose' ),
-			'features_subheading' => __( 'The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, premium everything.', 'skyyrose' ),
+			'features_subheading' => __( 'The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, built different.', 'skyyrose' ),
 			'features'            => array(
 				array(
 					'icon'  => '&#x2726;',
-					'title' => __( 'Premium Materials', 'skyyrose' ),
-					'text'  => __( 'Same uncompromising fabrics as the adult lines — premium cotton, reinforced stitching, luxury hand-feel.', 'skyyrose' ),
+					'title' => __( 'Uncompromising Fabrics', 'skyyrose' ),
+					'text'  => __( 'Same uncompromising fabrics as the adult lines — heavyweight cotton, reinforced stitching, luxury hand-feel.', 'skyyrose' ),
 				),
 				array(
 					'icon'  => '&#x2726;',
@@ -233,10 +304,57 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Their Turn Now', 'skyyrose' ),
 			'cta_text'            => __( 'We built this for Skyy Rose. For every kid who deserves to feel the same luxury their parents wear. Legacy isn\'t inherited — it\'s earned. But we can give them a head start.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Kids Capsule', 'skyyrose' ),
-			'newsletter_text'     => __( 'Be first to know about new Kids Capsule drops and family exclusives.', 'skyyrose' ),
+			'newsletter_text'     => __( 'Be first to know about new Kids Capsule drops and family previews.', 'skyyrose' ),
 			'email_id'            => 'kc-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE LEGACY', 'skyyrose' ),
+					'lead'   => __( 'legacy is not inherited.', 'skyyrose' ),
+					'accent' => __( 'It is worn.', 'skyyrose' ),
+					'sub'    => __( 'Kids Capsule / Family', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — NO PASTELS', 'skyyrose' ),
+					'lead'   => __( 'No pastels.', 'skyyrose' ),
+					'accent' => __( 'No cartoons.', 'skyyrose' ),
+					'sub'    => __( 'Kids Capsule / Skyy Rose', 'skyyrose' ),
+				),
+			),
 		),
 	);
 
-	return isset( $collections[ $slug ] ) ? $collections[ $slug ] : null;
+	if ( ! isset( $collections[ $slug ] ) ) {
+		return null;
+	}
+
+	$data = $collections[ $slug ];
+
+	/*
+	 * SOT override (S-5): resolve hero_bg and hero_logo from sot.json FIRST.
+	 *
+	 * skyyrose_sot_hero()   → imagery.hero_backdrop.resolved  → overrides hero_bg
+	 * skyyrose_sot_lockup() → lockup.display_webp.resolved    → overrides hero_logo
+	 *
+	 * The SOT reader may not be loaded yet in very early bootstrap (e.g. during
+	 * unit tests). Guard with function_exists() so this file remains safe to
+	 * include independently.
+	 *
+	 * Returns '' when the key/file is absent → fall through to the hand-maintained
+	 * value already in $data, preserving backward compatibility exactly.
+	 */
+	if ( function_exists( 'skyyrose_sot_hero' ) ) {
+		$sot_hero = skyyrose_sot_hero( $slug );
+		if ( '' !== $sot_hero ) {
+			$data['hero_bg'] = $sot_hero;
+		}
+	}
+
+	if ( function_exists( 'skyyrose_sot_lockup' ) ) {
+		$sot_lockup = skyyrose_sot_lockup( $slug );
+		if ( '' !== $sot_lockup ) {
+			$data['hero_logo'] = $sot_lockup;
+		}
+	}
+
+	return $data;
 }

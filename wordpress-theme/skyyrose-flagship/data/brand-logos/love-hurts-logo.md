@@ -71,8 +71,9 @@ This logo has several companion files in the same directory:
   Love Hurts collection (same three-rose composition as the Black Rose
   logo, but with **red roses** instead of greyscale; green stems and white
   cloud unchanged).
-- `heart-rose-composite.jpeg` — a stand-alone broken-heart-with-thorns
-  graphic (without the wordmark).
+- `heart-rose-composite.jpeg` — the heart-and-rose mark: a red rose rising
+  from a broken, thorn-wrapped heart, with blood drips (without the wordmark).
+  Full reference: `data/brand-logos/heart-rose-composite.md`.
 - `love-lettering.jpeg` / `hurts-lettering.jpeg` — the wordmark elements
   separated (for products that need them on different regions).
 

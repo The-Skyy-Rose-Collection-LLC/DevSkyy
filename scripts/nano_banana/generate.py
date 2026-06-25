@@ -10,14 +10,29 @@ import base64
 import logging
 from pathlib import Path
 
+from llm.model_ids import (
+    NANO_BANANA_2_MODEL,
+    NANO_BANANA_MODEL,
+    NANO_BANANA_PRO_MODEL,
+    OPENAI_IMAGE_15_MODEL,
+    OPENAI_IMAGE_MINI_MODEL,
+)
+
 log = logging.getLogger(__name__)
 
 # -- Model IDs (official Google genai SDK) ------------------------------------
-GEMINI_FAST = "gemini-2.5-flash-image"
-GEMINI_PRO = "gemini-3-pro-image-preview"
+# Local module aliases for the canonical constants in llm/model_ids.py.
+# Kept as named constants so existing call signatures (model: str = GEMINI_FAST)
+# stay one short identifier instead of pulling the qualified name into the
+# function default each time.
+GEMINI_FAST = NANO_BANANA_PRO_MODEL  # NB Pro everywhere — luxury default (Option A 2026-05-06)
+GEMINI_NB2 = NANO_BANANA_2_MODEL  # "gemini-3.1-flash-image-preview" — NB2, w/ thinking (unused)
+GEMINI_PRO = NANO_BANANA_PRO_MODEL  # "gemini-3-pro-image-preview"  — NB Pro, 4K
+GEMINI_NB1 = NANO_BANANA_MODEL  # "gemini-2.5-flash-image" — NB1 (retired, kept for back-compat)
 FLUX_MODEL = "black-forest-labs/FLUX.2-pro"
 FLUX_FREE = "black-forest-labs/FLUX.1-schnell-Free"
-GPT_IMAGE_MODEL = "gpt-image-1.5"
+GPT_IMAGE_MODEL = OPENAI_IMAGE_15_MODEL  # "gpt-image-1.5"
+GPT_IMAGE_MINI = OPENAI_IMAGE_MINI_MODEL  # "gpt-image-1-mini"  — cheap variant
 
 
 def generate_gemini(
@@ -212,7 +227,9 @@ def generate_flux(
         import urllib.request
 
         try:
-            with urllib.request.urlopen(img_data.url, timeout=30) as resp:
+            with urllib.request.urlopen(
+                img_data.url, timeout=30
+            ) as resp:  # nosec B310 — URL from controlled API response, not user input
                 raw_bytes = resp.read()
         except Exception as e:
             log.error("FLUX image URL download failed: %s", e)

@@ -31,10 +31,10 @@ export function AssetCard({ asset, isSelected, onToggle, onPreview, onEdit }: As
         className="aspect-square bg-gray-800 flex items-center justify-center"
         onClick={onPreview}
       >
-        {asset.thumbnail_url ? (
+        {asset.url ? (
           <img
-            src={asset.thumbnail_url}
-            alt={asset.filename}
+            src={asset.url}
+            alt={asset.name}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -42,7 +42,7 @@ export function AssetCard({ asset, isSelected, onToggle, onPreview, onEdit }: As
         )}
       </div>
       <div className="p-2">
-        <p className="text-white text-xs truncate">{asset.filename}</p>
+        <p className="text-white text-xs truncate">{asset.name}</p>
         <p className="text-gray-400 text-xs">{asset.collection}</p>
       </div>
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">

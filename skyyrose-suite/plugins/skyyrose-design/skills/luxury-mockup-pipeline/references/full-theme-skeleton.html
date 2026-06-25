@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-skeleton="reference">
+<!--
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  LUXURY-MOCKUP-PIPELINE                                             │
+  │  Canonical Full-Theme Reference Skeleton                            │
+  │                                                                     │
+  │  This file is the agents' shared layout contract.                   │
+  │  Every UX Architect / UI Designer / Brand Guardian / Frontend Dev / │
+  │  Senior Developer dispatch reads this BEFORE producing output.      │
+  │                                                                     │
+  │  Coverage: header → page body → footer                              │
+  │  Scope: every canonical page + component + widget + layout slot     │
+  │  Standard: highest-performing default per slot (Lighthouse 95+,     │
+  │            WCAG 2.2 AA, LCP < 2.5s, CLS < 0.1, INP < 200ms)         │
+  │                                                                     │
+  │  Agents add platform-specific markup (WP / Next.js / Shopify /      │
+  │  Astro / Liquid) when implementing — this is the abstract IA.       │
+  └─────────────────────────────────────────────────────────────────────┘
+-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0A0A0A">
+
+  <!-- PERFORMANCE: critical preconnect + preload before anything else -->
+  <link rel="preconnect" href="<self-host-cdn>" crossorigin>
+  <link rel="preload" href="<hero-lcp-image>.avif" as="image" type="image/avif" fetchpriority="high">
+  <link rel="preload" href="<critical-font>.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="modulepreload" href="<critical-route-bundle>.js">
+
+  <!-- PERFORMANCE: critical CSS inlined here (< 14KB target) -->
+  <style id="critical-css">
+    /* Above-the-fold tokens + layout + typography only.
+       Full design-tokens.css loads async. */
+  </style>
+
+  <!-- Async full stylesheet load -->
+  <link rel="stylesheet" href="<theme-bundle>.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="<theme-bundle>.css"></noscript>
+
+  <!-- SEO: title / description / canonical / OG / Twitter / JSON-LD -->
+  <title>[Page-specific title — 50–60 char]</title>
+  <meta name="description" content="[150–160 char]">
+  <link rel="canonical" href="<canonical-url>">
+  <meta property="og:title" content="[OG title]">
+  <meta property="og:description" content="[OG desc]">
+  <meta property="og:image" content="<og-1200x630>.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    { "@context": "https://schema.org", "@type": "Organization", "name": "<brand>", "url": "<url>", "logo": "<logo-url>" }
+  </script>
+
+  <!-- Favicons + manifest -->
+  <link rel="icon" type="image/svg+xml" href="<favicon>.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="<favicon-32>.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="<apple-touch>.png">
+  <link rel="manifest" href="/site.webmanifest">
+</head>
+
+<body data-page-type="<home|collection|pdp|cart|checkout|search|404|about|contact|blog|lookbook|preorder|immersive|account>">
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- SKIP LINK — A11Y mandatory                                      -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- LIVE REGION — A11Y for toast / cart updates / async results     -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- ANNOUNCEMENT BAR (optional)                                     -->
+  <!-- High-perf: < 1 DOM node per message, dismissible, persists via   -->
+  <!-- localStorage, no CLS                                            -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <aside class="announcement-bar" role="region" aria-label="Site-wide announcement" data-dismissible="true">
+    <p class="announcement-bar__text">[Free shipping over $X · Drop 01 ends [date]]</p>
+    <button class="announcement-bar__close" aria-label="Dismiss">×</button>
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- HEADER                                                          -->
+  <!--   - sticky with intersection observer for shadow-on-scroll       -->
+  <!--   - transparent over hero, solid past hero                       -->
+  <!--   - 56–72px desktop / 56px mobile                                -->
+  <!--   - logo SVG inline (no extra HTTP)                              -->
+  <!--   - mega-menu opens on hover (desktop) + focus (keyboard)        -->
+  <!--   - mobile drawer slides in from right                           -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner" data-sticky="true" data-transparent-on-hero="true">
+    <div class="site-header__row">
+
+      <!-- LEFT: primary nav (desktop) -->
+      <nav class="site-header__nav-primary" aria-label="Primary">
+        <ul>
+          <li class="has-mega"><a href="<shop>" aria-haspopup="true" aria-expanded="false">Shop</a>
+            <div class="mega-menu" role="region">
+              <ul class="mega-menu__col">
+                <li><a href="<collection-1>">[Collection 1]</a></li>
+                <li><a href="<collection-2>">[Collection 2]</a></li>
+              </ul>
+              <ul class="mega-menu__col mega-menu__col--featured">
+                <li><a href="<featured>"><img src="<featured>.avif" alt="" loading="lazy" width="160" height="200">[Featured drop]</a></li>
+              </ul>
+            </div>
+          </li>
+          <li><a href="<collections>">Collections</a></li>
+          <li><a href="<lookbook>">Lookbook</a></li>
+          <li><a href="<journal>">Journal</a></li>
+          <li><a href="<about>">About</a></li>
+        </ul>
+      </nav>
+
+      <!-- CENTER: brand monogram (LCP candidate — fetchpriority high) -->
+      <a class="site-header__brand" href="<home>" aria-label="<brand> home">
+        <!-- inline SVG monogram preferred; falls back to <img> with explicit width/height (no CLS) -->
+        <svg class="site-header__monogram" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+          <!-- monogram path here -->
+        </svg>
+      </a>
+
+      <!-- RIGHT: utility nav -->
+      <nav class="site-header__nav-utility" aria-label="Utility">
+        <button class="site-header__search" aria-label="Open search" data-action="open-search">
+          <svg class="icon-search" width="20" height="20" aria-hidden="true"><!-- icon --></svg>
+        </button>
+        <a class="site-header__account" href="<account>" aria-label="Account"><svg class="icon-account" width="20" height="20" aria-hidden="true"></svg></a>
+        <a class="site-header__wishlist" href="<wishlist>" aria-label="Wishlist"><svg class="icon-heart" width="20" height="20" aria-hidden="true"></svg></a>
+        <button class="site-header__cart" aria-label="Cart (0 items)" data-action="open-cart-drawer">
+          <svg class="icon-cart" width="20" height="20" aria-hidden="true"></svg>
+          <span class="site-header__cart-count" data-cart-count>0</span>
+        </button>
+        <button class="site-header__menu-toggle" aria-label="Open menu" aria-controls="mobile-nav" aria-expanded="false" data-action="open-mobile-nav">
+          <span class="hamburger"></span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Optional: secondary nav strip (e.g., live filters on collection pages) -->
+    <nav class="site-header__nav-secondary" aria-label="Filters" hidden></nav>
+  </header>
+
+  <!-- MOBILE NAV DRAWER (off-canvas, focus-trapped) -->
+  <div id="mobile-nav" class="mobile-nav" role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden>
+    <div class="mobile-nav__panel">
+      <button class="mobile-nav__close" aria-label="Close menu">×</button>
+      <nav class="mobile-nav__primary" aria-label="Mobile primary"></nav>
+      <nav class="mobile-nav__secondary" aria-label="Mobile secondary"></nav>
+      <div class="mobile-nav__utility"></div>
+    </div>
+    <div class="mobile-nav__scrim" data-action="close-mobile-nav"></div>
+  </div>
+
+  <!-- SEARCH OVERLAY (instant search w/ debounce, keyboard nav) -->
+  <div id="search-overlay" class="search-overlay" role="dialog" aria-modal="true" aria-label="Search" hidden>
+    <div class="search-overlay__panel">
+      <form class="search-overlay__form" role="search" action="<search-action>">
+        <input type="search" name="q" placeholder="Search products, collections, stories…" aria-label="Search query" autocomplete="off">
+        <button type="submit" aria-label="Submit search"></button>
+      </form>
+      <div class="search-overlay__suggestions" aria-live="polite"></div>
+      <div class="search-overlay__results"></div>
+    </div>
+  </div>
+
+  <!-- CART DRAWER (slide-in from right, focus-trapped) -->
+  <aside id="cart-drawer" class="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping cart" hidden>
+    <header class="cart-drawer__header">
+      <h2>Cart</h2>
+      <button class="cart-drawer__close" aria-label="Close cart">×</button>
+    </header>
+    <ul class="cart-drawer__items"></ul>
+    <footer class="cart-drawer__footer">
+      <div class="cart-drawer__subtotal"></div>
+      <a class="btn btn--primary" href="<checkout>">Checkout</a>
+      <a class="btn btn--ghost" href="<cart>">View cart</a>
+    </footer>
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- MAIN — page body                                                -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <main id="main-content" role="main" tabindex="-1">
+
+    <!-- ═══════ HERO SLOT ═══════ -->
+    <!-- One per page. Variants: full-bleed photo, video loop, scene-takeover, editorial split. -->
+    <!-- Highest-perf default: <picture> with avif/webp/img, fetchpriority="high", -->
+    <!-- aspect-ratio CSS to prevent CLS, no JS animation on initial paint -->
+    <section class="hero hero--<variant>" data-hero-type="cover|hero|video|editorial">
+      <picture class="hero__bg-picture">
+        <source srcset="<hero>-1680.avif 1680w, <hero>-1280.avif 1280w, <hero>-768.avif 768w, <hero>-480.avif 480w" sizes="100vw" type="image/avif">
+        <source srcset="<hero>-1680.webp 1680w, <hero>-1280.webp 1280w, <hero>-768.webp 768w, <hero>-480.webp 480w" sizes="100vw" type="image/webp">
+        <img src="<hero>-1280.jpg" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" class="hero__bg">
+      </picture>
+      <div class="hero__shade" aria-hidden="true"></div>
+      <div class="hero__content">
+        <h1 class="hero__title">[Page-specific H1]</h1>
+        <p class="hero__sub">[Supporting line]</p>
+        <a class="btn btn--primary" href="<cta>">[Primary CTA]</a>
+        <a class="btn btn--ghost" href="<secondary>">[Secondary]</a>
+      </div>
+      <div class="hero__scroll-indicator" aria-hidden="true"></div>
+    </section>
+
+    <!-- ═══════ CONTENT SLOTS (variants per page-type below) ═══════ -->
+
+    <!-- COVER FRAME (magazine-style intro — used on luxury / editorial verticals) -->
+    <section class="cover">
+      <picture class="cover__photo-picture"><!-- responsive --></picture>
+      <div class="cover__shade" aria-hidden="true"></div>
+      <header class="cover__masthead">
+        <h1 class="cover__nameplate">[Brand]</h1>
+        <div class="cover__nameplate-rule" aria-hidden="true"></div>
+        <p class="cover__meta">VOL · S/S · DROP</p>
+      </header>
+      <footer class="cover__line">
+        <p class="cover__tagline">[Tagline]</p>
+        <p class="cover__byline">[Byline]</p>
+      </footer>
+    </section>
+
+    <!-- VOICE QUOTE (founder voice / press pull-quote) -->
+    <section class="voice">
+      <blockquote class="voice__quote">
+        <span class="line">[Line 1]</span>
+        <span class="line">[Line 2]</span>
+      </blockquote>
+      <p class="voice__attribution">[Source · context]</p>
+    </section>
+
+    <!-- SPREAD / CATEGORY GRID — 4 evenly-aligned scene tiles by default -->
+    <section class="spread" aria-labelledby="spread-title">
+      <header class="spread__title-row">
+        <h2 id="spread-title" class="spread__title">[Section title]</h2>
+        <p class="spread__page-marker">PG XX—XX</p>
+      </header>
+      <div class="spread__grid" data-grid-cols-desktop="4" data-grid-cols-tablet="2" data-grid-cols-mobile="1">
+        <!-- 4× repeat -->
+        <a class="spread__tile" href="<destination>">
+          <picture>
+            <source srcset="<scene>.avif" type="image/avif">
+            <source srcset="<scene>.webp" type="image/webp">
+            <img src="<scene>.jpg" alt="[Scene description]" width="800" height="1066" loading="lazy" decoding="async" class="spread__tile-img">
+          </picture>
+          <div class="spread__tile-overlay">
+            <span class="spread__tile-label">[Collection NN]</span>
+            <p class="spread__tile-name">[NAME]</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- PRODUCT CARD GRID (collection / shop / search pages) -->
+    <section class="product-grid" aria-labelledby="product-grid-title">
+      <h2 id="product-grid-title" class="visually-hidden">[Products]</h2>
+      <ul class="product-grid__items">
+        <li class="product-card">
+          <a href="<pdp>" class="product-card__link">
+            <picture>
+              <source srcset="<product>.avif" type="image/avif">
+              <source srcset="<product>.webp" type="image/webp">
+              <img src="<product>.jpg" alt="[Product name]" width="600" height="800" loading="lazy" decoding="async">
+            </picture>
+            <h3 class="product-card__name">[Product name]</h3>
+            <p class="product-card__price"><span class="visually-hidden">Price: </span>$[price]</p>
+          </a>
+          <button class="product-card__wishlist" aria-label="Add to wishlist" aria-pressed="false">♥</button>
+          <button class="product-card__quick-view" aria-label="Quick view">Quick view</button>
+        </li>
+        <!-- repeat -->
+      </ul>
+    </section>
+
+    <!-- LOOKBOOK STRIP (horizontal scroll-snap) -->
+    <section class="lookbook-strip" aria-labelledby="lookbook-title">
+      <h2 id="lookbook-title" class="lookbook-strip__title">[Lookbook]</h2>
+      <div class="lookbook-strip__rail" data-scroll-snap="x mandatory">
+        <figure class="lookbook-strip__slide"><img src="<lb>.avif" alt="" loading="lazy"></figure>
+      </div>
+    </section>
+
+    <!-- TESTIMONIAL / PRESS STRIP (logo wall + pull-quote) -->
+    <section class="press-strip" aria-labelledby="press-title">
+      <h2 id="press-title" class="visually-hidden">Press</h2>
+      <ul class="press-strip__logos">
+        <li><img src="<press-1>.svg" alt="[Outlet]" loading="lazy" width="120" height="40"></li>
+      </ul>
+      <blockquote class="press-strip__quote">[Pull-quote]</blockquote>
+    </section>
+
+    <!-- STAT COUNTER / TRUST BAR -->
+    <section class="stats-bar" aria-labelledby="stats-title">
+      <h2 id="stats-title" class="visually-hidden">Trust indicators</h2>
+      <ul class="stats-bar__items">
+        <li><span class="stats-bar__value">100%</span><span class="stats-bar__label">[Metric]</span></li>
+      </ul>
+    </section>
+
+    <!-- STORY / EDITORIAL BLOCK (founder letter / drop story) -->
+    <section class="story-block">
+      <div class="story-block__media"><picture></picture></div>
+      <div class="story-block__copy">
+        <h2 class="story-block__title">[Story title]</h2>
+        <p class="story-block__body">[Body]</p>
+        <a class="btn btn--ghost" href="<read-more>">Read</a>
+      </div>
+    </section>
+
+    <!-- FAQ ACCORDION -->
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title" class="faq__title">[FAQ]</h2>
+      <details class="faq__item">
+        <summary class="faq__question">[Question]</summary>
+        <div class="faq__answer">[Answer]</div>
+      </details>
+    </section>
+
+    <!-- NEWSLETTER CAPTURE -->
+    <section class="newsletter" aria-labelledby="newsletter-title">
+      <h2 id="newsletter-title" class="newsletter__title">[Subscribe headline]</h2>
+      <form class="newsletter__form" action="<subscribe-action>" method="POST" novalidate>
+        <label for="newsletter-email" class="visually-hidden">Email</label>
+        <input id="newsletter-email" type="email" name="email" placeholder="Your email" required autocomplete="email">
+        <button type="submit" class="btn btn--primary">[CTA]</button>
+        <p class="newsletter__status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- CTA BANNER (full-bleed conversion moment) -->
+    <section class="cta-banner">
+      <picture class="cta-banner__bg-picture"></picture>
+      <div class="cta-banner__copy">
+        <h2 class="cta-banner__title">[CTA headline]</h2>
+        <a class="btn btn--primary" href="<cta>">[CTA]</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                          -->
+  <!--   - 4 link columns + newsletter + social + payment + legal       -->
+  <!--   - Brand signature line at bottom                               -->
+  <!--   - Back-to-top button (last child, focus-visible)               -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+
+    <!-- Primary footer band: links + newsletter side-by-side -->
+    <div class="site-footer__primary">
+      <div class="site-footer__brand">
+        <a href="<home>" aria-label="<brand>"><img src="<footer-logo>.svg" alt="" width="120" height="40"></a>
+        <p class="site-footer__byline">[Brand tagline]</p>
+        <ul class="site-footer__social" aria-label="Social links">
+          <li><a href="<ig>" aria-label="Instagram">IG</a></li>
+          <li><a href="<tt>" aria-label="TikTok">TT</a></li>
+          <li><a href="<yt>" aria-label="YouTube">YT</a></li>
+          <li><a href="<x>" aria-label="X">X</a></li>
+        </ul>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        <div class="site-footer__col">
+          <h3 class="site-footer__col-title">Shop</h3>
+          <ul>
+            <li><a href="<collection-1>">[Collection 1]</a></li>
+            <li><a href="<collection-2>">[Collection 2]</a></li>
+            <li><a href="<new>">New arrivals</a></li>
+            <li><a href="<best>">Best sellers</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__col">
+          <h3 class="site-footer__col-title">Support</h3>
+          <ul>
+            <li><a href="<contact>">Contact</a></li>
+            <li><a href="<shipping>">Shipping & returns</a></li>
+            <li><a href="<size-guide>">Size guide</a></li>
+            <li><a href="<faq>">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__col">
+          <h3 class="site-footer__col-title">About</h3>
+          <ul>
+            <li><a href="<story>">Our story</a></li>
+            <li><a href="<journal>">Journal</a></li>
+            <li><a href="<press>">Press</a></li>
+            <li><a href="<sustainability>">Sustainability</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__col site-footer__col--newsletter">
+          <h3 class="site-footer__col-title">[Newsletter heading]</h3>
+          <form class="site-footer__newsletter-form" action="<subscribe>" method="POST" novalidate>
+            <label for="footer-newsletter-email" class="visually-hidden">Email</label>
+            <input id="footer-newsletter-email" type="email" name="email" placeholder="Email" required autocomplete="email">
+            <button type="submit" class="btn btn--primary">Subscribe</button>
+          </form>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Secondary footer band: payment icons + legal strip -->
+    <div class="site-footer__secondary">
+      <ul class="site-footer__payments" aria-label="Accepted payments">
+        <li><img src="<visa>.svg" alt="Visa" width="36" height="24"></li>
+        <li><img src="<mc>.svg" alt="Mastercard" width="36" height="24"></li>
+        <li><img src="<amex>.svg" alt="Amex" width="36" height="24"></li>
+        <li><img src="<apple-pay>.svg" alt="Apple Pay" width="36" height="24"></li>
+        <li><img src="<shop-pay>.svg" alt="Shop Pay" width="36" height="24"></li>
+      </ul>
+      <ul class="site-footer__legal" aria-label="Legal">
+        <li><a href="<privacy>">Privacy</a></li>
+        <li><a href="<terms>">Terms</a></li>
+        <li><a href="<accessibility>">Accessibility</a></li>
+        <li><a href="<sitemap>">Sitemap</a></li>
+      </ul>
+      <p class="site-footer__copyright">© [Year] [Brand]. Founded by [Founder]. All rights reserved.</p>
+    </div>
+
+  </footer>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- GLOBAL WIDGETS                                                  -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+
+  <!-- Back-to-top (appears past hero, IntersectionObserver-driven) -->
+  <button class="back-to-top" aria-label="Back to top" hidden>↑</button>
+
+  <!-- Toast notification container (slot-based, ARIA polite) -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- Modal mount point (focus-trapped on open) -->
+  <div id="modal-root"></div>
+
+  <!-- Cookie consent (GDPR / CCPA compliant, opt-in for non-essential) -->
+  <aside id="cookie-consent" class="cookie-consent" role="region" aria-label="Cookie preferences" hidden>
+    <p class="cookie-consent__text">[Cookie copy]</p>
+    <div class="cookie-consent__actions">
+      <button class="btn btn--primary">Accept all</button>
+      <button class="btn btn--ghost">Reject non-essential</button>
+      <button class="btn btn--text">Manage preferences</button>
+    </div>
+  </aside>
+
+  <!-- Scroll progress indicator (top of viewport, 2px height) -->
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress__bar"></div></div>
+
+  <!-- Live chat launcher (lazy-loaded after interaction) -->
+  <button class="live-chat__launcher" aria-label="Open chat" data-action="open-chat" hidden>💬</button>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- DEFERRED JS                                                     -->
+  <!--   - Critical interaction handlers inline in <head> (cart/menu)   -->
+  <!--   - Everything else after page load                              -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <script type="module" src="<theme-bundle>.js"></script>
+  <script type="module" src="<analytics-bundle>.js" defer></script>
+
+</body>
+</html>
+<!--
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ PERFORMANCE CHECKLIST (every dispatch verifies):                    │
+  │   ☐ Critical CSS < 14KB inlined                                     │
+  │   ☐ LCP image fetchpriority=high + preload                          │
+  │   ☐ Fonts self-hosted woff2 + font-display: swap + preload critical │
+  │   ☐ Images: avif + webp + img fallback, explicit width/height       │
+  │   ☐ Lazy-load below-fold, eager-load above-fold                     │
+  │   ☐ aspect-ratio CSS on every img to prevent CLS                    │
+  │   ☐ No blocking JS — defer / module / async                         │
+  │   ☐ Compress: gzip/brotli on HTML/CSS/JS                            │
+  │   ☐ HTTP/2 or HTTP/3                                                │
+  │   ☐ Long-cache assets with content-hash filenames                   │
+  │                                                                     │
+  │ A11Y CHECKLIST (every dispatch verifies):                           │
+  │   ☐ Skip link first focusable                                       │
+  │   ☐ Live regions for async updates                                  │
+  │   ☐ Focus-visible on all interactive                                │
+  │   ☐ Color contrast ≥ 4.5:1 body, 3:1 large text                     │
+  │   ☐ Heading hierarchy h1 → h2 → h3 (no skip)                        │
+  │   ☐ ARIA only when semantics fail (prefer native)                   │
+  │   ☐ Keyboard nav: all functions reachable, focus traps in dialogs   │
+  │   ☐ prefers-reduced-motion honored                                  │
+  │   ☐ prefers-contrast honored                                        │
+  │   ☐ Form labels present + autocomplete + error linkage              │
+  │                                                                     │
+  │ SEO CHECKLIST (every dispatch verifies):                            │
+  │   ☐ Unique title 50–60 char                                         │
+  │   ☐ Unique meta description 150–160 char                            │
+  │   ☐ Canonical URL                                                   │
+  │   ☐ OG + Twitter card tags                                          │
+  │   ☐ JSON-LD per page type (Organization, Product, BreadcrumbList,   │
+  │     ItemList, FAQPage, Article)                                     │
+  │   ☐ Hreflang if multi-locale                                        │
+  │   ☐ Robots meta accurate                                            │
+  │   ☐ Sitemap.xml + robots.txt                                        │
+  └─────────────────────────────────────────────────────────────────────┘
+-->

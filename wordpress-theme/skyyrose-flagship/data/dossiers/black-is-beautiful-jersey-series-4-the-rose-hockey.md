@@ -3,11 +3,11 @@ sku: br-011
 name: BLACK is Beautiful Jersey Series — 4. The Rose (Hockey)
 collection: black-rose
 preorder: true
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/hockey-championship-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-011-design-front.jpeg
+reference_image: assets/products/references/br-011-design-front.jpeg
 ---
 
 # BLACK is Beautiful Jersey Series — 4. The Rose (Hockey)
@@ -25,10 +25,10 @@ tank. NOT a baseball jersey. NOT a football jersey. NOT a sherpa jacket
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Hockey Championship patch:     `data/brand-logos/hockey-championship-patch.md`
 > - SR monogram (back-neck):       `data/brand-logos/sr-monogram.md`
-> - Product design render:          `data/product-references/br-011-design-front.jpeg`
+> - Product design render:          `assets/products/references/br-011-design-front.jpeg`
 >
 > ### COLORWAY OVERRIDE — read this BEFORE rendering
 >
@@ -103,6 +103,11 @@ tank. NOT a baseball jersey. NOT a football jersey. NOT a sherpa jacket
 - NO solid-color "0" digit — the digit has teal outline + rose-cluster fill.
 - NO MLB Authentic Collection patch. NO NFL Authentic Collection patch. NO
   NBA Authentic Collection patch — only the Hockey Championship patch.
+- NO NHL logos, no barcode labels, no real sports league trademarks. The
+  collar emblem is a GENERIC black-and-white hockey-style woven league
+  label — NOT the NHL shield mark, NOT any real-league trademark. The
+  hem patch is the greyscale Hockey Championship patch — NOT a retail
+  barcode/UPC label, NOT a price tag, NOT a hangtag.
 - NO embossed/debossed decoration.
 - NO buttons, NO placket, NO zipper — pullover construction.
 - NO laces at the V-neck (this is a fashion hoodie, not a tied-collar hockey

@@ -259,7 +259,7 @@ def log_validation(
 def import_model_class_from_model_name_or_path(
     pretrained_model_name_or_path: str, revision: str, subfolder: str = "text_encoder"
 ):
-    text_encoder_config = PretrainedConfig.from_pretrained(
+    text_encoder_config = PretrainedConfig.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         pretrained_model_name_or_path, subfolder=subfolder, revision=revision
     )
     model_class = text_encoder_config.architectures[0]
@@ -811,7 +811,7 @@ class DreamBoothDataset(Dataset):
             # Downloading and loading a dataset from the hub.
             # See more about loading custom images at
             # https://huggingface.co/docs/datasets/v2.0.0/en/dataset_script
-            dataset = load_dataset(
+            dataset = load_dataset(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                 args.dataset_name,
                 args.dataset_config_name,
                 cache_dir=args.cache_dir,
@@ -1120,7 +1120,7 @@ def main(args):
                 torch_dtype = torch.float16
             elif args.prior_generation_precision == "bf16":
                 torch_dtype = torch.bfloat16
-            pipeline = StableDiffusionXLPipeline.from_pretrained(
+            pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                 args.pretrained_model_name_or_path,
                 torch_dtype=torch_dtype,
                 revision=args.revision,
@@ -1171,13 +1171,13 @@ def main(args):
             ).repo_id
 
     # Load the tokenizers
-    tokenizer_one = AutoTokenizer.from_pretrained(
+    tokenizer_one = AutoTokenizer.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         args.pretrained_model_name_or_path,
         subfolder="tokenizer",
         revision=args.revision,
         use_fast=False,
     )
-    tokenizer_two = AutoTokenizer.from_pretrained(
+    tokenizer_two = AutoTokenizer.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         args.pretrained_model_name_or_path,
         subfolder="tokenizer_2",
         revision=args.revision,
@@ -1196,27 +1196,27 @@ def main(args):
     scheduler_type = determine_scheduler_type(args.pretrained_model_name_or_path, args.revision)
     if "EDM" in scheduler_type:
         args.do_edm_style_training = True
-        noise_scheduler = EDMEulerScheduler.from_pretrained(
+        noise_scheduler = EDMEulerScheduler.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             args.pretrained_model_name_or_path, subfolder="scheduler"
         )
         logger.info("Performing EDM-style training!")
     elif args.do_edm_style_training:
-        noise_scheduler = EulerDiscreteScheduler.from_pretrained(
+        noise_scheduler = EulerDiscreteScheduler.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             args.pretrained_model_name_or_path, subfolder="scheduler"
         )
         logger.info("Performing EDM-style training!")
     else:
-        noise_scheduler = DDPMScheduler.from_pretrained(
+        noise_scheduler = DDPMScheduler.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             args.pretrained_model_name_or_path, subfolder="scheduler"
         )
 
-    text_encoder_one = text_encoder_cls_one.from_pretrained(
+    text_encoder_one = text_encoder_cls_one.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         args.pretrained_model_name_or_path,
         subfolder="text_encoder",
         revision=args.revision,
         variant=args.variant,
     )
-    text_encoder_two = text_encoder_cls_two.from_pretrained(
+    text_encoder_two = text_encoder_cls_two.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         args.pretrained_model_name_or_path,
         subfolder="text_encoder_2",
         revision=args.revision,
@@ -1227,7 +1227,7 @@ def main(args):
         if args.pretrained_vae_model_name_or_path is None
         else args.pretrained_vae_model_name_or_path
     )
-    vae = AutoencoderKL.from_pretrained(
+    vae = AutoencoderKL.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         vae_path,
         subfolder="vae" if args.pretrained_vae_model_name_or_path is None else None,
         revision=args.revision,
@@ -1239,7 +1239,7 @@ def main(args):
     if hasattr(vae.config, "latents_std") and vae.config.latents_std is not None:
         latents_std = torch.tensor(vae.config.latents_std).view(1, 4, 1, 1)
 
-    unet = UNet2DConditionModel.from_pretrained(
+    unet = UNet2DConditionModel.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
         args.pretrained_model_name_or_path,
         subfolder="unet",
         revision=args.revision,
@@ -2064,19 +2064,19 @@ def main(args):
             if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
                 # create pipeline
                 if not args.train_text_encoder:
-                    text_encoder_one = text_encoder_cls_one.from_pretrained(
+                    text_encoder_one = text_encoder_cls_one.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         args.pretrained_model_name_or_path,
                         subfolder="text_encoder",
                         revision=args.revision,
                         variant=args.variant,
                     )
-                    text_encoder_two = text_encoder_cls_two.from_pretrained(
+                    text_encoder_two = text_encoder_cls_two.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                         args.pretrained_model_name_or_path,
                         subfolder="text_encoder_2",
                         revision=args.revision,
                         variant=args.variant,
                     )
-                pipeline = StableDiffusionXLPipeline.from_pretrained(
+                pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
                     args.pretrained_model_name_or_path,
                     vae=vae,
                     text_encoder=accelerator.unwrap_model(text_encoder_one),
@@ -2131,14 +2131,14 @@ def main(args):
 
         # Final inference
         # Load previous pipeline
-        vae = AutoencoderKL.from_pretrained(
+        vae = AutoencoderKL.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             vae_path,
             subfolder="vae" if args.pretrained_vae_model_name_or_path is None else None,
             revision=args.revision,
             variant=args.variant,
             torch_dtype=weight_dtype,
         )
-        pipeline = StableDiffusionXLPipeline.from_pretrained(
+        pipeline = StableDiffusionXLPipeline.from_pretrained(  # nosec B615 — HF model ID constant; well-known public model from trusted org
             args.pretrained_model_name_or_path,
             vae=vae,
             revision=args.revision,

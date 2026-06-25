@@ -16,6 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 --------------------------------------------------------------
+ * Constants
+ *--------------------------------------------------------------*/
+
+/**
+ * Free shipping order threshold in dollars.
+ * Change this one value to update all cart and policy displays site-wide.
+ *
+ * @since 1.1.0
+ */
+if ( ! defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ) {
+	define( 'SKYYROSE_FREE_SHIPPING_THRESHOLD', 200 );
+}
+
+/*
+--------------------------------------------------------------
  * WooCommerce Support Declaration
  *--------------------------------------------------------------*/
 
@@ -218,6 +233,25 @@ function skyyrose_woocommerce_related_products_args( $args ) {
 	);
 }
 add_filter( 'woocommerce_output_related_products_args', 'skyyrose_woocommerce_related_products_args' );
+
+/**
+ * Disable the related-products block on single product pages (H4 launch decision).
+ *
+ * Removes the default WooCommerce action that outputs related products under
+ * the summary. Keeps the args filter above intact so the block can be re-enabled
+ * by deleting this remove_action call alone.
+ *
+ * @since 1.4.0
+ * @return void
+ */
+function skyyrose_disable_related_products() {
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+}
+// Hook on `wp` (after all plugins have bootstrapped) so the remove_action
+// fires AFTER WooCommerce has registered the action. Hooking on `init`
+// worked in practice but relied on ordering assumptions — `wp` is the
+// canonical safe choice for conditional remove_action on WC template hooks.
+add_action( 'wp', 'skyyrose_disable_related_products' );
 
 /*
 --------------------------------------------------------------
@@ -492,22 +526,15 @@ add_action( 'wp_ajax_nopriv_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_co
  * Complete the Look — single product cross-sell
  *--------------------------------------------------------------*/
 
-/**
- * Render the "Complete the Look" cross-sell section on single product pages.
- *
- * Delegates all logic and markup to template-parts/complete-the-look.php,
- * which resolves curated SKU pairs and outputs quick-add cards.
- *
- * @since 5.0.0
- * @return void
+/*
+ * "Complete the Look" cross-sell removed 2026-05-27 per founder canon: no
+ * related products on PDP, garment is the protagonist. Template part,
+ * enqueue, and similarity-fallback wiring removed in the same commit.
  */
-function skyyrose_complete_the_look() {
-	get_template_part( 'template-parts/complete-the-look' );
-}
-add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 50 );
 
-/* Pre-order meta, notices, pricing, and referral credit logic moved to
-   inc/woocommerce-preorder.php in v6.3.0 for maintainability. */
+/*
+Pre-order meta, notices, pricing, and referral credit logic moved to
+	inc/woocommerce-preorder.php in v6.3.0 for maintainability. */
 
 /**
  * Inject product collection data on WooCommerce native loop items.
@@ -539,6 +566,60 @@ function skyyrose_wc_inject_product_attrs(): void {
 	);
 }
 add_action( 'woocommerce_before_shop_loop_item_title', 'skyyrose_wc_inject_product_attrs', 5 );
+
+/**
+ * Substitute the catalog ghost-mannequin render for WooCommerce products that
+ * have no featured image set, so the classic /shop loop (and any get_image()
+ * consumer) shows the garment instead of the generic WooCommerce placeholder.
+ *
+ * Guarded to act ONLY when the product has no featured image — never overrides
+ * a real featured photo the founder uploaded. Skips wp-admin so the media
+ * library and product-edit thumbnails stay intact. Ghost-first (front_model_image),
+ * byte-parity with skyyrose_catalog_to_static_card() and the holo-card fallback.
+ *
+ * @since 6.7.0
+ *
+ * @param  string     $html    Existing image HTML (placeholder when no featured image).
+ * @param  WC_Product $product Product being rendered.
+ * @param  mixed      $size    Requested image size (unused — render is fixed-size).
+ * @return string               Ghost render markup when available, else original $html.
+ */
+function skyyrose_wc_ghost_loop_image( $html, $product, $size ) {
+	unset( $size );
+	if ( is_admin() || ! $product instanceof WC_Product ) {
+		return $html;
+	}
+	if ( $product->get_image_id() ) {
+		return $html; // Real featured image exists — leave it untouched.
+	}
+	if ( ! function_exists( 'skyyrose_get_product' )
+		|| ! function_exists( 'skyyrose_normalize_sku' )
+		|| ! function_exists( 'skyyrose_product_image_uri' ) ) {
+		return $html;
+	}
+	$sku = $product->get_sku();
+	if ( '' === $sku ) {
+		return $html;
+	}
+	$catalog_product = skyyrose_get_product( skyyrose_normalize_sku( $sku ) );
+	if ( ! $catalog_product ) {
+		return $html;
+	}
+	$render = ( $catalog_product['front_model_image'] ?? '' ) ?: ( $catalog_product['image'] ?? '' );
+	if ( '' === $render ) {
+		return $html;
+	}
+	$url = skyyrose_product_image_uri( $render );
+	if ( '' === $url ) {
+		return $html;
+	}
+	return sprintf(
+		'<img src="%s" alt="%s" class="skyy-ghost-loop-img" loading="lazy" decoding="async" />',
+		esc_url( $url ),
+		esc_attr( $product->get_name() )
+	);
+}
+add_filter( 'woocommerce_product_get_image', 'skyyrose_wc_ghost_loop_image', 10, 3 );
 
 /*
 --------------------------------------------------------------
@@ -612,6 +693,64 @@ function skyyrose_override_fse_detection( $is_fse ) {
 	return false;
 }
 add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );
+
+/*
+--------------------------------------------------------------
+ * Cart "Wears With" Cross-Sell Helper
+ *--------------------------------------------------------------*/
+
+/**
+ * Suggest a single cross-sell product for the cart page.
+ *
+ * Counts collections among cart SKUs, picks the dominant collection,
+ * and returns the first published product from that collection that
+ * is NOT already in the cart.
+ *
+ * @since 7.2.0
+ *
+ * @param  array $cart_skus Array of SKUs currently in the cart.
+ * @return array|null       Single product array from the catalog, or null.
+ */
+function skyyrose_get_cart_wears_with( $cart_skus ) {
+	if ( empty( $cart_skus ) || ! function_exists( 'skyyrose_get_product' ) ) {
+		return null;
+	}
+
+	// Tally collections.
+	$counts = array();
+	foreach ( $cart_skus as $sku ) {
+		$product = skyyrose_get_product( $sku );
+		if ( $product && ! empty( $product['collection'] ) ) {
+			$col            = $product['collection'];
+			$counts[ $col ] = ( $counts[ $col ] ?? 0 ) + 1;
+		}
+	}
+
+	if ( empty( $counts ) ) {
+		return null;
+	}
+
+	// Pick dominant collection.
+	arsort( $counts );
+	$dominant = array_key_first( $counts );
+
+	// Find first published product not already in cart.
+	$collection_products = function_exists( 'skyyrose_get_collection_products' )
+		? skyyrose_get_collection_products( $dominant )
+		: array();
+
+	foreach ( $collection_products as $product ) {
+		if ( ! $product['published'] ) {
+			continue;
+		}
+		if ( in_array( $product['sku'], $cart_skus, true ) ) {
+			continue;
+		}
+		return $product;
+	}
+
+	return null;
+}
 
 /*
 Pre-order meta, notices, pricing, and referral credit logic moved to

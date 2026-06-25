@@ -1,6 +1,8 @@
-from unittest.mock import MagicMock, patch
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 from scripts.purge_hallucinations import purge
+
 
 def test_purge_logic():
     # Mock files
@@ -24,14 +26,14 @@ def test_purge_logic():
     m2 = MagicMock(spec=Path)
     m2.name = "br-001-model.jpg"
     m2.is_file.return_value = True
-    m2.stat.return_value.st_size = 2 * 1024 * 1024 # 2MB
+    m2.stat.return_value.st_size = 2 * 1024 * 1024  # 2MB
     mock_files.append(m2)
 
     # Safe file
     m3 = MagicMock(spec=Path)
     m3.name = "br-001.jpg"
     m3.is_file.return_value = True
-    m3.stat.return_value.st_size = 500 * 1024 # 500KB
+    m3.stat.return_value.st_size = 500 * 1024  # 500KB
     mock_files.append(m3)
 
     with patch("scripts.purge_hallucinations.PRODUCTS_DIR") as mock_dir:

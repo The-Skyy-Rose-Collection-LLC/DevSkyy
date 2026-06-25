@@ -14,6 +14,7 @@ import logging
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
+from llm.model_ids import GEMINI_FLASH_2_MODEL
 
 from ..models import VariantResult
 
@@ -28,7 +29,7 @@ class VariantAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_variant_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_FLASH_2_MODEL,
                 system_prompt="You are the Legendary Variant Architect for SkyyRose. You create diverse, hyper-accurate product variations.",
             )
         super().__init__(config)
@@ -45,12 +46,19 @@ class VariantAgent(BaseSuperAgent):
         logger.info(f"Running Legendary Variant Generation for {sku} via ADK...")
         adk_result = await self.execute(adk_prompt)
 
-        # Placeholder: Phase B2 logic (Claude Sonnet + GPT-4o best-of-N)
-        # Return base image as the only variant for now
+        # P1 #7: Pass-through stub. Phase B2 best-of-N logic not wired yet.
+        # success=False so callers don't consume base image as a "variant".
+        logger.warning(
+            "VariantAgent.generate_variants is a stub: returning base image as only variant. "
+            "Wire to Claude Sonnet + GPT-4o best-of-N before relying on output."
+        )
         metadata = adk_result.to_dict() if hasattr(adk_result, "to_dict") else {}
 
         return [
             VariantResult(
-                success=True, variant_name="default", output_path=base_image_path, metadata=metadata
+                success=False,
+                variant_name="default",
+                output_path=base_image_path,
+                metadata={**metadata, "stub": True, "reason": "variants_not_implemented"},
             )
         ]

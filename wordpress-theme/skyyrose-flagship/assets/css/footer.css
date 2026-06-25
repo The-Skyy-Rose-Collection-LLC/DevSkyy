@@ -70,7 +70,7 @@
 	gap: 0.5rem;
 	padding: 0.75rem 1.25rem;
 	min-height: 44px;
-	background: #B76E79;
+	background: var(--skyyrose-accent, #B76E79);
 	border: none;
 	color: #fff;
 	font-family: var(--font-body, 'Inter', sans-serif);
@@ -84,7 +84,7 @@
 }
 
 .footer-newsletter__submit:hover {
-	background: #D4AF37;
+	background: var(--skyyrose-secondary, #D4AF37);
 	color: #000;
 }
 
@@ -124,7 +124,7 @@
 	transition: color 0.2s ease;
 }
 
-.footer-grid__list a:hover { color: #B76E79; }
+.footer-grid__list a:hover { color: var(--skyyrose-accent, #B76E79); }
 
 .footer-grid__col--brand { padding-right: 2rem; }
 
@@ -139,7 +139,6 @@
 .footer-brand__monogram {
 	width: 36px;
 	height: 36px;
-	border-radius: 50%;
 	object-fit: contain;
 }
 
@@ -181,7 +180,7 @@
 }
 
 .footer-brand__social-link:hover {
-	color: #B76E79;
+	color: var(--skyyrose-accent, #B76E79);
 	background: rgba(183, 110, 121, 0.1);
 }
 
@@ -225,7 +224,7 @@
 	align-items: center;
 }
 
-.footer-copyright__menu a:hover { color: #B76E79; }
+.footer-copyright__menu a:hover { color: var(--skyyrose-accent, #B76E79); }
 
 .toast-container {
 	position: fixed;
@@ -277,18 +276,18 @@
 /* ── Focus-visible rings for keyboard navigation ── */
 .footer-grid__list a:focus-visible,
 .footer-copyright__menu a:focus-visible {
-	outline: 2px solid #B76E79;
+	outline: 2px solid var(--skyyrose-accent, #B76E79);
 	outline-offset: 3px;
 	border-radius: 2px;
 }
 
 .footer-brand__social-link:focus-visible {
-	outline: 2px solid #B76E79;
+	outline: 2px solid var(--skyyrose-accent, #B76E79);
 	outline-offset: 3px;
 }
 
 .footer-brand__logo-link:focus-visible {
-	outline: 2px solid #B76E79;
+	outline: 2px solid var(--skyyrose-accent, #B76E79);
 	outline-offset: 3px;
 	border-radius: 4px;
 }

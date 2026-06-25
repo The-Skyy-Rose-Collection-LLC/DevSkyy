@@ -270,6 +270,19 @@ def test_jersey_patch_lookup(catalog: Catalog) -> None:
     assert catalog.jersey_patch_for("br-001") is None  # not a jersey
 
 
+def test_jersey_patch_lookup_live_catalog_v4_skus() -> None:
+    """br-014/015 (registry v4) auto-detect baseball from CSV names. br-013 retired."""
+    from skyyrose.elite_studio.catalog import Catalog
+
+    live = Catalog.load()
+    assert live.jersey_patch_for("br-014") == "baseball"
+    assert live.jersey_patch_for("br-015") == "baseball"
+    assert live.jersey_patch_for("br-010") == "basketball"
+    assert live.jersey_patch_for("br-011") == "hockey"
+    # br-013 was retired (duplicate of br-003)
+    assert live.get("br-013") is None
+
+
 # ─── Collection filtering ─────────────────────────────────────────────
 
 

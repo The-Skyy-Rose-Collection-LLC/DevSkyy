@@ -58,6 +58,7 @@ from typing import Any
 
 from adk.base import AgentConfig, AgentResult, AgentStatus
 from agents.base_super_agent import EnhancedSuperAgent, SuperAgentType
+from llm.model_ids import CODE_REVIEW_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -1024,7 +1025,7 @@ class CodingDoctorAgent(EnhancedSuperAgent):
             config = AgentConfig(
                 name="CodingDoctorAgent",
                 description="Self-learning, self-healing codebase guardian",
-                model="claude-sonnet-4-20250514",
+                model=CODE_REVIEW_MODEL,
                 temperature=0.3,
             )
         super().__init__(config)
@@ -1381,7 +1382,7 @@ class CodingDoctorAgent(EnhancedSuperAgent):
 
 
 def create_coding_doctor(
-    model: str = "claude-sonnet-4-20250514",
+    model: str = CODE_REVIEW_MODEL,
     temperature: float = 0.3,
 ) -> CodingDoctorAgent:
     """Create a Coding Doctor agent"""

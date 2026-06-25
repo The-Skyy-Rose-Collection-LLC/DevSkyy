@@ -298,7 +298,7 @@ async def download_product_images(
 
             for idx, image_url in enumerate(product.image_urls):
                 # Generate cache filename from URL hash
-                url_hash = hashlib.md5(image_url.encode()).hexdigest()[:12]
+                url_hash = hashlib.md5(image_url.encode(), usedforsecurity=False).hexdigest()[:12]
                 extension = Path(image_url).suffix or ".jpg"
                 cache_path = sku_dir / f"image_{idx}_{url_hash}{extension}"
 

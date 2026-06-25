@@ -399,11 +399,21 @@
 		showStep: function (step) {
 			this.$steps
 				.removeClass('skyy-checkout__step--active')
-				.removeAttr('data-skyy-active');
+				.removeAttr('data-skyy-active')
+				.removeAttr('tabindex');
 
-			$('[data-skyy-step="' + step + '"]')
+			var $active = $('[data-skyy-step="' + step + '"]')
 				.addClass('skyy-checkout__step--active')
 				.attr('data-skyy-active', '');
+
+			var $firstField = $active.find('input,select,textarea,button,[tabindex]').not('[disabled],[tabindex="-1"]').first();
+			window.setTimeout(function () {
+				if ( $firstField.length ) {
+					$firstField.trigger('focus');
+				} else {
+					$active.attr('tabindex','-1').trigger('focus');
+				}
+			}, 320);
 		},
 
 		updateProgress: function (step) {

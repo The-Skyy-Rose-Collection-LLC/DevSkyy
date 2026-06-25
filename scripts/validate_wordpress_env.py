@@ -53,19 +53,19 @@ def run_wp_cli(command: str) -> tuple[bool, str]:
     if not wp_path or not wp_cli:
         return False, "WP-CLI path not configured"
 
-    full_command = (
-        f'cd {wp_path} && php {wp_cli} {command} --allow-root 2>&1 | grep -v "Deprecated:"'
-    )
+    argv = ["php", wp_cli, *command.split(), "--allow-root"]
 
     try:
         result = subprocess.run(
-            full_command,
-            shell=True,
-            capture_output=True,
+            argv,
+            cwd=wp_path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
             timeout=30,
         )
-        return result.returncode == 0, result.stdout.strip()
+        output = "\n".join(line for line in result.stdout.splitlines() if "Deprecated:" not in line)
+        return result.returncode == 0, output.strip()
     except subprocess.TimeoutExpired:
         return False, "Command timed out"
     except Exception as e:

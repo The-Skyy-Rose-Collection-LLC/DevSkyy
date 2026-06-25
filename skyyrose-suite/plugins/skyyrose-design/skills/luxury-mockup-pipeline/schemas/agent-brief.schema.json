@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "luxury-mockup-pipeline/agent-brief.schema.json",
+  "title": "Agent Brief Contract",
+  "description": "Structured prompt contract delivered to each pipeline agent. JSON-first so the agent has a deterministic input shape; the agent reads this AND the companion HTML reference layout before producing any output.",
+  "type": "object",
+  "required": ["agent", "mode", "mission", "scope", "performance_baseline", "deliverables", "roi_upgrade", "constraints", "return_format"],
+  "properties": {
+    "agent": {
+      "type": "string",
+      "enum": ["UX Architect", "UI Designer", "Brand Guardian", "Frontend Developer", "Senior Developer"],
+      "description": "Which pipeline role this brief is for"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["refine", "build", "migrate", "harden"],
+      "description": "Pipeline mode — refine an existing mockup, build from scratch, migrate platforms, or harden production"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["wordpress", "next.js", "shopify", "astro", "webflow", "wix", "standalone-html"],
+      "description": "Target platform — agent picks appropriate idioms"
+    },
+    "criteria": {
+      "type": "string",
+      "enum": ["luxury", "saas", "ecommerce", "marketing", "editorial", "portfolio"],
+      "description": "Vertical/use-case — agent applies vertical-specific patterns"
+    },
+    "mission": {
+      "type": "object",
+      "required": ["objective", "founder_feedback"],
+      "properties": {
+        "objective": {"type": "string", "description": "One-sentence goal for this dispatch"},
+        "founder_feedback": {"type": "string", "description": "Verbatim founder quote driving this work"},
+        "success_metric": {"type": "string", "description": "How we know the agent succeeded"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "Full layout coverage — agent must address every surface listed",
+      "required": ["header", "page_body", "footer"],
+      "properties": {
+        "header": {
+          "type": "object",
+          "properties": {
+            "navbar": {"type": "boolean", "default": true},
+            "mobile_nav": {"type": "boolean", "default": true},
+            "announcement_bar": {"type": "boolean"},
+            "search": {"type": "boolean"},
+            "account_menu": {"type": "boolean"},
+            "cart_indicator": {"type": "boolean"}
+          }
+        },
+        "page_body": {
+          "type": "object",
+          "required": ["pages"],
+          "properties": {
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["home", "collection", "product-detail", "cart", "checkout", "search", "404", "about", "contact", "blog-list", "blog-post", "lookbook", "preorder", "immersive", "account", "wishlist", "policies"]
+              }
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["hero", "cover", "voice-quote", "spread-grid", "product-card", "category-tile", "testimonial", "newsletter", "story-block", "cta-banner", "size-guide", "review-block", "faq", "press-strip", "lookbook-strip", "founder-letter", "marquee", "video-loop", "image-comparison", "before-after", "stat-counter", "timeline", "instagram-feed", "trust-badges"]
+              }
+            },
+            "widgets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["scroll-progress", "back-to-top", "live-chat", "currency-switcher", "language-switcher", "cookie-consent", "toast-notification", "modal", "drawer", "tooltip", "popover", "share-buttons", "wishlist-heart", "quick-view", "filter-sidebar", "sort-dropdown", "pagination", "breadcrumb", "compare-tray", "size-recommender"]
+              }
+            },
+            "layouts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["magazine-spread", "asymmetric-grid", "12col-bootstrap", "css-grid-template-areas", "masonry", "scroll-snap", "horizontal-scroll", "split-screen", "z-pattern", "f-pattern", "centered-stage", "marginalia"]
+              }
+            }
+          }
+        },
+        "footer": {
+          "type": "object",
+          "properties": {
+            "primary_footer": {"type": "boolean", "default": true},
+            "newsletter_block": {"type": "boolean"},
+            "link_columns": {"type": "boolean"},
+            "social_strip": {"type": "boolean"},
+            "payment_icons": {"type": "boolean"},
+            "legal_strip": {"type": "boolean"},
+            "founder_signature": {"type": "boolean"},
+            "back_to_top": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "performance_baseline": {
+      "type": "object",
+      "description": "Always-encourage performance defaults. Agent must meet or exceed.",
+      "properties": {
+        "lcp_seconds": {"type": "number", "default": 2.5, "description": "Largest Contentful Paint target"},
+        "cls": {"type": "number", "default": 0.1, "description": "Cumulative Layout Shift max"},
+        "inp_ms": {"type": "number", "default": 200, "description": "Interaction to Next Paint max"},
+        "lighthouse_performance": {"type": "number", "default": 95, "description": "Min Lighthouse perf score"},
+        "lighthouse_accessibility": {"type": "number", "default": 100},
+        "lighthouse_seo": {"type": "number", "default": 100},
+        "lighthouse_best_practices": {"type": "number", "default": 100},
+        "wcag_level": {"type": "string", "default": "AA"},
+        "image_format_priority": {"type": "array", "items": {"type": "string"}, "default": ["avif", "webp", "jpg/png"]},
+        "font_loading": {"type": "string", "default": "self-hosted woff2, font-display: swap, preload critical"},
+        "js_budget_kb": {"type": "number", "default": 200, "description": "Max compressed JS per page"},
+        "css_budget_kb": {"type": "number", "default": 100, "description": "Max compressed CSS per page"}
+      }
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "format"],
+        "properties": {
+          "name": {"type": "string"},
+          "path": {"type": "string", "description": "Where the file should be written"},
+          "format": {"type": "string", "enum": ["markdown", "json", "html", "css", "js", "php"]},
+          "sections": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "roi_upgrade": {
+      "type": "object",
+      "required": ["mandate", "category_options", "constraints"],
+      "properties": {
+        "mandate": {"type": "string", "description": "Required: exactly 1 high-ROI upgrade per the skill's Upgrade Mandate"},
+        "category_options": {"type": "array", "items": {"type": "string"}},
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "self_contained": {"type": "boolean", "default": true},
+            "production_grade": {"type": "boolean", "default": true},
+            "prefers_reduced_motion_safe": {"type": "boolean", "default": true},
+            "browser_fallback_required": {"type": "boolean", "default": true},
+            "single_commit_scope": {"type": "boolean", "default": true}
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "no_three_js": {"type": "boolean", "default": false, "description": "Set true for standalone mockups"},
+        "no_cdn_dependencies": {"type": "boolean", "default": true},
+        "no_modify_target": {"type": "boolean", "default": false, "description": "True for diagnostic agents, false for executor"},
+        "canon_docs": {"type": "array", "items": {"type": "string"}, "description": "Paths to brand canon docs that override agent judgment"},
+        "locked_out_references": {"type": "array", "items": {"type": "string"}, "description": "Brand references the agent MUST NOT cite"},
+        "working_directory": {"type": "string"}
+      }
+    },
+    "return_format": {
+      "type": "object",
+      "required": ["max_words", "required_fields"],
+      "properties": {
+        "max_words": {"type": "integer", "default": 180, "description": "Return summary word ceiling — token-aware"},
+        "required_fields": {"type": "array", "items": {"type": "string"}},
+        "format": {"type": "string", "enum": ["json", "markdown"], "default": "markdown"}
+      }
+    },
+    "html_reference_path": {
+      "type": "string",
+      "description": "Path to companion HTML reference layout — agent reads this for canonical structure"
+    },
+    "memory": {
+      "type": "object",
+      "description": "Agent's persistent memory pointers — read on every dispatch, write after corrections or pattern locks",
+      "required": ["read_paths", "write_path", "write_mandate"],
+      "properties": {
+        "read_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Paths the agent MUST read before producing output (shared + own discipline INDEX)"
+        },
+        "write_path": {
+          "type": "string",
+          "description": "Directory where the agent writes new memory entries (one .md per fact, INDEX.md updated)"
+        },
+        "write_mandate": {
+          "type": "string",
+          "description": "When the agent must write a memory entry"
+        },
+        "previous_entries": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Slugs of memory entries known to be relevant to current dispatch"
+        }
+      }
+    },
+    "dispatched_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp when this brief was resolved + dispatched. Used to detect staleness."
+    }
+  }
+}

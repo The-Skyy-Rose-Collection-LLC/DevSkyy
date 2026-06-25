@@ -1,8 +1,9 @@
 /**
  * SkyyRose Single Product Page JS — Elite Web Builder v4.0.0
  *
- * Gallery zoom, thumbnail switcher, WC variation image swap,
- * accordion, sticky ATC bar, AJAX cart feedback, scroll reveals.
+ * Thumbnail switcher, WC variation image swap, AJAX cart feedback.
+ * Hero reveals (.rv-clip-left/.rv-clip-right) are served by the
+ * global observer in premium-interactions.js — no parallel observer here.
  *
  * @package SkyyRose
  * @since 4.0.0
@@ -10,30 +11,8 @@
 (function($) {
     'use strict';
 
-    var galleryMain = document.querySelector('.sr-gallery-main');
     var mainImg = document.getElementById('srMainImg');
-    var zoomEl = document.getElementById('srZoom');
     var thumbs = document.querySelectorAll('.sr-thumb');
-
-    /* ════════════════════════════════════════
-       Gallery Zoom (desktop only)
-       ════════════════════════════════════════ */
-    if (galleryMain && mainImg && zoomEl) {
-        galleryMain.addEventListener('mousemove', function(e) {
-            var rect = galleryMain.getBoundingClientRect();
-            var x = ((e.clientX - rect.left) / rect.width) * 100;
-            var y = ((e.clientY - rect.top) / rect.height) * 100;
-            zoomEl.style.backgroundPosition = x + '% ' + y + '%';
-        });
-        galleryMain.addEventListener('mouseenter', function() {
-            zoomEl.style.backgroundImage = 'url("' + (mainImg.src || mainImg.currentSrc) + '")';
-        });
-        // Disable zoom on touch devices.
-        if ('ontouchstart' in window) {
-            galleryMain.style.cursor = 'default';
-            zoomEl.style.display = 'none';
-        }
-    }
 
     /* ════════════════════════════════════════
        Thumbnail Switcher
@@ -47,7 +26,6 @@
                 setTimeout(function() {
                     mainImg.src = imgSrc;
                     mainImg.style.opacity = '1';
-                    if (zoomEl) zoomEl.style.backgroundImage = 'url("' + imgSrc + '")';
                 }, 250);
                 thumbs.forEach(function(t) { t.classList.remove('sr-thumb-active'); });
                 thumb.classList.add('sr-thumb-active');
@@ -64,7 +42,6 @@
             setTimeout(function() {
                 mainImg.src = v.image.full_src;
                 mainImg.style.opacity = '1';
-                if (zoomEl) zoomEl.style.backgroundImage = 'url("' + v.image.full_src + '")';
             }, 250);
         }
     });
@@ -72,11 +49,71 @@
         var first = document.querySelector('.sr-thumb');
         if (first && mainImg) {
             mainImg.src = first.dataset.img;
-            if (zoomEl) zoomEl.style.backgroundImage = 'url("' + first.dataset.img + '")';
             thumbs.forEach(function(t) { t.classList.remove('sr-thumb-active'); });
             first.classList.add('sr-thumb-active');
         }
     });
+
+    /* ════════════════════════════════════════
+       Editorial Size Chip → WC Variation Form Binding
+       Wires the decorative .sr-ed__size buttons to the WooCommerce variations
+       form's size <select>. Without this, customers see selectable-looking
+       chips but cannot actually pick a size. (P0 fix, audit 2026-05-23)
+       ════════════════════════════════════════ */
+    var sizeChips = document.querySelectorAll('.sr-ed__sizes .sr-ed__size');
+    if (sizeChips.length) {
+        function getSizeSelect() {
+            return document.querySelector('.variations_form select[name="attribute_pa_size"]')
+                || document.querySelector('.variations_form select[name="attribute_size"]');
+        }
+        function syncChipsToSelectValue(value) {
+            var current = (value || '').toLowerCase();
+            sizeChips.forEach(function(c) {
+                var isMatch = current && c.dataset.size && c.dataset.size.toLowerCase() === current;
+                c.classList.toggle('is-selected', isMatch);
+                c.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+            });
+        }
+        sizeChips.forEach(function(chip) {
+            chip.addEventListener('click', function() {
+                var size = chip.dataset.size;
+                if (!size) return;
+                var sizeSelect = getSizeSelect();
+                if (sizeSelect) {
+                    var matched = false;
+                    Array.prototype.forEach.call(sizeSelect.options, function(opt) {
+                        if (opt.value && opt.value.toLowerCase() === size.toLowerCase()) {
+                            sizeSelect.value = opt.value;
+                            matched = true;
+                        }
+                    });
+                    if (matched) {
+                        $(sizeSelect).trigger('change');
+                    }
+                }
+                syncChipsToSelectValue(size);
+            });
+        });
+        // Mirror WC variation form state back to chips when WC resolves a
+        // variation (fires AFTER WC validates stock/availability, so the
+        // select value at this point is the confirmed selection — not the
+        // in-flight user pick that WC may later clear). Matches the
+        // found_variation / reset_data event pair used by the image-swap
+        // handler at line 61 of this file.
+        $(document).on('found_variation', '.variations_form', function() {
+            var sizeSelect = getSizeSelect();
+            if (sizeSelect) syncChipsToSelectValue(sizeSelect.value);
+        });
+        $(document).on('reset_data', '.variations_form', function() {
+            syncChipsToSelectValue('');
+        });
+        // Initial sync — WC may set the select via URL query string or
+        // persisted variation choice before this handler binds.
+        var initialSelect = getSizeSelect();
+        if (initialSelect && initialSelect.value) {
+            syncChipsToSelectValue(initialSelect.value);
+        }
+    }
 
     /* ════════════════════════════════════════
        Product Details Accordion
@@ -156,7 +193,7 @@
         var btn = document.querySelector('.sr-atc-wrap .single_add_to_cart_button');
         if (btn) {
             var orig = btn.textContent;
-            btn.textContent = '\u2713 ADDED TO BAG';
+            btn.textContent = '✓ ADDED TO BAG';
             btn.style.opacity = '.7';
             setTimeout(function() {
                 btn.textContent = orig;
@@ -164,149 +201,5 @@
             }, 2000);
         }
     });
-
-    /* ════════════════════════════════════════
-       Social Share Buttons
-       ════════════════════════════════════════ */
-    // Web Share API on mobile (native share sheet).
-    var nativeBtn = document.querySelector('.sr-share-native');
-    if (nativeBtn && navigator.share) {
-        nativeBtn.style.display = '';
-        nativeBtn.addEventListener('click', function() {
-            navigator.share({
-                title: nativeBtn.dataset.title,
-                text: nativeBtn.dataset.text,
-                url: nativeBtn.dataset.url
-            }).catch(function() { /* user cancelled — noop */ });
-        });
-    }
-
-    // Copy link button.
-    var copyBtn = document.querySelector('.sr-share-copy');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function() {
-            var url = copyBtn.dataset.url;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(function() {
-                    copyBtn.classList.add('sr-share-copied');
-                    setTimeout(function() { copyBtn.classList.remove('sr-share-copied'); }, 2000);
-                });
-            }
-        });
-    }
-
-    /* ════════════════════════════════════════
-       Recently Viewed Products (localStorage)
-       ════════════════════════════════════════ */
-    var RV_KEY = 'sr_recently_viewed';
-    var RV_MAX = 8;
-
-    // Track current product.
-    var rvJson = document.getElementById('sr-rv-product');
-    if (rvJson) {
-        try {
-            var current = JSON.parse(rvJson.textContent);
-            var viewed = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
-
-            // Remove duplicate (same product ID).
-            viewed = viewed.filter(function(p) { return p.id !== current.id; });
-
-            // Prepend current product.
-            viewed.unshift(current);
-
-            // Cap at max.
-            if (viewed.length > RV_MAX) viewed = viewed.slice(0, RV_MAX);
-
-            localStorage.setItem(RV_KEY, JSON.stringify(viewed));
-        } catch (e) { /* localStorage quota — noop */ }
-    }
-
-    // Render recently viewed carousel (exclude current product).
-    var rvSection = document.querySelector('.sr-recently-viewed');
-    var rvGrid = rvSection ? rvSection.querySelector('.sr-rv-grid') : null;
-
-    if (rvSection && rvGrid) {
-        try {
-            var items = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
-            var currentId = rvJson ? JSON.parse(rvJson.textContent).id : null;
-
-            // Filter out current product.
-            var others = items.filter(function(p) { return p.id !== currentId; });
-
-            if (others.length > 0) {
-                rvGrid.textContent = ''; // Clear existing content safely.
-                others.slice(0, 6).forEach(function(p) {
-                    var card = document.createElement('a');
-                    card.href = p.url;
-                    card.className = 'sr-rv-card';
-
-                    var imgWrap = document.createElement('div');
-                    imgWrap.className = 'sr-rv-img';
-
-                    if (p.image) {
-                        var img = document.createElement('img');
-                        img.src = p.image;
-                        img.alt = p.name;
-                        img.loading = 'lazy';
-                        imgWrap.appendChild(img);
-                    } else {
-                        var letter = document.createElement('span');
-                        letter.className = 'sr-rv-letter';
-                        letter.textContent = p.name.charAt(0);
-                        imgWrap.appendChild(letter);
-                    }
-
-                    var badge = document.createElement('span');
-                    badge.className = 'sr-rv-badge';
-                    badge.textContent = p.badge;
-                    imgWrap.appendChild(badge);
-
-                    var body = document.createElement('div');
-                    body.className = 'sr-rv-body';
-
-                    var name = document.createElement('h3');
-                    name.className = 'sr-rv-name';
-                    name.textContent = p.name;
-                    body.appendChild(name);
-
-                    var price = document.createElement('span');
-                    price.className = 'sr-rv-price';
-                    price.textContent = p.price;
-                    body.appendChild(price);
-
-                    card.appendChild(imgWrap);
-                    card.appendChild(body);
-                    rvGrid.appendChild(card);
-                });
-                rvSection.style.display = '';
-            }
-        } catch (e) { /* parse error — section stays hidden */ }
-    }
-
-    /* ════════════════════════════════════════
-       Scroll Reveal Animations
-       ════════════════════════════════════════ */
-    if ('IntersectionObserver' in window &&
-        !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-
-        var obs = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    obs.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-
-        document.querySelectorAll(
-            '.sr-related-card, .sr-accordion, .sr-cta-banner, .sr-related-head, .sr-rv-card, .sr-rv-head'
-        ).forEach(function(el) {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)';
-            obs.observe(el);
-        });
-    }
 
 })(jQuery);

@@ -535,13 +535,20 @@ class ThreeDGenerationPipeline:
                     )
 
                     client = self._providers[current_provider]
-                    model_path = await client.generate_from_image(
+                    result = await client.generate_from_image(
                         image_path=str(image_path),
                         output_dir=config.output_dir,
                         output_format=config.output_format.value,
                         prompt=prompt,
                         texture_resolution=config.texture_resolution,
                     )
+
+                    # Meshy returns a dict (model_path + thumbnail_url + metadata);
+                    # other providers return a path string. Normalize to a path string.
+                    if isinstance(result, dict):
+                        model_path = result.get("model_path")
+                    else:
+                        model_path = result
 
                     if model_path and Path(model_path).exists():
                         logger.info(

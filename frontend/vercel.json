@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "devskyy",
   "buildCommand": "next build",
   "devCommand": "next dev",
   "installCommand": "npm install",

@@ -1,0 +1,94 @@
+{
+  "skus_requested": [
+    "br-001",
+    "lh-004",
+    "sg-007",
+    "kids-001"
+  ],
+  "elapsed_seconds": 1661.2732792500028,
+  "max_usd": 15.0,
+  "cap_exceeded": false,
+  "summary": {
+    "passed": 0,
+    "refined": 4,
+    "total_cost": 0.35000000000000003
+  },
+  "results": [
+    {
+      "sku": "br-001",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp",
+      "engine_used": "gemini-pro",
+      "route_decision": "Complex fabric (Smooth, lustrous knit fabric with a satin-like sheen for the body and sleeves. The collar, cuffs, and hem are made of a matte, ribbed knit.) \u2014 Gemini Pro best at material physics",
+      "qa_score": 42.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.08,
+      "issues": [
+        "SR monogram is misplaced on the front of the garment \u2014 spec restricts the SR monogram to the back-neck only.",
+        "Large rose/cloud graphic appears on the mid-back, which is a prohibited hallucination \u2014 back-center must be empty.",
+        "Front-chest rose logo is not rendered as a tonal black-on-black emboss; it reads as visible embroidery/applique with non-tonal contrast, violating the embossed-only technique spec.",
+        "SR monogram lettering is distorted and does not cleanly read 'SR' (reads closer to '$R'), failing the canonical gold lettermark requirement.",
+        "Canonical three-rose-cluster artwork (roses + thorny vines + cloud) is not faithfully reproduced."
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "lh-004",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-front-render.webp",
+      "engine_used": "flux-pro",
+      "route_decision": "Standard garment \u2014 FLUX Pro best value (98% quality, 26% cost)",
+      "qa_score": 30.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.07500000000000001,
+      "issues": [
+        "Front closure is a zipper; spec requires a full-length body-tone button or snap placket (explicit negative violation).",
+        "Hood has drawstrings, which are explicitly forbidden on this button-front bomber (hallucination).",
+        "Heart-and-thorns/rose graphic is rendered on the front chest, explicitly forbidden \u2014 that lockup belongs on the back only (hallucination).",
+        "Front wordmark is not in canonical red cursive embroidered script; 'Love'/'Hurts' placement and styling are incorrect across the placket.",
+        "Inner hood lining lacks the required white-with-red-rose-silhouette sublimated mini-pattern."
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "sg-007",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/sg-007-front-render.webp",
+      "engine_used": "flux-pro",
+      "route_decision": "Standard garment \u2014 FLUX Pro best value (98% quality, 26% cost)",
+      "qa_score": 48.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.07500000000000001,
+      "issues": [
+        "Front decoration is rendered as a rectangular patch/applique with a raised border \u2014 spec requires direct embroidery into the cuff face and explicitly forbids any exterior patch or tag.",
+        "Rose graphic does not match any canonical variant: only two roses instead of the three-rose cluster, and the white cloud wraps the roses as a background rather than sitting at the base of the thorny stems.",
+        "Logo scale appears too large/prominent for the ~1.5\u20132in cuff embroidery callout, and canonical details (thorny vines, blue accents in the cloud) are missing or incorrect.",
+        "Garment silhouette is mostly correct: black cuffed knit beanie with no brim or pom-pom.",
+        "Front decoration is wrong in material: it appears as a rectangular sewn patch/applique with a border, while the spec requires embroidery directly into the cuff and no exterior tag/patch."
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "kids-001",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/kids-001-front-render.webp",
+      "engine_used": "gpt-image",
+      "route_decision": "Text/logo product (kids-001) \u2014 GPT Image has 96%+ text accuracy",
+      "qa_score": 22.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.12,
+      "issues": [
+        "Hallucinated large white rose/laurel graphic on the black upper chest panel \u2014 not in spec.",
+        "Hallucinated large circular text patch on the sweatpants \u2014 not in spec.",
+        "Pants are rust/orange instead of solid black.",
+        "Lower hoodie body and hood are rust/orange instead of saturated red.",
+        "Drawstrings on both hoodie and pants are black instead of the required white flat drawstrings."
+      ],
+      "refinement_applied": true
+    }
+  ]
+}

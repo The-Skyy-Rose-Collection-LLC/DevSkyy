@@ -39,7 +39,7 @@ class Tripo3DClient:
         with open(image_path, "rb") as f:
             files = {"file": f}
             headers = {"Authorization": f"Bearer {self.api_key}"}
-            response = requests.post(url, headers=headers, files=files)
+            response = requests.post(url, headers=headers, files=files, timeout=60)
 
         response.raise_for_status()
         data = response.json()
@@ -54,7 +54,7 @@ class Tripo3DClient:
             "file": {"type": "png", "file_token": image_token},
         }
 
-        response = requests.post(url, headers=self.headers, json=payload)
+        response = requests.post(url, headers=self.headers, json=payload, timeout=30)
         response.raise_for_status()
         data = response.json()
         return data["data"]["task_id"]
@@ -62,13 +62,13 @@ class Tripo3DClient:
     def get_task_status(self, task_id: str) -> dict:
         """Get task status and result."""
         url = f"{self.base_url}/task/{task_id}"
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers, timeout=30)
         response.raise_for_status()
         return response.json()["data"]
 
     def download_model(self, model_url: str, output_path: str):
         """Download GLB model from URL."""
-        response = requests.get(model_url)
+        response = requests.get(model_url, timeout=120)
         response.raise_for_status()
 
         with open(output_path, "wb") as f:

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevSkyy Memory Architecture</title>
+<style>
+  body { font: 15px/1.6 -apple-system, system-ui, sans-serif; max-width: 980px; margin: 2rem auto; padding: 0 1.25rem; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .3rem; }
+  h2 { margin-top: 2.2rem; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  code { background: #f4f4f4; padding: .1rem .35rem; border-radius: 3px; font-size: .9em; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 14px; }
+  th, td { border: 1px solid #ccc; padding: .5rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #0A0A0A; color: #fff; }
+  .tracked { color: #1a7f37; font-weight: 600; }
+  .ignored { color: #9a6700; }
+  .ext { color: #8250df; }
+  .note { background: #fff8e6; border-left: 4px solid #B76E79; padding: .6rem 1rem; margin: 1rem 0; }
+  small { color: #666; }
+</style>
+</head>
+<body>
+<h1>DevSkyy Memory Architecture</h1>
+<p><small>Source of truth for how memory/context is stored, who writes it, and how it stays in sync. Established 2026-06-12. Pairs with <code>.wolf/OPENWOLF.md</code> (the OpenWolf protocol) and the auto-memory protocol in the global CLAUDE.md.</small></p>
+
+<div class="note">
+<strong>Core principle:</strong> every memory artifact has exactly one <em>scope</em> (repo-shared, machine-personal, or ephemeral) and one <em>owner</em>. Do not write the same fact into multiple systems — pick the scope. Derived/ephemeral artifacts are <strong>git-ignored and never hand-authored.</strong>
+</div>
+
+<h2 id="sources">1. The nine sources</h2>
+<table>
+  <tr><th>#</th><th>Source</th><th>Scope</th><th>Git</th><th>Owner / writer</th><th>Role</th></tr>
+  <tr><td>1</td><td><code>~/.claude-mem/claude-mem.db</code></td><td>machine-personal</td><td class="ext">outside repo</td><td>claude-mem worker (auto-ingests transcripts)</td><td>Cross-session episodic observations. Query via the claude-mem MCP search / <code>mem-search</code> skill. <strong>Never authored by hand.</strong></td></tr>
+  <tr><td>2</td><td><code>.wolf/cerebrum.md</code></td><td>repo-shared</td><td class="tracked">TRACKED</td><td>me (per OPENWOLF protocol)</td><td>Durable project learnings, Do-Not-Repeat, conventions, decision log. Travels with the code.</td></tr>
+  <tr><td>3</td><td><code>.wolf/anatomy.md</code></td><td>repo-shared</td><td class="tracked">TRACKED</td><td>me (on file create/delete/rename)</td><td>File map: 2–3 line description + token estimate per file. Read before opening files.</td></tr>
+  <tr><td>4</td><td><code>.wolf/buglog.json</code></td><td>repo-shared</td><td class="tracked">TRACKED</td><td>me (after any bug/fix)</td><td>Bug ledger. Append-only; union-merged by <code>id</code> on branch merges.</td></tr>
+  <tr><td>5</td><td><code>tasks/todo.md</code> + <code>tasks/lessons.md</code></td><td>repo-shared</td><td class="tracked">TRACKED</td><td>me</td><td>Active worklist + behavioral lessons from corrections.</td></tr>
+  <tr><td>6</td><td>Auto-memory <code>~/.claude/projects/&lt;proj&gt;/memory/</code> (<code>MEMORY.md</code> + fact files)</td><td>machine-personal</td><td class="ext">outside repo</td><td>me (per global auto-memory protocol)</td><td>Durable personal facts/preferences (catalog source, brand canon pointers, founder voice). Loaded at session start.</td></tr>
+  <tr><td>7</td><td><code>.wolf/memory.md</code></td><td>ephemeral</td><td class="ignored">ignored</td><td>me (one row per significant action)</td><td>Action log. Churns every action — derived narrative, not content.</td></tr>
+  <tr><td>8</td><td><code>.wolf/claude-mem-digest.md</code></td><td>derived</td><td class="ignored">ignored</td><td>SessionStart hook <code>claude-mem-sync.sh</code></td><td>Last ~25 claude-mem observations synced in for cross-session context. Regenerated each session.</td></tr>
+  <tr><td>9</td><td><code>**/CLAUDE.local.md</code></td><td>derived</td><td class="ignored">ignored</td><td>claude-mem worker (per-folder)</td><td>Per-folder claude-mem context injection. Claude Code loads it as local context; git ignores it. <strong>(New target — see §3.)</strong></td></tr>
+  <tr><td>—</td><td><code>CLAUDE.md</code>, <code>.claude/rules/*</code>, <code>.wolf/OPENWOLF.md</code></td><td>repo-shared</td><td class="tracked">TRACKED</td><td>me (intentional edits only)</td><td>Standing instructions/standards. <strong>Must contain NO injected memory blocks.</strong></td></tr>
+</table>
+
+<h2 id="overlap">2. Overlap resolution (the alignment rule)</h2>
+<p>"Learnings / gotchas / preferences" historically lived in <em>three</em> places at once — cerebrum, auto-memory, and claude-mem. From now on, route by scope:</p>
+<table>
+  <tr><th>If the fact is…</th><th>Write it to</th><th>Why</th></tr>
+  <tr><td>A repo-scoped convention or gotcha (true for anyone working this codebase)</td><td><code>.wolf/cerebrum.md</code></td><td>Travels with the repo; every clone/teammate gets it.</td></tr>
+  <tr><td>A personal, cross-project fact or preference</td><td>Auto-memory fact file</td><td>Yours across all projects; not repo-bound.</td></tr>
+  <tr><td>Raw "what happened in this session" history</td><td>nothing — claude-mem captures it</td><td>Auto-ingested. Query it; don't author it.</td></tr>
+  <tr><td>An active task / worklist item</td><td><code>tasks/todo.md</code></td><td>Single worklist, survives session boundaries.</td></tr>
+  <tr><td>A bug + its fix</td><td><code>.wolf/buglog.json</code></td><td>Single ledger, dedup by id.</td></tr>
+</table>
+
+<h2 id="sync">3. Synchronization config (2026-06-12)</h2>
+<p>The problem: claude-mem's per-folder injection wrote <code>&lt;claude-mem-context&gt;</code> blocks into <strong>tracked</strong> <code>CLAUDE.md</code> files (342 of them). Because a background worker mutates them on a timer, any multi-step git op that resets the index (<code>merge --abort</code>, <code>rebase</code>, <code>reset</code>, branch checkout) raced the worker and failed with <code>Entry 'X/CLAUDE.md' not uptodate</code>.</p>
+<p>The fix — <strong>redirect, don't disable</strong> (keep gathering info, stop the churn):</p>
+<table>
+  <tr><th>Setting (<code>~/.claude-mem/settings.json</code>)</th><th>Value</th><th>Effect</th></tr>
+  <tr><td><code>CLAUDE_MEM_FOLDER_CLAUDEMD_ENABLED</code></td><td><code>true</code></td><td>Per-folder context injection stays ON (info still gathered).</td></tr>
+  <tr><td><code>CLAUDE_MEM_FOLDER_USE_LOCAL_MD</code></td><td><code>true</code></td><td>Worker writes to <code>CLAUDE.local.md</code> instead of <code>CLAUDE.md</code> (worker logic: <code>USE_LOCAL_MD==="true" ? "CLAUDE.local.md" : "CLAUDE.md"</code>).</td></tr>
+  <tr><td><code>.gitignore</code></td><td><code>CLAUDE.local.md</code></td><td>Ignored at any depth — Claude Code still loads it as local context; git never sees it.</td></tr>
+</table>
+<p>After changing settings, the worker must be <strong>restarted</strong> to pick up the new config: <code>node &lt;plugin&gt;/scripts/bun-runner.js &lt;plugin&gt;/scripts/worker-service.cjs restart</code>.</p>
+
+<div class="note">
+<strong>One-time cleanup (2026-06-12):</strong> the 342 pre-existing tracked <code>CLAUDE.md</code> with stale blocks were cleaned — 254 pure-stub files (block only, zero content) deleted; 88 content-bearing files had the block stripped, real content kept. The root <code>CLAUDE.md</code> and <code>.wolf/cerebrum.md</code> never carried blocks.
+</div>
+
+<h2 id="gitignore">4. Git-ignored memory artifacts (never commit)</h2>
+<ul>
+  <li><code>.wolf/memory.md</code> — action log</li>
+  <li><code>.wolf/claude-mem-digest.md</code> — derived from claude-mem DB</li>
+  <li><code>.wolf/token-ledger.json</code> — token tracking</li>
+  <li><code>.wolf/hooks/_session.json</code> — session-local state</li>
+  <li><code>**/CLAUDE.local.md</code> — per-folder claude-mem injection</li>
+</ul>
+
+<h2 id="hygiene">5. Open hygiene notes</h2>
+<ul>
+  <li><strong>Two claude-mem installs:</strong> <code>~/.claude/plugins/cache/thedotmack/claude-mem/13.5.7</code> and <code>~/.claude/plugins/marketplaces/thedotmack/plugin</code> (13.6.0, the one that runs). Both read the shared <code>~/.claude-mem/settings.json</code>, so config applies to either — but the version drift should be reconciled to one install.</li>
+  <li><strong><code>.wolf/anatomy.md</code> (209KB) and <code>buglog.json</code> (85KB)</strong> are large tracked files that diff on most changes — acceptable, but watch for unbounded growth.</li>
+</ul>
+</body>
+</html>

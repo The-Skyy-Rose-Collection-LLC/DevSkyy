@@ -111,6 +111,8 @@ try:
     from .creative_agent import CreativeAgent, VisualTaskType
 except ImportError as _e:
     _logger.debug("CreativeAgent unavailable: %s", _e)
+    CreativeAgent = None  # type: ignore[assignment,misc]
+    VisualTaskType = None  # type: ignore[assignment,misc]
 
 try:
     # Specialized agents

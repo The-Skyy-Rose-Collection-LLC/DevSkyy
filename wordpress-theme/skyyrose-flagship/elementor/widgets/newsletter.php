@@ -60,7 +60,7 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 			array(
 				'label'   => esc_html__( 'Description', 'skyyrose' ),
 				'type'    => \Elementor\Controls_Manager::TEXTAREA,
-				'default' => esc_html__( 'Early access to drops, exclusive offers, and behind-the-scenes from the studio.', 'skyyrose' ),
+				'default' => esc_html__( 'Early access to drops, member-only alerts, and behind-the-scenes from the studio.', 'skyyrose' ),
 			)
 		);
 
@@ -78,7 +78,7 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 			array(
 				'label'   => esc_html__( 'Success Message', 'skyyrose' ),
 				'type'    => \Elementor\Controls_Manager::TEXT,
-				'default' => esc_html__( 'Welcome to the circle.', 'skyyrose' ),
+				'default' => esc_html__( 'You\'re in.', 'skyyrose' ),
 			)
 		);
 

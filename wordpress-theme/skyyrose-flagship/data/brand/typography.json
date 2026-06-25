@@ -1,0 +1,12 @@
+{
+  "$schema": "./typography.schema.json",
+  "universal": {
+    "display": { "family": "Playfair Display", "stack": "'Playfair Display', serif", "woff2": "assets/fonts/playfair-display-latin.woff2" },
+    "body":    { "family": "Cormorant Garamond", "stack": "'Cormorant Garamond', 'Inter', sans-serif", "woff2": "assets/fonts/cormorant-garamond-latin.woff2" },
+    "mono":    { "family": "SF Mono", "stack": "ui-monospace, 'SF Mono', Menlo, monospace", "woff2": null },
+    "ui":      { "family": "Bebas Neue", "stack": "'Bebas Neue', sans-serif", "woff2": "assets/fonts/bebas-neue-latin.woff2" }
+  },
+  "caps":   { "family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "note": "caps/eyebrow; also each collection's caps in identity.json" },
+  "system": { "family": "Inter", "woff2": "assets/fonts/inter-latin.woff2", "note": "system/utility; --ff-system + body fallback" },
+  "collection_scripts": { "note": "per-collection script fonts live in data/collections/<slug>/identity.json", "black-rose": "Yellowtail", "signature": "Pinyon Script", "kids-capsule": "Pinyon Script", "love-hurts": "Kaushan Script" }
+}

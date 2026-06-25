@@ -1,5 +1,13 @@
 # WordPress Theme JS — Agent Guide
 
+> **V2 Build Addendum (Phase 0+, 2026-05-03):** This guide is augmented by the Skyyrose V2 build:
+> - Source-of-truth plans: `docs/SKYYROSE_V2_MASTER_PLAN.md` §0.4 (this directory's allowed/forbidden table) and `docs/SKYYROSE_WORDPRESS_PLAN.md`
+> - Cost-cap policy for paid API calls: `eval/cost-cap-policy.md` (hybrid stance — supersedes CLAUDE.md STOP-AND-SHOW for ≤$1 calls)
+> - 6-step per-edit workflow (Phase 0.5+ once toolchain scripts ship): adds `verify-impl` (Step 2, Context7-first) + `post-simplify-verify` (Step 4, 4-check revert protocol) + `kb-distill` (Step 6, KB pattern entry) on top of the lint/simplify/verification-loop workflow already documented below.
+> - KB cross-references: `knowledge-base/README.md` integration map covers 4 prior memory systems (OpenWolf, Serena, GSD, claude-mem) + new `knowledge-base/` + graphify topology graph (Phase 0 Deliverable J).
+> - Cross-boundary handoff: sequenced agents only (agent A commit → exit → agent B reads → commit). Never simultaneous.
+> - GSAP allowed only on permitted templates (immersive / preorder / about / experiences). Other surfaces use IntersectionObserver scroll-reveal classes (`.col-reveal`, `.lp-rv`).
+
 ## Isolated Workspace
 
 **Your scope — read/write freely:**

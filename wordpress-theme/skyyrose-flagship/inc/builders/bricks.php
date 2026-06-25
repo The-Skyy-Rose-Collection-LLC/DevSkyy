@@ -2,9 +2,9 @@
 /**
  * Bricks Builder Compatibility
  *
- * Provides brand color injection and design token loading for sites
- * using Bricks Builder. Bricks reads theme.json natively, so minimal
- * integration code is needed.
+ * Brand color injection into Bricks global defaults. Bricks reads
+ * theme.json natively, so no further integration is required.
+ * Design-tokens.css is enqueued globally by inc/enqueue.php.
  *
  * @package SkyyRose
  * @since   1.0.0
@@ -15,14 +15,19 @@ if ( ! defined( 'ABSPATH' ) || ! defined( 'BRICKS_VERSION' ) ) {
 }
 
 /**
- * Inject SkyyRose brand colors into Bricks global settings defaults.
+ * Map skyyrose_brand_colors() to Bricks' global-defaults shape.
  *
  * @since 1.0.0
- * @param array $defaults Bricks global defaults.
- * @return array Modified defaults with brand colors.
+ *
+ * @param array $colors    skyyrose_brand_colors() output.
+ * @param array $defaults  Existing Bricks defaults (merged with brand colors).
+ * @return array Defaults with brand colors prepended.
  */
-function skyyrose_bricks_default_globals( $defaults ) {
-	if ( ! isset( $defaults['colors'] ) ) {
+function skyyrose_bricks_default_globals_callback( array $colors, $defaults = array() ) {
+	if ( ! is_array( $defaults ) ) {
+		$defaults = array();
+	}
+	if ( ! isset( $defaults['colors'] ) || ! is_array( $defaults['colors'] ) ) {
 		$defaults['colors'] = array();
 	}
 
@@ -30,12 +35,12 @@ function skyyrose_bricks_default_globals( $defaults ) {
 		array(
 			'id'   => 'skyyrose-dark',
 			'name' => 'Dark Base',
-			'raw'  => '#0A0A0A',
+			'raw'  => $colors['dark'],
 		),
 		array(
 			'id'   => 'skyyrose-rose-gold',
 			'name' => 'Rose Gold',
-			'raw'  => '#B76E79',
+			'raw'  => $colors['rose_gold'],
 		),
 		array(
 			'id'   => 'skyyrose-white',
@@ -45,17 +50,17 @@ function skyyrose_bricks_default_globals( $defaults ) {
 		array(
 			'id'   => 'skyyrose-gold',
 			'name' => 'Gold',
-			'raw'  => '#D4AF37',
+			'raw'  => $colors['gold'],
 		),
 		array(
 			'id'   => 'skyyrose-silver',
 			'name' => 'Silver',
-			'raw'  => '#C0C0C0',
+			'raw'  => $colors['silver'],
 		),
 		array(
 			'id'   => 'skyyrose-crimson',
 			'name' => 'Crimson',
-			'raw'  => '#DC143C',
+			'raw'  => $colors['crimson'],
 		),
 	);
 
@@ -63,22 +68,11 @@ function skyyrose_bricks_default_globals( $defaults ) {
 
 	return $defaults;
 }
-add_filter( 'bricks/setup/default_globals', 'skyyrose_bricks_default_globals' );
 
-/**
- * Enqueue design tokens when Bricks renders a page.
- *
- * @since 1.0.0
- */
-function skyyrose_bricks_enqueue_styles() {
-	$post_id = get_the_ID();
-	if ( $post_id && 'bricks' === get_post_meta( $post_id, '_bricks_editor_mode', true ) ) {
-		wp_enqueue_style(
-			'skyyrose-design-tokens',
-			SKYYROSE_ASSETS_URI . '/css/design-tokens.css',
-			array(),
-			SKYYROSE_VERSION
-		);
-	}
-}
-add_action( 'wp_enqueue_scripts', 'skyyrose_bricks_enqueue_styles', 20 );
+skyyrose_register_builder_compat(
+	'bricks',
+	array(
+		'palette_hook'     => 'bricks/setup/default_globals',
+		'palette_callback' => 'skyyrose_bricks_default_globals_callback',
+	)
+);

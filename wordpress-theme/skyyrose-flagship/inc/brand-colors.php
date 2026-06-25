@@ -15,22 +15,24 @@
 defined( 'ABSPATH' ) || exit;
 
 // -- Core brand palette -------------------------------------------------------
+// Guarded: brand.generated.php defines the same constants earlier in the
+// load order. Without these guards each page load emits PHP warnings.
 
-define( 'SKYYROSE_COLOR_ROSE_GOLD', '#B76E79' );  // Global accent, Kids Capsule fallback
-define( 'SKYYROSE_COLOR_GOLD', '#D4AF37' );  // Signature collection accent
-define( 'SKYYROSE_COLOR_CRIMSON', '#DC143C' );  // Love Hurts accent
-define( 'SKYYROSE_COLOR_SILVER', '#C0C0C0' );  // Black Rose accent
-define( 'SKYYROSE_COLOR_DARK', '#0A0A0A' );  // Background, primary dark
+defined( 'SKYYROSE_COLOR_ROSE_GOLD' ) || define( 'SKYYROSE_COLOR_ROSE_GOLD', '#B76E79' );  // Global accent, Kids Capsule fallback
+defined( 'SKYYROSE_COLOR_GOLD' ) || define( 'SKYYROSE_COLOR_GOLD', '#D4AF37' );        // Signature collection accent
+defined( 'SKYYROSE_COLOR_CRIMSON' ) || define( 'SKYYROSE_COLOR_CRIMSON', '#DC143C' );     // Love Hurts accent
+defined( 'SKYYROSE_COLOR_SILVER' ) || define( 'SKYYROSE_COLOR_SILVER', '#C0C0C0' );      // Black Rose accent
+defined( 'SKYYROSE_COLOR_DARK' ) || define( 'SKYYROSE_COLOR_DARK', '#0A0A0A' );        // Background, primary dark
 
 // -- Extended palette ---------------------------------------------------------
 
-define( 'SKYYROSE_COLOR_DEEP_BLACK', '#1A1A2E' );  // Black Rose primary
-define( 'SKYYROSE_COLOR_DEEP_RED', '#8B0000' );  // Love Hurts primary
-define( 'SKYYROSE_COLOR_PURPLE', '#4B0082' );  // Love Hurts secondary
-define( 'SKYYROSE_COLOR_NAVY', '#16213E' );  // Black Rose secondary
-define( 'SKYYROSE_COLOR_DEEP_BLUE', '#0F3460' );  // Black Rose accent
-define( 'SKYYROSE_COLOR_SOFT_PINK', '#FFB6C1' );  // Kids Capsule primary
-define( 'SKYYROSE_COLOR_LAVENDER', '#FFF0F5' );  // Kids Capsule secondary
+defined( 'SKYYROSE_COLOR_DEEP_BLACK' ) || define( 'SKYYROSE_COLOR_DEEP_BLACK', '#0D0D0D' );  // Black Rose primary — true black, no blue tint
+defined( 'SKYYROSE_COLOR_DEEP_RED' ) || define( 'SKYYROSE_COLOR_DEEP_RED', '#8B0000' );    // Love Hurts primary
+defined( 'SKYYROSE_COLOR_PURPLE' ) || define( 'SKYYROSE_COLOR_PURPLE', '#4A1942' );      // Love Hurts secondary — warm plum (bruise purple, not electric indigo)
+defined( 'SKYYROSE_COLOR_NAVY' ) || define( 'SKYYROSE_COLOR_NAVY', '#1A1818' );        // Warm near-black (legacy token; BR palette now uses DARK)
+defined( 'SKYYROSE_COLOR_DEEP_BLUE' ) || define( 'SKYYROSE_COLOR_DEEP_BLUE', '#221A1A' );   // Warm near-black (legacy token; BR palette now uses SILVER)
+defined( 'SKYYROSE_COLOR_SOFT_PINK' ) || define( 'SKYYROSE_COLOR_SOFT_PINK', '#FFB6C1' );   // Kids Capsule primary
+defined( 'SKYYROSE_COLOR_LAVENDER' ) || define( 'SKYYROSE_COLOR_LAVENDER', '#FFF0F5' );    // Kids Capsule secondary
 
 /**
  * Get all brand colors as an associative array.

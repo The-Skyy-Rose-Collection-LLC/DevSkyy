@@ -1,0 +1,160 @@
+{
+  "$schema": "./schemas/agent-brief.schema.json",
+  "description": "Platform × Criteria → which specialist agents wake for a build/refine/migrate/harden run. Orchestrator reads this to expand the default 5-agent team with platform-specific specialists.",
+  "default_team": [
+    "UX Architect",
+    "UI Designer",
+    "Brand Guardian",
+    "Frontend Developer",
+    "Senior Developer"
+  ],
+  "platform_specialists": {
+    "wordpress": {
+      "lead": "Senior Developer",
+      "additions": ["Backend Architect", "Security Engineer", "DevOps Automator"],
+      "skills": ["wordpress-theme-development", "woocommerce-best-practices", "php-security-hardening"],
+      "deliverable_extensions": [
+        "theme.json design tokens",
+        "block patterns",
+        "WC overrides",
+        "deploy-theme.sh verify gate"
+      ]
+    },
+    "next.js": {
+      "lead": "Senior Developer",
+      "additions": ["Frontend Developer", "Backend Architect", "AI Engineer"],
+      "skills": ["nextjs-app-router", "react-server-components", "vercel-deployment"],
+      "deliverable_extensions": [
+        "app/ route tree",
+        "RSC + Cache Components split",
+        "Suspense boundary architecture",
+        "edge function routing"
+      ]
+    },
+    "shopify": {
+      "lead": "Senior Developer",
+      "additions": ["Frontend Developer", "Mobile App Builder"],
+      "skills": ["shopify-liquid", "hydrogen-headless", "storefront-api"],
+      "deliverable_extensions": [
+        "sections + blocks JSON schema",
+        "translations files",
+        "theme settings schema",
+        "OS 2.0 metafields"
+      ]
+    },
+    "astro": {
+      "lead": "Senior Developer",
+      "additions": ["Frontend Developer", "Content Creator"],
+      "skills": ["astro-islands", "content-collections-mdx"],
+      "deliverable_extensions": [
+        ".astro components",
+        "content collections schema",
+        "partial hydration directives",
+        "endpoint routes"
+      ]
+    },
+    "webflow": {
+      "lead": "Frontend Developer",
+      "additions": ["UI Designer", "Senior Developer"],
+      "skills": ["webflow-export-hardening", "tailwind-token-extraction"],
+      "deliverable_extensions": [
+        "cleaned export",
+        "extracted tokens to design-tokens.css",
+        "removed Webflow runtime",
+        "added perf budget"
+      ]
+    },
+    "wix": {
+      "lead": "Frontend Developer",
+      "additions": ["UI Designer"],
+      "skills": ["wix-velo", "embedded-code-blocks"],
+      "deliverable_extensions": [
+        "Velo backend code",
+        "embedded HTML blocks",
+        "DNS integration spec"
+      ]
+    },
+    "standalone-html": {
+      "lead": "Senior Developer",
+      "additions": [],
+      "skills": [],
+      "deliverable_extensions": [
+        "single HTML file with inlined critical CSS",
+        "deferred non-critical JS",
+        "self-contained asset paths"
+      ]
+    }
+  },
+  "criteria_overlays": {
+    "luxury": {
+      "additions": ["Image Prompt Engineer", "Visual Storyteller"],
+      "patterns": ["editorial-typography", "magazine-grid", "scene-takeover", "ambient-motion", "restrained-palette", "lockup-hero"],
+      "performance_lift": {
+        "lcp_target": 2.0,
+        "image_quality_min": "AVIF q80 + WebP q85",
+        "font_subset_required": true
+      }
+    },
+    "saas": {
+      "additions": ["Growth Hacker", "Product Marketing", "AI Engineer"],
+      "patterns": ["above-fold-value-prop", "gradient-blur-bg", "social-proof-rail", "pricing-table", "demo-cta", "dashboard-preview"],
+      "performance_lift": {
+        "lcp_target": 1.5,
+        "image_quality_min": "AVIF q70",
+        "interactive_below_2s": true
+      }
+    },
+    "ecommerce": {
+      "additions": ["Tracking & Measurement Specialist", "Performance Benchmarker", "Backend Architect"],
+      "patterns": ["plp", "pdp", "cart", "checkout", "sticky-add-to-cart", "holo-product-card", "size-guide", "review-block", "wishlist-heart", "recommendation-slots"],
+      "performance_lift": {
+        "lcp_target": 2.0,
+        "checkout_inp_max": 100,
+        "tracking_attribution_required": true
+      }
+    },
+    "marketing": {
+      "additions": ["Ad Creative Strategist", "Growth Hacker", "Content Creator"],
+      "patterns": ["hero-cta", "benefit-grid", "testimonial-carousel", "faq-accordion", "newsletter-capture", "lead-magnet"],
+      "performance_lift": {
+        "lcp_target": 1.8,
+        "form_inp_max": 80
+      }
+    },
+    "editorial": {
+      "additions": ["Technical Writer", "Content Creator"],
+      "patterns": ["long-form-typography", "reading-progress", "footnote-system", "related-articles", "newsletter-capture", "byline-block"],
+      "performance_lift": {
+        "lcp_target": 1.8,
+        "font_subset_required": true,
+        "reading_progress_required": true
+      }
+    },
+    "portfolio": {
+      "additions": ["Visual Storyteller"],
+      "patterns": ["case-study-spreads", "scroll-driven-storytelling", "project-filter", "contact-form", "press-strip"],
+      "performance_lift": {
+        "lcp_target": 2.0,
+        "scroll_smoothness_60fps": true
+      }
+    }
+  },
+  "mode_team_overrides": {
+    "refine": {
+      "description": "Audit + propose against existing artifact. Default 5-agent team only.",
+      "exclude_specialists": ["Backend Architect", "DevOps Automator", "Security Engineer", "AI Engineer"]
+    },
+    "build": {
+      "description": "Create from scratch. Wakes platform + criteria specialists.",
+      "include_specialists": "ALL"
+    },
+    "migrate": {
+      "description": "Port theme to new platform. Wakes BOTH source and target platform specialists for translation.",
+      "include_specialists": "PLATFORM_PAIR"
+    },
+    "harden": {
+      "description": "Production-grade existing theme. Wakes perf + a11y + security specialists.",
+      "additions": ["Performance Benchmarker", "Accessibility Auditor", "Security Engineer", "Threat Detection Engineer"]
+    }
+  }
+}

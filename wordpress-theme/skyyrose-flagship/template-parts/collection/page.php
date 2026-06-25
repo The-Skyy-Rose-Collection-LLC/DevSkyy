@@ -19,18 +19,46 @@ $slug = isset( $args['slug'] ) ? sanitize_key( $args['slug'] ) : '';
 $c    = skyyrose_get_collection_content( $slug );
 
 if ( ! $c ) {
+	// Hard-fail: log + emit hidden error marker. Silent return previously
+	// masked a missing kids-capsule config — caught only after a structural
+	// audit ran. data-skyyrose-error is a project-wide beacon picked up by
+	// scripts/verify_live_structure.py to fail deploys on render regressions.
+	error_log(
+		sprintf(
+			"[SkyyRose Collections] Missing content config for slug '%s' in %s. Check inc/collection-content.php.",
+			$slug,
+			__FILE__
+		)
+	);
+	printf(
+		'<div class="skyyrose-render-error" data-skyyrose-error="missing-collection-content" data-collection="%s" hidden></div>',
+		esc_attr( $slug )
+	);
 	return;
 }
 
 /* ── Shared data ────────────────────────────────────────────────── */
-$products    = skyyrose_get_collection_display_products( $slug );
-$cross_nav   = skyyrose_get_cross_nav( $slug );
-$svg_kses    = skyyrose_svg_kses();
-$has_wc      = function_exists( 'wc_get_cart_url' );
-$is_kids     = ( 'kids-capsule' === $slug );
-$has_hero_bg = ! empty( $c['hero_bg'] );
-$has_logo    = ! empty( $c['hero_logo'] );
-$has_3d      = ! empty( $c['experience_url'] );
+$products  = skyyrose_get_collection_display_products( $slug );
+$cross_nav = skyyrose_get_cross_nav( $slug );
+$svg_kses  = skyyrose_svg_kses();
+$has_wc    = function_exists( 'wc_get_cart_url' );
+$is_kids   = ( 'kids-capsule' === $slug );
+$has_3d    = ! empty( $c['experience_url'] );
+
+/*
+ * SOT-first image resolution (S-5).
+ * skyyrose_sot_hero()   → imagery.hero_backdrop.resolved   (maps to hero_bg)
+ * skyyrose_sot_lockup() → lockup.display_webp.resolved     (maps to hero_logo)
+ * Falls back to the hand-maintained $c values when SOT returns ''.
+ */
+$sot_hero_bg  = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
+$sot_hero_logo = function_exists( 'skyyrose_sot_lockup' ) ? skyyrose_sot_lockup( $slug ) : '';
+
+$resolved_hero_bg  = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
+$resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_logo'] ?? '' );
+
+$has_hero_bg = ! empty( $resolved_hero_bg );
+$has_logo    = ! empty( $resolved_hero_logo );
 
 /* Kids Capsule uses pre-order URL for product links */
 $preorder_url  = $is_kids ? home_url( '/pre-order/' ) : '';
@@ -41,23 +69,47 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 ?>
 
 <div class="col-page" data-collection="<?php echo esc_attr( $slug ); ?>">
-	<div class="col-floating" aria-hidden="true"></div>
 
 	<!-- ════ Hero ════ -->
 	<section class="col-hero ambient-glow" data-scroll-fade>
-		<?php if ( $has_hero_bg ) : ?>
+		<?php
+		if ( $has_hero_bg ) :
+			$hero_bg_base = isset( $c['hero_bg_base'] ) ? (string) $c['hero_bg_base'] : '';
+			$hero_srcset  = '';
+			if ( '' !== $hero_bg_base ) {
+				$widths  = array( 480, 768, 1280, 1680 );
+				$entries = array();
+				foreach ( $widths as $w ) {
+					$entries[] = esc_url( SKYYROSE_ASSETS_URI . $hero_bg_base . '-' . $w . 'w.webp' ) . ' ' . $w . 'w';
+				}
+				$hero_srcset = implode( ', ', $entries );
+			}
+			?>
 			<div class="col-hero__bg parallax-ken-burns">
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_bg'] . '?v=' . SKYYROSE_VERSION ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_bg . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php
+					if ( '' !== $hero_srcset ) :
+						?>
+						srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_bg_alt'] ); ?>"
-					loading="eager" fetchpriority="high" decoding="async" width="1024" height="1024">
+					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
 			</div>
 		<?php endif; ?>
 		<div class="col-hero__content col-reveal">
 			<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_logo'] . '?v=' . SKYYROSE_VERSION ); ?>"
+				<?php
+				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
+				// hero logo — image blurs + scales in coupled to scroll, not
+				// triggered once by IntersectionObserver. Modern browsers
+				// (Chromium 115+, Firefox 2026) honor it; others render the
+				// existing .rv-clip-up reveal. Reduced-motion respected.
+				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				?>
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_logo . '?v=' . SKYYROSE_VERSION ); ?>"
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
-					class="col-hero__logo rv-clip-up" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager">
+					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager" fetchpriority="high" decoding="async">
+				<h1 class="screen-reader-text"><?php echo esc_html( $c['hero_logo_alt'] ); ?></h1>
 			<?php else : ?>
 				<h1 class="col-hero__title"><span><?php echo esc_html( $c['hero_title'] ); ?></span></h1>
 			<?php endif; ?>
@@ -73,58 +125,18 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
-	<!-- ════ Marquee ════ -->
-	<div class="col-marquee" aria-hidden="true">
-		<div class="col-marquee__track">
-			<?php for ( $i = 0; $i < 8; $i++ ) : ?>
-				<span><?php echo esc_html( $c['marquee'][0] ); ?></span>
-				<span><?php echo wp_kses( $c['marquee_icon'], $svg_kses ); ?></span>
-				<span><?php echo esc_html( $c['marquee'][1] ); ?></span>
-				<span><?php echo wp_kses( $c['marquee_icon'], $svg_kses ); ?></span>
-			<?php endfor; ?>
-		</div>
-	</div>
+	<?php
+	get_template_part(
+		'template-parts/pin-narrative',
+		null,
+		array(
+			'slug'  => $slug,
+			'beats' => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+		)
+	);
+	?>
 
-	<!-- ════ Story ════ -->
-	<section class="col-story rv-clip-up">
-		<div class="col-story__grid">
-			<div class="col-story__content">
-				<span class="col-story__label"><?php echo esc_html( $c['story_label'] ); ?></span>
-				<h2 class="col-story__title"><?php echo esc_html( $c['story_title'] ); ?></h2>
-				<p class="col-story__text"><?php echo esc_html( $c['story_text_1'] ); ?></p>
-				<blockquote class="col-story__quote"><?php echo esc_html( $c['story_quote'] ); ?></blockquote>
-				<p class="col-story__text"><?php echo esc_html( $c['story_text_2'] ); ?></p>
-			</div>
-			<div class="col-story__visual">
-				<span class="col-story__visual-text"><?php echo esc_html( $c['story_visual_text'] ); ?></span>
-				<span class="col-story__visual-label"><?php echo esc_html( $c['story_visual_label'] ); ?></span>
-			</div>
-		</div>
-	</section>
-
-	<!-- ════ Divider + Quote ════ -->
-	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon"><?php echo wp_kses( $c['divider_icon'], $svg_kses ); ?></span></div>
-	<div class="col-quote-block rv-blur">
-		<blockquote class="col-quote-block__text"><?php echo esc_html( $c['quote_text'] ); ?></blockquote>
-		<cite class="col-quote-block__cite">&mdash; <?php echo esc_html( $c['quote_cite'] ); ?></cite>
-	</div>
-
-	<!-- ════ Feature Cards ════ -->
-	<section class="col-features rv-clip-left">
-		<h2 class="col-features__heading"><?php echo esc_html( $c['features_heading'] ); ?></h2>
-		<p class="col-features__subheading"><?php echo esc_html( $c['features_subheading'] ); ?></p>
-		<div class="col-features__grid stagger-grid">
-			<?php foreach ( $c['features'] as $feat ) : ?>
-				<div class="col-features__card">
-					<div class="col-features__icon" aria-hidden="true"><?php echo wp_kses( $feat['icon'], $svg_kses ); ?></div>
-					<h3><?php echo esc_html( $feat['title'] ); ?></h3>
-					<p><?php echo esc_html( $feat['text'] ); ?></p>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</section>
-
-	<!-- ════ Product Grid ════ -->
+	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
 	// Build subheading: kids-capsule uses a dynamic piece count, others
 	// use the static copy from skyyrose_get_collection_content().
@@ -153,6 +165,24 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		)
 	);
 	?>
+
+	<?php // Black Rose only: founder pull quote anchors the page in Corey's voice. ?>
+	<?php
+	if ( 'black-rose' === $slug ) {
+		get_template_part( 'template-parts/collection/founder-pullquote' ); }
+	?>
+
+	<!-- ════ Story (condensed — after products) ════ -->
+	<section class="col-story rv-clip-up">
+		<div class="col-story__grid">
+			<div class="col-story__content">
+				<span class="col-story__label"><?php echo esc_html( $c['story_label'] ); ?></span>
+				<h2 class="col-story__title"><?php echo esc_html( $c['story_title'] ); ?></h2>
+				<p class="col-story__text"><?php echo esc_html( $c['story_text_1'] ); ?></p>
+				<blockquote class="col-story__quote"><?php echo esc_html( $c['story_quote'] ); ?></blockquote>
+			</div>
+		</div>
+	</section>
 
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">

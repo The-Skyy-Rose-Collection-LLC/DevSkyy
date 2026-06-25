@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    verbose="false"
+    stopOnFailure="false"
+    convertWarningsToExceptions="false"
+    convertDeprecationsToExceptions="false"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">tests/unit</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <!-- Only the three pure-PHP modules loaded by tests/bootstrap.php -->
+            <file>inc/brand-colors.php</file>
+            <file>inc/collections-config.php</file>
+            <file>inc/product-catalog.php</file>
+        </include>
+        <report>
+            <html outputDirectory="tests/coverage/html" lowUpperBound="50" highLowerBound="85"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+</phpunit>

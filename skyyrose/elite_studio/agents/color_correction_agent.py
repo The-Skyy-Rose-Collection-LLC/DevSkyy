@@ -14,6 +14,7 @@ import logging
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
+from llm.model_ids import GEMINI_VISION_MODEL
 
 from ..models import ColorCorrectionResult
 
@@ -28,7 +29,7 @@ class ColorCorrectionAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_color_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_VISION_MODEL,
                 system_prompt="You are the Legendary Color Architect for SkyyRose. You ensure brand-perfect luxury color palettes.",
             )
         super().__init__(config)
@@ -40,11 +41,17 @@ class ColorCorrectionAgent(BaseSuperAgent):
         logger.info(f"Running Legendary Color Correction for {image_path} via ADK...")
         adk_result = await self.execute(adk_prompt)
 
+        # P1 #7: Pass-through stub. No actual color correction is performed.
+        # The "auto-levels" / "brand-white-balance" labels were misleading.
+        logger.warning(
+            "ColorCorrectionAgent.correct is a stub: returning input image unchanged. "
+            "Wire to a real color-correction backend before relying on output."
+        )
         metadata = adk_result.to_dict() if hasattr(adk_result, "to_dict") else {}
 
         return ColorCorrectionResult(
-            success=True,
+            success=False,
             output_path=image_path,
-            adjustments_applied=("auto-levels", "brand-white-balance"),
-            metadata=metadata,
+            adjustments_applied=(),
+            metadata={**metadata, "stub": True, "reason": "color_correction_not_implemented"},
         )

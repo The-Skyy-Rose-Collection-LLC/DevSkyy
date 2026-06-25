@@ -12,6 +12,7 @@
 // server components — importing from a client component will fail the build.
 import fs from 'node:fs';
 import path from 'node:path';
+import { splitCsvRow } from './catalog-csv';
 
 export interface CatalogProduct {
   sku: string;
@@ -39,19 +40,27 @@ const CANONICAL_CSV_RELATIVE = path.join(
   'skyyrose-catalog.csv'
 );
 
-function resolveCsvPath(): string {
-  // Walk up from cwd until we find a directory containing the canonical CSV.
+/**
+ * Resolve a repo-relative file by walking up from cwd until it is found.
+ * Shared by the catalog reader, the catalog writer, and the SOT-image reader
+ * so every server module agrees on where the monorepo root is.
+ */
+export function resolveRepoFile(relative: string): string {
   let dir = process.cwd();
   for (let i = 0; i < 6; i += 1) {
-    const candidate = path.join(dir, CANONICAL_CSV_RELATIVE);
+    const candidate = path.join(dir, relative);
     if (fs.existsSync(candidate)) return candidate;
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
   throw new Error(
-    `Canonical catalog not found. Expected to find ${CANONICAL_CSV_RELATIVE} walking up from ${process.cwd()}.`
+    `Repo file not found: ${relative} (searched up from ${process.cwd()}).`
   );
+}
+
+export function resolveCsvPath(): string {
+  return resolveRepoFile(CANONICAL_CSV_RELATIVE);
 }
 
 function parseCsv(text: string): CatalogProduct[] {
@@ -93,36 +102,18 @@ function parseCsv(text: string): CatalogProduct[] {
   return out;
 }
 
-function splitCsvRow(line: string): string[] {
-  const out: string[] = [];
-  let cur = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i += 1) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        cur += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (ch === ',' && !inQuotes) {
-      out.push(cur);
-      cur = '';
-    } else {
-      cur += ch;
-    }
-  }
-  out.push(cur);
-  return out;
-}
-
 interface CacheEntry {
   products: CatalogProduct[];
   mtimeMs: number;
 }
 
 let cache: CacheEntry | null = null;
+
+/** Drop the in-memory catalog cache. Call after writing the CSV so the next
+ *  read re-parses immediately (mtime also auto-busts, this is belt-and-braces). */
+export function resetCatalogCache(): void {
+  cache = null;
+}
 
 function loadFresh(): CatalogProduct[] {
   const csvPath = resolveCsvPath();

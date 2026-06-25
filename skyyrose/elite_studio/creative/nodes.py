@@ -200,9 +200,9 @@ def three_d_model_node(state: dict) -> dict:
                 "success": True,
                 "model_path": sdk_glb_path,
                 "execution_mode": "sdk_agent",
-                "session_dir": sdk_result_payload.get("session_dir")
-                if sdk_result_payload
-                else None,
+                "session_dir": (
+                    sdk_result_payload.get("session_dir") if sdk_result_payload else None
+                ),
                 "error": "",
             },
             "model_output_path": sdk_glb_path,
@@ -433,11 +433,19 @@ def scene_composite_node(state: dict) -> dict:
         from skyyrose.elite_studio.agents.compositor_agent import CompositorAgent
 
         agent = CompositorAgent()
+        scene_image_path = params.get("scene_image_path", "")
+        model_image_path = params.get("model_image_path") or scene_image_path
+        if not scene_image_path or not model_image_path:
+            raise RuntimeError(
+                "scene_composite_node requires scene_image_path and model_image_path in params"
+            )
         result = agent.composite(
             sku=sku,
-            image_path=params.get("model_image_path") or params.get("scene_image_path", ""),
+            scene_image_path=scene_image_path,
+            model_image_path=model_image_path,
             collection=params.get("collection", ""),
             scene_name=params.get("scene_name", ""),
+            output_dir=params.get("output_dir") or "renders/output/compositor",
         )
         composite_result = {
             "success": result.success,
@@ -559,6 +567,67 @@ def collection_plan_node(state: dict) -> dict:
             "status": "error",
             "error": f"collection_plan failed: {exc}",
             "stage_timings": {**state.get("stage_timings", {}), "collection_plan": elapsed},
+        }
+
+
+def tripo_generate_node(state: dict) -> dict:
+    """Generate multiview product imagery via Tripo3D for a single SKU.
+
+    Expects params to contain:
+      - image_path (str): absolute path to source garment flat image
+
+    STOP-AND-SHOW confirmation must be obtained before invoking this node.
+    Use scripts/tripo_dispatch.py which enforces the gate at the dispatch layer.
+
+    Returns tripo_result matching render_result shape plus a views list.
+    """
+    import asyncio
+
+    start = time.monotonic()
+    sku = state.get("sku", "")
+    params = state.get("params", {})
+    image_path = params.get("image_path", "")
+
+    if not image_path:
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": {"success": False, "error": "params.image_path is required"},
+            "status": "error",
+            "error": "tripo_generate_node requires params.image_path",
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
+        }
+
+    try:
+        from skyyrose.elite_studio.agents.tripo_agent import TripoGenerateAgent
+
+        agent = TripoGenerateAgent()
+        result = asyncio.run(agent.generate_multiview(sku=sku, image_path=image_path))
+
+        tripo_result = {
+            "success": result.success,
+            "sku": result.sku,
+            "view": "multiview",
+            "status": "success" if result.success else "error",
+            "output_path": result.output_dir,
+            "views": result.views,
+            "task_id": result.task_id,
+            "credits_used": result.credits_used,
+            "error": result.error,
+        }
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": tripo_result,
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
+        }
+
+    except Exception as exc:
+        logger.exception("tripo_generate_node failed: %s", exc)
+        elapsed = time.monotonic() - start
+        return {
+            "tripo_result": {"success": False, "error": str(exc)},
+            "status": "error",
+            "error": f"tripo_generate failed: {exc}",
+            "stage_timings": {**state.get("stage_timings", {}), "tripo_generate": elapsed},
         }
 
 

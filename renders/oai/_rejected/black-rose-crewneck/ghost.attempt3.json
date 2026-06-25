@@ -1,0 +1,12 @@
+{
+  "sku": "br-001",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 3,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The embossed logo in the render does not match the detailed description of the Black Rose logo in the spec. The stems, leaves, and thorny vines are incorrectly represented, lacking the required grey color and detail, and the cloud does not match the specified form in the composition."
+}

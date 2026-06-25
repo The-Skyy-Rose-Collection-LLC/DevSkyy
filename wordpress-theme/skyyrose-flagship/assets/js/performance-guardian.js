@@ -62,7 +62,7 @@
     frameCount = 0;
     lastTime = now;
 
-    if (budget.debug) {
+    if (budget.debug || window.SKYYROSE_DEBUG) {
       // eslint-disable-next-line no-console
       console.log('[SkyyPerformance] FPS:', fps);
     }
@@ -76,7 +76,7 @@
     isThrottled = true;
     document.body.classList.add('skyy-motion-reduced');
 
-    if (budget.debug) {
+    if (budget.debug || window.SKYYROSE_DEBUG) {
       // eslint-disable-next-line no-console
       console.warn('[SkyyPerformance] Low FPS — throttling animations.');
     }
@@ -89,7 +89,7 @@
     isThrottled = false;
     document.body.classList.remove('skyy-motion-reduced');
 
-    if (budget.debug) {
+    if (budget.debug || window.SKYYROSE_DEBUG) {
       // eslint-disable-next-line no-console
       console.log('[SkyyPerformance] Recovered — restoring animations.');
     }

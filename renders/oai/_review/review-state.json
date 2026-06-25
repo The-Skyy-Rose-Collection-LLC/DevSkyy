@@ -1,0 +1,488 @@
+{
+  "black-is-beautiful-jersey-giants/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:02.833Z"
+  },
+  "black-is-beautiful-jersey-giants/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:01.415Z"
+  },
+  "black-is-beautiful-jersey-giants/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:04.916Z"
+  },
+  "black-is-beautiful-jersey-white/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:19.085Z"
+  },
+  "black-is-beautiful-jersey-white/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:17.666Z"
+  },
+  "black-is-beautiful-jersey-white/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:20.716Z"
+  },
+  "black-is-beautiful-jersey/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:44:57.353Z"
+  },
+  "black-is-beautiful-jersey/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:44:54.889Z"
+  },
+  "black-is-beautiful-jersey/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:44:59.015Z"
+  },
+  "black-rose-crewneck/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:32.883Z"
+  },
+  "black-rose-crewneck/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:31.334Z"
+  },
+  "black-rose-hoodie-signature/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:47:15.836Z"
+  },
+  "black-rose-hoodie-signature/on-model.png": {
+    "approved": false,
+    "comment": "the logo is on the sleeve and its supposed to be on the side or the hoodie",
+    "flagged": true,
+    "updated": "2026-06-10T01:46:33.818Z"
+  },
+  "black-rose-hoodie/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:35.999Z"
+  },
+  "black-rose-hoodie/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:45:39.382Z"
+  },
+  "black-rose-joggers/ghost-back.png": {
+    "approved": false,
+    "comment": "no logo on back",
+    "flagged": true,
+    "updated": "2026-06-10T01:47:29.453Z"
+  },
+  "black-rose-joggers/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:47:21.466Z"
+  },
+  "black-rose-love-hurts-bb-shorts/ghost-back.png": {
+    "approved": false,
+    "comment": "Love Hurts is only on the side not across the back",
+    "flagged": true,
+    "updated": "2026-06-10T01:54:07.034Z"
+  },
+  "black-rose-love-hurts-bb-shorts/ghost.png": {
+    "approved": false,
+    "comment": "oakland needs to be centered and slightly bigger",
+    "flagged": true,
+    "updated": "2026-06-10T01:53:13.104Z"
+  },
+  "black-rose-love-hurts-bb-shorts/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:54:11.007Z"
+  },
+  "black-rose-sherpa-jacket/ghost.png": {
+    "approved": true,
+    "comment": "but I do have back photos too",
+    "flagged": false,
+    "updated": "2026-06-10T01:55:16.728Z"
+  },
+  "black-rose-sherpa-jacket/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T01:55:18.952Z"
+  },
+  "br-010/ghost-back.png": {
+    "approved": false,
+    "comment": "what is this?",
+    "flagged": false,
+    "updated": "2026-06-10T01:57:22.472Z"
+  },
+  "br-010/ghost.png": {
+    "approved": false,
+    "comment": "what is this?",
+    "flagged": false,
+    "updated": "2026-06-10T01:57:15.644Z"
+  },
+  "br-010/on-model.png": {
+    "approved": false,
+    "comment": "what is this?",
+    "flagged": false,
+    "updated": "2026-06-10T01:57:26.536Z"
+  },
+  "bridge-bay-bridge-shirt/ghost.png": {
+    "approved": false,
+    "comment": "doesn't look like my logo and logo needs to be centered with the bay bridge imagery embroidered into the rose",
+    "flagged": true,
+    "updated": "2026-06-10T01:58:24.130Z"
+  },
+  "bridge-bay-bridge-shorts/ghost-back.png": {
+    "approved": false,
+    "comment": " looks more like a tech flat",
+    "flagged": true,
+    "updated": "2026-06-10T02:00:25.120Z"
+  },
+  "bridge-bay-bridge-shorts/ghost.png": {
+    "approved": false,
+    "comment": "missing logo and not rendered looks more like a tech flat",
+    "flagged": true,
+    "updated": "2026-06-10T01:59:10.485Z"
+  },
+  "bridge-stay-golden-shirt/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:01:17.488Z"
+  },
+  "bridge-stay-golden-shirt/ghost.png": {
+    "approved": false,
+    "comment": "needs to be slightly bigger and look embroidered for the logo",
+    "flagged": true,
+    "updated": "2026-06-10T02:01:12.224Z"
+  },
+  "bridge-stay-golden-shorts/ghost-back.png": {
+    "approved": false,
+    "comment": " looks more like a tech flat",
+    "flagged": true,
+    "updated": "2026-06-10T02:01:47.296Z"
+  },
+  "bridge-stay-golden-shorts/ghost.png": {
+    "approved": false,
+    "comment": "missing logo and not rendered looks more like a tech flat",
+    "flagged": true,
+    "updated": "2026-06-10T02:01:37.953Z"
+  },
+  "jersey-last-oakland-baseball/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:02:53.255Z"
+  },
+  "jersey-last-oakland-baseball/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:02:51.373Z"
+  },
+  "jersey-last-oakland-baseball/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:02:54.872Z"
+  },
+  "jersey-last-oakland-football/ghost-back.png": {
+    "approved": false,
+    "comment": "rose logo only goes in the 2 in back",
+    "flagged": true,
+    "updated": "2026-06-10T02:03:50.416Z"
+  },
+  "jersey-last-oakland-football/ghost.png": {
+    "approved": false,
+    "comment": "rose logo only goes in the 3 infront",
+    "flagged": true,
+    "updated": "2026-06-10T02:03:26.224Z"
+  },
+  "jersey-last-oakland-football/on-model.png": {
+    "approved": false,
+    "comment": "fix rose logo only goes in the 3",
+    "flagged": true,
+    "updated": "2026-06-10T02:04:08.142Z"
+  },
+  "jersey-sf-inspired-football/ghost-back.png": {
+    "approved": false,
+    "comment": "rose logo only goes in the 0 in back",
+    "flagged": true,
+    "updated": "2026-06-10T02:04:58.113Z"
+  },
+  "jersey-sf-inspired-football/ghost.png": {
+    "approved": false,
+    "comment": "rose only goes in the 8 in front ",
+    "flagged": true,
+    "updated": "2026-06-10T02:04:39.803Z"
+  },
+  "jersey-sf-inspired-football/on-model.png": {
+    "approved": false,
+    "comment": "fix logo inside numbers",
+    "flagged": true,
+    "updated": "2026-06-10T02:05:11.409Z"
+  },
+  "jersey-the-bay-basketball/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:05:57.373Z"
+  },
+  "jersey-the-bay-basketball/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:05:56.307Z"
+  },
+  "jersey-the-bay-basketball/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:05:59.223Z"
+  },
+  "jersey-the-rose-hockey/ghost-back.png": {
+    "approved": false,
+    "comment": "adjust hood",
+    "flagged": true,
+    "updated": "2026-06-10T02:06:28.210Z"
+  },
+  "jersey-the-rose-hockey/ghost.png": {
+    "approved": false,
+    "comment": "adjust hood",
+    "flagged": true,
+    "updated": "2026-06-10T02:06:11.933Z"
+  },
+  "jersey-the-rose-hockey/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:06:30.439Z"
+  },
+  "kids-purple-set/ghost-back.png": {
+    "approved": false,
+    "comment": "not rendered to look 3d extra logos were added",
+    "flagged": true,
+    "updated": "2026-06-10T02:07:28.358Z"
+  },
+  "kids-purple-set/ghost.png": {
+    "approved": false,
+    "comment": "not rendered to look 3d extra logos were added",
+    "flagged": true,
+    "updated": "2026-06-10T02:08:50.274Z"
+  },
+  "kids-red-set/ghost-back.png": {
+    "approved": false,
+    "comment": "not rendered to look 3d extra logos were added",
+    "flagged": true,
+    "updated": "2026-06-10T02:09:02.448Z"
+  },
+  "kids-red-set/ghost.png": {
+    "approved": false,
+    "comment": "not rendered to look 3d extra logos were added",
+    "flagged": true,
+    "updated": "2026-06-10T02:08:55.852Z"
+  },
+  "love-hurts-basketball-shorts/ghost-back.png": {
+    "approved": false,
+    "comment": "adding logos could be input and rendered better",
+    "flagged": true,
+    "updated": "2026-06-10T02:10:23.547Z"
+  },
+  "love-hurts-basketball-shorts/ghost.png": {
+    "approved": false,
+    "comment": "adding logos could be input and rendered better",
+    "flagged": true,
+    "updated": "2026-06-10T02:10:15.996Z"
+  },
+  "love-hurts-basketball-shorts/on-model.png": {
+    "approved": false,
+    "comment": "adding logos could be input and rendered better",
+    "flagged": true,
+    "updated": "2026-06-10T02:10:26.177Z"
+  },
+  "love-hurts-bomber/ghost-back.png": {
+    "approved": false,
+    "comment": "doesn't look satin",
+    "flagged": true,
+    "updated": "2026-06-10T02:10:54.542Z"
+  },
+  "love-hurts-bomber/ghost.png": {
+    "approved": false,
+    "comment": "doesn't look satin",
+    "flagged": true,
+    "updated": "2026-06-10T02:10:51.825Z"
+  },
+  "love-hurts-joggers-white/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:12:15.492Z"
+  },
+  "love-hurts-joggers/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:11:03.675Z"
+  },
+  "mint-lavender-crewneck/ghost-back.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:13:27.593Z"
+  },
+  "mint-lavender-crewneck/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:13:26.192Z"
+  },
+  "mint-lavender-hoodie/ghost.png": {
+    "approved": false,
+    "comment": "WRONG PRODUCT IT RENDERED THE SIGNATURE WINDBREAKER OUTFIT",
+    "flagged": true,
+    "updated": "2026-06-10T02:13:58.093Z"
+  },
+  "mint-lavender-hoodie/on-model.png": {
+    "approved": false,
+    "comment": "WRONG PRODUCT IT RENDERED THE SIGNATURE WINDBREAKER OUTFIT",
+    "flagged": true,
+    "updated": "2026-06-10T02:14:13.942Z"
+  },
+  "mint-lavender-sweatpants/ghost-back.png": {
+    "approved": false,
+    "comment": "WRONG PRODUCT IT RENDERED THE SIGNATURE WINDBREAKER OUTFIT",
+    "flagged": true,
+    "updated": "2026-06-10T02:14:24.841Z"
+  },
+  "mint-lavender-sweatpants/ghost.png": {
+    "approved": false,
+    "comment": "WRONG PRODUCT IT RENDERED THE SIGNATURE WINDBREAKER OUTFIT",
+    "flagged": true,
+    "updated": "2026-06-10T02:14:20.521Z"
+  },
+  "original-label-tee-orchid/ghost.png": {
+    "approved": false,
+    "comment": "ADDED A LOGO",
+    "flagged": true,
+    "updated": "2026-06-10T02:14:34.743Z"
+  },
+  "original-label-tee-orchid/on-model.png": {
+    "approved": false,
+    "comment": "ADDED A LOGO",
+    "flagged": true,
+    "updated": "2026-06-10T02:14:44.042Z"
+  },
+  "original-label-tee-white/ghost.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:15:08.959Z"
+  },
+  "original-label-tee-white/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:14:52.893Z"
+  },
+  "pair__br-001__br-002/on-model.png": {
+    "approved": true,
+    "comment": "",
+    "flagged": false,
+    "updated": "2026-06-10T02:17:14.144Z"
+  },
+  "pair__kids-001__kids-001-joggers/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:17:15.244Z"
+  },
+  "pair__kids-002__kids-002-joggers/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:17:23.152Z"
+  },
+  "pair__lh-004__lh-002/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:17:30.710Z"
+  },
+  "pair__lh-004__lh-006/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:17:42.504Z"
+  },
+  "pair__sg-001__sg-005/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:55:47.890Z"
+  },
+  "pair__sg-002__sg-003/on-model.png": {
+    "approved": false,
+    "comment": "JUST THE ISSUES WE HAD ON THE MANNEQUIN RENDER",
+    "flagged": true,
+    "updated": "2026-06-10T02:55:52.074Z"
+  },
+  "signature-beanie/ghost.png": {
+    "approved": false,
+    "comment": "logo Is a patch not directly on beanie",
+    "flagged": true,
+    "updated": "2026-06-10T02:55:30.428Z"
+  },
+  "signature-beanie/on-model.png": {
+    "approved": false,
+    "comment": "logo Is a patch not directly on beanie",
+    "flagged": true,
+    "updated": "2026-06-10T02:55:34.873Z"
+  },
+  "signature-sherpa-jacket/ghost.png": {
+    "approved": false,
+    "comment": "sherpa lining doesn't show on bottom",
+    "flagged": true,
+    "updated": "2026-06-10T02:55:08.250Z"
+  },
+  "signature-sherpa-jacket/on-model.png": {
+    "approved": false,
+    "comment": "sherpa lining doesn't show on bottom",
+    "flagged": true,
+    "updated": "2026-06-10T02:54:57.870Z"
+  },
+  "the-fannie/ghost.png": {
+    "approved": false,
+    "comment": " logo is supposed the be the dot of the I ",
+    "flagged": true,
+    "updated": "2026-06-10T02:54:15.168Z"
+  },
+  "the-fannie/on-model.png": {
+    "approved": false,
+    "comment": " logo is supposed the be the dot of the I ",
+    "flagged": true,
+    "updated": "2026-06-10T02:54:30.347Z"
+  }
+}

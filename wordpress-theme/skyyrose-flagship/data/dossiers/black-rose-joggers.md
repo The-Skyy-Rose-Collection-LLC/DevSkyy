@@ -2,7 +2,7 @@
 sku: br-002
 name: BLACK Rose Joggers
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
 ---
@@ -14,7 +14,7 @@ extra_logos:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (gold lettermark): `data/brand-logos/sr-monogram.md`
 
 ### Front

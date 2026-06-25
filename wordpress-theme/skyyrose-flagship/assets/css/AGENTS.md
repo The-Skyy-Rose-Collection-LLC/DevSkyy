@@ -1,5 +1,14 @@
 # assets/css/ — SkyyRose Theme Design System
 
+> **V2 Build Addendum (Phase 0+, 2026-05-03):** This guide is augmented by the Skyyrose V2 build:
+> - Source-of-truth plans: `docs/SKYYROSE_V2_MASTER_PLAN.md` §0.4 (this directory's allowed/forbidden table) and `docs/SKYYROSE_WORDPRESS_PLAN.md` §5.1 (token spec) + §5.3 (premium-feel checklist)
+> - Cost-cap policy for paid API calls: `eval/cost-cap-policy.md` (hybrid stance — supersedes CLAUDE.md STOP-AND-SHOW for ≤$1 calls)
+> - 6-step per-edit workflow (Phase 0.5+ once toolchain scripts ship): adds `verify-impl` (Step 2, Context7-first) + `post-simplify-verify` (Step 4, 4-check revert protocol) + `kb-distill` (Step 6, KB pattern entry) on top of the lint/simplify/verification-loop workflow already documented below.
+> - KB cross-references: `knowledge-base/README.md` integration map covers 4 prior memory systems (OpenWolf, Serena, GSD, claude-mem) + new `knowledge-base/` + graphify topology graph (Phase 0 Deliverable J).
+> - Cross-boundary handoff: sequenced agents only (agent A commit → exit → agent B reads → commit). Never simultaneous.
+> - Token system: extend `design-tokens.css` (existing repo file) — do NOT create a parallel `tokens.css`. The WP plan §5.1 originally specified `tokens.css`; PLAN_INDEX.md resolves the conflict in favor of the existing repo convention.
+> - Banned-by-default elements: see `eval/banned-elements.md` (gradients, generic 4-col grids, drop-shadow stacks, etc. — WP §1.3).
+
 ## Isolated Workspace
 
 **Your scope — read/write freely:**
@@ -143,15 +152,16 @@ Brand tokens defined in `design-tokens.css`:
 Collection pages and landing pages use CSS custom property overrides — no JS class toggling needed.
 
 ```css
-/* PHP sets data-collection on <body> */
-/* CSS overrides collection-specific vars */
-[data-collection="black-rose"]  { --col-accent: var(--color-silver);   --col-glow: ... }
-[data-collection="love-hurts"]  { --col-accent: var(--color-crimson);  --col-glow: ... }
-[data-collection="signature"]   { --col-accent: var(--color-gold);     --col-glow: ... }
-[data-collection="kids-capsule"]{ --col-accent: var(--color-rose-gold); --col-glow: ... }
+/* PHP sets data-collection on <body> or any wrapper */
+/* design-tokens.css overrides --skyyrose-* per collection */
+[data-collection="black-rose"]  { --skyyrose-accent: #C0C0C0; /* … */ }
+[data-collection="love-hurts"]  { --skyyrose-accent: #DC143C; /* … */ }
+[data-collection="signature"]   { --skyyrose-accent: #D4AF37; /* … */ }
 ```
 
-Landing pages use the same `[data-collection]` attribute with `--lp-*` variable overrides.
+Both collection pages and landing pages consume `--skyyrose-*` tokens directly
+from `design-tokens.css`. The legacy `--col-*` and `--lp-*` aliases were
+retired in U-4 (2026-05-04) — do not reintroduce them.
 
 ## Class Naming Conventions
 

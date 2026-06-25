@@ -30,6 +30,7 @@
     "@google/genai": "^1.38.0",
     "@google/model-viewer": "^4.1.0",
     "@hookform/resolvers": "^5.2.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -86,6 +87,7 @@
     "react-hook-form": "^7.71.2",
     "react-resizable-panels": "^4.6.5",
     "recharts": "^3.7.0",
+    "server-only": "^0.0.1",
     "sharp": "^0.34.5",
     "stripe": "^20.3.1",
     "tailwind-merge": "^3.4.0",
@@ -100,10 +102,15 @@
     "lodash-es": "^4.17.23",
     "undici": ">=5.29.0",
     "tar": ">=7.5.11",
-    "ajv": "$ajv",
     "minimatch": ">=10.2.1",
     "path-to-regexp": ">=6.3.0",
-    "@tootallnate/once": ">=3.0.1"
+    "@tootallnate/once": ">=3.0.1",
+    "axios": ">=1.15.2",
+    "basic-ftp": ">=5.3.1",
+    "flatted": ">=3.4.2",
+    "fast-uri": ">=3.1.2",
+    "picomatch": ">=4.0.4",
+    "protobufjs": ">=7.5.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",

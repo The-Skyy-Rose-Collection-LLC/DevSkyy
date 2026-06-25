@@ -187,6 +187,7 @@ async def test_agent_with_rag_context(ingested_rag_manager):
 
 
 @pytest.mark.asyncio
+@pytest.mark.slow  # real chromadb + sentence-transformers model load — not for the fast gate
 async def test_rag_context_caching(ingested_rag_manager):
     """Test that RAG context caching works."""
     # Enable caching
@@ -206,6 +207,7 @@ async def test_rag_context_caching(ingested_rag_manager):
 
 
 @pytest.mark.asyncio
+@pytest.mark.slow  # loads SentenceTransformer("all-MiniLM-L6-v2") per call — flaky under full-suite load; real-dep integration test
 async def test_rag_document_chunking():
     """Test that documents are properly chunked during ingestion."""
     from orchestration.auto_ingestion import AutoDocumentIngestion

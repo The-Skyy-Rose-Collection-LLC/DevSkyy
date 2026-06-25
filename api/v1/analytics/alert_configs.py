@@ -311,10 +311,12 @@ async def list_alert_configs(
         where_clause = " AND ".join(conditions) if conditions else "1=1"
 
         # Count total
-        count_query = text(f"""
+        count_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT COUNT(*) FROM alert_configs
             WHERE {where_clause}
-        """)
+        """
+        )
         count_result = await db.execute(count_query, params)
         total = count_result.scalar() or 0
 
@@ -323,7 +325,8 @@ async def list_alert_configs(
         params["limit"] = page_size
         params["offset"] = offset
 
-        data_query = text(f"""
+        data_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             SELECT
                 id, name, description, metric_name,
                 condition_type, condition_operator,
@@ -336,7 +339,8 @@ async def list_alert_configs(
             WHERE {where_clause}
             ORDER BY created_at DESC
             LIMIT :limit OFFSET :offset
-        """)
+        """
+        )
 
         result = await db.execute(data_query, params)
         rows = result.fetchall()
@@ -646,12 +650,14 @@ async def update_alert_config(
             )
 
         update_clause = ", ".join(updates)
-        update_query = text(f"""
+        update_query = text(
+            f"""  # nosec B608 — parameterized SQLAlchemy text(); conditions are static literals, user values in params dict
             UPDATE alert_configs
             SET {update_clause}
             WHERE id = :config_id
             RETURNING *
-        """)
+        """
+        )
 
         result = await db.execute(update_query, params)
         await db.commit()

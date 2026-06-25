@@ -22,22 +22,37 @@ Usage:
     }
 """
 
+import sys
+
+from utils.logging_utils import configure_logging
+
 from mcp_tools import mcp  # noqa: F401 - re-export for deploy script compatibility
 from mcp_tools.server import API_BASE_URL, API_KEY
 
 if __name__ == "__main__":
+    # stdio transport uses STDOUT as the JSON-RPC channel \u2014 every human-readable
+    # line must go to stderr, and must never crash startup on an unencodable glyph.
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
+    # structlog defaults to stdout — re-route it to stderr for stdio mode so logs
+    # never pollute the JSON-RPC channel. Scoped here; the FastAPI app keeps stdout.
+    configure_logging(json_output=True, stream=sys.stderr)
+
     # Validate configuration
     if not API_KEY:
-        print("\u26a0\ufe0f  Warning: DEVSKYY_API_KEY not set. Using empty key for testing.")
-        print("   Set it with: export DEVSKYY_API_KEY='your-key-here'")
+        print(
+            "\u26a0\ufe0f  Warning: DEVSKYY_API_KEY not set. Using empty key for testing.",
+            file=sys.stderr,
+        )
+        print("   Set it with: export DEVSKYY_API_KEY='your-key-here'", file=sys.stderr)
 
-    print(f"""
+    print(
+        f"""
 \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557
 \u2551                                                                  \u2551
 \u2551   DevSkyy MCP Server v2.0.0 - Advanced Tool Use                 \u2551
 \u2551   Industry-First Multi-Agent AI Platform Integration            \u2551
 \u2551                                                                  \u2551
-\u2551   54 AI Agents \u2022 Enterprise Security \u2022 Multi-Model AI           \u2551
+\u2551   Agent Fleet \u2022 Enterprise Security \u2022 Multi-Model AI           \u2551
 \u2551                                                                  \u2551
 \u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d
 
@@ -66,13 +81,15 @@ if __name__ == "__main__":
    \u2022 devskyy_lora_dataset_preview - Preview LoRA training dataset
    \u2022 devskyy_lora_version_info - Get LoRA version information
    \u2022 devskyy_lora_product_history - Get product LoRA training history
-   \u2022 devskyy_list_agents - View all 54 agents
+   \u2022 devskyy_list_agents - View all agents
 
 \ud83d\udcda Documentation: https://docs.devskyy.com/mcp
 \ud83d\udd17 API Reference: {API_BASE_URL}/docs
 
 Starting MCP server on stdio...
-""")
+""",
+        file=sys.stderr,
+    )
 
     # Run the server
     mcp.run()

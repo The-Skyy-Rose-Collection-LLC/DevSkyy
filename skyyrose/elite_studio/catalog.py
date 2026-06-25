@@ -22,6 +22,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+try:
+    import yaml as _yaml  # type: ignore[import-untyped]
+
+    _YAML_AVAILABLE = True
+except ImportError:
+    _YAML_AVAILABLE = False
+
 from skyyrose.core.catalog_loader import CATALOG_CSV as CANONICAL_CATALOG_CSV
 from skyyrose.core.catalog_loader import (
     PRODUCT_STATUS,
@@ -150,12 +157,122 @@ class Catalog:
 
     @classmethod
     def load(cls, path: Path | str | None = None, *, strict: bool = False) -> Catalog:
-        """Load the canonical catalog CSV."""
+        """Load the canonical catalog (CSV or YAML, detected by extension)."""
         p = Path(path) if path else default_catalog_path()
         if not p.is_file():
             raise FileNotFoundError(f"Catalog not found at {p}")
+        if p.suffix.lower() in {".yaml", ".yml"}:
+            if not _YAML_AVAILABLE:
+                raise ImportError("PyYAML is required to load YAML catalogs: pip install pyyaml")
+            with p.open("r", encoding="utf-8") as fh:
+                data = _yaml.safe_load(fh)
+            return cls._from_yaml_data(data, source_path=p, strict=strict)
         rows = read_catalog_rows(p)
         return cls._from_csv_rows(rows, source_path=p, strict=strict)
+
+    @classmethod
+    def _from_yaml_data(
+        cls, data: dict[str, Any], *, source_path: Path, strict: bool = False
+    ) -> Catalog:
+        """Parse the full YAML catalog structure."""
+        collections: dict[str, Any] = data.get("collections") or {}
+        catalog_rules: dict[str, Any] = data.get("catalog_rules") or {}
+
+        # Build series entries from the YAML series block
+        series_by_name: dict[str, SeriesEntry] = {}
+        for sname, sdata in (data.get("series") or {}).items():
+            sd = sdata or {}
+            series_by_name[sname] = SeriesEntry(
+                name=sname,
+                collection=sd.get("collection", ""),
+                description=sd.get("description", ""),
+                skus=tuple(sd.get("skus") or []),
+                lookbook_images=tuple(sd.get("lookbook_images") or []),
+            )
+
+        # Build a reverse map: sku → series name (derived from series block, not per-product field)
+        sku_to_series: dict[str, str] = {}
+        for sname, se in series_by_name.items():
+            for sku in se.skus:
+                sku_to_series[sku] = sname
+
+        # Parse products
+        products_by_sku: dict[str, ProductEntry] = {}
+        for raw in data.get("products") or []:
+            if not raw:
+                continue
+            sku = (raw.get("sku") or "").strip()
+            if not sku:
+                continue
+
+            master_raw = raw.get("master") or {}
+            master: dict[str, Any] = {
+                "path": master_raw.get("path"),
+                "hash": master_raw.get("hash"),
+                "source": master_raw.get("source"),
+            }
+            # Remove None values for cleaner dict
+            master = {k: v for k, v in master.items() if v is not None}
+
+            color_spec_raw = raw.get("color_spec") or {}
+            color_spec: dict[str, Any] = {}
+            if color_spec_raw.get("primary") is not None:
+                color_spec["primary"] = color_spec_raw["primary"]
+            accents = color_spec_raw.get("accents")
+            if accents is not None:
+                color_spec["accents"] = list(accents)
+
+            products_by_sku[sku] = ProductEntry(
+                sku=sku,
+                name=(raw.get("name") or "").strip(),
+                collection=(raw.get("collection") or "").strip(),
+                price_usd=float(raw.get("price_usd") or 0.0),
+                status=(raw.get("status") or "draft").strip(),
+                branding_summary=(raw.get("branding_summary") or "").strip(),
+                series=sku_to_series.get(sku),
+                aliases=tuple(raw.get("aliases") or []),
+                filename_patterns=tuple(raw.get("filename_patterns") or []),
+                color_spec=color_spec,
+                text_spec=tuple(raw.get("text_spec") or []),
+                variants=tuple(raw.get("variants") or []),
+                master=master,
+                source_files=tuple(raw.get("source_files") or []),
+                ai_renders=tuple(raw.get("ai_renders") or []),
+                review_flags=tuple(raw.get("review_flags") or []),
+                notes=(raw.get("notes") or ""),
+                limited_pieces=raw.get("limited_pieces"),
+                retirement_note=raw.get("retirement_note"),
+            )
+
+        violations = cls._validate_integrity(
+            collections=collections,
+            series_by_name=series_by_name,
+            products_by_sku=products_by_sku,
+            catalog_rules=catalog_rules,
+        )
+        if strict and violations:
+            raise IntegrityError(list(violations))
+
+        # Prefer YAML-declared generated_at; fall back to source mtime so
+        # downstream consumers always have a stable timestamp for cache keys.
+        generated_at = str(data.get("generated_at") or "")
+        if not generated_at:
+            try:
+                generated_at = str(source_path.stat().st_mtime)
+            except OSError:
+                generated_at = ""
+
+        return cls(
+            version=int(data.get("version") or 1),
+            generated_at=generated_at,
+            collections=collections,
+            catalog_rules=catalog_rules,
+            series_by_name=series_by_name,
+            products_by_sku=products_by_sku,
+            unclaimed_legacy_files=data.get("unclaimed_legacy_files") or {},
+            orphan_brand_files=data.get("orphan_brand_files") or {},
+            violations=tuple(violations),
+        )
 
     @classmethod
     def _from_csv_rows(
@@ -239,6 +356,7 @@ class Catalog:
             collections=collections,
             series_by_name=series_by_name,
             products_by_sku=products_by_sku,
+            catalog_rules={},
         )
         if strict and violations:
             raise IntegrityError(list(violations))
@@ -255,14 +373,18 @@ class Catalog:
             violations=tuple(violations),
         )
 
+    _VALID_PATCH_SPORTS = frozenset({"baseball", "football", "basketball", "hockey", "soccer"})
+
     @staticmethod
     def _validate_integrity(
         collections: dict[str, Any],
         series_by_name: dict[str, SeriesEntry],
         products_by_sku: dict[str, ProductEntry],
+        catalog_rules: dict[str, Any] | None = None,
     ) -> list[Violation]:
         """Cross-reference checks. Returns violations list (empty = clean)."""
         viols: list[Violation] = []
+        catalog_rules = catalog_rules or {}
 
         declared_collections = set(collections.keys())
         for sku, p in products_by_sku.items():
@@ -290,6 +412,48 @@ class Catalog:
                             message=f"series references unknown SKU {sku!r}",
                         )
                     )
+
+        # alias_collision: same alias claimed by two or more products
+        alias_to_skus: dict[str, list[str]] = {}
+        for sku, p in products_by_sku.items():
+            for alias in p.aliases:
+                alias_to_skus.setdefault(alias, []).append(sku)
+        for alias, owners in alias_to_skus.items():
+            if len(owners) > 1:
+                viols.append(
+                    Violation(
+                        severity="referential",
+                        code="alias_collision",
+                        path=f"products[*].aliases[{alias!r}]",
+                        message=f"alias {alias!r} claimed by multiple SKUs: {sorted(owners)}",
+                    )
+                )
+
+        # catalog_rules.jerseys.sku_to_patch checks
+        jerseys = catalog_rules.get("jerseys") or {}
+        sku_to_patch: dict[str, str] = jerseys.get("sku_to_patch") or {}
+        valid_sports = Catalog._VALID_PATCH_SPORTS
+        for mapped_sku, sport in sku_to_patch.items():
+            if mapped_sku not in products_by_sku:
+                viols.append(
+                    Violation(
+                        severity="referential",
+                        code="patch_sku_missing",
+                        path=f"catalog_rules.jerseys.sku_to_patch[{mapped_sku!r}]",
+                        message=f"patch mapping references unknown SKU {mapped_sku!r}",
+                    )
+                )
+            if sport not in valid_sports:
+                viols.append(
+                    Violation(
+                        severity="referential",
+                        code="patch_sport_invalid",
+                        path=f"catalog_rules.jerseys.sku_to_patch[{mapped_sku!r}]",
+                        message=(
+                            f"sport {sport!r} is not in allowed values {sorted(valid_sports)}"
+                        ),
+                    )
+                )
 
         return viols
 
@@ -336,9 +500,21 @@ class Catalog:
         return out
 
     def jersey_patch_for(self, sku: str) -> str | None:
-        """Return patch sport for a jersey SKU, inferred from product name."""
+        """Return patch sport for a jersey SKU.
+
+        Prefers the explicit ``catalog_rules.jerseys.sku_to_patch`` map when
+        populated (YAML catalogs).  Falls back to a product-name heuristic for
+        CSV-loaded catalogs that lack the rules block.
+        """
+        sku_to_patch: dict[str, str] = (self.catalog_rules.get("jerseys") or {}).get(
+            "sku_to_patch"
+        ) or {}
+        if sku in sku_to_patch:
+            return sku_to_patch[sku]
+        # Name-heuristic fallback (CSV path) — iterate canonical sport set so
+        # YAML and CSV catalogs share the same validity list (incl. soccer).
         name = self.products_by_sku[sku].name.lower() if sku in self.products_by_sku else ""
-        for sport in ("baseball", "football", "basketball", "hockey"):
+        for sport in Catalog._VALID_PATCH_SPORTS:
             if sport in name:
                 return sport
         return None

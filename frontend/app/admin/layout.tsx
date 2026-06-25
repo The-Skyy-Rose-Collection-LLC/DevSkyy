@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/dashboard/app-sidebar';
@@ -13,7 +14,9 @@ export default function AdminLayout({
   return (
     <SessionProvider>
       <SidebarProvider>
-        <AppSidebar />
+        <Suspense fallback={null}>
+          <AppSidebar />
+        </Suspense>
         <SidebarInset className="bg-gray-950">
           <header className="flex h-14 shrink-0 items-center gap-2 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
             <div className="flex items-center gap-2 px-4">

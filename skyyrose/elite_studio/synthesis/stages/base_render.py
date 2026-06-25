@@ -14,10 +14,12 @@ Why Kontext over plain text-to-image:
 from __future__ import annotations
 
 import logging
+import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from ...budget import BudgetExceededError, RunBudget
 from ..clients import FalClient
 from ..prompts.base_prompts import build_base_prompt
 from ..state.telemetry import CostTracker
@@ -25,6 +27,17 @@ from ..state.telemetry import CostTracker
 logger = logging.getLogger(__name__)
 
 FLUX_KONTEXT_ENDPOINT = "fal-ai/flux-pro/kontext"
+
+# Env flag that promotes the "unbudgeted call" WARNING into a hard refusal.
+# Set ELITE_STUDIO_STRICT_BUDGET=1 in production deploys to fail fast on any
+# direct caller that has not yet been wired through a RunBudget. Default off
+# keeps back-compat for existing scripts during migration.
+_STRICT_BUDGET_ENV = "ELITE_STUDIO_STRICT_BUDGET"
+
+
+def _strict_budget_enabled() -> bool:
+    """Return True when ELITE_STUDIO_STRICT_BUDGET is set to a truthy value."""
+    return os.environ.get(_STRICT_BUDGET_ENV, "").lower() in ("1", "true", "yes", "on")
 
 
 @dataclass
@@ -44,6 +57,7 @@ async def render_base(
     sku: str,
     view: str,
     cost_tracker: CostTracker | None = None,
+    budget: RunBudget | None = None,
     aspect_ratio: str = "1:1",
     seed: int | None = None,
 ) -> BaseRenderResult:
@@ -52,6 +66,13 @@ async def render_base(
     Uploads the techflat to fal CDN, calls Kontext with the dossier-derived
     base prompt (decoration explicitly suppressed), downloads the output.
 
+    The budget gate for Stage 1 is applied by the caller (flux_pipeline.render)
+    before this function is invoked, so ``render_base`` does not re-check.  The
+    ``budget`` kwarg is accepted here so callers that invoke ``render_base``
+    directly (e.g. scripts, future stages) can pass a budget for forwarding.
+    When ``budget`` is ``None`` a WARNING is emitted so the migration audit can
+    identify call sites that have not yet been wired.
+
     Args:
         client: shared FalClient.
         techflat_path: local path to the techflat image.
@@ -59,12 +80,28 @@ async def render_base(
         out_dir: where to save the output PNG.
         sku, view: identifiers for telemetry + filename.
         cost_tracker: optional CostTracker for spend accounting.
+        budget: optional RunBudget; accepted for passthrough but gate is
+            applied upstream.  Pass the same instance flux_pipeline.render
+            received to keep the API surface consistent.
         aspect_ratio: locked to 1:1 by default for downstream mask alignment.
         seed: optional seed for reproducibility.
 
     Returns:
         BaseRenderResult with the downloaded output path and metadata.
     """
+    if budget is None:
+        if _strict_budget_enabled():
+            raise BudgetExceededError(
+                f"render_base refused: ELITE_STUDIO_STRICT_BUDGET is set and no "
+                f"RunBudget was passed (sku={sku!r} view={view!r}). Wire budget= "
+                f"or unset the env var to allow unbudgeted dispatch."
+            )
+        logger.warning(
+            "render_base called without a RunBudget (sku=%s view=%s) — "
+            "Stage 1 FAL call is unbudgeted; wire budget= to enable ceiling enforcement.",
+            sku,
+            view,
+        )
     techflat_path = Path(techflat_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

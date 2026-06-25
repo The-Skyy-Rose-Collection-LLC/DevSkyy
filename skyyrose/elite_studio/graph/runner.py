@@ -17,6 +17,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+from .._observability import langfuse_config
 from ..config import BATCH_DELAY_SECONDS, OUTPUT_DIR
 from ..models import ProductionResult
 from ..utils import discover_all_skus
@@ -58,7 +59,7 @@ def run_single(
         max_retries=config.max_retries,
     )
 
-    final_state = graph.invoke(state)
+    final_state = graph.invoke(state, config=langfuse_config())
     return extract_production_result(final_state)
 
 
@@ -95,7 +96,7 @@ def run_batch(
     results: list[ProductionResult] = []
     total = len(skus)
     for i, sku in enumerate(skus):
-        print(f"[{i+1}/{total}] Processing {sku}...")
+        logger.info("[%d/%d] Processing %s...", i + 1, total, sku)
         if skip_existing:
             expected = OUTPUT_DIR / sku / f"{sku}-model-{view}-gemini.jpg"
             if expected.exists():
