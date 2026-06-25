@@ -36,6 +36,7 @@ class TaskType(StrEnum):
     EXTRACT = "extract"
     TRANSLATE = "translate"
     CODE = "code"
+    EMBED = "embed"  # OBS-wire: server-side image/text embedding encode
 
 
 # Provider cost per 1M tokens (as of 2026-01-08)
@@ -61,6 +62,10 @@ PROVIDER_COSTS = {
     # Groq
     "llama-3.3-70b-versatile": {"input": 0.59, "output": 0.79},
     "mixtral-8x7b-32768": {"input": 0.24, "output": 0.24},
+    # Embeddings (local weights — no per-token API cost; listed so EMBED rows
+    # don't log a spurious unknown_model_cost warning on every encode).
+    "openai/clip-vit-base-patch32": {"input": 0.0, "output": 0.0},
+    "facebook/dinov2-base": {"input": 0.0, "output": 0.0},
 }
 
 
@@ -363,3 +368,45 @@ def record_llm_usage(
         )
     except Exception:  # noqa: BLE001 — telemetry must never break the call path
         logger.warning("record_llm_usage_failed", exc_info=True)
+
+
+def record_embedding_usage(
+    *,
+    model: str,
+    latency_ms: float = 0.0,
+    success: bool = True,
+    cache_hit: bool = False,
+    dim: int | None = None,
+    count: int = 1,
+    agent_id: str | None = None,
+    error: str | None = None,
+) -> None:
+    """Record one embedding encode (or cache hit) into the global tracker.
+
+    OBS-wire: the embedding encode path emitted zero telemetry, so FleetObserver
+    was blind to its cost/latency/errors. One row per encode (``task_type=EMBED``)
+    with latency, cache-hit, success. Embeddings are token-free (local weights), so
+    token counts are 0 and cost resolves to 0. ``agent_id`` falls back to the
+    ``current_agent_id`` ContextVar. NEVER raises — telemetry must not break the
+    encode path.
+    """
+    try:
+        meta: dict[str, Any] = {"cache_hit": cache_hit, "count": count}
+        if dim is not None:
+            meta["dim"] = dim
+        get_token_tracker().record(
+            TokenUsage(
+                provider="embeddings",
+                model=model,
+                task_type=TaskType.EMBED,
+                agent_id=agent_id if agent_id is not None else current_agent_id.get(),
+                input_tokens=0,
+                output_tokens=0,
+                latency_ms=latency_ms,
+                success=success,
+                error=error,
+                metadata=meta,
+            )
+        )
+    except Exception:  # noqa: BLE001 — telemetry must never break the encode path
+        logger.warning("record_embedding_usage_failed", exc_info=True)
