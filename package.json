@@ -143,7 +143,7 @@
     "postprocessing": "^6.38.2",
     "potpack": "^2.1.0",
     "prisma": "^7.1.0",
-    "rate-limiter-flexible": "^9.1.1",
+    "rate-limiter-flexible": "^11.2.0",
     "react": "^19.2.3",
     "react-blurhash": "^0.3.0",
     "react-dom": "^19.2.3",
