@@ -555,7 +555,13 @@ jobs:
         # job's continue-on-error) instead of running to the 30-min JOB timeout, which fires as
         # a cancellation that continue-on-error cannot absorb — that gated the pipeline.
         timeout-minutes: 15
-        run: ./node_modules/.bin/playwright test --reporter=html
+        # `--reporter=list,html`: the `list` reporter streams per-test results to the
+        # CI log (a bare `--reporter=html` overrode the config's list reporter, so the
+        # run produced ZERO output and the 15-min timeout was a black box — you could
+        # not tell which test hung). `html` is kept for the uploaded report artifact.
+        # `--max-failures=10`: bail fast instead of grinding 42 serial tests (workers=1,
+        # retries=2 = up to 90s each) past the 15-min cap with no signal.
+        run: ./node_modules/.bin/playwright test --reporter=list,html --max-failures=10
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
