@@ -320,3 +320,54 @@ export const HfDatasetsResponseSchema = z.object({
     count: z.number(),
     author: z.string(),
 });
+
+// Training Schemas
+export const TrainingProgressSchema = z.object({
+    status: z.enum(['idle', 'preparing', 'training', 'completed', 'failed']),
+    version: z.string(),
+    current_epoch: z.number(),
+    total_epochs: z.number(),
+    current_step: z.number(),
+    total_steps: z.number(),
+    progress_percentage: z.number(),
+    loss: z.number(),
+    learning_rate: z.number(),
+    avg_loss: z.number(),
+    best_loss: z.number().nullable(),
+    started_at: z.string().nullable(),
+    updated_at: z.string().nullable(),
+    estimated_completion: z.string().nullable(),
+    elapsed_seconds: z.number(),
+    remaining_seconds: z.number(),
+    total_images: z.number(),
+    total_products: z.number(),
+    collections: z.record(z.string(), z.number()),
+    latest_checkpoint: z.string(),
+    checkpoint_step: z.number(),
+    message: z.string(),
+    error: z.string(),
+});
+
+export const TrainingJobInfoSchema = z.object({
+    job_id: z.string(),
+    version: z.string(),
+    status: z.enum(['pending', 'running', 'completed', 'failed']),
+    started_at: z.string().nullable(),
+    completed_at: z.string().nullable(),
+    total_epochs: z.number(),
+    final_loss: z.number().nullable(),
+    total_images: z.number(),
+    total_products: z.number(),
+    collections: z.record(z.string(), z.number()),
+    model_path: z.string().nullable(),
+    error: z.string().nullable(),
+});
+
+export const TrainingJobsListSchema = z.object({
+    total_jobs: z.number(),
+    running: z.number(),
+    completed: z.number(),
+    failed: z.number(),
+    jobs: z.array(TrainingJobInfoSchema),
+    retrieved_at: z.string(),
+});

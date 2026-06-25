@@ -92,3 +92,6 @@ export type AutonomousOperationsResponse = z.infer<typeof schemas.AutonomousOper
 export type SkuImageCounts = z.infer<typeof schemas.SkuImageCountsSchema>;
 export type HfDatasetInfo = z.infer<typeof schemas.HfDatasetInfoSchema>;
 export type HfDatasetsResponse = z.infer<typeof schemas.HfDatasetsResponseSchema>;
+export type TrainingProgress = z.infer<typeof schemas.TrainingProgressSchema>;
+export type TrainingJobInfo = z.infer<typeof schemas.TrainingJobInfoSchema>;
+export type TrainingJobsList = z.infer<typeof schemas.TrainingJobsListSchema>;
