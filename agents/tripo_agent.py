@@ -53,6 +53,7 @@ from agents.core.base import (
     ValidationResult,
 )
 from agents.core.validation_scoring import compute_validation_scores
+from agents.errors import ConfigurationError, ExecutionError
 from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
@@ -941,16 +942,30 @@ class TripoAssetAgent(SuperAgent):
             dict with riggable bool, task_id, and any messages from Tripo.
         """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+            raise ConfigurationError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d.",
+                config_key="tripo3d",
+            )
         if not self.tripo_config.api_key:
-            raise ValueError("TRIPO_API_KEY environment variable is required.")
+            raise ConfigurationError(
+                "TRIPO_API_KEY environment variable is required.",
+                config_key="TRIPO_API_KEY",
+            )
 
-        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+        async with TripoClient(
+            api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
+        ) as client:
             check_task_id = await client.check_riggable(original_model_task_id)
             task = await client.wait_for_task(check_task_id, verbose=True)
 
             if task.status != TaskStatus.SUCCESS:
-                raise RuntimeError(f"Riggability check failed: {getattr(task, 'error', 'unknown')}")
+                raise ExecutionError(
+                    f"Riggability check failed: {getattr(task, 'error', 'unknown')}",
+                    context={
+                        "task_id": check_task_id,
+                        "source_task_id": original_model_task_id,
+                    },
+                )
 
             riggable_result = getattr(task, "result", {}) or {}
             return {
@@ -984,9 +999,23 @@ class TripoAssetAgent(SuperAgent):
             GenerationResult dict with the rigged model path.
         """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+            raise ConfigurationError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d.",
+                config_key="tripo3d",
+            )
         if not self.tripo_config.api_key:
-            raise ValueError("TRIPO_API_KEY environment variable is required.")
+            raise ConfigurationError(
+                "TRIPO_API_KEY environment variable is required.",
+                config_key="TRIPO_API_KEY",
+            )
+
+        # Validate out_format eagerly before any paid API work so an invalid
+        # value fails fast rather than after a costly generation completes.
+        try:
+            format_enum = ModelFormat(out_format)
+        except ValueError as e:
+            valid = [f.value for f in ModelFormat]
+            raise ValueError(f"Invalid out_format '{out_format}'. Must be one of: {valid}") from e
 
         try:
             rig_type_enum = RigType(rig_type.lower())
@@ -1000,7 +1029,9 @@ class TripoAssetAgent(SuperAgent):
             valid = [r.value for r in RigSpec]
             raise ValueError(f"Invalid spec '{spec}'. Must be one of: {valid}") from e
 
-        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+        async with TripoClient(
+            api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
+        ) as client:
             logger.info(
                 "Rigging model %s with rig_type=%s spec=%s",
                 original_model_task_id,
@@ -1017,7 +1048,13 @@ class TripoAssetAgent(SuperAgent):
 
             task = await client.wait_for_task(rig_task_id, verbose=True)
             if task.status != TaskStatus.SUCCESS:
-                raise RuntimeError(f"Rigging failed: {getattr(task, 'error', 'unknown')}")
+                raise ExecutionError(
+                    f"Rigging failed: {getattr(task, 'error', 'unknown')}",
+                    context={
+                        "task_id": rig_task_id,
+                        "source_task_id": original_model_task_id,
+                    },
+                )
 
             output_dir = Path(self.tripo_config.output_dir) / "rigged"
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -1034,7 +1071,7 @@ class TripoAssetAgent(SuperAgent):
                 task_id=rig_task_id,
                 model_path=str(model_path),
                 model_url=str(model_path),
-                format=ModelFormat(out_format),
+                format=format_enum,
                 metadata={
                     "source_task_id": original_model_task_id,
                     "rig_type": rig_type_enum.value,
@@ -1072,9 +1109,15 @@ class TripoAssetAgent(SuperAgent):
             GenerationResult dict with the animated model path.
         """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+            raise ConfigurationError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d.",
+                config_key="tripo3d",
+            )
         if not self.tripo_config.api_key:
-            raise ValueError("TRIPO_API_KEY environment variable is required.")
+            raise ConfigurationError(
+                "TRIPO_API_KEY environment variable is required.",
+                config_key="TRIPO_API_KEY",
+            )
 
         if not animations:
             animations = ["idle", "walk"]
@@ -1089,7 +1132,9 @@ class TripoAssetAgent(SuperAgent):
                 f"Invalid animation in {animations}. Must be names from: {valid}"
             ) from e
 
-        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+        async with TripoClient(
+            api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
+        ) as client:
             logger.info(
                 "Retargeting animations %s onto rigged model %s",
                 [a.value for a in anim_enums],
@@ -1106,8 +1151,12 @@ class TripoAssetAgent(SuperAgent):
 
             task = await client.wait_for_task(retarget_task_id, verbose=True)
             if task.status != TaskStatus.SUCCESS:
-                raise RuntimeError(
-                    f"Animation retarget failed: {getattr(task, 'error', 'unknown')}"
+                raise ExecutionError(
+                    f"Animation retarget failed: {getattr(task, 'error', 'unknown')}",
+                    context={
+                        "task_id": retarget_task_id,
+                        "source_task_id": rigged_model_task_id,
+                    },
                 )
 
             output_dir = Path(self.tripo_config.output_dir) / "animated"

@@ -225,6 +225,12 @@ def merge(idle_path: Path, walk_path: Path, out_path: Path) -> dict:
         src_anim=walk.animations[0],
         new_clip_name="walk",
     )
+    if not walk_clip.channels:
+        raise ValueError(
+            "Walk clip imported 0 channels — no bones from the walk GLB matched the "
+            "destination skeleton. Re-download the walk animation from Mixamo using the "
+            "same character upload that produced the idle GLB, with 'Skin: With Skin'."
+        )
     base.animations.append(walk_clip)
     log.info(
         "Imported walk animation -> 'walk' (%d channels, %d samplers)",

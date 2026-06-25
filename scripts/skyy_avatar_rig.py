@@ -80,6 +80,7 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
             available = float(getattr(balance, "balance", 0))
             frozen = float(getattr(balance, "frozen", 0))
             return {
+                "api_key": key,
                 "key_suffix": suffix,
                 "region": region,
                 "is_global": is_global,
@@ -90,6 +91,7 @@ async def _probe_key_on_region(key: str, is_global: bool) -> dict:
             }
     except Exception as exc:
         return {
+            "api_key": key,
             "key_suffix": suffix,
             "region": region,
             "is_global": is_global,
@@ -170,7 +172,9 @@ async def generate_cartoon_mesh(agent: TripoAssetAgent, image_path: Path) -> tup
     from tripo3d import TripoClient
 
     log.info("Generating cartoon mesh from %s", image_path)
-    async with TripoClient(api_key=agent.tripo_config.api_key) as client:
+    async with TripoClient(
+        api_key=agent.tripo_config.api_key, IS_GLOBAL=agent.tripo_config.is_global
+    ) as client:
         task_id = await client.image_to_model(
             image=str(image_path),
             model_version="v3.1-20260211",
@@ -336,8 +340,10 @@ async def main() -> int:
         return 1
 
     # Configure the agent with the winning key + region.
+    # winner["api_key"] holds the full key set by discover_credit_holding_account so we
+    # never reconstruct by suffix (which can collide when multiple keys share a suffix).
     config = TripoConfig.from_env()
-    config.api_key = next(k for k in candidate_keys if k.endswith(winner["key_suffix"]))
+    config.api_key = winner["api_key"]
     config.is_global = winner["is_global"]
     if not config.is_global:
         config.base_url = "https://api.tripo3d.com/v2"
@@ -350,12 +356,17 @@ async def main() -> int:
         winner["region"],
         starting_balance,
     )
+
+    # Hard-abort if available balance is below the caller's spend ceiling.
+    # This enforces --max-cost BEFORE any paid API call is made.
     if starting_balance < args.max_cost:
-        log.warning(
-            "Balance %.2f below max-cost ceiling %.2f — pipeline may not complete",
+        log.error(
+            "Aborting — balance %.2f is below the --max-cost ceiling %.2f. "
+            "Top up your Tripo account or lower --max-cost and retry.",
             starting_balance,
             args.max_cost,
         )
+        return 1
 
     if args.dry_run:
         log.info("DRY RUN — would execute:")
