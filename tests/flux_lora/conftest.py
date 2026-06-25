@@ -8,8 +8,6 @@ All fixtures needed by flux_lora tests are defined here.
 
 from __future__ import annotations
 
-import os
-import textwrap
 from pathlib import Path
 
 import pytest
