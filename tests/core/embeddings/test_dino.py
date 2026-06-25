@@ -9,6 +9,7 @@ from PIL import Image
 
 from skyyrose.core.embeddings import dino as dino_mod
 from skyyrose.core.embeddings.config import EmbeddingConfig
+from skyyrose.core.embeddings.device import dtype_load_kwargs
 from skyyrose.core.embeddings.dino import DinoEncoder
 
 
@@ -76,7 +77,8 @@ def test_load_passes_pinned_revision_safetensors_dtype(patched):
     enc.embed_image(_img())
     assert patched["model"]["revision"] == "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
     assert patched["model"]["use_safetensors"] is True
-    assert patched["model"]["dtype"] == torch.float32
+    dtype_key = next(iter(dtype_load_kwargs(torch.float32)))
+    assert patched["model"][dtype_key] == torch.float32
     assert patched["proc"]["revision"] == "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
 
 
