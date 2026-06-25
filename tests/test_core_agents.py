@@ -1864,15 +1864,19 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_content_sub_agents_import_error(self):
+        import sys
+        import agents.core.content.agent as mod
+
+        # Remove the module before patching to allow reload
+        sys.modules.pop("agents.core.content.agent", None)
         with patch.dict(
             "sys.modules",
             {
+                "agents.core.content.agent": mod,
                 "agents.core.content.sub_agents.collection_content": None,
                 "agents.core.content.sub_agents.seo_copywriter": None,
             },
         ):
-            import agents.core.content.agent as mod
-
             importlib.reload(mod)
             a = mod.ContentCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -1892,12 +1896,17 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_creative_sub_agents_import_error(self):
+        import sys
+        import agents.core.creative.agent as mod
+
+        sys.modules.pop("agents.core.creative.agent", None)
         with patch.dict(
             "sys.modules",
-            {"agents.core.creative.sub_agents.brand_creative": None},
+            {
+                "agents.core.creative.agent": mod,
+                "agents.core.creative.sub_agents.brand_creative": None,
+            },
         ):
-            import agents.core.creative.agent as mod
-
             importlib.reload(mod)
             a = mod.CreativeCoreAgent()
             assert len(a._sub_agents) == 0
@@ -1915,15 +1924,18 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_marketing_sub_agents_import_error(self):
+        import sys
+        import agents.core.marketing.agent as mod
+
+        sys.modules.pop("agents.core.marketing.agent", None)
         with patch.dict(
             "sys.modules",
             {
+                "agents.core.marketing.agent": mod,
                 "agents.core.marketing.sub_agents.social_media": None,
                 "agents.core.marketing.sub_agents.campaign_ops": None,
             },
         ):
-            import agents.core.marketing.agent as mod
-
             importlib.reload(mod)
             a = mod.MarketingCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -1943,16 +1955,19 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_operations_sub_agents_import_error(self):
+        import sys
+        import agents.core.operations.agent as mod
+
+        sys.modules.pop("agents.core.operations.agent", None)
         with patch.dict(
             "sys.modules",
             {
+                "agents.core.operations.agent": mod,
                 "agents.core.operations.sub_agents.deploy_health": None,
                 "agents.core.operations.sub_agents.security_monitor": None,
                 "agents.core.operations.sub_agents.coding_doctor": None,
             },
         ):
-            import agents.core.operations.agent as mod
-
             importlib.reload(mod)
             a = mod.OperationsCoreAgent()
             # Legacy sub-agents should be absent; SDK agents may still register
@@ -2037,12 +2052,17 @@ class TestImportErrorBranches:
 
     @pytest.mark.asyncio
     async def test_web_builder_sub_agents_import_error(self):
+        import sys
+        import agents.core.web_builder.agent as mod
+
+        sys.modules.pop("agents.core.web_builder.agent", None)
         with patch.dict(
             "sys.modules",
-            {"agents.core.web_builder.sub_agents.web_dev": None},
+            {
+                "agents.core.web_builder.agent": mod,
+                "agents.core.web_builder.sub_agents.web_dev": None,
+            },
         ):
-            import agents.core.web_builder.agent as mod
-
             importlib.reload(mod)
             a = mod.WebBuilderCoreAgent()
             # Legacy sub-agent should be absent; SDK agents may still register
