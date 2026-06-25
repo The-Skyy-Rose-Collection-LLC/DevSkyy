@@ -1,54 +1,44 @@
-# DevSkyy Platform - Multi-stage Docker Build
-# Optimized for production deployment with security hardening
-# Enterprise hardening: Retry logic, timeouts, minimal layers
-
+# syntax=docker/dockerfile:1.7
 # =============================================================================
-# Stage 1: Frontend Builder (Next.js Dashboard)
+# DevSkyy Platform — Python API / Worker image (multi-stage, security-hardened)
 # =============================================================================
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /app/frontend
-
-# Copy package files from frontend directory
-COPY frontend/package*.json ./
-
-# Install dependencies with legacy peer deps (React version conflicts)
-RUN npm ci --legacy-peer-deps && npm cache clean --force
-
-# Copy Next.js source code from frontend directory
-COPY frontend/app/ ./app/
-COPY frontend/components/ ./components/
-COPY frontend/contexts/ ./contexts/
-COPY frontend/hooks/ ./hooks/
-COPY frontend/lib/ ./lib/
-COPY frontend/public/ ./public/
-COPY frontend/types/ ./types/
-COPY frontend/*.config.js ./
-COPY frontend/*.config.ts ./
-COPY frontend/tsconfig*.json ./
-COPY frontend/next-env.d.ts ./
-
-# Build Next.js application
-RUN npm run build
-
+# ONE image, three roles (selected by the compose `command:`):
+#   • API          → docker-entrypoint.sh (default) → uvicorn main_enterprise:app
+#   • task worker  → python -m agent_sdk.worker
+#   • elite worker → python -m skyyrose.elite_studio worker
+# The frontend (Next.js) is NOT built here — it deploys to Vercel (devskyy.app).
+# Baking it in served zero requests and doubled build time.
+#
+# INSTALL_TARGET selects which optional-dependency extras to add on top of the
+# base deps (default "all"). NOTE: the ML stack (torch/transformers/diffusers/
+# chromadb) lives in the BASE [project.dependencies], so every target pulls it —
+# a genuinely torch-free image needs those moved into an optional group first.
+#   docker build .                              # INSTALL_TARGET=all (default)
+#   docker build --build-arg INSTALL_TARGET=api # base + api extras only
 # =============================================================================
-# Stage 2: Python Backend Builder
-# =============================================================================
-FROM python:3.12-slim AS backend-builder
 
-# Prevent apt from hanging
-ENV DEBIAN_FRONTEND=noninteractive
+# -----------------------------------------------------------------------------
+# Stage 1: dependency builder — installs third-party wheels into a clean prefix.
+# Cache key is pyproject.toml + README.md only, so source edits never bust it.
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim AS builder
 
-# Set Python environment
-ENV PYTHONUNBUFFERED=1 \
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Enterprise hardening: apt-get with retry logic and timeout
+# Build toolchain for native wheels. On arm64 several deps have no prebuilt wheel
+# and compile from source: reportlab's renderPM needs freetype (ft2build.h),
+# Pillow needs jpeg/zlib, asyncpg/psycopg need libpq.
 RUN apt-get update --fix-missing || apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
         build-essential \
+        libpq-dev \
+        libfreetype6-dev \
+        libjpeg-dev \
+        zlib1g-dev \
         curl \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
@@ -56,89 +46,91 @@ RUN apt-get update --fix-missing || apt-get update --fix-missing && \
 
 WORKDIR /app
 
-# Copy project metadata only. Dependencies resolve from pyproject.toml; the
-# application source is added in the production stage and run from /app, so the
-# builder only needs to install third-party deps. setuptools' explicit
-# packages.find produces an (empty) devskyy wheel here — verified to build from
-# pyproject.toml + README.md alone — which keeps this expensive layer cacheable
-# (busts only when pyproject/README change, not on source edits).
+# uv = fast, reliable resolver/installer. python:3.12-slim ships NO setuptools and
+# pip backtracks for ~10min on the large .[all] set (then dies on a missing
+# setuptools.build_meta during sdist metadata builds). uv resolves deterministically
+# and provisions build envs robustly. Installed into the system interpreter so the
+# production stage's site-packages copy still works.
+COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
+
+# Which optional-dependency set to install (see pyproject [project.optional-dependencies]).
+ARG INSTALL_TARGET=all
+
+ENV UV_HTTP_TIMEOUT=600 \
+    UV_SYSTEM_PYTHON=1 \
+    UV_LINK_MODE=copy
+
+# Only metadata first → this expensive layer is cached until deps actually change.
+# The devskyy wheel built here is intentionally empty (source isn't copied yet);
+# the runtime stage adds the source via COPY . . and runs it from /app.
 COPY pyproject.toml README.md ./
 
-# Install all production dependencies. Documented Docker install target is
-# ".[all]" (requirements.txt is a deprecated -e . stub). Longer timeout for the
-# large ML wheels (torch/transformers/diffusers).
-RUN pip install --no-cache-dir --timeout=600 ".[all]"
+# BuildKit cache mount keeps uv's wheel cache warm across rebuilds.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system ".[${INSTALL_TARGET}]"
 
-# =============================================================================
-# Stage 3: Production Runtime
-# =============================================================================
+# -----------------------------------------------------------------------------
+# Stage 2: production runtime — slim, non-root, only runtime libs.
+# -----------------------------------------------------------------------------
 FROM python:3.12-slim AS production
 
-# Prevent apt from hanging
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Set Python environment
-ENV PYTHONUNBUFFERED=1 \
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH="/app"
+    PYTHONPATH="/app:/app/sdk/python" \
+    PORT=8000
 
-# Create non-root user for security
-RUN groupadd -r devskyy && useradd -r -g devskyy -m -u 1000 devskyy
-
-# Install runtime dependencies with retry logic
+# Runtime-only system libs: libpq5 (postgres clients), curl (healthcheck),
+# tini (PID1), libgl1 + libglib2.0-0 (OpenCV/cv2 — imagery & render-QC pipeline),
+# libfreetype6 (Pillow text rendering on arm64 source builds), fonts-dejavu-core
+# (TrueType font the imagery overlays load by path — otherwise a bitmap fallback).
 RUN apt-get update --fix-missing || apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
+        libpq5 \
         curl \
         ca-certificates \
+        tini \
+        libgl1 \
+        libglib2.0-0 \
+        libfreetype6 \
+        fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
+# Non-root runtime user.
+RUN groupadd -r devskyy && useradd -r -g devskyy -m -u 1000 devskyy
+
 WORKDIR /app
 
-# Copy Python dependencies from builder
-COPY --from=backend-builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=backend-builder /usr/local/bin /usr/local/bin
+# Installed third-party packages + console scripts from the builder.
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy Next.js build artifacts
-COPY --from=frontend-builder /app/frontend/.next ./.next/
-COPY --from=frontend-builder /app/frontend/public ./public/
+# Application source. `.dockerignore` already stripped VCS, deps, secrets, the
+# frontend, and all binary media — so this copies code + canonical text data
+# (catalog CSV, visual manifest, per-SKU dossiers) and nothing heavy.
+COPY . .
 
-# Verify Next.js build artifacts exist
-RUN test -d ./.next || (echo "ERROR: .next directory not found" && exit 1)
-RUN test -d ./public || (echo "ERROR: public directory not found" && exit 1)
-
-# Copy application code
-COPY sdk/python/agent_sdk/ ./agent_sdk/
-COPY agents/ ./agents/
-COPY api/ ./api/
-COPY adk/ ./adk/
-COPY core/ ./core/
-COPY utils/ ./utils/
-COPY integrations/ ./integrations/
-COPY llm/ ./llm/
-COPY mcp_servers/ ./mcp_servers/
-COPY orchestration/ ./orchestration/
-COPY security/ ./security/
-COPY wordpress/ ./wordpress/
-COPY main_enterprise.py ./
-COPY mcp_tools/ ./mcp_tools/
-COPY devskyy_mcp.py ./
-COPY docker-entrypoint.sh /app/
-RUN chmod +x /app/docker-entrypoint.sh
-
-# Create necessary directories
-RUN mkdir -p /app/logs /app/data /app/uploads && \
+RUN chmod +x /app/docker-entrypoint.sh && \
+    mkdir -p /app/logs /app/data /app/uploads && \
     chown -R devskyy:devskyy /app
 
-# Switch to non-root user
 USER devskyy
 
-# Health check with timeout
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+# OCI metadata (overridable at build time via --build-arg).
+ARG BUILD_VERSION=dev
+ARG BUILD_REVISION=unknown
+LABEL org.opencontainers.image.title="DevSkyy Platform" \
+      org.opencontainers.image.description="AI-driven luxury fashion e-commerce platform (API + workers)" \
+      org.opencontainers.image.vendor="SkyyRose" \
+      org.opencontainers.image.source="https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy" \
+      org.opencontainers.image.version="${BUILD_VERSION}" \
+      org.opencontainers.image.revision="${BUILD_REVISION}"
 
-# Expose port
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -fsS "http://localhost:${PORT}/health" || exit 1
+
 EXPOSE 8000
 
-# Start with entrypoint script that handles startup errors
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# tini = PID 1 → proper signal forwarding / zombie reaping for the workers.
+ENTRYPOINT ["/usr/bin/tini", "--", "/app/docker-entrypoint.sh"]

@@ -26,26 +26,39 @@ python3 -c "import sys; print(f'Python {sys.version}')" || {
     exit 1
 }
 
-# Generate required secrets if not provided (BEFORE uvicorn startup)
+# Generate required secrets if not provided (BEFORE uvicorn startup). This keeps
+# the API + workers bootable without a committed .env; .env.docker is the
+# expected production source (see docs/DOCKER.md). Ephemeral keys rotate on
+# restart — set them explicitly for any real deployment.
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking secrets..."
-if [ -z "$JWT_SECRET_KEY" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating JWT_SECRET_KEY..."
-    JWT_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(64))" 2>&1) || {
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate JWT_SECRET_KEY: $JWT_KEY"
+ts() { date '+%Y-%m-%d %H:%M:%S'; }
+gen_secret() {
+    # $1 = env var name, $2 = python expression that prints the secret value.
+    # SECURITY: $2 is fed to `python3 -c`, so CALL SITES MUST PASS A LITERAL — never
+    # a variable / env-expanded value (that would be arbitrary code at startup).
+    # printenv reads the named var without eval (call sites pass literal names).
+    var="$1"
+    [ -n "$(printenv "$var")" ] && return 0
+    echo "[$(ts)] Generating $var..."
+    val=$(python3 -c "$2" 2>&1) || {
+        echo "[$(ts)] ERROR: Failed to generate $var: $val"
         exit 1
     }
-    export JWT_SECRET_KEY="$JWT_KEY"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] JWT_SECRET_KEY generated (length: ${#JWT_SECRET_KEY})"
-fi
+    export "$var=$val"
+    echo "[$(ts)] $var generated (length: ${#val})"
+}
 
-if [ -z "$ENCRYPTION_MASTER_KEY" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Generating ENCRYPTION_MASTER_KEY..."
-    ENC_KEY=$(python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())" 2>&1) || {
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to generate ENCRYPTION_MASTER_KEY: $ENC_KEY"
-        exit 1
-    }
-    export ENCRYPTION_MASTER_KEY="$ENC_KEY"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ENCRYPTION_MASTER_KEY generated (length: ${#ENCRYPTION_MASTER_KEY})"
+gen_secret JWT_SECRET_KEY "import secrets; print(secrets.token_urlsafe(64))"
+gen_secret JWT_REFRESH_SECRET_KEY "import secrets; print(secrets.token_urlsafe(64))"
+gen_secret ENCRYPTION_MASTER_KEY "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
+
+# Command dispatch: this one image serves the API *and* the background workers.
+# If compose (or `docker run`) passed a command, run THAT instead of uvicorn —
+# the workers still inherit the secret bootstrap above. The API role passes no
+# command and falls through to the uvicorn default below.
+if [ "$#" -gt 0 ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Executing passed command: $*"
+    exec "$@"
 fi
 
 # Check if main_enterprise.py exists
@@ -72,10 +85,10 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] ======================================"
 # - proxy-headers: enabled for X-Forwarded-* from Fly.io proxy
 exec python3 -m uvicorn main_enterprise:app \
     --host 0.0.0.0 \
-    --port 8000 \
+    --port "${PORT:-8000}" \
     --workers 1 \
     --timeout-keep-alive 65 \
     --lifespan on \
     --proxy-headers \
-    --forwarded-allow-ips '*' \
+    --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1}" \
     --access-log 2>&1

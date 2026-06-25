@@ -6,7 +6,8 @@
 ## ./
 
 - `.claudeignore` — /*.png (~644 tok)
-- `.dockerignore` — Docker ignore rules (~122 tok)
+- `.dockerignore` — ALLOWLIST: ignore all, re-include first-party packages + canonical data; cuts context 1GB→43MB (~600 tok)
+- `.env.docker.example` — env template for the compose stack; `make docker-secrets` fills secrets (~400 tok)
 - `.eslintrc.cjs` — ESLint configuration (~954 tok)
 - `.gitattributes` — Git attributes (~70 tok)
 - `.gitignore` — Git ignore rules (~2263 tok)
@@ -31,10 +32,9 @@
 - `DESIGN.md` — Design System Inspired by Claude (Anthropic) (~5031 tok)
 - `devskyy_mcp.py` (~1153 tok)
 - `docker-compose.staging.yml` — Docker Compose: 14 services (~3431 tok)
-- `docker-compose.yml` — Docker Compose services (~1920 tok)
-- `docker-entrypoint.sh` — Enterprise startup script with error handling and logging (~1012 tok)
-- `Dockerfile` — Docker container definition (~1133 tok)
-- `Dockerfile.worker` — DevSkyy Worker - Lightweight build for background task processing (~809 tok)
+- `docker-compose.yml` — production stack: postgres/redis/app/worker/elite-worker + monitoring & proxy profiles; one devskyy:local image, fail-loud secrets (~2000 tok)
+- `docker-entrypoint.sh` — startup script; generates JWT/ENC keys if unset, then dispatches a passed command (worker) or defaults to uvicorn (~1100 tok)
+- `Dockerfile` — multi-stage Python image (builder + non-root runtime), `COPY . .` + allowlist .dockerignore, INSTALL_TARGET arg, tini PID1; one image for app+workers (~1200 tok)
 - `fastmcp.config.json` (~287 tok)
 - `fly.toml` — fly.toml - DevSkyy Enterprise Platform (~1070 tok)
 - `G1-BUNDLE.md` — G1 STOP — Phase 0 Review Bundle (~2329 tok)
@@ -3889,3 +3889,14 @@ wp-admin console + PHP MCP streamable-HTTP client to api.devskyy.app/mcp/. State
 
 ### wordpress-theme/skyyrose-flagship/assets/js/admin-mcp-console.js (~0.9k tok)
 Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call via admin-ajax. Vanilla, createElement/textContent only (no innerHTML). Enqueued only on tools_page_skyyrose-mcp.
+
+## design-system/skyyrose-storefront/
+
+- `package.json` — @skyyrose/storefront-ds v0.1.0; npm scripts build/test/sync/sync:check; peer react>=18 (~300 tok)
+- `tsconfig.json` — ES2020, bundler moduleResolution, react-jsx, strict, noEmit, vitest/globals + jest-dom types (~200 tok)
+- `vite.config.ts` — library mode: es format, skyyrose-ds.es.js, cssFileName skyyrose-ds, dts({ include: ['src'], insertTypesEntry: true }), externals react/react-dom (~250 tok)
+- `vitest.config.ts` — globals:true, jsdom, setupFiles vitest.setup.ts, css:false (~150 tok)
+- `vitest.setup.ts` — imports @testing-library/jest-dom/vitest (~50 tok)
+- `src/types.ts` — exports Collection type ('signature'|'black-rose'|'love-hurts'|'kids-capsule') (~50 tok)
+- `src/index.ts` — re-exports Collection from ./types; placeholder for component exports (~50 tok)
+- `test/smoke.test.ts` — verifies module loads (1 test) (~80 tok)
