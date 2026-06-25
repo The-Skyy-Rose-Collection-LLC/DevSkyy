@@ -636,7 +636,9 @@ class TripoAssetAgent(SuperAgent):
         )
 
         try:
-            async with TripoClient(api_key=self.tripo_config.api_key) as client:
+            async with TripoClient(
+                api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
+            ) as client:
                 # Generate 3D model from text
                 logger.info(f"Generating 3D model from text: {product_name}")
                 try:
@@ -818,7 +820,9 @@ class TripoAssetAgent(SuperAgent):
             ) from e
 
         try:
-            async with TripoClient(api_key=self.tripo_config.api_key) as client:
+            async with TripoClient(
+                api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
+            ) as client:
                 # Generate 3D model from image
                 logger.info(f"Generating 3D model from image: {image_file.name}")
                 try:
