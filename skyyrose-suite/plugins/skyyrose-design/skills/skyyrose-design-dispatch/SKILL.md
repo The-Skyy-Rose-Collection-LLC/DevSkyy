@@ -7,6 +7,8 @@ description: Handoff router for skyyrose-design. Use when a design/build task ne
 
 `skyyrose-design` owns imagery (gpt-image-2 composition), frontend, Three.js/immersive, WP/WooCommerce theming, accessibility, and layout. Hand off along the suite graph (`CROSS-PLUGIN.md`): **design → qa** for verification, back to **market** for copy, to **core** for backend.
 
+> **Boot first:** orient from the root canonical sources — `SOT.md` (imagery → `sot-images.json`, non-product → `visual-manifest.json`) → `.wolf/anatomy.md` → `.wolf/cerebrum.md` → `CLAUDE.md` (full block in `CROSS-PLUGIN.md`) — before acting.
+
 ## When to hand off
 
 | The task also needs… | Hand off to | Example |

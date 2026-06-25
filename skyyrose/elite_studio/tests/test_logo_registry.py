@@ -44,10 +44,13 @@ def test_black_roses_stays_centralized(registry: LogoRegistry) -> None:
     assert entry.collection == "black_rose"
 
 
-def test_signature_red_rose_is_signature_collection(registry: LogoRegistry) -> None:
-    """red-roses-cloud-cluster was misclassified pre-v4; must be Signature."""
+def test_red_rose_is_dual_collection(registry: LogoRegistry) -> None:
+    """red-roses-cloud-cluster is DUAL-collection (founder re-confirmed 2026-05-27):
+    used on BOTH Signature (sg-009) AND Love Hurts (lh-003, lh-004 inside-hood).
+    The 2026-05-25 'Signature only' reclassification was reverted in the registry.
+    """
     entry = registry.get_logo("red-roses-cloud-cluster")
-    assert entry.collection == "signature"
+    assert entry.collection == "shared_signature_love_hurts"
 
 
 def test_heart_rose_is_love_hurts(registry: LogoRegistry) -> None:
@@ -121,19 +124,23 @@ def test_four_mlb_jerseys_exactly(registry: LogoRegistry) -> None:
     assert sorted(mlb_users) == ["br-003", "br-012", "br-014", "br-015"]
 
 
-def test_lh003_uses_heart_rose_not_red_rose(registry: LogoRegistry) -> None:
-    """v4 correction: lh-003 must not reference red-roses (Signature LOGO)."""
+def test_lh003_uses_red_rose_not_heart_rose(registry: LogoRegistry) -> None:
+    """Founder re-confirmed 2026-05-27: lh-003 uses red-roses-cloud-cluster
+    (all_over + mesh_panels), NOT heart-rose-composite. The 2026-05-25 switch to
+    heart-rose was itself wrong and was reverted in the registry."""
     placements = registry.placements_for("lh-003")
     logo_ids = [p["logo_id"] for p in placements]
-    assert "red-roses-cloud-cluster" not in logo_ids
-    assert logo_ids.count("heart-rose-composite") >= 2  # all_over + mesh_panels
+    assert "heart-rose-composite" not in logo_ids
+    assert logo_ids.count("red-roses-cloud-cluster") >= 2  # all_over + mesh_panels
 
 
-def test_lh004_uses_heart_rose_not_red_rose(registry: LogoRegistry) -> None:
+def test_lh004_uses_both_red_rose_and_heart_rose(registry: LogoRegistry) -> None:
+    """Founder re-confirmed 2026-05-27: lh-004 carries BOTH —
+    red-roses-cloud-cluster (inside_hood) AND heart-rose-composite (back_center)."""
     placements = registry.placements_for("lh-004")
     logo_ids = [p["logo_id"] for p in placements]
-    assert "red-roses-cloud-cluster" not in logo_ids
-    assert "heart-rose-composite" in logo_ids
+    assert "red-roses-cloud-cluster" in logo_ids  # inside_hood
+    assert "heart-rose-composite" in logo_ids  # back_center
 
 
 def test_sg009_uses_red_rose(registry: LogoRegistry) -> None:

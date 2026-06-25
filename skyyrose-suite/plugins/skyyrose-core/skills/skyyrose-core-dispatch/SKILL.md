@@ -7,6 +7,8 @@ description: Handoff router + memory/self-heal wiring for skyyrose-core. Use whe
 
 `skyyrose-core` owns backend (FastAPI/Python), data, infra, planning, behavior discipline, and memory/self-healing. Hand off along the suite graph (`CROSS-PLUGIN.md`): **core → qa** for tests/review.
 
+> **Boot first:** orient from the root canonical sources — `SOT.md` → `.wolf/anatomy.md` → `.wolf/cerebrum.md` → `CLAUDE.md` (full block in `CROSS-PLUGIN.md`) — before acting.
+
 ## When to hand off
 
 | The task also needs… | Hand off to | Example |

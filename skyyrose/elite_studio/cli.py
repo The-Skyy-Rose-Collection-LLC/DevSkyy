@@ -16,8 +16,9 @@ import sys
 from .agents.compositor_agent import CompositorAgent
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
+from .agents.scene_generator_agent import SceneGeneratorAgent
 from .agents.vision_agent import VisionAgent
-from .config import OUTPUT_DIR, PRODUCT_IMAGES_DIR
+from .config import OUTPUT_DIR, PRODUCT_IMAGES_DIR, SCENES_DIR
 from .coordinator import Coordinator
 from .utils import discover_all_skus, discover_scene_images
 
@@ -390,6 +391,189 @@ def cmd_catalog(args: argparse.Namespace) -> None:
     print(f"With source: {with_source}/{len(PRODUCT_CATALOG)}")
 
 
+# Founder-locked scene defaults per collection. Used when --scene is omitted
+# in the home-spread command. Mirrors SCENE_LOOKBOOK canon (2026-05-26 lock).
+_COLLECTION_DEFAULT_SCENE: dict[str, str] = {
+    "black-rose": "black-rose-bay-bridge-sf-side-night",
+    "signature": "signature-oakland-waterfront-bay-bridge-day",
+    "love-hurts": "love-hurts-enchanted-rose-cathedral",
+}
+
+
+def cmd_home_spread(args: argparse.Namespace) -> None:
+    """Elite-team orchestrator for v2 home-spread tile generation.
+
+    Chains scene-only generation (SceneGeneratorAgent) and product composite
+    (CompositorAgent) end-to-end. Replaces the standalone
+    ``scripts/gemini_scene_gen.py`` + ``scripts/composite_products.py`` path
+    with a single canonical elite-team entry point.
+
+    Pipeline per collection:
+      1. Resolve scene_name + collection (founder-locked defaults if omitted).
+      2. Load scene.json from SCENES_DIR via load_lighting_spec.
+      3. (Optional Stage 1) SceneGeneratorAgent.generate_scene → scene PNG.
+      4. (Optional Stage 2) CompositorAgent.composite(sku, scene, model) →
+         home-col tile PNG.
+      5. RunBudget enforced across all paid API calls in the run.
+      6. --dry-run prints resolved prompts/paths/cost without paid dispatch.
+    """
+    import asyncio
+    import json
+    from pathlib import Path
+
+    from .agents.compositor.lighting import SCENE_LOOKBOOK, load_lighting_spec
+    from .budget import RunBudget
+
+    # Resolve target collections.
+    if args.collection == "all":
+        collections = ["black-rose", "signature", "love-hurts"]
+    else:
+        collections = [args.collection]
+
+    budget = RunBudget(ceiling_usd=args.budget_usd)
+    print("=" * 72)
+    print(" Home-Spread Pipeline — elite team")
+    print(f" Budget cap     : ${args.budget_usd:.2f} USD")
+    print(f" Collections    : {', '.join(collections)}")
+    print(f" Dry run        : {args.dry_run}")
+    print(f" Force regen    : {args.regenerate_scene}")
+    print("=" * 72)
+
+    async def _run_one(collection: str) -> dict:
+        scene_name = args.scene or _COLLECTION_DEFAULT_SCENE.get(collection)
+        if not scene_name:
+            return {"collection": collection, "error": "no default scene mapped"}
+
+        if scene_name not in SCENE_LOOKBOOK:
+            return {
+                "collection": collection,
+                "error": f"scene {scene_name!r} not in SCENE_LOOKBOOK",
+            }
+
+        spec = load_lighting_spec(collection, scene_name)
+        if not spec:
+            return {
+                "collection": collection,
+                "error": (
+                    f"scene.json not found at SCENES_DIR/{collection}/{scene_name}/scene.json"
+                ),
+            }
+
+        scene_dir = SCENES_DIR / collection / scene_name
+        scene_filename = spec.get("expected_filename") or f"{scene_name}.png"
+        scene_image_path = scene_dir / scene_filename
+
+        # Stage 1 — Scene generation.
+        scene_agent = SceneGeneratorAgent()
+        scene_prompt_preview = scene_agent._build_scene_prompt(spec)
+
+        if args.dry_run:
+            print(f"\n── {collection} / {scene_name} ──")
+            print(f"  canon_lock_date  : {spec.get('canon_lock_date')}")
+            print(f"  founder_directed : {spec.get('founder_directed')}")
+            print(f"  scene_image_path : {scene_image_path}")
+            print(f"  scene_exists     : {scene_image_path.exists()}")
+            print("  est. scene cost  : $0.08")
+            if args.sku:
+                print(f"  composite_sku    : {args.sku}")
+                print("  est. composite   : ~$0.15 (FAL Bria)")
+            print("\n  PROMPT PREVIEW (first 600 chars):")
+            print("  " + "\n  ".join(scene_prompt_preview[:600].split("\n")))
+            return {
+                "collection": collection,
+                "scene_name": scene_name,
+                "scene_image_path": str(scene_image_path),
+                "dry_run": True,
+                "estimated_cost_usd": 0.08 + (0.15 if args.sku else 0.0),
+            }
+
+        # Live dispatch.
+        needs_scene_gen = args.regenerate_scene or not scene_image_path.exists()
+        scene_result_meta = {}
+        if needs_scene_gen:
+            print(f"\n→ Stage 1 scene generation for {collection} / {scene_name}")
+            await scene_agent.initialize()
+            scene_result = await scene_agent.generate_scene(
+                scene_name=scene_name,
+                collection=collection,
+                budget=budget,
+            )
+            if not scene_result.success:
+                return {
+                    "collection": collection,
+                    "scene_name": scene_name,
+                    "stage": "scene-gen",
+                    "error": scene_result.error,
+                }
+            scene_image_path = Path(scene_result.output_path)
+            scene_result_meta = dict(scene_result.metadata)
+            print(f"  ✓ Scene PNG: {scene_image_path}")
+        else:
+            print(f"\n✓ Scene PNG cached: {scene_image_path} (use --regenerate-scene to force)")
+
+        # Stage 2 — Product composite (optional).
+        composite_path = None
+        composite_meta = {}
+        if args.sku:
+            print(f"\n→ Stage 2 composite: {args.sku} onto {scene_name}")
+            model_image = args.model_image
+            if not model_image:
+                candidates = sorted(
+                    (PRODUCT_IMAGES_DIR / collection).glob(f"{args.sku}-front-model.*")
+                )
+                if not candidates:
+                    candidates = sorted((PRODUCT_IMAGES_DIR / collection).glob(f"{args.sku}-*.*"))
+                if candidates:
+                    model_image = str(candidates[0])
+            if not model_image:
+                return {
+                    "collection": collection,
+                    "scene_name": scene_name,
+                    "stage": "composite",
+                    "error": f"no model image found for sku={args.sku}",
+                }
+            compositor = CompositorAgent()
+            comp_result = compositor.composite(
+                sku=args.sku,
+                scene_image_path=str(scene_image_path),
+                model_image_path=model_image,
+                collection=collection,
+                scene_name=scene_name,
+            )
+            if not comp_result.success:
+                return {
+                    "collection": collection,
+                    "scene_name": scene_name,
+                    "stage": "composite",
+                    "error": comp_result.error,
+                }
+            composite_path = comp_result.output_path
+            composite_meta = {"qa_status": getattr(comp_result, "qa_status", None)}
+            print(f"  ✓ Composite: {composite_path}")
+
+        return {
+            "collection": collection,
+            "scene_name": scene_name,
+            "scene_image_path": str(scene_image_path),
+            "composite_path": composite_path,
+            "scene_meta": scene_result_meta,
+            "composite_meta": composite_meta,
+        }
+
+    async def _run_all() -> list[dict]:
+        return [await _run_one(c) for c in collections]
+
+    results = asyncio.run(_run_all())
+
+    print("\n" + "=" * 72)
+    print(" Home-Spread Pipeline — RESULTS")
+    print("=" * 72)
+    print(json.dumps(results, indent=2, default=str))
+
+    if not args.dry_run:
+        print(f"\nBudget spent : ${budget.spent_usd:.4f} / ${args.budget_usd:.2f}")
+
+
 def main(argv: list[str] | None = None) -> None:
     """CLI main entry point."""
     parser = argparse.ArgumentParser(
@@ -519,6 +703,53 @@ def main(argv: list[str] | None = None) -> None:
         "--concurrency", type=int, default=1, help="Number of concurrent jobs (default: 1)"
     )
 
+    # home-spread (elite-team orchestrator: scene gen + product composite end-to-end)
+    p_home_spread = sub.add_parser(
+        "home-spread",
+        help=(
+            "Generate a Stage-1 scene + Stage-2 composite home-spread tile end-to-end "
+            "via elite-team agents (SceneGeneratorAgent + CompositorAgent + QualityAgent). "
+            "Canonical entry point — replaces standalone scripts/gemini_scene_gen.py path."
+        ),
+    )
+    p_home_spread.add_argument(
+        "--collection",
+        required=True,
+        choices=["black-rose", "love-hurts", "signature", "all"],
+        help="Collection slug, or 'all' to process all 3 founder-locked collections",
+    )
+    p_home_spread.add_argument(
+        "--scene",
+        help=(
+            "Scene name from SCENE_LOOKBOOK. Auto-resolved from --collection if "
+            "omitted (uses founder-locked default scene per collection)."
+        ),
+    )
+    p_home_spread.add_argument(
+        "--sku",
+        help="Product SKU to composite over the scene (Stage 2). Omit for scene-only output.",
+    )
+    p_home_spread.add_argument(
+        "--model-image",
+        help="Path to product front-model image for composite. Auto-discovered from --sku if omitted.",
+    )
+    p_home_spread.add_argument(
+        "--budget-usd",
+        type=float,
+        default=1.50,
+        help="RunBudget ceiling in USD (default 1.50 covers 3-collection scene+composite run)",
+    )
+    p_home_spread.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show resolved prompts, scene paths, and cost estimate. No API call dispatches.",
+    )
+    p_home_spread.add_argument(
+        "--regenerate-scene",
+        action="store_true",
+        help="Force regeneration of scene PNG even if it already exists at SCENES_DIR.",
+    )
+
     # create (Creative Operations Hub)
     p_create = sub.add_parser(
         "create", help="Run a creative operation via the Creative Operations Hub"
@@ -572,3 +803,5 @@ def main(argv: list[str] | None = None) -> None:
         cmd_create(args)
     elif args.command == "catalog":
         cmd_catalog(args)
+    elif args.command == "home-spread":
+        cmd_home_spread(args)

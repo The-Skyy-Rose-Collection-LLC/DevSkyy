@@ -2174,7 +2174,17 @@
 - `api.ts` — TypeScript resolves `@/lib/api` to this file before the `api/` directory. (~62 tok)
 - `auth.d.ts` — NextAuth.js type augmentations for custom JWT fields (~146 tok)
 - `auth.ts` — NextAuth.js v4 Configuration (~798 tok)
-- `catalog.ts` — Canonical product catalog reader (server-only). (~1334 tok)
+- `catalog.ts` — Canonical product catalog reader (server-only). Exposes resolveRepoFile/resolveCsvPath/resetCatalogCache; reuses splitCsvRow from catalog-csv.ts. (~1334 tok)
+- `catalog-csv.ts` — PURE CSV transforms (no fs / no server-only): splitCsvRow, serializeCsvRow, applyPatch (lossless single-line splice — preserves all 24 cols incl. render_*), parseDataRows, EDITABLE_COLUMNS. Unit-testable; shared by catalog.ts + catalog-write.ts.
+- `catalog-write.ts` — Server-only CSV write path: updateProductRow(sku, patch) → applyPatch → atomic temp-write+rename → resetCatalogCache. Editable commerce fields only; image cols are SOT-governed (not writable).
+- `sot-images.ts` — Server-only reader of generated data/sot-images.json (front-first SOT contract): getSotImagesForSku. DO-NOT-EDIT manifest.
+- `app/admin/catalog/page.tsx` — /admin/catalog SKU editor (client): searchable list + per-SKU edit of 9 commerce fields, read-only SOT imagery, honesty banner. Writes via PUT /api/catalog/:sku.
+- `app/api/catalog/route.ts` — GET raw catalog (CatalogProduct + sot per SKU); `await connection()` keeps it dynamic. `app/api/catalog/[sku]/route.ts` — PUT single-SKU update (Zod strict).
+- `renders-pure.ts` — PURE render-review helpers (no fs/server-only): isSafeSegment (traversal guard), stableStringify (Python json.dump parity for the shared review-state.json), parseVerdicts (run-JSONL attempt→qc_verdict→accepted correlation + sku/slug fallback). Unit-testable.
+- `renders.ts` — Server-only OAI render-review data layer: getRenderQueue (list renders/oai/* + review-state + QC verdicts), resolveRenderImage (realpathSync + containment guard), saveReviewEntry (atomic, Python-parity), loadReviewState.
+- `app/api/renders/route.ts` — GET render queue (`await connection()`). `app/api/renders/image/route.ts` — guarded image proxy (25MB cap → 413). `app/api/renders/review/route.ts` — POST approve/flag/comment → review-state.json (Zod strict).
+- `app/admin/renders/review/page.tsx` — /admin/renders/review approval queue (client): grouped-by-slug render cards, real previews, QC verdict badges, approve/flag/comment, SOT-promotion CLI surfaced read-only.
+- `proxy.ts` — Next 16 auth gate (renamed from middleware.ts). `getToken` → pages redirect to /login, /api/* get 401 JSON. Matcher: `/admin/:path*` + `/api/((?!auth|checkout).*)`. **Editing the auth gate = edit proxy.ts, never create middleware.ts (build fails).**
 - `CLAUDE.md` (~11 tok)
 - `collections.ts` — Exports CollectionSlug, CollectionProduct, CollectionScene, CollectionConfig + 4 more (~3122 tok)
 - `elite-studio-client.ts` — ENVIRONMENT (~2467 tok)
@@ -2670,7 +2680,6 @@
 - `consolidate_branches_ralph.py` — GitConsolidationError: run_git_command, merge_branch_squash, attempt_merge, consolidate_branches + 1 more (~2616 tok)
 - `create_cpu_space_then_upgrade.py` — show_instructions (~1223 tok)
 - `create_luxury_experience_pages.py` — Create Luxury Experience Pages for SkyyRose Collections. (~4854 tok)
-- `create_training_space.py` — train_lora (~1882 tok)
 - `create_virtual_tryon_space.py` — Create virtual-tryon HuggingFace Space and push code with ralph-loop retry. (~1045 tok)
 - `curate_centroid_test_set.py` — Curate the labeled good/bad render fixtures the centroid harness needs. (~2796 tok)
 - `demo_image_generation.py` — demo_replicate, demo_stability, compare_providers, main + 1 more (~3045 tok)
@@ -2708,7 +2717,6 @@
 - `extract_skyyrose_assets.py` — AssetExtractor: extract_zip, create_directory_structure, categorize_file, organize_files + 5 more (~3104 tok)
 - `fix_and_redeploy_spaces.py` — Fix and redeploy all HuggingFace Spaces with correct dependencies (ralph-loop retry). (~1086 tok)
 - `fix_elementor_spinning_logo.py` — get_spinning_logo_html, make_request, update_elementor_widget, update_recursive + 4 more (~2595 tok)
-- `fix_space_training.py` — install_dependencies, train_lora (~2725 tok)
 - `fix_spinning_logo_shortcode.py` — make_request, replace_shortcode, replacement, get_elementor_data + 3 more (~3303 tok)
 - `format_staged.sh` — scripts/format_staged.sh — Pre-format every git-staged file by type. (~2994 tok)
 - `gemini_lookbook.py` — load_image_bytes, generate_lookbook (~4290 tok)
@@ -2821,7 +2829,6 @@
 - `start_autotrain_simple.sh` — Simple AutoTrain starter script (~586 tok)
 - `start_lora_training.py` — Declares name (~508 tok)
 - `start_training_via_api.py` (~468 tok)
-- `submit_training_job.py` (~870 tok)
 - `sync_brand_to_php.py` — Sync brand.yaml → wordpress-theme/skyyrose-flagship/inc/brand.generated.php. (~2423 tok)
 - `sync_catalog_downstream.py` — sync_catalog_downstream.py — Surgical auto-sync of downstream catalog references. (~5158 tok)
 - `sync_vault_products.py` — WooCommerceVaultSync: create_category, create_tag, find_product_by_sku, create_or_update_product + 2 more (~2410 tok)
@@ -2841,9 +2848,6 @@
 - `theme-marketplace-eval.sh` — scripts/theme-marketplace-eval.sh -- Marketplace readiness evaluation for WordPress theme (~9053 tok)
 - `train_dreambooth_lora_sdxl.py` — you may not use this file except in compliance with the License. (~25430 tok)
 - `train_lora_from_products.py` — parse_args, print_banner, print_dataset_summary, preview_dataset + 3 more (~2876 tok)
-- `train_lora_local.py` — SkyyRoseDataset: get_device, train_lora, main (~2905 tok)
-- `train_lora_replicate.py` — create_training_zip, upload_to_huggingface, main (~2877 tok)
-- `train_lora_v4_replicate.py` — create_training_zip, upload_to_huggingface, start_training, monitor_training + 2 more (~3783 tok)
 - `train_phase2_exact_replica.py` — create_output_dirs, save_training_config, create_progress_file, install_dependencies + 3 more (~4117 tok)
 - `train_skyyrose_lora.py` — install_dependencies, download_training_script, run_training, main (~1259 tok)
 - `trellis_demo.py` — End-to-end demo for the clothing 3D pipeline. (~1102 tok)
@@ -2851,7 +2855,6 @@
 - `tripo_publish.py` — URL configuration (~2670 tok)
 - `tripo_spike_asset_extraction.py` — load_catalog_row, resolve_source_image, show_manifest, run_spike + 1 more (~1751 tok)
 - `update_galleries_via_mcp.py` (~768 tok)
-- `update_space_with_training.py` — install_dependencies, train_lora (~2759 tok)
 - `update_webp_mapping_ids.py` — fetch_wordpress_media, main (~1259 tok)
 - `upload_3d_to_github.py` — run_gh_command, main (~1768 tok)
 - `upload_all_collections.sh` — Upload all SkyyRose collections from Google Drive to WooCommerce (~538 tok)

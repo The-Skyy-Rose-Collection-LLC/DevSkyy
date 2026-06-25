@@ -1,0 +1,383 @@
+/**
+ * SkyyRose Commercial Polish — premium presentation layer.
+ *
+ * This file adds the "commercial masterpiece" finish on top of the existing
+ * theme CSS. It does NOT replace component styles — it applies refinements:
+ * luxurious spacing, premium typography rhythm, refined card treatments,
+ * elevated focus/hover states, and subtle motion that reads as expensive.
+ *
+ * Loaded globally from inc/enqueue.php as the LAST CSS file so it can
+ * override earlier layer declarations via specificity.
+ *
+ * Organized by surface, in cascading order:
+ *   1. Design tokens (spacing scale, radii, shadows, motion)
+ *   2. Typography rhythm
+ *   3. Button polish
+ *   4. Card + product tile polish
+ *   5. Hero section polish
+ *   6. Section rhythm + breathing room
+ *   7. Focus states (accessibility + luxury feel)
+ *   8. Motion refinements
+ *   9. Mobile refinements
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 1. Design tokens — luxury scale
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Spacing scale — generous breathing room for premium feel */
+    --cp-space-xs: clamp(0.5rem, 1vw, 0.75rem);
+    --cp-space-sm: clamp(0.75rem, 1.5vw, 1rem);
+    --cp-space-md: clamp(1rem, 2vw, 1.5rem);
+    --cp-space-lg: clamp(1.5rem, 3vw, 2.25rem);
+    --cp-space-xl: clamp(2rem, 5vw, 3.5rem);
+    --cp-space-2xl: clamp(3rem, 7vw, 5.5rem);
+    --cp-space-3xl: clamp(4rem, 10vw, 8rem);
+
+    /* Elevation — soft, layered shadows that suggest depth without weight */
+    --cp-shadow-xs: 0 1px 2px rgba(10, 10, 10, 0.08);
+    --cp-shadow-sm: 0 2px 8px rgba(10, 10, 10, 0.08), 0 1px 3px rgba(10, 10, 10, 0.04);
+    --cp-shadow-md: 0 8px 24px rgba(10, 10, 10, 0.12), 0 2px 8px rgba(10, 10, 10, 0.06);
+    --cp-shadow-lg: 0 20px 48px rgba(10, 10, 10, 0.18), 0 6px 16px rgba(10, 10, 10, 0.08);
+    --cp-shadow-glow-gold: 0 0 32px rgba(212, 175, 55, 0.25);
+    --cp-shadow-glow-rose: 0 0 32px rgba(183, 110, 121, 0.28);
+
+    /* Radii — soft, not trying-too-hard */
+    --cp-radius-sm: 6px;
+    --cp-radius-md: 10px;
+    --cp-radius-lg: 16px;
+    --cp-radius-pill: 999px;
+
+    /* Motion — slow enough to feel deliberate */
+    --cp-ease-luxe: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --cp-ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --cp-dur-fast: 180ms;
+    --cp-dur-med: 320ms;
+    --cp-dur-slow: 520ms;
+
+    /* Hairline borders — the thing that separates premium from cheap */
+    --cp-hairline: 1px solid rgba(255, 255, 255, 0.08);
+    --cp-hairline-dark: 1px solid rgba(10, 10, 10, 0.12);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 2. Typography rhythm — refined scale, proper line-height, generous leading
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+body {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    text-wrap: balance;
+}
+
+h1 {
+    font-size: clamp(2.25rem, 6vw, 4.5rem);
+    letter-spacing: -0.025em;
+}
+
+h2 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+}
+
+h3 {
+    font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+    letter-spacing: -0.01em;
+}
+
+p, li {
+    line-height: 1.65;
+    max-width: 68ch;
+    text-wrap: pretty;
+}
+
+/* Editorial leading on any explicitly long-form block */
+.long-form, .prose, .editorial {
+    line-height: 1.78;
+    letter-spacing: 0.002em;
+}
+
+/* Small all-caps labels — the luxury world uses them generously */
+.eyebrow, .label-caps, .meta-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0.72;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 3. Button polish — make CTAs feel expensive
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn, .button, button.wp-block-button__link,
+.wp-block-button__link, .woocommerce .button, .woocommerce-Button {
+    border-radius: var(--cp-radius-pill);
+    padding-inline: clamp(1.25rem, 2.5vw, 2rem);
+    padding-block: clamp(0.625rem, 1.25vw, 0.875rem);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    transition:
+        transform var(--cp-dur-fast) var(--cp-ease-snap),
+        box-shadow var(--cp-dur-med) var(--cp-ease-luxe),
+        background-color var(--cp-dur-fast) var(--cp-ease-luxe),
+        color var(--cp-dur-fast) var(--cp-ease-luxe);
+    /* will-change omitted — set dynamically on :hover/focus by JS to avoid
+       permanent compositor layers on every button (premium-interactions.js pattern) */
+}
+
+.btn:hover, .button:hover,
+button.wp-block-button__link:hover, .wp-block-button__link:hover,
+.woocommerce .button:hover, .woocommerce-Button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--cp-shadow-md);
+}
+
+.btn:active, .button:active,
+button.wp-block-button__link:active, .wp-block-button__link:active {
+    transform: translateY(0);
+    box-shadow: var(--cp-shadow-xs);
+}
+
+/* Primary CTA — gold gradient with rose-gold glow on hover */
+.btn-primary, .btn-cta, .button.alt {
+    background: linear-gradient(
+        135deg,
+        var(--color-gold, #D4AF37) 0%,
+        var(--color-rose-gold, #B76E79) 100%
+    );
+    color: var(--color-page-bg, #0A0A0A);
+    border: 0;
+    font-weight: 700;
+}
+
+.btn-primary:hover, .btn-cta:hover, .button.alt:hover {
+    box-shadow: var(--cp-shadow-md), var(--cp-shadow-glow-gold);
+    filter: brightness(1.05);
+}
+
+/* Ghost button — thin line, luxurious spacing */
+.btn-ghost, .btn-outline {
+    background: transparent;
+    color: currentColor;
+    border: 1px solid currentColor;
+}
+
+.btn-ghost:hover, .btn-outline:hover {
+    background: currentColor;
+    color: var(--color-page-bg, #0A0A0A);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 4. Card + product tile polish
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.product-card, .product, .woocommerce ul.products li.product,
+.holo-card, .showcase-card {
+    border-radius: var(--cp-radius-lg);
+    box-shadow: var(--cp-shadow-sm);
+    transition:
+        transform var(--cp-dur-med) var(--cp-ease-luxe),
+        box-shadow var(--cp-dur-med) var(--cp-ease-luxe);
+    /* will-change omitted — set dynamically; permanent compositor layers on
+       every card create GPU memory pressure (see premium-interactions.js pattern) */
+    overflow: hidden;
+}
+
+.product-card:hover, .product:hover,
+.woocommerce ul.products li.product:hover,
+.holo-card:hover, .showcase-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--cp-shadow-lg);
+}
+
+/* Product imagery — never distorted */
+.product-card img, .product img,
+.woocommerce ul.products li.product img {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    transition: transform var(--cp-dur-slow) var(--cp-ease-luxe);
+}
+
+.product-card:hover img, .product:hover img,
+.woocommerce ul.products li.product:hover img {
+    transform: scale(1.03);
+}
+
+/* Limited-edition badge on jerseys + pre-order */
+.badge-limited, .badge-preorder {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--cp-radius-pill);
+    background: linear-gradient(90deg, var(--color-gold, #D4AF37), var(--color-rose-gold, #B76E79));
+    color: var(--color-page-bg, #0A0A0A);
+}
+
+.badge-preorder {
+    background: linear-gradient(90deg, var(--color-rose-gold, #B76E79), var(--color-page-bg, #0A0A0A));
+    color: var(--color-text-primary, #F5F5F5);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 5. Hero section polish
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.hero, .hero-section, .site-hero, .home-hero {
+    padding-block: var(--cp-space-3xl);
+    position: relative;
+}
+
+.hero h1, .hero-section h1, .site-hero h1, .home-hero h1 {
+    margin-bottom: var(--cp-space-md);
+    max-width: 18ch;
+}
+
+.hero .hero-subtitle, .hero-section .hero-subtitle,
+.hero .eyebrow, .hero-section .eyebrow {
+    margin-bottom: var(--cp-space-sm);
+}
+
+.hero .btn, .hero-section .btn {
+    margin-top: var(--cp-space-md);
+}
+
+/* Hero gradient overlay — ensures text contrast over imagery */
+.hero-overlay, .site-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(10, 10, 10, 0.15) 0%,
+        rgba(10, 10, 10, 0.55) 75%,
+        rgba(10, 10, 10, 0.80) 100%
+    );
+    pointer-events: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 6. Section rhythm — gives every page consistent breathing room
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+section, .section, .site-section {
+    padding-block: var(--cp-space-2xl);
+}
+
+section + section {
+    padding-top: var(--cp-space-xl);
+}
+
+.container, .wrap, .site-container {
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+/* Tight container — for editorial copy */
+.container-narrow, .container-editorial {
+    max-width: 720px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 7. Focus states — accessible + luxurious
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* :focus-visible color is owned by design-tokens.css (--color-rose-gold default).
+   Only the border-radius softening is added here — no color override. */
+:focus-visible {
+    border-radius: var(--cp-radius-sm);
+}
+
+/* Gold-ring enhancement for interactive CTA elements.
+   --color-gold-rgb is defined in design-tokens.css as 212, 175, 55. */
+button:focus-visible, a:focus-visible, .btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(var(--color-gold-rgb), 0.35);
+    outline: 2px solid var(--color-gold, #D4AF37);
+    outline-offset: 3px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 8. Motion refinements — reduce motion respectfully
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 9. Mobile refinements — ensure premium feel on phones
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    h1 { font-size: clamp(2rem, 9vw, 3rem); }
+    h2 { font-size: clamp(1.5rem, 6vw, 2.25rem); }
+
+    .btn, .button, .wp-block-button__link {
+        min-height: 44px; /* Apple HIG touch target */
+        min-width: 44px;
+    }
+
+    section, .section {
+        padding-block: var(--cp-space-xl);
+    }
+
+    /* Edge-to-edge product cards on mobile for max imagery impact */
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: var(--cp-space-md);
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * 10. Print — clean, brandable
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+    *, ::before, ::after {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+    }
+    a[href]::after { content: " (" attr(href) ")"; }
+    .btn, .button, nav, .site-header, .site-footer { display: none !important; }
+}

@@ -1,0 +1,218 @@
+/**
+ * Holo Product Card — Impeccable Luxury Refinement
+ * Technical aesthetic, sharp borders, techflat hover.
+ */
+
+.holo {
+	position: relative;
+	border: 1px solid rgba(255, 255, 255, 0.08); /* Sharp outer border */
+	background: var(--skyyrose-bg, #050505);
+	display: flex;
+	flex-direction: column;
+	transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo:hover {
+	border-color: rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.4); /* Collection accent focus */
+	transform: translateY(-4px);
+}
+
+.holo__body {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+/* Gallery & Images */
+.holo__gallery {
+	position: relative;
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+	background: var(--skyyrose-bg, #0a0a0a);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.holo__img-link {
+	display: block;
+	height: 100%;
+}
+
+.holo__img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+}
+
+/* Back image is the techflat in the new architecture */
+.holo__img--back {
+	opacity: 0;
+	filter: grayscale(100%) contrast(1.2); /* Technical blueprint look */
+}
+
+.holo:hover .holo__img--front { opacity: 0; }
+.holo:hover .holo__img--back { opacity: 1; }
+
+/* Badges */
+.holo__badge {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 9px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	background: #fff;
+	color: #000;
+	padding: 4px 8px;
+	z-index: 10;
+}
+.holo__badge--soldout { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.holo__badge--preorder { background: var(--skyyrose-accent, #B76E79); color: #fff; }
+
+/* Product Info */
+.holo__info {
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex: 1;
+}
+
+.holo__collection {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 10px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.6));
+}
+
+.holo__name {
+	margin: 0;
+	font-size: 1.1rem;
+	line-height: 1.4;
+}
+
+.holo__name a {
+	font-family: 'Cinzel', serif;
+	letter-spacing: 2px;
+	color: #fff;
+	text-decoration: none;
+}
+
+/* Price Row */
+.holo__price-row {
+	margin-top: auto;
+	padding-top: 16px;
+}
+
+.holo__price {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 13px;
+	color: var(--skyyrose-accent, #B76E79);
+}
+
+/* Quick Add Drawer (Technical Hover) */
+.holo__drawer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.95);
+	backdrop-filter: blur(12px);
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.3);
+	padding: 16px 24px;
+	transform: translateY(100%);
+	opacity: 0;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	z-index: 20;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.holo:hover .holo__drawer {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+.holo__sizes {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.holo__size-pill {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 10px;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: #fff;
+	padding: 6px 12px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.holo__size-pill:hover,
+.holo__size-pill--active,
+.holo__size-pill[aria-checked="true"] {
+	border-color: #fff;
+	background: #fff;
+	color: #000;
+}
+
+.holo__buy {
+	width: 100%;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 14px;
+	letter-spacing: 6px;
+	text-transform: uppercase;
+	background: #fff;
+	color: #000;
+	border: none;
+	padding: 12px;
+	text-align: center;
+	cursor: pointer;
+	transition: background 0.3s ease;
+	text-decoration: none;
+}
+
+.holo__buy:hover {
+	background: var(--skyyrose-accent, #B76E79);
+	color: #fff;
+}
+
+/* ── Touch devices (hover:none) — always-visible drawer ──────────────────
+   On touch screens the hover state never fires, so the drawer stays hidden
+   and the quick-add CTA is completely inaccessible. Make it static and
+   visible, and suppress the front→back image crossfade so the product
+   image stays visible (no accidental techflat reveal on tap).
+   ─────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+	.holo__drawer {
+		position: static;
+		transform: translateY(0);
+		opacity: 1;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: none;
+	}
+
+	.holo:hover .holo__img--front { opacity: 1; }
+	.holo:hover .holo__img--back  { opacity: 0; }
+}
+
+/* ── Reduced motion — disable all transitions on affected elements ───────
+   Covers the card entrance, image crossfade, drawer slide, pill and button
+   state changes. Users with vestibular disorders should see instant states.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.holo,
+	.holo__img,
+	.holo__drawer,
+	.holo__size-pill,
+	.holo__buy {
+		transition: none;
+	}
+}

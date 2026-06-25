@@ -70,9 +70,14 @@ def test_missing_markers_exits_1(tmp_path, monkeypatch, capsys):
 def test_end_marker_before_start_exits_1(tmp_path, monkeypatch, capsys):
     mod = _load_gen()
     bad = tmp_path / "design-tokens.css"
+    # The generator regenerates the global-fonts region first, so the fixture must
+    # carry a well-formed global-fonts region for main() to reach the
+    # collection-tokens ordering check this test exercises. The collection-tokens
+    # markers are intentionally reversed (END before START).
     bad.write_text(
+        "/* GENERATED:global-fonts START */\n/* GENERATED:global-fonts END */\n"
         "/* GENERATED:collection-tokens END */\n/* GENERATED:collection-tokens START */\n"
     )
     monkeypatch.setattr(mod, "CSS", bad)
     assert mod.main() == 1
-    assert "END marker before START" in capsys.readouterr().err
+    assert "collection-tokens END marker before START" in capsys.readouterr().err

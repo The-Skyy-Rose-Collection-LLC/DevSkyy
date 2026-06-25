@@ -7,6 +7,8 @@ description: SkyyRose Suite router. Classifies a task into one or more plugins (
 
 The router for the SkyyRose Suite. You receive a task, classify it, and route it — you do not do the work yourself; you hand off to the plugin that owns it.
 
+> **Boot first:** orient from the root canonical sources — `SOT.md` → `.wolf/anatomy.md` → `.wolf/cerebrum.md` → `CLAUDE.md` (full block in `CROSS-PLUGIN.md`) — before routing.
+
 ## When to use
 
 - Behind the `/skyyrose <task>` command.

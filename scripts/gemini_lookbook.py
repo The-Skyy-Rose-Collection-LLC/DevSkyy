@@ -2,8 +2,20 @@
 """
 Gemini single-shot lookbook generator.
 
-Send scene background + all product techflats to Gemini in ONE call.
-Gemini generates the complete lookbook scene with all products placed naturally.
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
+
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh,all} --sku <sku>
+
+Elite-team path adds: SceneGeneratorAgent (canon-anchored scene.json reads),
+CompositorAgent 6-stage pipeline (matte → relight → FLUX → cleanup → shadows
+→ QA), RunBudget gates, and automatic retry. This single-shot lookbook
+remains runnable for quick experiments but produces Gemini-rendered products
+in-scene which can hallucinate garment details — fails the no-hallucination
+constraint locked 2026-05-26.
+
+Send scene background + all product techflats to Gemini in ONE call. Gemini
+generates the complete lookbook scene with all products placed naturally.
 
 Usage:
     source .venv-imagery/bin/activate
@@ -131,43 +143,43 @@ COLLECTIONS = {
         ],
     },
     "signature": {
-        "scene_file": "signature/signature-golden-gate-showroom-v2.png",
+        "scene_file": "signature/signature-oakland-waterfront-bay-bridge-day-v2.png",
         "products": [
             {
-                "sku": "sg-002",
-                "ref": "sg-002-techflat-v4.jpg",
-                "desc": "Mint green t-shirt with SkyyRose signature logo",
-                "placement": "on acrylic mannequin bust near window, center",
+                "sku": "sg-001",
+                "ref": "sg-001-bay-bridge-shorts-front-authentic.png",
+                "desc": "Bay Bridge Series shorts — sublimated Bay Bridge print",
+                "placement": "displayed on the weathered wooden crate beside the drafting paper, center-foreground",
             },
             {
-                "sku": "sg-004",
-                "ref": "sg-004-techflat.jpeg",
-                "desc": "Mint hoodie with SkyyRose branding",
-                "placement": "draped over marble display cube, center-right",
+                "sku": "sg-002",
+                "ref": "sg-002-stay-golden-shirt-techflat.jpeg",
+                "desc": "Stay Golden Bridge Series shirt — gold rose embroidery",
+                "placement": "draped over the brass mooring cleat, foreground-left of the pier",
             },
             {
                 "sku": "sg-005",
-                "ref": "sg-005-techflat.jpeg",
-                "desc": "Bay Rose matching set (hoodie + joggers) in mint and pink",
-                "placement": "featured on center marble display table",
-            },
-            {
-                "sku": "sg-006",
-                "ref": "sg-006-techflat.jpeg",
-                "desc": "Tie-dye crewneck sweatshirt with SkyyRose logo",
-                "placement": "folded on marble shelf, right wall niche",
+                "ref": "sg-005-bay-bridge-shirt-techflat.jpeg",
+                "desc": "Bay Bridge Series shirt — white with blue rose + Bay Bridge emblem",
+                "placement": "laid flat on the wooden pier planks at center-left, edges catching morning light",
             },
             {
                 "sku": "sg-007",
-                "ref": "sg-007-techflat-v4.jpg",
-                "desc": "Black beanie with SkyyRose embroidered rose logo",
-                "placement": "on marble pedestal, left-center",
+                "ref": "sg-007-techflat.jpeg",
+                "desc": "Signature Beanie — embroidered rose monogram",
+                "placement": "resting beside the drafting paper at center-foreground, on the wooden crate",
             },
             {
                 "sku": "sg-009",
-                "ref": "sg-009-sherpa.webp",
-                "desc": "Sherpa jacket with SkyyRose branding",
-                "placement": "draped over designer chair, far left",
+                "ref": "sg-009-sherpa-front.jpeg",
+                "desc": "Sherpa Jacket — cream sherpa with red rose logo",
+                "placement": "folded across the far-right end of the wooden crate",
+            },
+            {
+                "sku": "sg-011",
+                "ref": "sg-011-original-label-tee-white-techflat.jpeg",
+                "desc": "Original Label Tee — white minimal signature branding",
+                "placement": "laid flat on the pier planks at right-foreground",
             },
         ],
     },

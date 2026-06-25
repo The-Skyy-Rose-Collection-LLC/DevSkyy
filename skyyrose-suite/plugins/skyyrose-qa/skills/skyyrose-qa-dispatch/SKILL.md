@@ -7,6 +7,8 @@ description: Handoff router for skyyrose-qa. Use when verification surfaces work
 
 `skyyrose-qa` owns TDD, drive-to-green, verification loops, audits, evals, and code review. It is the gate every built artifact passes before shipping. Hand off along the suite graph (`CROSS-PLUGIN.md`): **qa → core** (log lessons / backend fixes), **qa → design** (UI/theme fixes).
 
+> **Boot first:** orient from the root canonical sources — `SOT.md` → `.wolf/anatomy.md` → `.wolf/cerebrum.md` → `.wolf/buglog.json` (read before fixing) → `CLAUDE.md` (full block in `CROSS-PLUGIN.md`) — before acting.
+
 ## When to hand off
 
 | Verification found… | Hand off to | Example |

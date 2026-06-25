@@ -672,14 +672,16 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
             self._current_model_provider = provider_used
 
             return AgentResult(
+                agent_name=self.name,
+                agent_provider=self._active_provider,
+                content=routed_response.get("text", ""),
                 status=AgentStatus.COMPLETED,
-                output=routed_response.get("text", ""),
-                usage=routed_response.get("usage", {}),
                 metadata={
                     "provider": provider_used,
                     "model": routed_response.get("model", self.config.model),
                     "routed": True,
                     "correlation_id": correlation_id,
+                    "usage": routed_response.get("usage", {}),
                 },
             )
         except Exception as e:
@@ -714,13 +716,12 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
             success = winner is not None and winner.response
 
             return AgentResult(
+                agent_name=self.name,
+                agent_provider=self._active_provider,
+                content=winner.response if winner else "",
                 status=AgentStatus.COMPLETED if success else AgentStatus.FAILED,
-                output=winner.response if winner else "",
-                usage={
-                    "cost_usd": winner.cost_usd if winner else 0.0,
-                    "latency_ms": winner.latency_ms if winner else 0.0,
-                    "round_table_entries": len(round_table_result.entries),
-                },
+                cost_usd=winner.cost_usd if winner else 0.0,
+                latency_ms=winner.latency_ms if winner else 0.0,
                 metadata={
                     "round_table": True,
                     "task_id": round_table_result.task_id,
@@ -728,6 +729,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
                     "winner_score": winner.total_score if winner else 0.0,
                     "judge_reasoning": round_table_result.judge_reasoning,
                     "correlation_id": correlation_id,
+                    "round_table_entries": len(round_table_result.entries),
                 },
             )
         except Exception as e:
@@ -793,15 +795,17 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
 
                 # Build result from routed response
                 result = AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self._active_provider,
+                    content=routed_response.get("text", ""),
                     status=AgentStatus.COMPLETED,
-                    output=routed_response.get("text", ""),
-                    usage=routed_response.get("usage", {}),
                     metadata={
                         "provider": provider_used,
                         "model": routed_response.get("model", self.config.model),
                         "routed": True,
                         "task_category": task_category.value,
                         "technique": technique.value,
+                        "usage": routed_response.get("usage", {}),
                     },
                 )
             except Exception as e:
@@ -985,13 +989,12 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
 
             # Build result from winner
             result = AgentResult(
+                agent_name=self.name,
+                agent_provider=self._active_provider,
+                content=winner.response if winner else "",
                 status=AgentStatus.COMPLETED if success else AgentStatus.FAILED,
-                output=winner.response if winner else "",
-                usage={
-                    "cost_usd": winner.cost_usd if winner else 0.0,
-                    "latency_ms": winner.latency_ms if winner else 0.0,
-                    "round_table_entries": len(round_table_result.entries),
-                },
+                cost_usd=winner.cost_usd if winner else 0.0,
+                latency_ms=latency_ms,
                 metadata={
                     "round_table": True,
                     "task_id": round_table_result.task_id,
@@ -1000,6 +1003,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck t
                     "judge_reasoning": round_table_result.judge_reasoning,
                     "technique": technique.value,
                     "task_category": task_category.value,
+                    "round_table_entries": len(round_table_result.entries),
                 },
             )
 

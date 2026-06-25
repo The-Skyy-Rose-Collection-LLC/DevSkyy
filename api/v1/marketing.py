@@ -15,6 +15,8 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from adk.base import AgentStatus
+from agents.marketing_agent import MarketingAgent
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 # Configure logging
@@ -59,16 +61,6 @@ class MarketingCampaignRequest(BaseModel):
     )
 
 
-class CampaignMetrics(BaseModel):
-    """Predicted campaign performance metrics."""
-
-    estimated_reach: int
-    estimated_engagement_rate: float
-    estimated_conversion_rate: float
-    estimated_revenue: float | None = None
-    confidence_score: float
-
-
 class MarketingCampaignResponse(BaseModel):
     """Response model for marketing campaigns."""
 
@@ -76,10 +68,41 @@ class MarketingCampaignResponse(BaseModel):
     status: str
     timestamp: str
     campaign_type: str
-    target_audience_size: int
+    channels: list[str]
     content_generated: bool
     scheduled_for: str | None = None
-    metrics: CampaignMetrics
+    campaign_content: str
+    metadata: dict[str, Any] | None = None
+
+
+_CHANNELS_BY_TYPE: dict[str, list[str]] = {
+    "email": ["email"],
+    "sms": ["sms"],
+    "social": ["instagram", "facebook", "tiktok"],
+    "multi_channel": ["instagram", "email", "sms", "website"],
+}
+
+
+def _channels_for_campaign(campaign_type: str) -> list[str]:
+    """Map a campaign type to the channels the agent should plan for."""
+    return _CHANNELS_BY_TYPE.get(campaign_type, ["instagram", "email", "website"])
+
+
+def _build_campaign_brief(request: MarketingCampaignRequest) -> str:
+    """Compose a natural-language brief for the marketing agent from the request."""
+    parts = [
+        f"Create a {request.campaign_type} marketing campaign for SkyyRose.",
+        f"Target audience: {request.target_audience}.",
+    ]
+    if request.content_template:
+        parts.append(f"Content direction: {request.content_template}")
+    if request.budget is not None:
+        parts.append(f"Budget: ${request.budget:.2f} USD.")
+    if request.schedule:
+        parts.append(f"Scheduled for: {request.schedule}.")
+    if request.ab_test:
+        parts.append("Include an A/B test plan.")
+    return " ".join(parts)
 
 
 # =============================================================================
@@ -133,67 +156,40 @@ async def create_campaign(
     """
     campaign_id = str(uuid4())
     logger.info(
-        f"Creating marketing campaign {campaign_id} for user {user.sub}: {request.campaign_type}"
+        "Creating marketing campaign %s for user %s: %s",
+        campaign_id,
+        user.sub,
+        request.campaign_type,
     )
 
+    channels = _channels_for_campaign(request.campaign_type)
+    brief = _build_campaign_brief(request)
+
     try:
-        # TODO: Integrate with agents/marketing_agent.py MarketingAgent
-        # For now, return mock data demonstrating the structure
-
-        # Calculate target audience size based on criteria
-        audience_size = 2500  # Mock value
-
-        # Generate AI content if not provided
-        content_generated = request.content_template is None
-
-        # Calculate predicted metrics
-        if request.campaign_type == "email":
-            metrics = CampaignMetrics(
-                estimated_reach=audience_size,
-                estimated_engagement_rate=0.28,
-                estimated_conversion_rate=0.045,
-                estimated_revenue=5625.0,
-                confidence_score=0.82,
-            )
-        elif request.campaign_type == "sms":
-            metrics = CampaignMetrics(
-                estimated_reach=int(audience_size * 0.95),
-                estimated_engagement_rate=0.42,
-                estimated_conversion_rate=0.08,
-                estimated_revenue=9500.0,
-                confidence_score=0.88,
-            )
-        elif request.campaign_type == "social":
-            metrics = CampaignMetrics(
-                estimated_reach=int(audience_size * 3.5),
-                estimated_engagement_rate=0.15,
-                estimated_conversion_rate=0.02,
-                estimated_revenue=3500.0,
-                confidence_score=0.75,
-            )
-        else:  # multi_channel
-            metrics = CampaignMetrics(
-                estimated_reach=int(audience_size * 4.2),
-                estimated_engagement_rate=0.35,
-                estimated_conversion_rate=0.065,
-                estimated_revenue=15750.0,
-                confidence_score=0.85,
-            )
-
-        return MarketingCampaignResponse(
-            campaign_id=campaign_id,
-            status="scheduled" if request.schedule else "draft",
-            timestamp=datetime.now(UTC).isoformat(),
-            campaign_type=request.campaign_type,
-            target_audience_size=audience_size,
-            content_generated=content_generated,
-            scheduled_for=request.schedule,
-            metrics=metrics,
-        )
-
+        agent = MarketingAgent()
+        result = await agent.create_campaign(brief, channels)
     except Exception as e:
-        logger.error(f"Marketing campaign creation failed: {e}", exc_info=True)
+        logger.exception("Marketing campaign creation failed for %s", campaign_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Marketing campaign creation failed: {str(e)}",
+            detail="Marketing campaign creation failed",
+        ) from e
+
+    if result.status == AgentStatus.FAILED:
+        logger.error("Marketing agent failed for %s: %s", campaign_id, result.error)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Marketing agent could not generate the campaign",
         )
+
+    return MarketingCampaignResponse(
+        campaign_id=campaign_id,
+        status="scheduled" if request.schedule else "draft",
+        timestamp=datetime.now(UTC).isoformat(),
+        campaign_type=request.campaign_type,
+        channels=channels,
+        content_generated=request.content_template is None,
+        scheduled_for=request.schedule,
+        campaign_content=result.content,
+        metadata=result.metadata,
+    )

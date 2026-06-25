@@ -20,6 +20,7 @@ from openai import OpenAI
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
 
+from ..budget import BudgetExceededError, RunBudget
 from ..gemini_rest import generate_image as gemini_generate_image
 from ..models import GenerationResult
 
@@ -30,6 +31,13 @@ from llm.model_ids import OPENAI_IMAGE_2_MODEL as _GPT_MODEL
 from ..config import GEMINI_IMAGE_GEN_MODEL as _GEMINI_GEN_MODEL
 
 _DEFAULT_OUTPUT_DIR = "renders/output"
+
+# Per-provider cost estimates (USD). Dual-path means both can fire in one call,
+# so the worst-case budget pre-check sums both. Actual spend is reported back
+# to the budget anchor per provider that succeeded.
+_GPT_IMAGE_COST_USD = 0.08
+_GEMINI_IMAGE_COST_USD = 0.04
+_DUAL_PATH_WORST_CASE_USD = _GPT_IMAGE_COST_USD + _GEMINI_IMAGE_COST_USD
 
 
 class GeneratorAgent(BaseSuperAgent):
@@ -57,9 +65,34 @@ class GeneratorAgent(BaseSuperAgent):
         self._openai = OpenAI()
 
     async def generate(
-        self, sku: str, view: str, generation_spec: str, reference_images: list[str] | None = None
+        self,
+        sku: str,
+        view: str,
+        generation_spec: str,
+        reference_images: list[str] | None = None,
+        budget: RunBudget | None = None,
     ) -> GenerationResult:
-        """Generate image from spec with full ADK observability."""
+        """Generate image from spec with full ADK observability.
+
+        When ``budget`` is provided, the dual-path worst-case cost is
+        pre-checked before any paid call dispatches. Actual per-provider
+        cost is recorded after each successful generation. A
+        ``BudgetExceededError`` short-circuits the call with a failure
+        ``GenerationResult`` before money is spent.
+        """
+        # Pre-check budget BEFORE any paid call. Worst case = both providers fire.
+        if budget is not None:
+            try:
+                budget.ensure_within_budget(_DUAL_PATH_WORST_CASE_USD, stage="generator_agent")
+            except BudgetExceededError as exc:
+                logger.error("budget exceeded before generation for %s: %s", sku, exc)
+                return GenerationResult(
+                    success=False,
+                    provider="none",
+                    error=f"budget exceeded: {exc}",
+                    metadata={"budget_blocked": True},
+                )
+
         # Capture "Back Data" via ADK run
         adk_prompt = f"GENERATION TASK: SKU={sku}, VIEW={view}, SPEC={generation_spec}"
         logger.info("Running Legendary Generation for %s via ADK...", sku)
@@ -73,6 +106,8 @@ class GeneratorAgent(BaseSuperAgent):
         try:
             # Agent A: GPT-Image (Legacy fallback)
             img_a = await self._generate_gpt_image(generation_spec)
+            if budget is not None:
+                budget.spend(_GPT_IMAGE_COST_USD, stage="generator_agent.gpt")
         except Exception as exc:
             err_a = str(exc)
             logger.warning("GPT-Image generation failed for %s: %s", sku, exc)
@@ -80,6 +115,8 @@ class GeneratorAgent(BaseSuperAgent):
         try:
             # Agent B: Gemini Pro Image (Supports Multi-Image RAS)
             img_b = await self._generate_gemini_image(generation_spec, reference_images)
+            if budget is not None:
+                budget.spend(_GEMINI_IMAGE_COST_USD, stage="generator_agent.gemini")
         except Exception as exc:
             err_b = str(exc)
             logger.warning("Gemini image generation failed for %s: %s", sku, exc)

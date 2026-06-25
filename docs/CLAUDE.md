@@ -28,6 +28,7 @@ These come from `~/.claude/projects/-Users-theceo-DevSkyy/memory/` and apply to 
 3. **Always reference The Five.** Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels. Never Bottega / Numéro / Hedi Slimane / Rick Owens / 032c / Acne FW24 / Givenchy by Tisci / Khaite / Bode / The Row — those are locked OUT.
 4. **Catalog is the source of truth.** `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` is the only product manifest. Never reference retired SKUs or invent SKUs.
 5. **No mock data in production code.** Even in spec docs, name real verified files and paths only.
+6. **Product imagery resolves through the SOT only.** Every surface (WP, dashboard, MCP, pipelines, agents, skills, plugins) gets a SKU's image from `skyyrose.core.sot_images.resolve_image()` / `data/sot-images.json` — front-first (on-model render before flat packshot), never a hardcoded `assets/images/products/...` literal or a `/images/scenes/*` fabrication. Policy + backlog: `docs/brand/sot-imagery-policy.md`. Guard: `tests/test_sot_no_adhoc_imagery.py`.
 
 ## Folder index
 
@@ -41,11 +42,3 @@ These come from `~/.claude/projects/-Users-theceo-DevSkyy/memory/` and apply to 
 ## Conflict policy
 
 If a doc anywhere in this folder conflicts with the canon docs above, **the canon doc wins**. Update the conflicting doc to reference the canon. Do not edit the canon without founder sign-off. New canon decisions get appended to the relevant `docs/brand/*.md` file with a date stamp + founder-locked note.
-
-
-<<<<<<< Updated upstream
-=======
-<claude-mem-context>
-
-</claude-mem-context>
->>>>>>> Stashed changes

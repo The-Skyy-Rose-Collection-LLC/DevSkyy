@@ -107,10 +107,13 @@ class TestCoordinatorProduce:
 
         coordinator.produce("br-001")
 
+        # Coordinator threads its RunBudget (None when unconfigured) through
+        # to the generator so the per-call budget gate has an anchor.
         mock_generator.generate.assert_called_once_with(
             sku="br-001",
             view="front",
             generation_spec="THE EXACT SPEC",
+            budget=None,
         )
 
 

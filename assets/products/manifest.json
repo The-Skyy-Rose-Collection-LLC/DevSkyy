@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-19T03:57:38+00:00",
-  "catalog_sha": "sha256:8d20467b496fe324a3d49ad8582e75942a18e849a7386e6f18b210b5c462c340",
+  "generated_at": "2026-06-23T01:27:20+00:00",
+  "catalog_sha": "sha256:367c47144eb4863341cccd9b85f82fc0303d6c5739aeb0634bc8f0ab2fbf3ffa",
   "skus": {
     "br-001": {
       "sku": "br-001",

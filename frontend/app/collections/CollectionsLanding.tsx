@@ -5,15 +5,14 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Play, Sparkles } from 'lucide-react';
-import { getAllCollections } from '@/lib/collections';
+import type { CollectionConfig } from '@/lib/collections';
 import CollectionTabBar from '@/components/collections/CollectionTabBar';
 
 const RotatingLogoFallback = lazy(
   () => import('@/components/3d/RotatingLogoFallback')
 );
 
-export default function CollectionsLanding() {
-  const collections = getAllCollections();
+export default function CollectionsLanding({ collections }: { collections: CollectionConfig[] }) {
 
   return (
     <>

@@ -172,32 +172,6 @@ def verify_client_instantiation(clients: dict):
     return results
 
 
-def verify_orchestrator():
-    """Verify LLM Orchestrator integration"""
-    print_header("Verifying LLM Orchestrator Integration")
-
-    try:
-        from orchestration import LLMOrchestrator, RoutingStrategy, TaskType
-
-        print_success("LLMOrchestrator imported successfully")
-
-        # Try to instantiate
-        LLMOrchestrator()
-        print_success("LLMOrchestrator instantiated successfully")
-
-        # Check available task types
-        print_info(f"Available task types: {', '.join([t.value for t in TaskType])}")
-
-        # Check routing strategies
-        print_info(f"Routing strategies: {', '.join([s.value for s in RoutingStrategy])}")
-
-        return True
-
-    except Exception as e:
-        print_error(f"Orchestrator verification failed: {e}")
-        return False
-
-
 def verify_registry():
     """Verify LLM Registry"""
     print_header("Verifying LLM Registry")
@@ -240,7 +214,6 @@ def verify_file_structure():
 
     required_files = {
         "orchestration/llm_clients.py": "LLM client implementations",
-        "orchestration/llm_orchestrator.py": "LLM orchestrator",
         "orchestration/llm_registry.py": "Model registry",
         "orchestration/__init__.py": "Package initialization",
     }
@@ -316,9 +289,6 @@ def main():
         results["Client Instantiation"] = all(instantiation.values())
     else:
         results["Client Instantiation"] = False
-
-    # Verify orchestrator
-    results["LLM Orchestrator"] = verify_orchestrator()
 
     # Verify registry
     results["LLM Registry"] = verify_registry()

@@ -213,12 +213,15 @@ class TestCompositeWithFluxBudgetThreading:
     code-review CRITICAL where the dispatcher dropped budget on the floor.
     """
 
-    def test_primary_hit_passes_budget_to_fal(self) -> None:
+    def test_primary_hit_passes_budget_to_kontext(self) -> None:
+        # kontext is the PRIMARY provider (flux_methods order: kontext → fal-fill
+        # → replicate; promoted in da951f494 because kontext conditions on the
+        # relit garment reference). When it succeeds, fal-fill/replicate never run.
         agent = _agent()
         budget = RunBudget(ceiling_usd=1.0)
         with (
-            patch.object(agent, "_flux_fill_fal", return_value=_FAKE_PNG) as fal,
-            patch.object(agent, "_flux_kontext") as kontext,
+            patch.object(agent, "_flux_kontext", return_value=_FAKE_PNG) as kontext,
+            patch.object(agent, "_flux_fill_fal") as fal,
             patch.object(agent, "_flux_fill_replicate") as replicate,
         ):
             out, provider = agent._composite_with_flux(
@@ -228,10 +231,10 @@ class TestCompositeWithFluxBudgetThreading:
                 prompt=_PROMPT,
                 budget=budget,
             )
-        assert provider == "fal-fill"
+        assert provider == "kontext"
         assert out == _FAKE_PNG
-        fal.assert_called_once_with(_SCENE, _MASK, _PROMPT, budget=budget)
-        kontext.assert_not_called()
+        kontext.assert_called_once_with(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+        fal.assert_not_called()
         replicate.assert_not_called()
 
     def test_fallback_chain_threads_budget_through_all_providers(self) -> None:

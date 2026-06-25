@@ -201,6 +201,17 @@ ts-format:
 	$(NPM) run format
 
 # ============================================================================
+# SOT (Single Source of Truth) — product imagery
+# ============================================================================
+
+# Regenerate the SOT product-imagery manifest (data/sot-images.json) that every
+# non-Python surface reads. Run after build-collection-sot.py / any catalog image
+# change. The Python resolver (skyyrose.core.sot_images) reads sot.json fresh, so
+# this only refreshes the serialized manifest for JS/PHP consumers.
+sot-manifest:
+	python3 -m skyyrose.core.sot_images
+
+# ============================================================================
 # UNIFIED COMMANDS
 # ============================================================================
 
