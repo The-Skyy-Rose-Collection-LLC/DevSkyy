@@ -33,8 +33,17 @@ class TestConstants:
 
 
 class TestPaths:
-    def test_overrides_dir_exists(self):
-        assert config.OVERRIDES_DIR.exists()
+    def test_overrides_dir_is_optional_path(self):
+        """OVERRIDES_DIR points at the retired per-SKU prompt-override location.
+
+        The directory was intentionally removed (overrides retired 2026-04-25,
+        commit 292ccc027); the constant remains as an OPTIONAL enrichment path
+        that consumers (utils.get_override, skyyrose_production_studio) tolerate
+        when absent. So we assert the constant is correctly located, not that the
+        directory exists on disk.
+        """
+        assert hasattr(config.OVERRIDES_DIR, "is_dir")
+        assert str(config.OVERRIDES_DIR).replace("\\", "/").endswith("prompts/overrides")
 
     def test_source_dir_is_path(self):
         """SOURCE_DIR is a Path object pointing to the expected location."""
