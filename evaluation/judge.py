@@ -12,6 +12,10 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+# Default judge model: Sonnet, not Opus. Q-modelpin — a caller-supplied model with
+# no default risks an accidental Opus (5x cost). Sonnet is the calibrated QC judge.
+DEFAULT_JUDGE_MODEL = "claude-sonnet-4-6"
+
 # USD per 1M tokens (input, output). Keep in sync with model-routing doc.
 _PRICING: dict[str, tuple[float, float]] = {
     "claude-sonnet-4-6": (3.0, 15.0),
@@ -56,18 +60,21 @@ class ClaudeJudge:
     def __init__(
         self,
         client: Any,
-        model: str,
+        model: str = DEFAULT_JUDGE_MODEL,
         max_tokens: int = 1500,  # generous for a verdict JSON; bump if adapters request large free-text fields
+        temperature: float = 0.0,  # Q-modelpin — 0 = deterministic, reproducible verdicts
     ) -> None:
         self._client = client
         self._model = model
         self._max_tokens = max_tokens
+        self._temperature = temperature
 
     def run(self, *, messages: list[dict], tool: dict) -> tuple[dict, float]:
         """Force one call to `tool` and return (tool_input, cost_usd)."""
         resp = self._client.messages.create(
             model=self._model,
             max_tokens=self._max_tokens,
+            temperature=self._temperature,
             messages=messages,
             tools=[tool],
             tool_choice={"type": "tool", "name": tool["name"], "disable_parallel_tool_use": True},
