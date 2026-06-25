@@ -1883,6 +1883,8 @@ class TestImportErrorBranches:
             # Legacy sub-agents should be absent; SDK agents may still register
             assert "collection_content" not in a._sub_agents
             assert "seo_copywriter" not in a._sub_agents
+        # Restore module to sys.modules before cleanup reload
+        sys.modules["agents.core.content.agent"] = mod
         importlib.reload(mod)
 
     @pytest.mark.asyncio
@@ -1912,6 +1914,8 @@ class TestImportErrorBranches:
             importlib.reload(mod)
             a = mod.CreativeCoreAgent()
             assert len(a._sub_agents) == 0
+        # Restore module to sys.modules before cleanup reload
+        sys.modules["agents.core.creative.agent"] = mod
         importlib.reload(mod)
 
     @pytest.mark.asyncio
@@ -1944,6 +1948,8 @@ class TestImportErrorBranches:
             # Legacy sub-agents should be absent; SDK agents may still register
             assert "social_media" not in a._sub_agents
             assert "campaign_ops" not in a._sub_agents
+        # Restore module to sys.modules before cleanup reload
+        sys.modules["agents.core.marketing.agent"] = mod
         importlib.reload(mod)
 
     @pytest.mark.asyncio
@@ -1978,6 +1984,8 @@ class TestImportErrorBranches:
             assert "deploy_health" not in a._sub_agents
             assert "security_monitor" not in a._sub_agents
             assert "coding_doctor" not in a._sub_agents
+        # Restore module to sys.modules before cleanup reload
+        sys.modules["agents.core.operations.agent"] = mod
         importlib.reload(mod)
 
     @pytest.mark.asyncio
@@ -2072,6 +2080,8 @@ class TestImportErrorBranches:
             a = mod.WebBuilderCoreAgent()
             # Legacy sub-agent should be absent; SDK agents may still register
             assert "web_dev" not in a._sub_agents
+        # Restore module to sys.modules before cleanup reload
+        sys.modules["agents.core.web_builder.agent"] = mod
         importlib.reload(mod)
 
     @pytest.mark.asyncio
