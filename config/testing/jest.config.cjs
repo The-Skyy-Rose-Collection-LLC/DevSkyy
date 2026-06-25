@@ -132,8 +132,9 @@ module.exports = {
   // Clear mocks between tests
   clearMocks: true,
 
-  // Restore mocks after each test
-  restoreMocks: true,
+  // Restore mocks after each test - disabled due to Jest 29.7.0 compatibility issue
+  // with clearMocksOnScope not being available in _moduleMocker
+  // restoreMocks: true,
 
   // Verbose output
   verbose: true,
