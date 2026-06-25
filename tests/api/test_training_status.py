@@ -211,9 +211,56 @@ def test_export_upload_failure_is_502(monkeypatch, tmp_path):
             raise RuntimeError("hub down")
 
     monkeypatch.setattr(tmod, "HfApi", _BoomHfApi)
-    assert _client().post("/training/export", json={"dataset_name": "ds"}).status_code == 502
+    resp = _client().post("/training/export", json={"dataset_name": "ds"})
+    assert resp.status_code == 502
+    # Raw exception strings must NOT be echoed to clients (security + info-leak).
+    detail = resp.json()["detail"]
+    assert "hub down" not in detail
+    assert "HuggingFace upload failed" in detail
 
 
 def test_export_404_when_no_round_table(monkeypatch, tmp_path):
     monkeypatch.setattr(tmod, "ROUND_TABLE_RESULTS_PATH", tmp_path / "missing.json")
     assert _client().post("/training/export", json={"dataset_name": "ds"}).status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# best_loss field validator — non-finite float coercion (regression guard)
+# A progress.json with inf/nan used to crash JSON serialisation with a 500;
+# the field_validator must silently coerce those values to None.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw_value",
+    [
+        float("inf"),
+        float("-inf"),
+        float("nan"),
+        "inf",
+        "-inf",
+        "nan",
+        "Infinity",
+        "-Infinity",
+        "NaN",
+    ],
+)
+def test_best_loss_non_finite_coerced_to_none(monkeypatch, tmp_path, raw_value):
+    """Non-finite best_loss values must be serialised as JSON null (not crash)."""
+    monkeypatch.setattr(tmod, "TRAINING_OUTPUT_DIR", tmp_path)
+    _write_progress(tmp_path, "v1", status="training", version="v1", best_loss=raw_value)
+    resp = _client().get("/training/status")
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["best_loss"] is None
+
+
+def test_best_loss_finite_value_preserved(monkeypatch, tmp_path):
+    monkeypatch.setattr(tmod, "TRAINING_OUTPUT_DIR", tmp_path)
+    _write_progress(tmp_path, "v1", status="training", version="v1", best_loss=0.3456)
+    assert _client().get("/training/status").json()["best_loss"] == pytest.approx(0.3456)
+
+
+def test_best_loss_null_preserved(monkeypatch, tmp_path):
+    monkeypatch.setattr(tmod, "TRAINING_OUTPUT_DIR", tmp_path)
+    _write_progress(tmp_path, "v1", status="training", version="v1", best_loss=None)
+    assert _client().get("/training/status").json()["best_loss"] is None

@@ -657,10 +657,20 @@ async def export_round_table_to_hf(request: ExportRequest):
                 commit_message=f"Add {len(export_items)} SkyyRose scene specs",
             )
         except Exception as hf_err:  # noqa: BLE001 - surface any HF failure as 502
-            logger.error(f"HuggingFace upload failed for {repo_id}: {hf_err}", exc_info=True)
+            # Log full details server-side (exc_info captures the traceback).
+            # repo_id is derived from user input so use %s formatting to prevent
+            # log-injection (no f-string interpolation of user-controlled values).
+            logger.error(
+                "HuggingFace upload failed for repo %s",
+                repr(repo_id),
+                exc_info=True,
+            )
+            # Return a generic client message — never echo raw exception strings
+            # to clients as they can expose internal paths, tokens, or upstream
+            # service details.
             raise HTTPException(
                 status_code=502,
-                detail=f"HuggingFace upload failed: {hf_err}",
+                detail="HuggingFace upload failed. Check server logs for details.",
             ) from hf_err
 
         # dataset_url comes only from a real create_repo result (RepoUrl is a str).
