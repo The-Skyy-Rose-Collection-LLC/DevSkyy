@@ -1136,6 +1136,16 @@ class TripoAssetAgent(SuperAgent):
                 f"Invalid animation in {animations}. Must be names from: {valid}"
             ) from e
 
+        # Validate out_format before submitting the task to the Tripo API so
+        # an invalid format raises immediately rather than after a paid call.
+        try:
+            validated_format = ModelFormat(out_format)
+        except ValueError as e:
+            valid_formats = [f.value for f in ModelFormat]
+            raise ValueError(
+                f"Invalid out_format {out_format!r}. Must be one of: {valid_formats}"
+            ) from e
+
         async with TripoClient(
             api_key=self.tripo_config.api_key, IS_GLOBAL=self.tripo_config.is_global
         ) as client:
@@ -1182,7 +1192,7 @@ class TripoAssetAgent(SuperAgent):
                 task_id=retarget_task_id,
                 model_path=str(model_path),
                 model_url=str(model_path),
-                format=ModelFormat(out_format),
+                format=validated_format,
                 metadata={
                     "source_task_id": rigged_model_task_id,
                     "animations": [a.value for a in anim_enums],

@@ -145,16 +145,25 @@ async def discover_credit_holding_account(
                 f", error: {result['error']}" if result["error"] else "",
             )
 
-    # Find the winner: first key+region combo with auth_ok AND balance > 0
+    # Find the winner: key+region combo with highest balance among auth_ok results.
+    # Picking highest (not first non-zero) ensures we don't abort on a low-balance
+    # account when another account has enough credits to cover --max-cost.
+    best_key: str | None = None
+    best_result: dict | None = None
     for winning_key, r in all_results:
         if r["auth_ok"] and r["balance"] > 0:
-            log.info(
-                "✓ FOUND credit-holding account: key ***%s on %s (balance=%.2f)",
-                r["key_suffix"],
-                r["region"],
-                r["balance"],
-            )
-            return winning_key, r
+            if best_result is None or r["balance"] > best_result["balance"]:
+                best_key = winning_key
+                best_result = r
+
+    if best_key is not None and best_result is not None:
+        log.info(
+            "✓ FOUND credit-holding account: key ***%s on %s (balance=%.2f)",
+            best_result["key_suffix"],
+            best_result["region"],
+            best_result["balance"],
+        )
+        return best_key, best_result
 
     log.error("✗ NO key+region combo has credits. Tried:")
     for _key, r in all_results:
@@ -284,7 +293,10 @@ def rename_animation_clips(src: Path, dst: Path) -> dict[str, str]:
 
 def inspect_final_glb(path: Path) -> dict:
     """Read the saved GLB and return a verification report."""
-    from pygltflib import GLTF2
+    try:
+        from pygltflib import GLTF2
+    except ImportError as exc:
+        raise ImportError("pygltflib not installed. Run: pip install 'pygltflib>=1.16.5'") from exc
 
     gltf = GLTF2().load(str(path))
 
@@ -425,14 +437,17 @@ async def main() -> int:
         log.error("Animation retargeting failed: %s", exc)
         return 5
 
+    # Write to a temp file first; only replace args.output after verification passes.
+    tmp_output = args.output.with_suffix(".tmp.glb")
     try:
-        renames = rename_animation_clips(animated_glb, args.output)
+        renames = rename_animation_clips(animated_glb, tmp_output)
         log.info("Renamed clips: %s", renames or "(none — already correct)")
     except Exception as exc:
         log.error("Clip rename failed: %s", exc)
+        tmp_output.unlink(missing_ok=True)
         return 6
 
-    report = inspect_final_glb(args.output)
+    report = inspect_final_glb(tmp_output)
     log.info("=== Final GLB verification ===")
     for key, val in report.items():
         log.info("  %s: %s", key, val)
@@ -446,8 +461,11 @@ async def main() -> int:
             expected,
             actual,
         )
+        tmp_output.unlink(missing_ok=True)
         return 7
 
+    # Verification passed — atomically replace the output file.
+    tmp_output.replace(args.output)
     log.info("✓ Saved rigged + animated Skyy avatar to %s", args.output)
     return 0
 
