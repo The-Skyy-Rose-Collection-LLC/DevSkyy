@@ -7,6 +7,8 @@ description: Handoff router for skyyrose-market. Use when a marketing task needs
 
 `skyyrose-market` owns copy, brand voice, SEO, email, social, paid media, influencer, and launch planning. When a task crosses out of that scope, hand off along the suite graph (see `CROSS-PLUGIN.md`): **market → design → qa → core → qa**.
 
+> **Boot first:** orient from the root canonical sources — `SOT.md` (product facts → catalog CSV + dossier; brand canon → `knowledge-base/seed/from-interview.md`) → `.wolf/anatomy.md` → `.wolf/cerebrum.md` → `CLAUDE.md` (full block in `CROSS-PLUGIN.md`) — before acting.
+
 ## When to hand off
 
 | The task also needs… | Hand off to | Example |

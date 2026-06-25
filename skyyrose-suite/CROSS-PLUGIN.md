@@ -2,6 +2,15 @@
 
 Five plugins, one marketplace. The orchestrator (`skyyrose`) is the front door; the four themed plugins do the work and hand off to each other along a fixed graph.
 
+## Boot sequence (every agent, every invocation)
+
+Before classifying, building, or verifying anything, orient from the repo-root canonical sources — in this order. These four are the same for every plugin; the per-plugin dispatch skills point back here.
+
+1. **`SOT.md`** — the Source-of-Truth registry. Every product, imagery, and brand fact resolves through the authorities it lists (catalog CSV, `sot-images.json`, `visual-manifest.json`, brand canon). Never cache a fact from any other source.
+2. **`.wolf/anatomy.md`** — per-file map + token estimates. Check it before reading any project file; the description may already answer the question.
+3. **`.wolf/cerebrum.md`** — conventions, key learnings, Do-Not-Repeat list, decision log. Read before generating code.
+4. **`CLAUDE.md`** — project identity, architecture, Critical Rules, and the STOP-AND-SHOW gates.
+
 ## Plugins & namespaces
 
 | Plugin | Namespace | Owns |
