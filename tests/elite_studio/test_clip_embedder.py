@@ -59,8 +59,8 @@ def test_cosine_similarity_different_images_below_one(red_image: Path, blue_imag
 
 
 def test_singleton_does_not_reload_model(red_image: Path) -> None:
-    clip_embedder.get_clip()
-    state = clip_embedder._STATE  # internal access for test only
-    first_model_id = id(state.model)
+    # The shim exposes an lru_cached encoder singleton (no get_clip/_STATE anymore).
+    enc_before = clip_embedder._encoder()
     clip_embedder.embed_image(red_image)
-    assert id(state.model) == first_model_id
+    enc_after = clip_embedder._encoder()
+    assert enc_before is enc_after
