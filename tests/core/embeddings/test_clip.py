@@ -11,6 +11,7 @@ import torch
 from skyyrose.core.embeddings import clip as clip_mod
 from skyyrose.core.embeddings.clip import ClipEncoder
 from skyyrose.core.embeddings.config import EmbeddingConfig
+from skyyrose.core.embeddings.device import dtype_load_kwargs
 from skyyrose.core.embeddings.errors import EmbedError
 
 
@@ -78,7 +79,11 @@ def test_load_passes_pinned_revision_safetensors_dtype(patched):
     assert model_call["revision"] == "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268"
     # CLIP ships only pytorch_model.bin at the pinned SHA -> cannot force safetensors.
     assert model_call["use_safetensors"] is False
-    assert model_call["dtype"] == torch.float32  # E-determinism (transformers 5 kwarg)
+    # E-determinism: the dtype kwarg is passed; its NAME is version-dependent
+    # ("dtype" on transformers >=5, "torch_dtype" on 4.x), so derive it from the
+    # same helper the loader uses instead of hardcoding the v5 name.
+    dtype_key = next(iter(dtype_load_kwargs(torch.float32)))
+    assert model_call[dtype_key] == torch.float32
     # Processor is pinned to the same revision.
     assert patched["proc"]["revision"] == "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268"
 
