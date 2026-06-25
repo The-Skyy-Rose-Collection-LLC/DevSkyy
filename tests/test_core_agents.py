@@ -1865,6 +1865,7 @@ class TestImportErrorBranches:
     @pytest.mark.asyncio
     async def test_content_sub_agents_import_error(self):
         import sys
+
         import agents.core.content.agent as mod
 
         # Remove the module before patching to allow reload
@@ -1897,6 +1898,7 @@ class TestImportErrorBranches:
     @pytest.mark.asyncio
     async def test_creative_sub_agents_import_error(self):
         import sys
+
         import agents.core.creative.agent as mod
 
         sys.modules.pop("agents.core.creative.agent", None)
@@ -1925,6 +1927,7 @@ class TestImportErrorBranches:
     @pytest.mark.asyncio
     async def test_marketing_sub_agents_import_error(self):
         import sys
+
         import agents.core.marketing.agent as mod
 
         sys.modules.pop("agents.core.marketing.agent", None)
@@ -1956,6 +1959,7 @@ class TestImportErrorBranches:
     @pytest.mark.asyncio
     async def test_operations_sub_agents_import_error(self):
         import sys
+
         import agents.core.operations.agent as mod
 
         sys.modules.pop("agents.core.operations.agent", None)
@@ -2053,6 +2057,7 @@ class TestImportErrorBranches:
     @pytest.mark.asyncio
     async def test_web_builder_sub_agents_import_error(self):
         import sys
+
         import agents.core.web_builder.agent as mod
 
         sys.modules.pop("agents.core.web_builder.agent", None)
