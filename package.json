@@ -84,7 +84,7 @@
     "@vercel/sdk": "^1.19.6",
     "@vercel/speed-insights": "^2.0.0",
     "@vercel/toolbar": "^0.2.2",
-    "@vitejs/plugin-react": "^5.1.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "@vitejs/plugin-vue": "^6.0.3",
     "@wordpress/api-fetch": "^7.39.0",
     "@wordpress/block-editor": "^15.12.0",
