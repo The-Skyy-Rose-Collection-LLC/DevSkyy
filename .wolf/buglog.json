@@ -2281,6 +2281,30 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-24T13:55:00-07:00"
+    },
+    {
+      "id": "bug-163",
+      "timestamp": "2026-06-25T04:30:00-07:00",
+      "error_message": "All /api/v1/training/* endpoints returned HTTP 500 (coroutine '_find_training_versions' was never awaited; TypeError 'coroutine' object is not iterable). After await fix: ValueError: Out of range float values are not JSON compliant: inf",
+      "file": "api/v1/training_status.py",
+      "root_cause": "A prior perf refactor (a16ee1d67) converted the file helpers to async (aiofiles/asyncio.to_thread) but left every call site synchronous -> each endpoint received a coroutine object (truthy), so guards passed and iteration/attr-access raised -> caught -> 500. Bug-behind-a-bug: TrainingProgressResponse.best_loss defaulted to float('inf'), which is not JSON-compliant; the await bug masked it because requests never reached serialization. imagery/training_progress_reporter.py writes real progress.json with best_loss=Infinity, so live data hits this too.",
+      "fix": "Added 'await' to all 9 helper call sites (_find_training_versions/_load_progress_file/_load_status_file/_load_round_table_results). Made best_loss Optional[float] default None + field_validator coercing non-finite (inf/-inf/nan) -> None. Also wired POST /training/export to real huggingface_hub HfApi.create_repo+upload_file (dataset) via asyncio.to_thread, honest fallback: missing HF_TOKEN -> local-only success with dataset_url=None; HF failure -> 502; real URL only from a real RepoUrl. 13 tests added (tests/api/test_training_status.py). Dashboard get_training_status() consumer was also repaired by this fix.",
+      "tags": [
+        "fastapi",
+        "async",
+        "await",
+        "coroutine",
+        "json",
+        "inf",
+        "huggingface",
+        "training",
+        "lora",
+        "api-500",
+        "bug-behind-bug"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-25T04:30:00-07:00"
     }
   ]
 }
