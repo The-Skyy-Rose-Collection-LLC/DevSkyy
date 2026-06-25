@@ -433,6 +433,9 @@ class TestToolRegistryIntegration:
             "tripo_generate_from_text",
             "tripo_generate_from_image",
             "tripo_validate_asset",
+            "tripo_check_riggable",
+            "tripo_rig_model",
+            "tripo_retarget_animation",
         ]
 
         for tool_name in tools:

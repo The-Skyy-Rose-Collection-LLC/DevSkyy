@@ -321,6 +321,12 @@ observability = [
     "langfuse>=4.6,<5",
 ]
 
+rigging = [
+    # Skyy avatar rigging pipeline (scripts/skyy_avatar_rig.py, scripts/skyy_mixamo_merge.py)
+    "tripo3d>=0.4.1",   # Tripo3D SDK for 3D generation + rigging + animation
+    "pygltflib>=1.16.5",  # GLB/GLTF read-write for animation clip renaming
+]
+
 all = [
     "devskyy[dev,api,mcp,ml,worker,deploy,sdk,rag,observability]",
 ]
