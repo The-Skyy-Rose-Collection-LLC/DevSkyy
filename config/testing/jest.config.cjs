@@ -129,9 +129,6 @@ module.exports = {
   // Module directories
   moduleDirectories: ['node_modules', '<rootDir>/src'],
 
-  // Ignore paths for module resolution (prevents duplicate mock detection in dist/)
-  modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
-
   // Clear mocks between tests
   clearMocks: true,
 
