@@ -80,7 +80,7 @@ def test_gate_rejects_below_threshold(monkeypatch, tmp_path) -> None:
     assert "below brand threshold" in verdict.reason.lower()
 
 
-def test_gate_dispatches_dino_by_model_id(monkeypatch) -> None:
+def test_gate_dispatches_dino_by_model_id(monkeypatch, tmp_path) -> None:
     """E-encoder-gate: a model_id containing 'dino' routes to dino_embedder, not clip."""
     from skyyrose.core import clip_embedder as clip_mod
     from skyyrose.core import dino_embedder as dino_mod
@@ -105,7 +105,7 @@ def test_gate_dispatches_dino_by_model_id(monkeypatch) -> None:
         sample_count=10,
         model_id="facebook/dinov2-base",
     )
-    verdict = embedding_gate.evaluate("ignored.png", centroid)
+    verdict = embedding_gate.evaluate(_real_image(tmp_path), centroid)
 
     assert called["dino"] is True
     assert called["clip"] is False
