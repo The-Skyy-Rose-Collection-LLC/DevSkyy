@@ -7,7 +7,6 @@ This module provides endpoints for:
 Version: 1.0.0
 """
 
-import asyncio
 import logging
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -17,6 +16,9 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from agents.base_super_agent.ml_module import MLCapabilitiesModule
+from agents.base_super_agent.types import MLPrediction as AgentMLPrediction
+from agents.base_super_agent.types import SuperAgentType
 from core.task_status_store import TaskStatusStore, get_initialized_task_status_store
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
@@ -40,6 +42,21 @@ class MLModelType(StrEnum):
     DEMAND_FORECASTING = "demand_forecasting"
     DYNAMIC_PRICING = "dynamic_pricing"
     SENTIMENT_ANALYSIS = "sentiment_analysis"
+
+
+# MLCapabilitiesModule carries no version string of its own; this identifies the
+# wiring/adapter version surfaced in the response.
+_AGENT_ML_VERSION = "agent-ml-1"
+
+# Map each public MLModelType to the (agent type, internal model name) that the
+# MLCapabilitiesModule registry actually exposes. Exhaustive over MLModelType.
+_MODEL_TYPE_MAP: dict[str, tuple[SuperAgentType, str]] = {
+    MLModelType.TREND_PREDICTION.value: (SuperAgentType.MARKETING, "trend_predictor"),
+    MLModelType.CUSTOMER_SEGMENTATION.value: (SuperAgentType.ANALYTICS, "clusterer"),
+    MLModelType.DEMAND_FORECASTING.value: (SuperAgentType.COMMERCE, "demand_forecaster"),
+    MLModelType.DYNAMIC_PRICING.value: (SuperAgentType.COMMERCE, "price_optimizer"),
+    MLModelType.SENTIMENT_ANALYSIS.value: (SuperAgentType.MARKETING, "sentiment_analyzer"),
+}
 
 
 class MLPredictionRequest(BaseModel):
@@ -118,158 +135,109 @@ async def _run_ml_prediction_background(
             },
         )
 
-        # Simulate ML computation time
-        await asyncio.sleep(0.5)
-
-        # TODO: Integrate with agents/ml_module.py MLModule
-        # Generate mock predictions based on model type
-        predictions, metrics = _generate_mock_predictions(model_type)
+        predictions, metrics, pred_status = await _compute_prediction(model_type, data)
 
         await store.set_status(
             prediction_id,
             {
-                "status": "completed",
+                "status": pred_status,
                 "model_type": model_type,
-                "model_version": "v2.1.0",
+                "model_version": _AGENT_ML_VERSION,
                 "started_at": started_at,
                 "completed_at": datetime.now(UTC).isoformat(),
-                "predictions": predictions,
+                "predictions": [p.model_dump() for p in predictions],
                 "metrics": metrics,
             },
         )
-        logger.info(f"Background ML task completed: {prediction_id}")
+        logger.info("Background ML task %s: %s", pred_status, prediction_id)
 
-    except Exception as e:
-        logger.error(f"Background ML task failed: {prediction_id}: {e}", exc_info=True)
+    except HTTPException as e:
+        logger.warning("Background ML task unavailable %s: %s", prediction_id, e.detail)
         await store.set_status(
             prediction_id,
             {
                 "status": "failed",
-                "error": str(e),
+                "model_type": model_type,
+                "started_at": started_at,
                 "completed_at": datetime.now(UTC).isoformat(),
+                "error": str(e.detail),
+            },
+        )
+
+    except Exception as e:
+        logger.error("Background ML task failed: %s: %s", prediction_id, e, exc_info=True)
+        await store.set_status(
+            prediction_id,
+            {
+                "status": "failed",
+                "model_type": model_type,
+                "started_at": started_at,
+                "completed_at": datetime.now(UTC).isoformat(),
+                "error": str(e),
             },
         )
 
 
-def _generate_mock_predictions(model_type: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Generate mock predictions for demonstration."""
-    if model_type == "trend_prediction":
-        predictions = [
-            {
-                "label": "oversized_blazers",
-                "confidence": 0.85,
-                "value": "trending_up",
-                "metadata": {
-                    "growth_rate": 0.45,
-                    "time_to_peak": "2_months",
-                    "similar_trends": ["wide_leg_pants", "structured_outerwear"],
-                },
-            },
-            {
-                "label": "cargo_pants",
-                "confidence": 0.72,
-                "value": "stable",
-                "metadata": {
-                    "growth_rate": 0.05,
-                    "time_to_peak": "current",
-                    "similar_trends": ["utility_wear", "tactical_fashion"],
-                },
-            },
-        ]
-        metrics = {
-            "model_accuracy": 0.89,
-            "prediction_horizon_days": 90,
-            "data_sources": ["social_media", "search_trends", "sales_data"],
-        }
-    elif model_type == "customer_segmentation":
-        predictions = [
-            {
-                "label": "high_value_loyalists",
-                "confidence": 0.91,
-                "value": 125,
-                "metadata": {
-                    "avg_order_value": 450.0,
-                    "purchase_frequency": "monthly",
-                    "lifetime_value": 5400.0,
-                },
-            },
-            {
-                "label": "occasional_shoppers",
-                "confidence": 0.88,
-                "value": 380,
-                "metadata": {
-                    "avg_order_value": 120.0,
-                    "purchase_frequency": "quarterly",
-                    "lifetime_value": 720.0,
-                },
-            },
-        ]
-        metrics = {
-            "num_segments": 5,
-            "silhouette_score": 0.72,
-            "customers_analyzed": 10000,
-        }
-    elif model_type == "demand_forecasting":
-        predictions = [
-            {
-                "label": "forecast_7_days",
-                "confidence": 0.94,
-                "value": 145,
-                "metadata": {"lower_bound": 120, "upper_bound": 170},
-            },
-            {
-                "label": "forecast_30_days",
-                "confidence": 0.78,
-                "value": 580,
-                "metadata": {"lower_bound": 450, "upper_bound": 710},
-            },
-        ]
-        metrics = {
-            "model_type": "lstm",
-            "mae": 12.5,
-            "rmse": 18.3,
-            "historical_days": 180,
-        }
-    elif model_type == "dynamic_pricing":
-        predictions = [
-            {
-                "label": "optimal_price",
-                "confidence": 0.86,
-                "value": 79.99,
-                "metadata": {
-                    "current_price": 89.99,
-                    "price_change": -10.0,
-                    "expected_revenue_lift": 0.15,
-                },
-            },
-        ]
-        metrics = {
-            "competitor_prices": [75.0, 85.0, 92.0],
-            "demand_elasticity": -1.2,
-            "margin_maintained": 0.35,
-        }
-    else:  # sentiment_analysis
-        predictions = [
-            {
-                "label": "overall_sentiment",
-                "confidence": 0.92,
-                "value": "positive",
-                "metadata": {"polarity": 0.75, "subjectivity": 0.6},
-            },
-            {
-                "label": "aspect_quality",
-                "confidence": 0.88,
-                "value": "positive",
-                "metadata": {"mentions": 3, "polarity": 0.8},
-            },
-        ]
-        metrics = {
-            "model": "transformer",
-            "language": "en",
-            "text_length": 150,
-        }
+def _reshape_agent_result(
+    result: AgentMLPrediction, model_name: str
+) -> tuple[list[MLPrediction], dict[str, Any]]:
+    """Adapt the agent-layer MLPrediction dataclass into the API response shape.
 
-    return predictions, metrics
+    ``predict()`` never raises; it signals failure with ``prediction is None`` or
+    ``confidence == 0.0``. In that case return an empty prediction list so the
+    endpoint reports ``status="failed"`` honestly instead of fabricating output.
+    """
+    metrics: dict[str, Any] = {
+        "latency_ms": result.latency_ms,
+        "model_used": result.model_used,
+    }
+    if result.prediction is None or result.confidence == 0.0:
+        metrics["error"] = (result.metadata or {}).get("error", "prediction unavailable")
+        return [], metrics
+
+    # predict() returns model_used="none" on the not-found path (a truthy string),
+    # so fall back to the requested model_name only when it is that sentinel.
+    label = result.model_used if result.model_used != "none" else model_name
+    prediction = MLPrediction(
+        label=label,
+        confidence=result.confidence,
+        value=result.prediction,
+        metadata=result.metadata,
+    )
+    return [prediction], metrics
+
+
+async def _compute_prediction(
+    model_type: str, data: dict[str, Any]
+) -> tuple[list[MLPrediction], dict[str, Any], str]:
+    """Run a real ML prediction for ``model_type`` via MLCapabilitiesModule.
+
+    Returns ``(predictions, metrics, status)`` where status is ``"completed"`` or
+    ``"failed"`` (degraded/unfitted model). Raises ``HTTPException(503)`` when the
+    ML module cannot initialize or the model is not available for its agent type;
+    the sync endpoint surfaces that as 503 and the background task stores it as a
+    failed status.
+    """
+    agent_type, model_name = _MODEL_TYPE_MAP[model_type]
+    module = MLCapabilitiesModule(agent_type)
+    try:
+        await module.initialize()
+    except Exception as e:
+        logger.exception("ML module init failed for %s", model_type)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="ML module is unavailable",
+        ) from e
+
+    if model_name not in module.list_available_models():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Model for '{model_type}' is unavailable",
+        )
+
+    result = await module.predict(model_name, data)
+    predictions, metrics = _reshape_agent_result(result, model_name)
+    return predictions, metrics, "completed" if predictions else "failed"
 
 
 # =============================================================================
@@ -362,36 +330,19 @@ async def predict(
             metrics={"message": "Task running in background. Poll status endpoint for results."},
         )
 
-    try:
-        # Process synchronously for lighter models
-        predictions_data, metrics = _generate_mock_predictions(request.model_type.value)
+    predictions, metrics, pred_status = await _compute_prediction(
+        request.model_type.value, request.data
+    )
 
-        predictions = [
-            MLPrediction(
-                label=p["label"],
-                confidence=p["confidence"],
-                value=p["value"],
-                metadata=p.get("metadata"),
-            )
-            for p in predictions_data
-        ]
-
-        return MLPredictionResponse(
-            prediction_id=prediction_id,
-            status="completed",
-            timestamp=datetime.now(UTC).isoformat(),
-            model_type=request.model_type.value,
-            model_version="v2.1.0",
-            predictions=predictions,
-            metrics=metrics,
-        )
-
-    except Exception as e:
-        logger.error(f"ML prediction failed: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"ML prediction failed: {str(e)}",
-        )
+    return MLPredictionResponse(
+        prediction_id=prediction_id,
+        status=pred_status,
+        timestamp=datetime.now(UTC).isoformat(),
+        model_type=request.model_type.value,
+        model_version=_AGENT_ML_VERSION,
+        predictions=predictions,
+        metrics=metrics,
+    )
 
 
 @router.get(
