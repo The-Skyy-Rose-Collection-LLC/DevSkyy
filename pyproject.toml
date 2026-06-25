@@ -227,9 +227,14 @@ mcp = [
 ]
 
 ml = [
-    "torch==2.12.1",
+    # Keep the torch/torchvision/torchaudio trio version-consistent: torchvision
+    # 0.24.1 requires torch 2.9.1, so torch must stay 2.9.1 (and torchaudio 2.9.1).
+    # A Dependabot bump of torch alone (2.9.1 -> 2.12.1) made the [all] extra
+    # unresolvable and broke the Docker build; this is the locally-installed,
+    # test-validated set. Bump all three together (and re-validate) if upgrading.
+    "torch==2.9.1",
     "torchvision==0.24.1",
-    "torchaudio==2.11.0",
+    "torchaudio==2.9.1",
     "transformers>=4.53.0",
     "huggingface-hub>=0.27.0",
     "numpy>=2.1.3",
