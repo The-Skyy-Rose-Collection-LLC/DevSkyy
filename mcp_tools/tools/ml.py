@@ -98,9 +98,13 @@ async def ml_prediction(params: MLPredictionInput) -> str:
         ... })
     """
     data = await _make_api_request(
-        f"ml/predict/{params.model_type.value}",
+        "ml/predict",
         method="POST",
-        data={"data": params.data, "confidence_threshold": params.confidence_threshold},
+        data={
+            "model_type": params.model_type.value,
+            "data": params.data,
+            "confidence_threshold": params.confidence_threshold,
+        },
     )
 
     return _format_response(
