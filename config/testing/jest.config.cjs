@@ -129,6 +129,9 @@ module.exports = {
   // Module directories
   moduleDirectories: ['node_modules', '<rootDir>/src'],
 
+  // Exclude build artifacts from Jest's module/mock scanning (fixes duplicate mock errors)
+  modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/build/'],
+
   // Clear mocks between tests
   clearMocks: true,
 

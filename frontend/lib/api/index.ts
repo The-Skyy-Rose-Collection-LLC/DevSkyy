@@ -10,6 +10,7 @@ import { qa } from './endpoints/qa';
 import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
 import { socialMedia } from './endpoints/social-media';
+import { training } from './endpoints/training';
 import * as settings from './endpoints/settings';
 import * as tasks from './endpoints/tasks';
 
@@ -29,6 +30,7 @@ export const api = {
     batch,
     health,
     socialMedia,
+    training,
     settings,
     tasks,
 };
