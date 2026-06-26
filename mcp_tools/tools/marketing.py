@@ -105,7 +105,7 @@ async def marketing_campaign(params: MarketingCampaignInput) -> str:
         ... })
     """
     data = await _make_api_request(
-        "marketing/campaign",
+        "marketing/campaigns",
         method="POST",
         data={
             "campaign_type": params.campaign_type,
