@@ -53,8 +53,11 @@ The diligence spine. These are the standard for every task — not aspirational,
 | Recent web facts (prices, events, status) | **WebSearch** | Only when the answer depends on current state. |
 | Existing implementation to reuse | `gh search code` / `gh search repos` | Search before writing net-new. |
 | What a render / image actually shows | **Read the image** (vision); `identify` for metadata | One-shot batch quota — batch reads, never retry (all fail once exceeded). |
+| Product image about to touch the site (render / content / skyyrose.co edit) | **Read the actual pixels (vision)** → confirm correct garment for that SKU vs catalog/dossier | **MANDATORY.** Filename/manifest can lie; wrong-garment is the #1 recurring defect. Eyes-on or don't ship. |
 
 **Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
+
+> **MANDATORY — Product-image fidelity gate.** Before you **render anything, create content, or edit skyyrose.co**, every product image about to touch the site MUST be eyes-on verified as the *correct garment for that SKU* — read the actual pixels (vision), not the filename or manifest. Product renders come from **OAI-image-2 only** (see project memory). If you cannot visually confirm SKU ↔ garment match, do NOT render / publish / deploy — flag it. Wrong-garment imagery is the #1 recurring defect (lh-005 fanny-pack hallucination, never-made renders leaking onto cards).
 
 > Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
 
