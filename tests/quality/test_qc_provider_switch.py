@@ -44,7 +44,9 @@ def test_anthropic_provider_uses_claude_judge(monkeypatch):
     assert "req" in calls
 
 
-def test_anthropic_judge_error_fails_open(monkeypatch):
+def test_anthropic_judge_error_routes_to_mandatory_review(monkeypatch):
+    """Q-unavail: a judge-infra failure no longer fails OPEN — it routes the render to
+    mandatory human review (needs_review) instead of auto-passing it unjudged."""
     monkeypatch.setattr(config, "QC_JUDGE_PROVIDER", "anthropic")
 
     def boom(req):
@@ -53,5 +55,6 @@ def test_anthropic_judge_error_fails_open(monkeypatch):
     gate = QCGate(use_judge=True, judge_fn=boom)
     monkeypatch.setattr("scripts.oai_render.qc.deterministic_checks", lambda data: [])
     v = gate.check(b"\x89PNG", _exp())
-    assert v.passed is True and v.failure_tags == ("judge_unavailable",)
+    assert v.passed is False and v.needs_review is True
+    assert v.failure_tags == ("judge_unavailable",)
     assert v.judge_cost_usd == 0.0

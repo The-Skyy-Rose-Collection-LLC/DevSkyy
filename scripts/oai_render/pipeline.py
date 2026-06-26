@@ -55,7 +55,7 @@ class SkuPlan:
 @dataclass
 class RenderResult:
     sku: str
-    status: str  # "rendered" | "skipped" | "error"
+    status: str  # "rendered" | "skipped" | "error" | "qc_failed" | "needs_review"
     reason: str = ""
     output_path: Path | None = None
 
@@ -438,6 +438,20 @@ def render_sku(
                 reason=verdict.reason,
                 analysis=verdict.analysis,
             )
+
+        if verdict is not None and verdict.needs_review:
+            # Q-unavail: the QC judge was unavailable, so this render is UNJUDGED.
+            # Never auto-accept it, and never burn paid retries — re-rendering cannot
+            # fix a down judge. Quarantine the bytes for mandatory human sign-off and
+            # stop here.
+            _quarantine(plan, data, attempt + 1, verdict)
+            _emit(
+                "qc_needs_review",
+                attempt=attempt + 1,
+                tags=list(verdict.failure_tags),
+                reason=verdict.reason,
+            )
+            return RenderResult(sku=plan.sku, status="needs_review", reason=verdict.summary)
 
         if verdict is None or verdict.passed:
             return _accept_render(plan, data, attempt + 1, _emit)
