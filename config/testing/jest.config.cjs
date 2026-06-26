@@ -121,6 +121,12 @@ module.exports = {
     '/design-system/skyyrose-storefront/test/',
   ],
 
+  // Exclude compiled output from module resolution to prevent duplicate mocks
+  modulePathIgnorePatterns: [
+    '<rootDir>/dist/',
+    '<rootDir>/build/',
+  ],
+
   // Transform node_modules that use ESM (like three.js)
   transformIgnorePatterns: [
     '/node_modules/(?!(three|three/examples)/)',
