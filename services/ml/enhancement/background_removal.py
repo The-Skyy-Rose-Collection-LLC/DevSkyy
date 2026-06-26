@@ -25,6 +25,7 @@ from typing import Any
 import httpx
 from PIL import Image, ImageColor
 from pydantic import BaseModel
+from security.ssrf_protection import SSRFProtection
 from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from core.errors.production_errors import (
@@ -185,7 +186,12 @@ class BackgroundRemovalService:
 
     def _composite_on_color(self, cutout_bytes: bytes, color: str) -> bytes:
         """Composite an RGBA cutout over a solid color; return flattened PNG bytes."""
-        cutout = Image.open(BytesIO(cutout_bytes)).convert("RGBA")
+        cutout = Image.open(BytesIO(cutout_bytes))
+        # Guard against DoS via oversized images (max 50MP)
+        max_pixels = 50_000_000
+        if cutout.width * cutout.height > max_pixels:
+            raise ValueError(f"Image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels")
+        cutout = cutout.convert("RGBA")
         rgb = ImageColor.getrgb(color)
         background = Image.new("RGBA", cutout.size, (rgb[0], rgb[1], rgb[2], 255))
         flattened = Image.alpha_composite(background, cutout).convert("RGB")
@@ -195,8 +201,17 @@ class BackgroundRemovalService:
 
     def _composite_on_image(self, cutout_bytes: bytes, background_bytes: bytes) -> bytes:
         """Composite an RGBA cutout over a background image; return flattened PNG bytes."""
-        cutout = Image.open(BytesIO(cutout_bytes)).convert("RGBA")
-        background = Image.open(BytesIO(background_bytes)).convert("RGBA").resize(cutout.size)
+        max_pixels = 50_000_000
+        cutout = Image.open(BytesIO(cutout_bytes))
+        if cutout.width * cutout.height > max_pixels:
+            raise ValueError(f"Cutout image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels")
+        cutout = cutout.convert("RGBA")
+
+        background = Image.open(BytesIO(background_bytes))
+        if background.width * background.height > max_pixels:
+            raise ValueError(f"Background image too large: {background.width}x{background.height} exceeds {max_pixels} pixels")
+        background = background.convert("RGBA").resize(cutout.size)
+
         flattened = Image.alpha_composite(background, cutout).convert("RGB")
         out = BytesIO()
         flattened.save(out, format="PNG")
@@ -305,29 +320,51 @@ class BackgroundRemovalService:
         # external storage), so result_url always points at the actual output and
         # background_value is never misleading.
         background_value: str | None = None
-        if background_type == BackgroundType.SOLID_COLOR:
-            color = background_color or "#FFFFFF"
-            cutout_bytes = await self._download_image_bytes(result_url, correlation_id)
-            result_url = self._to_png_data_url(self._composite_on_color(cutout_bytes, color))
-            background_value = color
-        elif background_type == BackgroundType.CUSTOM_IMAGE:
-            if not background_image_url:
-                raise BackgroundRemovalError(
-                    "BackgroundType.CUSTOM_IMAGE requires background_image_url",
-                    image_url=image_url,
-                    correlation_id=correlation_id,
-                )
-            cutout_bytes = await self._download_image_bytes(result_url, correlation_id)
-            bg_bytes = await self._download_image_bytes(background_image_url, correlation_id)
-            result_url = self._to_png_data_url(self._composite_on_image(cutout_bytes, bg_bytes))
-            background_value = background_image_url
+        try:
+            if background_type == BackgroundType.SOLID_COLOR:
+                color = background_color or "#FFFFFF"
+                cutout_bytes = await self._download_image_bytes(result_url, correlation_id)
+                result_url = self._to_png_data_url(self._composite_on_color(cutout_bytes, color))
+                background_value = color
+            elif background_type == BackgroundType.CUSTOM_IMAGE:
+                if not background_image_url:
+                    raise BackgroundRemovalError(
+                        "BackgroundType.CUSTOM_IMAGE requires background_image_url",
+                        image_url=image_url,
+                        correlation_id=correlation_id,
+                    )
+                # SSRF protection: validate URL before download
+                ssrf = SSRFProtection()
+                try:
+                    ssrf.validate_url(background_image_url)
+                except Exception as e:
+                    raise BackgroundRemovalError(
+                        f"Invalid background_image_url: {e}",
+                        image_url=image_url,
+                        correlation_id=correlation_id,
+                    ) from e
+                cutout_bytes = await self._download_image_bytes(result_url, correlation_id)
+                bg_bytes = await self._download_image_bytes(background_image_url, correlation_id)
+                result_url = self._to_png_data_url(self._composite_on_image(cutout_bytes, bg_bytes))
+                background_value = background_image_url
+        except BackgroundRemovalError:
+            raise
+        except (OSError, ValueError) as e:
+            raise BackgroundRemovalError(
+                f"Failed to composite background: {e}",
+                image_url=image_url,
+                correlation_id=correlation_id,
+                cause=e,
+            ) from e
 
         processing_time_ms = int((time.time() - start_time) * 1000)
+        result_is_inline = result_url.startswith("data:")
 
         logger.info(
             "Background removal complete",
             extra={
-                "result_url": result_url,
+                "result_url": "<inline-png-data-url>" if result_is_inline else result_url,
+                "result_url_inline": result_is_inline,
                 "model_used": model_used,
                 "processing_time_ms": processing_time_ms,
                 "correlation_id": correlation_id,
