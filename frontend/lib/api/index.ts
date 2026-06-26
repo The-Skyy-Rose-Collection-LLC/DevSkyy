@@ -11,6 +11,7 @@ import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
 import { socialMedia } from './endpoints/social-media';
 import { training } from './endpoints/training';
+import { catalog } from './endpoints/catalog';
 import * as settings from './endpoints/settings';
 import * as tasks from './endpoints/tasks';
 
@@ -31,6 +32,7 @@ export const api = {
     health,
     socialMedia,
     training,
+    catalog,
     settings,
     tasks,
 };

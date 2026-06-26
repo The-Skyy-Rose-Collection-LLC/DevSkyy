@@ -167,6 +167,31 @@ export const BatchJobSchema = z.object({
 });
 
 
+// Catalog Schemas
+export const CatalogMatchResponseSchema = z.object({
+    sku: z.string(),
+    name: z.string(),
+    collection: z.string(),
+    score: z.number(),
+    description: z.string().default(''),
+    branding_spec: z.string().default(''),
+});
+
+export const CatalogSearchResponseSchema = z.object({
+    query: z.string(),
+    top_k: z.number(),
+    collection: z.string().nullable(),
+    matches: z.array(CatalogMatchResponseSchema),
+    elapsed_ms: z.number(),
+});
+
+export const CatalogSimilarResponseSchema = z.object({
+    sku: z.string(),
+    top_k: z.number(),
+    matches: z.array(CatalogMatchResponseSchema),
+    elapsed_ms: z.number(),
+});
+
 // Settings Schema
 export const SettingsSchema = z.object({
     wordpress: z.object({

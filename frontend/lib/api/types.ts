@@ -95,3 +95,14 @@ export type HfDatasetsResponse = z.infer<typeof schemas.HfDatasetsResponseSchema
 export type TrainingProgress = z.infer<typeof schemas.TrainingProgressSchema>;
 export type TrainingJobInfo = z.infer<typeof schemas.TrainingJobInfoSchema>;
 export type TrainingJobsList = z.infer<typeof schemas.TrainingJobsListSchema>;
+
+// Catalog types
+export type CatalogMatchResponse = z.infer<typeof schemas.CatalogMatchResponseSchema>;
+export type CatalogSearchResponse = z.infer<typeof schemas.CatalogSearchResponseSchema>;
+export type CatalogSimilarResponse = z.infer<typeof schemas.CatalogSimilarResponseSchema>;
+
+export interface CatalogSearchRequest {
+    q: string;
+    top_k?: number;
+    collection?: string;
+}
