@@ -34,6 +34,7 @@ from api.v1.commerce import router as commerce_router
 from api.v1.competitors import router as competitors_router
 from api.v1.descriptions import router as descriptions_router
 from api.v1.hf_spaces import hf_spaces_router
+from api.v1.lora import lora_router
 from api.v1.marketing import router as marketing_router
 from api.v1.media import router as media_router
 from api.v1.ml import router as ml_router
@@ -66,6 +67,7 @@ __all__ = [
     "social_media_router",
     "wordpress_agent_router",
     "wordpress_theme_router",
+    "lora_router",
     "training_router",
     "sync_router",
     "claude_sdk_router",

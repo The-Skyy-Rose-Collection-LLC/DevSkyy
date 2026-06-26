@@ -264,6 +264,7 @@ from api.v1 import (
     code_router,
     commerce_router,
     hf_spaces_router,
+    lora_router,
     marketing_router,
     media_router,
     ml_router,
@@ -286,6 +287,7 @@ app.include_router(autonomous_router, prefix="/api/v1")
 app.include_router(monitoring_router, prefix="/api/v1")
 app.include_router(orchestration_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")
+app.include_router(lora_router, prefix="/api/v1")
 app.include_router(training_router, prefix="/api/v1")
 app.include_router(wordpress_agent_router, prefix="/api/v1")
 app.include_router(wordpress_theme_router, prefix="/api/v1")
