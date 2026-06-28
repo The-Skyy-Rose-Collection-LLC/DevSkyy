@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.6.5' );
+define( 'SKYYROSE_VERSION', '1.6.6' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -79,6 +79,7 @@ $skyyrose_core_includes = array(
 	'/inc/collection-sot-reader.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
+	'/inc/v7-cards.php',
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',

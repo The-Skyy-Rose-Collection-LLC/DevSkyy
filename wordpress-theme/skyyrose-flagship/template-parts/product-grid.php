@@ -300,7 +300,11 @@ if ( $first_slug ) {
 						'index'      => $index,
 					);
 				}
-				get_template_part( 'template-parts/product-card-holo', null, $card_args );
+				$skyyrose_card_type = apply_filters( 'skyyrose_product_card_type', 'holo' );
+				if ( ! in_array( $skyyrose_card_type, array( 'holo', 'v7-lookbook' ), true ) ) {
+					$skyyrose_card_type = 'holo';
+				}
+				get_template_part( 'template-parts/product-card-' . $skyyrose_card_type, null, $card_args );
 				++$index;
 			endforeach;
 			?>
