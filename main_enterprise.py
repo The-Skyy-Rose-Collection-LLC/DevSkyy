@@ -323,6 +323,16 @@ from api.v1.wordpress_integration import router as wordpress_router
 
 app.include_router(wordpress_router, prefix="/api/v1")
 
+# Feature flags
+from api.v1.feature_flags import router as feature_flags_router
+
+app.include_router(feature_flags_router)  # router already carries full /api/v1/flags prefix
+
+# WordPress content (sync/status) — no path collision with wordpress_integration routes
+from api.v1.wordpress import router as wordpress_content_router
+
+app.include_router(wordpress_content_router, prefix="/api/v1")
+
 # Analytics & pipeline
 from api.v1 import (
     approval_router,
