@@ -8,8 +8,8 @@ This module provides endpoints for:
 Version: 1.0.0
 """
 
+import asyncio
 import logging
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -18,6 +18,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from security.code_analysis import CodeSecurityAnalyzer, SecurityFinding
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 # Configure logging
@@ -125,6 +126,64 @@ class CodeFixResponse(BaseModel):
 
 
 # =============================================================================
+# SAST helpers
+# =============================================================================
+
+# Resolve to repo root: api/v1/code.py → api/v1 → api → DevSkyy
+PROJECT_ROOT: Path = Path(__file__).resolve().parents[2]
+
+# Mirror analyze_directory's default exclusion list so file counts are consistent
+_EXCLUDE_PATTERNS: list[str] = ["__pycache__", ".git", "node_modules", "venv", ".venv", "env"]
+
+
+def _do_scan(resolved: Path) -> tuple[list[SecurityFinding], int]:
+    """Run synchronous SAST analysis and return (findings, files_scanned).
+
+    Intended to be called via asyncio.to_thread to avoid blocking the event loop;
+    CodeSecurityAnalyzer.analyze_directory/analyze_file are CPU-bound filesystem walks.
+
+    A fresh CodeSecurityAnalyzer is created per call because the analyzer stores
+    mutable state (self.findings) that would race under concurrent requests if shared.
+    """
+    analyzer = CodeSecurityAnalyzer()
+    if resolved.is_file():
+        findings = analyzer.analyze_file(resolved)
+        files_scanned = 1 if resolved.suffix == ".py" else 0
+    else:
+        findings = analyzer.analyze_directory(resolved)
+        files_scanned = sum(
+            1 for f in resolved.rglob("*.py") if not any(pat in str(f) for pat in _EXCLUDE_PATTERNS)
+        )
+    return findings, files_scanned
+
+
+def _finding_to_issue(finding: SecurityFinding) -> ScanIssue:
+    """Map a SecurityFinding to a ScanIssue for the API response."""
+    return ScanIssue(
+        file=finding.file_path,
+        line=finding.line_number,
+        column=None,
+        # SecuritySeverity is a StrEnum; .value yields "critical"/"high"/"medium"/"low"/"info"
+        severity=finding.severity.value,
+        type="security",
+        message=finding.title if finding.title else finding.description,
+        rule=finding.cwe_id if finding.cwe_id else finding.id,
+        suggestion=finding.recommendation if finding.recommendation else None,
+    )
+
+
+def _build_summary(findings: list[SecurityFinding]) -> dict[str, Any]:
+    """Build severity count summary from real findings (not hardcoded)."""
+    counts: dict[str, int] = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
+    for f in findings:
+        key = f.severity.value
+        if key in counts:
+            counts[key] += 1
+    counts["security_issues"] = len(findings)
+    return counts
+
+
+# =============================================================================
 # Endpoints
 # =============================================================================
 
@@ -153,63 +212,41 @@ async def scan_code(
         CodeScanResponse with detailed scan results
 
     Raises:
-        HTTPException: If path doesn't exist or scan fails
+        HTTPException: If path is outside project root (400), not found (404), or scan fails (500)
     """
     scan_id = str(uuid4())
     logger.info(f"Starting code scan {scan_id} for user {user.sub} at path: {request.path}")
 
     try:
-        # Validate path
-        scan_path = Path(request.path)
-        if not scan_path.exists():
+        # Resolve path and enforce containment within PROJECT_ROOT (path-injection guard).
+        # request.path is user-controlled; reject anything that escapes the repo.
+        resolved = Path(request.path).resolve()
+        if not resolved.is_relative_to(PROJECT_ROOT):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Path is outside the project root: {request.path}",
+            )
+
+        if not resolved.exists():
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Path not found: {request.path}",
             )
 
-        # TODO: Integrate with security/code_scanner.py or security/vulnerability_scanner.py
-        # For now, return mock data demonstrating the structure
+        # Delegate synchronous SAST analysis to a thread to avoid blocking the event loop.
+        # _do_scan is a pure CPU/IO function with no async calls inside.
+        findings, files_scanned = await asyncio.to_thread(_do_scan, resolved)
 
-        issues = [
-            ScanIssue(
-                file="example.py",
-                line=42,
-                column=10,
-                severity="high",
-                type="security",
-                message="Potential SQL injection vulnerability",
-                rule="S100",
-                suggestion="Use parameterized queries instead of string concatenation",
-            ),
-            ScanIssue(
-                file="example.py",
-                line=105,
-                column=5,
-                severity="medium",
-                type="quality",
-                message="Function too complex (cyclomatic complexity: 15)",
-                rule="C901",
-                suggestion="Refactor into smaller functions",
-            ),
-        ]
-
-        summary = {
-            "critical": 0,
-            "high": 1,
-            "medium": 1,
-            "low": 0,
-            "info": 0,
-            "security_issues": 1,
-            "quality_issues": 1,
-            "performance_issues": 0,
-        }
+        # Map SecurityFinding → ScanIssue and derive summary from real findings
+        issues = [_finding_to_issue(f) for f in findings]
+        summary = _build_summary(findings)
 
         return CodeScanResponse(
             scan_id=scan_id,
             status="completed",
             timestamp=datetime.now(UTC).isoformat(),
             path=request.path,
-            files_scanned=10,
+            files_scanned=files_scanned,
             issues_found=len(issues),
             issues=issues,
             summary=summary,
@@ -229,26 +266,21 @@ async def scan_code(
 async def fix_code(
     request: CodeFixRequest, user: TokenPayload = Depends(get_current_user)
 ) -> CodeFixResponse:
-    """Automatically fix code issues detected by scanner.
+    """Automated code fixing — NOT IMPLEMENTED (returns HTTP 501).
 
-    The Fixer provides automated code remediation:
-    - Syntax error correction
-    - Import optimization and organization
-    - Missing docstring generation
-    - Type hint inference
-    - Security vulnerability patching
-    - Code formatting (Black, Prettier)
-    - Performance optimizations
+    No backend maps a scan finding to a verified fix: code/scan reports security
+    issues (SQL injection, XSS, secrets) which are not auto-fixable, and the only
+    healer available (SelfHealingEngine) merely re-formats with black/isort/ruff
+    and cannot address them. Rather than fabricate CodeFix results, this endpoint
+    honestly returns 501. Apply fixes manually or run the formatters directly.
 
     Args:
         request: Fix configuration (scan_id or scan_results, auto_apply, etc.)
         user: Authenticated user (from JWT token)
 
-    Returns:
-        CodeFixResponse with summary of fixes applied
-
     Raises:
-        HTTPException: If scan_id not found or fix fails
+        HTTPException: 400 if neither scan_id nor scan_results is provided;
+            501 (Not Implemented) otherwise.
     """
     fix_id = str(uuid4())
     logger.info(f"Starting code fix {fix_id} for user {user.sub}")
@@ -261,40 +293,21 @@ async def fix_code(
                 detail="Either scan_id or scan_results must be provided",
             )
 
-        # TODO: Integrate with actual code fixing logic
-        # For now, return mock data demonstrating the structure
-
-        fixes = [
-            CodeFix(
-                file="example.py",
-                line=42,
-                fix_type="security",
-                original='query = "SELECT * FROM users WHERE id = " + user_id',
-                fixed='query = "SELECT * FROM users WHERE id = %s"\ncursor.execute(query, (user_id,))',
-                applied=request.auto_apply,
+        # No code-fixing backend maps a scan finding to a verified fix.
+        # SelfHealingEngine.heal() only auto-formats (black/isort/ruff) Python
+        # files explicitly flagged auto_fixable with a fix_action; it cannot
+        # remediate the security findings code/scan reports (FIX_SECURITY is
+        # unimplemented at coding_doctor_agent.py:453), and CodeFixRequest has
+        # no adapter from scan_results to its CodeIssue input. Returning
+        # fabricated fixes would be worse than honest — surface 501.
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail=(
+                "Automated code fixing is not implemented. No backend maps scan "
+                "findings to verified fixes: security findings are not auto-fixable, "
+                "and the available format/import healer does not address them. Apply "
+                "fixes manually or run formatters (ruff --fix, isort, black)."
             ),
-            CodeFix(
-                file="example.py",
-                line=10,
-                fix_type="imports",
-                original="import os, sys, json",
-                fixed="import json\nimport os\nimport sys",
-                applied=request.auto_apply,
-            ),
-        ]
-
-        backup_path = None
-        if request.create_backup and request.auto_apply:
-            backup_path = str(Path(tempfile.gettempdir()) / f"backup_{fix_id}")
-
-        return CodeFixResponse(
-            fix_id=fix_id,
-            status="completed" if request.auto_apply else "suggestions_generated",
-            timestamp=datetime.now(UTC).isoformat(),
-            fixes_generated=len(fixes),
-            fixes_applied=len(fixes) if request.auto_apply else 0,
-            fixes=fixes,
-            backup_path=backup_path,
         )
 
     except HTTPException:

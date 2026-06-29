@@ -819,7 +819,7 @@ async def get_wordpress_overview():
                 site_url="https://skyyrose.com",
             )
 
-        async with WordPressWooCommerceClient() as client:
+        async with WordPressWooCommerceClient.from_env() as client:
             # Get products summary
             products = await client.get_products(per_page=100)
             published = sum(1 for p in products if p.get("status") == "publish")
@@ -879,7 +879,7 @@ async def get_wordpress_products(limit: int = 20, status: str | None = None):
         if not wc_key or not wc_secret:
             return {"error": "WooCommerce not configured", "products": []}
 
-        async with WordPressWooCommerceClient() as client:
+        async with WordPressWooCommerceClient.from_env() as client:
             products = await client.get_products(per_page=limit, status=status)
             return {
                 "total": len(products),
@@ -914,7 +914,7 @@ async def get_wordpress_orders(limit: int = 20, status: str | None = None):
         if not wc_key or not wc_secret:
             return {"error": "WooCommerce not configured", "orders": []}
 
-        async with WordPressWooCommerceClient() as client:
+        async with WordPressWooCommerceClient.from_env() as client:
             orders = await client.get_orders(per_page=limit, status=status)
             return {
                 "total": len(orders),
