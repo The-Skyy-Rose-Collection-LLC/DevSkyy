@@ -49,7 +49,9 @@ def extract_alpha(
         input_bytes = f.read()
     # Hash the bytes we already have in memory so we don't re-read the
     # source image to compute the cache key.
-    input_hash = hashlib.sha256(input_bytes).hexdigest()[:16]
+    # SKU is mixed into the key so two garments sharing an identical base
+    # studio photo can't collide on a cached matte (wrong silhouette).
+    input_hash = hashlib.sha256(sku.encode() + input_bytes).hexdigest()[:16]
     # Try local rembg first (cheaper, no network). If it raises ImportError
     # — common on Python 3.14 where numba/numpy 2.x is still settling — fall
     # through to FAL's hosted BRIA endpoint. Other exceptions still surface

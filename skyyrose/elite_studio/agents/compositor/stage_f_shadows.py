@@ -7,6 +7,8 @@ gaussian blur. GPSDiffusion can be hooked in later by replacing this body.
 from __future__ import annotations
 
 import logging
+import os
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageFilter
@@ -14,10 +16,20 @@ from PIL import Image, ImageFilter
 logger = logging.getLogger(__name__)
 
 
+class ShadowStageError(RuntimeError):
+    """Raised when the PIL shadow pass fails.
+
+    The caller must NOT score the result as a shadowed render — silently
+    forwarding the un-shadowed composite (the old behavior) labeled it as a
+    shadow path and let the QA gate score the wrong image.
+    """
+
+
 def generate_shadows(
     composite_path: str,
     sku: str,
     output_dir: str,
+    scene_name: str = "",
 ) -> str:
     """Add a soft contact shadow to anchor the subject in the scene.
 
@@ -32,7 +44,12 @@ def generate_shadows(
         output_dir: Directory where the shadow image is written.
 
     Returns:
-        Path to the shadow-composited image, or ``composite_path`` on any failure.
+        Path to the shadow-composited image, or ``composite_path`` unchanged
+        when the subject fills the frame (no ground plane to anchor).
+
+    Raises:
+        ShadowStageError: on any PIL/IO failure — fail-closed, never silently
+            returns an un-shadowed image labeled as a shadow path.
     """
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -80,9 +97,17 @@ def generate_shadows(
             black.alpha_composite(shadow_rgba)
             final = Image.alpha_composite(black, composite)
 
-        dest = out / f"{sku}-shadow.png"
-        final.save(dest, format="PNG")
+        dest = out / (f"{sku}-{scene_name}-shadow.png" if scene_name else f"{sku}-shadow.png")
+        # Atomic write: render to a temp file then os.replace, so a crash
+        # mid-write can't leave a truncated PNG the QA gate reads as garbage.
+        fd, tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
+        try:
+            os.close(fd)
+            final.save(tmp, format="PNG")
+            os.replace(tmp, dest)
+        except Exception:
+            Path(tmp).unlink(missing_ok=True)
+            raise
         return str(dest)
     except Exception as exc:
-        logger.warning("Shadow stage failed for %s, using composite as-is: %s", sku, exc)
-        return composite_path
+        raise ShadowStageError(f"Shadow stage failed for {sku}: {exc}") from exc

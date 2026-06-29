@@ -21,6 +21,15 @@ from .infra import _cache_dir, _file_hash
 logger = logging.getLogger(__name__)
 
 
+class RelightStageError(RuntimeError):
+    """Raised when every IC-Light provider fails.
+
+    Returning the unrelit alpha here (the old behavior) let an unrelit
+    composite pass QC silently — the documented "QA will be stricter"
+    promise was never wired. Fail closed; the caller decides hold/skip/abort.
+    """
+
+
 def relight_subject(
     alpha_path: str,
     scene_path: str,
@@ -30,10 +39,9 @@ def relight_subject(
 ) -> str:
     """Match subject lighting to scene via IC-Light.
 
-    Tries Replicate IC-Light first, then a local libcom path, then falls back
-    to the alpha image unchanged so the pipeline never blocks on a single
-    missing provider. The fallback is logged in the audit so downstream QA can
-    be stricter.
+    Tries Replicate IC-Light first, then a local libcom path. If every provider
+    fails, raises RelightStageError — it never returns the unrelit alpha
+    unchanged, which would silently poison downstream QC.
 
     Args:
         alpha_path: Path to the Stage A alpha matte.
@@ -43,7 +51,11 @@ def relight_subject(
         output_dir: Directory where the relit image is written.
 
     Returns:
-        Path to the relit image, or ``alpha_path`` on full fallback.
+        Path to the relit image.
+
+    Raises:
+        RelightStageError: if every provider fails — never returns the unrelit
+            alpha (which would silently poison downstream QC).
     """
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -87,9 +99,11 @@ def relight_subject(
     except Exception as exc:
         logger.warning("IC-Light local fallback failed for %s: %s", sku, exc)
 
-    # Final fallback — pass alpha through unchanged. QA gate will weigh
-    # this against the scene to decide pass/warn/fail.
-    return alpha_path
+    # Both providers failed — fail closed (see RelightStageError).
+    raise RelightStageError(
+        f"relight_subject: all providers failed for SKU {sku!r} "
+        "(Replicate IC-Light + local libcom both unavailable)"
+    )
 
 
 def _run_iclight_replicate(
