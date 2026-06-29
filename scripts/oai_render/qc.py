@@ -155,6 +155,21 @@ class QCVerdict:
 
 
 @dataclass(frozen=True)
+class _CentroidSignal:
+    """Brand-centroid result normalized to safe types before it reaches the gate.
+
+    Coercion happens inside ``_centroid_signal``'s try/except so a malformed verdict
+    (e.g. a non-numeric score from a future centroid backend) degrades to None instead
+    of raising into the QC decision path — the "centroid never breaks the gate" invariant.
+    """
+
+    accepted: bool
+    score: float
+    threshold: float
+    reason: str = ""
+
+
+@dataclass(frozen=True)
 class RenderExpectation:
     """What the QC gate should hold this render to (derived from the SkuPlan)."""
 
@@ -442,21 +457,35 @@ class QCGate:
             base = self._judge(data, exp)
         return self._fuse_centroid(base, centroid)
 
-    def _centroid_signal(self, data: bytes):
-        """Brand-style centroid verdict (GateVerdict-like) or None when off/unavailable.
+    def _centroid_signal(self, data: bytes) -> _CentroidSignal | None:
+        """Normalized brand-centroid signal, or None when off/unavailable/malformed.
 
-        Never raises: a missing centroid file, decode failure, or model error degrades to
-        None so the QC gate is unaffected by the advisory signal's availability.
+        Never raises: a missing centroid file, decode failure, model error, or a verdict
+        with unexpected field types all degrade to None so the QC gate is unaffected by
+        the advisory signal's availability or shape.
         """
         if self._centroid_mode == "off":
             return None
         if self._centroid_fn is not None:
             try:
-                return self._centroid_fn(data)
+                raw = self._centroid_fn(data)
             except Exception as exc:  # advisory signal must never break the gate
                 log.warning("centroid_fn failed: %s: %s", type(exc).__name__, exc)
                 return None
-        return self._real_centroid_gate(data)
+        else:
+            raw = self._real_centroid_gate(data)
+        if raw is None:
+            return None
+        try:
+            return _CentroidSignal(
+                accepted=bool(raw.accepted),
+                score=float(raw.score),
+                threshold=float(raw.threshold),
+                reason=str(getattr(raw, "reason", "")),
+            )
+        except Exception as exc:  # a malformed verdict must not break the gate either
+            log.warning("malformed centroid verdict: %s: %s", type(exc).__name__, exc)
+            return None
 
     def _real_centroid_gate(self, data: bytes):
         """Load the brand centroid and score the render. Lazy imports keep qc.py torch-free."""
@@ -478,8 +507,11 @@ class QCGate:
             log.warning("centroid gate unavailable: %s: %s", type(exc).__name__, exc)
             return None
 
-    def _fuse_centroid(self, verdict: QCVerdict, centroid) -> QCVerdict:
-        """Attach the centroid signal. Advisory: record only. Hard: AND it into ``passed``."""
+    def _fuse_centroid(self, verdict: QCVerdict, centroid: _CentroidSignal | None) -> QCVerdict:
+        """Attach the centroid signal. Advisory: record only. Hard: AND it into ``passed``.
+
+        ``centroid`` is already normalized (safe float/bool fields), so nothing here raises.
+        """
         if centroid is None:
             return verdict
         passed = verdict.passed
@@ -495,9 +527,9 @@ class QCGate:
             passed=passed,
             failure_tags=tags,
             reason=reason,
-            centroid_score=float(centroid.score),
-            centroid_threshold=float(centroid.threshold),
-            on_brand=bool(centroid.accepted),
+            centroid_score=centroid.score,
+            centroid_threshold=centroid.threshold,
+            on_brand=centroid.accepted,
         )
 
     def _judge(self, data: bytes, exp: RenderExpectation) -> QCVerdict:

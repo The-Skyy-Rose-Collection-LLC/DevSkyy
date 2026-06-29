@@ -119,6 +119,33 @@ def test_off_mode_default_no_centroid_and_not_called(monkeypatch):
     assert cfn.seen["called"] is False
 
 
+def test_malformed_centroid_verdict_degrades_to_none(monkeypatch):
+    # A centroid backend returning a bad-typed verdict must NOT raise into the gate:
+    # the signal is dropped (fields None) and the judge decision stands.
+    def bad(data):
+        return SimpleNamespace(accepted="yes", score="not-a-number", threshold=0.7, reason="x")
+
+    monkeypatch.setattr(config, "QC_JUDGE_PROVIDER", "anthropic")
+    monkeypatch.setattr("scripts.oai_render.qc.deterministic_checks", lambda data: [])
+    gate = QCGate(use_judge=True, judge_fn=_judge_pass, centroid_fn=bad, centroid_mode="advisory")
+    v = gate.check(b"\x89PNG", _exp())
+    assert v.passed is True
+    assert v.centroid_score is None and v.on_brand is None
+
+
+def test_centroid_fn_exception_degrades_to_none(monkeypatch):
+    # A centroid_fn that raises must be swallowed (advisory signal never breaks the gate).
+    def boom(data):
+        raise RuntimeError("centroid backend down")
+
+    monkeypatch.setattr(config, "QC_JUDGE_PROVIDER", "anthropic")
+    monkeypatch.setattr("scripts.oai_render.qc.deterministic_checks", lambda data: [])
+    gate = QCGate(use_judge=True, judge_fn=_judge_pass, centroid_fn=boom, centroid_mode="hard")
+    v = gate.check(b"\x89PNG", _exp())
+    assert v.passed is True  # judge passed; down centroid does not reject even in hard mode
+    assert v.centroid_score is None and v.on_brand is None
+
+
 def test_centroid_skipped_on_deterministic_reject(monkeypatch):
     # A corrupt image fails deterministic checks -> centroid never runs.
     monkeypatch.setattr(config, "QC_JUDGE_PROVIDER", "anthropic")
