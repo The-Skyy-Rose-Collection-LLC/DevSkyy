@@ -183,6 +183,7 @@ class CopyAdapter:
         self,
         regenerate_fn: Callable[[CopyBrief, dict], Awaitable[str]] | None = None,
         review_state_path: Path | None = None,
+        mode: str = "soft_signal",
     ) -> None:
         self._regenerate_fn = regenerate_fn
         self._review_state = (
@@ -190,6 +191,7 @@ class CopyAdapter:
             if review_state_path
             else (Path(__file__).parent / "copy-review-state.json")
         )
+        self._mode = mode
 
     def deterministic_checks(self, subject: str, ref: CopyBrief) -> list[str]:
         text = subject or ""
@@ -242,6 +244,7 @@ class CopyAdapter:
             failure_tags=all_tags,
             reason=str(judge_output.get("reason", ""))[:300],
             detail={"brand_analysis": judge_output.get("brand_analysis", "")},
+            mode=self._mode,
         )
 
     async def revise(self, ref: CopyBrief, critique: dict) -> str:

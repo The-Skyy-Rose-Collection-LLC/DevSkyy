@@ -37,7 +37,7 @@ class _Adapter:
         return "revised"
 
 
-def _v(passed, cost=0.01):
+def _v(passed, cost=0.01, mode="hard_gate"):
     return Verdict(
         domain="test",
         passed=passed,
@@ -46,6 +46,7 @@ def _v(passed, cost=0.01):
         failure_tags=() if passed else ("x",),
         reason="",
         cost_usd=cost,
+        mode=mode,
     )
 
 
