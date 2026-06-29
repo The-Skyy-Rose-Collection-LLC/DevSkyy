@@ -315,6 +315,67 @@ def test_render_sku_no_gate_accepts_first_render(_tmp_output):
     assert result.output_path is not None and result.output_path.exists()
 
 
+# ── Q-unavail: judge-infra failure → mandatory human review, never auto-ship ──
+
+
+class _UnavailableGate:
+    """QC gate double reporting the judge was unavailable (Q-unavail)."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def check(self, data: bytes, exp) -> qc.QCVerdict:
+        self.calls += 1
+        return qc.QCVerdict(
+            passed=False,
+            needs_review=True,
+            failure_tags=("judge_unavailable",),
+            reason="judge error: TimeoutError: backend down",
+        )
+
+
+def test_qc_check_judge_unavailable_routes_to_review(monkeypatch):
+    """A judge exception during check() must yield a needs_review verdict (NOT pass)."""
+    monkeypatch.setattr(config, "QC_ENABLED", True)
+
+    def _boom(_req):
+        raise TimeoutError("judge backend down")
+
+    gate = qc.QCGate(judge_fn=_boom)
+    exp = qc.RenderExpectation(
+        sku="br-001",
+        name="Black Rose Crewneck",
+        style="ghost",
+        view="front",
+        is_pair=False,
+        is_patch=False,
+    )
+    verdict = gate.check(_png_bytes(_noise_render()), exp)
+    assert verdict.needs_review is True
+    assert verdict.passed is False
+    assert "judge_unavailable" in verdict.failure_tags
+
+
+def test_render_sku_needs_review_quarantines_without_retry(_tmp_output):
+    """judge_unavailable: quarantine for human sign-off, no paid retry, never shipped."""
+    client = _FakeClient(b"png-bytes")
+    gate = _UnavailableGate()
+    result = render_sku(_plan(), client, gate=gate, spend=SpendTracker())
+
+    assert result.status == "needs_review"
+    assert client.calls == 1  # judge being down can't be fixed by re-rendering — no retry
+    assert gate.calls == 1
+
+    qdir = config.REJECTED_DIR / "black-rose-crewneck"
+    pngs = list(qdir.glob("*.png"))
+    assert len(pngs) == 1  # the render bytes are held for mandatory human review
+    meta = json.loads(sorted(qdir.glob("*.json"))[0].read_text())
+    assert meta["failure_tags"] == ["judge_unavailable"]
+
+    # never accepted/shipped to the output tree
+    assert not (config.OUTPUT_DIR / "black-rose-crewneck" / "ghost.png").exists()
+
+
 # ── Founder review corrections (2026-06-09 review board) ────────────────────
 def _write_corrections(tmp_path: Path, monkeypatch, corrections: dict) -> None:
     path = tmp_path / "render-corrections.json"

@@ -142,9 +142,12 @@ class QCVerdict:
     reason: str = ""
     judge_cost_usd: float = 0.0
     analysis: str = ""  # judge's forced visual_analysis — auditable, never gates pass/fail
+    needs_review: bool = False  # Q-unavail: judge infra failed → mandatory human sign-off
 
     @property
     def summary(self) -> str:
+        if self.needs_review:
+            return f"needs_review: {self.reason}"
         return "pass" if self.passed else f"{','.join(self.failure_tags)}: {self.reason}"
 
 
@@ -419,9 +422,9 @@ class QCGate:
         """Judge via an injected callable — the swappable seam (tests + alt backends).
 
         ``judge_fn`` receives a provider-agnostic request dict and returns
-        ``(verdict_dict, cost_usd)``. Any exception fails OPEN (judge_unavailable),
-        identical to a real judge-infrastructure failure — a paid render is never
-        discarded because the judge backend broke.
+        ``(verdict_dict, cost_usd)``. Any exception routes to mandatory review
+        (judge_unavailable), identical to a real judge-infrastructure failure — a
+        paid render is held for human sign-off, never shipped unjudged.
         """
         req = {
             "instructions": _judge_instructions(exp),
@@ -530,13 +533,16 @@ class QCGate:
                 time.sleep(delay)
 
     def _unavailable(self, exp: RenderExpectation, exc: Exception) -> QCVerdict:
-        """Judge infrastructure failure ≠ render failure. Accept (deterministic checks
-        already passed) but tag for human review — never silently swallow the error."""
-        log.error("QC judge call failed for %s: %s — accepting unjudged", exp.sku, exc)
+        """Judge infrastructure failure ≠ render failure — but an unjudged render must
+        NOT ship. Q-unavail: route to mandatory human review (needs_review) instead of
+        auto-accepting. The deterministic checks passed, so the bytes are kept for the
+        reviewer; never silently swallow the error."""
+        log.error("QC judge call failed for %s: %s — routing to mandatory review", exp.sku, exc)
         # Exception strings from SDKs can embed request metadata; the runlog JSONL
         # and monitor surface this reason verbatim, so keep it typed + truncated.
         return QCVerdict(
-            passed=True,
+            passed=False,
+            needs_review=True,
             failure_tags=("judge_unavailable",),
             reason=f"judge error: {type(exc).__name__}: {str(exc)[:120]}",
             judge_cost_usd=0.0,
