@@ -41,6 +41,12 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
 EncoderName = Literal["clip", "dino"]
 
+# Canonical on-disk location of the brand-style centroid (the CLIP variant). The
+# compositor's stage_g + orchestrator recompute this same path locally to avoid an
+# eager (torch-heavy) import of this module; new consumers that already pay the import
+# cost (e.g. the oai_render QC gate) reference this constant instead of forking a copy.
+DEFAULT_CENTROID_PATH = Path(__file__).resolve().parents[1] / "data" / "brand_centroid.npz"
+
 SIDECAR_SCHEMA_VERSION = 1
 
 
