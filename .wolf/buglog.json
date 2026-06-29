@@ -2407,9 +2407,9 @@
   {
     "id": "bug-165",
     "timestamp": "2026-06-28T17:00:00-07:00",
-    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' — CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
+    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' \u2014 CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
     "file": "agents/commerce_agent.py",
-    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() — it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
+    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() \u2014 it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
     "fix": "FIXED 2026-06-28 (founder approved full fix). (1) integrations/wordpress_client.py: added module-level alias `WordPressWooCommerceClient = WordPressClient` + a `WordPressClient.from_env()` classmethod (reads WORDPRESS_URL/WP_SITE_URL + WC_CONSUMER_KEY/WOOCOMMERCE_KEY + WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET; raises ValueError when missing). (2) agents/commerce_agent.py _ensure_wordpress_client: dropped the non-existent `.connect()`, now constructs via `WordPressWooCommerceClient.from_env()` (honors an injected client, degrades gracefully on missing creds keeping _wordpress_connected=False). (3) api/dashboard.py: 3 sites swapped `WordPressWooCommerceClient()` -> `.from_env()`. Verified: import resolves (is WordPressClient True), WORDPRESS_AVAILABLE flipped False->True, from_env graceful-raise on missing creds; black+ruff clean on all 3 files; rtk proxy pytest tests/api/test_commerce_bulk_wire.py + tests/test_core_agents.py = 231 passed (no regression). optimize_price (in main) uses ml_module not _ensure_wordpress_client, so unaffected.",
     "tags": [
       "commerce-agent",
@@ -2423,5 +2423,42 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-28T17:00:00-07:00"
+  },
+  {
+    "id": "bug-166",
+    "timestamp": "2026-06-29",
+    "error_message": "wordpress/theme/deploy leaked the deploy subprocess on timeout (no proc.kill); CancelledError on client-disconnect also leaked it; proc.wait() was unbounded",
+    "file": "api/v1/wordpress_theme.py",
+    "root_cause": "except TimeoutError returned a body without killing/reaping the still-running child; no except for asyncio.CancelledError; reap could hang on a D-state child",
+    "fix": "SIGKILL (proc.kill, guard ProcessLookupError) + bounded proc.wait() via _kill_and_reap helper; added except asyncio.CancelledError to kill+re-raise; proc initialized to None for type-safe guards. Context7-verified asyncio idiom (kill+wait, never a 2nd communicate()).",
+    "tags": [
+      "asyncio",
+      "subprocess",
+      "resource-leak",
+      "fastapi",
+      "tier3"
+    ],
+    "related_bugs": [
+      "bug-165"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29"
+  },
+  {
+    "id": "bug-167",
+    "timestamp": "2026-06-29",
+    "error_message": "MCP tool fix_code called route 'fixer/fix' which 404s (no such mounted path)",
+    "file": "mcp_tools/tools/infrastructure.py",
+    "root_cause": "the endpoint is mounted at /api/v1/code/fix (router prefix 'code'); the MCP tool used 'fixer/fix'",
+    "fix": "changed _make_api_request route 'fixer/fix' -> 'code/fix'",
+    "tags": [
+      "mcp",
+      "routing",
+      "404",
+      "tier3"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29"
   }
 ]

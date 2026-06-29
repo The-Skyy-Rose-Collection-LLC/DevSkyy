@@ -8,8 +8,9 @@ Verifies:
 - Non-existent in-project paths return 404
 """
 
+from contextlib import contextmanager
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
@@ -137,24 +138,143 @@ class TestCodeScanPathSafety:
         assert resp.status_code == 404
 
 
-class TestCodeFixNotImplemented:
-    """/code/fix has no real backend yet — must return an honest 501, never mock fixes.
+def _scan_results(*files: str) -> dict:
+    """Build a scan_results payload referencing the given file paths."""
+    return {"issues": [{"file": f, "line": 1} for f in files]}
 
-    The only real healer (SelfHealingEngine) does not implement FIX_SECURITY and
-    speaks its own CodeIssue type, not the SecurityFinding scan_results this
-    endpoint receives. Until that adapter exists, the endpoint returns 501 rather
-    than fabricating fixes (no-stubs rule).
+
+def _default_heal(issue, dry_run):  # noqa: ANN001 - test stub
+    """Sync side_effect for the heal AsyncMock — returns a real HealingResult."""
+    from agents.coding_doctor_agent import HealingResult
+
+    return HealingResult(
+        action=issue.fix_action,
+        file_path=issue.file_path,
+        success=True,
+        changes_made=[f"applied {issue.fix_action.value}"],
+        error=None,
+    )
+
+
+@contextmanager
+def _patched_engines(heal_side_effect=_default_heal):
+    """Patch BOTH SelfHealingEngine and SelfLearningEngine; yield (heal, learn) mocks.
+
+    No real black/isort/ruff/autoflake runs and no real learnings file is written.
     """
+    with (
+        patch("agents.coding_doctor_agent.SelfHealingEngine") as mock_heal_cls,
+        patch("agents.coding_doctor_agent.SelfLearningEngine") as mock_learn_cls,
+    ):
+        heal = mock_heal_cls.return_value
+        heal.initialize = AsyncMock()
+        heal.heal = AsyncMock(side_effect=heal_side_effect)
 
-    def test_fix_with_scan_results_returns_501(self, client: TestClient) -> None:
-        resp = client.post(
-            "/code/fix",
-            json={"scan_results": {"issues": []}, "auto_apply": False},
+        learn = mock_learn_cls.return_value
+        learn.initialize = AsyncMock()
+        learn.learn = MagicMock()
+        learn.save = AsyncMock()
+        learn.get_stats = MagicMock(
+            return_value={"total_patterns": 1, "categories": {"maintainability": 1}}
         )
-        assert resp.status_code == 501, resp.text
-        assert "not yet implemented" in resp.json()["detail"].lower()
+        yield heal, learn
 
-    def test_fix_without_scan_input_returns_400(self, client: TestClient) -> None:
-        """No scan_id and no scan_results → 400 (input validation precedes 501)."""
-        resp = client.post("/code/fix", json={"auto_apply": False})
+
+class TestCodeFixWire:
+    """POST /code/fix delegates to SelfHealingEngine and records outcomes for learning."""
+
+    _TARGET = str(_PROJECT_ROOT / "security" / "code_analysis.py")
+
+    def test_dry_run_previews_without_learning(self, client: TestClient) -> None:
+        """Default (auto_apply=False) previews via the healer; does NOT record learning."""
+        with _patched_engines() as (heal, learn):
+            resp = client.post(
+                "/code/fix",
+                json={"scan_results": _scan_results(self._TARGET), "fix_types": ["imports"]},
+            )
+
+        assert resp.status_code == 200, resp.text
+        data = resp.json()
+        assert data["dry_run"] is True
+        assert data["status"] == "previewed"
+        assert data["files_processed"] == 1
+        assert data["fixes_applied"] == 1
+        assert len(data["results"]) == 1
+        assert data["results"][0]["action"] == "fix_imports"
+        assert data["results"][0]["success"] is True
+        heal.heal.assert_awaited_once()  # real delegation occurred
+        learn.learn.assert_not_called()  # dry-run previews are not learned from
+        learn.save.assert_not_awaited()
+
+    def test_auto_apply_records_learning(self, client: TestClient) -> None:
+        """auto_apply=True applies in place and records each outcome to the learner."""
+        captured: dict = {}
+
+        def _heal(issue, dry_run):
+            captured["dry_run"] = dry_run
+            return _default_heal(issue, dry_run)
+
+        with _patched_engines(heal_side_effect=_heal) as (heal, learn):
+            resp = client.post(
+                "/code/fix",
+                json={
+                    "scan_results": _scan_results(self._TARGET),
+                    "fix_types": ["format", "imports"],
+                    "auto_apply": True,
+                },
+            )
+
+        assert resp.status_code == 200, resp.text
+        data = resp.json()
+        assert captured["dry_run"] is False  # real (in-place) run
+        assert data["dry_run"] is False
+        assert data["status"] == "completed"
+        assert heal.heal.await_count == 2  # one per (file × action)
+        assert learn.learn.call_count == 2  # every outcome recorded
+        learn.save.assert_awaited_once()  # learnings persisted
+        assert data["learning_stats"]["total_patterns"] == 1
+
+    def test_unsupported_fix_types_reported(self, client: TestClient) -> None:
+        """fix_types with no real healer are reported, never faked; nothing dispatched."""
+        with _patched_engines() as (heal, learn):
+            resp = client.post(
+                "/code/fix",
+                json={
+                    "scan_results": _scan_results(self._TARGET),
+                    "fix_types": ["security", "docstrings"],
+                },
+            )
+
+        assert resp.status_code == 200, resp.text
+        data = resp.json()
+        assert data["status"] == "no_action"
+        assert set(data["unsupported_fix_types"]) == {"security", "docstrings"}
+        assert data["results"] == []
+        heal.heal.assert_not_awaited()
+        learn.learn.assert_not_called()
+
+    def test_path_outside_project_rejected(self, client: TestClient) -> None:
+        """A scan-result file outside the project never reaches the healer."""
+        with _patched_engines() as (heal, learn):
+            resp = client.post(
+                "/code/fix",
+                json={"scan_results": _scan_results("/etc/passwd"), "fix_types": ["imports"]},
+            )
+
+        assert resp.status_code == 200, resp.text
+        data = resp.json()
+        assert data["files_processed"] == 0
+        assert len(data["results"]) == 1
+        assert data["results"][0]["success"] is False
+        assert "path outside" in data["results"][0]["error"]
+        heal.heal.assert_not_awaited()
+
+    def test_requires_scan_results(self, client: TestClient) -> None:
+        """scan_id without scan_results → 400 (no scan store to look it up yet)."""
+        resp = client.post("/code/fix", json={"scan_id": "abc123", "fix_types": ["imports"]})
+        assert resp.status_code == 400
+
+    def test_no_scan_input_returns_400(self, client: TestClient) -> None:
+        """Neither scan_id nor scan_results → 400."""
+        resp = client.post("/code/fix", json={"fix_types": ["imports"]})
         assert resp.status_code == 400

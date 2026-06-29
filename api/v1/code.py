@@ -12,7 +12,7 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -102,27 +102,28 @@ class CodeFixRequest(BaseModel):
     )
 
 
-class CodeFix(BaseModel):
-    """Individual code fix applied."""
+class CodeFixResult(BaseModel):
+    """Outcome of one auto-fix action applied to one file (mirrors HealingResult)."""
 
     file: str
-    line: int
-    fix_type: str
-    original: str
-    fixed: str
-    applied: bool
+    action: str
+    success: bool
+    changes_made: list[str]
+    error: str | None = None
 
 
 class CodeFixResponse(BaseModel):
     """Response model for code fixing."""
 
     fix_id: str
-    status: str
+    status: str  # completed | previewed (dry-run) | no_action
     timestamp: str
-    fixes_generated: int
+    dry_run: bool
+    files_processed: int
     fixes_applied: int
-    fixes: list[CodeFix]
-    backup_path: str | None = None
+    results: list[CodeFixResult]
+    unsupported_fix_types: list[str] = []
+    learning_stats: dict[str, Any] = {}
 
 
 # =============================================================================
@@ -262,50 +263,211 @@ async def scan_code(
         )
 
 
+# Map request fix_types to HealingAction names that have a REAL healer in
+# SelfHealingEngine (black / isort / ruff --fix / autoflake). Types without a
+# real healer (security, docstrings, type_hints, dependency, syntax) are reported
+# as unsupported rather than silently faked.
+_FIX_TYPE_TO_ACTION: dict[str, str] = {
+    "format": "AUTO_FORMAT",
+    "imports": "FIX_IMPORTS",
+    "lint": "FIX_LINT",
+    "unused": "REMOVE_UNUSED",
+}
+
+
+# Persistent self-learning store for code-fix outcomes (success/failure per action).
+_LEARNINGS_PATH = PROJECT_ROOT / "data" / "code_fix_learnings.json"
+
+
+def _apply_heals(
+    repo_root: Path, issues: list[Any], dry_run: bool
+) -> tuple[list[Any], dict[str, Any]]:
+    """Drive SelfHealingEngine over the issues in a worker thread, with learning.
+
+    SelfHealingEngine.heal() shells out to black/isort/ruff/autoflake via blocking
+    subprocess.run; running the batch under its own event loop in a thread keeps
+    the request's event loop responsive. Agent modules are imported lazily — they
+    pull heavy dependencies we do not want at app-import time.
+
+    Self-learning + improving: real (non-dry-run) heal outcomes are recorded in a
+    persistent SelfLearningEngine, so the system's per-action success/failure stats
+    accumulate across calls (the same loop CodingDoctorAgent.diagnose_and_heal uses).
+    Dry-run previews are NOT learned from — a clean check is not a real fix outcome.
+    Returns (healing_results, learning_stats).
+    """
+    from agents.coding_doctor_agent import SelfHealingEngine, SelfLearningEngine
+
+    async def _drive() -> tuple[list[Any], dict[str, Any]]:
+        engine = SelfHealingEngine(repo_root)
+        await engine.initialize()
+        learner = SelfLearningEngine(_LEARNINGS_PATH)
+        await learner.initialize()
+
+        results: list[Any] = []
+        for issue in issues:
+            result = await engine.heal(issue, dry_run=dry_run)
+            results.append(result)
+            if not dry_run:
+                learner.learn(
+                    issue.category,
+                    result.action.value,
+                    "; ".join(result.changes_made) or (result.error or "n/a"),
+                    result.success,
+                )
+        if not dry_run:
+            await learner.save()
+        return results, learner.get_stats()
+
+    return asyncio.run(_drive())
+
+
 @router.post("/fix", response_model=CodeFixResponse, status_code=status.HTTP_200_OK)
 async def fix_code(
     request: CodeFixRequest, user: TokenPayload = Depends(get_current_user)
-) -> NoReturn:
-    """Automatically fix code issues detected by scanner.
+) -> CodeFixResponse:
+    """Auto-fix code by delegating to the SelfHealingEngine.
 
-    The Fixer provides automated code remediation:
-    - Syntax error correction
-    - Import optimization and organization
-    - Missing docstring generation
-    - Type hint inference
-    - Security vulnerability patching
-    - Code formatting (Black, Prettier)
-    - Performance optimizations
+    Real backend: black (format), isort (imports), ruff --fix (lint), autoflake
+    (unused). Requested ``fix_types`` map to those healers; types with no real
+    healer (``security``, ``docstrings``, ``type_hints``, ``dependency``,
+    ``syntax``) are returned in ``unsupported_fix_types`` and never fabricated.
+    Files come from ``scan_results['issues'][*]['file']`` and must resolve inside
+    the project root.
+
+    ``auto_apply=False`` (default) previews via each tool's check mode without
+    modifying files; ``auto_apply=True`` applies fixes in place.
 
     Args:
-        request: Fix configuration (scan_id or scan_results, auto_apply, etc.)
-        user: Authenticated user (from JWT token)
+        request: Fix configuration (scan_results, fix_types, auto_apply).
+        user: Authenticated user (from JWT token).
 
     Returns:
-        CodeFixResponse with summary of fixes applied
+        CodeFixResponse with per-file/per-action healer results.
 
     Raises:
-        HTTPException: If scan_id not found or fix fails
+        HTTPException: 400 if scan_results missing; 500 if the healer is unavailable.
     """
     logger.info("Code fix requested by user %s", user.sub)
 
-    # Input validation precedes the not-implemented signal so a malformed request
-    # gets the most specific error (400) and a well-formed one gets 501.
     if not request.scan_id and not request.scan_results:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Either scan_id or scan_results must be provided",
         )
+    if not request.scan_results:
+        # scan_id-only retrieval needs a scan store, which does not exist yet.
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="scan_results is required (scan_id lookup is not supported yet)",
+        )
 
-    # No automated code-fix backend exists yet. The only real healer
-    # (SelfHealingEngine) implements format/imports/lint/unused but NOT
-    # FIX_SECURITY, and speaks its own CodeIssue type — not the SecurityFinding
-    # scan_results this endpoint receives. Wiring it would silently fail on every
-    # security finding, so return an honest 501 rather than fabricated fixes.
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail=(
-            "Automated code fixing is not yet implemented. "
-            "Use POST /code/scan for security analysis."
-        ),
+    from agents.coding_doctor_agent import (
+        CodeIssue,
+        HealingAction,
+        IssueCategory,
+        SeverityLevel,
+    )
+
+    # Resolve requested fix types to healers that actually exist; report the rest.
+    actions: list[Any] = []
+    unsupported: list[str] = []
+    for fix_type in request.fix_types:
+        action_name = _FIX_TYPE_TO_ACTION.get(fix_type)
+        if action_name is None:
+            unsupported.append(fix_type)
+        else:
+            actions.append(getattr(HealingAction, action_name))
+
+    # Collect unique, path-safe .py files from the scan results.
+    raw_issues = request.scan_results.get("issues", [])
+    if not isinstance(raw_issues, list):
+        raw_issues = []
+    rel_files: list[str] = []
+    invalid: list[CodeFixResult] = []
+    seen: set[str] = set()
+    for item in raw_issues:
+        file_ref = item.get("file") if isinstance(item, dict) else None
+        if not file_ref or file_ref in seen:
+            continue
+        seen.add(file_ref)
+        candidate = Path(file_ref)
+        resolved = (candidate if candidate.is_absolute() else PROJECT_ROOT / candidate).resolve()
+        if (
+            not resolved.is_relative_to(PROJECT_ROOT)
+            or not resolved.exists()
+            or resolved.suffix != ".py"
+        ):
+            invalid.append(
+                CodeFixResult(
+                    file=file_ref,
+                    action="-",
+                    success=False,
+                    changes_made=[],
+                    error="path outside project root, missing, or not a .py file",
+                )
+            )
+            continue
+        rel_files.append(str(resolved.relative_to(PROJECT_ROOT)))
+
+    # One issue per (file, action); auto_fixable=True so heal() dispatches.
+    issues = [
+        CodeIssue(
+            file_path=rel,
+            line_number=None,
+            category=IssueCategory.MAINTAINABILITY,
+            severity=SeverityLevel.LOW,
+            title=f"auto-fix:{action.value}",
+            description=f"Apply {action.value} via SelfHealingEngine",
+            auto_fixable=True,
+            fix_action=action,
+        )
+        for rel in rel_files
+        for action in actions
+    ]
+
+    dry_run = not request.auto_apply
+    healing: list[Any] = []
+    learning_stats: dict[str, Any] = {}
+    try:
+        if issues:
+            healing, learning_stats = await asyncio.to_thread(
+                _apply_heals, PROJECT_ROOT, issues, dry_run
+            )
+    except Exception as exc:  # heavy import or driver failure → backend unavailable
+        logger.error("Code fix backend failed: %s", exc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Code fix backend is unavailable",
+        ) from exc
+
+    results = [
+        CodeFixResult(
+            file=h.file_path,
+            action=h.action.value,
+            success=h.success,
+            changes_made=h.changes_made,
+            error=h.error,
+        )
+        for h in healing
+    ]
+    results.extend(invalid)
+    fixes_applied = sum(1 for r in results if r.success)
+
+    if not actions:
+        run_status = "no_action"
+    elif dry_run:
+        run_status = "previewed"
+    else:
+        run_status = "completed"
+
+    return CodeFixResponse(
+        fix_id=str(uuid4()),
+        status=run_status,
+        timestamp=datetime.now(UTC).isoformat(),
+        dry_run=dry_run,
+        files_processed=len(rel_files),
+        fixes_applied=fixes_applied,
+        results=results,
+        unsupported_fix_types=unsupported,
+        learning_stats=learning_stats,
     )

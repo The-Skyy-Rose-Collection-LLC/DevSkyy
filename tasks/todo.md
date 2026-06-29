@@ -20,8 +20,15 @@ Register: `tasks/wiring-gaps-register.md` (T3-1..T3-4) — but 3 of its 4 specif
       (flag-driven: `--dry-run`/`--with-maintenance`, NOT env). non-prod env→`--dry-run`. PROD-touching at runtime → MOCK subprocess in tests, never run live.
 
 ### Verify (main thread, after agents — never on a subagent's word)
-- [ ] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
-- [ ] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+- [x] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
+- [x] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+
+### Follow-ups — DONE 2026-06-29 (branch `fix/tier3-followups`, off HEAD; adversarially reviewed)
+Triggered by re-verifying the wires (all 4 confirmed REAL delegation), then hardened.
+- [x] **deploy** — SIGKILL + bounded reap on timeout (bug-166, was leaking the child), `except CancelledError` kill+re-raise, `--with-maintenance` flag wired (script gates `wp maintenance-mode activate`). `api/v1/wordpress_theme.py:_kill_and_reap`.
+- [x] **code/fix** — honest 501 first (no fabricated fixes), then FULLY WIRED per founder: delegates to `SelfHealingEngine` (black/isort/ruff/autoflake) via `asyncio.to_thread`; path-guarded files from scan_results; unsupported types reported, never faked; **self-learning embedded** via `SelfLearningEngine` (records real outcomes → `data/code_fix_learnings.json`, `learning_stats` in response). Response model redesigned (`CodeFixResult`/`CodeFixResponse`).
+- [x] **MCP route** — `mcp_tools/tools/infrastructure.py` `"fixer/fix"`→`"code/fix"` (bug-167; was a 404).
+- [x] **coverage** — +15 tests (deploy timeout/cancelled/maintenance, code/fix dry-run/auto-apply-learning/unsupported/path-reject/400s, commerce update/delete, media image). 30/30 wire + 462 tests/api green; ruff+black+mypy clean.
 
 ## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
 
