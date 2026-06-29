@@ -111,6 +111,11 @@ def build_options() -> ClaudeAgentOptions:
     return ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT,
         model="claude-sonnet-4-6",  # pinned for reproducibility; swap to taste
+        # tools=[] removes ALL built-in tools (Bash/Read/Edit/…) from context. A commerce
+        # concierge needs none of them, and shrinking the tool surface to just our 3 MCP
+        # tools keeps the CLI below its tool-search threshold — so tools load eagerly
+        # instead of the model running a ToolSearch round-trip before every catalog call.
+        tools=[],
         mcp_servers={"catalog": catalog_server},
         allowed_tools=[
             "mcp__catalog__lookup_product",
