@@ -12,6 +12,7 @@ import asyncio
 import logging
 import shutil
 import tempfile
+from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -284,6 +285,28 @@ _FIX_TYPE_TO_ACTION: dict[str, str] = {
 # Persistent self-learning store for code-fix outcomes (success/failure per action).
 _LEARNINGS_PATH = PROJECT_ROOT / "data" / "code_fix_learnings.json"
 
+# fix_type that routes to source-level security remediation (SecurityRemediator)
+# rather than a tool healer. Opt-in: absent from the default fix_types.
+_SECURITY_FIX_TYPE = "security"
+
+
+def _resolve_repo_py(file_ref: str) -> Path | None:
+    """Resolve a scan-result file reference to an absolute .py path inside the repo.
+
+    Returns the resolved path only if it stays within PROJECT_ROOT, exists, and is
+    a Python file; otherwise None (path-injection / traversal guard). User-supplied
+    paths from scan_results are never trusted.
+    """
+    candidate = Path(file_ref)
+    resolved = (candidate if candidate.is_absolute() else PROJECT_ROOT / candidate).resolve()
+    if (
+        not resolved.is_relative_to(PROJECT_ROOT)
+        or not resolved.exists()
+        or resolved.suffix != ".py"
+    ):
+        return None
+    return resolved
+
 
 def _apply_heals(
     repo_root: Path, issues: list[Any], dry_run: bool
@@ -327,21 +350,69 @@ def _apply_heals(
     return asyncio.run(_drive())
 
 
+def _apply_security(
+    repo_root: Path, targets_by_file: dict[str, list[Any]], dry_run: bool
+) -> "tuple[list[HealingResult], dict[str, Any]]":
+    """Drive SecurityRemediator over scan-derived security targets, with learning.
+
+    Runs in a worker thread (CPU/IO-bound file edits) and MUST be invoked BEFORE the
+    tool healers: it edits specific lines, so any formatter that reflows the file
+    afterwards would invalidate the scan line numbers it relies on. Real (non-dry-run)
+    outcomes feed the same persistent SelfLearningEngine the tool healers use.
+    Returns (healing_results, learning_stats).
+    """
+    from agents.code_security_remediator import SecurityRemediator
+    from agents.coding_doctor_agent import IssueCategory, SelfLearningEngine
+
+    async def _drive() -> tuple[list[Any], dict[str, Any]]:
+        remediator = SecurityRemediator(repo_root)
+        learner = SelfLearningEngine(_LEARNINGS_PATH)
+        await learner.initialize()
+
+        results: list[Any] = []
+        for rel, targets in targets_by_file.items():
+            file_results = remediator.remediate_file(rel, targets, dry_run=dry_run)
+            results.extend(file_results)
+            if not dry_run:
+                for r in file_results:
+                    learner.learn(
+                        IssueCategory.SECURITY,
+                        r.action.value,
+                        "; ".join(r.changes_made) or (r.error or "n/a"),
+                        r.success,
+                    )
+        if not dry_run:
+            await learner.save()
+        return results, learner.get_stats()
+
+    return asyncio.run(_drive())
+
+
 @router.post("/fix", response_model=CodeFixResponse, status_code=status.HTTP_200_OK)
 async def fix_code(
     request: CodeFixRequest, user: TokenPayload = Depends(get_current_user)
 ) -> CodeFixResponse:
-    """Auto-fix code by delegating to the SelfHealingEngine.
+    """Auto-fix code by delegating to real healers.
 
-    Real backend: black (format), isort (imports), ruff --fix (lint), autoflake
-    (unused). Requested ``fix_types`` map to those healers; types with no real
-    healer (``security``, ``docstrings``, ``type_hints``, ``dependency``,
-    ``syntax``) are returned in ``unsupported_fix_types`` and never fabricated.
-    Files come from ``scan_results['issues'][*]['file']`` and must resolve inside
-    the project root.
+    Two backends, both real:
+      * Tool healers — black (``format``), isort (``imports``), ruff --fix
+        (``lint``), autoflake (``unused``) — operate on whole files.
+      * Security remediation (``security``, opt-in) — SecurityRemediator applies
+        SAFE, line-targeted rewrites for the subset of SAST findings that can be
+        fixed deterministically (CWE-396 bare ``except:``, CWE-489 ``DEBUG=True``).
+        Security findings whose CWE has no safe automated fix (SQL injection,
+        eval/exec, hardcoded secrets, ...) are returned as failed results marked
+        "manual review required" — never silently dropped, never falsely "fixed".
 
-    ``auto_apply=False`` (default) previews via each tool's check mode without
-    modifying files; ``auto_apply=True`` applies fixes in place.
+    ``fix_types`` with no real healer (``docstrings``, ``type_hints``,
+    ``dependency``, ``syntax``) are returned in ``unsupported_fix_types`` and never
+    fabricated. Tool-healer files come from ``scan_results['issues'][*]['file']``;
+    security targets additionally use ``['type'] == 'security'``, ``['rule']`` (CWE)
+    and ``['line']``. All paths must resolve inside the project root.
+
+    ``auto_apply=False`` (default) previews without modifying files; ``auto_apply=True``
+    applies fixes in place and requires ADMIN. When both run, security fixes are
+    applied first (line-preserving) so tool reflows cannot invalidate scan lines.
 
     Args:
         request: Fix configuration (scan_results, fix_types, auto_apply).
@@ -351,7 +422,8 @@ async def fix_code(
         CodeFixResponse with per-file/per-action healer results.
 
     Raises:
-        HTTPException: 400 if scan_results missing; 500 if the healer is unavailable.
+        HTTPException: 400 if scan_results missing; 403 if auto_apply without ADMIN;
+        500 if a healer backend is unavailable.
     """
     logger.info("Code fix requested by user %s", user.sub)
 
@@ -367,6 +439,7 @@ async def fix_code(
             detail="scan_results is required (scan_id lookup is not supported yet)",
         )
 
+    from agents.code_security_remediator import SecurityRemediator, SecurityTarget
     from agents.coding_doctor_agent import (
         CodeIssue,
         HealingAction,
@@ -374,48 +447,90 @@ async def fix_code(
         SeverityLevel,
     )
 
-    # Resolve requested fix types to healers that actually exist; report the rest.
-    actions: list[Any] = []
+    # Split requested fix types: tool healers (black/isort/ruff/autoflake), the
+    # security remediator (opt-in), and everything else (reported, never faked).
+    tool_actions: list[Any] = []
+    security_requested = False
     unsupported: list[str] = []
     for fix_type in request.fix_types:
+        if fix_type == _SECURITY_FIX_TYPE:
+            security_requested = True
+            continue
         action_name = _FIX_TYPE_TO_ACTION.get(fix_type)
         if action_name is None:
             unsupported.append(fix_type)
         else:
-            actions.append(getattr(HealingAction, action_name))
+            tool_actions.append(getattr(HealingAction, action_name))
 
-    # Collect unique, path-safe .py files from the scan results.
     raw_issues = request.scan_results.get("issues", [])
     if not isinstance(raw_issues, list):
         raw_issues = []
+
+    # Tool healers operate on whole files: collect unique, path-safe .py files.
     rel_files: list[str] = []
     invalid: list[CodeFixResult] = []
     seen: set[str] = set()
-    for item in raw_issues:
-        file_ref = item.get("file") if isinstance(item, dict) else None
-        if not file_ref or file_ref in seen:
-            continue
-        seen.add(file_ref)
-        candidate = Path(file_ref)
-        resolved = (candidate if candidate.is_absolute() else PROJECT_ROOT / candidate).resolve()
-        if (
-            not resolved.is_relative_to(PROJECT_ROOT)
-            or not resolved.exists()
-            or resolved.suffix != ".py"
-        ):
-            invalid.append(
-                CodeFixResult(
-                    file=file_ref,
-                    action="-",
-                    success=False,
-                    changes_made=[],
-                    error="path outside project root, missing, or not a .py file",
+    if tool_actions:
+        for item in raw_issues:
+            file_ref = item.get("file") if isinstance(item, dict) else None
+            if not file_ref or file_ref in seen:
+                continue
+            seen.add(file_ref)
+            resolved = _resolve_repo_py(file_ref)
+            if resolved is None:
+                invalid.append(
+                    CodeFixResult(
+                        file=file_ref,
+                        action="-",
+                        success=False,
+                        changes_made=[],
+                        error="path outside project root, missing, or not a .py file",
+                    )
                 )
-            )
-            continue
-        rel_files.append(str(resolved.relative_to(PROJECT_ROOT)))
+                continue
+            rel_files.append(str(resolved.relative_to(PROJECT_ROOT)))
 
-    # One issue per (file, action); auto_fixable=True so heal() dispatches.
+    # Security remediation is line+CWE targeted: build per-file targets from the
+    # security findings, splitting supported CWEs from those needing manual review.
+    security_targets: dict[str, list[SecurityTarget]] = defaultdict(list)
+    security_manual: list[CodeFixResult] = []
+    security_files: set[str] = set()
+    if security_requested:
+        for item in raw_issues:
+            if not isinstance(item, dict) or item.get("type") != "security":
+                continue
+            file_ref = item.get("file")
+            cwe = item.get("rule")
+            line = item.get("line")
+            resolved = _resolve_repo_py(file_ref) if file_ref else None
+            if resolved is None or not isinstance(line, int):
+                security_manual.append(
+                    CodeFixResult(
+                        file=str(file_ref),
+                        action=HealingAction.FIX_SECURITY.value,
+                        success=False,
+                        changes_made=[],
+                        error="invalid path or line; manual review required",
+                    )
+                )
+                continue
+            if not SecurityRemediator.supports(cwe):
+                security_manual.append(
+                    CodeFixResult(
+                        file=file_ref,
+                        action=HealingAction.FIX_SECURITY.value,
+                        success=False,
+                        changes_made=[],
+                        error=f"{cwe or 'unknown CWE'}: no safe automated remediation; "
+                        "manual review required",
+                    )
+                )
+                continue
+            rel = str(resolved.relative_to(PROJECT_ROOT))
+            security_targets[rel].append(SecurityTarget(cwe_id=cwe, line_number=line))
+            security_files.add(rel)
+
+    # One CodeIssue per (file, tool action); auto_fixable=True so heal() dispatches.
     issues = [
         CodeIssue(
             file_path=rel,
@@ -428,7 +543,7 @@ async def fix_code(
             fix_action=action,
         )
         for rel in rel_files
-        for action in actions
+        for action in tool_actions
     ]
 
     dry_run = not request.auto_apply
@@ -442,11 +557,12 @@ async def fix_code(
         )
 
     # Honor create_backup: copy each target file into a temp dir BEFORE applying,
-    # so a bad fix is recoverable. Only meaningful when actually mutating (auto_apply).
+    # so a bad fix is recoverable. Covers both tool-healer and security targets.
+    backup_files = sorted(set(rel_files) | security_files)
     backup_path: str | None = None
-    if not dry_run and request.create_backup and rel_files:
+    if not dry_run and request.create_backup and backup_files:
         backup_dir = Path(tempfile.mkdtemp(prefix="codefix-backup-"))
-        for rel in rel_files:
+        for rel in backup_files:
             dest = backup_dir / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(PROJECT_ROOT / rel, dest)
@@ -456,17 +572,27 @@ async def fix_code(
         logger.info(
             "Code fix APPLYING in place: user=%s files=%s backup=%s",
             user.sub,
-            rel_files,
+            backup_files,
             backup_path,
         )
 
     healing: list[Any] = []
     learning_stats: dict[str, Any] = {}
     try:
+        # Security fixes FIRST: line-targeted and line-count-preserving, so the scan
+        # line numbers stay valid. Tool healers (which reflow files) run after.
+        if security_targets:
+            sec_results, sec_stats = await asyncio.to_thread(
+                _apply_security, PROJECT_ROOT, dict(security_targets), dry_run
+            )
+            healing.extend(sec_results)
+            learning_stats = sec_stats
         if issues:
-            healing, learning_stats = await asyncio.to_thread(
+            tool_results, tool_stats = await asyncio.to_thread(
                 _apply_heals, PROJECT_ROOT, issues, dry_run
             )
+            healing.extend(tool_results)
+            learning_stats = tool_stats or learning_stats
     except Exception as exc:  # heavy import or driver failure → backend unavailable
         logger.error("Code fix backend failed: %s", exc, exc_info=True)
         raise HTTPException(
@@ -484,10 +610,13 @@ async def fix_code(
         )
         for h in healing
     ]
+    results.extend(security_manual)
     results.extend(invalid)
     fixes_applied = sum(1 for r in results if r.success)
 
-    if not actions:
+    # "no_action" only when nothing actionable was requested or matched.
+    any_action = bool(tool_actions) or bool(security_targets) or bool(security_manual)
+    if not any_action:
         run_status = "no_action"
     elif dry_run:
         run_status = "previewed"
@@ -499,7 +628,7 @@ async def fix_code(
         status=run_status,
         timestamp=datetime.now(UTC).isoformat(),
         dry_run=dry_run,
-        files_processed=len(rel_files),
+        files_processed=len(set(rel_files) | security_files),
         fixes_applied=fixes_applied,
         results=results,
         unsupported_fix_types=unsupported,

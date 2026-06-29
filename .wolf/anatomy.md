@@ -229,6 +229,7 @@
 - `asset_tagging_agent.py` — VisionServiceError: tag_image (~2932 tok)
 - `base_legacy.py` — for: has_capability, to_dict, is_ready, duration_seconds + 8 more (~5806 tok)
 - `CLAUDE.md` — agents/ — SuperAgent layer (162 Python files) (~624 tok)
+- `code_security_remediator.py` — SecurityRemediator: safe line-targeted SAST fixes (CWE-396 bare except, CWE-489 DEBUG=True); pattern-confirm + ast backstop; returns HealingResult; wired into POST /code/fix fix_types:["security"] (~1500 tok)
 - `coding_doctor_agent.py` — HealthCheckType: to_dict, to_dict, success_rate, to_dict + 6 more (~15498 tok)
 - `coding_doctor_toolkits.py` — from: to_dict, analyze (~30983 tok)
 - `collection_content_agent.py` — CollectionContentAgent: manage_collection, validate_collection_design, recover_collection_design, get_design_template + 2 more (~3269 tok)

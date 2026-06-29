@@ -279,7 +279,12 @@ class TestCodeFixWire:
         learn.learn.assert_not_called()
 
     def test_unsupported_fix_types_reported(self, client: TestClient) -> None:
-        """fix_types with no real healer are reported, never faked; nothing dispatched."""
+        """fix_types with no real healer are reported, never faked; nothing dispatched.
+
+        ``security`` is now a real (opt-in) healer, so it is NOT unsupported — but the
+        scan_results here carry no ``type=='security'`` findings, so it yields no work
+        and the run is still ``no_action``. Only ``docstrings`` is unsupported.
+        """
         with _patched_engines() as (heal, learn):
             resp = client.post(
                 "/code/fix",
@@ -292,7 +297,7 @@ class TestCodeFixWire:
         assert resp.status_code == 200, resp.text
         data = resp.json()
         assert data["status"] == "no_action"
-        assert set(data["unsupported_fix_types"]) == {"security", "docstrings"}
+        assert set(data["unsupported_fix_types"]) == {"docstrings"}
         assert data["results"] == []
         heal.heal.assert_not_awaited()
         learn.learn.assert_not_called()
