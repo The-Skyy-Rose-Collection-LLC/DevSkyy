@@ -97,7 +97,10 @@ async def test_gate_revises_once_then_passes():
     async def producer(ref):
         return "Initial draft, weak voice."
 
-    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+    agent = CopyEvaluator(
+        judge_fn=judge,
+        adapter=CopyAdapter(regenerate_fn=regenerate_fn, mode="hard_gate"),
+    )
     v = await agent.gate(ref=_brief(), producer=producer, cap=2)
 
     assert v.passed is True
@@ -118,7 +121,10 @@ async def test_gate_caps_revisions_when_never_passes():
     async def producer(ref):
         return "weak draft"
 
-    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+    agent = CopyEvaluator(
+        judge_fn=judge,
+        adapter=CopyAdapter(regenerate_fn=regenerate_fn, mode="hard_gate"),
+    )
     v = await agent.gate(ref=_brief(), producer=producer, cap=2)
 
     assert v.passed is False
