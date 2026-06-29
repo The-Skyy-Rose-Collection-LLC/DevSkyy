@@ -4,6 +4,7 @@
 Reads the two canonical sources and patches downstream files that have drifted:
   - skyyrose/elite_studio/sku_resolver.py  (_JERSEY_SKUS frozenset)
   - wordpress-theme/.../data/product-similarities.json  (stale SKU refs)
+  - wordpress-theme/.../data/v7-cards.json  (regenerated from CSV + served tree)
 
 Does NOT touch:
   - dossier prose files (*.md in data/dossiers/)
@@ -435,6 +436,74 @@ def sync_registry_updated(dry_run: bool = False) -> SyncAction:
 
 
 # ---------------------------------------------------------------------------
+# Sync: v7-cards.json (regenerate the V7 lookbook view from CSV + served tree)
+# ---------------------------------------------------------------------------
+
+
+def sync_v7_cards(dry_run: bool = False) -> SyncAction:
+    """Regenerate ``data/v7-cards.json`` from the CSV + promoted V7 served tree.
+
+    v7-cards.json is a GENERATED VIEW (see scripts/build_v7_cards.py): its catalog
+    fields come from the CSV, its imagery from the tracked served tree. Previously
+    hand-maintained, it drifted (inherited the br-014/15 badge/is_preorder
+    contradiction). Wiring it here makes "push downstream" regenerate it so it can
+    never silently diverge from the CSV again; the validator check
+    ``v7_cards_current`` is the matching CI guard.
+    """
+    target = "wordpress-theme/skyyrose-flagship/data/v7-cards.json"
+    out = _REPO_ROOT / target
+    gen_path = _REPO_ROOT / "scripts" / "build_v7_cards.py"
+    if not gen_path.exists():
+        return SyncAction(target=target, action="skip", description="build_v7_cards.py not found")
+
+    # The generator imports skyyrose.core.catalog_loader — ensure it resolves
+    # regardless of how this script was invoked.
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("build_v7_cards", gen_path)
+        if spec is None or spec.loader is None:
+            return SyncAction(
+                target=target, action="skip", description="cannot load build_v7_cards.py"
+            )
+        gen_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gen_mod)
+        generated = gen_mod.serialize(gen_mod.build_document())
+    except Exception as exc:
+        return SyncAction(
+            target=target, action="skip", description="generator failed", error=str(exc)
+        )
+
+    current = out.read_text(encoding="utf-8") if out.exists() else None
+    if current == generated:
+        return SyncAction(
+            target=target,
+            action="noop",
+            description="v7-cards.json already in sync with CSV + served tree",
+            applied=True,
+        )
+
+    if dry_run:
+        return SyncAction(
+            target=target,
+            action="would-update",
+            description="v7-cards.json would be regenerated from CSV + served tree",
+        )
+
+    if out.exists():
+        _backup(out)
+    out.write_text(generated, encoding="utf-8")
+    return SyncAction(
+        target=target,
+        action="updated",
+        description="v7-cards.json regenerated from CSV + served tree",
+        applied=True,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Human-attention report
 # ---------------------------------------------------------------------------
 
@@ -525,6 +594,7 @@ def main(argv: list[str] | None = None) -> int:
     sync_fns = [
         lambda d=dry_run: sync_jersey_skus(dry_run=d),
         lambda r=rows, d=dry_run: sync_similarities_json(r, dry_run=d),
+        lambda d=dry_run: sync_v7_cards(dry_run=d),
         lambda d=dry_run: sync_registry_updated(dry_run=d),
     ]
     for fn in sync_fns:
