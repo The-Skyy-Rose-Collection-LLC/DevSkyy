@@ -384,7 +384,18 @@ class QCGate:
         # resolved lazily so qc.py import stays torch-free. mode: "off" | "advisory" | "hard".
         self._centroid_fn = centroid_fn
         self._centroid_path = centroid_path
-        self._centroid_mode = (centroid_mode or config.QC_CENTROID_GATE or "off").strip().lower()
+        _raw_mode = (centroid_mode or config.QC_CENTROID_GATE or "off").strip().lower()
+        _valid_modes = {"off", "advisory", "hard"}
+        if _raw_mode not in _valid_modes:
+            import logging
+
+            logging.warning(
+                "Invalid centroid_mode=%r (expected one of %s), defaulting to 'off'",
+                _raw_mode,
+                _valid_modes,
+            )
+            _raw_mode = "off"
+        self._centroid_mode = _raw_mode
         self._client = None
         self._model = ""
         if self._use_judge and self._judge_fn is None:
