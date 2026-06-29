@@ -670,10 +670,6 @@ class TestBackgroundRemovalService:
             assert result.result_url == mock_prediction_success.output
             assert result.background_type == BackgroundType.TRANSPARENT
 
-    @pytest.mark.xfail(
-        reason="services/ml/enhancement/background_removal.py:281 BackgroundType.SOLID_COLOR composite path not implemented",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_remove_background_with_solid_color(
         self, mock_replicate_client, mock_prediction_success, test_image_bytes
@@ -703,6 +699,7 @@ class TestBackgroundRemovalService:
 
             assert result.background_type == BackgroundType.SOLID_COLOR
             assert result.background_value == "#B76E79"
+            assert result.result_url.startswith("data:image/png;base64,")
 
     @pytest.mark.asyncio
     async def test_remove_background_all_models_fail(
