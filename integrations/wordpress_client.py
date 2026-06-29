@@ -255,7 +255,9 @@ class WordPressClient:
                 "WORDPRESS_URL / WP_SITE_URL / WC_BASE_URL plus WC_CONSUMER_KEY "
                 "and WC_CONSUMER_SECRET)"
             )
-        api_type = APIType.WPCOM if "wordpress.com" in site_url else APIType.SELF_HOSTED
+        # Check if site_url is a wordpress.com domain (not just contains the string)
+        parsed_url = httpx.URL(site_url)
+        api_type = APIType.WPCOM if parsed_url.host and parsed_url.host.endswith("wordpress.com") else APIType.SELF_HOSTED
         return cls(
             site_url=site_url,
             consumer_key=consumer_key,
