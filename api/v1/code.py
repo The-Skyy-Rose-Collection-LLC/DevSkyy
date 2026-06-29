@@ -10,16 +10,21 @@ Version: 1.0.0
 
 import asyncio
 import logging
+import shutil
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from security.code_analysis import CodeSecurityAnalyzer, SecurityFinding
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
+
+if TYPE_CHECKING:  # annotations only — avoids importing the heavy agent module at startup
+    from agents.coding_doctor_agent import HealingResult
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -96,8 +101,8 @@ class CodeFixRequest(BaseModel):
     )
     create_backup: bool = Field(default=True, description="Create backup before applying fixes")
     fix_types: list[str] = Field(
-        default=["syntax", "imports", "docstrings"],
-        description="Types of fixes to apply",
+        default=["format", "imports", "lint", "unused"],
+        description="Fix types to apply. Supported (real healers): format, imports, lint, unused.",
         max_length=10,
     )
 
@@ -124,6 +129,7 @@ class CodeFixResponse(BaseModel):
     results: list[CodeFixResult]
     unsupported_fix_types: list[str] = []
     learning_stats: dict[str, Any] = {}
+    backup_path: str | None = None  # dir holding pre-fix copies when create_backup + auto_apply
 
 
 # =============================================================================
@@ -281,7 +287,7 @@ _LEARNINGS_PATH = PROJECT_ROOT / "data" / "code_fix_learnings.json"
 
 def _apply_heals(
     repo_root: Path, issues: list[Any], dry_run: bool
-) -> tuple[list[Any], dict[str, Any]]:
+) -> "tuple[list[HealingResult], dict[str, Any]]":
     """Drive SelfHealingEngine over the issues in a worker thread, with learning.
 
     SelfHealingEngine.heal() shells out to black/isort/ruff/autoflake via blocking
@@ -426,6 +432,34 @@ async def fix_code(
     ]
 
     dry_run = not request.auto_apply
+
+    # In-place mutation requires elevated privileges — an api_user token must not be
+    # able to rewrite server-side source files. Dry-run previews stay open.
+    if not dry_run and not user.has_any_role({UserRole.ADMIN, UserRole.SUPER_ADMIN}):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="auto_apply requires ADMIN role",
+        )
+
+    # Honor create_backup: copy each target file into a temp dir BEFORE applying,
+    # so a bad fix is recoverable. Only meaningful when actually mutating (auto_apply).
+    backup_path: str | None = None
+    if not dry_run and request.create_backup and rel_files:
+        backup_dir = Path(tempfile.mkdtemp(prefix="codefix-backup-"))
+        for rel in rel_files:
+            dest = backup_dir / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(PROJECT_ROOT / rel, dest)
+        backup_path = str(backup_dir)
+
+    if not dry_run:
+        logger.info(
+            "Code fix APPLYING in place: user=%s files=%s backup=%s",
+            user.sub,
+            rel_files,
+            backup_path,
+        )
+
     healing: list[Any] = []
     learning_stats: dict[str, Any] = {}
     try:
@@ -470,4 +504,5 @@ async def fix_code(
         results=results,
         unsupported_fix_types=unsupported,
         learning_stats=learning_stats,
+        backup_path=backup_path,
     )

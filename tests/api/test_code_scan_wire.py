@@ -8,6 +8,7 @@ Verifies:
 - Non-existent in-project paths return 404
 """
 
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -32,12 +33,30 @@ def _mock_user() -> TokenPayload:
     )
 
 
+def _admin_user() -> TokenPayload:
+    return TokenPayload(
+        sub="admin-user",
+        jti="jti-admin",
+        type=TokenType.ACCESS,
+        roles=["admin"],
+    )
+
+
 @pytest.fixture()
 def client() -> TestClient:
-    """Isolated FastAPI app with auth dependency bypassed."""
+    """Isolated FastAPI app, auth bypassed as an api_user (no auto_apply rights)."""
     app = FastAPI()
     app.include_router(code_router)
     app.dependency_overrides[get_current_user] = lambda: _mock_user()
+    return TestClient(app, raise_server_exceptions=False)
+
+
+@pytest.fixture()
+def admin_client() -> TestClient:
+    """Isolated FastAPI app, auth bypassed as an ADMIN (may auto_apply)."""
+    app = FastAPI()
+    app.include_router(code_router)
+    app.dependency_overrides[get_current_user] = lambda: _admin_user()
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -206,8 +225,8 @@ class TestCodeFixWire:
         learn.learn.assert_not_called()  # dry-run previews are not learned from
         learn.save.assert_not_awaited()
 
-    def test_auto_apply_records_learning(self, client: TestClient) -> None:
-        """auto_apply=True applies in place and records each outcome to the learner."""
+    def test_auto_apply_records_learning(self, admin_client: TestClient) -> None:
+        """auto_apply=True (ADMIN) applies in place, records each outcome, backs up first."""
         captured: dict = {}
 
         def _heal(issue, dry_run):
@@ -215,7 +234,7 @@ class TestCodeFixWire:
             return _default_heal(issue, dry_run)
 
         with _patched_engines(heal_side_effect=_heal) as (heal, learn):
-            resp = client.post(
+            resp = admin_client.post(
                 "/code/fix",
                 json={
                     "scan_results": _scan_results(self._TARGET),
@@ -233,6 +252,31 @@ class TestCodeFixWire:
         assert learn.learn.call_count == 2  # every outcome recorded
         learn.save.assert_awaited_once()  # learnings persisted
         assert data["learning_stats"]["total_patterns"] == 1
+
+        # create_backup (default True) made a pre-fix copy before mutating.
+        backup = data["backup_path"]
+        assert backup is not None
+        backup_dir = Path(backup)
+        try:
+            assert backup_dir.is_dir()
+            assert (backup_dir / "security" / "code_analysis.py").exists()
+        finally:
+            shutil.rmtree(backup_dir, ignore_errors=True)
+
+    def test_auto_apply_forbidden_for_non_admin(self, client: TestClient) -> None:
+        """api_user (non-admin) cannot trigger in-place mutation → 403; nothing dispatched."""
+        with _patched_engines() as (heal, learn):
+            resp = client.post(
+                "/code/fix",
+                json={
+                    "scan_results": _scan_results(self._TARGET),
+                    "fix_types": ["imports"],
+                    "auto_apply": True,
+                },
+            )
+        assert resp.status_code == 403, resp.text
+        heal.heal.assert_not_awaited()
+        learn.learn.assert_not_called()
 
     def test_unsupported_fix_types_reported(self, client: TestClient) -> None:
         """fix_types with no real healer are reported, never faked; nothing dispatched."""
@@ -278,3 +322,44 @@ class TestCodeFixWire:
         """Neither scan_id nor scan_results → 400."""
         resp = client.post("/code/fix", json={"fix_types": ["imports"]})
         assert resp.status_code == 400
+
+
+class TestSelfLearningRoundTrip:
+    """Regression for bug-168 — SelfLearningEngine must survive load→save→load→save.
+
+    The /code/fix tests mock the learner wholesale, so the REAL round-trip was never
+    exercised: a reloaded entry kept category/last_used as plain strings and the
+    SECOND save() crashed (AttributeError: 'str' object has no attribute 'value'),
+    which the endpoint's broad except turned into a 500 on every later call. This
+    exercises the real engine + real file I/O to prove the persisted-state path.
+    """
+
+    def test_learn_save_reload_save_no_crash(self, tmp_path) -> None:
+        import asyncio
+        import json
+
+        from agents.coding_doctor_agent import IssueCategory, SelfLearningEngine
+
+        store = tmp_path / "learnings.json"
+
+        async def _cycle() -> dict:
+            e1 = SelfLearningEngine(store)
+            await e1.initialize()
+            e1.learn(IssueCategory.MAINTAINABILITY, "fix_imports", "isort", True)
+            await e1.save()
+
+            # Reload the persisted file and save AGAIN — the pre-fix crash point.
+            e2 = SelfLearningEngine(store)
+            await e2.initialize()
+            e2.learn(IssueCategory.MAINTAINABILITY, "fix_imports", "isort", False)
+            await e2.save()
+            return e2.get_stats()
+
+        stats = asyncio.run(_cycle())
+        assert stats["total_patterns"] == 1
+
+        entry = json.loads(store.read_text())["patterns"][0]
+        assert entry["category"] == "maintainability"
+        # second engine reloaded the first's entry, so outcomes accumulate (learning)
+        assert entry["success_count"] == 1
+        assert entry["failure_count"] == 1

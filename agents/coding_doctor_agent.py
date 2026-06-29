@@ -292,6 +292,11 @@ class SelfLearningEngine:
             try:
                 data = json.loads(self.storage_path.read_text())
                 for entry in data.get("patterns", []):
+                    # Coerce serialized scalars back to their typed forms so a later
+                    # save() (which calls .value / .isoformat()) cannot crash with
+                    # AttributeError on a reloaded str. (bug-168)
+                    entry["category"] = IssueCategory(entry["category"])
+                    entry["last_used"] = datetime.fromisoformat(entry["last_used"])
                     self._patterns[entry["pattern_hash"]] = LearningEntry(**entry)
                 logger.info(f"Loaded {len(self._patterns)} learned patterns")
             except Exception as e:
@@ -299,7 +304,17 @@ class SelfLearningEngine:
         self._loaded = True
 
     async def save(self):
-        """Persist learned patterns to storage"""
+        """Persist learned patterns to storage.
+
+        Guarded by a cross-process FileLock and written atomically (temp + replace)
+        so concurrent savers cannot corrupt or partially write the file. NOTE: this
+        prevents corruption but not advisory-counter lost-updates — two savers that
+        both incremented the same pattern since their last load will keep only the
+        last writer's value. Acceptable for advisory success/failure stats; revisit
+        with delta-merge or JSONL if exact counts ever matter. (bug-168)
+        """
+        from filelock import FileLock  # lazy: optional dep, only needed on save
+
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
         data = {
             "patterns": [
@@ -316,7 +331,11 @@ class SelfLearningEngine:
             ],
             "saved_at": datetime.now(UTC).isoformat(),
         }
-        self.storage_path.write_text(json.dumps(data, indent=2))
+        payload = json.dumps(data, indent=2)
+        with FileLock(f"{self.storage_path}.lock"):
+            tmp = self.storage_path.with_suffix(self.storage_path.suffix + ".tmp")
+            tmp.write_text(payload)
+            tmp.replace(self.storage_path)  # atomic on POSIX
         logger.info(f"Saved {len(self._patterns)} learned patterns")
 
     def learn(
@@ -394,6 +413,11 @@ class SelfHealingEngine:
     - Docstring generation
     - Lint auto-fix
     - Security fixes
+
+    WARNING: the _heal_* methods are ``async def`` but call BLOCKING
+    ``subprocess.run``. Do NOT ``await heal()`` directly on a live event loop — it
+    will stall the loop. Drive it off-thread (e.g. ``asyncio.to_thread`` wrapping
+    an ``asyncio.run`` of the heal batch), as api/v1/code.py:_apply_heals does.
     """
 
     def __init__(self, repo_root: Path):

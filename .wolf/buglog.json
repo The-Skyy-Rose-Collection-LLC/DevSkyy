@@ -2460,5 +2460,26 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-29"
+  },
+  {
+    "id": "bug-168",
+    "timestamp": "2026-06-29",
+    "error_message": "SelfLearningEngine.save() raised AttributeError: 'str' object has no attribute 'value' on the 2nd persisted call",
+    "file": "agents/coding_doctor_agent.py",
+    "root_cause": "initialize() did LearningEntry(**entry) with raw JSON; category(str)/last_used(str) were never coerced to IssueCategory/datetime, so the next save()'s e.category.value crashed. /code/fix's broad except turned it into a 500 on every later call. Mocked tests never exercised the real load->save->load->save round-trip.",
+    "fix": "initialize() now coerces entry['category']=IssueCategory(...) + entry['last_used']=datetime.fromisoformat(...); save() is FileLock-guarded + atomic (temp+replace). Added a real round-trip regression test (TestSelfLearningRoundTrip). Also: role-gated auto_apply to ADMIN, honored create_backup (temp-dir copies), fixed default fix_types to the 4 supported healers.",
+    "tags": [
+      "self-learning",
+      "serialization",
+      "round-trip",
+      "mocked-test-gap",
+      "code-fix",
+      "tier3"
+    ],
+    "related_bugs": [
+      "bug-167"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29"
   }
 ]
