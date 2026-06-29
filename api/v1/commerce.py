@@ -8,7 +8,6 @@ This module provides endpoints for:
 Version: 1.0.0
 """
 
-import asyncio
 import logging
 from datetime import UTC, datetime
 from typing import Any, Literal
@@ -115,6 +114,125 @@ class DynamicPricingResponse(BaseModel):
 # =============================================================================
 
 
+async def _dispatch_product_op(
+    action: str,
+    product_data: dict[str, Any],
+    agent: CommerceAgent,
+    validate_only: bool = False,
+) -> ProductResult:
+    """Dispatch a single product operation to CommerceAgent.
+
+    Never raises — all errors map to ProductResult(status="failed", message=...).
+
+    Args:
+        action: "create", "update", or "delete"
+        product_data: Raw dict from the request payload
+        agent: Initialized CommerceAgent instance
+        validate_only: When True validate shape only; make no write calls
+
+    Returns:
+        ProductResult with status "success", "failed", or "skipped"
+    """
+    sku: str | None = product_data.get("sku")
+
+    # -- validate_only: shape check, no writes --
+    if validate_only:
+        if action == "create":
+            if not product_data.get("name") or product_data.get("price") is None:
+                return ProductResult(
+                    sku=sku,
+                    status="skipped",
+                    message="validation only: missing name or price",
+                )
+        elif action in ("update", "delete"):
+            if not (product_data.get("id") or product_data.get("product_id")):
+                return ProductResult(
+                    sku=sku,
+                    status="skipped",
+                    message=f"validation only: missing product id for {action}",
+                )
+        return ProductResult(sku=sku, status="success", message="validation only")
+
+    # -- create --
+    if action == "create":
+        name = product_data.get("name")
+        price = product_data.get("price")
+        if not name or price is None:
+            return ProductResult(sku=sku, status="failed", message="missing name/price")
+        try:
+            result = await agent.sync_product_to_woocommerce(
+                name=str(name),
+                price=float(price),
+                sku=sku,
+                description=str(product_data.get("description", "")),
+                short_description=str(product_data.get("short_description", "")),
+                stock_quantity=product_data.get("stock_quantity"),
+                status=str(product_data.get("status", "draft")),
+                categories=product_data.get("categories"),
+                tags=product_data.get("tags"),
+                images=product_data.get("images"),
+            )
+        except Exception as exc:
+            return ProductResult(sku=sku, status="failed", message=str(exc))
+        if "error" in result:
+            return ProductResult(sku=sku, status="failed", message=str(result["error"]))
+        wc_id = result.get("woocommerce_id") or result.get("id")
+        return ProductResult(
+            product_id=str(wc_id) if wc_id is not None else None,
+            sku=sku,
+            status="success",
+        )
+
+    # -- update --
+    if action == "update":
+        pid_raw = product_data.get("id") or product_data.get("product_id")
+        if not pid_raw:
+            return ProductResult(sku=sku, status="failed", message="missing product id for update")
+        try:
+            product_id_int = int(pid_raw)
+        except (TypeError, ValueError):
+            return ProductResult(sku=sku, status="failed", message=f"invalid product id: {pid_raw}")
+        try:
+            result = await agent.update_woocommerce_product(
+                product_id=product_id_int, updates=product_data
+            )
+        except Exception as exc:
+            return ProductResult(sku=sku, status="failed", message=str(exc))
+        if "error" in result:
+            return ProductResult(sku=sku, status="failed", message=str(result["error"]))
+        result_id = result.get("id")
+        return ProductResult(
+            product_id=str(result_id) if result_id is not None else None,
+            sku=sku,
+            status="success",
+        )
+
+    # -- delete (via _wordpress_client — CommerceAgent has no public delete method) --
+    if action == "delete":
+        pid_raw = product_data.get("id") or product_data.get("product_id")
+        if not pid_raw:
+            return ProductResult(sku=sku, status="failed", message="missing product id for delete")
+        try:
+            product_id_int = int(pid_raw)
+        except (TypeError, ValueError):
+            return ProductResult(sku=sku, status="failed", message=f"invalid product id: {pid_raw}")
+        try:
+            await agent._ensure_wordpress_client()
+            if agent._wordpress_client is None:
+                return ProductResult(
+                    sku=sku, status="failed", message="WordPress client not available"
+                )
+            result = await agent._wordpress_client.delete_product(product_id_int, force=False)
+        except Exception as exc:
+            return ProductResult(sku=sku, status="failed", message=str(exc))
+        if isinstance(result, dict) and "error" in result:
+            return ProductResult(sku=sku, status="failed", message=str(result["error"]))
+        return ProductResult(product_id=str(product_id_int), sku=sku, status="success")
+
+    # Should not reach here — BulkProductRequest.action is a Literal
+    return ProductResult(sku=sku, status="failed", message=f"unsupported action: {action}")
+
+
 async def _process_bulk_products_background(
     operation_id: str,
     action: str,
@@ -149,37 +267,42 @@ async def _process_bulk_products_background(
             },
         )
 
-        results = []
+        results: list[dict[str, Any]] = []
         successful = 0
         failed = 0
 
-        for i, product_data in enumerate(products):
-            # TODO: Integrate with agents/commerce_agent.py CommerceAgent
-            # Simulate processing delay
-            await asyncio.sleep(0.01)  # Small delay to prevent blocking
+        # Initialize CommerceAgent once for the entire background batch.
+        agent = CommerceAgent()
+        try:
+            await agent.initialize()
+        except Exception as exc:
+            logger.exception(
+                "CommerceAgent initialization failed for background task %s", operation_id
+            )
+            await store.set_status(
+                operation_id,
+                {
+                    "status": "failed",
+                    "error": f"Commerce agent unavailable: {exc}",
+                    "completed_at": datetime.now(UTC).isoformat(),
+                },
+            )
+            return
 
-            # Mock validation
-            if i % 10 == 0:  # Simulate 10% failure rate
-                results.append(
-                    {
-                        "product_id": None,
-                        "sku": product_data.get("sku"),
-                        "status": "failed",
-                        "message": "Invalid SKU format",
-                    }
-                )
-                failed += 1
-            else:
-                product_id = f"prod_{uuid4().hex[:8]}"
-                results.append(
-                    {
-                        "product_id": product_id,
-                        "sku": product_data.get("sku"),
-                        "status": "success",
-                        "message": None,
-                    }
-                )
+        for i, product_data in enumerate(products):
+            op_result = await _dispatch_product_op(action, product_data, agent)
+            results.append(
+                {
+                    "product_id": op_result.product_id,
+                    "sku": op_result.sku,
+                    "status": op_result.status,
+                    "message": op_result.message,
+                }
+            )
+            if op_result.status == "success":
                 successful += 1
+            else:
+                failed += 1
 
             # Update progress periodically (every 10 items to reduce Redis calls)
             if (i + 1) % 10 == 0 or i == len(products) - 1:
@@ -300,34 +423,31 @@ async def bulk_product_operations(
         )
 
     try:
-        # Process synchronously for small batches
-        results = []
+        # Process synchronously for small batches.
+        results: list[ProductResult] = []
         successful = 0
         failed = 0
 
-        for i, product_data in enumerate(request.products):
-            # Mock validation
-            if i % 10 == 0:  # Simulate 10% failure rate
-                results.append(
-                    ProductResult(
-                        product_id=None,
-                        sku=product_data.get("sku"),
-                        status="failed",
-                        message="Invalid SKU format",
-                    )
-                )
-                failed += 1
-            else:
-                product_id = f"prod_{uuid4().hex[:8]}"
-                results.append(
-                    ProductResult(
-                        product_id=product_id,
-                        sku=product_data.get("sku"),
-                        status="success",
-                        message=None,
-                    )
-                )
+        # Initialize CommerceAgent once for the entire batch.
+        agent = CommerceAgent()
+        try:
+            await agent.initialize()
+        except Exception as exc:
+            logger.exception("CommerceAgent initialization failed for operation %s", operation_id)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Commerce agent unavailable",
+            ) from exc
+
+        for product_data in request.products:
+            op_result = await _dispatch_product_op(
+                request.action, product_data, agent, request.validate_only
+            )
+            results.append(op_result)
+            if op_result.status == "success":
                 successful += 1
+            else:
+                failed += 1
 
         return BulkProductResponse(
             operation_id=operation_id,

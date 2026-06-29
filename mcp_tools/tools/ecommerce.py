@@ -13,26 +13,21 @@ from mcp_tools.types import BaseAgentInput
 class ProductManagementInput(BaseAgentInput):
     """Input for product management operations."""
 
-    action: Literal["create", "update", "delete", "list", "optimize"] = Field(
+    action: Literal["create", "update", "delete"] = Field(
         ..., description="Product operation to perform"
     )
-    product_data: dict[str, Any] | None = Field(
-        default=None, description="Product information (for create/update operations)"
+    products: list[dict[str, Any]] = Field(
+        ...,
+        description=(
+            "Products to act on. create: requires name+price. "
+            "update/delete: requires id or product_id."
+        ),
+        min_length=1,
+        max_length=1000,
     )
-    product_id: str | None = Field(
-        default=None,
-        description="Product ID (for update/delete operations)",
-        max_length=100,
-    )
-    filters: dict[str, Any] | None = Field(
-        default=None,
-        description="Filters for list operations (e.g., {'category': 'clothing', 'price_min': 20})",
-    )
-    limit: int | None = Field(
-        default=50,
-        description="Maximum number of results for list operations",
-        ge=1,
-        le=1000,
+    validate_only: bool = Field(
+        default=False,
+        description="When True, validate payload shape without writing to WooCommerce",
     )
 
 
@@ -129,27 +124,15 @@ async def manage_products(params: ProductManagementInput) -> str:
         ...     }
         ... })
     """
-    endpoint_map = {
-        "create": "products/create",
-        "update": "products/update",
-        "delete": "products/delete",
-        "list": "products/list",
-        "optimize": "products/optimize",
-    }
-
-    endpoint = endpoint_map[params.action]
-
-    request_data = {}
-    if params.product_data:
-        request_data["product_data"] = params.product_data
-    if params.product_id:
-        request_data["product_id"] = params.product_id
-    if params.filters:
-        request_data["filters"] = params.filters
-    if params.action == "list":
-        request_data["limit"] = params.limit
-
-    data = await _make_api_request(endpoint, method="POST", data=request_data)
+    data = await _make_api_request(
+        "commerce/products/bulk",
+        method="POST",
+        data={
+            "action": params.action,
+            "products": params.products,
+            "validate_only": params.validate_only,
+        },
+    )
 
     return _format_response(data, params.response_format, f"Product {params.action.title()}")
 
