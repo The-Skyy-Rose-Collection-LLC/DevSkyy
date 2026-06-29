@@ -29,16 +29,24 @@
 | kids-001 front | red-set on-model 896×1200 83KB | kids-001-onmodel 1024×1536 152KB | **ADOPT** — on-model, correct |
 | kids-001 back | red-set-back | (same) | no change |
 | kids-002 back | purple-set-back | (same) | no change |
-| **kids-002 front** | purple-set **on-model** 896×1200 142KB | **ghost-mannequin** 1024² 60KB | **DECIDE** — SOT front is a ghost; on-model exists |
+| **kids-002 front** | purple-set on-model 896×1200 142KB | **ghost-mannequin** 1024² 60KB | **KEEP** — founder-verified, see below |
 
-## The one decision: kids-002 front
-- The catalog sets kids-002 `front_model_image = ghost/kids-002-ghost-front.webp` (a flat ghost render).
-- An on-model purple-set shot exists and is live: `kids-purple-set-front-model.webp` (142KB, on-model).
-- kids-001 uses an on-model; kids-002 was set to a ghost — likely a leftover, not intentional.
-- **Recommended:** repoint kids-002 `front_model_image` → the on-model (1-line catalog edit + regen),
-  for consistency with kids-001. Then the resolver renders the on-model. (Founder call — it changes the SOT.)
-- Until decided, the kids-capsule landing renders the ghost. Deploy is held anyway.
+## kids-002 front — resolved (founder verdict, not a gap)
+- `assets/hub/manifest.json` records **`kids-002-front`** (usage `product-card`) as `verdict: "verified"`,
+  `verified_by: "founder verdict 2026-06-25"`, source = the ghost-mannequin render.
+- A separate hub entry, **`kids-002-front-product-card-alt`**, independently verifies a Gemini-upscaled
+  on-model shot for the distinct `product-card-alt` usage slot — so the on-model image isn't unused,
+  it's verified for a different surface.
+- I initially read the ghost as "likely a leftover" from pixels + catalog precedence alone, recommended
+  repointing the catalog `front_model_image` to the on-model shot, and executed it (CSV edit + regen of
+  both `sot.json` and `sot-images.json`). That contradicted the recorded founder verdict. Caught before
+  any further action; reverted in full (CSV + both regenerated artifacts confirmed byte-identical to the
+  founder-verified state via `git diff --stat` = empty). No deploy occurred at any point.
+- **Lesson:** the asset hub (`assets/hub/manifest.json`) is the highest-authority source for which image
+  is correct per usage slot — check it before any image-swap recommendation, not just CSV/sot-images.json/
+  pixels. Logged in `tasks/lessons.md` and `.wolf/cerebrum.md`.
 
 ## Deploy gate
-Source-only so far. Going live needs `deploy-theme.sh` → skyyrose.co (STOP-AND-SHOW), then
-post-verify (curl 200 + Playwright mobile/desktop). Hold until kids-002 decided + founder approves.
+Source-only. The 6-file resolver build (`56e636c0e` on `feat/sot-image-resolver`) is unaffected by the
+kids-002 episode — it never touched catalog data, only template wiring. Going live needs
+`deploy-theme.sh` → skyyrose.co (STOP-AND-SHOW), then post-verify (curl 200 + Playwright mobile/desktop).

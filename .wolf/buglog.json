@@ -2548,5 +2548,132 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-30T12:41:00-07:00"
+  },
+  {
+    "id": "bug-143",
+    "timestamp": "2026-06-30T15:05:00-07:00",
+    "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
+    "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
+    "root_cause": "Storefront collection-grid cards render from the v7-cards system (build_v7_cards.py scans the products/v7/<sku>/ served tree), NOT sot.json front_model_image. The sot.json/sot-images tie reaches the holo card + dashboard, but the dominant v7 grid is a separate authority. The v7 tree was already hub-synced for 9/11 picks, so the deploy had ~0 visible card effect.",
+    "fix": "No code fix \u2014 corrected the claim. To reach the v7 grid, hub picks must be synced into products/v7/<sku>/ + v7-cards.json regenerated (build_v7_cards.py). lh-003 front + br-007 back are the 2 gaps. Deferred: PR #684 is actively refactoring v7 \u2014 coordinate, do not race.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "v7-cards",
+      "storefront",
+      "imagery-layers",
+      "overclaim"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T15:05:00-07:00"
+  },
+  {
+    "id": "bug-168",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "database/seed_catalog.py set is_active=(is_preorder=='1') \u2014 inverted; live products seeded inactive, pre-orders active",
+    "file": "database/seed_catalog.py",
+    "root_cause": "Raw is_preorder used as active predicate instead of canonical status. pre-order!=active, live==active. Backwards.",
+    "fix": "is_active=(status_from_row(row)=='live') via catalog_loader. Surfaced in Phase-2 loader-routing (PR #686).",
+    "tags": [
+      "catalog",
+      "seed",
+      "status",
+      "inverted-logic"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T00:00:00-07:00"
+  },
+  {
+    "id": "bug-169",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "br-011 (Jersey Series 4 Hockey) has garment_type_lock='hoodie' but is a jersey per registry+_JERSEY_SKUS",
+    "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+    "root_cause": "Jersey membership in 3 unsynced places (CSV garment_type_lock, registry sku_folders, _JERSEY_SKUS). br-011 CSV=hoodie, other two=jersey. Same redundant-field disease as br-014/15.",
+    "fix": "PENDING FOUNDER DECISION \u2014 flip hoodie->jersey (render impact), then derive roster from CSV + jersey_consistency invariant. Flagged in PR #686.",
+    "tags": [
+      "catalog",
+      "jersey",
+      "garment_type_lock",
+      "needs-founder-decision"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T00:00:00-07:00"
+  },
+  {
+    "id": "bug-170",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "Glyphs built from potrace-vectorized PNG cells rendered upside-down (PIL ImageFont render showed an inverted A) despite a sane-looking bbox",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "potrace's SVG <g transform=\"translate(...) scale(...)\"> repositions/scales the path on the page but does not convert SVG's y-down convention into font y-up/baseline-up space -- bbox math looked correct in both orientations so a coordinate sanity check could not have caught it; only rendering the actual glyph and reading the pixels surfaced the flip.",
+    "fix": "Added a second, explicit Transform().scale(1, -1) after potrace's own translate/scale, plus Cu2QuPen(reverse_direction=True) for correct hole winding on O/A/B/g. Verified by rendering 8 test glyphs (straight lines, curves, holes, descender) with PIL.ImageFont and reading the PNG pixels.",
+    "tags": [
+      "font-generation",
+      "potrace",
+      "fonttools",
+      "svg",
+      "coordinate-transform"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-171",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "build_font() crashed with a bare AssertionError deep in fontTools, or silently mis-mapped glyphs, on malformed/ambiguous manifests",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "No validation of manifest cell uniqueness (duplicate char/codepoint -> glyphOrder/glyf length mismatch -> fontTools AssertionError), no bbox bounds checking (OOB bbox silently read as black-padded ink via Image.crop), and Image.open() had no decode-error wrapping (PIL.UnidentifiedImageError leaked past the CLI's narrow except tuple as a raw traceback). Found by an adversarial code-review workflow agent and reproduced.",
+    "fix": "Added _validate_manifest() (dup char/codepoint, missing keys, OOB bbox -> all raise clear ValueError) called before any processing; wrapped Image.open() to normalize decode failures to ValueError. Verified all 4 new fail-loud paths raise ValueError (not a crash, not silent corruption) with a standalone test script.",
+    "tags": [
+      "font-generation",
+      "validation",
+      "fail-loud",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-170"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-172",
+    "timestamp": "2026-06-30T17:05:00-07:00",
+    "error_message": "OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does not support the input_fidelity parameter' (code invalid_input_fidelity_model)",
+    "file": "scripts/oai_render/client.py",
+    "root_cause": "OAIImageClient.edit() (client.py:74-85) unconditionally sends input_fidelity=config.INPUT_FIDELITY ('high', config.py:37) on every edit() call. config.py's comment claims this is 'verified via Context7... supported for gpt-image-1.5+ (incl. gpt-image-2)' but the LIVE API rejects it for gpt-image-2 specifically -- reproduced 24/24 times in a real call. Context7 (openai/openai-openapi, images/edits schema) lists input_fidelity support for gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only -- gpt-image-2 is not in that list. This means every product-render edit() call through this client is currently failing the same way, separate from any font-generation work.",
+    "fix": "NOT YET FIXED (discovered incidentally during an unrelated font-pilot task, flagged to founder rather than patched unprompted since it touches the shared production render pipeline). Workaround used in the font pilot: bypass OAIImageClient.edit() and call openai.OpenAI().images.edit() directly, omitting input_fidelity entirely. Real fix needed in client.py/config.py: stop sending input_fidelity when model=='gpt-image-2', or make it conditional on model name.",
+    "tags": [
+      "oai-render",
+      "gpt-image-2",
+      "production-bug",
+      "input_fidelity",
+      "needs-founder-decision"
+    ],
+    "related_bugs": [],
+    "occurrences": 24,
+    "last_seen": "2026-06-30T17:05:00-07:00"
+  },
+  {
+    "id": "bug-172",
+    "timestamp": "2026-06-30T20:44:00",
+    "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
+    "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
+    "root_cause": ".venv was fully deleted from disk (untracked, not a git operation). pip install -e \".[all]\" resolves an enormous dep graph (torch/langchain/mineru/bentoml/xxhash-fallback-chain) that stalled for 6+min on source builds before I killed it; boto3 (used by integrations/cloudflare_r2_manager.py) was never declared in any pyproject.toml extra despite being required by the mcp extra import chain.",
+    "fix": "Recreated .venv, installed base package + boto3 + langgraph + scikit-image directly (piecemeal, faster than full [all] resolve) instead of waiting out the slow full extras install. Declared boto3>=1.43.0 in the mcp extra of pyproject.toml so future installs pick it up without manual patching.",
+    "tags": [
+      "venv",
+      "pip",
+      "pyproject",
+      "missing-dependency",
+      "boto3",
+      "test-infra"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T20:44:00"
   }
 ]

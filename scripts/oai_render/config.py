@@ -29,12 +29,19 @@ BACKGROUND = "auto"  # "transparent" | "opaque" | "auto"
 N = 1
 MAX_REFERENCE_IMAGES = 16  # gpt-image edit hard limit
 # input_fidelity controls how hard the model matches the reference images'
-# style/features. Verified via Context7 (openai-python image_edit_params.py,
-# 2026-06-24): supported for gpt-image-1.5+ (incl. gpt-image-2), values
-# "high" | "low", DEFAULT "low". We send "high" so garment graphics, logos,
-# and the style-reference anchor are reproduced as faithfully as possible.
-# Cost note: "high" raises per-image input-token cost vs the "low" default.
+# style/features, values "high" | "low", DEFAULT "low". We send "high" so
+# garment graphics, logos, and the style-reference anchor are reproduced as
+# faithfully as possible -- but ONLY for models that accept the parameter.
+# CORRECTED 2026-06-30: the 2026-06-24 comment claiming gpt-image-2 support
+# was wrong -- the LIVE API rejects input_fidelity for gpt-image-2 with a 400
+# invalid_input_fidelity_model error (reproduced; bug-172). Context7
+# (openai/openai-openapi, images/edits schema) confirms support is listed for
+# gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only. client.edit() now only
+# sends this parameter when config.MODEL is in INPUT_FIDELITY_SUPPORTED_MODELS.
+# Cost note: "high" raises per-image input-token cost vs the "low" default,
+# on models where it applies.
 INPUT_FIDELITY = "high"
+INPUT_FIDELITY_SUPPORTED_MODELS = frozenset({"gpt-image-1", "gpt-image-1-mini", "gpt-image-1.5"})
 
 # ── Networking / resilience ─────────────────────────────────────────────────
 REQUEST_TIMEOUT_S = 180.0
