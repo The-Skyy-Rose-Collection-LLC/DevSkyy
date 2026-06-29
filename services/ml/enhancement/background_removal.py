@@ -25,7 +25,6 @@ from typing import Any
 import httpx
 from PIL import Image, ImageColor
 from pydantic import BaseModel
-from security.ssrf_protection import SSRFProtection
 from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from core.errors.production_errors import (
@@ -33,6 +32,7 @@ from core.errors.production_errors import (
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
+from security.ssrf_protection import SSRFProtection
 
 logger = logging.getLogger(__name__)
 
@@ -207,14 +207,16 @@ class BackgroundRemovalService:
         cutout = Image.open(BytesIO(cutout_bytes))
         if cutout.width * cutout.height > max_pixels:
             raise ValueError(
-                f"Cutout image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels"
+                f"Cutout image too large: {cutout.width}x{cutout.height} "
+                f"exceeds {max_pixels} pixels"
             )
         cutout = cutout.convert("RGBA")
 
         background = Image.open(BytesIO(background_bytes))
         if background.width * background.height > max_pixels:
             raise ValueError(
-                f"Background image too large: {background.width}x{background.height} exceeds {max_pixels} pixels"
+                f"Background image too large: {background.width}x{background.height} "
+                f"exceeds {max_pixels} pixels"
             )
         background = background.convert("RGBA").resize(cutout.size)
 
