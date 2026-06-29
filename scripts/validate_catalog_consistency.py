@@ -3,7 +3,7 @@
 
 Checks that all downstream files referencing SKUs or logos are consistent with
 the two canonical data sources:
-  1. wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv   (32 SKUs)
+  1. wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv   (33 SKUs)
   2. wordpress-theme/skyyrose-flagship/data/logo-registry.json     (v4 logos)
 
 Exit codes:
@@ -31,6 +31,9 @@ Available check names (pass comma-separated to --checks):
   retired_sku_guard     no retired SKUs appear in checked downstream files
   dossier_slugs         dossier_slug values in CSV have matching .md files
   brand_primary         brand_primary logo id exists in logos block
+  preorder_consistency  CSV badge column and is_preorder flag never contradict
+  v7_cards_current      v7-cards.json equals fresh build_v7_cards.py output
+  sot_images_current    sot-images.json equals fresh sot_images.serialize_manifest()
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
@@ -72,6 +75,10 @@ _SIMILARITIES_JSON: Path = (
 )
 _SKU_RESOLVER_PY: Path = _REPO_ROOT / "skyyrose" / "elite_studio" / "sku_resolver.py"
 _DOSSIERS_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "dossiers"
+_V7_CARDS_JSON: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "v7-cards.json"
+)
+_BUILD_V7_CARDS: Path = _REPO_ROOT / "scripts" / "build_v7_cards.py"
 
 # Retired SKUs — must not appear in downstream files
 _RETIRED_SKUS: frozenset[str] = frozenset({"br-013"})
@@ -613,6 +620,119 @@ def check_brand_primary() -> CheckResult:
     return _ok(name, f"brand_primary={bp!r} exists in logos block")
 
 
+def check_preorder_consistency() -> CheckResult:
+    """Verify the CSV badge column and is_preorder flag never contradict.
+
+    The catalog encodes pre-order status redundantly: ``badge`` (display text)
+    and ``is_preorder`` (the boolean that consumers actually trust —
+    ``catalog_loader.status_from_row``, WooCommerce sync, the V7 card generator).
+    Nothing forced the two to agree, so br-014/br-015 shipped with
+    ``badge="Pre-Order"`` but ``is_preorder=0`` — in-stock to code, pre-order to
+    the eye. This is the invariant that was missing (the contradiction passed CI
+    clean and propagated into v7-cards.json verbatim).
+
+    Rule — the only badge values the catalog uses are "" and "Pre-Order":
+        badge == "pre-order"  (case/space-insensitive)  <=>  is_preorder == "1"
+    """
+    name = "preorder_consistency"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check pre-order consistency — CSV not readable")
+
+    violations: list[str] = []
+    for row in rows:
+        sku = row.get("sku", "").strip()
+        badge_says_preorder = (row.get("badge") or "").strip().casefold() in {
+            "pre-order",
+            "preorder",
+        }
+        flag = (row.get("is_preorder") or "").strip() == "1"
+        if badge_says_preorder != flag:
+            violations.append(
+                f"  {sku}: badge={row.get('badge')!r} (preorder={badge_says_preorder}) "
+                f"vs is_preorder={row.get('is_preorder')!r} (flag={flag})"
+            )
+    if violations:
+        return _fail(
+            name,
+            f"{len(violations)} SKU(s) have a badge/is_preorder contradiction",
+            violations,
+        )
+    return _ok(name, "badge and is_preorder agree for all SKUs")
+
+
+def check_v7_cards_current() -> CheckResult:
+    """Verify v7-cards.json equals fresh generator output (no hand-drift).
+
+    v7-cards.json is a GENERATED VIEW (scripts/build_v7_cards.py) joining the CSV
+    (catalog fields) with the promoted V7 served tree (imagery). This check
+    regenerates into a buffer and fails if the committed file has drifted — the
+    guard that makes the generator actually prevent recurrence (a generator
+    without an up-to-date guard does not stop hand-edits). Skips cleanly when the
+    generator is absent. The generator depends only on the CSV + the tracked
+    served tree, never the gitignored hub manifest, so it runs in CI.
+    """
+    name = "v7_cards_current"
+    if not _BUILD_V7_CARDS.exists():
+        return _ok(name, "build_v7_cards.py not present — skip")
+    if not _V7_CARDS_JSON.exists():
+        return _fail(name, f"v7-cards.json not found: {_V7_CARDS_JSON}")
+
+    # Make `skyyrose` importable for the generator regardless of how the
+    # validator was invoked (CI sets PYTHONPATH; local runs may not).
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("build_v7_cards", _BUILD_V7_CARDS)
+        if spec is None or spec.loader is None:
+            return _fail(name, "Could not load build_v7_cards.py spec")
+        gen_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gen_mod)
+        generated = gen_mod.serialize(gen_mod.build_document())
+    except Exception as exc:  # defensive — never crash the whole validator run
+        return _fail(name, f"v7-cards generator failed to run: {exc}")
+
+    current = _V7_CARDS_JSON.read_text(encoding="utf-8")
+    if current != generated:
+        return _fail(
+            name,
+            "v7-cards.json is stale — run `python scripts/build_v7_cards.py` to regenerate it",
+        )
+    return _ok(name, "v7-cards.json matches fresh generator output")
+
+
+def check_sot_images_current() -> CheckResult:
+    """Verify data/sot-images.json equals fresh generator output (no hand-drift).
+
+    Same generated-artifact-up-to-date guard as ``v7_cards_current``, applied to the
+    SOT imagery contract. ``skyyrose.core.sot_images.serialize_manifest`` is the single
+    byte-authority for that file; this check regenerates into a buffer and fails if the
+    committed file drifted. The module is stdlib-importable, so this runs in the
+    stdlib-only catalog-validate CI job.
+    """
+    name = "sot_images_current"
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    try:
+        from skyyrose.core import sot_images
+
+        generated = sot_images.serialize_manifest()
+    except Exception as exc:  # defensive — surface, never crash the validator
+        return _fail(name, f"sot-images generator failed to run: {exc}")
+
+    path = sot_images.MANIFEST_PATH
+    if not path.exists():
+        return _fail(name, f"sot-images.json not found: {path}")
+    if path.read_text(encoding="utf-8") != generated:
+        return _fail(
+            name,
+            "sot-images.json is stale — run `make sot-manifest` to regenerate it",
+        )
+    return _ok(name, "sot-images.json matches fresh generator output")
+
+
 # ---------------------------------------------------------------------------
 # Check registry
 # ---------------------------------------------------------------------------
@@ -631,6 +751,9 @@ ALL_CHECKS: dict[str, Any] = {
     "retired_sku_guard": check_retired_sku_guard,
     "dossier_slugs": check_dossier_slugs,
     "brand_primary": check_brand_primary,
+    "preorder_consistency": check_preorder_consistency,
+    "v7_cards_current": check_v7_cards_current,
+    "sot_images_current": check_sot_images_current,
 }
 
 # Checks that must pass before others can meaningfully run
