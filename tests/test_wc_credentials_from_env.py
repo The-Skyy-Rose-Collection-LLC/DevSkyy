@@ -2,7 +2,8 @@
 
 WCSafeClient appends the REST route itself, so from_env must return the SITE ROOT
 under any of the repo's URL conventions, and accept the WC_/WOOCOMMERCE_ key names.
-_ensure_wordpress_env_loaded is stubbed so the real .env.wordpress never leaks in.
+from_env() reads os.environ only (the .env.wordpress load lives in the app
+bootstrap, devskyy_mcp.py), so clearing the env vars below is the entire isolation.
 """
 
 import pytest
@@ -12,8 +13,8 @@ import skyyrose.integrations.wc_safe_client as wc
 
 @pytest.fixture(autouse=True)
 def _isolate_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Never touch the real .env.wordpress during unit tests.
-    monkeypatch.setattr(wc, "_ensure_wordpress_env_loaded", lambda: None)
+    # from_env() is pure (os.environ only); clear every credential var-name it
+    # accepts so the real shell/.env never leaks into a unit test.
     for var in (
         "WC_BASE_URL",
         "WORDPRESS_URL",

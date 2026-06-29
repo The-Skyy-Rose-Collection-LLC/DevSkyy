@@ -25,7 +25,6 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
-from pathlib import Path
 from typing import Any
 
 import httpx
@@ -38,23 +37,6 @@ _RETRY_DELAYS_SECONDS = (1.0, 2.0, 4.0, 8.0, 16.0, 32.0)
 _RETRIABLE_STATUSES = frozenset({429, 503})
 _RETRIABLE_NETWORK_ERRORS = (httpx.ConnectError, httpx.ReadTimeout, httpx.RemoteProtocolError)
 _TOTAL_DEADLINE_SECONDS = 120.0  # Hard ceiling across all retries combined.
-
-
-def _ensure_wordpress_env_loaded() -> None:
-    """Load the canonical .env.wordpress so WC creds resolve from ONE source.
-
-    No-op when the vars are already set (override=False), when the file is
-    absent, or when python-dotenv is unavailable — callers still get a clear
-    KeyError if creds remain unresolved.
-    """
-    env_file = Path(__file__).resolve().parents[2] / ".env.wordpress"
-    if not env_file.exists():
-        return
-    try:
-        from dotenv import load_dotenv
-    except ImportError:
-        return
-    load_dotenv(env_file, override=False)
 
 
 @dataclass(frozen=True)
@@ -77,9 +59,10 @@ class WCCredentials:
         Accepts every WC URL/key convention in this repo and derives the REST
         base from a bare site root, so the MCP path resolves the same creds the
         WordPressClient path does. Raises KeyError (surfaced by callers) when the
-        URL or key/secret cannot be resolved under any known name.
+        URL or key/secret cannot be resolved under any known name. Reads
+        os.environ only — the application bootstrap (devskyy_mcp.py) loads
+        .env.wordpress; this stays pure so callers can monkeypatch the env.
         """
-        _ensure_wordpress_env_loaded()
         site_or_base = (
             os.environ.get("WC_BASE_URL")
             or os.environ.get("WORDPRESS_URL")
