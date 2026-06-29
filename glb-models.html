@@ -148,6 +148,11 @@ dl.onclick=()=>{const del=tiles.filter(t=>t.dataset.state=='del').map(t=>t.datas
 // file:// robustness: show the HTTP-server banner and flag any tile whose model fails to load
 if(location.protocol==='file:')fwarn.style.display='block';
 fwx.onclick=()=>fwarn.style.display='none';
-tiles.forEach(t=>{const m=t.querySelector('model-viewer');m.addEventListener('error',()=>{t.dataset.err='1';});m.addEventListener('load',()=>{t.dataset.err='';});});
+if(typeof fwx!=='undefined')fwx.setAttribute('aria-label','Dismiss notice');
+tiles.forEach(t=>{const m=t.querySelector('model-viewer');const sku=t.dataset.sku||'model';
+  const k=t.querySelector('.k'),d=t.querySelector('.d');if(k)k.setAttribute('aria-label','Keep '+sku);if(d)d.setAttribute('aria-label','Delete '+sku);
+  if(!m)return;m.setAttribute('aria-label','3D model '+sku);
+  m.addEventListener('error',()=>{t.dataset.err='1';t.setAttribute('role','alert');t.setAttribute('aria-label',sku+' failed to load — serve over HTTP');});
+  m.addEventListener('load',()=>{t.dataset.err='';t.removeAttribute('role');t.removeAttribute('aria-label');});});
 c();
 </script></body></html>
