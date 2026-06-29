@@ -489,7 +489,7 @@
       "sku": "br-014",
       "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
       "price": "100",
-      "is_preorder": false,
+      "is_preorder": true,
       "published": true,
       "images": {
         "image": {
@@ -512,7 +512,7 @@
       "sku": "br-015",
       "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
       "price": "100",
-      "is_preorder": false,
+      "is_preorder": true,
       "published": true,
       "images": {
         "image": {
