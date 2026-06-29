@@ -23,11 +23,18 @@ Usage:
 """
 
 import sys
+from pathlib import Path
 
+from dotenv import load_dotenv
 from utils.logging_utils import configure_logging
 
-from mcp_tools import mcp  # noqa: F401 - re-export for deploy script compatibility
-from mcp_tools.server import API_BASE_URL, API_KEY
+# Bootstrap canonical WooCommerce/WordPress credentials into os.environ so the MCP
+# tools resolve them. WCCredentials.from_env reads os.environ only — loading the
+# .env.wordpress file is the application's job and lives here, not in the dataclass.
+load_dotenv(Path(__file__).resolve().parent / ".env.wordpress")
+
+from mcp_tools import mcp  # noqa: E402, F401 - re-export for deploy script compatibility
+from mcp_tools.server import API_BASE_URL, API_KEY  # noqa: E402
 
 if __name__ == "__main__":
     # stdio transport uses STDOUT as the JSON-RPC channel \u2014 every human-readable

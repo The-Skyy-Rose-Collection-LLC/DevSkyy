@@ -2407,9 +2407,9 @@
   {
     "id": "bug-165",
     "timestamp": "2026-06-28T17:00:00-07:00",
-    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' — CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
+    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' \u2014 CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
     "file": "agents/commerce_agent.py",
-    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() — it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
+    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() \u2014 it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
     "fix": "FIXED 2026-06-28 (founder approved full fix). (1) integrations/wordpress_client.py: added module-level alias `WordPressWooCommerceClient = WordPressClient` + a `WordPressClient.from_env()` classmethod (reads WORDPRESS_URL/WP_SITE_URL + WC_CONSUMER_KEY/WOOCOMMERCE_KEY + WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET; raises ValueError when missing). (2) agents/commerce_agent.py _ensure_wordpress_client: dropped the non-existent `.connect()`, now constructs via `WordPressWooCommerceClient.from_env()` (honors an injected client, degrades gracefully on missing creds keeping _wordpress_connected=False). (3) api/dashboard.py: 3 sites swapped `WordPressWooCommerceClient()` -> `.from_env()`. Verified: import resolves (is WordPressClient True), WORDPRESS_AVAILABLE flipped False->True, from_env graceful-raise on missing creds; black+ruff clean on all 3 files; rtk proxy pytest tests/api/test_commerce_bulk_wire.py + tests/test_core_agents.py = 231 passed (no regression). optimize_price (in main) uses ml_module not _ensure_wordpress_client, so unaffected.",
     "tags": [
       "commerce-agent",
@@ -2423,5 +2423,29 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-28T17:00:00-07:00"
+  },
+  {
+    "id": "bug-166",
+    "timestamp": "2026-06-29T12:20:00-07:00",
+    "error_message": "Stop-hook RED locally: tests/mcp/test_wc_client.py::test_missing_env_raises_keyerror DID NOT RAISE KeyError. Local-only \u2014 CI was green.",
+    "file": "skyyrose/integrations/wc_safe_client.py",
+    "root_cause": "Follow-on to bug-165's WC unification (commit 7426334dc). WCCredentials.from_env() called a helper _ensure_wordpress_env_loaded() that load_dotenv'd .env.wordpress BEFORE reading os.environ. On a dev machine .env.wordpress exists, so the auto-load repopulated the exact credential vars the test had just cleared via monkeypatch.delenv -> from_env resolved creds -> KeyError never raised -> test failed. In CI .env.wordpress is gitignored/absent, so the load no-op'd and the test passed: a test whose outcome depends on an untracked file's presence is non-deterministic. A parallel session compounded confusion by editing the same files (kept auto-load + stubbed the helper in a new test) while this session removed the auto-load.",
+    "fix": "FIXED 2026-06-29, committed 7bfce75cf direct to main (founder: 'commit the wc fix to main'). (1) wc_safe_client.py: removed _ensure_wordpress_env_loaded entirely; from_env() now reads os.environ ONLY (pure), so callers/tests fully control the env via monkeypatch. (2) devskyy_mcp.py: the application bootstrap now does load_dotenv(Path(__file__).parent/'.env.wordpress') after imports (with noqa: E402 on the post-load mcp_tools imports) \u2014 the file load belongs to the app, not the dataclass. (3) tests/mcp/test_wc_client.py: test_missing_env_raises_keyerror + smoketest missing-env test clear all SEVEN var-names from_env accepts (WC_BASE_URL/WORDPRESS_URL/WP_SITE_URL + WC_/WOOCOMMERCE_ key+secret). (4) tests/test_wc_credentials_from_env.py: dropped the now-dead setattr stub of the removed helper; the delenv loop is the entire isolation. Verified: PYTEST_EXIT=0 (25/25 across both WC test files), ruff clean on all 4 files; pushed da73ed5ab..7bfce75cf fast-forward; re-confirmed on origin/main (helper=0, stub=0, all-7-cleared, bootstrap load present).",
+    "tags": [
+      "woocommerce",
+      "wc-credentials",
+      "from-env",
+      "monkeypatch",
+      "dotenv",
+      "non-deterministic-test",
+      "stop-hook",
+      "parallel-session",
+      "local-only"
+    ],
+    "related_bugs": [
+      "bug-165"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T12:20:00-07:00"
   }
 ]
