@@ -3,19 +3,25 @@
 This module provides endpoints for:
 - 3D model generation from text descriptions
 - 3D model generation from images
-- Integration with agents/tripo_agent.py
+- Integration with agents/tripo_agent.py via BackgroundTask + TaskStatusStore
 
-Version: 1.0.0
+Version: 1.1.0
 """
 
+import base64
 import logging
+import os
+import tempfile
 from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 
+from agents.tripo_agent import TripoAssetAgent
+from core.task_status_store import TaskStatusStore, get_initialized_task_status_store
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from security.ssrf_protection import ssrf_protection
 
@@ -116,6 +122,127 @@ class ThreeDGenerationResponse(BaseModel):
 
 
 # =============================================================================
+# Helpers
+# =============================================================================
+
+
+async def _resolve_image_to_tempfile(image_url: str) -> str:
+    """Download a URL or decode base64 data into a local temp file.
+
+    Returns the temp file path. Caller is responsible for deleting it.
+    Agent's _tool_generate_from_image requires a local filesystem path.
+    """
+    suffix = ".png"
+
+    if image_url.startswith("data:"):
+        # data URI: data:image/jpeg;base64,<data>
+        header, encoded = image_url.split(",", 1)
+        if "jpeg" in header or "jpg" in header:
+            suffix = ".jpg"
+        elif "webp" in header:
+            suffix = ".webp"
+        raw = base64.b64decode(encoded)
+    elif image_url.startswith(("http://", "https://")):
+        # follow_redirects=False (SSRF): image_url was SSRF-validated at request
+        # parse time; following a redirect could bounce to an unvalidated internal
+        # host. The validated origin is the only host we contact.
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=False) as hc:
+            resp = await hc.get(image_url)
+            resp.raise_for_status()
+            ct = resp.headers.get("content-type", "")
+            if "jpeg" in ct or "jpg" in ct:
+                suffix = ".jpg"
+            elif "webp" in ct:
+                suffix = ".webp"
+            raw = resp.content
+    else:
+        # Treat as raw base64 without data: prefix
+        raw = base64.b64decode(image_url)
+
+    fd, path = tempfile.mkstemp(suffix=suffix)
+    try:
+        os.write(fd, raw)
+    finally:
+        os.close(fd)
+    return path
+
+
+# =============================================================================
+# Background Task
+# =============================================================================
+
+
+async def _run_3d_generation_background(
+    generation_id: str,
+    request: ThreeDGenerationFromTextRequest | ThreeDGenerationFromImageRequest,
+    store: TaskStatusStore,
+    _agent: TripoAssetAgent | None = None,
+) -> None:
+    """Run 3D generation in background; write status to TaskStatusStore.
+
+    Uses BackgroundTask pattern so the 202 response is immediate and the
+    caller polls GET /media/3d/{generation_id}/status for results.
+
+    _agent is an injection seam for tests — in production it is None and a
+    real TripoAssetAgent is constructed from env.
+    """
+    agent = _agent or TripoAssetAgent()
+    image_temp_path: str | None = None
+
+    try:
+        if isinstance(request, ThreeDGenerationFromTextRequest):
+            result = await agent._tool_generate_from_text(
+                product_name=request.product_name,
+                collection=request.collection,
+                garment_type=request.garment_type,
+                additional_details=request.additional_details,
+                output_format=request.output_format,
+            )
+        else:
+            # image_url is either an HTTP URL or base64 — bridge to local path
+            image_temp_path = await _resolve_image_to_tempfile(request.image_url)
+            result = await agent._tool_generate_from_image(
+                image_path=image_temp_path,
+                product_name=request.product_name,
+                output_format=request.output_format,
+            )
+
+        # result is GenerationResult.model_dump() — a dict.
+        # ThreeDAssetMetadata requires polycount/file_size_mb/… which are absent
+        # from GenerationResult.metadata, so metadata is correctly None.
+        model_url: str = result["model_url"]
+        await store.update_status(
+            generation_id,
+            {
+                "status": "completed",
+                "completed_at": datetime.now(UTC).isoformat(),
+                "model_url": model_url,
+                "preview_url": result.get("thumbnail_path"),
+                "download_url": model_url,
+                "metadata": None,
+            },
+        )
+        logger.info("3D generation %s completed: %s", generation_id, model_url)
+
+    except Exception as exc:
+        logger.error("3D generation %s failed: %s", generation_id, exc, exc_info=True)
+        await store.update_status(
+            generation_id,
+            {
+                "status": "failed",
+                "failed_at": datetime.now(UTC).isoformat(),
+                "error": str(exc),
+            },
+        )
+    finally:
+        if image_temp_path and os.path.exists(image_temp_path):
+            os.unlink(image_temp_path)
+        # TripoAssetAgent.close() exists but is a documented no-op — the Tripo
+        # SDK self-manages connections via async context managers inside each
+        # _tool_* call, so there is nothing to release here.
+
+
+# =============================================================================
 # Endpoints
 # =============================================================================
 
@@ -127,6 +254,8 @@ class ThreeDGenerationResponse(BaseModel):
 )
 async def generate_3d_from_text(
     request: ThreeDGenerationFromTextRequest,
+    background_tasks: BackgroundTasks,
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
     user: TokenPayload = Depends(get_current_user),
 ) -> ThreeDGenerationResponse:
     """Generate 3D fashion models from text descriptions using Tripo3D AI.
@@ -155,52 +284,50 @@ async def generate_3d_from_text(
 
     Args:
         request: Generation parameters (product_name, collection, garment_type, etc.)
+        background_tasks: FastAPI background task runner
+        store: Task status store for async polling
         user: Authenticated user (from JWT token)
 
     Returns:
-        ThreeDGenerationResponse with generation status and URLs
-
-    Raises:
-        HTTPException: If generation fails
+        ThreeDGenerationResponse with status=processing and generation_id for polling
     """
     generation_id = str(uuid4())
+    now = datetime.now(UTC).isoformat()
+
     logger.info(
-        f"Starting text-to-3D generation {generation_id} for user {user.sub}: "
-        f"{request.product_name} ({request.collection})"
+        "Queuing text-to-3D generation %s for user %s: %s (%s)",
+        generation_id,
+        user.sub,
+        request.product_name,
+        request.collection,
     )
 
-    try:
-        # TODO: Integrate with agents/tripo_agent.py TripoAgent
-        # For now, return mock data demonstrating the structure
+    await store.set_status(
+        generation_id,
+        {
+            "status": "processing",
+            "started_at": now,
+            "generation_id": generation_id,
+            "product_name": request.product_name,
+            "output_format": request.output_format,
+        },
+    )
 
-        metadata = ThreeDAssetMetadata(
-            polycount=25000,
-            file_size_mb=8.5,
-            texture_resolution="2048x2048",
-            includes_materials=True,
-            includes_textures=True,
-            animation_ready=True,
-        )
+    background_tasks.add_task(
+        _run_3d_generation_background,
+        generation_id,
+        request,
+        store,
+    )
 
-        return ThreeDGenerationResponse(
-            generation_id=generation_id,
-            status="processing",
-            timestamp=datetime.now(UTC).isoformat(),
-            product_name=request.product_name,
-            output_format=request.output_format,
-            model_url=f"https://cdn.devskyy.com/3d/{generation_id}.{request.output_format}",
-            preview_url=f"https://preview.devskyy.com/3d/{generation_id}",
-            download_url=f"https://downloads.devskyy.com/3d/{generation_id}.{request.output_format}",
-            metadata=metadata,
-            estimated_completion_time="2-5 minutes",
-        )
-
-    except Exception as e:
-        logger.error(f"Text-to-3D generation failed: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Text-to-3D generation failed: {str(e)}",
-        )
+    return ThreeDGenerationResponse(
+        generation_id=generation_id,
+        status="processing",
+        timestamp=now,
+        product_name=request.product_name,
+        output_format=request.output_format,
+        estimated_completion_time="2-5 minutes",
+    )
 
 
 @router.post(
@@ -210,6 +337,8 @@ async def generate_3d_from_text(
 )
 async def generate_3d_from_image(
     request: ThreeDGenerationFromImageRequest,
+    background_tasks: BackgroundTasks,
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
     user: TokenPayload = Depends(get_current_user),
 ) -> ThreeDGenerationResponse:
     """Generate 3D models from reference images using Tripo3D AI.
@@ -224,8 +353,8 @@ async def generate_3d_from_image(
 
     **Supported Input:**
     - Image URLs (PNG, JPG, WebP)
-    - Base64-encoded images
-    - Product photos or design sketches
+    - Base64-encoded images (with or without data: prefix)
+    - Data URIs (data:image/png;base64,...)
 
     **Supported Output Formats:**
     - GLB (Binary glTF) - Recommended for web/AR
@@ -237,50 +366,91 @@ async def generate_3d_from_image(
 
     Args:
         request: Generation parameters (product_name, image_url, output_format)
+        background_tasks: FastAPI background task runner
+        store: Task status store for async polling
         user: Authenticated user (from JWT token)
 
     Returns:
-        ThreeDGenerationResponse with generation status and URLs
-
-    Raises:
-        HTTPException: If generation fails or image is invalid
+        ThreeDGenerationResponse with status=processing and generation_id for polling
     """
     generation_id = str(uuid4())
+    now = datetime.now(UTC).isoformat()
+
     logger.info(
-        f"Starting image-to-3D generation {generation_id} for user {user.sub}: "
-        f"{request.product_name}"
+        "Queuing image-to-3D generation %s for user %s: %s",
+        generation_id,
+        user.sub,
+        request.product_name,
     )
 
-    try:
-        # TODO: Integrate with agents/tripo_agent.py TripoAgent
-        # Validate image URL or base64 data
-        # For now, return mock data demonstrating the structure
+    await store.set_status(
+        generation_id,
+        {
+            "status": "processing",
+            "started_at": now,
+            "generation_id": generation_id,
+            "product_name": request.product_name,
+            "output_format": request.output_format,
+        },
+    )
 
-        metadata = ThreeDAssetMetadata(
-            polycount=32000,
-            file_size_mb=12.3,
-            texture_resolution="4096x4096",
-            includes_materials=True,
-            includes_textures=True,
-            animation_ready=True,
-        )
+    background_tasks.add_task(
+        _run_3d_generation_background,
+        generation_id,
+        request,
+        store,
+    )
 
-        return ThreeDGenerationResponse(
-            generation_id=generation_id,
-            status="processing",
-            timestamp=datetime.now(UTC).isoformat(),
-            product_name=request.product_name,
-            output_format=request.output_format,
-            model_url=f"https://cdn.devskyy.com/3d/{generation_id}.{request.output_format}",
-            preview_url=f"https://preview.devskyy.com/3d/{generation_id}",
-            download_url=f"https://downloads.devskyy.com/3d/{generation_id}.{request.output_format}",
-            metadata=metadata,
-            estimated_completion_time="3-7 minutes",
-        )
+    return ThreeDGenerationResponse(
+        generation_id=generation_id,
+        status="processing",
+        timestamp=now,
+        product_name=request.product_name,
+        output_format=request.output_format,
+        estimated_completion_time="3-7 minutes",
+    )
 
-    except Exception as e:
-        logger.error(f"Image-to-3D generation failed: {e}", exc_info=True)
+
+@router.get(
+    "/3d/{generation_id}/status",
+    response_model=ThreeDGenerationResponse,
+)
+async def get_3d_generation_status(
+    generation_id: str,
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
+    user: TokenPayload = Depends(get_current_user),
+) -> ThreeDGenerationResponse:
+    """Poll the status of a 3D generation job.
+
+    Args:
+        generation_id: ID returned by the POST /media/3d/generate/* endpoints
+        store: Task status store
+        user: Authenticated user (from JWT token)
+
+    Returns:
+        ThreeDGenerationResponse with current status and result URLs when complete
+
+    Raises:
+        HTTPException 404: If generation_id is not found
+    """
+    stored = await store.get_status(generation_id)
+    if stored is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Image-to-3D generation failed: {str(e)}",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Generation {generation_id!r} not found",
         )
+
+    return ThreeDGenerationResponse(
+        generation_id=generation_id,
+        status=stored["status"],
+        timestamp=stored.get("started_at")
+        or stored.get("completed_at")
+        or stored.get("failed_at", ""),
+        product_name=stored.get("product_name", ""),
+        output_format=stored.get("output_format", "glb"),
+        model_url=stored.get("model_url"),
+        preview_url=stored.get("preview_url"),
+        download_url=stored.get("download_url"),
+        metadata=None,
+        estimated_completion_time=None,
+    )

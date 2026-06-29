@@ -160,7 +160,7 @@ async def scan_code(params: ScanCodeInput) -> str:
         )
 
     data = await _make_api_request(
-        "scanner/scan",
+        "code/scan",
         method="POST",
         data={
             "path": sanitized_path,
