@@ -25,7 +25,6 @@ from typing import Any
 import httpx
 from PIL import Image, ImageColor
 from pydantic import BaseModel
-from security.ssrf_protection import SSRFProtection
 from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from core.errors.production_errors import (
@@ -33,6 +32,7 @@ from core.errors.production_errors import (
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
+from security.ssrf_protection import SSRFProtection
 
 logger = logging.getLogger(__name__)
 
