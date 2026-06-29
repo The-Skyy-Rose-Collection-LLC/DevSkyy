@@ -22,6 +22,30 @@ require_admin = RoleChecker([UserRole.ADMIN])
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 _DEPLOY_SCRIPT = _PROJECT_ROOT / "scripts" / "deploy-theme.sh"
 _DEPLOY_TIMEOUT_S = 600
+# Bound on reaping a SIGKILL'd child so a D-state process can't hang the loop.
+_REAP_TIMEOUT_S = 10
+
+
+async def _kill_and_reap(proc: asyncio.subprocess.Process) -> None:
+    """SIGKILL a still-running deploy child and reap it without hanging the loop.
+
+    kill() (SIGKILL, uncatchable) is used over terminate() so the deploy script
+    cannot ignore it. The child is reaped with proc.wait() — never a second
+    communicate(), whose pipe readers are indeterminate after the cancelled await
+    and could deadlock. wait() is itself bounded so a process stuck in an
+    uninterruptible (D-state) kernel wait cannot block the event loop forever.
+    """
+    try:
+        proc.kill()
+    except ProcessLookupError:
+        return  # already exited between the timeout and the kill
+    try:
+        await asyncio.wait_for(proc.wait(), timeout=_REAP_TIMEOUT_S)
+    except TimeoutError:
+        logger.warning(
+            "Deploy child still alive %ds after SIGKILL; leaving it for the OS to reap",
+            _REAP_TIMEOUT_S,
+        )
 
 
 class ThemeConfig(BaseModel):
@@ -39,6 +63,7 @@ class ThemeDeployRequest(BaseModel):
 
     environment: str = "production"
     backup_first: bool = True
+    with_maintenance: bool = False
 
 
 @router.get("/config", response_model=ThemeConfig, summary="Get theme config")
@@ -71,7 +96,10 @@ async def deploy_theme(
 
     is_dry_run = request.environment != "production"
     flags: list[str] = ["--dry-run"] if is_dry_run else []
+    if request.with_maintenance:
+        flags.append("--with-maintenance")
 
+    proc: asyncio.subprocess.Process | None = None
     try:
         proc = await asyncio.create_subprocess_exec(
             "bash",
@@ -86,6 +114,12 @@ async def deploy_theme(
         )
     except TimeoutError:
         logger.error("Theme deploy timed out after %ds", _DEPLOY_TIMEOUT_S)
+        # wait_for cancelled communicate() but the child is still running in the OS.
+        # SIGKILL + bounded reap so we neither leak a zombie nor hang the loop.
+        # (proc is always bound here — TimeoutError only comes from wait_for, after
+        # create_subprocess_exec succeeded — but guard for the type-checker.)
+        if proc is not None:
+            await _kill_and_reap(proc)
         return {
             "success": False,
             "returncode": -1,
@@ -93,6 +127,16 @@ async def deploy_theme(
             "message": f"deploy timed out after {_DEPLOY_TIMEOUT_S}s",
             "log_tail": [],
         }
+    except asyncio.CancelledError:
+        # Request cancelled (client disconnect / server shutdown). Kill the child
+        # so the deploy does not keep running unattended. Do NOT await here — the
+        # task is unwinding; the OS reaps the killed child when this process exits.
+        if proc is not None and proc.returncode is None:
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+        raise
     except FileNotFoundError as exc:
         logger.error("bash or deploy script not found: %s", exc)
         raise HTTPException(status_code=500, detail="bash or deploy script not found") from exc

@@ -185,3 +185,102 @@ def test_validate_only_skips_all_agent_write_calls(monkeypatch: pytest.MonkeyPat
     results = body["results"]
     assert len(results) == 1
     assert results[0]["status"] in ("success", "skipped")
+
+
+# ---------------------------------------------------------------------------
+# (d) update path — update_woocommerce_product; result['id'] → product_id
+# ---------------------------------------------------------------------------
+
+
+def test_update_maps_agent_success_to_product_result(monkeypatch: pytest.MonkeyPatch) -> None:
+    """action=update → update_woocommerce_product(product_id, updates); id wired through."""
+
+    class _StubAgent:
+        async def initialize(self) -> None:
+            return None
+
+        async def update_woocommerce_product(self, product_id: int, updates: dict) -> dict:
+            return {"id": product_id}
+
+    client = _make_client(_StubAgent, monkeypatch)
+    resp = client.post(
+        "/commerce/products/bulk",
+        json={
+            "action": "update",
+            "products": [{"id": 42, "price": 99.99, "sku": "br-001"}],
+        },
+    )
+
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["status"] == "completed"
+    results = body["results"]
+    assert len(results) == 1
+    assert results[0]["status"] == "success"
+    assert results[0]["product_id"] == "42"
+    assert body["successful"] == 1
+    assert body["failed"] == 0
+
+
+# ---------------------------------------------------------------------------
+# (e) delete path — _wordpress_client.delete_product; product_id from input id
+# ---------------------------------------------------------------------------
+
+
+def test_delete_maps_agent_success_to_product_result(monkeypatch: pytest.MonkeyPatch) -> None:
+    """action=delete → _ensure_wordpress_client + _wordpress_client.delete_product."""
+
+    class _StubAgent:
+        async def initialize(self) -> None:
+            return None
+
+        async def _ensure_wordpress_client(self) -> None:
+            wc = MagicMock()
+            wc.delete_product = AsyncMock(return_value={"deleted": True})
+            self._wordpress_client = wc
+
+    client = _make_client(_StubAgent, monkeypatch)
+    resp = client.post(
+        "/commerce/products/bulk",
+        json={
+            "action": "delete",
+            "products": [{"id": 99, "sku": "sg-001"}],
+        },
+    )
+
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    results = body["results"]
+    assert len(results) == 1
+    assert results[0]["status"] == "success"
+    # product_id is sourced from the input id, not the delete_product return value
+    assert results[0]["product_id"] == "99"
+    assert body["successful"] == 1
+    assert body["failed"] == 0
+
+
+def test_delete_missing_client_maps_to_failed(monkeypatch: pytest.MonkeyPatch) -> None:
+    """delete with no WordPress client available → status='failed', honest (no fake success)."""
+
+    class _StubAgent:
+        async def initialize(self) -> None:
+            return None
+
+        async def _ensure_wordpress_client(self) -> None:
+            self._wordpress_client = None
+
+    client = _make_client(_StubAgent, monkeypatch)
+    resp = client.post(
+        "/commerce/products/bulk",
+        json={
+            "action": "delete",
+            "products": [{"id": 7, "sku": "lh-001"}],
+        },
+    )
+
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    results = body["results"]
+    assert len(results) == 1
+    assert results[0]["status"] == "failed"
+    assert body["failed"] == 1

@@ -10,10 +10,9 @@ Version: 1.0.0
 
 import asyncio
 import logging
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -266,7 +265,7 @@ async def scan_code(
 @router.post("/fix", response_model=CodeFixResponse, status_code=status.HTTP_200_OK)
 async def fix_code(
     request: CodeFixRequest, user: TokenPayload = Depends(get_current_user)
-) -> CodeFixResponse:
+) -> NoReturn:
     """Automatically fix code issues detected by scanner.
 
     The Fixer provides automated code remediation:
@@ -288,58 +287,25 @@ async def fix_code(
     Raises:
         HTTPException: If scan_id not found or fix fails
     """
-    fix_id = str(uuid4())
-    logger.info(f"Starting code fix {fix_id} for user {user.sub}")
+    logger.info("Code fix requested by user %s", user.sub)
 
-    try:
-        # Validate input
-        if not request.scan_id and not request.scan_results:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Either scan_id or scan_results must be provided",
-            )
-
-        # TODO: Integrate with actual code fixing logic
-        # For now, return mock data demonstrating the structure
-
-        fixes = [
-            CodeFix(
-                file="example.py",
-                line=42,
-                fix_type="security",
-                original='query = "SELECT * FROM users WHERE id = " + user_id',
-                fixed='query = "SELECT * FROM users WHERE id = %s"\ncursor.execute(query, (user_id,))',
-                applied=request.auto_apply,
-            ),
-            CodeFix(
-                file="example.py",
-                line=10,
-                fix_type="imports",
-                original="import os, sys, json",
-                fixed="import json\nimport os\nimport sys",
-                applied=request.auto_apply,
-            ),
-        ]
-
-        backup_path = None
-        if request.create_backup and request.auto_apply:
-            backup_path = str(Path(tempfile.gettempdir()) / f"backup_{fix_id}")
-
-        return CodeFixResponse(
-            fix_id=fix_id,
-            status="completed" if request.auto_apply else "suggestions_generated",
-            timestamp=datetime.now(UTC).isoformat(),
-            fixes_generated=len(fixes),
-            fixes_applied=len(fixes) if request.auto_apply else 0,
-            fixes=fixes,
-            backup_path=backup_path,
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Code fix failed: {e}", exc_info=True)
+    # Input validation precedes the not-implemented signal so a malformed request
+    # gets the most specific error (400) and a well-formed one gets 501.
+    if not request.scan_id and not request.scan_results:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Code fix failed: {str(e)}",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either scan_id or scan_results must be provided",
         )
+
+    # No automated code-fix backend exists yet. The only real healer
+    # (SelfHealingEngine) implements format/imports/lint/unused but NOT
+    # FIX_SECURITY, and speaks its own CodeIssue type — not the SecurityFinding
+    # scan_results this endpoint receives. Wiring it would silently fail on every
+    # security finding, so return an honest 501 rather than fabricated fixes.
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail=(
+            "Automated code fixing is not yet implemented. "
+            "Use POST /code/scan for security analysis."
+        ),
+    )

@@ -135,3 +135,26 @@ class TestCodeScanPathSafety:
         missing = str(_PROJECT_ROOT / "does_not_exist_xyz_abc_123_sentinel")
         resp = client.post("/code/scan", json={"path": missing})
         assert resp.status_code == 404
+
+
+class TestCodeFixNotImplemented:
+    """/code/fix has no real backend yet — must return an honest 501, never mock fixes.
+
+    The only real healer (SelfHealingEngine) does not implement FIX_SECURITY and
+    speaks its own CodeIssue type, not the SecurityFinding scan_results this
+    endpoint receives. Until that adapter exists, the endpoint returns 501 rather
+    than fabricating fixes (no-stubs rule).
+    """
+
+    def test_fix_with_scan_results_returns_501(self, client: TestClient) -> None:
+        resp = client.post(
+            "/code/fix",
+            json={"scan_results": {"issues": []}, "auto_apply": False},
+        )
+        assert resp.status_code == 501, resp.text
+        assert "not yet implemented" in resp.json()["detail"].lower()
+
+    def test_fix_without_scan_input_returns_400(self, client: TestClient) -> None:
+        """No scan_id and no scan_results → 400 (input validation precedes 501)."""
+        resp = client.post("/code/fix", json={"auto_apply": False})
+        assert resp.status_code == 400

@@ -211,3 +211,91 @@ def test_get_status_returns_failed_no_crash(api_client):
     body = resp.json()
     assert body["status"] == "failed"
     assert body["generation_id"] == "gen-fail-get"
+
+
+# ---------------------------------------------------------------------------
+# (d) POST /media/3d/generate/image → 202 + generation_id + status=processing
+#     data: URI bypasses the SSRF validator; resolver + agent are mocked.
+# ---------------------------------------------------------------------------
+
+# 1x1 transparent PNG, base64 — used as a data: URI so the SSRF validator
+# (which only fires on http/https) is skipped and no real fetch occurs.
+_TINY_PNG_B64 = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk"
+    "+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+)
+_DATA_URI = f"data:image/png;base64,{_TINY_PNG_B64}"
+
+
+def test_post_image_202_processing_no_fake_urls(api_client):
+    client, _ = api_client
+    with (
+        patch("api.v1.media.TripoAssetAgent") as MockCls,
+        patch("api.v1.media._resolve_image_to_tempfile", new_callable=AsyncMock) as mock_resolve,
+    ):
+        inst = MagicMock()
+        inst._tool_generate_from_image = AsyncMock(return_value=MOCK_RESULT)
+        MockCls.return_value = inst
+        mock_resolve.return_value = "/tmp/fake-test-image.png"
+
+        resp = client.post(
+            "/api/v1/media/3d/generate/image",
+            json={"product_name": "Test Tee", "image_url": _DATA_URI},
+        )
+
+    assert resp.status_code == 202, resp.text
+    body = resp.json()
+    assert "generation_id" in body
+    assert body["status"] == "processing"
+    assert body.get("model_url") is None, "stub URLs must not appear in 202 body"
+    assert body.get("download_url") is None
+    assert body.get("preview_url") is None
+    # Not a stub: TestClient runs the BackgroundTask before returning, so the
+    # handler must have delegated to the resolver + agent (guards against a
+    # response-only stub that never wires to TripoAssetAgent).
+    mock_resolve.assert_awaited_once()
+    inst._tool_generate_from_image.assert_awaited_once()
+
+
+# ---------------------------------------------------------------------------
+# (e) _run_3d_generation_background image branch — resolver mocked, agent mocked
+#     Verify store → status=completed with real model_url; metadata=None
+# ---------------------------------------------------------------------------
+
+
+def test_background_fn_image_stores_completed(in_memory_store):
+    from api.v1.media import ThreeDGenerationFromImageRequest, _run_3d_generation_background
+
+    generation_id = "gen-test-img"
+    request = ThreeDGenerationFromImageRequest(product_name="Test Tee", image_url=_DATA_URI)
+
+    mock_agent = MagicMock()
+    mock_agent._tool_generate_from_image = AsyncMock(return_value=MOCK_RESULT)
+
+    async def _run():
+        await in_memory_store.set_status(
+            generation_id,
+            {
+                "status": "processing",
+                "started_at": "2026-01-01T00:00:00Z",
+                "product_name": "Test Tee",
+                "output_format": "glb",
+            },
+        )
+        with patch(
+            "api.v1.media._resolve_image_to_tempfile", new_callable=AsyncMock
+        ) as mock_resolve:
+            mock_resolve.return_value = "/tmp/fake-test-image.png"
+            await _run_3d_generation_background(
+                generation_id, request, in_memory_store, _agent=mock_agent
+            )
+        return await in_memory_store.get_status(generation_id)
+
+    stored = asyncio.run(_run())
+
+    assert stored is not None
+    assert stored["status"] == "completed"
+    assert stored["model_url"] == MOCK_RESULT["model_url"]
+    # image branch resolved the URL then handed the local path to the agent
+    mock_agent._tool_generate_from_image.assert_awaited_once()
+    assert stored.get("metadata") is None
