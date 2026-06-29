@@ -190,7 +190,9 @@ class BackgroundRemovalService:
         # Guard against DoS via oversized images (max 50MP)
         max_pixels = 50_000_000
         if cutout.width * cutout.height > max_pixels:
-            raise ValueError(f"Image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels")
+            raise ValueError(
+                f"Image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels"
+            )
         cutout = cutout.convert("RGBA")
         rgb = ImageColor.getrgb(color)
         background = Image.new("RGBA", cutout.size, (rgb[0], rgb[1], rgb[2], 255))
@@ -204,12 +206,16 @@ class BackgroundRemovalService:
         max_pixels = 50_000_000
         cutout = Image.open(BytesIO(cutout_bytes))
         if cutout.width * cutout.height > max_pixels:
-            raise ValueError(f"Cutout image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels")
+            raise ValueError(
+                f"Cutout image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels"
+            )
         cutout = cutout.convert("RGBA")
 
         background = Image.open(BytesIO(background_bytes))
         if background.width * background.height > max_pixels:
-            raise ValueError(f"Background image too large: {background.width}x{background.height} exceeds {max_pixels} pixels")
+            raise ValueError(
+                f"Background image too large: {background.width}x{background.height} exceeds {max_pixels} pixels"
+            )
         background = background.convert("RGBA").resize(cutout.size)
 
         flattened = Image.alpha_composite(background, cutout).convert("RGB")
