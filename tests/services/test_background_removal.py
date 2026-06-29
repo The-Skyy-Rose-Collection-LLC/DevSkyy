@@ -195,24 +195,28 @@ class TestRemoveBackground:
         assert result.background_type == BackgroundType.TRANSPARENT
         assert result.model_used == DEFAULT_BACKGROUND_REMOVAL_MODEL
 
-    @pytest.mark.xfail(
-        reason="services/ml/enhancement/background_removal.py:281 BackgroundType.SOLID_COLOR composite path not implemented",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_remove_background_with_solid_color(
         self, service: BackgroundRemovalService, mock_replicate_client: MagicMock
     ) -> None:
-        """Should handle solid color background request."""
+        """Should composite the cutout onto a solid color and return a PNG data URL."""
+        from io import BytesIO
+
+        from PIL import Image
+
         mock_prediction = MagicMock()
         mock_prediction.succeeded = True
         mock_prediction.output = "https://example.com/result.png"
         mock_replicate_client.run_prediction = AsyncMock(return_value=mock_prediction)
 
+        buffer = BytesIO()
+        Image.new("RGBA", (8, 8), (0, 0, 0, 0)).save(buffer, format="PNG")
+        cutout_png = buffer.getvalue()
+
         with patch.object(
             service, "_download_image_bytes", new_callable=AsyncMock
         ) as mock_download:
-            mock_download.return_value = b"fake-image-data"
+            mock_download.return_value = cutout_png
 
             result = await service.remove_background(
                 "https://example.com/product.jpg",
@@ -222,6 +226,7 @@ class TestRemoveBackground:
 
         assert result.background_type == BackgroundType.SOLID_COLOR
         assert result.background_value == "#FF0000"
+        assert result.result_url.startswith("data:image/png;base64,")
 
     @pytest.mark.asyncio
     async def test_remove_background_fallback_on_primary_failure(
