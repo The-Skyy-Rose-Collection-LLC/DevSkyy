@@ -1,11 +1,12 @@
 """Domain-tagged evaluation observability: per-evaluation JSONL + batch summary +
-judge-vs-human agreement. Alert+recommend only (never auto-acts)."""
+judge-vs-human agreement (Cohen's κ). Alert+recommend only (never auto-acts)."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+from evaluation.calibration import cohen_kappa
 from evaluation.contracts import Verdict
 
 
@@ -51,6 +52,9 @@ class Observer:
 
 
 def judge_human_agreement(judge_pass: list[bool], human_pass: list[bool]) -> float:
-    if len(judge_pass) != len(human_pass) or not judge_pass:
-        raise ValueError("equal-length non-empty lists required")
-    return sum(1 for a, b in zip(judge_pass, human_pass, strict=True) if a == b) / len(judge_pass)
+    """Chance-corrected judge-vs-human agreement (Cohen's κ) over binary pass/fail.
+
+    Q-kappa unification: there is ONE agreement implementation — ``calibration.cohen_kappa``.
+    This is its bool-input adapter (raw proportion was the divergent second metric and is gone).
+    """
+    return cohen_kappa([int(p) for p in judge_pass], [int(p) for p in human_pass])

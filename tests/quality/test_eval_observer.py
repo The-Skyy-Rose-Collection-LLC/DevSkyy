@@ -31,5 +31,19 @@ def test_record_writes_jsonl(tmp_path):
     assert round(summary["cost_usd"], 2) == 0.04
 
 
-def test_agreement():
-    assert judge_human_agreement([True, False, True], [True, False, False]) == 2 / 3
+def test_agreement_is_cohen_kappa():
+    # Q-kappa unification: judge-human agreement is chance-corrected (Cohen's κ),
+    # not raw proportion. One implementation lives in calibration.cohen_kappa;
+    # observer.judge_human_agreement is a bool->int adapter over it.
+    import pytest
+
+    from evaluation.calibration import cohen_kappa
+
+    judge = [True, False, True]
+    human = [True, False, False]
+    # delegates to the single κ implementation (exact equality, same float)
+    assert judge_human_agreement(judge, human) == cohen_kappa([1, 0, 1], [1, 0, 0])
+    # raw proportion would be 2/3; chance-corrected κ for this case is 0.4
+    assert judge_human_agreement(judge, human) == pytest.approx(0.4)
+    # perfect agreement -> κ == 1.0
+    assert judge_human_agreement([True, True], [True, True]) == 1.0
