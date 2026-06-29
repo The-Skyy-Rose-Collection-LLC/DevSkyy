@@ -189,7 +189,7 @@ mcp = [
     "ratelimit==2.2.1",
     "cryptography==49.0.0",
     "pyjwt==2.13.0",
-    "sqlalchemy==2.0.45",
+    "sqlalchemy==2.0.51",
     "aiosqlite==0.22.1",
     "redis==8.0.0",
     "pyyaml==6.0.3",
@@ -282,7 +282,7 @@ ml = [
     "fastapi>=0.119.0",
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
-    "sqlalchemy==2.0.45",
+    "sqlalchemy==2.0.51",
     "pymongo==4.17.0",
     # Compatibility constraints for dependency resolution
     "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
