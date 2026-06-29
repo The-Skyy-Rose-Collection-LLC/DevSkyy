@@ -47,6 +47,10 @@ EncoderName = Literal["clip", "dino"]
 # cost (e.g. the oai_render QC gate) reference this constant instead of forking a copy.
 DEFAULT_CENTROID_PATH = Path(__file__).resolve().parents[1] / "data" / "brand_centroid.npz"
 
+# Minimum number of approved images required to build a stable centroid.
+# A mean embedding from fewer images is too noisy to be a reliable gate.
+MIN_APPROVED = 8
+
 SIDECAR_SCHEMA_VERSION = 1
 
 
@@ -104,6 +108,7 @@ def build_centroid(
     approved_dir: Path,
     threshold_percentile: float = 10.0,
     encoder: EncoderName = "clip",
+    manifest: Path | None = None,
 ) -> BrandCentroid:
     """Compute centroid + a robust threshold from approved hero shots.
 
@@ -116,10 +121,39 @@ def build_centroid(
         approved_dir: Directory of approved hero shots.
         threshold_percentile: Lower = more permissive gate.
         encoder: "clip" or "dino". DINOv2 typically ~2x discrimination gap.
+        manifest: Optional JSON file specifying a curated allowlist of
+            filenames to use from ``approved_dir``.  Accepts either a plain
+            list of filenames (``["a.png", "b.png"]``) or an object with an
+            ``"approved"`` key (``{"approved": ["a.png", "b.png"]}``).
+            When provided, only images whose basename appears in the
+            allowlist are used.  A manifest entry that has no matching file
+            in ``approved_dir`` raises ``ValueError`` — no silent skips.
+            When ``None``, all images in ``approved_dir`` are used
+            (back-compat behaviour).
     """
     paths = _list_images(approved_dir)
     if not paths:
         raise ValueError(f"no image files in {approved_dir}")
+
+    if manifest is not None:
+        raw = json.loads(manifest.read_text())
+        if isinstance(raw, dict):
+            allowlist: list[str] = raw["approved"]
+        else:
+            allowlist = list(raw)
+        # Build a name→path map from the directory listing.
+        by_name = {p.name: p for p in paths}
+        filtered: list[Path] = []
+        for name in allowlist:
+            if name not in by_name:
+                raise ValueError(f"manifest entry {name!r} not found in {approved_dir}")
+            filtered.append(by_name[name])
+        paths = filtered
+
+    if len(paths) < MIN_APPROVED:
+        raise ValueError(
+            f"need >= {MIN_APPROVED} approved images for a stable centroid, got {len(paths)}"
+        )
 
     embeddings = np.stack([_embed(encoder, p) for p in paths])
     raw_centroid = embeddings.mean(axis=0)

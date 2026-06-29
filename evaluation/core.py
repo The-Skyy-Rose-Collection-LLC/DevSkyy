@@ -73,7 +73,10 @@ class EvaluationCore:
         if budget is not None:
             budget.add(verdict.cost_usd)
         attempts = 0
-        while not verdict.passed and attempts < cap:
+        # Only revise when the judge is calibrated (hard_gate).  A soft_signal
+        # verdict means kappa < KAPPA_FLOOR — we don't trust the judge enough to
+        # spend money on a revise loop; return the scored verdict as-is.
+        while verdict.mode == "hard_gate" and not verdict.passed and attempts < cap:
             self._ensure_affordable(budget, est_call_cost_usd)
             attempts += 1
             critique = {

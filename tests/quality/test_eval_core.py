@@ -28,7 +28,7 @@ class _Adapter:
         return []
 
 
-def _v(passed, score=1.0):
+def _v(passed, score=1.0, mode="hard_gate"):
     return Verdict(
         domain="test",
         passed=passed,
@@ -37,6 +37,7 @@ def _v(passed, score=1.0):
         failure_tags=() if passed else ("x",),
         reason="",
         cost_usd=0.01,
+        mode=mode,
     )
 
 
@@ -86,3 +87,39 @@ async def test_gate_exhausts_cap_and_returns_failing_verdict():
 
     v = await core.gate(ad, ref={}, producer=_producer, cap=2)
     assert v.passed is False and v.attempts == 2
+
+
+async def test_gate_soft_signal_does_not_revise():
+    """soft_signal verdict (uncalibrated judge) must not trigger the revise loop."""
+    revise_calls = 0
+
+    class _TrackingAdapter(_Adapter):
+        async def revise(self, ref, critique):
+            nonlocal revise_calls
+            revise_calls += 1
+            return "revised"
+
+    core = EvaluationCore(judge_fn=lambda req: ({}, 0.01))
+    ad = _TrackingAdapter(det=[], verdicts=[_v(False, mode="soft_signal")])
+
+    async def _producer(ref):
+        return "initial"
+
+    v = await core.gate(ad, ref={}, producer=_producer, cap=3)
+    assert v.passed is False
+    assert v.attempts == 0  # loop never entered
+    assert revise_calls == 0  # revise never called
+
+
+async def test_gate_hard_gate_revises_to_cap():
+    """hard_gate failing verdict must run the revise loop up to cap."""
+    core = EvaluationCore(judge_fn=lambda req: ({}, 0.01))
+    # Three failing hard_gate verdicts; cap=2 means 2 revisions maximum.
+    ad = _Adapter(det=[], verdicts=[_v(False), _v(False), _v(False)])
+
+    async def _producer(ref):
+        return "initial"
+
+    v = await core.gate(ad, ref={}, producer=_producer, cap=2)
+    assert v.passed is False
+    assert v.attempts == 2  # revise loop ran the full cap
