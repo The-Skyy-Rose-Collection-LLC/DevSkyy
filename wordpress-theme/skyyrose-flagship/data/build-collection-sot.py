@@ -9,7 +9,7 @@ Orphans = every image file in the scanned tree registered to NO manifest entry, 
 product, or logo (naming-independent set-difference). Manifest entries are expanded across
 their declared `formats`, so format siblings (avif/png of a webp role) count as registered.
 
-USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD]
+USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD] [--out-dir DIR]
 """
 
 import argparse
@@ -257,7 +257,17 @@ def main() -> int:
         default="GENERATED",
         help="Value for each sot.json 'updated' field, e.g. 2026-06-14.",
     )
-    updated = parser.parse_args().updated
+    parser.add_argument(
+        "--out-dir",
+        default=None,
+        help="Directory to write the per-slug sot.json folders + _orphans.json into. "
+        "Defaults to data/collections/ (the tracked SOT view). Tests pass a tmp dir so "
+        "they never mutate tracked files or race a concurrent build.",
+    )
+    args = parser.parse_args()
+    updated = args.updated
+    out = Path(args.out_dir) if args.out_dir else OUT
+    out.mkdir(parents=True, exist_ok=True)
     idents = sot_common.load_identity()
     manifest = sot_common.load_manifest()
     logo_reg = sot_common.load_logo_registry()
@@ -268,7 +278,7 @@ def main() -> int:
     for slug, ident in idents.items():
         products = products_by_col.get(slug, [])
         sot = build_collection(slug, ident, manifest, logo_reg, products, updated)
-        folder = OUT / slug
+        folder = out / slug
         folder.mkdir(parents=True, exist_ok=True)
         (folder / "sot.json").write_text(json.dumps(sot, indent=2) + "\n")
         print(
@@ -280,7 +290,7 @@ def main() -> int:
     for ident in idents.values():
         known |= set(ident.get("known_orphans", []))
     orphans = sorted(tree - reg - known)
-    (OUT / "_orphans.json").write_text(
+    (out / "_orphans.json").write_text(
         json.dumps(
             {
                 "_note": "Image files in the asset tree registered to NO manifest entry, product, or logo. "
