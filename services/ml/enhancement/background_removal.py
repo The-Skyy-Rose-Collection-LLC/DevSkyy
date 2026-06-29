@@ -207,14 +207,16 @@ class BackgroundRemovalService:
         cutout = Image.open(BytesIO(cutout_bytes))
         if cutout.width * cutout.height > max_pixels:
             raise ValueError(
-                f"Cutout image too large: {cutout.width}x{cutout.height} exceeds {max_pixels} pixels"
+                f"Cutout image too large: {cutout.width}x{cutout.height} "
+                f"exceeds {max_pixels} pixels"
             )
         cutout = cutout.convert("RGBA")
 
         background = Image.open(BytesIO(background_bytes))
         if background.width * background.height > max_pixels:
             raise ValueError(
-                f"Background image too large: {background.width}x{background.height} exceeds {max_pixels} pixels"
+                f"Background image too large: {background.width}x{background.height} "
+                f"exceeds {max_pixels} pixels"
             )
         background = background.convert("RGBA").resize(cutout.size)
 
