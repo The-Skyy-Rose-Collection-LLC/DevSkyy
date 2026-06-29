@@ -45,6 +45,13 @@ dl.onclick=()=>{const del=tiles.filter(t=>t.dataset.state==='del').map(t=>t.data
 // file:// note (accurate: images work locally) + per-image broken-file badge
 if(location.protocol==='file:')pnote.style.display='block';
 if(typeof pnx!=='undefined')pnx.onclick=()=>pnote.style.display='none';
-tiles.forEach(t=>{const img=t.querySelector('img');if(!img)return;const mark=()=>{t.dataset.err='1';};if(img.complete&&img.naturalWidth===0&&img.getAttribute('src'))mark();img.addEventListener('error',mark);img.addEventListener('load',()=>{if(t.dataset.err)t.dataset.err='';});});
+if(typeof pnx!=='undefined')pnx.setAttribute('aria-label','Dismiss notice');
+tiles.forEach(t=>{const img=t.querySelector('img');const path=t.dataset.path||'';const name=path.split('/').pop()||'render';
+  const k=t.querySelector('.k'),d=t.querySelector('.d');if(k)k.setAttribute('aria-label','Keep '+name);if(d)d.setAttribute('aria-label','Delete '+name);
+  if(!img)return;if(!img.getAttribute('alt'))img.setAttribute('alt','render '+name);
+  const mark=()=>{t.dataset.err='1';t.setAttribute('role','alert');t.setAttribute('aria-label','Image missing: '+name+' — serve over HTTP');};
+  if(img.complete&&img.naturalWidth===0&&img.getAttribute('src'))mark();
+  img.addEventListener('error',mark);
+  img.addEventListener('load',()=>{if(t.dataset.err){t.dataset.err='';t.removeAttribute('role');t.removeAttribute('aria-label');}});});
 counts();
 </script></body></html>
