@@ -200,9 +200,20 @@ class TestCredentials:
         assert creds.consumer_key == "ck_xyz"
 
     def test_missing_env_raises_keyerror(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.delenv("WC_BASE_URL", raising=False)
-        monkeypatch.delenv("WC_CONSUMER_KEY", raising=False)
-        monkeypatch.delenv("WC_CONSUMER_SECRET", raising=False)
+        # from_env() reads os.environ only (the .env load lives in the app bootstrap,
+        # devskyy_mcp.py), accepting several var-name conventions. Clear every name it
+        # reads so the nothing-configured path raises KeyError regardless of ambient
+        # env files.
+        for var in (
+            "WC_BASE_URL",
+            "WORDPRESS_URL",
+            "WP_SITE_URL",
+            "WC_CONSUMER_KEY",
+            "WOOCOMMERCE_KEY",
+            "WC_CONSUMER_SECRET",
+            "WOOCOMMERCE_SECRET",
+        ):
+            monkeypatch.delenv(var, raising=False)
         with pytest.raises(KeyError):
             WCCredentials.from_env()
 
@@ -268,9 +279,19 @@ class TestSmoketest:
 
     @pytest.mark.asyncio
     async def test_missing_env_returns_clear_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.delenv("WC_BASE_URL", raising=False)
-        monkeypatch.delenv("WC_CONSUMER_KEY", raising=False)
-        monkeypatch.delenv("WC_CONSUMER_SECRET", raising=False)
+        # from_env() reads os.environ only now (.env load moved to app bootstrap);
+        # clear every credential var-name it accepts so the smoketest hits the
+        # missing-env branch (see .wolf buglog).
+        for var in (
+            "WC_BASE_URL",
+            "WORDPRESS_URL",
+            "WP_SITE_URL",
+            "WC_CONSUMER_KEY",
+            "WOOCOMMERCE_KEY",
+            "WC_CONSUMER_SECRET",
+            "WOOCOMMERCE_SECRET",
+        ):
+            monkeypatch.delenv(var, raising=False)
         result = await wc_smoketest(SmoketestInput())
         assert "FAILED" in result
         assert "missing env var" in result.lower()

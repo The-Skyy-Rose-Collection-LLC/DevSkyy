@@ -10,7 +10,6 @@ Version: 1.0.0
 
 import asyncio
 import logging
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -267,26 +266,21 @@ async def scan_code(
 async def fix_code(
     request: CodeFixRequest, user: TokenPayload = Depends(get_current_user)
 ) -> CodeFixResponse:
-    """Automatically fix code issues detected by scanner.
+    """Automated code fixing — NOT IMPLEMENTED (returns HTTP 501).
 
-    The Fixer provides automated code remediation:
-    - Syntax error correction
-    - Import optimization and organization
-    - Missing docstring generation
-    - Type hint inference
-    - Security vulnerability patching
-    - Code formatting (Black, Prettier)
-    - Performance optimizations
+    No backend maps a scan finding to a verified fix: code/scan reports security
+    issues (SQL injection, XSS, secrets) which are not auto-fixable, and the only
+    healer available (SelfHealingEngine) merely re-formats with black/isort/ruff
+    and cannot address them. Rather than fabricate CodeFix results, this endpoint
+    honestly returns 501. Apply fixes manually or run the formatters directly.
 
     Args:
         request: Fix configuration (scan_id or scan_results, auto_apply, etc.)
         user: Authenticated user (from JWT token)
 
-    Returns:
-        CodeFixResponse with summary of fixes applied
-
     Raises:
-        HTTPException: If scan_id not found or fix fails
+        HTTPException: 400 if neither scan_id nor scan_results is provided;
+            501 (Not Implemented) otherwise.
     """
     fix_id = str(uuid4())
     logger.info(f"Starting code fix {fix_id} for user {user.sub}")
@@ -299,40 +293,21 @@ async def fix_code(
                 detail="Either scan_id or scan_results must be provided",
             )
 
-        # TODO: Integrate with actual code fixing logic
-        # For now, return mock data demonstrating the structure
-
-        fixes = [
-            CodeFix(
-                file="example.py",
-                line=42,
-                fix_type="security",
-                original='query = "SELECT * FROM users WHERE id = " + user_id',
-                fixed='query = "SELECT * FROM users WHERE id = %s"\ncursor.execute(query, (user_id,))',
-                applied=request.auto_apply,
+        # No code-fixing backend maps a scan finding to a verified fix.
+        # SelfHealingEngine.heal() only auto-formats (black/isort/ruff) Python
+        # files explicitly flagged auto_fixable with a fix_action; it cannot
+        # remediate the security findings code/scan reports (FIX_SECURITY is
+        # unimplemented at coding_doctor_agent.py:453), and CodeFixRequest has
+        # no adapter from scan_results to its CodeIssue input. Returning
+        # fabricated fixes would be worse than honest — surface 501.
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail=(
+                "Automated code fixing is not implemented. No backend maps scan "
+                "findings to verified fixes: security findings are not auto-fixable, "
+                "and the available format/import healer does not address them. Apply "
+                "fixes manually or run formatters (ruff --fix, isort, black)."
             ),
-            CodeFix(
-                file="example.py",
-                line=10,
-                fix_type="imports",
-                original="import os, sys, json",
-                fixed="import json\nimport os\nimport sys",
-                applied=request.auto_apply,
-            ),
-        ]
-
-        backup_path = None
-        if request.create_backup and request.auto_apply:
-            backup_path = str(Path(tempfile.gettempdir()) / f"backup_{fix_id}")
-
-        return CodeFixResponse(
-            fix_id=fix_id,
-            status="completed" if request.auto_apply else "suggestions_generated",
-            timestamp=datetime.now(UTC).isoformat(),
-            fixes_generated=len(fixes),
-            fixes_applied=len(fixes) if request.auto_apply else 0,
-            fixes=fixes,
-            backup_path=backup_path,
         )
 
     except HTTPException:
