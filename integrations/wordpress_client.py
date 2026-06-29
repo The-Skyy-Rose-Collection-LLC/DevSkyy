@@ -11,6 +11,7 @@ import base64
 import hashlib
 import hmac
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
@@ -228,6 +229,31 @@ class WordPressClient:
 
     async def __aexit__(self, *args: Any) -> None:
         await self.close()
+
+    @classmethod
+    def from_env(cls) -> WordPressClient:
+        """Construct a client from environment credentials.
+
+        Reads WORDPRESS_URL/WP_SITE_URL + WC_CONSUMER_KEY/WOOCOMMERCE_KEY +
+        WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET (the same vars wordpress/products.py
+        uses). Raises ValueError when any are missing so callers can fall back
+        gracefully instead of constructing a credential-less client.
+        """
+        site_url = os.getenv("WORDPRESS_URL") or os.getenv("WP_SITE_URL") or ""
+        consumer_key = os.getenv("WC_CONSUMER_KEY") or os.getenv("WOOCOMMERCE_KEY") or ""
+        consumer_secret = os.getenv("WC_CONSUMER_SECRET") or os.getenv("WOOCOMMERCE_SECRET") or ""
+        if not (site_url and consumer_key and consumer_secret):
+            raise ValueError(
+                "WooCommerce credentials not configured "
+                "(set WORDPRESS_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET)"
+            )
+        api_type = APIType.WPCOM if "wordpress.com" in site_url else APIType.SELF_HOSTED
+        return cls(
+            site_url=site_url,
+            consumer_key=consumer_key,
+            consumer_secret=consumer_secret,
+            api_type=api_type,
+        )
 
     # ==================== Product Operations ====================
 
@@ -670,3 +696,8 @@ class WordPressClient:
                 "error": str(e),
                 "site_url": self.site_url,
             }
+
+
+# Backwards-compatible alias — consumers (agents/commerce_agent.py,
+# api/dashboard.py) import the client under this name.
+WordPressWooCommerceClient = WordPressClient
