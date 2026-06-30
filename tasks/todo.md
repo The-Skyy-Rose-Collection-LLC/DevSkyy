@@ -20,8 +20,8 @@ Register: `tasks/wiring-gaps-register.md` (T3-1..T3-4) — but 3 of its 4 specif
       (flag-driven: `--dry-run`/`--with-maintenance`, NOT env). non-prod env→`--dry-run`. PROD-touching at runtime → MOCK subprocess in tests, never run live.
 
 ### Verify (main thread, after agents — never on a subagent's word)
-- [ ] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
-- [ ] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+- [x] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
+- [x] Update buglog/anatomy/cerebrum/memory; mark register items done; report
 
 ## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
 

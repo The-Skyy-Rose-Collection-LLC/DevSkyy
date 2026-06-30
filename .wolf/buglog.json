@@ -2447,5 +2447,106 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-29T12:20:00-07:00"
+  },
+  {
+    "id": "bug-167",
+    "timestamp": "2026-06-29T14:30:00-07:00",
+    "error_message": "Stop-hook suite red: tests/test_asset_hub.py (pending 49!=20, product-card 17!=29, br-003/br-004/br-010-back/pending resolve None mismatches) + tests/mcp/test_wc_client.py missing-env tests",
+    "file": "tests/test_asset_hub.py, tests/mcp/test_wc_client.py",
+    "root_cause": "Snapshot-pinned tests rotted vs evolving SoT. asset_hub froze the 2026-06-25 manifest counts + hardcoded SKU verdicts; manifest since promoted to 73 verified/20 pending. wc_client from_env() auto-loaded symlinked .env.wordpress, defeating monkeypatch.delenv.",
+    "fix": "asset_hub tests rewritten snapshot->CONTRACT/data-derived (counts derived from live manifest; resolve contract by verdict; canonical <sku>-<face> filter since usage-variant ids are by_usage-only). wc_client: clear all 7 credential var-name fallbacks + drop setattr after from_env made pure. Full fast suite green (exit 0). Manifest = locked verdict authority over handoff; br-010/br-004 backs stay pending (resolve->None correct).",
+    "tags": [
+      "test-drift",
+      "snapshot-tests",
+      "asset-hub",
+      "wc-client",
+      "contract-tests",
+      "stop-hook"
+    ],
+    "related_bugs": [
+      "bug-164"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T14:30:00-07:00"
+  },
+  {
+    "id": "bug-139",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "ingest_verdicts.py (Jun-25) rebuilt product manifest from verdicts each run; on a 2nd pass it would overwrite verified entries and (no is_ref gate) promote a source-photo/techflat 'use' pick into a served product-card \u2014 the fidelity-gate violation class (lh-005 fanny-pack).",
+    "file": "assets/hub/ingest_verdicts.py",
+    "root_cause": "First-ingest design (empty manifest -> rebuild from verdicts) reused for a second run against a now-authoritative LOCKED manifest; no is_ref() exclusion, no backup, no dry-run, no current-verdict gating.",
+    "fix": "Rewrote incremental + gated: start FROM manifest, dry-run default, --apply backs up manifest.json->.bak then mutates ONLY bucket-A (pending gap + exactly 1 serveable use). is_ref() excludes source-photos/source-products/techflat/references from ever becoming product-cards. Already-verified faces reported (bucket B), never overwritten. Verified-by gated on current verdict==pending.",
+    "tags": [
+      "asset-hub",
+      "ingest_verdicts",
+      "fidelity-gate",
+      "is_ref",
+      "manifest",
+      "sot",
+      "idempotency"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-167",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
+    "file": "wordpress-theme/skyyrose-flagship/front-page.php",
+    "root_cause": "Phantom subdirectory in the image path. front-page.php (lines 308, 485, 521) and data/render-keepers.json:12 referenced .../images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 with an extra black-rose-sherpa-jacket/ folder that does not exist in the theme asset tree (all product images are flat in products/). Verified authoritatively via curl: subdir path -> HTTP 404, flat path -> HTTP 200; Playwright predecode confirmed exactly 1 broken image of 33. Vision-verified the flat-path file is the correct garment (black Black-Rose hooded jacket with grayscale rose/wings chest crest), so the bug is the path, not the asset.",
+    "fix": "Collapsed the phantom subdir to the flat path in both files: front-page.php (3 occurrences via replace_all) and render-keepers.json (br-006 asset line) now point at /images/products/black-rose-sherpa-jacket-front-model.webp (the HTTP 200 file). Verified: 0 remaining subdir refs in wordpress-theme/, render-keepers.json re-parses as valid JSON, no other products/<slug>/<slug> double-subdir image paths in front-page.php. Source-only fix (PHP/JSON, no .min rebuild). Live still 404s until theme deploy (STOP-AND-SHOW gated).",
+    "tags": [
+      "wordpress",
+      "front-page",
+      "404",
+      "image-path",
+      "broken-image",
+      "br-006",
+      "black-rose",
+      "homepage",
+      "render-keepers"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-141",
+    "timestamp": "2026-06-30T12:40:00-07:00",
+    "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
+    "file": "skyyrose/core/asset_hub.py",
+    "root_cause": "served_theme_path used Path(source).suffix for the off-theme case; the staged file is always webp (theme .gitignore excludes png), so the .png path never resolved.",
+    "fix": "served_theme_path always returns assets/images/products/hub/<sku>-<face>.webp for off-theme verified renders; added regression test test_served_theme_path_offtheme_render_is_always_webp.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "build-collection-sot",
+      "served_theme_path",
+      "webp",
+      "fidelity"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:40:00-07:00"
+  },
+  {
+    "id": "bug-142",
+    "timestamp": "2026-06-30T12:41:00-07:00",
+    "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
+    "file": "skyyrose/core/sot_images.py",
+    "root_cause": "PHP theme reads data/collections/<slug>/sot.json via inc/collection-sot-reader.php, NOT data/sot-images.json (zero theme readers of sot-images.json). _index() feeds sot-images.json only.",
+    "fix": "Moved the single override seam upstream to build-collection-sot.py (generates sot.json); reverted _index(). sot.json now carries hub paths \u2192 PHP theme AND sot-images.json both honor the verdict.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "architecture",
+      "php",
+      "split-brain",
+      "seam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:41:00-07:00"
   }
 ]

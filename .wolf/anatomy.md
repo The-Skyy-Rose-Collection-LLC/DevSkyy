@@ -3902,3 +3902,5 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `src/types.ts` — exports Collection type ('signature'|'black-rose'|'love-hurts'|'kids-capsule') (~50 tok)
 - `src/index.ts` — re-exports Collection from ./types; placeholder for component exports (~50 tok)
 - `test/smoke.test.ts` — verifies module loads (1 test) (~80 tok)
+
+- `wordpress-theme/skyyrose-flagship/inc/collection-sot-reader.php` — collection sot.json reader + per-SKU product-image resolver `skyyrose_sot_product_image(_uri)($sku,$view)` (front-first, CSV fallback, placeholder). ~330t

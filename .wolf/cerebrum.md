@@ -237,3 +237,9 @@ gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer
 
 ### Do-Not-Repeat (2026-06-28)
 - VERIFY current git branch with `git rev-parse --abbrev-ref HEAD` BEFORE committing — session-start branch info can be stale. Committed v7 to `main` by trusting stale "Current branch" context; had to move it to feat/v7-lookbook-card + `git branch -f main origin/main`. Branch-first rule (CLAUDE.md): never commit to main directly.
+
+### SOT product-image resolver (2026-06-30)
+- Templates must NEVER hardcode `/images/products/...`. Resolve via `skyyrose_sot_product_image_uri($sku,$view)` (inc/collection-sot-reader.php). view = front|back|packshot; front-first (front_model_image>image).
+- Runtime SOT source for PHP = the DEPLOYED per-collection `data/collections/<slug>/sot.json` (ships in theme). The repo-root `data/sot-images.json` is the AUTHORING manifest and does NOT deploy — never read it from PHP.
+- Gate: `validate_catalog_consistency.py::check_no_hardcoded_product_images` fails the build on any `/images/products/` literal in templates (inc/ excluded).
+- kids-002 front_model_image = a ghost render (catalog), inconsistent with kids-001 (on-model). Founder decision pending whether to repoint.
