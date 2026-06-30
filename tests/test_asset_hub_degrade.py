@@ -12,6 +12,10 @@ monkeypatch, so it needs no real manifest and always runs.
 
 from __future__ import annotations
 
+import json
+
+import pytest
+
 import skyyrose.core.asset_hub as hub
 
 
@@ -28,3 +32,21 @@ def test_missing_manifest_degrades(monkeypatch, tmp_path):
         assert hub.verify_integrity() == []
     finally:
         hub.refresh()  # restore cache state for other tests
+
+
+def test_corrupt_manifest_raises(monkeypatch, tmp_path):
+    """A malformed manifest (JSONDecodeError) MUST propagate loudly, not degrade to {}.
+
+    Absent → {} is truthful ("nothing promoted yet"); corrupt → {} would silently mask a
+    data-integrity failure. The guard catches only FileNotFoundError on purpose — this test
+    pins that intent so a future broadening of the except clause is caught.
+    """
+    bad = tmp_path / "bad.json"
+    bad.write_text("not valid json")
+    monkeypatch.setattr(hub, "_MANIFEST_PATH", bad)
+    hub.refresh()
+    try:
+        with pytest.raises(json.JSONDecodeError):
+            hub.manifest()
+    finally:
+        hub.refresh()

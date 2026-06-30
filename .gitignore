@@ -245,9 +245,9 @@ theme-upload-*.png
 upload-form-*.png
 woocommerce-*.png
 wp-admin-*.png
-# Playwright capture runs (pwfinal1-*-hero.jpeg) + v7 live-site captures
+# Playwright capture runs (pwfinal1-*-hero.jpeg) + v7 live-site captures (any image ext)
 pwfinal*
-_v7-*.jpeg
+_v7-*
 
 # WordPress theme binary assets
 # Track homepage/brand images and product photos; ignore avatar and 3D assets.
