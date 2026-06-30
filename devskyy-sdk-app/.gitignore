@@ -1,0 +1,11 @@
+# Secrets — never commit the real key
+.env
+
+# uv / virtualenv
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
