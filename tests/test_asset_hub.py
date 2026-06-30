@@ -18,6 +18,15 @@ import pytest
 
 import skyyrose.core.asset_hub as hub
 
+# The hub manifest lives under the gitignored ``assets/hub/`` tree, so an env without it
+# (fresh checkout / CI) has no live manifest to assert the contract against. Skip the whole
+# module there rather than fail — ``asset_hub`` itself degrades to an empty manifest, which
+# is verified in ``tests/test_asset_hub_degrade.py`` (always runs, manifest or not).
+pytestmark = pytest.mark.skipif(
+    not hub._MANIFEST_PATH.exists(),
+    reason="hub manifest absent (assets/hub/ is gitignored) — nothing to assert against",
+)
+
 
 @pytest.fixture(autouse=True)
 def _clear_cache():

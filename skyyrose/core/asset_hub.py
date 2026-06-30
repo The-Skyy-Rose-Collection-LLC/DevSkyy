@@ -37,8 +37,17 @@ def _manifest() -> dict[str, dict]:
     directly with ``{asset_id: entry}`` without traversing the top-level
     metadata keys.  Call :func:`refresh` to drop the cache after a manifest
     rebuild.
+
+    Degrades to an empty dict when the manifest is absent: the hub data lives
+    under the gitignored ``assets/hub/`` tree, so a fresh checkout or CI without
+    it resolves to "no verified assets" (every consumer returns None / empty)
+    rather than crashing. This is what makes hard importers — e.g.
+    ``build-collection-sot.py`` — safe on a manifest-less environment.
     """
-    data = json.loads(_MANIFEST_PATH.read_text())
+    try:
+        data = json.loads(_MANIFEST_PATH.read_text())
+    except FileNotFoundError:
+        return {}
     return data.get("assets", {})
 
 
