@@ -24,6 +24,7 @@ sys.path.insert(0, str(DATA))
 sys.path.insert(0, str(DATA.parents[2]))
 import sot_common  # noqa: E402
 
+from skyyrose.core.asset_hub import served_theme_path  # noqa: E402
 from skyyrose.core.catalog_loader import bool_col, read_catalog_rows  # noqa: E402
 
 ASSETS = sot_common.ASSETS
@@ -58,11 +59,23 @@ def manifest_entry(entry: Any) -> dict | None:
 def load_products_by_collection() -> dict[str, list]:
     by_col: dict[str, list] = {}
     for row in read_catalog_rows():
+        sku = row["sku"]
         imgs = {}
         for col in ("image", "front_model_image", "back_image", "back_model_image"):
             v = (row.get(col) or "").strip()
             if v:
                 imgs[col] = {"path": v, "resolved": sot_common.resolve_asset(v)}
+        # Verified asset-hub override (the single seam): where the hub has a verified,
+        # theme-servable front/back for this SKU, it is the imagery authority OVER the
+        # catalog column. Guarded by resolve_asset — the file must exist under the theme
+        # (legacy-theme source, or a render staged by scripts/sync_hub_to_theme.py) — so
+        # a not-yet-staged verdict cleanly falls back to the catalog image.
+        for col, face in (("front_model_image", "front"), ("back_model_image", "back")):
+            hub_path = served_theme_path(sku, face)
+            if hub_path:
+                resolved = sot_common.resolve_asset(hub_path)
+                if resolved:
+                    imgs[col] = {"path": hub_path, "resolved": resolved}
         dslug = (row.get("dossier_slug") or "").strip()
         by_col.setdefault(row.get("collection", ""), []).append(
             {

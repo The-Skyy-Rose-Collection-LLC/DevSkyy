@@ -1,0 +1,1713 @@
+{
+  "_authority": "SkyyRose asset hub manifest \u2014 single source for ALL imagery. Only verdict:verified serves. See HUB-SPEC.md.",
+  "_generated_by": "assets/hub/build_hub.py",
+  "_scopes": [
+    "black-rose",
+    "kids-capsule",
+    "love-hurts",
+    "signature",
+    "site"
+  ],
+  "assets": {
+    "scene-black-rose": {
+      "path": "collections/black-rose/scenes/scene-preview.png",
+      "scope": "black-rose",
+      "usage": [
+        "scene-backdrop"
+      ],
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "review-state 2026-06-10",
+      "source": "renders/oai/_lookbook/onmodel/_scene-preview-black-rose.png",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "scene-love-hurts": {
+      "path": "collections/love-hurts/scenes/scene-preview.png",
+      "scope": "love-hurts",
+      "usage": [
+        "scene-backdrop"
+      ],
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "review-state 2026-06-10",
+      "source": "renders/oai/_lookbook/onmodel/_scene-preview-love-hurts.png",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "scene-signature": {
+      "path": "collections/signature/scenes/scene-preview.png",
+      "scope": "signature",
+      "usage": [
+        "scene-backdrop"
+      ],
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "review-state 2026-06-10",
+      "source": "renders/oai/_lookbook/onmodel/_scene-preview-signature.png",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "scene-kids-capsule": {
+      "path": "collections/kids-capsule/scenes/scene-preview.png",
+      "scope": "kids-capsule",
+      "usage": [
+        "scene-backdrop"
+      ],
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "review-state 2026-06-10",
+      "source": "renders/oai/_lookbook/onmodel/_scene-preview-kids-capsule.png",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "lockup-black-rose": {
+      "path": "collections/black-rose/brand/lockup.webp",
+      "scope": "black-rose",
+      "usage": [
+        "web-lockup",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/lockups/black-rose-lockup.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lockup-love-hurts": {
+      "path": "collections/love-hurts/brand/lockup.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "web-lockup",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/lockups/love-hurts-lockup.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lockup-signature": {
+      "path": "collections/signature/brand/lockup.webp",
+      "scope": "signature",
+      "usage": [
+        "web-lockup",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/lockups/signature-lockup.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "logos-black-roses-cloud-cluster": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/black-roses-cloud-cluster.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/black-roses-cloud-cluster.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-heart-rose-composite": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/heart-rose-composite.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/heart-rose-composite.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-hurts-lettering": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/hurts-lettering.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/hurts-lettering.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-love-hurts-full-lettering": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/love-hurts-full-lettering.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/love-hurts-full-lettering.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-love-lettering": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/love-lettering.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/love-lettering.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-red-roses-cloud-cluster": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/red-roses-cloud-cluster.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/red-roses-cloud-cluster.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-rose-gold-rose": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/rose-gold-rose.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/rose-gold-rose.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-skyy-rose-collection-circular-patch": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/skyy-rose-collection-circular-patch.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/skyy-rose-collection-circular-patch.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-sr-monogram-gold": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/sr-monogram-gold.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/sr-monogram-gold.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "logos-sr-monogram-rose-gold": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/logos/sr-monogram-rose-gold.avif",
+      "scope": "site",
+      "usage": [
+        "site-chrome"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/logos/sr-monogram-rose-gold.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-brand-script-logotype": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script-logotype.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script-logotype.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-brand-script": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-patch-hockey": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-patch-mlb-baseball": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-patch-nba-basketball": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-br-patch-nfl-football": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.avif",
+      "scope": "black-rose",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-lh-logo-combined": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-combined.avif",
+      "scope": "love-hurts",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-combined.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-lh-logo-hurts": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-hurts.avif",
+      "scope": "love-hurts",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-hurts.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-lh-logo-love": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-love.avif",
+      "scope": "love-hurts",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/lh-logo-love.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "hero-overlays-sig-brand-skyy-rose-gold": {
+      "path": null,
+      "in_place": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/sig-brand-skyy-rose-gold.avif",
+      "scope": "site",
+      "usage": [
+        "web-hero",
+        "logotype"
+      ],
+      "engine": "brand-asset",
+      "verdict": "verified",
+      "verified_by": "brand-canon",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/sig-brand-skyy-rose-gold.avif",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": "registered in-place; physical hub migration = Phase 1b"
+    },
+    "br-001-front": {
+      "path": "collections/black-rose/products/br-001/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-001",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-001-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-001-front-ad-creative-web-content": {
+      "path": "collections/black-rose/products/br-001/front-ad-creative-web-content.png",
+      "scope": "black-rose",
+      "usage": [
+        "ad-creative",
+        "web-content"
+      ],
+      "sku": "br-001",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-001-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-002-front": {
+      "path": "collections/black-rose/products/br-002/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-002",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/br-002-ghost-front.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-003-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-003",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "br-003-model-back-gemini-upscaled-corrected.jpg: wrong jersey",
+      "provenance": null
+    },
+    "br-003-front": {
+      "path": "collections/black-rose/products/br-003/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-003",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-003-onmodel.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": null
+    },
+    "br-004-front": {
+      "path": "collections/black-rose/products/br-004/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "ad-creative",
+        "product-card"
+      ],
+      "sku": "br-004",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-004-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-004-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-004/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-004",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-004-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-005-front": {
+      "path": "collections/black-rose/products/br-005/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-005",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/br-005-ghost-front.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": null
+    },
+    "br-006-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-006",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "br-006-front": {
+      "path": "collections/black-rose/products/br-006/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-006",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-006-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-006-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-006/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-006",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-006-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-007-back": {
+      "path": "collections/black-rose/products/br-007/back.jpg",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-007",
+      "face": "back",
+      "engine": "gemini",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "skyyrose/assets/images/products/br-007/br-007-model-back-gemini.jpg",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gemini",
+        "generation_date": null
+      },
+      "note": null
+    },
+    "br-007-front": {
+      "path": "collections/black-rose/products/br-007/front.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-007",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-007-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-008-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-008",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "br-008-front": {
+      "path": "collections/black-rose/products/br-008/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-008",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-008-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-008-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-008/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-008",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-008-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-009-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-009",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "br-009-front": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-009",
+      "face": "front",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "br-009-onmodel.webp: missing patch",
+      "provenance": null
+    },
+    "br-010-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-010",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "br-010-front": {
+      "path": "collections/black-rose/products/br-010/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-010",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-010-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-010-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-010/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-010",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-010-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-011-back": {
+      "path": "collections/black-rose/products/br-011/back.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-011",
+      "face": "back",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-011-the-rose-hockey-back.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-011-front": {
+      "path": "collections/black-rose/products/br-011/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-011",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-011-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-011-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-011/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-011",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-011-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "br-012-back": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-012",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "RENDER from source refs: wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.webp, wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.jpeg | br-012-last-oakland-baseball-back.webp: use to generate the render; br-012-last-oakland-baseball-back.jpeg: use to generate the render",
+      "provenance": null
+    },
+    "br-012-front": {
+      "path": null,
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-012",
+      "face": "front",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "RENDER from source refs: wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-front.webp, wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-front.jpeg | br-012-last-oakland-baseball-front.webp: use to generate the render; br-012-last-oakland-baseball-front.jpeg: use to generate the render",
+      "provenance": null
+    },
+    "br-014-front": {
+      "path": "collections/black-rose/products/br-014/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-014",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-014-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-014-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-014/front-product-card-alt.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-014",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/br-014-ghost-front.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-015-front": {
+      "path": "collections/black-rose/products/br-015/front.webp",
+      "scope": "black-rose",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "br-015",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-015-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "br-015-front-product-card-alt": {
+      "path": "collections/black-rose/products/br-015/front-product-card-alt.png",
+      "scope": "black-rose",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "br-015",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/br-015-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "kids-001-back": {
+      "path": null,
+      "scope": "kids-capsule",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "kids-001",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "kids-001-front": {
+      "path": "collections/kids-capsule/products/kids-001/front.webp",
+      "scope": "kids-capsule",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "kids-001",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-001-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "kids-002-back": {
+      "path": null,
+      "scope": "kids-capsule",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "kids-002",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "kids-002-front": {
+      "path": "collections/kids-capsule/products/kids-002/front.webp",
+      "scope": "kids-capsule",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "kids-002",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/kids-002-ghost-front.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "kids-002-front-product-card-alt": {
+      "path": "collections/kids-capsule/products/kids-002/front-product-card-alt.jpg",
+      "scope": "kids-capsule",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "kids-002",
+      "face": "front",
+      "engine": "gemini",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "skyyrose/assets/images/products/kids-002/kids-002-model-front-gemini-upscaled-corrected.jpg",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gemini",
+        "generation_date": null
+      }
+    },
+    "lh-002-front": {
+      "path": "collections/love-hurts/products/lh-002/front.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-002",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-002-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-002-front-product-card-alt": {
+      "path": "collections/love-hurts/products/lh-002/front-product-card-alt.png",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "lh-002",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/lh-002-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "lh-003-back": {
+      "path": null,
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-003",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "lh-003-front": {
+      "path": "collections/love-hurts/products/lh-003/front.png",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-003",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "renders/oai/_lookbook/onmodel/lh-003-onmodel.png",
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      },
+      "note": "missing allot of detail"
+    },
+    "lh-004-back": {
+      "path": null,
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-004",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "lh-004-bomber-back.webp: flatly",
+      "provenance": null
+    },
+    "lh-004-front": {
+      "path": "collections/love-hurts/products/lh-004/front.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-004",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-004-front-product-card-alt": {
+      "path": "collections/love-hurts/products/lh-004/front-product-card-alt.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "lh-004",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-bomber.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-005-front": {
+      "path": "collections/love-hurts/products/lh-005/front.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-005",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-005-onmodel.webp",
+      "note": "needs to be leather tho",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-005-front-product-card-alt": {
+      "path": "collections/love-hurts/products/lh-005/front-product-card-alt.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "lh-005",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-005-fannie.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-006-front": {
+      "path": "collections/love-hurts/products/lh-006/front.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "lh-006",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-006-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "lh-006-front-product-card-alt": {
+      "path": "collections/love-hurts/products/lh-006/front-product-card-alt.webp",
+      "scope": "love-hurts",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "lh-006",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/lh-006-ghost-front.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-001-front": {
+      "path": "collections/signature/products/sg-001/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-001",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-001-bay-bridge-shorts.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-002-front": {
+      "path": "collections/signature/products/sg-002/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-002",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-002-stay-golden-shirt.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-003-front": {
+      "path": "collections/signature/products/sg-003/front.png",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-003",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/sg-003-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "sg-005-front": {
+      "path": "collections/signature/products/sg-005/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-005",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-005-onmodel.webp",
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      },
+      "note": null
+    },
+    "sg-006-back": {
+      "path": null,
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-006",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "sg-006-front": {
+      "path": "collections/signature/products/sg-006/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-006",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-006-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-007-front": {
+      "path": "collections/signature/products/sg-007/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-007",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-007-signature-beanie.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-009-front": {
+      "path": "collections/signature/products/sg-009/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-009",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-009-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-009-front-product-card-alt": {
+      "path": "collections/signature/products/sg-009/front-product-card-alt.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "sg-009",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-009-sherpa-jacket.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-011-back": {
+      "path": "collections/signature/products/sg-011/back.png",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-011",
+      "face": "back",
+      "engine": "pipeline",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/output/original-label-tee-(white)/sg-011-back/sg-011-back-stage3-branded-attempt1.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "flux",
+        "generation_date": null
+      }
+    },
+    "sg-011-front": {
+      "path": "collections/signature/products/sg-011/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-011",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-011-front-product-card-alt": {
+      "path": "collections/signature/products/sg-011/front-product-card-alt.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "sg-011",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-original-label-tee-white.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-012-front": {
+      "path": "collections/signature/products/sg-012/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-012",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-012-front-product-card-alt": {
+      "path": "collections/signature/products/sg-012/front-product-card-alt.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "sg-012",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-original-label-tee-orchid.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-013-back": {
+      "path": null,
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-013",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "sg-013-front": {
+      "path": "collections/signature/products/sg-013/front.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-013",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-013-onmodel.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    },
+    "sg-013-front-product-card-alt": {
+      "path": "collections/signature/products/sg-013/front-product-card-alt.jpg",
+      "scope": "signature",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "sg-013",
+      "face": "front",
+      "engine": "gemini",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "skyyrose/assets/images/products/sg-013/sg-013-model-front-gemini-upscaled-corrected.jpg",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gemini",
+        "generation_date": null
+      }
+    },
+    "sg-014-back": {
+      "path": null,
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-014",
+      "face": "back",
+      "engine": null,
+      "verdict": "pending",
+      "verified_by": null,
+      "source": null,
+      "reason": "no 'use' pick",
+      "provenance": null
+    },
+    "sg-014-front": {
+      "path": "collections/signature/products/sg-014/front.png",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-014",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/sg-014-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "sg-015-front": {
+      "path": "collections/signature/products/sg-015/front.png",
+      "scope": "signature",
+      "usage": [
+        "product-card"
+      ],
+      "sku": "sg-015",
+      "face": "front",
+      "engine": "oai-image-2",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-25",
+      "source": "renders/oai/_lookbook/onmodel/sg-015-onmodel.png",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "gpt-image-2",
+        "generation_date": null
+      }
+    },
+    "sg-005-front-product-card-alt": {
+      "path": "collections/signature/products/sg-005/front-product-card-alt.webp",
+      "scope": "signature",
+      "usage": [
+        "product-card-alt"
+      ],
+      "sku": "sg-005",
+      "face": "front",
+      "engine": "legacy-theme",
+      "verdict": "verified",
+      "verified_by": "founder verdict 2026-06-29",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-005-bay-bridge-shirt.webp",
+      "note": null,
+      "provenance": {
+        "digital_source_type": "unknown",
+        "ai_system_used": null,
+        "generation_date": null
+      }
+    }
+  }
+}
