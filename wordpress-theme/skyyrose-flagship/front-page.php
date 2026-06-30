@@ -305,7 +305,7 @@ get_header();
 	</div>
 	<div class="commercial-runway__rail stagger-grid">
 		<a class="commercial-tile commercial-tile--wide magnetic" href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>">
-			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>"
 				alt="<?php esc_attr_e( 'Black Rose sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -316,7 +316,7 @@ get_header();
 			<em><?php esc_html_e( 'Cold-weather statement pieces with Oakland weight.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>">
-			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>"
+			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'lh-004', 'front' ) ); ?>"
 				alt="<?php esc_attr_e( 'Love Hurts varsity jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -327,7 +327,7 @@ get_header();
 			<em><?php esc_html_e( 'Built for nights that need proof.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>">
-			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/signature-sherpa-jacket-front-model.webp' ); ?>"
+			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'sg-009', 'front' ) ); ?>"
 				alt="<?php esc_attr_e( 'Signature sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -482,7 +482,7 @@ get_header();
 				data-style-title="<?php esc_attr_e( 'Statement Layer', 'skyyrose' ); ?>"
 				data-style-kicker="<?php esc_attr_e( 'Black Rose', 'skyyrose' ); ?>"
 				data-style-copy="<?php esc_attr_e( 'Structured outerwear, dark palette, heavyweight presence. Start with the sherpa and build the rest quiet.', 'skyyrose' ); ?>"
-				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+				data-style-image="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>"
 				data-style-alt="<?php esc_attr_e( 'Black Rose sherpa jacket style recommendation', 'skyyrose' ); ?>"
 				data-style-link="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>">
 				<span><?php esc_html_e( 'Statement', 'skyyrose' ); ?></span>
@@ -495,7 +495,7 @@ get_header();
 				data-style-title="<?php esc_attr_e( 'Clean Daily Rotation', 'skyyrose' ); ?>"
 				data-style-kicker="<?php esc_attr_e( 'Signature', 'skyyrose' ); ?>"
 				data-style-copy="<?php esc_attr_e( 'Soft luxury staples with mint, gold, and easy proportions. Built for repeat wear without losing identity.', 'skyyrose' ); ?>"
-				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/mint-lavender-hoodie-front-model.webp' ); ?>"
+				data-style-image="<?php echo esc_url( skyyrose_sot_product_image_uri( 'sg-006', 'front' ) ); ?>"
 				data-style-alt="<?php esc_attr_e( 'Mint lavender hoodie style recommendation', 'skyyrose' ); ?>"
 				data-style-link="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>">
 				<span><?php esc_html_e( 'Daily', 'skyyrose' ); ?></span>
@@ -508,7 +508,7 @@ get_header();
 				data-style-title="<?php esc_attr_e( 'Night Signal', 'skyyrose' ); ?>"
 				data-style-kicker="<?php esc_attr_e( 'Love Hurts', 'skyyrose' ); ?>"
 				data-style-copy="<?php esc_attr_e( 'Varsity energy, crimson edge, and pieces that read from across the room. Designed for entrance moments.', 'skyyrose' ); ?>"
-				data-style-image="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>"
+				data-style-image="<?php echo esc_url( skyyrose_sot_product_image_uri( 'lh-004', 'front' ) ); ?>"
 				data-style-alt="<?php esc_attr_e( 'Love Hurts varsity jacket style recommendation', 'skyyrose' ); ?>"
 				data-style-link="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>">
 				<span><?php esc_html_e( 'Night', 'skyyrose' ); ?></span>
@@ -518,7 +518,7 @@ get_header();
 		<div class="style-atelier__result rv-blur" aria-live="polite">
 			<div class="style-atelier__image">
 				<img id="styleAtelierImage"
-					src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp' ); ?>"
+					src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>"
 					alt="<?php esc_attr_e( 'Black Rose sherpa jacket style recommendation', 'skyyrose' ); ?>"
 					loading="lazy"
 					decoding="async"

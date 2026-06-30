@@ -79,6 +79,20 @@ _V7_CARDS_JSON: Path = (
     _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "v7-cards.json"
 )
 _BUILD_V7_CARDS: Path = _REPO_ROOT / "scripts" / "build_v7_cards.py"
+_THEME_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship"
+# A hardcoded `/images/products/<file>` path literal in a template — the thing
+# templates must NOT do (they must resolve via skyyrose_sot_product_image_uri()).
+_HARDCODED_PRODUCT_IMG_RE = re.compile(
+    r"/images/products/[A-Za-z0-9_./-]+\.(?:webp|avif|jpe?g|png)"
+)
+# Template surfaces the SOT rule applies to. `inc/` is excluded — it holds the
+# resolver itself, which legitimately names the products path in fallback logic.
+_TEMPLATE_GLOBS: tuple[str, ...] = (
+    "*.php",
+    "template-parts/**/*.php",
+    "woocommerce/**/*.php",
+    "patterns/**/*.php",
+)
 
 # Retired SKUs — must not appear in downstream files
 _RETIRED_SKUS: frozenset[str] = frozenset({"br-013"})
@@ -733,6 +747,48 @@ def check_sot_images_current() -> CheckResult:
     return _ok(name, "sot-images.json matches fresh generator output")
 
 
+def check_no_hardcoded_product_images() -> CheckResult:
+    """Fail if any template hardcodes an `/images/products/...` path literal.
+
+    Templates must resolve product imagery through ``skyyrose_sot_product_image_uri()``
+    (inc/collection-sot-reader.php), so the homepage/landing tiles follow the SOT and
+    cannot silently drift to a stale or wrong asset — the front-page commercial-runway
+    regression (a phantom-subdir 404 on the br-006 jacket) is exactly what this guards.
+    ``inc/`` is excluded: it holds the resolver itself.
+    """
+    name = "no_hardcoded_product_images"
+    if not _THEME_DIR.exists():
+        return _fail(name, f"theme dir not found: {_THEME_DIR}")
+
+    offenders: list[str] = []
+    seen: set[Path] = set()
+    for pattern in _TEMPLATE_GLOBS:
+        for php in sorted(_THEME_DIR.glob(pattern)):
+            if php in seen or not php.is_file():
+                continue
+            seen.add(php)
+            try:
+                text = php.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            try:
+                rel = php.relative_to(_REPO_ROOT)
+            except ValueError:
+                rel = php
+            for lineno, line in enumerate(text.splitlines(), start=1):
+                if _HARDCODED_PRODUCT_IMG_RE.search(line):
+                    offenders.append(f"{rel}:{lineno}")
+
+    if offenders:
+        return _fail(
+            name,
+            f"{len(offenders)} hardcoded product-image path(s) — resolve via "
+            "skyyrose_sot_product_image_uri() instead",
+            details=offenders[:50],
+        )
+    return _ok(name, "no hardcoded product-image paths in templates")
+
+
 # ---------------------------------------------------------------------------
 # Check registry
 # ---------------------------------------------------------------------------
@@ -754,6 +810,7 @@ ALL_CHECKS: dict[str, Any] = {
     "preorder_consistency": check_preorder_consistency,
     "v7_cards_current": check_v7_cards_current,
     "sot_images_current": check_sot_images_current,
+    "no_hardcoded_product_images": check_no_hardcoded_product_images,
 }
 
 # Checks that must pass before others can meaningfully run

@@ -89,7 +89,7 @@ function skyyrose_get_collection_sot( $slug ) {
 /**
  * Extract a "resolved" image path from a sot.json imagery slot.
  *
- * sot.json imagery values are either null or an object with a "resolved" key
+ * Imagery slot values are either null or an object with a "resolved" key
  * containing a path relative to the theme's assets/ directory, e.g.:
  *   "images/homepage-col-black-rose.webp"
  *
@@ -201,4 +201,109 @@ function skyyrose_sot_lockup( $slug ) {
 	}
 
 	return '';
+}
+
+/**
+ * Resolve a per-SKU PRODUCT image through the SOT, front-first.
+ *
+ * This is the runtime bridge that closes the documented gap (templates used to
+ * hardcode `/images/products/...` paths instead of consulting the SOT). Every
+ * surface that shows a product image — editorial tiles, style cards, landing
+ * pages — must resolve it through here so the imagery follows the catalog/SOT
+ * and can never silently drift to a stale or wrong asset.
+ *
+ * Resolution order:
+ *   1. The deployed collection sot.json (data/collections/<slug>/sot.json) —
+ *      products[].images.<slot>.resolved, walked front-first per the SOT
+ *      `_authority` (on-model render before flat packshot).
+ *   2. The catalog CSV columns via skyyrose_get_product() (also theme-local).
+ *   3. '' — caller / the _uri wrapper substitutes a placeholder.
+ *
+ * View → ordered image-slot chain:
+ *   'front'    → front_model_image, image
+ *   'back'     → back_model_image, back_image
+ *   'packshot' → image, front_model_image
+ *
+ * Returns a theme-relative URI with a leading '/' (assets-relative, matching
+ * skyyrose_sot_hero/scene/lockup), so callers concatenate:
+ *   esc_url( SKYYROSE_ASSETS_URI . skyyrose_sot_product_image( $sku, $view ) )
+ * or use skyyrose_sot_product_image_uri() for a ready full URL.
+ *
+ * @since 1.6.7
+ * @param string $sku  Product SKU, e.g. 'br-006'.
+ * @param string $view 'front' | 'back' | 'packshot'. Defaults to 'front'.
+ * @return string Theme-relative URI (leading '/'), or '' on miss.
+ */
+function skyyrose_sot_product_image( $sku, $view = 'front' ) {
+	$sku = sanitize_key( $sku );
+	if ( '' === $sku ) {
+		return '';
+	}
+
+	$chains = array(
+		'front'    => array( 'front_model_image', 'image' ),
+		'back'     => array( 'back_model_image', 'back_image' ),
+		'packshot' => array( 'image', 'front_model_image' ),
+	);
+	$chain  = $chains[ $view ] ?? $chains['front'];
+
+	// Collection comes from the product SOT (the catalog), so this stays correct
+	// for any future SKU without a hardcoded prefix map.
+	$product    = function_exists( 'skyyrose_get_product' ) ? skyyrose_get_product( $sku ) : null;
+	$collection = is_array( $product ) ? ( $product['collection'] ?? '' ) : '';
+
+	// 1. Preferred: the deployed collection sot.json imagery view.
+	if ( '' !== $collection ) {
+		$sot = skyyrose_get_collection_sot( $collection );
+		if ( ! empty( $sot['products'] ) && is_array( $sot['products'] ) ) {
+			foreach ( $sot['products'] as $entry ) {
+				if ( ! is_array( $entry ) || ( $entry['sku'] ?? '' ) !== $sku ) {
+					continue;
+				}
+				$images = isset( $entry['images'] ) && is_array( $entry['images'] ) ? $entry['images'] : array();
+				foreach ( $chain as $slot ) {
+					$resolved = $images[ $slot ]['resolved'] ?? '';
+					if ( is_string( $resolved ) && '' !== $resolved ) {
+						return '/' . ltrim( $resolved, '/' );
+					}
+				}
+				break; // SKU matched but no slot in chain — fall through to CSV.
+			}
+		}
+	}
+
+	// 2. Fallback: catalog CSV columns. CSV paths are "assets/images/products/..";
+	// strip the leading "assets" so the return matches the assets-relative convention.
+	if ( is_array( $product ) ) {
+		foreach ( $chain as $slot ) {
+			$val = $product[ $slot ] ?? '';
+			if ( is_string( $val ) && '' !== $val ) {
+				return '/' . ltrim( preg_replace( '#^assets/#', '', $val ), '/' );
+			}
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Full URL for a per-SKU product image, with a placeholder on miss.
+ *
+ * Template-friendly wrapper around skyyrose_sot_product_image(): always returns
+ * a valid URL, so a SOT miss degrades to the product placeholder rather than a
+ * broken `SKYYROSE_ASSETS_URI . ''`.
+ *
+ * Usage: <img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>">
+ *
+ * @since 1.6.7
+ * @param string $sku  Product SKU.
+ * @param string $view 'front' | 'back' | 'packshot'.
+ * @return string Full image URL (never empty).
+ */
+function skyyrose_sot_product_image_uri( $sku, $view = 'front' ) {
+	$rel = skyyrose_sot_product_image( $sku, $view );
+	if ( '' === $rel ) {
+		return get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+	}
+	return SKYYROSE_ASSETS_URI . $rel;
 }
