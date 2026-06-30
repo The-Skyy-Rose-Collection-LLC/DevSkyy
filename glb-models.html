@@ -1,0 +1,158 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>SkyyRose — 3D GLB models (33) · web/production</title>
+<script>
+// Decoder config MUST run before the model-viewer module + before any <model-viewer> element.
+// Served over HTTP (repo root): use vendored local decoders (verified working).
+// Opened via file://: Chrome blocks fetch() of local worker/wasm, so fall back to Google's
+// gstatic CDN mirror for the decoders. (The GLBs themselves still need HTTP — see #fwarn banner.)
+self.ModelViewerElement = self.ModelViewerElement || {};
+self.ModelViewerElement.dracoDecoderLocation = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
+if (location.protocol === 'file:') {
+  // CDN fallback (all URLs curl-verified 200 — gstatic's modelviewer/thirdparty mirror 404s).
+  self.ModelViewerElement.meshoptDecoderLocation = 'https://cdn.jsdelivr.net/npm/meshoptimizer/meshopt_decoder.js';
+  self.ModelViewerElement.ktx2TranscoderLocation = 'https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/libs/basis/';
+} else {
+  self.ModelViewerElement.meshoptDecoderLocation = 'renders/3d/_viewer/meshopt_decoder.js';
+  self.ModelViewerElement.ktx2TranscoderLocation = 'renders/3d/_viewer/basis/';
+}
+</script>
+<script type="module" src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<style>:root{--g:#1db954;--r:#e03}*{box-sizing:border-box}body{background:#0a0a0a;color:#eee;font:14px system-ui;margin:0;padding:0 14px 120px}
+.bar{position:sticky;top:0;z-index:9;background:#0a0a0aee;backdrop-filter:blur(8px);padding:12px 4px;border-bottom:1px solid #222;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:15px;margin:0} .count{font:13px ui-monospace} .count b.k{color:var(--g)} .count b.d{color:var(--r)}
+button{cursor:pointer;border:1px solid #333;background:#161616;color:#eee;border-radius:6px;padding:7px 11px;font-size:13px} #dl{background:var(--g);color:#031;border:none;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:14px}
+.t{margin:0;background:#141414;border:2px solid #222;border-radius:10px;overflow:hidden}
+.t figcaption{font:11px ui-monospace;color:#bbb;padding:7px 9px;line-height:1.5} .t figcaption b{color:#D4AF37} .inv{color:#888;font-size:10px}
+.t .b{display:flex} .t .b button{flex:1;border:none;border-radius:0;font-size:13px;padding:8px} .t .b .k{color:var(--g)} .t .b .d{color:var(--r)}
+.t[data-state=keep]{border-color:var(--g)} .t[data-state=del]{border-color:var(--r);opacity:.6}
+#fwarn{display:none;margin:10px 4px 0;padding:10px 14px;background:#2a1d05;border:1px solid #D4AF37;border-radius:8px;color:#f0d999;font-size:13px;line-height:1.7}
+#fwarn b{color:#fff} #fwarn code{background:#000;color:#7fd1ff;padding:2px 6px;border-radius:4px;font:12px ui-monospace;user-select:all;-webkit-user-select:all}
+#fwarn .x{float:right;cursor:pointer;color:#f0d999;background:none;border:none;font-size:18px;line-height:1;padding:0 2px}
+.t[data-err="1"]{position:relative} .t[data-err="1"] model-viewer{opacity:.22}
+.t[data-err="1"]::after{content:"\26A0 can\2019t load over file:// \2014 serve over HTTP";position:absolute;top:42%;left:8px;right:8px;text-align:center;color:#f0d999;font-size:12px;line-height:1.5;pointer-events:none}
+</style></head><body>
+<div class="bar"><h1>3D GLB — 33 SKUs · web/production (meshopt+basis)</h1>
+<span class="count">✓ <b class="k" id="ck">0</b> · ✗ <b class="d" id="cd">0</b> / 33</span>
+<button id="dl">⬇ Download delete list</button>
+<span style="color:#888;font-size:12px">drag to rotate · WASM decoders wired · CDN fallback on file://</span></div>
+<div id="fwarn"><button class="x" id="fwx" title="dismiss">×</button><b>Opened from a file path.</b> Browsers block loading local <code>.glb</code> files over <code>file://</code> for security, so the model tiles below may stay blank. The 3D decoders have switched to the CDN fallback, but the models themselves must be served over HTTP. Run this from the repo root, then reload at the localhost URL:<br><code>python3 -m http.server 8010</code> &nbsp;→&nbsp; <code>http://127.0.0.1:8010/glb-models.html</code></div>
+<div class="grid"><figure class="t" data-sku="br-001" data-init="">
+<model-viewer src="renders/3d/web/br-001.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-001</b> · black-rose<br>BLACK Rose Crewneck<br><span class="inv">web 1.9MB (meshopt+basis) · full 6.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-002" data-init="">
+<model-viewer src="renders/3d/web/br-002.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-002</b> · black-rose<br>BLACK Rose Joggers<br><span class="inv">web 2.0MB (meshopt+basis)</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-003" data-init="">
+<model-viewer src="renders/3d/web/br-003.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-003</b> · black-rose<br>BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)<br><span class="inv">web 0.9MB (meshopt+basis)</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-004" data-init="">
+<model-viewer src="renders/3d/web/br-004.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-004</b> · black-rose<br>BLACK Rose Hoodie<br><span class="inv">web 1.7MB (meshopt+basis)</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-005" data-init="">
+<model-viewer src="renders/3d/web/br-005.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-005</b> · black-rose<br>BLACK Rose Hoodie — Signature Edition<br><span class="inv">web 2.0MB (meshopt+basis)</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-006" data-init="">
+<model-viewer src="renders/3d/web/br-006.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-006</b> · black-rose<br>BLACK Rose Sherpa Jacket<br><span class="inv">web 2.0MB (meshopt+basis) · full 8.7MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-007" data-init="">
+<model-viewer src="renders/3d/web/br-007.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-007</b> · black-rose<br>BLACK Rose x Love Hurts Basketball Shorts<br><span class="inv">web 1.9MB (meshopt+basis) · full 8.7MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-008" data-init="">
+<model-viewer src="renders/3d/web/br-008.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-008</b> · black-rose<br>BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)<br><span class="inv">web 1.4MB (meshopt+basis) · full 6.4MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-009" data-init="">
+<model-viewer src="renders/3d/web/br-009.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-009</b> · black-rose<br>BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)<br><span class="inv">web 2.0MB (meshopt+basis) · full 9.1MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-010" data-init="">
+<model-viewer src="renders/3d/web/br-010.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-010</b> · black-rose<br>BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)<br><span class="inv">web 1.5MB (meshopt+basis) · full 6.8MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-011" data-init="">
+<model-viewer src="renders/3d/web/br-011.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-011</b> · black-rose<br>BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)<br><span class="inv">web 1.7MB (meshopt+basis) · full 7.6MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-012" data-init="">
+<model-viewer src="renders/3d/web/br-012.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-012</b> · black-rose<br>BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)<br><span class="inv">web 1.2MB (meshopt+basis) · full 5.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-014" data-init="">
+<model-viewer src="renders/3d/web/br-014.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-014</b> · black-rose<br>BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)<br><span class="inv">web 1.1MB (meshopt+basis) · full 5.8MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="br-015" data-init="">
+<model-viewer src="renders/3d/web/br-015.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>br-015</b> · black-rose<br>BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)<br><span class="inv">web 1.3MB (meshopt+basis) · full 6.0MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="kids-001" data-init="">
+<model-viewer src="renders/3d/web/kids-001.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>kids-001</b> · kids-capsule<br>Kids Colorblock Hoodie Set — Red/Black<br><span class="inv">web 1.3MB (meshopt+basis) · full 6.6MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="kids-002" data-init="">
+<model-viewer src="renders/3d/web/kids-002.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>kids-002</b> · kids-capsule<br>Kids Colorblock Hoodie Set — Purple/Black<br><span class="inv">web 1.8MB (meshopt+basis) · full 8.3MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="lh-002" data-init="">
+<model-viewer src="renders/3d/web/lh-002.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>lh-002</b> · love-hurts<br>Love Hurts Joggers (Black)<br><span class="inv">web 1.7MB (meshopt+basis) · full 7.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="lh-003" data-init="">
+<model-viewer src="renders/3d/web/lh-003.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>lh-003</b> · love-hurts<br>Love Hurts Basketball Shorts<br><span class="inv">web 2.2MB (meshopt+basis) · full 10.4MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="lh-004" data-init="">
+<model-viewer src="renders/3d/web/lh-004.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>lh-004</b> · love-hurts<br>Love Hurts Bomber Jacket<br><span class="inv">web 2.0MB (meshopt+basis) · full 9.3MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="lh-005" data-init="">
+<model-viewer src="renders/3d/web/lh-005.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>lh-005</b> · love-hurts<br>The Fannie<br><span class="inv">web 1.8MB (meshopt+basis) · full 8.3MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="lh-006" data-init="">
+<model-viewer src="renders/3d/web/lh-006.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>lh-006</b> · love-hurts<br>Love Hurts Joggers (White)<br><span class="inv">web 1.6MB (meshopt+basis) · full 7.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-001" data-init="">
+<model-viewer src="renders/3d/web/sg-001.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-001</b> · signature<br>The Bridge Series &#x27;The Bay Bridge&#x27; Shorts<br><span class="inv">web 1.8MB (meshopt+basis) · full 7.6MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-002" data-init="">
+<model-viewer src="renders/3d/web/sg-002.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-002</b> · signature<br>The Bridge Series &#x27;Stay Golden&#x27; Shirt<br><span class="inv">web 1.6MB (meshopt+basis) · full 7.2MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-003" data-init="">
+<model-viewer src="renders/3d/web/sg-003.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-003</b> · signature<br>The Bridge Series &#x27;Stay Golden&#x27; Shorts<br><span class="inv">web 1.9MB (meshopt+basis) · full 9.0MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-005" data-init="">
+<model-viewer src="renders/3d/web/sg-005.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-005</b> · signature<br>The Bridge Series &#x27;The Bay Bridge&#x27; Shirt<br><span class="inv">web 1.1MB (meshopt+basis) · full 5.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-006" data-init="">
+<model-viewer src="renders/3d/web/sg-006.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-006</b> · signature<br>Mint &amp; Lavender Hoodie<br><span class="inv">web 1.5MB (meshopt+basis) · full 6.8MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-007" data-init="">
+<model-viewer src="renders/3d/web/sg-007.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-007</b> · signature<br>The Signature Beanie<br><span class="inv">web 1.4MB (meshopt+basis) · full 7.0MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-009" data-init="">
+<model-viewer src="renders/3d/web/sg-009.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-009</b> · signature<br>The Sherpa Jacket<br><span class="inv">web 2.1MB (meshopt+basis) · full 9.1MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-011" data-init="">
+<model-viewer src="renders/3d/web/sg-011.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-011</b> · signature<br>Original Label Tee (White)<br><span class="inv">web 1.0MB (meshopt+basis) · full 5.2MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-012" data-init="">
+<model-viewer src="renders/3d/web/sg-012.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-012</b> · signature<br>Original Label Tee (Orchid)<br><span class="inv">web 1.2MB (meshopt+basis) · full 5.9MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-013" data-init="">
+<model-viewer src="renders/3d/web/sg-013.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-013</b> · signature<br>Mint &amp; Lavender Crewneck<br><span class="inv">web 1.6MB (meshopt+basis) · full 7.3MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-014" data-init="">
+<model-viewer src="renders/3d/web/sg-014.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-014</b> · signature<br>Mint &amp; Lavender Sweatpants<br><span class="inv">web 1.5MB (meshopt+basis) · full 6.8MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure><figure class="t" data-sku="sg-015" data-init="">
+<model-viewer src="renders/3d/web/sg-015.glb" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="26deg" interaction-prompt="none" loading="lazy" reveal="auto" shadow-intensity="1" exposure="1.05" environment-image="neutral" style="width:100%;height:300px;background:#0d0d0d"></model-viewer>
+<figcaption><b>sg-015</b> · signature<br>The Windbreaker Set<br><span class="inv">web 2.0MB (meshopt+basis) · full 8.7MB</span></figcaption>
+<div class="b"><button class="k">✓ keep</button><button class="d">✗ delete</button></div></figure></div>
+<script>
+const LS='skyy-glb';let st=JSON.parse(localStorage.getItem(LS)||'{}');
+const tiles=[...document.querySelectorAll('.t')];
+tiles.forEach(t=>{const s=st[t.dataset.sku]; if(s)t.dataset.state=s;});
+function save(){const o={};tiles.forEach(t=>{if(t.dataset.state)o[t.dataset.sku]=t.dataset.state;});localStorage.setItem(LS,JSON.stringify(o));c();}
+function c(){let k=0,d=0;tiles.forEach(t=>{if(t.dataset.state=='keep')k++;else if(t.dataset.state=='del')d++;});ck.textContent=k;cd.textContent=d;}
+tiles.forEach(t=>{t.querySelector('.k').onclick=()=>{t.dataset.state=t.dataset.state=='keep'?'':'keep';save();};t.querySelector('.d').onclick=()=>{t.dataset.state=t.dataset.state=='del'?'':'del';save();};});
+dl.onclick=()=>{const del=tiles.filter(t=>t.dataset.state=='del').map(t=>t.dataset.sku);const blob=new Blob([JSON.stringify({delete_3d_skus:del,generated:new Date().toISOString()},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='skyyrose-3d-delete.json';a.click();};
+// file:// robustness: show the HTTP-server banner and flag any tile whose model fails to load
+if(location.protocol==='file:')fwarn.style.display='block';
+fwx.onclick=()=>fwarn.style.display='none';
+if(typeof fwx!=='undefined')fwx.setAttribute('aria-label','Dismiss notice');
+tiles.forEach(t=>{const m=t.querySelector('model-viewer');const sku=t.dataset.sku||'model';
+  const k=t.querySelector('.k'),d=t.querySelector('.d');if(k)k.setAttribute('aria-label','Keep '+sku);if(d)d.setAttribute('aria-label','Delete '+sku);
+  if(!m)return;m.setAttribute('aria-label','3D model '+sku);
+  m.addEventListener('error',()=>{t.dataset.err='1';t.setAttribute('role','alert');t.setAttribute('aria-label',sku+' failed to load — serve over HTTP');});
+  m.addEventListener('load',()=>{t.dataset.err='';t.removeAttribute('role');t.removeAttribute('aria-label');});});
+c();
+</script></body></html>
