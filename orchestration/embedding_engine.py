@@ -17,16 +17,16 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import logging
 import os
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from enum import StrEnum
 from typing import Any
 
+import structlog
 from pydantic import BaseModel, ConfigDict, Field
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 # =============================================================================
@@ -72,7 +72,7 @@ class EmbeddingCache:
                 # Move to end (most recently used)
                 self._cache.move_to_end(key)
                 self._hits += 1
-                logger.debug(f"Embedding cache hit for key: {key[:8]}...")
+                logger.debug("embedding_cache_hit", key_prefix=key[:8])
                 return self._cache[key]
             self._misses += 1
             return None
@@ -124,7 +124,7 @@ def get_embedding_cache() -> EmbeddingCache:
     if _embedding_cache is None:
         cache_size = int(os.getenv("EMBEDDING_CACHE_SIZE", "1024"))
         _embedding_cache = EmbeddingCache(maxsize=cache_size)
-        logger.info(f"Initialized embedding cache with maxsize={cache_size}")
+        logger.info("embedding_cache_initialized", maxsize=cache_size)
     return _embedding_cache
 
 
@@ -247,7 +247,10 @@ class SentenceTransformerEngine(BaseEmbeddingEngine):
             self._dimension = self._model.get_sentence_embedding_dimension()
             self._initialized = True
             logger.info(
-                f"SentenceTransformer initialized: {self.config.st_model_name} (dim={self._dimension})"
+                "embedding_provider_initialized",
+                provider="sentence_transformer",
+                model=self.config.st_model_name,
+                dim=self._dimension,
             )
 
         except ImportError:
@@ -255,7 +258,11 @@ class SentenceTransformerEngine(BaseEmbeddingEngine):
                 "sentence-transformers not installed. Run: pip install sentence-transformers"
             )
         except Exception as e:
-            logger.error(f"SentenceTransformer initialization failed: {e}")
+            logger.error(
+                "embedding_provider_init_failed",
+                provider="sentence_transformer",
+                error=str(e),
+            )
             raise
 
     async def embed_text(self, text: str) -> list[float]:
@@ -334,13 +341,20 @@ class OpenAIEmbeddingEngine(BaseEmbeddingEngine):
             self._dimension = self.MODEL_DIMS.get(self.config.openai_model, 1536)
             self._initialized = True
             logger.info(
-                f"OpenAI Embeddings initialized: {self.config.openai_model} (dim={self._dimension})"
+                "embedding_provider_initialized",
+                provider="openai",
+                model=self.config.openai_model,
+                dim=self._dimension,
             )
 
         except ImportError:
             raise ImportError("openai not installed. Run: pip install openai")
         except Exception as e:
-            logger.error(f"OpenAI Embeddings initialization failed: {e}")
+            logger.error(
+                "embedding_provider_init_failed",
+                provider="openai",
+                error=str(e),
+            )
             raise
 
     async def embed_text(self, text: str) -> list[float]:
@@ -442,13 +456,20 @@ class CohereEmbeddingEngine(BaseEmbeddingEngine):
             self._dimension = self.MODEL_DIMS.get(self.config.cohere_model, 1024)
             self._initialized = True
             logger.info(
-                f"Cohere Embeddings initialized: {self.config.cohere_model} (dim={self._dimension})"
+                "embedding_provider_initialized",
+                provider="cohere",
+                model=self.config.cohere_model,
+                dim=self._dimension,
             )
 
         except ImportError:
             raise ImportError("cohere not installed. Run: pip install cohere")
         except Exception as e:
-            logger.error(f"Cohere Embeddings initialization failed: {e}")
+            logger.error(
+                "embedding_provider_init_failed",
+                provider="cohere",
+                error=str(e),
+            )
             raise
 
     async def embed_text(self, text: str) -> list[float]:
@@ -584,14 +605,21 @@ class VoyageEmbeddingEngine(BaseEmbeddingEngine):
             self._dimension = self.config.voyage_output_dimension or base_dim
             self._initialized = True
             logger.info(
-                f"Voyage Embeddings initialized: {self.config.voyage_model} "
-                f"(dim={self._dimension}, asymmetric=True)"
+                "embedding_provider_initialized",
+                provider="voyage",
+                model=self.config.voyage_model,
+                dim=self._dimension,
+                asymmetric=True,
             )
 
         except ImportError:
             raise ImportError("voyageai not installed. Run: pip install voyageai")
         except Exception as e:
-            logger.error(f"Voyage Embeddings initialization failed: {e}")
+            logger.error(
+                "embedding_provider_init_failed",
+                provider="voyage",
+                error=str(e),
+            )
             raise
 
     def _embed_kwargs(self, texts: list[str], input_type: str) -> dict[str, Any]:
