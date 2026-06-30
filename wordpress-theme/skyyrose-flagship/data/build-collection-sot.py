@@ -9,7 +9,7 @@ Orphans = every image file in the scanned tree registered to NO manifest entry, 
 product, or logo (naming-independent set-difference). Manifest entries are expanded across
 their declared `formats`, so format siblings (avif/png of a webp role) count as registered.
 
-USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD]
+USAGE: python3 build-collection-sot.py [--updated YYYY-MM-DD] [--out-dir DIR]
 """
 
 import argparse
@@ -248,6 +248,75 @@ def build_collection(
     }
 
 
+# Masters tuple: (identity, visual-manifest, logo-registry, products-by-collection).
+# Plain assignment (not `X: TypeAlias` / PEP 695 `type X`): ruff UP040 wants the `type`
+# keyword, which is 3.12+ syntax and this runs on Python 3.11 in CI.
+_Masters = tuple[dict[str, Any], Any, Any, dict[str, list]]
+
+
+def serialize(obj: Any) -> str:
+    r"""Single byte-authority for every file this script writes.
+
+    The writer (``main``) and the CI freshness guard
+    (``validate_catalog_consistency.check_collection_sot_current``) both render
+    through here, so a regenerate-and-compare can never disagree with the writer
+    over formatting. Matches the historical on-disk format exactly: 2-space
+    indent, ASCII-escaped (the em-dash in ``_generated_by`` is ``—``),
+    trailing newline.
+    """
+    return json.dumps(obj, indent=2, ensure_ascii=True) + "\n"
+
+
+def _load_masters() -> _Masters:
+    """Load the four canonical masters once (identity, manifest, logos, products)."""
+    return (
+        sot_common.load_identity(),
+        sot_common.load_manifest(),
+        sot_common.load_logo_registry(),
+        load_products_by_collection(),
+    )
+
+
+def build_documents(
+    updated: str = "GENERATED", *, masters: _Masters | None = None
+) -> dict[str, dict]:
+    """Build every per-collection SOT document, keyed by slug. Pure — no disk writes.
+
+    Reads only the tracked masters + ``resolve_asset`` (file-presence checks against the
+    tracked asset tree); it never scans the broad image tree, so it is deterministic in a
+    clean CI checkout. This is the seam the freshness guard regenerates and byte-compares.
+    """
+    idents, manifest, logo_reg, products_by_col = masters or _load_masters()
+    return {
+        slug: build_collection(
+            slug, ident, manifest, logo_reg, products_by_col.get(slug, []), updated
+        )
+        for slug, ident in idents.items()
+    }
+
+
+def build_orphans(*, masters: _Masters | None = None) -> dict:
+    """Build the global _orphans.json document (scans the asset tree, set-difference).
+
+    Kept separate from ``build_documents`` because it is the only step that depends on the
+    full image tree on disk — the freshness guard deliberately checks the per-collection
+    sot.json files (deterministic) and leaves _orphans to freshness-guard.sh.
+    """
+    idents, manifest, logo_reg, products_by_col = masters or _load_masters()
+    tree = scan_tree()
+    reg = registered_files(manifest, logo_reg, products_by_col)
+    known: set[str] = set()
+    for ident in idents.values():
+        known |= set(ident.get("known_orphans", []))
+    orphans = sorted(tree - reg - known)
+    return {
+        "_note": "Image files in the asset tree registered to NO manifest entry, product, or logo. "
+        "Audit before use; add legit non-role files to a collection identity.json known_orphans[].",
+        "count": len(orphans),
+        "orphans": orphans,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate per-collection SOT JSON + the global _orphans.json."
@@ -257,44 +326,30 @@ def main() -> int:
         default="GENERATED",
         help="Value for each sot.json 'updated' field, e.g. 2026-06-14.",
     )
-    updated = parser.parse_args().updated
-    idents = sot_common.load_identity()
-    manifest = sot_common.load_manifest()
-    logo_reg = sot_common.load_logo_registry()
-    products_by_col = load_products_by_collection()
-    tree = scan_tree()
-    reg = registered_files(manifest, logo_reg, products_by_col)
+    parser.add_argument(
+        "--out-dir",
+        default=None,
+        help="Directory to write the per-slug sot.json folders + _orphans.json into. "
+        "Defaults to data/collections/ (the tracked SOT view). Tests pass a tmp dir so "
+        "they never mutate tracked files or race a concurrent build.",
+    )
+    args = parser.parse_args()
+    out = Path(args.out_dir) if args.out_dir else OUT
+    out.mkdir(parents=True, exist_ok=True)
+    masters = _load_masters()
 
-    for slug, ident in idents.items():
-        products = products_by_col.get(slug, [])
-        sot = build_collection(slug, ident, manifest, logo_reg, products, updated)
-        folder = OUT / slug
+    for slug, sot in build_documents(args.updated, masters=masters).items():
+        folder = out / slug
         folder.mkdir(parents=True, exist_ok=True)
-        (folder / "sot.json").write_text(json.dumps(sot, indent=2) + "\n")
+        (folder / "sot.json").write_text(serialize(sot))
         print(
-            f"{slug}: {len(products)} products, {len(sot['logos'])} logos "
+            f"{slug}: {len(sot['products'])} products, {len(sot['logos'])} logos "
             f"({len(sot['unresolved_product_images'])} unresolved imgs)"
         )
 
-    known = set()
-    for ident in idents.values():
-        known |= set(ident.get("known_orphans", []))
-    orphans = sorted(tree - reg - known)
-    (OUT / "_orphans.json").write_text(
-        json.dumps(
-            {
-                "_note": "Image files in the asset tree registered to NO manifest entry, product, or logo. "
-                "Audit before use; add legit non-role files to a collection identity.json known_orphans[].",
-                "count": len(orphans),
-                "orphans": orphans,
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    print(
-        f"_orphans.json: {len(orphans)} unregistered (of {len(tree)} scanned, {len(reg)} registered)"
-    )
+    orphans = build_orphans(masters=masters)
+    (out / "_orphans.json").write_text(serialize(orphans))
+    print(f"_orphans.json: {orphans['count']} unregistered")
     return 0
 
 
