@@ -1,4 +1,5 @@
 {
+ "_generated_by": "scripts/build_v7_cards.py \u2014 DO NOT EDIT. SOT = skyyrose-catalog.csv (fields) \u00d7 promoted v7 served tree (imagery). Regenerate after CSV/imagery changes; CI check 'v7_cards_current' enforces this.",
  "_authority": "verdict:verified hub images only \u2014 see feedback_real_products_only",
  "_count": 27,
  "cards": [
@@ -153,7 +154,7 @@
    "collection": "black-rose",
    "badge": "Pre-Order",
    "edition": 250,
-   "preorder": false,
+   "preorder": true,
    "shots": [
     {
      "face": "front",
@@ -172,7 +173,7 @@
    "collection": "black-rose",
    "badge": "Pre-Order",
    "edition": 250,
-   "preorder": false,
+   "preorder": true,
    "shots": [
     {
      "face": "front",
