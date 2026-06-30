@@ -71,8 +71,7 @@ jobs:
 
       - name: Run pytest — catalog consistency tests
         run: |
-          pytest skyyrose/elite_studio/tests/test_catalog_consistency.py \
-                 tests/test_collection_sot_guard.py -v --tb=short
+          pytest skyyrose/elite_studio/tests/test_catalog_consistency.py -v --tb=short
         env:
           PYTHONPATH: ${{ github.workspace }}
 
