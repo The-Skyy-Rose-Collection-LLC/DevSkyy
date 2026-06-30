@@ -227,6 +227,19 @@ Never fix a test by weakening it. Fix the code, not the test.
 
 ---
 
+## Karpathy Coding Guidelines
+
+Bias toward caution over speed. For trivial tasks, use judgment. ([source](https://x.com/karpathy/status/2015883857489522876))
+
+1. **Think before coding.** State assumptions explicitly; if uncertain, ask. If multiple interpretations exist, present them — don't pick silently. If a simpler approach exists, say so and push back. If something is unclear, stop and name it.
+2. **Simplicity first.** Minimum code that solves the problem, nothing speculative. No unrequested features, abstractions for single-use code, "flexibility," or error handling for impossible cases. If 200 lines could be 50, rewrite it. Ask: "would a senior engineer call this overcomplicated?"
+3. **Surgical changes.** Touch only what the request requires. Don't "improve" adjacent code, comments, or formatting; don't refactor what isn't broken; match existing style. Remove only the imports/vars/functions YOUR change orphaned — flag pre-existing dead code, don't delete it unasked. Test: every changed line traces to the request.
+4. **Goal-driven execution.** Turn tasks into verifiable goals ("add validation" → "write tests for invalid inputs, then make them pass"). For multi-step work, state a brief plan with a `verify:` check per step, then loop until verified. Strong success criteria let you loop independently; weak ones ("make it work") force constant clarification.
+
+> These reinforce the existing **Anti-Hallucination**, **Loop**, and **Verification** protocols above — same spine, sharper on simplicity and surgical scope.
+
+---
+
 ## Critical Rules
 
 - Files <800 lines, functions <50 lines
@@ -376,7 +389,7 @@ Every output delivered in this project is production-ready. Not a draft. Not a p
 1. Fix it
 2. In one sentence: what was wrong and why
 3. In one sentence: what you changed to prevent it recurring
-4. Update `tasks/lessons.md`
+4. Record the lesson — `tasks/lessons.md` (behavioral) and/or a Learnings entry (engineering); commit the fix and the lesson together
 5. Move on
 
 Do not: apologize repeatedly, re-explain the mistake at length, ask if the fix is acceptable before showing it. Fix it, show it, name the lesson.
@@ -444,9 +457,3 @@ Show the exact file path, exact cost, and exact action — not a summary, the li
 "Autonomous" means Claude handles implementation without hand-holding **after the user has confirmed the plan and inputs**. It does NOT mean Claude decides what files to use, what to deploy, or what API calls to make without checking first.
 
 The pattern "act → apologize → act again → apologize again" is a bug, not a feature. If the right source file is unclear, ask. If the deploy target is ambiguous, ask. One question costs zero dollars. Getting it wrong costs real money and breaks the live site.
-
----
-
-## Self-Correction
-
-1. Fix the issue → 2. Add Learnings entry above → 3. Commit both together
