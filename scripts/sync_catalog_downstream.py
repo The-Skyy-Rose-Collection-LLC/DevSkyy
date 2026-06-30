@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import argparse
 import ast
-import csv
 import json
 import re
 import shutil
@@ -87,9 +86,24 @@ class SyncReport:
 # ---------------------------------------------------------------------------
 
 
-def _load_csv() -> list[dict[str, str]]:
-    with _CATALOG_CSV.open(newline="", encoding="utf-8") as fh:
-        return list(csv.DictReader(fh))
+def _load_csv() -> list[dict[str, str]] | None:
+    """Load catalog CSV via the canonical loader; returns None on error.
+
+    Delegates to ``skyyrose.core.catalog_loader.read_catalog_rows()`` so both
+    this sync tool and the validator use a single read path.
+    ``read_catalog_rows`` is @cached and returns a shared read-only list —
+    callers must not mutate it (copy if you need to modify).
+    """
+    if not _CATALOG_CSV.exists():
+        return None
+    try:
+        if str(_REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(_REPO_ROOT))
+        from skyyrose.core.catalog_loader import read_catalog_rows
+
+        return list(read_catalog_rows(_CATALOG_CSV))
+    except Exception:
+        return None
 
 
 def _registry_jersey_skus() -> frozenset[str]:
@@ -581,11 +595,11 @@ def main(argv: list[str] | None = None) -> int:
         print("  [DRY RUN — no files will be written]\n")
 
     # Load canonical source
-    if not _CATALOG_CSV.exists():
-        print(f"ERROR: Catalog CSV not found: {_CATALOG_CSV}", file=sys.stderr)
+    rows = _load_csv()
+    if rows is None:
+        print(f"ERROR: Catalog CSV not found or unreadable: {_CATALOG_CSV}", file=sys.stderr)
         return 1
 
-    rows = _load_csv()
     print(f"  Catalog: {len(rows)} SKUs loaded from CSV\n")
 
     report = SyncReport()
