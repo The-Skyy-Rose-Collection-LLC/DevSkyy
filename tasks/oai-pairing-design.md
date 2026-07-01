@@ -110,8 +110,12 @@ collage (the batch-1 sg-015 defect). So:
 
 ## Open / deferred
 
-- **sg-015 (Windbreaker)**: only reference is a 4-panel composite → excluded from paid runs until a
-  clean cropped front techflat exists. Will render multi-panel otherwise.
+- **sg-015 (Windbreaker)**: RESOLVED 2026-07-01. The 4-panel composite split at the exact 50/50
+  midpoint, which bled the pants waistband into the jacket crop (jacket row > half the composite
+  height). Fixed via `split_2x2(..., row_split=553)` in `scripts/split_techflats.py` (measured from
+  the whitespace gap between panels, y=547-559) — also fixed `TECHFLATS` pointing at the wrong
+  `assets/techflats` path instead of `assets/products/techflats`. All 4 crops re-verified clean
+  (eyes-on, no cross-panel bleed). No longer excluded from paid runs.
 - **Founder visual verdict pending** on the 6-image batch before scaling to the full 81 (≈$32.40).
 - **lh-006 flatlay** still resolves a techflat (labeled GROUND TRUTH) — correct garment now, but
   label is a techflat not a photo; refine before the lh-bomber-white pair renders in the full run.
