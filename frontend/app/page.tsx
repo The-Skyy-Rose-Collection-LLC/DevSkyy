@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import HomePage from './(storefront)/HomePage';
 import SiteNav from '@/components/navigation/SiteNav';
 import IncentivePopup from '@/components/marketing/IncentivePopup';
+import { getAllEnrichedCollections } from '@/lib/catalog-server';
 
 export const metadata: Metadata = {
   title: 'SkyyRose | Luxury Grows from Concrete.',
@@ -16,11 +17,12 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+  const collections = getAllEnrichedCollections();
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       <SiteNav />
       <main>
-        <HomePage />
+        <HomePage collections={collections} />
       </main>
       <IncentivePopup />
     </div>
