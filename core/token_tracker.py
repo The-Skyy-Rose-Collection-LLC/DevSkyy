@@ -37,6 +37,7 @@ class TaskType(StrEnum):
     TRANSLATE = "translate"
     CODE = "code"
     EMBED = "embed"  # OBS-wire: server-side image/text embedding encode
+    GATE = "gate"  # OBS-wire: brand-centroid gate verdict (cosine score vs centroid)
 
 
 # Provider cost per 1M tokens (as of 2026-01-08)
@@ -410,3 +411,59 @@ def record_embedding_usage(
         )
     except Exception:  # noqa: BLE001 — telemetry must never break the encode path
         logger.warning("record_embedding_usage_failed", exc_info=True)
+
+
+def record_gate_score(
+    *,
+    model: str,
+    score: float,
+    accepted: bool,
+    threshold: float,
+    subject: str | None = None,
+    agent_id: str | None = None,
+) -> None:
+    """Record one brand-centroid gate verdict into the global tracker.
+
+    OBS-wire: ``embedding_gate.evaluate`` produced a cosine score per render but emitted
+    nothing, so ``EmbeddingObserver`` (PSI drift) had no signal. One ``TaskType.GATE`` row
+    per evaluate carries ``score``/``accepted``/``threshold`` in metadata; ``gate_scores``
+    reads them back. Gate scoring uses local embedding weights, so token counts and cost
+    are 0. NEVER raises — telemetry must not break the gate.
+    """
+    try:
+        meta: dict[str, Any] = {
+            "score": float(score),
+            "accepted": bool(accepted),
+            "threshold": float(threshold),
+        }
+        if subject is not None:
+            meta["subject"] = subject
+        get_token_tracker().record(
+            TokenUsage(
+                provider="embeddings",
+                model=model,
+                task_type=TaskType.GATE,
+                agent_id=agent_id if agent_id is not None else current_agent_id.get(),
+                input_tokens=0,
+                output_tokens=0,
+                metadata=meta,
+            )
+        )
+    except Exception:  # noqa: BLE001 — telemetry must never break the gate
+        logger.warning("record_gate_score_failed", exc_info=True)
+
+
+def gate_scores(since: datetime | None = None) -> list[float]:
+    """Cosine scores from recorded ``TaskType.GATE`` rows, oldest-first.
+
+    The read path the ``EmbeddingObserver`` consumes as ``live_scores`` for PSI drift.
+    Filters out non-gate rows (EMBED encodes, LLM calls) and any malformed gate row.
+    """
+    out: list[float] = []
+    for u in get_token_tracker().records(since):
+        if u.task_type is TaskType.GATE and "score" in u.metadata:
+            try:
+                out.append(float(u.metadata["score"]))
+            except (TypeError, ValueError):
+                continue
+    return out

@@ -101,6 +101,15 @@ QC_MAX_RENDER_RETRIES = 2  # judged re-renders per plan before quarantine
 # Anthropic claude-sonnet-4-6 (1 candidate + 3 refs, full-res) ≈ $0.04-0.05.
 EST_JUDGE_COST_USD = 0.05
 
+# Q-fusion centroid gate mode: "off" (default) | "advisory" | "hard".
+#   off      — centroid never runs (no CLIP/DINO cost); the verdict carries no centroid fields.
+#   advisory — centroid runs and is RECORDED alongside the judge, but never rejects
+#              (verdict.passed = judge only) → collects centroid-vs-judge calibration data.
+#   hard     — passed = on_brand AND judge.pass. Enable ONLY after the centroid threshold is
+#              calibrated for oai_render; the compositor-tuned threshold can over-reject here.
+# Env-overridable so promotion (advisory → hard) is a one-value flip with no code change.
+QC_CENTROID_GATE = os.environ.get("OAI_QC_CENTROID_GATE", "off").strip().lower()
+
 
 EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 

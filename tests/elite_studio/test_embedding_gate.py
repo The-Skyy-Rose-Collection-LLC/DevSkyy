@@ -51,3 +51,38 @@ def test_evaluate_rejects_below_threshold(
     verdict = embedding_gate.evaluate(render_image, fake_centroid)
     assert verdict.accepted is False
     assert "below" in verdict.reason.lower()
+
+
+@pytest.mark.unit
+def test_evaluate_emits_gate_score_to_tracker(
+    fake_centroid: BrandCentroid, render_image: Path, monkeypatch
+) -> None:
+    # Track-OBS: every evaluate records its verdict score for PSI-drift observability.
+    from core import token_tracker
+
+    monkeypatch.setattr(embedding_gate, "score_against_centroid", lambda *_a, **_kw: 0.80)
+    token_tracker.get_token_tracker().clear()
+    embedding_gate.evaluate(render_image, fake_centroid)
+    assert token_tracker.gate_scores() == [pytest.approx(0.80)]
+    row = token_tracker.get_token_tracker().records()[-1]
+    assert row.task_type is token_tracker.TaskType.GATE
+    assert row.model == "test"  # centroid.model_id
+    assert row.metadata["accepted"] is True
+    assert row.metadata["threshold"] == pytest.approx(0.65)
+
+
+@pytest.mark.unit
+def test_evaluate_telemetry_failure_does_not_break_gate(
+    fake_centroid: BrandCentroid, render_image: Path, monkeypatch
+) -> None:
+    # A broken tracker must never break the gate verdict.
+    from core import token_tracker
+
+    monkeypatch.setattr(embedding_gate, "score_against_centroid", lambda *_a, **_kw: 0.80)
+    monkeypatch.setattr(
+        token_tracker,
+        "record_gate_score",
+        lambda **_k: (_ for _ in ()).throw(RuntimeError("telemetry down")),
+    )
+    verdict = embedding_gate.evaluate(render_image, fake_centroid)
+    assert verdict.accepted is True and verdict.score == pytest.approx(0.80)
