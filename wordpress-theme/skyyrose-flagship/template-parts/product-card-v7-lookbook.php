@@ -63,11 +63,20 @@ if ( $v7_product instanceof WC_Product ) {
 					continue;
 				}
 				$shot_face = ! empty( $shot['face'] ) ? (string) $shot['face'] : 'view';
+				// AVIF tier: serve the .avif sibling via <picture> when it exists on disk
+				// (~30% smaller than webp); <img> stays the universal fallback + carousel hook.
+				$avif_uri = preg_replace( '/\.(webp|png|jpe?g)$/i', '.avif', $shot_uri );
+				$has_avif = $avif_uri !== $shot_uri && file_exists( get_theme_file_path( $avif_uri ) );
 				?>
-				<img class="v7card__shot"<?php echo 0 === $i ? ' data-active="true"' : ' aria-hidden="true"'; ?>
-					src="<?php echo esc_url( get_theme_file_uri( $shot_uri ) ); ?>"
-					alt="<?php echo esc_attr( $v7_name . ' — ' . $shot_face ); ?>"
-					loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
+				<picture>
+					<?php if ( $has_avif ) : ?>
+						<source type="image/avif" srcset="<?php echo esc_url( get_theme_file_uri( $avif_uri ) ); ?>">
+					<?php endif; ?>
+					<img class="v7card__shot"<?php echo 0 === $i ? ' data-active="true"' : ' aria-hidden="true"'; ?>
+						src="<?php echo esc_url( get_theme_file_uri( $shot_uri ) ); ?>"
+						alt="<?php echo esc_attr( $v7_name . ' — ' . $shot_face ); ?>"
+						loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
+				</picture>
 			<?php endforeach; ?>
 		</div>
 		<span class="v7card__scrim" aria-hidden="true"></span>
