@@ -54,6 +54,12 @@ def generate_template(
         raise ValueError("chars must be a non-empty string")
     if cols < 1:
         raise ValueError("cols must be >= 1")
+    if len(set(chars)) != len(chars):
+        dupes = sorted({c for c in chars if chars.count(c) > 1})
+        raise ValueError(
+            f"chars contains duplicate characters {dupes!r} — each character must be "
+            "unique (duplicates would emit duplicate codepoints into the manifest)"
+        )
 
     cell_w, cell_h = cell_size
     rows = math.ceil(len(chars) / cols)

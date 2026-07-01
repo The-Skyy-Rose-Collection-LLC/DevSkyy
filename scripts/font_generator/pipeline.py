@@ -45,7 +45,15 @@ def _validate_manifest(manifest: dict[str, Any]) -> None:
         if key not in manifest:
             raise ValueError(f"manifest missing required key {key!r}")
 
-    image_w, image_h = manifest["image_size"]
+    image_size = manifest["image_size"]
+    if not (isinstance(image_size, (list, tuple)) and len(image_size) == 2):
+        raise ValueError(
+            f"manifest 'image_size' must be a 2-element [width, height], got {image_size!r}"
+        )
+    if not isinstance(manifest["cells"], list):
+        raise ValueError(f"manifest 'cells' must be a list, got {type(manifest['cells']).__name__}")
+
+    image_w, image_h = image_size
     seen_chars: set[str] = set()
     seen_codepoints: set[int] = set()
 
@@ -169,6 +177,12 @@ def build_font(
     filled_image_path = Path(filled_image_path)
     manifest_path = Path(manifest_path)
     out_path = Path(out_path)
+
+    # threshold is an 8-bit grayscale cutoff (`gray < threshold` == ink). Outside
+    # 1..255 it silently makes every cell all-blank (0) or all-ink (>255), so
+    # reject it up front instead of producing an empty or unusable font.
+    if not 1 <= threshold <= 255:
+        raise ValueError(f"threshold must be between 1 and 255 (8-bit grayscale), got {threshold}")
 
     if not filled_image_path.exists():
         raise FileNotFoundError(f"filled image not found: {filled_image_path}")

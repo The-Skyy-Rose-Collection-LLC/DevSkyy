@@ -106,6 +106,7 @@ dependencies = [
     # 3D & Visual Generation
     "Pillow>=10.0",
     "opencv-python>=4.8",
+    "fonttools>=4.55",  # scripts/font_generator: PNG-template -> TTF vectorization
 
     # Performance & Async I/O
     "aiofiles>=24.1.0",

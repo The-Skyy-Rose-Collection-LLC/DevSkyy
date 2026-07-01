@@ -161,7 +161,10 @@ def main() -> None:
 
     try:
         args.func(args)
-    except (ValueError, RuntimeError, FileNotFoundError) as exc:
+    except (ValueError, RuntimeError, OSError) as exc:
+        # OSError covers FileNotFoundError, PermissionError, IsADirectoryError —
+        # any filesystem failure from a subcommand surfaces as a clean message,
+        # not a traceback.
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(1)
 
