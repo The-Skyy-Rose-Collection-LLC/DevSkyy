@@ -236,12 +236,6 @@ def main(
     out_path = skipped_out if skipped_out is not None else DEFAULT_SKIPPED_OUT
     _write_skipped_json(entries, out_path)
 
-    if len(entries) != len(rows):
-        print(
-            f"WARN: classified {len(entries)} SKUs but catalog has {len(rows)}",
-            file=sys.stderr,
-        )
-
     return 0
 
 
