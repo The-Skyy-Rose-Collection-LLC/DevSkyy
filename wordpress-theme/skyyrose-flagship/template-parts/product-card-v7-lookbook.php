@@ -63,17 +63,17 @@ if ( $v7_product instanceof WC_Product ) {
 					continue;
 				}
 				$shot_face = ! empty( $shot['face'] ) ? (string) $shot['face'] : 'view';
-				// AVIF tier: serve the .avif sibling via <picture> when it exists on disk
-				// (~30% smaller than webp); <img> stays the universal fallback + carousel hook.
-				$avif_uri = preg_replace( '/\.(webp|png|jpe?g)$/i', '.avif', $shot_uri );
-				$has_avif = $avif_uri !== $shot_uri && file_exists( get_theme_file_path( $avif_uri ) );
+				$shot_src = get_theme_file_uri( $shot_uri );
+				// AVIF tier via the shared next-gen sibling prober (Photon-safe): serves the
+				// .avif sibling through <picture> when present; <img> is the universal fallback.
+				$shot_pic = skyyrose_picture_sources( $shot_src );
 				?>
 				<picture>
-					<?php if ( $has_avif ) : ?>
-						<source type="image/avif" srcset="<?php echo esc_url( get_theme_file_uri( $avif_uri ) ); ?>">
+					<?php if ( ! empty( $shot_pic['avif'] ) ) : ?>
+						<source type="image/avif" srcset="<?php echo esc_url( $shot_pic['avif'] ); ?>">
 					<?php endif; ?>
 					<img class="v7card__shot"<?php echo 0 === $i ? ' data-active="true"' : ' aria-hidden="true"'; ?>
-						src="<?php echo esc_url( get_theme_file_uri( $shot_uri ) ); ?>"
+						src="<?php echo esc_url( $shot_src ); ?>"
 						alt="<?php echo esc_attr( $v7_name . ' — ' . $shot_face ); ?>"
 						loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
 				</picture>

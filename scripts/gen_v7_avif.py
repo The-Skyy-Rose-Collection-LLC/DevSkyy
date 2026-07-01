@@ -40,7 +40,7 @@ def main() -> int:
     if not _V7_DIR.is_dir():
         print(f"no V7 tree at {_V7_DIR}", file=sys.stderr)
         return 1
-    made, skipped = [], 0
+    made, skipped = 0, 0
     for src in sorted(_V7_DIR.rglob("*")):
         if src.suffix.lower() not in _SRC_EXTS or not src.is_file():
             continue
@@ -55,11 +55,10 @@ def main() -> int:
             im = im.convert("RGB")
         im.save(avif, "AVIF", quality=_AVIF_QUALITY)
         rel = src.relative_to(_V7_DIR.parent)
-        made.append(f"{rel} → {avif.name} ({avif.stat().st_size // 1024}KB)")
+        print(f"  {rel} → {avif.name} ({avif.stat().st_size // 1024}KB)")
+        made += 1
 
-    for m in made:
-        print(f"  {m}")
-    print(f"\navif: {len(made)} written | {skipped} up-to-date")
+    print(f"\navif: {made} written | {skipped} up-to-date")
     return 0
 
 
