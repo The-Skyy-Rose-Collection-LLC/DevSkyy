@@ -101,10 +101,12 @@ def resolve(sku: str, face: str = "front") -> str | None:
     return _validated_path(raw, asset_id)
 
 
+# Shared with ``scripts/sync_hub_to_theme.py`` — the staged path and the resolved
+# path come from ONE definition (drift = sync writes where the resolver never looks).
 # Theme tree prefix for entries whose source already serves from WordPress.
-_THEME_PREFIX = "wordpress-theme/skyyrose-flagship/"
-# Where off-theme verified renders are staged by ``scripts/sync_hub_to_theme.py``.
-_HUB_THEME_SUBDIR = "assets/images/products/hub"
+THEME_PREFIX = "wordpress-theme/skyyrose-flagship/"
+# Where off-theme verified renders are staged.
+HUB_THEME_SUBDIR = "assets/images/products/hub"
 
 
 def served_theme_path(sku: str, face: str = "front") -> str | None:
@@ -128,14 +130,14 @@ def served_theme_path(sku: str, face: str = "front") -> str | None:
     if entry is None or entry.get("verdict") != "verified":
         return None
     src = entry.get("source") or ""
-    if src.startswith(_THEME_PREFIX):
-        return src[len(_THEME_PREFIX) :]
+    if src.startswith(THEME_PREFIX):
+        return src[len(THEME_PREFIX) :]
     if not (entry.get("path") or src):
         return None
     # Off-theme render → the staged projection. ``scripts/sync_hub_to_theme.py`` always
     # transcodes to ``.webp`` (the theme's served format; PNG is .gitignore'd), so the
     # served extension is webp regardless of the original render's format.
-    return f"{_HUB_THEME_SUBDIR}/{sku}-{face}.webp"
+    return f"{HUB_THEME_SUBDIR}/{sku}-{face}.webp"
 
 
 def by_usage(usage: str, scope: str | None = None) -> list[dict]:
@@ -213,12 +215,12 @@ def verify_integrity() -> list[str]:
 
 if __name__ == "__main__":
     assets = manifest()
-    verified = [e for e in assets.values() if e.get("verdict") == "verified"]
+    verified = sum(1 for e in assets.values() if e.get("verdict") == "verified")
     pend = pending()
     problems = verify_integrity()
 
     print(f"Hub manifest: {len(assets)} total entries")
-    print(f"  verified : {len(verified)}")
+    print(f"  verified : {verified}")
     print(f"  pending  : {len(pend)}")
     print()
     if problems:

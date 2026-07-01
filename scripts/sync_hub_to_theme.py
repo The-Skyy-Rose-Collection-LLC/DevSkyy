@@ -36,8 +36,6 @@ from skyyrose.core.paths import REPO_ROOT, THEME_ROOT
 
 APPLY = "--apply" in sys.argv[1:]
 HUB_DIR = REPO_ROOT / "assets" / "hub"
-DEST_SUBDIR = "assets/images/products/hub"  # theme-relative
-THEME_PREFIX = "wordpress-theme/skyyrose-flagship/"
 WEBP_QUALITY = 82
 AVIF_QUALITY = 60
 
@@ -51,20 +49,18 @@ def staging_plan() -> list[dict]:
             continue
         if e.get("verdict") != "verified":
             continue
-        if (e.get("source") or "").startswith(THEME_PREFIX):
+        if (e.get("source") or "").startswith(asset_hub.THEME_PREFIX):
             continue  # already serves from the theme as-is
         hub_path = e.get("path")
         if not hub_path:
             continue
         src = HUB_DIR / hub_path
-        base = f"{DEST_SUBDIR}/{sku}-{face}"
+        base = f"{asset_hub.HUB_THEME_SUBDIR}/{sku}-{face}"
         plan.append(
             {
                 "aid": aid,
                 "engine": e.get("engine"),
                 "src": src,
-                "webp_rel": f"{base}.webp",
-                "avif_rel": f"{base}.avif",
                 "webp": THEME_ROOT / f"{base}.webp",
                 "avif": THEME_ROOT / f"{base}.avif",
             }
@@ -88,7 +84,9 @@ def _transcode(src: Path, webp: Path, avif: Path) -> tuple[int, int]:
 def main() -> int:
     plan = staging_plan()
     print(f"HUB → THEME transcode  ({'APPLY' if APPLY else 'DRY-RUN — no writes'})")
-    print(f"dest: {THEME_PREFIX}{DEST_SUBDIR}/  (webp q{WEBP_QUALITY} + avif q{AVIF_QUALITY})\n")
+    print(
+        f"dest: {asset_hub.THEME_PREFIX}{asset_hub.HUB_THEME_SUBDIR}/  (webp q{WEBP_QUALITY} + avif q{AVIF_QUALITY})\n"
+    )
     if not plan:
         print("nothing to stage — every verified face already serves from the theme.")
         return 0
@@ -100,13 +98,14 @@ def main() -> int:
             missing.append(p["aid"])
             continue
         src_kb = p["src"].stat().st_size // 1024
+        rel = p["webp"].relative_to(THEME_ROOT)
         if APPLY:
             wkb, akb = _transcode(p["src"], p["webp"], p["avif"])
             print(
-                f"  {p['aid']:14s} {p['engine']:11s} {src_kb:>5}KB → webp {wkb}KB + avif {akb}KB  {p['webp_rel']}"
+                f"  {p['aid']:14s} {p['engine']:11s} {src_kb:>5}KB → webp {wkb}KB + avif {akb}KB  {rel}"
             )
         else:
-            print(f"  {p['aid']:14s} {p['engine']:11s} {src_kb:>5}KB → {p['webp_rel']} (+ .avif)")
+            print(f"  {p['aid']:14s} {p['engine']:11s} {src_kb:>5}KB → {rel} (+ .avif)")
         done.append(p["aid"])
 
     verb = "transcoded" if APPLY else "would transcode"

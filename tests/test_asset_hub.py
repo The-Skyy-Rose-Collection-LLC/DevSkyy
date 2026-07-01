@@ -33,7 +33,6 @@ def _clear_cache():
     """Drop manifest cache before each test so tests are isolated."""
     hub.refresh()
     yield
-    hub.refresh()
 
 
 # ---------------------------------------------------------------------------
@@ -72,7 +71,6 @@ def test_served_theme_path_offtheme_render_is_always_webp():
         ):
             tp = hub.served_theme_path(e["sku"], e["face"])
             assert tp == f"assets/images/products/hub/{e['sku']}-{e['face']}.webp"
-            assert tp.endswith(".webp")
             return
     pytest.skip("no off-theme verified render in manifest")
 
