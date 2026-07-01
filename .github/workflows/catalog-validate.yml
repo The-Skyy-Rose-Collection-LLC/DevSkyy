@@ -37,13 +37,15 @@ jobs:
       - name: Install minimal dependencies
         run: |
           python -m pip install --upgrade pip
-          # The validator step is stdlib-only. The pytest step collects
-          # test_catalog_consistency.py + the (lazy-import) shared conftest, which
-          # need only pytest + pytest-asyncio (asyncio_mode is declared in
-          # pyproject; without pytest-asyncio pytest errors "Unknown config option").
+          # The validator step is near-stdlib: the only third-party import is jsonschema,
+          # reached when collection_sot_current regenerates the per-collection SOT
+          # (build-collection-sot.py validates identity.json against its schema). The pytest
+          # step collects test_catalog_consistency.py + the (lazy-import) shared conftest,
+          # which need only pytest + pytest-asyncio (asyncio_mode is declared in pyproject;
+          # without pytest-asyncio pytest errors "Unknown config option").
           # No project/base install — `.[dev]` pulls the heavy provider stack, was
           # timing out, and silently fell back to a pytest-only env that failed.
-          pip install pytest pytest-asyncio --quiet
+          pip install pytest pytest-asyncio jsonschema --quiet
 
       - name: Run catalog consistency validator
         run: |
@@ -69,7 +71,8 @@ jobs:
 
       - name: Run pytest — catalog consistency tests
         run: |
-          pytest skyyrose/elite_studio/tests/test_catalog_consistency.py -v --tb=short
+          pytest skyyrose/elite_studio/tests/test_catalog_consistency.py \
+                 tests/test_collection_sot_guard.py -v --tb=short
         env:
           PYTHONPATH: ${{ github.workspace }}
 
