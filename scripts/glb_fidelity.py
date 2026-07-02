@@ -99,6 +99,9 @@ _FRONT_EXTS: tuple[str, ...] = ("webp", "png", "jpg", "jpeg")
 # CLIP is only available if open_clip_torch is installed.
 _COLOR_DELTA_E_MAX = 20.0
 _CLIP_SIM_MIN = 0.70
+# Render harness defaults — overridable via --exposure/--tone-mapping (see glb_calibrate.py).
+_DEFAULT_EXPOSURE = 1.0
+_TONE_MAPPING_CHOICES: tuple[str, ...] = ("neutral", "aces", "agx")
 # A blank/failed canvas compresses far below this; real renders are 80KB+.
 _MIN_SCREENSHOT_BYTES = 20_000
 # Valid SKU stems (e.g. br-001, kids-002) — anything else in the GLB dir is skipped.
@@ -195,15 +198,57 @@ def _start_http_server(serve_dir: Path) -> tuple[int, _ReusableTCPServer]:
     return port, server
 
 
+def setup_serve_root() -> tuple[Path, int, _ReusableTCPServer]:
+    """
+    Vendor model-viewer, then start a symlink-only HTTP server for the QC browser.
+
+    Serves a temp root exposing ONLY the four asset trees the viewer needs. Rooting
+    at REPO_ROOT would expose .env* and every other repo file to any JS running in
+    the QC browser. Shared by glb_fidelity.py and glb_calibrate.py so the symlink
+    security property lives in exactly one place.
+
+    Returns (serve_root, http_port, http_server). Caller is responsible for calling
+    http_server.shutdown() when done; serve_root cleanup is registered via atexit.
+    """
+    _ensure_model_viewer()
+
+    serve_root = Path(tempfile.mkdtemp(prefix="glbqc-"))
+    # atexit (not try/finally) so the symlink tree is reclaimed on EVERY exit
+    # path — unhandled exceptions included. rmtree removes links, never targets.
+    atexit.register(shutil.rmtree, serve_root, ignore_errors=True)
+    (serve_root / "renders" / "3d").mkdir(parents=True)
+    (serve_root / "renders" / "3d" / "qc").mkdir(parents=True)
+    HTML_CACHE.mkdir(parents=True, exist_ok=True)
+    VENDOR_DIR.mkdir(parents=True, exist_ok=True)
+    os.symlink(GLB_DIR, serve_root / "renders" / "3d" / "web")
+    os.symlink(REPO_ROOT / "renders" / "3d" / "_viewer", serve_root / "renders" / "3d" / "_viewer")
+    os.symlink(VENDOR_DIR, serve_root / "renders" / "3d" / "qc" / "_vendor")
+    os.symlink(HTML_CACHE, serve_root / "renders" / "3d" / "qc" / "_html_cache")
+    http_port, http_server = _start_http_server(serve_root)
+    print(f"HTTP server port={http_port} root={serve_root} (symlink-only)", flush=True)
+    return serve_root, http_port, http_server
+
+
 # ── HTML template ──────────────────────────────────────────────────────────────
 
 
-def _make_html(sku: str, port: int) -> str:
-    """Return per-SKU page HTML with correct decoder config and load-event signalling."""
+def _make_html(
+    sku: str,
+    port: int,
+    *,
+    exposure: float = _DEFAULT_EXPOSURE,
+    tone_mapping: str | None = None,
+) -> str:
+    """Return per-SKU page HTML with correct decoder config and load-event signalling.
+
+    exposure/tone_mapping default to the original hardcoded values (exposure=1, no
+    tone-mapping attribute) so callers that don't pass them see unchanged behavior.
+    """
     glb_url = f"http://127.0.0.1:{port}/renders/3d/web/{sku}.glb"
     mv_url = f"http://127.0.0.1:{port}/renders/3d/qc/_vendor/model-viewer.min.js"
     meshopt_url = f"http://127.0.0.1:{port}{_MESHOPT_REL}"
     ktx2_url = f"http://127.0.0.1:{port}{_KTX2_REL}"
+    tone_mapping_attr = f'\n  tone-mapping="{tone_mapping}"' if tone_mapping else ""
 
     # JS curly braces must be doubled inside an f-string: {{ -> {, }} -> }
     return f"""<!DOCTYPE html>
@@ -237,7 +282,7 @@ self.ModelViewerElement.ktx2TranscoderLocation = '{ktx2_url}';
   auto-rotate="false"
   camera-controls="false"
   shadow-intensity="1"
-  exposure="1"
+  exposure="{exposure}"{tone_mapping_attr}
   loading="eager"
   reveal="auto">
 </model-viewer>
@@ -265,11 +310,18 @@ def _screenshot_glb(
     port: int,
     out_path: Path,
     *,
+    exposure: float = _DEFAULT_EXPOSURE,
+    tone_mapping: str | None = None,
     timeout_ms: int = 30_000,
     settle_ms: int = 800,
+    html_name: str | None = None,
 ) -> tuple[bool, str, bool, bool]:
     """
     Render the GLB and save a PNG screenshot.
+
+    html_name overrides the cached HTML filename (default: f"{sku}.html") — used by
+    the calibration grid so per-combo pages don't clobber each other or the canonical
+    per-SKU page.
 
     Returns:
         (screenshot_ok, message, mv_loaded, mv_errored)
@@ -280,10 +332,12 @@ def _screenshot_glb(
 
     # Write HTML to cache dir (same HTTP server root = no CORS issues).
     HTML_CACHE.mkdir(parents=True, exist_ok=True)
-    (HTML_CACHE / f"{sku}.html").write_text(_make_html(sku, port), encoding="utf-8")
+    html_file = html_name or f"{sku}.html"
+    html = _make_html(sku, port, exposure=exposure, tone_mapping=tone_mapping)
+    (HTML_CACHE / html_file).write_text(html, encoding="utf-8")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    page_url = f"http://127.0.0.1:{port}/renders/3d/qc/_html_cache/{sku}.html"
+    page_url = f"http://127.0.0.1:{port}/renders/3d/qc/_html_cache/{html_file}"
 
     mv_loaded = False
     mv_errored = False
@@ -477,7 +531,28 @@ def main() -> None:
         action="store_true",
         help="Skip SKUs that already have a >20KB screenshot",
     )
+    parser.add_argument(
+        "--exposure",
+        type=float,
+        default=_DEFAULT_EXPOSURE,
+        help=f"model-viewer exposure attribute (default {_DEFAULT_EXPOSURE})",
+    )
+    parser.add_argument(
+        "--tone-mapping",
+        choices=_TONE_MAPPING_CHOICES,
+        default=None,
+        help="model-viewer tone-mapping attribute (default: attribute omitted)",
+    )
     args = parser.parse_args()
+
+    # A cached screenshot was rendered under whatever settings produced it — reusing
+    # it while claiming non-default exposure/tone-mapping would silently mislabel it.
+    if args.skip_existing and (args.exposure != _DEFAULT_EXPOSURE or args.tone_mapping is not None):
+        sys.exit(
+            "--skip-existing cannot be combined with --exposure/--tone-mapping: "
+            "cached screenshots were rendered under different settings and reusing "
+            "them would mislabel the report. Drop --skip-existing to re-render."
+        )
 
     # ── resolve SKU list ─────────────────────────────────────────────────────
     skus = _all_skus()
@@ -500,27 +575,13 @@ def main() -> None:
         "CLIP ≥ 0.70 (heuristic, available only with open_clip_torch)",
         flush=True,
     )
+    print(
+        f"Render settings: exposure={args.exposure}  tone-mapping={args.tone_mapping or '(none)'}",
+        flush=True,
+    )
 
-    # ── vendor ───────────────────────────────────────────────────────────────
-    _ensure_model_viewer()
-
-    # ── HTTP server — serve a temp root exposing ONLY the four asset trees the
-    # viewer needs. Rooting at REPO_ROOT would expose .env* and every other
-    # repo file to any JS running in the QC browser.
-    serve_root = Path(tempfile.mkdtemp(prefix="glbqc-"))
-    # atexit (not try/finally) so the symlink tree is reclaimed on EVERY exit
-    # path — unhandled exceptions included. rmtree removes links, never targets.
-    atexit.register(shutil.rmtree, serve_root, ignore_errors=True)
-    (serve_root / "renders" / "3d").mkdir(parents=True)
-    (serve_root / "renders" / "3d" / "qc").mkdir(parents=True)
-    HTML_CACHE.mkdir(parents=True, exist_ok=True)
-    VENDOR_DIR.mkdir(parents=True, exist_ok=True)
-    os.symlink(GLB_DIR, serve_root / "renders" / "3d" / "web")
-    os.symlink(REPO_ROOT / "renders" / "3d" / "_viewer", serve_root / "renders" / "3d" / "_viewer")
-    os.symlink(VENDOR_DIR, serve_root / "renders" / "3d" / "qc" / "_vendor")
-    os.symlink(HTML_CACHE, serve_root / "renders" / "3d" / "qc" / "_html_cache")
-    http_port, http_server = _start_http_server(serve_root)
-    print(f"HTTP server port={http_port} root={serve_root} (symlink-only)", flush=True)
+    # ── vendor + HTTP server ─────────────────────────────────────────────────
+    _serve_root, http_port, http_server = setup_serve_root()
 
     results: list[SKUResult] = []
     t_start = time.monotonic()
@@ -545,7 +606,13 @@ def main() -> None:
             print("screenshot=cached", end="  ", flush=True)
         else:
             try:
-                shot_ok, msg, mv_loaded, mv_errored = _screenshot_glb(sku, http_port, qc_png)
+                shot_ok, msg, mv_loaded, mv_errored = _screenshot_glb(
+                    sku,
+                    http_port,
+                    qc_png,
+                    exposure=args.exposure,
+                    tone_mapping=args.tone_mapping,
+                )
                 print(f"screenshot={msg}", end="  ", flush=True)
             except Exception as exc:  # noqa: BLE001
                 error = f"screenshot_err:{exc}"
@@ -621,6 +688,7 @@ def main() -> None:
             "heuristics for render-vs-photo comparison. Use FAIL as 'triage flag', "
             "not as ground-truth wrong-garment detection."
         ),
+        "render_settings": {"exposure": args.exposure, "tone_mapping": args.tone_mapping},
         "skus": [asdict(r) for r in results],
         "summary": {
             "pass": n_pass,
