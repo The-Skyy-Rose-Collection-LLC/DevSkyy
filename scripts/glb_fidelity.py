@@ -20,11 +20,16 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import http.server
 import json
+import os
+import re
+import shutil
 import socketserver
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import urllib.request
@@ -69,6 +74,9 @@ VENDOR_DIR: Path = QC_DIR / "_vendor"
 HTML_CACHE: Path = QC_DIR / "_html_cache"
 
 _MV_CDN = "https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"
+# Pinned SHA-256 of the vendored module — a CDN compromise otherwise executes
+# arbitrary JS inside the QC browser (which can reach the localhost server).
+_MV_SHA256 = "774edda21e1be2a0934e460ca5943af1fe3f88da130a9f98bd6a9d611576cacf"
 _MV_LOCAL = VENDOR_DIR / "model-viewer.min.js"
 
 # Decoder URLs — absolute from HTTP server root (REPO_ROOT).
@@ -90,6 +98,10 @@ _FRONT_EXTS: tuple[str, ...] = ("webp", "png", "jpg", "jpeg")
 # CLIP is only available if open_clip_torch is installed.
 _COLOR_DELTA_E_MAX = 20.0
 _CLIP_SIM_MIN = 0.70
+# A blank/failed canvas compresses far below this; real renders are 80KB+.
+_MIN_SCREENSHOT_BYTES = 20_000
+# Valid SKU stems (e.g. br-001, kids-002) — anything else in the GLB dir is skipped.
+_SKU_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
@@ -118,21 +130,45 @@ def _hub_master(sku: str) -> Path | None:
 
 
 def _all_skus() -> list[str]:
-    """Return all GLB SKUs sorted by filename stem."""
-    return sorted(p.stem for p in GLB_DIR.glob("*.glb"))
+    """Return all valid GLB SKUs sorted by stem; skip files with unexpected names."""
+    skus: list[str] = []
+    for p in GLB_DIR.glob("*.glb"):
+        if _SKU_RE.fullmatch(p.stem):
+            skus.append(p.stem)
+        else:
+            print(f"  ! skipping non-SKU glb name: {p.name}", flush=True)
+    return sorted(skus)
 
 
 # ── vendor: download model-viewer once ────────────────────────────────────────
 
 
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def _ensure_model_viewer() -> None:
-    """Download model-viewer.min.js to VENDOR_DIR if not already cached."""
-    if _MV_LOCAL.exists() and _MV_LOCAL.stat().st_size > 50_000:
-        return
+    """Ensure the vendored model-viewer module exists AND matches the pinned SHA-256."""
+    if _MV_LOCAL.exists():
+        got = _sha256(_MV_LOCAL)
+        if got == _MV_SHA256:
+            return
+        sys.exit(
+            f"vendored model-viewer hash mismatch (got {got[:16]}…, want {_MV_SHA256[:16]}…) — "
+            f"delete {_MV_LOCAL} only if you trust a re-download, then re-run"
+        )
     VENDOR_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Downloading {_MV_CDN} ...", flush=True)
     urllib.request.urlretrieve(_MV_CDN, _MV_LOCAL)
-    print(f"  -> {_MV_LOCAL} ({_MV_LOCAL.stat().st_size:,} B)", flush=True)
+    got = _sha256(_MV_LOCAL)
+    if got != _MV_SHA256:
+        _MV_LOCAL.unlink(missing_ok=True)
+        sys.exit(f"downloaded model-viewer failed integrity check ({got[:16]}…) — aborting")
+    print(f"  -> {_MV_LOCAL} ({_MV_LOCAL.stat().st_size:,} B, sha256 verified)", flush=True)
 
 
 # ── HTTP server ────────────────────────────────────────────────────────────────
@@ -283,7 +319,7 @@ def _screenshot_glb(
         browser.close()
 
     size = out_path.stat().st_size if out_path.exists() else 0
-    ok = size > 20_000
+    ok = size > _MIN_SCREENSHOT_BYTES
 
     parts = []
     if mv_loaded:
@@ -467,9 +503,20 @@ def main() -> None:
     # ── vendor ───────────────────────────────────────────────────────────────
     _ensure_model_viewer()
 
-    # ── HTTP server (rooted at REPO_ROOT — serves GLBs, HTML, vendor JS) ────
-    http_port, http_server = _start_http_server(REPO_ROOT)
-    print(f"HTTP server port={http_port} root={REPO_ROOT}", flush=True)
+    # ── HTTP server — serve a temp root exposing ONLY the four asset trees the
+    # viewer needs. Rooting at REPO_ROOT would expose .env* and every other
+    # repo file to any JS running in the QC browser.
+    serve_root = Path(tempfile.mkdtemp(prefix="glbqc-"))
+    (serve_root / "renders" / "3d").mkdir(parents=True)
+    (serve_root / "renders" / "3d" / "qc").mkdir(parents=True)
+    HTML_CACHE.mkdir(parents=True, exist_ok=True)
+    VENDOR_DIR.mkdir(parents=True, exist_ok=True)
+    os.symlink(GLB_DIR, serve_root / "renders" / "3d" / "web")
+    os.symlink(REPO_ROOT / "renders" / "3d" / "_viewer", serve_root / "renders" / "3d" / "_viewer")
+    os.symlink(VENDOR_DIR, serve_root / "renders" / "3d" / "qc" / "_vendor")
+    os.symlink(HTML_CACHE, serve_root / "renders" / "3d" / "qc" / "_html_cache")
+    http_port, http_server = _start_http_server(serve_root)
+    print(f"HTTP server port={http_port} root={serve_root} (symlink-only)", flush=True)
 
     results: list[SKUResult] = []
     t_start = time.monotonic()
@@ -488,7 +535,7 @@ def main() -> None:
         error: str | None = None
 
         # ── screenshot ───────────────────────────────────────────────────────
-        if args.skip_existing and qc_png.exists() and qc_png.stat().st_size > 20_000:
+        if args.skip_existing and qc_png.exists() and qc_png.stat().st_size > _MIN_SCREENSHOT_BYTES:
             shot_ok = True
             mv_loaded = True  # assume loaded if we already have a good screenshot
             print("screenshot=cached", end="  ", flush=True)
@@ -520,10 +567,8 @@ def main() -> None:
                 "color_pass": None,
                 "clip_score": None,
                 "clip_pass": None,
-                "verdict": "no_screenshot" if not shot_ok else scores.get("verdict", "error"),  # type: ignore[index]
+                "verdict": "no_screenshot",
             }
-            # Reset to no_screenshot for clarity when shot failed.
-            scores["verdict"] = "no_screenshot"
 
         elapsed = time.monotonic() - t_sku
         r = SKUResult(
@@ -584,8 +629,13 @@ def main() -> None:
         },
     }
     report_path = QC_DIR / "fidelity_report.json"
-    report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    tmp_path = report_path.with_suffix(".json.tmp")
+    tmp_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    os.replace(tmp_path, report_path)  # atomic — a crash never leaves a half-written report
     print(f"\n  Report -> {report_path}", flush=True)
+
+    # rmtree removes the symlinks themselves, never their targets.
+    shutil.rmtree(serve_root, ignore_errors=True)
 
 
 if __name__ == "__main__":
