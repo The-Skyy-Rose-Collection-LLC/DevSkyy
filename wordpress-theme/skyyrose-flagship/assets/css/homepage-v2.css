@@ -1855,13 +1855,6 @@
 		min-height: 44px;
 	}
 	/* Mobile menu links: generous tap targets */
-	.mob-menu a {
-		padding: 12px 0;
-		min-height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
 	/* Footer social links: enough tap area */
 	.ft-social a {
 		padding: 8px 0;

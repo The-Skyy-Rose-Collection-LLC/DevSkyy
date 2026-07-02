@@ -275,7 +275,7 @@ function skyyrose_ce_drop_block_customize_register( $wp_customize ) {
 		array(
 			'default'           => false,
 			'transport'         => 'refresh',
-			'sanitize_callback' => 'skyyrose_ce_sanitize_checkbox',
+			'sanitize_callback' => 'absint',
 		)
 	);
 	$wp_customize->add_control(
@@ -403,17 +403,6 @@ function skyyrose_ce_drop_block_customize_register( $wp_customize ) {
 }
 add_action( 'customize_register', 'skyyrose_ce_drop_block_customize_register', 20 );
 
-/**
- * Sanitize a Customizer checkbox to a boolean.
- *
- * @since 1.6.8
- *
- * @param mixed $value Raw Customizer input.
- * @return bool True when the checkbox is checked.
- */
-function skyyrose_ce_sanitize_checkbox( $value ) {
-	return (bool) $value;
-}
 
 /**
  * Render the Drop Block section on the homepage.
@@ -633,6 +622,11 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 		if (addBtn) {
 			addBtn.addEventListener('click', function (e) {
 				e.preventDefault();
+				/* Guard: a double-tap during the 350ms scroll window would queue a
+				   second programmatic submit — WC does not dedupe, so the cart
+				   would silently gain duplicate line items. */
+				if (addBtn.dataset.submitting) { return; }
+				addBtn.dataset.submitting = '1';
 				var atcWrap  = document.querySelector('.sr-ed__atc-wrap');
 				var cartForm = document.querySelector('form.cart');
 				if (atcWrap) {
@@ -648,6 +642,8 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 							cartForm.submit();
 						}
 					}
+					/* Re-arm after the submit settles (page nav or AJAX add). */
+					setTimeout(function () { delete addBtn.dataset.submitting; }, 2000);
 				}, 350);
 			});
 		}

@@ -52,10 +52,12 @@ function skyyrose_send_security_headers() {
 		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://s0.wp.com https://widgets.wp.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",
 		"font-src 'self' data: https://fonts.wp.com https://cdn.jsdelivr.net",
-		// api-eu.mixpanel.com: Elementor sends telemetry to Mixpanel; disabling via PHP filter
+		// Elementor Mixpanel telemetry: blocked by BOTH the PHP opt-out filter
+		// (performance.php) AND its absence from connect-src — defense in depth;
+		// do NOT re-add api-eu.mixpanel.com here.
 		// requires verified Elementor source — using CSP allowlist as the guaranteed path.
 		// If future Elementor versions expose a stable opt-out filter, prefer that approach.
-		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net https://api-eu.mixpanel.com",
+		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
 		// wordpress.com frame: required for Jetpack / WP.com widget iframes.
 		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com https://wordpress.com",
 		"frame-ancestors 'self'",

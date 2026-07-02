@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.6.7
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,13 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.7.0 =
+* Full-site audit batch: CSP fix restores Stripe express checkout (Apple/Google Pay); standard header converged on every page incl. homepage
+* Header refinement: transparent-to-solid condensing navbar, centered logo, Bag language + cart badge, Customizer announcement bar
+* Editorial 3-column product grids; imagery sizing fixes; Jetpack CSS conditional dequeue; AVIF/WebP product-image bases
+* PDP fit notes + model specs, homepage Drop Block (Customizer), sticky Add-to-Bag on editorial PDPs; pre-order hero video stacking fix
+* /immersive-* 301 redirects; review hardening (double-submit guard, redirect query strings)
 
 = 1.6.7 =
 * Product images now resolve through the catalog/dossier SOT chain: collection-sot-reader.php gained a per-SKU image resolver, front-page.php and template-landing-kids-capsule.php migrated off all hardcoded image paths

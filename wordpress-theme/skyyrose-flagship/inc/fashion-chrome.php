@@ -24,6 +24,8 @@ function skyyrose_cart_to_bag_gettext( $translated, $text, $domain ) {
 	if ( 'woocommerce' !== $domain ) {
 		return $translated;
 	}
+	// Keys are exact WooCommerce EN source strings (verified against WC 9.x);
+	// a WC rename silently disables the rewrite — re-verify on major WC updates.
 	$map = array(
 		'Cart'        => 'Bag',
 		'Add to cart' => 'Add to Bag',

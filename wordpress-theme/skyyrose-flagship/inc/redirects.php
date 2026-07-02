@@ -42,7 +42,9 @@ function skyyrose_collection_redirects() {
 	$query = strpos( $request_uri, '?' ) !== false ? substr( $request_uri, strpos( $request_uri, '?' ) ) : '';
 
 	if ( isset( $redirects[ $path ] ) ) {
-		$target = home_url( $redirects[ $path ] . ltrim( $query, '?' ) );
+		// $query is '' or begins with '?' — append AFTER home_url(), never into the
+		// path (path-concatenation turned ?utm_… links into unknown-slug 404s).
+		$target = home_url( $redirects[ $path ] ) . $query;
 		wp_safe_redirect( $target, 301 );
 		exit;
 	}
@@ -140,7 +142,9 @@ function skyyrose_immersive_experience_redirects() {
 	$query       = strpos( $request_uri, '?' ) !== false ? substr( $request_uri, strpos( $request_uri, '?' ) ) : '';
 
 	if ( isset( $redirects[ $path ] ) ) {
-		$target = home_url( $redirects[ $path ] . ltrim( $query, '?' ) );
+		// $query is '' or begins with '?' — append AFTER home_url(), never into the
+		// path (path-concatenation turned ?utm_… links into unknown-slug 404s).
+		$target = home_url( $redirects[ $path ] ) . $query;
 		wp_safe_redirect( $target, 301 );
 		exit;
 	}
