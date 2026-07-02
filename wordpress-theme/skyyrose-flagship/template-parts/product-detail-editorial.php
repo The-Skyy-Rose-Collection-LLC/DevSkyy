@@ -185,6 +185,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<div class="sr-ed__atc-wrap">
 			<?php woocommerce_template_single_add_to_cart(); ?>
 		</div>
+		<?php if ( function_exists( 'skyyrose_render_fit_block' ) ) { skyyrose_render_fit_block( $product->get_id() ); } ?>
 
 		<div class="sr-ed__stock">
 			<span class="sr-ed__stock-dot"></span>
@@ -232,4 +233,5 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		</div>
 	</section>
 
+	<?php if ( function_exists( 'skyyrose_render_ed_sticky_atc' ) ) { skyyrose_render_ed_sticky_atc( $product, $price_html ); } ?>
 </article>

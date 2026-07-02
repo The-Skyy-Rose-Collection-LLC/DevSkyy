@@ -132,6 +132,7 @@ while ( have_posts() ) :
 									: esc_html__( 'Pre-Order', 'skyyrose' );
 								?>
 							</div>
+							<?php if ( function_exists( 'skyyrose_render_fit_block' ) ) { skyyrose_render_fit_block( $product->get_id() ); } ?>
 						</div>
 					</div>
 				</div>

@@ -518,7 +518,7 @@
 
 .lp-product-card__image-wrap {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   margin-bottom: 1.25rem;
   background: rgba(0, 0, 0, 0.3);

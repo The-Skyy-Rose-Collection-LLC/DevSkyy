@@ -29,6 +29,7 @@
 .sr-gallery-main {
 	position: relative;
 	aspect-ratio: 4 / 5;
+	max-width: 640px;
 	background: var(--color-page-bg, #0a0a0a);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	overflow: hidden;

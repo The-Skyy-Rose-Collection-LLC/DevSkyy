@@ -174,42 +174,7 @@ get_header();
 	<div class="ld-bar"><div class="ld-fill" id="ldFill"></div></div>
 </div>
 
-<!-- ═══ MOBILE MENU ═══ -->
-<div class="mob-menu" id="mobMenu" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose' ); ?>">
-	<button class="mob-close" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose' ); ?>">&times;</button>
-	<a href="#story"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
-	<a href="#commercial-runway"><?php esc_html_e( 'Shop', 'skyyrose' ); ?></a>
-	<a href="#collections"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></a>
-	<a href="#style-atelier"><?php esc_html_e( 'Style Atelier', 'skyyrose' ); ?></a>
-	<a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose' ); ?></a>
-	<a href="#craft"><?php esc_html_e( 'Craft', 'skyyrose' ); ?></a>
-	<a href="#community"><?php esc_html_e( 'Community', 'skyyrose' ); ?></a>
-	<a href="<?php echo esc_url( $cart_url ); ?>"><?php esc_html_e( 'Bag', 'skyyrose' ); ?></a>
-</div>
-
-<!-- ═══ NAV ═══ -->
-<nav class="nav" id="mainNav" aria-label="<?php esc_attr_e( 'Homepage Navigation', 'skyyrose' ); ?>">
-	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="nav-brand">
-		<span class="nav-name"><?php esc_html_e( 'SkyyRose', 'skyyrose' ); ?></span>
-		<span class="nav-sub"><?php esc_html_e( 'Oakland Luxury', 'skyyrose' ); ?></span>
-	</a>
-	<div class="nav-center">
-		<a href="#story" class="nav-link"><?php esc_html_e( 'Story', 'skyyrose' ); ?></a>
-		<a href="#commercial-runway" class="nav-link"><?php esc_html_e( 'Shop', 'skyyrose' ); ?></a>
-		<a href="#collections" class="nav-link"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></a>
-		<a href="#style-atelier" class="nav-link"><?php esc_html_e( 'Atelier', 'skyyrose' ); ?></a>
-		<a href="#lookbook" class="nav-link"><?php esc_html_e( 'Lookbook', 'skyyrose' ); ?></a>
-	</div>
-	<div class="nav-right">
-		<button class="nav-bag" type="button" aria-label="<?php esc_attr_e( 'Shopping Bag', 'skyyrose' ); ?>">
-			<?php esc_html_e( 'Bag', 'skyyrose' ); ?>
-			<span class="bag-ct" id="bagCt">0</span>
-		</button>
-		<button class="nav-ham" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose' ); ?>">
-			<span></span><span></span><span></span>
-		</button>
-	</div>
-</nav>
+<!-- mob-menu + mainNav removed (audit 2026-07-01) — WP header/mobile overlay handles navigation. -->
 
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero" data-scroll-fade aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose' ); ?>">
@@ -262,6 +227,8 @@ get_header();
 		<div class="hero-scroll-line"></div>
 	</div>
 </section>
+
+<?php if ( function_exists( 'skyyrose_render_drop_block' ) ) { skyyrose_render_drop_block(); } ?>
 
 <!-- ═══ PRESS STRIP ═══ -->
 <div class="press rv">

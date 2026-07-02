@@ -108,7 +108,7 @@
 	   Header Scroll State
 	   -------------------------------------------------- */
 	var header = document.querySelector('.site-header');
-	var scrollThreshold = 60;
+	var scrollThreshold = 70;
 	var ticking = false;
 
 	function updateHeaderState() {
@@ -143,6 +143,7 @@
 			searchOverlay.setAttribute('aria-hidden', 'true');
 			searchOverlay.setAttribute('inert', '');
 		}
+		if (searchToggle) searchToggle.setAttribute('aria-expanded', 'false');
 		if (pageWrap) pageWrap.removeAttribute('inert');
 	}
 
@@ -151,6 +152,7 @@
 			searchOverlay.classList.add('open');
 			searchOverlay.setAttribute('aria-hidden', 'false');
 			searchOverlay.removeAttribute('inert');
+			searchToggle.setAttribute('aria-expanded', 'true');
 			if (pageWrap) pageWrap.setAttribute('inert', '');
 			if (searchInput) setTimeout(function () { searchInput.focus(); }, 100);
 		});
@@ -163,6 +165,26 @@
 			closeMobileMenu();
 		}
 	});
+
+	/* --------------------------------------------------
+	   Announcement Bar Dismiss
+	   -------------------------------------------------- */
+	var announcementBar = document.getElementById('announcement-bar');
+	var announcementDismissKey = 'skyyrose_announcement_dismissed';
+
+	if (announcementBar) {
+		// Hide immediately if dismissed this session.
+		if (sessionStorage.getItem(announcementDismissKey)) {
+			announcementBar.style.display = 'none';
+		}
+		var dismissBtn = announcementBar.querySelector('.announcement-bar__dismiss');
+		if (dismissBtn) {
+			dismissBtn.addEventListener('click', function () {
+				sessionStorage.setItem(announcementDismissKey, '1');
+				announcementBar.style.display = 'none';
+			});
+		}
+	}
 
 	/* --------------------------------------------------
 	   Smooth Scroll

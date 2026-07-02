@@ -114,3 +114,35 @@ function skyyrose_shop2_slug_redirect() {
 	exit;
 }
 add_action( 'template_redirect', 'skyyrose_shop2_slug_redirect', 1 );
+
+/**
+ * Redirect legacy /immersive-{collection}/ URLs to canonical /experience-{collection}/.
+ *
+ * The immersive pages were renamed to "experience" during v6 navigation rework.
+ * External links, sitemap entries, and social referrers that use the old /immersive-{slug}/
+ * pattern get a 301 so link equity and bookmarks are preserved.
+ *
+ * Mirrors skyyrose_collection_redirects() — same query-string pass-through pattern.
+ *
+ * @since 1.5.5
+ * @return void
+ */
+function skyyrose_immersive_experience_redirects() {
+	$redirects = array(
+		'/immersive-signature/'    => '/experience-signature/',
+		'/immersive-black-rose/'   => '/experience-black-rose/',
+		'/immersive-love-hurts/'   => '/experience-love-hurts/',
+		'/immersive-kids-capsule/' => '/experience-kids-capsule/',
+	);
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+	$path        = strtok( $request_uri, '?' );
+	$query       = strpos( $request_uri, '?' ) !== false ? substr( $request_uri, strpos( $request_uri, '?' ) ) : '';
+
+	if ( isset( $redirects[ $path ] ) ) {
+		$target = home_url( $redirects[ $path ] . ltrim( $query, '?' ) );
+		wp_safe_redirect( $target, 301 );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'skyyrose_immersive_experience_redirects', 1 );

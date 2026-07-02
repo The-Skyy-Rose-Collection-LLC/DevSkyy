@@ -156,10 +156,11 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Cookie consent banner (GDPR).
-	if ( file_exists( $base_dir . '/cookie-consent.css' ) ) {
+	$cookie_file = $use_min && file_exists( $base_dir . '/cookie-consent.min.css' ) ? 'cookie-consent.min.css' : 'cookie-consent.css';
+	if ( file_exists( $base_dir . '/' . $cookie_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-cookie-consent',
-			$base_uri . '/cookie-consent.css',
+			$base_uri . '/' . $cookie_file,
 			array(),
 			SKYYROSE_VERSION
 		);
@@ -209,12 +210,15 @@ function skyyrose_enqueue_global_styles() {
 	// is restored in footer.php and front-page.php.
 
 	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
-	wp_enqueue_style(
-		'skyyrose-agency-visuals',
-		$base_uri . '/agency-tier-visuals.css',
-		array( 'skyyrose-design-tokens', 'skyyrose-components' ),
-		SKYYROSE_VERSION
-	);
+	$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
+	if ( file_exists( $base_dir . '/' . $agency_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-agency-visuals',
+			$base_uri . '/' . $agency_file,
+			array( 'skyyrose-design-tokens', 'skyyrose-components' ),
+			SKYYROSE_VERSION
+		);
+	}
 
 	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
 	// collection lockup. Loaded in <head> on content templates so this above-the-fold
@@ -548,6 +552,21 @@ function skyyrose_enqueue_template_styles() {
 				'skyyrose-immersive-scenes',
 				$base_css_uri . '/' . $scenes_file,
 				array( 'skyyrose-template-immersive' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
+	// Customer Enhancements — Fit Notes (PDP), Drop Block (homepage), Sticky ATC (editorial PDP).
+	// Both slugs render CE components; no other templates use this stylesheet.
+	if ( in_array( $slug, array( 'single-product', 'front-page' ), true ) ) {
+		$ce_css = $use_min && file_exists( $base_css_dir . '/customer-enhancements.min.css' )
+			? 'customer-enhancements.min.css' : 'customer-enhancements.css';
+		if ( file_exists( $base_css_dir . '/' . $ce_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-customer-enhancements',
+				$base_css_uri . '/' . $ce_css,
+				array( 'skyyrose-design-tokens' ),
 				SKYYROSE_VERSION
 			);
 		}
@@ -910,43 +929,6 @@ function skyyrose_enqueue_template_scripts() {
 	}
 }
 
-/**
- * Enqueue admin styles and scripts.
- *
- * @since 1.0.0
- * @return void
- */
-function skyyrose_admin_scripts() {
-	$css_dir = SKYYROSE_DIR . '/assets/css';
-	$css_uri = SKYYROSE_ASSETS_URI . '/css';
-	$js_dir  = SKYYROSE_DIR . '/assets/js';
-	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-
-	$admin_css_file = $use_min && file_exists( $css_dir . '/admin.min.css' )
-		? 'admin.min.css' : 'admin.css';
-	if ( file_exists( $css_dir . '/' . $admin_css_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-admin',
-			$css_uri . '/' . $admin_css_file,
-			array(),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$admin_js_file = $use_min && file_exists( $js_dir . '/admin.min.js' )
-		? 'admin.min.js' : 'admin.js';
-	if ( file_exists( $js_dir . '/' . $admin_js_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-admin',
-			$js_uri . '/' . $admin_js_file,
-			array( 'jquery' ),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-}
-
 // Hook registration. Priority order: 5 fonts → 10 globals → 15 localize → 20 templates.
 // Phase 2/3/4 + commercial polish (priorities 25/30/40/42) live in inc/enqueue-phases.php.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
@@ -955,4 +937,6 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_scripts', 10 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_localize_scripts', 15 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
-add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
+// Note: skyyrose_admin_scripts() removed — assets/css/admin.css and
+// assets/js/admin.js never existed, so this hook was a no-op on every
+// wp-admin page load. (audit 2026-06-28)

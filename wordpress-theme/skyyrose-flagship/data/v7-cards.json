@@ -48,7 +48,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-004/alt.png"
+     "uri": "assets/images/products/v7/br-004/alt.webp"
     }
    ]
   },
@@ -67,7 +67,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-006/alt.png"
+     "uri": "assets/images/products/v7/br-006/alt.webp"
     }
    ]
   },
@@ -82,7 +82,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/br-007/front.png"
+     "uri": "assets/images/products/v7/br-007/front.webp"
     },
     {
      "face": "back",
@@ -105,7 +105,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-008/alt.png"
+     "uri": "assets/images/products/v7/br-008/alt.webp"
     }
    ]
   },
@@ -124,7 +124,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-010/alt.png"
+     "uri": "assets/images/products/v7/br-010/alt.webp"
     }
    ]
   },
@@ -143,7 +143,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-011/alt.png"
+     "uri": "assets/images/products/v7/br-011/alt.webp"
     },
     {
      "face": "back",
@@ -185,7 +185,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-015/alt.png"
+     "uri": "assets/images/products/v7/br-015/alt.webp"
     }
    ]
   },
@@ -238,7 +238,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/lh-002/alt.png"
+     "uri": "assets/images/products/v7/lh-002/alt.webp"
     }
    ]
   },
@@ -355,7 +355,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-003/front.png"
+     "uri": "assets/images/products/v7/sg-003/front.webp"
     }
    ]
   },
@@ -480,7 +480,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-014/front.png"
+     "uri": "assets/images/products/v7/sg-014/front.webp"
     }
    ]
   },
@@ -495,7 +495,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-015/front.png"
+     "uri": "assets/images/products/v7/sg-015/front.webp"
     }
    ]
   }
