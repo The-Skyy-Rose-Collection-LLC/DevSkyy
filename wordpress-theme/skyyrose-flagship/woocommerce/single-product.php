@@ -76,6 +76,8 @@ while ( have_posts() ) :
 									class="sr-gallery-img"
 									id="srMainImg"
 									alt="<?php echo esc_attr( get_the_title() ); ?>"
+									width="640"
+									height="800"
 									loading="eager"
 									decoding="async"
 									fetchpriority="high">
