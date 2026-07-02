@@ -71,6 +71,8 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 				src="<?php echo esc_url( $hero_image ); ?>"
 				alt="<?php echo esc_attr( $product->get_name() ); ?>"
 				class="sr-ed__encounter-img"
+				width="1024"
+				height="1280"
 				fetchpriority="high"
 			/>
 		<?php endif; ?>
@@ -152,12 +154,12 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 			<?php if ( $front_model ) : ?>
 				<img src="<?php echo esc_url( $front_model ); ?>"
 					alt="<?php echo esc_attr( $product->get_name() . ' — front' ); ?>"
-					class="sr-ed__fit-img" loading="lazy" />
+					class="sr-ed__fit-img" width="600" height="800" loading="lazy" />
 			<?php endif; ?>
 			<?php if ( $back_model ) : ?>
 				<img src="<?php echo esc_url( $back_model ); ?>"
 					alt="<?php echo esc_attr( $product->get_name() . ' — back' ); ?>"
-					class="sr-ed__fit-img" loading="lazy" />
+					class="sr-ed__fit-img" width="600" height="800" loading="lazy" />
 			<?php endif; ?>
 		</div>
 	</section>
@@ -185,6 +187,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<div class="sr-ed__atc-wrap">
 			<?php woocommerce_template_single_add_to_cart(); ?>
 		</div>
+		<?php if ( function_exists( 'skyyrose_render_fit_block' ) ) { skyyrose_render_fit_block( $product->get_id() ); } ?>
 
 		<div class="sr-ed__stock">
 			<span class="sr-ed__stock-dot"></span>
@@ -232,4 +235,5 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		</div>
 	</section>
 
+	<?php if ( function_exists( 'skyyrose_render_ed_sticky_atc' ) ) { skyyrose_render_ed_sticky_atc( $product, $price_html ); } ?>
 </article>

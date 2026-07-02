@@ -75,6 +75,7 @@ if ( $v7_product instanceof WC_Product ) {
 					<img class="v7card__shot"<?php echo 0 === $i ? ' data-active="true"' : ' aria-hidden="true"'; ?>
 						src="<?php echo esc_url( $shot_src ); ?>"
 						alt="<?php echo esc_attr( $v7_name . ' — ' . $shot_face ); ?>"
+						width="600" height="750"
 						loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
 				</picture>
 			<?php endforeach; ?>

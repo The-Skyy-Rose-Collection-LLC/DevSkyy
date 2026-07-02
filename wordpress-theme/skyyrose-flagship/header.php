@@ -25,6 +25,25 @@ defined( 'ABSPATH' ) || exit;
 
 <div id="page" class="site">
 	<header id="masthead" class="site-header" role="banner">
+		<?php
+		$skyyrose_ann_enabled = get_theme_mod( 'skyyrose_announcement_enabled', false );
+		$skyyrose_ann_text    = get_theme_mod( 'skyyrose_announcement_text', '' );
+		if ( $skyyrose_ann_enabled && ! empty( $skyyrose_ann_text ) ) :
+			$skyyrose_ann_link = get_theme_mod( 'skyyrose_announcement_link', '' );
+			?>
+			<div class="announcement-bar" id="announcement-bar" role="note" aria-label="<?php esc_attr_e( 'Site announcement', 'skyyrose' ); ?>">
+				<div class="announcement-bar__inner">
+					<?php if ( ! empty( $skyyrose_ann_link ) ) : ?>
+						<a href="<?php echo esc_url( $skyyrose_ann_link ); ?>" class="announcement-bar__content"><?php echo esc_html( $skyyrose_ann_text ); ?></a>
+					<?php else : ?>
+						<span class="announcement-bar__content"><?php echo esc_html( $skyyrose_ann_text ); ?></span>
+					<?php endif; ?>
+					<button class="announcement-bar__dismiss" type="button" aria-label="<?php esc_attr_e( 'Dismiss announcement', 'skyyrose' ); ?>">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+					</button>
+				</div>
+			</div>
+		<?php endif; ?>
 		<nav class="navbar" id="navbar" aria-label="<?php esc_attr_e( 'Primary Navigation', 'skyyrose' ); ?>">
 			<div class="navbar__container">
 

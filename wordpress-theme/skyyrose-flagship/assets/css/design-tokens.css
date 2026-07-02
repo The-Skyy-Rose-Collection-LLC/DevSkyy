@@ -61,7 +61,7 @@
 
 :root {
 	/* --- §1.1  Layout ---------------------------------------------- */
-	--header-height:      72px;
+	--header-height:      80px; /* matches .navbar height in header.css */
 	--tab-bar-height:     48px;
 	--sidebar-width:      280px;
 	--container-narrow:   800px;
@@ -237,7 +237,7 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 html {
-	scroll-padding-top: var(--header-height, 72px);
+	scroll-padding-top: var(--header-height, 80px);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
