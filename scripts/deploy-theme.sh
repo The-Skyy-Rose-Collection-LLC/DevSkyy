@@ -558,11 +558,16 @@ try_lftp() {
         return 1
     fi
 
-    # Convert rsync excludes to lftp exclude format
+    # Convert rsync excludes (GLOBS) to lftp exclude format (REGEX).
+    # Passing globs straight through breaks the mirror: lftp aborts on '*.map'
+    # with "Invalid preceding regular expression" (2026-07-02 deploy failure).
     local lftp_excludes=""
     for exc in "${RSYNC_EXCLUDES[@]}"; do
         local pattern="${exc#--exclude=}"
         pattern="${pattern//\'/}"
+        pattern="${pattern%/}"          # trailing dir slash — regex matches path segments anyway
+        pattern="${pattern//./\\.}"     # escape literal dots
+        pattern="${pattern//\*/.*}"     # glob star -> regex .*
         lftp_excludes="$lftp_excludes --exclude $pattern"
     done
 
