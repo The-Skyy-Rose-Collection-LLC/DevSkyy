@@ -59,7 +59,7 @@ function skyyrose_send_security_headers() {
 		// If future Elementor versions expose a stable opt-out filter, prefer that approach.
 		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
 		// wordpress.com frame: required for Jetpack / WP.com widget iframes.
-		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com https://wordpress.com",
+		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com https://wordpress.com https://js.stripe.com",
 		"frame-ancestors 'self'",
 		"worker-src 'self' blob:",
 		"child-src 'self' blob:",
