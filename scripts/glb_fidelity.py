@@ -20,6 +20,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import atexit
 import hashlib
 import http.server
 import json
@@ -507,6 +508,9 @@ def main() -> None:
     # viewer needs. Rooting at REPO_ROOT would expose .env* and every other
     # repo file to any JS running in the QC browser.
     serve_root = Path(tempfile.mkdtemp(prefix="glbqc-"))
+    # atexit (not try/finally) so the symlink tree is reclaimed on EVERY exit
+    # path — unhandled exceptions included. rmtree removes links, never targets.
+    atexit.register(shutil.rmtree, serve_root, ignore_errors=True)
     (serve_root / "renders" / "3d").mkdir(parents=True)
     (serve_root / "renders" / "3d" / "qc").mkdir(parents=True)
     HTML_CACHE.mkdir(parents=True, exist_ok=True)
@@ -633,9 +637,6 @@ def main() -> None:
     tmp_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     os.replace(tmp_path, report_path)  # atomic — a crash never leaves a half-written report
     print(f"\n  Report -> {report_path}", flush=True)
-
-    # rmtree removes the symlinks themselves, never their targets.
-    shutil.rmtree(serve_root, ignore_errors=True)
 
 
 if __name__ == "__main__":
