@@ -221,9 +221,20 @@
 /* ===================================================================
    SKYY — Living Mascot Widget
    Cinematic walk-on · speech bubbles · choice chips
+
+   Motion is OPT-IN (WCAG 2.3.3 / 2.2.2): the widget's base rules below
+   render every state in its settled end-position with NO animation.
+   Keyframe motion (walk-on/off, breathing idle, speak pulse, excited
+   jump) is added ONLY inside `@media (prefers-reduced-motion:
+   no-preference)` further down — never as the unconditional default.
+   This is a fail-safe posture: a browser or user-agent that doesn't
+   evaluate the media query at all gets the motion-free state, not the
+   animated one. The minimize button (always visible + keyboard-reachable
+   whenever the widget is idle or speaking) is the SC 2.2.2 pause/stop
+   control for the looping idle-breathe animation.
    =================================================================== */
 
-/* --- Keyframes --- */
+/* --- Keyframes (inert until referenced inside the no-preference block) --- */
 
 @keyframes skyy-walk-on {
 	0%   { transform: translateX(120%) scale(0.35) translateY(40px); opacity: 0; }
@@ -232,9 +243,21 @@
 	100% { transform: translateX(0) scale(1) translateY(0); }
 }
 
+@keyframes skyy-walk-on-left {
+	0%   { transform: translateX(-120%) scale(0.35) translateY(40px); opacity: 0; }
+	40%  { opacity: 1; }
+	70%  { transform: translateX(-8%) scale(1.04) translateY(-4px); }
+	100% { transform: translateX(0) scale(1) translateY(0); }
+}
+
 @keyframes skyy-walk-off {
 	0%   { transform: translateX(0) scale(1); opacity: 1; }
 	100% { transform: translateX(140%) scale(0.45); opacity: 0; }
+}
+
+@keyframes skyy-walk-off-left {
+	0%   { transform: translateX(0) scale(1); opacity: 1; }
+	100% { transform: translateX(-140%) scale(0.45); opacity: 0; }
 }
 
 @keyframes skyy-breathe {
@@ -261,7 +284,7 @@
 	100% { transform: translateY(0) rotate(0deg); }
 }
 
-/* --- Widget Container --- */
+/* --- Widget Container — settled end-state, no motion by default --- */
 
 .skyyrose-mascot {
 	position: fixed;
@@ -273,15 +296,16 @@
 	align-items: flex-end;
 	gap: 12px;
 	pointer-events: none;
-	transform: translateX(140%);
-	opacity: 0;
 }
 
-.skyyrose-mascot--entering {
-	animation: skyy-walk-on 1.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
-	pointer-events: auto;
+/* Black Rose walks in from the left; everyone else from the right. */
+.skyyrose-mascot[data-walk-side="left"] {
+	right: auto;
+	left: 20px;
+	flex-direction: row;
 }
 
+.skyyrose-mascot--entering,
 .skyyrose-mascot--idle {
 	transform: translateX(0) scale(1);
 	opacity: 1;
@@ -289,7 +313,7 @@
 }
 
 .skyyrose-mascot--exiting {
-	animation: skyy-walk-off 0.6s ease-in forwards;
+	opacity: 0;
 	pointer-events: none;
 }
 
@@ -318,23 +342,14 @@
 	filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.35));
 }
 
-.skyyrose-mascot--idle .skyyrose-mascot__image {
-	animation: skyy-breathe 3.5s ease-in-out infinite;
-}
-
-.skyy--speaking .skyyrose-mascot__image {
-	animation: skyy-speak-pulse 0.8s ease-in-out infinite;
-}
-
-.skyy--excited .skyyrose-mascot__image {
-	animation: skyy-excited 0.65s ease-out;
-}
-
 .skyy--glancing .skyyrose-mascot__image {
 	filter: drop-shadow(0 12px 32px rgba(183, 110, 121, 0.55));
 }
 
-/* --- Speech Bubble (left of character via flex row-reverse) --- */
+/* --- Speech Bubble (left of character via flex row-reverse; right of
+   character on the left-side variant) — the open/close transition here is
+   a short, interaction-triggered UI affordance, not auto-motion, so it
+   isn't gated behind prefers-reduced-motion. --- */
 
 .skyy-bubble {
 	position: relative;
@@ -355,13 +370,17 @@
 	margin-bottom: 48px;
 }
 
+.skyyrose-mascot[data-walk-side="left"] .skyy-bubble {
+	transform: translateX(-12px) scale(0.95);
+}
+
 .skyy-bubble--visible {
 	opacity: 1;
 	transform: translateX(0) scale(1);
 	pointer-events: auto;
 }
 
-/* Right-pointing tail */
+/* Right-pointing tail — points at the character to its right. */
 .skyy-bubble::after {
 	content: '';
 	position: absolute;
@@ -376,12 +395,138 @@
 	border-radius: 0 2px 0 0;
 }
 
+/* Left-pointing tail on the left-side variant — points at the character
+   to its left instead. */
+.skyyrose-mascot[data-walk-side="left"] .skyy-bubble::after {
+	right: auto;
+	left: -8px;
+	border-top: none;
+	border-right: none;
+	border-bottom: 1.5px solid rgba(183, 110, 121, 0.5);
+	border-left: 1.5px solid rgba(183, 110, 121, 0.5);
+	border-radius: 0 0 0 2px;
+}
+
 .skyy-bubble__text {
 	font-size: 0.85rem;
 	line-height: 1.55;
 	color: rgba(255, 255, 255, 0.92);
 	margin: 0;
 	font-family: inherit;
+}
+
+/* --- Ask Skyy trigger — opens the native <dialog> panel below --- */
+
+.skyy-ask-trigger {
+	display: block;
+	margin-top: 0.625rem;
+	background: none;
+	border: none;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	padding-top: 0.5rem;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 0.72rem;
+	font-family: inherit;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	cursor: pointer;
+}
+
+.skyy-ask-trigger:hover,
+.skyy-ask-trigger:focus-visible {
+	color: #c08090;
+	outline: none;
+}
+
+/* --- Ask Skyy dialog — native <dialog> + showModal(): the one deliberate,
+   user-initiated "panel" in the widget. Focus is trapped while open (native
+   dialog behaviour) and restored to the trigger on close (mascot.js). --- */
+
+.skyy-ask-dialog {
+	border: 1.5px solid rgba(183, 110, 121, 0.5);
+	border-radius: 1rem;
+	padding: 1.25rem;
+	max-width: 320px;
+	width: calc(100% - 2rem);
+	background: rgba(14, 14, 14, 0.98);
+	color: rgba(255, 255, 255, 0.92);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.skyy-ask-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.skyy-ask-dialog__title {
+	font-size: 1.05rem;
+	margin: 0 0 0.75rem;
+	font-family: inherit;
+}
+
+.skyy-ask-form__label {
+	display: block;
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.65);
+	margin-bottom: 0.4rem;
+}
+
+.skyy-ask-form__input {
+	width: 100%;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(183, 110, 121, 0.35);
+	border-radius: 999px;
+	color: rgba(255, 255, 255, 0.92);
+	font-size: 0.85rem;
+	font-family: inherit;
+	padding: 0.55rem 0.9rem;
+	transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.skyy-ask-form__input:focus-visible {
+	outline: none;
+	border-color: #B76E79;
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.skyy-ask-form__input::placeholder {
+	color: rgba(255, 255, 255, 0.4);
+}
+
+.skyy-ask-form__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-top: 1rem;
+}
+
+.skyy-ask-form__cancel,
+.skyy-ask-form__submit {
+	font-family: inherit;
+	font-size: 0.8rem;
+	font-weight: 600;
+	padding: 0.45rem 1rem;
+	border-radius: 999px;
+	cursor: pointer;
+}
+
+.skyy-ask-form__cancel {
+	background: none;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.skyy-ask-form__submit {
+	background: #B76E79;
+	border: 1px solid #B76E79;
+	color: #fff;
+}
+
+.skyy-ask-form__cancel:hover,
+.skyy-ask-form__cancel:focus-visible,
+.skyy-ask-form__submit:hover,
+.skyy-ask-form__submit:focus-visible {
+	filter: brightness(1.15);
+	outline: none;
 }
 
 /* --- Choice Chips --- */
@@ -416,7 +561,8 @@
 	outline: none;
 }
 
-/* --- Minimize Button (× at top-right of character) --- */
+/* --- Minimize Button (× at top-right of character) — the visible,
+   always keyboard-reachable SC 2.2.2 stop control. --- */
 
 .skyyrose-mascot__minimize {
 	position: absolute;
@@ -439,14 +585,21 @@
 	z-index: 2;
 }
 
+.skyyrose-mascot[data-walk-side="left"] .skyyrose-mascot__minimize {
+	right: auto;
+	left: -8px;
+}
+
 .skyyrose-mascot--idle .skyyrose-mascot__minimize,
 .skyy--speaking .skyyrose-mascot__minimize {
 	opacity: 1;
 }
 
-.skyyrose-mascot__minimize:hover {
+.skyyrose-mascot__minimize:hover,
+.skyyrose-mascot__minimize:focus-visible {
 	background: rgba(200, 40, 40, 0.85);
 	color: #fff;
+	outline: none;
 }
 
 /* --- Recall Pill (bottom-right when minimized) --- */
@@ -484,6 +637,56 @@
 	box-shadow: 0 6px 28px rgba(183, 110, 121, 0.4);
 }
 
+/* --- 3D canvas positioning — mirrors the walk-side of the widget it
+   sits behind (skyy-3d.js toggles display when a GLB is configured). --- */
+
+.skyy-3d-canvas {
+	right: 20px;
+}
+
+.skyy-3d-canvas--left {
+	right: auto;
+	left: 20px;
+}
+
+/* ===================================================================
+   Motion — opt-in only (SC 2.3.3 / 2.2.2)
+
+   Nothing above this point animates. These rules are the ONLY place the
+   Skyy widget gains keyframe motion, and only for users/agents whose
+   `prefers-reduced-motion` evaluates to `no-preference`.
+   =================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+	.skyyrose-mascot--entering {
+		animation: skyy-walk-on 1.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+	}
+
+	.skyyrose-mascot[data-walk-side="left"].skyyrose-mascot--entering {
+		animation-name: skyy-walk-on-left;
+	}
+
+	.skyyrose-mascot--idle .skyyrose-mascot__image {
+		animation: skyy-breathe 3.5s ease-in-out infinite;
+	}
+
+	.skyy--speaking .skyyrose-mascot__image {
+		animation: skyy-speak-pulse 0.8s ease-in-out infinite;
+	}
+
+	.skyy--excited .skyyrose-mascot__image {
+		animation: skyy-excited 0.65s ease-out;
+	}
+
+	.skyyrose-mascot--exiting {
+		animation: skyy-walk-off 0.6s ease-in forwards;
+	}
+
+	.skyyrose-mascot[data-walk-side="left"].skyyrose-mascot--exiting {
+		animation-name: skyy-walk-off-left;
+	}
+}
+
 /* ===================================================================
    Responsive — Skyy Widget
    =================================================================== */
@@ -497,22 +700,40 @@
 		gap: 8px;
 	}
 
+	/* Side-entrance is a desktop nicety — mobile always anchors bottom-right
+	   regardless of collection, keeping the responsive CSS surface small. */
+	.skyyrose-mascot[data-walk-side="left"] {
+		left: auto;
+		right: 16px;
+		flex-direction: column;
+	}
+
 	.skyyrose-mascot__image {
 		width: 140px;
 	}
 
-	.skyy-bubble {
+	.skyy-bubble,
+	.skyyrose-mascot[data-walk-side="left"] .skyy-bubble {
 		max-width: 210px;
 		margin-bottom: 0;
 		align-self: flex-end;
+		transform: translateX(0) scale(0.95);
 	}
 
-	/* On mobile, tail points downward (bubble is above character) */
-	.skyy-bubble::after {
+	/* On mobile, tail points downward (bubble is above character) regardless
+	   of walk-side, since mobile always stacks bottom-right. */
+	.skyy-bubble::after,
+	.skyyrose-mascot[data-walk-side="left"] .skyy-bubble::after {
 		right: 24px;
+		left: auto;
 		bottom: -8px;
 		top: auto;
 		transform: rotate(135deg);
+		border-top: 1.5px solid rgba(183, 110, 121, 0.5);
+		border-right: 1.5px solid rgba(183, 110, 121, 0.5);
+		border-bottom: none;
+		border-left: none;
+		border-radius: 0 2px 0 0;
 	}
 
 	.skyy-chips {
@@ -525,7 +746,12 @@
 }
 
 /* ===================================================================
-   Reduced Motion — All Sections
+   Reduced Motion — Kids Capsule + 404 static sections
+
+   These two sections are a separate, pre-existing system (see file
+   docblock) and still use the conventional animate-by-default /
+   override-off-under-reduce pattern — out of scope for the Skyy widget's
+   opt-in motion rework above.
    =================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -542,32 +768,5 @@
 
 	.collection-mascot__cta {
 		transition: none;
-	}
-
-	/* Skyy widget — skip all animations, appear instantly */
-	.skyyrose-mascot {
-		transition: none !important;
-	}
-
-	.skyyrose-mascot--entering {
-		animation: none !important;
-		transform: translateX(0) scale(1) !important;
-		opacity: 1 !important;
-	}
-
-	.skyyrose-mascot--exiting {
-		animation: none !important;
-	}
-
-	.skyyrose-mascot__image,
-	.skyy--speaking .skyyrose-mascot__image,
-	.skyy--excited .skyyrose-mascot__image,
-	.skyyrose-mascot--idle .skyyrose-mascot__image {
-		animation: none !important;
-		filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.35));
-	}
-
-	.skyy-bubble {
-		transition: none !important;
 	}
 }
