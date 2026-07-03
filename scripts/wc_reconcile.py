@@ -106,8 +106,12 @@ def fetch_live_products(*, timeout: float = 30.0) -> dict[str, dict[str, Any]]:
         resp = httpx.get(
             WC_API, params={"per_page": 100, "page": page}, headers=headers, timeout=timeout
         )
-        if resp.status_code == 429:
-            break
+        # No special-case for 429: raise_for_status() surfaces it as an httpx.HTTPError,
+        # which main()/sot_status.py already report as BROKEN. Silently breaking here
+        # used to turn a rate-limit into an empty live-products dict — indistinguishable
+        # from "the live store has zero products" — which diff_products() then reported
+        # as every CSV SKU being live-only-missing. A transient failure must fail loudly,
+        # not masquerade as catastrophic drift.
         resp.raise_for_status()
         items = resp.json()
         if not items:

@@ -40,6 +40,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 THEME = REPO_ROOT / "wordpress-theme" / "skyyrose-flagship"
 PYTHON = sys.executable
 
+# Needed for `from skyyrose.core import asset_hub` (hub pixels domain) and
+# `from scripts import wc_reconcile` (WC store domain) to resolve when this file is
+# invoked directly (`python scripts/sot_status.py`), where sys.path[0] is scripts/,
+# not the repo root. Set once at import time so domain functions don't depend on
+# each other's execution order to get REPO_ROOT onto sys.path first.
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 OK = "OK"
 DRIFT = "DRIFT"
 BROKEN = "BROKEN"
@@ -343,9 +351,20 @@ def _theme_version_domain(freshness_output: str | None) -> DomainStatus:
 def _hub_pixels_domain() -> DomainStatus:
     artifact = "assets/hub/manifest.json"
     check = "skyyrose.core.asset_hub.verify_integrity()"
+    # Every verified manifest entry's pixels live under the gitignored
+    # assets/hub/collections/ tree (see .gitignore "/assets/*" rule) — the manifest
+    # itself is tracked and always present, but a fresh checkout or CI runner never
+    # has the pixels. Presence-gate the same way _presence_probe does for 3D/GLB
+    # and scene backdrops: absent tree -> UNCHECKED, not a DRIFT false alarm.
+    pixels_dir = REPO_ROOT / "assets" / "hub" / "collections"
+    if not pixels_dir.exists():
+        return build_row(
+            "hub pixels",
+            artifact,
+            check,
+            unchecked(f"gitignored disk asset dir not present in this checkout: {pixels_dir}"),
+        )
     try:
-        if str(REPO_ROOT) not in sys.path:
-            sys.path.insert(0, str(REPO_ROOT))
         from skyyrose.core import asset_hub  # noqa: PLC0415
     except ImportError as exc:
         return build_row("hub pixels", artifact, check, broken(f"import failed: {exc}"))
