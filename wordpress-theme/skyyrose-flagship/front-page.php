@@ -216,7 +216,7 @@ get_header();
 		<h1 class="hero-title" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>">SkyyRose</h1>
 		<p class="hero-mark-bot"><?php esc_html_e( 'Est. 2020', 'skyyrose' ); ?></p>
 		<div class="hero-rule" aria-hidden="true"></div>
-		<p class="hero-subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Four collections, one bloodline — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
+		<p class="hero-subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Four collections, one name — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
 		<div class="hero-ctas">
 			<a href="#collections" class="hero-cta hero-cta-primary btn-sweep btn-press"><?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?></a>
 			<a href="#story" class="hero-cta btn-border-draw btn-press"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
