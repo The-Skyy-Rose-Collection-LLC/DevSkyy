@@ -76,6 +76,17 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
 
+      - name: Run freshness-guard --all
+        # Previously local-only (the .husky/pre-commit hook only checks staged files —
+        # a full-repo audit never ran in CI). --all forces every check regardless of
+        # what's staged. CHECK 2 (.min staleness) downgrades to a skip here since this
+        # job doesn't install Node — freshness-guard.sh treats missing tooling as a
+        # skip, never a fail, by design (see its own docstring).
+        run: |
+          bash scripts/freshness-guard.sh --all
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
   retired-sku-scan:
     name: Retired SKU Guard
     runs-on: ubuntu-latest

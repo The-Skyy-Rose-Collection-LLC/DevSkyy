@@ -32,6 +32,21 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   fi
 fi
 
+# Catalog consistency gate: staged files touching the catalog CSV, logo registry,
+# or the readers that consume them must pass validate_catalog_consistency.py.
+# Ports the file-pattern trigger of the orphaned .git/hooks/pre-commit (dead since
+# core.hooksPath=.husky/_ moved Git off it — see SOT.md "Known dead hook"), so the
+# gate is actually live again. Skip: SKIP_CATALOG_VALIDATE=1 git commit
+CATALOG_PATTERN='wordpress-theme/skyyrose-flagship/data/skyyrose-catalog\.csv|wordpress-theme/skyyrose-flagship/data/logo-registry\.json|wordpress-theme/skyyrose-flagship/data/product-similarities\.json|skyyrose/elite_studio/sku_resolver\.py|skyyrose/elite_studio/logo_registry\.py|skyyrose/elite_studio/commerce\.py|scripts/validate_catalog_consistency\.py|scripts/sync_catalog_downstream\.py'
+if [ "${SKIP_CATALOG_VALIDATE:-0}" != "1" ] \
+   && git diff --cached --name-only --diff-filter=ACMR | grep -qE "$CATALOG_PATTERN"; then
+  PY="$REPO_ROOT/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
+  if command -v "$PY" >/dev/null 2>&1; then
+    echo "Running catalog consistency validator (staged catalog files changed)..."
+    "$PY" "$REPO_ROOT/scripts/validate_catalog_consistency.py" || exit 1
+  fi
+fi
+
 # Freshness guard: derived files (SOT sot.json/design-tokens, theme .min,
 # theme version, retired-master refs) must not be committed stale. Scoped to
 # staged files, so it is a no-op unless you touched a source whose derived file

@@ -1,0 +1,64 @@
+name: SOT Freshness Status
+
+# Weekly + on-demand run of the unified SOT freshness dashboard (scripts/sot_status.py).
+# Aggregates existing validators (catalog, dossiers, imagery, collection content, theme
+# version, hub integrity) plus the read-only WooCommerce reconcile — see SOT.md
+# "Freshness status" for the full domain table this reflects.
+#
+# The live WC reconcile is a read-only GET; it never writes to the store. Repo secrets
+# are named WOO_REST_API_KEY/WOO_REST_API_SECRET (gh secret naming) and are mapped here
+# to WOOCOMMERCE_KEY/WOOCOMMERCE_SECRET (the env vars scripts/wc_reconcile.py reads —
+# same names used locally via .env.wordpress). If secrets are unset (e.g. a fork PR),
+# wc_reconcile.py raises CredentialsMissing and sot_status.py reports LIVE-SKIPPED,
+# not a failure.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 13 * * 1" # Monday 13:00 UTC / 05:00-06:00 Pacific depending on DST
+
+jobs:
+  sot-status:
+    name: SOT Freshness Dashboard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx python-dotenv jsonschema --quiet
+
+      - name: Run SOT status (with live WC reconcile)
+        # Single invocation — the aggregation shells out to several subprocess checks
+        # and makes one live network call; running it a second time for a "pretty"
+        # rendering would double both. jq renders the JSON as a readable table for
+        # the job log; sot-status.json is the machine-readable artifact.
+        run: |
+          python scripts/sot_status.py --live --json | tee sot-status.json
+          jq -r '
+            ["DOMAIN","STATUS","CHECK","DETAIL"],
+            (.rows[] | [.domain, .status, .check, .detail])
+            | @tsv
+          ' sot-status.json | column -t -s $'\t'
+          jq -e '.passed' sot-status.json >/dev/null
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          WOOCOMMERCE_KEY: ${{ secrets.WOO_REST_API_KEY }}
+          WOOCOMMERCE_SECRET: ${{ secrets.WOO_REST_API_SECRET }}
+
+      - name: Upload sot-status.json
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa9 # v4
+        with:
+          name: sot-status
+          path: sot-status.json
+          retention-days: 30

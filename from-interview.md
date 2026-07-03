@@ -1,0 +1,1 @@
+knowledge-base/seed/from-interview.md

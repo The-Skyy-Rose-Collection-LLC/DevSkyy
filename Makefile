@@ -10,7 +10,7 @@
         docker-secrets docker-build docker-up docker-up-monitoring \
         docker-down docker-logs docker-ps docker-config docker-clean docker-run \
         validate-catalog sync-catalog sync-catalog-dry catalog-help \
-        fresh fresh-fix
+        fresh fresh-fix sot-status
 
 # Python
 PYTHON := python3
@@ -376,3 +376,14 @@ catalog-help:
 	@echo "  DOES NOT auto-edit:"
 	@echo "    data/dossiers/*.md  |  ProductCatalogTest.php  |  logo-registry.json content"
 	@echo ""
+
+# ============================================================================
+# SOT FRESHNESS DASHBOARD
+# ============================================================================
+
+# Aggregates every existing SOT validator (catalog, dossiers, imagery, collection
+# content, theme version, hub integrity) into one domain table. LIVE=1 adds the
+# read-only WooCommerce reconcile (scripts/wc_reconcile.py — GET only, no writes).
+# See SOT.md "Freshness status" for the full domain table this reflects.
+sot-status:
+	$(PYTHON) scripts/sot_status.py $(if $(LIVE),--live,)
