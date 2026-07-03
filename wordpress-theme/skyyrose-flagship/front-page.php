@@ -819,8 +819,10 @@ if ( file_exists( $homepage_js_path ) ) :
 get_template_part( 'template-parts/footer-cro' );
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
-// Skyy mascot disabled — re-enable when character art is finalized.
-// get_template_part( 'template-parts/skyy-mascot' );
+// Skyy mascot — gated on the Customizer kill switch.
+if ( get_theme_mod( 'skyyrose_mascot_enabled', false ) ) {
+	get_template_part( 'template-parts/skyy-mascot' );
+}
 get_template_part( 'template-parts/mobile-bottom-nav' );
 ?>
 

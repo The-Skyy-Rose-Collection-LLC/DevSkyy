@@ -69,6 +69,7 @@ $skyyrose_core_includes = array(
 	'/inc/enqueue-performance.php',
 	'/inc/enqueue-phases.php',
 	'/inc/customizer.php',
+	'/inc/mascot-config.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
 	'/inc/accessibility-fix.php',

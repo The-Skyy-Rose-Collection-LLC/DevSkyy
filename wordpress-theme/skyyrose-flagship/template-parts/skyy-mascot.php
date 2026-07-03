@@ -28,26 +28,10 @@ if ( file_exists( $canonical_path ) ) {
 	$skyy_img_url = '';
 }
 
-// Determine conversation context from current page/template.
-$skyy_context = 'default';
-if ( is_front_page() ) {
-	$skyy_context = 'homepage';
-} elseif ( is_page( 'pre-order' ) || is_page( 'preorder' ) ) {
-	$skyy_context = 'preorder';
-} elseif ( is_404() ) {
-	$skyy_context = '404';
-} else {
-	$slug = get_queried_object() ? get_post_field( 'post_name', get_queried_object_id() ) : '';
-	if ( str_contains( $slug, 'black-rose' ) ) {
-		$skyy_context = 'black-rose';
-	} elseif ( str_contains( $slug, 'love-hurts' ) ) {
-		$skyy_context = 'love-hurts';
-	} elseif ( str_contains( $slug, 'signature' ) ) {
-		$skyy_context = 'signature';
-	} elseif ( str_contains( $slug, 'kids-capsule' ) ) {
-		$skyy_context = 'kids-capsule';
-	}
-}
+// Conversation context + walk-on side — shared resolution lives in
+// inc/mascot-config.php so body_class, walkSide, and per-page tips all agree.
+$skyy_context = skyyrose_get_skyy_context();
+$skyy_side    = skyyrose_get_skyy_walk_side( $skyy_context );
 
 // Recall pill: tiny avatar thumb for the minimised state.
 $recall_thumb = $skyy_img_url ?: '';
@@ -57,11 +41,11 @@ $recall_thumb = $skyy_img_url ?: '';
 <!-- Skyy 3D canvas — sits behind the speech bubble, driven by skyy-3d.js -->
 <canvas
 	id="skyy-3d-canvas"
-	class="skyy-3d-canvas"
+	class="skyy-3d-canvas <?php echo 'left' === $skyy_side ? 'skyy-3d-canvas--left' : ''; ?>"
 	width="220"
 	height="340"
 	aria-hidden="true"
-	style="position:fixed;bottom:20px;right:20px;z-index:9989;pointer-events:none;display:none;"
+	style="position:fixed;bottom:20px;z-index:9989;pointer-events:none;display:none;"
 ></canvas>
 <?php endif; ?>
 
@@ -72,12 +56,16 @@ $recall_thumb = $skyy_img_url ?: '';
 	aria-hidden="true"
 	aria-label="<?php esc_attr_e( 'Skyy, your SkyyRose style guide', 'skyyrose' ); ?>"
 	data-context="<?php echo esc_attr( $skyy_context ); ?>"
+	data-walk-side="<?php echo esc_attr( $skyy_side ); ?>"
 	role="complementary"
 >
 	<!-- Speech bubble (rendered left of character via flex row-reverse) -->
 	<div id="skyy-bubble" class="skyy-bubble" role="status" aria-live="polite" hidden>
 		<p id="skyy-bubble-text" class="skyy-bubble__text"></p>
 		<div id="skyy-chips" class="skyy-chips" role="group" aria-label="<?php esc_attr_e( 'Quick replies', 'skyyrose' ); ?>"></div>
+		<button id="skyy-ask-trigger" class="skyy-ask-trigger" type="button" hidden>
+			<?php esc_html_e( 'Ask a question', 'skyyrose' ); ?>
+		</button>
 	</div>
 
 	<!-- Character button (click = open / dismiss bubble) -->
@@ -107,15 +95,37 @@ $recall_thumb = $skyy_img_url ?: '';
 
 	</button>
 
-	<!-- Minimize × button — must be OUTSIDE the trigger to avoid nested <button> (invalid HTML) -->
+	<!-- Minimize × button — must be OUTSIDE the trigger to avoid nested <button> (invalid HTML).
+	     Keyboard-reachable (no tabindex="-1"): ESC is a shortcut, not the only way to dismiss. -->
 	<button
 		id="skyyrose-mascot-minimize"
 		class="skyyrose-mascot__minimize"
 		type="button"
 		aria-label="<?php esc_attr_e( 'Minimize Skyy', 'skyyrose' ); ?>"
-		tabindex="-1"
 	>&#215;</button>
 </div><!-- #skyyrose-mascot -->
+
+<!-- Ask Skyy — native <dialog> panel: focus trapped while open, ESC closes,
+     focus restored to the trigger on close. Routine speech stays in the
+     non-modal bubble above; this is the one deliberate, user-initiated
+     "panel" interaction in the widget. -->
+<dialog id="skyy-ask-dialog" class="skyy-ask-dialog" aria-labelledby="skyy-ask-dialog-title">
+	<form id="skyy-ask-form" class="skyy-ask-form" method="dialog">
+		<h2 id="skyy-ask-dialog-title" class="skyy-ask-dialog__title"><?php esc_html_e( 'Ask Skyy', 'skyyrose' ); ?></h2>
+		<label class="skyy-ask-form__label" for="skyy-ask-input"><?php esc_html_e( 'Where to find something, sizing, shipping…', 'skyyrose' ); ?></label>
+		<input
+			type="text"
+			id="skyy-ask-input"
+			class="skyy-ask-form__input"
+			autocomplete="off"
+			placeholder="<?php esc_attr_e( 'Sizing, shipping, a collection…', 'skyyrose' ); ?>"
+		/>
+		<div class="skyy-ask-form__actions">
+			<button type="button" id="skyy-ask-cancel" class="skyy-ask-form__cancel"><?php esc_html_e( 'Cancel', 'skyyrose' ); ?></button>
+			<button type="submit" class="skyy-ask-form__submit"><?php esc_html_e( 'Ask', 'skyyrose' ); ?></button>
+		</div>
+	</form>
+</dialog>
 
 <!-- Recall pill — shown when minimised -->
 <button

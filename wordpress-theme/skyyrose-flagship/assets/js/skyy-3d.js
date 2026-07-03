@@ -23,15 +23,32 @@
 	var MODEL_URL = ( window.SKYY_3D_CONFIG && window.SKYY_3D_CONFIG.modelUrl )
 		? window.SKYY_3D_CONFIG.modelUrl
 		: '/wp-content/themes/skyyrose-flagship/assets/models/skyy.glb';
-	var WALK_ON_DELAY = 3000;      // ms after page load before walk-on starts
+	/** Self-hosted Draco decoder directory — no new CSP origin (decoder files
+	 *  land here once a Draco-compressed GLB ships; non-Draco GLBs never
+	 *  touch this path). */
+	var DRACO_DECODER_PATH = SKYYROSE_ASSETS_URI_3D() + '/js/lib/draco/';
 	var CANVAS_ID     = 'skyy-3d-canvas';
 	var CHARACTER_W   = 220;       // px — canvas width
 	var CHARACTER_H   = 340;       // px — canvas height
 
+	/** Best-effort theme assets base for the Draco decoder path — falls back
+	 *  to a relative guess if skyyRoseData hasn't localized yet. */
+	function SKYYROSE_ASSETS_URI_3D() {
+		return ( window.skyyRoseData && window.skyyRoseData.assetsUri )
+			? window.skyyRoseData.assetsUri
+			: '/wp-content/themes/skyyrose-flagship/assets';
+	}
+
 	// Animation clip names expected in the .glb (Mixamo standard names).
-	// The model should contain at minimum: 'idle', 'walk'.
-	var CLIP_IDLE = 'idle';
-	var CLIP_WALK = 'walk';
+	// The model should contain at minimum: 'idle' and 'walk'. wave/point/
+	// talk/joy are optional — missing clips fall back to idle gracefully
+	// (see playNamedAction below).
+	var CLIP_IDLE  = 'idle';
+	var CLIP_WALK  = 'walk';
+	var CLIP_WAVE  = 'wave';
+	var CLIP_POINT = 'point';
+	var CLIP_TALK  = 'talk';
+	var CLIP_JOY   = 'joy';
 
 	// -------------------------------------------------------------------------
 	// DOM / Three.js setup
@@ -53,7 +70,7 @@
 	// -------------------------------------------------------------------------
 
 	function loadThree( callback ) {
-		if ( window.THREE && window.THREE_GLTFLoader ) {
+		if ( window.THREE && window.THREE_GLTFLoader && window.THREE_DRACOLoader ) {
 			callback( window.THREE );
 			return;
 		}
@@ -61,13 +78,19 @@
 		var base = 'https://cdn.jsdelivr.net/npm/three@0.170.0';
 
 		// Inject a module script that imports THREE and attaches it to window.
+		// jsdelivr is already an allowed script-src origin (inc/security.php) —
+		// this adds no new CSP surface. The Draco decoder binaries themselves
+		// are self-hosted (DRACO_DECODER_PATH below) since their runtime
+		// fetch falls under connect-src, which does not allow jsdelivr.
 		var injectScript = document.createElement( 'script' );
 		injectScript.type = 'module';
 		injectScript.textContent = [
 			"import * as THREE from '" + base + "/build/three.module.js';",
 			"import { GLTFLoader } from '" + base + "/examples/jsm/loaders/GLTFLoader.js';",
+			"import { DRACOLoader } from '" + base + "/examples/jsm/loaders/DRACOLoader.js';",
 			"window.THREE = THREE;",
 			"window.THREE_GLTFLoader = GLTFLoader;",
+			"window.THREE_DRACOLoader = DRACOLoader;",
 			"document.dispatchEvent(new Event('three-ready'));",
 		].join( '\n' );
 
@@ -140,6 +163,17 @@
 		}
 
 		var loader = new GLTFLoader();
+
+		// DRACOLoader is only invoked by GLTFLoader when a loaded glTF actually
+		// declares the KHR_draco_mesh_compression extension — wiring it in is
+		// a no-op for non-Draco GLBs (today, since no GLB exists yet).
+		var DRACOLoaderClass = window.THREE_DRACOLoader || ( window.THREE && window.THREE.DRACOLoader );
+		if ( DRACOLoaderClass ) {
+			var dracoLoader = new DRACOLoaderClass();
+			dracoLoader.setDecoderPath( DRACO_DECODER_PATH );
+			loader.setDRACOLoader( dracoLoader );
+		}
+
 		loader.load(
 			MODEL_URL,
 			function ( gltf ) {
@@ -228,6 +262,22 @@
 		currentAction = action;
 	}
 
+	/**
+	 * Play the first clip found among candidateNames, falling back to the
+	 * idle clip when none of them exist in this GLB's animation set —
+	 * missing clips (wave/point/talk/joy are all optional) degrade
+	 * gracefully instead of throwing or freezing on the last pose.
+	 */
+	function playFirstAvailable( candidateNames, options ) {
+		for ( var i = 0; i < candidateNames.length; i++ ) {
+			if ( actions[ candidateNames[ i ] ] ) {
+				playAction( candidateNames[ i ], options );
+				return;
+			}
+		}
+		playAction( CLIP_IDLE, options );
+	}
+
 	// -------------------------------------------------------------------------
 	// Render loop
 	// -------------------------------------------------------------------------
@@ -253,10 +303,13 @@
 			}
 		}
 
-		// The mascot.min.js dispatches CustomEvents that we listen for here
+		// The mascot.min.js dispatches CustomEvents that we listen for here.
+		// Motion is opt-in (same rule as the CSS sprite path): when the
+		// visitor prefers reduced motion, walk/transient-reaction clips are
+		// skipped entirely and the character sits on idle instead.
 		document.addEventListener( 'skyy:walking-in', function () {
 			clearExcitedTimer();
-			playAction( CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
+			playAction( reduced ? CLIP_IDLE : CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
 		} );
 
 		document.addEventListener( 'skyy:idle', function () {
@@ -266,35 +319,56 @@
 
 		document.addEventListener( 'skyy:speaking', function () {
 			clearExcitedTimer();
-			// Play talk clip if available, else stay on idle
-			playAction( actions.talk ? 'talk' : CLIP_IDLE );
+			playFirstAvailable( [ CLIP_TALK ], { fadeIn: 0.3, fadeOut: 0.3 } );
 		} );
 
 		document.addEventListener( 'skyy:exiting', function () {
 			clearExcitedTimer();
-			playAction( CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
+			playAction( reduced ? CLIP_IDLE : CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
 		} );
 
-		document.addEventListener( 'skyy:excited', function () {
-			var exciteClip = actions.jump || actions.wave || actions[ CLIP_IDLE ];
-			if ( ! exciteClip ) return;
+		// Transient reaction clips — crossfade in, hold briefly, crossfade
+		// back to idle. Shared by excited/wave/point so the timer-cleanup
+		// logic isn't repeated four times.
+		function playTransient( candidateNames, holdMs ) {
 			clearExcitedTimer();
-			currentAction && currentAction.fadeOut( 0.15 );
-			exciteClip.reset().fadeIn( 0.15 ).play();
-			currentAction = exciteClip;
+			if ( reduced ) {
+				playAction( CLIP_IDLE, { fadeIn: 0.3, fadeOut: 0.3 } );
+				return;
+			}
+			playFirstAvailable( candidateNames, { fadeIn: 0.15, fadeOut: 0.15 } );
 			excitedTimer = setTimeout( function () {
 				excitedTimer = null;
 				playAction( CLIP_IDLE, { fadeIn: 0.3, fadeOut: 0.3 } );
-			}, 1000 );
+			}, holdMs );
+		}
+
+		document.addEventListener( 'skyy:excited', function () {
+			playTransient( [ CLIP_JOY, CLIP_WAVE ], 1000 );
+		} );
+
+		document.addEventListener( 'skyy:wave', function () {
+			playTransient( [ CLIP_WAVE ], 1200 );
+		} );
+
+		document.addEventListener( 'skyy:point', function () {
+			playTransient( [ CLIP_POINT ], 1200 );
+		} );
+
+		document.addEventListener( 'skyy:joy', function () {
+			playTransient( [ CLIP_JOY ], 1000 );
 		} );
 	}
 
 	// -------------------------------------------------------------------------
 	// Bootstrap
 	// -------------------------------------------------------------------------
+	//
+	// No additional page-load delay here: this script is only ever injected
+	// by mascot-loader.js after requestIdleCallback/first-interaction, so
+	// the "don't cost LCP/CLS budget" job is already done by the time this
+	// line runs.
 
-	setTimeout( function () {
-		loadThree( initScene );
-	}, reduced ? 100 : WALK_ON_DELAY );
+	loadThree( initScene );
 
 } )();
