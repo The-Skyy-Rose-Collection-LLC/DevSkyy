@@ -921,6 +921,22 @@ function skyyrose_enqueue_template_scripts() {
 		}
 	}
 
+	// WooCommerce AJAX add-to-cart on custom (non-WC-native) templates.
+	// WC_Frontend_Scripts::register_scripts() always registers 'wc-add-to-cart'
+	// on every frontend pageload, but WooCommerce only ENQUEUES it sitewide when
+	// the "Enable AJAX add to cart" setting is on — enqueue never depends on page
+	// type. Our custom templates render .ajax_add_to_cart buttons (Reserve on
+	// preorder-gateway, Quick Add on v7 cards via product-grid.php) outside any
+	// WooCommerce-native page, so the click would just follow the PDP fallback
+	// href with JS enabled and no AJAX add. Enqueuing the already-registered
+	// handle here is enough: WC's own localize_printed_scripts() (wp_print_scripts
+	// / wp_print_footer_scripts, priority 5) attaches wc_add_to_cart_params to any
+	// handle it finds enqueued at print time, regardless of who enqueued it.
+	$ajax_add_to_cart_slugs = array( 'front-page', 'collection-standalone', 'preorder-gateway' );
+	if ( class_exists( 'WooCommerce' ) && in_array( $slug, $ajax_add_to_cart_slugs, true ) && wp_script_is( 'wc-add-to-cart', 'registered' ) ) {
+		wp_enqueue_script( 'wc-add-to-cart' );
+	}
+
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
 	if ( in_array( $slug, array( 'collection-standalone', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial', 'single-product' ), true ) ) {
