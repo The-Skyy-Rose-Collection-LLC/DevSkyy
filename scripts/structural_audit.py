@@ -162,7 +162,9 @@ def blue_dominant_hexes(css_text: str) -> list[str]:
     proven in the repo's brand-law tooling.
     """
     found: list[str] = []
-    for m in re.finditer(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b", css_text):
+    # (?<!&) — HTML entities like &#039; (escaped apostrophe) are not colors;
+    # without the guard, #039 expands to a phantom #003399 finding.
+    for m in re.finditer(r"(?<!&)#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b", css_text):
         h = m.group(1)
         if len(h) == 3:
             h = "".join(c * 2 for c in h)
