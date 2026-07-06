@@ -118,12 +118,44 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			<div class="col-hero__cta-group">
 				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>
-					<a href="<?php echo esc_url( home_url( $c['experience_url'] ) ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
+					<?php
+					// Experience merged into this page (WS3): anchor URLs ('#experience')
+					// link in-page; anything else still routes through home_url().
+					$exp_href = ( 0 === strpos( $c['experience_url'], '#' ) )
+						? $c['experience_url']
+						: home_url( $c['experience_url'] );
+					?>
+					<a href="<?php echo esc_url( $exp_href ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
 				<?php endif; ?>
 			</div>
 		</div>
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
+
+	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
+	<?php
+	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;
+	if ( $experience && ! empty( $experience['rooms'] ) ) :
+		?>
+		<section id="experience" class="col-experience" aria-label="<?php echo esc_attr( $experience['world_name'] ); ?>">
+			<?php
+			get_template_part(
+				'template-parts/immersive/scene',
+				null,
+				array(
+					'collection_slug' => $slug,
+					'collection_name' => $experience['collection_name'],
+					'world_name'      => $experience['world_name'],
+					'tagline'         => $experience['tagline'],
+					'accent_color'    => $experience['accent_color'],
+					'collection_url'  => '',
+					'rooms'           => $experience['rooms'],
+					'embedded'        => true,
+				)
+			);
+			?>
+		</section>
+	<?php endif; ?>
 
 	<?php
 	get_template_part(

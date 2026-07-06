@@ -28,6 +28,12 @@
 	cursor: crosshair;
 }
 
+/* Embedded experience layer (WS3) — scene lives inside a collection page
+   section; 100vw would overflow the content column by the scrollbar width. */
+.col-experience .immersive-scene {
+	width: 100%;
+}
+
 /* ==================================================
    LOADING SCREEN
    ================================================== */
