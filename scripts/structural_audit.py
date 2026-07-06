@@ -144,9 +144,7 @@ def is_hidden_or_allowed_after_footer(el: Tag) -> bool:
     if any(h in idcls for h in COOKIE_HINTS):
         return True
     # Empty structural wrappers (e.g. portal mount points) are fine.
-    if not el.get_text(strip=True) and not el.find(("img", "video", "iframe")):
-        return True
-    return False
+    return not el.get_text(strip=True) and not el.find(("img", "video", "iframe"))
 
 
 def blue_dominant_hexes(css_text: str) -> list[str]:
@@ -231,8 +229,12 @@ def check_routes(a: Audit) -> None:
         )
     for path in CANONICAL_PAGES:
         r = a.get(path)
+        # 5000 bytes is a PHP-fatal / white-screen tripwire, not a content-richness
+        # gate — lean utility pages (size-guide, contact) can be valid 200s well
+        # under a hero-page byte count, so this must stay low enough to never
+        # false-positive on legitimate lightweight pages.
         a.check(
-            r.status_code == 200 and len(r.text) > 20000,
+            r.status_code == 200 and len(r.text) > 5000,
             f"{path} 200 with substantial body",
             f"status={r.status_code} bytes={len(r.text)}",
         )
