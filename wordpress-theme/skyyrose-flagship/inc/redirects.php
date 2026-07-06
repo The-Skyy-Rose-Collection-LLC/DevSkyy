@@ -230,10 +230,39 @@ function skyyrose_virtual_template( $template ) {
 	$wp_query->is_404 = false;
 	status_header( 200 );
 
+	// No post object on a virtual route — keep Jetpack/core comment forms
+	// from rendering after the footer (post-deploy audit finding).
+	add_filter( 'comments_open', '__return_false', 99 );
+	add_filter( 'pings_open', '__return_false', 99 );
+
 	$virtual = get_theme_file_path( 'template-size-guide.php' );
 	return file_exists( $virtual ) ? $virtual : $template;
 }
 add_filter( 'template_include', 'skyyrose_virtual_template' );
+
+/**
+ * Force the canonical /collections/ index template.
+ *
+ * The live Collections page still carries stale _wp_page_template meta
+ * pointing at skyyrose-canvas.php — a live-only file that is not in the
+ * repo and (verified post-deploy) is NOT removed by the hot-swap deploy.
+ * Overriding template_include beats both the stale meta and the stale
+ * file with zero production DB writes.
+ *
+ * @since 1.8.1
+ * @param string $template Resolved template path.
+ * @return string
+ */
+function skyyrose_collections_index_template( $template ) {
+	if ( is_page( 'collections' ) ) {
+		$index = get_theme_file_path( 'page-collections.php' );
+		if ( file_exists( $index ) ) {
+			return $index;
+		}
+	}
+	return $template;
+}
+add_filter( 'template_include', 'skyyrose_collections_index_template', 20 );
 
 /**
  * Canonical + title for the virtual size-guide route (no page object means
@@ -297,10 +326,9 @@ add_action( 'init', 'skyyrose_flush_rewrites_once', 30 );
  * @return void
  */
 function skyyrose_case_normalize_redirect() {
-	if ( ! is_404() ) {
-		return;
-	}
-
+	// Not gated on is_404(): WP resolves pagename case-insensitively on
+	// this host, so /PRE-ORDER/ serves 200 duplicate content. Uppercase
+	// path → 301 to the lowercase canonical regardless of resolution.
 	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 	$path        = (string) strtok( $request_uri, '?' );
 	$lower       = strtolower( $path );

@@ -96,6 +96,13 @@ function skyyrose_resolve_display_products( array $catalog_entries ) {
 			continue;
 		}
 
+		// Production-image gate (mirrors the pre-order gateway): a SKU with
+		// no real display image on disk must not render a placeholder card.
+		$display_img = skyyrose_get_product_display_image( $cat );
+		if ( '' === $display_img || ! file_exists( get_theme_file_path( $display_img ) ) ) {
+			continue;
+		}
+
 		// Try to match to a WC product by SKU (primary, then normalized).
 		$wc_product = null;
 		if ( $has_wc ) {

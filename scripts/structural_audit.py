@@ -383,10 +383,14 @@ def check_brand(a: Audit) -> None:
             "core-block-supports-inline-css",
             "admin-bar-inline-css",
         )
+        # Plugin-owned inline styles (Jetpack likes/sharing/search etc.) are
+        # not the theme's palette to police — brand law targets theme output.
+        plugin_style_prefixes = ("jetpack", "sharedaddy", "sharing")
         inline_css = " ".join(
             s.get_text()
             for s in soup.find_all("style")
             if (s.get("id") or "") not in core_style_ids
+            and not (s.get("id") or "").startswith(plugin_style_prefixes)
         )
         inline_attrs = " ".join(m.group(1) for m in re.finditer(r'style="([^"]*)"', html))
         blues = blue_dominant_hexes(inline_css + " " + inline_attrs)

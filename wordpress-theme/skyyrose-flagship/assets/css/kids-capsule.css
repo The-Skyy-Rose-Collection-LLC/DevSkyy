@@ -248,7 +248,7 @@
 
 .kc-teaser__silhouette-placeholder {
 	border-radius: 8px;
-	background: linear-gradient(180deg, rgba(232, 160, 191, 0.15) 0%, rgba(168, 216, 234, 0.1) 100%);
+	background: linear-gradient(180deg, rgba(232, 160, 191, 0.15) 0%, rgba(216, 161, 170, 0.1) 100%);
 	border: 1px solid rgba(232, 160, 191, 0.2);
 }
 
@@ -277,7 +277,7 @@
 .kc-teaser__waitlist {
 	padding: var(--space-3xl, 8rem) var(--space-md, 1.5rem);
 	text-align: center;
-	background: rgba(26, 26, 46, 0.6);
+	background: rgba(23, 19, 16, 0.6);
 }
 
 .kc-teaser__waitlist-inner {
