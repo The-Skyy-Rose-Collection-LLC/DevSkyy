@@ -101,7 +101,24 @@ defined( 'ABSPATH' ) || exit;
 					);
 					?>
 				</div>
-				
+
+				<?php
+				// No-JS fallback: navigation.js relocates .navbar__menu into the
+				// mobile drawer at <=1024px and drives the hamburger toggle. If JS
+				// never runs (network/CSP/script error/disabled), the drawer stays
+				// empty AND the hamburger button has no click handler, so mobile
+				// visitors would have zero primary navigation. Force the desktop
+				// nav wrapper back to visible at the same breakpoint so the menu
+				// (already server-rendered above) stays reachable without JS.
+				?>
+				<noscript>
+					<style>
+						@media (max-width: 1024px) {
+							.navbar__nav-wrapper { display: block; }
+						}
+					</style>
+				</noscript>
+
 				<!-- Mobile Menu Toggle (Right aligned on Mobile) -->
 				<button class="navbar__hamburger" id="mobile-menu-toggle" type="button" aria-label="<?php esc_attr_e( 'Open navigation menu', 'skyyrose' ); ?>" aria-expanded="false" aria-controls="mobile-menu">
 					<span class="navbar__hamburger-line"></span>
