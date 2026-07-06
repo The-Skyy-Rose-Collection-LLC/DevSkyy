@@ -135,6 +135,10 @@ def is_hidden_or_allowed_after_footer(el: Tag) -> bool:
         return True
     if el.name == "dialog" and not el.has_attr("open"):
         return True
+    # Hidden form inputs (plugin nonces/config, e.g. CommerceKit) are never
+    # visible; html.parser can fold following text into the void tag.
+    if el.name == "input" and (el.get("type") or "").lower() == "hidden":
+        return True
     if el.has_attr("hidden") or el.get("aria-hidden") == "true":
         return True
     style = (el.get("style") or "").replace(" ", "").lower()
@@ -142,6 +146,10 @@ def is_hidden_or_allowed_after_footer(el: Tag) -> bool:
         return True
     idcls = " ".join([el.get("id") or ""] + (el.get("class") or [])).lower()
     if any(h in idcls for h in COOKIE_HINTS):
+        return True
+    # Plugin-injected overlays hidden via stylesheet, not inline (Jetpack
+    # Carousel's lightbox + comment form) — never visible page content.
+    if "jp-carousel" in idcls:
         return True
     # Empty structural wrappers (e.g. portal mount points) are fine.
     return not el.get_text(strip=True) and not el.find(("img", "video", "iframe"))
@@ -203,9 +211,22 @@ def check_shell(a: Audit) -> None:
         for marker in LEGACY_MARKERS:
             a.check(marker not in html, f"{path} no legacy marker {marker!r}")
 
-        headers = soup.find_all("header")
+        # HTML5 sectioning <header> inside cards/sections is valid — the shell
+        # contract is exactly one BANNER header (#masthead) and no stray
+        # top-level headers alongside it.
+        banner_headers = soup.select("header#masthead")
+        stray_top = [
+            h
+            for h in soup.find_all("header")
+            if h.get("id") != "masthead"
+            and not h.find_parent(("main", "section", "article", "aside", "dialog"))
+        ]
         footers = soup.find_all("footer")
-        a.check(len(headers) == 1, f"{path} exactly one <header>", f"found {len(headers)}")
+        a.check(
+            len(banner_headers) == 1 and not stray_top,
+            f"{path} exactly one banner <header#masthead>",
+            f"banner={len(banner_headers)}, stray top-level={len(stray_top)}",
+        )
         a.check(len(footers) == 1, f"{path} exactly one <footer>", f"found {len(footers)}")
 
 
@@ -338,9 +359,25 @@ def check_commerce(a: Audit) -> None:
             not re.search(r'href="[^"]*add-to-cart=', html),
             f"{path} no GET add-to-cart hrefs",
         )
+        # Placeholder srcs inside hidden/inert dialog templates (e.g. the
+        # product-panel slide-up, whose thumb JS swaps before reveal) are
+        # never user-visible — only flag placeholders in rendered content.
+        soup_r = a.soup(path)
+        visible_placeholders = [
+            img
+            for img in soup_r.find_all(
+                "img", src=re.compile(r"placeholder[^\"]*\.(jpg|png|webp|gif)")
+            )
+            if not any(
+                isinstance(p, Tag)
+                and (p.has_attr("hidden") or p.has_attr("inert") or p.get("aria-hidden") == "true")
+                for p in [img, *img.parents]
+            )
+        ]
         a.check(
-            not re.search(r'src="[^"]*placeholder[^"]*\.(jpg|png|webp|gif)', html),
-            f"{path} no placeholder images",
+            not visible_placeholders,
+            f"{path} no visible placeholder images",
+            f"{len(visible_placeholders)} in rendered content",
         )
         a.check(
             not re.search(r"countdown|data-timer|\b\d{2}:\d{2}:\d{2}:\d{2}\b", html, re.IGNORECASE),
