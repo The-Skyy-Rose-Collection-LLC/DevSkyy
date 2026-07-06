@@ -90,6 +90,13 @@
 	// State: dormant | walking-in | greeting | idle | speaking | exiting
 	var state = 'dormant';
 
+	// Bridge to skyy-3d.js: every state transition (and gesture moment) is
+	// broadcast as a `skyy:*` CustomEvent so the 3D loader can switch
+	// animation clips. skyy-3d.js listens; nothing else needs these.
+	function emitSkyy(name) {
+		document.dispatchEvent(new CustomEvent('skyy:' + name));
+	}
+
 	var typewriterTimer  = null;
 	var autoDismissTimer = null;
 	var idleTimer        = null;
@@ -273,6 +280,7 @@
 	function speak(text, chips) {
 		clearTimeout(autoDismissTimer);
 		state = 'speaking';
+		emitSkyy('speaking');
 		mascotEl.classList.add('skyy--speaking');
 		triggerBtn.setAttribute('aria-expanded', 'true');
 
@@ -324,7 +332,10 @@
 					askTrigger.hidden = true;
 				}
 			}
-			if (state === 'speaking') state = 'idle';
+			if (state === 'speaking') {
+				state = 'idle';
+				emitSkyy('idle');
+			}
 		}, 300);
 	}
 
@@ -501,6 +512,7 @@
 	function walkOn(isProactive) {
 		if (state === 'walking-in' || state === 'idle' || state === 'speaking') return;
 		state = 'walking-in';
+		emitSkyy('walking-in');
 		mascotEl.setAttribute('aria-hidden', 'false');
 		mascotEl.classList.remove('skyyrose-mascot--hidden', 'skyyrose-mascot--exiting');
 		mascotEl.classList.add('skyyrose-mascot--entering');
@@ -510,6 +522,7 @@
 			mascotEl.classList.remove('skyyrose-mascot--entering');
 			mascotEl.classList.add('skyyrose-mascot--idle');
 			state = 'idle';
+			emitSkyy('idle');
 
 			// First visit = one contextual nudge, never a tour. Greet once
 			// per session; never resurface the same greeting after that.
@@ -522,7 +535,9 @@
 				} catch (e) { /* degrade silently */ }
 				var script = SCRIPTS[context] || SCRIPTS['default'];
 				var greetingText = mascotConfig.pageTip ? mascotConfig.pageTip : script.greeting.text;
-				proactiveSpeak('greeting:' + context, greetingText, script.greeting.chips);
+				if (proactiveSpeak('greeting:' + context, greetingText, script.greeting.chips)) {
+					emitSkyy('wave');
+				}
 				recordProactiveAppearance();
 			}
 		}, walkDuration);
@@ -530,6 +545,7 @@
 
 	function walkOff(onDone) {
 		state = 'exiting';
+		emitSkyy('exiting');
 		dismissBubble();
 		clearTimeout(idleTimer);
 		mascotEl.classList.remove('skyyrose-mascot--idle', 'skyyrose-mascot--entering');
