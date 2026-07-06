@@ -99,6 +99,24 @@
 		});
 	}
 
+
+	/* --------------------------------------------------
+	   In-page anchor drift correction: content above lazy
+	   sections grows after the initial jump (#shop landed
+	   ~5000px past the grid on collection pages).
+	   -------------------------------------------------- */
+	document.addEventListener('click', function (e) {
+		var link = e.target.closest('a[href="#shop"], a[href="#experience"]');
+		if (!link) return;
+		var target = document.querySelector(link.getAttribute('href'));
+		if (!target) return;
+		e.preventDefault();
+		target.scrollIntoView({ behavior: 'smooth' });
+		setTimeout(function () {
+			target.scrollIntoView({ behavior: 'smooth' });
+		}, 900);
+	});
+
 	if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
 	if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
 

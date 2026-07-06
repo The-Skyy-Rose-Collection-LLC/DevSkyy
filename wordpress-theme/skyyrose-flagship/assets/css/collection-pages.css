@@ -70,7 +70,7 @@
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--skyyrose-accent);
-	margin-bottom: 32px;
+	margin-bottom: 56px; /* clears the script lockup ascender (eyebrow overlapped 'THE') */
 }
 
 .col-hero__title {
@@ -619,4 +619,13 @@
 	.col-features__card,
 	.col-crossnav__link { transition: none; }
 	.col-founder-quote__text { transition: none; }
+}
+
+/* Wide small-caps tracking is a label treatment — paragraph-length hero
+   subtitles wrap 6-7 lines on mobile with it. Relax below 600px. */
+@media (max-width: 600px) {
+	.col-hero__subtitle {
+		letter-spacing: 1.5px;
+		line-height: 1.65;
+	}
 }
