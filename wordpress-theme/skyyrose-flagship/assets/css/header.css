@@ -284,12 +284,36 @@
 	outline-offset: -2px;
 	color: var(--color-rose-gold, #B76E79);
 }
+/* Relocated primary menu — navigation.js moves the single .navbar__menu node
+   into the drawer at ≤1024px. Neutralize its desktop layout inside the drawer. */
+.mobile-menu__nav .navbar__menu {
+	display: block;
+	gap: 0;
+}
+.mobile-menu__nav .navbar__menu > li.menu-item-has-children > a::after {
+	display: none;
+}
+
 /* Mobile dropdown sub-menus — always expanded (no hover on touch) */
 .mobile-menu__nav .sub-menu {
+	position: static;
+	transform: none;
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	min-width: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
 	list-style: none;
 	margin: 0;
 	padding: 0 0 8px 0;
 	background: rgba(255, 255, 255, 0.02);
+}
+.mobile-menu__nav .sub-menu::before {
+	display: none;
 }
 .mobile-menu__nav .sub-menu li a {
 	display: block;

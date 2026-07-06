@@ -14,12 +14,12 @@
 
 :root {
 	--kc-sunrise: #F4A261;
-	--kc-sky:     #A8D8EA;
+	--kc-sky:     #D8A1AA;
 	--kc-bloom:   #E8A0BF;
 	--kc-mint:    #B8F0C8;
 	--kc-cloud:   #F8F4EE;
-	--kc-night:   #1A1A2E;
-	--kc-dawn:    linear-gradient(135deg, #A8D8EA 0%, #E8A0BF 40%, #F4A261 80%, #B76E79 100%);
+	--kc-night:   #171310;
+	--kc-dawn:    linear-gradient(135deg, #D8A1AA 0%, #E8A0BF 40%, #F4A261 80%, #B76E79 100%);
 }
 
 /* ---------------------------------------------------------------

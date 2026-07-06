@@ -35,7 +35,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Elegance distilled into every fiber. You don\'t wear it to stand out. You wear it because you already stood up.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Discover', 'skyyrose' ),
 			'hero_3d_label'       => __( 'View 3D Experience', 'skyyrose' ),
-			'experience_url'      => '/experience-black-rose/',
+			'experience_url'      => '#experience',
 			'marquee'             => array(
 				__( 'Dark Elegance', 'skyyrose' ),
 				__( 'Quiet Authority', 'skyyrose' ),
@@ -112,7 +112,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_subtitle'       => __( 'But even the Beast kept a rose under glass — protecting the most fragile thing he ever loved. This collection carries the weight of three generations of Hurts.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Explore', 'skyyrose' ),
 			'hero_3d_label'       => __( 'Enter the 3D Experience', 'skyyrose' ),
-			'experience_url'      => '/experience-love-hurts/',
+			'experience_url'      => '#experience',
 			'marquee'             => array(
 				__( 'The Hurts Bloodline', 'skyyrose' ),
 				__( 'Love Is Worth the Pain', 'skyyrose' ),
@@ -189,7 +189,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_subtitle'       => __( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Discover', 'skyyrose' ),
 			'hero_3d_label'       => __( 'View 3D Experience', 'skyyrose' ),
-			'experience_url'      => '/experience-signature/',
+			'experience_url'      => '#experience',
 			'marquee'             => array(
 				__( 'The Foundation', 'skyyrose' ),
 				__( 'Est. Oakland', 'skyyrose' ),

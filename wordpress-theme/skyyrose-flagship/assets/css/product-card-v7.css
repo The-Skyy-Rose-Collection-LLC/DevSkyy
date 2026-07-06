@@ -51,6 +51,19 @@
 }
 .v7card:hover .v7card__logo { opacity: .26; transform: scale(1.04); }
 
+/* Star-plaque backdrops (dark full-scene art needs more presence than the
+   light logo marks to read against the void-black card). */
+.v7card[data-collection="black-rose"] .v7card__logo,
+.v7card[data-collection="love-hurts"] .v7card__logo {
+	background-size: contain;
+	opacity: .24;
+	filter: none;
+}
+.v7card[data-collection="black-rose"]:hover .v7card__logo,
+.v7card[data-collection="love-hurts"]:hover .v7card__logo {
+	opacity: .34;
+}
+
 .v7card__carousel { position: absolute; inset: 0; z-index: 1; }
 .v7card__shot {
 	position: absolute;
@@ -133,6 +146,30 @@
 .v7card__add:active { transform: scale(.97); }
 .v7card__add.loading { opacity: .6; pointer-events: none; }
 .v7card__add.added::after { content: " ✓"; }
+
+/* Secondary AJAX quick-add (WS5) — ghost variant beside the primary View Piece. */
+.v7card__quickadd {
+	display: inline-block;
+	margin-top: 6px;
+	margin-left: 8px;
+	font-family: 'Bebas Neue', sans-serif;
+	letter-spacing: .16em;
+	font-size: 13px;
+	text-transform: uppercase;
+	text-align: center;
+	color: var(--v7-accent);
+	background: transparent;
+	border: 1px solid var(--v7-accent);
+	border-radius: 8px;
+	padding: 10px 14px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background .25s, color .25s, transform .15s;
+}
+.v7card__quickadd:hover { background: var(--v7-accent); color: #0a0a0a; }
+.v7card__quickadd:active { transform: scale(.97); }
+.v7card__quickadd.loading { opacity: .6; pointer-events: none; }
+.v7card__quickadd.added::after { content: " ✓"; }
 
 @media (prefers-reduced-motion: reduce) {
 	.v7card, .v7card__shot, .v7card__logo, .v7card__add { transition: none !important; }

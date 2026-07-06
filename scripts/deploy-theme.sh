@@ -552,23 +552,70 @@ try_rsync() {
     log_success "Theme uploaded and extracted"
 }
 
+# Convert one rsync exclude glob into an lftp-compatible extended regex
+# (lftp mirror's -x/--exclude takes a REGEX, matched per lftp(1); rsync's
+# excludes are GLOBS -- passing them straight through breaks the mirror,
+# e.g. lftp aborts on '*.map' with "Invalid preceding regular expression",
+# 2026-07-02 deploy failure).
+#
+# rsync's own anchoring rules, ported to regex:
+#   - a leading '/', or a '/' anywhere but trailing, anchors the pattern to
+#     the start of the relative path (rsync matches these against the full
+#     path from the transfer root).
+#   - no '/' at all, or only a trailing '/', matches a whole path SEGMENT
+#     at any depth (rsync matches these against the final path component,
+#     but at any depth in the tree).
+# A naive escape-dots-only conversion leaves the regex unanchored, so it
+# matches as a substring anywhere: 'node_modules' would also exclude
+# 'assets/js/lib/fake_node_modules_shim.js', and '.git' would exclude
+# 'assets/legit.github-badge.png'. Anchoring to path segments fixes both.
+#
+# A trailing '/' in the source glob marks a directory-only exclude in
+# rsync; lftp appends '/' when testing a directory's path against
+# --exclude (per lftp(1)), so requiring a literal trailing '/' in the
+# regex reproduces that directory-only behavior (a same-named plain file
+# is left alone).
+rsync_glob_to_lftp_regex() {
+    local raw="$1" is_dir=0 anchored=0
+
+    [[ "$raw" == */ ]] && { is_dir=1; raw="${raw%/}"; }
+    [[ "$raw" == /* ]] && { anchored=1; raw="${raw#/}"; }
+    [[ "$raw" == */* ]] && anchored=1
+
+    # Placeholder the glob wildcards before escaping so the escape step
+    # below leaves them alone, then swap in their regex equivalents.
+    raw="${raw//\*\*/$'\x01'}"
+    raw="${raw//\*/$'\x02'}"
+    # ']' must lead the class to be a literal member (POSIX bracket-
+    # expression rule) -- this escapes every other ERE metachar.
+    raw="$(printf '%s' "$raw" | sed -E 's/[]^$.+?(){}|\[]/\\&/g')"
+    raw="${raw//$'\x01'/.*}"
+    raw="${raw//$'\x02'/[^/]*}"
+
+    local prefix suffix
+    [[ "$anchored" -eq 1 ]] && prefix="^" || prefix="(^|/)"
+    [[ "$is_dir" -eq 1 ]] && suffix="/" || suffix='($|/)'
+    printf '%s%s%s' "$prefix" "$raw" "$suffix"
+}
+
 try_lftp() {
     if ! command -v lftp &>/dev/null; then
         log_warn "lftp not installed -- cannot use SFTP fallback"
         return 1
     fi
 
-    # Convert rsync excludes (GLOBS) to lftp exclude format (REGEX).
-    # Passing globs straight through breaks the mirror: lftp aborts on '*.map'
-    # with "Invalid preceding regular expression" (2026-07-02 deploy failure).
+    # Convert rsync excludes (GLOBS) to lftp exclude format (REGEX) via
+    # rsync_glob_to_lftp_regex (above). Each regex is single-quoted going
+    # into the lftp -c script since anchored regexes now contain '(', '|',
+    # '$' -- characters lftp's own command tokenizer shouldn't have to
+    # guess about.
     local lftp_excludes=""
     for exc in "${RSYNC_EXCLUDES[@]}"; do
         local pattern="${exc#--exclude=}"
         pattern="${pattern//\'/}"
-        pattern="${pattern%/}"          # trailing dir slash — regex matches path segments anyway
-        pattern="${pattern//./\\.}"     # escape literal dots
-        pattern="${pattern//\*/.*}"     # glob star -> regex .*
-        lftp_excludes="$lftp_excludes --exclude $pattern"
+        local regex
+        regex="$(rsync_glob_to_lftp_regex "$pattern")"
+        lftp_excludes="$lftp_excludes --exclude '$regex'"
     done
 
     if [[ "$DRY_RUN" == "true" ]]; then

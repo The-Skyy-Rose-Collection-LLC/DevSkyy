@@ -427,7 +427,7 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 				<?php esc_html_e( 'Oakland, California — Est. 2020', 'skyyrose' ); ?>
 			</span>
 			<span class="cs-foot__col cs-reveal" data-delay="4">
-				<a class="cs-foot__link" href="https://instagram.com/theskyyrosecollection" rel="noopener noreferrer" target="_blank">
+				<a class="cs-foot__link" href="https://instagram.com/skyyrose.co" rel="noopener noreferrer" target="_blank">
 					<?php esc_html_e( 'Instagram', 'skyyrose' ); ?>
 				</a>
 			</span>

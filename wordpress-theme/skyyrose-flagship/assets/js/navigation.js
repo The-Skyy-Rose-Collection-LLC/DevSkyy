@@ -36,13 +36,42 @@
 	}, true);
 
 	/* --------------------------------------------------
-	   Hamburger Toggle (Mobile)
+	   Single-Menu Relocation (Desktop ⇄ Mobile Drawer)
+	   The primary menu is server-rendered once inside
+	   .navbar__nav-wrapper; at ≤1024px the same node moves
+	   into the drawer. One DOM node, two homes.
 	   -------------------------------------------------- */
 	var toggle  = document.querySelector('#mobile-menu-toggle');
 	var nav     = document.querySelector('.navbar__nav-wrapper');
 	var mobilePanel = document.querySelector('#mobile-menu');
 	var mobileClose = document.querySelector('#mobile-menu-close');
 	var mobileOverlay = document.querySelector('#mobile-menu-overlay');
+
+	var primaryMenu = document.querySelector('.navbar__nav-wrapper .navbar__menu');
+	var drawerNav   = document.querySelector('.mobile-menu__nav');
+	var drawerMq    = window.matchMedia('(max-width: 1024px)');
+
+	function placePrimaryMenu() {
+		if (!primaryMenu || !nav || !drawerNav) return;
+		var home = drawerMq.matches ? drawerNav : nav;
+		if (primaryMenu.parentElement !== home) {
+			home.appendChild(primaryMenu);
+		}
+	}
+	function onDrawerBreakpointChange() {
+		placePrimaryMenu();
+		// Crossing up past 1024px while the drawer is open would strand a
+		// full-viewport, click-blocking, now-empty overlay — close it.
+		if (!drawerMq.matches) {
+			closeMobileMenu();
+		}
+	}
+	placePrimaryMenu();
+	if (typeof drawerMq.addEventListener === 'function') {
+		drawerMq.addEventListener('change', onDrawerBreakpointChange);
+	} else if (typeof drawerMq.addListener === 'function') {
+		drawerMq.addListener(onDrawerBreakpointChange);
+	}
 
 	function closeMobileMenu() {
 		if (mobilePanel) {

@@ -141,7 +141,7 @@ function skyyrose_rebuild_menu_items() {
 
 // One-time rebuild trigger on init — bump SKYYROSE_MENU_BUILD_VERSION to re-run.
 // Fires after skyyrose_setup_menus() (priority 20 vs 10) so menu objects exist.
-define( 'SKYYROSE_MENU_BUILD_VERSION', 'v701' );
+define( 'SKYYROSE_MENU_BUILD_VERSION', 'v702' );
 
 add_action(
 	'init',
@@ -163,7 +163,7 @@ add_action(
  */
 function skyyrose_get_menu_definitions() {
 	return array(
-		'primary'      => array(
+		'primary' => array(
 			'name'  => __( 'Primary Menu', 'skyyrose' ),
 			'items' => array(
 				array(
@@ -176,50 +176,30 @@ function skyyrose_get_menu_definitions() {
 					'children' => array(
 						array(
 							'title' => __( 'Black Rose', 'skyyrose' ),
-							'url'   => '/collection-black-rose/',
+							'url'   => '/collections/black-rose/',
 						),
 						array(
 							'title' => __( 'Love Hurts', 'skyyrose' ),
-							'url'   => '/collection-love-hurts/',
+							'url'   => '/collections/love-hurts/',
 						),
 						array(
 							'title' => __( 'Signature', 'skyyrose' ),
-							'url'   => '/collection-signature/',
+							'url'   => '/collections/signature/',
 						),
 						array(
 							'title' => __( 'Kids Capsule', 'skyyrose' ),
-							'url'   => '/collection-kids-capsule/',
+							'url'   => '/collections/kids-capsule/',
 						),
 					),
 				),
-				array(
-					'title'    => __( 'Experiences', 'skyyrose' ),
-					'url'      => '/experiences/',
-					'children' => array(
-						array(
-							'title' => __( 'The Garden', 'skyyrose' ),
-							'url'   => '/experience-black-rose/',
-						),
-						array(
-							'title' => __( 'The Ballroom', 'skyyrose' ),
-							'url'   => '/experience-love-hurts/',
-						),
-						array(
-							'title' => __( 'The Runway', 'skyyrose' ),
-							'url'   => '/experience-signature/',
-						),
-						array(
-							'title' => __( 'Heir Apparent', 'skyyrose' ),
-							'url'   => '/experience-kids-capsule/',
-						),
-					),
-				),
+				// Experiences tree removed (structural remediation WS3) — each
+				// experience is now the opening layer of its collection page.
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose' ),
 					'url'   => '/pre-order/',
 				),
 				array(
-					'title' => __( 'About', 'skyyrose' ),
+					'title' => __( 'Our Story', 'skyyrose' ),
 					'url'   => '/about/',
 				),
 				array(
@@ -228,11 +208,11 @@ function skyyrose_get_menu_definitions() {
 				),
 			),
 		),
-		'footer'       => array(
+		'footer'  => array(
 			'name'  => __( 'Footer Menu', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'About', 'skyyrose' ),
+					'title' => __( 'Our Story', 'skyyrose' ),
 					'url'   => '/about/',
 				),
 				array(
@@ -241,7 +221,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'FAQ', 'skyyrose' ),
-					'url'   => '/contact/#faq',
+					'url'   => '/faq/',
 				),
 				array(
 					'title' => __( 'Privacy Policy', 'skyyrose' ),
