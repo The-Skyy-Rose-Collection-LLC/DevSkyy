@@ -118,7 +118,7 @@ function skyyrose_get_collections_config(): array {
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_SOFT_PINK,
 				'secondary' => SKYYROSE_COLOR_LAVENDER,
-				'accent'    => SKYYROSE_COLOR_GOLD,
+				'accent'    => SKYYROSE_COLOR_ROSE_GOLD,
 			),
 			'front_page'  => array(
 				'title'          => 'Kids<br>Capsule',

@@ -141,7 +141,7 @@ function skyyrose_rebuild_menu_items() {
 
 // One-time rebuild trigger on init — bump SKYYROSE_MENU_BUILD_VERSION to re-run.
 // Fires after skyyrose_setup_menus() (priority 20 vs 10) so menu objects exist.
-define( 'SKYYROSE_MENU_BUILD_VERSION', 'v700' );
+define( 'SKYYROSE_MENU_BUILD_VERSION', 'v701' );
 
 add_action(
 	'init',
@@ -262,48 +262,9 @@ function skyyrose_get_menu_definitions() {
 		// waste. If mobile and desktop menus ever need to diverge, register 'mobile'
 		// in theme-setup.php and re-add it here.
 
-		'collection'   => array(
-			'name'  => __( 'Collection Navigation', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'Black Rose', 'skyyrose' ),
-					'url'   => '/collection-black-rose/',
-				),
-				array(
-					'title' => __( 'Love Hurts', 'skyyrose' ),
-					'url'   => '/collection-love-hurts/',
-				),
-				array(
-					'title' => __( 'Signature', 'skyyrose' ),
-					'url'   => '/collection-signature/',
-				),
-				array(
-					'title' => __( 'Kids Capsule', 'skyyrose' ),
-					'url'   => '/collection-kids-capsule/',
-				),
-			),
-		),
-		'experiences'  => array(
-			'name'  => __( 'Experiences Navigation', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'The Garden', 'skyyrose' ),
-					'url'   => '/experience-black-rose/',
-				),
-				array(
-					'title' => __( 'The Ballroom', 'skyyrose' ),
-					'url'   => '/experience-love-hurts/',
-				),
-				array(
-					'title' => __( 'The Runway', 'skyyrose' ),
-					'url'   => '/experience-signature/',
-				),
-				array(
-					'title' => __( 'Heir Apparent', 'skyyrose' ),
-					'url'   => '/experience-kids-capsule/',
-				),
-			),
-		),
+		// 'collection' and 'experiences' locations removed (audit 2026-06-28).
+		// These were never called by any template; removed from register_nav_menus()
+		// in theme-setup.php in the same change. No live consumers confirmed.
 	);
 }
 

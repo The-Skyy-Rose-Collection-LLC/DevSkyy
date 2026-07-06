@@ -139,7 +139,9 @@ function skyyrose_get_product_display_image( $product ) {
 	if ( ! is_array( $product ) ) {
 		return '';
 	}
-	foreach ( array( 'image', 'front_model_image', 'back_image', 'back_model_image' ) as $slot ) {
+	// IMAGERY PRECEDENCE (canon, 2026-06-16): front-model-first, matching
+	// product-card-holo.php and the WC ghost-loop filter. Keep all three in sync.
+	foreach ( array( 'front_model_image', 'image', 'back_model_image', 'back_image' ) as $slot ) {
 		$value = $product[ $slot ] ?? '';
 		if ( is_string( $value ) && '' !== $value ) {
 			return $value;

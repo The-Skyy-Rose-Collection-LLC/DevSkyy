@@ -2,8 +2,7 @@
 /**
  * Template Name: About
  *
- * Editorial scroll-cinema, streetwear-luxury register (KITH lookbook
- * x Drake Related x FOG Eternal restraint).
+ * Editorial scroll-cinema, streetwear-luxury register (KITH lookbook x FOG Eternal restraint).
  *
  * Sections: Hero (asymmetric metadata stack) -> Chapter I (Origin)
  *           -> Mission Banner -> Chapter II (Collections grid)
@@ -74,7 +73,7 @@ $timeline_milestones = array(
 	array(
 		'year'  => '2021',
 		'event' => 'Three Chapters Drop',
-		'desc'  => 'Black Rose. Love Hurts. Signature. Three collections, one bloodline &mdash; not a launch, a declaration.',
+		'desc'  => 'Black Rose. Love Hurts. Signature. Three collections, one name &mdash; not a launch, a declaration.',
 	),
 	array(
 		'year'  => '2023',

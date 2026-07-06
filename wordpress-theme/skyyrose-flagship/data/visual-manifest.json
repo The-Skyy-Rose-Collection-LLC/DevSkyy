@@ -30,7 +30,7 @@
         ],
         "kind": "monogram",
         "status": "verified",
-        "notes": "SR monogram, gold. Rhythm element: marquees, dividers, footers, seals. White-bg jpeg — prefer webp/avif with transparency check before light backgrounds."
+        "notes": "SR monogram, gold. Rhythm element: marquees, dividers, footers, seals. White-bg jpeg \u2014 prefer webp/avif with transparency check before light backgrounds."
       },
       {
         "path": "images/logos/sr-monogram-rose-gold",
@@ -52,7 +52,7 @@
         ],
         "kind": "seal-patch",
         "status": "verified",
-        "notes": "Circular collection patch. Ships on a WHITE SQUARE background — circle-crop (border-radius:50% + object-fit:cover) before display on dark surfaces."
+        "notes": "Circular collection patch. Ships on a WHITE SQUARE background \u2014 circle-crop (border-radius:50% + object-fit:cover) before display on dark surfaces."
       }
     ],
     "hero_backdrops": [
@@ -79,7 +79,7 @@
         ],
         "kind": "hero-video",
         "status": "verified",
-        "notes": "Purpose-made pre-order hero film (model in BR satin sherpa, Oakland night). Pair with luxury-nighttime poster. 6.9MB mp4 — preload=metadata, save-data guard mandatory."
+        "notes": "Purpose-made pre-order hero film (model in BR satin sherpa, Oakland night). Pair with luxury-nighttime poster. 6.9MB mp4 \u2014 preload=metadata, save-data guard mandatory."
       },
       {
         "path": "images/branding/rose-gold-spin",
@@ -103,7 +103,7 @@
       ],
       "kind": "collection-lockup",
       "status": "verified",
-      "notes": "THE Black Rose Collection script with rose. BLACK lettering — on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
+      "notes": "THE Black Rose Collection script with rose. BLACK lettering \u2014 on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
     },
     "lockup_display": {
       "path": "images/lockups/black-rose-lockup.webp",
@@ -112,7 +112,7 @@
       ],
       "kind": "collection-lockup-display",
       "status": "verified",
-      "notes": "CANONICAL display lockup — high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
+      "notes": "CANONICAL display lockup \u2014 high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
     },
     "lockup_svg_master": {
       "path": "branding/vectorized/black-rose-script.svg",
@@ -173,6 +173,26 @@
         "kind": "collection-hero-art",
         "status": "verified",
         "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-courtyard",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR courtyard immersive scene still \u2014 crop of night-editorial master."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-gazebo",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR gazebo immersive scene still."
       }
     ],
     "patches": [
@@ -255,7 +275,11 @@
           "768w.webp",
           "1280w.webp",
           "1680w.webp",
-          "1680w.jpg"
+          "1680w.jpg",
+          "480w.avif",
+          "768w.avif",
+          "1280w.avif",
+          "1680w.avif"
         ],
         "kind": "cinematic-backdrop",
         "status": "verified",
@@ -282,7 +306,7 @@
       ],
       "kind": "collection-lockup-display",
       "status": "verified",
-      "notes": "CANONICAL display lockup — full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
+      "notes": "CANONICAL display lockup \u2014 full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
     },
     "lockup_svg_master": {
       "path": "branding/vectorized/love-hurts-full-lettering.svg",
@@ -303,7 +327,7 @@
         ],
         "kind": "collection-lockup-part",
         "status": "verified",
-        "notes": "'Love' script alone — stacked/split hero compositions."
+        "notes": "'Love' script alone \u2014 stacked/split hero compositions."
       },
       {
         "path": "images/hero-overlays/lh-logo-hurts",
@@ -411,7 +435,7 @@
         ],
         "kind": "scene-art",
         "status": "verified",
-        "notes": "LH cathedral immersive scene still. Heavy atmospheric — hero/manifesto scale."
+        "notes": "LH cathedral immersive scene still. Heavy atmospheric \u2014 hero/manifesto scale."
       },
       {
         "path": "branding/collection-logo-love-hurts",
@@ -429,7 +453,7 @@
         ],
         "kind": "collection-logo-alt",
         "status": "verified",
-        "notes": "Red neon star — ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
+        "notes": "Red neon star \u2014 ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
       }
     ],
     "lookbook": [
@@ -472,7 +496,7 @@
       ],
       "kind": "collection-lockup",
       "status": "verified",
-      "notes": "Gold script — doubles as brand lockup (see brand_global). The lockup IS the collection name."
+      "notes": "Gold script \u2014 doubles as brand lockup (see brand_global). The lockup IS the collection name."
     },
     "lockup_display": {
       "path": "images/lockups/signature-lockup.webp",
@@ -481,7 +505,7 @@
       ],
       "kind": "collection-lockup-display",
       "status": "verified",
-      "notes": "CANONICAL display lockup — gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
+      "notes": "CANONICAL display lockup \u2014 gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
     },
     "lockup_svg_master": {
       "path": "branding/vectorized/signature-script.svg",
@@ -522,6 +546,26 @@
         "kind": "collection-logo",
         "status": "verified",
         "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "images/immersive/scene-signature-golden-gate",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG golden-gate immersive scene still."
+      },
+      {
+        "path": "images/immersive/scene-signature-bay-bridge",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
       }
     ],
     "lookbook": [
@@ -549,7 +593,7 @@
       ],
       "kind": "collection-lockup",
       "status": "verified",
-      "notes": "Kids Capsule uses the rose-gold monogram as its mark (no dedicated script lockup exists yet). Launch-mode collection — empty grid by design."
+      "notes": "Kids Capsule uses the rose-gold monogram as its mark (no dedicated script lockup exists yet). Launch-mode collection \u2014 empty grid by design."
     },
     "lookbook": [
       {
@@ -564,14 +608,36 @@
         "status": "verified",
         "notes": "Kid wearing Black Rose piece. Kids Capsule surfaces (founder-assigned 2026-06-11)."
       }
+    ],
+    "atmospherics": [
+      {
+        "path": "images/immersive/scene-kids-capsule-playroom",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "KC playroom immersive scene still \u2014 canon regen 2026-07-02 (dark premium, no pastels)."
+      },
+      {
+        "path": "images/immersive/scene-kids-capsule-runway",
+        "formats": [
+          "webp",
+          "avif"
+        ],
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "KC runway immersive scene still \u2014 canon regen 2026-07-02."
+      }
     ]
   },
   "usage_rules": [
-    "Product imagery (model shots, ghosts, flats) resolves through skyyrose-catalog.csv columns — never this file, never invented paths, never per-product subdirectory guesses.",
+    "Product imagery (model shots, ghosts, flats) resolves through skyyrose-catalog.csv columns \u2014 never this file, never invented paths, never per-product subdirectory guesses.",
     "Collection lockup images ARE the collection names. Never type-render a collection name as a hero or panel title.",
     "Cross-collection imagery use (e.g., red roses on a Black Rose surface) is a canon violation unless this manifest registers the asset to that collection.",
     "Black-lettering lockups (br-*) require the invert treatment or a light ground.",
-    "Filenames are NOT identity — this manifest is. If pixels contradict the registry entry, stop and flag (see the 2026-06-10 sherpa mis-file).",
+    "Filenames are NOT identity \u2014 this manifest is. If pixels contradict the registry entry, stop and flag (see the 2026-06-10 sherpa mis-file).",
     "New imagery enters this manifest in the same commit that adds the files; status starts at needs-founder-review unless Corey assigns it."
   ]
 }
