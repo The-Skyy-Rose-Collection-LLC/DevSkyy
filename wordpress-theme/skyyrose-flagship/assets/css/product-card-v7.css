@@ -174,3 +174,11 @@
 @media (prefers-reduced-motion: reduce) {
 	.v7card, .v7card__shot, .v7card__logo, .v7card__add { transition: none !important; }
 }
+
+/* Love Hurts CTA contrast: brand crimson #DC143C with dark ink computes 3.97:1
+   (below AA). CTA surface uses a deepened crimson with white ink (6.4:1);
+   the collection accent token itself is unchanged. */
+.v7card[data-collection="love-hurts"] .v7card__add {
+	background: #a50f2d;
+	color: #fff;
+}

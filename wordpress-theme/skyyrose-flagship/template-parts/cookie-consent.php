@@ -52,7 +52,7 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	if ( ! banner || ! accept || ! decline ) return;
 	banner.classList.remove( 'cookie-consent--hidden' );
 	// Move focus to accept button so keyboard users reach the dialog immediately.
-	setTimeout( function() { accept.focus(); }, 100 );
+	setTimeout( function() { accept.focus( { preventScroll: true } ); }, 100 );
 	function dismiss( value ) {
 		localStorage.setItem( 'skyyrose_cookie_consent', value );
 		banner.classList.add( 'cookie-consent--hidden' );

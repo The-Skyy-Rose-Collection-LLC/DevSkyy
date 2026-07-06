@@ -40,7 +40,7 @@
    BASE RESETS (homepage body context)
    ========================================================================== */
 .homepage-v2 {
-	background: var(--void);
+	background: var(--void, #050505);
 	color: #fff;
 	font-family: 'Cormorant Garamond', serif;
 	-webkit-font-smoothing: antialiased;
@@ -63,7 +63,7 @@
 	position: fixed;
 	inset: 0;
 	z-index: 10000;
-	background: var(--void);
+	background: var(--void, #050505);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -301,7 +301,7 @@
 }
 .hero-cta-primary {
 	background: #fff;
-	color: var(--void);
+	color: var(--void, #050505);
 }
 .hero-cta-primary:hover {
 	background: var(--rose);
@@ -363,7 +363,7 @@
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
-	opacity: .6;
+	opacity: .9; /* AA contrast at rest (was .6 = 2.5:1) */
 	margin-bottom: 32px;
 }
 .press-logos {
@@ -379,7 +379,7 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--haze);
-	opacity: .4;
+	opacity: .75; /* AA contrast at rest (was .4 = 1.85:1) */
 	transition: opacity .5s var(--ease-luxury), color .5s var(--ease-luxury);
 }
 .press-item:hover { opacity: 1; }
@@ -515,8 +515,8 @@
 	background: rgba(255, 255, 255, 0.02);
 	isolation: isolate;
 	transform: translate3d(
-		calc(var(--mag-x, 0) * 8px),
-		calc(var(--mag-y, 0) * 8px),
+		calc(var(--mag-x, 0) * 14px),
+		calc(var(--mag-y, 0) * 14px),
 		0
 	);
 	transition: border-color .6s var(--ease-luxury), transform .6s var(--ease-luxury);
@@ -681,7 +681,7 @@
 	position: absolute;
 	bottom: -32px;
 	left: -32px;
-	background: var(--void);
+	background: var(--void, #050505);
 	border: 1px solid var(--ghost);
 	padding: 24px 32px;
 	z-index: 3;
@@ -858,7 +858,7 @@
 	transition: all .5s var(--ease-luxury);
 	color: #fff;
 }
-.col-card:hover .col-card-cta { border-color: #fff; background: #fff; color: var(--void); }
+.col-card:hover .col-card-cta { border-color: #fff; background: #fff; color: var(--void, #050505); }
 
 /* Collection name lockup — image replaces type-rendered heading */
 .col-card-name {
@@ -1274,7 +1274,7 @@
 .style-atelier__cta:focus-visible {
 	border-color: var(--rose);
 	background: var(--rose);
-	color: var(--void);
+	color: var(--void, #050505);
 }
 
 /* ==========================================================================
@@ -1562,7 +1562,7 @@
 	padding: 16px 40px;
 	background: #fff;
 	border: 1px solid transparent;
-	color: var(--void);
+	color: var(--void, #050505);
 	font-family: var(--ff-cta);
 	font-size: 14px;
 	letter-spacing: 6px;

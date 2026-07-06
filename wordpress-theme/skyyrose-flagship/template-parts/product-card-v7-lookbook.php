@@ -51,7 +51,7 @@ if ( $v7_product instanceof WC_Product ) {
 		: esc_html( '$' . number_format( (float) $v7['price'], 2 ) );
 }
 ?>
-<article class="v7card" data-collection="<?php echo esc_attr( $v7_collection ); ?>" data-sku="<?php echo esc_attr( $v7_sku ); ?>">
+<article class="v7card" role="listitem" data-collection="<?php echo esc_attr( $v7_collection ); ?>" data-sku="<?php echo esc_attr( $v7_sku ); ?>">
 	<a class="v7card__frame" href="<?php echo esc_url( $v7_permalink ); ?>" aria-label="<?php echo esc_attr( $v7_name ); ?>">
 		<?php if ( $v7_lockup ) : ?>
 			<?php

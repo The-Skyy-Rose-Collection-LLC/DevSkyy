@@ -156,7 +156,7 @@ defined( 'ABSPATH' ) || exit;
 			aria-hidden="true"
 			inert>
 			<div class="search-overlay__container">
-				<h2 id="search-overlay-label" class="screen-reader-text"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></h2>
+				<span id="search-overlay-label" class="screen-reader-text"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></span>
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></label>
 					<input id="search-overlay-input" type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">

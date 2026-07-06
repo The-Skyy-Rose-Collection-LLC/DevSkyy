@@ -247,8 +247,8 @@
 /* overflow:hidden is load-bearing: the panel parks off-canvas via
    translateX(100%), and without clipping here the transformed panel
    widens document scrollWidth by 400px on every page (bug-109). */
-.mobile-menu { position: fixed; inset: 0; z-index: 1500; pointer-events: none; overflow: hidden; }
-.mobile-menu[aria-hidden="false"] { pointer-events: auto; }
+.mobile-menu { position: fixed; inset: 0; z-index: 1500; pointer-events: none; overflow: hidden; visibility: hidden; }
+.mobile-menu[aria-hidden="false"] { pointer-events: auto; visibility: visible; }
 .mobile-menu__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); opacity: 0; transition: opacity .4s;}
 .mobile-menu[aria-hidden="false"] .mobile-menu__overlay { opacity: 1; }
 .mobile-menu__panel {
