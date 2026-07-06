@@ -381,3 +381,107 @@
 		padding: 1rem 0;
 	}
 }
+
+/* ==========================================================================
+   7. SIZE GUIDE PAGE — /size-guide/ (template-size-guide.php, WS4)
+   ========================================================================== */
+
+.sg-page {
+	background: var(--color-dark, #0A0A0A);
+	color: var(--color-warm-100, #EDE6DF);
+}
+.sg-page__hero {
+	max-width: 760px;
+	margin: 0 auto;
+	padding: clamp(96px, 14vh, 150px) 28px 48px;
+	text-align: center;
+}
+.sg-page__eyebrow {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 12px;
+	letter-spacing: 6px;
+	text-transform: uppercase;
+	color: var(--color-rose-gold, #B76E79);
+	margin: 0 0 18px;
+}
+.sg-page__title {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(32px, 5vw, 52px);
+	font-weight: 500;
+	color: #fff;
+	margin: 0 0 16px;
+}
+.sg-page__subtitle {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 18px;
+	line-height: 1.6;
+	color: rgba(237, 230, 223, 0.7);
+	margin: 0;
+}
+.sg-page__section {
+	max-width: 760px;
+	margin: 0 auto;
+	padding: 24px 28px;
+}
+.sg-page__heading {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 24px;
+	font-weight: 500;
+	color: var(--color-rose-gold, #B76E79);
+	margin: 0 0 16px;
+}
+.sg-page__table-wrap {
+	overflow-x: auto;
+	border: 1px solid rgba(183, 110, 121, 0.22);
+	border-radius: var(--skyyrose-radius, 4px);
+}
+.sg-page__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+.sg-page__table th,
+.sg-page__table td {
+	padding: 12px 16px;
+	text-align: left;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.sg-page__table thead th {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 11px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: var(--color-rose-gold, #B76E79);
+	background: rgba(183, 110, 121, 0.06);
+}
+.sg-page__table tbody th {
+	color: #fff;
+	font-weight: 600;
+}
+.sg-page__table tbody tr:last-child th,
+.sg-page__table tbody tr:last-child td {
+	border-bottom: 0;
+}
+.sg-page__help {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 40px 28px 120px;
+	text-align: center;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 17px;
+	color: rgba(237, 230, 223, 0.7);
+}
+.sg-page__contact {
+	display: inline-block;
+	margin-top: 12px;
+	color: var(--color-rose-gold, #B76E79);
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 12px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+.sg-page__contact:hover,
+.sg-page__contact:focus-visible {
+	text-decoration: underline;
+}

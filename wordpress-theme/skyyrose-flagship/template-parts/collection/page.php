@@ -51,10 +51,10 @@ $has_3d    = ! empty( $c['experience_url'] );
  * skyyrose_sot_lockup() → lockup.display_webp.resolved     (maps to hero_logo)
  * Falls back to the hand-maintained $c values when SOT returns ''.
  */
-$sot_hero_bg  = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
+$sot_hero_bg   = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
 $sot_hero_logo = function_exists( 'skyyrose_sot_lockup' ) ? skyyrose_sot_lockup( $slug ) : '';
 
-$resolved_hero_bg  = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
+$resolved_hero_bg   = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
 $resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_logo'] ?? '' );
 
 $has_hero_bg = ! empty( $resolved_hero_bg );
@@ -118,12 +118,44 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			<div class="col-hero__cta-group">
 				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>
-					<a href="<?php echo esc_url( home_url( $c['experience_url'] ) ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
+					<?php
+					// Experience merged into this page (WS3): anchor URLs ('#experience')
+					// link in-page; anything else still routes through home_url().
+					$exp_href = ( 0 === strpos( $c['experience_url'], '#' ) )
+						? $c['experience_url']
+						: home_url( $c['experience_url'] );
+					?>
+					<a href="<?php echo esc_url( $exp_href ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
 				<?php endif; ?>
 			</div>
 		</div>
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
+
+	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
+	<?php
+	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;
+	if ( $experience && ! empty( $experience['rooms'] ) ) :
+		?>
+		<section id="experience" class="col-experience" aria-label="<?php echo esc_attr( $experience['world_name'] ); ?>">
+			<?php
+			get_template_part(
+				'template-parts/immersive/scene',
+				null,
+				array(
+					'collection_slug' => $slug,
+					'collection_name' => $experience['collection_name'],
+					'world_name'      => $experience['world_name'],
+					'tagline'         => $experience['tagline'],
+					'accent_color'    => $experience['accent_color'],
+					'collection_url'  => '',
+					'rooms'           => $experience['rooms'],
+					'embedded'        => true,
+				)
+			);
+			?>
+		</section>
+	<?php endif; ?>
 
 	<?php
 	get_template_part(
@@ -196,7 +228,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose' ); ?></h3>
 		<div class="col-crossnav__grid stagger-grid">
 			<?php foreach ( $cross_nav as $nav ) : ?>
-				<a href="<?php echo esc_url( home_url( '/' . $nav['slug'] . '/' ) ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
+				<a href="<?php echo esc_url( $nav['url'] ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
 					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
 					<p><?php echo esc_html( $nav['desc'] ); ?></p>
 				</a>

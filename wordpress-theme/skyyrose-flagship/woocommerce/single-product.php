@@ -76,6 +76,8 @@ while ( have_posts() ) :
 									class="sr-gallery-img"
 									id="srMainImg"
 									alt="<?php echo esc_attr( get_the_title() ); ?>"
+									width="640"
+									height="800"
 									loading="eager"
 									decoding="async"
 									fetchpriority="high">
@@ -132,6 +134,7 @@ while ( have_posts() ) :
 									: esc_html__( 'Pre-Order', 'skyyrose' );
 								?>
 							</div>
+							<?php if ( function_exists( 'skyyrose_render_fit_block' ) ) { skyyrose_render_fit_block( $product->get_id() ); } ?>
 						</div>
 					</div>
 				</div>

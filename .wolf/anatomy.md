@@ -38,6 +38,7 @@
 - `fastmcp.config.json` (~287 tok)
 - `fly.toml` — fly.toml - DevSkyy Enterprise Platform (~1070 tok)
 - `G1-BUNDLE.md` — G1 STOP — Phase 0 Review Bundle (~2329 tok)
+- `glb-models.html` — 33-SKU 3D GLB keep/delete QC sheet; model-viewer + meshopt/basis/draco decoders; serve over HTTP (`python3 -m http.server 8010`), file://-robust via CDN fallback + warning banner (~7000 tok)
 - `HANDOFF.md` — Session Handoff — 2026-04-16 (~1575 tok)
 - `init.sql` — DevSkyy Database Initialization (~1088 tok)
 - `INITIAL_EXAMPLE.md` — FEATURE: (~324 tok)
@@ -55,6 +56,7 @@
 - `pyproject.toml` — Python project configuration (~4212 tok)
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
+- `render-review.html` — all-engines render keep/delete QC sheet, 1719 inline `<img>` across 18 engine groups (HUB/source/OAI/Gemini/FLUX/Tripo/LoRA/legacy/…); localStorage marks + Blob delete-list download; works over file:// (plain images, no decoder), file://-robust via per-img "⚠ file missing" badge + accurate note (~190000 tok — do NOT full-read; edit by anchor) (~190k tok)
 - `requirements-dev.txt` — Development Dependencies (~85 tok)
 - `requirements-full.txt` — DevSkyy - Full ML/3D Dependencies (~46 tok)
 - `requirements-imagery.txt` — Nano Banana 2 — SkyyRose AI Image Pipeline (~130 tok)
@@ -2926,6 +2928,13 @@
 - `ship.sh` — Ship gate — composite pre-push gate. Fail-fast: cheap stages first. (~1112 tok)
 - `tdd.sh` — TDD gate — RED / GREEN / coverage enforcement via pytest (~1096 tok)
 
+## scripts/font_generator/
+
+- `__init__.py` (~0 tok)
+- `template.py` — generate_template/save_template: blank fill-in PNG grid + manifest.json (cell bboxes, gray guide marks, sha256 chars_fingerprint) for a hand-filled glyph sheet (~1171 tok)
+- `pipeline.py` — build_font: vectorizes a filled-in scan via potrace + fontTools (Cu2QuPen, double y-flip transform — see cerebrum) into a .ttf; _validate_manifest guards dup chars/codepoints + OOB bbox (~2956 tok)
+- `cli.py` — argparse CLI: `template`/`build` subcommands wrapping the two functions above (~1326 tok)
+
 ## scripts/hooks/
 
 - `strip-claude-mem-stubs.sh` — Pre-commit hook: strip empty <claude-mem-context> stubs from staged files. (~809 tok)
@@ -3900,3 +3909,5 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `src/types.ts` — exports Collection type ('signature'|'black-rose'|'love-hurts'|'kids-capsule') (~50 tok)
 - `src/index.ts` — re-exports Collection from ./types; placeholder for component exports (~50 tok)
 - `test/smoke.test.ts` — verifies module loads (1 test) (~80 tok)
+
+- `wordpress-theme/skyyrose-flagship/inc/collection-sot-reader.php` — collection sot.json reader + per-SKU product-image resolver `skyyrose_sot_product_image(_uri)($sku,$view)` (front-first, CSV fallback, placeholder). ~330t

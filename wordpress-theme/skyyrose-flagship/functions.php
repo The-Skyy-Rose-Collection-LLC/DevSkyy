@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.6.5' );
+define( 'SKYYROSE_VERSION', '1.8.0' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -77,8 +77,10 @@ $skyyrose_core_includes = array(
 	'/inc/ajax-handlers.php',
 	'/inc/collection-content.php',
 	'/inc/collection-sot-reader.php',
+	'/inc/experience-rooms.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
+	'/inc/v7-cards.php',
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
@@ -95,6 +97,10 @@ $skyyrose_core_includes = array(
 	'/inc/image-placements.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
+	'/inc/fashion-chrome.php',
+	// Customer enhancements: fit notes metabox, drop block customizer, sticky ATC helper.
+	// Loaded in core (not WC-only) so the Customizer section registers on all pages.
+	'/inc/customer-enhancements.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {

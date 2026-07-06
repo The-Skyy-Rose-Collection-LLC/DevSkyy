@@ -9,43 +9,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$sg_tables = array(
-	'tops'    => array(
-		'label'   => __( 'Tops', 'skyyrose' ),
-		'headers' => array( 'Size', 'Chest', 'Waist', 'Length', 'Sleeve' ),
-		'rows'    => array(
-			array( 'XS', '34', '28', '27', '32' ),
-			array( 'S', '36', '30', '28', '33' ),
-			array( 'M', '38', '32', '29', '34' ),
-			array( 'L', '40', '34', '30', '35' ),
-			array( 'XL', '42', '36', '31', '35.5' ),
-			array( '2XL', '44', '38', '32', '36' ),
-		),
-	),
-	'bottoms' => array(
-		'label'   => __( 'Bottoms', 'skyyrose' ),
-		'headers' => array( 'Size', 'Waist', 'Hip', 'Inseam', 'Length' ),
-		'rows'    => array(
-			array( 'XS', '28', '34', '30', '38' ),
-			array( 'S', '30', '36', '31', '39' ),
-			array( 'M', '32', '38', '32', '40' ),
-			array( 'L', '34', '40', '32', '41' ),
-			array( 'XL', '36', '42', '33', '42' ),
-			array( '2XL', '38', '44', '33', '43' ),
-		),
-	),
-	'kids'    => array(
-		'label'   => __( 'Kids', 'skyyrose' ),
-		'headers' => array( 'Size', 'Age', 'Chest', 'Waist', 'Height' ),
-		'rows'    => array(
-			array( '2T', '2', '21', '20', '33-36' ),
-			array( '3T', '3', '22', '20.5', '36-39' ),
-			array( '4T', '4', '23', '21', '39-42' ),
-			array( '5', '5-6', '24', '21.5', '42-45' ),
-			array( '6', '6-7', '25', '22', '45-48' ),
-		),
-	),
-);
+// Tables come from the single source shared with /size-guide/ (WS4).
+$sg_tables = skyyrose_get_size_guide_tables();
 ?>
 <div id="size-guide-modal" class="sg-overlay" role="dialog" aria-labelledby="sg-heading" aria-modal="true" aria-hidden="true" inert>
 <div class="sg-panel">

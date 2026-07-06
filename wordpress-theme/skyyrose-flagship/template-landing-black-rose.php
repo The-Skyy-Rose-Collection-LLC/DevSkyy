@@ -98,7 +98,7 @@ get_header();
 				><?php esc_html_e( 'Explore the Collection', 'skyyrose' ); ?></a>
 				<?php
 				$_br_col_page = get_page_by_path( 'collection-black-rose' );
-				$_br_col_url  = $_br_col_page ? get_permalink( $_br_col_page ) : home_url( '/collection-black-rose/' );
+				$_br_col_url  = $_br_col_page ? get_permalink( $_br_col_page ) : home_url( '/collections/black-rose/' );
 				?>
 				<a
 					href="<?php echo esc_url( $_br_col_url ); ?>"

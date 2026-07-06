@@ -245,6 +245,9 @@ theme-upload-*.png
 upload-form-*.png
 woocommerce-*.png
 wp-admin-*.png
+# Playwright capture runs (pwfinal1-*-hero.jpeg) + v7 live-site captures (any image ext)
+pwfinal*
+_v7-*
 
 # WordPress theme binary assets
 # Track homepage/brand images and product photos; ignore avatar and 3D assets.
@@ -549,3 +552,6 @@ graphify-out/
 
 # Superseded binary render artifacts (dot-prefixed; _archive/ already covered)
 .archive/
+
+# Generated from brand.yaml at build/deploy time — never committed (see theme docs).
+wordpress-theme/skyyrose-flagship/inc/brand.generated.php

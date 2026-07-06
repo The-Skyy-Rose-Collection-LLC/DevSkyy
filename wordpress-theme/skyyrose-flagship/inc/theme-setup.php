@@ -61,10 +61,10 @@ function skyyrose_setup() {
 	 */
 	register_nav_menus(
 		array(
-			'primary'     => esc_html__( 'Primary Menu', 'skyyrose' ),
-			'collection'  => esc_html__( 'Collection Navigation', 'skyyrose' ),
-			'experiences' => esc_html__( 'Experiences Navigation', 'skyyrose' ),
-			'footer'      => esc_html__( 'Footer Menu', 'skyyrose' ),
+			'primary' => esc_html__( 'Primary Menu', 'skyyrose' ),
+			'footer'  => esc_html__( 'Footer Menu', 'skyyrose' ),
+			// 'collection' and 'experiences' removed (audit 2026-06-28) — never
+			// called in any template; dead locations waste DB + Customizer UI space.
 		)
 	);
 

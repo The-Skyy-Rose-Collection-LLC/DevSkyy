@@ -1,5 +1,28 @@
 # Current Tasks
 
+## ACTIVE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
+
+Replace 4 hardcoded-fixture handler bodies with real agent delegation. TDD, tests green, scope-clean.
+Wiring is autonomous-safe; runtime paid/prod gates stay intact (tests MUST mock paid/prod calls).
+Register: `tasks/wiring-gaps-register.md` (T3-1..T3-4) — but 3 of its 4 specifics were wrong; wired from verified source.
+
+- [x] **T3-1 code/scan** — DONE. Verified 5/5 via rtk; path-injection guard; `asyncio.to_thread`. — `api/v1/code.py:170-194` mock `ScanIssue` list → `CodeSecurityAnalyzer.analyze_directory()`
+      (real source SAST, `security/code_analysis.py`; NOT the register's dependency-CVE scanner). Map
+      `SecurityFinding{file_path,line_number,severity,category,recommendation}` → `ScanIssue`. Fix MCP route
+      `mcp_tools/tools/infrastructure.py:163` `"scanner/scan"`→`"code/scan"`.
+- [x] **T3-2 commerce/bulk** — DONE. Wire 3/3; bug-165 (CommerceAgent WC integration) FIXED full per founder: alias + `WordPressClient.from_env()` + lifecycle reconcile + dashboard.py 3 sites. 231 passed, no regression. — `api/v1/commerce.py:156-182,308-340` mock loops → `CommerceAgent` (init pattern proven
+      at `commerce.py:467`). create→`sync_product_to_woocommerce`, update→`update_woocommerce_product(product_id,updates)`,
+      delete→honest (no agent method; WC client or unsupported-result). Fix MCP endpoint_map `ecommerce.py:133-137`→`"commerce/products/bulk"`.
+- [x] **T3-3 3D text/image-to-3D** — DONE. 4/4 via rtk; async BackgroundTask + status endpoint; +my fixes (SSRF follow_redirects=False, close() comment). — `api/v1/media.py:173-196,255-278` fake URLs → `TripoAssetAgent` (real class name;
+      generators `_tool_generate_from_text`/`_tool_generate_from_image` → `GenerationResult`; PAID at runtime → MOCK in tests).
+      Fix MCP routes `threed.py:149,203` → `media/3d/generate/text`, `media/3d/generate/image`.
+- [x] **T3-4 theme deploy** — DONE. 3/3 via rtk (subprocess MOCKED, never ran real deploy); `create_subprocess_exec`+600s timeout; non-prod→`--dry-run`. — `api/v1/wordpress_theme.py:46-56` `success=False` stub → `subprocess.run(["bash","scripts/deploy-theme.sh",...])`
+      (flag-driven: `--dry-run`/`--with-maintenance`, NOT env). non-prod env→`--dry-run`. PROD-touching at runtime → MOCK subprocess in tests, never run live.
+
+### Verify (main thread, after agents — never on a subagent's word)
+- [x] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
+- [x] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+
 ## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
 
 Branch `feat/embeddings-phase2` off `origin/main`. Spec: `docs/superpowers/specs/2026-06-22-embeddings-reframe-design.md` §Track E.

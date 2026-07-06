@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.6.5
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,28 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.8.0 =
+* Structural remediation: shell unification (single header/footer/nav, one skip link across all templates)
+* Route architecture: /collections/{slug}/ canonical URLs with a redirect layer (redirects.csv) for legacy paths
+* Experiences merged into Collections as an embedded scene layer, retiring the standalone Experiences surface
+* Homepage DOM restructured to data-driven content blocks
+* Commerce layer hardening: AJAX add-to-cart now enqueued on custom templates (homepage, collection, pre-order gateway) that render .ajax_add_to_cart buttons outside WooCommerce-native pages
+* scripts/structural_audit.py — new automated verification suite for shell, routes, and DOM invariants
+* SEO: og:image/twitter:image now excludes SVG logos (unsupported by social crawlers); canonical collection slugs derived from a single source of truth
+* Accessibility: <noscript> fallback restores primary navigation in the mobile drawer when JavaScript is unavailable
+
+= 1.7.0 =
+* Full-site audit batch: CSP fix restores Stripe express checkout (Apple/Google Pay); standard header converged on every page incl. homepage
+* Header refinement: transparent-to-solid condensing navbar, centered logo, Bag language + cart badge, Customizer announcement bar
+* Editorial 3-column product grids; imagery sizing fixes; Jetpack CSS conditional dequeue; AVIF/WebP product-image bases
+* PDP fit notes + model specs, homepage Drop Block (Customizer), sticky Add-to-Bag on editorial PDPs; pre-order hero video stacking fix
+* /immersive-* 301 redirects; review hardening (double-submit guard, redirect query strings)
+
+= 1.6.7 =
+* Product images now resolve through the catalog/dossier SOT chain: collection-sot-reader.php gained a per-SKU image resolver, front-page.php and template-landing-kids-capsule.php migrated off all hardcoded image paths
+* Verified asset hub wired as the upstream authority feeding the SOT image manifest, with no-hardcoded-product-image regression guard added to CI
+* Version triple re-synced: style.css, readme.txt Stable tag, and SKYYROSE_VERSION constant all set to 1.6.7
 
 = 1.6.5 =
 * SEO: static front page now emits og:type=website (was article). The is_singular() branches in the Open Graph, Twitter, and meta-description functions now defer to is_front_page(), so the homepage gets website OG + the brand-tagline description. Exposed when the 1.6.4 Jetpack OG dedup removed the masking duplicate website tag.

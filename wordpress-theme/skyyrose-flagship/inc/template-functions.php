@@ -797,30 +797,90 @@ function skyyrose_sanitize_class_list( $classes ) {
  * @return array Associative array of social links keyed by platform.
  */
 function skyyrose_get_social_links() {
-	return array(
+	// Canonical brand profiles (brand DNA). Overridable per network via the
+	// skyyrose_social_{network} theme mods registered in inc/customizer.php.
+	$defaults = array(
 		'instagram' => array(
-			'url'   => 'https://instagram.com/theskyyrosecollection',
+			'url'   => 'https://instagram.com/skyyrose.co',
 			'label' => __( 'Instagram', 'skyyrose' ),
 		),
 		'tiktok'    => array(
-			'url'   => 'https://tiktok.com/@skyyrosecollection',
+			'url'   => 'https://tiktok.com/@skyyroseco',
 			'label' => __( 'TikTok', 'skyyrose' ),
 		),
 		'twitter'   => array(
-			'url'   => 'https://twitter.com/skyyrosellc',
+			'url'   => 'https://x.com/skyyroseco',
 			'label' => __( 'X (Twitter)', 'skyyrose' ),
 		),
 		'facebook'  => array(
-			'url'   => 'https://facebook.com/skyyrosecollection',
+			'url'   => 'https://facebook.com/TheSkyyRoseCollection',
 			'label' => __( 'Facebook', 'skyyrose' ),
 		),
-		'youtube'   => array(
-			'url'   => 'https://youtube.com/@skyyrosecollection',
-			'label' => __( 'YouTube', 'skyyrose' ),
+	);
+
+	$links = array();
+	foreach ( $defaults as $network => $data ) {
+		$override = get_theme_mod( 'skyyrose_social_' . $network, '' );
+		if ( ! empty( $override ) ) {
+			$data['url'] = esc_url_raw( $override );
+		}
+		$links[ $network ] = $data;
+	}
+
+	return $links;
+}
+
+/*
+--------------------------------------------------------------
+ * Size Guide (Single Source of Truth)
+ *--------------------------------------------------------------*/
+
+/**
+ * Get the size-guide measurement tables.
+ *
+ * Consumed by both the site-wide modal (template-parts/size-guide-modal.php)
+ * and the canonical /size-guide/ page (template-size-guide.php) so the two
+ * surfaces can never drift (structural remediation WS4).
+ *
+ * @since 1.8.0
+ * @return array Tables keyed by category: label, headers, rows.
+ */
+function skyyrose_get_size_guide_tables() {
+	return array(
+		'tops'    => array(
+			'label'   => __( 'Tops', 'skyyrose' ),
+			'headers' => array( 'Size', 'Chest', 'Waist', 'Length', 'Sleeve' ),
+			'rows'    => array(
+				array( 'XS', '34', '28', '27', '32' ),
+				array( 'S', '36', '30', '28', '33' ),
+				array( 'M', '38', '32', '29', '34' ),
+				array( 'L', '40', '34', '30', '35' ),
+				array( 'XL', '42', '36', '31', '35.5' ),
+				array( '2XL', '44', '38', '32', '36' ),
+			),
 		),
-		'pinterest' => array(
-			'url'   => 'https://pinterest.com/skyyrosecollection',
-			'label' => __( 'Pinterest', 'skyyrose' ),
+		'bottoms' => array(
+			'label'   => __( 'Bottoms', 'skyyrose' ),
+			'headers' => array( 'Size', 'Waist', 'Hip', 'Inseam', 'Length' ),
+			'rows'    => array(
+				array( 'XS', '28', '34', '30', '38' ),
+				array( 'S', '30', '36', '31', '39' ),
+				array( 'M', '32', '38', '32', '40' ),
+				array( 'L', '34', '40', '32', '41' ),
+				array( 'XL', '36', '42', '33', '42' ),
+				array( '2XL', '38', '44', '33', '43' ),
+			),
+		),
+		'kids'    => array(
+			'label'   => __( 'Kids', 'skyyrose' ),
+			'headers' => array( 'Size', 'Age', 'Chest', 'Waist', 'Height' ),
+			'rows'    => array(
+				array( '2T', '2', '21', '20', '33-36' ),
+				array( '3T', '3', '22', '20.5', '36-39' ),
+				array( '4T', '4', '23', '21', '39-42' ),
+				array( '5', '5-6', '24', '21.5', '42-45' ),
+				array( '6', '6-7', '25', '22', '45-48' ),
+			),
 		),
 	);
 }
@@ -853,37 +913,19 @@ function skyyrose_nav_fallback() {
 			'children' => array(
 				array(
 					'title' => __( 'Black Rose', 'skyyrose' ),
-					'url'   => home_url( '/collection-black-rose/' ),
+					'url'   => home_url( '/collections/black-rose/' ),
 				),
 				array(
 					'title' => __( 'Love Hurts', 'skyyrose' ),
-					'url'   => home_url( '/collection-love-hurts/' ),
+					'url'   => home_url( '/collections/love-hurts/' ),
 				),
 				array(
 					'title' => __( 'Signature', 'skyyrose' ),
-					'url'   => home_url( '/collection-signature/' ),
+					'url'   => home_url( '/collections/signature/' ),
 				),
 				array(
 					'title' => __( 'Kids Capsule', 'skyyrose' ),
-					'url'   => home_url( '/collection-kids-capsule/' ),
-				),
-			),
-		),
-		array(
-			'title'    => __( 'Experiences', 'skyyrose' ),
-			'url'      => home_url( '/experiences/' ),
-			'children' => array(
-				array(
-					'title' => __( 'The Garden', 'skyyrose' ),
-					'url'   => home_url( '/experience-black-rose/' ),
-				),
-				array(
-					'title' => __( 'The Ballroom', 'skyyrose' ),
-					'url'   => home_url( '/experience-love-hurts/' ),
-				),
-				array(
-					'title' => __( 'The Runway', 'skyyrose' ),
-					'url'   => home_url( '/experience-signature/' ),
+					'url'   => home_url( '/collections/kids-capsule/' ),
 				),
 			),
 		),

@@ -106,6 +106,7 @@ dependencies = [
     # 3D & Visual Generation
     "Pillow>=10.0",
     "opencv-python>=4.8",
+    "fonttools>=4.55",  # scripts/font_generator: PNG-template -> TTF vectorization
 
     # Performance & Async I/O
     "aiofiles>=24.1.0",
@@ -187,6 +188,7 @@ mcp = [
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
+    "boto3>=1.43.0",  # integrations/cloudflare_r2_manager.py — was undeclared, install -e .[all] never pulled it
     "cryptography==49.0.0",
     "pyjwt==2.13.0",
     "sqlalchemy==2.0.51",

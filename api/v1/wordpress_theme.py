@@ -85,21 +85,12 @@ async def deploy_theme(
             proc.communicate(), timeout=_DEPLOY_TIMEOUT_S
         )
     except TimeoutError:
-        logger.error("Theme deploy timed out after %ds; killing subprocess", _DEPLOY_TIMEOUT_S)
-        # wait_for cancelled communicate(): the pipe readers are in an
-        # indeterminate state, so kill + reap with wait() — never a second
-        # communicate() (can deadlock). Guard the race where the process
-        # already exited between the timeout and the kill.
-        try:
-            proc.kill()
-            await proc.wait()
-        except ProcessLookupError:
-            pass
+        logger.error("Theme deploy timed out after %ds", _DEPLOY_TIMEOUT_S)
         return {
             "success": False,
-            "returncode": proc.returncode if proc.returncode is not None else -1,
+            "returncode": -1,
             "environment": request.environment,
-            "message": f"deploy timed out after {_DEPLOY_TIMEOUT_S}s (subprocess killed)",
+            "message": f"deploy timed out after {_DEPLOY_TIMEOUT_S}s",
             "log_tail": [],
         }
     except FileNotFoundError as exc:

@@ -39,10 +39,26 @@ $po_collections = array(
 	),
 );
 
-/* ─── Pre-load all 3 collection product arrays ─────────────────────────────────── */
+/*
+─── Pre-load all 3 collection product arrays ─────────────────────────────────── */
+
+/*
+ * Production-image gate (structural remediation WS5): a SKU whose resolved
+ * display image is missing on disk never renders here — no placeholder
+ * imagery may reach the pre-order page. Data-driven (catalog + filesystem),
+ * never a hardcoded SKU list.
+ */
 $po_products = array();
 foreach ( array_keys( $po_collections ) as $po_slug ) {
-	$po_products[ $po_slug ] = skyyrose_get_collection_products( $po_slug );
+	$po_products[ $po_slug ] = array_values(
+		array_filter(
+			skyyrose_get_collection_products( $po_slug ),
+			static function ( $po_candidate ) {
+				$po_image = skyyrose_get_product_display_image( $po_candidate );
+				return '' !== $po_image && file_exists( get_theme_file_path( $po_image ) );
+			}
+		)
+	);
 }
 
 /* ─── WC helpers ───────────────────────────────────────────────────────────────── */
@@ -370,9 +386,6 @@ get_header();
 									: ( isset( $po_item['back_image'] ) ? $po_item['back_image'] : '' )
 							);
 							$po_product_url = skyyrose_product_url( $po_sku );
-							$po_cart_link   = $po_wc_id
-								? add_query_arg( 'add-to-cart', $po_wc_id, wc_get_cart_url() )
-								: $po_product_url;
 							?>
 							<article class="po-card holo" aria-label="<?php echo esc_attr( $po_name ); ?>">
 								<a class="po-card__img-wrap" href="<?php echo esc_url( $po_product_url ); ?>"
@@ -430,8 +443,18 @@ get_header();
 									<div class="po-card__footer">
 										<span class="po-card__price"><?php echo esc_html( $po_price_str ); ?></span>
 										<?php if ( $po_wc_id ) : ?>
-											<a class="po-btn po-btn--reserve"
-												href="<?php echo esc_url( $po_cart_link ); ?>"
+											<?php
+											// AJAX add-to-cart (WS5): WooCommerce's global add-to-cart.js
+											// intercepts .ajax_add_to_cart clicks and POSTs wc-ajax=add_to_cart
+											// with data-product_id. The href is the no-JS fallback and points
+											// at the PDP — never a GET ?add-to-cart= URL (crawler cart-adds,
+											// cache poisoning).
+											?>
+											<a class="po-btn po-btn--reserve add_to_cart_button ajax_add_to_cart"
+												href="<?php echo esc_url( $po_product_url ); ?>"
+												data-product_id="<?php echo esc_attr( $po_wc_id ); ?>"
+												data-quantity="1"
+												rel="nofollow"
 												aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Reserve %s', 'skyyrose' ), $po_name ) ); ?>">
 												<?php esc_html_e( 'Reserve', 'skyyrose' ); ?>
 											</a>

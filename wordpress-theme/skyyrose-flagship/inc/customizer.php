@@ -354,6 +354,70 @@ function skyyrose_customize_register( $wp_customize ) {
 			'type'        => 'text',
 		)
 	);
+
+	/*
+	--------------------------------------------------------------
+	 * Section: Announcement Bar
+	 *--------------------------------------------------------------*/
+	$wp_customize->add_section(
+		'skyyrose_announcement',
+		array(
+			'title'       => esc_html__( 'Announcement Bar', 'skyyrose' ),
+			'description' => esc_html__( 'Sitewide announcement strip shown at the very top of the page.', 'skyyrose' ),
+			'priority'    => 25,
+		)
+	);
+
+	$wp_customize->add_setting(
+		'skyyrose_announcement_enabled',
+		array(
+			'default'           => false,
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'skyyrose_announcement_enabled',
+		array(
+			'label'   => esc_html__( 'Enable Announcement Bar', 'skyyrose' ),
+			'section' => 'skyyrose_announcement',
+			'type'    => 'checkbox',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'skyyrose_announcement_text',
+		array(
+			'default'           => '',
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'skyyrose_announcement_text',
+		array(
+			'label'   => esc_html__( 'Announcement Text', 'skyyrose' ),
+			'section' => 'skyyrose_announcement',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'skyyrose_announcement_link',
+		array(
+			'default'           => '',
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		'skyyrose_announcement_link',
+		array(
+			'label'   => esc_html__( 'Announcement Link (optional)', 'skyyrose' ),
+			'section' => 'skyyrose_announcement',
+			'type'    => 'url',
+		)
+	);
 }
 add_action( 'customize_register', 'skyyrose_customize_register' );
 

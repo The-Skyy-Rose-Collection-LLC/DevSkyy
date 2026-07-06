@@ -50,11 +50,10 @@ Write-side feeders that *populate* the SOT columns (`skyyrose/core/review.py`,
 are **compliant** — they feed the SOT, they don't bypass it. The READ-side consumers below
 display/use product imagery from non-SOT sources and must be migrated:
 
-**Dashboard (display):** `frontend/lib/collections.ts` — hardcoded `/images/scenes/*-product-*`
-+ a drifted product list (`lh-006`, `sg-003/005/011/012/013/014` with fabricated names). Real fix
-= derive products from `@/lib/catalog` (already SOT-correct) + SOT image URLs; needs the renders
-served (currently 404 on skyyrose.co, absent from `frontend/public`) → one-way sync into
-`frontend/public/assets/images/products/` (mirror the design-system `sync-theme-assets.mjs` pattern).
+**Dashboard (display):** `frontend/lib/collections.ts` — RESOLVED. Now derives products from
+`@/lib/catalog` via `getEnrichedCollection`/`getAllEnrichedCollections` in `catalog-server.ts`;
+the raw `COLLECTIONS` config carries no hand-populated `products` array. Removed from
+`ALLOWLIST` in `tests/test_sot_no_adhoc_imagery.py`.
 
 **MCP tools:** `mcp_tools/tools/virtual_tryon.py` · `threed.py` · `lora_generation.py` ·
 `oai_render.py` · `core/runtime/tool_registry.py` (try-on example) — accept free-form image URLs;

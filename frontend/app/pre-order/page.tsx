@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import SiteNav from '@/components/navigation/SiteNav';
 import IncentivePopup from '@/components/marketing/IncentivePopup';
 import PreOrderPage from './PreOrderPage';
+import { getAllEnrichedCollections } from '@/lib/catalog-server';
 
 export const metadata: Metadata = {
   title: 'Pre-Order | SkyyRose',
@@ -15,10 +16,11 @@ export const metadata: Metadata = {
 };
 
 export default function PreOrder() {
+  const collections = getAllEnrichedCollections();
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       <SiteNav />
-      <PreOrderPage />
+      <PreOrderPage collections={collections} />
       <IncentivePopup />
     </div>
   );

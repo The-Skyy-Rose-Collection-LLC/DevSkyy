@@ -1,0 +1,503 @@
+{
+ "_generated_by": "scripts/build_v7_cards.py \u2014 DO NOT EDIT. SOT = skyyrose-catalog.csv (fields) \u00d7 promoted v7 served tree (imagery). Regenerate after CSV/imagery changes; CI check 'v7_cards_current' enforces this.",
+ "_authority": "verdict:verified hub images only \u2014 see feedback_real_products_only",
+ "_count": 28,
+ "cards": [
+  {
+   "sku": "br-001",
+   "name": "BLACK Rose Crewneck",
+   "price": 35,
+   "collection": "black-rose",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-001/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-002",
+   "name": "BLACK Rose Joggers",
+   "price": 50,
+   "collection": "black-rose",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-002/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-004",
+   "name": "BLACK Rose Hoodie",
+   "price": 40,
+   "collection": "black-rose",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-004/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-004/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-006",
+   "name": "BLACK Rose Sherpa Jacket",
+   "price": 95,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-006/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-006/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-007",
+   "name": "BLACK Rose x Love Hurts Basketball Shorts",
+   "price": 65,
+   "collection": "black-rose",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-007/front.webp"
+    },
+    {
+     "face": "back",
+     "uri": "assets/images/products/v7/br-007/back.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-008",
+   "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+   "price": 115,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 80,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-008/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-008/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-010",
+   "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+   "price": 100,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 80,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-010/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-010/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-011",
+   "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
+   "price": 115,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 80,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-011/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-011/alt.webp"
+    },
+    {
+     "face": "back",
+     "uri": "assets/images/products/v7/br-011/back.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-014",
+   "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+   "price": 100,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-014/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-014/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "br-015",
+   "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+   "price": 100,
+   "collection": "black-rose",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/br-015/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/br-015/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "kids-001",
+   "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+   "price": 65,
+   "collection": "kids-capsule",
+   "badge": "",
+   "edition": 150,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/kids-001/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "kids-002",
+   "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+   "price": 65,
+   "collection": "kids-capsule",
+   "badge": "",
+   "edition": 150,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/kids-002/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/kids-002/alt.jpg"
+    }
+   ]
+  },
+  {
+   "sku": "lh-002",
+   "name": "Love Hurts Joggers (Black)",
+   "price": 95,
+   "collection": "love-hurts",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-002/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/lh-002/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "lh-003",
+   "name": "Love Hurts Basketball Shorts",
+   "price": 75,
+   "collection": "love-hurts",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-003/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "lh-004",
+   "name": "Love Hurts Bomber Jacket",
+   "price": 265,
+   "collection": "love-hurts",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-004/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/lh-004/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "lh-005",
+   "name": "The Fannie",
+   "price": 45,
+   "collection": "love-hurts",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-005/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/lh-005/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "lh-006",
+   "name": "Love Hurts Joggers (White)",
+   "price": 95,
+   "collection": "love-hurts",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-006/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/lh-006/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-001",
+   "name": "The Bridge Series 'The Bay Bridge' Shorts",
+   "price": 195,
+   "collection": "signature",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-001/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-002",
+   "name": "The Bridge Series 'Stay Golden' Shirt",
+   "price": 65,
+   "collection": "signature",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-002/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-003",
+   "name": "The Bridge Series 'Stay Golden' Shorts",
+   "price": 65,
+   "collection": "signature",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-003/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-006",
+   "name": "Mint & Lavender Hoodie",
+   "price": 45,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-006/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-007",
+   "name": "The Signature Beanie",
+   "price": 25,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-007/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-009",
+   "name": "The Sherpa Jacket",
+   "price": 80,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-009/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/sg-009/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-011",
+   "name": "Original Label Tee (White)",
+   "price": 30,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-011/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/sg-011/alt.webp"
+    },
+    {
+     "face": "back",
+     "uri": "assets/images/products/v7/sg-011/back.png"
+    }
+   ]
+  },
+  {
+   "sku": "sg-012",
+   "name": "Original Label Tee (Orchid)",
+   "price": 30,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-012/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/sg-012/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-013",
+   "name": "Mint & Lavender Crewneck",
+   "price": 40,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-013/front.webp"
+    },
+    {
+     "face": "alt",
+     "uri": "assets/images/products/v7/sg-013/alt.jpg"
+    }
+   ]
+  },
+  {
+   "sku": "sg-014",
+   "name": "Mint & Lavender Sweatpants",
+   "price": 45,
+   "collection": "signature",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-014/front.webp"
+    }
+   ]
+  },
+  {
+   "sku": "sg-015",
+   "name": "The Windbreaker Set",
+   "price": 85,
+   "collection": "signature",
+   "badge": "Pre-Order",
+   "edition": 250,
+   "preorder": true,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/sg-015/front.webp"
+    }
+   ]
+  }
+ ]
+}
