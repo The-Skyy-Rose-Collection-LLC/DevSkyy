@@ -122,16 +122,12 @@ defined( 'ABSPATH' ) || exit;
 						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 					</button>
 				</div>
-				<div class="mobile-menu__nav">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'container'      => false,
-						)
-					);
-					?>
-				</div>
+				<?php
+				// Single-menu shell: the primary menu renders ONCE (desktop
+				// .navbar__nav-wrapper above). navigation.js relocates that same
+				// DOM node into this container at ≤1024px — never a second copy.
+				?>
+				<div class="mobile-menu__nav"></div>
 			</div>
 		</div>
 
