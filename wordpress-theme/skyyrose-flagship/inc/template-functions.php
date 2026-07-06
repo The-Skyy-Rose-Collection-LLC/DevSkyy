@@ -801,7 +801,7 @@ function skyyrose_get_social_links() {
 	// skyyrose_social_{network} theme mods registered in inc/customizer.php.
 	$defaults = array(
 		'instagram' => array(
-			'url'   => 'https://instagram.com/skyyroseco',
+			'url'   => 'https://instagram.com/skyyrose.co',
 			'label' => __( 'Instagram', 'skyyrose' ),
 		),
 		'tiktok'    => array(

@@ -700,7 +700,7 @@ echo wp_json_encode(
 			'addressRegion'   => 'CA',
 			'addressCountry'  => 'US',
 		),
-		'sameAs'       => array( 'https://instagram.com/skyyroseco' ),
+		'sameAs'       => array( 'https://instagram.com/skyyrose.co' ),
 	),
 	JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
 );
