@@ -43,7 +43,7 @@ if ( file_exists( $skyyrose_fcro_dir . '/' . $skyyrose_fcro_file ) ) {
 	<div class="ft-cro__container">
 		<h2 class="ft-cro__heading"><?php esc_html_e( 'Why SkyyRose', 'skyyrose' ); ?></h2>
 		<p class="ft-cro__subheading"><?php esc_html_e( 'Every dollar goes into the product. No influencer budgets. No middlemen. Just quality you can feel.', 'skyyrose' ); ?></p>
-		<div class="ft-cro-reviews__grid">
+		<div class="ft-cro-reviews__grid stagger-grid">
 			<?php
 			$ft_reviews = array(
 				array( "The quality is insane. I've washed my hoodie 20+ times and it still looks brand new.", 'Marcus T., Oakland' ),

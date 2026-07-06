@@ -515,8 +515,8 @@
 	background: rgba(255, 255, 255, 0.02);
 	isolation: isolate;
 	transform: translate3d(
-		calc(var(--mag-x, 0) * 8px),
-		calc(var(--mag-y, 0) * 8px),
+		calc(var(--mag-x, 0) * 14px),
+		calc(var(--mag-y, 0) * 14px),
 		0
 	);
 	transition: border-color .6s var(--ease-luxury), transform .6s var(--ease-luxury);
