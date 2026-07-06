@@ -363,7 +363,7 @@
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
-	opacity: .6;
+	opacity: .9; /* AA contrast at rest (was .6 = 2.5:1) */
 	margin-bottom: 32px;
 }
 .press-logos {
@@ -379,7 +379,7 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--haze);
-	opacity: .4;
+	opacity: .75; /* AA contrast at rest (was .4 = 1.85:1) */
 	transition: opacity .5s var(--ease-luxury), color .5s var(--ease-luxury);
 }
 .press-item:hover { opacity: 1; }

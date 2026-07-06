@@ -519,7 +519,7 @@ $kc_link   = $kc_config['page_url'] ?? home_url( '/collections/kids-capsule/' );
 		<p class="kc-heir__sub"><?php esc_html_e( 'Not a fourth world. A letter to one. Hover to break the seal.', 'skyyrose' ); ?></p>
 	</div>
 
-	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0" aria-label="<?php esc_attr_e( 'Open the letter — discover Kids Capsule', 'skyyrose' ); ?>">
+	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0" aria-label="<?php esc_attr_e( 'You were born into the rose — open the letter, discover Kids Capsule', 'skyyrose' ); ?>">
 		<div class="kc-heir__envelope">
 			<div class="kc-heir__letter">
 				<div class="kc-heir__chapter"><?php esc_html_e( 'Chapter IV', 'skyyrose' ); ?></div>
