@@ -350,6 +350,9 @@
 		var action = btn.dataset.action;
 		var next   = btn.dataset.next;
 
+		// Visitor picked a destination — Skyy points the way.
+		emitSkyy('point');
+
 		if (action) {
 			window.location.href = action;
 			return;
@@ -535,9 +538,12 @@
 				} catch (e) { /* degrade silently */ }
 				var script = SCRIPTS[context] || SCRIPTS['default'];
 				var greetingText = mascotConfig.pageTip ? mascotConfig.pageTip : script.greeting.text;
-				if (proactiveSpeak('greeting:' + context, greetingText, script.greeting.chips)) {
-					emitSkyy('wave');
-				}
+				// Wave first, speak after — emitting both synchronously makes
+				// the talk clip instantly override the wave in the 3D layer.
+				emitSkyy('wave');
+				setTimeout(function () {
+					proactiveSpeak('greeting:' + context, greetingText, script.greeting.chips);
+				}, prefersReducedMotion ? 0 : 1400);
 				recordProactiveAppearance();
 			}
 		}, walkDuration);
@@ -557,6 +563,9 @@
 			mascotEl.classList.add('skyyrose-mascot--hidden');
 			mascotEl.classList.remove('skyyrose-mascot--exiting');
 			state = 'dormant';
+			// The 3D canvas is a sibling of the mascot container — CSS state
+			// classes can't reach it, so it must be told to stop and hide.
+			emitSkyy('hidden');
 			if (onDone) onDone();
 		}, exitDuration);
 	}
@@ -611,7 +620,9 @@
 					setTimeout(function () {
 						mascotEl.classList.remove('skyy--glancing');
 					}, 2000);
-					proactiveSpeak('product-glance', 'These just landed. 👀', null);
+					if (proactiveSpeak('product-glance', 'These just landed. 👀', null)) {
+						emitSkyy('excited');
+					}
 				}
 			});
 		}, { threshold: 0.3 });
@@ -643,6 +654,9 @@
 		walkOff(function () {
 			recallBtn.style.display = 'flex';
 			recallBtn.setAttribute('aria-hidden', 'false');
+			// Dismissal must not strand keyboard focus on <body> — the recall
+			// pill is the continuation control.
+			recallBtn.focus();
 		});
 	}
 

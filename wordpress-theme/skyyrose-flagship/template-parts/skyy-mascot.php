@@ -37,7 +37,7 @@ $skyy_side    = skyyrose_get_skyy_walk_side( $skyy_context );
 $recall_thumb = $skyy_img_url ?: '';
 ?>
 
-<?php if ( wp_script_is( 'skyyrose-skyy-3d', 'enqueued' ) ) : ?>
+<?php if ( get_theme_mod( 'skyyrose_mascot_glb_url', '' ) ) : // skyy-3d.js is injected client-side by mascot-loader.js, never via wp_enqueue_script — gate the canvas on the same theme mod that gates the loader. ?>
 <!-- Skyy 3D canvas — sits behind the speech bubble, driven by skyy-3d.js -->
 <canvas
 	id="skyy-3d-canvas"
@@ -96,7 +96,7 @@ $recall_thumb = $skyy_img_url ?: '';
 	</button>
 
 	<!-- Minimize × button — must be OUTSIDE the trigger to avoid nested <button> (invalid HTML).
-	     Keyboard-reachable (no tabindex="-1"): ESC is a shortcut, not the only way to dismiss. -->
+		Keyboard-reachable (no tabindex="-1"): ESC is a shortcut, not the only way to dismiss. -->
 	<button
 		id="skyyrose-mascot-minimize"
 		class="skyyrose-mascot__minimize"
@@ -106,9 +106,9 @@ $recall_thumb = $skyy_img_url ?: '';
 </div><!-- #skyyrose-mascot -->
 
 <!-- Ask Skyy — native <dialog> panel: focus trapped while open, ESC closes,
-     focus restored to the trigger on close. Routine speech stays in the
-     non-modal bubble above; this is the one deliberate, user-initiated
-     "panel" interaction in the widget. -->
+	focus restored to the trigger on close. Routine speech stays in the
+	non-modal bubble above; this is the one deliberate, user-initiated
+	"panel" interaction in the widget. -->
 <dialog id="skyy-ask-dialog" class="skyy-ask-dialog" aria-labelledby="skyy-ask-dialog-title">
 	<form id="skyy-ask-form" class="skyy-ask-form" method="dialog">
 		<h2 id="skyy-ask-dialog-title" class="skyy-ask-dialog__title"><?php esc_html_e( 'Ask Skyy', 'skyyrose' ); ?></h2>

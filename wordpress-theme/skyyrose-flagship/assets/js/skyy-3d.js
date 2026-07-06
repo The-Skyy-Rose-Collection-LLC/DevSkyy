@@ -62,8 +62,53 @@
 
 	if ( ! canvas ) return;
 
-	// Respect prefers-reduced-motion — still render but skip walk-in delay
+	// Respect prefers-reduced-motion — render a single static frame, never a
+	// running animation loop (SC 2.2.2: no auto-playing motion).
 	var reduced = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+
+	// Session-dismissal + visibility state. mascot.js owns the sessionStorage
+	// key; the 3D layer honours the same contract (nothing pops in unsolicited
+	// after a dismissal) and stops rendering while the character is hidden.
+	var SESSION_KEY_DISMISSED = 'skyy_dismissed';
+	var visible     = true;
+	var loopRunning = false;
+	var modelReady  = false;
+	var bootStarted = false;
+	var pendingClip = null; // clip requested before the GLB finished loading
+
+	function dismissedThisSession() {
+		try {
+			return sessionStorage.getItem( SESSION_KEY_DISMISSED ) === '1';
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	function startLoop() {
+		if ( ! renderer ) return;
+		if ( reduced ) {
+			renderer.render( scene, camera );
+			return;
+		}
+		if ( ! loopRunning ) {
+			clock.getDelta(); // flush time accrued while stopped
+			renderer.setAnimationLoop( render );
+			loopRunning = true;
+		}
+	}
+
+	function stopLoop() {
+		if ( renderer && loopRunning ) {
+			renderer.setAnimationLoop( null );
+			loopRunning = false;
+		}
+	}
+
+	function revealCanvas() {
+		canvas.style.display = 'block';
+		var staticImg = document.querySelector( '.skyyrose-mascot__image' );
+		if ( staticImg ) staticImg.style.display = 'none';
+	}
 
 	// -------------------------------------------------------------------------
 	// Bootstrap — load Three.js dynamically then initialise
@@ -203,11 +248,6 @@
 
 				scene.add( model );
 
-				// Show 3D canvas, hide static fallback image
-				canvas.style.display = 'block';
-				var staticImg = document.querySelector( '.skyyrose-mascot__image' );
-				if ( staticImg ) staticImg.style.display = 'none';
-
 				// Animation mixer
 				if ( gltf.animations && gltf.animations.length ) {
 					mixer = new THREE.AnimationMixer( model );
@@ -222,15 +262,29 @@
 						console.warn( 'Skyy 3D: expected clips "idle"/"walk" not found. Available:', Object.keys( actions ) );
 					}
 
-					// Start with idle, transition to walk when event fires
-					playAction( CLIP_IDLE );
+					modelReady = true;
+
+					if ( reduced ) {
+						// Pose one static idle frame — no loop ever runs.
+						var idle = actions[ CLIP_IDLE ];
+						if ( idle ) idle.play();
+						mixer.update( 0.05 );
+					} else {
+						// Apply whichever state fired while the GLB was still
+						// downloading, falling back to idle.
+						playAction( pendingClip || CLIP_IDLE );
+						pendingClip = null;
+					}
+				} else {
+					modelReady = true;
 				}
 
-				// Start render loop
-				renderer.setAnimationLoop( render );
-
-				// Listen for mascot state events
-				bindMascotEvents();
+				// Reveal + animate only while the character is on screen — a
+				// load resolving after a dismissal/walk-off must stay hidden.
+				if ( visible ) {
+					revealCanvas();
+					startLoop();
+				}
 			},
 			undefined,
 			function ( error ) {
@@ -249,6 +303,13 @@
 	// -------------------------------------------------------------------------
 
 	function playAction( clipName, options ) {
+		if ( ! mixer ) {
+			// GLB still loading — remember the request, apply on load.
+			pendingClip = clipName;
+			return;
+		}
+		if ( reduced ) return; // static idle pose only under reduced motion
+
 		var action = actions[ clipName ] || actions[ Object.keys( actions )[ 0 ] ];
 		if ( ! action ) return;
 
@@ -309,7 +370,27 @@
 		// skipped entirely and the character sits on idle instead.
 		document.addEventListener( 'skyy:walking-in', function () {
 			clearExcitedTimer();
+			visible = true;
+			if ( ! bootStarted ) {
+				// First user-invited appearance in a dismissed session — the
+				// 3D layer was deliberately never booted. Boot lazily now.
+				boot();
+			} else if ( modelReady ) {
+				revealCanvas();
+				startLoop();
+			}
 			playAction( reduced ? CLIP_IDLE : CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
+		} );
+
+		// mascot.js emits skyy:hidden when the character is fully off screen
+		// (minimize / ESC / walk-off complete). The canvas is a DOM sibling of
+		// the mascot container, out of reach of its CSS state classes — it has
+		// to be stopped and hidden here or it animates forever.
+		document.addEventListener( 'skyy:hidden', function () {
+			clearExcitedTimer();
+			visible = false;
+			stopLoop();
+			canvas.style.display = 'none';
 		} );
 
 		document.addEventListener( 'skyy:idle', function () {
@@ -369,6 +450,21 @@
 	// the "don't cost LCP/CLS budget" job is already done by the time this
 	// line runs.
 
-	loadThree( initScene );
+	function boot() {
+		bootStarted = true;
+		loadThree( initScene );
+	}
+
+	// Bind immediately — mascot.js can fire its first skyy:* events before
+	// Three.js or the GLB have loaded; pendingClip catches those.
+	bindMascotEvents();
+
+	if ( dismissedThisSession() ) {
+		// Same contract as mascot.js: after a dismissal nothing pops in
+		// unsolicited. Defer boot until a user-initiated skyy:walking-in.
+		visible = false;
+	} else {
+		boot();
+	}
 
 } )();
