@@ -7,11 +7,7 @@ The gotchas below are the ones a fresh session gets wrong.
 
 - **Admin (`/admin/*`): NextAuth v4.** `lib/auth.ts` + `SessionProvider` (`app/admin/layout.tsx`). Server-side: `getServerSession(authOptions)`. Client-side: `useSession()`. JWT, 15-min expiry.
 - **Storefront/legacy:** `contexts/AuthContext.tsx` → `useAuth()`, `localStorage` key `access_token`. NOT used by any admin page. `lib/api/client.ts` also reads this key directly for backend calls. Calling `useAuth()` in an admin page gets undefined context.
-<<<<<<< HEAD
 - **Edge gate = `proxy.ts`, NOT `middleware.ts`.** Next.js 16 **deprecated `middleware.ts` in favor of `proxy.ts`** (both still resolve — a lone `middleware.ts` only warns, both-present is a hard error; named export `middleware` → `proxy`). `frontend/proxy.ts` exports `async function proxy()` + `export const config.matcher` — this IS the registered gate and it DOES run. Add gated paths via `config.matcher` (`proxy.ts:42`). Caveat: `proxy` runs the **nodejs** runtime — edge is not supported in `proxy`; keep a `middleware.ts` only if you need edge. Per-route `getServerSession()` stays as defense-in-depth.
-=======
-- **Edge gate = `proxy.ts`, NOT `middleware.ts`.** Next.js 16 **renamed `middleware.ts` → `proxy.ts`** (named export `middleware` → `proxy`); `frontend/proxy.ts` exports `async function proxy()` + `export const config.matcher` — this IS the registered gate and it DOES run. Add gated paths via `config.matcher` (`proxy.ts:42`). Caveat: `proxy` runs the **nodejs** runtime — edge is not supported in `proxy`; keep a `middleware.ts` only if you need edge. Per-route `getServerSession()` stays as defense-in-depth.
->>>>>>> origin/main
 
 ## Catalog data is SERVER-ONLY
 
