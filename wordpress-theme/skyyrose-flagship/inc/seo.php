@@ -35,8 +35,12 @@ function skyyrose_og_logo_url() {
 	if ( ! $logo_id ) {
 		return '';
 	}
-	$mime = (string) get_post_mime_type( $logo_id );
-	if ( 0 !== strpos( $mime, 'image/' ) ) {
+	// Raster formats only — social crawlers (Facebook, X, LinkedIn) do not
+	// render SVG in og:image/twitter:image, so allowing it through recreates
+	// the same broken-preview class this function exists to prevent.
+	$raster_mimes = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif' );
+	$mime         = (string) get_post_mime_type( $logo_id );
+	if ( ! in_array( $mime, $raster_mimes, true ) ) {
 		return '';
 	}
 	return (string) wp_get_attachment_url( $logo_id );
