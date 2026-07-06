@@ -418,7 +418,7 @@ function skyyrose_product_url( $sku ) {
 		return home_url( '/pre-order/#' . sanitize_title( $sku ) );
 	}
 	if ( $product && ! empty( $product['collection'] ) ) {
-		return home_url( '/collection-' . sanitize_title( $product['collection'] ) . '/#' . sanitize_title( $sku ) );
+		return home_url( '/collections/' . sanitize_title( $product['collection'] ) . '/#' . sanitize_title( $sku ) );
 	}
 
 	return home_url( '/pre-order/#' . sanitize_title( $sku ) );
