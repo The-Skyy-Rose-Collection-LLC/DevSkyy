@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,16 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.8.0 =
+* Structural remediation: shell unification (single header/footer/nav, one skip link across all templates)
+* Route architecture: /collections/{slug}/ canonical URLs with a redirect layer (redirects.csv) for legacy paths
+* Experiences merged into Collections as an embedded scene layer, retiring the standalone Experiences surface
+* Homepage DOM restructured to data-driven content blocks
+* Commerce layer hardening: AJAX add-to-cart now enqueued on custom templates (homepage, collection, pre-order gateway) that render .ajax_add_to_cart buttons outside WooCommerce-native pages
+* scripts/structural_audit.py — new automated verification suite for shell, routes, and DOM invariants
+* SEO: og:image/twitter:image now excludes SVG logos (unsupported by social crawlers); canonical collection slugs derived from a single source of truth
+* Accessibility: <noscript> fallback restores primary navigation in the mobile drawer when JavaScript is unavailable
 
 = 1.7.0 =
 * Full-site audit batch: CSP fix restores Stripe express checkout (Apple/Google Pay); standard header converged on every page incl. homepage
