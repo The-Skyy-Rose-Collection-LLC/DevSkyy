@@ -20,11 +20,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Collection slugs served under the canonical /collections/{slug}/ routes.
  *
+ * Derives from skyyrose_get_collections_config() (inc/collections-config.php,
+ * the single source of truth for collection metadata) so a new or renamed
+ * collection there doesn't require a second, easily-missed edit here. This
+ * function is only ever CALLED at init/template_redirect — long after every
+ * inc/ file has been included — so it's safe even though redirects.php loads
+ * before collections-config.php in functions.php's include order. The literal
+ * array is kept as a documented fallback for the (currently theoretical) case
+ * where collections-config.php failed to load.
+ *
  * @since 1.8.0
  * @return string[] Collection slugs.
  */
 function skyyrose_canonical_collection_slugs() {
-	return array( 'black-rose', 'love-hurts', 'signature', 'kids-capsule' );
+	return function_exists( 'skyyrose_get_collections_config' )
+		? array_keys( skyyrose_get_collections_config() )
+		: array( 'black-rose', 'love-hurts', 'signature', 'kids-capsule' );
 }
 
 /**
