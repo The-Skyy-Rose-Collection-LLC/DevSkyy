@@ -228,7 +228,10 @@ get_header();
 	</div>
 </section>
 
-<?php if ( function_exists( 'skyyrose_render_drop_block' ) ) { skyyrose_render_drop_block(); } ?>
+<?php
+if ( function_exists( 'skyyrose_render_drop_block' ) ) {
+	skyyrose_render_drop_block(); }
+?>
 
 <!-- ═══ PRESS STRIP ═══ -->
 <div class="press rv">

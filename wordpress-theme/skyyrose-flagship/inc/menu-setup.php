@@ -163,7 +163,7 @@ add_action(
  */
 function skyyrose_get_menu_definitions() {
 	return array(
-		'primary'      => array(
+		'primary' => array(
 			'name'  => __( 'Primary Menu', 'skyyrose' ),
 			'items' => array(
 				array(
@@ -208,7 +208,7 @@ function skyyrose_get_menu_definitions() {
 				),
 			),
 		),
-		'footer'       => array(
+		'footer'  => array(
 			'name'  => __( 'Footer Menu', 'skyyrose' ),
 			'items' => array(
 				array(

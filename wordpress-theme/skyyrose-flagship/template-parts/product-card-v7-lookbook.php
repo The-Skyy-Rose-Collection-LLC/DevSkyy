@@ -73,7 +73,7 @@ if ( $v7_product instanceof WC_Product ) {
 					continue;
 				}
 				$shot_face = ! empty( $shot['face'] ) ? (string) $shot['face'] : 'view';
-				$shot_src = get_theme_file_uri( $shot_uri );
+				$shot_src  = get_theme_file_uri( $shot_uri );
 				// AVIF tier via the shared next-gen sibling prober (Photon-safe): serves the
 				// .avif sibling through <picture> when present; <img> is the universal fallback.
 				$shot_pic = skyyrose_picture_sources( $shot_src );

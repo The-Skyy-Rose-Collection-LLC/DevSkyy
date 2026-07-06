@@ -39,7 +39,9 @@ $po_collections = array(
 	),
 );
 
-/* ─── Pre-load all 3 collection product arrays ─────────────────────────────────── */
+/*
+─── Pre-load all 3 collection product arrays ─────────────────────────────────── */
+
 /*
  * Production-image gate (structural remediation WS5): a SKU whose resolved
  * display image is missing on disk never renders here — no placeholder

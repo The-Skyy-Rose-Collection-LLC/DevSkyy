@@ -51,10 +51,10 @@ $has_3d    = ! empty( $c['experience_url'] );
  * skyyrose_sot_lockup() → lockup.display_webp.resolved     (maps to hero_logo)
  * Falls back to the hand-maintained $c values when SOT returns ''.
  */
-$sot_hero_bg  = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
+$sot_hero_bg   = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
 $sot_hero_logo = function_exists( 'skyyrose_sot_lockup' ) ? skyyrose_sot_lockup( $slug ) : '';
 
-$resolved_hero_bg  = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
+$resolved_hero_bg   = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
 $resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_logo'] ?? '' );
 
 $has_hero_bg = ! empty( $resolved_hero_bg );
