@@ -299,7 +299,9 @@
 	position: relative;
 	overflow: hidden;
 }
-.hero-cta-primary {
+.hero-cta.hero-cta-primary {
+	/* Double-class beats `.homepage-v2 a { color: inherit }` (0,1,1) — a bare
+	   .hero-cta-primary (0,1,0) loses that cascade and inherits white-on-white. */
 	background: #fff;
 	color: var(--void, #050505);
 }
