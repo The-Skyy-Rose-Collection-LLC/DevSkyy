@@ -165,7 +165,7 @@ api = [
 
 mcp = [
     "mcp>=1.23.0",
-    "fastmcp==3.4.2",  # standalone FastMCP 3.0 (pinned; SDK-bundled mcp.server.fastmcp still used by devskyy_mcp)
+    "fastmcp==3.4.3",  # standalone FastMCP 3.0 (pinned; SDK-bundled mcp.server.fastmcp still used by devskyy_mcp)
     "openai>=1.57.2",
     "anthropic>=0.75.0",
     "google-genai>=1.50.0",
@@ -196,7 +196,7 @@ mcp = [
     "redis==8.0.0",
     "pyyaml==6.0.3",
     "toml==0.10.2",
-    "typing-extensions==4.15.0",
+    "typing-extensions==4.16.0",
     "python-dateutil==2.9.0.post0",
     "tiktoken>=0.8.0",
     "transformers>=4.53.0",
@@ -257,7 +257,7 @@ ml = [
     # security pin, making .[all] unresolvable (Docker + local + CI).
     "bentoml>=1.4.34",
     "wandb>=0.24.2",  # Updated for protobuf 6.x compatibility
-    "tensorboard==2.20.0",
+    "tensorboard==2.21.0",
     "matplotlib==3.11.0",
     "seaborn==0.13.2",
     "plotly==6.8.0",
@@ -274,9 +274,9 @@ ml = [
     #     prophet's cmdstan build never succeeded in the py3.12 image anyway).
     #   gymnasium, stable-baselines3, soundfile, lime → dead RL/audio/explainability
     # This unbreaks `uv pip install .[all]` on Python 3.12.
-    "polars==1.42.0",
+    "polars==1.42.1",
     "pyarrow==24.0.0",
-    "hydra-core==1.3.3",
+    "hydra-core==1.3.4",
     "omegaconf==2.3.1",
     "tqdm==4.67.3",
     "joblib==1.5.3",
