@@ -97,6 +97,18 @@
 		document.dispatchEvent(new CustomEvent('skyy:' + name));
 	}
 
+	// Pending greeting delay (wave-then-speak). Tracked so any user action
+	// inside the gap — manual trigger, chip advance, minimize, ESC — cancels
+	// the deferred greeting instead of letting it clobber the new state.
+	var greetTimer = null;
+
+	function clearGreetTimer() {
+		if (greetTimer !== null) {
+			clearTimeout(greetTimer);
+			greetTimer = null;
+		}
+	}
+
 	var typewriterTimer  = null;
 	var autoDismissTimer = null;
 	var idleTimer        = null;
@@ -278,6 +290,7 @@
 	// -------------------------------------------------------------------------
 
 	function speak(text, chips) {
+		clearGreetTimer();
 		clearTimeout(autoDismissTimer);
 		state = 'speaking';
 		emitSkyy('speaking');
@@ -541,7 +554,11 @@
 				// Wave first, speak after — emitting both synchronously makes
 				// the talk clip instantly override the wave in the 3D layer.
 				emitSkyy('wave');
-				setTimeout(function () {
+				greetTimer = setTimeout(function () {
+					greetTimer = null;
+					// User may have acted during the gap — only greet an
+					// idle, undismissed character.
+					if (state !== 'idle' || isDismissedThisSession()) return;
 					proactiveSpeak('greeting:' + context, greetingText, script.greeting.chips);
 				}, prefersReducedMotion ? 0 : 1400);
 				recordProactiveAppearance();
@@ -550,6 +567,7 @@
 	}
 
 	function walkOff(onDone) {
+		clearGreetTimer();
 		state = 'exiting';
 		emitSkyy('exiting');
 		dismissBubble();

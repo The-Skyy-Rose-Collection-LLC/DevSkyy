@@ -412,15 +412,19 @@ function skyyrose_enqueue_global_scripts() {
 			if ( ! empty( $glb_url ) ) {
 				$skyy3d_file = $use_min && file_exists( $js_dir . '/skyy-3d.min.js' ) ? 'skyy-3d.min.js' : 'skyy-3d.js';
 				if ( file_exists( $js_dir . '/' . $skyy3d_file ) ) {
-					$skyy3d_js = $js_uri . '/' . $skyy3d_file;
+					$skyy3d_js = add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $skyy3d_file );
 				}
 			}
 
+			// mascot.js / skyy-3d.js are injected client-side by the loader,
+			// outside wp_enqueue_script — they get no automatic ?ver=. Without
+			// an explicit ver param a CDN/Batcache keeps serving stale copies
+			// after every SKYYROSE_VERSION bump.
 			wp_localize_script(
 				'skyyrose-mascot-loader',
 				'SKYY_LOADER_CONFIG',
 				array(
-					'mascotUrl' => $js_uri . '/' . $mascot_file,
+					'mascotUrl' => add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $mascot_file ),
 					'skyy3dUrl' => $skyy3d_js,
 				)
 			);
