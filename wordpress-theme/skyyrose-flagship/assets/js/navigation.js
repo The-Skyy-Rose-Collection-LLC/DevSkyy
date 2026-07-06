@@ -58,11 +58,19 @@
 			home.appendChild(primaryMenu);
 		}
 	}
+	function onDrawerBreakpointChange() {
+		placePrimaryMenu();
+		// Crossing up past 1024px while the drawer is open would strand a
+		// full-viewport, click-blocking, now-empty overlay — close it.
+		if (!drawerMq.matches) {
+			closeMobileMenu();
+		}
+	}
 	placePrimaryMenu();
 	if (typeof drawerMq.addEventListener === 'function') {
-		drawerMq.addEventListener('change', placePrimaryMenu);
+		drawerMq.addEventListener('change', onDrawerBreakpointChange);
 	} else if (typeof drawerMq.addListener === 'function') {
-		drawerMq.addListener(placePrimaryMenu);
+		drawerMq.addListener(onDrawerBreakpointChange);
 	}
 
 	function closeMobileMenu() {

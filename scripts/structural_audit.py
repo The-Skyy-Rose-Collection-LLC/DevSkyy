@@ -254,6 +254,7 @@ def check_dom(a: Audit) -> None:
             a.fail(f"{path} has a <footer>")
             continue
         offenders = []
+        offender_tags: list[Tag] = []
         for sib in footer.find_all_next():
             if sib.find_parent("footer") is not None:
                 continue
@@ -264,8 +265,17 @@ def check_dom(a: Audit) -> None:
             ):
                 continue
             if isinstance(sib, Tag) and not is_hidden_or_allowed_after_footer(sib):
+                # One violation, one report: descendants of an already-recorded
+                # offender would only restate it and crowd the [:5] window.
+                if any(p is o for p in sib.parents for o in offender_tags):
+                    continue
+                offender_tags.append(sib)
                 text = sib.get_text(strip=True)[:60]
-                if text:
+                if (
+                    text
+                    or sib.find(("img", "video", "iframe"))
+                    or sib.name in ("img", "video", "iframe")
+                ):
                     offenders.append(f"<{sib.name}> {text!r}")
         a.check(not offenders, f"{path} nothing visible after </footer>", "; ".join(offenders[:5]))
 
@@ -275,7 +285,10 @@ def piece_counts(soup: BeautifulSoup) -> dict[str, int]:
     elements carrying data-collection + data-piece-count."""
     counts: dict[str, int] = {}
     for el in soup.select("[data-collection][data-piece-count]"):
-        counts[el["data-collection"]] = int(el["data-piece-count"])
+        raw = str(el["data-piece-count"]).strip()
+        # Malformed markup must fail the data check, not crash the run.
+        if raw.isdigit():
+            counts[str(el["data-collection"])] = int(raw)
     return counts
 
 

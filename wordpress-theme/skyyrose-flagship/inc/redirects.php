@@ -63,7 +63,11 @@ add_action( 'init', 'skyyrose_collection_route_rewrites' );
  * @return string|false
  */
 function skyyrose_collections_keep_canonical_route( $redirect_url, $requested_url ) {
-	if ( false !== strpos( (string) $requested_url, '/collections/' ) ) {
+	// Scope to the exact canonical routes (trailing-slash + query tolerant) so
+	// WP's normal canonicalization — e.g. trailing-slash normalization on
+	// /collections/ itself or unknown child paths — keeps working.
+	$slugs = implode( '|', array_map( 'preg_quote', skyyrose_canonical_collection_slugs() ) );
+	if ( preg_match( '#/collections/(' . $slugs . ')/?($|\?)#', (string) $requested_url ) ) {
 		return false;
 	}
 	return $redirect_url;
@@ -249,6 +253,27 @@ function skyyrose_virtual_document_title( $title ) {
 	return $title;
 }
 add_filter( 'document_title_parts', 'skyyrose_virtual_document_title' );
+
+/**
+ * One-shot rewrite flush per theme version.
+ *
+ * The rewrite rules above (/collections/{slug}/, /size-guide/) need a
+ * permalink flush to take effect, but the SFTP deploy never triggers the
+ * switch-theme lifecycle where the theme's only other flush lives. Mirror
+ * the menu-rebuild pattern: flush once when SKYYROSE_VERSION changes.
+ * Runs at init 30 — after every add_rewrite_rule() registered at init 10.
+ *
+ * @since 1.8.0
+ * @return void
+ */
+function skyyrose_flush_rewrites_once() {
+	if ( get_option( 'skyyrose_rewrites_flushed_v' ) === SKYYROSE_VERSION ) {
+		return;
+	}
+	flush_rewrite_rules();
+	update_option( 'skyyrose_rewrites_flushed_v', SKYYROSE_VERSION );
+}
+add_action( 'init', 'skyyrose_flush_rewrites_once', 30 );
 
 /**
  * Case-normalize 404ing uppercase paths (e.g. /PRE-ORDER/ → /pre-order/).

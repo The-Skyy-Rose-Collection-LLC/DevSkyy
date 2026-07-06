@@ -228,7 +228,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose' ); ?></h3>
 		<div class="col-crossnav__grid stagger-grid">
 			<?php foreach ( $cross_nav as $nav ) : ?>
-				<a href="<?php echo esc_url( home_url( '/' . $nav['slug'] . '/' ) ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
+				<a href="<?php echo esc_url( $nav['url'] ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
 					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
 					<p><?php echo esc_html( $nav['desc'] ); ?></p>
 				</a>

@@ -112,7 +112,7 @@ class CollectionsConfigTest extends TestCase {
 	public function test_cross_nav_excludes_given_slug(): void {
 		$nav = skyyrose_get_cross_nav( 'black-rose' );
 		$slugs = array_column( $nav, 'slug' );
-		$this->assertNotContains( 'collection-black-rose', $slugs );
+		$this->assertNotContains( 'black-rose', $slugs );
 	}
 
 	public function test_cross_nav_returns_three_items_when_excluding_one(): void {
@@ -129,10 +129,11 @@ class CollectionsConfigTest extends TestCase {
 		}
 	}
 
-	public function test_cross_nav_slug_prefixed_with_collection(): void {
+	public function test_cross_nav_urls_are_canonical_collections_routes(): void {
 		$nav = skyyrose_get_cross_nav( 'black-rose' );
 		foreach ( $nav as $entry ) {
-			$this->assertStringStartsWith( 'collection-', $entry['slug'] );
+			$this->assertStringNotContainsString( '/collection-', $entry['url'] );
+			$this->assertStringContainsString( '/collections/' . $entry['slug'] . '/', $entry['url'] );
 		}
 	}
 

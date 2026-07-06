@@ -150,7 +150,10 @@ function skyyrose_get_cross_nav( string $exclude_slug ): array {
 			continue;
 		}
 		$out[] = array(
-			'slug'  => 'collection-' . $slug,
+			'slug'  => $slug,
+			// Canonical route from the single source of truth — never a
+			// reconstructed /collection-{slug}/ legacy path (WS2 review fix).
+			'url'   => $config['page_url'],
 			'name'  => $config['label'],
 			'desc'  => $config['short_desc'],
 			'class' => 'col-crossnav__link--' . $slug,
