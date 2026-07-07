@@ -45,7 +45,7 @@ function skyyrose_send_security_headers() {
 	 */
 	$csp_directives = array(
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net blob:",
+		"script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net blob:",
 		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",
 		"font-src 'self' data: https://fonts.wp.com https://cdn.jsdelivr.net",
