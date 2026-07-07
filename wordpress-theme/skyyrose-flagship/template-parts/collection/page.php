@@ -209,7 +209,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 	$lookbook_grid_class    = 'col-lookbook__grid' . ( count( $lookbook_images ) > 1 ? ' col-lookbook__grid--2up' : '' );
 	if ( ! empty( $lookbook_images ) ) :
 		?>
-		<section class="col-lookbook rv-clip-up" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>">
+		<section class="col-lookbook rv-clip-up" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>" style="content-visibility:auto;contain-intrinsic-size:0 500px;">
 			<div class="<?php echo esc_attr( $lookbook_grid_class ); ?>">
 				<?php foreach ( $lookbook_images as $lb ) : ?>
 					<figure class="col-lookbook__figure">
