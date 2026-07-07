@@ -292,8 +292,10 @@
 .sr-sticky-atc__btn:focus-visible {
 	background-color: var(--skyyrose-accent-dark, #9a5a64);
 	/* accent-dark is a different shade than accent — needs its own
-	   contrast token (Kids Capsule flips to white here; see
-	   single-product.css --sr-on-accent-dark). */
+	   contrast token (Love Hurts flips to white here too; Kids Capsule
+	   stays black — white on its #B8960C dark shade fails contrast at
+	   2.84:1, black passes at 7.41:1. See single-product.css
+	   --sr-on-accent-dark). */
 	color: var(--sr-on-accent-dark, #000000);
 }
 

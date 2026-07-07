@@ -101,7 +101,9 @@
 	object-fit: contain;
 	transition: filter 0.4s ease;
 }
-.navbar__logo-static {
+/* .navbar scope beats the page-level .homepage-v2 img reset (0,1,1) that
+   otherwise re-shows this at (0,1,0) — the #719/#721 cascade-trap class. */
+.navbar .navbar__logo-static {
 	display: none;
 }
 @media (min-width: 768px) {
@@ -452,10 +454,10 @@ a.announcement-bar__content:hover {
 	}
 	/* Rotating TSRC lockup is a continuous animation — swap it for the
 	   static poster frame instead of the autoplaying <video>. */
-	.navbar__logo-video {
+	.navbar .navbar__logo-video {
 		display: none;
 	}
-	.navbar__logo-static {
+	.navbar .navbar__logo-static {
 		display: block;
 	}
 }

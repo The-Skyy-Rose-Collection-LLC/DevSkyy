@@ -220,7 +220,11 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 		<div class="sr-ed__atc-wrap">
 			<?php woocommerce_template_single_add_to_cart(); ?>
 		</div>
-		<?php if ( function_exists( 'skyyrose_render_fit_block' ) ) { skyyrose_render_fit_block( $product->get_id() ); } ?>
+		<?php
+		if ( function_exists( 'skyyrose_render_fit_block' ) ) {
+			skyyrose_render_fit_block( $product->get_id() );
+		}
+		?>
 
 		<div class="sr-ed__stock">
 			<span class="sr-ed__stock-dot"></span>
@@ -268,5 +272,9 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 		</div>
 	</section>
 
-	<?php if ( function_exists( 'skyyrose_render_ed_sticky_atc' ) ) { skyyrose_render_ed_sticky_atc( $product, $price_html ); } ?>
+	<?php
+	if ( function_exists( 'skyyrose_render_ed_sticky_atc' ) ) {
+		skyyrose_render_ed_sticky_atc( $product, $price_html );
+	}
+	?>
 </article>
