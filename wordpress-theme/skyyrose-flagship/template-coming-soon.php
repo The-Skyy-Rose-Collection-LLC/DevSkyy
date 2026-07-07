@@ -345,11 +345,36 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute;
 			width: 1px; word-wrap: normal !important;
 		}
+		.skip-link {
+			position: absolute;
+			top: -100%;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 10000;
+			padding: 14px 32px;
+			background: var(--c-rose-gold);
+			color: #fff;
+			font-family: var(--ff-ui);
+			font-size: 0.75rem;
+			font-weight: 600;
+			letter-spacing: 0.18em;
+			text-transform: uppercase;
+			text-decoration: none;
+			border: 1px solid var(--c-gold);
+			border-top: none;
+			border-radius: 0 0 2px 2px;
+			transition: top 0.25s var(--ease);
+		}
+		.skip-link:focus {
+			top: 0;
+			outline: 2px solid var(--c-gold);
+			outline-offset: 3px;
+		}
 	</style>
 </head>
 <body class="skyyrose-coming-soon">
 
-	<a class="screen-reader-text" href="#cs-main">
+	<a class="skip-link" href="#cs-main">
 		<?php esc_html_e( 'Skip to main content', 'skyyrose' ); ?>
 	</a>
 
@@ -368,7 +393,7 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			</span>
 		</header>
 
-		<main id="cs-main" class="cs-stage" role="main">
+		<main id="cs-main" class="cs-stage" role="main" tabindex="-1">
 
 			<div class="cs-stage__left">
 				<h1 class="cs-headline cs-reveal" data-delay="1">

@@ -190,4 +190,4 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 
 	</header>
-	<div id="content" class="site-content">
+	<div id="content" class="site-content" tabindex="-1">

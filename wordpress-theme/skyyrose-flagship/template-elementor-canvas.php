@@ -27,12 +27,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 <body <?php body_class( 'skyyrose-canvas' ); ?>>
 <?php wp_body_open(); ?>
 
+<a class="skip-link" href="#primary"><?php esc_html_e( 'Skip to the story', 'skyyrose' ); ?></a>
+
+<div id="primary" tabindex="-1">
 <?php
 while ( have_posts() ) :
 	the_post();
 	the_content();
 endwhile;
 ?>
+</div>
 
 <?php
 // This template never calls get_footer(), so the sitewide mascot mount in
