@@ -76,7 +76,33 @@ Pages verified (11 total): Homepage, REST API, Collections ×3, About, Immersive
 
 Credentials required in `.env.wordpress`: `SSH_HOST`, `SSH_USER`, `SSH_PASS`, `WP_THEME_PATH`, `SFTP_HOST`, `SFTP_USER`, `SFTP_PASS`.
 
-Note: Binary assets in `assets/images/` are gitignored — rsync uploads them from local disk each deploy.
+Note: theme product imagery under `assets/images/products/` is **tracked in git**
+(deploy-from-clean-tree convention) even though `.gitignore` blanket-ignores theme
+webp — land new binaries with `git add -f` in the same change that references them.
+Guard: `tests/test_sot_assets_tracked.py` fails CI on any SOT-referenced image that
+isn't a tracked blob (bug-175). Deploy from a checkout of `main`, never from a
+feature-branch working tree.
+
+### WordPress MU-Plugins
+
+Production MU-plugins live in `wordpress/mu-plugins/` and deploy individually
+(SCP to `wp-content/mu-plugins/`, destination filename = source basename):
+
+```bash
+# Ally AJAX guard (default source) — keeps Ally out of AJAX/REST JSON responses
+STOPSHOW_ACK=1 bash scripts/deploy-mu-plugin.sh
+
+# Anonymous-cache guard — withholds WC session/cart cookies on anon GETs so the
+# Atomic/Batcache edge can cache them (TTFB 1.8s → ~0.06s on edge HIT)
+STOPSHOW_ACK=1 MU_SRC=wordpress/mu-plugins/skyyrose-anon-cache-guard.php \
+  bash scripts/deploy-mu-plugin.sh
+```
+
+The script php-lints the plugin, uploads, flushes cache, and verifies the
+CommerceKit nonce endpoint returns clean JSON. Post-deploy checks for the
+anon-cache guard: anonymous `curl -sI https://skyyrose.co/` must emit **no**
+`Set-Cookie`, repeat request must show `x-ac: … HIT`, and a fresh-session
+add-to-cart must still populate the cart (session starts on the wc-ajax POST).
 
 ### Backend (Docker)
 

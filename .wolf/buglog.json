@@ -2799,5 +2799,25 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-177",
+    "timestamp": "2026-07-07T11:20:00-07:00",
+    "error_message": "paid-api-stopgate blocked read-only commands (head/grep of deploy-theme.sh) and rejected STOPSHOW_ACK=1 when preceded by other env assignments",
+    "file": ".claude/hooks/paid-api-stopgate.sh",
+    "root_cause": "deploy rule substring-matched the script filename in any context; ACK bypass only accepted the token as the literal first command token",
+    "fix": "deploy rules now require execution context (interpreter invocation or command-position path); ACK accepted after leading assignment-shaped tokens only (flag/string-embedded tokens still blocked); deploy-mu-plugin.sh execution added to the gate; 17/17 regression matrix green (scratchpad/stopgate-matrix.sh pattern)",
+    "tags": [
+      "hooks",
+      "stopgate",
+      "false-positive",
+      "deploy",
+      "security"
+    ],
+    "related_bugs": [
+      "bug-174"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
   }
 ]

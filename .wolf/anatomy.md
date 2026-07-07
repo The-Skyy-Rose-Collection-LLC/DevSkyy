@@ -2694,6 +2694,7 @@
 - `deploy-holo-cards.sh` — scripts/deploy-holo-cards.sh -- Deploy Holo product card rollout to production (~3234 tok)
 - `deploy-pipeline.sh` — scripts/deploy-pipeline.sh -- Single-command deploy pipeline for SkyyRose WordPress theme (~1847 tok)
 - `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~9657 tok)
+- `deploy-mu-plugin.sh` — scripts/deploy-mu-plugin.sh -- SCP one MU-plugin (MU_SRC param, dest=basename) to wp-content/mu-plugins/ + nonce-endpoint verify; STOPSHOW_ACK-gated (~1100 tok)
 - `diagnose_cli_raw.py` — Build the exact CLI command the SDK would use and run it via subprocess (~507 tok)
 - `diagnose_orchestrator.py` — Test ClaudeSDKClient (async context manager) with MCP server. (~665 tok)
 - `diagnose_sdk.py` — Diagnostic: capture exact claude CLI stderr when SDK fails. (~554 tok)
@@ -3911,3 +3912,5 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `test/smoke.test.ts` — verifies module loads (1 test) (~80 tok)
 
 - `wordpress-theme/skyyrose-flagship/inc/collection-sot-reader.php` — collection sot.json reader + per-SKU product-image resolver `skyyrose_sot_product_image(_uri)($sku,$view)` (front-first, CSV fallback, placeholder). ~330t
+- `test_sot_assets_tracked.py` — tests/test_sot_assets_tracked.py -- Census guard: every image path in sot-images.json / collection sot.json / catalog CSV must be a git-tracked blob (bug-175 class) (~700 tok)
+- `skyyrose-anon-cache-guard.php` — wordpress/mu-plugins/skyyrose-anon-cache-guard.php -- WC session-handler swap + cart-cookie suppression on anonymous cacheable GETs; unblocks Batcache edge caching (TTFB 1.8s→0.06s) (~1300 tok)
