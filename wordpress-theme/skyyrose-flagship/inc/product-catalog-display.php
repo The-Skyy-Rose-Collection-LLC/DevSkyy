@@ -427,7 +427,7 @@ function skyyrose_get_display_product_fields( $item ) {
 	}
 
 	if ( '' === $permalink && $product_id > 0 ) {
-		$permalink = get_permalink( $product_id );
+		$permalink = get_permalink( $product_id ) ?: '';
 	}
 	if ( '' === $permalink ) {
 		$permalink = '#';
