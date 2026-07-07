@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,14 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.9.0 =
+* Homepage: hero on-model scroll strip, featured/lookbook sections retired
+* Product pages: per-collection theming, editorial layout, sticky add-to-cart
+* Collection pages: product feature in pin-narrative stage, lookbook imagery
+* Immersive: verified scene imagery wired
+* Header: rotating TSRC lockup (video + reduced-motion static)
+* Accessibility: text-safe accent tokens (WCAG AA small text on dark)
 
 = 1.8.0 =
 * Structural remediation: shell unification (single header/footer/nav, one skip link across all templates)
