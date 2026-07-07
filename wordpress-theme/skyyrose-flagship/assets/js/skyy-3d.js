@@ -134,10 +134,14 @@
 		// fetch falls under connect-src, which does not allow jsdelivr.
 		var injectScript = document.createElement( 'script' );
 		injectScript.type = 'module';
+		// /+esm endpoints rewrite the loaders' bare `from 'three'` specifiers to
+		// jsdelivr's own ESM URL for the same version — one shared three
+		// instance, no importmap needed (a late importmap is rejected once the
+		// page has already executed any module script, which the homepage does).
 		injectScript.textContent = [
-			"import * as THREE from '" + base + "/build/three.module.js';",
-			"import { GLTFLoader } from '" + base + "/examples/jsm/loaders/GLTFLoader.js';",
-			"import { DRACOLoader } from '" + base + "/examples/jsm/loaders/DRACOLoader.js';",
+			"import * as THREE from '" + base + "/+esm';",
+			"import { GLTFLoader } from '" + base + "/examples/jsm/loaders/GLTFLoader.js/+esm';",
+			"import { DRACOLoader } from '" + base + "/examples/jsm/loaders/DRACOLoader.js/+esm';",
 			"window.THREE = THREE;",
 			"window.THREE_GLTFLoader = GLTFLoader;",
 			"window.THREE_DRACOLoader = DRACOLoader;",
