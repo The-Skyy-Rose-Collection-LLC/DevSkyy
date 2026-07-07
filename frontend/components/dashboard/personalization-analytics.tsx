@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   Card,
@@ -22,6 +23,7 @@ import {
   MousePointerClick,
   Heart,
 } from 'lucide-react';
+import { getCollection } from '@/lib/collections';
 
 // ─── Brand ───────────────────────────────────────────────────────────────────
 
@@ -124,37 +126,62 @@ function generateFunnel(): FunnelStage[] {
   ];
 }
 
-function generateTopProducts(): TopProduct[] {
-  const products: TopProduct[] = [
-    { sku: 'br-006', name: 'BLACK Rose Sherpa Jacket', heatScore: 0, collection: 'Black Rose' },
-    { sku: 'lh-004', name: 'Love Hurts Varsity Jacket', heatScore: 0, collection: 'Love Hurts' },
-    { sku: 'br-004', name: 'BLACK Rose Hoodie', heatScore: 0, collection: 'Black Rose' },
-    { sku: 'sg-001', name: 'The Bay Set', heatScore: 0, collection: 'Signature' },
-    { sku: 'br-001', name: 'BLACK Rose Crewneck', heatScore: 0, collection: 'Black Rose' },
-    { sku: 'sg-009', name: 'The Sherpa Jacket', heatScore: 0, collection: 'Signature' },
-  ];
-  return products
-    .map((p) => ({ ...p, heatScore: randomInt(15, 95) }))
-    .sort((a, b) => b.heatScore - a.heatScore);
+// SKUs tracked by this demo panel. Only the SKU is hardcoded — name and
+// collection are resolved live from the catalog below so this never shows a
+// stale product name (e.g. a since-renamed product). heatScore itself stays
+// simulated: this panel has no real behavioral-tracking backend yet.
+const TRACKED_SKUS = ['br-006', 'lh-004', 'br-004', 'sg-001', 'br-001', 'sg-009'];
+
+function generateTopProducts(catalogLookup: Map<string, { name: string; collection: string }>): TopProduct[] {
+  return TRACKED_SKUS.map((sku) => {
+    const entry = catalogLookup.get(sku);
+    return {
+      sku,
+      name: entry?.name ?? sku,
+      collection: entry?.collection ?? '',
+      heatScore: randomInt(15, 95),
+    };
+  }).sort((a, b) => b.heatScore - a.heatScore);
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function PersonalizationAnalytics() {
+  const { data: productsData } = useQuery({
+    queryKey: ['products', 'personalization-tracked'],
+    queryFn: async () => {
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('Failed to load products');
+      const json = await res.json();
+      return json.data.products as Array<{ sku: string; name: string; collection: string }>;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const catalogLookup = useMemo(() => {
+    const map = new Map<string, { name: string; collection: string }>();
+    for (const p of productsData ?? []) {
+      const collectionName = getCollection(p.collection)?.name ?? p.collection;
+      map.set(p.sku, { name: p.name, collection: collectionName });
+    }
+    return map;
+  }, [productsData]);
+
   const [metrics, setMetrics] = useState<PersonalizationMetrics>(generateMetrics);
   const [segments, setSegments] = useState<IntentSegment[]>(generateIntentSegments);
   const [funnel, setFunnel] = useState<FunnelStage[]>(generateFunnel);
-  const [topProducts, setTopProducts] = useState<TopProduct[]>(generateTopProducts);
+  const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshData = useCallback(() => {
     setMetrics(generateMetrics());
     setSegments(generateIntentSegments());
     setFunnel(generateFunnel());
-    setTopProducts(generateTopProducts());
-  }, []);
+    setTopProducts(generateTopProducts(catalogLookup));
+  }, [catalogLookup]);
 
   useEffect(() => {
+    refreshData();
     intervalRef.current = setInterval(refreshData, 15000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);

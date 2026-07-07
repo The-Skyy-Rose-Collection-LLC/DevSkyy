@@ -1,7 +1,7 @@
 {
  "_generated_by": "scripts/build_v7_cards.py \u2014 DO NOT EDIT. SOT = skyyrose-catalog.csv (fields) \u00d7 promoted v7 served tree (imagery). Regenerate after CSV/imagery changes; CI check 'v7_cards_current' enforces this.",
  "_authority": "verdict:verified hub images only \u2014 see feedback_real_products_only",
- "_count": 27,
+ "_count": 28,
  "cards": [
   {
    "sku": "br-001",
@@ -48,7 +48,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-004/alt.png"
+     "uri": "assets/images/products/v7/br-004/alt.webp"
     }
    ]
   },
@@ -67,7 +67,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-006/alt.png"
+     "uri": "assets/images/products/v7/br-006/alt.webp"
     }
    ]
   },
@@ -82,7 +82,11 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/br-007/front.png"
+     "uri": "assets/images/products/v7/br-007/front.webp"
+    },
+    {
+     "face": "back",
+     "uri": "assets/images/products/v7/br-007/back.webp"
     }
    ]
   },
@@ -101,7 +105,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-008/alt.png"
+     "uri": "assets/images/products/v7/br-008/alt.webp"
     }
    ]
   },
@@ -120,7 +124,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-010/alt.png"
+     "uri": "assets/images/products/v7/br-010/alt.webp"
     }
    ]
   },
@@ -139,7 +143,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-011/alt.png"
+     "uri": "assets/images/products/v7/br-011/alt.webp"
     },
     {
      "face": "back",
@@ -181,7 +185,7 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/br-015/alt.png"
+     "uri": "assets/images/products/v7/br-015/alt.webp"
     }
    ]
   },
@@ -234,7 +238,22 @@
     },
     {
      "face": "alt",
-     "uri": "assets/images/products/v7/lh-002/alt.png"
+     "uri": "assets/images/products/v7/lh-002/alt.webp"
+    }
+   ]
+  },
+  {
+   "sku": "lh-003",
+   "name": "Love Hurts Basketball Shorts",
+   "price": 75,
+   "collection": "love-hurts",
+   "badge": "",
+   "edition": 250,
+   "preorder": false,
+   "shots": [
+    {
+     "face": "front",
+     "uri": "assets/images/products/v7/lh-003/front.webp"
     }
    ]
   },
@@ -336,7 +355,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-003/front.png"
+     "uri": "assets/images/products/v7/sg-003/front.webp"
     }
    ]
   },
@@ -461,7 +480,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-014/front.png"
+     "uri": "assets/images/products/v7/sg-014/front.webp"
     }
    ]
   },
@@ -476,7 +495,7 @@
    "shots": [
     {
      "face": "front",
-     "uri": "assets/images/products/v7/sg-015/front.png"
+     "uri": "assets/images/products/v7/sg-015/front.webp"
     }
    ]
   }

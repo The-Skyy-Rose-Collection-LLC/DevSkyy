@@ -96,7 +96,7 @@ get_header();
 					href="
 					<?php
 					$_sig_col_page = get_page_by_path( 'collection-signature' );
-					echo esc_url( $_sig_col_page ? get_permalink( $_sig_col_page ) : home_url( '/collection-signature/' ) );
+					echo esc_url( $_sig_col_page ? get_permalink( $_sig_col_page ) : home_url( '/collections/signature/' ) );
 					?>
 					"
 					class="lp-btn lp-btn--ghost"

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   ArrowRight,
   Check,
@@ -16,11 +15,14 @@ import {
   Sparkles,
   ShoppingBag,
 } from 'lucide-react';
-import { getAllCollections, type CollectionConfig } from '@/lib/collections';
+import type { CollectionConfig } from '@/lib/collections';
 import { useCartStore, type CartItem } from '@/lib/stores/cart-store';
 
-export default function PreOrderPage() {
-  const collections = getAllCollections();
+interface PreOrderPageProps {
+  collections: CollectionConfig[];
+}
+
+export default function PreOrderPage({ collections }: PreOrderPageProps) {
   const [activeCollection, setActiveCollection] = useState<string>('all');
   const { items: cart, addItem, removeItem: removeCartItem, subtotal, itemCount } = useCartStore();
   const [email, setEmail] = useState('');
@@ -444,13 +446,15 @@ function ProductPreOrderCard({
     >
       {/* Image */}
       <div className="relative aspect-square overflow-hidden">
-        {!imageError ? (
-          <Image
-            src={image}
+        {!imageError && image ? (
+          // SOT paths are theme assets served by skyyrose.co, not the dashboard's
+          // public/ dir — next/image throws synchronously on an unconfigured host
+          // before onError can fire, so a plain <img> degrades gracefully instead.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/${image.replace(/^\/+/, '')}`}
             alt={name}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
             onError={() => setImageError(true)}
           />
         ) : (

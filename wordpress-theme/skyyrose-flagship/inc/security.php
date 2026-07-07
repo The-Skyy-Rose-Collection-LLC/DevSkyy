@@ -45,12 +45,23 @@ function skyyrose_send_security_headers() {
 	 */
 	$csp_directives = array(
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net blob:",
-		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		// https://js.stripe.com is CRITICAL — required for Stripe Elements, Apple Pay, Google Pay.
+		// Without it the browser blocks the Stripe JS bundle before any checkout renders.
+		// 'wasm-unsafe-eval' permits WebAssembly compilation ONLY (not JS eval) —
+		// required by the self-hosted Draco decoder for the 3D mascot GLB.
+		"script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net https://js.stripe.com blob:",
+		// s0.wp.com and widgets.wp.com serve inline widget stylesheets (Jetpack Share, WP.com bars).
+		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://s0.wp.com https://widgets.wp.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",
 		"font-src 'self' data: https://fonts.wp.com https://cdn.jsdelivr.net",
+		// Elementor Mixpanel telemetry: blocked by BOTH the PHP opt-out filter
+		// (performance.php) AND its absence from connect-src — defense in depth;
+		// do NOT re-add api-eu.mixpanel.com here.
+		// requires verified Elementor source — using CSP allowlist as the guaranteed path.
+		// If future Elementor versions expose a stable opt-out filter, prefer that approach.
 		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
-		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com",
+		// wordpress.com frame: required for Jetpack / WP.com widget iframes.
+		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com https://wordpress.com https://js.stripe.com",
 		"frame-ancestors 'self'",
 		"worker-src 'self' blob:",
 		"child-src 'self' blob:",

@@ -282,7 +282,7 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 						}
 
 						if ( '#' === $skyyrose_link || is_wp_error( $skyyrose_link ) ) {
-							$skyyrose_link  = home_url( '/collection-' . $skyyrose_collection['slug'] . '/' );
+							$skyyrose_link  = home_url( '/collections/' . $skyyrose_collection['slug'] . '/' );
 							$skyyrose_count = __( 'Explore', 'skyyrose' );
 						}
 						?>

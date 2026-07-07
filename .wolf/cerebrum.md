@@ -233,3 +233,10 @@ Goal: eliminate fix cycles caused by outdated or assumed API knowledge — spend
 
 ### Key Learning — model-viewer compressed GLBs (2026-06-28)
 gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer needs decoders wired BEFORE the module script: `self.ModelViewerElement.meshoptDecoderLocation` (meshopt OFF by default) + `.ktx2TranscoderLocation`. gstatic basis transcoder is CORS-blocked from localhost → VENDOR locally (`renders/3d/_viewer/meshopt_decoder.js` + `basis/basis_transcoder.js`+`.wasm`), same-origin paths. Local file:// can't fetch GLBs at all — must serve over http. Same decoders required if 3D ships to skyyrose.co (self-host them in the theme).
+
+## 2026-07-05 — structural remediation session
+- **User correction (Do-Not-Repeat):** the brand Instagram is `instagram.com/skyyrose.co` (dot handle). `skyyroseco` AND `theskyyrosecollection` are both legacy — never emit either. Canonical set: instagram/tiktok skyyrose.co-family per founder, facebook.com/TheSkyyRoseCollection; x.com/skyyroseco pending HG-1 confirmation.
+- **Key learning:** live skyyrose.co ran theme 1.7.0 = feat/site-audit-batch (PR #704, OPEN — never merged) while main sat at 1.6.7. Always verify live `?ver=` against branch versions before choosing a base branch; "merged and deployed" memories can be half-true (deployed ≠ merged).
+- **Key learning:** the nav menu is theme-managed (inc/menu-setup.php definitions + SKYYROSE_MENU_BUILD_VERSION bump ⇒ one-shot rebuild on deploy). Menu content changes are THEME code, not site-state scripts.
+- **Key learning:** live /collections/ page's assigned template `skyyrose-canvas.php` exists only on the server (stale file — deploy is a full hot-swap, so any deploy removes it). Shipping `page-collections.php` wins template hierarchy the moment it vanishes; zero site-state mutation needed.
+- **Key learning:** preflight `PENDING_USER_ASSETS` = render-pipeline bundle status (data/product-bundles/ probe), NOT web-imagery availability. Never gate storefront rendering on it — gate on catalog display image existing on disk.

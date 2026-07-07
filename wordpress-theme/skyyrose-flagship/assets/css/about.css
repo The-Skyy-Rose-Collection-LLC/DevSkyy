@@ -162,13 +162,17 @@
 .abt-hero__portrait {
 	margin: 0;
 	width: 100%;
-	max-width: 560px;
+	max-width: 640px; /* headroom over the ~520-580px column so it fills the grid track instead of leaving a gap on wide desktops */
 	position: relative;
 }
+/* 2:3 = the source asset's native ratio (724x1086) — the previous 4:5 box
+   center-cropped it, clipping the hair buns and shoes. Full-frame at the
+   native ratio reads taller and more editorial ("enlarge" via composition,
+   not a bare number bump) while showing the whole figure. */
 .abt-hero__portrait img {
 	display: block;
 	width: 100%;
-	aspect-ratio: 4 / 5;
+	aspect-ratio: 2 / 3;
 	object-fit: cover;
 	filter: grayscale(8%) contrast(1.05);
 }

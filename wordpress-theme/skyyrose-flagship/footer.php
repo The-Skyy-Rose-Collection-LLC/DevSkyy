@@ -163,7 +163,7 @@ defined( 'ABSPATH' ) || exit;
 						foreach ( $footer_collections as $footer_slug => $footer_label ) :
 							?>
 							<li>
-								<a href="<?php echo esc_url( home_url( '/collection-' . $footer_slug . '/' ) ); ?>">
+								<a href="<?php echo esc_url( home_url( '/collections/' . $footer_slug . '/' ) ); ?>">
 									<?php echo esc_html( $footer_label ); ?>
 								</a>
 							</li>
@@ -182,8 +182,8 @@ defined( 'ABSPATH' ) || exit;
 						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contact/#size-guide' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contact/#care-instructions' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose' ); ?></a></li>
 					</ul>
 				</div>
 
@@ -246,6 +246,12 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 		</div><!-- .footer-copyright -->
 
+		<?php
+		// Mobile bottom nav is position:fixed chrome; it lives INSIDE the
+		// footer landmark so nothing visible renders after </footer>
+		// (structural remediation WS4 DOM acceptance).
+		get_template_part( 'template-parts/mobile-bottom-nav' );
+		?>
 	</footer><!-- #colophon -->
 </div><!-- #page -->
 
@@ -253,8 +259,8 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
 <?php
-// Skyy mascot — gated on the Customizer kill switch (live by default),
-// checkout always excluded.
+// Skyy mascot — reinstated v1.9.0 with finalized character art. Gated on the
+// Customizer kill switch (live by default), checkout always excluded.
 if ( skyyrose_mascot_is_enabled() && ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
 	get_template_part( 'template-parts/skyy-mascot' );
 }
