@@ -183,7 +183,7 @@
 	font-weight: 500;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: var(--skyyrose-accent);
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
 	opacity: 0.75;
 }
 

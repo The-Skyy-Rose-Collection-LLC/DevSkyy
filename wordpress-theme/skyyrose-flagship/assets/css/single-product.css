@@ -332,8 +332,11 @@
 	border-top: 1px solid rgba(var(--skyyrose-accent-rgb), 0.18);
 }
 
-/* Chapter 1: Encounter — full-bleed hero image, no section padding. */
-.sr-ed__encounter {
+/* Chapter 1: Encounter — full-bleed hero image, no section padding.
+   Scoped under .sr-editorial (0,2,0) to beat .sr-editorial section (0,1,1)
+   above — a bare .sr-ed__encounter (0,1,0) loses that cascade fight and
+   the 860px max-width/padding leak through. */
+.sr-editorial .sr-ed__encounter {
 	padding: 0;
 	max-width: 100%;
 }
