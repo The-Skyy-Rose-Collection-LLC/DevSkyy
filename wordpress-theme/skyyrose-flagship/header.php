@@ -73,17 +73,39 @@ defined( 'ABSPATH' ) || exit;
 					<?php endif; ?>
 				</div>
 
-				<!-- CENTER: Brand Primary Logo (rose-gold SR monogram, pre-sized 50x50 nav variant) -->
+				<!-- CENTER: Brand Primary Logo (rotating TSRC rose-gold 3D lockup — webm+alpha, animated-webp <video> fallback; static poster substitutes under prefers-reduced-motion) -->
 				<div class="navbar__brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" aria-label="<?php esc_attr_e( 'SkyyRose — Home', 'skyyrose' ); ?>">
+						<video
+							class="navbar__logo-video"
+							width="60"
+							height="44"
+							poster="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-static@2x.webp' ); ?>"
+							autoplay
+							muted
+							loop
+							playsinline
+							disablepictureinpicture
+							fetchpriority="low"
+							aria-hidden="true">
+							<source src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-rotating@2x.webm' ); ?>" type="video/webm">
+							<?php // Fallback content only paints if no <source> is playable (e.g. Safari versions without WebM support) — same nav-logo weight class as the primary video, so it must not outrank real above-fold content either. ?>
+							<img
+								src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-rotating@2x.webp' ); ?>"
+								alt=""
+								class="navbar__logo-img"
+								width="60"
+								height="44"
+								decoding="async"
+								fetchpriority="low">
+						</video>
 						<img
-							src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram-nav.webp' ); ?>"
-							alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>"
-							class="navbar__logo-img"
-							width="50"
-							height="50"
-							decoding="async"
-							fetchpriority="high">
+							src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-static@2x.webp' ); ?>"
+							alt=""
+							class="navbar__logo-static"
+							width="60"
+							height="44"
+							decoding="async">
 						<span class="screen-reader-text"><?php esc_html_e( 'SkyyRose', 'skyyrose' ); ?></span>
 					</a>
 				</div>

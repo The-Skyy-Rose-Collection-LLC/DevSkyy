@@ -94,6 +94,22 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 						height="896"
 						<?php echo ( 0 === $index && ! $embedded ) ? 'fetchpriority="high"' : 'loading="lazy"'; ?>
 						data-warp>
+				<?php else : ?>
+					<?php
+					/*
+					 * Branded empty state — immersive-core.css §7 (.scene-layer--missing)
+					 * already paints an accent-tinted gradient here so the room never
+					 * renders blank; this caption makes the state read as an intentional
+					 * "next chapter" rather than a broken image.
+					 * aria-hidden: the room name is already announced via the
+					 * room-indicator buttons and the live .room-name region — this is
+					 * a sighted-only decorative label, not new information.
+					 */
+					?>
+					<div class="scene-layer-fallback" aria-hidden="true">
+						<span class="scene-layer-fallback__name"><?php echo esc_html( $room_name ); ?></span>
+						<span class="scene-layer-fallback__note"><?php esc_html_e( 'Coming soon.', 'skyyrose' ); ?></span>
+					</div>
 				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
@@ -238,6 +254,17 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php endif; ?>
 			</picture>
+			<?php
+			/*
+			 * No-JS fallback: .scene-lockup starts at opacity:0 in
+			 * immersive-core.css, awaiting the GSAP intro reveal
+			 * (immersive-core.js). If JS never runs (blocked, failed,
+			 * disabled) the lockup would stay invisible forever — force it
+			 * visible, matching the reduced-motion override already in
+			 * immersive-core.css §6. Same idiom as header.php / front-page.php.
+			 */
+			?>
+			<noscript><style>.scene-lockup{opacity:1!important}</style></noscript>
 		<?php endif; ?>
 		<!-- Hairline accent rule: JS queries .scene-hairline; CSS sizes it (width:120px) in immersive-core.css. The intro clones it into the overlay and GSAP animates scaleX 0→1 in step 3. -->
 		<div class="scene-hairline" aria-hidden="true"></div>

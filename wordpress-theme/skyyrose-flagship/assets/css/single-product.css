@@ -9,6 +9,45 @@
 	padding-top: 120px;
 }
 
+/* ==========================================================================
+   PER-COLLECTION THEMING — On-Accent Contrast Tokens
+   --------------------------------------------------------------------------
+   --skyyrose-accent already cascades per [data-collection] (design-tokens.css).
+   Signature gold / Black Rose silver / Kids Capsule rose-gold are light
+   colors that fail WCAG AA (4.5:1) with white text on top of a filled
+   accent surface (CTA hover, selected size chip). Love Hurts crimson is
+   dark enough that white text passes instead. --sr-on-accent picks the
+   correct foreground wherever --skyyrose-accent is used as a fill.
+
+   --sr-on-accent-dark is the same idea for --skyyrose-accent-dark (the
+   darker hover/pressed shade used by the sticky ATC button). Kids Capsule's
+   rose-gold-dark (#9A5662) is dark enough that only WHITE text clears
+   4.5:1 there (black text on it measures ~3.9:1) — the opposite of its
+   base fill — so it gets its own override.
+
+   Coverage, all four collections:
+     signature    (gold #D4AF37)      -> black text on both fills (default)
+     black-rose   (silver #C0C0C0)    -> black text on both fills (default)
+     love-hurts   (crimson #DC143C)   -> white text on both fills (override)
+     kids-capsule (rose-gold #B76E79) -> black on base, white on -dark (override)
+   ========================================================================== */
+.sr-product,
+.sr-editorial {
+	--sr-on-accent: #000000;
+	--sr-on-accent-dark: #000000;
+}
+
+.sr-product[data-collection="love-hurts"],
+.sr-editorial[data-collection="love-hurts"] {
+	--sr-on-accent: #ffffff;
+	--sr-on-accent-dark: #ffffff;
+}
+
+.sr-product[data-collection="kids-capsule"],
+.sr-editorial[data-collection="kids-capsule"] {
+	--sr-on-accent-dark: #ffffff;
+}
+
 .sr-container {
 	max-width: 1600px;
 	margin: 0 auto;
@@ -29,9 +68,9 @@
 .sr-gallery-main {
 	position: relative;
 	aspect-ratio: 4 / 5;
-	max-width: 640px;
+	max-width: 720px;
 	background: var(--color-page-bg, #0a0a0a);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.2);
 	overflow: hidden;
 	margin-bottom: 24px;
 }
@@ -48,7 +87,7 @@
 
 .sr-gallery-thumbs {
 	display: grid;
-	grid-template-columns: repeat(6, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	gap: 12px;
 }
 
@@ -64,6 +103,11 @@
 
 .sr-thumb:hover, .sr-thumb-active {
 	border-color: var(--skyyrose-accent);
+}
+
+.sr-thumb:focus-visible {
+	outline: 2px solid var(--skyyrose-accent);
+	outline-offset: 2px;
 }
 
 .sr-thumb img {
@@ -96,7 +140,7 @@
 	color: var(--color-text-primary, #fff);
 	margin-bottom: 40px;
 	padding-bottom: 24px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	border-bottom: 1px solid rgba(var(--skyyrose-accent-rgb), 0.35);
 }
 
 .sr-info-desc {
@@ -137,6 +181,48 @@
 	color: var(--color-text-primary, #fff);
 }
 
+/* Size Guide trigger — ghost text link, shared by both PDP layouts
+   (.sr-product and .sr-editorial). Opens template-parts/size-guide-modal.php
+   via its site-wide [data-open-size-guide] delegated listener (footer.php);
+   no new JS wiring needed here. */
+.sr-size-guide-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 11px;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.55);
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 4px;
+	text-decoration-color: rgba(255, 255, 255, 0.25);
+	transition: color 0.25s ease, text-decoration-color 0.25s ease;
+}
+
+.sr-size-guide-link:hover {
+	color: var(--skyyrose-accent);
+	text-decoration-color: var(--skyyrose-accent);
+}
+
+.sr-size-guide-link:focus-visible {
+	outline: 2px solid var(--skyyrose-accent);
+	outline-offset: 3px;
+	color: var(--skyyrose-accent);
+	text-decoration-color: var(--skyyrose-accent);
+}
+
+/* Standalone placement on the simple PDP: sits just above the ATC form,
+   at the exact moment the customer is choosing a size. */
+.sr-info-size-guide {
+	display: block;
+	margin: 0 0 20px;
+}
+
 /* Add to Cart */
 .sr-atc-wrap {
 	margin-bottom: 32px;
@@ -158,13 +244,379 @@
 
 .single_add_to_cart_button:hover {
 	background: var(--skyyrose-accent) !important;
-	color: var(--color-white, #fff) !important;
+	/* Per-collection contrast: black text on light accents (gold/silver/
+	   rose-gold), white text on Love Hurts crimson. See --sr-on-accent above. */
+	color: var(--sr-on-accent, #000) !important;
+}
+
+.single_add_to_cart_button:focus-visible {
+	outline: 2px solid var(--skyyrose-accent) !important;
+	outline-offset: 3px;
+}
+
+/* Round-trip states WooCommerce's AJAX add-to-cart JS toggles on this exact
+   button element (wc-add-to-cart.js: .loading while the request is in
+   flight, .added on success). Base rule above uses !important, so these
+   must too or the state is invisible. Covers both PDP layouts — the
+   editorial ATC (Chapter 5) renders the same core WC button. */
+.single_add_to_cart_button.loading {
+	opacity: 0.55 !important;
+	cursor: not-allowed !important;
+	pointer-events: none !important;
+}
+
+.single_add_to_cart_button.added {
+	background: var(--skyyrose-accent) !important;
+	color: var(--sr-on-accent, #000) !important;
+}
+
+/* "View cart" link WooCommerce inserts after the button on a successful
+   AJAX add (class .added_to_cart, core-generated markup — not ours). */
+.sr-atc-wrap .added_to_cart,
+.sr-ed__atc-wrap .added_to_cart {
+	display: inline-block;
+	margin-top: 12px;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.sr-atc-wrap .added_to_cart:hover,
+.sr-atc-wrap .added_to_cart:focus-visible,
+.sr-ed__atc-wrap .added_to_cart:hover,
+.sr-ed__atc-wrap .added_to_cart:focus-visible {
+	color: var(--color-text-primary, #fff);
+}
+
+/* Customer improvement: sticky Add to Cart on mobile — pure CSS, no JS.
+   .sr-atc-wrap sticks to the bottom of its scrolling column (.sr-info)
+   once the customer scrolls past it, keeping the CTA reachable through
+   the specs/description without a floating overlay. */
+@media (max-width: 768px) {
+	.sr-atc-wrap {
+		position: sticky;
+		bottom: 0;
+		background: var(--color-page-bg, #050505);
+		padding: 16px 0;
+		z-index: 20;
+		border-top: 1px solid rgba(var(--skyyrose-accent-rgb), 0.25);
+	}
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
 	.sr-hero-grid { grid-template-columns: 1fr; gap: 48px; }
 	.sr-container { padding: 0 24px; }
+}
+
+/* ==========================================================================
+   EDITORIAL 7-CHAPTER PDP — .sr-editorial (product-detail-editorial.php)
+   --------------------------------------------------------------------------
+   Base layout + per-collection theming for the dossier-driven scroll PDP.
+   Accent color and on-accent contrast come from the tokens declared above
+   ([data-collection] cascade + --sr-on-accent). Chapter 6 "Wears With" was
+   retired (founder canon: no related products on PDP) — do not re-add.
+   ========================================================================== */
+.sr-editorial {
+	background: var(--color-page-bg, #050505);
+	color: var(--color-text-primary, #fff);
+}
+
+.sr-editorial section {
+	padding: clamp(56px, 8vw, 120px) 24px;
+	max-width: 860px;
+	margin: 0 auto;
+}
+
+/* Hairline divider between chapters, tinted per collection. */
+.sr-editorial section + section {
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb), 0.18);
+}
+
+/* Chapter 1: Encounter — full-bleed hero image, no section padding. */
+.sr-ed__encounter {
+	padding: 0;
+	max-width: 100%;
+}
+
+.sr-ed__encounter-img {
+	display: block;
+	width: 100%;
+	height: min(100vh, 900px);
+	object-fit: cover;
+}
+
+.sr-ed__chapter-num {
+	display: block;
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 12px;
+	letter-spacing: 0.35em;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	margin-bottom: 20px;
+}
+
+.sr-ed__section-title {
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(28px, 4vw, 44px);
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	line-height: 1.15;
+	margin: 0 0 32px;
+}
+
+/* Chapter 2: The Piece */
+.sr-ed__garment-lock {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 13px;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.55);
+	margin: 0 0 24px;
+}
+
+/* Spec-hierarchy chip row — material / fit / made-in as a distinct
+   technical block, separated from the garment lock and prose above/below
+   by a hairline rule (not the banned accent side-stripe). */
+.sr-ed__meta-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 28px;
+	margin: 0 0 28px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid rgba(var(--skyyrose-accent-rgb), 0.15);
+}
+
+.sr-ed__meta-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.sr-ed__meta-label {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 10px;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.sr-ed__meta-value {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.sr-ed__branding-detail {
+	margin-bottom: 20px;
+}
+
+.sr-ed__branding-label {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	margin: 0 0 6px;
+}
+
+.sr-ed__branding-detail p {
+	font-family: var(--skyyrose-font-body);
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: rgba(255, 255, 255, 0.75);
+	margin: 0;
+}
+
+.sr-ed__description {
+	font-family: var(--skyyrose-font-body);
+	font-size: 1.2rem;
+	line-height: 1.8;
+	color: rgba(255, 255, 255, 0.75);
+	max-width: 60ch;
+}
+
+/* Chapter 3: The Story — subtle collection-tinted backdrop. */
+.sr-ed__story {
+	background: radial-gradient(ellipse at top, rgba(var(--skyyrose-accent-rgb), 0.06), transparent 70%);
+}
+
+.sr-ed__story-text {
+	font-family: var(--skyyrose-font-body);
+	font-size: 1.25rem;
+	line-height: 1.85;
+	color: rgba(255, 255, 255, 0.8);
+	max-width: 62ch;
+	margin: 0 0 32px;
+}
+
+/* Editorial pull-quote: oversized serif glyph + top hairline mark the
+   quote structurally (no side-stripe — see impeccable absolute_bans). */
+.sr-ed__blockquote {
+	position: relative;
+	margin: 48px 0;
+	padding-top: 28px;
+	max-width: 62ch;
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb), 0.25);
+}
+
+.sr-ed__blockquote::before {
+	content: '\201C';
+	display: block;
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(48px, 6vw, 72px);
+	line-height: 1;
+	color: var(--skyyrose-accent);
+	margin-bottom: -0.2em;
+}
+
+.sr-ed__blockquote p {
+	font-family: var(--skyyrose-font-display);
+	font-style: italic;
+	font-size: clamp(20px, 2.4vw, 28px);
+	line-height: 1.5;
+	color: var(--color-text-primary, #fff);
+	margin: 0;
+}
+
+/* Chapter 4: The Fit */
+.sr-ed__fit-images {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+}
+
+.sr-ed__fit-img {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.15);
+}
+
+/* Chapter 5: Make It Yours (Add to Cart) */
+.sr-ed__price {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 28px;
+	color: var(--color-text-primary, #fff);
+	margin: 0 0 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid rgba(var(--skyyrose-accent-rgb), 0.35);
+}
+
+/* Label + Size Guide trigger share a row so the affordance sits at the
+   exact decision point, not buried in a footer or drawer link. */
+.sr-ed__sizes-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 0 0 12px;
+}
+
+.sr-ed__sizes-label {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 12px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0;
+}
+
+.sr-ed__sizes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 32px;
+}
+
+.sr-ed__size {
+	appearance: none;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: var(--color-text-primary, #fff);
+	font-family: var(--skyyrose-font-ui);
+	font-size: 14px;
+	letter-spacing: 0.08em;
+	padding: 10px 20px;
+	cursor: pointer;
+	transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.sr-ed__size:hover {
+	border-color: var(--skyyrose-accent);
+}
+
+/* Selected state (toggled by single-product.js): filled accent, contrast-
+   correct text via --sr-on-accent (see token block above). */
+.sr-ed__size.is-selected {
+	background: var(--skyyrose-accent);
+	border-color: var(--skyyrose-accent);
+	color: var(--sr-on-accent, #000);
+}
+
+.sr-ed__size:focus-visible {
+	outline: 2px solid var(--skyyrose-accent);
+	outline-offset: 2px;
+}
+
+.sr-ed__stock {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 12px;
+	letter-spacing: 0.05em;
+	color: rgba(255, 255, 255, 0.65);
+	margin-top: 20px;
+}
+
+.sr-ed__stock-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--skyyrose-accent);
+	flex-shrink: 0;
+}
+
+.sr-ed__edition {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 12px;
+	letter-spacing: 0.05em;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	margin-top: 12px;
+}
+
+/* Chapter 7: Care + Craft */
+.sr-ed__care-items {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 40px;
+}
+
+.sr-ed__care-item-title {
+	font-family: var(--skyyrose-font-ui);
+	font-size: 13px;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	margin: 0 0 12px;
+}
+
+.sr-ed__care-item p {
+	font-family: var(--skyyrose-font-body);
+	font-size: 0.95rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.65);
+	margin: 0;
+}
+
+@media (max-width: 900px) {
+	.sr-editorial section { padding: 56px 20px; }
+	.sr-ed__fit-images { grid-template-columns: 1fr; }
+	.sr-ed__care-items { grid-template-columns: 1fr; gap: 28px; }
 }
 
 /* ==========================================================================

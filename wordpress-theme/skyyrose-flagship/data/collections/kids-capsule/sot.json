@@ -57,7 +57,22 @@
   "imagery": {
     "scene_portrait": null,
     "hero_backdrop": null,
-    "atmospherics": [],
+    "atmospherics": [
+      {
+        "path": "images/immersive/scene-kids-capsule-playroom",
+        "resolved": "images/immersive/scene-kids-capsule-playroom.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "KC playroom immersive scene still \u2014 canon regen 2026-07-02 (dark premium, no pastels)."
+      },
+      {
+        "path": "images/immersive/scene-kids-capsule-runway",
+        "resolved": "images/immersive/scene-kids-capsule-runway.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "KC runway immersive scene still \u2014 canon regen 2026-07-02."
+      }
+    ],
     "patches": [],
     "lettering_alt": [],
     "lockup_parts": [],

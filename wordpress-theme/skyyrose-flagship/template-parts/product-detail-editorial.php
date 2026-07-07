@@ -107,6 +107,28 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<?php if ( $garment_lock ) : ?>
 			<p class="sr-ed__garment-lock"><?php echo esc_html( $garment_lock ); ?></p>
 		<?php endif; ?>
+		<?php if ( ! empty( $meta['material'] ) || ! empty( $meta['fit'] ) || ! empty( $meta['made_in'] ) ) : ?>
+			<div class="sr-ed__meta-row">
+				<?php if ( ! empty( $meta['material'] ) ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Material', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( $meta['material'] ); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ( ! empty( $meta['fit'] ) ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Fit', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( $meta['fit'] ); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ( ! empty( $meta['made_in'] ) ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Made In', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>
+					</div>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 		<?php if ( ! empty( $branding['front'] ) ) : ?>
 			<div class="sr-ed__branding-detail">
 				<h3 class="sr-ed__branding-label"><?php esc_html_e( 'Front', 'skyyrose' ); ?></h3>
@@ -175,7 +197,12 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<p class="sr-ed__price"><?php echo wp_kses_post( $price_html ); ?></p>
 
 		<?php if ( $sizes_raw ) : ?>
-			<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
+			<div class="sr-ed__sizes-header">
+				<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
+				<button type="button" class="sr-size-guide-link" data-open-size-guide>
+					<?php esc_html_e( 'Size Guide', 'skyyrose' ); ?>
+				</button>
+			</div>
 			<div class="sr-ed__sizes" role="group" aria-labelledby="sr-ed-sizes-label">
 				<?php foreach ( explode( '|', $sizes_raw ) as $size ) : ?>
 					<?php $size_clean = trim( $size ); ?>

@@ -129,9 +129,20 @@
 	inset: 0;
 	z-index: 2;
 	pointer-events: none;
+	/*
+	 * Accent-tinted mid-stop before the black falls to edge: a whisper of
+	 * each room's key-light color (the same --skyyrose-accent already
+	 * carrying the beacons/hairline for this collection — one accent per
+	 * surface, not a second competing hue) so the vignette itself reads as
+	 * that world's light, not a generic dark frame reused across all four
+	 * collections. [data-collection] on .immersive-scene (design-tokens.css
+	 * §2) resolves the variable; same rgba(var(--x-rgb), a) pattern already
+	 * used in immersive-core.css's .scene-layer--missing.
+	 */
 	background: radial-gradient(
 		ellipse at center,
-		transparent 40%,
+		transparent 35%,
+		rgba(var(--skyyrose-accent-rgb), 0.05) 65%,
 		rgba(0, 0, 0, 0.55) 100%
 	);
 }
@@ -1015,8 +1026,21 @@
    ENVIRONMENTAL ANIMATION OVERLAYS
    ================================================== */
 
+/*
+ * ::before, not ::after: immersive-scenes.css also targets
+ * .immersive-{slug} .scene-viewport::after (its "AMBIENT PARTICLES" block)
+ * at the identical (0,2,0) specificity, and loads after this file
+ * (skyyrose-immersive-scenes depends on skyyrose-template-immersive in
+ * inc/enqueue.php). Same selector + same properties + later cascade
+ * position meant these four rules were being silently and completely
+ * overridden — the per-collection ambient light never rendered, only the
+ * dust particles did. Moving to ::before resurrects the light wash as an
+ * independent layer that composites with the particles instead of losing
+ * to them (see css-cascade-discipline skill).
+ */
+
 /* Subtle candlelight flicker for Love Hurts scenes */
-.immersive-love-hurts .scene-viewport::after {
+.immersive-love-hurts .scene-viewport::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1040,7 +1064,7 @@
 }
 
 /* Light shimmer for Signature scenes (golden hour) */
-.immersive-signature .scene-viewport::after {
+.immersive-signature .scene-viewport::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1062,7 +1086,7 @@
 }
 
 /* Mist drift for Black Rose scenes */
-.immersive-black-rose .scene-viewport::after {
+.immersive-black-rose .scene-viewport::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1083,7 +1107,7 @@
 }
 
 /* Rose-gold glow for Kids Capsule scenes */
-.immersive-kids-capsule .scene-viewport::after {
+.immersive-kids-capsule .scene-viewport::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1201,10 +1225,10 @@
 	}
 
 	/* Disable environmental animations */
-	.immersive-love-hurts .scene-viewport::after,
-	.immersive-signature .scene-viewport::after,
-	.immersive-black-rose .scene-viewport::after,
-	.immersive-kids-capsule .scene-viewport::after {
+	.immersive-love-hurts .scene-viewport::before,
+	.immersive-signature .scene-viewport::before,
+	.immersive-black-rose .scene-viewport::before,
+	.immersive-kids-capsule .scene-viewport::before {
 		animation: none;
 		opacity: 0;
 	}

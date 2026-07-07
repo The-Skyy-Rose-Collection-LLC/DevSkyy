@@ -1,8 +1,8 @@
 /**
  * Homepage V2 — Impeccable Luxury Refinement
  *
- * Cinematic homepage design with loader, hero, press strip, marquee,
- * story, quote, collections grid, lookbook, craft, newsletter, footer.
+ * Cinematic homepage design with loader, hero (on-model scroll strip), press
+ * strip, marquee, story, quote, collections grid, craft, newsletter, footer.
  *
  * Depends on: system design tokens
  * Load: Conditional — front page only (via inc/enqueue.php)
@@ -182,6 +182,58 @@
 	10% { opacity: .15; }
 	90% { opacity: .1; }
 	100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* Hero on-model scroll strip — auto-scrolling editorial photography behind
+   the hero title. z-index sits above hero-bg/hero-ov/hero-particles (all
+   z-index:auto, stack at DOM order) but below .hero-content (z-index:3).
+   Vignette mask + low opacity keep the "SkyyRose" lockup dominant. */
+.hero-strip {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	z-index: 1;
+	opacity: 0.22;
+	-webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 76%, transparent 100%);
+	mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 76%, transparent 100%);
+}
+.hero-strip-track {
+	display: flex;
+	width: max-content;
+	height: 100%;
+	animation: heroStripScroll 70s linear infinite;
+	will-change: transform;
+}
+.hero-strip-item {
+	flex: 0 0 auto;
+	width: clamp(140px, 14vw, 220px);
+	height: 100%;
+	margin-right: 24px; /* baked into item (not track gap) so translateX(-50%) lands on an exact set boundary — see .mq-item for the same pattern */
+	overflow: hidden;
+	filter: grayscale(0.35) brightness(0.75) contrast(1.05);
+}
+.hero-strip-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center 18%;
+	display: block;
+}
+@keyframes heroStripScroll {
+	from { transform: translateX(0); }
+	to   { transform: translateX(-50%); }
+}
+@media (max-width: 768px) {
+	.hero-strip {
+		opacity: 0.16;
+	}
+	.hero-strip-track {
+		animation-duration: 110s;
+	}
+	.hero-strip-item {
+		width: clamp(90px, 26vw, 130px);
+		margin-right: 14px;
+	}
 }
 
 .hero-content {
@@ -1356,94 +1408,6 @@
 }
 
 /* ==========================================================================
-   LOOKBOOK (Asymmetric Editorial Layout)
-   ========================================================================== */
-.lookbook {
-	position: relative;
-	padding: clamp(100px, 12vw, 180px) 0;
-}
-.lookbook-header {
-	text-align: center;
-	margin-bottom: clamp(48px, 6vw, 80px);
-	padding: 0 48px;
-}
-.lookbook-eyebrow {
-	font-family: var(--ff-mono);
-	font-size: 11px;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-	color: var(--rose);
-	margin-bottom: 24px;
-}
-.lookbook-header h2 {
-	font-family: var(--ff-brand);
-	font-size: clamp(28px, 4vw, 48px);
-	font-weight: 400;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-}
-.lookbook-tagline {
-	font-family: var(--ff-editorial);
-	font-style: italic;
-	font-size: 1.2rem;
-	color: var(--haze);
-	margin-top: 16px;
-}
-.lookbook-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	grid-auto-rows: 400px;
-	gap: 16px;
-	max-width: 1600px;
-	margin: 0 auto;
-	padding: 0 48px;
-}
-.lookbook-grid .lb-img {
-	position: relative;
-	overflow: hidden;
-}
-/* The Bento Arrangement */
-.lookbook-grid .lb-img:nth-child(1) { grid-column: span 2; grid-row: span 2; }
-.lookbook-grid .lb-img:nth-child(2) { grid-column: span 2; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(3) { grid-column: span 1; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(4) { grid-column: span 1; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(5) { grid-column: span 4; grid-row: span 1; }
-
-.lookbook-grid .lb-img img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	/* Editorial grade — masks source-quality variance across the bento grid. */
-	filter: contrast(1.04) saturate(0.94) brightness(0.97);
-	will-change: transform;
-	transition: transform 1.5s var(--ease-luxury), filter 0.4s var(--ease-luxury);
-}
-.lookbook-grid .lb-img:hover img {
-	transform: scale(1.05);
-	filter: contrast(1.06) saturate(1) brightness(1);
-}
-.lb-label {
-	position: absolute;
-	bottom: 24px;
-	left: 24px;
-	z-index: 2;
-	font-family: var(--ff-mono);
-	font-size: 11px;
-	letter-spacing: 6px;
-	text-transform: uppercase;
-	opacity: 1;
-	transition: all .6s var(--ease-luxury);
-	transform: translateY(0);
-	background: rgba(5,5,5,0.8);
-	padding: 8px 16px;
-	backdrop-filter: blur(8px);
-}
-@media (hover: hover) {
-	.lb-label { opacity: 0; transform: translateY(12px); }
-	.lb-img:hover .lb-label { opacity: 1; transform: translateY(0); }
-}
-
-/* ==========================================================================
    CRAFT (Tactile Concrete)
    ========================================================================== */
 .craft {
@@ -1479,6 +1443,37 @@
 	transition: all .6s var(--ease-luxury);
 	display: flex;
 	flex-direction: column;
+}
+/* Featured card — this section now sits directly under .service-promise__list,
+   another 4-up card row, once .lookbook's asymmetric bento was removed as the
+   in-between visual break (audit 2026-07-06). One broken element restores the
+   rhythm without reintroducing imagery: span + a flat rose wash + a type-scale
+   bump on "Oakland Made Mentality" (2nd card — the founder-story anchor,
+   already the most narratively load-bearing copy in the row). No border-left
+   accent stripe, no gradient fill, no new glass surface (impeccable BAN 1/2;
+   project glassmorphism ban stays scoped to product-card-holo).
+   Specificity (0,2,0) — .craft-card is a <div>, never a <a>, so this never
+   contests `.homepage-v2 a { color: inherit }` (0,1,1); placed BEFORE
+   .craft-card:hover below so hover wins the (0,2,0) tie and card 2 still gets
+   the shared hover feedback instead of freezing on the resting tint. */
+.craft-card:nth-child(2) {
+	background: rgba(183, 110, 121, 0.035);
+}
+.craft-card:nth-child(2) .craft-label {
+	font-size: 13px;
+	letter-spacing: 5px;
+}
+.craft-card:nth-child(2) .craft-desc {
+	font-size: 1.1rem;
+	max-width: 46ch;
+}
+@media (min-width: 1025px) {
+	/* grid-column: span 2 is guarded to the 4-col breakpoint only — at the
+	   2-up (1024px) and 1-up (768px) reflows below, a span:2 on the 2nd
+	   child leaves an orphaned gap next to card 1 (sparse auto-placement). */
+	.craft-card:nth-child(2) {
+		grid-column: span 2;
+	}
 }
 .craft-card:hover {
 	border-color: rgba(255,255,255,0.15);
@@ -1701,14 +1696,6 @@
 	.craft-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
-	.lookbook-grid {
-		grid-template-columns: repeat(2, 1fr);
-		grid-auto-rows: 300px;
-	}
-	.lookbook-grid .lb-img:nth-child(n) {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
 	.ft-inner {
 		grid-template-columns: 1fr 1fr;
 	}
@@ -1816,10 +1803,6 @@
 	}
 	.craft-grid {
 		grid-template-columns: 1fr;
-	}
-	.lookbook-grid {
-		grid-template-columns: 1fr;
-		grid-auto-rows: 400px;
 	}
 	.ft-inner {
 		grid-template-columns: 1fr;
@@ -1965,10 +1948,9 @@
 		animation: none;
 	}
 
-	/* Lookbook filter transition */
-	.lb-img {
-		transition: none;
-		filter: contrast(1.04) saturate(0.94) brightness(0.97);
+	/* Hero on-model scroll strip */
+	.hero-strip-track {
+		animation: none;
 	}
 
 	/* Marquee scroll */

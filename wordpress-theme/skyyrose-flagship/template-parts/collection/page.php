@@ -162,11 +162,65 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		'template-parts/pin-narrative',
 		null,
 		array(
-			'slug'  => $slug,
-			'beats' => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+			'slug'     => $slug,
+			'beats'    => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+			// Reuses the same $products list the grid below renders — no
+			// second catalog/WC query — so the narrative's closing beat can
+			// spotlight the collection's flagship piece instead of ending
+			// on empty stage space (founder: "it's just wasted space").
+			'products' => $products,
 		)
 	);
 	?>
+
+	<!-- ════ Lookbook (editorial imagery, narrative → shop bridge) ════ -->
+	<?php
+	$lookbook_by_collection = array(
+		'signature'    => array(
+			array(
+				'file' => 'lb-rose-hoodie-beanie',
+				'alt'  => __( 'Rose hoodie and beanie, worn — Signature editorial', 'skyyrose' ),
+			),
+		),
+		'black-rose'   => array(
+			array(
+				'file' => 'lb-black-rose-football',
+				'alt'  => __( 'Black Rose football jersey, worn — editorial', 'skyyrose' ),
+			),
+			array(
+				'file' => 'lb-black-rose-hockey',
+				'alt'  => __( 'Black Rose hockey jersey, worn — editorial', 'skyyrose' ),
+			),
+		),
+		'love-hurts'   => array(
+			array(
+				'file' => 'lb-love-hurts-varsity',
+				'alt'  => __( 'Love Hurts varsity jacket, worn — editorial', 'skyyrose' ),
+			),
+		),
+		'kids-capsule' => array(
+			array(
+				'file' => 'lb-kid-black-rose',
+				'alt'  => __( 'Child wearing a Black Rose piece — Kids Capsule editorial', 'skyyrose' ),
+			),
+		),
+	);
+	$lookbook_images        = $lookbook_by_collection[ $slug ] ?? array();
+	$lookbook_grid_class    = 'col-lookbook__grid' . ( count( $lookbook_images ) > 1 ? ' col-lookbook__grid--2up' : '' );
+	if ( ! empty( $lookbook_images ) ) :
+		?>
+		<section class="col-lookbook rv-clip-up" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>">
+			<div class="<?php echo esc_attr( $lookbook_grid_class ); ?>">
+				<?php foreach ( $lookbook_images as $lb ) : ?>
+					<figure class="col-lookbook__figure">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'] . '-960w.webp?v=' . SKYYROSE_VERSION ); ?>"
+							alt="<?php echo esc_attr( $lb['alt'] ); ?>"
+							loading="lazy" decoding="async" width="960" height="1200" class="col-lookbook__img">
+					</figure>
+				<?php endforeach; ?>
+			</div>
+		</section>
+	<?php endif; ?>
 
 	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
