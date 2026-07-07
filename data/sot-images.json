@@ -14,7 +14,7 @@
     },
     "br-003": {
       "front": "assets/images/products/br-003-onmodel.webp",
-      "back": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
+      "back": "assets/images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp",
       "packshot": "assets/images/products/br-003-baseball-classic.jpeg"
     },
     "br-004": {
@@ -29,7 +29,7 @@
     },
     "br-006": {
       "front": "assets/images/products/br-006-onmodel.webp",
-      "back": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
+      "back": "assets/images/products/black-rose-sherpa-jacket-back.jpg",
       "packshot": "assets/images/products/br-006-sherpa-jacket.jpeg"
     },
     "br-007": {
@@ -59,17 +59,17 @@
     },
     "br-012": {
       "front": "assets/images/products/jersey-last-oakland-baseball-front-model.webp",
-      "back": "assets/images/products/jersey-last-oakland-baseball-back-model.webp",
+      "back": "assets/images/products/br-012-last-oakland-baseball-back.webp",
       "packshot": "assets/images/products/br-012-last-oakland-baseball-front.jpeg"
     },
     "br-014": {
       "front": "assets/images/products/br-014-onmodel.webp",
-      "back": "assets/images/products/black-is-beautiful-jersey-giants-back-model.webp",
+      "back": "assets/images/products/br-014-giants-back.webp",
       "packshot": "assets/images/products/br-014-baseball-classic-giants.jpeg"
     },
     "br-015": {
       "front": "assets/images/products/br-015-onmodel.webp",
-      "back": "assets/images/products/black-is-beautiful-jersey-white-back-model.webp",
+      "back": "assets/images/products/black-is-beautiful-jersey-white/black-is-beautiful-jersey-white-back-model.webp",
       "packshot": "assets/images/products/br-015-baseball-classic-white.jpeg"
     },
     "kids-001": {
