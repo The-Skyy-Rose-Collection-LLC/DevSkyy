@@ -23,6 +23,8 @@
 	var MODEL_URL = ( window.SKYY_3D_CONFIG && window.SKYY_3D_CONFIG.modelUrl )
 		? window.SKYY_3D_CONFIG.modelUrl
 		: '/wp-content/themes/skyyrose-flagship/assets/models/skyy.glb';
+	/** Draco decoder dir (theme-hosted) — skyy.glb ships draco-compressed. */
+	var DRACO_PATH = MODEL_URL.replace( /assets\/models\/[^?]*(\?.*)?$/, 'assets/js/lib/draco/' );
 	var WALK_ON_DELAY = 3000;      // ms after page load before walk-on starts
 	var CANVAS_ID     = 'skyy-3d-canvas';
 	var CHARACTER_W   = 220;       // px — canvas width
@@ -66,8 +68,10 @@
 		injectScript.textContent = [
 			"import * as THREE from '" + base + "/build/three.module.js';",
 			"import { GLTFLoader } from '" + base + "/examples/jsm/loaders/GLTFLoader.js';",
+			"import { DRACOLoader } from '" + base + "/examples/jsm/loaders/DRACOLoader.js';",
 			"window.THREE = THREE;",
 			"window.THREE_GLTFLoader = GLTFLoader;",
+			"window.THREE_DRACOLoader = DRACOLoader;",
 			"document.dispatchEvent(new Event('three-ready'));",
 		].join( '\n' );
 
@@ -140,6 +144,20 @@
 		}
 
 		var loader = new GLTFLoader();
+
+		// skyy.glb is draco-compressed — GLTFLoader cannot parse it without a
+		// DRACOLoader pointed at the theme-hosted decoders (CSP: wasm-unsafe-eval).
+		var DRACOLoader = window.THREE_DRACOLoader ||
+			( window.THREE && window.THREE.DRACOLoader );
+		if ( DRACOLoader ) {
+			var draco = new DRACOLoader();
+			draco.setDecoderPath( DRACO_PATH );
+			loader.setDRACOLoader( draco );
+		} else if ( window.SKYYROSE_DEBUG ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'Skyy 3D: DRACOLoader unavailable — draco GLB will fail to parse' );
+		}
+
 		loader.load(
 			MODEL_URL,
 			function ( gltf ) {
