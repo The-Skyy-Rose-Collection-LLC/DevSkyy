@@ -73,17 +73,23 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
       (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
       php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
-- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+- [x] P6 docs — `docs/mcp-http-architecture.md` covers the mount, Bearer auth, both consumer
+      surfaces (dashboard proxy + WP bridge), env var matrix, and failure modes (401/421).
+      `scripts/verify-mcp-surfaces.sh` is a read-only E2E verifier (initialize -> tools/list,
+      401-without-token) — CI-safe (SKIPPED + exit 0 when MCP_URL/MCP_SERVICE_TOKEN unset).
+      Live E2E (both surfaces invoking a tool against production /mcp) is prepared — pending
+      gated go-live, see `tasks/mcp-golive-manifest.md`.
 
-  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
-  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
-    redeploy frontend. ⚠️
-  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
-    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
-  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
-    + DNS records); then the committed default URLs work without per-surface overrides.
-  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
-  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/) — exact gated
+  commands + verify steps are in `tasks/mcp-golive-manifest.md`:
+  - P4 Vercel env: MCP_URL + MCP_SERVICE_TOKEN (Production), redeploy frontend. ⚠️
+  - P5 WP deploy: SKYYROSE_MCP_URL + SKYYROSE_MCP_TOKEN (option/wp-config const), then
+    `bash scripts/deploy-theme.sh` if needed. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly, then the committed default URLs
+    work without per-surface overrides.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY/WC_CONSUMER_SECRET -a devskyy-api`.
+  - Post every step: `bash scripts/verify-mcp-surfaces.sh` (MCP_URL/MCP_SERVICE_TOKEN exported)
+    to confirm the surface is still healthy.
 
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
