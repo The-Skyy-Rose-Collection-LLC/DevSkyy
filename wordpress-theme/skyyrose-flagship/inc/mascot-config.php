@@ -189,6 +189,147 @@ function skyyrose_get_skyy_page_tip() {
 
 /*
 --------------------------------------------------------------
+ * Live-On-Deploy Defaults
+ *--------------------------------------------------------------*/
+
+/**
+ * Theme-shipped GLB URL — used as the Customizer field's default so the
+ * 3D host is live the moment the theme deploys, with zero manual config.
+ * An explicit Customizer value (including an intentionally emptied field)
+ * always overrides this.
+ *
+ * @since 7.2.0
+ * @return string Theme-relative GLB URL, or '' if the file isn't on disk.
+ */
+function skyyrose_get_default_skyy_glb_url() {
+	static $default_url = null;
+
+	if ( null !== $default_url ) {
+		return $default_url;
+	}
+
+	$rel_path    = 'assets/models/skyy.glb';
+	$default_url = file_exists( get_template_directory() . '/' . $rel_path )
+		? get_template_directory_uri() . '/' . $rel_path
+		: '';
+
+	return $default_url;
+}
+
+/**
+ * Is the Skyy mascot enabled? Defaults TRUE — the host ships live on
+ * deploy; an explicit Customizer "Enable Skyy" = off still wins.
+ *
+ * @since 7.2.0
+ * @return bool
+ */
+function skyyrose_mascot_is_enabled() {
+	return (bool) get_theme_mod( 'skyyrose_mascot_enabled', true );
+}
+
+/**
+ * Resolve the GLB URL Skyy should use: an explicit Customizer value, else
+ * the theme-shipped model (skyyrose_get_default_skyy_glb_url()) when that
+ * file exists on disk, else '' (2D sprite fallback).
+ *
+ * @since 7.2.0
+ * @return string
+ */
+function skyyrose_get_skyy_glb_url() {
+	$url = get_theme_mod( 'skyyrose_mascot_glb_url', skyyrose_get_default_skyy_glb_url() );
+	return is_string( $url ) ? $url : '';
+}
+
+/*
+--------------------------------------------------------------
+ * Tier 2 Fallback — deterministic, no external API, no cost
+ *--------------------------------------------------------------*/
+
+/**
+ * Keyword categories the Tier 1 guide-brain (data/site-guide.json) doesn't
+ * cover: contact, about/founder, pricing, cart/checkout, account/login, and
+ * greeting/identity. Pure server-side substring matching — no external API
+ * call, no per-use cost. Consumed by skyyrose_ajax_mascot_chat() (see
+ * inc/ajax-handlers.php) so the Tier 2 AJAX seam answers instead of always
+ * returning an empty stub.
+ *
+ * @since 7.2.0
+ * @return array<int, array{patterns: array<int, string>, answer: string, link: string}>
+ */
+function skyyrose_mascot_fallback_intents() {
+	return array(
+		array(
+			'patterns' => array( 'contact', 'customer service', 'email', 'phone', 'reach you', 'get in touch' ),
+			'answer'   => esc_html__( 'You can reach the SkyyRose team directly through our contact page. 🌹', 'skyyrose' ),
+			'link'     => '/contact/',
+		),
+		array(
+			'patterns' => array( 'about', 'story', 'founder', 'corey', 'who made this', 'who started' ),
+			'answer'   => esc_html__( 'SkyyRose was built by Corey Foster from the ground up — Oakland roots, real luxury. Our story page has the full journey.', 'skyyrose' ),
+			'link'     => '/about/',
+		),
+		array(
+			'patterns' => array( 'price', 'cost', 'how much', 'expensive' ),
+			'answer'   => esc_html__( 'Prices vary by piece — every product page shows the exact price and any pre-order details.', 'skyyrose' ),
+			'link'     => '/shop/',
+		),
+		array(
+			'patterns' => array( 'cart', 'checkout', 'discount', 'coupon', 'promo code', 'sale' ),
+			'answer'   => esc_html__( 'You can review your bag and apply any code at checkout.', 'skyyrose' ),
+			'link'     => '/cart/',
+		),
+		array(
+			'patterns' => array( 'account', 'login', 'log in', 'sign in', 'sign up' ),
+			'answer'   => esc_html__( 'Manage orders, addresses, and details from your account page.', 'skyyrose' ),
+			'link'     => '/my-account/',
+		),
+		array(
+			'patterns' => array( 'hi', 'hello', 'hey', 'who are you', 'what is your name', 'whats your name' ),
+			'answer'   => esc_html__( 'Hey! I’m Skyy 👋 — ask me about sizing, shipping, pre-orders, or a collection.', 'skyyrose' ),
+			'link'     => '',
+		),
+	);
+}
+
+/**
+ * Match a free-text message against skyyrose_mascot_fallback_intents().
+ * Mirrors mascot.js's client-side matchIntent() scoring (longer/more-specific
+ * patterns outrank single-word ones) so server and client behave the same.
+ *
+ * @since 7.2.0
+ * @param string $message Raw visitor message.
+ * @return array{patterns: array, answer: string, link: string}|null
+ */
+function skyyrose_mascot_match_fallback_intent( $message ) {
+	$normalized = strtolower( trim( preg_replace( '/[^\w\s\'-]/', ' ', (string) $message ) ) );
+	if ( '' === $normalized ) {
+		return null;
+	}
+
+	$best       = null;
+	$best_score = 0;
+
+	foreach ( skyyrose_mascot_fallback_intents() as $intent ) {
+		$score = 0;
+		foreach ( $intent['patterns'] as $pattern ) {
+			// Word-boundary match, not plain substring — short tokens like
+			// 'hi'/'hey'/'cost' would otherwise false-positive inside
+			// unrelated words ('this', 'they', 'costume').
+			if ( preg_match( '/\b' . preg_quote( $pattern, '/' ) . '\b/', $normalized ) ) {
+				$score += substr_count( $pattern, ' ' ) + 1;
+			}
+		}
+		if ( $score > $best_score ) {
+			$best_score = $score;
+			$best       = $intent;
+		}
+	}
+
+	return $best;
+}
+
+/*
+--------------------------------------------------------------
  * Customizer — Skyy Mascot
  *--------------------------------------------------------------*/
 
@@ -220,16 +361,16 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 		'skyyrose_mascot',
 		array(
 			'title'       => esc_html__( 'Skyy Mascot', 'skyyrose' ),
-			'description' => esc_html__( 'Living character widget — off by default until character art is finalized.', 'skyyrose' ),
+			'description' => esc_html__( 'Living character widget — live sitewide by default (checkout excluded). Uncheck to take Skyy down.', 'skyyrose' ),
 			'priority'    => 65,
 		)
 	);
 
-	// Kill switch — sitewide off by default.
+	// Kill switch — live sitewide by default; explicitly unchecking still wins.
 	$wp_customize->add_setting(
 		'skyyrose_mascot_enabled',
 		array(
-			'default'           => false,
+			'default'           => true,
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'skyyrose_sanitize_mascot_checkbox',
 		)
@@ -244,11 +385,13 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 		)
 	);
 
-	// GLB character model URL — empty means the 2D sprite fallback renders.
+	// GLB character model URL — defaults to the theme-shipped model
+	// (assets/models/skyy.glb) when that file exists on disk; empty falls
+	// back to the 2D sprite. An explicit Customizer value always overrides.
 	$wp_customize->add_setting(
 		'skyyrose_mascot_glb_url',
 		array(
-			'default'           => '',
+			'default'           => skyyrose_get_default_skyy_glb_url(),
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'esc_url_raw',
 		)
@@ -257,17 +400,19 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 		'skyyrose_mascot_glb_url',
 		array(
 			'label'       => esc_html__( 'Character GLB URL', 'skyyrose' ),
-			'description' => esc_html__( 'Rigged 3D model. Leave empty to use the 2D sprite walk-on.', 'skyyrose' ),
+			'description' => esc_html__( 'Rigged 3D model. Defaults to the theme-shipped model when present; leave empty to force the 2D sprite walk-on.', 'skyyrose' ),
 			'section'     => 'skyyrose_mascot',
 			'type'        => 'url',
 		)
 	);
 
-	// Tier 2 LLM advice — off by default, paid per-use.
+	// Tier 2 expanded fallback — deterministic server-side keyword matching
+	// (contact, about, pricing, account, greetings) beyond the 9 core Tier 1
+	// intents. No external API call, no per-use cost — on by default.
 	$wp_customize->add_setting(
 		'skyyrose_mascot_llm_enabled',
 		array(
-			'default'           => false,
+			'default'           => true,
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'skyyrose_sanitize_mascot_checkbox',
 		)
@@ -275,8 +420,8 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'skyyrose_mascot_llm_enabled',
 		array(
-			'label'       => esc_html__( 'Enable LLM Advice (Tier 2)', 'skyyrose' ),
-			'description' => esc_html__( 'Falls back to Claude for questions the scripted guide can\'t answer. Incurs per-use API cost.', 'skyyrose' ),
+			'label'       => esc_html__( 'Enable Expanded Fallback Answers (Tier 2)', 'skyyrose' ),
+			'description' => esc_html__( 'Answers questions the scripted guide misses (contact, about, pricing, account) via deterministic server-side matching. No external API call, no per-use cost.', 'skyyrose' ),
 			'section'     => 'skyyrose_mascot',
 			'type'        => 'checkbox',
 		)

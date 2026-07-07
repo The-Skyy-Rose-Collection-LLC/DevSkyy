@@ -253,8 +253,9 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
 <?php
-// Skyy mascot — gated on the Customizer kill switch, checkout always excluded.
-if ( get_theme_mod( 'skyyrose_mascot_enabled', false ) && ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
+// Skyy mascot — gated on the Customizer kill switch (live by default),
+// checkout always excluded.
+if ( skyyrose_mascot_is_enabled() && ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
 	get_template_part( 'template-parts/skyy-mascot' );
 }
 ?>

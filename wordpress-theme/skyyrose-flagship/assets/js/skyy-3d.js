@@ -70,7 +70,12 @@
 	// key; the 3D layer honours the same contract (nothing pops in unsolicited
 	// after a dismissal) and stops rendering while the character is hidden.
 	var SESSION_KEY_DISMISSED = 'skyy_dismissed';
-	var visible     = true;
+	// Starts false: mascot.js's "no pop-in on page load" rule (state only
+	// becomes visible on a real skyy:walking-in event) must hold for the 3D
+	// layer too. Without this, a GLB that finishes loading before the
+	// visitor's idle-entrance timer fires would reveal the canvas in idle
+	// pose ahead of any walk-on decision. skyy:walking-in flips this true.
+	var visible     = false;
 	var loopRunning = false;
 	var modelReady  = false;
 	var bootStarted = false;

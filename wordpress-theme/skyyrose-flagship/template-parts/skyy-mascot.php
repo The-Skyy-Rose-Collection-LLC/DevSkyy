@@ -37,7 +37,7 @@ $skyy_side    = skyyrose_get_skyy_walk_side( $skyy_context );
 $recall_thumb = $skyy_img_url ?: '';
 ?>
 
-<?php if ( get_theme_mod( 'skyyrose_mascot_glb_url', '' ) ) : // skyy-3d.js is injected client-side by mascot-loader.js, never via wp_enqueue_script — gate the canvas on the same theme mod that gates the loader. ?>
+<?php if ( skyyrose_get_skyy_glb_url() ) : // skyy-3d.js is injected client-side by mascot-loader.js, never via wp_enqueue_script — gate the canvas on the same resolved GLB URL (Customizer override, else the theme-shipped model, else '') that gates the loader. ?>
 <!-- Skyy 3D canvas — sits behind the speech bubble, driven by skyy-3d.js -->
 <canvas
 	id="skyy-3d-canvas"

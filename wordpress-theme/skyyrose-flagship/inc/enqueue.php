@@ -204,11 +204,10 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Skyy mascot CSS — gated on the Customizer kill switch (default OFF until
-	// founder flips it) and excluded from checkout. Character art convergence
-	// is still in progress; the widget degrades to a 2D sprite until a GLB is
-	// configured via skyyrose_mascot_glb_url.
-	$mascot_enabled = get_theme_mod( 'skyyrose_mascot_enabled', false )
+	// Skyy mascot CSS — gated on the Customizer kill switch (live by default,
+	// see skyyrose_mascot_is_enabled()) and excluded from checkout. Degrades
+	// to a 2D sprite when no GLB is configured/shipped.
+	$mascot_enabled = skyyrose_mascot_is_enabled()
 		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $mascot_enabled ) {
 		$mascot_css_file = $use_min && file_exists( $base_dir . '/mascot.min.css' ) ? 'mascot.min.css' : 'mascot.css';
@@ -389,7 +388,7 @@ function skyyrose_enqueue_global_scripts() {
 	// bundle never costs LCP/CLS budget: it only fetches mascot.min.js (and
 	// skyy-3d.min.js, when a GLB is configured) after requestIdleCallback or
 	// first interaction, whichever comes first.
-	$mascot_js_enabled = get_theme_mod( 'skyyrose_mascot_enabled', false )
+	$mascot_js_enabled = skyyrose_mascot_is_enabled()
 		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $mascot_js_enabled ) {
 		$loader_file = $use_min && file_exists( $js_dir . '/mascot-loader.min.js' ) ? 'mascot-loader.min.js' : 'mascot-loader.js';
@@ -407,7 +406,7 @@ function skyyrose_enqueue_global_scripts() {
 				)
 			);
 
-			$glb_url   = get_theme_mod( 'skyyrose_mascot_glb_url', '' );
+			$glb_url   = skyyrose_get_skyy_glb_url();
 			$skyy3d_js = null;
 			if ( ! empty( $glb_url ) ) {
 				$skyy3d_file = $use_min && file_exists( $js_dir . '/skyy-3d.min.js' ) ? 'skyy-3d.min.js' : 'skyy-3d.js';
@@ -437,7 +436,7 @@ function skyyrose_enqueue_global_scripts() {
 				'SKYY_MASCOT_CONFIG',
 				array(
 					'pageTip'    => skyyrose_get_skyy_page_tip(),
-					'llmEnabled' => (bool) get_theme_mod( 'skyyrose_mascot_llm_enabled', false ),
+					'llmEnabled' => (bool) get_theme_mod( 'skyyrose_mascot_llm_enabled', true ),
 				)
 			);
 

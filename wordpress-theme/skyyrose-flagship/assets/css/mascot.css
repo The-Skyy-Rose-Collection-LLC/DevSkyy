@@ -692,8 +692,12 @@
    =================================================================== */
 
 @media (max-width: 768px) {
+	/* .mobile-nav (assets/css/mobile-bottom-nav.css) is a fixed 64px+safe-area
+	   band pinned to the same bottom-right corner at a lower z-index (9000
+	   vs this widget's 9990) — without clearance the mascot/recall pill
+	   render on top of the nav's rightmost tap target instead of above it. */
 	.skyyrose-mascot {
-		bottom: 16px;
+		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
 		right: 16px;
 		flex-direction: column;
 		align-items: flex-end;
@@ -742,6 +746,29 @@
 
 	.skyy-chip {
 		text-align: center;
+	}
+
+	/* Recall pill shares the mascot's mobile clearance/offset so it doesn't
+	   sit on top of the mobile nav band either. */
+	.skyyrose-mascot__recall {
+		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+		right: 16px;
+	}
+
+	/* 3D canvas mirrors the widget's mobile size/offset — without this it
+	   stays a fixed 220x340px at the desktop 20px offset regardless of
+	   viewport, occupying far more mobile screen real estate than the 2D
+	   sprite it replaces. */
+	.skyy-3d-canvas {
+		width: 140px;
+		height: 216px;
+		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+		right: 16px;
+	}
+
+	.skyy-3d-canvas--left {
+		right: auto;
+		left: 16px;
 	}
 }
 

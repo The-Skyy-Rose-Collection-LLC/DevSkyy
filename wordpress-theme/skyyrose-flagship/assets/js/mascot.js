@@ -237,6 +237,12 @@
 				chips: [{ id: 'sg_shop', label: 'See it →', action: '/collection-signature/', next: null }]
 			}
 		},
+		'kids-capsule': {
+			greeting: {
+				text: 'Little rebels need luxury too. 👑 Kids Capsule brings the SkyyRose story down a size.',
+				chips: [{ id: 'kc_browse', label: 'Browse Kids Capsule', action: '/collection-kids-capsule/', next: null }]
+			}
+		},
 		preorder: {
 			greeting: {
 				text: 'Pre-ordering means we make it for you — no overstock, no waste. Pure luxury.',
@@ -443,12 +449,12 @@
 		})
 			.then(function (response) { return response.json(); })
 			.then(function (json) {
-				var answer = json && json.data && typeof json.data.answer === 'string' ? json.data.answer : '';
+				var data   = json && json.data ? json.data : null;
+				var answer = data && typeof data.answer === 'string' ? data.answer : '';
 				if (answer) {
-					speak(answer, null);
+					var chips = data.link ? [{ id: 'tier2-link', label: 'Take me there →', action: data.link, next: null }] : null;
+					speak(answer, chips);
 				} else {
-					// Tier 2 endpoint is a reserved seam (no answer field yet) —
-					// degrade to the same redirect as a Tier 1 miss.
 					speakFallbackRedirect();
 				}
 			})
@@ -650,7 +656,11 @@
 		});
 	}
 
-	// React when hovering product cards
+	// React when hovering product cards. Throttled separately from the CSS
+	// class toggle below — rapid multi-card hovering must not thrash the 3D
+	// layer's clip-switching (skyy-3d.js listens for skyy:excited).
+	var HOVER_EXCITE_THROTTLE_MS = 2000;
+	var lastHoverExciteAt = 0;
 	document.addEventListener('mouseover', function (e) {
 		if (state !== 'idle') return;
 		if (e.target.closest('.product, .wc-block-grid__product')) {
@@ -658,6 +668,12 @@
 			setTimeout(function () {
 				mascotEl.classList.remove('skyy--excited');
 			}, 1200);
+
+			var now = Date.now();
+			if (now - lastHoverExciteAt > HOVER_EXCITE_THROTTLE_MS) {
+				lastHoverExciteAt = now;
+				emitSkyy('excited');
+			}
 		}
 	});
 
