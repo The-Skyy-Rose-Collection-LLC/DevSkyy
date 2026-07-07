@@ -32,6 +32,12 @@ while ( have_posts() ) :
 	$meta       = skyyrose_get_product_meta();
 	$sku        = $product->get_sku();
 
+	// skyyrose_get_product_meta() backfills 'made_in' to 'USA' when the
+	// postmeta is unset, so $meta['made_in'] is never empty. Check the raw
+	// postmeta directly so the spec row only renders for products that
+	// actually have _skyyrose_made_in set.
+	$has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', true );
+
 	// Technical Garment Lock logic.
 	$catalog_entry = function_exists( 'skyyrose_get_product' ) ? skyyrose_get_product( $sku ) : null;
 
@@ -133,7 +139,7 @@ while ( have_posts() ) :
 									<span class="sr-spec-value"><?php echo esc_html( $meta['fit'] ); ?></span>
 								</div>
 								<?php endif; ?>
-								<?php if ( ! empty( $meta['made_in'] ) ) : ?>
+								<?php if ( $has_made_in ) : ?>
 								<div class="sr-spec">
 									<span class="sr-spec-label"><?php esc_html_e( 'MADE IN', 'skyyrose' ); ?></span>
 									<span class="sr-spec-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>

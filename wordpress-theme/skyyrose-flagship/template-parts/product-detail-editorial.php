@@ -57,6 +57,12 @@ $garment_lock = $dossier['garment_type_lock'] ?? '';
 $branding     = $dossier['branding'] ?? array();
 $edition_size = (int) ( $catalog_entry['edition_size'] ?? 0 );
 $sizes_raw    = $catalog_entry['sizes'] ?? '';
+
+// skyyrose_get_product_meta() backfills 'made_in' to 'USA' when the postmeta
+// is unset, so $meta['made_in'] is never empty. Check the raw postmeta
+// directly so the meta row/item only renders for products that actually
+// have _skyyrose_made_in set.
+$has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', true );
 ?>
 
 <article class="sr-editorial" data-collection="<?php echo esc_attr( $collection ); ?>">
@@ -107,7 +113,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<?php if ( $garment_lock ) : ?>
 			<p class="sr-ed__garment-lock"><?php echo esc_html( $garment_lock ); ?></p>
 		<?php endif; ?>
-		<?php if ( ! empty( $meta['material'] ) || ! empty( $meta['fit'] ) || ! empty( $meta['made_in'] ) ) : ?>
+		<?php if ( ! empty( $meta['material'] ) || ! empty( $meta['fit'] ) || $has_made_in ) : ?>
 			<div class="sr-ed__meta-row">
 				<?php if ( ! empty( $meta['material'] ) ) : ?>
 					<div class="sr-ed__meta-item">
@@ -121,7 +127,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 						<span class="sr-ed__meta-value"><?php echo esc_html( $meta['fit'] ); ?></span>
 					</div>
 				<?php endif; ?>
-				<?php if ( ! empty( $meta['made_in'] ) ) : ?>
+				<?php if ( $has_made_in ) : ?>
 					<div class="sr-ed__meta-item">
 						<span class="sr-ed__meta-label"><?php esc_html_e( 'Made In', 'skyyrose' ); ?></span>
 						<span class="sr-ed__meta-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>
