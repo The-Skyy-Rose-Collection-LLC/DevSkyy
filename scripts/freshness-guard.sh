@@ -120,6 +120,20 @@ if forced || staged_match "$MIN_TRIGGER"; then
       min="${f%.*}.min.${f##*.}"
       [ -f "$ROOT/$min" ] || continue          # source isn't a built asset → skip
       if ! printf '%s\n' "$STAGED" | grep -qxF "$min"; then
+        # Comment/whitespace-only source edits rebuild to a byte-identical
+        # .min — there is nothing to stage and the presence check can never
+        # be satisfied. Detect that case precisely: strip comments+whitespace
+        # from the staged source and HEAD's copy; identical => cosmetic-only
+        # edit, .min is fresh by definition. (Checking the .min against HEAD
+        # alone would also pass for a stale un-rebuilt .min — insufficient.)
+        if command -v perl >/dev/null 2>&1; then
+          norm() { perl -0777 -pe 's{/\*.*?\*/}{}gs; s{^\s*//[^\n]*$}{}gm; s/\s+//g'; }
+          staged_sig=$(git -C "$ROOT" show ":$f" 2>/dev/null | norm | git hash-object --stdin)
+          head_sig=$(git -C "$ROOT" show "HEAD:$f" 2>/dev/null | norm | git hash-object --stdin)
+          if [ -n "$staged_sig" ] && [ "$staged_sig" = "$head_sig" ]; then
+            continue
+          fi
+        fi
         c_bad "edited source not rebuilt: $f  →  (cd wordpress-theme && npm run build) && git add $min"
         STALE_MIN=1
       fi
