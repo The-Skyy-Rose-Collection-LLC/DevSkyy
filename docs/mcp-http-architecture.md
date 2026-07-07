@@ -90,8 +90,10 @@ handler (`action: 'list' | 'call'`) that:
 
 - Returns `401` if there is no authenticated dashboard session
   (`getServerSession(authOptions)`), before ever touching the MCP token —
-  "the proxy holds `MCP_SERVICE_TOKEN` server-side, so an open route would
-  expose all 38 tools" (route.ts comment).
+  per the route.ts comment, "the proxy holds `MCP_SERVICE_TOKEN`
+  server-side, so an open route would expose the full tool set" (the
+  in-code comment says "38 tools," a stale count from before later tool
+  additions; the live-verified count per `tasks/todo.md` P3b is 42).
 - Uses the official `@modelcontextprotocol/sdk` `Client` +
   `StreamableHTTPClientTransport`, constructing the transport with the
   Bearer header baked into `requestInit` when `MCP_TOKEN` is set.
