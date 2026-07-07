@@ -326,7 +326,7 @@ npm outdated
 ---
 
 **See Also**:
-- [CONTRIB.md](CONTRIB.md) - Development setup
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development setup
 - [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) - Environment configuration
 - [pyproject.toml](../pyproject.toml) - Python dependencies source
 - [package.json](../package.json) - JavaScript dependencies source

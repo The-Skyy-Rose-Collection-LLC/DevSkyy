@@ -47,7 +47,9 @@ function skyyrose_send_security_headers() {
 		"default-src 'self'",
 		// https://js.stripe.com is CRITICAL — required for Stripe Elements, Apple Pay, Google Pay.
 		// Without it the browser blocks the Stripe JS bundle before any checkout renders.
-		"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net https://js.stripe.com blob:",
+		// 'wasm-unsafe-eval' permits WebAssembly compilation ONLY (not JS eval) —
+		// required by the self-hosted Draco decoder for the 3D mascot GLB.
+		"script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net https://js.stripe.com blob:",
 		// s0.wp.com and widgets.wp.com serve inline widget stylesheets (Jetpack Share, WP.com bars).
 		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://s0.wp.com https://widgets.wp.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",

@@ -1,0 +1,280 @@
+{
+  "pages": {
+    "home": {
+      "title": "Home",
+      "url": "/",
+      "tips": []
+    },
+    "about": {
+      "title": "About",
+      "url": "/about/",
+      "tips": []
+    },
+    "contact": {
+      "title": "Contact",
+      "url": "/contact/",
+      "tips": []
+    },
+    "pre-order": {
+      "title": "Pre-Order",
+      "url": "/pre-order/",
+      "tips": []
+    },
+    "collection-black-rose": {
+      "title": "Black Rose Collection",
+      "url": "/collection-black-rose/",
+      "tips": []
+    },
+    "collection-love-hurts": {
+      "title": "Love Hurts Collection",
+      "url": "/collection-love-hurts/",
+      "tips": []
+    },
+    "collection-signature": {
+      "title": "Signature Collection",
+      "url": "/collection-signature/",
+      "tips": []
+    },
+    "collection-kids-capsule": {
+      "title": "Kids Capsule",
+      "url": "/collection-kids-capsule/",
+      "tips": []
+    },
+    "experience-black-rose": {
+      "title": "Black Rose Experience",
+      "url": "/experience-black-rose/",
+      "tips": []
+    },
+    "experience-love-hurts": {
+      "title": "Love Hurts Experience",
+      "url": "/experience-love-hurts/",
+      "tips": []
+    },
+    "experience-signature": {
+      "title": "Signature Experience",
+      "url": "/experience-signature/",
+      "tips": []
+    },
+    "experience-kids-capsule": {
+      "title": "Kids Capsule Experience",
+      "url": "/experience-kids-capsule/",
+      "tips": []
+    },
+    "experiences": {
+      "title": "Immersive Worlds",
+      "url": "/experiences/",
+      "tips": []
+    },
+    "landing-black-rose": {
+      "title": "Black Rose — Drop",
+      "url": "/landing-black-rose/",
+      "tips": []
+    },
+    "landing-love-hurts": {
+      "title": "Love Hurts — Drop",
+      "url": "/landing-love-hurts/",
+      "tips": []
+    },
+    "landing-signature": {
+      "title": "Signature — Drop",
+      "url": "/landing-signature/",
+      "tips": []
+    },
+    "landing-kids-capsule": {
+      "title": "Kids Capsule — Drop",
+      "url": "/landing-kids-capsule/",
+      "tips": []
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "url": "/wishlist/",
+      "tips": []
+    },
+    "shop": {
+      "title": "Shop",
+      "url": "/shop/",
+      "tips": []
+    },
+    "cart": {
+      "title": "Cart",
+      "url": "/cart/",
+      "tips": []
+    },
+    "checkout": {
+      "title": "Checkout",
+      "url": "/checkout/",
+      "tips": []
+    },
+    "my-account": {
+      "title": "My Account",
+      "url": "/my-account/",
+      "tips": []
+    },
+    "faq": {
+      "title": "Care Instructions",
+      "url": "/faq/",
+      "tips": []
+    },
+    "shipping-returns": {
+      "title": "Shipping & Returns",
+      "url": "/shipping-returns/",
+      "tips": []
+    },
+    "size-guide": {
+      "title": "Size Guide",
+      "url": "/size-guide/",
+      "tips": []
+    },
+    "privacy-policy": {
+      "title": "Privacy Policy",
+      "url": "/privacy-policy/",
+      "tips": []
+    },
+    "terms-of-service": {
+      "title": "Terms of Service",
+      "url": "/terms-of-service/",
+      "tips": []
+    },
+    "refund-policy": {
+      "title": "Refund Policy",
+      "url": "/refund-policy/",
+      "tips": []
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "url": "/accessibility/",
+      "tips": []
+    },
+    "cookie-policy": {
+      "title": "Cookie Policy",
+      "url": "/cookie-policy/",
+      "tips": []
+    },
+    "collections": {
+      "title": "Collections",
+      "url": "/collections/",
+      "tips": []
+    },
+    "collections-black-rose": {
+      "title": "Black Rose",
+      "url": "/collections/black-rose/",
+      "tips": []
+    },
+    "collections-love-hurts": {
+      "title": "Love Hurts",
+      "url": "/collections/love-hurts/",
+      "tips": []
+    },
+    "collections-signature": {
+      "title": "Signature",
+      "url": "/collections/signature/",
+      "tips": []
+    },
+    "collections-kids-capsule": {
+      "title": "Kids Capsule",
+      "url": "/collections/kids-capsule/",
+      "tips": []
+    }
+  },
+  "intents": [
+    {
+      "id": "where-black-rose",
+      "patterns": [
+        "black rose",
+        "black-rose"
+      ],
+      "answer": "Head to Black Rose Collection →",
+      "link": "/collection-black-rose/"
+    },
+    {
+      "id": "where-kids-capsule",
+      "patterns": [
+        "kids capsule",
+        "kids-capsule"
+      ],
+      "answer": "Head to Kids Capsule →",
+      "link": "/collection-kids-capsule/"
+    },
+    {
+      "id": "where-love-hurts",
+      "patterns": [
+        "love hurts",
+        "love-hurts"
+      ],
+      "answer": "Head to Love Hurts Collection →",
+      "link": "/collection-love-hurts/"
+    },
+    {
+      "id": "where-signature",
+      "patterns": [
+        "signature",
+        "signature"
+      ],
+      "answer": "Head to Signature Collection →",
+      "link": "/collection-signature/"
+    },
+    {
+      "id": "where-shop",
+      "patterns": [
+        "shop",
+        "buy",
+        "browse",
+        "products",
+        "store",
+        "everything"
+      ],
+      "answer": "Everything we've got, right here →",
+      "link": "/shop/"
+    },
+    {
+      "id": "where-preorder",
+      "patterns": [
+        "pre-order",
+        "preorder",
+        "pre order",
+        "reserve",
+        "drop"
+      ],
+      "answer": "Pre-ordering means we make each piece for you — no overstock, no waste →",
+      "link": "/pre-order/"
+    },
+    {
+      "id": "sizing",
+      "patterns": [
+        "size",
+        "sizing",
+        "fit",
+        "runs small",
+        "runs big",
+        "measurements"
+      ],
+      "answer": "Fit notes live on every product page — general sizing lives in the FAQ →",
+      "link": "/faq/"
+    },
+    {
+      "id": "shipping",
+      "patterns": [
+        "shipping",
+        "returns",
+        "exchange",
+        "refund",
+        "delivery",
+        "ship"
+      ],
+      "answer": "Shipping rates, delivery times, and our return policy →",
+      "link": "/shipping-returns/"
+    },
+    {
+      "id": "order-tracking",
+      "patterns": [
+        "track",
+        "order status",
+        "where is my order",
+        "my order",
+        "tracking"
+      ],
+      "answer": "Check your order status in your account →",
+      "link": "/my-account/"
+    }
+  ]
+}

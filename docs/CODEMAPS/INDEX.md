@@ -1,85 +1,34 @@
 # DevSkyy Codemaps Index
 
-**Last Updated:** 2026-02-19
-**Source of Truth:** Repository structure, `package.json`, `.env.example`
+<!-- Generated: 2026-07-06 | Files scanned: 6 codemaps + repo root scan | Token estimate: ~450 -->
 
-## What Are Codemaps?
-
-Codemaps provide navigable, high-level overviews of each major area of the DevSkyy codebase. They are generated from the actual code structure and kept under 500 lines each.
+**Status: STAGED FOR APPROVAL.** This is a full rewrite of the codemap set (previous headers dated 2026-02-19, ~140 days stale, predating major repo growth). Files live in `docs/CODEMAPS/.pending/` — not yet promoted to `docs/CODEMAPS/`. See `.reports/codemap-diff.txt` for the full diff.
 
 ## Available Codemaps
 
-| Codemap | Covers | Location |
-|---------|--------|----------|
-| [Frontend](frontend.md) | TypeScript SDK, React components, 3D collections, Next.js dashboard | `docs/CODEMAPS/frontend.md` |
-| [Backend](backend.md) | Python FastAPI, agents, security, LLM providers, MCP server | `docs/CODEMAPS/backend.md` |
+| Codemap | Covers |
+|---|---|
+| [architecture.md](architecture.md) | System diagram, 3 independent deployables, backend dependency flow |
+| [backend.md](backend.md) | FastAPI (`main_enterprise.py` + `api/v1/*`), GraphQL, `core`/`security`/`llm`/`orchestration`/`services`/`agents` |
+| [frontend.md](frontend.md) | Next.js 16 dashboard (`frontend/`), `proxy.ts` auth gate, legacy `src/` SDK |
+| [wordpress.md](wordpress.md) | `skyyrose-flagship` theme templates, `inc/` modules, `.min` build discipline |
+| [data.md](data.md) | Catalog CSV + dossiers, SOT imagery resolution, Alembic models, asset hub |
+| [dependencies.md](dependencies.md) | External services: WooCommerce, WP.com, Vercel, OAI gpt-image-2, Pinecone, Meshy/Tripo, LLM providers |
 
-## Repository Overview
+## Three independent systems — never cross-wire
 
-```
-DevSkyy/                         # v3.2.0 - AI orchestration platform
-|-- main_enterprise.py           # FastAPI entry point (47+ endpoints)
-|-- devskyy_mcp.py               # MCP server (13 tools, 54 agents)
-|-- package.json                 # Node.js config (28 scripts)
-|-- .env.example                 # Environment variable template
-|
-|-- core/                        # Foundation layer (zero outer deps)
-|-- security/                    # AES-256-GCM, JWT, audit, zero-trust
-|-- agents/                      # 54 AI agents (SuperAgent base)
-|-- llm/                         # 6 LLM providers + tournament router
-|-- api/                         # REST endpoints, webhooks, dashboard
-|-- services/                    # ML, 3D, analytics, notifications
-|
-|-- src/                         # TypeScript SDK
-|   |-- collections/             # 5 Three.js 3D experiences
-|   |-- components/              # React Three Fiber components
-|   |-- lib/                     # Cart, checkout, Stripe, materials
-|   |-- hooks/                   # React hooks (cart, scroll, filters)
-|   |-- services/                # Agent, OpenAI, ThreeJS services
-|   `-- types/                   # TypeScript type definitions
-|
-|-- frontend/                    # Next.js dashboard application
-|-- wordpress-theme/             # SkyyRose WordPress theme
-|   `-- skyyrose-flagship/       # Production theme
-|
-|-- tests/                       # unit/, integration/, e2e/
-|-- docs/                        # 90+ documentation files
-|-- config/                      # TypeScript, Jest, Vite configs
-`-- scripts/                     # Utility and deployment scripts
-```
+1. **Python API** (repo root) — `main_enterprise.py` (Docker/Fly) or `api/index.py` (Vercel serverless mirror)
+2. **Next.js dashboard** (`frontend/`) — devskyy.app on Vercel
+3. **WordPress theme** (`wordpress-theme/skyyrose-flagship/`) — skyyrose.co, deployed via SFTP
 
-## Dependency Flow
+All three read the same canonical product data (`skyyrose-catalog.csv` + dossiers + `sot-images.json`, registered in `SOT.md`) but never call into each other's admin APIs directly.
 
-```
-Core (auth, registry, runtime) -- zero dependencies on outer layers
-  |
-  v
-Security, Database, LLM Providers
-  |
-  v
-Orchestration, Services (ML, 3D, analytics)
-  |
-  v
-Agents (54 specialized, SuperAgent base)
-  |
-  v
-API (FastAPI REST, WebSocket, MCP)
-```
+## Repository scale (verified this pass)
 
-## Key Entry Points
+- `agents/`: 218 Python files (root CLAUDE.md's "54 agents" figure predates the `core/` 8-domain hierarchy, `claude_sdk/domain_agents/`, `elite_web_builder/`, and `render_pipeline/` additions)
+- `api/`: 25 top-level modules + `api/v1/` (30 modules, 3 subpackages) + `api/v2/` (5, new) + `api/graphql/`
+- `llm/providers/`: 11 adapter files — root CLAUDE.md's "6 providers" claim is stale (adds deepseek, replicate, stability, vertex_imagen, litellm_provider) — see [dependencies.md](dependencies.md)
 
-| Entry Point | Technology | Purpose |
-|-------------|-----------|---------|
-| `main_enterprise.py` | FastAPI (Python) | Backend API server |
-| `devskyy_mcp.py` | FastMCP (Python) | MCP tool server |
-| `src/index.ts` | TypeScript | SDK exports |
-| `frontend/` | Next.js | Dashboard UI |
-| `wordpress-theme/skyyrose-flagship/` | PHP | Production WordPress theme |
+## Staleness warning
 
-## Related Documentation
-
-- [CONTRIB.md](../CONTRIB.md) -- Development workflow and setup
-- [RUNBOOK.md](../RUNBOOK.md) -- Deployment and operations
-- [SCRIPTS_REFERENCE.md](../SCRIPTS_REFERENCE.md) -- NPM scripts reference
-- [ENV_VARS_REFERENCE.md](../ENV_VARS_REFERENCE.md) -- Environment variables
-- [ARCHITECTURE.md](../ARCHITECTURE.md) -- System architecture
+Previous codemaps (`docs/CODEMAPS/{INDEX,backend,frontend}.md`) carry a `2026-02-19` "Last Updated" header (git shows the files were last touched 2026-06-12 without the header being bumped) — 137+ days stale by header date. They predate `database/`, `orchestration/`, `eval/`, `skyyrose/`, `aos/`, and most of `api/v1/`.

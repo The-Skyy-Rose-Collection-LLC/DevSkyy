@@ -2819,5 +2819,24 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-178",
+    "timestamp": "2026-07-07T11:30:00-07:00",
+    "error_message": "Skyy mascot never appears on live skyyrose.co \u2014 GLB load fails silently, no console error surfaced",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "root_cause": "skyy.glb ships draco-compressed (gltf-transform --compress draco) but GLTFLoader had no DRACOLoader attached \u2014 decoders were shipped to assets/js/lib/draco/ and CSP updated, yet the loader wiring itself was never added. QC harness masked it: harness viewer has its own DRACOLoader.",
+    "fix": "Import DRACOLoader alongside GLTFLoader in module bootstrap, expose window.THREE_DRACOLoader, attach via loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DRACO_PATH)) with DRACO_PATH derived from MODEL_URL. Rebuilt .min.",
+    "tags": [
+      "mascot",
+      "three.js",
+      "draco",
+      "gltfloader",
+      "silent-failure",
+      "qc-blind-spot"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T11:30:00-07:00"
   }
 ]

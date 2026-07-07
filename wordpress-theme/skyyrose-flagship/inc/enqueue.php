@@ -205,9 +205,32 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Skyy mascot CSS disabled — character widget is not rendered until art is finalized.
-	// Re-enable mascot.min.css and skyy-walk.css when get_template_part('skyy-mascot')
-	// is restored in footer.php and front-page.php.
+	// Skyy mascot CSS — gated on the Customizer kill switch (live by default,
+	// see skyyrose_mascot_is_enabled()) and excluded from checkout. Degrades
+	// to a 2D sprite when no GLB is configured/shipped.
+	$mascot_enabled = skyyrose_mascot_is_enabled()
+		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $mascot_enabled ) {
+		$mascot_css_file = $use_min && file_exists( $base_dir . '/mascot.min.css' ) ? 'mascot.min.css' : 'mascot.css';
+		if ( file_exists( $base_dir . '/' . $mascot_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-mascot',
+				$base_uri . '/' . $mascot_css_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		$skyy_walk_css_file = $use_min && file_exists( $base_dir . '/skyy-walk.min.css' ) ? 'skyy-walk.min.css' : 'skyy-walk.css';
+		if ( file_exists( $base_dir . '/' . $skyy_walk_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-skyy-walk',
+				$base_uri . '/' . $skyy_walk_css_file,
+				array( 'skyyrose-mascot' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
 
 	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
 	$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
@@ -364,9 +387,75 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	// Skyy mascot JS disabled — character widget is not rendered until art is finalized.
-	// Re-enable mascot.min.js and skyy-3d.js when get_template_part('skyy-mascot')
-	// is restored in footer.php and front-page.php.
+	// Skyy mascot JS — gated on the same kill switch as the CSS above. Loaded
+	// via a tiny idle-time bootstrap (mascot-loader.js) so the character
+	// bundle never costs LCP/CLS budget: it only fetches mascot.min.js (and
+	// skyy-3d.min.js, when a GLB is configured) after requestIdleCallback or
+	// first interaction, whichever comes first.
+	$mascot_js_enabled = skyyrose_mascot_is_enabled()
+		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $mascot_js_enabled ) {
+		$loader_file = $use_min && file_exists( $js_dir . '/mascot-loader.min.js' ) ? 'mascot-loader.min.js' : 'mascot-loader.js';
+		$mascot_file = $use_min && file_exists( $js_dir . '/mascot.min.js' ) ? 'mascot.min.js' : 'mascot.js';
+
+		if ( file_exists( $js_dir . '/' . $loader_file ) && file_exists( $js_dir . '/' . $mascot_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-mascot-loader',
+				$js_uri . '/' . $loader_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+
+			$glb_url   = skyyrose_get_skyy_glb_url();
+			$skyy3d_js = null;
+			if ( ! empty( $glb_url ) ) {
+				$skyy3d_file = $use_min && file_exists( $js_dir . '/skyy-3d.min.js' ) ? 'skyy-3d.min.js' : 'skyy-3d.js';
+				if ( file_exists( $js_dir . '/' . $skyy3d_file ) ) {
+					$skyy3d_js = add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $skyy3d_file );
+				}
+			}
+
+			// mascot.js / skyy-3d.js are injected client-side by the loader,
+			// outside wp_enqueue_script — they get no automatic ?ver=. Without
+			// an explicit ver param a CDN/Batcache keeps serving stale copies
+			// after every SKYYROSE_VERSION bump.
+			wp_localize_script(
+				'skyyrose-mascot-loader',
+				'SKYY_LOADER_CONFIG',
+				array(
+					'mascotUrl' => add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $mascot_file ),
+					'skyy3dUrl' => $skyy3d_js,
+				)
+			);
+
+			wp_localize_script( 'skyyrose-mascot-loader', 'SKYY_GUIDE_DATA', skyyrose_get_site_guide() );
+
+			$skyy_context = skyyrose_get_skyy_context();
+			wp_localize_script(
+				'skyyrose-mascot-loader',
+				'SKYY_MASCOT_CONFIG',
+				array(
+					'pageTip'    => skyyrose_get_skyy_page_tip(),
+					'llmEnabled' => (bool) get_theme_mod( 'skyyrose_mascot_llm_enabled', true ),
+				)
+			);
+
+			if ( $skyy3d_js ) {
+				wp_localize_script(
+					'skyyrose-mascot-loader',
+					'SKYY_3D_CONFIG',
+					array(
+						'modelUrl' => esc_url_raw( $glb_url ),
+						'walkSide' => skyyrose_get_skyy_walk_side( $skyy_context ),
+					)
+				);
+			}
+		}
+	}
 }
 
 /**

@@ -535,15 +535,19 @@ add_action( 'wp_ajax_nopriv_skyyrose_track_referral', 'skyyrose_ajax_track_refer
 
 /*
 --------------------------------------------------------------
- * Mascot Chat (Scripted — future AI upgrade hook)
+ * Mascot Chat (Tier 2 — deterministic fallback, future AI upgrade hook)
  *--------------------------------------------------------------*/
 
 /**
- * Handle mascot chip interaction AJAX call.
+ * Handle mascot "Ask Skyy" free-text AJAX call — Tier 2 fallback for
+ * questions Tier 1 (client-side data/site-guide.json matching) misses.
  *
- * Rate-limited to 20 requests/minute per IP. Currently returns scripted
- * responses (JS handles conversation trees client-side). Reserved for
- * future Claude API integration.
+ * Rate-limited to 20 requests/minute per IP. Matches against
+ * skyyrose_mascot_match_fallback_intent() (see inc/mascot-config.php) —
+ * deterministic server-side keyword matching, no external API call, no
+ * per-use cost. Always returns a real `answer` string so the client never
+ * has to guess whether Tier 2 "worked"; a future Claude/LLM upgrade can
+ * replace the matching branch without changing this contract.
  *
  * @since 4.0.0
  * @return void
@@ -565,9 +569,32 @@ function skyyrose_ajax_mascot_chat() {
 	}
 	set_transient( $ip_key, $count + 1, MINUTE_IN_SECONDS );
 
-	// JS handles all scripted responses client-side.
-	// This endpoint is reserved for future AI integration.
-	wp_send_json_success( array( 'ok' => true ) );
+	$message = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+	$intent  = function_exists( 'skyyrose_mascot_match_fallback_intent' )
+		? skyyrose_mascot_match_fallback_intent( $message )
+		: null;
+
+	if ( $intent ) {
+		wp_send_json_success(
+			array(
+				'ok'     => true,
+				'answer' => $intent['answer'],
+				'link'   => $intent['link'],
+			)
+		);
+		return;
+	}
+
+	// No keyword match — graceful, on-brand answer instead of a dead
+	// {ok:true} stub, so mascot.js's askTier2Fallback() always has a real
+	// line to speak regardless of coverage.
+	wp_send_json_success(
+		array(
+			'ok'     => true,
+			'answer' => esc_html__( 'I don’t have that one memorized — try Contact, or ask me about sizing, shipping, or a collection. 🌹', 'skyyrose' ),
+			'link'   => '/contact/',
+		)
+	);
 }
 add_action( 'wp_ajax_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );
 add_action( 'wp_ajax_nopriv_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );

@@ -69,6 +69,7 @@ $skyyrose_core_includes = array(
 	'/inc/enqueue-performance.php',
 	'/inc/enqueue-phases.php',
 	'/inc/customizer.php',
+	'/inc/mascot-config.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
 	'/inc/accessibility-fix.php',
@@ -175,4 +176,4 @@ foreach ( $skyyrose_builder_stubs as $skyyrose_stub ) {
 
 /* Admin includes and brand styles removed in v5.2.0 — dead code cleanup. */
 
-/* Mascot + brand-ambassador removed in v5.2.0. */
+/* Mascot reinstated in v1.9.0 — Skyy 3D character host (inc/mascot-config.php). */

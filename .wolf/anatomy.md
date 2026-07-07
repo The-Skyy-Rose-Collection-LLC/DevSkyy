@@ -1332,7 +1332,7 @@
 - `CLOTHING_3D_PRODUCTION.md` — Clothing 3D — Production Deployment Guide (~2484 tok)
 - `COLAB_TRAINING_GUIDE.md` — ✅ Google Colab LoRA Training Guide (FREE) (~1014 tok)
 - `CONSOLIDATED_VALIDATION_ISSUES.md` — DevSkyy Consolidated Validation Issues Report (~3918 tok)
-- `CONTRIB.md` — DevSkyy Contributor Guide (~1917 tok)
+- `CONTRIBUTING.md` — DevSkyy Contributor Guide, renamed from CONTRIB.md 2026-07-06 (~2600 tok)
 - `CRITICAL_FUCHSIA_APE_QUICKSTART.md` — Critical Fuchsia Ape - Quick Start Guide (~1234 tok)
 - `CRITICAL_FUCHSIA_APE_SETUP.md` — DevSkyy MCP - Critical Fuchsia Ape Backend Setup (~1840 tok)
 - `CRITICAL_FUCHSIA_APE_SUMMARY.md` — DevSkyy MCP - Critical Fuchsia Ape Setup Summary (~1946 tok)

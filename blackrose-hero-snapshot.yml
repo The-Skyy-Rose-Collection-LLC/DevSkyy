@@ -1,0 +1,735 @@
+- generic [ref=f101e1]:
+  - generic [ref=f101e2]:
+    - navigation "Toolbar":
+      - menu:
+        - group [ref=f101e3]:
+          - menuitem "WordPress.com" [ref=f101e4]:
+            - generic [ref=f101e6]: WordPress.com
+        - group [ref=f101e7]:
+          - menuitem " The Skyy Rose Collection" [ref=f101e8]
+        - group [ref=f101e9]:
+          - menuitem "Customize" [ref=f101e10]
+        - group [ref=f101e11]:
+          - menuitem "0 Comments in moderation" [ref=f101e12]:
+            - generic [ref=f101e14]: "0"
+            - generic [ref=f101e15]: 0 Comments in moderation
+        - group [ref=f101e16]:
+          - menuitem "New" [ref=f101e17]:
+            - generic [ref=f101e19]: New
+        - group [ref=f101e20]:
+          - menuitem "Edit Page" [ref=f101e21]
+        - group [ref=f101e22]:
+          - menuitem "" [ref=f101e23]:
+            - generic [ref=f101e24]: 
+        - group [ref=f101e25]:
+          - menuitem "Stats" [ref=f101e26]:
+            - img "Stats" [ref=f101e28]
+        - group [ref=f101e29]:
+          - menuitem "Notes" [ref=f101e30]
+        - group [ref=f101e31]:
+          - menuitem "Elementor Debugger" [ref=f101e32]
+        - group [ref=f101e33]:
+          - 'link "Image Guide: Active" [ref=f101e34]':
+            - /url: https://skyyrose.co/wp-admin/admin.php?page=jetpack-boost
+            - img [ref=f101e36]
+            - generic [ref=f101e40]: "Image Guide: Active"
+      - menu [ref=f101e41]:
+        - group [ref=f101e42]:
+          - menuitem "Reader" [ref=f101e43]:
+            - generic [ref=f101e45]: Reader
+        - group [ref=f101e46]:
+          - menuitem [ref=f101e47]:
+            - generic "Help Center":
+              - img [ref=f101e48]
+        - group [ref=f101e50]:
+          - menuitem "Notifications" [ref=f101e51]:
+            - generic [ref=f101e1079]: 
+            - generic [ref=f101e52]: Notifications
+        - group [ref=f101e53]:
+          - menuitem "Howdy, skyyroseco" [ref=f101e54]
+        - group [ref=f101e55]:
+          - menuitem "Search" [ref=f101e56]:
+            - generic [ref=f101e57]:
+              - textbox "Search" [ref=f101e58]
+              - generic [ref=f101e59]: Search
+  - link "Skip to the story" [ref=f101e60]:
+    - /url: "#content"
+  - generic [ref=f101e61]:
+    - banner [ref=f101e62]:
+      - navigation "Primary Navigation" [ref=f101e63]:
+        - generic [ref=f101e64]:
+          - generic [ref=f101e65]:
+            - button "Search" [ref=f101e66]:
+              - img [ref=f101e67]
+              - generic [ref=f101e70]: Search
+            - link "Account" [ref=f101e71]:
+              - /url: https://skyyrose.co/my-account/
+              - img [ref=f101e72]
+              - generic [ref=f101e75]: Account
+            - link "Bag" [ref=f101e76]:
+              - /url: https://skyyrose.co/cart/
+              - img [ref=f101e77]
+              - generic [ref=f101e80]: Bag
+          - link "SkyyRose — Home" [ref=f101e82]:
+            - /url: https://skyyrose.co/
+            - img "SkyyRose" [ref=f101e83]
+            - generic [ref=f101e84]: SkyyRose
+          - list [ref=f101e86]:
+            - listitem [ref=f101e87]:
+              - menuitem "Home" [ref=f101e88]
+            - listitem [ref=f101e89]:
+              - menuitem "Collections" [ref=f101e90]
+            - listitem [ref=f101e91]:
+              - menuitem "Pre-Order" [ref=f101e92]
+            - listitem [ref=f101e93]:
+              - menuitem "Our Story" [ref=f101e94]
+            - listitem [ref=f101e95]:
+              - menuitem "Contact" [ref=f101e96]
+    - generic [ref=f101e98]:
+      - generic [ref=f101e99]:
+        - img [ref=f101e107]
+        - img "Black Rose Collection — rose from concrete" [ref=f101e112]
+        - generic [ref=f101e113]:
+          - img [ref=f101e121]
+          - generic [ref=f101e125]: The Original Collection
+          - img "The Black Rose Collection" [ref=f101e126]
+          - heading "The Black Rose Collection" [level=1] [ref=f101e127]
+          - paragraph [ref=f101e128]:
+            - generic [ref=f101e129]: The
+            - generic [ref=f101e130]: beauty
+            - generic [ref=f101e131]: of
+            - generic [ref=f101e132]: the
+            - generic [ref=f101e133]: color
+            - generic [ref=f101e134]: black
+            - generic [ref=f101e135]: through
+            - generic [ref=f101e136]: the
+            - generic [ref=f101e137]: rose
+            - generic [ref=f101e138]: and
+            - generic [ref=f101e139]: high-end
+            - generic [ref=f101e140]: fashion
+            - generic [ref=f101e141]: design.
+          - paragraph [ref=f101e142]: Monochrome sophistication. Dark-on-dark texture. Elegance distilled into every fiber. You don't wear it to stand out. You wear it because you already stood up.
+          - generic [ref=f101e143]:
+            - link "Shop the Collection" [ref=f101e144]:
+              - /url: "#shop"
+            - link "View 3D Experience" [ref=f101e145]:
+              - /url: "#experience"
+        - generic [ref=f101e146]: Discover↓
+      - region "The Bay Bridge" [ref=f101e147]:
+        - region [ref=f101e1085]:
+          - img [ref=f101e156]
+          - button "Previous room" [ref=f101e163]:
+            - img [ref=f101e164]
+          - button "Next room" [ref=f101e167]:
+            - img [ref=f101e168]
+          - group "Room selector" [ref=f101e170]:
+            - 'button "Room 1 of 2: Moonlit Courtyard" [pressed] [ref=f101e171]'
+            - 'button "Room 2 of 2: Iron Gazebo" [ref=f101e172]'
+          - generic [ref=f101e173]: Moonlit Courtyard
+          - generic [ref=f101e174]:
+            - link "BLACK Rose Sherpa Jacket — $95" [ref=f101e175]:
+              - /url: https://skyyrose.co/product/br-006/
+              - generic:
+                - generic: BLACK Rose Sherpa Jacket
+                - generic: $95
+            - link "BLACK Rose Hoodie — Signature Edition — $65" [ref=f101e177]:
+              - /url: https://skyyrose.co/product/br-005/
+              - generic:
+                - generic: BLACK Rose Hoodie — Signature Edition
+                - generic: $65
+            - link "BLACK Rose Joggers — $50" [ref=f101e179]:
+              - /url: https://skyyrose.co/product/br-002/
+              - generic:
+                - generic: BLACK Rose Joggers
+                - generic: $50
+            - link "BLACK Rose x Love Hurts Basketball Shorts — $65" [ref=f101e181]:
+              - /url: https://skyyrose.co/product/br-007/
+              - generic:
+                - generic: BLACK Rose x Love Hurts Basketball Shorts
+                - generic: $65
+        - dialog [ref=f101e183]:
+          - button [ref=f101e184]: ×
+          - generic [ref=f101e185]:
+            - img [ref=f101e194]
+            - generic [ref=f101e195]:
+              - heading [level=3] [ref=f101e196]: Product Details
+              - generic [ref=f101e197]:
+                - button [ref=f101e198]: Pre-Order Now
+                - link [ref=f101e199]:
+                  - /url: https://skyyrose.co/pre-order/
+                  - text: View Details
+      - region "Brand story" [ref=f101e200]:
+        - generic [ref=f101e201]:
+          - generic [ref=f101e202]:
+            - article [ref=f101e1080]:
+              - generic [ref=f101e1081]: 01 — THE POSTURE
+              - heading "Not a flower — a conviction." [level=2] [ref=f101e1083]
+              - generic [ref=f101e1084]: Black Rose / Oakland
+            - article:
+              - generic: 02 — THE ANSWER
+              - heading "Every piece in Black Rose is the concrete answering back." [level=2]
+              - generic: Black Rose / The Town
+            - article:
+              - generic: 03 — THE STAND
+              - heading "You wear it because you already stood up." [level=2]
+              - generic: Black Rose / Collection I
+          - generic [ref=f101e212]: 01 / 03
+          - status [ref=f101e213]: Not a flower — a conviction.
+      - region "The Collection" [ref=f101e214]:
+        - generic [ref=f101e215]:
+          - heading "The Collection" [level=2] [ref=f101e216]
+          - paragraph [ref=f101e217]: Dark elegance — holographic preview
+        - list [ref=f101e219]:
+          - article [ref=f101e220]:
+            - link "BLACK Rose Crewneck" [ref=f101e221]:
+              - /url: https://skyyrose.co/product/br-001/
+              - generic [ref=f101e223]:
+                - img [ref=f101e229]
+                - img [ref=f101e238]
+              - img "BLACK Rose Crewneck — front" [ref=f101e243]
+            - generic [ref=f101e244]:
+              - generic [ref=f101e245]: Black Rose
+              - heading "BLACK Rose Crewneck" [level=3] [ref=f101e246]:
+                - link "BLACK Rose Crewneck" [ref=f101e247]:
+                  - /url: https://skyyrose.co/product/br-001/
+              - generic [ref=f101e248]:
+                - generic [ref=f101e250]: $35.00
+                - generic [ref=f101e251]: ED. 250
+              - link "View Piece" [ref=f101e252]:
+                - /url: https://skyyrose.co/product/br-001/
+              - link "Quick Add" [ref=f101e253]:
+                - /url: https://skyyrose.co/product/br-001/
+          - article [ref=f101e254]:
+            - link "BLACK Rose Joggers" [ref=f101e255]:
+              - /url: https://skyyrose.co/product/br-002/
+              - generic [ref=f101e257]:
+                - img [ref=f101e263]
+                - img [ref=f101e272]
+              - img "BLACK Rose Joggers — front" [ref=f101e277]
+            - generic [ref=f101e278]:
+              - generic [ref=f101e279]: Black Rose
+              - heading "BLACK Rose Joggers" [level=3] [ref=f101e280]:
+                - link "BLACK Rose Joggers" [ref=f101e281]:
+                  - /url: https://skyyrose.co/product/br-002/
+              - generic [ref=f101e282]:
+                - generic [ref=f101e284]: $50.00
+                - generic [ref=f101e285]: ED. 250
+              - link "View Piece" [ref=f101e286]:
+                - /url: https://skyyrose.co/product/br-002/
+              - link "Quick Add" [ref=f101e287]:
+                - /url: https://skyyrose.co/product/br-002/
+          - generic [ref=f101e289]:
+            - generic [ref=f101e290]:
+              - generic [ref=f101e292]:
+                - img [ref=f101e298]
+                - img [ref=f101e307]
+              - 'link "View BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)" [ref=f101e311]':
+                - /url: https://skyyrose.co/product/br-003/
+                - 'img "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)" [ref=f101e312]'
+                - 'img "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black) — technical blueprint view" [ref=f101e313]'
+            - generic [ref=f101e314]:
+              - generic [ref=f101e315]: BLACK ROSE
+              - 'heading "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)" [level=3] [ref=f101e316]':
+                - 'link "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)" [ref=f101e317]':
+                  - /url: https://skyyrose.co/product/br-003/
+              - generic [ref=f101e320]: $100.00
+            - generic [ref=f101e321]:
+              - radiogroup "Select size" [ref=f101e322]:
+                - radio "S" [ref=f101e323]
+                - radio "M" [ref=f101e324]
+                - radio "L" [ref=f101e325]
+                - radio "XL" [ref=f101e326]
+              - 'button "Add BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black) to cart" [ref=f101e327]': Add to Cart ↗
+              - 'button "Add BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black) to wishlist" [ref=f101e328]': ♡
+          - article [ref=f101e329]:
+            - link "BLACK Rose Hoodie" [ref=f101e330]:
+              - /url: https://skyyrose.co/product/br-004/
+              - generic [ref=f101e332]:
+                - img [ref=f101e338]
+                - img [ref=f101e347]
+                - img [ref=f101e356]
+              - generic [ref=f101e360]:
+                - img "BLACK Rose Hoodie — front" [ref=f101e361]
+                - img [ref=f101e362]
+            - generic [ref=f101e366]:
+              - generic [ref=f101e367]: Black Rose
+              - heading "BLACK Rose Hoodie" [level=3] [ref=f101e368]:
+                - link "BLACK Rose Hoodie" [ref=f101e369]:
+                  - /url: https://skyyrose.co/product/br-004/
+              - generic [ref=f101e370]:
+                - generic [ref=f101e372]: $40.00
+                - generic [ref=f101e373]: ED. 250
+              - link "View Piece" [ref=f101e374]:
+                - /url: https://skyyrose.co/product/br-004/
+              - link "Quick Add" [ref=f101e375]:
+                - /url: https://skyyrose.co/product/br-004/
+          - generic [ref=f101e377]:
+            - generic [ref=f101e378]:
+              - generic [ref=f101e380]:
+                - img [ref=f101e386]
+                - img [ref=f101e395]
+              - link "View BLACK Rose Hoodie — Signature Edition" [ref=f101e399]:
+                - /url: https://skyyrose.co/product/br-005/
+                - img "BLACK Rose Hoodie — Signature Edition" [ref=f101e400]
+                - img "BLACK Rose Hoodie — Signature Edition — technical blueprint view" [ref=f101e401]
+            - generic [ref=f101e402]:
+              - generic [ref=f101e403]: BLACK ROSE
+              - heading "BLACK Rose Hoodie — Signature Edition" [level=3] [ref=f101e404]:
+                - link "BLACK Rose Hoodie — Signature Edition" [ref=f101e405]:
+                  - /url: https://skyyrose.co/product/br-005/
+              - generic [ref=f101e408]: $65.00
+            - generic [ref=f101e409]:
+              - radiogroup "Select size" [ref=f101e410]:
+                - radio "S" [ref=f101e411]
+                - radio "M" [ref=f101e412]
+                - radio "L" [ref=f101e413]
+                - radio "XL" [ref=f101e414]
+              - button "Add BLACK Rose Hoodie — Signature Edition to cart" [ref=f101e415]: Add to Cart ↗
+              - button "Add BLACK Rose Hoodie — Signature Edition to wishlist" [ref=f101e416]: ♡
+          - article [ref=f101e417]:
+            - link "BLACK Rose Sherpa Jacket" [ref=f101e418]:
+              - /url: https://skyyrose.co/product/br-006/
+              - generic [ref=f101e420]:
+                - img [ref=f101e426]
+                - img [ref=f101e435]
+                - img [ref=f101e444]
+              - generic [ref=f101e448]:
+                - img "BLACK Rose Sherpa Jacket — front" [ref=f101e449]
+                - img [ref=f101e450]
+              - generic [ref=f101e451]: Pre-Order
+            - generic [ref=f101e455]:
+              - generic [ref=f101e456]: Black Rose
+              - heading "BLACK Rose Sherpa Jacket" [level=3] [ref=f101e457]:
+                - link "BLACK Rose Sherpa Jacket" [ref=f101e458]:
+                  - /url: https://skyyrose.co/product/br-006/
+              - generic [ref=f101e459]:
+                - generic [ref=f101e461]: $95.00
+                - generic [ref=f101e462]: ED. 250
+              - link "Pre-Order" [ref=f101e463]:
+                - /url: https://skyyrose.co/product/br-006/
+          - article [ref=f101e464]:
+            - link "BLACK Rose x Love Hurts Basketball Shorts" [ref=f101e465]:
+              - /url: https://skyyrose.co/product/br-007/
+              - generic [ref=f101e467]:
+                - img [ref=f101e473]
+                - img [ref=f101e482]
+                - img [ref=f101e491]
+              - generic [ref=f101e495]:
+                - img "BLACK Rose x Love Hurts Basketball Shorts — front" [ref=f101e496]
+                - img [ref=f101e497]
+            - generic [ref=f101e501]:
+              - generic [ref=f101e502]: Black Rose
+              - heading "BLACK Rose x Love Hurts Basketball Shorts" [level=3] [ref=f101e503]:
+                - link "BLACK Rose x Love Hurts Basketball Shorts" [ref=f101e504]:
+                  - /url: https://skyyrose.co/product/br-007/
+              - generic [ref=f101e505]:
+                - generic [ref=f101e507]: $65.00
+                - generic [ref=f101e508]: ED. 250
+              - link "View Piece" [ref=f101e509]:
+                - /url: https://skyyrose.co/product/br-007/
+              - link "Quick Add" [ref=f101e510]:
+                - /url: https://skyyrose.co/product/br-007/
+          - article [ref=f101e511]:
+            - 'link "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)" [ref=f101e512]':
+              - /url: https://skyyrose.co/product/br-008/
+              - generic [ref=f101e514]:
+                - img [ref=f101e520]
+                - img [ref=f101e529]
+                - img [ref=f101e538]
+              - generic [ref=f101e542]:
+                - 'img "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football) — front" [ref=f101e543]'
+                - img [ref=f101e544]
+              - generic [ref=f101e545]: Pre-Order
+            - generic [ref=f101e549]:
+              - generic [ref=f101e550]: Black Rose
+              - 'heading "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)" [level=3] [ref=f101e551]':
+                - 'link "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)" [ref=f101e552]':
+                  - /url: https://skyyrose.co/product/br-008/
+              - generic [ref=f101e553]:
+                - generic [ref=f101e555]: $115.00
+                - generic [ref=f101e556]: ED. 80
+              - link "Pre-Order" [ref=f101e557]:
+                - /url: https://skyyrose.co/product/br-008/
+          - generic [ref=f101e559]:
+            - generic [ref=f101e560]:
+              - generic [ref=f101e562]:
+                - img [ref=f101e568]
+                - img [ref=f101e577]
+              - 'link "View BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)" [ref=f101e581]':
+                - /url: https://skyyrose.co/product/br-009/
+                - 'img "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)" [ref=f101e582]'
+                - 'img "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football) — technical blueprint view" [ref=f101e583]'
+            - generic [ref=f101e584]:
+              - generic [ref=f101e585]: BLACK ROSE
+              - 'heading "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)" [level=3] [ref=f101e586]':
+                - 'link "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)" [ref=f101e587]':
+                  - /url: https://skyyrose.co/product/br-009/
+              - generic [ref=f101e590]: $115.00
+            - generic [ref=f101e591]:
+              - radiogroup "Select size" [ref=f101e592]:
+                - radio "S" [ref=f101e593]
+                - radio "M" [ref=f101e594]
+                - radio "L" [ref=f101e595]
+                - radio "XL" [ref=f101e596]
+              - 'button "Add BLACK is Beautiful Jersey Series: 2. Last Oakland (Football) to cart" [ref=f101e597]': Add to Cart ↗
+              - 'button "Add BLACK is Beautiful Jersey Series: 2. Last Oakland (Football) to wishlist" [ref=f101e598]': ♡
+          - article [ref=f101e599]:
+            - 'link "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)" [ref=f101e600]':
+              - /url: https://skyyrose.co/product/br-010/
+              - generic [ref=f101e602]:
+                - img [ref=f101e608]
+                - img [ref=f101e617]
+                - img [ref=f101e626]
+              - generic [ref=f101e630]:
+                - 'img "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball) — front" [ref=f101e631]'
+                - img [ref=f101e632]
+              - generic [ref=f101e633]: Pre-Order
+            - generic [ref=f101e637]:
+              - generic [ref=f101e638]: Black Rose
+              - 'heading "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)" [level=3] [ref=f101e639]':
+                - 'link "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)" [ref=f101e640]':
+                  - /url: https://skyyrose.co/product/br-010/
+              - generic [ref=f101e641]:
+                - generic [ref=f101e643]: $100.00
+                - generic [ref=f101e644]: ED. 80
+              - link "Pre-Order" [ref=f101e645]:
+                - /url: https://skyyrose.co/product/br-010/
+          - article [ref=f101e646]:
+            - 'link "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)" [ref=f101e647]':
+              - /url: https://skyyrose.co/product/br-011/
+              - generic [ref=f101e649]:
+                - img [ref=f101e655]
+                - img [ref=f101e664]
+                - img [ref=f101e673]
+                - img [ref=f101e682]
+              - generic [ref=f101e686]:
+                - 'img "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey) — front" [ref=f101e687]'
+                - img [ref=f101e688]
+                - img [ref=f101e689]
+              - generic [ref=f101e690]: Pre-Order
+            - generic [ref=f101e695]:
+              - generic [ref=f101e696]: Black Rose
+              - 'heading "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)" [level=3] [ref=f101e697]':
+                - 'link "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)" [ref=f101e698]':
+                  - /url: https://skyyrose.co/product/br-011/
+              - generic [ref=f101e699]:
+                - generic [ref=f101e701]: $115.00
+                - generic [ref=f101e702]: ED. 80
+              - link "Pre-Order" [ref=f101e703]:
+                - /url: https://skyyrose.co/product/br-011/
+          - generic [ref=f101e705]:
+            - generic [ref=f101e706]:
+              - generic [ref=f101e708]:
+                - img [ref=f101e714]
+                - img [ref=f101e723]
+              - 'link "View BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)" [ref=f101e727]':
+                - /url: https://skyyrose.co/product/br-003-oakland/
+                - 'img "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)" [ref=f101e728]'
+                - 'img "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland) — technical blueprint view" [ref=f101e729]'
+            - generic [ref=f101e730]:
+              - generic [ref=f101e731]: BLACK ROSE
+              - 'heading "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)" [level=3] [ref=f101e732]':
+                - 'link "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)" [ref=f101e733]':
+                  - /url: https://skyyrose.co/product/br-003-oakland/
+              - generic [ref=f101e736]: $100.00
+            - generic [ref=f101e737]:
+              - radiogroup "Select size" [ref=f101e738]:
+                - radio "S" [ref=f101e739]
+                - radio "M" [ref=f101e740]
+                - radio "L" [ref=f101e741]
+                - radio "XL" [ref=f101e742]
+              - 'button "Add BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland) to cart" [ref=f101e743]': Add to Cart ↗
+              - 'button "Add BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland) to wishlist" [ref=f101e744]': ♡
+          - article [ref=f101e745]:
+            - 'link "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)" [ref=f101e746]':
+              - /url: https://skyyrose.co/product/br-003-giants/
+              - generic [ref=f101e748]:
+                - img [ref=f101e754]
+                - img [ref=f101e763]
+                - img [ref=f101e772]
+              - generic [ref=f101e776]:
+                - 'img "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants) — front" [ref=f101e777]'
+                - img [ref=f101e778]
+              - generic [ref=f101e779]: Pre-Order
+            - generic [ref=f101e783]:
+              - generic [ref=f101e784]: Black Rose
+              - 'heading "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)" [level=3] [ref=f101e785]':
+                - 'link "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)" [ref=f101e786]':
+                  - /url: https://skyyrose.co/product/br-003-giants/
+              - generic [ref=f101e787]:
+                - generic [ref=f101e789]: $100.00
+                - generic [ref=f101e790]: ED. 250
+              - link "Pre-Order" [ref=f101e791]:
+                - /url: https://skyyrose.co/product/br-003-giants/
+          - article [ref=f101e792]:
+            - 'link "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)" [ref=f101e793]':
+              - /url: https://skyyrose.co/product/br-003-white/
+              - generic [ref=f101e795]:
+                - img [ref=f101e801]
+                - img [ref=f101e810]
+                - img [ref=f101e819]
+              - generic [ref=f101e823]:
+                - 'img "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White) — front" [ref=f101e824]'
+                - img [ref=f101e825]
+              - generic [ref=f101e826]: Pre-Order
+            - generic [ref=f101e830]:
+              - generic [ref=f101e831]: Black Rose
+              - 'heading "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)" [level=3] [ref=f101e832]':
+                - 'link "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)" [ref=f101e833]':
+                  - /url: https://skyyrose.co/product/br-003-white/
+              - generic [ref=f101e834]:
+                - generic [ref=f101e836]: $100.00
+                - generic [ref=f101e837]: ED. 250
+              - link "Pre-Order" [ref=f101e838]:
+                - /url: https://skyyrose.co/product/br-003-white/
+      - region "Founder note from Corey Foster" [ref=f101e839]:
+        - generic [ref=f101e840]:
+          - blockquote [ref=f101e841]: If you asked me four years ago, I never would have thought I'd be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary.
+          - generic [ref=f101e842]:
+            - generic [ref=f101e843]: Corey Foster
+            - generic [ref=f101e844]: Founder · Oakland
+      - generic [ref=f101e847]:
+        - generic [ref=f101e848]: From the Concrete
+        - heading "Born from a Single Question" [level=2] [ref=f101e849]
+        - paragraph [ref=f101e850]: "Someone asked who Black Rose was for. The answer came before the question finished: a black rose is a posture. Not a flower — a conviction. In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission. It forces its way through the cracks."
+        - blockquote [ref=f101e851]: “ "They said luxury can't come from the Town. We said watch. Every piece in Black Rose is the concrete answering back."
+      - generic [ref=f101e852]:
+        - heading "Wear the Darkness" [level=2] [ref=f101e853]
+        - paragraph [ref=f101e854]: "The thorn protects what the world tries to take. Every piece in Black Rose carries that Oakland lesson: be beautiful, be sharp, never be soft where it counts."
+        - link "Shop Black Rose" [ref=f101e855]:
+          - /url: https://skyyrose.co/cart/
+      - navigation "Other collections" [ref=f101e856]:
+        - heading "Explore More Collections" [level=3] [ref=f101e857]
+        - generic [ref=f101e858]:
+          - link "Explore the Love Hurts collection" [ref=f101e859]:
+            - /url: https://skyyrose.co/collections/love-hurts/
+            - heading "Love Hurts" [level=3] [ref=f101e860]
+            - paragraph [ref=f101e861]: Crimson Rebellion
+          - link "Explore the Signature collection" [ref=f101e862]:
+            - /url: https://skyyrose.co/collections/signature/
+            - heading "Signature" [level=3] [ref=f101e863]
+            - paragraph [ref=f101e864]: The Foundation
+          - link "Explore the Kids Capsule collection" [ref=f101e865]:
+            - /url: https://skyyrose.co/collections/kids-capsule/
+            - heading "Kids Capsule" [level=3] [ref=f101e866]
+            - paragraph [ref=f101e867]: Next Generation
+      - generic [ref=f101e868]:
+        - heading "Join the Inner Circle" [level=2] [ref=f101e869]
+        - paragraph [ref=f101e870]: First access to new drops, behind-the-scenes stories, and the darkness behind each piece.
+        - form "Newsletter signup" [ref=f101e871]:
+          - generic [ref=f101e872]: Email address
+          - textbox "Email address" [ref=f101e873]:
+            - /placeholder: Enter your email
+          - button "Join" [ref=f101e874]
+    - contentinfo [ref=f101e875]:
+      - paragraph [ref=f101e877]: Limited Edition. Individually Numbered. Never Restocked.
+      - region "Why SkyyRose" [ref=f101e878]:
+        - generic [ref=f101e879]:
+          - heading "Why SkyyRose" [level=2] [ref=f101e880]
+          - paragraph [ref=f101e881]: Every dollar goes into the product. No influencer budgets. No middlemen. Just quality you can feel.
+          - generic [ref=f101e882]:
+            - generic [ref=f101e883]:
+              - generic "5 out of 5 stars" [ref=f101e884]:
+                - img [ref=f101e885]
+                - img [ref=f101e887]
+                - img [ref=f101e889]
+                - img [ref=f101e891]
+                - img [ref=f101e893]
+              - blockquote [ref=f101e895]:
+                - paragraph [ref=f101e896]: The quality is insane. I've washed my hoodie 20+ times and it still looks brand new.
+              - text: — Marcus T., Oakland
+            - generic [ref=f101e897]:
+              - generic "5 out of 5 stars" [ref=f101e898]:
+                - img [ref=f101e899]
+                - img [ref=f101e901]
+                - img [ref=f101e903]
+                - img [ref=f101e905]
+                - img [ref=f101e907]
+              - blockquote [ref=f101e909]:
+                - paragraph [ref=f101e910]: The numbered tag makes it feel like yours alone. Exceeded every expectation.
+              - text: — Jade W., Oakland
+            - generic [ref=f101e911]:
+              - generic "5 out of 5 stars" [ref=f101e912]:
+                - img [ref=f101e913]
+                - img [ref=f101e915]
+                - img [ref=f101e917]
+                - img [ref=f101e919]
+                - img [ref=f101e921]
+              - blockquote [ref=f101e923]:
+                - paragraph [ref=f101e924]: This isn't just a brand, it's a movement. The craftsmanship is unmatched.
+              - text: — Devon L., Los Angeles
+          - generic [ref=f101e925]:
+            - generic [ref=f101e926]:
+              - generic [ref=f101e927]: 380gsm
+              - heading "380gsm French Terry" [level=3] [ref=f101e928]
+              - paragraph [ref=f101e929]: Premium heavyweight fabric. Most brands use 220gsm. We use nearly double.
+            - generic [ref=f101e930]:
+              - generic [ref=f101e931]: "#"
+              - heading "Numbered Authentication" [level=3] [ref=f101e932]
+              - paragraph [ref=f101e933]: Every piece is hand-numbered. You know exactly which one is yours.
+            - generic [ref=f101e934]:
+              - generic [ref=f101e935]: //
+              - heading "Made-to-Order" [level=3] [ref=f101e936]
+              - paragraph [ref=f101e937]: We produce what is ordered. No waste, no overstock. Made for you.
+            - generic [ref=f101e938]:
+              - generic [ref=f101e939]: ////
+              - heading "Double-Stitched Seams" [level=3] [ref=f101e940]
+              - paragraph [ref=f101e941]: Reinforced at every stress point. Built to last years, not seasons.
+      - region "Frequently asked questions" [ref=f101e942]:
+        - generic [ref=f101e943]:
+          - heading "Frequently Asked" [level=2] [ref=f101e944]
+          - generic [ref=f101e945]:
+            - generic [ref=f101e946]:
+              - button "How does the sizing run?" [ref=f101e947]:
+                - generic [ref=f101e948]: How does the sizing run?
+                - img [ref=f101e949]
+              - region:
+                - generic [ref=f101e950]: True to size, S through 3XL. Check the size guide on any product page for exact measurements.
+            - generic [ref=f101e951]:
+              - button "Is this really limited edition?" [ref=f101e952]:
+                - generic [ref=f101e953]: Is this really limited edition?
+                - img [ref=f101e954]
+              - region:
+                - generic [ref=f101e955]: Yes. Every style is produced in a numbered run of 80-250 pieces. Once sold out, never restocked or reprinted.
+            - generic [ref=f101e956]:
+              - button "What is your return policy?" [ref=f101e957]:
+                - generic [ref=f101e958]: What is your return policy?
+                - img [ref=f101e959]
+              - region:
+                - generic [ref=f101e960]: 30-day return and exchange on unworn items. Contact us and we will make it right.
+          - paragraph [ref=f101e961]:
+            - link "View all questions on the FAQ page →" [ref=f101e962]:
+              - /url: https://skyyrose.co/faq/
+      - generic [ref=f101e964]:
+        - generic [ref=f101e965]:
+          - heading "Join the Inner Circle" [level=3] [ref=f101e966]:
+            - generic [ref=f101e967]: Join
+            - generic [ref=f101e968]: the
+            - generic [ref=f101e969]: Inner
+            - generic [ref=f101e970]: Circle
+          - paragraph [ref=f101e971]: Exclusive drops, early access, and luxury delivered to your inbox.
+        - form "Newsletter signup" [ref=f101e972]:
+          - generic [ref=f101e973]:
+            - generic [ref=f101e974]: Email address
+            - textbox "Email address" [ref=f101e975]:
+              - /placeholder: Enter your email
+            - button "Subscribe" [ref=f101e976]: Subscribe
+      - generic [ref=f101e979]:
+        - generic [ref=f101e980]:
+          - link "SkyyRose SKYY ROSE" [ref=f101e981]:
+            - /url: https://skyyrose.co/
+            - img "SkyyRose" [ref=f101e982]
+            - generic [ref=f101e983]: SKYY ROSE
+          - paragraph [ref=f101e984]: Luxury Grows from Concrete.
+          - paragraph [ref=f101e985]: Oakland luxury streetwear. Gender-neutral, limited edition pieces — built by a father, named after a daughter.
+          - navigation "Social Media Links" [ref=f101e986]:
+            - link "Instagram" [ref=f101e987]:
+              - /url: https://instagram.com/skyyrose.co
+              - img [ref=f101e988]
+            - link "TikTok" [ref=f101e992]:
+              - /url: https://tiktok.com/@skyyroseco
+              - img [ref=f101e993]
+            - link "X (Twitter)" [ref=f101e995]:
+              - /url: https://x.com/skyyroseco
+              - img [ref=f101e996]
+            - link "Facebook" [ref=f101e999]:
+              - /url: https://facebook.com/TheSkyyRoseCollection
+              - img [ref=f101e1000]
+        - generic [ref=f101e1002]:
+          - heading "Shop" [level=4] [ref=f101e1003]
+          - list [ref=f101e1004]:
+            - listitem [ref=f101e1005]:
+              - link "Black Rose" [ref=f101e1006]:
+                - /url: https://skyyrose.co/collections/black-rose/
+            - listitem [ref=f101e1007]:
+              - link "Love Hurts" [ref=f101e1008]:
+                - /url: https://skyyrose.co/collections/love-hurts/
+            - listitem [ref=f101e1009]:
+              - link "Signature" [ref=f101e1010]:
+                - /url: https://skyyrose.co/collections/signature/
+            - listitem [ref=f101e1011]:
+              - link "Kids Capsule" [ref=f101e1012]:
+                - /url: https://skyyrose.co/collections/kids-capsule/
+            - listitem [ref=f101e1013]:
+              - link "Pre-Order" [ref=f101e1014]:
+                - /url: https://skyyrose.co/pre-order/
+            - listitem [ref=f101e1015]:
+              - link "All Products" [ref=f101e1016]:
+                - /url: https://skyyrose.co/shop/
+        - generic [ref=f101e1017]:
+          - heading "Help" [level=4] [ref=f101e1018]
+          - list [ref=f101e1019]:
+            - listitem [ref=f101e1020]:
+              - link "Reach Out" [ref=f101e1021]:
+                - /url: https://skyyrose.co/contact/
+            - listitem [ref=f101e1022]:
+              - link "FAQ" [ref=f101e1023]:
+                - /url: https://skyyrose.co/faq/
+            - listitem [ref=f101e1024]:
+              - link "Shipping & Returns" [ref=f101e1025]:
+                - /url: https://skyyrose.co/shipping-returns/
+            - listitem [ref=f101e1026]:
+              - link "Size Guide" [ref=f101e1027]:
+                - /url: https://skyyrose.co/size-guide/
+            - listitem [ref=f101e1028]:
+              - link "Care Instructions" [ref=f101e1029]:
+                - /url: https://skyyrose.co/faq/
+        - generic [ref=f101e1030]:
+          - heading "Legal" [level=4] [ref=f101e1031]
+          - list [ref=f101e1032]:
+            - listitem [ref=f101e1033]:
+              - link "Privacy Policy" [ref=f101e1034]:
+                - /url: https://skyyrose.co/privacy-policy/
+            - listitem [ref=f101e1035]:
+              - link "Terms of Service" [ref=f101e1036]:
+                - /url: https://skyyrose.co/terms-of-service/
+            - listitem [ref=f101e1037]:
+              - link "Refund Policy" [ref=f101e1038]:
+                - /url: https://skyyrose.co/refund-policy/
+            - listitem [ref=f101e1039]:
+              - link "Accessibility" [ref=f101e1040]:
+                - /url: https://skyyrose.co/accessibility/
+            - listitem [ref=f101e1041]:
+              - link "Cookie Policy" [ref=f101e1042]:
+                - /url: https://skyyrose.co/cookie-policy/
+        - generic [ref=f101e1043]:
+          - heading "Connect" [level=4] [ref=f101e1044]
+          - list [ref=f101e1045]:
+            - listitem [ref=f101e1046]:
+              - link "Instagram" [ref=f101e1047]:
+                - /url: https://instagram.com/skyyrose.co
+            - listitem [ref=f101e1048]:
+              - link "TikTok" [ref=f101e1049]:
+                - /url: https://tiktok.com/@skyyroseco
+            - listitem [ref=f101e1050]:
+              - link "X (Twitter)" [ref=f101e1051]:
+                - /url: https://x.com/skyyroseco
+            - listitem [ref=f101e1052]:
+              - link "Facebook" [ref=f101e1053]:
+                - /url: https://facebook.com/TheSkyyRoseCollection
+      - generic [ref=f101e1055]:
+        - paragraph [ref=f101e1056]: © 2026 The Skyy Rose Collection LLC. All rights reserved.
+        - navigation "Footer Legal Navigation" [ref=f101e1057]:
+          - list [ref=f101e1058]:
+            - listitem [ref=f101e1059]:
+              - menuitem "Our Story" [ref=f101e1060]
+            - listitem [ref=f101e1061]:
+              - menuitem "Contact" [ref=f101e1062]
+            - listitem [ref=f101e1063]:
+              - menuitem "FAQ" [ref=f101e1064]
+            - listitem [ref=f101e1065]:
+              - menuitem "Privacy Policy" [ref=f101e1066]
+            - listitem [ref=f101e1067]:
+              - menuitem "Terms of Service" [ref=f101e1068]
+  - dialog "Cookie consent" [ref=f101e1069]:
+    - paragraph [ref=f101e1070]:
+      - text: Cookies keep this site fast and personal. Stay to accept, or
+      - link "read how we handle your data" [ref=f101e1071]:
+        - /url: https://skyyrose.co/privacy-policy/
+      - text: .
+    - generic [ref=f101e1072]:
+      - button "Accept" [active] [ref=f101e1073]
+      - button "Decline" [ref=f101e1074]
+  - button "Back to top" [ref=f101e1075]:
+    - img [ref=f101e1076]
+  - status [ref=f101e1078]

@@ -182,7 +182,7 @@ echo $ANTHROPIC_API_KEY
 ---
 
 **See Also**:
-- [CONTRIB.md](CONTRIB.md) - Development workflow
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow
 - [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) - Environment variables
 - [RUNBOOK.md](RUNBOOK.md) - Operations guide
 

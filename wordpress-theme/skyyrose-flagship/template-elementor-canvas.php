@@ -5,7 +5,10 @@
  *
  * Blank canvas for Elementor — no header, footer, or theme wrapper.
  * Design tokens and fonts still load via wp_head() so Elementor
- * sections inherit the SkyyRose brand system.
+ * sections inherit the SkyyRose brand system. Deliberate exception: the
+ * Skyy mascot widget IS mounted (same kill-switch gate as every other
+ * template) so the "no theme wrapper" contract doesn't create a sitewide
+ * host coverage hole — see the gate before wp_footer() below.
  *
  * @package SkyyRose
  * @since   1.0.0
@@ -29,6 +32,16 @@ while ( have_posts() ) :
 	the_post();
 	the_content();
 endwhile;
+?>
+
+<?php
+// This template never calls get_footer(), so the sitewide mascot mount in
+// footer.php never reaches it — mount independently here, same gate
+// (Customizer kill switch, checkout excluded) as footer.php/front-page.php.
+if ( function_exists( 'skyyrose_mascot_is_enabled' ) && skyyrose_mascot_is_enabled()
+	&& ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
+	get_template_part( 'template-parts/skyy-mascot' );
+}
 ?>
 
 <?php wp_footer(); ?>

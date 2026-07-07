@@ -111,8 +111,8 @@
       "published": true,
       "images": {
         "image": {
-          "path": "assets/images/products/kids-001-red-set.jpeg",
-          "resolved": "images/products/kids-001-red-set.jpeg"
+          "path": "assets/images/products/kids-red-set-branding.webp",
+          "resolved": "images/products/kids-red-set-branding.webp"
         },
         "front_model_image": {
           "path": "assets/images/products/kids-001-onmodel-v2.webp",

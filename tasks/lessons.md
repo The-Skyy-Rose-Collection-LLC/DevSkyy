@@ -136,3 +136,11 @@ Before claiming a SOT/imagery change is visible on skyyrose.co, identify WHICH l
 - Presented mascot face render with visible mouth/chin marks framed as "zoom-only nits" because judges scored 9/10 at 220px usage scale. Founder: "look at what you sent" — marks plainly visible at the presented 800px scale.
 - Rule: the quality bar applies at THE SCALE I PRESENT, not the smallest scale the asset ships at. If a defect is visible in the image I'm showing, it's a defect, full stop — name it as one or fix it before showing.
 - Corollary: judge-panel scores never override my own eyes on the exact artifact being presented.
+
+## 2026-07-07 — Never `git add -u` in a shared working tree
+Two Claude sessions worked ~/DevSkyy concurrently; my `git add -u` swept the other
+session's files into my commits (30 rebuilt .min.js — luckily byte-identical to
+main-source builds and actually fixed stale committed .min; plus their
+tasks/phase-e-manifest.md edit under my chore message). Rule: stage by explicit
+path list only; before committing, `git status` and account for every staged file;
+if unexplained modified files exist, assume a parallel session owns them.
