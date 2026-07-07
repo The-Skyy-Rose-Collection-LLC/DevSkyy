@@ -2838,5 +2838,22 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-07T11:30:00-07:00"
+  },
+  {
+    "id": "bug-179",
+    "timestamp": "2026-07-07T21:43:04Z",
+    "error_message": "stage_f_shadows.generate_shadows() silently swallows PIL/IO errors and returns the un-shadowed composite path as if it were the shadow output, letting a broken shadow pass QA scoring undetected",
+    "file": "skyyrose/elite_studio/agents/compositor/stage_f_shadows.py",
+    "root_cause": "the trailing except Exception caught every failure mode (including real I/O errors) in the same branch as the legitimate >=85%-frame-fill skip-shadow case, and both returned composite_path unchanged with only a log.warning \u2014 the caller (orchestrator.py single broad-except at line 378) never saw the failure, so success stayed True",
+    "fix": "added ShadowStageError(RuntimeError); the except block now raises it instead of returning composite_path, letting the orchestrator existing broad-except at line 378 correctly fail the render closed (success=False). The intentional skip-shadow early-return path is untouched. Removed now-orphaned logging import/logger (the only log call was in the removed branch).",
+    "tags": [
+      "compositor",
+      "stage_f",
+      "fail-open",
+      "embeddings-hardening"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T21:43:04Z"
   }
 ]
