@@ -299,7 +299,9 @@ ScrollTrigger.create({
 
 When building for SkyyRose, always:
 
-**Load**: `skyyrose-brand-dna` SKILL.md alongside this skill for full brand context.
+**Load**: `skyyrose-market:skyyrose-brand-dna` SKILL.md alongside this skill for full brand context.
+
+**CDN loading**: this project self-hosts all JS libs (zero-CDN policy) — swap CDN script tags for `SKYYROSE_ASSETS_URI` paths when outputting WordPress code.
 
 **Spatial Brand Palette**:
 ```css

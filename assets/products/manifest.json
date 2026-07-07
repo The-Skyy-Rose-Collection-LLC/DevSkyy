@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-06-23T01:27:20+00:00",
-  "catalog_sha": "sha256:367c47144eb4863341cccd9b85f82fc0303d6c5739aeb0634bc8f0ab2fbf3ffa",
+  "generated_at": "2026-07-07T05:42:04+00:00",
+  "catalog_sha": "sha256:8e3f084a88f0d05481795f0647f580b27d1becbc97418875a5e6f3cc0c9c6cf3",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -548,12 +548,12 @@
         {
           "role": "garment",
           "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-front.jpg",
-          "sha256": "sha256:2d33ddf6e9747049f7b6580f613a59818dc65ec6a953fa307d16c7434bf7d8ab"
+          "sha256": "sha256:624d2039a0fa1c29d9189fd983beab667072e5a36a1b1228c517a86c27a3ee94"
         },
         {
           "role": "garment-back",
           "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-back.jpg",
-          "sha256": "sha256:0a2b6b2a09634ff88affa644b880b949af4ad926d4f39fc09e75aaae67151030"
+          "sha256": "sha256:d6e2756c3d87ef5c6d38abae124647e33881a065ad31a53f6c4c37c72223a136"
         },
         {
           "role": "logo",

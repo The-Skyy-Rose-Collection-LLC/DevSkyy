@@ -93,7 +93,7 @@ DevSkyy/
 │   └── e2e/                    # End-to-end tests (1200+ tests)
 │
 ├── docs/                       # Documentation
-│   ├── CONTRIB.md              # Contributor guide
+│   ├── CONTRIBUTING.md         # Contributor guide
 │   ├── RUNBOOK.md              # Operations runbook
 │   ├── ENV_VARS_REFERENCE.md   # Environment variables
 │   ├── MCP_TOOLS.md            # MCP tools catalog
@@ -491,7 +491,7 @@ pytest tests/e2e/ -v            # E2E tests only
 ---
 
 **See Also**:
-- [CONTRIB.md](CONTRIB.md) - Development workflow
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow
 - [RUNBOOK.md](RUNBOOK.md) - Operations guide
 - [DEPENDENCIES.md](DEPENDENCIES.md) - Dependency reference
 - [MCP_TOOLS.md](MCP_TOOLS.md) - MCP tools catalog
