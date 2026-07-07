@@ -144,3 +144,8 @@ main-source builds and actually fixed stale committed .min; plus their
 tasks/phase-e-manifest.md edit under my chore message). Rule: stage by explicit
 path list only; before committing, `git status` and account for every staged file;
 if unexplained modified files exist, assume a parallel session owns them.
+
+## 2026-07-07 — Workflow model overrides silently fall back; verify runtime config, not just deliverables
+- **What happened:** `Workflow agent()` `model:'opus'`/`model:'fable'` silently resolved to `claude-sonnet-5` for all 10 agents of run wf_97e2e6e5-673. No error, no warning; requested model recorded NOWHERE (journal has zero model fields; task metadata records only the resolved model). Confirmed platform-level via 2-agent minimal repro (wf_aa733ab7-fb1): clean script, same fallback.
+- **Why it went undetected 57min:** every failure channel watched (agents_error=0, task status, review findings) stayed green; agents cannot self-report their model; main thread verified DELIVERABLES (tests/diffs/lints) but never the RUNTIME CONFIG. Resolved model was visible in task metadata ~90s after launch — first read at completion.
+- **Rule:** after launching any workflow/agent with a model override, spot-check resolved models in task metadata within the first minutes (`grep '"model"' <task output>`); if downgraded, stop and surface the tradeoff to the founder BEFORE burning the run. A config the harness can silently change is a config that must be independently verified, same as any other claim.
