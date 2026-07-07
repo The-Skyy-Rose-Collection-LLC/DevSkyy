@@ -60,17 +60,17 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | sg-006 | signature | OK | OK | **GAP** | mint-lavender-hoodie |
 | sg-007 | signature | OK | OK | OK | the-signature-beanie |
 | sg-009 | signature | OK | OK | OK | the-sherpa-jacket |
-| sg-011 | signature | OK | OK | **GAP** | original-label-tee-white |
-| sg-012 | signature | OK | OK | **GAP** | original-label-tee-orchid |
+| sg-011 | signature | OK | **GAP** | **GAP** | original-label-tee-white |
+| sg-012 | signature | OK | **GAP** | **GAP** | original-label-tee-orchid |
 | sg-013 | signature | OK | OK | **GAP** | mint-lavender-crewneck |
-| sg-014 | signature | OK | **GAP** | **GAP** | mint-lavender-sweatpants |
+| sg-014 | signature | OK | OK | **GAP** | mint-lavender-sweatpants |
 | sg-015 | signature | OK | OK | OK | the-windbreaker-set |
-| kids-001 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-red-black |
-| kids-002 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-purple-black |
+| kids-001 | kids-capsule | OK | OK | **GAP** | kids-colorblock-hoodie-set-red-black |
+| kids-002 | kids-capsule | OK | OK | **GAP** | kids-colorblock-hoodie-set-purple-black |
 | br-014 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
 | br-015 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
 
-**Summary:** 30 / 33 ready for primary-logo render. 22 / 33 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
+**Summary:** 29 / 33 ready for primary-logo render. 20 / 33 fully ready (logo + extras). 4 SKU(s) missing primary `logo_reference`. 13 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
 <!-- PERSKU-AUTO-END -->
 
 ## Dossier gap remediation options
