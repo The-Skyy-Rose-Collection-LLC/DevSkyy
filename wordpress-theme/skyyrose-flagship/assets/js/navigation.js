@@ -152,6 +152,35 @@
 	});
 
 	/* --------------------------------------------------
+	   Header Logo Video — pause off-screen / reduced-motion
+	   An autoplay+loop <video> keeps decoding frames even
+	   while display:none (the reduced-motion CSS swap) or the
+	   tab is backgrounded, since neither state removes it from
+	   the DOM. Explicitly pause both cases for battery + INP;
+	   resume only when motion is allowed AND the tab is visible.
+	   -------------------------------------------------- */
+	var logoVideo = document.querySelector('.navbar__logo-video');
+	if (logoVideo) {
+		var logoMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+		function syncLogoVideoPlayback() {
+			if (logoMotionQuery.matches || document.hidden) {
+				logoVideo.pause();
+			} else if (logoVideo.paused) {
+				logoVideo.play().catch(function () {});
+			}
+		}
+
+		syncLogoVideoPlayback();
+		document.addEventListener('visibilitychange', syncLogoVideoPlayback);
+		if (typeof logoMotionQuery.addEventListener === 'function') {
+			logoMotionQuery.addEventListener('change', syncLogoVideoPlayback);
+		} else if (typeof logoMotionQuery.addListener === 'function') {
+			logoMotionQuery.addListener(syncLogoVideoPlayback);
+		}
+	}
+
+	/* --------------------------------------------------
 	   Header Scroll State
 	   -------------------------------------------------- */
 	var header = document.querySelector('.site-header');

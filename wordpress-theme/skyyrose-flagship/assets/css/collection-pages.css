@@ -550,6 +550,148 @@
 }
 
 /* ==========================================================================
+   PIN-NARRATIVE — closing feature beat, collection pages only
+   The base component (.pin-beat, .pin-feature) lives in pin-narrative.css;
+   this overrides/extends it here because the override is collection-specific,
+   not shared with the landing-template usage of the same part. Loads after
+   pin-narrative.css (skyyrose_enqueue_collection_styles() runs after the
+   pin-narrative enqueue in inc/enqueue.php) and every selector below is
+   scoped under .col-page for a specificity win either way (0,2,0+ vs 0,1,0
+   — see css-cascade-discipline).
+
+   Goal: the reveal reads as the next line of the story, not a product card
+   dropped into the stage. The headline stays the one large-serif moment
+   (matches the three text beats above it); the piece unveils beneath as a
+   framed plate, corner ticks echoing .pin-corner's bevel language. The glow
+   tints itself per collection through --skyyrose-accent-rgb, which already
+   cascades: gold for Signature, silver for Black Rose, crimson for Love
+   Hurts, rose-gold for Kids Capsule — the "world" falls out of the existing
+   token architecture for free. Black Rose additionally desaturates the
+   photo itself so "armor" reads as dark metal, not a colorized shot behind
+   a silver frame — same treatment already used on its hero image below.
+   ========================================================================== */
+.col-page .pin-feature__media {
+	position: relative;
+	/* Corner ticks below are the only frame — the base component's full
+	   1px border (pin-narrative.css) would double-frame it into a box. */
+	border: none;
+	box-shadow: 0 24px 64px -16px rgba(var(--skyyrose-accent-rgb), 0.3);
+}
+
+.col-page .pin-feature__media::before,
+.col-page .pin-feature__media::after {
+	content: '';
+	position: absolute;
+	width: 1.1rem;
+	height: 1.1rem;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.7);
+	pointer-events: none;
+	z-index: 2;
+}
+.col-page .pin-feature__media::before { top: 0.5rem; left: 0.5rem; border-width: 1px 0 0 1px; }
+.col-page .pin-feature__media::after  { bottom: 0.5rem; right: 0.5rem; border-width: 0 1px 1px 0; }
+
+/* Reveal choreography, CSS-only: the piece unveils ~0.15s after the beat's
+   own text fade-in (that opacity/transform transition lives in
+   pin-narrative.css and is untouched). premium-interactions.js only ever
+   toggles .is-active on .pin-beat — this reuses that same state, no JS
+   change needed. */
+.col-page .pin-beat--product .pin-feature__media {
+	clip-path: inset(0 0 100% 0);
+	transition: clip-path 0.7s var(--skyyrose-ease, ease) 0.15s;
+}
+.col-page .pin-beat--product.is-active .pin-feature__media {
+	clip-path: inset(0 0 0% 0);
+}
+
+.col-page[data-collection="black-rose"] .pin-feature__img {
+	filter: grayscale(85%) contrast(1.15);
+}
+
+/* Name + price demoted to one mono meta line — the headline above is the
+   beat's only display-weight moment; a second large serif name competed
+   with it instead of reading as the payoff of the same line. */
+.col-page .pin-feature__meta {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+.col-page .pin-feature__name { font-family: var(--skyyrose-font-mono); font-size: 0.75rem; color: var(--skyyrose-text-muted); }
+.col-page .pin-feature__price { font-family: var(--skyyrose-font-mono); font-size: 0.75rem; color: var(--skyyrose-accent-text, var(--skyyrose-accent)); }
+.col-page .pin-feature__price::before { content: '\00B7'; margin-right: 0.5rem; color: var(--skyyrose-text-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+	/* Under reduced motion premium-interactions.js never runs (early return),
+	   so .is-active never toggles on .pin-beat--product; without this reset
+	   the clip-path above would leave the piece permanently invisible instead
+	   of falling back to pin-narrative.css's static, always-visible stack. */
+	.col-page .pin-beat--product .pin-feature__media {
+		clip-path: none;
+		transition: none;
+	}
+}
+
+/* ==========================================================================
+   LOOKBOOK — editorial imagery, narrative → shop bridge
+   Worn-editorial stills (data/visual-manifest.json lookbook entries),
+   woven in right after the pin-narrative stage. 1-up for a single image,
+   2-up for collections with a pair (Black Rose: football + hockey).
+   ========================================================================== */
+.col-lookbook {
+	padding: clamp(64px, 8vw, 120px) 48px;
+	background: #050505;
+}
+
+.col-lookbook__grid {
+	max-width: 1400px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 32px;
+}
+
+.col-lookbook__grid--2up {
+	grid-template-columns: 1fr 1fr;
+}
+
+/* Editorial-plate framing: corner ticks (echoes .pin-corner / .pin-feature__media
+   above) replace the flat hairline box, and an inset vignette masks the rim
+   only — full color/saturation on the garment itself stays untouched
+   (luxury-design-taste: full color is reserved for the product being sold). */
+.col-lookbook__figure {
+	position: relative;
+	margin: 0;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: #0A0A0A;
+	border: none;
+}
+.col-lookbook__figure::before,
+.col-lookbook__figure::after {
+	content: '';
+	position: absolute;
+	width: 1.5rem;
+	height: 1.5rem;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.55);
+	pointer-events: none;
+	z-index: 2;
+}
+.col-lookbook__figure::before { top: 0.75rem; left: 0.75rem; border-width: 1px 0 0 1px; }
+.col-lookbook__figure::after  { bottom: 0.75rem; right: 0.75rem; border-width: 0 1px 1px 0; }
+
+.col-lookbook__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 -100px 120px -70px rgba(0, 0, 0, 0.55);
+}
+
+/* ==========================================================================
    FOUNDER PULL QUOTE — Black Rose only (v1.5.4, F5)
    Editorial register inside Expressive Brand: hairline rules, generous
    space, fluid type. No boxes, no shadows, no gradients. Reduced-motion
@@ -608,6 +750,12 @@
 	.col-founder-quote { padding: 80px 24px; }
 	.col-founder-quote__inner { padding: 48px 0; }
 	.col-founder-quote__text { max-width: 100%; padding: 0; }
+
+	/* Lookbook mobile overrides live AFTER the lookbook base block above —
+	   inside the earlier 768px section they tie on specificity (0,1,0) and
+	   lose to the later base rules (cascade order). */
+	.col-lookbook { padding: 64px 24px; }
+	.col-lookbook__grid--2up { grid-template-columns: 1fr; gap: 24px; }
 }
 
 /* ==========================================================================

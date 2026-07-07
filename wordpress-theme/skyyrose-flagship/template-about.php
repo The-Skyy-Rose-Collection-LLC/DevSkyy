@@ -180,7 +180,7 @@ $arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns=
 					<img src="<?php echo esc_url( $hero_img ); ?>"
 						alt="<?php esc_attr_e( 'SkyyRose origin portrait', 'skyyrose' ); ?>"
 						fetchpriority="high"
-						width="900" height="1125">
+						width="900" height="1350">
 					<figcaption class="abt-hero__portrait-cap" aria-hidden="true">
 						<?php esc_html_e( 'Skyy Rose &mdash; The Heir', 'skyyrose' ); ?>
 					</figcaption>

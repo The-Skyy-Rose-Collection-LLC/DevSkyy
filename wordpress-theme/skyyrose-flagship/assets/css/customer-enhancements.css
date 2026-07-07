@@ -186,7 +186,10 @@
 	right: 0;
 	z-index: 900; /* Header sits at 1000; stays below it. */
 	background-color: #0a0a0a;
-	border-top: 1px solid rgba(183, 110, 121, 0.35);
+	/* Per-collection accent (--skyyrose-accent cascades via [data-collection]
+	   on the .sr-editorial ancestor); rgba fallback keeps rose-gold default
+	   for any context without the token. */
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.35);
 	display: flex;
 	align-items: center;
 	gap: 16px;
@@ -239,7 +242,7 @@
 	appearance: none;
 	-webkit-appearance: none;
 	background-color: transparent;
-	border: 1px solid rgba(183, 110, 121, 0.5);
+	border: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.5);
 	color: rgba(255, 255, 255, 0.75);
 	font-family: "Bebas Neue", sans-serif;
 	font-size: 13px;
@@ -247,7 +250,7 @@
 	padding: 8px 32px 8px 12px;
 	cursor: pointer;
 	flex-shrink: 0;
-	/* Inline SVG arrow — rose-gold tinted, minimal. */
+	/* Inline SVG arrow — rose-gold; decorative caret, not collection-critical. */
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23B76E79'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 10px center;
@@ -255,7 +258,7 @@
 }
 
 .sr-sticky-atc__size:focus-visible {
-	outline: 1px solid #b76e79;
+	outline: 1px solid var(--skyyrose-accent, #b76e79);
 	outline-offset: 2px;
 }
 
@@ -266,11 +269,14 @@
 	color: #ffffff;
 }
 
-/* CTA button — rose-gold filled, Bebas Neue, matches sitewide ATC style. */
+/* CTA button — accent filled per collection, Bebas Neue, matches sitewide
+   ATC style. Text color uses --sr-on-accent (single-product.css) so gold/
+   silver/rose-gold get black text and Love Hurts crimson keeps white —
+   both meet WCAG AA 4.5:1 against their own fill. */
 .sr-sticky-atc__btn {
 	appearance: none;
-	background-color: #b76e79;
-	color: #ffffff;
+	background-color: var(--skyyrose-accent, #b76e79);
+	color: var(--sr-on-accent, #000000);
 	font-family: "Bebas Neue", sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.2em;
@@ -284,11 +290,15 @@
 
 .sr-sticky-atc__btn:hover,
 .sr-sticky-atc__btn:focus-visible {
-	background-color: #9a5a64;
+	background-color: var(--skyyrose-accent-dark, #9a5a64);
+	/* accent-dark is a different shade than accent — needs its own
+	   contrast token (Kids Capsule flips to white here; see
+	   single-product.css --sr-on-accent-dark). */
+	color: var(--sr-on-accent-dark, #000000);
 }
 
 .sr-sticky-atc__btn:focus-visible {
-	outline: 2px solid #b76e79;
+	outline: 2px solid var(--skyyrose-accent, #b76e79);
 	outline-offset: 2px;
 }
 

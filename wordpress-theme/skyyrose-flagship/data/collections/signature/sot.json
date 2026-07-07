@@ -89,6 +89,20 @@
         "kind": "collection-logo",
         "status": "verified",
         "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "images/immersive/scene-signature-golden-gate",
+        "resolved": "images/immersive/scene-signature-golden-gate.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG golden-gate immersive scene still."
+      },
+      {
+        "path": "images/immersive/scene-signature-bay-bridge",
+        "resolved": "images/immersive/scene-signature-bay-bridge.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
       }
     ],
     "patches": [],

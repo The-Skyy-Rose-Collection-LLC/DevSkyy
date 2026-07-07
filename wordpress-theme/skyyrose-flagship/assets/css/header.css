@@ -72,7 +72,7 @@
 	border-radius: 2px;
 }
 
-/* CENTER: Brand Primary Logo (rose-gold SR monogram) */
+/* CENTER: Brand Primary Logo (rotating TSRC rose-gold 3D lockup, 198x144 native ≈ 1.375:1) */
 .navbar__brand {
 	order: 2;
 	justify-self: center;
@@ -87,15 +87,27 @@
 	transform: scale(1.04);
 	filter: drop-shadow(0 0 12px rgba(183, 110, 121, 0.45));
 }
+/* .navbar__logo-video = default (motion-safe) rendering; .navbar__logo-static =
+   reduced-motion frame; .navbar__logo-img = <video> fallback content for
+   browsers that cannot play the <video> element at all. Fixed width+height
+   (not width:auto) at each breakpoint prevents CLS from the video element's
+   default 300x150 intrinsic box before metadata loads. */
+.navbar__logo-video,
+.navbar__logo-static,
 .navbar__logo-img {
 	display: block;
-	width: 44px;
+	width: 60px;
 	height: 44px;
 	object-fit: contain;
 	transition: filter 0.4s ease;
 }
+.navbar__logo-static {
+	display: none;
+}
 @media (min-width: 768px) {
-	.navbar__logo-img { width: 52px; height: 52px; }
+	.navbar__logo-video,
+	.navbar__logo-static,
+	.navbar__logo-img { width: 72px; height: 52px; }
 }
 /* Legacy text title — retained as fallback when JS strips picture (rare) */
 .navbar__site-title {
@@ -437,5 +449,13 @@ a.announcement-bar__content:hover {
 	.navbar__menu .sub-menu,
 	.search-overlay {
 		transition: none;
+	}
+	/* Rotating TSRC lockup is a continuous animation — swap it for the
+	   static poster frame instead of the autoplaying <video>. */
+	.navbar__logo-video {
+		display: none;
+	}
+	.navbar__logo-static {
+		display: block;
 	}
 }

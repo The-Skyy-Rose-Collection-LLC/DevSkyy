@@ -109,6 +109,20 @@
         "kind": "collection-hero-art",
         "status": "verified",
         "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-courtyard",
+        "resolved": "images/immersive/scene-black-rose-courtyard.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR courtyard immersive scene still \u2014 crop of night-editorial master."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-gazebo",
+        "resolved": "images/immersive/scene-black-rose-gazebo.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR gazebo immersive scene still."
       }
     ],
     "patches": [

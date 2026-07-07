@@ -281,7 +281,7 @@ html {
 [data-collection="kids-capsule"] {
 	--skyyrose-accent:       #B76E79;
 	--skyyrose-accent-rgb:   183, 110, 121;
-	--skyyrose-accent-dark:  #9A5662;
+	--skyyrose-accent-dark:  #B8960C;
 	--skyyrose-secondary:    #B76E79;
 	--skyyrose-font-script:  'Pinyon Script', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
@@ -308,6 +308,17 @@ html {
 	--skyyrose-font-display: var(--skyyrose-font-caps);
 }
 /* GENERATED:collection-tokens END */
+
+/* Text-safe accent — small-text (<18px) color on --skyyrose-bg (#0A0A0A) must
+   hit WCAG AA 4.5:1. Crimson #DC143C is 3.97:1 and fails; all other accents
+   pass and reuse their base value. Literal per scope (a var() reference here
+   would resolve at :root and ignore collection overrides). Lives outside the
+   generated block so gen-design-tokens.py regens don't wipe it. */
+:root { --skyyrose-accent-text: #B76E79; }
+[data-collection="black-rose"] { --skyyrose-accent-text: #C0C0C0; }
+[data-collection="kids-capsule"] { --skyyrose-accent-text: #B76E79; }
+[data-collection="love-hurts"] { --skyyrose-accent-text: #FF5C7A; } /* 6.66:1 */
+[data-collection="signature"] { --skyyrose-accent-text: #D4AF37; }
 
 /* ═══════════════════════════════════════════════════════════════════
    §3  Reduced Motion — Override duration tokens
