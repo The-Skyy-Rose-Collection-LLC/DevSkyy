@@ -58,8 +58,9 @@ MU_DIR="$WP_CONTENT/mu-plugins"
 echo "==> ensuring $MU_DIR exists"
 "${SSH[@]}" "${SSH_USER}@${SSH_HOST}" "mkdir -p '$MU_DIR'"
 
-echo "==> uploading skyyrose-ally-ajax-guard.php"
-"${SCP[@]}" "$SRC" "${SSH_USER}@${SSH_HOST}:$MU_DIR/skyyrose-ally-ajax-guard.php"
+DEST="$(basename "$SRC")"
+echo "==> uploading $DEST"
+"${SCP[@]}" "$SRC" "${SSH_USER}@${SSH_HOST}:$MU_DIR/$DEST"
 
 echo "==> flushing cache"
 "${SSH[@]}" "${SSH_USER}@${SSH_HOST}" "wp cache flush" >/dev/null 2>&1 || true
