@@ -21,7 +21,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="${ENV_FILE:-$ROOT/.env.wordpress}"
-SRC="$ROOT/wordpress/mu-plugins/skyyrose-ally-ajax-guard.php"
+# Override with MU_SRC=<path> to deploy a different MU-plugin from wordpress/mu-plugins/.
+SRC="${MU_SRC:-$ROOT/wordpress/mu-plugins/skyyrose-ally-ajax-guard.php}"
 
 [ -f "$ENV_FILE" ] || { echo "FATAL: $ENV_FILE missing" >&2; exit 1; }
 [ -f "$SRC" ]      || { echo "FATAL: $SRC missing" >&2; exit 1; }
@@ -57,8 +58,9 @@ MU_DIR="$WP_CONTENT/mu-plugins"
 echo "==> ensuring $MU_DIR exists"
 "${SSH[@]}" "${SSH_USER}@${SSH_HOST}" "mkdir -p '$MU_DIR'"
 
-echo "==> uploading skyyrose-ally-ajax-guard.php"
-"${SCP[@]}" "$SRC" "${SSH_USER}@${SSH_HOST}:$MU_DIR/skyyrose-ally-ajax-guard.php"
+DEST="$(basename "$SRC")"
+echo "==> uploading $DEST"
+"${SCP[@]}" "$SRC" "${SSH_USER}@${SSH_HOST}:$MU_DIR/$DEST"
 
 echo "==> flushing cache"
 "${SSH[@]}" "${SSH_USER}@${SSH_HOST}" "wp cache flush" >/dev/null 2>&1 || true
