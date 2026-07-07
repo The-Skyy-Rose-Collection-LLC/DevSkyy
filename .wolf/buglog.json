@@ -2305,7 +2305,7 @@
     "last_seen": "2026-06-25T04:30:00-07:00"
   },
   {
-    "id": "bug-131",
+    "id": "bug-180",
     "timestamp": "2026-06-26T12:45:00-07:00",
     "error_message": "V7 product cards in grid row 2+ never auto-advance (carousel stalls)",
     "file": "prototypes/product-card-variants/v7-lookbook-card/index.html",
@@ -2490,7 +2490,7 @@
     "last_seen": "2026-06-29T18:55:00-07:00"
   },
   {
-    "id": "bug-167",
+    "id": "bug-187",
     "timestamp": "2026-06-29T18:55:00-07:00",
     "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
     "file": "wordpress-theme/skyyrose-flagship/front-page.php",
@@ -2512,7 +2512,7 @@
     "last_seen": "2026-06-29T18:55:00-07:00"
   },
   {
-    "id": "bug-141",
+    "id": "bug-181",
     "timestamp": "2026-06-30T12:40:00-07:00",
     "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
     "file": "skyyrose/core/asset_hub.py",
@@ -2531,7 +2531,7 @@
     "last_seen": "2026-06-30T12:40:00-07:00"
   },
   {
-    "id": "bug-142",
+    "id": "bug-182",
     "timestamp": "2026-06-30T12:41:00-07:00",
     "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
     "file": "skyyrose/core/sot_images.py",
@@ -2550,7 +2550,7 @@
     "last_seen": "2026-06-30T12:41:00-07:00"
   },
   {
-    "id": "bug-143",
+    "id": "bug-183",
     "timestamp": "2026-06-30T15:05:00-07:00",
     "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
     "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
@@ -2658,7 +2658,7 @@
     "last_seen": "2026-06-30T17:05:00-07:00"
   },
   {
-    "id": "bug-172",
+    "id": "bug-188",
     "timestamp": "2026-06-30T20:44:00",
     "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
     "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
@@ -2677,7 +2677,7 @@
     "last_seen": "2026-06-30T20:44:00"
   },
   {
-    "id": "bug-150",
+    "id": "bug-184",
     "timestamp": "2026-07-05T21:20:00-07:00",
     "error_message": "og:image/twitter:image emitted VideoPress .mp4 (logo_400x100.mp4) \u2014 link previews broken sitewide",
     "file": "wordpress-theme/skyyrose-flagship/inc/seo.php",
@@ -2694,7 +2694,7 @@
     "last_seen": "2026-07-05"
   },
   {
-    "id": "bug-151",
+    "id": "bug-185",
     "timestamp": "2026-07-05T21:20:00-07:00",
     "error_message": "Footer content rendered after </footer> on every page (mobile-bottom-nav; homepage also footer-cro/FAQ/size-guide)",
     "file": "wordpress-theme/skyyrose-flagship/footer.php",
@@ -2711,7 +2711,7 @@
     "last_seen": "2026-07-05"
   },
   {
-    "id": "bug-152",
+    "id": "bug-186",
     "timestamp": "2026-07-05T21:20:00-07:00",
     "error_message": "kids-capsule.css shipped blue-dominant colors (#A8D8EA, #1A1A2E) violating no-blue brand law",
     "file": "wordpress-theme/skyyrose-flagship/assets/css/kids-capsule.css",
