@@ -126,3 +126,13 @@ Recommended repointing kids-002's front image (ghost → on-model), calling the 
 
 ## 2026-06-30 — Storefront cards read v7-cards, not sot.json
 Before claiming a SOT/imagery change is visible on skyyrose.co, identify WHICH layer renders it. Three imagery surfaces: **v7-cards grid** (`products/v7/<sku>/` tree → `build_v7_cards.py`) = the dominant collection-card layer; **holo card** reads `sot.json` front_model_image; **dashboard** reads `sot-images.json`. Tying the hub into `sot.json` reaches holo+dashboard but NOT the v7 grid. Verify the live HTML's actual image-src layer BEFORE asserting a visible change, and check for a parallel session owning that layer (PR #684 owned v7).
+
+## 2026-07-06 — Quality gate on popup windows
+- Opened 3 sub-par mascot QC PNGs in Preview → founder: only professional PRODUCTION-GRADE work belongs in popup windows.
+- Rule: eyes-on QC pixels against the production bar BEFORE any `open`/popup. Fails the bar → describe defects + paths in text; never showcase bad work.
+- Also: founder REJECTED skyy-web-final.glb (garbled chest lettering, muddy back). New canonical mascot reference: assets/images/mascot/skyy-canonical-v2.png (arms out, both hands visible — fixes arm-in-pocket defect of v1 source).
+
+## 2026-07-06 — "Clean at usage scale" is a rationalization, not a quality bar
+- Presented mascot face render with visible mouth/chin marks framed as "zoom-only nits" because judges scored 9/10 at 220px usage scale. Founder: "look at what you sent" — marks plainly visible at the presented 800px scale.
+- Rule: the quality bar applies at THE SCALE I PRESENT, not the smallest scale the asset ships at. If a defect is visible in the image I'm showing, it's a defect, full stop — name it as one or fix it before showing.
+- Corollary: judge-panel scores never override my own eyes on the exact artifact being presented.

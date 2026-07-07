@@ -150,6 +150,8 @@
 - [2026-06-22] **Stop-hook "parade of failing tests" = stale checkout, not real bugs.** When the Stop hook fails on a test you ALREADY fixed+merged, the checkout is on a stale branch behind main — STOP chasing tests, check `git rev-list --count HEAD..origin/main`. Fix = merge origin/main into the branch (or switch checkout to main), not re-fix merged code. Root prevention: keep the main checkout ON `main`; do feature work in `git worktree`s so background automations can't park the primary checkout on a stale feature branch and poison every session's Stop hook.
 
 ## Decision Log
+- **2026-07-07 — Ghost-composite backs = accepted house style.** The 7 ghost-mannequin composite back images (lh-006, sg-003/005/011/012/013/014) are founder-accepted as-is; NOT queued for on-model re-renders. No paid re-render jobs for these slots unless the founder reopens.
+
 
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
 - [2026-04-15] Chose `sdk/python/agent_sdk/` as SDK source of truth over root `agent_sdk/` — root copy had stale brand data ("Where Love Meets Luxury" tagline, missing EliteStudio integration). All internal imports converted to relative to make the package location-independent.
@@ -240,3 +242,7 @@ gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer
 - **Key learning:** the nav menu is theme-managed (inc/menu-setup.php definitions + SKYYROSE_MENU_BUILD_VERSION bump ⇒ one-shot rebuild on deploy). Menu content changes are THEME code, not site-state scripts.
 - **Key learning:** live /collections/ page's assigned template `skyyrose-canvas.php` exists only on the server (stale file — deploy is a full hot-swap, so any deploy removes it). Shipping `page-collections.php` wins template hierarchy the moment it vanishes; zero site-state mutation needed.
 - **Key learning:** preflight `PENDING_USER_ASSETS` = render-pipeline bundle status (data/product-bundles/ probe), NOT web-imagery availability. Never gate storefront rendering on it — gate on catalog display image existing on disk.
+
+- **[2026-07-06] Do-Not-Repeat:** never showcase sub-par visuals in popup windows — popups reserved for production-grade work only; QC pixels eyes-on first, else report defects as text + paths. Founder correction.
+- **[2026-07-06] Decision:** skyy-web-final.glb REJECTED by founder (bad texture bake). Mascot 3D restart from new arms-out reference `assets/images/mascot/skyy-canonical-v2.png` via image→3D + rig pipeline.
+- **[2026-07-06] Key Learning (Blender/glTF):** glTF import attaches CUSTOM SPLIT NORMALS — `shade_smooth()`/`shade_smooth_by_angle()` are silently overridden by them. Must run `bpy.ops.mesh.customdata_custom_splitnormals_clear()` first or the smoothing is a no-op.
