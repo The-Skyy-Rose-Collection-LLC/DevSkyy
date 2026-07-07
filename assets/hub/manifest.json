@@ -1057,15 +1057,15 @@
       ],
       "sku": "kids-001",
       "face": "front",
-      "engine": "legacy-theme",
+      "engine": "oai-image-2",
       "verdict": "verified",
-      "verified_by": "founder verdict 2026-06-25",
-      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-001-onmodel.webp",
+      "verified_by": "eyes-on + founder y 2026-07-07",
+      "source": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-001-onmodel-v2.webp",
       "note": null,
       "provenance": {
-        "digital_source_type": "unknown",
-        "ai_system_used": null,
-        "generation_date": null
+        "digital_source_type": "trainedAlgorithmicMedia",
+        "ai_system_used": "oai-image-2",
+        "generation_date": "2026-07"
       }
     },
     "kids-002-back": {
