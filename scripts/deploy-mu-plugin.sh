@@ -21,7 +21,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="${ENV_FILE:-$ROOT/.env.wordpress}"
-SRC="$ROOT/wordpress/mu-plugins/skyyrose-ally-ajax-guard.php"
+# Override with MU_SRC=<path> to deploy a different MU-plugin from wordpress/mu-plugins/.
+SRC="${MU_SRC:-$ROOT/wordpress/mu-plugins/skyyrose-ally-ajax-guard.php}"
 
 [ -f "$ENV_FILE" ] || { echo "FATAL: $ENV_FILE missing" >&2; exit 1; }
 [ -f "$SRC" ]      || { echo "FATAL: $SRC missing" >&2; exit 1; }
