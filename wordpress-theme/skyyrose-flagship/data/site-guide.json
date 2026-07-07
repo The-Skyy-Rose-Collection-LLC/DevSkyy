@@ -111,13 +111,18 @@
       "tips": []
     },
     "faq": {
-      "title": "FAQ",
+      "title": "Care Instructions",
       "url": "/faq/",
       "tips": []
     },
     "shipping-returns": {
       "title": "Shipping & Returns",
       "url": "/shipping-returns/",
+      "tips": []
+    },
+    "size-guide": {
+      "title": "Size Guide",
+      "url": "/size-guide/",
       "tips": []
     },
     "privacy-policy": {
@@ -148,6 +153,26 @@
     "collections": {
       "title": "Collections",
       "url": "/collections/",
+      "tips": []
+    },
+    "collections-black-rose": {
+      "title": "Black Rose",
+      "url": "/collections/black-rose/",
+      "tips": []
+    },
+    "collections-love-hurts": {
+      "title": "Love Hurts",
+      "url": "/collections/love-hurts/",
+      "tips": []
+    },
+    "collections-signature": {
+      "title": "Signature",
+      "url": "/collections/signature/",
+      "tips": []
+    },
+    "collections-kids-capsule": {
+      "title": "Kids Capsule",
+      "url": "/collections/kids-capsule/",
       "tips": []
     }
   },
