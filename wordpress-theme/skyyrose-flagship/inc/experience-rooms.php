@@ -54,7 +54,7 @@ function skyyrose_get_experience_config( $slug ) {
 					array(
 						array(
 							'name'     => esc_html__( 'Moonlit Courtyard', 'skyyrose' ),
-							'image'    => 'scene-black-rose-courtyard.webp',
+							'image'    => $room1_image( 'scene-black-rose-courtyard.webp' ),
 							'products' => array(
 								skyyrose_immersive_product(
 									'br-006',
@@ -141,7 +141,7 @@ function skyyrose_get_experience_config( $slug ) {
 					array(
 						array(
 							'name'     => esc_html__( 'The Cathedral', 'skyyrose' ),
-							'image'    => 'scene-love-hurts-cathedral.webp',
+							'image'    => $room1_image( 'scene-love-hurts-cathedral.webp' ),
 							'products' => array(
 								skyyrose_immersive_product(
 									'lh-004',
@@ -195,7 +195,7 @@ function skyyrose_get_experience_config( $slug ) {
 					array(
 						array(
 							'name'     => esc_html__( 'The Golden Gate', 'skyyrose' ),
-							'image'    => 'scene-signature-golden-gate.webp',
+							'image'    => $room1_image( 'scene-signature-golden-gate.webp' ),
 							'products' => array(
 								skyyrose_immersive_product(
 									'sg-009',

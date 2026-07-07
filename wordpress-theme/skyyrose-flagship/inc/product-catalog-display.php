@@ -416,7 +416,7 @@ function skyyrose_get_display_product_fields( $item ) {
 			}
 		}
 	}
-	if ( '' === $image_url ) {
+	if ( '' === $image_url && is_array( $item ) ) {
 		$image_url = (string) ( $item['image_url'] ?? '' );
 	}
 	if ( '' === $image_url && $wc_product ) {

@@ -20,16 +20,16 @@
    correct foreground wherever --skyyrose-accent is used as a fill.
 
    --sr-on-accent-dark is the same idea for --skyyrose-accent-dark (the
-   darker hover/pressed shade used by the sticky ATC button). Kids Capsule's
-   rose-gold-dark (#9A5662) is dark enough that only WHITE text clears
-   4.5:1 there (black text on it measures ~3.9:1) — the opposite of its
-   base fill — so it gets its own override.
+   darker hover/pressed shade used by the sticky ATC button). Values come
+   from the collection SOT masters (data/collections/*/sot.json via
+   gen-design-tokens.py) — verify contrast against THOSE, not memory.
 
-   Coverage, all four collections:
+   Coverage, all four collections (accent-dark per current SOT):
      signature    (gold #D4AF37)      -> black text on both fills (default)
      black-rose   (silver #C0C0C0)    -> black text on both fills (default)
      love-hurts   (crimson #DC143C)   -> white text on both fills (override)
-     kids-capsule (rose-gold #B76E79) -> black on base, white on -dark (override)
+     kids-capsule (base #B76E79, dark #B8960C) -> black on both (default;
+       white on #B8960C is 2.84:1 FAIL, black is 7.41:1)
    ========================================================================== */
 .sr-product,
 .sr-editorial {
@@ -40,11 +40,6 @@
 .sr-product[data-collection="love-hurts"],
 .sr-editorial[data-collection="love-hurts"] {
 	--sr-on-accent: #ffffff;
-	--sr-on-accent-dark: #ffffff;
-}
-
-.sr-product[data-collection="kids-capsule"],
-.sr-editorial[data-collection="kids-capsule"] {
 	--sr-on-accent-dark: #ffffff;
 }
 
