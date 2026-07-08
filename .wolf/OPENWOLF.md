@@ -96,6 +96,8 @@ OpenWolf's value comes from learning across sessions. You MUST update `.wolf/cer
 
 **Before fixing:** Read `.wolf/buglog.json` first — the fix may already be known.
 
+**Before allocating a new ID:** run `python scripts/wolf_bug_id.py` for the next free `bug-NNN` ID — do not guess or reuse an ID from memory (past cross-session collisions came from manual ID guessing).
+
 **After fixing:** ALWAYS append to `.wolf/buglog.json` with this structure:
 ```json
 {

@@ -2890,6 +2890,7 @@
 - `VISUAL_RECOGNITION_README.md` — Visual Product Recognition for SkyyRose (~1700 tok)
 - `wc_trash_extras.py` — Trash WC products that exist on skyyrose.co but not in canonical CSV. (~1246 tok)
 - `webp_converter.sh` — ############################################################################## (~2321 tok)
+- `wolf_bug_id.py` — allocates the next .wolf/buglog.json bug-NNN ID (`next_id`) and detects duplicate IDs (`find_duplicates`, `--check`); stdlib-only (~350 tok)
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
 - `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
