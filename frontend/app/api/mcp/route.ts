@@ -38,13 +38,21 @@ async function withClient<T>(run: (client: Client) => Promise<T>): Promise<T> {
   const transport = new StreamableHTTPClientTransport(new URL(MCP_URL), {
     requestInit: MCP_TOKEN ? { headers: { Authorization: `Bearer ${MCP_TOKEN}` } } : undefined,
   });
-  await client.connect(transport);
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new McpTimeoutError()), MCP_TIMEOUT_MS);
   });
   try {
-    return await Promise.race([run(client), timeout]);
+    // connect() (the initialize handshake, a bare fetch with no default
+    // timeout) is inside the race too — a wedged/unreachable backend must
+    // not hang past the deadline any more than a slow tool call would.
+    return await Promise.race([
+      (async () => {
+        await client.connect(transport);
+        return run(client);
+      })(),
+      timeout,
+    ]);
   } finally {
     // Clear the timer so it can't reject after a successful race (would
     // otherwise be an unhandled rejection on every successful request).
