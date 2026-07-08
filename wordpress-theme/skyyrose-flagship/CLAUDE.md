@@ -20,6 +20,14 @@ Then create the source CSS/JS and run `npm run build` to emit `.min`. Miss eithe
 
 Color constants (`SKYYROSE_COLOR_ROSE_GOLD` / `_GOLD` / `_CRIMSON` / `_SILVER`) are defined in committed `inc/brand-colors.php`. `functions.php` ALSO includes `inc/brand.generated.php` (loaded first) — that file is **generated from `assets/brand/brand.yaml` at build and is NOT committed** (you won't see it in a fresh checkout); it supplies `SKYYROSE_BRAND_TAGLINE` + helpers like `skyyrose_brand_collections()`. NEVER hardcode a hex value or the tagline in PHP — reference the constants.
 
+## Skyy mascot (3D site host) — v1.9.0
+
+- `assets/models/skyy.glb` is **draco-compressed** — `skyy-3d.js` MUST keep its DRACOLoader wiring (`setDRACOLoader` + decoder path derived from `MODEL_URL`) or the load fails silently and she never appears. Decoders live in `assets/js/lib/draco/`; CSP needs `'wasm-unsafe-eval'` (inc/security.php).
+- Clip contract: lowercase `idle`/`walk` required, `wave`/`point`/`talk`/`joy` optional. mascot.js emits `skyy:*` CustomEvents; skyy-3d.js maps them to clips by name.
+- Gate: `skyyrose_mascot_is_enabled()` (inc/mascot-config.php) — Customizer theme_mod `skyyrose_mascot_enabled`, **live by default**, but an explicit stored `false` in the DB overrides code defaults (bit us on first deploy).
+- Mounts ONLY via footer.php (front-page.php uses `get_footer()`); checkout excluded.
+- `window.SKYY_3D_CONFIG` is optional — nothing emits it; loader uses hardcoded theme-path fallbacks.
+
 ## Kill-switch awareness
 
 `SKYYROSE_COMING_SOON_MODE` (`functions.php:~39`) — `true` makes all public traffic see HTTP 503. Default `false`; don't toggle without intent. `CONCATENATE_SCRIPTS = false` (`functions.php:~50`) is an intentional override for WP.com MIME/concat errors — don't "fix" it.

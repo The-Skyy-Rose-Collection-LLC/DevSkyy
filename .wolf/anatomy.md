@@ -31,11 +31,11 @@
 - `deployment_summary.json` (~406 tok)
 - `DESIGN.md` — Design System Inspired by Claude (Anthropic) (~5031 tok)
 - `devskyy_mcp.py` (~1153 tok)
-- `docker-compose.staging.yml` — Docker Compose: 14 services (~3431 tok)
 - `docker-compose.yml` — production stack: postgres/redis/app/worker/elite-worker + monitoring & proxy profiles; one devskyy:local image, fail-loud secrets (~2000 tok)
 - `docker-entrypoint.sh` — startup script; generates JWT/ENC keys if unset, then dispatches a passed command (worker) or defaults to uvicorn (~1100 tok)
 - `Dockerfile` — multi-stage Python image (builder + non-root runtime), `COPY . .` + allowlist .dockerignore, INSTALL_TARGET arg, tini PID1; one image for app+workers (~1200 tok)
 - `fastmcp.config.json` (~287 tok)
+- `fly.backend.toml` — Fly config for devskyy-backend (main_enterprise API app); explicit CORS origins (no dead wildcard literal), DB_*/REDIS_* env names matching actual code consumers, /health+/ready checks (~1050 tok)
 - `fly.toml` — fly.toml - DevSkyy Enterprise Platform (~1070 tok)
 - `G1-BUNDLE.md` — G1 STOP — Phase 0 Review Bundle (~2329 tok)
 - `glb-models.html` — 33-SKU 3D GLB keep/delete QC sheet; model-viewer + meshopt/basis/draco decoders; serve over HTTP (`python3 -m http.server 8010`), file://-robust via CDN fallback + warning banner (~7000 tok)
@@ -57,11 +57,8 @@
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
 - `render-review.html` — all-engines render keep/delete QC sheet, 1719 inline `<img>` across 18 engine groups (HUB/source/OAI/Gemini/FLUX/Tripo/LoRA/legacy/…); localStorage marks + Blob delete-list download; works over file:// (plain images, no decoder), file://-robust via per-img "⚠ file missing" badge + accurate note (~190000 tok — do NOT full-read; edit by anchor) (~190k tok)
-- `requirements-dev.txt` — Development Dependencies (~85 tok)
-- `requirements-full.txt` — DevSkyy - Full ML/3D Dependencies (~46 tok)
 - `requirements-imagery.txt` — Nano Banana 2 — SkyyRose AI Image Pipeline (~130 tok)
 - `requirements-trellis.txt` — TRELLIS clothing 3D pipeline dependencies (~326 tok)
-- `requirements.txt` — Python dependencies (~109 tok)
 - `run_generation.sh` (~179 tok)
 - `skills-lock.json` (~3208 tok)
 - `skyyrose_clothing_barcodes.txt` (~459 tok)
@@ -860,8 +857,6 @@
 ## api/v1/
 
 - `__init__.py` — API v1 Package. (~766 tok)
-- `ai_enhancement.py` — URL configuration (~2728 tok)
-- `ai_image_enhancement.py` — API: POST, GET (5 endpoints) (~2963 tok)
 - `approval.py` — Approval queue API endpoints. (~3846 tok)
 - `assets.py` — Asset Processing API Endpoints. (~11886 tok)
 - `autonomous.py` — API: GET, POST (4 endpoints) (~1814 tok)
@@ -1332,7 +1327,7 @@
 - `CLOTHING_3D_PRODUCTION.md` — Clothing 3D — Production Deployment Guide (~2484 tok)
 - `COLAB_TRAINING_GUIDE.md` — ✅ Google Colab LoRA Training Guide (FREE) (~1014 tok)
 - `CONSOLIDATED_VALIDATION_ISSUES.md` — DevSkyy Consolidated Validation Issues Report (~3918 tok)
-- `CONTRIB.md` — DevSkyy Contributor Guide (~1917 tok)
+- `CONTRIBUTING.md` — DevSkyy Contributor Guide, renamed from CONTRIB.md 2026-07-06 (~2600 tok)
 - `CRITICAL_FUCHSIA_APE_QUICKSTART.md` — Critical Fuchsia Ape - Quick Start Guide (~1234 tok)
 - `CRITICAL_FUCHSIA_APE_SETUP.md` — DevSkyy MCP - Critical Fuchsia Ape Backend Setup (~1840 tok)
 - `CRITICAL_FUCHSIA_APE_SUMMARY.md` — DevSkyy MCP - Critical Fuchsia Ape Setup Summary (~1946 tok)
@@ -1750,11 +1745,12 @@
 - `package.json` — Node.js package manifest (~1294 tok)
 - `playwright.config.ts` — Playwright test configuration (~236 tok)
 - `postcss.config.js` — PostCSS configuration (~24 tok)
-- `proxy.ts` — Next.js Proxy — Protects /admin/* routes with NextAuth.js (~224 tok)
+- `proxy.ts` — Next.js Proxy — gates /admin/* + /api/* (except auth/checkout/webhooks) with NextAuth.js (~230 tok)
 - `tailwind.config.ts` — Tailwind CSS configuration (~770 tok)
 - `tsconfig.json` — TypeScript configuration (~200 tok)
 - `VERCEL_PROJECT_CONFIG.md` — Vercel Project Configuration (~1510 tok)
 - `vercel.json` — /*.ts": { (~492 tok)
+- `vitest.config.ts` — vitest config scoped to lib/wp/**/*.test.ts (server-only-free WP wiring modules) — WS7 (~98 tok)
 
 ## frontend/app/
 
@@ -1888,6 +1884,10 @@
 - `CLAUDE.md` (~11 tok)
 - `route.ts` — NextAuth.js v4 API Route Handler (~82 tok)
 
+## frontend/app/api/catalog/summary/
+
+- `route.ts` — Live WooCommerce catalog counts vs canonical CSV, by collection — WS7 (~310 tok)
+
 ## frontend/app/api/checkout/
 
 - `route.ts` — Stripe is initialized lazily to avoid errors when STRIPE_SECRET_KEY is not set (~622 tok)
@@ -1896,6 +1896,10 @@
 
 - `CLAUDE.md` (~11 tok)
 - `route.ts` — Conversion Analytics API — Unified Event Collection (~3265 tok)
+
+## frontend/app/api/health/
+
+- `route.ts` — WP↔dashboard wiring health check: public/authed-wc/authed-wp probes — WS7 (~267 tok)
 
 ## frontend/app/api/huggingface/
 
@@ -1983,6 +1987,10 @@
 ## frontend/app/api/v1/3d/status/
 
 - `route.ts` — Next.js API route: GET (~156 tok)
+
+## frontend/app/api/webhooks/woocommerce/
+
+- `route.ts` — WooCommerce webhook receiver, HMAC-verified + tag revalidation — WS7 (~270 tok)
 
 ## frontend/app/api/wordpress/proxy/
 
@@ -2276,6 +2284,21 @@
 ## frontend/lib/vercel/
 
 - `deployment-manager.ts` — Vercel Deployment Manager (~4402 tok)
+
+## frontend/lib/wp/
+
+WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signature.ts`/`throttle.ts` are framework-free (unit-tested with vitest); `client.ts` composes them behind `server-only`. Coexists with `lib/wordpress/` (legacy stack, untouched, own env names).
+
+- `auth-policy.ts` — resolveAuthTier(path): 'public'\|'wc'\|'wp-app', throws on unmatched path (~196 tok)
+- `client.ts` — server-only typed client: wpRequest/wpRequestRaw + 13 typed methods (~1184 tok)
+- `signature.ts` — computeWebhookSignature/verifyWebhookSignature, HMAC-SHA256 via node:crypto (~161 tok)
+- `throttle.ts` — RequestThrottle: 2 req/s pacing + Retry-After-aware backoff (~214 tok)
+
+## frontend/lib/wp/__tests__/
+
+- `auth-policy.test.ts` — vitest: tier routing per prefix + throw-on-unknown (~109 tok)
+- `signature.test.ts` — vitest: accept-on-match, reject on tampered body/secret/null/malformed (~158 tok)
+- `throttle.test.ts` — vitest: fake-timer pacing delay + Retry-After/backoff math (~165 tok)
 
 ## frontend/lib/wordpress/
 
@@ -2694,6 +2717,7 @@
 - `deploy-holo-cards.sh` — scripts/deploy-holo-cards.sh -- Deploy Holo product card rollout to production (~3234 tok)
 - `deploy-pipeline.sh` — scripts/deploy-pipeline.sh -- Single-command deploy pipeline for SkyyRose WordPress theme (~1847 tok)
 - `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~9657 tok)
+- `deploy-mu-plugin.sh` — scripts/deploy-mu-plugin.sh -- SCP one MU-plugin (MU_SRC param, dest=basename) to wp-content/mu-plugins/ + nonce-endpoint verify; STOPSHOW_ACK-gated (~1100 tok)
 - `diagnose_cli_raw.py` — Build the exact CLI command the SDK would use and run it via subprocess (~507 tok)
 - `diagnose_orchestrator.py` — Test ClaudeSDKClient (async context manager) with MCP server. (~665 tok)
 - `diagnose_sdk.py` — Diagnostic: capture exact claude CLI stderr when SDK fails. (~554 tok)
@@ -2895,8 +2919,8 @@
 - `VISUAL_RECOGNITION_README.md` — Visual Product Recognition for SkyyRose (~1700 tok)
 - `wc_trash_extras.py` — Trash WC products that exist on skyyrose.co but not in canonical CSV. (~1246 tok)
 - `webp_converter.sh` — ############################################################################## (~2321 tok)
+- `wolf_bug_id.py` — allocates the next .wolf/buglog.json bug-NNN ID (`next_id`) and detects duplicate IDs (`find_duplicates`, `--check`); stdlib-only (~350 tok)
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
-- `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
 - `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
 - `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~688 tok)
@@ -2927,6 +2951,13 @@
 - `security.sh` — Parallel security gate on changed files — bandit | secret scan | npm audit (~1806 tok)
 - `ship.sh` — Ship gate — composite pre-push gate. Fail-fast: cheap stages first. (~1112 tok)
 - `tdd.sh` — TDD gate — RED / GREEN / coverage enforcement via pytest (~1096 tok)
+
+## scripts/font_generator/
+
+- `__init__.py` (~0 tok)
+- `template.py` — generate_template/save_template: blank fill-in PNG grid + manifest.json (cell bboxes, gray guide marks, sha256 chars_fingerprint) for a hand-filled glyph sheet (~1171 tok)
+- `pipeline.py` — build_font: vectorizes a filled-in scan via potrace + fontTools (Cu2QuPen, double y-flip transform — see cerebrum) into a .ttf; _validate_manifest guards dup chars/codepoints + OOB bbox (~2956 tok)
+- `cli.py` — argparse CLI: `template`/`build` subcommands wrapping the two functions above (~1326 tok)
 
 ## scripts/hooks/
 
@@ -3009,6 +3040,16 @@
 - `merge_gate.py` — Merge gate — evaluates the 10-check predicate for auto-merge. (~2148 tok)
 - `reviewer.py` — Reviewer agent — Claude judges a PR diff and returns APPROVE / REQUEST_CHANGES / DEFER_HUMAN. (~3278 tok)
 - `RISK_PATHS.txt` — alembic/versions/** (~264 tok)
+
+## scripts/remediation/
+
+WS7 wiring core scripts (spec C2/C3/C6). All live-hitting entrypoints are dry-run/read-only by default, gated behind an explicit flag + `STOPSHOW_ACK=1` for any production write.
+
+- `__init__.py` — empty, makes remediation/ an importable package (matches `scripts/` subpackage convention) (~0 tok)
+- `env.example` — WS7 env var template (WP_BASE_URL, WP_APP_USER/PASSWORD, WC_CONSUMER_KEY/SECRET, WP_WEBHOOK_SECRET, REVALIDATE_SECRET) (~157 tok)
+- `register_webhooks.py` — idempotent WC webhook registration; `diff_webhooks()` pure; dry-run default, `--execute`+`STOPSHOW_ACK=1` for live POST (~523 tok)
+- `setup_credentials.py` — HG-7 credential setup + live validation against production endpoints; syncs to Vercel env (~1400 tok)
+- `wiring_audit.py` — spec-C6 runnable audit: health/public/authed/signature/secret-grep/pacing checks; write checks gated `--write`+`STOPSHOW_ACK=1` (~1713 tok)
 
 ## scripts/security/
 
@@ -3124,7 +3165,6 @@
 ## services/
 
 - `__init__.py` — services/__init__.py (~258 tok)
-- `ai_image_enhancement.py` — LuxuryImageEnhancer: remove_background, upscale_image, generate_product_image, interrogate_image + 4 more (~3204 tok)
 - `approval_queue_manager.py` — Approval queue manager for WordPress media sync. (~6631 tok)
 - `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~997 tok)
 - `image_deduplication.py` — Image deduplication service using content hashing. (~2915 tok)
@@ -3902,3 +3942,14 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `src/types.ts` — exports Collection type ('signature'|'black-rose'|'love-hurts'|'kids-capsule') (~50 tok)
 - `src/index.ts` — re-exports Collection from ./types; placeholder for component exports (~50 tok)
 - `test/smoke.test.ts` — verifies module loads (1 test) (~80 tok)
+
+- `wordpress-theme/skyyrose-flagship/inc/collection-sot-reader.php` — collection sot.json reader + per-SKU product-image resolver `skyyrose_sot_product_image(_uri)($sku,$view)` (front-first, CSV fallback, placeholder). ~330t
+- `test_sot_assets_tracked.py` — tests/test_sot_assets_tracked.py -- Census guard: every image path in sot-images.json / collection sot.json / catalog CSV must be a git-tracked blob (bug-175 class) (~700 tok)
+- `skyyrose-anon-cache-guard.php` — wordpress/mu-plugins/skyyrose-anon-cache-guard.php -- WC session-handler swap + cart-cookie suppression on anonymous cacheable GETs; unblocks Batcache edge caching (TTFB 1.8s→0.06s) (~1300 tok)
+
+## Root reorg 2026-07-07 (path deltas)
+- Root screenshots/QA artifacts (98) → `screenshots/root-audit/`
+- `CONTEXT.md` `DESIGN.md` `REMEDIATION_MAP.md` → `docs/`; `G1-BUNDLE.md` `HANDOFF.md` `INITIAL*.md` `.impeccable.md` `.plugin-fix-complete` → `docs/archive/2026/`
+- `setup-claude-config.sh` `claude-mem-settings.sh` `install_agy.sh` `run_generation.sh` `pre-build-check.sh` → `scripts/`; `autonomous_agent_demo.py` → `examples/`
+- `redirects.csv` `skyyrose_clothing_barcodes.txt` → `data/`; `autotrain_config.yaml` → `config/`; `deployment_summary.json` `wordpress-health-check-results.json` → `.reports/`
+- Domain config index: `SOT.md` → "Domain configuration map" (read that before old docs)

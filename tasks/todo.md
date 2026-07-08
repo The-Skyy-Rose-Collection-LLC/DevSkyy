@@ -1,5 +1,28 @@
 # Current Tasks
 
+## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
+
+Replace 4 hardcoded-fixture handler bodies with real agent delegation. TDD, tests green, scope-clean.
+Wiring is autonomous-safe; runtime paid/prod gates stay intact (tests MUST mock paid/prod calls).
+Register: `tasks/wiring-gaps-register.md` (T3-1..T3-4) — but 3 of its 4 specifics were wrong; wired from verified source.
+
+- [x] **T3-1 code/scan** — DONE. Verified 5/5 via rtk; path-injection guard; `asyncio.to_thread`. — `api/v1/code.py:170-194` mock `ScanIssue` list → `CodeSecurityAnalyzer.analyze_directory()`
+      (real source SAST, `security/code_analysis.py`; NOT the register's dependency-CVE scanner). Map
+      `SecurityFinding{file_path,line_number,severity,category,recommendation}` → `ScanIssue`. Fix MCP route
+      `mcp_tools/tools/infrastructure.py:163` `"scanner/scan"`→`"code/scan"`.
+- [x] **T3-2 commerce/bulk** — DONE. Wire 3/3; bug-165 (CommerceAgent WC integration) FIXED full per founder: alias + `WordPressClient.from_env()` + lifecycle reconcile + dashboard.py 3 sites. 231 passed, no regression. — `api/v1/commerce.py:156-182,308-340` mock loops → `CommerceAgent` (init pattern proven
+      at `commerce.py:467`). create→`sync_product_to_woocommerce`, update→`update_woocommerce_product(product_id,updates)`,
+      delete→honest (no agent method; WC client or unsupported-result). Fix MCP endpoint_map `ecommerce.py:133-137`→`"commerce/products/bulk"`.
+- [x] **T3-3 3D text/image-to-3D** — DONE. 4/4 via rtk; async BackgroundTask + status endpoint; +my fixes (SSRF follow_redirects=False, close() comment). — `api/v1/media.py:173-196,255-278` fake URLs → `TripoAssetAgent` (real class name;
+      generators `_tool_generate_from_text`/`_tool_generate_from_image` → `GenerationResult`; PAID at runtime → MOCK in tests).
+      Fix MCP routes `threed.py:149,203` → `media/3d/generate/text`, `media/3d/generate/image`.
+- [x] **T3-4 theme deploy** — DONE. 3/3 via rtk (subprocess MOCKED, never ran real deploy); `create_subprocess_exec`+600s timeout; non-prod→`--dry-run`. — `api/v1/wordpress_theme.py:46-56` `success=False` stub → `subprocess.run(["bash","scripts/deploy-theme.sh",...])`
+      (flag-driven: `--dry-run`/`--with-maintenance`, NOT env). non-prod env→`--dry-run`. PROD-touching at runtime → MOCK subprocess in tests, never run live.
+
+### Verify (main thread, after agents — never on a subagent's word)
+- [x] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
+- [x] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+
 ## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
 
 Branch `feat/embeddings-phase2` off `origin/main`. Spec: `docs/superpowers/specs/2026-06-22-embeddings-reframe-design.md` §Track E.
@@ -20,7 +43,8 @@ DEFER:      store.py (sqlite LocalVectorStore) — no consumer, YAGNI; E-store c
 
 ## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
 
-Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+Goal: expose the devskyy MCP (tool count computed at runtime — see mcp_service.py
+/health) over authenticated HTTP so the Next.js
 dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
 the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
 Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
@@ -37,7 +61,8 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
       (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
       ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
-      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      initialize→200+Mcp-Session-Id, tools/list→42 tools (stale point-in-time reading;
+      live count is now served by /health's tool_count field), 401 w/o Bearer, foreign Host→421.
       Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
 - [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
       console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
@@ -50,17 +75,23 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
       (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
       php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
-- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+- [x] P6 docs — `docs/mcp-http-architecture.md` covers the mount, Bearer auth, both consumer
+      surfaces (dashboard proxy + WP bridge), env var matrix, and failure modes (401/421).
+      `scripts/verify-mcp-surfaces.sh` is a read-only E2E verifier (initialize -> tools/list,
+      401-without-token) — CI-safe (SKIPPED + exit 0 when MCP_URL/MCP_SERVICE_TOKEN unset).
+      Live E2E (both surfaces invoking a tool against production /mcp) is prepared — pending
+      gated go-live, see `tasks/mcp-golive-manifest.md`.
 
-  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
-  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
-    redeploy frontend. ⚠️
-  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
-    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
-  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
-    + DNS records); then the committed default URLs work without per-surface overrides.
-  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
-  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/) — exact gated
+  commands + verify steps are in `tasks/mcp-golive-manifest.md`:
+  - P4 Vercel env: MCP_URL + MCP_SERVICE_TOKEN (Production), redeploy frontend. ⚠️
+  - P5 WP deploy: SKYYROSE_MCP_URL + SKYYROSE_MCP_TOKEN (option/wp-config const), then
+    `bash scripts/deploy-theme.sh` if needed. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly, then the committed default URLs
+    work without per-surface overrides.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY/WC_CONSUMER_SECRET -a devskyy-api`.
+  - Post every step: `bash scripts/verify-mcp-surfaces.sh` (MCP_URL/MCP_SERVICE_TOKEN exported)
+    to confirm the surface is still healthy.
 
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
@@ -191,9 +222,9 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 ## Dashboard (devskyy.app) — Gaps to Fill
 
 ### Priority 1: Settings Persistence
-- [ ] Create `frontend/app/api/settings/route.ts` — GET/PUT settings via FastAPI or local file
-- [ ] Wire `frontend/app/admin/settings/page.tsx` — replace localStorage with API calls
-- [ ] Remove `// TODO: Also save to backend API` comment
+SHIPPED — `frontend/app/api/settings/route.ts` exists (GET/PUT, real handler);
+`frontend/app/admin/settings/page.tsx` already wired per
+`tasks/wiring-gaps-register.md` T2-4. This section is stale, kept for history.
 
 ### Priority 2: Tasks Page Expansion
 - [ ] Expand `frontend/app/admin/tasks/page.tsx` (122L) — add task list, filtering, history, status tracking
@@ -207,9 +238,10 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 - [ ] Expand specialized agents list (currently "+42 more agents..." placeholder)
 
 ### Priority 4: Monitoring — Real API Wiring
-- [ ] Wire `frontend/app/admin/monitoring/page.tsx` to FastAPI health endpoints
-- [ ] Replace `setTimeout + random data` in refreshMetrics with actual API calls
-- [ ] Add real service health checks (WordPress, Vercel, FastAPI, DB)
+Backend SHIPPED — `api/v1/monitoring.py:360` `/monitoring/metrics` route,
+mounted `main_enterprise.py:286`. Remaining: frontend `metrics()` client
+method + `useMonitoring` wire per `tasks/wiring-gaps-register.md` T3-9
+(frontend-only).
 
 ### Priority 5: Autonomous — Live Data
 - [ ] Wire `frontend/app/admin/autonomous/page.tsx` to selfHealingService real endpoints
@@ -300,3 +332,13 @@ Standing rules (§14): authoritative sources only (trace every value to a master
 - `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
 - Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
 - NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.
+
+## P5 — Backend production home (run 20260707-4, started 2026-07-07)
+
+- [x] WS1 ml-extra: move transformers/sentence-transformers/chromadb/diffusers from base deps → `ml` extra; import-site guards; resolve proofs
+- [x] WS2 dockerfile-api: Dockerfile.api slim image ([api] on slimmed base); fail-loud DATABASE_URL in production (database/db.py:58)
+- [x] WS3 fly-backend: fly.backend.toml (devskyy-backend); CORS wildcard fix; Sentry sample-rate wiring; tasks/backend-golive-manifest.md (gated)
+- [x] Fable audit each branch (standing order), merge in order WS1→WS2→WS3
+- [x] Post-merge: real `docker build -f Dockerfile.api` proof (main thread)
+- [ ] GATED: fly apps create devskyy-backend + secrets + deploy + DNS repoint (STOP-AND-SHOW)
+- [ ] P6 GATED: MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md

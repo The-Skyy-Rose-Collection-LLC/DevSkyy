@@ -10,7 +10,9 @@ Auth: a shared Bearer service token (``MCP_SERVICE_TOKEN``). When the token is s
 a warning is logged — so a deployed, reachable ``/mcp`` is never silently open.
 
 Mutation gating stays in the tool layer (each mutating tool requires its own confirm
-flag); this middleware is the coarse network gate in front of all 38 tools.
+flag); this middleware is the coarse network gate in front of the full registered
+tool set (count is env-dependent — see mcp_service.py's /health tool_count field and
+mcp_tools/tools/__init__.py's SLIM_EXCLUDED_MODULES for the exact split).
 """
 
 from __future__ import annotations
@@ -138,3 +140,15 @@ def mcp_session_manager():
     Only valid after :func:`build_mcp_app` (i.e. ``streamable_http_app()``) has run.
     """
     return mcp.session_manager
+
+
+async def tool_count() -> int:
+    """Number of MCP tools actually registered in THIS process.
+
+    Env-dependent: the full backend and the slim Fly image (``mcp_service.py``)
+    register different counts because the slim image deliberately skips a
+    declared set of heavy-dependency modules — see
+    ``mcp_tools/tools/__init__.py``'s ``SLIM_EXCLUDED_MODULES``. This is the
+    computed source of truth; never hand-type a tool count in docs/comments.
+    """
+    return len(await mcp.list_tools())

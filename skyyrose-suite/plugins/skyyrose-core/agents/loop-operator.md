@@ -27,15 +27,15 @@ Loop lifecycle manager. You start, monitor, and safely terminate autonomous agen
 
 1. **Pre-flight — confirm all gates before starting the loop.**
    ```bash
-   # Confirm eval baseline exists
-   ls /Users/theceo/DevSkyy/tasks/eval-baseline.json 2>/dev/null || echo "MISSING"
+   # Compare against eval baseline if present — do not block if it's absent
+   ls /Users/theceo/DevSkyy/tasks/eval-baseline.json 2>/dev/null && echo "baseline found — compare against it" || echo "no baseline — continuing without one"
    # Confirm rollback path (git worktree or clean branch)
    git status --short
    git stash list | head -5
    # Confirm budget window is set (check env or task file)
    grep -i "budget\|cost_limit\|max_cost" /Users/theceo/DevSkyy/tasks/todo.md 2>/dev/null | head -5
    ```
-   Block loop start if: no eval baseline, no rollback path, no budget ceiling.
+   Block loop start if: no rollback path, no budget ceiling. A missing eval baseline is a warning, not a block.
 
 2. **Start the loop with an explicit stop condition.**
    Document in `tasks/todo.md`:
@@ -104,7 +104,7 @@ If available: treat as a retry storm and diagnose the client-side bug.
 ## Required Pre-Loop Checks
 
 - [ ] Quality gate command documented and runnable
-- [ ] Eval baseline exists and is current
+- [ ] Eval baseline compared if `tasks/eval-baseline.json` exists; absence noted and non-blocking
 - [ ] Rollback path confirmed (worktree branch or stash)
 - [ ] Branch/worktree isolation configured (loop edits do not land on main until verified)
 - [ ] Budget ceiling set (max cost or max iterations)

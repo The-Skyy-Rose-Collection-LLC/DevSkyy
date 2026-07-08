@@ -1,0 +1,39 @@
+DevSkyy Codemap Diff Report
+Generated: 2026-07-06
+Previous set: docs/CODEMAPS/{INDEX,backend,frontend}.md (header-dated 2026-02-19; git shows the files were last touched 2026-06-12 without the header being bumped)
+New set staged at: docs/CODEMAPS/.pending/ (NOT applied — awaiting approval; see DISPOSITION below)
+
+STALENESS
+- Previous codemap headers: 2026-02-19 -> 137 days old at time of this scan (2026-07-06). Exceeds the 90-day threshold.
+- The "Last Updated" header does not match the git-touch date (2026-06-12), meaning whatever changed that day did not refresh the content that mattered — the enumerated structure is still the Feb-19 view.
+
+DIFF ESTIMATE: >90% structural/content change (treated as a full rewrite, not an incremental diff)
+Method: directory-by-directory comparison of what each old file enumerates vs. a fresh `ls`/anatomy.md scan of the same areas. Not a byte-diff — an exact percentage would be false precision given the scale of restructuring below; "effectively a full rewrite" is the honest characterization.
+
+ADDED (present in the repo, absent from the old codemap set entirely)
+- database/ (SQLAlchemy models, Alembic wiring) — zero mentions in the old set
+- orchestration/ (33 modules: RAG, brand_learning, catalog_retriever, 3D round table)
+- eval/ (content/brand evaluation rulebook, QC judge inputs)
+- skyyrose/ (elite_studio canonical imagery hub, core/ SOT resolvers, elite_team/)
+- aos/ (experimental agent micro-kernel: kernel, governance, healing, memory, IPC)
+- scripts/oai_render/ (OAI gpt-image-2 render pipeline — the current canonical new-render engine)
+- api/v1/ as a populated package — old backend.md listed "v1/" as a bare placeholder comment; it now holds 30 routers + 3 subpackages (analytics/, clothing_3d/, portal/)
+- api/v2/ (5 modules: assets, characters, creative, health, webhooks) — entirely new, no v1 equivalent yet
+- api/graphql/ (schema.py, types.py, resolvers/, dataloaders/) — old codemap referenced GraphQL only generically
+- frontend/app/admin/{catalog,renders} — shipped after the old frontend.md was written
+- frontend/proxy.ts as the auth gate — old frontend.md predates the Next.js 16 middleware.ts -> proxy.ts rename
+
+REMOVED / NO LONGER ACCURATE
+- Old frontend.md treats src/ (TypeScript SDK, Three.js collections) as THE frontend. Verified this pass: src/ is not imported by frontend/ (only frontend/node_modules type-defs matched a search for it), and it is absent from both the root CLAUDE.md workspace table and frontend/CLAUDE.md. Reclassified in the new frontend.md as a legacy/standalone SDK, not the active dashboard.
+- The old set had no wordpress.md, data.md, or dependencies.md — the production WordPress storefront and the canonical data sources (catalog CSV, dossiers, SOT imagery) were previously undocumented as codemaps.
+
+MODIFIED / CORRECTED (docs-vs-code discrepancies surfaced, not fixed — out of scope for a codemap regen)
+- LLM providers: root CLAUDE.md and the old backend.md both say "6 providers" (OpenAI, Anthropic, Google, Mistral, Cohere, Groq). Verified this pass: llm/providers/ has 11 files — adds deepseek.py, replicate.py, stability.py, vertex_imagen.py, litellm_provider.py. Flagged in the new dependencies.md and backend.md for founder awareness.
+- agents/ count: old backend.md implies "54 agents." This pass counts 218 .py files under agents/ (includes the core/ 8-domain hierarchy, claude_sdk/domain_agents/, elite_web_builder/, render_pipeline/ — likely additions since the 54-agent figure was taken, not a contradiction so much as a large undercount if read literally today).
+
+ARCHITECTURE CHANGES
+- The two backend entry points diverge further than the old codemap noted: main_enterprise.py (primary, mounts the api.v1 aggregator + graphql_router) vs. api/index.py (serverless/Vercel mirror, only 7 routers). The old codemap didn't flag this split.
+- Confirmed the 3-system separation still holds: Python API / Next.js dashboard (devskyy.app) / WordPress theme (skyyrose.co) — no cross-wiring found in this pass.
+
+DISPOSITION
+Per the >30% change-gate: all 7 files (INDEX.md + 6 codemaps) are staged at docs/CODEMAPS/.pending/ rather than overwritten in place. Rationale: architecture.md/wordpress.md/data.md/dependencies.md are net-new (no prior version to diff against), while backend.md/frontend.md are effectively full rewrites (>90% change) — landing only the net-new files live would leave a half-migrated, internally contradictory codemap set (old-style backend.md/frontend.md sitting next to new-style architecture.md). Awaiting approval to promote docs/CODEMAPS/.pending/* -> docs/CODEMAPS/.

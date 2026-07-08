@@ -15,6 +15,12 @@ export interface CollectionScene {
   name: string;
   description: string;
   backgroundImage: string;
+  /**
+   * Always [] on the raw COLLECTIONS config below — real product data is
+   * SOT-authoritative and injected at request time by
+   * `getEnrichedCollection`/`getAllEnrichedCollections` in catalog-server.ts.
+   * Never hand-populate this array; it silently drifts from the catalog CSV.
+   */
   products: CollectionProduct[];
 }
 
@@ -53,43 +59,7 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
         name: 'The Garden',
         description: 'Wrought-iron racks amid gothic rose arbors',
         backgroundImage: '/images/scenes/black-rose-garden.jpg',
-        products: [
-          {
-            id: 'br-001',
-            name: 'BLACK Rose Crewneck',
-            price: 35,
-            image: '/images/scenes/black-rose-product-1.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'br-002',
-            name: 'BLACK Rose Joggers',
-            price: 50,
-            image: '/images/scenes/black-rose-product-2.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'br-003',
-            name: 'BLACK is Beautiful Jersey',
-            price: 45,
-            image: '/images/scenes/black-rose-product-3.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'br-004',
-            name: 'BLACK Rose Hoodie',
-            price: 40,
-            image: '/images/scenes/black-rose-product-4.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'br-005',
-            name: 'BLACK Rose Hoodie \u2014 Signature Edition',
-            price: 65,
-            image: '/images/scenes/black-rose-product-5.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-        ],
+        products: [],
       },
     ],
   },
@@ -112,44 +82,14 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
         name: 'The Ballroom',
         description: 'Candlelit manor with crystal chandeliers',
         backgroundImage: '/images/scenes/love-hurts-ballroom.jpg',
-        products: [
-          {
-            id: 'lh-006',
-            name: 'The Fannie',
-            price: 45,
-            image: '/images/scenes/love-hurts-product-1.jpg',
-            sizes: ['One Size'],
-          },
-          {
-            id: 'lh-002',
-            name: 'Love Hurts Joggers',
-            price: 95,
-            image: '/images/scenes/love-hurts-product-2.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'lh-003',
-            name: 'Love Hurts Basketball Shorts',
-            price: 75,
-            image: '/images/scenes/love-hurts-product-3.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-        ],
+        products: [],
       },
       {
         id: 'the-manor',
         name: 'The Manor',
         description: 'Golden pedestals with flickering candlelight',
         backgroundImage: '/images/scenes/love-hurts-manor.jpg',
-        products: [
-          {
-            id: 'lh-004',
-            name: 'Love Hurts Varsity Jacket',
-            price: 265,
-            image: '/images/scenes/love-hurts-product-4.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-        ],
+        products: [],
       },
     ],
   },
@@ -172,115 +112,21 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
         name: 'The Runway',
         description: 'Bay Bridge glass venue with industrial racks',
         backgroundImage: '/images/scenes/signature-runway.jpg',
-        products: [
-          {
-            id: 'sg-001',
-            name: "The Bridge Series 'The Bay Bridge' Shorts",
-            price: 195,
-            image: '/images/scenes/signature-product-1.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-002',
-            name: "The Bridge Series 'Stay Golden' Shirt",
-            price: 65,
-            image: '/images/scenes/signature-product-2.jpg',
-            sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
-          },
-          {
-            id: 'sg-003',
-            name: "The Bridge Series 'Stay Golden' Shorts",
-            price: 65,
-            image: '/images/scenes/signature-product-3.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-005',
-            name: "The Bridge Series 'The Bay Bridge' Shirt",
-            price: 25,
-            image: '/images/scenes/signature-product-5.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL'],
-          },
-        ],
+        products: [],
       },
       {
         id: 'the-showroom',
         name: 'The Showroom',
         description: 'Grand exhibition hall with marble columns',
         backgroundImage: '/images/scenes/signature-showroom.jpg',
-        products: [
-          {
-            id: 'sg-006',
-            name: 'Mint & Lavender Hoodie',
-            price: 45,
-            image: '/images/scenes/signature-product-6.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-007',
-            name: 'The Signature Beanie',
-            price: 25,
-            image: '/images/scenes/signature-product-7.jpg',
-            sizes: ['One Size'],
-          },
-          {
-            id: 'sg-013',
-            name: 'Mint & Lavender Crewneck',
-            price: 40,
-            image: '/images/scenes/signature-product-8.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-009',
-            name: 'The Sherpa Jacket',
-            price: 80,
-            image: '/images/scenes/signature-product-9.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-014',
-            name: 'Mint & Lavender Sweatpants',
-            price: 45,
-            image: '/images/scenes/signature-product-10.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-        ],
+        products: [],
       },
       {
         id: 'the-fitting-room',
         name: 'The Fitting Room',
         description: 'Intimate dressing area with signature racks',
         backgroundImage: '/images/scenes/signature-fitting-room.jpg',
-        products: [
-          {
-            id: 'sg-011',
-            name: 'Original Label Tee (White)',
-            price: 30,
-            image: '/images/scenes/signature-beanie-1.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-012',
-            name: 'Original Label Tee (Orchid)',
-            price: 30,
-            image: '/images/scenes/signature-beanie-2.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
-            id: 'sg-007',
-            name: 'The Signature Beanie',
-            price: 25,
-            image: '/images/scenes/signature-beanie-3.jpg',
-            sizes: ['One Size'],
-          },
-          {
-            id: 'sg-009',
-            name: 'The Sherpa Jacket',
-            price: 80,
-            image: '/images/scenes/signature-beanie-4.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-        ],
+        products: [],
       },
     ],
   },
@@ -303,26 +149,7 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
         name: 'The Playground',
         description: 'Vibrant colorblock sets for the next generation',
         backgroundImage: '/images/scenes/kids-capsule-hero.jpg',
-        products: [
-          {
-            id: 'kids-001',
-            name: 'Kids Colorblock Hoodie Set — Red/Black',
-            price: 65,
-            image: '/assets/images/products/kids-001-red-set.jpeg',
-            sizes: ['2T', '3T', '4T', '5', '6', '7'],
-            description:
-              'Bold red and black V-chevron colorblock hoodie and jogger set. Designed for young ones who wear luxury from the start.',
-          },
-          {
-            id: 'kids-002',
-            name: 'Kids Colorblock Hoodie Set — Purple/Black',
-            price: 65,
-            image: '/assets/images/products/kids-002-purple-set.jpeg',
-            sizes: ['2T', '3T', '4T', '5', '6', '7'],
-            description:
-              'Rich purple and black V-chevron colorblock hoodie and jogger set. Little ones deserve luxury too.',
-          },
-        ],
+        products: [],
       },
     ],
   },

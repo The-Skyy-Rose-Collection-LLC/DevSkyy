@@ -9,7 +9,7 @@ Get started with DevSkyy's 6 LLM provider clients in minutes.
 ### 1. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -e ".[all]"
 ```
 
 Required packages:

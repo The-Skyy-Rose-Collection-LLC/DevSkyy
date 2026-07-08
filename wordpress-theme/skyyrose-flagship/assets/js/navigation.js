@@ -36,13 +36,42 @@
 	}, true);
 
 	/* --------------------------------------------------
-	   Hamburger Toggle (Mobile)
+	   Single-Menu Relocation (Desktop ⇄ Mobile Drawer)
+	   The primary menu is server-rendered once inside
+	   .navbar__nav-wrapper; at ≤1024px the same node moves
+	   into the drawer. One DOM node, two homes.
 	   -------------------------------------------------- */
 	var toggle  = document.querySelector('#mobile-menu-toggle');
 	var nav     = document.querySelector('.navbar__nav-wrapper');
 	var mobilePanel = document.querySelector('#mobile-menu');
 	var mobileClose = document.querySelector('#mobile-menu-close');
 	var mobileOverlay = document.querySelector('#mobile-menu-overlay');
+
+	var primaryMenu = document.querySelector('.navbar__nav-wrapper .navbar__menu');
+	var drawerNav   = document.querySelector('.mobile-menu__nav');
+	var drawerMq    = window.matchMedia('(max-width: 1024px)');
+
+	function placePrimaryMenu() {
+		if (!primaryMenu || !nav || !drawerNav) return;
+		var home = drawerMq.matches ? drawerNav : nav;
+		if (primaryMenu.parentElement !== home) {
+			home.appendChild(primaryMenu);
+		}
+	}
+	function onDrawerBreakpointChange() {
+		placePrimaryMenu();
+		// Crossing up past 1024px while the drawer is open would strand a
+		// full-viewport, click-blocking, now-empty overlay — close it.
+		if (!drawerMq.matches) {
+			closeMobileMenu();
+		}
+	}
+	placePrimaryMenu();
+	if (typeof drawerMq.addEventListener === 'function') {
+		drawerMq.addEventListener('change', onDrawerBreakpointChange);
+	} else if (typeof drawerMq.addListener === 'function') {
+		drawerMq.addListener(onDrawerBreakpointChange);
+	}
 
 	function closeMobileMenu() {
 		if (mobilePanel) {
@@ -69,6 +98,24 @@
 			document.body.classList.toggle('mobile-nav-open');
 		});
 	}
+
+
+	/* --------------------------------------------------
+	   In-page anchor drift correction: content above lazy
+	   sections grows after the initial jump (#shop landed
+	   ~5000px past the grid on collection pages).
+	   -------------------------------------------------- */
+	document.addEventListener('click', function (e) {
+		var link = e.target.closest('a[href="#shop"], a[href="#experience"]');
+		if (!link) return;
+		var target = document.querySelector(link.getAttribute('href'));
+		if (!target) return;
+		e.preventDefault();
+		target.scrollIntoView({ behavior: 'smooth' });
+		setTimeout(function () {
+			target.scrollIntoView({ behavior: 'smooth' });
+		}, 900);
+	});
 
 	if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
 	if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
@@ -105,10 +152,39 @@
 	});
 
 	/* --------------------------------------------------
+	   Header Logo Video — pause off-screen / reduced-motion
+	   An autoplay+loop <video> keeps decoding frames even
+	   while display:none (the reduced-motion CSS swap) or the
+	   tab is backgrounded, since neither state removes it from
+	   the DOM. Explicitly pause both cases for battery + INP;
+	   resume only when motion is allowed AND the tab is visible.
+	   -------------------------------------------------- */
+	var logoVideo = document.querySelector('.navbar__logo-video');
+	if (logoVideo) {
+		var logoMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+		function syncLogoVideoPlayback() {
+			if (logoMotionQuery.matches || document.hidden) {
+				logoVideo.pause();
+			} else if (logoVideo.paused) {
+				logoVideo.play().catch(function () {});
+			}
+		}
+
+		syncLogoVideoPlayback();
+		document.addEventListener('visibilitychange', syncLogoVideoPlayback);
+		if (typeof logoMotionQuery.addEventListener === 'function') {
+			logoMotionQuery.addEventListener('change', syncLogoVideoPlayback);
+		} else if (typeof logoMotionQuery.addListener === 'function') {
+			logoMotionQuery.addListener(syncLogoVideoPlayback);
+		}
+	}
+
+	/* --------------------------------------------------
 	   Header Scroll State
 	   -------------------------------------------------- */
 	var header = document.querySelector('.site-header');
-	var scrollThreshold = 60;
+	var scrollThreshold = 70;
 	var ticking = false;
 
 	function updateHeaderState() {
@@ -143,6 +219,7 @@
 			searchOverlay.setAttribute('aria-hidden', 'true');
 			searchOverlay.setAttribute('inert', '');
 		}
+		if (searchToggle) searchToggle.setAttribute('aria-expanded', 'false');
 		if (pageWrap) pageWrap.removeAttribute('inert');
 	}
 
@@ -151,6 +228,7 @@
 			searchOverlay.classList.add('open');
 			searchOverlay.setAttribute('aria-hidden', 'false');
 			searchOverlay.removeAttribute('inert');
+			searchToggle.setAttribute('aria-expanded', 'true');
 			if (pageWrap) pageWrap.setAttribute('inert', '');
 			if (searchInput) setTimeout(function () { searchInput.focus(); }, 100);
 		});
@@ -163,6 +241,26 @@
 			closeMobileMenu();
 		}
 	});
+
+	/* --------------------------------------------------
+	   Announcement Bar Dismiss
+	   -------------------------------------------------- */
+	var announcementBar = document.getElementById('announcement-bar');
+	var announcementDismissKey = 'skyyrose_announcement_dismissed';
+
+	if (announcementBar) {
+		// Hide immediately if dismissed this session.
+		if (sessionStorage.getItem(announcementDismissKey)) {
+			announcementBar.style.display = 'none';
+		}
+		var dismissBtn = announcementBar.querySelector('.announcement-bar__dismiss');
+		if (dismissBtn) {
+			dismissBtn.addEventListener('click', function () {
+				sessionStorage.setItem(announcementDismissKey, '1');
+				announcementBar.style.display = 'none';
+			});
+		}
+	}
 
 	/* --------------------------------------------------
 	   Smooth Scroll

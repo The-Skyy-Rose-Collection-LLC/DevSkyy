@@ -150,7 +150,13 @@ class RequestDeduplicator:
             # Propagate exception to all waiting requests
             async with self._lock:
                 if request_hash in self.pending:
-                    self.pending[request_hash].future.set_exception(e)
+                    shared_future = self.pending[request_hash].future
+                    shared_future.set_exception(e)
+                    # Consume the exception on the shared future immediately.
+                    # If no duplicate caller ever awaits it, asyncio logs
+                    # "Future exception was never retrieved" at GC time.
+                    # The primary caller still gets the error via `raise` below.
+                    shared_future.exception()
                     del self.pending[request_hash]
 
             raise

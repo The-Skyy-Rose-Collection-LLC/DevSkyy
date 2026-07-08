@@ -277,6 +277,7 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 | Target | Command | Config |
 |--------|---------|--------|
 | WordPress | `bash scripts/deploy-theme.sh` | `.env.wordpress` |
+| WP MU-plugin | `STOPSHOW_ACK=1 [MU_SRC=wordpress/mu-plugins/<file>.php] bash scripts/deploy-mu-plugin.sh` | `.env.wordpress` (dest = source basename) |
 | Frontend | `cd frontend && npm run deploy` | `vercel.json` |
 | API | `docker compose up -d` | `docker-compose.yml` |
 | HF Spaces | `bash scripts/deploy_hf_spaces.sh` | `.env` |

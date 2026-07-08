@@ -6,12 +6,18 @@ gaussian blur. GPSDiffusion can be hooked in later by replacing this body.
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 from PIL import Image, ImageFilter
 
-logger = logging.getLogger(__name__)
+
+class ShadowStageError(RuntimeError):
+    """Raised when the PIL shadow pass fails.
+
+    The caller must NOT score the result as a shadowed render — silently
+    forwarding the un-shadowed composite (the old behavior) labeled it as a
+    shadow path and let the QA gate score the wrong image.
+    """
 
 
 def generate_shadows(
@@ -32,7 +38,12 @@ def generate_shadows(
         output_dir: Directory where the shadow image is written.
 
     Returns:
-        Path to the shadow-composited image, or ``composite_path`` on any failure.
+        Path to the shadow-composited image, or ``composite_path`` unchanged
+        when the subject fills the frame (no ground plane to anchor).
+
+    Raises:
+        ShadowStageError: on any PIL/IO failure — fail-closed, never silently
+            returns an un-shadowed image mislabeled as a shadow path.
     """
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -84,5 +95,4 @@ def generate_shadows(
         final.save(dest, format="PNG")
         return str(dest)
     except Exception as exc:
-        logger.warning("Shadow stage failed for %s, using composite as-is: %s", sku, exc)
-        return composite_path
+        raise ShadowStageError(f"Shadow stage failed for {sku}: {exc}") from exc

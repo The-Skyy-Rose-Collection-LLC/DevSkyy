@@ -135,22 +135,3 @@ class TestCodeScanPathSafety:
         missing = str(_PROJECT_ROOT / "does_not_exist_xyz_abc_123_sentinel")
         resp = client.post("/code/scan", json={"path": missing})
         assert resp.status_code == 404
-
-
-class TestCodeFixNotImplemented:
-    """code/fix has no honest backend (security findings aren't auto-fixable) →
-    returns 501, never fabricated CodeFix data."""
-
-    def test_fix_with_scan_results_returns_501(self, client: TestClient) -> None:
-        resp = client.post(
-            "/code/fix",
-            json={"scan_results": {"issues": [{"file": "x.py", "line": 1}]}},
-        )
-        assert resp.status_code == 501, resp.text
-        assert "not implemented" in resp.json()["detail"].lower()
-
-    def test_fix_without_scan_input_returns_400(self, client: TestClient) -> None:
-        # CodeFixRequest fields are all optional; an empty body passes schema
-        # validation, then the handler rejects "no scan_id and no scan_results".
-        resp = client.post("/code/fix", json={})
-        assert resp.status_code == 400

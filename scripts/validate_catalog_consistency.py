@@ -34,6 +34,8 @@ Available check names (pass comma-separated to --checks):
   preorder_consistency  CSV badge column and is_preorder flag never contradict
   v7_cards_current      v7-cards.json equals fresh build_v7_cards.py output
   sot_images_current    sot-images.json equals fresh sot_images.serialize_manifest()
+  collection_sot_current  collections/<slug>/sot.json equal fresh build-collection-sot.py output
+  no_hardcoded_product_images  Fail if any template hardcodes an /images/products/... path literal
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
@@ -50,7 +52,6 @@ from __future__ import annotations
 
 import argparse
 import ast
-import csv
 import json
 import re
 import sys
@@ -75,6 +76,17 @@ _SIMILARITIES_JSON: Path = (
 )
 _SKU_RESOLVER_PY: Path = _REPO_ROOT / "skyyrose" / "elite_studio" / "sku_resolver.py"
 _DOSSIERS_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "dossiers"
+_V7_CARDS_JSON: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "v7-cards.json"
+)
+_BUILD_V7_CARDS: Path = _REPO_ROOT / "scripts" / "build_v7_cards.py"
+_COLLECTIONS_DIR: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "collections"
+)
+_BUILD_COLLECTION_SOT: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "build-collection-sot.py"
+)
+
 _THEME_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship"
 # A hardcoded `/images/products/<file>` path literal in a template — the thing
 # templates must NOT do (they must resolve via skyyrose_sot_product_image_uri()).
@@ -89,10 +101,6 @@ _TEMPLATE_GLOBS: tuple[str, ...] = (
     "woocommerce/**/*.php",
     "patterns/**/*.php",
 )
-_V7_CARDS_JSON: Path = (
-    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "v7-cards.json"
-)
-_BUILD_V7_CARDS: Path = _REPO_ROOT / "scripts" / "build_v7_cards.py"
 
 # Retired SKUs — must not appear in downstream files
 _RETIRED_SKUS: frozenset[str] = frozenset({"br-013"})
@@ -146,12 +154,21 @@ def _fail(name: str, msg: str, details: list[str] | None = None) -> CheckResult:
 
 
 def _load_csv() -> list[dict[str, str]] | None:
-    """Load catalog CSV; returns None on error."""
+    """Load catalog CSV via the canonical loader; returns None on error.
+
+    Delegates to ``skyyrose.core.catalog_loader.read_catalog_rows()`` so both
+    this validator and the downstream pipeline use a single read path.
+    ``read_catalog_rows`` is @cached and returns a shared read-only list — callers
+    must not mutate it.
+    """
     if not _CATALOG_CSV.exists():
         return None
     try:
-        with _CATALOG_CSV.open(newline="", encoding="utf-8") as fh:
-            return list(csv.DictReader(fh))
+        if str(_REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(_REPO_ROOT))
+        from skyyrose.core.catalog_loader import read_catalog_rows
+
+        return list(read_catalog_rows(_CATALOG_CSV))
     except Exception:
         return None
 
@@ -634,48 +651,6 @@ def check_brand_primary() -> CheckResult:
     return _ok(name, f"brand_primary={bp!r} exists in logos block")
 
 
-def check_no_hardcoded_product_images() -> CheckResult:
-    """Fail if any template hardcodes an `/images/products/...` path literal.
-
-    Templates must resolve product imagery through ``skyyrose_sot_product_image_uri()``
-    (inc/collection-sot-reader.php), so the homepage/landing tiles follow the SOT and
-    cannot silently drift to a stale or wrong asset — the front-page commercial-runway
-    regression (a phantom-subdir 404 on the br-006 jacket) is exactly what this guards.
-    ``inc/`` is excluded: it holds the resolver itself.
-    """
-    name = "no_hardcoded_product_images"
-    if not _THEME_DIR.exists():
-        return _fail(name, f"theme dir not found: {_THEME_DIR}")
-
-    offenders: list[str] = []
-    seen: set[Path] = set()
-    for pattern in _TEMPLATE_GLOBS:
-        for php in sorted(_THEME_DIR.glob(pattern)):
-            if php in seen or not php.is_file():
-                continue
-            seen.add(php)
-            try:
-                text = php.read_text(encoding="utf-8")
-            except OSError:
-                continue
-            try:
-                rel = php.relative_to(_REPO_ROOT)
-            except ValueError:
-                rel = php
-            for lineno, line in enumerate(text.splitlines(), start=1):
-                if _HARDCODED_PRODUCT_IMG_RE.search(line):
-                    offenders.append(f"{rel}:{lineno}")
-
-    if offenders:
-        return _fail(
-            name,
-            f"{len(offenders)} hardcoded product-image path(s) — resolve via "
-            "skyyrose_sot_product_image_uri() instead",
-            details=offenders[:50],
-        )
-    return _ok(name, "no hardcoded product-image paths in templates")
-
-
 def check_preorder_consistency() -> CheckResult:
     """Verify the CSV badge column and is_preorder flag never contradict.
 
@@ -715,6 +690,114 @@ def check_preorder_consistency() -> CheckResult:
             violations,
         )
     return _ok(name, "badge and is_preorder agree for all SKUs")
+
+
+def check_price_positive() -> CheckResult:
+    """Every published row must have an integer price > 0."""
+    name = "price_positive"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check prices — CSV not readable")
+
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    from skyyrose.core.catalog_loader import bool_col, int_col
+
+    bad: list[str] = []
+    for row in rows:
+        if not bool_col(row, "published"):
+            continue
+        price = int_col(row, "price")
+        if price is None or price <= 0:
+            raw = row.get("price", "")
+            bad.append(
+                f"  {row.get('sku', '?')}: published=1 but price={raw!r} (must be integer > 0)"
+            )
+    if bad:
+        return _fail(name, f"{len(bad)} published SKU(s) have non-positive price", bad)
+    published_count = sum(1 for row in rows if bool_col(row, "published"))
+    return _ok(name, f"All {published_count} published SKUs have a positive integer price")
+
+
+def check_collection_enum() -> CheckResult:
+    """Every row's collection must be one of the four canonical values."""
+    name = "collection_enum"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check collections — CSV not readable")
+
+    valid = frozenset({"signature", "black-rose", "love-hurts", "kids-capsule"})
+    bad: list[str] = []
+    for row in rows:
+        col = (row.get("collection") or "").strip()
+        if col not in valid:
+            bad.append(f"  {row.get('sku', '?')}: collection={col!r} (valid: {sorted(valid)})")
+    if bad:
+        return _fail(name, f"{len(bad)} SKU(s) have an invalid collection value", bad)
+    return _ok(name, f"All {len(rows)} SKUs have a valid collection value")
+
+
+def check_unique_skus() -> CheckResult:
+    """No two rows may share the same SKU."""
+    name = "unique_skus"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check uniqueness — CSV not readable")
+
+    seen: dict[str, int] = {}
+    dups: list[str] = []
+    for i, row in enumerate(rows, 1):
+        sku = (row.get("sku") or "").strip()
+        if sku in seen:
+            dups.append(f"  {sku!r}: first at row {seen[sku]}, again at row {i}")
+        else:
+            seen[sku] = i
+    if dups:
+        return _fail(name, f"{len(dups)} duplicate SKU(s) found", dups)
+    return _ok(name, f"All {len(rows)} SKUs are unique")
+
+
+def check_dossier_present() -> CheckResult:
+    """Every row must have a non-empty dossier_slug (regardless of whether the file exists).
+
+    This is stronger than ``dossier_slugs``, which validates that non-empty slugs resolve
+    to a file. This check asserts that *every* SKU declares a slug in the first place.
+    """
+    name = "dossier_present"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check dossier presence — CSV not readable")
+
+    missing: list[str] = []
+    for row in rows:
+        slug = (row.get("dossier_slug") or "").strip()
+        if not slug:
+            missing.append(f"  {row.get('sku', '?')}: dossier_slug is blank")
+    if missing:
+        return _fail(
+            name,
+            f"{len(missing)} SKU(s) are missing a dossier_slug value",
+            missing,
+        )
+    return _ok(name, f"All {len(rows)} SKUs have a non-empty dossier_slug")
+
+
+def check_badge_enum() -> CheckResult:
+    """Every badge value must be either '' or 'Pre-Order' (the only values the catalog uses)."""
+    name = "badge_enum"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check badges — CSV not readable")
+
+    valid = frozenset({"", "Pre-Order"})
+    bad: list[str] = []
+    for row in rows:
+        badge = (row.get("badge") or "").strip()
+        if badge not in valid:
+            bad.append(f"  {row.get('sku', '?')}: badge={badge!r} (valid: {sorted(valid)!r})")
+    if bad:
+        return _fail(name, f"{len(bad)} SKU(s) have an invalid badge value", bad)
+    return _ok(name, f"All {len(rows)} SKUs have a valid badge value")
 
 
 def check_v7_cards_current() -> CheckResult:
@@ -789,6 +872,109 @@ def check_sot_images_current() -> CheckResult:
     return _ok(name, "sot-images.json matches fresh generator output")
 
 
+def check_collection_sot_current() -> CheckResult:
+    """Verify each collections/<slug>/sot.json equals fresh generator output (no hand-drift).
+
+    Same generated-artifact-up-to-date guard as ``v7_cards_current``, applied to the
+    per-collection SOT view (``build-collection-sot.py``). The generator's
+    ``build_documents()`` is the pure builder the writer also uses (single byte-authority via
+    its ``serialize``), so this regenerates each document in-memory and byte-compares it
+    against the committed file. It reads only the tracked masters + file-presence checks on
+    the tracked asset tree — never the broad image scan — so it is deterministic in a clean
+    CI checkout. The sibling ``_orphans.json`` is intentionally NOT guarded here: it depends
+    on the full image tree and is covered by ``freshness-guard.sh``. The generator validates
+    identity.json with ``jsonschema``, so the catalog-validate CI job installs it.
+    """
+    name = "collection_sot_current"
+    if not _BUILD_COLLECTION_SOT.exists():
+        return _ok(name, "build-collection-sot.py not present — skip")
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    saved_path = sys.path[:]
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("build_collection_sot", _BUILD_COLLECTION_SOT)
+        if spec is None or spec.loader is None:
+            return _fail(name, "Could not load build-collection-sot.py spec")
+        gen_mod = importlib.util.module_from_spec(spec)
+        # Register before exec so a future @dataclass in the generator can resolve
+        # cls.__module__ (py3.12+/3.14), matching the test loader.
+        sys.modules["build_collection_sot"] = gen_mod
+        spec.loader.exec_module(gen_mod)
+        documents = gen_mod.build_documents()
+    except Exception as exc:  # defensive — never crash the whole validator run
+        return _fail(name, f"collection-sot generator failed to run: {exc}")
+    finally:
+        # The generator inserts its own data/ dir onto sys.path at import time; restore so
+        # it cannot shadow imports in later checks of this validator run.
+        sys.path[:] = saved_path
+
+    stale: list[str] = []
+    for slug, doc in documents.items():
+        fp = _COLLECTIONS_DIR / slug / "sot.json"
+        if not fp.exists():
+            stale.append(f"  {slug}/sot.json missing: {fp}")
+            continue
+        if fp.read_text(encoding="utf-8") != gen_mod.serialize(doc):
+            stale.append(f"  {slug}/sot.json drifted from generator output")
+    # Symmetric guard: a committed sot.json whose collection the generator no longer
+    # produces (e.g. its identity.json was removed) would otherwise pass unseen.
+    committed = {p.parent.name for p in _COLLECTIONS_DIR.glob("*/sot.json")}
+    for orphaned in sorted(committed - set(documents)):
+        stale.append(f"  {orphaned}/sot.json committed but slug no longer in generator output")
+    if stale:
+        return _fail(
+            name,
+            "collection sot.json is stale — run "
+            "`python wordpress-theme/skyyrose-flagship/data/build-collection-sot.py`",
+            stale,
+        )
+    return _ok(name, f"all {len(documents)} collection sot.json match fresh generator output")
+
+
+def check_no_hardcoded_product_images() -> CheckResult:
+    """Fail if any template hardcodes an `/images/products/...` path literal.
+
+    Templates must resolve product imagery through ``skyyrose_sot_product_image_uri()``
+    (inc/collection-sot-reader.php), so the homepage/landing tiles follow the SOT and
+    cannot silently drift to a stale or wrong asset — the front-page commercial-runway
+    regression (a phantom-subdir 404 on the br-006 jacket) is exactly what this guards.
+    ``inc/`` is excluded: it holds the resolver itself.
+    """
+    name = "no_hardcoded_product_images"
+    if not _THEME_DIR.exists():
+        return _fail(name, f"theme dir not found: {_THEME_DIR}")
+
+    offenders: list[str] = []
+    seen: set[Path] = set()
+    for pattern in _TEMPLATE_GLOBS:
+        for php in sorted(_THEME_DIR.glob(pattern)):
+            if php in seen or not php.is_file():
+                continue
+            seen.add(php)
+            try:
+                text = php.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            try:
+                rel = php.relative_to(_REPO_ROOT)
+            except ValueError:
+                rel = php
+            for lineno, line in enumerate(text.splitlines(), start=1):
+                if _HARDCODED_PRODUCT_IMG_RE.search(line):
+                    offenders.append(f"{rel}:{lineno}")
+
+    if offenders:
+        return _fail(
+            name,
+            f"{len(offenders)} hardcoded product-image path(s) — resolve via "
+            "skyyrose_sot_product_image_uri() instead",
+            details=offenders[:50],
+        )
+    return _ok(name, "no hardcoded product-image paths in templates")
+
+
 # ---------------------------------------------------------------------------
 # Check registry
 # ---------------------------------------------------------------------------
@@ -807,10 +993,16 @@ ALL_CHECKS: dict[str, Any] = {
     "retired_sku_guard": check_retired_sku_guard,
     "dossier_slugs": check_dossier_slugs,
     "brand_primary": check_brand_primary,
-    "no_hardcoded_product_images": check_no_hardcoded_product_images,
     "preorder_consistency": check_preorder_consistency,
+    "price_positive": check_price_positive,
+    "collection_enum": check_collection_enum,
+    "unique_skus": check_unique_skus,
+    "dossier_present": check_dossier_present,
+    "badge_enum": check_badge_enum,
     "v7_cards_current": check_v7_cards_current,
     "sot_images_current": check_sot_images_current,
+    "collection_sot_current": check_collection_sot_current,
+    "no_hardcoded_product_images": check_no_hardcoded_product_images,
 }
 
 # Checks that must pass before others can meaningfully run

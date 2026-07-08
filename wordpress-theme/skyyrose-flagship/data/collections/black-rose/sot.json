@@ -109,6 +109,20 @@
         "kind": "collection-hero-art",
         "status": "verified",
         "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-courtyard",
+        "resolved": "images/immersive/scene-black-rose-courtyard.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR courtyard immersive scene still \u2014 crop of night-editorial master."
+      },
+      {
+        "path": "images/immersive/scene-black-rose-gazebo",
+        "resolved": "images/immersive/scene-black-rose-gazebo.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "BR gazebo immersive scene still."
       }
     ],
     "patches": [
@@ -243,12 +257,12 @@
           "resolved": "images/products/br-003-onmodel.webp"
         },
         "back_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-back-model.webp"
+          "path": "assets/images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp",
+          "resolved": "images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-back-model.webp"
+          "path": "assets/images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp",
+          "resolved": "images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic.md",
@@ -324,12 +338,12 @@
           "resolved": "images/products/br-006-onmodel.webp"
         },
         "back_image": {
-          "path": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
-          "resolved": "images/products/black-rose-sherpa-jacket-back-model.webp"
+          "path": "assets/images/products/black-rose-sherpa-jacket-back.jpg",
+          "resolved": "images/products/black-rose-sherpa-jacket-back.jpg"
         },
         "back_model_image": {
-          "path": "assets/images/products/black-rose-sherpa-jacket-back-model.webp",
-          "resolved": "images/products/black-rose-sherpa-jacket-back-model.webp"
+          "path": "assets/images/products/black-rose-sherpa-jacket-back.jpg",
+          "resolved": "images/products/black-rose-sherpa-jacket-back.jpg"
         }
       },
       "dossier": "data/dossiers/black-rose-sherpa-jacket.md",
@@ -347,16 +361,16 @@
           "resolved": "images/products/br-007.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/br-007-ghost-front.webp",
-          "resolved": "images/products/ghost/br-007-ghost-front.webp"
+          "path": "assets/images/products/hub/br-007-front.webp",
+          "resolved": "images/products/hub/br-007-front.webp"
         },
         "back_image": {
           "path": "assets/images/products/br-007-real-back.jpg",
           "resolved": "images/products/br-007-real-back.jpg"
         },
         "back_model_image": {
-          "path": "assets/images/products/black-rose-love-hurts-basketball-shorts-back-model.webp",
-          "resolved": "images/products/black-rose-love-hurts-basketball-shorts-back-model.webp"
+          "path": "assets/images/products/hub/br-007-back.webp",
+          "resolved": "images/products/hub/br-007-back.webp"
         }
       },
       "dossier": "data/dossiers/black-rose-x-love-hurts-basketball-shorts.md",
@@ -451,8 +465,8 @@
           "resolved": "images/products/black-is-beautiful-hockey-jersey-back-model.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/jersey-the-rose-hockey-back-model.webp",
-          "resolved": "images/products/jersey-the-rose-hockey-back-model.webp"
+          "path": "assets/images/products/br-011-the-rose-hockey-back.webp",
+          "resolved": "images/products/br-011-the-rose-hockey-back.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md",
@@ -478,8 +492,8 @@
           "resolved": "images/products/br-012-last-oakland-baseball-back.jpeg"
         },
         "back_model_image": {
-          "path": "assets/images/products/jersey-last-oakland-baseball-back-model.webp",
-          "resolved": "images/products/jersey-last-oakland-baseball-back-model.webp"
+          "path": "assets/images/products/br-012-last-oakland-baseball-back.webp",
+          "resolved": "images/products/br-012-last-oakland-baseball-back.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-5-last-oakland-baseball.md",
@@ -489,7 +503,7 @@
       "sku": "br-014",
       "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
       "price": "100",
-      "is_preorder": false,
+      "is_preorder": true,
       "published": true,
       "images": {
         "image": {
@@ -501,8 +515,8 @@
           "resolved": "images/products/br-014-onmodel.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-giants-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-giants-back-model.webp"
+          "path": "assets/images/products/br-014-giants-back.webp",
+          "resolved": "images/products/br-014-giants-back.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-giants.md",
@@ -512,7 +526,7 @@
       "sku": "br-015",
       "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
       "price": "100",
-      "is_preorder": false,
+      "is_preorder": true,
       "published": true,
       "images": {
         "image": {
@@ -524,8 +538,8 @@
           "resolved": "images/products/br-015-onmodel.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/black-is-beautiful-jersey-white-back-model.webp",
-          "resolved": "images/products/black-is-beautiful-jersey-white-back-model.webp"
+          "path": "assets/images/products/black-is-beautiful-jersey-white/black-is-beautiful-jersey-white-back-model.webp",
+          "resolved": "images/products/black-is-beautiful-jersey-white/black-is-beautiful-jersey-white-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",

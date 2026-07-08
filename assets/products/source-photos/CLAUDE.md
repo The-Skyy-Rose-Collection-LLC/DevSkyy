@@ -7,7 +7,7 @@ Raw source photography, organized by collection slug: `black-rose/`, `signature/
 
 - **Naming:** `{sku}-{variant}.{ext}` — e.g. `br-001-front.jpg`, `br-001-back.jpg`. Use the real SKU from the catalog CSV; never invent one.
 - These are SOURCE files — NOT served directly by the theme and NOT committed to WooCommerce.
-- **After adding/changing files, run `make sot-manifest`** to regenerate the SOT image manifest. Every surface resolves a SKU's image through `skyyrose.core.sot_images.resolve_image()` (`sot_images.py:98`) — front-first — never a hardcoded path.
+- **After adding/changing files, run `make sot-manifest`** to regenerate the SOT image manifest. Every surface resolves a SKU's image through `skyyrose.core.sot_images.resolve_image()` (`sot_images.py:103`) — front-first — never a hardcoded path.
 
 ## Fidelity gate (mandatory)
 

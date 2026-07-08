@@ -342,17 +342,21 @@
 .page-enter {
 	animation: pageEnter 0.5s var(--ease-cinematic) forwards;
 }
+/* Opacity-only by design: these run on <body>, and a transform keyframe held
+   by fill-mode:forwards makes body a containing block forever — every
+   position:fixed descendant (Skyy mascot, modals) anchors to the page
+   instead of the viewport. Never reintroduce transforms here. */
 @keyframes pageEnter {
-	from { opacity: 0; transform: translateY(12px); }
-	to { opacity: 1; transform: translateY(0); }
+	from { opacity: 0; }
+	to { opacity: 1; }
 }
 
 .page-exit {
 	animation: pageExit 0.3s var(--ease-whip) forwards;
 }
 @keyframes pageExit {
-	from { opacity: 1; transform: translateY(0); }
-	to { opacity: 0; transform: translateY(-12px); }
+	from { opacity: 1; }
+	to { opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

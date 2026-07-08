@@ -274,7 +274,7 @@ redis-cli GET devskyy:dlq:task-xxx
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+pip install -e ".[all]"
 
 # Set environment
 export REDIS_URL=redis://localhost:6379/0
