@@ -149,7 +149,7 @@ aws logs tail /aws/lambda/skyyrose-api --since 2h --format short > incident-clou
 
    ```bash
    # Update dependencies
-   pip install --upgrade -r requirements.txt
+   pip install --upgrade -e ".[all]"
    npm audit fix
 
    # Apply security patches

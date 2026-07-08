@@ -45,7 +45,7 @@ RAG/retrieval: `catalog_retriever.py`, `vector_store.py`, `reranker.py`, `embedd
 
 ## services/ — business logic
 
-`analytics/`, `competitive/`, `forecasting/`(demand), `lifecycle/`(retention), `ml/`(gemini_client, `enhancement/`, `prompts/`, `schemas/`), `notifications/`, `personalization/`(recommender), `risk/`(fraud), `storage/`(r2_client, version_manager), `three_d/`(provider_factory, `trellis/`). Root: `ai_image_enhancement.py`, `approval_queue_manager.py`, `image_deduplication.py`, `image_ingestion.py`, `rag_anything_service.py`.
+`analytics/`, `competitive/`, `forecasting/`(demand), `lifecycle/`(retention), `ml/`(gemini_client, `enhancement/`, `prompts/`, `schemas/`), `notifications/`, `personalization/`(recommender), `risk/`(fraud), `storage/`(r2_client, version_manager), `three_d/`(provider_factory, `trellis/`). Root: `approval_queue_manager.py`, `image_deduplication.py`, `image_ingestion.py`, `rag_anything_service.py`.
 
 ## Testing
 

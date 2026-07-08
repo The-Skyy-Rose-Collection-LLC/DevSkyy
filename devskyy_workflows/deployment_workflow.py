@@ -361,7 +361,7 @@ class DeploymentWorkflow:
             deployment_config = {
                 "staging": {
                     "url": os.environ.get("STAGING_URL", "https://staging.devskyy.com"),
-                    "compose_file": "docker-compose.staging.yml",
+                    "compose_file": "docker-compose.yml",  # staging compose deleted 2026-07-07 (orphaned); base compose is the only real file
                     "kubectl_context": "staging-cluster",
                 },
                 "production": {
@@ -555,7 +555,7 @@ class DeploymentWorkflow:
 
             # Fallback: docker-compose with previous image
             compose_files = {
-                "staging": "docker-compose.staging.yml",
+                "staging": "docker-compose.yml",  # staging compose deleted 2026-07-07 (orphaned)
                 "production": "docker-compose.prod.yml",
                 "development": "docker-compose.yml",
             }

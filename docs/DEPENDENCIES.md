@@ -184,8 +184,6 @@ Includes: torch, torchvision, torchaudio, huggingface-hub, pandas, scikit-learn,
 |---------|---------|---------|
 | `sharp` | ^0.34.5 | Image processing |
 | `pica` | ^9.0.1 | Image resizing |
-| `blurhash` | ^2.0.5 | Image placeholders |
-| `react-blurhash` | ^0.3.0 | React blurhash |
 | `@vercel/og` | ^0.8.6 | OG image generation |
 
 ### WordPress Ecosystem

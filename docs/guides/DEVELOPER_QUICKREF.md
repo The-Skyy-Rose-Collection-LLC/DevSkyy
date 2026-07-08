@@ -114,7 +114,7 @@ black . --line-length 88
 mypy . --ignore-missing-imports
 
 # Update dependencies
-pip install -r requirements.txt --upgrade
+pip install -e ".[all]" --upgrade
 ```
 
 ## 📊 Status Checks
@@ -288,7 +288,7 @@ pytest -m "not slow"
 pre-commit autoupdate
 
 # Update Python dependencies
-pip install -r requirements.txt --upgrade
+pip install -e ".[all]" --upgrade
 
 # Update Node.js dependencies
 npm update

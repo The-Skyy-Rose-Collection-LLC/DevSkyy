@@ -47,7 +47,7 @@ warn_if_missing() {
 
 echo "📁 Core Configuration Files"
 echo "----------------------------"
-check_file "requirements.txt"
+check_file "pyproject.toml"
 check_file "package.json"
 check_file "Dockerfile"
 check_file "Dockerfile.worker"
@@ -293,7 +293,7 @@ if [ $ERRORS -eq 0 ]; then
     echo -e "${GREEN}✅ Ready to build!${NC}"
     echo ""
     echo "Next steps:"
-    echo "  1. Install dependencies: npm install && pip install -r requirements.txt"
+    echo "  1. Install dependencies: npm install && pip install -e \".[all]\""
     echo "  2. Build images: docker-compose build"
     echo "  3. Start services: docker-compose up -d"
     echo "  4. Check logs: docker-compose logs -f"

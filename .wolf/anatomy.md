@@ -31,7 +31,6 @@
 - `deployment_summary.json` (~406 tok)
 - `DESIGN.md` — Design System Inspired by Claude (Anthropic) (~5031 tok)
 - `devskyy_mcp.py` (~1153 tok)
-- `docker-compose.staging.yml` — Docker Compose: 14 services (~3431 tok)
 - `docker-compose.yml` — production stack: postgres/redis/app/worker/elite-worker + monitoring & proxy profiles; one devskyy:local image, fail-loud secrets (~2000 tok)
 - `docker-entrypoint.sh` — startup script; generates JWT/ENC keys if unset, then dispatches a passed command (worker) or defaults to uvicorn (~1100 tok)
 - `Dockerfile` — multi-stage Python image (builder + non-root runtime), `COPY . .` + allowlist .dockerignore, INSTALL_TARGET arg, tini PID1; one image for app+workers (~1200 tok)
@@ -57,11 +56,8 @@
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
 - `render-review.html` — all-engines render keep/delete QC sheet, 1719 inline `<img>` across 18 engine groups (HUB/source/OAI/Gemini/FLUX/Tripo/LoRA/legacy/…); localStorage marks + Blob delete-list download; works over file:// (plain images, no decoder), file://-robust via per-img "⚠ file missing" badge + accurate note (~190000 tok — do NOT full-read; edit by anchor) (~190k tok)
-- `requirements-dev.txt` — Development Dependencies (~85 tok)
-- `requirements-full.txt` — DevSkyy - Full ML/3D Dependencies (~46 tok)
 - `requirements-imagery.txt` — Nano Banana 2 — SkyyRose AI Image Pipeline (~130 tok)
 - `requirements-trellis.txt` — TRELLIS clothing 3D pipeline dependencies (~326 tok)
-- `requirements.txt` — Python dependencies (~109 tok)
 - `run_generation.sh` (~179 tok)
 - `skills-lock.json` (~3208 tok)
 - `skyyrose_clothing_barcodes.txt` (~459 tok)
@@ -860,8 +856,6 @@
 ## api/v1/
 
 - `__init__.py` — API v1 Package. (~766 tok)
-- `ai_enhancement.py` — URL configuration (~2728 tok)
-- `ai_image_enhancement.py` — API: POST, GET (5 endpoints) (~2963 tok)
 - `approval.py` — Approval queue API endpoints. (~3846 tok)
 - `assets.py` — Asset Processing API Endpoints. (~11886 tok)
 - `autonomous.py` — API: GET, POST (4 endpoints) (~1814 tok)
@@ -2896,8 +2890,8 @@
 - `VISUAL_RECOGNITION_README.md` — Visual Product Recognition for SkyyRose (~1700 tok)
 - `wc_trash_extras.py` — Trash WC products that exist on skyyrose.co but not in canonical CSV. (~1246 tok)
 - `webp_converter.sh` — ############################################################################## (~2321 tok)
+- `wolf_bug_id.py` — allocates the next .wolf/buglog.json bug-NNN ID (`next_id`) and detects duplicate IDs (`find_duplicates`, `--check`); stdlib-only (~350 tok)
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
-- `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
 - `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
 - `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~688 tok)
@@ -3132,7 +3126,6 @@
 ## services/
 
 - `__init__.py` — services/__init__.py (~258 tok)
-- `ai_image_enhancement.py` — LuxuryImageEnhancer: remove_background, upscale_image, generate_product_image, interrogate_image + 4 more (~3204 tok)
 - `approval_queue_manager.py` — Approval queue manager for WordPress media sync. (~6631 tok)
 - `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~997 tok)
 - `image_deduplication.py` — Image deduplication service using content hashing. (~2915 tok)
