@@ -4035,7 +4035,7 @@ Active-state driver: GSAP ScrollTrigger create() per item (onEnter/onEnterBack, 
 ## OpenAI ChatGPT product feed (2026-07-08)
 
 - `docs/integrations/openai-product-feed-spec.md` — Full field-by-field OpenAI Commerce "Stable" file-upload product feed spec, fetched from developers.openai.com/commerce/specs/file-upload/products; 15 schema groups, required-field summary. (~2.4k tok)
-- `docs/integrations/openai-feed-compliance-report.md` — Live audit: 18/33 catalog SKUs feed-ready today; sole blocker = 15 pre-order SKUs missing `availability_date` (no source anywhere in stack). Field matrix, per-product issue list, CSV drift, remediation list. (~2.9k tok)
+- `docs/integrations/openai-feed-compliance-report.md` — Live audit: 18/33 catalog SKUs pass required fields today (blocker #1 = 15 pre-order SKUs missing `availability_date`, framed as a founder trade-off vs mapping to `backorder`); blocker #2 = `image_url` resolves JPEG or WebP depending on requester Accept header (Photon negotiation over native-WebP origin, verified via curl) — cross-cutting risk on all 33, unresolved, founder/eng decision needed. Field matrix, per-product issue list, CSV drift, remediation list. (~3.6k tok)
 - `data/audits/openai-feed/wc-products-2026-07-08.json` — Raw pretty-printed WC REST v3 snapshot (35 products incl. variations placeholder), reproducible audit input. (~180k tok, don't read whole — query with python/jq)
 - `scripts/openai_feed/__init__.py` — Package docstring only.
 - `scripts/openai_feed/constants.py` — `FeedConstants` dataclass (brand/seller/return-policy/geo constants + is_eligible_* flags, checkout defaults False), `REQUIRED_FIELDS`/`CHECKOUT_REQUIRED_FIELDS`/`VALID_AVAILABILITY`/`CSV_COLUMNS`. (~500 tok)
