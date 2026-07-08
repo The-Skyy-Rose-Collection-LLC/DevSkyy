@@ -67,7 +67,13 @@ assets
 /claude-context
 /editorial-staging
 /renders
-/wordpress-theme
+# wordpress-theme excluded EXCEPT the SOT catalog data dir — frontend/lib/catalog.ts
+# resolves wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv at build+runtime
+# (gitignore semantics: a file under an excluded dir can't be re-included, hence the /* ladder)
+/wordpress-theme/*
+!/wordpress-theme/skyyrose-flagship
+/wordpress-theme/skyyrose-flagship/*
+!/wordpress-theme/skyyrose-flagship/data
 /source-products
 /brand-assets
 /cerebrum
@@ -79,7 +85,9 @@ assets
 /.husky
 /.planning
 /.openwolf
-/data
+# data excluded EXCEPT sot-images.json — frontend/lib/sot-images.ts reads data/sot-images.json
+/data/*
+!/data/sot-images.json
 /eval
 /knowledge-base
 /orchestration
