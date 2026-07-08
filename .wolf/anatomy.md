@@ -860,7 +860,6 @@
 ## api/v1/
 
 - `__init__.py` — API v1 Package. (~766 tok)
-- `ai_image_enhancement.py` — API: POST, GET (5 endpoints) (~2963 tok)
 - `approval.py` — Approval queue API endpoints. (~3846 tok)
 - `assets.py` — Asset Processing API Endpoints. (~11886 tok)
 - `autonomous.py` — API: GET, POST (4 endpoints) (~1814 tok)
@@ -2896,7 +2895,6 @@
 - `wc_trash_extras.py` — Trash WC products that exist on skyyrose.co but not in canonical CSV. (~1246 tok)
 - `webp_converter.sh` — ############################################################################## (~2321 tok)
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
-- `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
 - `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
 - `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~688 tok)
@@ -3131,7 +3129,6 @@
 ## services/
 
 - `__init__.py` — services/__init__.py (~258 tok)
-- `ai_image_enhancement.py` — LuxuryImageEnhancer: remove_background, upscale_image, generate_product_image, interrogate_image + 4 more (~3204 tok)
 - `approval_queue_manager.py` — Approval queue manager for WordPress media sync. (~6631 tok)
 - `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~997 tok)
 - `image_deduplication.py` — Image deduplication service using content hashing. (~2915 tok)
