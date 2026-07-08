@@ -59,7 +59,12 @@ function skyyrose_send_security_headers() {
 		// do NOT re-add api-eu.mixpanel.com here.
 		// requires verified Elementor source — using CSP allowlist as the guaranteed path.
 		// If future Elementor versions expose a stable opt-out filter, prefer that approach.
-		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
+		// blob: is required by three.js GLTFLoader — embedded GLB textures are
+		// extracted to blob URLs and loaded via fetch()/ImageBitmapLoader,
+		// which CSP governs under connect-src (NOT img-src). Without it the
+		// mascot renders as an untextured white silhouette. blob: URLs are
+		// same-context in-memory objects — no external request surface.
+		"connect-src 'self' blob: https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
 		// wordpress.com frame: required for Jetpack / WP.com widget iframes.
 		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com https://wordpress.com https://js.stripe.com",
 		"frame-ancestors 'self'",

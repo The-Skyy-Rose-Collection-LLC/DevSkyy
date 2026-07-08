@@ -233,20 +233,25 @@
 			function ( gltf ) {
 				var model = gltf.scene;
 
-				// Centre model at origin
+				// Scale FIRST, then centre from a recomputed box — the offsets
+				// must be in post-scale units. Computing them pre-scale displaces
+				// the model by the scale factor (she floated in the top half of
+				// the canvas whenever the source GLB wasn't already 1.8u tall).
+				var size = new THREE.Box3().setFromObject( model ).getSize( new THREE.Vector3() );
+				model.scale.setScalar( 1.8 / size.y );
 				var box = new THREE.Box3().setFromObject( model );
 				var centre = box.getCenter( new THREE.Vector3() );
-				model.position.sub( centre );
-				model.position.y = -( box.min.y - centre.y );
-
-				// Auto-scale to fit within ~1.8 units height
-				var size = box.getSize( new THREE.Vector3() );
-				var scale = 1.8 / size.y;
-				model.scale.setScalar( scale );
+				model.position.x -= centre.x;
+				model.position.z -= centre.z;
+				model.position.y -= box.min.y; // feet on the origin plane
 
 				// Enable shadows + PBR materials
 				model.traverse( function ( child ) {
 					if ( child.isMesh ) {
+						// Skinned mesh + baked clips: the static bounding sphere
+						// leaves the frustum mid-walk and the whole mesh vanishes
+						// unless culling is disabled.
+						if ( child.isSkinnedMesh ) child.frustumCulled = false;
 						child.castShadow    = false;
 						child.receiveShadow = false;
 						if ( child.material ) {
