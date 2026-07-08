@@ -3907,3 +3907,10 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `wordpress-theme/skyyrose-flagship/inc/collection-sot-reader.php` — collection sot.json reader + per-SKU product-image resolver `skyyrose_sot_product_image(_uri)($sku,$view)` (front-first, CSV fallback, placeholder). ~330t
 - `test_sot_assets_tracked.py` — tests/test_sot_assets_tracked.py -- Census guard: every image path in sot-images.json / collection sot.json / catalog CSV must be a git-tracked blob (bug-175 class) (~700 tok)
 - `skyyrose-anon-cache-guard.php` — wordpress/mu-plugins/skyyrose-anon-cache-guard.php -- WC session-handler swap + cart-cookie suppression on anonymous cacheable GETs; unblocks Batcache edge caching (TTFB 1.8s→0.06s) (~1300 tok)
+
+## Root reorg 2026-07-07 (path deltas)
+- Root screenshots/QA artifacts (98) → `screenshots/root-audit/`
+- `CONTEXT.md` `DESIGN.md` `REMEDIATION_MAP.md` → `docs/`; `G1-BUNDLE.md` `HANDOFF.md` `INITIAL*.md` `.impeccable.md` `.plugin-fix-complete` → `docs/archive/2026/`
+- `setup-claude-config.sh` `claude-mem-settings.sh` `install_agy.sh` `run_generation.sh` `pre-build-check.sh` → `scripts/`; `autonomous_agent_demo.py` → `examples/`
+- `redirects.csv` `skyyrose_clothing_barcodes.txt` → `data/`; `autotrain_config.yaml` → `config/`; `deployment_summary.json` `wordpress-health-check-results.json` → `.reports/`
+- Domain config index: `SOT.md` → "Domain configuration map" (read that before old docs)
