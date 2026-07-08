@@ -93,4 +93,8 @@ docker compose --env-file .env.docker up -d --scale worker=3
 
 - `Dockerfile.mcp` — slim standalone MCP HTTP service (`mcp_service:app`, no ML
   stack), selected by `fly.toml` for Fly.io.
+- `Dockerfile.api` — slim production image for the full backend
+  (`main_enterprise:app`), installs `.[api]` only. Not yet wired into
+  `fly.toml`/compose — build and run it standalone, or point a deploy target
+  at it explicitly.
 - `deploy/clothing_3d/` — standalone 3D service, separate concern.
