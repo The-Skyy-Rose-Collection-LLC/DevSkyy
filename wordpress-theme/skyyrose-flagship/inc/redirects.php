@@ -46,7 +46,7 @@ function skyyrose_canonical_collection_slugs() {
  * the LOCKED canonical URL for every collection. The underlying WordPress
  * pages still carry their legacy collection-{slug} slugs, so these rewrites
  * resolve the canonical routes without touching site state. The follow-up
- * page-slug migration is logged in REMEDIATION_MAP.md.
+ * page-slug migration is logged in docs/REMEDIATION_MAP.md.
  *
  * Requires a permalink flush on deploy (HG-4).
  *
