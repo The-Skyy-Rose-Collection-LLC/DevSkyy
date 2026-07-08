@@ -33,17 +33,17 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Install Python deps first so layer cache survives source changes.
-COPY requirements.txt requirements-trellis.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt -r requirements-trellis.txt redis
-
-# Application source (only what the worker actually needs).
-COPY pyproject.toml /app/
+# Application source (only what the worker actually needs). Copied before the
+# pip install below because `pip install -e .` needs pyproject.toml + the
+# package source present to resolve the editable install.
+COPY pyproject.toml requirements-trellis.txt /app/
 COPY core/ /app/core/
 COPY services/ /app/services/
 COPY pipelines/ /app/pipelines/
 COPY agents/ /app/agents/
 COPY security/ /app/security/
+
+RUN pip install --no-cache-dir -e ".[ml]" -r requirements-trellis.txt redis
 
 RUN mkdir -p "$THREE_D_OUTPUT_DIR" "$TRELLIS_CACHE_DIR"
 
