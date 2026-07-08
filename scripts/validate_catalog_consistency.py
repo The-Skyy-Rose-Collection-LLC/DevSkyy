@@ -52,7 +52,6 @@ from __future__ import annotations
 
 import argparse
 import ast
-import csv
 import json
 import re
 import sys
@@ -155,12 +154,21 @@ def _fail(name: str, msg: str, details: list[str] | None = None) -> CheckResult:
 
 
 def _load_csv() -> list[dict[str, str]] | None:
-    """Load catalog CSV; returns None on error."""
+    """Load catalog CSV via the canonical loader; returns None on error.
+
+    Delegates to ``skyyrose.core.catalog_loader.read_catalog_rows()`` so both
+    this validator and the downstream pipeline use a single read path.
+    ``read_catalog_rows`` is @cached and returns a shared read-only list — callers
+    must not mutate it.
+    """
     if not _CATALOG_CSV.exists():
         return None
     try:
-        with _CATALOG_CSV.open(newline="", encoding="utf-8") as fh:
-            return list(csv.DictReader(fh))
+        if str(_REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(_REPO_ROOT))
+        from skyyrose.core.catalog_loader import read_catalog_rows
+
+        return list(read_catalog_rows(_CATALOG_CSV))
     except Exception:
         return None
 
@@ -684,6 +692,114 @@ def check_preorder_consistency() -> CheckResult:
     return _ok(name, "badge and is_preorder agree for all SKUs")
 
 
+def check_price_positive() -> CheckResult:
+    """Every published row must have an integer price > 0."""
+    name = "price_positive"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check prices — CSV not readable")
+
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    from skyyrose.core.catalog_loader import bool_col, int_col
+
+    bad: list[str] = []
+    for row in rows:
+        if not bool_col(row, "published"):
+            continue
+        price = int_col(row, "price")
+        if price is None or price <= 0:
+            raw = row.get("price", "")
+            bad.append(
+                f"  {row.get('sku', '?')}: published=1 but price={raw!r} (must be integer > 0)"
+            )
+    if bad:
+        return _fail(name, f"{len(bad)} published SKU(s) have non-positive price", bad)
+    published_count = sum(1 for row in rows if bool_col(row, "published"))
+    return _ok(name, f"All {published_count} published SKUs have a positive integer price")
+
+
+def check_collection_enum() -> CheckResult:
+    """Every row's collection must be one of the four canonical values."""
+    name = "collection_enum"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check collections — CSV not readable")
+
+    valid = frozenset({"signature", "black-rose", "love-hurts", "kids-capsule"})
+    bad: list[str] = []
+    for row in rows:
+        col = (row.get("collection") or "").strip()
+        if col not in valid:
+            bad.append(f"  {row.get('sku', '?')}: collection={col!r} (valid: {sorted(valid)})")
+    if bad:
+        return _fail(name, f"{len(bad)} SKU(s) have an invalid collection value", bad)
+    return _ok(name, f"All {len(rows)} SKUs have a valid collection value")
+
+
+def check_unique_skus() -> CheckResult:
+    """No two rows may share the same SKU."""
+    name = "unique_skus"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check uniqueness — CSV not readable")
+
+    seen: dict[str, int] = {}
+    dups: list[str] = []
+    for i, row in enumerate(rows, 1):
+        sku = (row.get("sku") or "").strip()
+        if sku in seen:
+            dups.append(f"  {sku!r}: first at row {seen[sku]}, again at row {i}")
+        else:
+            seen[sku] = i
+    if dups:
+        return _fail(name, f"{len(dups)} duplicate SKU(s) found", dups)
+    return _ok(name, f"All {len(rows)} SKUs are unique")
+
+
+def check_dossier_present() -> CheckResult:
+    """Every row must have a non-empty dossier_slug (regardless of whether the file exists).
+
+    This is stronger than ``dossier_slugs``, which validates that non-empty slugs resolve
+    to a file. This check asserts that *every* SKU declares a slug in the first place.
+    """
+    name = "dossier_present"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check dossier presence — CSV not readable")
+
+    missing: list[str] = []
+    for row in rows:
+        slug = (row.get("dossier_slug") or "").strip()
+        if not slug:
+            missing.append(f"  {row.get('sku', '?')}: dossier_slug is blank")
+    if missing:
+        return _fail(
+            name,
+            f"{len(missing)} SKU(s) are missing a dossier_slug value",
+            missing,
+        )
+    return _ok(name, f"All {len(rows)} SKUs have a non-empty dossier_slug")
+
+
+def check_badge_enum() -> CheckResult:
+    """Every badge value must be either '' or 'Pre-Order' (the only values the catalog uses)."""
+    name = "badge_enum"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check badges — CSV not readable")
+
+    valid = frozenset({"", "Pre-Order"})
+    bad: list[str] = []
+    for row in rows:
+        badge = (row.get("badge") or "").strip()
+        if badge not in valid:
+            bad.append(f"  {row.get('sku', '?')}: badge={badge!r} (valid: {sorted(valid)!r})")
+    if bad:
+        return _fail(name, f"{len(bad)} SKU(s) have an invalid badge value", bad)
+    return _ok(name, f"All {len(rows)} SKUs have a valid badge value")
+
+
 def check_v7_cards_current() -> CheckResult:
     """Verify v7-cards.json equals fresh generator output (no hand-drift).
 
@@ -878,6 +994,11 @@ ALL_CHECKS: dict[str, Any] = {
     "dossier_slugs": check_dossier_slugs,
     "brand_primary": check_brand_primary,
     "preorder_consistency": check_preorder_consistency,
+    "price_positive": check_price_positive,
+    "collection_enum": check_collection_enum,
+    "unique_skus": check_unique_skus,
+    "dossier_present": check_dossier_present,
+    "badge_enum": check_badge_enum,
     "v7_cards_current": check_v7_cards_current,
     "sot_images_current": check_sot_images_current,
     "collection_sot_current": check_collection_sot_current,
