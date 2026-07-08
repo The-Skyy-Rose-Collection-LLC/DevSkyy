@@ -2909,5 +2909,23 @@
       "warning",
       "request-deduplication"
     ]
+  },
+  {
+    "id": "bug-192",
+    "timestamp": "2026-07-07T23:15:00-07:00",
+    "error_message": "ModuleNotFoundError: psutil, then boto3, then langgraph — main_enterprise cannot import inside Dockerfile.api slim image",
+    "file": "pyproject.toml",
+    "root_cause": "Three unguarded hard imports reachable from main_enterprise were not in base deps: api/v1/monitoring.py:21 psutil (extra-only), integrations/__init__.py:6→cloudflare_r2_manager.py:6 boto3 (never declared anywhere; [all] had it transitively, CI installs it manually at ci.yml:142), orchestration/langgraph_integration.py:37 langgraph (mcp-extra-only). Worktree meta-path test passed because the shared .venv has all three; only a real in-container import probe could catch it. First stub-census was incomplete (aborted on from-import vs bare stub) — PEP-562 __getattr__ stubs needed for one-pass census.",
+    "fix": "Added psutil>=7.2.2, boto3>=1.34, langgraph>=0.2 to base [project.dependencies] with importer citations; re-proved [api] resolves torch-free; rebuilt image; in-container import probe clean.",
+    "tags": [
+      "docker",
+      "packaging",
+      "extras",
+      "slim-image",
+      "verification"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T23:15:00-07:00"
   }
 ]

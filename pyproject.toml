@@ -89,6 +89,9 @@ dependencies = [
 
     # Monitoring
     "prometheus-client>=0.19",
+    "psutil>=7.2.2",  # api/v1/monitoring.py:21 hard-imports; was only in an extra — broke .[api] image boot
+    "boto3>=1.34",  # integrations/cloudflare_r2_manager.py:6 hard-imports via integrations/__init__.py:6; was transitive-only in [all]
+    "langgraph>=0.2",  # orchestration/langgraph_integration.py:37 hard-imports (reached at boot via router from-imports); was mcp-extra-only
 
     # Utilities
     "python-dotenv>=1.0",
