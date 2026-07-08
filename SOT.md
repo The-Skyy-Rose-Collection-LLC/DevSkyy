@@ -27,6 +27,23 @@
 | `buglog.json` | `.wolf/buglog.json` | Known bugs + fixes. Read before fixing; append after fixing. |
 | — (gitignored, not symlinked) | `.wolf/memory.md` | Per-action session log. |
 
+## Domain configuration map (current-state, token-cheap)
+
+> **Rule: config questions resolve HERE, not in old docs.** For any domain below, read only the files in its row.
+> `docs/archive/`, `tasks/`, and root-level handoff docs are **historical** — never source configuration,
+> paths, or commands from them. (Root was reorganized 2026-07-07; pre-that paths in archived docs are stale.)
+
+| Domain | Canonical config | Entry points | Commands |
+|---|---|---|---|
+| **Python API** | `pyproject.toml`, `requirements.txt` (+`-dev`,`-full`), `mypy.ini`, `pyrightconfig.json`, `conftest.py`, `alembic.ini`, `.env` / `.env.example` | `main_enterprise.py` | `make install` · `make test` · `make format` · `make lint` |
+| **Frontend dashboard** | `frontend/package.json`, root `vercel.json`, `eslint.config.mjs`, `.nvmrc` | `frontend/` (Next.js 16 / React 19) | `cd frontend && npm run dev` · `npm run build` |
+| **WordPress theme** | `wordpress-theme/skyyrose-flagship/style.css` (version), `.phpcs.xml`, `theme.json`, `.env.wordpress` | `wordpress-theme/skyyrose-flagship/` | `cd wordpress-theme && npm run deploy` · `npm run lint:php` — serve `.min`: rebuild after CSS/JS edits |
+| **Imagery (OAI gpt-image-2)** | `requirements-imagery.txt`, `.env.hf`, judge envs `.env.judge-{gemini-vision,gpt-vision,opus-thinking}` | `scripts/oai-render-run.py`, engine `scripts/oai_render/` | `dry-run --sku <sku>`; paid `generate` needs `--yes` (STOP-AND-SHOW) |
+| **MCP / agents** | `.mcp.json`, `fastmcp.config.json`, `requirements-mcp.txt`, `skills-lock.json` | `devskyy_mcp.py`, `mcp_service.py`, `agents/base_super_agent/agent.py` | `docker compose up -d` (API) |
+| **Infra / deploy** | `Dockerfile`(+`.mcp`), `docker-compose.yml`(+`.staging`), `fly.toml`, `nginx*.conf`, `init.sql`, `prometheus.yml`, `.env.docker` | `scripts/deploy-theme.sh`, `scripts/deploy_hf_spaces.sh` | see `CLAUDE.md` → Deploy table |
+| **Data / one-off tooling** | `data/redirects.csv`, `data/skyyrose_clothing_barcodes.txt`, `config/autotrain_config.yaml` | consumers: `scripts/structural_audit.py`, `scripts/generate_clothing_barcodes.py`, `scripts/training/finetune_pipeline.py` | generated reports land in `.reports/` |
+| **Docs** | current: `README.md`, `CLAUDE.md`, `SOT.md`, `CHANGELOG.md`, `docs/` | — | historical: `docs/archive/`, `tasks/` (read-only context, never config) |
+
 ## Picking the right verification
 
 The check must match the *kind* of claim (full matrix in `CLAUDE.md` → "Verification Protocol"):
