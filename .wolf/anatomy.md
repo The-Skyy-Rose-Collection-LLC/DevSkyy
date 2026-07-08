@@ -860,7 +860,6 @@
 ## api/v1/
 
 - `__init__.py` — API v1 Package. (~766 tok)
-- `ai_enhancement.py` — URL configuration (~2728 tok)
 - `ai_image_enhancement.py` — API: POST, GET (5 endpoints) (~2963 tok)
 - `approval.py` — Approval queue API endpoints. (~3846 tok)
 - `assets.py` — Asset Processing API Endpoints. (~11886 tok)
