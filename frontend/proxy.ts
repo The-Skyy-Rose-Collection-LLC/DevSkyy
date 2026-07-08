@@ -10,8 +10,12 @@
  *
  * Scope (see `config.matcher`):
  *   - GATED: every /admin/* route, and every /api/* route …
- *   - OPEN:  …EXCEPT /api/auth/* (NextAuth itself — gating it deadlocks login)
- *            and /api/checkout/* (the public storefront checkout endpoint).
+ *   - OPEN:  …EXCEPT /api/auth/* (NextAuth itself — gating it deadlocks login),
+ *            /api/checkout/* (the public storefront checkout endpoint), and
+ *            /api/webhooks/* (HMAC-verified inside the handler itself — a
+ *            NextAuth JWT gate here would 401 the sender before the
+ *            handler's own signature check ever runs; see
+ *            app/api/webhooks/woocommerce/route.ts).
  *   Public pages (/login, /collections, /pre-order, /checkout) are not matched.
  *
  * Every /api/* route here is consumed only by authenticated /admin pages, so an
@@ -42,9 +46,10 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/admin/:path*',
-    // All /api routes except NextAuth (`auth`) and the public checkout endpoint.
-    // No current API route name begins with "auth" or "checkout" other than
-    // those two, so the prefix exclusion is exact.
-    '/api/((?!auth|checkout).*)',
+    // All /api routes except NextAuth (`auth`), the public checkout endpoint,
+    // and webhooks (auth is HMAC-inside-handler, see comment above). No
+    // current API route name begins with "auth", "checkout", or "webhooks"
+    // other than those three, so the prefix exclusion is exact.
+    '/api/((?!auth|checkout|webhooks).*)',
   ],
 };
