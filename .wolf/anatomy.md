@@ -31,7 +31,6 @@
 - `deployment_summary.json` (~406 tok)
 - `DESIGN.md` — Design System Inspired by Claude (Anthropic) (~5031 tok)
 - `devskyy_mcp.py` (~1153 tok)
-- `docker-compose.staging.yml` — Docker Compose: 14 services (~3431 tok)
 - `docker-compose.yml` — production stack: postgres/redis/app/worker/elite-worker + monitoring & proxy profiles; one devskyy:local image, fail-loud secrets (~2000 tok)
 - `docker-entrypoint.sh` — startup script; generates JWT/ENC keys if unset, then dispatches a passed command (worker) or defaults to uvicorn (~1100 tok)
 - `Dockerfile` — multi-stage Python image (builder + non-root runtime), `COPY . .` + allowlist .dockerignore, INSTALL_TARGET arg, tini PID1; one image for app+workers (~1200 tok)
