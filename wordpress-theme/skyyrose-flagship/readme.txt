@@ -135,7 +135,17 @@ Typography, header layout, footer layout, and collection palette overrides are c
 
 == Changelog ==
 
+= 1.9.3 =
+* Mascot: first entrance now greets arrivals ~4.5s after load regardless of visitor activity (idle-only gating meant actively-browsing visitors never saw her); idle-triggered re-entries, session cap, dismissal, and recall pill unchanged
+
+= 1.9.2 =
+* Fix: page transitions (pageEnter/pageExit) are opacity-only — the held translateY keyframe on body made it a containing block, breaking position:fixed for the mascot and any fixed overlay
+
+= 1.9.1 =
+* Fix: Skyy 3D loader imports three.js via jsdelivr /+esm endpoints (bare 'three' specifiers in the jsm loaders are unresolvable without an importmap); version bump to cache-bust served assets
+
 = 1.9.0 =
+* Skyy 3D mascot site host: draco GLB character (6 animation clips), guide brain with Tier-1/Tier-2 answers, conversation-synced gestures, live-by-default via Customizer kill switch, checkout excluded, WCAG-conscious (reduced-motion static frame, Escape dismissal, recall pill)
 * Homepage: hero on-model scroll strip, featured/lookbook sections retired
 * Product pages: per-collection theming, editorial layout, sticky add-to-cart
 * Collection pages: product feature in pin-narrative stage, lookbook imagery

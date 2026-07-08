@@ -107,6 +107,12 @@ add-to-cart must still populate the cart (session starts on the wc-ajax POST).
 
 **Never trust the deploy command's exit code alone** — a broken pipe (e.g. piping deploy output through `grep`/`tail`) can report exit 0 on a failed transfer. Verify with a live-state check (`npm run deploy:verify` or a cache-busted `curl`), not just the shell exit status.
 
+Mascot (Skyy) post-deploy checks — each catches a real shipped regression (bugs 178/189/190/193):
+1. Any JS/CSS change is INERT until the `?ver=` version triple bumps — the edge caches assets by full URL.
+2. `getComputedStyle(document.body).transform` must be `'none'` — any body transform (even a keyframe held by `fill-mode: forwards`) silently re-anchors every `position: fixed` overlay to the page.
+3. Watch the `pageerror` channel, not just console — browser module failures (e.g. bare `'three'` import specifiers) never appear in console.error.
+4. Behavioral check must SIMULATE ACTIVITY: scroll + move the mouse continuously and assert the mascot still enters. A motionless headless page structurally cannot exhibit idle-gating bugs.
+
 ### Backend (Docker)
 
 ```bash
