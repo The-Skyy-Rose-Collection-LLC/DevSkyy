@@ -153,3 +153,8 @@ if unexplained modified files exist, assume a parallel session owns them.
 ## 2026-07-07 — Foreign staged index contaminates commits; scope-check BEFORE commit, not after
 - **What happened twice in one session** (workflow executor, then main thread): `git commit` after `git add <file>` commits the ENTIRE index — a concurrent session's staged changes (root-screenshot reorg) rode into ci.yml commit 7cd44c191, discovered only post-push with force-push blocked by our own new branch protection.
 - **Rule:** when `git status` shows staged work you didn't stage, run `git diff --cached --stat` immediately before EVERY commit, and prefer `git commit -- <paths>` (pathspec-limited) in any checkout another session may share. Forward-fix beats history rewrite: complete the foreign change coherently (here: commit the rename's delete half) rather than reverting someone's half-landed work.
+
+## 2026-07-07 — Drip-deploy is the anti-pattern the founder explicitly banned
+- Deployed 4 times, each fixing one bug found after the previous deploy. Founder: "stop bullshitting my token usage."
+- Rule (matches CLAUDE.md "deploy ONCE"): build the local prod-mirror FIRST, assert the full user-visible chain (not just HTTP/markup — computed styles, viewport geometry, pageerror channel, resource fetches), loop to ALL-PASS, then one deploy + one live re-verify.
+- Corollary: "deploy verified live" from the deploy script ≠ feature works — its checks are structural, not behavioral.

@@ -332,3 +332,13 @@ Standing rules (§14): authoritative sources only (trace every value to a master
 - `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
 - Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
 - NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.
+
+## P5 — Backend production home (run 20260707-4, started 2026-07-07)
+
+- [x] WS1 ml-extra: move transformers/sentence-transformers/chromadb/diffusers from base deps → `ml` extra; import-site guards; resolve proofs
+- [x] WS2 dockerfile-api: Dockerfile.api slim image ([api] on slimmed base); fail-loud DATABASE_URL in production (database/db.py:58)
+- [x] WS3 fly-backend: fly.backend.toml (devskyy-backend); CORS wildcard fix; Sentry sample-rate wiring; tasks/backend-golive-manifest.md (gated)
+- [x] Fable audit each branch (standing order), merge in order WS1→WS2→WS3
+- [x] Post-merge: real `docker build -f Dockerfile.api` proof (main thread)
+- [ ] GATED: fly apps create devskyy-backend + secrets + deploy + DNS repoint (STOP-AND-SHOW)
+- [ ] P6 GATED: MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md
