@@ -304,6 +304,15 @@ class DatabaseManager:
         if self._engine is not None:
             return
 
+        database_url_unset = not os.getenv("DATABASE_URL")
+        is_production = os.getenv("ENVIRONMENT", "").lower() == "production"
+        if database_url_unset and is_production:
+            raise RuntimeError(
+                "CRITICAL: DATABASE_URL is not set. Refusing to fall back to the "
+                "SQLite default in production — set DATABASE_URL before starting "
+                "the application."
+            )
+
         config = config or DatabaseConfig()
         # Normalize locally — don't mutate the caller's config object.
         db_url = _normalize_async_url(config.url)
