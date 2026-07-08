@@ -89,6 +89,9 @@ dependencies = [
 
     # Monitoring
     "prometheus-client>=0.19",
+    "psutil>=7.2.2",  # api/v1/monitoring.py:21 hard-imports; was only in an extra — broke .[api] image boot
+    "boto3>=1.34",  # integrations/cloudflare_r2_manager.py:6 hard-imports via integrations/__init__.py:6; was transitive-only in [all]
+    "langgraph>=0.2",  # orchestration/langgraph_integration.py:37 hard-imports (reached at boot via router from-imports); was mcp-extra-only
 
     # Utilities
     "python-dotenv>=1.0",
@@ -106,6 +109,7 @@ dependencies = [
     # 3D & Visual Generation
     "Pillow>=10.0",
     "opencv-python>=4.8",
+    "fonttools>=4.55",  # scripts/font_generator: PNG-template -> TTF vectorization
 
     # Performance & Async I/O
     "aiofiles>=24.1.0",
@@ -121,14 +125,12 @@ dependencies = [
     # Kafka — Real-time event streaming and analytics
     "confluent-kafka>=2.3.0",
 
-    # ML/AI - Critical for Round Table and RAG
+    # ML/AI - Critical for Round Table and RAG. Heavy transformer/vector-store
+    # libs (transformers, sentence-transformers, chromadb, diffusers) live in
+    # the `ml` extra so `pip install -e ".[api]"` never pulls torch — see `ml`.
     "numpy>=2.1.3",
     "scipy>=1.14.1",
-    "transformers>=4.53.0",
-    "sentence-transformers>=5.6.0",
     "tiktoken>=0.8.0",
-    "chromadb>=0.6.0",
-    "diffusers>=0.38.0",
 ]
 
 [project.optional-dependencies]
@@ -187,6 +189,7 @@ mcp = [
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
+    "boto3>=1.43.0",  # integrations/cloudflare_r2_manager.py — was undeclared, install -e .[all] never pulled it
     "cryptography==49.0.0",
     "pyjwt==2.13.0",
     "sqlalchemy==2.0.51",
@@ -236,6 +239,9 @@ ml = [
     "torchvision==0.24.1",
     "torchaudio==2.11.0",
     "transformers>=4.53.0",
+    "sentence-transformers>=5.6.0",
+    "chromadb>=0.6.0",
+    "diffusers>=0.38.0",
     "huggingface-hub>=0.27.0",
     "numpy>=2.1.3",
     "pandas>=2.2.3",

@@ -44,6 +44,18 @@ $collection_url  = isset( $args['collection_url'] ) ? $args['collection_url'] : 
 $rooms           = isset( $args['rooms'] ) && is_array( $args['rooms'] ) ? $args['rooms'] : array();
 $room_count      = count( $rooms );
 $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['name'] : '';
+
+/*
+ * Embedded mode (structural remediation WS3): the scene renders as the
+ * opening experience layer INSIDE a /collections/{slug}/ page rather than
+ * as a standalone full-page world. Embedded mode:
+ *   - skips the loading screen, tab bar, cinematic toggle, and the
+ *     "Explore the Full Collection" CTA (the collection is this page);
+ *   - lazy-loads every scene image (the collection hero is the LCP element);
+ *   - demotes the scene heading from <h1> to <h2> (the page owns the h1).
+ */
+$embedded    = ! empty( $args['embedded'] );
+$scene_h_tag = $embedded ? 'h2' : 'h1';
 ?>
 
 <!-- ═══ Immersive Scene: <?php echo esc_html( $world_name ); ?> ═══ -->
@@ -52,8 +64,12 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 	role="region"
 	aria-labelledby="scene-title">
 
-	<!-- Loading Screen -->
-	<?php get_template_part( 'template-parts/immersive/loader', null, array( 'world_name' => $world_name ) ); ?>
+	<!-- Loading Screen (standalone only — embedded scenes reveal in-flow) -->
+	<?php
+	if ( ! $embedded ) {
+		get_template_part( 'template-parts/immersive/loader', null, array( 'world_name' => $world_name ) );
+	}
+	?>
 
 	<!-- Scene Viewport — Composited AI Scene Images -->
 	<div class="scene-viewport">
@@ -76,8 +92,24 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 						alt="<?php echo esc_attr( $room_name ); ?>"
 						width="1344"
 						height="896"
-						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>
+						<?php echo ( 0 === $index && ! $embedded ) ? 'fetchpriority="high"' : 'loading="lazy"'; ?>
 						data-warp>
+				<?php else : ?>
+					<?php
+					/*
+					 * Branded empty state — immersive-core.css §7 (.scene-layer--missing)
+					 * already paints an accent-tinted gradient here so the room never
+					 * renders blank; this caption makes the state read as an intentional
+					 * "next chapter" rather than a broken image.
+					 * aria-hidden: the room name is already announced via the
+					 * room-indicator buttons and the live .room-name region — this is
+					 * a sighted-only decorative label, not new information.
+					 */
+					?>
+					<div class="scene-layer-fallback" aria-hidden="true">
+						<span class="scene-layer-fallback__name"><?php echo esc_html( $room_name ); ?></span>
+						<span class="scene-layer-fallback__note"><?php esc_html_e( 'Coming soon.', 'skyyrose' ); ?></span>
+					</div>
 				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
@@ -209,28 +241,42 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 			<picture class="scene-lockup">
 				<source srcset="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.avif' ); ?>" type="image/avif">
 				<source srcset="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>" type="image/webp">
+				<?php
+				$lockup_loading = $embedded ? 'loading="lazy"' : 'fetchpriority="high" loading="eager"';
+				?>
 				<?php if ( $lockup_info['has_png'] ) : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.png' ); ?>"
 						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
-						fetchpriority="high" loading="eager" class="scene-lockup__img">
+						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php else : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>"
 						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
-						fetchpriority="high" loading="eager" class="scene-lockup__img">
+						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php endif; ?>
 			</picture>
+			<?php
+			/*
+			 * No-JS fallback: .scene-lockup starts at opacity:0 in
+			 * immersive-core.css, awaiting the GSAP intro reveal
+			 * (immersive-core.js). If JS never runs (blocked, failed,
+			 * disabled) the lockup would stay invisible forever — force it
+			 * visible, matching the reduced-motion override already in
+			 * immersive-core.css §6. Same idiom as header.php / front-page.php.
+			 */
+			?>
+			<noscript><style>.scene-lockup{opacity:1!important}</style></noscript>
 		<?php endif; ?>
 		<!-- Hairline accent rule: JS queries .scene-hairline; CSS sizes it (width:120px) in immersive-core.css. The intro clones it into the overlay and GSAP animates scaleX 0→1 in step 3. -->
 		<div class="scene-hairline" aria-hidden="true"></div>
-		<h1 id="scene-title" class="screen-reader-text"><?php echo esc_html( $collection_name ); ?></h1>
+		<<?php echo esc_html( $scene_h_tag ); ?> id="scene-title" class="screen-reader-text"><?php echo esc_html( $collection_name ); ?></<?php echo esc_html( $scene_h_tag ); ?>>
 		<p class="scene-subtitle rv-clip-left"><?php echo esc_html( $collection_name ); ?></p>
 		<?php if ( $tagline ) : ?>
 			<p class="scene-tagline rv-blur"><?php echo esc_html( $tagline ); ?></p>
 		<?php endif; ?>
 	</div>
 
-	<!-- Explore Full Collection CTA -->
-	<?php if ( $collection_url ) : ?>
+	<!-- Explore Full Collection CTA (standalone only) -->
+	<?php if ( $collection_url && ! $embedded ) : ?>
 		<div class="immersive-cta">
 			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link btn-sweep rv-clip-up">
 				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose' ); ?></span>
@@ -280,8 +326,10 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 	</div>
 </div>
 
-<!-- Cross-Collection Tab Bar -->
-<?php get_template_part( 'template-parts/immersive/tab-bar', null, array( 'active_slug' => $collection_slug ) ); ?>
+<?php if ( ! $embedded ) : ?>
+	<!-- Cross-Collection Tab Bar -->
+	<?php get_template_part( 'template-parts/immersive/tab-bar', null, array( 'active_slug' => $collection_slug ) ); ?>
 
-<!-- Cinematic Mode Toggle -->
-<?php get_template_part( 'template-parts/immersive/cinematic-toggle' ); ?>
+	<!-- Cinematic Mode Toggle -->
+	<?php get_template_part( 'template-parts/immersive/cinematic-toggle' ); ?>
+<?php endif; ?>

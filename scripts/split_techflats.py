@@ -17,7 +17,7 @@ from pathlib import Path
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-TECHFLATS = PROJECT_ROOT / "assets" / "techflats"
+TECHFLATS = PROJECT_ROOT / "assets" / "products" / "techflats"
 SPLIT_DIR = TECHFLATS / "split"
 
 
@@ -37,14 +37,16 @@ def split_horizontal(img, name_left, name_right, collection, out_dir):
     print(f"  -> {name_left}.jpeg + {name_right}.jpeg")
 
 
-def split_2x2(img, names, collection, out_dir):
+def split_2x2(img, names, collection, out_dir, row_split=None):
     """Split a 2x2 grid into 4 images.
 
     names = [top_left, top_right, bottom_left, bottom_right]
+    row_split overrides the default 50/50 row boundary for composites whose
+    panels aren't evenly sized (pass the y-coordinate of the whitespace gap).
     """
     w, h = img.size
     mid_x = w // 2
-    mid_y = h // 2
+    mid_y = row_split if row_split is not None else h // 2
 
     crops = [
         (0, 0, mid_x, mid_y),  # top-left
@@ -252,7 +254,9 @@ def main():
         print("  -> sg-mint-lav-hoodie-front.jpeg (single)")
         total += 1
 
-    # Windbreaker Set (2x2)
+    # Windbreaker Set (2x2) — jacket row is taller than half the composite,
+    # so the 50/50 default bleeds the pants waistband into the jacket crop.
+    # Row boundary measured from the whitespace gap between panels (y=547-559).
     print("\nsignature/windbreaker-set.jpeg")
     img = Image.open(TECHFLATS / "signature" / "windbreaker-set.jpeg")
     split_2x2(
@@ -265,6 +269,7 @@ def main():
         ],
         "signature",
         SPLIT_DIR,
+        row_split=553,
     )
     total += 4
 

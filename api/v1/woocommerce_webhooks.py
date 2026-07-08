@@ -7,7 +7,7 @@ All endpoints require a valid HMAC signature via the X-WC-Webhook-Signature head
 import json
 import logging
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.v1.wordpress_integration import verify_webhook
 
@@ -24,7 +24,14 @@ async def handle_order_webhook(
 
     Signature is verified via the verify_webhook dependency.
     """
-    payload = json.loads(body)
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError as exc:
+        logger.warning("Order webhook received malformed JSON payload")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid JSON payload",
+        ) from exc
     logger.info(
         "Order webhook received",
         extra={"order_id": payload.get("id"), "status": payload.get("status")},
@@ -40,7 +47,14 @@ async def handle_product_webhook(
 
     Signature is verified via the verify_webhook dependency.
     """
-    payload = json.loads(body)
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError as exc:
+        logger.warning("Product webhook received malformed JSON payload")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid JSON payload",
+        ) from exc
     logger.info(
         "Product webhook received",
         extra={"product_id": payload.get("id"), "name": payload.get("name")},

@@ -334,7 +334,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -e ".[all]"
           pip install pip-audit
 
       - name: Run Security Ops Agent

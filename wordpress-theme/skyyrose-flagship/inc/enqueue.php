@@ -156,10 +156,11 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Cookie consent banner (GDPR).
-	if ( file_exists( $base_dir . '/cookie-consent.css' ) ) {
+	$cookie_file = $use_min && file_exists( $base_dir . '/cookie-consent.min.css' ) ? 'cookie-consent.min.css' : 'cookie-consent.css';
+	if ( file_exists( $base_dir . '/' . $cookie_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-cookie-consent',
-			$base_uri . '/cookie-consent.css',
+			$base_uri . '/' . $cookie_file,
 			array(),
 			SKYYROSE_VERSION
 		);
@@ -204,17 +205,43 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Skyy mascot CSS disabled — character widget is not rendered until art is finalized.
-	// Re-enable mascot.min.css and skyy-walk.css when get_template_part('skyy-mascot')
-	// is restored in footer.php and front-page.php.
+	// Skyy mascot CSS — gated on the Customizer kill switch (live by default,
+	// see skyyrose_mascot_is_enabled()) and excluded from checkout. Degrades
+	// to a 2D sprite when no GLB is configured/shipped.
+	$mascot_enabled = skyyrose_mascot_is_enabled()
+		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $mascot_enabled ) {
+		$mascot_css_file = $use_min && file_exists( $base_dir . '/mascot.min.css' ) ? 'mascot.min.css' : 'mascot.css';
+		if ( file_exists( $base_dir . '/' . $mascot_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-mascot',
+				$base_uri . '/' . $mascot_css_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		$skyy_walk_css_file = $use_min && file_exists( $base_dir . '/skyy-walk.min.css' ) ? 'skyy-walk.min.css' : 'skyy-walk.css';
+		if ( file_exists( $base_dir . '/' . $skyy_walk_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-skyy-walk',
+				$base_uri . '/' . $skyy_walk_css_file,
+				array( 'skyyrose-mascot' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
 
 	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
-	wp_enqueue_style(
-		'skyyrose-agency-visuals',
-		$base_uri . '/agency-tier-visuals.css',
-		array( 'skyyrose-design-tokens', 'skyyrose-components' ),
-		SKYYROSE_VERSION
-	);
+	$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
+	if ( file_exists( $base_dir . '/' . $agency_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-agency-visuals',
+			$base_uri . '/' . $agency_file,
+			array( 'skyyrose-design-tokens', 'skyyrose-components' ),
+			SKYYROSE_VERSION
+		);
+	}
 
 	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
 	// collection lockup. Loaded in <head> on content templates so this above-the-fold
@@ -360,9 +387,75 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	// Skyy mascot JS disabled — character widget is not rendered until art is finalized.
-	// Re-enable mascot.min.js and skyy-3d.js when get_template_part('skyy-mascot')
-	// is restored in footer.php and front-page.php.
+	// Skyy mascot JS — gated on the same kill switch as the CSS above. Loaded
+	// via a tiny idle-time bootstrap (mascot-loader.js) so the character
+	// bundle never costs LCP/CLS budget: it only fetches mascot.min.js (and
+	// skyy-3d.min.js, when a GLB is configured) after requestIdleCallback or
+	// first interaction, whichever comes first.
+	$mascot_js_enabled = skyyrose_mascot_is_enabled()
+		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( $mascot_js_enabled ) {
+		$loader_file = $use_min && file_exists( $js_dir . '/mascot-loader.min.js' ) ? 'mascot-loader.min.js' : 'mascot-loader.js';
+		$mascot_file = $use_min && file_exists( $js_dir . '/mascot.min.js' ) ? 'mascot.min.js' : 'mascot.js';
+
+		if ( file_exists( $js_dir . '/' . $loader_file ) && file_exists( $js_dir . '/' . $mascot_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-mascot-loader',
+				$js_uri . '/' . $loader_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+
+			$glb_url   = skyyrose_get_skyy_glb_url();
+			$skyy3d_js = null;
+			if ( ! empty( $glb_url ) ) {
+				$skyy3d_file = $use_min && file_exists( $js_dir . '/skyy-3d.min.js' ) ? 'skyy-3d.min.js' : 'skyy-3d.js';
+				if ( file_exists( $js_dir . '/' . $skyy3d_file ) ) {
+					$skyy3d_js = add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $skyy3d_file );
+				}
+			}
+
+			// mascot.js / skyy-3d.js are injected client-side by the loader,
+			// outside wp_enqueue_script — they get no automatic ?ver=. Without
+			// an explicit ver param a CDN/Batcache keeps serving stale copies
+			// after every SKYYROSE_VERSION bump.
+			wp_localize_script(
+				'skyyrose-mascot-loader',
+				'SKYY_LOADER_CONFIG',
+				array(
+					'mascotUrl' => add_query_arg( 'ver', SKYYROSE_VERSION, $js_uri . '/' . $mascot_file ),
+					'skyy3dUrl' => $skyy3d_js,
+				)
+			);
+
+			wp_localize_script( 'skyyrose-mascot-loader', 'SKYY_GUIDE_DATA', skyyrose_get_site_guide() );
+
+			$skyy_context = skyyrose_get_skyy_context();
+			wp_localize_script(
+				'skyyrose-mascot-loader',
+				'SKYY_MASCOT_CONFIG',
+				array(
+					'pageTip'    => skyyrose_get_skyy_page_tip(),
+					'llmEnabled' => (bool) get_theme_mod( 'skyyrose_mascot_llm_enabled', true ),
+				)
+			);
+
+			if ( $skyy3d_js ) {
+				wp_localize_script(
+					'skyyrose-mascot-loader',
+					'SKYY_3D_CONFIG',
+					array(
+						'modelUrl' => esc_url_raw( $glb_url ),
+						'walkSide' => skyyrose_get_skyy_walk_side( $skyy_context ),
+					)
+				);
+			}
+		}
+	}
 }
 
 /**
@@ -414,6 +507,11 @@ function skyyrose_get_current_template_slug() {
 		$slug = 'front-page';
 	} elseif ( is_404() ) {
 		$slug = '404';
+	} elseif ( 'size-guide' === get_query_var( 'skyyrose_virtual' ) ) {
+		$slug = 'size-guide';
+	} elseif ( is_page( 'collections' ) ) {
+		// /collections/ index — page-collections.php via template hierarchy (WS2).
+		$slug = 'collections-index';
 	} elseif ( function_exists( 'is_product' ) && is_product() ) {
 		$slug = 'single-product';
 	} elseif ( function_exists( 'is_cart' ) && is_cart() ) {
@@ -496,6 +594,8 @@ function skyyrose_enqueue_template_styles() {
 		'search'              => 'search-results.css',
 		'faq'                 => 'info-pages.css',
 		'shipping-returns'    => 'info-pages.css',
+		'size-guide'          => 'info-pages.css',
+		'collections-index'   => 'collections-index.css',
 		'landing'             => 'landing-scrollytell.css',
 		'elementor-editorial' => 'landing-pages.css',
 		'single'              => 'generic-pages.css',
@@ -539,8 +639,25 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Embedded experience layer (WS3): collection pages render the immersive
+	// scene as their opening layer, so they need immersive.css too. The handle
+	// matches the filename-derived one the 'immersive' slug produces, keeping
+	// the immersive-scenes dependency below valid for both slugs.
+	if ( 'collection-standalone' === $slug ) {
+		$immersive_css = $use_min && file_exists( $base_css_dir . '/immersive.min.css' )
+			? 'immersive.min.css' : 'immersive.css';
+		if ( file_exists( $base_css_dir . '/' . $immersive_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-template-immersive',
+				$base_css_uri . '/' . $immersive_css,
+				$global_deps,
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Immersive scene images — overlays, tab bar, cinematic toggle, particles.
-	if ( 'immersive' === $slug ) {
+	if ( in_array( $slug, array( 'immersive', 'collection-standalone' ), true ) ) {
 		$scenes_file = $use_min && file_exists( $base_css_dir . '/immersive-scenes.min.css' )
 			? 'immersive-scenes.min.css' : 'immersive-scenes.css';
 		if ( file_exists( $base_css_dir . '/' . $scenes_file ) ) {
@@ -548,6 +665,21 @@ function skyyrose_enqueue_template_styles() {
 				'skyyrose-immersive-scenes',
 				$base_css_uri . '/' . $scenes_file,
 				array( 'skyyrose-template-immersive' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
+	// Customer Enhancements — Fit Notes (PDP), Drop Block (homepage), Sticky ATC (editorial PDP).
+	// Both slugs render CE components; no other templates use this stylesheet.
+	if ( in_array( $slug, array( 'single-product', 'front-page' ), true ) ) {
+		$ce_css = $use_min && file_exists( $base_css_dir . '/customer-enhancements.min.css' )
+			? 'customer-enhancements.min.css' : 'customer-enhancements.css';
+		if ( file_exists( $base_css_dir . '/' . $ce_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-customer-enhancements',
+				$base_css_uri . '/' . $ce_css,
+				array( 'skyyrose-design-tokens' ),
 				SKYYROSE_VERSION
 			);
 		}
@@ -727,7 +859,7 @@ function skyyrose_enqueue_template_scripts() {
 	// 'about' removed in 1.5.8: about.js uses prefers-reduced-motion query only,
 	// no gsap/ScrollTrigger API calls (audit: grep returns 0 hits). Was shipping
 	// 114KB of dead lib bytes to every About visitor.
-	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch' );
+	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch', 'collection-standalone' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js', array(), '3.12.2', true );
 	}
@@ -757,8 +889,9 @@ function skyyrose_enqueue_template_scripts() {
 	}
 
 	// Phase 1+2 — Immersive Core: scene intro, lockup, dust canvas, Lenis init, warp.
-	// Loaded on: immersive rooms (4×) + preorder gateway.
-	if ( in_array( $slug, array( 'immersive', 'preorder-gateway' ), true ) ) {
+	// Loaded on: immersive rooms (4×) + preorder gateway + collection pages
+	// (embedded experience layer, WS3).
+	if ( in_array( $slug, array( 'immersive', 'preorder-gateway', 'collection-standalone' ), true ) ) {
 		$ic_css = $use_min && file_exists( $base_css_dir . '/system/immersive-core.min.css' )
 			? 'system/immersive-core.min.css' : 'system/immersive-core.css';
 		if ( file_exists( $base_css_dir . '/' . $ic_css ) ) {
@@ -854,33 +987,43 @@ function skyyrose_enqueue_template_scripts() {
 		// Localize immersive scenes + load the WC bridge that wires the
 		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.
 		if ( 'immersive' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
-			wp_localize_script(
-				$handle,
-				'skyyRoseImmersive',
-				array(
-					'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
-					'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
-					'wcActive' => class_exists( 'WooCommerce' ),
-					'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
-				)
-			);
-
-			$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
-				? 'immersive-wc-bridge.min.js'
-				: 'immersive-wc-bridge.js';
-
-			if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
-				wp_enqueue_script(
-					'skyyrose-immersive-wc-bridge',
-					$base_js_uri . '/' . $bridge_file,
-					array( $handle ),
-					SKYYROSE_VERSION,
-					true
-				);
-			}
+			skyyrose_enqueue_immersive_runtime( $handle, $base_js_dir, $base_js_uri, $use_min );
 		}
 
 		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */
+	}
+
+	// Embedded experience layer (WS3): collection pages ship the immersive
+	// engine + WC bridge alongside their own template script.
+	if ( 'collection-standalone' === $slug ) {
+		$immersive_js = $use_min && file_exists( $base_js_dir . '/immersive.min.js' )
+			? 'immersive.min.js' : 'immersive.js';
+		if ( file_exists( $base_js_dir . '/' . $immersive_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-template-immersive',
+				$base_js_uri . '/' . $immersive_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+			skyyrose_enqueue_immersive_runtime( 'skyyrose-template-immersive', $base_js_dir, $base_js_uri, $use_min );
+		}
+	}
+
+	// WooCommerce AJAX add-to-cart on custom (non-WC-native) templates.
+	// WC_Frontend_Scripts::register_scripts() always registers 'wc-add-to-cart'
+	// on every frontend pageload, but WooCommerce only ENQUEUES it sitewide when
+	// the "Enable AJAX add to cart" setting is on — enqueue never depends on page
+	// type. Our custom templates render .ajax_add_to_cart buttons (Reserve on
+	// preorder-gateway, Quick Add on v7 cards via product-grid.php) outside any
+	// WooCommerce-native page, so the click would just follow the PDP fallback
+	// href with JS enabled and no AJAX add. Enqueuing the already-registered
+	// handle here is enough: WC's own localize_printed_scripts() (wp_print_scripts
+	// / wp_print_footer_scripts, priority 5) attaches wc_add_to_cart_params to any
+	// handle it finds enqueued at print time, regardless of who enqueued it.
+	$ajax_add_to_cart_slugs = array( 'front-page', 'collection-standalone', 'preorder-gateway' );
+	if ( class_exists( 'WooCommerce' ) && in_array( $slug, $ajax_add_to_cart_slugs, true ) && wp_script_is( 'wc-add-to-cart', 'registered' ) ) {
+		wp_enqueue_script( 'wc-add-to-cart' );
 	}
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
@@ -911,36 +1054,40 @@ function skyyrose_enqueue_template_scripts() {
 }
 
 /**
- * Enqueue admin styles and scripts.
+ * Localize the immersive engine + enqueue the WC bridge for a given handle.
  *
- * @since 1.0.0
+ * Shared by the standalone immersive templates and the embedded experience
+ * layer on collection pages (WS3) so both surfaces get identical runtime
+ * data and the "Pre-Order Now" → skyyrose_immersive_add_to_cart wiring.
+ *
+ * @since 1.8.0
+ * @param string $handle      Script handle immersive.js was enqueued under.
+ * @param string $base_js_dir Filesystem path to assets/js.
+ * @param string $base_js_uri URI to assets/js.
+ * @param bool   $use_min     Whether minified assets are preferred.
  * @return void
  */
-function skyyrose_admin_scripts() {
-	$css_dir = SKYYROSE_DIR . '/assets/css';
-	$css_uri = SKYYROSE_ASSETS_URI . '/css';
-	$js_dir  = SKYYROSE_DIR . '/assets/js';
-	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+function skyyrose_enqueue_immersive_runtime( $handle, $base_js_dir, $base_js_uri, $use_min ) {
+	wp_localize_script(
+		$handle,
+		'skyyRoseImmersive',
+		array(
+			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+			'wcActive' => class_exists( 'WooCommerce' ),
+			'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+		)
+	);
 
-	$admin_css_file = $use_min && file_exists( $css_dir . '/admin.min.css' )
-		? 'admin.min.css' : 'admin.css';
-	if ( file_exists( $css_dir . '/' . $admin_css_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-admin',
-			$css_uri . '/' . $admin_css_file,
-			array(),
-			SKYYROSE_VERSION
-		);
-	}
+	$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
+		? 'immersive-wc-bridge.min.js'
+		: 'immersive-wc-bridge.js';
 
-	$admin_js_file = $use_min && file_exists( $js_dir . '/admin.min.js' )
-		? 'admin.min.js' : 'admin.js';
-	if ( file_exists( $js_dir . '/' . $admin_js_file ) ) {
+	if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
 		wp_enqueue_script(
-			'skyyrose-admin',
-			$js_uri . '/' . $admin_js_file,
-			array( 'jquery' ),
+			'skyyrose-immersive-wc-bridge',
+			$base_js_uri . '/' . $bridge_file,
+			array( $handle ),
 			SKYYROSE_VERSION,
 			true
 		);
@@ -955,4 +1102,6 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_scripts', 10 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_localize_scripts', 15 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
-add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
+// Note: skyyrose_admin_scripts() removed — assets/css/admin.css and
+// assets/js/admin.js never existed, so this hook was a no-op on every
+// wp-admin page load. (audit 2026-06-28)

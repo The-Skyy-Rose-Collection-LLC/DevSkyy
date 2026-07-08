@@ -1,0 +1,22 @@
+[project]
+name = "devskyy-sdk-app"
+version = "0.1.0"
+description = "SkyyRose commerce agent built on the Claude Agent SDK (in-process MCP custom tools)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # Pinned floor to the version verified at scaffold time (PyPI: claude-agent-sdk 0.2.110).
+    # The SDK bundles the Claude Code CLI, so no separate CLI install is needed.
+    "claude-agent-sdk>=0.2.110",
+    # Loads ANTHROPIC_API_KEY (and friends) from .env into the process env, which the
+    # bundled CLI subprocess then inherits.
+    "python-dotenv>=1.0.1",
+]
+
+[dependency-groups]
+# Installed by `uv sync` alongside runtime deps. Keep dev tooling out of the runtime set.
+dev = ["ruff>=0.6.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

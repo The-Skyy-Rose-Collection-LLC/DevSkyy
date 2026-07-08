@@ -14,12 +14,12 @@
 
 :root {
 	--kc-sunrise: #F4A261;
-	--kc-sky:     #A8D8EA;
+	--kc-sky:     #D8A1AA;
 	--kc-bloom:   #E8A0BF;
 	--kc-mint:    #B8F0C8;
 	--kc-cloud:   #F8F4EE;
-	--kc-night:   #1A1A2E;
-	--kc-dawn:    linear-gradient(135deg, #A8D8EA 0%, #E8A0BF 40%, #F4A261 80%, #B76E79 100%);
+	--kc-night:   #171310;
+	--kc-dawn:    linear-gradient(135deg, #D8A1AA 0%, #E8A0BF 40%, #F4A261 80%, #B76E79 100%);
 }
 
 /* ---------------------------------------------------------------
@@ -248,7 +248,7 @@
 
 .kc-teaser__silhouette-placeholder {
 	border-radius: 8px;
-	background: linear-gradient(180deg, rgba(232, 160, 191, 0.15) 0%, rgba(168, 216, 234, 0.1) 100%);
+	background: linear-gradient(180deg, rgba(232, 160, 191, 0.15) 0%, rgba(216, 161, 170, 0.1) 100%);
 	border: 1px solid rgba(232, 160, 191, 0.2);
 }
 
@@ -277,7 +277,7 @@
 .kc-teaser__waitlist {
 	padding: var(--space-3xl, 8rem) var(--space-md, 1.5rem);
 	text-align: center;
-	background: rgba(26, 26, 46, 0.6);
+	background: rgba(23, 19, 16, 0.6);
 }
 
 .kc-teaser__waitlist-inner {

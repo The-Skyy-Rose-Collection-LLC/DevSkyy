@@ -24,6 +24,27 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
+def _parse_sentry_sample_rate(raw: str | None, default: float) -> float:
+    """Parse a Sentry sample-rate env var into [0.0, 1.0]; falls back to
+    ``default`` on missing, empty, non-numeric, or out-of-range input."""
+    if raw is None or raw.strip() == "":
+        return default
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return default
+    if not 0.0 <= value <= 1.0:
+        return default
+    return value
+
+
+def _resolve_cors_origin_regex(raw: str | None) -> str:
+    """Resolve the CORS allow_origin_regex from CORS_ORIGIN_REGEX env var,
+    falling back to the default *.vercel.app / *.devskyy.app subdomain pattern."""
+    raw = (raw or "").strip()
+    return raw or r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)"
+
+
 # =============================================================================
 # Lifespan — startup / shutdown
 # =============================================================================
@@ -48,8 +69,14 @@ async def lifespan(app: FastAPI):
 
         sentry_sdk.init(
             dsn=sentry_dsn,
-            environment=environment,
-            traces_sample_rate=0.1 if environment == "production" else 1.0,
+            environment=os.getenv("SENTRY_ENVIRONMENT", environment),
+            traces_sample_rate=_parse_sentry_sample_rate(
+                os.getenv("SENTRY_TRACES_SAMPLE_RATE"),
+                default=0.1 if environment == "production" else 1.0,
+            ),
+            profiles_sample_rate=_parse_sentry_sample_rate(
+                os.getenv("SENTRY_PROFILES_SAMPLE_RATE"), default=0.0
+            ),
             send_default_pii=False,
         )
         log.info("sentry_initialized")
@@ -152,7 +179,7 @@ cors_origins = [o.strip() for o in cors_origins if o.strip()] or [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_origin_regex=r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)",
+    allow_origin_regex=_resolve_cors_origin_regex(os.getenv("CORS_ORIGIN_REGEX")),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-Correlation-ID"],
@@ -322,6 +349,11 @@ app.include_router(v2_health_router, prefix="/api/v2")
 from api.v1.wordpress_integration import router as wordpress_router
 
 app.include_router(wordpress_router, prefix="/api/v1")
+
+# WooCommerce webhooks (order/product events)
+from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
+
+app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
 
 # Feature flags
 from api.v1.feature_flags import router as feature_flags_router

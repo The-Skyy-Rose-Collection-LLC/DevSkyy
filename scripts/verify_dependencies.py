@@ -98,8 +98,6 @@ def verify_all() -> int:
         print(f"\n⚠️  {failed} dependencies FAILED verification!")
         print("\nInstall missing dependencies with:")
         print("  pip install -e .")
-        print("  # or")
-        print("  pip install -r requirements.txt")
         return 1
     else:
         print("\n✅ All critical dependencies verified successfully!")

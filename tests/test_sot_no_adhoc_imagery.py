@@ -44,9 +44,7 @@ DISPLAY_DIRS = ("frontend/lib", "frontend/components", "frontend/app")
 
 # Ratchet allowlist — files with known, tracked violations. MAY ONLY SHRINK.
 # Each entry is a backlog item in docs/brand/sot-imagery-policy.md.
-ALLOWLIST = {
-    "frontend/lib/collections.ts",  # drifted product list + fake scene images; see policy backlog
-}
+ALLOWLIST: set[str] = set()
 
 
 @functools.lru_cache(maxsize=1)

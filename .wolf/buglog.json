@@ -2305,7 +2305,7 @@
     "last_seen": "2026-06-25T04:30:00-07:00"
   },
   {
-    "id": "bug-131",
+    "id": "bug-180",
     "timestamp": "2026-06-26T12:45:00-07:00",
     "error_message": "V7 product cards in grid row 2+ never auto-advance (carousel stalls)",
     "file": "prototypes/product-card-variants/v7-lookbook-card/index.html",
@@ -2403,5 +2403,550 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-28T12:00:00-07:00"
+  },
+  {
+    "id": "bug-165",
+    "timestamp": "2026-06-28T17:00:00-07:00",
+    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' \u2014 CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
+    "file": "agents/commerce_agent.py",
+    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() \u2014 it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
+    "fix": "FIXED 2026-06-28 (founder approved full fix). (1) integrations/wordpress_client.py: added module-level alias `WordPressWooCommerceClient = WordPressClient` + a `WordPressClient.from_env()` classmethod (reads WORDPRESS_URL/WP_SITE_URL + WC_CONSUMER_KEY/WOOCOMMERCE_KEY + WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET; raises ValueError when missing). (2) agents/commerce_agent.py _ensure_wordpress_client: dropped the non-existent `.connect()`, now constructs via `WordPressWooCommerceClient.from_env()` (honors an injected client, degrades gracefully on missing creds keeping _wordpress_connected=False). (3) api/dashboard.py: 3 sites swapped `WordPressWooCommerceClient()` -> `.from_env()`. Verified: import resolves (is WordPressClient True), WORDPRESS_AVAILABLE flipped False->True, from_env graceful-raise on missing creds; black+ruff clean on all 3 files; rtk proxy pytest tests/api/test_commerce_bulk_wire.py + tests/test_core_agents.py = 231 passed (no regression). optimize_price (in main) uses ml_module not _ensure_wordpress_client, so unaffected.",
+    "tags": [
+      "commerce-agent",
+      "woocommerce",
+      "import-error",
+      "interface-mismatch",
+      "pre-existing",
+      "wiring",
+      "dashboard"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-28T17:00:00-07:00"
+  },
+  {
+    "id": "bug-166",
+    "timestamp": "2026-06-29T12:20:00-07:00",
+    "error_message": "Stop-hook RED locally: tests/mcp/test_wc_client.py::test_missing_env_raises_keyerror DID NOT RAISE KeyError. Local-only \u2014 CI was green.",
+    "file": "skyyrose/integrations/wc_safe_client.py",
+    "root_cause": "Follow-on to bug-165's WC unification (commit 7426334dc). WCCredentials.from_env() called a helper _ensure_wordpress_env_loaded() that load_dotenv'd .env.wordpress BEFORE reading os.environ. On a dev machine .env.wordpress exists, so the auto-load repopulated the exact credential vars the test had just cleared via monkeypatch.delenv -> from_env resolved creds -> KeyError never raised -> test failed. In CI .env.wordpress is gitignored/absent, so the load no-op'd and the test passed: a test whose outcome depends on an untracked file's presence is non-deterministic. A parallel session compounded confusion by editing the same files (kept auto-load + stubbed the helper in a new test) while this session removed the auto-load.",
+    "fix": "FIXED 2026-06-29, committed 7bfce75cf direct to main (founder: 'commit the wc fix to main'). (1) wc_safe_client.py: removed _ensure_wordpress_env_loaded entirely; from_env() now reads os.environ ONLY (pure), so callers/tests fully control the env via monkeypatch. (2) devskyy_mcp.py: the application bootstrap now does load_dotenv(Path(__file__).parent/'.env.wordpress') after imports (with noqa: E402 on the post-load mcp_tools imports) \u2014 the file load belongs to the app, not the dataclass. (3) tests/mcp/test_wc_client.py: test_missing_env_raises_keyerror + smoketest missing-env test clear all SEVEN var-names from_env accepts (WC_BASE_URL/WORDPRESS_URL/WP_SITE_URL + WC_/WOOCOMMERCE_ key+secret). (4) tests/test_wc_credentials_from_env.py: dropped the now-dead setattr stub of the removed helper; the delenv loop is the entire isolation. Verified: PYTEST_EXIT=0 (25/25 across both WC test files), ruff clean on all 4 files; pushed da73ed5ab..7bfce75cf fast-forward; re-confirmed on origin/main (helper=0, stub=0, all-7-cleared, bootstrap load present).",
+    "tags": [
+      "woocommerce",
+      "wc-credentials",
+      "from-env",
+      "monkeypatch",
+      "dotenv",
+      "non-deterministic-test",
+      "stop-hook",
+      "parallel-session",
+      "local-only"
+    ],
+    "related_bugs": [
+      "bug-165"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T12:20:00-07:00"
+  },
+  {
+    "id": "bug-167",
+    "timestamp": "2026-06-29T14:30:00-07:00",
+    "error_message": "Stop-hook suite red: tests/test_asset_hub.py (pending 49!=20, product-card 17!=29, br-003/br-004/br-010-back/pending resolve None mismatches) + tests/mcp/test_wc_client.py missing-env tests",
+    "file": "tests/test_asset_hub.py, tests/mcp/test_wc_client.py",
+    "root_cause": "Snapshot-pinned tests rotted vs evolving SoT. asset_hub froze the 2026-06-25 manifest counts + hardcoded SKU verdicts; manifest since promoted to 73 verified/20 pending. wc_client from_env() auto-loaded symlinked .env.wordpress, defeating monkeypatch.delenv.",
+    "fix": "asset_hub tests rewritten snapshot->CONTRACT/data-derived (counts derived from live manifest; resolve contract by verdict; canonical <sku>-<face> filter since usage-variant ids are by_usage-only). wc_client: clear all 7 credential var-name fallbacks + drop setattr after from_env made pure. Full fast suite green (exit 0). Manifest = locked verdict authority over handoff; br-010/br-004 backs stay pending (resolve->None correct).",
+    "tags": [
+      "test-drift",
+      "snapshot-tests",
+      "asset-hub",
+      "wc-client",
+      "contract-tests",
+      "stop-hook"
+    ],
+    "related_bugs": [
+      "bug-164"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T14:30:00-07:00"
+  },
+  {
+    "id": "bug-139",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "ingest_verdicts.py (Jun-25) rebuilt product manifest from verdicts each run; on a 2nd pass it would overwrite verified entries and (no is_ref gate) promote a source-photo/techflat 'use' pick into a served product-card \u2014 the fidelity-gate violation class (lh-005 fanny-pack).",
+    "file": "assets/hub/ingest_verdicts.py",
+    "root_cause": "First-ingest design (empty manifest -> rebuild from verdicts) reused for a second run against a now-authoritative LOCKED manifest; no is_ref() exclusion, no backup, no dry-run, no current-verdict gating.",
+    "fix": "Rewrote incremental + gated: start FROM manifest, dry-run default, --apply backs up manifest.json->.bak then mutates ONLY bucket-A (pending gap + exactly 1 serveable use). is_ref() excludes source-photos/source-products/techflat/references from ever becoming product-cards. Already-verified faces reported (bucket B), never overwritten. Verified-by gated on current verdict==pending.",
+    "tags": [
+      "asset-hub",
+      "ingest_verdicts",
+      "fidelity-gate",
+      "is_ref",
+      "manifest",
+      "sot",
+      "idempotency"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-187",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
+    "file": "wordpress-theme/skyyrose-flagship/front-page.php",
+    "root_cause": "Phantom subdirectory in the image path. front-page.php (lines 308, 485, 521) and data/render-keepers.json:12 referenced .../images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 with an extra black-rose-sherpa-jacket/ folder that does not exist in the theme asset tree (all product images are flat in products/). Verified authoritatively via curl: subdir path -> HTTP 404, flat path -> HTTP 200; Playwright predecode confirmed exactly 1 broken image of 33. Vision-verified the flat-path file is the correct garment (black Black-Rose hooded jacket with grayscale rose/wings chest crest), so the bug is the path, not the asset.",
+    "fix": "Collapsed the phantom subdir to the flat path in both files: front-page.php (3 occurrences via replace_all) and render-keepers.json (br-006 asset line) now point at /images/products/black-rose-sherpa-jacket-front-model.webp (the HTTP 200 file). Verified: 0 remaining subdir refs in wordpress-theme/, render-keepers.json re-parses as valid JSON, no other products/<slug>/<slug> double-subdir image paths in front-page.php. Source-only fix (PHP/JSON, no .min rebuild). Live still 404s until theme deploy (STOP-AND-SHOW gated).",
+    "tags": [
+      "wordpress",
+      "front-page",
+      "404",
+      "image-path",
+      "broken-image",
+      "br-006",
+      "black-rose",
+      "homepage",
+      "render-keepers"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-181",
+    "timestamp": "2026-06-30T12:40:00-07:00",
+    "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
+    "file": "skyyrose/core/asset_hub.py",
+    "root_cause": "served_theme_path used Path(source).suffix for the off-theme case; the staged file is always webp (theme .gitignore excludes png), so the .png path never resolved.",
+    "fix": "served_theme_path always returns assets/images/products/hub/<sku>-<face>.webp for off-theme verified renders; added regression test test_served_theme_path_offtheme_render_is_always_webp.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "build-collection-sot",
+      "served_theme_path",
+      "webp",
+      "fidelity"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:40:00-07:00"
+  },
+  {
+    "id": "bug-182",
+    "timestamp": "2026-06-30T12:41:00-07:00",
+    "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
+    "file": "skyyrose/core/sot_images.py",
+    "root_cause": "PHP theme reads data/collections/<slug>/sot.json via inc/collection-sot-reader.php, NOT data/sot-images.json (zero theme readers of sot-images.json). _index() feeds sot-images.json only.",
+    "fix": "Moved the single override seam upstream to build-collection-sot.py (generates sot.json); reverted _index(). sot.json now carries hub paths \u2192 PHP theme AND sot-images.json both honor the verdict.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "architecture",
+      "php",
+      "split-brain",
+      "seam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:41:00-07:00"
+  },
+  {
+    "id": "bug-183",
+    "timestamp": "2026-06-30T15:05:00-07:00",
+    "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
+    "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
+    "root_cause": "Storefront collection-grid cards render from the v7-cards system (build_v7_cards.py scans the products/v7/<sku>/ served tree), NOT sot.json front_model_image. The sot.json/sot-images tie reaches the holo card + dashboard, but the dominant v7 grid is a separate authority. The v7 tree was already hub-synced for 9/11 picks, so the deploy had ~0 visible card effect.",
+    "fix": "No code fix \u2014 corrected the claim. To reach the v7 grid, hub picks must be synced into products/v7/<sku>/ + v7-cards.json regenerated (build_v7_cards.py). lh-003 front + br-007 back are the 2 gaps. Deferred: PR #684 is actively refactoring v7 \u2014 coordinate, do not race.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "v7-cards",
+      "storefront",
+      "imagery-layers",
+      "overclaim"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T15:05:00-07:00"
+  },
+  {
+    "id": "bug-168",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "database/seed_catalog.py set is_active=(is_preorder=='1') \u2014 inverted; live products seeded inactive, pre-orders active",
+    "file": "database/seed_catalog.py",
+    "root_cause": "Raw is_preorder used as active predicate instead of canonical status. pre-order!=active, live==active. Backwards.",
+    "fix": "is_active=(status_from_row(row)=='live') via catalog_loader. Surfaced in Phase-2 loader-routing (PR #686).",
+    "tags": [
+      "catalog",
+      "seed",
+      "status",
+      "inverted-logic"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T00:00:00-07:00"
+  },
+  {
+    "id": "bug-169",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "br-011 (Jersey Series 4 Hockey) has garment_type_lock='hoodie' but is a jersey per registry+_JERSEY_SKUS",
+    "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+    "root_cause": "Jersey membership in 3 unsynced places (CSV garment_type_lock, registry sku_folders, _JERSEY_SKUS). br-011 CSV=hoodie, other two=jersey. Same redundant-field disease as br-014/15.",
+    "fix": "PENDING FOUNDER DECISION \u2014 flip hoodie->jersey (render impact), then derive roster from CSV + jersey_consistency invariant. Flagged in PR #686.",
+    "tags": [
+      "catalog",
+      "jersey",
+      "garment_type_lock",
+      "needs-founder-decision"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T00:00:00-07:00"
+  },
+  {
+    "id": "bug-170",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "Glyphs built from potrace-vectorized PNG cells rendered upside-down (PIL ImageFont render showed an inverted A) despite a sane-looking bbox",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "potrace's SVG <g transform=\"translate(...) scale(...)\"> repositions/scales the path on the page but does not convert SVG's y-down convention into font y-up/baseline-up space -- bbox math looked correct in both orientations so a coordinate sanity check could not have caught it; only rendering the actual glyph and reading the pixels surfaced the flip.",
+    "fix": "Added a second, explicit Transform().scale(1, -1) after potrace's own translate/scale, plus Cu2QuPen(reverse_direction=True) for correct hole winding on O/A/B/g. Verified by rendering 8 test glyphs (straight lines, curves, holes, descender) with PIL.ImageFont and reading the PNG pixels.",
+    "tags": [
+      "font-generation",
+      "potrace",
+      "fonttools",
+      "svg",
+      "coordinate-transform"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-171",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "build_font() crashed with a bare AssertionError deep in fontTools, or silently mis-mapped glyphs, on malformed/ambiguous manifests",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "No validation of manifest cell uniqueness (duplicate char/codepoint -> glyphOrder/glyf length mismatch -> fontTools AssertionError), no bbox bounds checking (OOB bbox silently read as black-padded ink via Image.crop), and Image.open() had no decode-error wrapping (PIL.UnidentifiedImageError leaked past the CLI's narrow except tuple as a raw traceback). Found by an adversarial code-review workflow agent and reproduced.",
+    "fix": "Added _validate_manifest() (dup char/codepoint, missing keys, OOB bbox -> all raise clear ValueError) called before any processing; wrapped Image.open() to normalize decode failures to ValueError. Verified all 4 new fail-loud paths raise ValueError (not a crash, not silent corruption) with a standalone test script.",
+    "tags": [
+      "font-generation",
+      "validation",
+      "fail-loud",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-170"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-172",
+    "timestamp": "2026-06-30T17:05:00-07:00",
+    "error_message": "OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does not support the input_fidelity parameter' (code invalid_input_fidelity_model)",
+    "file": "scripts/oai_render/client.py",
+    "root_cause": "OAIImageClient.edit() (client.py:74-85) unconditionally sends input_fidelity=config.INPUT_FIDELITY ('high', config.py:37) on every edit() call. config.py's comment claims this is 'verified via Context7... supported for gpt-image-1.5+ (incl. gpt-image-2)' but the LIVE API rejects it for gpt-image-2 specifically -- reproduced 24/24 times in a real call. Context7 (openai/openai-openapi, images/edits schema) lists input_fidelity support for gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only -- gpt-image-2 is not in that list. This means every product-render edit() call through this client is currently failing the same way, separate from any font-generation work.",
+    "fix": "NOT YET FIXED (discovered incidentally during an unrelated font-pilot task, flagged to founder rather than patched unprompted since it touches the shared production render pipeline). Workaround used in the font pilot: bypass OAIImageClient.edit() and call openai.OpenAI().images.edit() directly, omitting input_fidelity entirely. Real fix needed in client.py/config.py: stop sending input_fidelity when model=='gpt-image-2', or make it conditional on model name.",
+    "tags": [
+      "oai-render",
+      "gpt-image-2",
+      "production-bug",
+      "input_fidelity",
+      "needs-founder-decision"
+    ],
+    "related_bugs": [],
+    "occurrences": 24,
+    "last_seen": "2026-06-30T17:05:00-07:00"
+  },
+  {
+    "id": "bug-188",
+    "timestamp": "2026-06-30T20:44:00",
+    "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
+    "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
+    "root_cause": ".venv was fully deleted from disk (untracked, not a git operation). pip install -e \".[all]\" resolves an enormous dep graph (torch/langchain/mineru/bentoml/xxhash-fallback-chain) that stalled for 6+min on source builds before I killed it; boto3 (used by integrations/cloudflare_r2_manager.py) was never declared in any pyproject.toml extra despite being required by the mcp extra import chain.",
+    "fix": "Recreated .venv, installed base package + boto3 + langgraph + scikit-image directly (piecemeal, faster than full [all] resolve) instead of waiting out the slow full extras install. Declared boto3>=1.43.0 in the mcp extra of pyproject.toml so future installs pick it up without manual patching.",
+    "tags": [
+      "venv",
+      "pip",
+      "pyproject",
+      "missing-dependency",
+      "boto3",
+      "test-infra"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T20:44:00"
+  },
+  {
+    "id": "bug-184",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "og:image/twitter:image emitted VideoPress .mp4 (logo_400x100.mp4) \u2014 link previews broken sitewide",
+    "file": "wordpress-theme/skyyrose-flagship/inc/seo.php",
+    "root_cause": "custom_logo theme-mod attachment used as social image without MIME validation; live logo attachment is a video",
+    "fix": "skyyrose_og_logo_url() helper gates all three emitters on image/* MIME, falls back to static brand asset",
+    "tags": [
+      "seo",
+      "og-image",
+      "wordpress",
+      "mime"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-185",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "Footer content rendered after </footer> on every page (mobile-bottom-nav; homepage also footer-cro/FAQ/size-guide)",
+    "file": "wordpress-theme/skyyrose-flagship/footer.php",
+    "root_cause": "front-page bypassed get_footer() with inline footer + manual part includes after it; footer.php included mobile-bottom-nav after </footer>",
+    "fix": "front-page uses get_footer(); mobile-bottom-nav moved inside the footer landmark (position:fixed makes placement visual no-op)",
+    "tags": [
+      "dom",
+      "landmarks",
+      "a11y",
+      "footer"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-186",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "kids-capsule.css shipped blue-dominant colors (#A8D8EA, #1A1A2E) violating no-blue brand law",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/kids-capsule.css",
+    "root_cause": "pre-canon palette survived the Kids Capsule rose-gold accent change (PR #704 changed accent but not the launch-teaser tokens)",
+    "fix": "--kc-sky \u2192 #D8A1AA, --kc-night \u2192 #171310, dawn gradient start \u2192 #D8A1AA; audit brand check now enforces",
+    "tags": [
+      "brand-law",
+      "css",
+      "kids-capsule",
+      "blue"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-173",
+    "timestamp": "2026-07-06T11:30:00-07:00",
+    "error_message": "AttributeError: 'NoneType' object has no attribute 'get' \u2014 meshy_skyy_pipeline.py poll() after i23d SUCCEEDED",
+    "file": "scratchpad/meshy_skyy_pipeline.py",
+    "root_cause": "Meshy API returns \"task_error\": null on success; dict.get('task_error', {}) returns None when key EXISTS with null value, so .get() chained on it crashes. Killed pipeline after 30-credit mesh task succeeded.",
+    "fix": "int(task.get('consumed_credits') or 0) \u2014 never chain .get() on a possibly-null JSON field; added resume-from-task-id CLI arg so paid tasks are never re-run after orchestrator crashes.",
+    "tags": [
+      "meshy",
+      "api",
+      "null-vs-missing",
+      "dict-get-default",
+      "paid-pipeline-resume"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-06T11:30:00-07:00"
+  },
+  {
+    "id": "bug-174",
+    "timestamp": "2026-07-07T17:50:00-07:00",
+    "error_message": "deploy-mu-plugin.sh would upload any MU_SRC plugin AS skyyrose-ally-ajax-guard.php (hardcoded SCP destination), clobbering the Ally guard on production",
+    "file": "scripts/deploy-mu-plugin.sh",
+    "root_cause": "PR #723 parametrized the source via MU_SRC but left the SCP destination filename hardcoded from the script's original single-plugin design",
+    "fix": "DEST=\"$(basename \"$SRC\")\" and upload to $MU_DIR/$DEST \u2014 caught pre-merge during deploy-script review, fixed on the PR branch before merge",
+    "tags": [
+      "deploy",
+      "mu-plugin",
+      "wordpress",
+      "production-safety",
+      "shell"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-175",
+    "timestamp": "2026-07-07T17:55:00-07:00",
+    "error_message": "PR #724 repointed catalog at br-014-giants-back.webp and kids-001-onmodel-v2.webp but neither binary was committed \u2014 .gitignore:524 blanket-ignores theme **/*.webp so plain git add silently skips them; live site would have 404'd both images after deploy",
+    "file": ".gitignore",
+    "root_cause": "gitignore rule 524 (wordpress-theme/skyyrose-flagship/assets/**/*.webp) contradicts the tracked-products-for-deploy convention (gitignore:254); repoint PRs hand-edit JSON without confirming target binaries are tracked",
+    "fix": "git add -f both binaries with the bless commit; caught by build-collection-sot.py resolver nulling br-014 back_model_image in the tracked view",
+    "tags": [
+      "gitignore",
+      "assets",
+      "repoint",
+      "deploy-integrity",
+      "sot"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-176",
+    "timestamp": "2026-07-07T18:01:00-07:00",
+    "error_message": "Failed to resolve module specifier \"three\". Relative references must start with \"/\", \"./\", or \"../\" \u2014 x4 on live PDP (product/br-003) console",
+    "file": "wordpress-theme/skyyrose-flagship (PDP template enqueue \u2014 import map missing/late on single-product pages)",
+    "root_cause": "UNCONFIRMED \u2014 a module script importing bare 'three' runs on the PDP without the three.js import map registered before it; pre-existing on live, observed during anon-cache-guard post-verify; NOT caused by today's merges (no CSS/JS changed)",
+    "fix": "OPEN \u2014 diagnose which module script the PDP enqueues and ensure the importmap is emitted first (or make the import relative); candidate files inc/enqueue.php + PDP 3D viewer scripts",
+    "tags": [
+      "threejs",
+      "importmap",
+      "pdp",
+      "enqueue",
+      "live-defect",
+      "open"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-177",
+    "timestamp": "2026-07-07T11:20:00-07:00",
+    "error_message": "paid-api-stopgate blocked read-only commands (head/grep of deploy-theme.sh) and rejected STOPSHOW_ACK=1 when preceded by other env assignments",
+    "file": ".claude/hooks/paid-api-stopgate.sh",
+    "root_cause": "deploy rule substring-matched the script filename in any context; ACK bypass only accepted the token as the literal first command token",
+    "fix": "deploy rules now require execution context (interpreter invocation or command-position path); ACK accepted after leading assignment-shaped tokens only (flag/string-embedded tokens still blocked); deploy-mu-plugin.sh execution added to the gate; 17/17 regression matrix green (scratchpad/stopgate-matrix.sh pattern)",
+    "tags": [
+      "hooks",
+      "stopgate",
+      "false-positive",
+      "deploy",
+      "security"
+    ],
+    "related_bugs": [
+      "bug-174"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-178",
+    "timestamp": "2026-07-07T11:30:00-07:00",
+    "error_message": "Skyy mascot never appears on live skyyrose.co \u2014 GLB load fails silently, no console error surfaced",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "root_cause": "skyy.glb ships draco-compressed (gltf-transform --compress draco) but GLTFLoader had no DRACOLoader attached \u2014 decoders were shipped to assets/js/lib/draco/ and CSP updated, yet the loader wiring itself was never added. QC harness masked it: harness viewer has its own DRACOLoader.",
+    "fix": "Import DRACOLoader alongside GLTFLoader in module bootstrap, expose window.THREE_DRACOLoader, attach via loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DRACO_PATH)) with DRACO_PATH derived from MODEL_URL. Rebuilt .min.",
+    "tags": [
+      "mascot",
+      "three.js",
+      "draco",
+      "gltfloader",
+      "silent-failure",
+      "qc-blind-spot"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T11:30:00-07:00"
+  },
+  {
+    "id": "bug-179",
+    "timestamp": "2026-07-07T21:43:04Z",
+    "error_message": "stage_f_shadows.generate_shadows() silently swallows PIL/IO errors and returns the un-shadowed composite path as if it were the shadow output, letting a broken shadow pass QA scoring undetected",
+    "file": "skyyrose/elite_studio/agents/compositor/stage_f_shadows.py",
+    "root_cause": "the trailing except Exception caught every failure mode (including real I/O errors) in the same branch as the legitimate >=85%-frame-fill skip-shadow case, and both returned composite_path unchanged with only a log.warning \u2014 the caller (orchestrator.py single broad-except at line 378) never saw the failure, so success stayed True",
+    "fix": "added ShadowStageError(RuntimeError); the except block now raises it instead of returning composite_path, letting the orchestrator existing broad-except at line 378 correctly fail the render closed (success=False). The intentional skip-shadow early-return path is untouched. Removed now-orphaned logging import/logger (the only log call was in the removed branch).",
+    "tags": [
+      "compositor",
+      "stage_f",
+      "fail-open",
+      "embeddings-hardening"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T21:43:04Z"
+  },
+  {
+    "id": "bug-189",
+    "timestamp": "2026-07-07T16:45:00-07:00",
+    "error_message": "TypeError: Failed to resolve module specifier 'three' (live pageerror; console clean)",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "root_cause": "jsdelivr examples/jsm loaders import bare 'three' \u2014 unresolvable in browsers without an importmap; window.THREE never set, 3D layer silently stayed on 2D fallback. Errors surface on 'pageerror', NOT 'console' \u2014 console-only monitoring missed it.",
+    "fix": "Import via jsdelivr /+esm endpoints (rewrites bare specifiers to a single shared three instance). Importmap rejected: page already executes module scripts and late importmaps throw.",
+    "tags": [
+      "three.js",
+      "esm",
+      "bare-specifier",
+      "jsdelivr",
+      "pageerror-vs-console"
+    ],
+    "related_bugs": [
+      "bug-178"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T16:45:00-07:00"
+  },
+  {
+    "id": "bug-190",
+    "timestamp": "2026-07-07T16:45:00-07:00",
+    "error_message": "Skyy mascot (position:fixed) rendered 13,084px down the document instead of the viewport corner",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/system/animations-premium.css",
+    "root_cause": "pageEnter/pageExit page transitions run on <body> with translateY keyframes + fill-mode:forwards \u2014 permanent identity transform on body. Per CSS spec (MDN containing-block), ANY transform (even identity), filter, perspective, will-change:transform, or contain:paint on an ancestor makes it the containing block for fixed descendants.",
+    "fix": "Opacity-only pageEnter/pageExit keyframes + do-not-reintroduce comment. Ship gate: assert getComputedStyle(document.body).transform === 'none' in live verification.",
+    "tags": [
+      "css",
+      "position-fixed",
+      "containing-block",
+      "body-transform",
+      "animation-fill-mode",
+      "mascot"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T16:45:00-07:00"
+  },
+  {
+    "id": "bug-191",
+    "timestamp": "2026-07-07T17:30:00-07:00",
+    "error_message": "pytest teardown noise: 'Future exception was never retrieved' from tests/test_utils_modules.py::test_deduplicate_exception_propagates",
+    "file": "utils/request_deduplication.py",
+    "root_cause": "deduplicate() sets the failure exception on the shared pending future for duplicate callers; when no duplicate caller ever awaits it, the exception is unretrieved at GC and asyncio logs the warning.",
+    "fix": "Consume the exception immediately after set_exception() via shared_future.exception() (marks it retrieved); primary caller still re-raises. Commit 9f468f298.",
+    "tags": [
+      "asyncio",
+      "future",
+      "pytest",
+      "warning",
+      "request-deduplication"
+    ]
+  },
+  {
+    "id": "bug-192",
+    "timestamp": "2026-07-07T23:15:00-07:00",
+    "error_message": "ModuleNotFoundError: psutil, then boto3, then langgraph \u2014 main_enterprise cannot import inside Dockerfile.api slim image",
+    "file": "pyproject.toml",
+    "root_cause": "Three unguarded hard imports reachable from main_enterprise were not in base deps: api/v1/monitoring.py:21 psutil (extra-only), integrations/__init__.py:6\u2192cloudflare_r2_manager.py:6 boto3 (never declared anywhere; [all] had it transitively, CI installs it manually at ci.yml:142), orchestration/langgraph_integration.py:37 langgraph (mcp-extra-only). Worktree meta-path test passed because the shared .venv has all three; only a real in-container import probe could catch it. First stub-census was incomplete (aborted on from-import vs bare stub) \u2014 PEP-562 __getattr__ stubs needed for one-pass census.",
+    "fix": "Added psutil>=7.2.2, boto3>=1.34, langgraph>=0.2 to base [project.dependencies] with importer citations; re-proved [api] resolves torch-free; rebuilt image; in-container import probe clean.",
+    "tags": [
+      "docker",
+      "packaging",
+      "extras",
+      "slim-image",
+      "verification"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T23:15:00-07:00"
+  },
+  {
+    "id": "bug-193",
+    "timestamp": "2026-07-07T23:30:00-07:00",
+    "error_message": "Founder: 'no skyy' on live despite ALL headless verification passing (10/10 assertions, screenshots)",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/mascot.js",
+    "root_cause": "Only entrance trigger was 10-30s of continuous stillness, re-armed by every scroll/pointermove; dormant container display:none with no manual summon. Actively-browsing humans never accumulate that stillness. Headless probes passed BECAUSE a headless page is perfectly still \u2014 the verification environment structurally could not exhibit the bug.",
+    "fix": "v1.9.3: first entrance per session = fixed 4.5s after load, immune to activity (host greets arrivals); re-entries keep idle trigger. Verified live: entered at 11.9s under continuous synthetic activity.",
+    "tags": [
+      "mascot",
+      "ux",
+      "idle-trigger",
+      "verification-blind-spot",
+      "headless-vs-real-user"
+    ],
+    "related_bugs": [
+      "bug-189",
+      "bug-190"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T23:30:00-07:00"
   }
 ]

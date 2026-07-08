@@ -1,0 +1,131 @@
+# fly.backend.toml - DevSkyy Backend API (main_enterprise)
+# Second Fly app: the FastAPI REST + GraphQL backend that serves the Next.js
+# dashboard (frontend/) and any api.devskyy.app traffic. Companion to fly.toml
+# (app 'devskyy-api' — the slim, single-machine MCP-only service; do not confuse
+# the two: this app does NOT carry the MCP session-affinity constraint).
+#
+# See https://fly.io/docs/reference/configuration/ for documentation
+
+app = 'devskyy-backend'
+primary_region = 'sjc'
+
+kill_signal = 'SIGTERM'
+kill_timeout = '30s'
+
+# Environment variables (non-sensitive only). Every value below is verified
+# against an actual os.getenv() consumer in this codebase as of 2026-07-07 —
+# see tasks/backend-golive-manifest.md for the file:line citations and for the
+# list of fly.toml env vars intentionally NOT carried forward because they have
+# zero consumers (SESSION_TIMEOUT_MINUTES, MAX_LOGIN_ATTEMPTS,
+# LOGIN_LOCKOUT_MINUTES, RAG_*, MAX_REQUEST_BODY_SIZE, REQUEST_TIMEOUT_SECONDS,
+# KEEPALIVE_TIMEOUT_SECONDS, DATABASE_CONNECT_TIMEOUT).
+[env]
+  # Core Production Settings
+  ENVIRONMENT = 'production'
+  LOG_LEVEL = 'INFO'
+  # LOG_JSON is not yet wired to configure_logging()'s json_output param
+  # (main_enterprise.py lifespan) — kept here as a documented placeholder, not a
+  # live switch. See core/structured_logging.py:107-139.
+  LOG_JSON = 'true'
+  PYTHONUNBUFFERED = '1'
+  PYTHONDONTWRITEBYTECODE = '1'
+
+  # Sentry — consumed by main_enterprise.py's sentry_sdk.init() via
+  # _parse_sentry_sample_rate() / SENTRY_ENVIRONMENT override (wired alongside
+  # this file; see main_enterprise.py lifespan()).
+  SENTRY_ENVIRONMENT = 'production'
+  SENTRY_TRACES_SAMPLE_RATE = '0.1'
+  SENTRY_PROFILES_SAMPLE_RATE = '0.05'
+
+  # CORS — explicit origins only. Starlette's CORSMiddleware.allow_origins does
+  # exact string membership, NOT glob matching (verified against
+  # starlette/middleware/cors.py is_allowed_origin()) — a literal
+  # 'https://*.devskyy.app' entry would never match a real Origin header, so it
+  # is deliberately omitted here (fly.toml's copy of that literal is dead
+  # config). Subdomain coverage comes from the default allow_origin_regex baked
+  # into main_enterprise.py; override with CORS_ORIGIN_REGEX below only if a
+  # non-default pattern is ever needed.
+  CORS_ORIGINS = 'https://devskyy.app,https://www.devskyy.app,https://app.devskyy.app,https://api.devskyy.app'
+
+  # Redis cache (optional — graceful fallback if unavailable). Consumed by
+  # core/redis_cache.py:47,50,53,56.
+  REDIS_SOCKET_TIMEOUT = '2.0'
+  REDIS_CONNECT_TIMEOUT = '2.0'
+  REDIS_RETRY_ON_TIMEOUT = 'true'
+  REDIS_MAX_CONNECTIONS = '10'
+
+  # Database pool (asyncpg via SQLAlchemy). Names match DatabaseConfig in
+  # database/db.py:59-62 exactly (DB_*, NOT DATABASE_* — fly.toml's
+  # DATABASE_POOL_SIZE/MAX_OVERFLOW/POOL_TIMEOUT/POOL_RECYCLE are dead env vars,
+  # zero consumers; DATABASE_CONNECT_TIMEOUT has no consumer anywhere and is
+  # intentionally omitted rather than propagated as more dead config).
+  DB_POOL_SIZE = '5'
+  DB_MAX_OVERFLOW = '10'
+  DB_POOL_TIMEOUT = '5'
+  DB_POOL_RECYCLE = '3600'
+
+  # IMPORTANT: Set these via secrets, never as [env] values — see
+  # tasks/backend-golive-manifest.md for the gated `fly secrets set` step.
+  # fly secrets set -a devskyy-backend DATABASE_URL=postgresql+asyncpg://...
+  # fly secrets set -a devskyy-backend REDIS_URL=redis://...
+  # fly secrets set -a devskyy-backend JWT_SECRET_KEY=...
+  # fly secrets set -a devskyy-backend ENCRYPTION_MASTER_KEY=...
+  # fly secrets set -a devskyy-backend SENTRY_DSN=https://...
+  # fly secrets set -a devskyy-backend OPENAI_API_KEY=...      # if the deployed
+  # fly secrets set -a devskyy-backend ANTHROPIC_API_KEY=...   # routes need them
+
+[build]
+  # Slim main_enterprise image built by WS2 (dockerfile-api). Do NOT edit
+  # Dockerfile.api from this workstream — out of contract scope.
+  dockerfile = "Dockerfile.api"
+
+# HTTP service configuration
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # Dashboard-facing traffic: keep one machine warm to avoid cold-start latency
+  # on interactive requests. See tasks/backend-golive-manifest.md for the
+  # min_machines_running=0 (scale-to-zero) cost/latency tradeoff note.
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'requests'
+    hard_limit = 250
+    soft_limit = 200
+
+# Health checks — both routes verified live in main_enterprise.py:437,459
+# (a third route, /live, also exists at :464 but is not checked here, mirroring
+# fly.toml's existing convention of checking /health + /ready only).
+[[http_service.checks]]
+  grace_period = '60s'
+  interval = '15s'
+  timeout = '10s'
+  method = 'GET'
+  path = '/health'
+  protocol = 'http'
+  tls_skip_verify = false
+
+[[http_service.checks]]
+  grace_period = '60s'
+  interval = '30s'
+  timeout = '5s'
+  method = 'GET'
+  path = '/ready'
+  protocol = 'http'
+  tls_skip_verify = false
+
+# VM configuration
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 1024
+
+# NOTE: fly.toml's [metrics] (path=/metrics) and [[statics]] (guest_path=
+# /app/public) sections are deliberately omitted — main_enterprise.py exposes
+# neither a /metrics route nor a StaticFiles mount (verified by grep, only
+# app.mount(MCP_MOUNT_PATH, ...) exists at line 164). Add them back only if
+# those routes are added to the app.

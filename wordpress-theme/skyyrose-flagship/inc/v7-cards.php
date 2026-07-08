@@ -79,13 +79,43 @@ function skyyrose_v7_coll_label( $collection ) {
  * @return string Theme URI or empty string.
  */
 function skyyrose_v7_lockup_uri( $collection ) {
+	$sources = skyyrose_v7_lockup_sources( $collection );
+	return $sources['webp'];
+}
+
+/**
+ * V7 backdrop art sources for a collection — WebP + optional AVIF sibling.
+ *
+ * Backdrop art (brand-icon plaques for Black Rose / Love Hurts, rose-gold
+ * SR script for Signature, rose emblem for Kids Capsule) is pre-optimized
+ * at 800px in assets/images/products/v7/_lockups/. The card emits an
+ * image-set() so AVIF-capable browsers take the ~20-48KB tier.
+ *
+ * @since 1.8.0
+ * @param  string $collection Collection slug.
+ * @return array{webp: string, avif: string} URIs; '' when unavailable.
+ */
+function skyyrose_v7_lockup_sources( $collection ) {
 	$collection = sanitize_title( (string) $collection );
-	$rel        = 'assets/images/products/v7/_lockups/' . $collection . '.webp';
-	if ( $collection && is_readable( get_theme_file_path( $rel ) ) ) {
-		return get_theme_file_uri( $rel );
+	$sources    = array(
+		'webp' => '',
+		'avif' => '',
+	);
+
+	$rel = 'assets/images/products/v7/_lockups/' . $collection;
+	if ( $collection && is_readable( get_theme_file_path( $rel . '.webp' ) ) ) {
+		$sources['webp'] = get_theme_file_uri( $rel . '.webp' );
+		if ( is_readable( get_theme_file_path( $rel . '.avif' ) ) ) {
+			$sources['avif'] = get_theme_file_uri( $rel . '.avif' );
+		}
+		return $sources;
 	}
+
 	$mono = 'assets/images/logos/sr-monogram-rose-gold.webp';
-	return is_readable( get_theme_file_path( $mono ) ) ? get_theme_file_uri( $mono ) : '';
+	if ( is_readable( get_theme_file_path( $mono ) ) ) {
+		$sources['webp'] = get_theme_file_uri( $mono );
+	}
+	return $sources;
 }
 
 /**

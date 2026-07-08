@@ -10,7 +10,7 @@ Sync documentation from source-of-truth:
    - Extract all environment variables
    - Document purpose and format
 
-3. Generate docs/CONTRIB.md with:
+3. Generate docs/CONTRIBUTING.md with:
    - Development workflow
    - Available scripts
    - Environment setup

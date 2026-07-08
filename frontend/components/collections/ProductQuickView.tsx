@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import Image from 'next/image';
 import type { CollectionProduct } from '@/lib/collections';
 import { useCartStore } from '@/lib/stores/cart-store';
 
@@ -126,13 +125,16 @@ export default function ProductQuickView({
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Image */}
                 <div className="relative w-full md:w-1/2 aspect-[3/4] rounded-lg overflow-hidden bg-white/[0.02]">
-                  {!imageError ? (
-                    <Image
-                      src={product.image}
+                  {!imageError && product.image ? (
+                    // See ProductCard.tsx: SOT paths are theme assets served by
+                    // skyyrose.co, not the dashboard's public/ dir — next/image
+                    // throws synchronously on an unconfigured host before onError
+                    // can fire, so a plain <img> degrades gracefully instead.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/${product.image.replace(/^\/+/, '')}`}
                       alt={product.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
+                      className="absolute inset-0 h-full w-full object-cover"
                       onError={() => setImageError(true)}
                     />
                   ) : (
