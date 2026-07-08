@@ -365,7 +365,7 @@ async def main():
     summary = await deployer.full_deployment()
 
     # Save summary
-    summary_file = Path("deployment_summary.json")
+    summary_file = Path(".reports/deployment_summary.json")
     with open(summary_file, "w") as f:
         json.dump(summary, f, indent=2)
     logger.info(f"Summary saved to: {summary_file}")

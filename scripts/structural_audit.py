@@ -36,7 +36,7 @@ from bs4 import BeautifulSoup, Tag
 
 BASE_URL = os.environ.get("AUDIT_BASE_URL", "https://skyyrose.co").rstrip("/")
 REPO_ROOT = Path(__file__).resolve().parent.parent
-REDIRECTS_CSV = Path(os.environ.get("AUDIT_REDIRECTS_CSV", REPO_ROOT / "redirects.csv"))
+REDIRECTS_CSV = Path(os.environ.get("AUDIT_REDIRECTS_CSV", REPO_ROOT / "data" / "redirects.csv"))
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) skyyrose-structural-audit/1.0"
 TIMEOUT = 30
 
