@@ -1,7 +1,10 @@
 # MCP over HTTP — Architecture
 
-The DevSkyy MCP server (42 tools: agents, WooCommerce, imagery, RAG, code
-analysis, and more) is exposed over authenticated **streamable HTTP**, live at
+The DevSkyy MCP server (agents, WooCommerce, imagery, RAG, code analysis, and
+more — tool count is computed at runtime via `mcp.list_tools()`, never
+hand-typed; see `mcp_service.py`'s `/health` `tool_count` field and the
+Slim-service pivot rationale section below for the full/slim split) is
+exposed over authenticated **streamable HTTP**, live at
 `https://devskyy-api.fly.dev/mcp/`. This lets the Next.js dashboard (AI
 console) and the skyyrose.co WordPress admin both consume the same tool set
 over the network, instead of each client needing local stdio access to the
@@ -29,6 +32,23 @@ dependency is absent on this slim image rather than failing the whole
 service — `tools/list` still enumerates every tool, but a tool that proxies
 to the full `main_enterprise` backend (not deployed alongside this slim
 service) returns a runtime error only if actually invoked.
+
+**Full vs. slim tool count (verified via `mcp.list_tools()`):** the full
+backend registers **89** tools. The slim Fly image (`MCP_SLIM_IMAGE=1`, set
+in `Dockerfile.mcp`) registers **82** — 2 modules are *deliberately* excluded
+there (`oai_render`, `lora_generation`; see
+`mcp_tools/tools/__init__.py`'s `SLIM_EXCLUDED_MODULES`) because their heavy
+optional deps (`scripts.oai_render`, `imagery.*`) are never shipped to the
+slim image. `Dockerfile.mcp` was previously pinned to `python:3.11-slim`
+(below this project's `>=3.12` floor per `pyproject.toml`), which caused an
+*undeclared* third module — `external_mcp` (17 tools) — to silently drop as
+well: `core/errors/production_errors.py` uses PEP-695 generic-function syntax
+(`def error_handler[T](`), a `SyntaxError` on Python <3.12, which propagated
+past the `except ImportError` handler that only catches declared-missing
+modules. That left the slim image at 65 tools instead of 82. Fixed by
+bumping the base image to `python:3.12-slim` (matching the main `Dockerfile`)
+and copying `core/errors/` (stdlib+pydantic only, safe for the slim image)
+alongside the existing slim COPY set.
 
 ## Mount and auth
 
@@ -91,12 +111,15 @@ handler (`action: 'list' | 'call'`) that:
 - Returns `401` if there is no authenticated dashboard session
   (`getServerSession(authOptions)`), before ever touching the MCP token —
   per the route.ts comment, "the proxy holds `MCP_SERVICE_TOKEN`
-  server-side, so an open route would expose the full tool set" (the
-  in-code comment says "38 tools," a stale count from before later tool
-  additions; the live-verified count per `tasks/todo.md` P3b is 42).
+  server-side, so an open route would expose the full tool set" (the live
+  count is now served at runtime by `/health`'s `tool_count` field — see
+  above — rather than hand-typed in a comment).
 - Uses the official `@modelcontextprotocol/sdk` `Client` +
   `StreamableHTTPClientTransport`, constructing the transport with the
-  Bearer header baked into `requestInit` when `MCP_TOKEN` is set.
+  Bearer header baked into `requestInit` when `MCP_TOKEN` is set, and races
+  the call against a ~20s timeout (matching the WordPress bridge's timeout
+  below) since the transport has no native `AbortSignal` hook — see the
+  in-code comment in `route.ts` for why.
 - Reads `process.env.MCP_URL` and `process.env.MCP_SERVICE_TOKEN`
   server-side only — never sent to the browser, never exposed via
   `NEXT_PUBLIC_*`.
@@ -172,7 +195,9 @@ the exact `initialize` -> `notifications/initialized` -> `tools/list`
 sequence documented above against a live `/mcp` endpoint, then asserts:
 
 1. `initialize` returns HTTP 200 with a non-empty `Mcp-Session-Id` header.
-2. `tools/list` returns at least 40 tools.
+2. `tools/list` returns at least `MIN_TOOLS` tools (currently 70 — a
+   conservative floor below the slim image's verified 82; see
+   `scripts/verify-mcp-surfaces.sh`'s inline comment for the derivation).
 3. A request with no `Authorization` header returns HTTP 401.
 
 It never calls `tools/call`, so it cannot mutate any state. It is CI-safe:

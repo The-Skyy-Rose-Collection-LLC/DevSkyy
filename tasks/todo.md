@@ -1,6 +1,6 @@
 # Current Tasks
 
-## ACTIVE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
+## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
 
 Replace 4 hardcoded-fixture handler bodies with real agent delegation. TDD, tests green, scope-clean.
 Wiring is autonomous-safe; runtime paid/prod gates stay intact (tests MUST mock paid/prod calls).
@@ -43,7 +43,8 @@ DEFER:      store.py (sqlite LocalVectorStore) — no consumer, YAGNI; E-store c
 
 ## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
 
-Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+Goal: expose the devskyy MCP (tool count computed at runtime — see mcp_service.py
+/health) over authenticated HTTP so the Next.js
 dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
 the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
 Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
@@ -60,7 +61,8 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
       (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
       ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
-      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      initialize→200+Mcp-Session-Id, tools/list→42 tools (stale point-in-time reading;
+      live count is now served by /health's tool_count field), 401 w/o Bearer, foreign Host→421.
       Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
 - [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
       console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
@@ -220,9 +222,9 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 ## Dashboard (devskyy.app) — Gaps to Fill
 
 ### Priority 1: Settings Persistence
-- [ ] Create `frontend/app/api/settings/route.ts` — GET/PUT settings via FastAPI or local file
-- [ ] Wire `frontend/app/admin/settings/page.tsx` — replace localStorage with API calls
-- [ ] Remove `// TODO: Also save to backend API` comment
+SHIPPED — `frontend/app/api/settings/route.ts` exists (GET/PUT, real handler);
+`frontend/app/admin/settings/page.tsx` already wired per
+`tasks/wiring-gaps-register.md` T2-4. This section is stale, kept for history.
 
 ### Priority 2: Tasks Page Expansion
 - [ ] Expand `frontend/app/admin/tasks/page.tsx` (122L) — add task list, filtering, history, status tracking
@@ -236,9 +238,10 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 - [ ] Expand specialized agents list (currently "+42 more agents..." placeholder)
 
 ### Priority 4: Monitoring — Real API Wiring
-- [ ] Wire `frontend/app/admin/monitoring/page.tsx` to FastAPI health endpoints
-- [ ] Replace `setTimeout + random data` in refreshMetrics with actual API calls
-- [ ] Add real service health checks (WordPress, Vercel, FastAPI, DB)
+Backend SHIPPED — `api/v1/monitoring.py:360` `/monitoring/metrics` route,
+mounted `main_enterprise.py:286`. Remaining: frontend `metrics()` client
+method + `useMonitoring` wire per `tasks/wiring-gaps-register.md` T3-9
+(frontend-only).
 
 ### Priority 5: Autonomous — Live Data
 - [ ] Wire `frontend/app/admin/autonomous/page.tsx` to selfHealingService real endpoints

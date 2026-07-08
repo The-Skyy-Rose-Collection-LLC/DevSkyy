@@ -16,7 +16,7 @@
 #
 # Asserts:
 #   1. initialize returns HTTP 200 with a non-empty Mcp-Session-Id response header.
-#   2. tools/list returns >= 40 tools.
+#   2. tools/list returns >= MIN_TOOLS tools (currently 70, see inline comment).
 #   3. A request to MCP_URL with no Authorization header returns HTTP 401.
 
 set -euo pipefail
@@ -24,7 +24,11 @@ set -euo pipefail
 MCP_URL="${MCP_URL:-}"
 MCP_SERVICE_TOKEN="${MCP_SERVICE_TOKEN:-}"
 PROTOCOL_VERSION="2025-06-18"
-MIN_TOOLS=40
+# Conservative floor below the slim image's verified 82 (89 full -
+# len(SLIM_EXCLUDED_MODULES)=2 modules/7 tools; see
+# mcp_tools/tools/__init__.py). Not an exact match — tolerates minor drift
+# (future tool additions/removals) without false failures on this verifier.
+MIN_TOOLS=70
 
 if [ -z "$MCP_URL" ] || [ -z "$MCP_SERVICE_TOKEN" ]; then
   echo "SKIPPED: MCP_URL and/or MCP_SERVICE_TOKEN not set in environment."
