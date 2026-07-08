@@ -11,6 +11,10 @@ on:
       - "scripts/sync_catalog_downstream.py"
       - "skyyrose/elite_studio/tests/test_catalog_consistency.py"
       - "skyyrose/elite_studio/tests/conftest.py"
+      - "scripts/build_v7_cards.py"
+      - "skyyrose/core/catalog_loader.py"
+      - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
+      - "tests/test_v7_cards_generator.py"
   push:
     branches: [main]
     paths:
@@ -18,6 +22,9 @@ on:
       - "skyyrose/elite_studio/sku_resolver.py"
       - "skyyrose/elite_studio/logo_registry.py"
       - "scripts/validate_catalog_consistency.py"
+      - "scripts/build_v7_cards.py"
+      - "skyyrose/core/catalog_loader.py"
+      - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
 
 jobs:
   validate:
