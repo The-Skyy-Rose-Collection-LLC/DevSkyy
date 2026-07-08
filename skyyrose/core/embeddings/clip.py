@@ -12,17 +12,17 @@ embeds; older versions returned the tensor directly. The fallback handles both.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import torch
 from PIL import Image
-from transformers import CLIPModel, CLIPProcessor
 
 from skyyrose.core.embeddings.base import BaseEncoder
-from skyyrose.core.embeddings.device import dtype_load_kwargs, resolve_dtype
 from skyyrose.core.embeddings.errors import EmbedError
 from skyyrose.core.embeddings.space import EmbeddingSpace
+
+if TYPE_CHECKING:
+    import torch
 
 
 class ClipEncoder(BaseEncoder):
@@ -39,6 +39,15 @@ class ClipEncoder(BaseEncoder):
         )
 
     def _load(self, device: str) -> tuple[Any, Any]:
+        try:
+            from transformers import CLIPModel, CLIPProcessor
+
+            from skyyrose.core.embeddings.device import dtype_load_kwargs, resolve_dtype
+        except ImportError as exc:
+            raise ImportError(
+                "CLIP embeddings require the 'ml' extra. Install with: pip install -e '.[ml]'"
+            ) from exc
+
         c = self._config
         dtype = resolve_dtype(c.dtype)
         model = (
@@ -69,6 +78,8 @@ class ClipEncoder(BaseEncoder):
         return getattr(features, "pooler_output", features)
 
     def _encode_pils(self, images: list[Image.Image]) -> np.ndarray:
+        import torch
+
         inputs = self._processor(images=images, return_tensors="pt").to(self._device)
         with torch.no_grad():
             feats = self._projected(self._model.get_image_features(**inputs))
@@ -76,6 +87,8 @@ class ClipEncoder(BaseEncoder):
 
     def embed_text(self, text: str) -> np.ndarray:
         """Encode text → 512-d L2-normalized vector (shares CLIP's image space)."""
+        import torch
+
         if not text or not text.strip():
             raise EmbedError("embed_text requires non-empty text")
         self._ensure_loaded()

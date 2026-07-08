@@ -10,7 +10,8 @@ from PIL import Image
 # Skip these tests if torchvision is unavailable (transformers AutoImageProcessor requires it)
 pytest.importorskip("torchvision")
 
-from skyyrose.core.embeddings import dino as dino_mod
+from transformers import AutoImageProcessor, AutoModel
+
 from skyyrose.core.embeddings.config import EmbeddingConfig
 from skyyrose.core.embeddings.device import dtype_load_kwargs
 from skyyrose.core.embeddings.dino import DinoEncoder
@@ -59,8 +60,8 @@ def patched(monkeypatch):
         calls["proc"] = {"model_id": model_id, **kwargs}
         return _FakeProcessor()
 
-    monkeypatch.setattr(dino_mod.AutoModel, "from_pretrained", fake_model_fp)
-    monkeypatch.setattr(dino_mod.AutoImageProcessor, "from_pretrained", fake_proc_fp)
+    monkeypatch.setattr(AutoModel, "from_pretrained", fake_model_fp)
+    monkeypatch.setattr(AutoImageProcessor, "from_pretrained", fake_proc_fp)
     return calls
 
 
