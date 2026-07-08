@@ -43,7 +43,7 @@ COPY pipelines/ /app/pipelines/
 COPY agents/ /app/agents/
 COPY security/ /app/security/
 
-RUN pip install --no-cache-dir -e ".[ml]" -r requirements-trellis.txt redis
+RUN pip install --no-cache-dir -e . -r requirements-trellis.txt redis
 
 RUN mkdir -p "$THREE_D_OUTPUT_DIR" "$TRELLIS_CACHE_DIR"
 
