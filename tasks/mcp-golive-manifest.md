@@ -6,7 +6,7 @@ below is what remains to wire the two consumer surfaces (dashboard, WordPress)
 and the WooCommerce tools to that live backend.
 
 Per `CLAUDE.md`'s STOP AND SHOW protocol, every block below touches
-production (Vercel prod env / Fly secrets / skyyrose.co) and **requires
+production (Fly secrets / Vercel prod env / skyyrose.co) and **requires
 explicit "y"/"yes" confirmation before execution** — this document is the
 manifest to show, not an instruction to run any of it autonomously. No real
 secret values are pasted anywhere in this file; every token/secret is a
@@ -16,48 +16,15 @@ lives (`.env.wordpress`, `fly secrets list`, etc.).
 Full architecture reference: `docs/mcp-http-architecture.md`.
 Read-only post-verify tool used throughout: `scripts/verify-mcp-surfaces.sh`.
 
----
-
-## Block 1 — Vercel production env (dashboard surface)
-
-```
-STOP — Confirm before proceeding:
-
-Action : Set Vercel Production environment variables + redeploy
-Vars   : MCP_URL=https://devskyy-api.fly.dev/mcp/
-         MCP_SERVICE_TOKEN=<value-from-fly-secrets:MCP_SERVICE_TOKEN>
-Cost   : $0 (no paid API call) — but redeploys the live dashboard
-Proceed? [y/N]
-```
-
-Commands (only after "y"):
-
-```bash
-cd frontend
-vercel env add MCP_URL production
-# paste: https://devskyy-api.fly.dev/mcp/
-vercel env add MCP_SERVICE_TOKEN production
-# paste: <value-from-fly-secrets:MCP_SERVICE_TOKEN> (see `fly secrets list -a devskyy-api`,
-# value itself lives in .env.wordpress or the Fly dashboard — never print it)
-npm run deploy
-```
-
-**Post-verify:**
-
-```bash
-MCP_URL=https://devskyy-api.fly.dev/mcp/ \
-MCP_SERVICE_TOKEN=<value-from-fly-secrets:MCP_SERVICE_TOKEN> \
-bash scripts/verify-mcp-surfaces.sh
-```
-
-This confirms the backend itself is healthy and the token is valid — it does
-not test Vercel's wiring. Follow with a manual browser check: sign in to the
-deployed dashboard, open `/admin/mcp`, click "list tools", confirm >= 40
-tools render.
+**Order:** Fly first, then Vercel, then WordPress — `fly secrets set`
+restarts the single `devskyy-api` machine (session-affinity drop; see
+`fly.toml`'s single-machine-by-design comment), so it should run while
+nothing downstream is actively consuming the endpoint, before the dashboard
+and WordPress surfaces are pointed at it. DNS stays last/deferred.
 
 ---
 
-## Block 2 — Fly WooCommerce secrets
+## Block 1 — Fly WooCommerce secrets
 
 ```
 STOP — Confirm before proceeding:
@@ -92,6 +59,46 @@ Then (manual, founder-run, read-only): call the `wc_get_products` tool via
 the dashboard console with a small `per_page` to confirm the WC credentials
 resolve end-to-end (`skyyrose/integrations/wc_safe_client.py` raises
 `KeyError` at call time if either var is still missing).
+
+---
+
+## Block 2 — Vercel production env (dashboard surface)
+
+```
+STOP — Confirm before proceeding:
+
+Action : Set Vercel Production environment variables + redeploy
+Vars   : MCP_URL=https://devskyy-api.fly.dev/mcp/
+         MCP_SERVICE_TOKEN=<value-from-fly-secrets:MCP_SERVICE_TOKEN>
+Cost   : $0 (no paid API call) — but redeploys the live dashboard
+Proceed? [y/N]
+```
+
+Commands (only after "y"):
+
+```bash
+cd frontend
+vercel env add MCP_URL production
+# paste: https://devskyy-api.fly.dev/mcp/
+vercel env add MCP_SERVICE_TOKEN production
+# paste: <value-from-fly-secrets:MCP_SERVICE_TOKEN> (see `fly secrets list -a devskyy-api`,
+# value itself lives in .env.wordpress or the Fly dashboard — never print it)
+npm run deploy
+```
+
+**Post-verify:**
+
+```bash
+MCP_URL=https://devskyy-api.fly.dev/mcp/ \
+MCP_SERVICE_TOKEN=<value-from-fly-secrets:MCP_SERVICE_TOKEN> \
+bash scripts/verify-mcp-surfaces.sh
+```
+
+This confirms the backend itself is healthy and the token is valid — it does
+not test Vercel's wiring. Follow with a manual browser check: sign in to the
+deployed dashboard, open `/admin/mcp`, click "list tools", confirm >= 70
+tools render (see `scripts/verify-mcp-surfaces.sh` MIN_TOOLS comment for
+derivation).
 
 ---
 
@@ -186,10 +193,33 @@ bash scripts/verify-mcp-surfaces.sh
 
 ---
 
+## Token rotation
+
+`MCP_SERVICE_TOKEN` lives in **4 places**. Rotate in this order — each is
+STOP-AND-SHOW per this document's existing convention:
+
+1. **Fly secret** `MCP_SERVICE_TOKEN` (`fly secrets set -a devskyy-api`) —
+   source of truth; this is the value the other 3 locations must match.
+   Restarts the machine (drops in-flight sessions), same as Block 1.
+2. Re-run `bash scripts/verify-mcp-surfaces.sh` with the **new** token to
+   confirm the backend accepts it before touching any consumer surface.
+3. **Vercel Production env** `MCP_SERVICE_TOKEN` — update + redeploy (Block
+   2 commands), then re-verify.
+4. **WordPress** `SKYYROSE_MCP_TOKEN` const/option — update (Block 3), then
+   re-verify.
+5. Finally, the **verify-mcp-surfaces.sh caller env** — this is not stored
+   anywhere; it's passed at invocation time by whoever runs the script, so
+   there's nothing to rotate here beyond using the new value going forward.
+
+Run `bash scripts/verify-mcp-surfaces.sh` (with the new token exported) as
+the final cross-surface check once all 4 locations agree.
+
+---
+
 ## Summary checklist
 
-- [ ] Block 1 — Vercel `MCP_URL` + `MCP_SERVICE_TOKEN` (Production) + redeploy — confirmed? ______
-- [ ] Block 2 — Fly `WC_CONSUMER_KEY` / `WC_CONSUMER_SECRET` — confirmed? ______
+- [ ] Block 1 — Fly `WC_CONSUMER_KEY` / `WC_CONSUMER_SECRET` — confirmed? ______
+- [ ] Block 2 — Vercel `MCP_URL` + `MCP_SERVICE_TOKEN` (Production) + redeploy — confirmed? ______
 - [ ] Block 3 — WordPress `SKYYROSE_MCP_URL` / `SKYYROSE_MCP_TOKEN` (+ theme deploy if needed) — confirmed? ______
 - [ ] Block 4 (optional) — `api.devskyy.app` cert + DNS — confirmed? ______
 
