@@ -65,7 +65,6 @@ DevSkyy/
 │       └── webhooks/           # Webhook handlers
 │
 ├── services/                   # ⭐ Layer 5: Business Logic
-│   ├── ai_image_enhancement.py # FLUX, SD3, RemBG
 │   └── ...                     # Other services
 │
 ├── llm/                        # LLM Router
