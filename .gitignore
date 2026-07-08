@@ -406,6 +406,10 @@ renders/_quarantine/
 renders/gated/
 generated_3d_models/
 
+# OpenAI product feed generator output — fully regenerable via
+# `python scripts/openai_product_feed.py --write` against live WC; don't track.
+feeds/
+
 # User PII data
 data/user/
 

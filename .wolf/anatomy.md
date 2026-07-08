@@ -3953,3 +3953,18 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `setup-claude-config.sh` `claude-mem-settings.sh` `install_agy.sh` `run_generation.sh` `pre-build-check.sh` → `scripts/`; `autonomous_agent_demo.py` → `examples/`
 - `redirects.csv` `skyyrose_clothing_barcodes.txt` → `data/`; `autotrain_config.yaml` → `config/`; `deployment_summary.json` `wordpress-health-check-results.json` → `.reports/`
 - Domain config index: `SOT.md` → "Domain configuration map" (read that before old docs)
+
+## OpenAI ChatGPT product feed (2026-07-08)
+
+- `docs/integrations/openai-product-feed-spec.md` — Full field-by-field OpenAI Commerce "Stable" file-upload product feed spec, fetched from developers.openai.com/commerce/specs/file-upload/products; 15 schema groups, required-field summary. (~2.4k tok)
+- `docs/integrations/openai-feed-compliance-report.md` — Live audit: 18/33 catalog SKUs feed-ready today; sole blocker = 15 pre-order SKUs missing `availability_date` (no source anywhere in stack). Field matrix, per-product issue list, CSV drift, remediation list. (~2.9k tok)
+- `data/audits/openai-feed/wc-products-2026-07-08.json` — Raw pretty-printed WC REST v3 snapshot (35 products incl. variations placeholder), reproducible audit input. (~180k tok, don't read whole — query with python/jq)
+- `scripts/openai_feed/__init__.py` — Package docstring only.
+- `scripts/openai_feed/constants.py` — `FeedConstants` dataclass (brand/seller/return-policy/geo constants + is_eligible_* flags, checkout defaults False), `REQUIRED_FIELDS`/`CHECKOUT_REQUIRED_FIELDS`/`VALID_AVAILABILITY`/`CSV_COLUMNS`. (~500 tok)
+- `scripts/openai_feed/catalog.py` — `load_catalog()` reads skyyrose-catalog.csv (SOT) into {sku: row} dict; used for `is_preorder` lookup. (~150 tok)
+- `scripts/openai_feed/mapping.py` — Pure functions: `clean_text` (HTML-strip+unescape), `resolve_availability` (catalog is_preorder overrides WC stock_status — WC reports instock even for preorder SKUs), `map_simple_product`, `map_variation`, `map_product_to_feed_items` (dispatches variable vs simple). No network. (~1.2k tok)
+- `scripts/openai_feed/validation.py` — `validate_feed_item` (required-fields-only check, never fails on missing optional fields), `partition_items` (valid/excluded split). (~600 tok)
+- `scripts/openai_feed/wc_client.py` — httpx WC REST v3 client: `.env.wordpress` loader (no python-dotenv dep), `fetch_all_products`/`fetch_variations`/`fetch_catalog` with pagination + retry-on-5xx/timeout. Read-only GETs only. (~1k tok)
+- `scripts/openai_feed/writer.py` — `write_csv_feed` (gzip+csv stdlib, no pandas/pyarrow), `write_exclusions` (JSON report). Format rationale documented in module docstring. (~350 tok)
+- `scripts/openai_product_feed.py` — CLI entry point. `--dry-run` (default, no writes) / `--write` (emits `feeds/openai-product-feed.csv.gz` + `feeds/openai-feed-exclusions.json`). Both modes read-only against WC. (~900 tok)
+- `tests/test_openai_product_feed.py` — 23 pure-function tests (no network), fixtures sampled from the real WC snapshot + one synthetic variable-product fixture for the untested-live variant path. All pass via `rtk proxy pytest`. (~1.8k tok)
