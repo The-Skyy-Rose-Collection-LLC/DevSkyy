@@ -87,11 +87,11 @@ class ClipEncoder(BaseEncoder):
 
     def embed_text(self, text: str) -> np.ndarray:
         """Encode text → 512-d L2-normalized vector (shares CLIP's image space)."""
-        import torch
-
         if not text or not text.strip():
             raise EmbedError("embed_text requires non-empty text")
         self._ensure_loaded()
+        import torch
+
         inputs = self._processor(
             text=[text], return_tensors="pt", padding=True, truncation=True
         ).to(self._device)
