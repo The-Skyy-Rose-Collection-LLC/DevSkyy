@@ -323,6 +323,11 @@ from api.v1.wordpress_integration import router as wordpress_router
 
 app.include_router(wordpress_router, prefix="/api/v1")
 
+# WooCommerce webhooks (order/product events)
+from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
+
+app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
+
 # Feature flags
 from api.v1.feature_flags import router as feature_flags_router
 

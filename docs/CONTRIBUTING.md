@@ -182,7 +182,7 @@ FastAPI mounts every `api/v1/*.py` router under `/api/v1` (each router declares 
 | `social_media.py` | `/api/v1` | Social content generation, scheduling, analytics |
 | `sync.py` | `/api/v1` | Asset sync pipeline (HF ↔ DevSkyy ↔ WordPress) |
 | `training_status.py` | `/api/v1/training` | LoRA training-run progress (reads the same `RUNS_DIR` as `scripts/flux_lora`) |
-| `woocommerce_webhooks.py` | `/api/v1` (`/order`, `/product`) | Inbound WooCommerce webhook receivers |
+| `woocommerce_webhooks.py` | `/api/v1/woocommerce/webhooks` (`/order`, `/product`) | Inbound WooCommerce webhook receivers |
 | `wordpress.py`, `wordpress_agent.py`, `wordpress_integration.py`, `wordpress_theme.py` | `/api/v1` | WordPress/WooCommerce sync, agent execution, product↔collection sync, theme deploy trigger |
 
 **Auth posture is opt-in, not default** — public catalog reads vs. `Depends(get_current_user)` vs. rate-limited are each router's explicit choice. Any caller-provided URL must validate through `security.ssrf_protection.ssrf_protection.validate_url()` before use (mandatory per `api/CLAUDE.md`; was a P1 finding in PR #649).
