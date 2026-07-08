@@ -35,6 +35,7 @@
 - `docker-entrypoint.sh` — startup script; generates JWT/ENC keys if unset, then dispatches a passed command (worker) or defaults to uvicorn (~1100 tok)
 - `Dockerfile` — multi-stage Python image (builder + non-root runtime), `COPY . .` + allowlist .dockerignore, INSTALL_TARGET arg, tini PID1; one image for app+workers (~1200 tok)
 - `fastmcp.config.json` (~287 tok)
+- `fly.backend.toml` — Fly config for devskyy-backend (main_enterprise API app); explicit CORS origins (no dead wildcard literal), DB_*/REDIS_* env names matching actual code consumers, /health+/ready checks (~1050 tok)
 - `fly.toml` — fly.toml - DevSkyy Enterprise Platform (~1070 tok)
 - `G1-BUNDLE.md` — G1 STOP — Phase 0 Review Bundle (~2329 tok)
 - `glb-models.html` — 33-SKU 3D GLB keep/delete QC sheet; model-viewer + meshopt/basis/draco decoders; serve over HTTP (`python3 -m http.server 8010`), file://-robust via CDN fallback + warning banner (~7000 tok)
