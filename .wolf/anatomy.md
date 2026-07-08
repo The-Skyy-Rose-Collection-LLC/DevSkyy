@@ -1744,11 +1744,12 @@
 - `package.json` — Node.js package manifest (~1294 tok)
 - `playwright.config.ts` — Playwright test configuration (~236 tok)
 - `postcss.config.js` — PostCSS configuration (~24 tok)
-- `proxy.ts` — Next.js Proxy — Protects /admin/* routes with NextAuth.js (~224 tok)
+- `proxy.ts` — Next.js Proxy — gates /admin/* + /api/* (except auth/checkout/webhooks) with NextAuth.js (~230 tok)
 - `tailwind.config.ts` — Tailwind CSS configuration (~770 tok)
 - `tsconfig.json` — TypeScript configuration (~200 tok)
 - `VERCEL_PROJECT_CONFIG.md` — Vercel Project Configuration (~1510 tok)
 - `vercel.json` — /*.ts": { (~492 tok)
+- `vitest.config.ts` — vitest config scoped to lib/wp/**/*.test.ts (server-only-free WP wiring modules) — WS7 (~98 tok)
 
 ## frontend/app/
 
@@ -1882,6 +1883,10 @@
 - `CLAUDE.md` (~11 tok)
 - `route.ts` — NextAuth.js v4 API Route Handler (~82 tok)
 
+## frontend/app/api/catalog/summary/
+
+- `route.ts` — Live WooCommerce catalog counts vs canonical CSV, by collection — WS7 (~310 tok)
+
 ## frontend/app/api/checkout/
 
 - `route.ts` — Stripe is initialized lazily to avoid errors when STRIPE_SECRET_KEY is not set (~622 tok)
@@ -1890,6 +1895,10 @@
 
 - `CLAUDE.md` (~11 tok)
 - `route.ts` — Conversion Analytics API — Unified Event Collection (~3265 tok)
+
+## frontend/app/api/health/
+
+- `route.ts` — WP↔dashboard wiring health check: public/authed-wc/authed-wp probes — WS7 (~267 tok)
 
 ## frontend/app/api/huggingface/
 
@@ -1977,6 +1986,10 @@
 ## frontend/app/api/v1/3d/status/
 
 - `route.ts` — Next.js API route: GET (~156 tok)
+
+## frontend/app/api/webhooks/woocommerce/
+
+- `route.ts` — WooCommerce webhook receiver, HMAC-verified + tag revalidation — WS7 (~270 tok)
 
 ## frontend/app/api/wordpress/proxy/
 
@@ -2270,6 +2283,21 @@
 ## frontend/lib/vercel/
 
 - `deployment-manager.ts` — Vercel Deployment Manager (~4402 tok)
+
+## frontend/lib/wp/
+
+WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signature.ts`/`throttle.ts` are framework-free (unit-tested with vitest); `client.ts` composes them behind `server-only`. Coexists with `lib/wordpress/` (legacy stack, untouched, own env names).
+
+- `auth-policy.ts` — resolveAuthTier(path): 'public'\|'wc'\|'wp-app', throws on unmatched path (~196 tok)
+- `client.ts` — server-only typed client: wpRequest/wpRequestRaw + 13 typed methods (~1184 tok)
+- `signature.ts` — computeWebhookSignature/verifyWebhookSignature, HMAC-SHA256 via node:crypto (~161 tok)
+- `throttle.ts` — RequestThrottle: 2 req/s pacing + Retry-After-aware backoff (~214 tok)
+
+## frontend/lib/wp/__tests__/
+
+- `auth-policy.test.ts` — vitest: tier routing per prefix + throw-on-unknown (~109 tok)
+- `signature.test.ts` — vitest: accept-on-match, reject on tampered body/secret/null/malformed (~158 tok)
+- `throttle.test.ts` — vitest: fake-timer pacing delay + Retry-After/backoff math (~165 tok)
 
 ## frontend/lib/wordpress/
 
@@ -3011,6 +3039,16 @@
 - `merge_gate.py` — Merge gate — evaluates the 10-check predicate for auto-merge. (~2148 tok)
 - `reviewer.py` — Reviewer agent — Claude judges a PR diff and returns APPROVE / REQUEST_CHANGES / DEFER_HUMAN. (~3278 tok)
 - `RISK_PATHS.txt` — alembic/versions/** (~264 tok)
+
+## scripts/remediation/
+
+WS7 wiring core scripts (spec C2/C3/C6). All live-hitting entrypoints are dry-run/read-only by default, gated behind an explicit flag + `STOPSHOW_ACK=1` for any production write.
+
+- `__init__.py` — empty, makes remediation/ an importable package (matches `scripts/` subpackage convention) (~0 tok)
+- `env.example` — WS7 env var template (WP_BASE_URL, WP_APP_USER/PASSWORD, WC_CONSUMER_KEY/SECRET, WP_WEBHOOK_SECRET, REVALIDATE_SECRET) (~157 tok)
+- `register_webhooks.py` — idempotent WC webhook registration; `diff_webhooks()` pure; dry-run default, `--execute`+`STOPSHOW_ACK=1` for live POST (~523 tok)
+- `setup_credentials.py` — HG-7 credential setup + live validation against production endpoints; syncs to Vercel env (~1400 tok)
+- `wiring_audit.py` — spec-C6 runnable audit: health/public/authed/signature/secret-grep/pacing checks; write checks gated `--write`+`STOPSHOW_ACK=1` (~1713 tok)
 
 ## scripts/security/
 
