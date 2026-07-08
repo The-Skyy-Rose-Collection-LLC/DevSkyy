@@ -3,7 +3,7 @@
 Distilled from 55+ source deep-research (full report in session transcript). Binding for all mascot implementation.
 
 ## Entrance & frequency
-1. NO pop-in on page load. Primary proactive trigger = 10–30s idle, tuned per page dwell.
+1. NO pop-in ever — she always WALKS in, animated. First entrance of a session = ~4.5s after load (host greets arrivals — founder directive 2026-07-08; the earlier idle-only rule meant actively-browsing visitors never saw her). Re-entries = 10–30s idle trigger, reset by activity.
 2. First visit = ONE contextual nudge, never a tour.
 3. Hard cap ~2–4 proactive appearances per session.
 4. Dismissed = gone for the session (persisted); never resurface the same prompt.

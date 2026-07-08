@@ -4,9 +4,11 @@
  * State machine: dormant → walking-in → greeting → idle ↔ speaking → exiting
  *
  * Design rules (binding — see tasks/mascot-design-rulebook.md):
- * - NO pop-in on page load. Proactive entrance triggers after the visitor
- *   has been idle (no scroll/pointer/key activity) for a randomized 10–30s
- *   window, never on a fixed page-load timer.
+ * - NO pop-in: she always WALKS in (animated entrance), never materializes.
+ *   First entrance of a session fires FIRST_ENTRY_DELAY_MS after load —
+ *   host-greets-arrival semantics (founder directive 2026-07-08; idle-only
+ *   gating meant actively-browsing visitors never saw her). Re-entries
+ *   only after a randomized 10–30s idle window, reset by activity.
  * - Hard cap of MAX_PROACTIVE_APPEARANCES proactive appearances per session.
  * - A dismissal (minimize/ESC) is remembered for the rest of the session —
  *   Skyy never walks on again unsolicited after that; the recall pill stays
@@ -51,6 +53,12 @@
 	var IDLE_TRIGGER_MIN_MS      = 10000;
 	var IDLE_TRIGGER_MAX_MS      = 30000;
 	var ACTIVITY_THROTTLE_MS     = 250;
+	/* First entrance of a session fires this long after load REGARDLESS of
+	 * activity — she is the site host and greets arrivals. Only re-entries
+	 * use the idle-trigger window above (an actively scrolling visitor never
+	 * accumulates 10-30s of stillness, so idle-only gating means engaged
+	 * visitors never meet her — the exact bug shipped in v1.9.2). */
+	var FIRST_ENTRY_DELAY_MS     = 4500;
 	var TYPEWRITER_SPEED         = 28;
 	var BUBBLE_AUTO_HIDE         = 8000;
 	var MAX_PROACTIVE_APPEARANCES = 3;
@@ -595,13 +603,14 @@
 	}
 
 	// -------------------------------------------------------------------------
-	// Idle-Trigger Entrance
+	// Entrance scheduling
 	//
-	// NO pop-in on page load: the proactive entrance only fires after the
-	// visitor has gone quiet (no scroll/pointer/key activity) for a
-	// randomized 10–30s window. Any activity resets the timer. Capped at
-	// MAX_PROACTIVE_APPEARANCES per session and skipped entirely once the
-	// visitor has explicitly dismissed her this session.
+	// First appearance per session: fixed FIRST_ENTRY_DELAY_MS after load,
+	// NOT reset by activity — she is the site host and greets arrivals.
+	// Re-entries (after she has appeared at least once): only after the
+	// visitor has gone quiet for a randomized 10–30s window, activity resets
+	// that timer. Capped at MAX_PROACTIVE_APPEARANCES per session and skipped
+	// entirely once the visitor has explicitly dismissed her this session.
 	// -------------------------------------------------------------------------
 
 	function scheduleIdleEntrance() {
@@ -609,7 +618,11 @@
 		if (isDismissedThisSession() || proactiveAppearancesExhausted()) {
 			return;
 		}
-		var threshold = IDLE_TRIGGER_MIN_MS + Math.random() * (IDLE_TRIGGER_MAX_MS - IDLE_TRIGGER_MIN_MS);
+		// First appearance of the session: short fixed delay, host-greets-
+		// arrival semantics. Re-entries: randomized idle window.
+		var threshold = getAppearanceCount() === 0
+			? FIRST_ENTRY_DELAY_MS
+			: IDLE_TRIGGER_MIN_MS + Math.random() * (IDLE_TRIGGER_MAX_MS - IDLE_TRIGGER_MIN_MS);
 		idleTimer = setTimeout(function () {
 			if (state === 'dormant' && !isDismissedThisSession() && !proactiveAppearancesExhausted()) {
 				walkOn(true);
@@ -621,9 +634,10 @@
 		var now = Date.now();
 		if (now - lastActivityReset < ACTIVITY_THROTTLE_MS) return;
 		lastActivityReset = now;
-		// Only re-arm the entrance timer before she's appeared — once idle
-		// or speaking, activity shouldn't cancel her.
-		if (state === 'dormant') {
+		// Re-arm only for idle-triggered RE-entries. The first-entrance timer
+		// must survive scrolling/mouse movement — resetting it on activity
+		// means engaged visitors never see her at all.
+		if (state === 'dormant' && getAppearanceCount() > 0) {
 			scheduleIdleEntrance();
 		}
 	}
