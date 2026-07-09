@@ -65,3 +65,43 @@ class TestProductionFailLoud:
         await db.initialize(DatabaseConfig(url="sqlite+aiosqlite:///:memory:"))
 
         assert db._engine is not None
+
+
+class TestAsyncpgUrlNormalization:
+    """Neon-style URLs carry psycopg2-only query params (sslmode,
+    channel_binding) that asyncpg.connect() rejects — _normalize_async_url
+    must translate sslmode to asyncpg's ssl and drop channel_binding."""
+
+    def test_neon_url_sslmode_translated_and_channel_binding_dropped(self):
+        from database.db import _normalize_async_url
+
+        url = _normalize_async_url(
+            "postgresql://u:p@ep-x-123.us-west-2.aws.neon.tech/neondb"
+            "?sslmode=require&channel_binding=require"
+        )
+        assert url.startswith("postgresql+asyncpg://")
+        assert "sslmode=" not in url
+        assert "channel_binding=" not in url
+        assert "ssl=require" in url
+
+    def test_plain_postgres_url_untouched_params_absent(self):
+        from database.db import _normalize_async_url
+
+        assert (
+            _normalize_async_url("postgres://u:p@h:5432/db") == "postgresql+asyncpg://u:p@h:5432/db"
+        )
+
+    def test_already_async_url_with_sslmode_still_translated(self):
+        from database.db import _normalize_async_url
+
+        url = _normalize_async_url("postgresql+asyncpg://u:p@h/db?sslmode=verify-full")
+        assert "sslmode=" not in url
+        assert "ssl=verify-full" in url
+
+    def test_sqlite_url_untouched(self):
+        from database.db import _normalize_async_url
+
+        assert (
+            _normalize_async_url("sqlite+aiosqlite:///./devskyy.db")
+            == "sqlite+aiosqlite:///./devskyy.db"
+        )

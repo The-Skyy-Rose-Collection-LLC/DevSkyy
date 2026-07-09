@@ -71,13 +71,34 @@ def _normalize_async_url(url: str) -> str:
     installed. Rewrite it to ``postgresql+asyncpg://`` so any well-formed Postgres
     URL works without callers having to know the driver. Already-qualified URLs
     (``postgresql+asyncpg://``, ``sqlite+aiosqlite://``) pass through unchanged.
+
+    Query params are normalized for asyncpg: managed-Postgres hosts (Neon,
+    Supabase, RDS) hand out URLs with libpq/psycopg2-only params that
+    ``asyncpg.connect()`` rejects — ``sslmode`` becomes asyncpg's ``ssl`` and
+    ``channel_binding`` (no asyncpg equivalent) is dropped.
     """
     if not url:
         return url
     for prefix in ("postgresql://", "postgres://"):
         if url.lower().startswith(prefix):
-            return "postgresql+asyncpg://" + url[len(prefix) :]
-    return url
+            url = "postgresql+asyncpg://" + url[len(prefix) :]
+            break
+    if not url.lower().startswith("postgresql+asyncpg://"):
+        return url
+
+    base, _, query = url.partition("?")
+    if not query:
+        return url
+    kept: list[str] = []
+    for pair in query.split("&"):
+        key = pair.split("=", 1)[0].lower()
+        if key == "channel_binding":
+            continue
+        if key == "sslmode":
+            kept.append("ssl" + pair[len("sslmode") :])
+            continue
+        kept.append(pair)
+    return base + ("?" + "&".join(kept) if kept else "")
 
 
 # =============================================================================
