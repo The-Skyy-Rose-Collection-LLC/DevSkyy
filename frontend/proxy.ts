@@ -47,9 +47,10 @@ export const config = {
   matcher: [
     '/admin/:path*',
     // All /api routes except NextAuth (`auth`), the public checkout endpoint,
-    // and webhooks (auth is HMAC-inside-handler, see comment above). No
-    // current API route name begins with "auth", "checkout", or "webhooks"
-    // other than those three, so the prefix exclusion is exact.
-    '/api/((?!auth|checkout|webhooks).*)',
+    // and webhooks (auth is HMAC-inside-handler, see comment above). Segment-
+    // anchored (`(?:/|$)`) so the exclusion matches ONLY these exact route
+    // names — a future `/api/authorize` or `/api/checkout-status` cannot slip
+    // through the gate (fail-closed), which a bare prefix lookahead would allow.
+    '/api/((?!auth(?:/|$)|checkout(?:/|$)|webhooks(?:/|$)).*)',
   ],
 };

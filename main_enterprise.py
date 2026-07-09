@@ -39,10 +39,23 @@ def _parse_sentry_sample_rate(raw: str | None, default: float) -> float:
 
 
 def _resolve_cors_origin_regex(raw: str | None) -> str:
-    """Resolve the CORS allow_origin_regex from CORS_ORIGIN_REGEX env var,
-    falling back to the default *.vercel.app / *.devskyy.app subdomain pattern."""
+    """Resolve the CORS allow_origin_regex from CORS_ORIGIN_REGEX env var.
+
+    The default is deliberately narrow because CORSMiddleware runs with
+    allow_credentials=True: a bare ``[a-z0-9-]+\\.vercel\\.app`` matched ANY
+    Vercel-hosted app (an attacker-registrable shared domain), letting a hostile
+    site read credentialed cross-origin responses. Scope to this project's own
+    surfaces only — devskyy.app + its subdomains, and this project's Vercel
+    preview URLs (``devskyy-<hash>-skyyroseco.vercel.app``). Anchored with ``$``
+    so no attacker suffix can extend a match. Override via CORS_ORIGIN_REGEX.
+    """
     raw = (raw or "").strip()
-    return raw or r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)"
+    return raw or (
+        r"^https://("
+        r"([a-z0-9-]+\.)?devskyy\.app"  # devskyy.app + any subdomain
+        r"|devskyy-[a-z0-9-]+-skyyroseco\.vercel\.app"  # this project's previews
+        r")$"
+    )
 
 
 # =============================================================================
@@ -145,6 +158,11 @@ async def lifespan(app: FastAPI):
 _environment = os.getenv("ENVIRONMENT", "development")
 _docs_url = None if _environment == "production" else "/docs"
 _redoc_url = None if _environment == "production" else "/redoc"
+# Gate the raw OpenAPI schema too: disabling docs_url/redoc_url alone still
+# leaves /openapi.json publicly readable, disclosing every route and parameter
+# on the now internet-facing backend. None disables the schema endpoint (and
+# the Swagger/ReDoc pages that depend on it) in production.
+_openapi_url = None if _environment == "production" else "/openapi.json"
 
 app = FastAPI(
     title="DevSkyy Enterprise Platform",
@@ -152,6 +170,7 @@ app = FastAPI(
     version="3.2.0",
     docs_url=_docs_url,
     redoc_url=_redoc_url,
+    openapi_url=_openapi_url,
     lifespan=lifespan,
 )
 

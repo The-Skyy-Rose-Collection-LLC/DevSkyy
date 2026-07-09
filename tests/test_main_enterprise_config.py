@@ -6,7 +6,12 @@ import re
 
 from main_enterprise import _parse_sentry_sample_rate, _resolve_cors_origin_regex
 
-DEFAULT_CORS_REGEX = r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)"
+DEFAULT_CORS_REGEX = (
+    r"^https://("
+    r"([a-z0-9-]+\.)?devskyy\.app"
+    r"|devskyy-[a-z0-9-]+-skyyroseco\.vercel\.app"
+    r")$"
+)
 
 
 class TestParseSentrySampleRate:
@@ -55,6 +60,30 @@ class TestResolveCorsOriginRegex:
     def test_default_pattern_matches_devskyy_subdomain(self):
         assert re.fullmatch(DEFAULT_CORS_REGEX, "https://dashboard.devskyy.app")
 
-    def test_default_pattern_rejects_bare_domain(self):
-        # bare https://devskyy.app has no subdomain label — regex requires one
-        assert not re.fullmatch(DEFAULT_CORS_REGEX, "https://devskyy.app")
+    def test_default_pattern_matches_bare_and_www_and_app_devskyy(self):
+        # The bare production domain and its real subdomains MUST be allowed —
+        # the old pattern rejected the bare domain, which was itself a defect.
+        for origin in (
+            "https://devskyy.app",
+            "https://www.devskyy.app",
+            "https://app.devskyy.app",
+            "https://api.devskyy.app",
+        ):
+            assert re.fullmatch(DEFAULT_CORS_REGEX, origin), origin
+
+    def test_default_pattern_matches_project_vercel_previews_only(self):
+        assert re.fullmatch(DEFAULT_CORS_REGEX, "https://devskyy-abc123-skyyroseco.vercel.app")
+
+    def test_default_pattern_rejects_attacker_origins(self):
+        # The core fix: credentialed CORS must NOT reflect attacker-registrable
+        # origins. Every one of these previously matched the *.vercel.app hole
+        # or could suffix-extend an unanchored match.
+        for origin in (
+            "https://evil.vercel.app",  # any attacker Vercel app
+            "https://devskyy-x-attacker.vercel.app",  # not the -skyyroseco project
+            "https://devskyy.app.evil.com",  # suffix smuggling
+            "https://evildevskyy.app",  # prefix smuggling
+            "http://devskyy.app",  # non-TLS
+            "https://notdevskyy.app",
+        ):
+            assert not re.fullmatch(DEFAULT_CORS_REGEX, origin), origin

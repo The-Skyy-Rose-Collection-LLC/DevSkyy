@@ -24,6 +24,7 @@
 import 'server-only';
 
 import { resolveAuthTier, type AuthTier } from './auth-policy';
+import { assertNoTraversal, requireInt } from './path-safety';
 import { RequestThrottle } from './throttle';
 
 type WpEnvKey = 'WP_BASE_URL' | 'WP_APP_USER' | 'WP_APP_PASSWORD' | 'WC_CONSUMER_KEY' | 'WC_CONSUMER_SECRET';
@@ -37,6 +38,7 @@ function requireEnv(key: WpEnvKey): string {
 }
 
 function buildUrl(path: string): string {
+  assertNoTraversal(path);
   const base = requireEnv('WP_BASE_URL').replace(/\/$/, '');
   return `${base}/wp-json${path.startsWith('/') ? path : `/${path}`}`;
 }
@@ -191,11 +193,20 @@ export async function getOrders(opts: { status?: string } = {}): Promise<WcOrder
 }
 
 export async function updateOrder(id: number, patch: Record<string, unknown>): Promise<WcOrder> {
-  return wpRequest<WcOrder>(`/wc/v3/orders/${id}`, { method: 'PUT', body: JSON.stringify(patch) });
+  // TS `number` is erased at runtime; a dynamic route param arrives as a string
+  // and would flow straight into the path. Coerce to a strict integer so the ID
+  // can never carry path syntax (defense in depth alongside buildUrl's guard).
+  return wpRequest<WcOrder>(`/wc/v3/orders/${requireInt(id, 'order id')}`, {
+    method: 'PUT',
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function updateProduct(id: number, patch: Record<string, unknown>): Promise<WcStoreProduct> {
-  return wpRequest<WcStoreProduct>(`/wc/v3/products/${id}`, { method: 'PUT', body: JSON.stringify(patch) });
+  return wpRequest<WcStoreProduct>(`/wc/v3/products/${requireInt(id, 'product id')}`, {
+    method: 'PUT',
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function batchProducts(ops: BatchProductOps): Promise<unknown> {
