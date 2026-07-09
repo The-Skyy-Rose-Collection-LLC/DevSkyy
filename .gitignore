@@ -92,7 +92,6 @@ credentials/
 *.secrets
 *.secrets.*
 **/*.secret
-**/*.secrets
 # .serena/ (below) already blanket-ignores this, so no per-file rule needed —
 # REDACTED 2026-0x: .serena/memories/woocommerce_api_credentials.md once held
 # a live WooCommerce secret. The file is deleted and the directory is
