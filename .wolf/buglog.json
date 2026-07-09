@@ -2591,16 +2591,16 @@
     "error_message": "br-011 (Jersey Series 4 Hockey) has garment_type_lock='hoodie' but is a jersey per registry+_JERSEY_SKUS",
     "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
     "root_cause": "Jersey membership in 3 unsynced places (CSV garment_type_lock, registry sku_folders, _JERSEY_SKUS). br-011 CSV=hoodie, other two=jersey. Same redundant-field disease as br-014/15.",
-    "fix": "PENDING FOUNDER DECISION \u2014 flip hoodie->jersey (render impact), then derive roster from CSV + jersey_consistency invariant. Flagged in PR #686.",
+    "fix": "RESOLVED (2026-06-24, commit 9ea639a744e70e638052bab6f7bb32d7258b1f75) \u2014 this note was stale. The jersey roster is derived from logo-registry.json sku_folders (scripts/sync_catalog_downstream.py:_registry_jersey_skus), NOT from CSV garment_type_lock, by deliberate design documented in cerebrum.md:79. br-011's garment_type_lock='hoodie' is CORRECT and dossier-confirmed (data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md: 'Hockey-style pullover hoodie ... with a hood'; 'this is a fashion hoodie, not a tied-collar hockey jersey'). Flipping CSV to 'jersey' changes the render prompt \u2014 garment_type_lock is fed verbatim into the RAS/FLUX prompt (skyyrose/elite_studio/agents/three_d_agent.py:95-112, literal f-string 'GARMENT LOCK: {dossier[\"garment_type_lock\"]}') and into the dual-vision QA gate (skyyrose/elite_studio/graph/nodes/ghost_mannequin.py:139-147) \u2014 so this was investigated and rejected. Re-open only if the founder explicitly wants to revisit the hood-vs-no-hood render decision; do not re-derive the roster from garment_type_lock again (twice-rejected per cerebrum.md:79).",
     "tags": [
       "catalog",
       "jersey",
       "garment_type_lock",
-      "needs-founder-decision"
+      "resolved-stale-note"
     ],
     "related_bugs": [],
     "occurrences": 1,
-    "last_seen": "2026-06-30T00:00:00-07:00"
+    "last_seen": "2026-07-07T00:00:00Z"
   },
   {
     "id": "bug-170",
