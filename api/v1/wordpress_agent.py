@@ -11,12 +11,13 @@ import json
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from starlette.responses import StreamingResponse
 
 from agents.wordpress_bridge.agent import WordPressBridgeAgent, run_agent
 from agents.wordpress_bridge.prompts import PROCESS_ORDER_PROMPT
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +55,20 @@ class WebhookDispatchRequest(BaseModel):
 
 
 @router.post("/execute")
-async def execute_agent(request: AgentExecuteRequest):
+async def execute_agent(
+    request: AgentExecuteRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
     """Execute WordPress Bridge Agent with SSE streaming.
 
     Returns a Server-Sent Events stream with agent progress.
     Each event is a JSON object with type, content, and optional metadata.
     Stream ends with data: [DONE]
+
+    AUTH REQUIRED: this drives an acceptEdits agent with live WooCommerce/
+    WordPress write tools from a free-form prompt — it must never be reachable
+    unauthenticated. Gated on a valid JWT (get_current_user) like every other
+    mutating v1 route (see api/v1/commerce.py).
     """
 
     async def event_stream():
@@ -92,11 +101,22 @@ async def execute_agent(request: AgentExecuteRequest):
 
 
 @router.post("/webhooks/dispatch")
-async def dispatch_webhook(request: WebhookDispatchRequest):
+async def dispatch_webhook(
+    request: WebhookDispatchRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
     """Process incoming WooCommerce webhook by dispatching to agent.
 
     Formats the webhook payload as a structured prompt and runs the agent.
     Returns the agent's response (non-streaming for webhooks).
+
+    AUTH REQUIRED: this runs the same acceptEdits production-write agent as
+    /execute, so it must not be callable unauthenticated. The registered Woo
+    webhooks target the HMAC-verified frontend receiver
+    (frontend/app/api/webhooks/woocommerce), not this route; any server-to-server
+    dispatch here presents a JWT. (If a direct HMAC-signed webhook path to the
+    backend is ever needed, add raw-body signature verification — do NOT drop
+    this auth gate.)
     """
     # Format webhook as agent prompt based on topic
     topic = request.topic

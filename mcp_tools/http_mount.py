@@ -17,6 +17,7 @@ mcp_tools/tools/__init__.py's SLIM_EXCLUDED_MODULES for the exact split).
 
 from __future__ import annotations
 
+import hmac
 import os
 
 from mcp.server.transport_security import TransportSecuritySettings
@@ -69,12 +70,24 @@ class BearerAuthMiddleware:
             return
 
         token = os.getenv(_TOKEN_ENV, "").strip()
-        if token:
-            headers = dict(scope.get("headers") or [])
-            provided = headers.get(b"authorization", b"").decode()
-            if provided != f"Bearer {token}":
+        if not token:
+            # Fail closed outside development: a missing token must not silently
+            # open the entire tool fleet. Only dev is allowed to run token-less.
+            if os.getenv("ENVIRONMENT", "development") != "development":
                 await self._reject(send)
                 return
+            await self.app(scope, receive, send)
+            return
+
+        headers = dict(scope.get("headers") or [])
+        try:
+            provided = headers.get(b"authorization", b"").decode()
+        except UnicodeDecodeError:
+            provided = ""
+        # Constant-time compare — a plain != leaks token length/prefix via timing.
+        if not hmac.compare_digest(provided, f"Bearer {token}"):
+            await self._reject(send)
+            return
 
         await self.app(scope, receive, send)
 

@@ -205,6 +205,18 @@ app.add_middleware(
     expose_headers=["X-Response-Time", "X-Correlation-ID"],
 )
 
+# Host-header allowlist (opt-in). Now that the app is internet-facing at
+# api.devskyy.app, a Host allowlist is standard hardening — but a wrong list
+# fails Fly's /health check and kills the machine, so it is enabled ONLY when
+# ALLOWED_HOSTS is explicitly set (comma-separated; e.g.
+# "api.devskyy.app,*.devskyy.app,devskyy-backend.fly.dev"). Include the Fly
+# health-check host and the .fly.dev domain when enabling. Unset = no change.
+_allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
+if _allowed_hosts:
+    from starlette.middleware.trustedhost import TrustedHostMiddleware
+
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=_allowed_hosts)
+
 
 # Correlation ID
 @app.middleware("http")
