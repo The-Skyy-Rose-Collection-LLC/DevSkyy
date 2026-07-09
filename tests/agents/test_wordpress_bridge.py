@@ -625,18 +625,50 @@ class TestWordPressAgentEndpoint:
 
     @pytest.fixture
     def app(self):
+        from types import SimpleNamespace
+
         from api.v1.wordpress_agent import router
+        from security.jwt_oauth2_auth import get_current_user
 
         app = FastAPI()
         app.include_router(router, prefix="/api/v1")
+        # These tests exercise endpoint BEHAVIOR (SSE streaming, event/webhook
+        # formatting). The auth gate itself is covered separately by
+        # test_execute_endpoint_requires_auth / test_webhook_dispatch_requires_auth.
+        # Override the auth dependency so behavior tests run as an authed caller.
+        app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(sub="test-user")
         return app
 
     @pytest.fixture
     def client(self, app):
         return TestClient(app)
 
+    @staticmethod
+    def _unauthenticated_client() -> TestClient:
+        """A client whose app has NO auth override — for asserting the gate."""
+        from api.v1.wordpress_agent import router
+
+        app = FastAPI()
+        app.include_router(router, prefix="/api/v1")
+        return TestClient(app, raise_server_exceptions=False)
+
+    def test_execute_endpoint_requires_auth(self):
+        """Unauthenticated POST must be rejected by auth BEFORE body validation."""
+        client = self._unauthenticated_client()
+        response = client.post("/api/v1/agent/execute", json={"intent": "x", "prompt": "y"})
+        assert response.status_code in (401, 403)
+
+    def test_webhook_dispatch_requires_auth(self):
+        """The webhook dispatch route runs the same write-agent — must be gated."""
+        client = self._unauthenticated_client()
+        response = client.post(
+            "/api/v1/agent/webhooks/dispatch",
+            json={"topic": "order.created", "payload": {}},
+        )
+        assert response.status_code in (401, 403)
+
     def test_execute_endpoint_rejects_missing_prompt(self, client):
-        """Should return 422 for missing prompt."""
+        """Should return 422 for missing prompt (authed request, body invalid)."""
         response = client.post("/api/v1/agent/execute", json={"intent": "test"})
         assert response.status_code == 422
 
