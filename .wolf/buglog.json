@@ -3254,5 +3254,81 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-210",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY CRITICAL] POST /api/v1/agent/execute + /webhooks/dispatch unauthenticated — prompt-injectable production WooCommerce/WordPress writes on public backend (live-confirmed 422 not 401)",
+    "file": "api/v1/wordpress_agent.py",
+    "root_cause": "routes had no Depends/auth; feed free-form prompt into acceptEdits agent with live WC/WP write tools (wp_update_order no-confirm); billing_middleware regex doesn't match /agent/",
+    "fix": "Added Depends(get_current_user) to both routes; verified auth_dep=True via route inspection",
+    "tags": [
+      "security",
+      "critical",
+      "authz",
+      "prompt-injection",
+      "agent"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-211",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] MCP bearer token compared with != (timing side-channel) + fail-open when token unset in prod",
+    "file": "mcp_tools/http_mount.py",
+    "root_cause": "plain string != leaks length/prefix; missing MCP_SERVICE_TOKEN → warn-and-serve-open",
+    "fix": "hmac.compare_digest + fail-closed (reject) in non-dev + UnicodeDecode guard",
+    "tags": [
+      "security",
+      "mcp",
+      "timing",
+      "fail-open"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-212",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] No TrustedHostMiddleware on public backend",
+    "file": "main_enterprise.py",
+    "root_cause": "no Host-header allowlist now that api.devskyy.app is internet-facing",
+    "fix": "TrustedHostMiddleware available, opt-in via ALLOWED_HOSTS env (safe default, won't break Fly health checks)",
+    "tags": [
+      "security",
+      "host-header",
+      "defense-in-depth"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-213",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY LOW] /api/v1/catalog/answer + /answer/stream unauthenticated and cost-bearing (Claude per request)",
+    "file": "api/v1/catalog.py",
+    "root_cause": "documented in file header as unauth + cost-bearing; no Depends or per-IP limit",
+    "fix": "FLAGGED for follow-up (not fixed this pass) — add Depends(get_current_user) or per-IP rate limit per the file's own comment",
+    "tags": [
+      "security",
+      "cost",
+      "rate-limit",
+      "follow-up"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
   }
 ]
