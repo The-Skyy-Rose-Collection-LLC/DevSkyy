@@ -1,0 +1,54 @@
+{
+  "approach": "weight_smoothing_manual_diffusion",
+  "select_radius": 0.12639951148926298,
+  "anchor_radius": 0.15556862952524675,
+  "base_radius_reference": 0.09723039345327922,
+  "diffuse_alpha": 0.5,
+  "diffuse_iters": 8,
+  "core_vert_count": 953,
+  "anchor_vert_count": 384,
+  "changed_vert_count": 951,
+  "max_abs_weight_delta": {
+    "hips": 0.2657883655490196,
+    "left": 0.2831087356804942,
+    "right": 0.27326357890345443
+  },
+  "fold_pair_validation": {
+    "walk": {
+      "peak_frame": 86,
+      "eval_live": true,
+      "same_leg_fold_pair_count_after_fix": 206,
+      "cross_leg_pair_count_after_fix": 54,
+      "same_leg_fold_pair_count_baseline": 5
+    },
+    "talk": {
+      "peak_frame": 15,
+      "eval_live": true,
+      "same_leg_fold_pair_count_after_fix": 112,
+      "cross_leg_pair_count_after_fix": 24,
+      "same_leg_fold_pair_count_baseline": 109
+    },
+    "point": {
+      "peak_frame": 59,
+      "eval_live": true,
+      "same_leg_fold_pair_count_after_fix": 98,
+      "cross_leg_pair_count_after_fix": 27,
+      "same_leg_fold_pair_count_baseline": 3
+    },
+    "wave": {
+      "peak_frame": 27,
+      "eval_live": true,
+      "same_leg_fold_pair_count_after_fix": 101,
+      "cross_leg_pair_count_after_fix": 0,
+      "same_leg_fold_pair_count_baseline": 23
+    },
+    "joy": {
+      "peak_frame": 12,
+      "eval_live": true,
+      "same_leg_fold_pair_count_after_fix": 87,
+      "cross_leg_pair_count_after_fix": 9,
+      "same_leg_fold_pair_count_baseline": 2
+    }
+  },
+  "glb_out": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-fix-weightsmooth-merged.glb"
+}

@@ -9,6 +9,32 @@
       "url": "https://gemini-api-docs-mcp.dev"
     }
   },
+  "_disabled_mcpServers__firecrawl_needs_api_key": {
+    "_comment": "firecrawl-mcp (v3.22.3, npm) requires FIRECRAWL_API_KEY (not set anywhere -- not in .env, .env.secrets, or shell). Get a key at firecrawl.dev, add FIRECRAWL_API_KEY=... to .env.secrets, then move this entry into mcpServers above.",
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      }
+    }
+  },
+  "_disabled_mcpServers__exa_needs_api_key": {
+    "_comment": "exa-mcp-server (v3.2.1, npm) requires EXA_API_KEY (not set anywhere -- not in .env, .env.secrets, or shell). Get a key at exa.ai, add EXA_API_KEY=... to .env.secrets, then move this entry into mcpServers above.",
+    "exa": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "exa-mcp-server"
+      ],
+      "env": {
+        "EXA_API_KEY": "${EXA_API_KEY}"
+      }
+    }
+  },
   "_disabled_mcpServers__claude_context_needs_milvus": {
     "_comment": "claude-context requires Milvus on 127.0.0.1:19530 (not running). Ollama on 11434 IS up. To enable: run `docker run -d -p 19530:19530 milvusdb/milvus:latest`, then move this entry into mcpServers above.",
     "claude-context": {

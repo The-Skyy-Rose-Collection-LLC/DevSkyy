@@ -2948,5 +2948,113 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-07T23:30:00-07:00"
+  },
+  {
+    "id": "bug-194",
+    "timestamp": "2026-07-08T01:25:00-07:00",
+    "error_message": "Mascot GLB renders as white untextured silhouette on Safari-path loaders on skyyrose.co live site",
+    "file": "renders/3d/mascot/v2/skyy-v6-web.glb (live), replaced by skyy-v7-web.glb",
+    "root_cause": "skyy-v6-web.glb has extensionsRequired: [EXT_texture_webp, KHR_draco_mesh_compression] with baseColor/emissive texture stored as image/webp. Loaders that don't support EXT_texture_webp (Safari-path) drop the required extension and fail to render the texture, producing a white silhouette. Separately, the task spec's build command `gltf-transform optimize ... --texture-compress jpeg` does not exist in gltf-transform CLI v4.4.1 -- the `optimize` subcommand's --texture-compress only accepts ktx2|webp|avif|auto|false, never jpeg/png (confirmed via `optimize --help`); jpeg/png conversion is a separate top-level `jpeg`/`png` subcommand.",
+    "fix": "Rebuilt from uncompressed master skyy-v6-merged.glb (image/png source, no draco, no webp) using a 3-stage single-pass pipeline instead of the invalid one-shot optimize flag: (1) `gltf-transform resize --width 2048 --height 2048` on the raw PNG texture, (2) `gltf-transform jpeg --formats '*' --quality 92` to convert to universal image/jpeg (alphaMode is OPAQUE so no alpha loss), (3) `gltf-transform draco` applied LAST as a single clean geometry compression pass (running draco before texture ops caused a 'Decoded KHR_draco_mesh_compression, further compression will be lossy' warning on re-encode -- avoided by ordering texture ops before the only draco pass). Result: extensionsRequired=[KHR_draco_mesh_compression] only, no EXT_texture_webp anywhere, image/jpeg 2048x2048, all 6 animation clips (idle/joy/point/talk/walk/wave) and the single skin + JOINTS_0 preserved byte-identical keyframe counts to the source master. 1.44MB total, under the 3.5MB budget. Visually QC'd the extracted JPEG texture atlas at quality 92 -- no banding on flat black/white fills.",
+    "tags": [
+      "gltf-transform",
+      "3d-mascot",
+      "webp",
+      "safari",
+      "draco",
+      "cli-flag-mismatch",
+      "texture-compression"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T01:25:00-07:00"
+  },
+  {
+    "id": "bug-195",
+    "timestamp": "2026-07-08T10:37:00-07:00",
+    "error_message": "Founder-reported: mascot body posture 'not human-like' -- hunched torso, head pitched down, arms hanging forward, one foot lifted -- visible in bind pose and specifically in the idle loop as played live.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (source), skyy-v8-web.glb (fixed, not yet deployed)",
+    "root_cause": "Three compounding mistakes across attempts, each caught before reaching production: (1) A prior diagnosis agent's corrective quaternion for the Hips bone ('world +X axis, +8.7954deg') did not reproduce in a fresh Blender session -- applying it moved the lean in the WRONG direction. Root cause: `pose_bone.rotation_quaternion` is defined in the bone's own LOCAL rest-space, not world space. This rig's Hips edit-bone rest orientation is heavily skewed from world axes (euler ~[-9,17,-99] degrees, confirmed via `bone.matrix_local.to_euler()`), so any 'world axis' rotation vector passed directly into `Quaternion(axis, angle)` and assigned to `.rotation_quaternion` was actually being interpreted in that skewed local frame, producing wildly wrong real-world rotations (one attempt collapsed the spine below the hips; another laid the whole body flat on its back). (2) The correct fix -- rotating a bone by a true WORLD-space angle -- requires manipulating `pose_bone.matrix` (armature/world-space) directly: `pb.matrix = Translation(pivot) @ Matrix.Rotation(angle, 4, world_axis) @ Translation(-pivot) @ pb.matrix.copy()`, then letting Blender back-solve the local values. This was verified with a monotonic, reproducible sweep (world X axis, -12.5deg drives Hips->Head world-space lean from -12.62deg to -0.12deg). (3) Even with the correct world-space rotation, applying it via `bpy.ops.pose.armature_apply()` (bake pose as new rest) had ZERO visible effect on the deployed mascot, because `skyy-3d.js` only ever plays named animation clips (idle/walk/etc) via GLTFLoader -- the bind/rest pose is never displayed. `armature_apply()` is explicitly designed to preserve existing animation clips' visual appearance relative to the new rest, so it structurally cannot un-hunch a clip whose own keyframes are the source of the hunch. The idle clip's Hips bone had only 2 keyframes (frames 0 and 72, the loop start/end) baked with the original bad rotation.",
+    "fix": "Directly re-keyed the idle action's Hips rotation_quaternion at both existing keyframes (frame 0 and 72) using the verified world-space rotate-around-pivot method (`pose_bone.matrix` manipulation, NOT `rotation_quaternion` assignment, NOT `armature_apply()`). Verified via direct render of the re-exported, re-optimized (resize->jpeg->draco) GLB's actual idle clip at 0/25/50/75/100% of the loop -- upright, symmetric, level head, loop closes cleanly. Walk/talk/joy clips were already correctly authored (untouched, confirmed still good); wave/point show an intentional forward-leaning gesture pose, not the standing-hunch defect, left as-is. Result file: renders/3d/mascot/v2/skyy-v8-web.glb, 827KB, all 6 clips + single skin + JOINTS_0/WEIGHTS_0 preserved, draco+jpeg applied. NOT YET deployed to production -- pending founder confirmation per STOP-AND-SHOW.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "pose-bone-local-vs-world-space",
+      "armature-apply-misconception",
+      "rest-pose-never-displayed",
+      "idle-clip-rekey",
+      "gltf-transform"
+    ],
+    "related_bugs": [
+      "bug-194"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T10:37:00-07:00"
+  },
+  {
+    "id": "bug-196",
+    "timestamp": "2026-07-08T22:44:00-07:00",
+    "error_message": "Founder: still not fixed why is this so complicated -- its the torso, waste, legs her whole bottom half (after v1.9.5 Hips-lean deploy)",
+    "file": "renders/3d/mascot/v2/skyy-v9-idle-only-merged.glb (source: skyy-v6-merged.glb)",
+    "root_cause": "Independent of the Hips-lean fix (bug-195), the mascot GLB has a pre-existing crossed-leg base pose (LeftUpLeg/RightUpLeg exaggerated adduction) baked into every one of the 6 animation clips (idle/walk/talk/point/wave/joy) at their starting keyframes, causing the pants mesh to pinch into a visible diagonal crease at the crotch/pelvis. Confirmed present in the pristine original v6-merged.glb, so not introduced by any fix tonight.",
+    "fix": "idle clip only: re-keyed LeftUpLeg/RightUpLeg rotation_quaternion at both existing keyframes (frames 0, 72) with a world-space Y-axis rotation of -15 degrees (left) / +15 degrees (right), computed via pose_bone.matrix world-space manipulation with the pose frozen (animation_data.action = None) before editing so the edit is not immediately overwritten by animation evaluation on the next depsgraph update. Verified clean via fresh render of the exported result. walk/talk/point/wave/joy were NOT fixed: a -8 to -30 degree sweep of the same world-Y correction against walk frame 1 (much deeper hip flexion than idle) never cleared the crease, indicating a different root cause at high flexion angles (likely a skin-weight pinch at the Hips/UpLeg boundary, not adduction/crossing) that requires mesh/weight-level work, not an animation-keyframe fix. Those 5 clips were left completely untouched in the shipped file (byte-identical to original v6 data) rather than shipping an unproven correction.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "pose-bone",
+      "skin-weights",
+      "animation-keyframes",
+      "partial-fix"
+    ],
+    "related_bugs": [
+      "bug-195"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T22:44:00-07:00"
+  },
+  {
+    "id": "bug-197",
+    "timestamp": "2026-07-09T05:00:00-07:00",
+    "error_message": "RuntimeError: CRITICAL: JWT_REFRESH_SECRET_KEY is not set \u2014 devskyy-backend first boot crash-looped, health checks timed out",
+    "file": "tasks/backend-golive-manifest.md",
+    "root_cause": "Go-live manifest listed required secrets by convention (JWT_SECRET_KEY, ENCRYPTION_MASTER_KEY, DATABASE_URL...) instead of by census \u2014 security/jwt_oauth2_auth.py has TWO _require_secret sites (JWT_SECRET_KEY:102 AND JWT_REFRESH_SECRET_KEY:104); the second was never in the manifest.",
+    "fix": "Set JWT_REFRESH_SECRET_KEY via fly secrets (founder-run, openssl-generated). Lesson: before any go-live, grep the boot path for _require_secret/fail-loud sites and derive the secret list from code, not memory.",
+    "tags": [
+      "deploy",
+      "secrets",
+      "fly",
+      "manifest",
+      "fail-loud"
+    ],
+    "related_bugs": [
+      "bug-192"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T05:00:00-07:00"
+  },
+  {
+    "id": "bug-198",
+    "timestamp": "2026-07-09T13:15:00-07:00",
+    "error_message": "Follow-up to bug-196: walk/talk/point/wave/joy crotch crease at high hip flexion -- three independent fix approaches (weight-smoothing, flexion-angle-clamping, manual weight redistribution) attempted via a mascot-skin-weight-fix Workflow with adversarial verification. All three failed.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (investigated in worktree mascot-skin-weight-fix, no changes shipped)",
+    "root_cause": "NOT a weight-painting defect -- the Hips/UpLeg vertex weight blend is smooth, anatomically sane, with zero hard cutoffs (0 hard-single vertices out of ~369 in the crotch region). Root cause is Linear Blend Skinning (candy-wrapper collapse) at extreme, stylized hip-flexion angles: these mascot poses hit 126-138 degrees of hip flexion (bind-pose-relative), well beyond real human ROM (~90-120 degrees). At that flexion, binding a vertex 100% to Hips vs 100% to the thigh bone produces deformed positions 26-28% of torso-reference-length apart -- no reweighting between the same two rigid bone transforms can close a gap that large; any blend, narrow or wide, produces visible pinching under LBS math. Confirmed independently by 3 separate diagnostic/fix attempts converging on the same conclusion.",
+    "fix": "NONE SHIPPED -- all three attempted fixes were adversarially verified (independent re-render + pixel-diff, not self-report) as no-improvement: (1) weight-smoothing via Jacobi diffusion on the Hips/UpLeg/UpLeg vertex groups, both mild (953 verts) and aggressive (1630 verts, 30 iterations) passes -- zero visible change, confirmed via determinism-controlled pixel diff; (2) flexion-angle clamping (halving the excess above 80% of each clip's own peak angle) -- adversarial matched-crop pixel diff disproved the builder's own claimed improvement on talk, AND this approach has a real cost: on this rig flexion is measured from bind pose not neutral-standing, so the threshold caught 102/102 walk frames, nearly halving the stride's rotational amplitude and making the walk animation visibly less dynamic for zero benefit; (3) manual vertex-weight redistribution with a wider, anatomically-anchored (0.5x thigh-bone-length) smoothstep blend band -- independent 800%-zoom + ImageMagick fuzz-diff re-render showed the actual pixel differences were a 1-2px anti-aliasing shift, not a real fold reduction. Recommended next step (not yet attempted): a corrective shape key / morph target sculpted for high hip-flexion, driven by a per-clip morph-weight keyframe track peaking at each clip's known peak frame (walk=86, talk=15, point=59, wave=27, joy=12) -- glTF + three.js natively support morph targets with animated weights, this is the standard fix for LBS candy-wrapper collapse. Fallbacks in order: helper/twist bone between Hips and UpLeg, then dual-quaternion skinning (requires custom three.js runtime/shader work, highest cost).",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "skin-weights",
+      "linear-blend-skinning",
+      "lbs-candy-wrapper-collapse",
+      "unresolved",
+      "adversarial-verification"
+    ],
+    "related_bugs": [
+      "bug-195",
+      "bug-196"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T13:15:00-07:00"
   }
 ]

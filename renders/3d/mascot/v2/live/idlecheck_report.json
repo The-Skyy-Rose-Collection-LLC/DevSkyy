@@ -1,0 +1,19 @@
+{
+  "source_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-v6-merged.glb",
+  "fixed_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-fix-manualblend-merged.glb",
+  "frames": [
+    1,
+    36,
+    73
+  ],
+  "src_renders": [
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_src_1.png",
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_src_36.png",
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_src_73.png"
+  ],
+  "fix_renders": [
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_fix_1.png",
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_fix_36.png",
+    "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/idlecheck_fix_73.png"
+  ]
+}
