@@ -104,7 +104,7 @@
           {
             "type": "command",
             "command": "python3 /Users/theceo/DevSkyy/.claude/hooks/router/router.py",
-            "timeout": 3
+            "timeout": 10
           }
         ]
       }
