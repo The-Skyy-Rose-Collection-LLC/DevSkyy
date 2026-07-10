@@ -6,8 +6,10 @@
 > `certbot`. Database is **Neon Postgres** (`DATABASE_URL` secret; `database/db.py`
 > fail-loud refuses the SQLite fallback in production). Image is `Dockerfile.api` (slim,
 > torch-free base; heavy ML behind the `[ml]` optional extra). Secrets are set via
-> `fly secrets set`. The MCP server runs as a **separate** Fly app (`devskyy-mcp`,
-> `Dockerfile.mcp`, Python 3.12, 82 tools, bearer-auth HTTP mount). The DNS zone is
+> `fly secrets set`. The MCP server runs as a **separate** Fly app — confusingly named
+> `devskyy-api` (`fly.toml` → `Dockerfile.mcp` → `mcp_service:app`, Python 3.12,
+> ~82 tools live via `http_mount.tool_count`, bearer-auth HTTP mount at `/mcp`).
+> Note the naming: `devskyy-backend` = the REST API, `devskyy-api` = the MCP. The DNS zone is
 > **Vercel-managed** (`ns1/ns2.vercel-dns.com`); an explicit `api` A/AAAA record overrides
 > the wildcard. The `certbot` / raw-backend-IP instructions further down are **superseded**
 > by this block.

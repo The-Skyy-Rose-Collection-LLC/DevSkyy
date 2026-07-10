@@ -43,6 +43,72 @@ export BRAVE_API_KEY="your-brave-search-key"  # Optional
 
 After configuration, restart Claude Desktop to load the MCP servers.
 
+<!-- AUTO-GENERATED: Fly.io deployment topology — from fly.toml, fly.backend.toml -->
+## Fly.io Deployment Topology
+
+DevSkyy runs as two separate Fly.io apps. The app names are **not** self-descriptive — read this before touching either config:
+
+| Fly app | Config file | Dockerfile | Serves |
+|---|---|---|---|
+| `devskyy-backend` | `fly.backend.toml` | `Dockerfile.api` | The REST + GraphQL API (`main_enterprise`), public at `api.devskyy.app` |
+| `devskyy-api` | `fly.toml` | `Dockerfile.mcp` | The MCP streamable-HTTP server (`mcp_service:app`) |
+
+**Counterintuitive but correct**: `devskyy-backend` is the REST API. `devskyy-api` is the MCP server. Do not swap them when editing deploy config or secrets (`fly secrets set -a <app> ...`).
+<!-- /AUTO-GENERATED -->
+
+<!-- AUTO-GENERATED: MCP transport (stdio + streamable HTTP) — from devskyy_mcp.py, mcp_tools/http_mount.py, mcp_service.py -->
+## MCP Transport — stdio + Streamable HTTP
+
+The DevSkyy MCP server (`mcp_tools/` — see [Tool Inventory](#tool-inventory) below) is exposed over **two** transports from the same FastMCP instance:
+
+1. **stdio** — `devskyy_mcp.py`, for local Claude Code / Claude Desktop via `.mcp.json` — the path described in Quick Start above, unchanged.
+2. **Streamable HTTP** — `mcp_tools/http_mount.py` mounts that same `mcp` FastMCP instance at path `/mcp`, served by `mcp_service:app` (`mcp_service.py` line 69: `app.mount("/mcp", build_mcp_app())`). This lets the Next.js dashboard and the WordPress site consume MCP tools over the network, not just local stdio clients.
+
+### HTTP client configuration
+
+- **Endpoint**: `https://<devskyy-api host>/mcp` (streamable HTTP) — the `devskyy-api` Fly app from the topology table above.
+- **Auth**: every request must carry `Authorization: Bearer <MCP_SERVICE_TOKEN>`.
+  - `MCP_SERVICE_TOKEN` is **required in every non-dev environment**. When it's set, a request without the correct bearer token is rejected with HTTP 401 (`{"error":"unauthorized","detail":"MCP requires Authorization: Bearer <MCP_SERVICE_TOKEN>"}`); the comparison is timing-safe (`hmac.compare_digest`).
+  - When the token is unset, auth is skipped and a warning is logged — this is a **local-dev-only** fallback, never intended for a deployed environment.
+  - Source: `mcp_tools/http_mount.py` lines 7-10, 20, 46, 50-53.
+
+An HTTP-transport client entry follows the same `"type": "http"` / `"url"` shape already used elsewhere in this repo's own MCP client configs (see this repo's `.mcp.json`), plus a `headers` object carrying the bearer token — the `headers` key itself is the pattern this repo's `.zed/settings.json` already uses for its own `http`-type MCP entry:
+
+```json
+{
+  "mcpServers": {
+    "devskyy-http": {
+      "type": "http",
+      "url": "https://<devskyy-api host>/mcp",
+      "headers": {
+        "Authorization": "Bearer <MCP_SERVICE_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+If your specific MCP client doesn't support a `headers` field on an `http`-type entry, consult that client's own docs for how it attaches custom request headers — the field name above is a pattern observed in this repo, not a guarantee that every MCP client implementation uses the same key.
+<!-- /AUTO-GENERATED -->
+
+<!-- AUTO-GENERATED: tool inventory — from mcp_tools/http_mount.py tool_count(), verified 2026-07-09 -->
+## Tool Inventory
+
+- **96** `@mcp.tool` handlers declared across **24 modules** in `mcp_tools/`.
+- The runtime count is **dynamic**, not fixed: some modules are skipped when their optional dependency isn't installed on a given image (see `mcp_tools/tools/__init__.py`'s `SLIM_EXCLUDED_MODULES`). Never hand-type a tool count in docs or comments — call `mcp_tools.http_mount.tool_count()`, which is also surfaced at the deployed slim MCP service's `/health` endpoint (`tool_count` field).
+- **82 of the 96** verified live as of 2026-07-09.
+- Largest modules by tool count: `external_mcp` (18), `wc_client` (11), `resources` (8), `rag` (6), `claude_sdk` (6), `wp_deploy` (5), `lora_generation` (5), `elite_studio` (5).
+<!-- /AUTO-GENERATED -->
+
+<!-- AUTO-GENERATED: runtime requirements — from pyproject.toml, Dockerfile.mcp -->
+## Runtime
+
+- Python **3.12** required — `pyproject.toml`: `requires-python = ">=3.12,<3.15"`; `Dockerfile.mcp` base image is `python:3.12-slim` (the codebase uses PEP-695 generic function syntax, e.g. in `core/errors/production_errors.py`, which is a `SyntaxError` on Python 3.11).
+- Container start command: `python -m uvicorn mcp_service:app --host 0.0.0.0 --port 8000`
+- `EXPOSE 8000`
+- Health check: `GET /health`
+<!-- /AUTO-GENERATED -->
+
 ## Configured MCP Servers
 
 ### DevSkyy Custom Servers
@@ -76,7 +142,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - Security scanning
   - Database operations
   - ML predictions
-- **Location**: `devskyy_mcp.py`
+- **Location**: `devskyy_mcp.py` for local stdio (Claude Code/Desktop). Also reachable over streamable HTTP at `/mcp` (`mcp_service:app`) — see [MCP Transport — stdio + Streamable HTTP](#mcp-transport--stdio--streamable-http) below.
 - **Use Cases**:
   - E-commerce automation
   - Content creation workflows
@@ -403,7 +469,7 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2025-12-16
+**Last Updated**: 2026-07-10 (HTTP-mount + bearer config, Fly topology, py3.12, tool count)
 **Version**: 1.0.0
 **Maintained by**: The Skyy Rose Collection LLC
 

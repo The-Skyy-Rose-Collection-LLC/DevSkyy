@@ -3376,5 +3376,23 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-09T09:55:00-07:00"
+  },
+  {
+    "id": "bug-217",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "docs/DEPLOYMENT_ARCHITECTURE.md asserted the MCP runs on Fly app 'devskyy-mcp' - wrong; real app is 'devskyy-api' (fly.toml -> Dockerfile.mcp -> mcp_service). Introduced in prior-turn doc banner from memory, not verified vs fly config.",
+    "file": "docs/DEPLOYMENT_ARCHITECTURE.md",
+    "root_cause": "Stated a Fly app name from session memory instead of reading authoritative fly*.toml. Naming is counterintuitive (devskyy-backend=REST API, devskyy-api=MCP), so memory was an easy trap.",
+    "fix": "Grepped fly.toml/fly.backend.toml for app<->dockerfile mapping; corrected banner to 'devskyy-api' + explicit do-not-swap note; same rule stated in MCP_ARCHITECTURE.md and MCP_CONFIGURATION_GUIDE.md.",
+    "tags": [
+      "docs",
+      "fly",
+      "mcp",
+      "anti-hallucination",
+      "app-naming"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
   }
 ]
