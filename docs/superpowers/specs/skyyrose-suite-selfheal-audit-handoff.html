@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!-- handoff: skyyrose-suite self-heal + learning audit — authored 2026-07-09 -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skyyrose Suite — Self-Heal &amp; Learning Audit Handoff</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; color: #1a1a1a; background: #fafafa; padding: 2rem 1rem; }
+    .page { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; border-bottom: 2px solid #e2e2e2; padding-bottom: 0.35rem; }
+    h3 { font-size: 0.95rem; font-weight: 700; margin: 1.25rem 0 0.4rem; color: #333; }
+    p { margin-bottom: 0.75rem; }
+    ul, ol { margin: 0.5rem 0 0.75rem 1.5rem; }
+    li { margin-bottom: 0.25rem; }
+    code { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.85em; background: #efefef; padding: 0.1em 0.35em; border-radius: 3px; }
+    pre { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.82rem; background: #1e1e1e; color: #d4d4d4; padding: 1.25rem 1.5rem; border-radius: 6px; overflow-x: auto; margin: 0.75rem 0 1rem; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0 1rem; font-size: 0.9rem; }
+    th { background: #f0f0f0; text-align: left; padding: 0.45rem 0.75rem; font-weight: 600; border: 1px solid #d8d8d8; }
+    td { padding: 0.4rem 0.75rem; border: 1px solid #d8d8d8; vertical-align: top; }
+    tr:nth-child(even) td { background: #f9f9f9; }
+    .meta { color: #666; font-size: 0.85rem; margin-bottom: 2rem; }
+    .callout { border-left: 4px solid #b91c1c; background: #fff5f5; padding: 0.65rem 1rem; margin: 0.75rem 0 1rem; font-size: 0.9rem; }
+    .callout-blue { border-left-color: #1d4ed8; background: #eff6ff; }
+    .callout-green { border-left-color: #15803d; background: #f0fdf4; }
+    nav { background: #f5f5f5; border: 1px solid #e2e2e2; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.88rem; }
+    nav a { color: #1d4ed8; text-decoration: none; margin-right: 1.2em; }
+    nav a:hover { text-decoration: underline; }
+    section { margin-bottom: 2.5rem; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Skyyrose Suite — Self-Heal &amp; Learning Audit Handoff</h1>
+  <p class="meta">
+    For: a background agent operating across <code>skyyrose-suite/plugins/*</code> &nbsp;|&nbsp;
+    Origin: mascot skin-weight investigation (bug-196/bug-198) + the skyyrose-design self-healing-theme-loop gap it surfaced &nbsp;|&nbsp;
+    Authored: 2026-07-09
+  </p>
+
+  <nav>
+    <strong>Sections:</strong>
+    <a href="#mission">Mission</a>
+    <a href="#precedent">Precedent</a>
+    <a href="#gap-pattern">Gap Pattern</a>
+    <a href="#reusable-pattern">Reusable Pattern</a>
+    <a href="#inventory">Plugin Inventory</a>
+    <a href="#boundaries">Boundaries</a>
+    <a href="#deliverable">Deliverable</a>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="mission">
+    <h2>Mission</h2>
+    <p>
+      Audit every skill and agent across all five <code>skyyrose-suite</code> plugins
+      (<code>skyyrose-core</code>, <code>skyyrose-design</code>, <code>skyyrose-market</code>,
+      <code>skyyrose-qa</code>, and the top-level <code>skyyrose</code> orchestrator) for the
+      same class of gap found tonight in <code>skyyrose-design</code>: capability that's
+      <strong>specified but never built</strong>, or that <strong>self-grades its own
+      success</strong> with nothing independently checking it. Where a real gap is found,
+      close it — following the exact pattern used tonight, not a generic rewrite.
+    </p>
+    <p>
+      This is not a request to make every plugin look like <code>skyyrose-design</code>.
+      Marketing content, backend Python, and QA processes don't have the same "regression on
+      a live URL" shape that theme work does. Adapt the underlying discipline (verify before
+      claim, learn from repeated failure, independent check before "done") to what each
+      domain actually needs — don't force-fit theme-heal-doctor's exact schema onto content
+      calendars.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="precedent">
+    <h2>Precedent — what happened tonight, concretely</h2>
+    <p>
+      A 3D mascot mesh had a defect that resisted three independent single-shot fix attempts.
+      Building a <a href="../../../.claude/skills/adversarial-verification/SKILL.md">general
+      adversarial-verification pattern</a> (independent verifier, skeptical default,
+      re-derived evidence, structured verdict — not the builder grading its own work) and
+      running it via a Workflow (parallel fix hypotheses → independent verify each →
+      synthesis) produced an honest result: none of the three approaches worked, but all
+      three independently converged on the same precise, evidence-backed root cause, with a
+      specific recommended next technique. That's a complete, valuable cycle — not a failure.
+    </p>
+    <p>
+      Trying to generalize this into the "elite web team" led to actually reading
+      <code>skyyrose-design/agents/theme-heal-doctor.md</code> and the spec it references
+      (<code>docs/superpowers/specs/self-healing-theme-loop.html</code>) rather than assuming
+      it worked. That surfaced the real gap:
+    </p>
+    <ul>
+      <li>The spec is a mature, detailed, well-designed contract (monitor signals,
+        learning-store schema, two-axis review gate, escalation rules) authored 2026-05-29.</li>
+      <li><strong>The engine it describes (<code>self-healing-theme-loop.js</code>) was never
+        built.</strong> Neither were its state files (<code>heal-knowledge.json</code>,
+        <code>theme-health-baseline.json</code>) or the log
+        (<code>tasks/heal-log.jsonl</code>). Confirmed by direct filesystem check, not
+        inference.</li>
+      <li>The one agent that DOES exist (<code>theme-heal-doctor</code>) self-reports
+        <code>healed: true</code> / <code>isNetImprovement: true</code> with nothing
+        independently checking those claims — exactly the failure mode
+        adversarial-verification exists to catch.</li>
+      <li>The spec's own example baseline numbers (page-size floors, <code>?ver=1.5.25</code>)
+        are stale — the live site has moved to <code>1.9.5</code>, and
+        <code>/experience-*/</code> paths in the spec now 301-redirect to
+        <code>/collections/*/</code>. A spec can look authoritative and still be quietly
+        wrong about current reality — always re-verify against the live site, never trust an
+        embedded example table at face value.</li>
+    </ul>
+    <p>Closed part of that gap tonight:</p>
+    <ul>
+      <li><code>skyyrose-design/agents/theme-heal-verifier.md</code> — independent adversarial
+        verifier for <code>theme-heal-doctor</code>'s fixes.</li>
+      <li><code>skyyrose-design/skills/autonomous-issue-diagnose-fix/SKILL.md</code> —
+        generalized parallel-hypothesis escalation tier for hard issues.</li>
+      <li>A new <code>#escalation-tier</code> section appended to the existing spec
+        documenting both, without touching the spec's existing authoritative content.</li>
+      <li>Real, freshly-verified baseline data (see table below) ready to seed
+        <code>theme-health-baseline.json</code> once the engine itself is built.</li>
+    </ul>
+    <p><strong>Live baseline captured 2026-07-09 (cache-busted curl, re-verify before trusting if this handoff is read much later):</strong></p>
+    <table>
+      <thead><tr><th>Path</th><th>HTTP</th><th>Size (bytes)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>200</td><td>~167,700</td><td>size varies ~20B run to run (dynamic content)</td></tr>
+        <tr><td><code>/shop/</code></td><td>200</td><td>178,211</td><td></td></tr>
+        <tr><td><code>/cart/</code></td><td>200</td><td>214,422</td><td></td></tr>
+        <tr><td><code>/pre-order/</code></td><td>200</td><td>256,292</td><td></td></tr>
+        <tr><td><code>/about/</code></td><td>200</td><td>151,898</td><td></td></tr>
+        <tr><td><code>/experience-black-rose/</code></td><td>301 → <code>/collections/black-rose/</code></td><td>0 (redirect)</td><td>spec's old path; redirect is the CURRENT correct behavior, not a regression</td></tr>
+        <tr><td><code>/experience-love-hurts/</code></td><td>301 → <code>/collections/love-hurts/</code></td><td>0</td><td>same</td></tr>
+        <tr><td><code>/experience-signature/</code></td><td>301 → <code>/collections/signature/</code></td><td>0</td><td>same</td></tr>
+        <tr><td><code>/experience-kids-capsule/</code></td><td>301 → <code>/collections/kids-capsule/</code></td><td>0</td><td>same</td></tr>
+        <tr><td><code>/collections/black-rose/</code></td><td>200</td><td>234,855</td><td>new canonical path — monitor this, not the old <code>/experience-*/</code></td></tr>
+        <tr><td><code>/collections/love-hurts/</code></td><td>200</td><td>203,677</td><td></td></tr>
+        <tr><td><code>/collections/signature/</code></td><td>200</td><td>226,424</td><td></td></tr>
+        <tr><td><code>/collections/kids-capsule/</code></td><td>200</td><td>135,604</td><td></td></tr>
+        <tr><td><code>/this-page-does-not-exist-404check/</code></td><td>404</td><td>154,576</td><td>404 sentinel, expected</td></tr>
+      </tbody>
+    </table>
+    <p>
+      S2 canon checks all currently pass: "Four Collections" present on <code>/</code>,
+      "Three Worlds" absent, tagline present, "Complete the Look" absent on
+      <code>/cart/</code>, <code>scene-lockup</code> present on
+      <code>/collections/black-rose/</code> (3 occurrences). S3: live
+      <code>SKYYROSE_VERSION</code> confirmed <code>1.9.5</code> via
+      <code>main.min.css?ver=1.9.5</code> / <code>design-tokens.min.css?ver=1.9.5</code> /
+      <code>premium-interactions.min.js?ver=1.9.5</code> on the homepage.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="gap-pattern">
+    <h2>Gap Pattern — what to actually look for</h2>
+    <p>For every agent/skill you inspect, check for these specific gap types. Don't assume any of them apply — verify per-plugin, per-skill, from the actual files.</p>
+    <table>
+      <thead><tr><th>Gap type</th><th>How to detect it</th><th>How it showed up tonight</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Spec-only / dormant capability</strong></td>
+          <td>An agent or skill's description promises orchestration, monitoring, or a "loop" — grep for the file(s) it claims to depend on or be invoked by. If those files don't exist, it's dormant.</td>
+          <td><code>self-healing-theme-loop.js</code> referenced by the spec and by <code>theme-heal-doctor.md</code>'s own frontmatter — never existed.</td>
+        </tr>
+        <tr>
+          <td><strong>Self-graded success, no independent check</strong></td>
+          <td>An agent's own report schema includes a boolean like <code>healed</code>, <code>passed</code>, <code>success</code>, <code>fixed</code> — and nothing else in the system re-derives that claim independently.</td>
+          <td><code>theme-heal-doctor</code>'s <code>healed</code>/<code>isNetImprovement</code> fields, un-verified before tonight.</td>
+        </tr>
+        <tr>
+          <td><strong>Stale embedded reference data</strong></td>
+          <td>A spec/doc contains hardcoded example numbers, version strings, or URLs presented as current fact. Cross-check against the live/actual current state — don't trust the doc.</td>
+          <td>Spec's <code>?ver=1.5.25</code> baseline vs. live <code>1.9.5</code>; <code>/experience-*/</code> paths vs. actual <code>/collections/*/</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>No escalation/learning loop</strong></td>
+          <td>Does repeated failure of the same task/signature get tracked anywhere, or does every invocation start from zero with no memory of what was already tried and failed?</td>
+          <td>The spec's <code>heal-knowledge.json</code> recurrence-tracking concept — designed, never implemented.</td>
+        </tr>
+        <tr>
+          <td><strong>No hard-issue tier</strong></td>
+          <td>Is there any path for "this resisted a normal fix, try something fundamentally different" — or does the system just retry the same approach or give up?</td>
+          <td>Before tonight: escalate after 2 cycles meant "give up, tell the founder." Now: try the parallel-hypothesis pattern once first.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="reusable-pattern">
+    <h2>The Reusable Pattern</h2>
+    <p>Two artifacts, both already built and usable as direct templates — read them, don't re-derive from scratch:</p>
+    <ul>
+      <li><code>.claude/skills/adversarial-verification/SKILL.md</code> (user-level, applies to any domain) — independent verifier, skeptical default, re-derived evidence, structured verdict enum, optional two-model debate loop capped at 3 rounds with forced execution on round 3.</li>
+      <li><code>skyyrose-suite/plugins/skyyrose-design/skills/autonomous-issue-diagnose-fix/SKILL.md</code> — the escalation-tier Workflow shape (diagnose → parallel fix hypotheses → adversarial verify each → synthesis → bounded revision), adapted for WordPress/theme conventions. Use as the template for adapting to other domains — e.g. a Python backend equivalent would swap "cache-busted curl + PHPCS" for "pytest + ruff/black + mypy", a marketing-content equivalent would swap it for "brand-canon compliance check + a second reviewer agent applying the same canon docs independently."</li>
+      <li><code>skyyrose-suite/plugins/skyyrose-design/agents/theme-heal-verifier.md</code> — concrete example of turning a self-graded agent into an independently-verified one without changing the original agent at all (verifier is a new, separate agent; the original agent's contract is untouched).</li>
+    </ul>
+    <div class="callout callout-blue">
+      <strong>Don't force domains where the pattern doesn't fit.</strong> Not everything needs
+      a "heal loop." <code>skyyrose-market</code>'s ~40 social/content skills mostly produce
+      one-shot copy/briefs with no "live regression" concept — the relevant discipline there is
+      probably "does a second agent independently check brand-canon compliance before the copy
+      ships" (a lighter adversarial-verification application), not a cron-monitored self-healing
+      loop. Use judgment per-plugin; don't manufacture a monitoring loop where nothing is being
+      monitored.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="inventory">
+    <h2>Plugin Inventory (as of 2026-07-09 — re-verify, don't trust this list blindly if stale)</h2>
+    <p>Real listing via <code>ls skyyrose-suite/plugins/&lt;plugin&gt;/{agents,skills}/</code>. Use this to scope the audit, not as a final answer about what's healthy vs. gapped — that requires reading each file.</p>
+
+    <h3>skyyrose-design (partially audited tonight — theme-heal-doctor path only)</h3>
+    <p>Agents: <code>deploy-and-verify</code>, <code>frontend-developer</code>, <code>skyyrose-photography-director</code>, <code>theme-heal-doctor</code>, <code>theme-heal-verifier</code> (new), <code>wp-code-simplifier</code>.
+    Still unaudited: whether <code>deploy-and-verify</code> and <code>wp-code-simplifier</code> have the same self-grading gap. Check each.</p>
+
+    <h3>skyyrose-core (unaudited)</h3>
+    <p>Agents: <code>architect</code>, <code>build-error-resolver</code>, <code>database-reviewer</code>, <code>doc-updater</code>, <code>loop-operator</code>, <code>planner</code>, <code>python-reviewer</code>, <code>refactor-cleaner</code>.
+    Notable existing skills worth checking first — they may ALREADY partially address the learning-loop gap, or may themselves be spec-only: <code>continuous-learning-v2</code>, <code>stalled-agent-recovery</code>, <code>context-budget</code>, <code>token-budget-advisor</code>. Verify whether these are wired to anything real or are themselves dormant specs.</p>
+
+    <h3>skyyrose-market (unaudited)</h3>
+    <p>Agents: <code>skyyrose-content-engine</code>, <code>skyyrose-email-strategist</code>, <code>skyyrose-influencer-lead</code>, <code>skyyrose-launch-commander</code>, <code>skyyrose-paid-media-buyer</code>, <code>skyyrose-seo-commerce</code>.
+    ~40 skills, mostly content/social. See the callout above — likely needs lighter-touch verification (second-reviewer-for-brand-canon), not a monitoring loop.</p>
+
+    <h3>skyyrose-qa (unaudited — but may already have relevant infrastructure)</h3>
+    <p>Agents: <code>code-reviewer</code>, <code>e2e-runner</code>, <code>fixer</code>, <code>security-reviewer</code>, <code>tdd-guide</code>.
+    Skills already present that sound directly relevant and should be checked FIRST for overlap
+    before building anything new: <code>verification-before-completion</code>,
+    <code>verification-loop</code>, <code>audit-pass2-verifier</code>,
+    <code>audit-resolution-loop</code>, <code>drive-to-green</code>. It's plausible this plugin
+    already has some of what <code>skyyrose-design</code> was missing — read these before
+    assuming a gap exists here.</p>
+
+    <h3>skyyrose (top-level orchestrator, unaudited)</h3>
+    <p>One agent: <code>skyyrose-orchestrator</code>. Likely thin-by-design (routes to the other
+    four plugins). Check whether routing itself has any self-verification (does it confirm it
+    routed to the right plugin/skill, or just fire-and-forget dispatch).</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="boundaries">
+    <h2>Boundaries (non-negotiable)</h2>
+    <ul>
+      <li><strong>Additive only.</strong> Extend specs with new sections (as done tonight in
+        <code>self-healing-theme-loop.html#escalation-tier</code>); never rewrite existing
+        authoritative sections that other systems may already assume are stable.</li>
+      <li><strong>Verify before claiming a gap.</strong> Don't assume every plugin has the
+        same problem <code>skyyrose-design</code> had. Read the actual files. Some plugins
+        (<code>skyyrose-qa</code> especially) may already have real infrastructure for this.</li>
+      <li><strong>No hallucinated file paths.</strong> Every path in your final report must
+        trace to an actual <code>ls</code>/<code>Read</code> from this session — the inventory
+        above is a starting point, not a substitute for checking.</li>
+      <li><strong>STOP-AND-SHOW unchanged.</strong> No deploys, no commits, no paid API calls,
+        no production writes, without explicit confirmation — same rule as every other agent
+        in this repo (see root <code>CLAUDE.md</code>).</li>
+      <li><strong>Live-site checks are read-only curl/grep</strong> — safe, no confirmation
+        needed for GET requests to public pages. Do not POST, do not authenticate, do not
+        touch WooCommerce/media without the standard confirmation gates.</li>
+      <li><strong>Log learnings as you go</strong> — <code>.wolf/buglog.json</code> (via
+        <code>python scripts/wolf_bug_id.py</code> for the next ID, never guess one) and
+        <code>.wolf/cerebrum.md</code>, per this repo's OpenWolf convention. If working in a
+        worktree, check whether the worktree's copy is stale relative to the main repo's
+        counter before allocating an ID (it was, tonight — this cost a false-collision risk
+        that had to be resolved by comparing max IDs across both copies).</li>
+    </ul>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="deliverable">
+    <h2>Expected Deliverable</h2>
+    <ol>
+      <li>A per-plugin gap report: for each of the 5 plugins, which of the 5 gap types (see
+        Gap Pattern table) actually apply, with file:line evidence — not speculation.</li>
+      <li>For each REAL gap found (not every plugin will have one): a concrete, additive fix
+        following the reusable pattern — a new verifier agent, a new escalation skill, a spec
+        addendum section. Same quality bar as tonight: real data, no placeholders, explicit
+        "what did NOT change" notes.</li>
+      <li>An honest "no gap found here" verdict is a valid, valuable outcome for any plugin
+        where the audit doesn't turn up a real problem — don't manufacture work to look
+        thorough.</li>
+      <li>If <code>self-healing-theme-loop.js</code> (the still-unbuilt engine) is in scope for
+        this pass, note that as a separate, larger deliverable — building the actual
+        cron-driven monitoring engine (S1–S4 checks, baseline diffing, knowledge-store
+        read/write, cron registration via <code>CronCreate</code>) is real, substantial work
+        distinct from the audit itself. Flag it, don't rush it into this pass unless
+        explicitly asked to build it too.</li>
+    </ol>
+  </section>
+
+</div>
+</body>
+</html>

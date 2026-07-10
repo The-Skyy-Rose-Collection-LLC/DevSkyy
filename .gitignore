@@ -1,10 +1,22 @@
 # DevSkyy Platform - .gitignore
+#
+# Reorganized/deduped 2026-07-09. Prior file had 6 exact-duplicate lines
+# (.mypy_cache/, .ruff_cache/, *.log, logs/, htmlcov/, generated_3d_models/)
+# plus ~10 functionally-redundant `**/x/` variants of already-recursive bare
+# patterns (gitignore patterns with no leading slash already match at any
+# depth — `**/foo/` adds nothing over `foo/`). Root cause: every entry was
+# added reactively by whoever hit git-status noise that session, with no
+# check against existing coverage. Same pattern nearly caused a real
+# incident (see .claude/ section) when a whole engine + state dir went
+# untracked and invisible in a worktree. No ignore behavior changes below
+# except the .claude/ section (was blanket-ignored, now allow-listed).
 
 # Ralph context file (persists across iterations, never commit deletions)
 .ralph/ralph-context.md
 .ralph/.ralph-context.bak
+.ralph/ralph-loop.state.json
 
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -31,9 +43,10 @@ venv/
 ENV/
 env/
 .venv/
+.venv-*/
 .venv-agents/
 
-# IDE
+# --- IDE ---
 .idea/
 .vscode/
 *.swp
@@ -43,31 +56,47 @@ env/
 .pydevproject
 .settings/
 
-# Testing
+# --- Testing / lint / type-check caches ---
 .tox/
 .nox/
 .coverage
 .coverage.*
 htmlcov/
+coverage/
 .pytest_cache/
 nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-coverage/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pre-commit-cache/
 
-# Secrets & Environment (catch-all, whitelist .env.example only)
+# --- Secrets & Environment ---
+# Catch-all, whitelist .env.example only
 .env
 .env.*
 !.env.example
 !.env.wordpress.example
 !.env.docker.example
+.env.secrets
+.env.secrets.*
 secrets/
 credentials/
+.secrets/
 *.pem
 *.key
 *.crt
-.secrets/
+*.secrets
+*.secrets.*
+**/*.secret
+# .serena/ (below) already blanket-ignores this, so no per-file rule needed —
+# REDACTED 2026-0x: .serena/memories/woocommerce_api_credentials.md once held
+# a live WooCommerce secret. The file is deleted and the directory is
+# ignored either way, but ROTATION STATUS OF THAT KEY IS UNCONFIRMED — this
+# comment does not prove the key was rotated. Verify before trusting it's dead.
 
 # --- Claude Code ---
 # agents/skills/hooks/workflows/state are source, tracked (128 files already
@@ -84,17 +113,18 @@ credentials/
 .claude/scheduled_tasks.lock
 .claude/tidy-log.jsonl
 
-# Database
+# --- Database ---
 *.db
 *.sqlite
 *.sqlite3
 
-# Logs
+# --- Logs ---
 *.log
 logs/
 log/
+nohup.out
 
-# OS
+# --- OS ---
 .DS_Store
 .DS_Store?
 ._*
@@ -103,7 +133,7 @@ log/
 ehthumbs.db
 Thumbs.db
 
-# Node (for frontend)
+# --- Node (frontend) ---
 node_modules/
 npm-debug.log
 yarn-error.log
@@ -111,118 +141,122 @@ package-lock.json
 !frontend/package-lock.json
 yarn.lock
 pnpm-lock.yaml
-**/pnpm-lock.yaml
+bun.lock
+bun.lockb
 
-# Docker
+# --- Docker ---
 .docker/
 
-# Artifacts & Cache
+# --- Build artifacts & cache ---
 artifacts/
 cache/
 .cache/
 tmp/
 temp/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Ruff
-.ruff_cache/
-
-# Pre-commit
-.pre-commit-cache/
-
-# Documentation builds
+*.tsbuildinfo
+.next/
 docs/_build/
 
-# Redis
+# --- Jupyter ---
+.ipynb_checkpoints/
+/*.ipynb
+
+# --- Redis ---
 dump.rdb
 
-# Vector databases (runtime-generated)
+# --- Vector databases / runtime data (regenerated) ---
 data/vectordb/
 data/raganything/
 data/*.sqlite3
 data/*.db
+data/user/
 .vercel
 
-# Build artifacts
-*.tsbuildinfo
-
-# Minified files (build artifacts — excluded globally EXCEPT theme)
+# --- Minified files (build artifacts — excluded globally EXCEPT theme) ---
 *.min.js
 *.min.css
 !wordpress-theme/skyyrose-flagship/assets/**/*.min.js
 !wordpress-theme/skyyrose-flagship/assets/**/*.min.css
 
-# Empty directories
+# --- Staging/deployment logs & backups ---
 keys/
-
-# Staging/deployment logs
 staging/
 backups/
 legacy/
 .deploy-archives/
 /tmp/skyyrose-deploy-*.log
 *-deploy.log
+*.bak-*
+**/front.jpg.bak.*
+**/back.jpg.bak.*
 
-# Imagery pipeline run artifacts (stale between runs — regenerated per batch)
+# --- Imagery pipeline run artifacts (stale between runs) ---
 data/product-vision/
 data/verify-results/
+data/agent-learning/
+data/vision-consensus/
 
-# Large archive files
+# --- Zip / large archive files ---
+*.zip
+!frontend/**/*.zip
 assets/_other/*.zip
+skyyrose_training_data.zip
 
-# Secrets - comprehensive patterns
-*.secrets
-*.secrets.*
-.env.secrets
-.env.secrets.*
-**/secrets/**
-**/*.secret
-**/*.secrets
-
-# Generated 3D assets (large binary files)
+# --- 3D pipeline artifacts (generated, regenerable) ---
 assets/3d-models-generated/
 assets/3d-models/*/
+generated_3d_models/
+generated_3d_models_color_accurate/
+renders/3d/
+renders/quarantine/
+renders/_quarantine/
+renders/gated/
+renders/cache/
+renders/output/
+renders/manifest_archive/
+renders/oai/
+renders/contact-sheets/
+/TRELLIS.2/
 
-# Generated images and model test outputs
-generated_images/
+# --- AI model weights & checkpoints (use HuggingFace Hub instead) ---
+models/checkpoints/
+models/loras/
 models/skyyrose-lora-v3-tests/
+skyyrose-brand-voice-lora/
+*.ckpt
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
 
-# External SDKs (install via pip instead)
+# --- External SDKs / vendored / experimental dirs ---
 tripo-python-sdk/
-
-# Experimental/workspace directories
 huggingface-spaces/
+hf_3d_cache/
+hf_enhancement_cache/
+# Vendored third-party repos (cloned via git, not authored here).
+# Track the scaffolding (README + .gitignore) so contributors can bootstrap.
+vendor/*
+!vendor/.gitignore
+!vendor/README.md
 
-# Git internal / temp
+# --- Git internal / temp ---
 .git-rewrite/
 
-# Local tool configs
+# --- Local tool configs ---
 .playwright-mcp/
+.serena/
+.ci-local-gate
 
-# Product & enhanced images (backed up locally, uploaded to WordPress/HuggingFace)
+# --- Product & enhanced images (backed up locally, uploaded elsewhere) ---
 assets/enhanced_products/
 assets/enhanced-images/
 assets/2d-25d-assets/
+assets/visual-generated/
+generated_images/
 
-# WordPress large files and binaries
-wp-cli.phar
-wordpress/Logos/
-wordpress/skyyrose-immersive/
-wordpress/skyyrose-immersive.zip
-wordpress/shoptimizer-child-theme/
-wordpress/plugins/
-
-# 3D Models (large binary files)
-generated_3d_models/
-
-# Large files moved to HuggingFace Hub
+# --- Large files moved to HuggingFace Hub ---
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
 # Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
 # Source-of-truth registries (small text YAML/JSON) are re-included below.
@@ -231,109 +265,69 @@ generated_3d_models/
 !/assets/prompts/
 !/assets/brand/
 !/assets/marketing-keepers/
+datasets/**/*.jpg
+datasets/**/*.jpeg
+datasets/**/*.png
+datasets/**/*.webp
+datasets/**/*.safetensors
+datasets/**/*.pt
 datasets/
-generated_3d_models_color_accurate/
-
-# Pipeline images (use HuggingFace for storage)
 skyyrose/assets/images/
 
-# AI-generated outputs (regenerate, don't track)
-assets/visual-generated/
-
-# Large training data files
-skyyrose_training_data.zip
-
-# Ralph auto-managed state (changes every iteration)
-.ralph/ralph-loop.state.json
-
-# Runtime artifacts
-scripts/nano-banana-results.json
-
-# Dev screenshots at repo root
-skyyrose-*.png
-devskyy-*.png
-product-gallery-*.png
-theme-upload-*.png
-upload-form-*.png
-woocommerce-*.png
-wp-admin-*.png
-# Playwright capture runs (pwfinal1-*-hero.jpeg) + v7 live-site captures (any image ext)
-pwfinal*
-_v7-*
-
-# WordPress theme binary assets
-# Track homepage/brand images and product photos; ignore avatar and 3D assets.
-# wordpress-theme/skyyrose-flagship/assets/images/products/  # now tracked — needed for deploy
+# --- WordPress ---
+wp-cli.phar
+wordpress/Logos/
+wordpress/skyyrose-immersive/
+wordpress/skyyrose-immersive.zip
+wordpress/shoptimizer-child-theme/
+wordpress/plugins/
+# Theme avatar/3D/scene assets never tracked
 wordpress-theme/skyyrose-flagship/assets/images/avatar/
 wordpress-theme/skyyrose-flagship/assets/scenes/
 wordpress-theme/skyyrose-flagship/assets/3d/
+# Theme raster/glb binaries (2026-06-22): theme packages from disk at deploy
+# time, not from git, so these stay untracked by design — deploy is unaffected.
+# Fonts (*.woff2) stay TRACKED (tiny, GDPR/zero-CDN-critical).
+wordpress-theme/skyyrose-flagship/assets/**/*.webp
+wordpress-theme/skyyrose-flagship/assets/**/*.avif
+wordpress-theme/skyyrose-flagship/assets/**/*.jpg
+wordpress-theme/skyyrose-flagship/assets/**/*.jpeg
+wordpress-theme/skyyrose-flagship/assets/**/*.png
+wordpress-theme/skyyrose-flagship/assets/**/*.gif
+wordpress-theme/skyyrose-flagship/assets/**/*.glb
+wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
+wordpress-theme/skyyrose-flagship/data/product-references/techflat-review.json
+wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analysis.json
+# Generated from brand.yaml at build/deploy time — never committed
+wordpress-theme/skyyrose-flagship/inc/brand.generated.php
 
-# Editorial staging (temp workspace, not for version control)
-editorial-staging/
+# --- Renders / generated media (2026-06-22, regenerable, kept on disk) ---
+renders/**/*.webp
+renders/**/*.avif
+renders/**/*.jpg
+renders/**/*.jpeg
+renders/**/*.png
+renders/**/*.gif
+renders/**/*.glb
+renders/**/*.gltf
+generated_assets/
+round_table_outputs/
 
-# Training data & photo scans (use HuggingFace datasets instead)
-skyyrose-photo-scan/
-data/lora_dataset/
-
-# Zip archives (never commit large binaries)
-*.zip
-!frontend/**/*.zip
-
-# Root artifacts (runtime-generated, not source code)
-deployment_summary.json
-wordpress-health-check-results.json
-skyyrose_clothing_barcodes.txt
-
-# Broken tooling artifacts
---version/
-
-# Dead symlinks & empty clone dirs
-adk
-Hunyuan3D-*/
-
-# Bun lockfile (use npm for Vercel compat)
-bun.lock
-bun.lockb
-
-# Marker files (build artifacts)
-.plugin-fix-complete
-
-# Virtual environments (all)
-.venv-*/
-
-# Serena config (local)
-.serena/
-
-# LoRA model weights (stored on HuggingFace: damBruh/skyyrose-assets)
-skyyrose-brand-voice-lora/
-
-# HuggingFace caches (regenerable)
-hf_enhancement_cache/
-
-# Local asset backups (created by cleanup scripts)
-DevSkyy-assets-backup/
-
-# Runtime-generated agent artifacts
-data/sdk_sessions/
-audit_reports/
-scraped_docs/
-
-# Dev screenshots (diagnostic captures, not source)
-screenshots/
-
-# Design system docs (generated by UI/UX Pro Max skill)
+# --- Design system docs (generated by UI/UX Pro Max skill) ---
 # Exclude the committed React package; ignore the rest of the tree
 design-system/**
 !design-system/skyyrose-storefront/**
 !design-system/skyyrose-storefront/
 
-# Archive & reference clones (not project source)
+# --- Archive & reference clones (not project source) ---
 _archive/
+.archive/
 open-claude-code/
 
-# Auto-generated agent/skill/plugin files
+# --- Auto-generated agent/skill/plugin files ---
 .agents/
-.aidesigner/
+.aidesigner/*
+!.aidesigner/.gitkeep
 .mcp.json
 
 # Third-party AI coding-assistant config dirs. Each contains ONLY symlinks
@@ -368,202 +362,104 @@ open-claude-code/
 .windsurf/
 .zencoder/
 
-# OpenWolf session-local state (churns every action — not content, ignore)
+# --- OpenWolf ---
+# Session-local state (churns every action — not content, ignore) +
+# derived/regenerated-per-scan artifacts.
 .wolf/memory.md
 .wolf/token-ledger.json
 .wolf/hooks/_session.json
 .wolf/claude-mem-digest.md
-
-# claude-mem per-folder context injection → CLAUDE.local.md (FOLDER_USE_LOCAL_MD=true).
-# Claude Code still loads it as local context; git ignores it so the sync gathers
-# info without churning tracked CLAUDE.md files (matches at any depth, no slash).
-CLAUDE.local.md
-
-# Prototype scratch tree (61MB; founder-picked variants are PORTED into the theme,
-# the scratch itself is not tracked). Also avoids duplicate build-standalone.py
-# module collisions in mypy. Un-ignore deliberately if a variant must be preserved.
-prototypes/
-
-# Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
-/*.ipynb
-
-# Immersive test renders (regenerable)
-wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
-scripts/nano-banana-composite-results.json
-
-# Vendored third-party repos (cloned via git, not authored here).
-# Track the scaffolding (README + .gitignore) so contributors can bootstrap.
-vendor/*
-!vendor/.gitignore
-!vendor/README.md
-
-# === Added by Claude optimization pass (20260424-190053) ===
-# These were missing from the original .gitignore.
-
-# Next.js build output
-.next/
-**/.next/
-
-# Loose Python compiled files
-*.pyc
-*.pyo
-*.pyd
-
-# DevSkyy-specific generated artifacts
-renders/cache/
-renders/output/
-renders/manifest_archive/
-renders/3d/
-renders/_quarantine/
-renders/gated/
-generated_3d_models/
-
-# User PII data
-data/user/
-
-# Design QC screenshots (regenerable via openwolf designqc)
-skyyrose-*.jpeg
-
-# Claude codebase context index (generated, not authored)
-claude-context/
-
-# AI model weights and large checkpoints
-models/checkpoints/
-models/loras/
-*.ckpt
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.onnx
-
-# Type-check and lint caches
-.mypy_cache/
-.ruff_cache/
-
-# Logs and runtime data
-logs/
-*.log
-nohup.out
-
-# Lockfile-realized state in subdirs (each subproject has its own)
-**/node_modules/
-**/__pycache__/
-**/.venv/
-**/venv/
-
-# Coverage artifacts
-htmlcov/
-**/coverage/
-**/htmlcov/
-
-# Vendored 3D model repo (Microsoft TRELLIS.2 — Linux+CUDA only, do not commit)
-/TRELLIS.2/
-
-# Pipeline quarantine and design QC captures (large binaries, regenerable)
-renders/quarantine/
+.wolf/memory-audit.json
 .wolf/designqc-captures/
 
-# Binary 3D proof-of-concept assets in planning handoffs
-.planning/handoffs/*.glb
-.aidesigner/*
-!.aidesigner/.gitkeep
+# --- claude-mem per-folder context injection ---
+# → CLAUDE.local.md (FOLDER_USE_LOCAL_MD=true). Claude Code still loads it as
+# local context; git ignores it so sync gathers info without churning
+# tracked CLAUDE.md files (matches at any depth, no slash).
+CLAUDE.local.md
 
-# Graphify intermediate caches (regenerable; large)
-graphify-out/.graphify_*
-graphify-out/cache/
-graphify-out/manifest.json
+# --- Prototype scratch tree ---
+# 61MB; founder-picked variants are PORTED into the theme, scratch itself is
+# not tracked. Un-ignore deliberately if a variant must be preserved.
+prototypes/
 
-# ADK render pipeline run artifacts (regenerable, run-specific, large)
+# --- Vendored third-party repo ---
+# Microsoft TRELLIS.2 — Linux+CUDA only, do not commit (see /TRELLIS.2/ above)
+
+# --- Runtime-generated agent artifacts ---
 # Pipeline outputs are reproducible from the catalog + dossiers; only the
 # pipeline source code under agents/render_pipeline/ is canonical.
 agents/render_pipeline/output/
-data/agent-learning/
-data/vision-consensus/
 tasks/render-pipeline-cli-*.json
+scripts/nano-banana-results.json
+scripts/nano-banana-composite-results.json
 
-# Catalog auto-sync + ad-hoc backups (sync scripts and one-off cleanups)
-*.bak-*
-
-# Visual Companion brainstorming artifacts (skill: superpowers/brainstorming)
+# --- Brainstorming artifacts (skill: superpowers/brainstorming) ---
 .superpowers/
 
-# OpenWolf derived artifacts — regenerated on every scan, hash-only churn pollutes diffs
-.wolf/memory-audit.json
+# --- Golden-photo uploader backups ---
+# (auto-created by scripts/golden_uploader.py — see **/front.jpg.bak.* above)
 
-# L5 tidy hook log (per-machine, observe-mode proposals)
-.claude/tidy-log.jsonl
+# --- Root-level runtime-generated artifacts (not source code) ---
+deployment_summary.json
+wordpress-health-check-results.json
+skyyrose_clothing_barcodes.txt
+audit_reports/
+scraped_docs/
+data/sdk_sessions/
 
-# Golden-photo uploader backups (auto-created by scripts/golden_uploader.py)
-**/front.jpg.bak.*
-**/back.jpg.bak.*
+# --- Broken tooling artifacts / dead symlinks / empty clone dirs ---
+--version/
+adk
+Hunyuan3D-*/
+.plugin-fix-complete
 
-wordpress-theme/skyyrose-flagship/data/product-references/techflat-review.json
-wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analysis.json
+# --- Dev/QC screenshots at repo root (diagnostic captures, not source) ---
+skyyrose-*.png
+skyyrose-*.jpeg
+devskyy-*.png
+product-gallery-*.png
+theme-upload-*.png
+upload-form-*.png
+woocommerce-*.png
+wp-admin-*.png
+# Playwright capture runs (pwfinal1-*-hero.jpeg) + v7 live-site captures
+pwfinal*
+_v7-*
+screenshots/
 
-# Autonomous coding agent scratch/demo output dir
-my_project/
-renders/oai/
-scripts/oai_render/CLAUDE.md
-scripts/oai-render-review.py
+# --- Editorial / training-data staging (use HuggingFace datasets instead) ---
+editorial-staging/
+skyyrose-photo-scan/
+data/lora_dataset/
 
-# ci-local stopgap: per-worktree opt-in sentinel (not version-controlled)
-.ci-local-gate
+# --- Claude codebase context index (generated, not authored) ---
+claude-context/
+graphify-out/.graphify_*
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/
 
-# Redacted — contained a live WooCommerce secret; keep out of git (rotate key, do not re-add)
-.serena/memories/woocommerce_api_credentials.md
-
-# --- Repo-hygiene: untracked scratch/generated/tool-cache that pollutes `git status` ---
-# Antigravity CLI artifacts (installer, scratch test, per-project id cache mirroring ~/.gemini)
-/.antigravitycli/
-/install_agy.sh
-/test_antigravity.py
-# Archived orphan render assets (~7M of superseded AI renders kept on disk, not history)
-/.archive/
-# Generated catalog contact sheets (sibling of already-ignored renders/oai/)
-renders/contact-sheets/
-# Pathfinder skill output (dated, regenerated per /pathfinder run)
-/PATHFINDER-*/
-
-# design-sync converter (generated, not durable inputs)
+# --- Design-sync converter (generated, not durable inputs) ---
 .ds-sync/
 ds-bundle/
 .design-sync/.cache/
 .design-sync/node_modules/
-# Theme binary assets (2026-06-22): kept on disk, untracked from git.
-# The theme is packaged from disk (not git), so the live site is unchanged.
-# Fonts (*.woff2) stay TRACKED (tiny, GDPR/zero-CDN-critical).
-wordpress-theme/skyyrose-flagship/assets/**/*.webp
-wordpress-theme/skyyrose-flagship/assets/**/*.avif
-wordpress-theme/skyyrose-flagship/assets/**/*.jpg
-wordpress-theme/skyyrose-flagship/assets/**/*.jpeg
-wordpress-theme/skyyrose-flagship/assets/**/*.png
-wordpress-theme/skyyrose-flagship/assets/**/*.gif
-wordpress-theme/skyyrose-flagship/assets/**/*.glb
 
-# Generated/scratch assets — untracked, kept on disk where pipeline needs them (2026-06-22)
-renders/**/*.webp
-renders/**/*.avif
-renders/**/*.jpg
-renders/**/*.jpeg
-renders/**/*.png
-renders/**/*.gif
-renders/**/*.glb
-renders/**/*.gltf
-datasets/**/*.jpg
-datasets/**/*.jpeg
-datasets/**/*.png
-datasets/**/*.webp
-datasets/**/*.safetensors
-datasets/**/*.pt
-generated_assets/
-round_table_outputs/
-hf_3d_cache/
-ci_mirror/
-graphify-out/
+# --- Autonomous coding agent scratch/demo output ---
+# NOTE: scripts/oai_render/CLAUDE.md and scripts/oai-render-review.py look
+# like stray scratch files rather than build artifacts — worth a look before
+# assuming they belong ignored rather than deleted.
+my_project/
+scripts/oai_render/CLAUDE.md
+scripts/oai-render-review.py
 
-# Superseded binary render artifacts (dot-prefixed; _archive/ already covered)
-.archive/
+# --- CI / repo hygiene ---
+# Antigravity CLI artifacts (installer, scratch test, per-project id cache)
+/.antigravitycli/
+/install_agy.sh
+/test_antigravity.py
+/PATHFINDER-*/
 
-# Generated from brand.yaml at build/deploy time — never committed (see theme docs).
-wordpress-theme/skyyrose-flagship/inc/brand.generated.php
+# --- Binary 3D proof-of-concept assets in planning handoffs ---
+.planning/handoffs/*.glb

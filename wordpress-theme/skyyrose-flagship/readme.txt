@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.9.4
+Stable tag: 1.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,9 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.9.5 =
+* Fix: mascot body posture in the idle animation was hunched forward with head pitched down — re-keyed the idle clip's Hips bone rotation at both loop keyframes using a verified world-space correction (Hips world-X rotation was previously being applied in the bone's skewed local rest-space, producing the wrong effect); walk/talk/joy clips were already correctly authored and are unchanged
 
 = 1.9.4 =
 * Fix: mascot rendered as an untextured white silhouette — CSP connect-src now allows blob: (GLTFLoader loads embedded textures via fetch of blob: URLs); GLB textures re-encoded as universal JPEG (EXT_texture_webp was in extensionsRequired, a hard fail on loaders without WebP ImageBitmap support); model normalization scales before centering (she floated in the top half of the canvas); skinned meshes exempt from frustum culling

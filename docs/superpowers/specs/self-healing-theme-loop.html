@@ -125,6 +125,7 @@
     <a href="#safety">Safety</a>
     <a href="#runbook">Runbook</a>
     <a href="#decisions">Decisions</a>
+    <a href="#escalation-tier">Escalation Tier (added 2026-07-09)</a>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -799,6 +800,76 @@
       signature classes are logged. The training set is <code>heal-log.jsonl</code>
       + <code>heal-knowledge.json</code> signatures with <code>lastOutcome</code> labels.
     </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="escalation-tier">
+    <h2>Escalation Tier (added 2026-07-09)</h2>
+    <p>
+      Added after the mascot skin-weight investigation (<code>bug-198</code>) proved out a
+      pattern for hard issues that resist a single-shot fix: parallel independent fix
+      hypotheses, each independently and adversarially verified, before falling back to
+      founder escalation. This section documents two new artifacts; it does not change
+      the architecture, signals, or safety rules defined above. <strong>Neither artifact
+      is wired into a running engine yet</strong> — <code>self-healing-theme-loop.js</code>
+      itself has not been built as of this spec revision. These are additive design,
+      ready for whenever the engine is implemented.
+    </p>
+
+    <h3>New artifact 1 — independent verifier (strengthens every cycle, no fan-out needed)</h3>
+    <p>
+      <code>skyyrose-suite/plugins/skyyrose-design/agents/theme-heal-verifier.md</code>.
+      The "Heal vs Improve — Two-Axis Review Gate" above never specified <em>who</em> runs
+      the gate. In practice a single agent that both fixes and self-grades its own fix will
+      round up — the same failure mode this loop's own <code>theme-heal-doctor</code> report
+      schema (<code>healed</code>, <code>isNetImprovement</code>) is vulnerable to if nothing
+      independently re-checks it. <code>theme-heal-verifier</code> takes the heal report as
+      an unverified claim, independently re-derives both axes (fresh cache-busted curl,
+      fresh source grep, fresh <code>php -l</code>/PHPCS, fresh screenshot for visual
+      surfaces) and returns a structured verdict. Slot this in as the GATE step in the
+      architecture diagram above, between <strong>HEAL + IMPROVE</strong> and
+      <strong>DEPLOY</strong> — read-only, never edits the fix, never deploys.
+    </p>
+
+    <h3>New artifact 2 — hard-issue escalation skill (only for escalated/uncertain regressions)</h3>
+    <p>
+      <code>skyyrose-suite/plugins/skyyrose-design/skills/autonomous-issue-diagnose-fix/SKILL.md</code>.
+      For the case this spec's <strong>Escalation bound</strong> (top of this document) and
+      <strong>Escalate after 2 consecutive failing cycles</strong> (Safety section) currently
+      resolve by giving up and surfacing to the founder: before that final step, invoke this
+      skill <strong>once</strong>. It runs N independent agents proposing genuinely different
+      root-cause hypotheses in parallel, each producing a candidate fix, each independently
+      adversarially verified by a fresh <code>theme-heal-verifier</code>-style check, then a
+      synthesis step picks the one clean candidate or reports honestly that none qualify —
+      with the specific evidence for why each hypothesis failed, so the same wrong guess
+      isn't retried next cycle. This does not relax the loop's bounded-fan-out safety rule
+      for <em>routine</em> cycles (still: one healing attempt per signature per normal
+      cycle) — the parallel fan-out is scoped strictly to the already-rare
+      escalation/hard-issue path, invoked at most once per escalated signature before
+      founder handoff.
+    </p>
+    <p>
+      Reference implementation of the underlying pattern (Workflow shape: diagnose → parallel
+      fix attempts → adversarial verify → synthesis → bounded revision) is the
+      <code>mascot-skin-weight-fix</code> and <code>mascot-corrective-shapekey-fix</code>
+      Workflow runs from the 2026-07-09 mascot investigation (see <code>.wolf/buglog.json</code>
+      bug-196/bug-198 and <code>.wolf/cerebrum.md</code> for the concrete before/after). The
+      general, domain-agnostic version of the pattern itself lives in the
+      <code>adversarial-verification</code> skill at the repo's user-level skills directory.
+    </p>
+
+    <h3>What did NOT change</h3>
+    <ul>
+      <li>All existing safety rules (worktree isolation, deploy off by default, no
+        self-grant, escalate after 2 cycles) apply unchanged to both new artifacts.</li>
+      <li><code>theme-heal-verifier</code> and the escalation skill are both strictly
+        read/verify-only with respect to production — neither deploys, commits, or bumps
+        <code>SKYYROSE_VERSION</code>.</li>
+      <li>The <code>heal-knowledge.json</code> schema is unchanged; an escalation-tier
+        outcome (clean fix found, or none found with reasons) upserts the existing
+        <code>signatures</code> array exactly as a normal cycle would, via the same
+        <code>lastOutcome</code> enum.</li>
+    </ul>
   </section>
 
 </div>

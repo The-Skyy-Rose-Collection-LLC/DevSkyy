@@ -67,13 +67,17 @@ assets
 /claude-context
 /editorial-staging
 /renders
-# wordpress-theme excluded EXCEPT the SOT catalog data dir — frontend/lib/catalog.ts
-# resolves wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv at build+runtime
-# (gitignore semantics: a file under an excluded dir can't be re-included, hence the /* ladder)
+# wordpress-theme excluded EXCEPT the single SOT catalog CSV that
+# frontend/lib/catalog.ts reads at build+runtime. Re-include only that file —
+# NOT the whole data/ dir (which carries generator scripts, dossiers, and
+# authoring notes with no place in the deployed Vercel artifact).
+# (gitignore semantics: re-including a file under an excluded dir needs the /* ladder)
 /wordpress-theme/*
 !/wordpress-theme/skyyrose-flagship
 /wordpress-theme/skyyrose-flagship/*
 !/wordpress-theme/skyyrose-flagship/data
+/wordpress-theme/skyyrose-flagship/data/*
+!/wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
 /source-products
 /brand-assets
 /cerebrum

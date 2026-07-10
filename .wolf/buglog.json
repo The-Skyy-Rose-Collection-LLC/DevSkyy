@@ -2908,8 +2908,7 @@
       "pytest",
       "warning",
       "request-deduplication"
-    ],
-    "related_bugs": []
+    ]
   },
   {
     "id": "bug-192",
@@ -2949,6 +2948,452 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-07T23:30:00-07:00"
+  },
+  {
+    "id": "bug-194",
+    "timestamp": "2026-07-08T01:25:00-07:00",
+    "error_message": "Mascot GLB renders as white untextured silhouette on Safari-path loaders on skyyrose.co live site",
+    "file": "renders/3d/mascot/v2/skyy-v6-web.glb (live), replaced by skyy-v7-web.glb",
+    "root_cause": "skyy-v6-web.glb has extensionsRequired: [EXT_texture_webp, KHR_draco_mesh_compression] with baseColor/emissive texture stored as image/webp. Loaders that don't support EXT_texture_webp (Safari-path) drop the required extension and fail to render the texture, producing a white silhouette. Separately, the task spec's build command `gltf-transform optimize ... --texture-compress jpeg` does not exist in gltf-transform CLI v4.4.1 -- the `optimize` subcommand's --texture-compress only accepts ktx2|webp|avif|auto|false, never jpeg/png (confirmed via `optimize --help`); jpeg/png conversion is a separate top-level `jpeg`/`png` subcommand.",
+    "fix": "Rebuilt from uncompressed master skyy-v6-merged.glb (image/png source, no draco, no webp) using a 3-stage single-pass pipeline instead of the invalid one-shot optimize flag: (1) `gltf-transform resize --width 2048 --height 2048` on the raw PNG texture, (2) `gltf-transform jpeg --formats '*' --quality 92` to convert to universal image/jpeg (alphaMode is OPAQUE so no alpha loss), (3) `gltf-transform draco` applied LAST as a single clean geometry compression pass (running draco before texture ops caused a 'Decoded KHR_draco_mesh_compression, further compression will be lossy' warning on re-encode -- avoided by ordering texture ops before the only draco pass). Result: extensionsRequired=[KHR_draco_mesh_compression] only, no EXT_texture_webp anywhere, image/jpeg 2048x2048, all 6 animation clips (idle/joy/point/talk/walk/wave) and the single skin + JOINTS_0 preserved byte-identical keyframe counts to the source master. 1.44MB total, under the 3.5MB budget. Visually QC'd the extracted JPEG texture atlas at quality 92 -- no banding on flat black/white fills.",
+    "tags": [
+      "gltf-transform",
+      "3d-mascot",
+      "webp",
+      "safari",
+      "draco",
+      "cli-flag-mismatch",
+      "texture-compression"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T01:25:00-07:00"
+  },
+  {
+    "id": "bug-195",
+    "timestamp": "2026-07-08T10:37:00-07:00",
+    "error_message": "Founder-reported: mascot body posture 'not human-like' -- hunched torso, head pitched down, arms hanging forward, one foot lifted -- visible in bind pose and specifically in the idle loop as played live.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (source), skyy-v8-web.glb (fixed, not yet deployed)",
+    "root_cause": "Three compounding mistakes across attempts, each caught before reaching production: (1) A prior diagnosis agent's corrective quaternion for the Hips bone ('world +X axis, +8.7954deg') did not reproduce in a fresh Blender session -- applying it moved the lean in the WRONG direction. Root cause: `pose_bone.rotation_quaternion` is defined in the bone's own LOCAL rest-space, not world space. This rig's Hips edit-bone rest orientation is heavily skewed from world axes (euler ~[-9,17,-99] degrees, confirmed via `bone.matrix_local.to_euler()`), so any 'world axis' rotation vector passed directly into `Quaternion(axis, angle)` and assigned to `.rotation_quaternion` was actually being interpreted in that skewed local frame, producing wildly wrong real-world rotations (one attempt collapsed the spine below the hips; another laid the whole body flat on its back). (2) The correct fix -- rotating a bone by a true WORLD-space angle -- requires manipulating `pose_bone.matrix` (armature/world-space) directly: `pb.matrix = Translation(pivot) @ Matrix.Rotation(angle, 4, world_axis) @ Translation(-pivot) @ pb.matrix.copy()`, then letting Blender back-solve the local values. This was verified with a monotonic, reproducible sweep (world X axis, -12.5deg drives Hips->Head world-space lean from -12.62deg to -0.12deg). (3) Even with the correct world-space rotation, applying it via `bpy.ops.pose.armature_apply()` (bake pose as new rest) had ZERO visible effect on the deployed mascot, because `skyy-3d.js` only ever plays named animation clips (idle/walk/etc) via GLTFLoader -- the bind/rest pose is never displayed. `armature_apply()` is explicitly designed to preserve existing animation clips' visual appearance relative to the new rest, so it structurally cannot un-hunch a clip whose own keyframes are the source of the hunch. The idle clip's Hips bone had only 2 keyframes (frames 0 and 72, the loop start/end) baked with the original bad rotation.",
+    "fix": "Directly re-keyed the idle action's Hips rotation_quaternion at both existing keyframes (frame 0 and 72) using the verified world-space rotate-around-pivot method (`pose_bone.matrix` manipulation, NOT `rotation_quaternion` assignment, NOT `armature_apply()`). Verified via direct render of the re-exported, re-optimized (resize->jpeg->draco) GLB's actual idle clip at 0/25/50/75/100% of the loop -- upright, symmetric, level head, loop closes cleanly. Walk/talk/joy clips were already correctly authored (untouched, confirmed still good); wave/point show an intentional forward-leaning gesture pose, not the standing-hunch defect, left as-is. Result file: renders/3d/mascot/v2/skyy-v8-web.glb, 827KB, all 6 clips + single skin + JOINTS_0/WEIGHTS_0 preserved, draco+jpeg applied. NOT YET deployed to production -- pending founder confirmation per STOP-AND-SHOW.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "pose-bone-local-vs-world-space",
+      "armature-apply-misconception",
+      "rest-pose-never-displayed",
+      "idle-clip-rekey",
+      "gltf-transform"
+    ],
+    "related_bugs": [
+      "bug-194"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T10:37:00-07:00"
+  },
+  {
+    "id": "bug-196",
+    "timestamp": "2026-07-08T22:44:00-07:00",
+    "error_message": "Founder: still not fixed why is this so complicated -- its the torso, waste, legs her whole bottom half (after v1.9.5 Hips-lean deploy)",
+    "file": "renders/3d/mascot/v2/skyy-v9-idle-only-merged.glb (source: skyy-v6-merged.glb)",
+    "root_cause": "Independent of the Hips-lean fix (bug-195), the mascot GLB has a pre-existing crossed-leg base pose (LeftUpLeg/RightUpLeg exaggerated adduction) baked into every one of the 6 animation clips (idle/walk/talk/point/wave/joy) at their starting keyframes, causing the pants mesh to pinch into a visible diagonal crease at the crotch/pelvis. Confirmed present in the pristine original v6-merged.glb, so not introduced by any fix tonight.",
+    "fix": "idle clip only: re-keyed LeftUpLeg/RightUpLeg rotation_quaternion at both existing keyframes (frames 0, 72) with a world-space Y-axis rotation of -15 degrees (left) / +15 degrees (right), computed via pose_bone.matrix world-space manipulation with the pose frozen (animation_data.action = None) before editing so the edit is not immediately overwritten by animation evaluation on the next depsgraph update. Verified clean via fresh render of the exported result. walk/talk/point/wave/joy were NOT fixed: a -8 to -30 degree sweep of the same world-Y correction against walk frame 1 (much deeper hip flexion than idle) never cleared the crease, indicating a different root cause at high flexion angles (likely a skin-weight pinch at the Hips/UpLeg boundary, not adduction/crossing) that requires mesh/weight-level work, not an animation-keyframe fix. Those 5 clips were left completely untouched in the shipped file (byte-identical to original v6 data) rather than shipping an unproven correction.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "pose-bone",
+      "skin-weights",
+      "animation-keyframes",
+      "partial-fix"
+    ],
+    "related_bugs": [
+      "bug-195"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T22:44:00-07:00"
+  },
+  {
+    "id": "bug-197",
+    "timestamp": "2026-07-09T05:00:00-07:00",
+    "error_message": "RuntimeError: CRITICAL: JWT_REFRESH_SECRET_KEY is not set \u2014 devskyy-backend first boot crash-looped, health checks timed out",
+    "file": "tasks/backend-golive-manifest.md",
+    "root_cause": "Go-live manifest listed required secrets by convention (JWT_SECRET_KEY, ENCRYPTION_MASTER_KEY, DATABASE_URL...) instead of by census \u2014 security/jwt_oauth2_auth.py has TWO _require_secret sites (JWT_SECRET_KEY:102 AND JWT_REFRESH_SECRET_KEY:104); the second was never in the manifest.",
+    "fix": "Set JWT_REFRESH_SECRET_KEY via fly secrets (founder-run, openssl-generated). Lesson: before any go-live, grep the boot path for _require_secret/fail-loud sites and derive the secret list from code, not memory.",
+    "tags": [
+      "deploy",
+      "secrets",
+      "fly",
+      "manifest",
+      "fail-loud"
+    ],
+    "related_bugs": [
+      "bug-192"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T05:00:00-07:00"
+  },
+  {
+    "id": "bug-198",
+    "timestamp": "2026-07-09T13:15:00-07:00",
+    "error_message": "Follow-up to bug-196: walk/talk/point/wave/joy crotch crease at high hip flexion -- three independent fix approaches (weight-smoothing, flexion-angle-clamping, manual weight redistribution) attempted via a mascot-skin-weight-fix Workflow with adversarial verification. All three failed.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (investigated in worktree mascot-skin-weight-fix, no changes shipped)",
+    "root_cause": "NOT a weight-painting defect -- the Hips/UpLeg vertex weight blend is smooth, anatomically sane, with zero hard cutoffs (0 hard-single vertices out of ~369 in the crotch region). Root cause is Linear Blend Skinning (candy-wrapper collapse) at extreme, stylized hip-flexion angles: these mascot poses hit 126-138 degrees of hip flexion (bind-pose-relative), well beyond real human ROM (~90-120 degrees). At that flexion, binding a vertex 100% to Hips vs 100% to the thigh bone produces deformed positions 26-28% of torso-reference-length apart -- no reweighting between the same two rigid bone transforms can close a gap that large; any blend, narrow or wide, produces visible pinching under LBS math. Confirmed independently by 3 separate diagnostic/fix attempts converging on the same conclusion.",
+    "fix": "NONE SHIPPED -- all three attempted fixes were adversarially verified (independent re-render + pixel-diff, not self-report) as no-improvement: (1) weight-smoothing via Jacobi diffusion on the Hips/UpLeg/UpLeg vertex groups, both mild (953 verts) and aggressive (1630 verts, 30 iterations) passes -- zero visible change, confirmed via determinism-controlled pixel diff; (2) flexion-angle clamping (halving the excess above 80% of each clip's own peak angle) -- adversarial matched-crop pixel diff disproved the builder's own claimed improvement on talk, AND this approach has a real cost: on this rig flexion is measured from bind pose not neutral-standing, so the threshold caught 102/102 walk frames, nearly halving the stride's rotational amplitude and making the walk animation visibly less dynamic for zero benefit; (3) manual vertex-weight redistribution with a wider, anatomically-anchored (0.5x thigh-bone-length) smoothstep blend band -- independent 800%-zoom + ImageMagick fuzz-diff re-render showed the actual pixel differences were a 1-2px anti-aliasing shift, not a real fold reduction. Recommended next step (not yet attempted): a corrective shape key / morph target sculpted for high hip-flexion, driven by a per-clip morph-weight keyframe track peaking at each clip's known peak frame (walk=86, talk=15, point=59, wave=27, joy=12) -- glTF + three.js natively support morph targets with animated weights, this is the standard fix for LBS candy-wrapper collapse. Fallbacks in order: helper/twist bone between Hips and UpLeg, then dual-quaternion skinning (requires custom three.js runtime/shader work, highest cost).",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "skin-weights",
+      "linear-blend-skinning",
+      "lbs-candy-wrapper-collapse",
+      "unresolved",
+      "adversarial-verification"
+    ],
+    "related_bugs": [
+      "bug-195",
+      "bug-196"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T13:15:00-07:00"
+  },
+  {
+    "id": "bug-216",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY CRITICAL] CORS allow_origin_regex matched any *.vercel.app with allow_credentials=True \u2014 credentialed cross-origin data theft (live-proven: reflected https://evil.vercel.app)",
+    "file": "main_enterprise.py",
+    "root_cause": "_resolve_cors_origin_regex default `[a-z0-9-]+\\.(vercel\\.app|devskyy\\.app)` \u2014 vercel.app is an attacker-registrable shared domain",
+    "fix": "Scoped regex to devskyy.app subdomains + `devskyy-*-skyyroseco.vercel.app`, anchored ^...$; 6 regex assertions",
+    "tags": [
+      "security",
+      "cors",
+      "critical",
+      "credentials"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-199",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY HIGH] Personalization REST route: no rate limit + attacker-controlled Referer in transient cache key \u2192 unbounded storage DoS",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-api-experience.php",
+    "root_cause": "public __return_true route, cache_key=md5(hash+collection+referer), referer from raw header, no throttle",
+    "fix": "30/min per-IP throttle; dropped Referer from cache key",
+    "tags": [
+      "security",
+      "wordpress",
+      "rate-limit",
+      "dos"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-200",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY HIGH] analytics/events forwarded raw attacker JSON to FastAPI backend verbatim",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-api-experience.php",
+    "root_cause": "relay_analytics($events) received unsanitized request array (store sanitized local copies only)",
+    "fix": "New skyyrose_see_sanitize_events() allowlists fields before relay",
+    "tags": [
+      "security",
+      "wordpress",
+      "sanitization",
+      "injection"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-201",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] /openapi.json served 200 unauthenticated in production \u2014 full route/param schema disclosure",
+    "file": "main_enterprise.py",
+    "root_cause": "docs_url/redoc_url gated but openapi_url was not",
+    "fix": "openapi_url=None in production",
+    "tags": [
+      "security",
+      "info-disclosure",
+      "fastapi"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-202",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] SSRF guard bypassable for IP-literal hosts (10.x/127.x/169.254/::1)",
+    "file": "wordpress-theme/skyyrose-flagship/inc/fastapi-client.php",
+    "root_cause": "range check ran only when gethostbyname changed the host; IP literals returned unchanged \u2192 skipped",
+    "fix": "Range filter unconditional + IPv6 literal handling + Alibaba metadata block; unit-verified",
+    "tags": [
+      "security",
+      "wordpress",
+      "ssrf"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-203",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] MCP bridge AJAX forwarded any tool under shared backend token (compromised-admin blast radius)",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "manage_options+nonce correct but no tool allowlist",
+    "fix": "Filterable denylist blocking paid-generation + deploy/release tools",
+    "tags": [
+      "security",
+      "wordpress",
+      "authz",
+      "defense-in-depth"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-204",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] WS7 updateOrder/updateProduct path-traversal via `..` in id (dormant, 0 callers)",
+    "file": "frontend/lib/wp/client.ts",
+    "root_cause": "auth tier chosen from raw path; fetch collapses `..` after \u2192 creds to wrong endpoint",
+    "fix": "buildUrl() rejects `..` via path-safety.ts + strict-int id coercion; 6 vitest",
+    "tags": [
+      "security",
+      "frontend",
+      "path-traversal",
+      "dormant"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-205",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] Klaviyo subscribe throttled per-email only \u2192 scriptable list-spam",
+    "file": "wordpress-theme/skyyrose-flagship/inc/klaviyo-integration.php",
+    "root_cause": "only per-email transient limit",
+    "fix": "Added 20/15min per-IP limit",
+    "tags": [
+      "security",
+      "wordpress",
+      "rate-limit",
+      "spam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-206",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] legacy wordpress/proxy route no in-route auth (SPOF on edge matcher)",
+    "file": "frontend/app/api/wordpress/proxy/route.ts",
+    "root_cause": "relied solely on proxy.ts matcher",
+    "fix": "Added getServerSession, fails closed",
+    "tags": [
+      "security",
+      "frontend",
+      "authz"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-207",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] proxy.ts matcher bare-prefix lookahead \u2014 /api/authorize would fail open",
+    "file": "frontend/proxy.ts",
+    "root_cause": "(?!auth|checkout|webhooks) prefix not segment-anchored",
+    "fix": "Segment-anchored (?:/|$)",
+    "tags": [
+      "security",
+      "frontend",
+      "authz"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-208",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] stock endpoint leaked draft products by SKU",
+    "file": "wordpress-theme/skyyrose-flagship/inc/klaviyo-integration.php",
+    "root_cause": "wc_get_product_id_by_sku ignores post_status",
+    "fix": "publish-status check",
+    "tags": [
+      "security",
+      "wordpress",
+      "info-disclosure"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-209",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] .vercelignore re-included entire data/ dir into prod artifact",
+    "file": "./.vercelignore",
+    "root_cause": "broad !/data re-include shipped tooling/notes",
+    "fix": "tightened to skyyrose-catalog.csv only",
+    "tags": [
+      "security",
+      "infra",
+      "hygiene"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-210",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY CRITICAL] POST /api/v1/agent/execute + /webhooks/dispatch unauthenticated \u2014 prompt-injectable production WooCommerce/WordPress writes on public backend (live-confirmed 422 not 401)",
+    "file": "api/v1/wordpress_agent.py",
+    "root_cause": "routes had no Depends/auth; feed free-form prompt into acceptEdits agent with live WC/WP write tools (wp_update_order no-confirm); billing_middleware regex doesn't match /agent/",
+    "fix": "Added Depends(get_current_user) to both routes; verified auth_dep=True via route inspection",
+    "tags": [
+      "security",
+      "critical",
+      "authz",
+      "prompt-injection",
+      "agent"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-211",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] MCP bearer token compared with != (timing side-channel) + fail-open when token unset in prod",
+    "file": "mcp_tools/http_mount.py",
+    "root_cause": "plain string != leaks length/prefix; missing MCP_SERVICE_TOKEN \u2192 warn-and-serve-open",
+    "fix": "hmac.compare_digest + fail-closed (reject) in non-dev + UnicodeDecode guard",
+    "tags": [
+      "security",
+      "mcp",
+      "timing",
+      "fail-open"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-212",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] No TrustedHostMiddleware on public backend",
+    "file": "main_enterprise.py",
+    "root_cause": "no Host-header allowlist now that api.devskyy.app is internet-facing",
+    "fix": "TrustedHostMiddleware available, opt-in via ALLOWED_HOSTS env (safe default, won't break Fly health checks)",
+    "tags": [
+      "security",
+      "host-header",
+      "defense-in-depth"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-213",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY LOW] /api/v1/catalog/answer + /answer/stream unauthenticated and cost-bearing (Claude per request)",
+    "file": "api/v1/catalog.py",
+    "root_cause": "documented in file header as unauth + cost-bearing; no Depends or per-IP limit",
+    "fix": "FLAGGED for follow-up (not fixed this pass) \u2014 add Depends(get_current_user) or per-IP rate limit per the file's own comment",
+    "tags": [
+      "security",
+      "cost",
+      "rate-limit",
+      "follow-up"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-214",
+    "timestamp": "2026-07-09T09:00:00-07:00",
+    "error_message": "Corrective shape-key fix for mascot crotch-fold defect (skyy-fix-shapekey-merged.glb) SHIP-BLOCKING: independent verifier found the baked morph-target rest weight is 1.0 (not 0.0), which three.js GLTFLoader loads directly into mesh.morphTargetInfluences at load time; skyy-3d.js never touches morph targets afterward (clip switching is AnimationMixer fadeIn/fadeOut crossfades only), so the wave-only correction permanently leaks into idle/walk/talk/point/joy in any real browser session. Worst regression in \"point\" (hip rose-embroidery shatters into jagged triangulated debris, uglier than the original wave defect). Corrects bug-198's scope claim: only \"wave\" has a genuine LBS candy-wrapper defect at peak flexion \u2014 walk/talk/point/joy are smooth/defect-free, confirmed independently by 4 separate methods (raw glTF JSON parse, fresh Blender reimport, three.js source + skyy-3d.js runtime grep, empirical re-render at true baked default).",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb (built in .claude/worktrees/mascot-skin-weight-fix)",
+    "root_cause": "Builder set the shape key's per-clip evaluated value to 0 for undriven clips only inside its OWN verification render harness before rendering \u2014 masking that the Key datablock's REST/basis default (what actually gets baked into glTF meshes[0].weights on export) was left at 1.0. Self-graded build report claimed \"value permanently 0/unauthored\" for the other 4 clips; this was false for the shipped file.",
+    "fix": "NOT YET SHIPPED \u2014 do not deploy skyy-fix-shapekey-merged.glb under any circumstance. One-line fix identified but not yet applied+verified: explicitly set key_blocks[\"CrotchFoldCorrective_wave\"].value = 0.0 on the Key datablock before the glTF export call, then assert meshes[0].weights in ([0],[0.0],None) by parsing the exported GLB's JSON directly (never trust Blender UI state or exporter defaults). Revision agent that was applying this crashed mid-stream (API stream stall) before completing re-verification \u2014 workflow resumable via cached run wf_c02081fb-534.",
+    "tags": [
+      "3d",
+      "mascot",
+      "glb",
+      "shape-key",
+      "morph-target",
+      "gltf-export",
+      "ship-blocking",
+      "adversarial-verification-caught-it"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T09:00:00-07:00"
+  },
+  {
+    "id": "bug-215",
+    "timestamp": "2026-07-09T09:55:00-07:00",
+    "error_message": "Revised mascot shape-key build (skyy-fix-shapekey-revised-merged.glb) fixes bug-214's ship-blocking cross-clip leak (idle/walk/talk/point/joy independently confirmed pixel-identical to pristine, correctly carrying flat 0.0 weights) but only wave actually received a correction, and even that is partial (residual angular faceting still visible at f44 per tight zoomed diff). Final verify: overall_verdict=\"partially-improved\", recommend_ship=false, packaged=null.",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-revised-merged.glb (worktree mascot-skin-weight-fix, not yet in main)",
+    "root_cause": "Workflow-design issue, not a code bug: every agent in this lineage (build, verify, revise) was fed the SAME static prompt asserting the original premise (\"walk/talk/point/wave/joy\" all defective) with an explicit \"do not re-litigate\" instruction \u2014 even after an EARLIER stage in this same lineage independently proved (4 separate methods: raw glTF weights-channel parse, fresh Blender reimport, three.js/skyy-3d.js runtime grep, empirical pristine-vs-candidate render diff) that only wave shows a genuine LBS candy-wrapper defect; walk/talk/point/joy show smooth, normal garment folding at peak flexion with no jagged collapse. The final verify stage flags those 4 clips as a \"ship-blocking gap\" purely because they don't match the task's original all-5 instruction, not because fresh evidence shows they need fixing. This is the same class of failure as bug-198's scope claim: a stale premise baked into a prompt outliving the evidence that overturned it, this time propagating across a workflow RESUME rather than across separate sessions.",
+    "fix": "NOT SHIPPED. Recommend treating wave-only as the correct scope (per the well-corroborated independent finding), evaluate whether wave's partial improvement (smoother crease, residual angularity at f44) is worth shipping on its own merits, and do NOT chase further \"fixes\" for walk/talk/point/joy without first re-deriving \u2014 with fresh eyes, ignoring the original task premise \u2014 whether those clips are actually defective at all.",
+    "tags": [
+      "3d",
+      "mascot",
+      "glb",
+      "shape-key",
+      "workflow-design",
+      "stale-premise",
+      "adversarial-verification"
+    ],
+    "related_bugs": [
+      "bug-198",
+      "bug-214"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T09:55:00-07:00"
+  },
+  {
+    "id": "bug-217",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "docs/DEPLOYMENT_ARCHITECTURE.md asserted the MCP runs on Fly app 'devskyy-mcp' - wrong; real app is 'devskyy-api' (fly.toml -> Dockerfile.mcp -> mcp_service). Introduced in prior-turn doc banner from memory, not verified vs fly config.",
+    "file": "docs/DEPLOYMENT_ARCHITECTURE.md",
+    "root_cause": "Stated a Fly app name from session memory instead of reading authoritative fly*.toml. Naming is counterintuitive (devskyy-backend=REST API, devskyy-api=MCP), so memory was an easy trap.",
+    "fix": "Grepped fly.toml/fly.backend.toml for app<->dockerfile mapping; corrected banner to 'devskyy-api' + explicit do-not-swap note; same rule stated in MCP_ARCHITECTURE.md and MCP_CONFIGURATION_GUIDE.md.",
+    "tags": [
+      "docs",
+      "fly",
+      "mcp",
+      "anti-hallucination",
+      "app-naming"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
   },
   {
     "id": "bug-218",

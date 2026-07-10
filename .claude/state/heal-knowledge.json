@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "cycles": 0,
+  "note": "Seeded 2026-05-29. Empty learning store — begins accumulating after first heal cycle. Schema is model-ready: flat, typed, no nested objects deeper than 2 levels.",
+  "signatures": [],
+  "preventions": [],
+  "metric_recurrence_trend": []
+}

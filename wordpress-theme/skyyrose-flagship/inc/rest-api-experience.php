@@ -44,7 +44,12 @@ function skyyrose_see_register_rest_routes(): void {
 					),
 					'visitorHash' => array(
 						'default'           => '',
-						'sanitize_callback' => 'sanitize_text_field',
+						'sanitize_callback' => function ( $param ) {
+							// Enforce the anonymous-hash invariant this file claims
+							// (hex, 8-64 chars) rather than accepting arbitrary text.
+							$hash = sanitize_text_field( (string) $param );
+							return preg_match( '/^[a-f0-9]{8,64}$/', $hash ) ? $hash : '';
+						},
 					),
 				),
 			),
@@ -203,17 +208,53 @@ function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_R
 	// is inactive the function is undefined and calling it would produce a fatal
 	// error that WordPress translates into a 404 rest_no_route response.
 	if ( ! function_exists( 'skyyrose_see_store_events' ) ) {
-		return new WP_REST_Response( array( 'stored' => 0, 'note' => 'analytics_unavailable' ), 200 );
+		return new WP_REST_Response(
+			array(
+				'stored' => 0,
+				'note'   => 'analytics_unavailable',
+			),
+			200
+		);
 	}
 
 	$stored = skyyrose_see_store_events( $events, $visitor_hash );
 
-	// Relay to FastAPI backend (non-blocking) — guarded for same reason.
+	// Relay to FastAPI backend (non-blocking). Sanitize first: store_events()
+	// sanitizes into local copies, but the raw request array would otherwise be
+	// piped verbatim from this public __return_true endpoint to the backend.
+	// Defense in depth — the backend must still validate independently.
 	if ( function_exists( 'skyyrose_see_relay_analytics' ) ) {
-		skyyrose_see_relay_analytics( $events );
+		skyyrose_see_relay_analytics( skyyrose_see_sanitize_events( (array) $events ) );
 	}
 
 	return new WP_REST_Response( array( 'stored' => $stored ), 200 );
+}
+
+/**
+ * Sanitize a raw behavioral-events array down to a known field allowlist before
+ * it leaves the site for the backend relay. Mirrors the per-field sanitization
+ * in skyyrose_see_store_events() so attacker JSON from the public analytics
+ * endpoint never reaches the FastAPI relay verbatim.
+ *
+ * @param array $events Raw events array from the request.
+ * @return array Sanitized events (max 50, known keys only).
+ */
+function skyyrose_see_sanitize_events( array $events ): array {
+	$clean = array();
+	foreach ( array_slice( $events, 0, 50 ) as $event ) {
+		if ( ! is_array( $event ) || empty( $event['type'] ) || ! is_string( $event['type'] ) ) {
+			continue;
+		}
+		$clean[] = array(
+			'type'       => sanitize_text_field( $event['type'] ),
+			'target'     => sanitize_text_field( $event['target'] ?? '' ),
+			'pageType'   => sanitize_text_field( $event['pageType'] ?? '' ),
+			'collection' => sanitize_text_field( $event['collection'] ?? '' ),
+			'value'      => floatval( $event['value'] ?? 0 ),
+			'ts'         => is_numeric( $event['ts'] ?? null ) ? floatval( $event['ts'] ) : 0,
+		);
+	}
+	return $clean;
 }
 
 /**
@@ -237,13 +278,25 @@ function skyyrose_see_rest_get_summary( WP_REST_Request $request ): WP_REST_Resp
  * Get personalized product recommendations.
  */
 function skyyrose_see_rest_get_recommendations( WP_REST_Request $request ): WP_REST_Response {
+	// Rate limit: 30/min per IP. This public endpoint triggers an upstream ML
+	// call and writes a transient per request — without a throttle a single
+	// client drives unbounded backend load and cache growth.
+	$ip         = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
+	$rate_key   = 'skyyrose_see_recs_rate_' . md5( $ip );
+	$rate_count = (int) get_transient( $rate_key );
+	if ( $rate_count >= 30 ) {
+		return new WP_REST_Response( array( 'error' => 'Rate limited' ), 429 );
+	}
+	set_transient( $rate_key, $rate_count + 1, MINUTE_IN_SECONDS );
+
 	$hash       = $request->get_param( 'hash' );
 	$collection = $request->get_param( 'collection' );
 	$limit      = $request->get_param( 'limit' );
 
-	// Cache scoped to hash + collection + page URL.
-	$referer   = sanitize_text_field( $request->get_header( 'referer' ) ?? '' );
-	$cache_key = 'skyyrose_see_recs_' . md5( $hash . $collection . $referer );
+	// Cache scoped to hash + collection only. The Referer header was previously
+	// mixed into the key — attacker-controlled and unbounded, so a randomized
+	// Referer per request exploded transient/object-cache storage. Removed.
+	$cache_key = 'skyyrose_see_recs_' . md5( $hash . '|' . $collection );
 	$cached    = get_transient( $cache_key );
 
 	if ( false !== $cached && is_array( $cached ) ) {

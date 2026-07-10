@@ -340,5 +340,5 @@ Standing rules (§14): authoritative sources only (trace every value to a master
 - [x] WS3 fly-backend: fly.backend.toml (devskyy-backend); CORS wildcard fix; Sentry sample-rate wiring; tasks/backend-golive-manifest.md (gated)
 - [x] Fable audit each branch (standing order), merge in order WS1→WS2→WS3
 - [x] Post-merge: real `docker build -f Dockerfile.api` proof (main thread)
-- [ ] GATED: fly apps create devskyy-backend + secrets + deploy + DNS repoint (STOP-AND-SHOW)
-- [ ] P6 GATED: MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md
+- [x] devskyy-backend deployed (Neon DB, /health+/ready 200); MPG destroyed; api.devskyy.app repointed to Fly (cert issued, public-resolver verified) 2026-07-09
+- [x] P6 COMPLETE (2026-07-09): Blocks 1-3 wired+verified, MCP redeployed 82 tools/py3.12, api.devskyy.app repointed. Orig marker:: Block1 done (WC secrets on devskyy-api), Block2 done (Vercel env+deploy, live-verified); Block3 DONE via WP-CLI/SSH (bridge e2e proof: 44 tools); DNS deferred; MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md

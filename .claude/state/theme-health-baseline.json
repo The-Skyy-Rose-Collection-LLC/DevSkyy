@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "assetVersion": "1.5.25",
+  "capturedAt": "2026-05-29T00:00:00Z",
+  "note": "Captured by baseline-seeding agent. All pages healthy at capture time. Size floors = 85% of observed. 404 path expected HTTP 404.",
+  "pages": [
+    {
+      "path": "/",
+      "expectedHttp": 200,
+      "observedKB": 217.0,
+      "sizeFloorKB": 184.4,
+      "phpError": false,
+      "label": "Homepage"
+    },
+    {
+      "path": "/shop/",
+      "expectedHttp": 200,
+      "observedKB": 140.1,
+      "sizeFloorKB": 119.1,
+      "phpError": false,
+      "label": "Shop"
+    },
+    {
+      "path": "/cart/",
+      "expectedHttp": 200,
+      "observedKB": 201.0,
+      "sizeFloorKB": 170.8,
+      "phpError": false,
+      "label": "Cart"
+    },
+    {
+      "path": "/pre-order/",
+      "expectedHttp": 200,
+      "observedKB": 263.0,
+      "sizeFloorKB": 223.5,
+      "phpError": false,
+      "label": "Pre-order"
+    },
+    {
+      "path": "/about/",
+      "expectedHttp": 200,
+      "observedKB": 148.4,
+      "sizeFloorKB": 126.1,
+      "phpError": false,
+      "label": "About"
+    },
+    {
+      "path": "/experience-black-rose/",
+      "expectedHttp": 200,
+      "observedKB": 147.4,
+      "sizeFloorKB": 125.3,
+      "phpError": false,
+      "label": "Experience — Black Rose"
+    },
+    {
+      "path": "/experience-love-hurts/",
+      "expectedHttp": 200,
+      "observedKB": 143.6,
+      "sizeFloorKB": 122.1,
+      "phpError": false,
+      "label": "Experience — Love Hurts"
+    },
+    {
+      "path": "/experience-signature/",
+      "expectedHttp": 200,
+      "observedKB": 149.0,
+      "sizeFloorKB": 126.6,
+      "phpError": false,
+      "label": "Experience — Signature"
+    },
+    {
+      "path": "/experience-kids-capsule/",
+      "expectedHttp": 200,
+      "observedKB": 142.2,
+      "sizeFloorKB": 120.9,
+      "phpError": false,
+      "label": "Experience — Kids Capsule"
+    },
+    {
+      "path": "/this-page-does-not-exist-404check/",
+      "expectedHttp": 404,
+      "observedKB": 146.1,
+      "sizeFloorKB": 124.2,
+      "phpError": false,
+      "label": "404 sentinel — must return 404, not 200"
+    }
+  ],
+  "canonChecks": [
+    {
+      "id": "home-four-collections",
+      "surface": "homepage",
+      "path": "/",
+      "grep": "Four Collections",
+      "expectedPresent": true,
+      "observedPresent": true,
+      "severity": "high",
+      "description": "Homepage must mention 'Four Collections'"
+    },
+    {
+      "id": "home-no-three-worlds",
+      "surface": "homepage",
+      "path": "/",
+      "grep": "Three Worlds",
+      "expectedPresent": false,
+      "observedPresent": false,
+      "severity": "high",
+      "description": "Homepage must NOT contain deprecated 'Three Worlds' copy"
+    },
+    {
+      "id": "home-tagline",
+      "surface": "homepage",
+      "path": "/",
+      "grep": "Luxury Grows from Concrete",
+      "expectedPresent": true,
+      "observedPresent": true,
+      "severity": "critical",
+      "description": "Brand tagline must be present on homepage"
+    },
+    {
+      "id": "cart-no-complete-the-look",
+      "surface": "cart",
+      "path": "/cart/",
+      "grep": "Complete the Look",
+      "expectedPresent": false,
+      "observedPresent": false,
+      "severity": "high",
+      "description": "Cart must NOT contain 'Complete the Look' cross-sell (founder canon: garment is the protagonist)"
+    },
+    {
+      "id": "experience-br-lockup-image",
+      "surface": "experience-black-rose",
+      "path": "/experience-black-rose/",
+      "grep": "hero-overlay",
+      "expectedPresent": true,
+      "observedPresent": true,
+      "severity": "high",
+      "description": "Experience collection pages must use lockup image (scene-lockup picture element with hero-overlay asset), never type-only hero"
+    }
+  ],
+  "assetChecks": [
+    {
+      "id": "asset-version-on-home",
+      "description": "Homepage HTML must reference ?ver=SKYYROSE_VERSION on theme assets",
+      "expectedVersion": "1.5.25",
+      "observedVersion": "1.5.25",
+      "matchesSource": true
+    },
+    {
+      "id": "min-css-main",
+      "url": "https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/main.min.css?ver=1.5.25",
+      "expectedHttp": 200,
+      "observedHttp": 200
+    },
+    {
+      "id": "min-css-design-tokens",
+      "url": "https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/css/design-tokens.min.css?ver=1.5.25",
+      "expectedHttp": 200,
+      "observedHttp": 200
+    },
+    {
+      "id": "min-js-premium-interactions",
+      "url": "https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets/js/premium-interactions.min.js?ver=1.5.25",
+      "expectedHttp": 200,
+      "observedHttp": 200
+    }
+  ]
+}

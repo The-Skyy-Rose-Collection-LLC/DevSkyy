@@ -1,0 +1,241 @@
+{
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CONTEXT7_PREFETCH_DISABLE": "1",
+    "CANON_PREFETCH_DISABLE": "1",
+    "PROMPT_ENG_NUDGE_DISABLE": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv lock:*)",
+      "Bash(uv pip:*)",
+      "Bash(uvx:*)",
+      "Bash(pytest tests/:*)",
+      "Bash(pytest -k:*)",
+      "Bash(pytest -x:*)",
+      "Bash(pytest --lf:*)",
+      "Bash(pytest --co:*)",
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(mypy:*)",
+      "Bash(python -m renders.preflight:*)",
+      "Bash(python -m renders.manifest:*)",
+      "Bash(python -m renders.validate:*)",
+      "Bash(python scripts/:*)",
+      "Bash(python tools/:*)",
+      "Bash(uvicorn app:*)",
+      "Bash(uvicorn main:*)",
+      "Bash(fastapi dev:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(python3 scripts/validate_dossier.py:*)",
+      "Bash(python3 scripts/check_dossier_coverage.py:*)",
+      "Bash(python3 scripts/remediation/setup_credentials.py*)",
+      "Bash(make lint)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "mcp__claude_ai_Context7__resolve-library-id",
+      "mcp__claude_ai_Context7__query-docs",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_serena_serena__list_dir"
+    ],
+    "deny": [
+      "Bash(python -m renders.generate --no-preflight:*)",
+      "Bash(python -m renders.fashn --no-preflight:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/api_keys/**)",
+      "Read(./renders/cache/**/.creds)"
+    ],
+    "ask": [
+      "Bash(python -m renders.fashn:*)",
+      "Bash(python -m renders.generate:*)",
+      "Bash(python scripts/deploy:*)",
+      "Bash(uv add:*)",
+      "Bash(uv remove:*)",
+      "Bash(alembic upgrade:*)",
+      "Bash(alembic downgrade:*)",
+      "Bash(huggingface-cli:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.wolf/hooks/memory-audit.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.wolf/hooks/claude-mem-sync.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/context7-prefetch.sh",
+            "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/canon-prefetch.sh",
+            "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/prompt-eng-nudge.sh",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/theceo/DevSkyy/.claude/hooks/router/router.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/paid-api-stopgate.sh",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/prompt-eng-tripwire.sh",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__.*[Cc]ontext7.*query-docs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/context7-touched.sh",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/learning-tripwire.sh",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/phpcs-on-write.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/catalog-drift-guard.sh",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/python-format-on-write.sh",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(jq -r '.tool_input.file_path // empty'); case \"$fp\" in /Users/theceo/DevSkyy/frontend/*.ts|/Users/theceo/DevSkyy/frontend/*.tsx) cd /Users/theceo/DevSkyy/frontend && npx tsc --noEmit --pretty false 2>&1 | head -10 ;; esac; true",
+            "timeout": 90,
+            "statusMessage": "Type-checking frontend"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/learning-reminder.sh",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/theceo/DevSkyy && ig=$(git ls-files --others --exclude-standard \"tests/*.py\" \"tests/**/*.py\" 2>/dev/null | sed \"s/^/--ignore=/\" | tr \"\\n\" \" \"); out=$(.venv/bin/python -m pytest tests/ -x -q $ig 2>&1); rc=$?; echo \"$out\" | tail -20; if [ $rc -ne 0 ]; then exit 2; fi; true",
+            "timeout": 600,
+            "statusMessage": "Running test suite (background)",
+            "asyncRewake": true,
+            "rewakeSummary": "Stop-hook test suite FAILED"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.claude/hooks/subagent-stop-tidy.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "frontend-mobile-development@ando-marketplace": false,
+    "fullstack-dev-skills@fullstack-dev-skills": false,
+    "context-engineering@context-engineering-marketplace": false,
+    "voltagent-core-dev@voltagent-subagents": true,
+    "agent-sdk-dev@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "finding-unknowns@finding-unknowns-skills": true
+  }
+}

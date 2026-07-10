@@ -420,6 +420,38 @@ function skyyrose_mcp_render_admin_page(): void {
 add_action( 'wp_ajax_skyyrose_mcp_invoke', 'skyyrose_mcp_ajax_invoke' );
 
 /**
+ * Tools the admin MCP bridge refuses to invoke by default: anything that spends
+ * real money (paid image/video/model generation) or mutates production
+ * (deploys, releases). Auth on the AJAX endpoint is already manage_options +
+ * nonce; this is a second control so one compromised admin session cannot drain
+ * the paid-API budget or ship a deploy through the shared backend service
+ * token. Operators can override with the `skyyrose_mcp_blocked_tools` filter.
+ *
+ * @return string[] Tool names blocked from the bridge.
+ */
+function skyyrose_mcp_blocked_tools(): array {
+	return apply_filters(
+		'skyyrose_mcp_blocked_tools',
+		array(
+			// Paid generation (per-call cost).
+			'devskyy_oai_render_generate',
+			'devskyy_lora_generate',
+			'devskyy_virtual_tryon',
+			'devskyy_batch_virtual_tryon',
+			'devskyy_generate_ai_model',
+			'devskyy_generate_3d_from_description',
+			'devskyy_generate_3d_from_image',
+			'es_render',
+			'es_batch',
+			// Production mutation / deploys.
+			'operations_deploy',
+			'wp_release',
+			'wp_bump_version',
+		)
+	);
+}
+
+/**
  * Admin-only AJAX relay: list tools or invoke one.
  *
  * @return void
@@ -438,6 +470,18 @@ function skyyrose_mcp_ajax_invoke(): void {
 		$tool = isset( $_POST['tool'] ) ? sanitize_text_field( wp_unslash( $_POST['tool'] ) ) : '';
 		if ( '' === $tool ) {
 			wp_send_json_error( array( 'message' => __( 'Tool name required.', 'skyyrose' ) ), 400 );
+		}
+
+		// Defense in depth: this endpoint is already manage_options + nonce
+		// gated, but it forwards to the backend under a shared service token, so
+		// a single compromised admin session must not be able to spend real
+		// money or mutate production through the bridge. Block the paid-API and
+		// deploy/release tools by default; override via the filter if needed.
+		if ( in_array( $tool, skyyrose_mcp_blocked_tools(), true ) ) {
+			wp_send_json_error(
+				array( 'message' => __( 'This tool is blocked from the admin bridge.', 'skyyrose' ) ),
+				403
+			);
 		}
 
 		// Arguments are an arbitrary JSON object forwarded verbatim to our own
