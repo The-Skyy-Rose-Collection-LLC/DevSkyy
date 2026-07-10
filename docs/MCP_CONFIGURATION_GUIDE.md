@@ -111,6 +111,17 @@ If your specific MCP client doesn't support a `headers` field on an `http`-type 
 
 ## Configured MCP Servers
 
+<!-- AUTO-GENERATED: current MCP wiring — from mcp_service.py, http_mount.py, .mcp.json (2026-07-10) -->
+> **Current wiring (2026-07-10) — this section is historical/aspirational.** In reality DevSkyy
+> ships **one** first-party MCP server (the devskyy MCP: 82 tools live, stdio + HTTP `/mcp`,
+> bearer-auth — see the transport section above), **not** a `devskyy-openai` + `devskyy-main`
+> split. OpenAI is a set of tools *inside* that one server (`devskyy_oai_render_*`) plus the
+> 6-provider LLM router, not a separate server, and `mcp/openai_server.py` does not exist in the
+> current tree. The "Standard MCP Servers" below are **developer-configured per scope**, not
+> shipped by DevSkyy — the project `.mcp.json` currently wires only `aidesigner` +
+> `gemini-api-docs-mcp`. The subsections below are kept for design reference.
+<!-- /AUTO-GENERATED -->
+
 ### DevSkyy Custom Servers
 
 #### 1. **devskyy-openai** - OpenAI Integration
@@ -130,7 +141,7 @@ If your specific MCP client doesn't support a `headers` field on an `http`-type 
   - Code generation for agents
   - Multi-step workflows
 
-#### 2. **devskyy-main** - 54-Agent Ecosystem
+#### 2. **devskyy-main** - the DevSkyy agent fleet (count dynamic, never hardcoded)
 
 - **Purpose**: Access to DevSkyy's specialized AI agents
 - **Capabilities**:

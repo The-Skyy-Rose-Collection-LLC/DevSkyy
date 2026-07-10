@@ -1,7 +1,7 @@
 {
   "name": "DevSkyy Enterprise Platform",
   "version": "1.0.0",
-  "description": "Model Context Protocol configuration for DevSkyy's 54-agent ecosystem with OpenAI integration",
+  "description": "Model Context Protocol configuration for DevSkyy's agent fleet (dynamic count -- query devskyy_list_agents / GET /api/v1/agents; never hardcoded) with OpenAI integration",
   "author": "The Skyy Rose Collection LLC",
   "license": "MIT",
   "homepage": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy",
@@ -15,7 +15,7 @@
         "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
         "ENVIRONMENT": "production"
       },
-      "description": "DevSkyy OpenAI MCP Server with 7 integrated tools",
+      "description": "(historical example -- OpenAI is now tools inside the single devskyy MCP, not a separate server; 2026-07-10) DevSkyy OpenAI MCP Server with 7 integrated tools",
       "capabilities": [
         "completion",
         "code_generation",
@@ -238,7 +238,7 @@
     },
 
     "agent_integration": {
-      "description": "Integrate with DevSkyy's 54-agent ecosystem for specialized tasks",
+      "description": "Integrate with DevSkyy's agent fleet (dynamic count -- query devskyy_list_agents / GET /api/v1/agents; never hardcoded) for specialized tasks",
       "parameters": {
         "agent_type": {
           "type": "string",

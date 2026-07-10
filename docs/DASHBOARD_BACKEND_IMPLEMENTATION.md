@@ -211,7 +211,7 @@ pending → running → completed/failed
 
 **Endpoints**:
 - `GET /api/v1/monitoring/metrics` - System metrics (health, performance, ML, business)
-- `GET /api/v1/agents` - Agent directory (all 69 agents)
+- `GET /api/v1/agents` - Agent directory (count is dynamic per `api/agents.py`; do not hardcode — query the endpoint or `devskyy_list_agents`)
 
 **Metrics**:
 - Health: uptime, agent status, database, cache
@@ -299,7 +299,7 @@ pending → running → completed/failed
 |------|---------|--------|
 | `api/dashboard.py` | Agent registry and endpoints | ✅ Production-ready |
 | `api/round_table.py` | Round Table API | ✅ Production-ready |
-| `api/agents.py` | Legacy agent endpoints (69 agents) | ✅ Production-ready |
+| `api/agents.py` | Legacy agent endpoints (dynamic agent count; do not hardcode) | ✅ Production-ready |
 
 ---
 
