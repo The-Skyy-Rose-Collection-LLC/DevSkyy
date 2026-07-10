@@ -41,7 +41,10 @@ true of the other — check which one you're actually touching before generalizi
 
 ## Mascot-specific spec (current production baseline)
 
-- GLB textures: 1024×1024, JPEG, re-encoded via `gltf-transform` (`resize` → `jpeg --formats
+- GLB textures: 1024×1024, JPEG, re-encoded via `npx @gltf-transform/cli` (confirmed this is
+  the correct invocation this session — a bare `gltf-transform` binary resolves to a different,
+  nonexistent npm package and fails; the CLI must be invoked via the scoped `@gltf-transform/cli`
+  package) (`resize` → `jpeg --formats
   png --quality 85` → `draco`). Note `--formats` defaults to only reprocessing *already-jpeg*
   textures — passing `--formats png` explicitly is required to convert PNG source textures.
 - Corrective shape keys (not weight-painting, not a helper bone) fix LBS collapse at extreme
