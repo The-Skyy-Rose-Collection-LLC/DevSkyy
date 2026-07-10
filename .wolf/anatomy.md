@@ -2667,6 +2667,30 @@ WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signat
 - `love-hurts.html` — LOVE HURTS Collection | SkyyRose Virtual Castle (~10271 tok)
 - `signature.html` — SIGNATURE Collection | SkyyRose Virtual Runway (~10217 tok)
 
+## renders/3d/girl-love-hurts/
+
+> Untracked (renders/3d/ is gitignored) — Love Hurts girl-rig build pipeline, added 2026-07-10.
+
+- `build_girl_rig.py` — Phase 1: builds a 24-bone skeleton for the Love Hurts girl mesh, structurally cloned from skyy.glb's bone hierarchy but positioned on the girl mesh's own geometry landmarks; outputs the working .blend/.glb + verify_front.png (~4900 tok)
+- `add_armpit_gusset.py` — Phase 2: welds the raw glTF-import mesh (duplicate coincident verts) then adds a small multi-bone-blended gusset panel at each armpit — locked-plan rejection of a "rip and leave open" topology in favor of a watertight-by-construction patch; overwrites love-hurts-girl-rig.blend in place, NOT idempotent (~3900 tok)
+- `gate_bone_direction.py` — Phase 3: retargeting-compatibility gate run BEFORE skin weighting — compares girl-rig vs skyy.glb mascot bone-direction angles per category threshold (10-20 deg); FAILED this run (15/24 bones, bug-219), triggering the fresh_keyframe fork (~2800 tok)
+- `skin_weight_body.py` — Phase 4: full-body skin weighting (torso/pants, arms incl. Phase-2 gusset gradient, legs, face/neck) with smoothstep blend bands at every joint boundary; own boundary-monotonicity self-check had sampling-bias bugs, fixed (bug-220) (~7500 tok)
+- `bake_walk_retarget.py` — Phase 7: authors + bakes the girl rig's walk-in-place cycle directly on her own rig (fresh_keyframe fork, Plan B after Phase 3 failed) — 6-pose sequence baked via `bpy.ops.nla.bake(channel_types={'ROTATION'})`; has `iter_action_fcurves()` helper for Blender 5.1's layered-Action F-curve nesting (bug-221) (~4700 tok)
+- `gate_animation_audit.py` — Independent re-derivation of the Phase-7 animation audit against the EXPORTED GLB's actual binary animation channels (via glb_json_parser.py), not the .blend's in-Blender F-curves — checks only the 10 named limb bones carry rotation variation (~3100 tok)
+- `gate_armpit_gusset.py` — Phase 6: read-only numeric gate pose-testing the armpit gusset region at named test poses (arm-raise abduction/flexion); never saves the .blend; did not pass this run (bug-222) (~5900 tok)
+- `export_for_verification.py` — Independent-verifier export step: opens the saved .blend read-only and exports a fresh GLB via introspected exporter RNA settings; produces the artifact under test for verify_export.py (~700 tok)
+- `verify_export.py` — Independent adversarial verification against the exported love-hurts-girl-v1.glb (never the .blend or the builder's self-report): re-derives 4 numeric gates from scratch (bone-direction, BVH/Laplacian) plus 3 eyes-on walk-cycle render frames (~13800 tok)
+- `glb_json_parser.py` — Minimal stdlib-only (struct+json) binary-glTF container/accessor decoder, deliberately re-derived from the glTF 2.0 spec rather than trusting Blender re-import or a third-party lib — used by gate_animation_audit.py (~1150 tok)
+- `verify_export_frames/` — rendered eyes-on QC frames from the verification passes above (binary PNGs, not token-counted)
+- `love-hurts-girl-rig.blend` — primary working Blender file (skeleton + mesh + gusset + skin weights + walk action); binary, 24.7MB, not token-counted
+- `love-hurts-girl-rig.blend1` — Blender auto-backup of the .blend (rotates on each save); binary, 24.7MB, not token-counted
+- `love-hurts-girl-rig.pre-gusset-backup.blend` — .blend snapshot before Phase 2's armpit-gusset edit (add_armpit_gusset.py is not idempotent — restore from here to rerun it); binary, 22.7MB, not token-counted
+- `love-hurts-girl-rig.pre-skinweight-backup.blend` — .blend snapshot before Phase 4's skin-weighting pass; binary, 24.4MB, not token-counted
+- `love-hurts-girl-rig.pre-bake-backup.blend` — .blend snapshot before Phase 7's walk-cycle bake; binary, 24.7MB, not token-counted
+- `love-hurts-girl-rig.glb` — current exported GLB from love-hurts-girl-rig.blend; binary, 22.1MB, not token-counted
+- `love-hurts-girl-v1.glb` — earlier exported GLB checkpoint (v1), the file verify_export.py's adversarial gates ran against; binary, 25.5MB, not token-counted
+- `verify_front.png` / `verify_side.png` / `verify_montage.png` — eyes-on QC renders from build_girl_rig.py / the verification passes; binary PNGs (1.5-2.2MB), not token-counted
+
 ## scripts/
 
 - `__init__.py` (~0 tok)
@@ -3953,3 +3977,49 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `setup-claude-config.sh` `claude-mem-settings.sh` `install_agy.sh` `run_generation.sh` `pre-build-check.sh` → `scripts/`; `autonomous_agent_demo.py` → `examples/`
 - `redirects.csv` `skyyrose_clothing_barcodes.txt` → `data/`; `autotrain_config.yaml` → `config/`; `deployment_summary.json` `wordpress-health-check-results.json` → `.reports/`
 - Domain config index: `SOT.md` → "Domain configuration map" (read that before old docs)
+
+## skyyrose/character_pipeline/
+FBX/GLB -> production rigged character pipeline. `devskyy-character build <input.fbx>` CLI.
+Ported from CHARACTER_PIPELINE_SPEC.md + validated Love Hurts Girl reference scripts, 2026-07-10.
+- `__init__.py` — package docstring, CLI pointer (~48 tok)
+- `_geometry.py` — shared point_segment_distance() + rotation_matrix() (~263 tok)
+- `_glb_io.py` — shared read_accessor() + GLBWriter chunk-accumulator (~921 tok)
+- `config.py` — WS0: constants registry (bone radii, landmark bands, gates) + character.yaml loader (~1569 tok)
+- `convert.py` (WS1) — FBX/GLB ingest via vendored FBX2glTF, pre-flight rigged/texture scan (~1436 tok)
+- `clean.py` (WS2) — node-TRS transform bake, ground+center, PBR fix, texture re-encode (~2226 tok)
+- `landmarks.py` (WS3a) — height-normalized slice-clustering landmark auto-detection (~1843 tok)
+- `skeleton.py` (WS3b) — 25-joint mixamorig skeleton builder off Landmarks (~1775 tok)
+- `segment.py` (WS4) — geodesic Dijkstra ArmL/ArmR/Body segmentation + weld-cut (~1721 tok)
+- `weights.py` (WS5) — radius-normalized capsule LBS weights + rigged GLB assembly (~2927 tok)
+- `verify.py` (WS6) — pure-numpy FK hard gate: wave_R/wave_L/bow/look pose asserts, QA renders (~3676 tok)
+- `package.py` (WS7) — surgical texture swap, widget/inspector HTML template assembly (~1924 tok)
+- `cli.py` (WS8) — `devskyy-character build|verify` orchestration + report.json (~1587 tok)
+
+## skyyrose/character_pipeline/characters/
+- `love_hurts_girl.yaml` — validated crotch_y/neck_y overrides + widget bot copy (~200 tok)
+
+## skyyrose/character_pipeline/templates/
+- `widget.html` — @@PLACEHOLDER@@ chatbot widget template, verbatim from reference (~4100 tok)
+- `inspector.html` — @@PLACEHOLDER@@ QA viewer template, verbatim from reference (~1600 tok)
+
+## skyyrose/character_pipeline/vendor/
+Git-ignored, fetched via scripts/setup_character_pipeline_vendor.sh — FBX2glTF v0.9.7 binaries
+(linux-x64, darwin-x64 — no darwin-arm64 upstream) + pinned three.js r128 UMD build.
+
+## tests/character_pipeline/
+- `conftest.py` — no-op override of root's rate-limiter autouse fixture (~112 tok)
+- `test_geometry.py` — point_segment_distance/rotation_matrix hand-computed cases (~462 tok)
+- `test_glb_io.py` — GLBWriter/read_accessor round-trip (~721 tok)
+- `test_skeleton.py` — joint topological-order invariant + proportional placement (~818 tok)
+- `test_verify_fk.py` — pure-numpy FK correctness on a hand-solved 2-joint chain (~752 tok)
+- `test_segment_weights_smoke.py` — segment+weights e2e on synthetic body-grid mesh (~1593 tok)
+- `test_love_hurts_girl_golden.py` — golden-fixture regression: real mesh through the full pipeline, plus a corruption test proving the wave_R gate has teeth (~1050 tok)
+- `test_glb_io_interleaved.py` — read_accessor on byteStride/interleaved bufferViews (bug-227, RED-first) (~450 tok)
+- `test_clean_normals.py` — normals inverse-transpose under non-uniform scale (bug-228, RED-first) (~400 tok)
+
+## tests/character_pipeline/fixtures/
+- `love_hurts_girl_static.glb` — real, cleaned (WS2) Love Hurts Girl mesh, 2.98MB, 52323 verts. Golden fixture for test_love_hurts_girl_golden.py, regenerate via scripts/prepare_character_pipeline_fixture.py (~250 tok metadata only, binary)
+
+## scripts/prepare_character_pipeline_fixture.py, scripts/setup_character_pipeline_vendor.sh
+- `prepare_character_pipeline_fixture.py` — regenerates tests/character_pipeline/fixtures/love_hurts_girl_static.glb from the real Blender export + observes real WS3-6 pipeline numbers (~950 tok)
+- `setup_character_pipeline_vendor.sh` — fetches FBX2glTF v0.9.7 binaries + three.js r128 UMD build into skyyrose/character_pipeline/vendor/ (~400 tok)
