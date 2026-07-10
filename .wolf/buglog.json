@@ -2908,7 +2908,8 @@
       "pytest",
       "warning",
       "request-deduplication"
-    ]
+    ],
+    "related_bugs": []
   },
   {
     "id": "bug-192",
@@ -2948,5 +2949,70 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-07T23:30:00-07:00"
+  },
+  {
+    "id": "bug-218",
+    "timestamp": "2026-07-09T07:58:00-07:00",
+    "error_message": "Mascot crotch 'candy-wrapper' LBS fold in wave/walk/talk/point/joy clips; 3 prior same-night fix attempts (weight smoothing, flexion clamp, manual-blend, 3 shape-key iterations) all failed or regressed (v3's closed-form shape key SHATTERED the wave crotch geometry into jagged radiating facets, worse than pristine).",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb (built fresh from pristine skyy-v6-merged.glb, not chained on any failed attempt)",
+    "root_cause": "Two distinct bugs conflated as one: (1) SCOPE error \u2014 the task assumed all 5 gesture clips needed a fix, but fresh pristine renders (tight crotch-zoom, both math-measured and given peak frames) showed walk/talk/point/joy have smooth, defect-free crotch fabric at peak flexion; only 'wave' (crossed-leg pose, held for its ENTIRE 129-frame duration, not a narrow peak) shows a genuine sharp angular pinch. (2) The prior v3 attempt's 'shattered geometry' was a scale-unit misdiagnosis at the time \u2014 mesh/armature world scale is 0.01 (cm-to-m), so a local-space shape-key delta of ~0.94 units (which looks huge vs a 0.257 world-space torso reference) is actually only ~0.0094 world units, i.e. correct and stable; a true closed-form LBS inverse (A_blend.inverted() @ desired_world) is fine as long as both numeric gates (forward-formula matches depsgraph; reapplying A_blend to corrected rest reproduces the desired posed target) are checked in the SAME unit space. Separately, re-exporting the pristine file through Blender's NLA_TRACKS round-trip introduced a spurious +1/24s (1-frame) time-axis shift on the 'idle' clip only, because idle's NLA strip (frame_start=1) doesn't match its action's own frame numbering (action_frame_start=0) \u2014 every other clip's strip/action numbering already agree at 1, so only idle was affected.",
+    "fix": "Rebuilt end-to-end from pristine only. Measured true peak frames via a closed-form LBS divergence metric (100%-Hips vs 100%-dominant-UpLeg bind, mean-top-50 across ~367 crotch vertices) instead of trusting given peak_frames blindly; validated the closed-form skinning formula against Blender's own depsgraph-evaluated positions (error ~1.7e-7, machine precision). Identified the actual folding vertex subset (top-60 by posed-vs-rest Laplacian delta, +104 halo neighbors at 0.4 falloff weight) instead of the whole 367-vertex crotch region. Computed ONE corrective shape key ('CrotchFoldCorrective_wave') via the closed-form LBS inverse with both numeric gates passing (gate2 error 2.3e-16), targeting a neighbor-averaged smoothing of the actual posed fold at wave's true peak (frame 27). Because the crossed-leg defect pose is held for the wave clip's full 1-129 frame range (verified by rendering 12+ frames spanning the whole clip, not just near the peak), keyframed the shape key value flat at 1.0 across the entire clip rather than a narrow 0->1->0 ramp \u2014 measured per-clip, not assumed. Left walk/talk/point/joy/idle completely untouched (no shape key, no Key NLA track). Fixed the idle NLA strip's frame_start/frame_end (1->0, 73->72, matching its action's own 0-72 numbering) purely as an export re-basing correction \u2014 zero idle keyframe VALUES touched \u2014 which made idle's exported time axis exactly match pristine (0.0 diff, vs +0.041667s before the fix). Verified via gltf-transform inspect + raw glTF JSON/accessor parsing: all 6 clips present, mesh carries exactly 1 morph target (CrotchFoldCorrective_wave), wave's animation channel list includes rotation/translation/scale (bone) channels AND a weights channel targeting the mesh node, the other 4 gesture clips have zero weights channels (fully untouched), and per-clip max animation-value diff vs pristine (~0.0007 quaternion units, ~0.04\u00b0) is IDENTICAL in magnitude across touched (wave, idle) and untouched (walk/talk/point/joy) clips \u2014 proving it's inherent Blender round-trip float32 requantization, not content drift from this fix. Eyes-on render comparison (tight crotch-zoom, pristine vs fixed, at peak\u00b12/\u00b15 and a 12-frame full-clip bracket) confirms the sharp jagged facet pinch is replaced by a smooth single fold with no popping anywhere in the ramp.",
+    "tags": [
+      "3d",
+      "mascot",
+      "skinning",
+      "shape-key",
+      "gltf",
+      "blender",
+      "lbs",
+      "candy-wrapper",
+      "scope-verification",
+      "unit-scale",
+      "nla-export-rebasing"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T07:58:00-07:00"
+  },
+  {
+    "id": "bug-219",
+    "timestamp": "2026-07-10T00:00:00-07:00",
+    "error_message": "Phase 3 retargeting-compatibility gate (gate_bone_direction.py) FAILED with any_critical_bone_failed=true before mascot-walk-to-girl-rig skin weighting; per locked plan fork, this mandates skipping the retarget smoke test entirely and pivoting to Plan B (fresh keyframed walk cycle authored directly on the girl rig).",
+    "file": "renders/3d/girl-love-hurts/gate_bone_direction.py",
+    "root_cause": "girl rig rest pose and skyy.glb mascot rest pose diverge far beyond the locked per-bone-category angle thresholds on CRITICAL bones: Hips 97.4 deg (10 max), Spine 34.0 deg (10 max), neck 43.2 deg (10 max), Head 23.4 deg (10 max), LeftArm 22.5/RightArm 22.3 deg (10 max), LeftForeArm 126.2/RightForeArm 130.5 deg (10 max, near-inverted), LeftLeg 11.8 deg (10 max). 15/24 bones failed overall. Local-space Copy Rotation retargeting assumes near-matching rest poses; a >120 deg forearm rest-direction mismatch would map into inverted-elbow geometry once mascot walk-clip local rotations are copied onto the girl armature.",
+    "fix": "No retarget smoke test built (fork rule: Phase-3-failed already satisfies the STOP condition on its own, independent of any smoke-test outcome -- running the smoke test could only ever downgrade a pass, never upgrade this fail). Decision: abandon Local-Space Copy Rotation retargeting for this rig pair. Pivot to Plan B -- author a fresh walk cycle directly on the girl own rig via 8-16 hand-placed pose keys (contact-L, passing-R-up, high-point, contact-R, passing-L-up, high-point, back to contact-L), skipping retargeting entirely.",
+    "tags": [
+      "retargeting",
+      "mascot",
+      "skin-weight",
+      "girl-rig",
+      "gate-bone-direction",
+      "plan-b",
+      "love-hurts"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T00:00:00-07:00"
+  },
+  {
+    "id": "bug-220",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "First self-check of skin_weight_body.py's own verification pass reported hip/shoulder/armpit_gusset boundaries as FAIL (non-monotonic weight transition) even though the underlying weighting formula (smoothstep on an axis projection) is monotonic by construction.",
+    "file": "renders/3d/girl-love-hurts/skin_weight_body.py",
+    "root_cause": "Two distinct bugs, both in the VERIFICATION sampling, not the weighting math: (1) several bones are written by TWO independent, unrelated pathways (e.g. Hips gets weight from both the spine-chain's own Hips<->Spine02 internal joint AND the leg-chains' hip branch blend; Shoulder from both the arm-chain branch blend AND the Phase-2 gusset) -- sorting ALL vertices with nonzero weight on a bone by an unrelated axis projection mixes two populations and breaks monotonicity even though each pathway is independently monotonic. (2) Even after restricting to the correct chain/segment, verification for a branch joint (hip, shoulder) still included vertices already inside the NEXT internal joint's own blend band (e.g. thigh vertices already blending into the knee), whose partial weight on the root bone comes from that unrelated joint, not the hip. A follow-on idempotency check then surfaced a third issue: gusset_verts was recomputed each run as 'len(v.groups)>0', which silently widens to ALL vertices after the first run and corrupts the persisted marker verification depends on.",
+    "fix": "classify_all_vertices() recomputes the SAME nearest-chain-polyline assignment the weighting pass used, and every verify_* function filters its sample population by that assignment (chain_name, and for branch joints, seg==0 AND s below the next joint's blend band) instead of by 'bone X has nonzero weight'. gusset_vertex_indices is now persisted as a custom ID property on the mesh ONCE (read back, not recomputed, on subsequent runs) so a second run is a true no-op: 0 newly weighted verts, all 4 boundaries still verify PASS.",
+    "tags": [
+      "blender",
+      "skin-weight",
+      "verification",
+      "sampling-bias",
+      "idempotency",
+      "girl-rig"
+    ],
+    "related_bugs": [
+      "bug-219"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
   }
 ]
