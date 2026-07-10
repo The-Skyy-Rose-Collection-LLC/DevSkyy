@@ -3394,5 +3394,27 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-10T06:00:00-07:00"
+  },
+  {
+    "id": "bug-218",
+    "timestamp": "2026-07-10T11:00:00-07:00",
+    "error_message": "[SECURITY HIGH] Admin MCP bridge (inc/mcp-bridge.php) used a denylist that fails OPEN: it blocked devskyy_lora_generate but not its paid siblings devskyy_lora_pose_transfer/_upscale/_clean_background or devskyy_train_lora_from_products (2-4h GPU job). A compromised manage_options session could invoke them via the free-form AJAX console and spend real Replicate credit under the shared MCP_SERVICE_TOKEN \u2014 defeating the control's stated purpose.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "Denylist model for a money guard: any paid tool not explicitly listed is invocable, so every new/renamed paid tool leaks until someone remembers to add it. Found by adversarial code-review (ran on Sonnet 5 after a fable->sonnet subagent-model downgrade).",
+    "fix": "Inverted to a fail-closed ALLOWLIST: skyyrose_mcp_authorize_tool() permits a tool only if NOT in the hard blocked list AND (read-only per source readOnlyHint census, 47 tools, OR in the skyyrose_mcp_allowed_write_tools operator filter). All 42 non-read-only tools \u2014 every paid generation + every write + any new/untagged tool \u2014 are refused by default. Verified: php -l clean, phpcs clean, 12/12 behavioral cases (paid blocked, reads allowed, unknown blocked).",
+    "tags": [
+      "security",
+      "wordpress",
+      "mcp",
+      "paid-api",
+      "fail-closed",
+      "allowlist",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T11:00:00-07:00"
   }
 ]

@@ -436,6 +436,10 @@ function skyyrose_mcp_blocked_tools(): array {
 			// Paid generation (per-call cost).
 			'devskyy_oai_render_generate',
 			'devskyy_lora_generate',
+			'devskyy_lora_pose_transfer',
+			'devskyy_lora_upscale',
+			'devskyy_lora_clean_background',
+			'devskyy_train_lora_from_products',
 			'devskyy_virtual_tryon',
 			'devskyy_batch_virtual_tryon',
 			'devskyy_generate_ai_model',
@@ -448,6 +452,110 @@ function skyyrose_mcp_blocked_tools(): array {
 			'wp_release',
 			'wp_bump_version',
 		)
+	);
+}
+
+/**
+ * Read-only tools the admin bridge is allowed to invoke. This is the fail-closed
+ * ALLOWLIST: only these run through the bridge; every other tool — all paid
+ * generation, all writes, and anything new or untagged — is refused by default.
+ *
+ * Sourced from the `readOnlyHint: True` MCP annotations in mcp_tools/tools/*.py
+ * (see core/runtime/tool_registry.py). A denylist alone fails open — a newly
+ * added paid tool would be invocable until someone remembered to block it; this
+ * allowlist fails closed. Regenerate when tools change; to expose a specific
+ * write tool without editing this list, use `skyyrose_mcp_allowed_write_tools`.
+ *
+ * @return string[] Read-only tool names permitted through the bridge.
+ */
+function skyyrose_mcp_readonly_tools(): array {
+	return apply_filters(
+		'skyyrose_mcp_readonly_tools',
+		array(
+			'context7_get_code_examples',
+			'context7_get_docs',
+			'context7_resolve_library',
+			'context7_search_docs',
+			'devskyy_analyze_spreadsheet',
+			'devskyy_dashboard_health',
+			'devskyy_demand_forecast',
+			'devskyy_email_triage',
+			'devskyy_fleet_health',
+			'devskyy_fraud_assess',
+			'devskyy_health_check',
+			'devskyy_list_agents',
+			'devskyy_lora_dataset_preview',
+			'devskyy_lora_product_history',
+			'devskyy_lora_version_info',
+			'devskyy_ml_prediction',
+			'devskyy_oai_render_plan',
+			'devskyy_product_caption',
+			'devskyy_recommend',
+			'devskyy_retention_assess',
+			'devskyy_scan_code',
+			'devskyy_system_monitoring',
+			'devskyy_virtual_tryon_status',
+			'es_cost_estimate',
+			'es_status',
+			'es_validate_dossier',
+			'playwright_get_page_content',
+			'playwright_screenshot',
+			'rag_get_context',
+			'rag_list_sources',
+			'rag_query',
+			'rag_query_rewrite',
+			'rag_stats',
+			'serena_analyze_file',
+			'serena_check_code_style',
+			'serena_find_issues',
+			'serena_full_project_audit',
+			'serena_validate_security',
+			'wc_get_orders',
+			'wc_get_product',
+			'wc_get_products',
+			'wc_get_store_settings',
+			'wc_list_orders',
+			'wc_search_customers',
+			'wc_smoketest',
+			'wc_validate_coupon',
+			'wp_verify_live',
+		)
+	);
+}
+
+/**
+ * Non-read-only tools the operator explicitly permits despite the read-only
+ * default. Empty by default (fail-closed). A tool in skyyrose_mcp_blocked_tools()
+ * stays blocked even if added here — the hard backstop always wins.
+ *
+ * @return string[]
+ */
+function skyyrose_mcp_allowed_write_tools(): array {
+	return apply_filters( 'skyyrose_mcp_allowed_write_tools', array() );
+}
+
+/**
+ * Fail-closed authorization for the admin MCP bridge. A tool may be invoked only
+ * if it is NOT hard-blocked AND is either read-only or explicitly operator-allowed.
+ * Everything else — new tools, untagged tools, and all paid generation — is refused.
+ *
+ * @param string $tool Tool name.
+ * @return true|WP_Error True if permitted, WP_Error with a 403 reason otherwise.
+ */
+function skyyrose_mcp_authorize_tool( string $tool ) {
+	if ( in_array( $tool, skyyrose_mcp_blocked_tools(), true ) ) {
+		return new WP_Error(
+			'skyyrose_mcp_blocked',
+			__( 'This tool is blocked from the admin bridge (paid generation or production mutation).', 'skyyrose' )
+		);
+	}
+	if ( in_array( $tool, skyyrose_mcp_readonly_tools(), true )
+		|| in_array( $tool, skyyrose_mcp_allowed_write_tools(), true ) ) {
+		return true;
+	}
+	return new WP_Error(
+		'skyyrose_mcp_not_allowlisted',
+		__( 'This tool is not on the read-only allowlist. Add it via the skyyrose_mcp_allowed_write_tools filter if it is safe to expose.', 'skyyrose' )
 	);
 }
 
@@ -475,13 +583,12 @@ function skyyrose_mcp_ajax_invoke(): void {
 		// Defense in depth: this endpoint is already manage_options + nonce
 		// gated, but it forwards to the backend under a shared service token, so
 		// a single compromised admin session must not be able to spend real
-		// money or mutate production through the bridge. Block the paid-API and
-		// deploy/release tools by default; override via the filter if needed.
-		if ( in_array( $tool, skyyrose_mcp_blocked_tools(), true ) ) {
-			wp_send_json_error(
-				array( 'message' => __( 'This tool is blocked from the admin bridge.', 'skyyrose' ) ),
-				403
-			);
+		// money or mutate production through the bridge. Fail-closed allowlist:
+		// only read-only (or explicitly operator-allowed) tools pass; all paid
+		// generation, all writes, and any new/untagged tool are refused.
+		$authz = skyyrose_mcp_authorize_tool( $tool );
+		if ( is_wp_error( $authz ) ) {
+			wp_send_json_error( array( 'message' => $authz->get_error_message() ), 403 );
 		}
 
 		// Arguments are an arbitrary JSON object forwarded verbatim to our own
