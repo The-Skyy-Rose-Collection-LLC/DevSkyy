@@ -23,8 +23,8 @@ $desc       = $collection ? $collection['description'] : '';
 <h1 class="wp-block-heading has-metallic-silver-color has-text-color has-cinzel-font-family" style="font-style:normal;font-weight:700;letter-spacing:-0.025em"><?php echo esc_html( $label ); ?></h1>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph {"style":{"typography":{"fontSize":"1.25rem","lineHeight":"1.6"}},"textColor":"text-secondary","fontFamily":"cormorant-garamond"} -->
-<p class="has-text-secondary-color has-text-color has-cormorant-garamond-font-family" style="font-size:1.25rem;line-height:1.6"><?php echo esc_html( $tagline ); ?></p>
+<!-- wp:paragraph {"style":{"typography":{"fontSize":"1.25rem","lineHeight":"1.6"}},"textColor":"text-secondary","fontFamily":"hanken-grotesk"} -->
+<p class="has-text-secondary-color has-text-color has-hanken-grotesk-font-family" style="font-size:1.25rem;line-height:1.6"><?php echo esc_html( $tagline ); ?></p>
 <!-- /wp:paragraph -->
 
 <?php if ( $desc ) : ?>

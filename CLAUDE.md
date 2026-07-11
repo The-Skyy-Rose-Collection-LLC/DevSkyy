@@ -267,8 +267,8 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 
 - Tagline: "Luxury Grows from Concrete."
 - Collections: Signature, Black Rose, Love Hurts, Kids Capsule
-- Fonts: Cinzel (BR headings), Playfair Display (SIG/LH/KC), Cormorant Garamond (body), Bebas Neue (UI), Inter (system)
-- All 9 font families declared in `theme.json` via WordPress Font Library (zero external CDN)
+- Fonts: **Archivo** (display/hero — expanded via `font-variation-settings 'wdth' 125`), **Hanken Grotesk** (body/UI), **Anton** (drop/UI accent), **Cinzel** (engraved caps). Per-collection scripts: **Pacifico** (BR), **Pinyon Script** (SIG), **Grand Hotel** (KC), **Kaushan Script** (LH — interim; custom graffiti face from lockup pending). **Inter** = system fallback.
+- Cut 2026-07-10: Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail (do NOT reintroduce — not in any brand lockup; they pulled toward the European-serif lineage the founder locked out). Self-hosted woff2, zero CDN, declared in `theme.json` Font Library + `assets/css/fonts.css`; the `--skyyrose-font-*` vars are generated from `data/brand/typography.json` via `gen-design-tokens.py`.
 
 ---
 

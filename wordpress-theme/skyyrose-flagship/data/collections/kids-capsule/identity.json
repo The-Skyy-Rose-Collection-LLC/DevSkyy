@@ -19,8 +19,8 @@
   },
   "fonts": {
     "script": {
-      "family": "Pinyon Script",
-      "woff2": "assets/fonts/pinyon-script-latin.woff2",
+      "family": "Grand Hotel",
+      "woff2": "assets/fonts/grand-hotel-latin.woff2",
       "source": "OFL / Google Fonts"
     },
     "caps": {

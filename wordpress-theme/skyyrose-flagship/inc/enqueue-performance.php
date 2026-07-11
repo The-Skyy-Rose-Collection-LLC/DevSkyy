@@ -51,9 +51,9 @@ function skyyrose_preload_fonts() {
 	$fonts_dir = SKYYROSE_ASSETS_URI . '/fonts';
 	?>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cormorant-garamond-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/bebas-neue-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/archivo-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/hanken-grotesk-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/anton-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<?php
 	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
 	// templates). Skip the preload elsewhere so non-BR pages don't waste

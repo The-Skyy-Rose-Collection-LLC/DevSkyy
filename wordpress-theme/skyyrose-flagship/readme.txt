@@ -25,7 +25,7 @@ SkyyRose is a premium dark luxury WooCommerce theme built for fashion, streetwea
 * **Cinematic Mode Toggle** — Immersive viewing mode for product and scene pages
 * **Glassmorphism Navigation** — Frosted-glass header with scroll-triggered effects
 * **Film Grain SVG Overlay** — Subtle texture applied to all pages
-* **Self-Hosted Typography** — Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue, and more — GDPR-compliant, no external requests
+* **Self-Hosted Typography** — Cinzel, Archivo, Hanken Grotesk, Anton, and more — GDPR-compliant, no external requests
 * **Responsive Design** — Breakpoints at 1200px, 768px, and 480px
 * **WCAG 2.2 AA Accessibility** — Full prefers-reduced-motion support for animations and transitions
 * **Security Hardened** — Content Security Policy, HSTS headers, XML-RPC disabled, nonce protection on all forms
@@ -273,10 +273,10 @@ Initial release. Requires WordPress 6.8+, WooCommerce 9.9+, and PHP 8.2+.
 All typefaces are self-hosted in /assets/fonts/ for GDPR compliance and performance.
 
 * Inter — https://github.com/rsms/inter (SIL Open Font License 1.1)
-* Playfair Display — https://github.com/clauseggers/Playfair-Display (SIL Open Font License 1.1)
+* Archivo — https://github.com/Omnibus-Type/Archivo (SIL Open Font License 1.1)
 * Cinzel — https://github.com/nicholasgross/Cinzel (SIL Open Font License 1.1)
-* Cormorant Garamond — https://github.com/CatharsisFonts/Cormorant (SIL Open Font License 1.1)
-* Bebas Neue — https://github.com/dharmatype/Bebas-Neue (SIL Open Font License 1.1)
+* Hanken Grotesk — https://github.com/marcologous/hanken-grotesk (SIL Open Font License 1.1)
+* Anton — https://github.com/googlefonts/AntonFont (SIL Open Font License 1.1)
 * Barlow — https://github.com/jpt/barlow (SIL Open Font License 1.1)
 * Oswald — https://github.com/googlefonts/OswaldFont (SIL Open Font License 1.1)
 * DM Sans — https://github.com/googlefonts/dm-fonts (SIL Open Font License 1.1)
@@ -285,9 +285,10 @@ All typefaces are self-hosted in /assets/fonts/ for GDPR compliance and performa
 
 Collection script accent fonts (per-collection interior headings, self-hosted):
 
-* Yellowtail — https://fonts.google.com/specimen/Yellowtail (SIL Open Font License 1.1) — Black Rose accent
+* Pacifico — https://fonts.google.com/specimen/Pacifico (SIL Open Font License 1.1) — Black Rose accent
 * Kaushan Script — https://fonts.google.com/specimen/Kaushan+Script (SIL Open Font License 1.1) — Love Hurts accent
-* Pinyon Script — https://fonts.google.com/specimen/Pinyon+Script (SIL Open Font License 1.1) — Signature + Kids Capsule accent
+* Pinyon Script — https://fonts.google.com/specimen/Pinyon+Script (SIL Open Font License 1.1) — Signature accent
+* Grand Hotel — https://fonts.google.com/specimen/Grand+Hotel (SIL Open Font License 1.1) — Kids Capsule accent
 
 = JavaScript Libraries =
 

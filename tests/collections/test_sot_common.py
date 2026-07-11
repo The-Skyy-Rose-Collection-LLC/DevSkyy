@@ -32,11 +32,12 @@ EXPECTED_PALETTE = {
     "signature": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
     "kids-capsule": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
 }
+# Canon pins — founder typography overhaul 2026-07-10 (typography.json is the SOT summary)
 SCRIPT_FONT = {
-    "black-rose": "Yellowtail",
+    "black-rose": "Pacifico",
     "love-hurts": "Kaushan Script",
     "signature": "Pinyon Script",
-    "kids-capsule": "Pinyon Script",
+    "kids-capsule": "Grand Hotel",
 }
 
 

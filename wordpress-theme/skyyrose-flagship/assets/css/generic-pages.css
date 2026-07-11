@@ -40,7 +40,7 @@
 }
 
 .skr-page__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 5vw, 3.25rem);
 	line-height: var(--leading-tight, 1.15);
 	letter-spacing: var(--tracking-tight, -0.025em);
@@ -145,7 +145,7 @@
 }
 
 .skr-single__cat {
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.8rem;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -156,7 +156,7 @@
 }
 
 .skr-single__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 5vw, 3.5rem);
 	line-height: var(--leading-tight, 1.15);
 	letter-spacing: var(--tracking-tight, -0.025em);
@@ -236,7 +236,7 @@
 }
 
 .skr-single__nav-label {
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.7rem;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -245,7 +245,7 @@
 
 .skr-single__nav-title {
 	display: block;
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1rem;
 	color: var(--color-text-secondary, #CCC);
 	transition: color 0.3s ease;
@@ -280,7 +280,7 @@
 }
 
 .skr-blog__desc {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: var(--text-lg);
 	color: var(--color-text-muted, #999);
 	font-style: italic;
@@ -343,7 +343,7 @@
 }
 
 .skr-blog-card__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: var(--text-lg);
 	line-height: 1.3;
 	margin: 0;
@@ -373,7 +373,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.8rem;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -411,7 +411,7 @@
 }
 
 .skr-blog__pagination a {
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.85rem;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;

@@ -20,8 +20,8 @@
   },
   "fonts": {
     "script": {
-      "family": "Yellowtail",
-      "woff2": "assets/fonts/yellowtail-latin.woff2",
+      "family": "Pacifico",
+      "woff2": "assets/fonts/pacifico-latin.woff2",
       "source": "OFL / Google Fonts"
     },
     "caps": {

@@ -30,7 +30,7 @@
 	margin: 0 0 20px;
 }
 .ci-hero__title {
-	font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Archivo', 'Hanken Grotesk', sans-serif;
 	font-size: clamp(34px, 5.5vw, 60px);
 	font-weight: 500;
 	line-height: 1.12;
@@ -38,7 +38,7 @@
 	color: #fff;
 }
 .ci-hero__subtitle {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-size: clamp(17px, 2vw, 20px);
 	line-height: 1.6;
 	color: rgba(237, 230, 223, 0.72);
@@ -95,14 +95,14 @@
 	display: block;
 }
 .ci-card__name-text {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: 'Archivo', sans-serif;
 	font-size: clamp(24px, 3vw, 34px);
 	font-weight: 500;
 	color: #fff;
 	margin: 0 0 18px;
 }
 .ci-card__tagline {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-style: italic;
 	font-size: 18px;
 	color: var(--color-rose-gold, #B76E79);
@@ -141,14 +141,14 @@
 	text-align: center;
 }
 .ci-preorder__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: 'Archivo', sans-serif;
 	font-size: clamp(24px, 3.4vw, 34px);
 	font-weight: 500;
 	color: #fff;
 	margin: 0 0 12px;
 }
 .ci-preorder__text {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-size: 17px;
 	color: rgba(237, 230, 223, 0.68);
 	margin: 0 0 28px;
