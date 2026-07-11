@@ -265,6 +265,31 @@ function skyyrose_collections_index_template( $template ) {
 add_filter( 'template_include', 'skyyrose_collections_index_template', 20 );
 
 /**
+ * Force the theme page shell on Cart + Checkout.
+ *
+ * Pages 9451 (/cart/) and 9452 (/checkout/) carry the same stale
+ * _wp_page_template meta as Collections did — skyyrose-canvas.php, a
+ * live-only file that is not in the repo — which renders them without
+ * the theme header/footer. Overriding template_include beats the stale
+ * meta with zero production DB writes; page.php calls the_content(),
+ * which renders the WC cart/checkout content and picks up the theme's
+ * woocommerce/ template overrides unchanged.
+ *
+ * @since 1.10.2
+ * @param string $template Resolved template path.
+ * @return string
+ */
+function skyyrose_wc_page_shell_template( $template ) {
+	if ( ! function_exists( 'is_cart' ) || ( ! is_cart() && ! is_checkout() ) ) {
+		return $template;
+	}
+
+	$shell = get_theme_file_path( 'page.php' );
+	return file_exists( $shell ) ? $shell : $template;
+}
+add_filter( 'template_include', 'skyyrose_wc_page_shell_template', 20 );
+
+/**
  * Canonical + title for the virtual size-guide route (no page object means
  * core emits neither).
  *
