@@ -166,38 +166,41 @@ def _product_meta_roundtrip(base: str, wc_auth: tuple[str, str]) -> tuple[str, b
 
 
 def _settings_roundtrip(base: str, wp_auth: tuple[str, str]) -> tuple[str, bool, str]:
-    """GET -> PATCH -> GET a marker key on skyyrose/v1/settings, then restore
-    the original value (or clear it if it wasn't present before)."""
+    """GET -> PATCH -> GET the whitelisted `fastapi_url` key on
+    skyyrose/v1/settings, then restore the original value.
+
+    The endpoint whitelists its accepted keys (correct boundary validation),
+    so an arbitrary marker key is silently dropped — the round-trip must use
+    a real key. `fastapi_url` is the only non-module string key; the marker
+    window is a few hundred ms and restore runs in a finally block.
+    """
     name = "settings PATCH round-trip"
-    marker_key = "devskyy_wiring_check"
+    url = f"{base}/wp-json/skyyrose/v1/settings"
+    key = "fastapi_url"
+    original_value = None
+    patched = False
     try:
-        before = requests.get(f"{base}/wp-json/skyyrose/v1/settings", auth=wp_auth, timeout=20)
+        before = requests.get(url, auth=wp_auth, timeout=20)
         before.raise_for_status()
-        original_value = before.json().get(marker_key)
+        original_value = before.json().get(key, "")
 
-        marker_value = f"wiring-audit-{int(time.time())}"
-        patch_response = requests.patch(
-            f"{base}/wp-json/skyyrose/v1/settings",
-            auth=wp_auth,
-            json={marker_key: marker_value},
-            timeout=20,
-        )
+        marker_value = f"https://wiring-check-{int(time.time())}.invalid"
+        patch_response = requests.patch(url, auth=wp_auth, json={key: marker_value}, timeout=20)
         patch_response.raise_for_status()
+        patched = True
+        if key not in patch_response.json().get("updated", []):
+            return name, False, f"endpoint did not accept whitelisted key {key!r}"
 
-        after = requests.get(f"{base}/wp-json/skyyrose/v1/settings", auth=wp_auth, timeout=20)
+        after = requests.get(url, auth=wp_auth, timeout=20)
         after.raise_for_status()
-        wrote_ok = after.json().get(marker_key) == marker_value
-
-        requests.patch(
-            f"{base}/wp-json/skyyrose/v1/settings",
-            auth=wp_auth,
-            json={marker_key: original_value},
-            timeout=20,
-        )
+        wrote_ok = after.json().get(key) == marker_value
         note = "wrote, read back, restored" if wrote_ok else "marker mismatch after PATCH"
         return name, wrote_ok, note
     except requests.RequestException as e:
         return name, False, f"{type(e).__name__}: {e}"
+    finally:
+        if patched:
+            requests.patch(url, auth=wp_auth, json={key: original_value or ""}, timeout=20)
 
 
 def run(write: bool) -> int:
