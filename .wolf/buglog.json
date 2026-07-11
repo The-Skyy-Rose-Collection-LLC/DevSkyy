@@ -3523,5 +3523,28 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-224",
+    "timestamp": "2026-07-10",
+    "error_message": "Kids Capsule teaser wordmark (\"Kids Capsule\") renders with overlapping/illegible glyphs on live page; DOM span rects do NOT overlap (paint-layer artifact, not layout).",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
+    "root_cause": "rv-split-word wraps the h1 into per-word .sr-word spans that carry filter:blur(0) even at REST (.is-visible, animations-premium.css:143). A non-none filter (incl blur(0)) forces a per-span compositing layer, so the background-clip:text gradient painted on the PARENT h1 is read through filter-isolated children -> doubled/overlapping ink on correctly-placed boxes. Structurally pre-existing; the Playfair->Archivo swap (bolder/wider) likely made the latent artifact visible.",
+    "fix": "Swapped the reveal class rv-split-word -> rv-clip-up on teaser.php:38. rv-clip-up rests with clip-path+opacity and NO filter, and acts on the h1 itself (no child spans) -> clip-mask and glyphs stay on one paint op. Consistent with siblings (.kc-teaser__badge already uses rv-clip-up, tagline uses rv-blur). rv-clip-up is already in the built .min (css+js) so no rebuild needed.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "kids-capsule",
+      "background-clip-text",
+      "reveal-animation",
+      "paint-layer",
+      "typography-release",
+      "css-compositing"
+    ],
+    "related_bugs": [
+      "bug-221"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
   }
 ]

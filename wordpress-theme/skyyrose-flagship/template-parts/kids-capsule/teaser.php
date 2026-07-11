@@ -35,7 +35,7 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 		<div class="kc-teaser__hero-bg" aria-hidden="true"></div>
 		<div class="kc-teaser__hero-content">
 			<span class="kc-teaser__badge rv-clip-up"><?php esc_html_e( 'Coming Soon', 'skyyrose' ); ?></span>
-			<h1 class="kc-teaser__wordmark rv-split-word"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></h1>
+			<h1 class="kc-teaser__wordmark rv-clip-up"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></h1>
 			<p class="kc-teaser__tagline rv-blur"><?php esc_html_e( 'Luxury runs in the family.', 'skyyrose' ); ?></p>
 		</div>
 		<div class="kc-teaser__scroll" aria-hidden="true">
