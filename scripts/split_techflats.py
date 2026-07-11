@@ -7,7 +7,7 @@ Analyzes each techflat layout and crops into separate images:
             bottom-left = item2 front, bottom-right = item2 back
 - Vertical stack: split by row
 
-Output goes to assets/techflats/split/ with clear naming:
+Output goes to assets/products/techflats/split/ with clear naming:
   {collection}/{product}-front.jpeg
   {collection}/{product}-back.jpeg
 """
@@ -46,7 +46,12 @@ def split_2x2(img, names, collection, out_dir, row_split=None):
     """
     w, h = img.size
     mid_x = w // 2
-    mid_y = row_split if row_split is not None else h // 2
+    if row_split is None:
+        mid_y = h // 2
+    else:
+        mid_y = int(row_split)
+        if not 0 < mid_y < h:
+            raise ValueError(f"row_split={row_split!r} out of bounds for image height {h}")
 
     crops = [
         (0, 0, mid_x, mid_y),  # top-left
