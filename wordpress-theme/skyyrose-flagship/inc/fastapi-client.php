@@ -94,16 +94,6 @@ function skyyrose_see_is_safe_url( string $url ): bool {
 		return false;
 	}
 
-	// Block metadata endpoints and obvious internal addresses.
-	$blocked_hosts = array(
-		'169.254.169.254',        // AWS/GCP/Azure IMDS
-		'metadata.google.internal',
-		'100.100.100.200',        // Alibaba Cloud metadata
-	);
-	if ( in_array( $host, $blocked_hosts, true ) ) {
-		return false;
-	}
-
 	// Resolve to a target IP. Critically: if the host is ALREADY an IP literal
 	// (v4 or v6), use it directly — gethostbyname() returns a literal unchanged,
 	// and the previous `$ip !== $host` guard then SKIPPED the range check
