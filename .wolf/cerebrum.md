@@ -293,3 +293,8 @@ gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer
 
 - **Key Learning**: Root `.env` is consumed by TWO loaders with different grammars: python-dotenv (tolerates unquoted spaces) and shell `source` (breaks on them — variable loads empty, silently under `2>/dev/null`). WP application passwords contain spaces, so an unquoted `WP_APP_PASSWORD=xxxx xxxx xxxx` works in Python tooling and silently fails in every bash pipeline. Quote ALL .env values that can contain spaces.
 - **Do-Not-Repeat**: A 401 from an authed check is not proof the credential is wrong — first prove the credential actually LOADED (`${VAR:+yes}`). Also: a secrets-scan hit is not a leak until eyes-on context confirms it (admin settings UI placeholders `ck_xxxxxxxxxxxxx` false-positived a ck_/cs_ regex; real WC keys are 40 lowercase hex).
+
+## 2026-07-11 — Consolidations revert fixes; registers must live in git
+
+- **Do-Not-Repeat**: The 2026-04-15 "source-of-truth consolidation" (64af42c9a) deleted root `agent_sdk/` — the copy carrying 4 fresh P1/P2 fixes — and promoted the OLDER unfixed `sdk/python/agent_sdk/` duplicate as canonical, silently reviving all 4 bugs for ~3 months (one crashes the docker-compose worker on startup). Before deleting either side of a duplicate pair, DIFF THE COPIES and port fixes forward; "newest path wins" is not a merge strategy.
+- **Do-Not-Repeat**: The go-live sweep register (30 findings) lived only in an untracked HTML + memory — the file is gone and 2 regressions went unnoticed through rewrites of seo.php/scene.php. Finding registers and fix-state tables must be COMMITTED (tasks/*.md in git), never untracked artifacts or memory-only.

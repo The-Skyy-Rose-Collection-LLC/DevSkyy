@@ -28,6 +28,19 @@ during the 2026-07-11 gap-closure sweep; full detail in memory `project_structur
 - [ ] FOUNDER: HG-3 real pre-order ship window for /faq/; HG-1 TikTok/X handle confirm.
 - [ ] Spec DoD amendment needed: "zero __return_true on write routes" now satisfied; consider
       documenting the shared-key analytics exemption model in the spec.
+- [x] Go-live sweep reconcile: 9/11 theme fixes hold; 2 regressions (policy bare <title>,
+      scene.php lockup CLS heights) re-fixed 2026-07-11
+- [ ] WP-ADMIN (not code): site title "The Skyy Rose Collection"→"SkyyRose"; Jetpack SEO Tools
+      duplicate meta-description toggle (now SITEWIDE, worse than register said); /kids-capsule/
+      → /collections/kids-capsule/ redirect rule (live 404 today)
+- [ ] ⛔ GATED (live content edit): cookie-policy page body carries its own <h1> duplicating the
+      template's — remove via wp-admin editor
+- [ ] IMAGERY (founder-gated, paid): KC hero brand-script lockup asset (Grand Hotel per canon) —
+      scene.php still falls back to sr-monogram
+- [ ] PERF BACKLOG: homepage stylesheet count grew 37→40
+- [ ] SDK regressions (2026-04-15 consolidation kept the UNFIXED duplicate): 4 fixes being
+      re-applied to sdk/python/agent_sdk — worker await-crash is production-critical
+      (docker-compose runs agent_sdk.worker)
 
 ## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
 

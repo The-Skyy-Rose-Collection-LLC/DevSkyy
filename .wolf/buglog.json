@@ -3546,5 +3546,26 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-224",
+    "timestamp": "2026-07-11",
+    "error_message": "4 SDK bugs live on main ~3 months: DevSkyy.round_table() TypeError (attr shadows method); agent_sdk.worker crashes on startup (await on sync redis.from_url); task status never updated post-completion; RequestSigner HMAC non-deterministic (unsorted json.dumps)",
+    "file": "sdk/python/agent_sdk/{main,worker,task_queue,utils/request_signer}.py",
+    "root_cause": "Consolidation commit 64af42c9a (2026-04-15) deleted root agent_sdk/ carrying the 2026-04-05 fixes and promoted the OLDER unfixed sdk/python duplicate as canonical \u2014 fixes silently reverted. Copies were never diffed before deletion.",
+    "fix": "Re-applied all 4 fixes to the canonical copy. Verified: compileall, integration 9/9, security suite 131 passed. Lesson in cerebrum: diff duplicate copies and port fixes forward before deleting either side.",
+    "tags": [
+      "sdk",
+      "consolidation-regression",
+      "redis-asyncio",
+      "worker",
+      "hmac",
+      "duplicate-code"
+    ],
+    "related_bugs": [
+      "bug-223"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
   }
 ]
