@@ -3463,5 +3463,26 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10T13:00:00-07:00"
+  },
+  {
+    "id": "bug-221",
+    "timestamp": "2026-07-10",
+    "error_message": "Collection emblem <img> 404 on Black Rose + Love Hurts heroes: src rendered as .../assetsimages/emblems/... (missing slash)",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/collection/page.php",
+    "root_cause": "Slash seam: SKYYROSE_ASSETS_URI ends WITHOUT trailing slash (functions.php:28) and $emblem_rel started WITHOUT leading slash (page.php:65). URL concat SKYYROSE_ASSETS_URI . $emblem_rel produced assetsimages. The file_exists gate used a DIFFERENT literal (assets/ . $emblem_rel) which had the slash, so the gate passed while the URL 404d -- a build-level check could not catch it; only live render did.",
+    "fix": "Gave $emblem_rel a leading slash (/images/emblems/...) to match the file convention (hero_bg vars carry their own leading slash), and changed the file_exists literal from assets/ to assets so both paths stay consistent. URL now .../assets/images/emblems/<slug>-emblem.webp.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "emblem",
+      "url",
+      "asset-path",
+      "404",
+      "collection-hero",
+      "typography-release"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
   }
 ]

@@ -62,8 +62,8 @@ $has_logo    = ! empty( $resolved_hero_logo );
 
 // Collection emblem (3D star-rose mark) — file-existence gated, so only
 // collections that have an emblem asset render it. Decorative; aria-hidden.
-$emblem_rel = 'images/emblems/' . $slug . '-emblem.webp';
-$has_emblem = file_exists( get_theme_file_path( 'assets/' . $emblem_rel ) );
+$emblem_rel = '/images/emblems/' . $slug . '-emblem.webp';
+$has_emblem = file_exists( get_theme_file_path( 'assets' . $emblem_rel ) );
 
 /* Kids Capsule uses pre-order URL for product links */
 $preorder_url  = $is_kids ? home_url( '/pre-order/' ) : '';

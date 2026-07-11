@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,10 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.10.1 =
+* Fix: collection emblem (3D star-rose mark) 404'd on Black Rose + Love Hurts heroes — asset URL was missing a path separator (`assetsimages`); corrected the slash seam so the emblem renders
+* Chore: version bump busts the CDN edge cache, refreshing the homepage hero-title clamp that had been pinned under the prior release stamp
 
 = 1.10.0 =
 * Typography overhaul: Archivo (display, expanded hero treatment), Hanken Grotesk (body), Anton (UI); collection scripts Pacifico (Black Rose) and Grand Hotel (Kids Capsule)
