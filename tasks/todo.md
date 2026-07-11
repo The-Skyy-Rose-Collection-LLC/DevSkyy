@@ -13,13 +13,17 @@ during the 2026-07-11 gap-closure sweep; full detail in memory `project_structur
 - [x] C5 /analytics/events shared-key gate — __return_true removed from write route (cdb76a951)
 - [x] C6 wiring_audit.py FIRST RUN: 8/8 read-only PASS (after .env WP_APP_PASSWORD quoting fix +
       audit scope/pattern fixes). Write round-trips still gated (--write + STOPSHOW_ACK=1).
-- [ ] ⛔ GATED (founder y): WS4.7 orphan categorization — live WC write: product 10077 (lh-005 Fannie)
-      → category 157 love-hurts; product 10067 (sg-015 Windbreaker) → 158 signature. Both 'uncategorized' live, CSV is SOT.
-- [ ] ⛔ GATED (founder y): C4 `register_webhooks.py --execute` — webhook registration never run;
-      dashboard write-back loop inert until done.
-- [ ] ⛔ GATED (founder y): theme deploy train — 3 committed fixes (cart shell, session cookie,
-      analytics key) inert on live until deployed; PDP size-chip JS from #539 also rides.
-- [ ] ⛔ GATED (--write audit): wiring_audit.py write round-trips after webhook registration.
+- [x] WS4.7 orphan categorization DONE 2026-07-11 (founder-approved): lh-005→love-hurts,
+      sg-015→signature. Live verified: 33/33 in collections, uncategorized=0.
+- [x] C4 webhooks REGISTERED 2026-07-11 (founder-approved): 5 topics active →
+      https://www.devskyy.app/api/webhooks/woocommerce (product.create/update/delete, order.create/update).
+- [x] Cookie-policy duplicate <h1> removed from page 10143 body (founder-approved) —
+      live renders exactly one h1.
+- [x] wiring_audit.py --write: **10/10 PASS** 2026-07-11 (after fixing the audit's settings
+      round-trip to use whitelisted fastapi_url — endpoint whitelist was correct, probe was wrong).
+- [ ] ⛔ GATED (founder y — NOT yet approved): theme deploy train v1.10.2 — 6 committed fixes
+      (cart shell, session cookie, analytics key, policy titles, lockup CLS, PDP size-chip)
+      inert on live until deployed.
 - [ ] FOUNDER DECISION: dashboard font migration (spec C5: Fraunces/Archivo/JetBrains vs current
       Playfair/Cormorant/Space Mono in frontend/lib/fonts.ts) — spec cites nonexistent skyyrose-tokens.css;
       brand canon cut Playfair/Cormorant 2026-07-10. Needs a call, then execution.
