@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.9.6
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,11 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.10.0 =
+* Typography overhaul: Archivo (display, expanded hero treatment), Hanken Grotesk (body), Anton (UI); collection scripts Pacifico (Black Rose) and Grand Hotel (Kids Capsule)
+* Old font families retired (Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail) with census-verified zero remaining references
+* Permissions-Policy: payment now delegates to js.stripe.com — unblocks Apple Pay / Google Pay wallet buttons on product pages
 
 = 1.9.6 =
 * Security: admin MCP bridge now uses a fail-closed allowlist — only read-only, non-paid tools are invocable; all paid generation, all writes, and any new/untagged tool are refused by default (a denylist previously failed open, leaving paid LoRA/Claude-SDK tools reachable by a compromised admin session)
