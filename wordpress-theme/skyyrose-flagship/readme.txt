@@ -138,6 +138,7 @@ Typography, header layout, footer layout, and collection palette overrides are c
 = 1.9.6 =
 * Security: admin MCP bridge now uses a fail-closed allowlist — only read-only, non-paid tools are invocable; all paid generation, all writes, and any new/untagged tool are refused by default (a denylist previously failed open, leaving paid LoRA/Claude-SDK tools reachable by a compromised admin session)
 * Security: the public personalization endpoint's `collection` parameter is now validated against the canonical collection slugs, closing a transient-cache-key storage-growth vector
+* Security: outbound backend requests (FastAPI + MCP URLs) are now restricted to an allowlist of known DevSkyy hosts, closing a DNS-rebinding (TOCTOU) SSRF vector where a validated hostname could resolve to an internal address at connect time
 
 = 1.9.5 =
 * Fix: mascot body posture in the idle animation was hunched forward with head pitched down — re-keyed the idle clip's Hips bone rotation at both loop keyframes using a verified world-space correction (Hips world-X rotation was previously being applied in the bone's skewed local rest-space, producing the wrong effect); walk/talk/joy clips were already correctly authored and are unchanged

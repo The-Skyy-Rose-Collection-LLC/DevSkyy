@@ -3440,5 +3440,28 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10T12:00:00-07:00"
+  },
+  {
+    "id": "bug-220",
+    "timestamp": "2026-07-10T13:00:00-07:00",
+    "error_message": "[SECURITY MEDIUM] SSRF TOCTOU in inc/fastapi-client.php skyyrose_see_is_safe_url(): it validated the target via gethostbyname() then wp_remote_post/get re-resolved DNS independently at connect time. An admin who set fastapi_url (or mcp_url; the guard is shared with mcp-bridge.php) to a rebindable domain could serve a public IP at check time and an internal IP (Fly 6PN, 169.254.169.254) at connect time, bypassing the private-range filter. Admin-gated, so bounded.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/fastapi-client.php",
+    "root_cause": "Validate-by-hostname then fetch-by-hostname leaves a DNS check-time/connect-time window. Both admin-settable URLs (fastapi_url, mcp_url) legitimately point ONLY at DevSkyy infra, so arbitrary hosts were never a needed feature \u2014 that flexibility WAS the attack surface.",
+    "fix": "Approach A (host allowlist, chosen over connection-pinning because it is transport-agnostic on WP.com and removes the arbitrary-host surface entirely). Added shared skyyrose_see_allowed_backend_hosts() (api.devskyy.app, devskyy-backend.fly.dev, devskyy-api.fly.dev, localhost, 127.0.0.1; filterable) checked in is_safe_url BEFORE any resolution \u2014 a non-allowlisted/rebindable host is refused outright, closing the TOCTOU by construction. Private/reserved-range checks retained as defense-in-depth. Covers both callers (fastapi POST/GET + MCP bridge).",
+    "tags": [
+      "security",
+      "wordpress",
+      "ssrf",
+      "toctou",
+      "dns-rebind",
+      "allowlist",
+      "fable"
+    ],
+    "related_bugs": [
+      "bug-218",
+      "bug-219"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T13:00:00-07:00"
   }
 ]
