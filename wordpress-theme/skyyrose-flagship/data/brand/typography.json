@@ -8,5 +8,5 @@
   },
   "caps":   { "family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "note": "caps/eyebrow; also each collection's caps in identity.json" },
   "system": { "family": "Inter", "woff2": "assets/fonts/inter-latin.woff2", "note": "system/utility; --ff-system + body fallback" },
-  "collection_scripts": { "note": "per-collection script fonts live in data/collections/<slug>/identity.json", "black-rose": "Pacifico", "signature": "Pinyon Script", "kids-capsule": "Grand Hotel", "love-hurts": "Kaushan Script (interim; custom graffiti face from lockup pending)" }
+  "collection_scripts": { "note": "per-collection script fonts live in data/collections/<slug>/identity.json", "black-rose": "Pacifico", "signature": "Pinyon Script", "kids-capsule": "Yellowtail", "love-hurts": "Kaushan Script (interim; custom graffiti face from lockup pending)" }
 }

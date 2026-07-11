@@ -37,7 +37,7 @@ SCRIPT_FONT = {
     "black-rose": "Pacifico",
     "love-hurts": "Kaushan Script",
     "signature": "Pinyon Script",
-    "kids-capsule": "Grand Hotel",
+    "kids-capsule": "Yellowtail",
 }
 
 

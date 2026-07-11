@@ -19,8 +19,8 @@
   },
   "fonts": {
     "script": {
-      "family": "Grand Hotel",
-      "woff2": "assets/fonts/grand-hotel-latin.woff2",
+      "family": "Yellowtail",
+      "woff2": "assets/fonts/yellowtail-latin.woff2",
       "source": "OFL / Google Fonts"
     },
     "caps": {

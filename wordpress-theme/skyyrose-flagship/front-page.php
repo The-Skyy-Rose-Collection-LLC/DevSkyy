@@ -553,7 +553,7 @@ $kc_link   = $kc_config['page_url'] ?? home_url( '/collections/kids-capsule/' );
 					<path d="M 40 6 A 34 34 0 0 1 40 74 L 40 6 Z" fill="url(#kc-wax-shine)"/>
 					<path d="M 72 38 L 74 44 L 71 47 L 73 52 M 68 22 L 71 26 M 66 60 L 69 64" fill="none" stroke="#0a0504" stroke-width="1.2"/>
 				</g>
-				<text x="40" y="54" text-anchor="middle" font-family="'Grand Hotel', Georgia, cursive" font-style="italic" font-size="46" fill="#D4AF37">S</text>
+				<text x="40" y="54" text-anchor="middle" font-family="'Yellowtail', Georgia, cursive" font-style="italic" font-size="46" fill="#D4AF37">S</text>
 			</svg>
 		</div>
 		<div class="kc-heir__hint"><?php esc_html_e( '↗ break the seal', 'skyyrose' ); ?></div>

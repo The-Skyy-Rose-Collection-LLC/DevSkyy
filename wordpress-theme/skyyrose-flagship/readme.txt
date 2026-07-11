@@ -301,7 +301,7 @@ Collection script accent fonts (per-collection interior headings, self-hosted):
 * Pacifico — https://fonts.google.com/specimen/Pacifico (SIL Open Font License 1.1) — Black Rose accent
 * Kaushan Script — https://fonts.google.com/specimen/Kaushan+Script (SIL Open Font License 1.1) — Love Hurts accent
 * Pinyon Script — https://fonts.google.com/specimen/Pinyon+Script (SIL Open Font License 1.1) — Signature accent
-* Grand Hotel — https://fonts.google.com/specimen/Grand+Hotel (SIL Open Font License 1.1) — Kids Capsule accent
+* Yellowtail — https://fonts.google.com/specimen/Yellowtail (SIL Open Font License 1.1) — Kids Capsule accent
 
 = JavaScript Libraries =
 
