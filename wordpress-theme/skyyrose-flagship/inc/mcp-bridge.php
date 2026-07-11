@@ -447,6 +447,9 @@ function skyyrose_mcp_blocked_tools(): array {
 			'devskyy_generate_3d_from_image',
 			'es_render',
 			'es_batch',
+			// Paid LLM agent runs (live Claude Agent SDK — unbounded per-call cost).
+			'devskyy_email_triage',
+			'devskyy_analyze_spreadsheet',
 			// Production mutation / deploys.
 			'operations_deploy',
 			'wp_release',
@@ -460,11 +463,15 @@ function skyyrose_mcp_blocked_tools(): array {
  * ALLOWLIST: only these run through the bridge; every other tool — all paid
  * generation, all writes, and anything new or untagged — is refused by default.
  *
- * Sourced from the `readOnlyHint: True` MCP annotations in mcp_tools/tools/*.py
- * (see core/runtime/tool_registry.py). A denylist alone fails open — a newly
- * added paid tool would be invocable until someone remembered to block it; this
- * allowlist fails closed. Regenerate when tools change; to expose a specific
- * write tool without editing this list, use `skyyrose_mcp_allowed_write_tools`.
+ * Membership rule: a tool must be read-only (`readOnlyHint: True` in
+ * mcp_tools/tools/*.py, see core/runtime/tool_registry.py) AND make no external
+ * paid/LLM API call. readOnlyHint means "does not mutate" — it does NOT mean
+ * "free": the Claude-Agent-SDK read tools (email_triage, analyze_spreadsheet,
+ * dashboard_health) and the LLM/embedding RAG tools (rag_query,
+ * rag_query_rewrite, rag_get_context) are read-only yet cost money, so they are
+ * deliberately EXCLUDED here (the two agent-run tools are also hard-blocked
+ * below). A denylist alone fails open; this allowlist fails closed. To expose a
+ * specific tool without editing this list, use `skyyrose_mcp_allowed_write_tools`.
  *
  * @return string[] Read-only tool names permitted through the bridge.
  */
@@ -476,10 +483,7 @@ function skyyrose_mcp_readonly_tools(): array {
 			'context7_get_docs',
 			'context7_resolve_library',
 			'context7_search_docs',
-			'devskyy_analyze_spreadsheet',
-			'devskyy_dashboard_health',
 			'devskyy_demand_forecast',
-			'devskyy_email_triage',
 			'devskyy_fleet_health',
 			'devskyy_fraud_assess',
 			'devskyy_health_check',
@@ -500,10 +504,7 @@ function skyyrose_mcp_readonly_tools(): array {
 			'es_validate_dossier',
 			'playwright_get_page_content',
 			'playwright_screenshot',
-			'rag_get_context',
 			'rag_list_sources',
-			'rag_query',
-			'rag_query_rewrite',
 			'rag_stats',
 			'serena_analyze_file',
 			'serena_check_code_style',

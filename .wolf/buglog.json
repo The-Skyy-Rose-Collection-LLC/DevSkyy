@@ -3416,5 +3416,29 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10T11:00:00-07:00"
+  },
+  {
+    "id": "bug-219",
+    "timestamp": "2026-07-10T12:00:00-07:00",
+    "error_message": "[SECURITY HIGH] The bug-218 allowlist fix sourced its safe set from readOnlyHint alone, which means 'does not mutate' \u2014 NOT 'free'. Six read-only tools cost money and were wrongly allowlisted: devskyy_email_triage + devskyy_analyze_spreadsheet (unconditional live Claude Agent SDK runs, unbounded spend), devskyy_dashboard_health (claude-sdk endpoint), rag_query/rag_query_rewrite (LLM query-variation/HyDE generation), rag_get_context (remote-embedding-capable). A compromised admin could still spend via these.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "Conflated readOnlyHint (mutation axis) with cost. readOnlyHint:True tools can still call paid third-party LLM/embedding APIs. Found by an adversarial re-review (requested on Fable) that traced tool implementations to the live ClaudeSDKClient / embedding-engine calls.",
+    "fix": "Allowlist membership rule tightened to read-only AND no external paid/LLM call. Removed the 6 cost-bearing tools from skyyrose_mcp_readonly_tools(); hard-blocked the 2 unbounded agent-run tools (email_triage, analyze_spreadsheet) in skyyrose_mcp_blocked_tools(). Local-ML read tools (demand_forecast/fraud_assess/ml_prediction/recommend/retention_assess) verified to have no paid-API signature and kept. Verified: php -l + phpcs clean, 16/16 behavioral cases (6 cost-bearing now blocked, 7 free reads allowed, 3 paid still blocked).",
+    "tags": [
+      "security",
+      "wordpress",
+      "mcp",
+      "paid-api",
+      "fail-closed",
+      "allowlist",
+      "code-review",
+      "fable"
+    ],
+    "related_bugs": [
+      "bug-218",
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T12:00:00-07:00"
   }
 ]
