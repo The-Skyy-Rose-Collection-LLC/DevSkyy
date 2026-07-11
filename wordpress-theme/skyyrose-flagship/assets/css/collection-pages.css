@@ -777,3 +777,6 @@
 		line-height: 1.65;
 	}
 }
+
+/* Collection hero emblem — 3D star-rose mark (Black Rose / Love Hurts). Decorative, aria-hidden. */
+.col-hero__emblem{display:block;margin:0 auto var(--space-md,1rem);width:auto;height:clamp(120px,18vh,210px);filter:drop-shadow(0 14px 22px rgba(0,0,0,.55));pointer-events:none;}
