@@ -53,7 +53,7 @@ def test_identity_validates_and_matches_canon(slug):
     assert EXPECTED_PALETTE[slug].issubset(set(ident["palette"]))
     assert ident["fonts"]["script"]["family"] == SCRIPT_FONT[slug]
     assert ident["fonts"]["caps"]["family"] == "Cinzel"
-    assert ident["fonts"]["body"]["family"] == "Cormorant Garamond"
+    assert ident["fonts"]["body"]["family"] == "Hanken Grotesk"
 
 
 import sys
