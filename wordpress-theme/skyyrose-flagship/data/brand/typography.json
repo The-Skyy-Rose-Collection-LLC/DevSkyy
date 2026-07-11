@@ -1,12 +1,12 @@
 {
   "$schema": "./typography.schema.json",
   "universal": {
-    "display": { "family": "Playfair Display", "stack": "'Playfair Display', serif", "woff2": "assets/fonts/playfair-display-latin.woff2" },
-    "body":    { "family": "Cormorant Garamond", "stack": "'Cormorant Garamond', 'Inter', sans-serif", "woff2": "assets/fonts/cormorant-garamond-latin.woff2" },
+    "display": { "family": "Archivo", "stack": "'Archivo', system-ui, sans-serif", "woff2": "assets/fonts/archivo-latin.woff2", "note": "expanded hero: apply font-variation-settings 'wdth' 125,'wght' 900 in hand-CSS" },
+    "body":    { "family": "Hanken Grotesk", "stack": "'Hanken Grotesk', 'Inter', sans-serif", "woff2": "assets/fonts/hanken-grotesk-latin.woff2" },
     "mono":    { "family": "SF Mono", "stack": "ui-monospace, 'SF Mono', Menlo, monospace", "woff2": null },
-    "ui":      { "family": "Bebas Neue", "stack": "'Bebas Neue', sans-serif", "woff2": "assets/fonts/bebas-neue-latin.woff2" }
+    "ui":      { "family": "Anton", "stack": "'Anton', sans-serif", "woff2": "assets/fonts/anton-latin.woff2" }
   },
   "caps":   { "family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "note": "caps/eyebrow; also each collection's caps in identity.json" },
   "system": { "family": "Inter", "woff2": "assets/fonts/inter-latin.woff2", "note": "system/utility; --ff-system + body fallback" },
-  "collection_scripts": { "note": "per-collection script fonts live in data/collections/<slug>/identity.json", "black-rose": "Yellowtail", "signature": "Pinyon Script", "kids-capsule": "Pinyon Script", "love-hurts": "Kaushan Script" }
+  "collection_scripts": { "note": "per-collection script fonts live in data/collections/<slug>/identity.json", "black-rose": "Pacifico", "signature": "Pinyon Script", "kids-capsule": "Grand Hotel", "love-hurts": "Kaushan Script (interim; custom graffiti face from lockup pending)" }
 }

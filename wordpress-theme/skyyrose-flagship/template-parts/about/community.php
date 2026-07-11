@@ -3,8 +3,8 @@
  * About page — Oakland manifesto.
  *
  * Replaces the prior 3-pillar card grid with an editorial manifesto stack:
- * an all-caps Bebas list of Oakland places (no explanation) followed by a
- * short Cormorant frame paragraph. Customer-photo gallery preserved with
+ * an all-caps Anton list of Oakland places (no explanation) followed by a
+ * short Hanken Grotesk frame paragraph. Customer-photo gallery preserved with
  * defensive file-existence skip.
  *
  * Called via get_template_part( 'template-parts/about/community', null, $args ).

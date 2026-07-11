@@ -34,7 +34,7 @@
 }
 
 .search-results__title {
-	font-family: var(--font-headline, 'Cinzel', 'Playfair Display', Georgia, serif);
+	font-family: var(--font-headline, 'Cinzel', 'Archivo', sans-serif);
 	font-size: var(--text-4xl, clamp(2.25rem, 3.8vw, 2.875rem));
 	font-weight: 700;
 	color: var(--color-text-primary, #FFFFFF);

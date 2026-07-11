@@ -185,7 +185,7 @@
 }
 
 .skyy-product-card__content .woocommerce-loop-product__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1rem;
 	font-weight: 600;
 	color: var(--skyy-woo-text);

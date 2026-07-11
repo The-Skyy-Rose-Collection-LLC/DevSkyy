@@ -87,8 +87,8 @@
 /* Hero typography per collection — font-family flows from --skyyrose-font-display
    (set in design-tokens.css per [data-collection] block). Letter-spacing stays
    collection-specific because it's a per-collection design parameter, not a font
-   choice. Cinzel for Black Rose, Playfair Display italic for Love Hurts,
-   Playfair Display tracked-out for Signature, Playfair Display for Kids Capsule. */
+   choice. All four collections alias font-display to font-caps (Cinzel) within
+   their [data-collection] scope — see gen-design-tokens.py's block(). */
 .col-page[data-collection="black-rose"]   .col-hero__title { font-family: var(--skyyrose-font-display); letter-spacing: 12px; }
 .col-page[data-collection="love-hurts"]   .col-hero__title { font-family: var(--skyyrose-font-display); font-style: italic; letter-spacing: 4px; }
 .col-page[data-collection="signature"]    .col-hero__title { font-family: var(--skyyrose-font-display); letter-spacing: 16px; }

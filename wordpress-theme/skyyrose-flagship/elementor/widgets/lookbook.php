@@ -132,7 +132,7 @@ class SkyyRose_Lookbook_Widget extends \Elementor\Widget_Base {
 					<?php if ( $overlay ) : ?>
 						<div style="position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;
 							transition:opacity .4s;display:flex;align-items:center;justify-content:center;
-							font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;
+							font-family:'Anton',sans-serif;font-size:14px;letter-spacing:4px;
 							color:#fff;text-transform:uppercase;"
 							onmouseenter="this.style.opacity='1';this.previousElementSibling.style.transform='scale(1.06)'"
 							onmouseleave="this.style.opacity='0';this.previousElementSibling.style.transform='scale(1)'">
