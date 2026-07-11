@@ -288,3 +288,8 @@ gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer
 ## 2026-07-11 — Dashboard = editorial face OF the WordPress site (founder correction)
 
 - **User Preference**: devskyy.app dashboard is the editorial/operations face of skyyrose.co — where we automate the WordPress site, make content, and track leads. Do NOT frame the two systems as "independent, never cross-wire" in the functional sense; independence is about traffic/codebase separation only. Dashboard features should serve WordPress automation, content authoring, and lead tracking. MCP-over-HTTP bridge is the intended connective tissue.
+
+## 2026-07-11 — .env values with spaces MUST be quoted (dual-loader trap)
+
+- **Key Learning**: Root `.env` is consumed by TWO loaders with different grammars: python-dotenv (tolerates unquoted spaces) and shell `source` (breaks on them — variable loads empty, silently under `2>/dev/null`). WP application passwords contain spaces, so an unquoted `WP_APP_PASSWORD=xxxx xxxx xxxx` works in Python tooling and silently fails in every bash pipeline. Quote ALL .env values that can contain spaces.
+- **Do-Not-Repeat**: A 401 from an authed check is not proof the credential is wrong — first prove the credential actually LOADED (`${VAR:+yes}`). Also: a secrets-scan hit is not a leak until eyes-on context confirms it (admin settings UI placeholders `ck_xxxxxxxxxxxxx` false-positived a ck_/cs_ regex; real WC keys are 40 lowercase hex).

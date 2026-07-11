@@ -3504,5 +3504,24 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-223",
+    "timestamp": "2026-07-11",
+    "error_message": "wiring_audit.py: settings read 401, agents-manager read 401, client-bundle secret grep 4 fragments \u2014 3/8 read-only checks failing on first-ever run",
+    "file": ".env + scripts/remediation/wiring_audit.py",
+    "root_cause": "Three independent causes: (1) WP_APP_PASSWORD in .env contains spaces and was UNQUOTED \u2014 python-dotenv parses it fine but shell `source` loads it empty, so authed checks ran credential-less (401). (2) Audit grepped ALL of frontend/.next including server chunks. (3) Secret pattern ck_/cs_[a-zA-Z0-9]{10,} matched literal UI input placeholders 'ck_xxxxxxxxxxxxx' from the admin settings page \u2014 'x' is not hex; real WC keys are 40 lowercase hex chars.",
+    "fix": "Quoted WP_APP_PASSWORD in .env (valid for both shell and dotenv). Audit: scope bundle grep to .next/static (browser-delivered JS only) + tighten patterns to ck_/cs_[a-f0-9]{20,}. Verified: 8/8 read-only PASS + pattern sanity test (real-shaped key matches, placeholder does not). Eyes-on confirmed fragments were placeholders before dismissing.",
+    "tags": [
+      "env",
+      "dotenv",
+      "shell-quoting",
+      "wiring-audit",
+      "false-positive",
+      "secrets-scan"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
   }
 ]

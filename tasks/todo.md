@@ -1,5 +1,34 @@
 # Current Tasks
 
+## ACTIVE — WS7 launch-night wiring + gap closure (2026-07-11)
+
+Spec: `.planning/SKYYROSE_LAUNCH_NIGHT_SPEC_V2.html` (committed to main 2026-07-11).
+This workstream previously had NO todo.md entry — tracked only in project memory. Register created
+during the 2026-07-11 gap-closure sweep; full detail in memory `project_structural_remediation_2026_07_05`.
+
+- [x] Sync: main==origin/main; launch spec + typography previews committed; feeds/ + tasks/assets/ gitignored
+- [x] bug-222 /cart/ + /checkout/ shell restored (template_include override, commit 940665873, v1.10.2)
+- [x] HG-5 skip links — verified ALREADY CLOSED (live audit 99/0, 2026-07-11)
+- [x] WS5.4 root fix — session cookie now set at guest wishlist write time, not every pageview (f75c92cb4)
+- [x] C5 /analytics/events shared-key gate — __return_true removed from write route (cdb76a951)
+- [x] C6 wiring_audit.py FIRST RUN: 8/8 read-only PASS (after .env WP_APP_PASSWORD quoting fix +
+      audit scope/pattern fixes). Write round-trips still gated (--write + STOPSHOW_ACK=1).
+- [ ] ⛔ GATED (founder y): WS4.7 orphan categorization — live WC write: product 10077 (lh-005 Fannie)
+      → category 157 love-hurts; product 10067 (sg-015 Windbreaker) → 158 signature. Both 'uncategorized' live, CSV is SOT.
+- [ ] ⛔ GATED (founder y): C4 `register_webhooks.py --execute` — webhook registration never run;
+      dashboard write-back loop inert until done.
+- [ ] ⛔ GATED (founder y): theme deploy train — 3 committed fixes (cart shell, session cookie,
+      analytics key) inert on live until deployed; PDP size-chip JS from #539 also rides.
+- [ ] ⛔ GATED (--write audit): wiring_audit.py write round-trips after webhook registration.
+- [ ] FOUNDER DECISION: dashboard font migration (spec C5: Fraunces/Archivo/JetBrains vs current
+      Playfair/Cormorant/Space Mono in frontend/lib/fonts.ts) — spec cites nonexistent skyyrose-tokens.css;
+      brand canon cut Playfair/Cormorant 2026-07-10. Needs a call, then execution.
+- [ ] FOUNDER/OPS: `agents-manager` REST namespace live on production but in NO repo source — identify
+      what serves it (plugin? leftover deploy?), bring under version control or retire.
+- [ ] FOUNDER: HG-3 real pre-order ship window for /faq/; HG-1 TikTok/X handle confirm.
+- [ ] Spec DoD amendment needed: "zero __return_true on write routes" now satisfied; consider
+      documenting the shared-key analytics exemption model in the spec.
+
 ## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
 
 Replace 4 hardcoded-fixture handler bodies with real agent delegation. TDD, tests green, scope-clean.

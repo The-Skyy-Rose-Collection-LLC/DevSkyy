@@ -41,7 +41,10 @@ OK, FAIL, WARN, SKIP = (
     "\033[36m SKIP \033[0m",
 )
 
-_SECRET_PATTERNS = (re.compile(r"ck_[a-zA-Z0-9]{10,}"), re.compile(r"cs_[a-zA-Z0-9]{10,}"))
+# WooCommerce keys are ck_/cs_ + 40 lowercase hex chars. Requiring hex (not
+# [a-zA-Z0-9]) keeps UI input placeholders like "ck_xxxxxxxxxxxxx" from
+# false-positiving — 'x' is not a hex digit.
+_SECRET_PATTERNS = (re.compile(r"ck_[a-f0-9]{20,}"), re.compile(r"cs_[a-f0-9]{20,}"))
 
 # Category slugs the dashboard's wc/store/v1/products?category= reads use
 # (verified live 2026-07-07: black-rose=14, love-hurts=4, signature=11,
@@ -289,11 +292,14 @@ def run(write: bool) -> int:
     else:
         report("webhook signature accept/reject simulation", False, "WP_WEBHOOK_SECRET not set")
 
-    # 7. client-bundle secret grep
-    next_dir = Path("frontend/.next")
+    # 7. client-bundle secret grep — .next/static only: that is what ships to
+    # browsers. Server chunks (.next/server) legitimately contain ck_/cs_
+    # placeholder strings from the admin settings page UI and false-positive.
+    next_dir = Path("frontend/.next/static")
     if not next_dir.exists():
         print(
-            f"{WARN} client-bundle secret grep — frontend/.next not found; run `npm run build` first"
+            f"{WARN} client-bundle secret grep — frontend/.next/static not found; "
+            "run `npm run build` first"
         )
     else:
         leaked: list[str] = []
