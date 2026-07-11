@@ -12,11 +12,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Initialize wishlist session for non-logged-in users.
+ * Ensure a persistent WooCommerce session exists for guest wishlist writes.
  *
- * @since 1.0.0
+ * Root fix for the anonymous session-cookie perf bug (launch spec WS5.4):
+ * the previous woocommerce_init hook forced the session cookie on EVERY
+ * anonymous page view, making all anonymous traffic uncacheable at the edge
+ * (Batcache refuses responses that set cookies). The cookie is only needed
+ * when a guest actually persists wishlist state, so it is now set at write
+ * time — inside admin-ajax/REST requests, which are never page-cached and
+ * are exempt from the anon-cache-guard MU-plugin's session handler.
+ *
+ * @since 1.10.2
  */
-function skyyrose_init_wishlist_session() {
+function skyyrose_ensure_wishlist_session() {
 	if ( ! function_exists( 'WC' ) || ! WC()->session ) {
 		return;
 	}
@@ -25,7 +33,6 @@ function skyyrose_init_wishlist_session() {
 		WC()->session->set_customer_session_cookie( true );
 	}
 }
-add_action( 'woocommerce_init', 'skyyrose_init_wishlist_session' );
 
 /**
  * Get the wishlist key for the current user or session.
@@ -60,6 +67,9 @@ function skyyrose_add_to_wishlist( $product_id ) {
 	if ( ! $product_id || ! function_exists( 'wc_get_product' ) || ! wc_get_product( $product_id ) ) {
 		return false;
 	}
+
+	// Guests need a persistent session before their wishlist key is derived.
+	skyyrose_ensure_wishlist_session();
 
 	$wishlist_key = skyyrose_get_wishlist_key();
 
