@@ -57,16 +57,26 @@ class TestCheckCategoryTotalsSane:
 
 
 class TestFindLeakedSecrets:
+    # Real WooCommerce keys are ck_/cs_ + 40 lowercase hex chars.
+    REAL_CK = "ck_" + "a1b2c3d4e5" * 4
+    REAL_CS = "cs_" + "0f9e8d7c6b" * 4
+
     def test_finds_consumer_key_fragment(self):
-        leaked = wiring_audit.find_leaked_secrets("const x = 'ck_abcdefghijklmno';")
+        leaked = wiring_audit.find_leaked_secrets(f"const x = '{self.REAL_CK}';")
         assert len(leaked) == 1
 
     def test_finds_consumer_secret_fragment(self):
-        leaked = wiring_audit.find_leaked_secrets("cs_abcdefghijklmno")
+        leaked = wiring_audit.find_leaked_secrets(self.REAL_CS)
         assert len(leaked) == 1
 
     def test_clean_bundle_finds_nothing(self):
         assert wiring_audit.find_leaked_secrets("export function foo() { return 1; }") == []
+
+    def test_ui_placeholder_does_not_false_positive(self):
+        # Admin settings inputs ship literal placeholders in client chunks
+        # (bug-223): 'x' is not a hex digit, so these must NOT match.
+        text = 'placeholder:"ck_xxxxxxxxxxxxx",placeholder:"cs_xxxxxxxxxxxxx"'
+        assert wiring_audit.find_leaked_secrets(text) == []
 
 
 class TestCheckBurstTiming:
