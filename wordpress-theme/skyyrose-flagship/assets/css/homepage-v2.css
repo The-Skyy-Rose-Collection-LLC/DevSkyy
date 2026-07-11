@@ -288,7 +288,7 @@
 	font-family: var(--ff-brand);
 	font-weight: 900; /* Archivo expanded monument treatment (typography.json) */
 	font-variation-settings: 'wdth' 125, 'wght' 900;
-	font-size: clamp(50px, 16vw, 220px);
+	font-size: clamp(38px, 11.5vw, 160px);
 	letter-spacing: clamp(10px, 2.5vw, 36px);
 	text-transform: uppercase;
 	line-height: 0.9;
