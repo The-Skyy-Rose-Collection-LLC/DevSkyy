@@ -149,6 +149,17 @@ function skyyrose_enqueue_phase3_experience_analyzer(): void {
 			'in_footer' => true,
 		)
 	);
+
+	// Shared ingest key for POST /analytics/events (launch spec C5) — static
+	// per site, so cached page HTML stays valid.
+	if ( function_exists( 'skyyrose_see_analytics_key' ) ) {
+		wp_add_inline_script(
+			'skyyrose-experience-analyzer',
+			'window.skyyroseSEE = window.skyyroseSEE || {};' .
+			'window.skyyroseSEE.key = ' . wp_json_encode( skyyrose_see_analytics_key() ) . ';',
+			'before'
+		);
+	}
 }
 
 /**

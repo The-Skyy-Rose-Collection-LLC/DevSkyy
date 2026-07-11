@@ -18,6 +18,46 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'rest_api_init', 'skyyrose_see_register_rest_routes' );
 
 /**
+ * Shared ingest key for the public analytics route (launch spec C5).
+ *
+ * Not a secret in the auth sense — it ships in page HTML via an inline
+ * script — but it removes the bare __return_true from a write route
+ * (spec Definition of Done) and raises the bar against blind endpoint
+ * spam beyond the per-IP rate limit.
+ *
+ * @since 1.10.2
+ * @return string
+ */
+function skyyrose_see_analytics_key(): string {
+	$key = get_option( 'skyyrose_see_analytics_key', '' );
+	if ( ! is_string( $key ) || '' === $key ) {
+		$key = wp_generate_password( 32, false, false );
+		add_option( 'skyyrose_see_analytics_key', $key, '', true );
+	}
+	return $key;
+}
+
+/**
+ * Permission check for POST /analytics/events — shared-key match.
+ *
+ * @since 1.10.2
+ * @param WP_REST_Request $request Request object.
+ * @return true|WP_Error
+ */
+function skyyrose_see_rest_events_permission( WP_REST_Request $request ) {
+	$provided = (string) $request->get_param( 'k' );
+	if ( '' !== $provided && hash_equals( skyyrose_see_analytics_key(), $provided ) ) {
+		return true;
+	}
+
+	return new WP_Error(
+		'rest_forbidden',
+		esc_html__( 'Invalid analytics key.', 'skyyrose' ),
+		array( 'status' => 401 )
+	);
+}
+
+/**
  * Register all Experience Engine REST routes.
  */
 function skyyrose_see_register_rest_routes(): void {
@@ -31,7 +71,7 @@ function skyyrose_see_register_rest_routes(): void {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => 'skyyrose_see_rest_receive_events',
-				'permission_callback' => '__return_true',
+				'permission_callback' => 'skyyrose_see_rest_events_permission',
 				'args'                => array(
 					'events'      => array(
 						'required'          => true,

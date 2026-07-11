@@ -3484,5 +3484,25 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-222",
+    "timestamp": "2026-07-11",
+    "error_message": "/cart/ (page 9451) renders shell-less on skyyrose.co \u2014 no theme header/footer; /checkout/ (9452) presumed same",
+    "file": "wordpress-theme/skyyrose-flagship/inc/redirects.php",
+    "root_cause": "Stale _wp_page_template=skyyrose-canvas post meta on pages 9451/9452 resolves to a live-only orphan template (skyyrose-canvas.php, not in repo, not removed by hot-swap deploy) that lacks get_header()/get_footer(). Same root cause previously hit the Collections page.",
+    "fix": "skyyrose_wc_page_shell_template(): template_include filter (priority 20) returning page.php for is_cart()/is_checkout(), mirroring the skyyrose_collections_index_template precedent. Zero DB writes. Commit 940665873, v1.10.2. Takes effect on next deploy.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "template_include",
+      "stale-meta",
+      "cart",
+      "checkout",
+      "woocommerce"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
   }
 ]
