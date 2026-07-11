@@ -94,6 +94,15 @@ function skyyrose_see_register_rest_routes(): void {
 					),
 					'collection' => array(
 						'default'           => '',
+						// Restrict to the canonical collection slugs so an
+						// attacker can't mint unbounded distinct transient cache
+						// keys (storage-growth vector) by varying this value.
+						// Empty = "no collection filter". Slugs resolve via the
+						// SOT (skyyrose_get_collection), not a hardcoded list.
+						'validate_callback' => function ( $param ) {
+							return '' === $param
+								|| ( function_exists( 'skyyrose_get_collection' ) && null !== skyyrose_get_collection( (string) $param ) );
+						},
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'limit'      => array(

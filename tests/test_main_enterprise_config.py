@@ -4,7 +4,11 @@ origin-regex override) — see docs on _parse_sentry_sample_rate / _resolve_cors
 
 import re
 
-from main_enterprise import _parse_sentry_sample_rate, _resolve_cors_origin_regex
+from main_enterprise import (
+    _parse_sentry_sample_rate,
+    _resolve_cors_origin_regex,
+    _resolve_schema_url,
+)
 
 DEFAULT_CORS_REGEX = (
     r"^https://("
@@ -87,3 +91,25 @@ class TestResolveCorsOriginRegex:
             "https://notdevskyy.app",
         ):
             assert not re.fullmatch(DEFAULT_CORS_REGEX, origin), origin
+
+
+class TestResolveSchemaUrl:
+    """The /docs, /redoc, and /openapi.json endpoints must be DISABLED in
+    production — /openapi.json alone leaks every route + parameter on the
+    internet-facing backend. A revert to serving them in prod must fail CI.
+    """
+
+    def test_production_disables_openapi(self):
+        assert _resolve_schema_url("production", "/openapi.json") is None
+
+    def test_production_disables_docs_and_redoc(self):
+        assert _resolve_schema_url("production", "/docs") is None
+        assert _resolve_schema_url("production", "/redoc") is None
+
+    def test_development_serves_the_path(self):
+        assert _resolve_schema_url("development", "/openapi.json") == "/openapi.json"
+
+    def test_only_production_gates_it(self):
+        # staging / any non-"production" value keeps the endpoints on.
+        for env in ("staging", "test", "dev", ""):
+            assert _resolve_schema_url(env, "/docs") == "/docs"
