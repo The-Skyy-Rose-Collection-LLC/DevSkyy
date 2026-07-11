@@ -135,6 +135,10 @@ Typography, header layout, footer layout, and collection palette overrides are c
 
 == Changelog ==
 
+= 1.10.2 =
+* Fix: Kids Capsule teaser wordmark rendered with overlapping/illegible glyphs — the `rv-split-word` reveal split the heading into filter-isolated spans that broke `background-clip:text` compositing; switched to `rv-clip-up` (no per-span filter), restoring legibility (bug-224)
+* Fix: homepage hero title overflowed the viewport at 1440px (box 1487px, clipped both edges) — tightened `letter-spacing` max 36px→24px, preserving the locked Archivo monument font-size
+
 = 1.10.1 =
 * Fix: collection emblem (3D star-rose mark) 404'd on Black Rose + Love Hurts heroes — asset URL was missing a path separator (`assetsimages`); corrected the slash seam so the emblem renders
 * Chore: version bump busts the CDN edge cache, refreshing the homepage hero-title clamp that had been pinned under the prior release stamp

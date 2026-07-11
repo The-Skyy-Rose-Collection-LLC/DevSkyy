@@ -289,7 +289,15 @@
 	font-weight: 900; /* Archivo expanded monument treatment (typography.json) */
 	font-variation-settings: 'wdth' 125, 'wght' 900;
 	font-size: clamp(38px, 11.5vw, 160px);
-	letter-spacing: clamp(10px, 2.5vw, 36px);
+	/* letter-spacing max tightened 36px→24px (audit item C): measured live at
+	   1440px viewport, the old 36px ceiling rendered the box at 1487px wide —
+	   23.6px past each edge, clipped by .hero's overflow:hidden (confirmed via
+	   Range/getBoundingClientRect, not estimated). Width here is exact and
+	   additive: 7.4952px/1px font-size + 8px/1px letter-spacing (8 characters).
+	   font-size max (160px) is the locked Archivo "monument" scale and stays
+	   untouched; 24px restores the original-intent 24px .hero-content gutter
+	   on both sides with zero risk to legibility. */
+	letter-spacing: clamp(10px, 2.5vw, 24px);
 	text-transform: uppercase;
 	line-height: 0.9;
 	white-space: nowrap;
