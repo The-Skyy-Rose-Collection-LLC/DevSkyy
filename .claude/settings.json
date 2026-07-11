@@ -208,7 +208,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd /Users/theceo/DevSkyy && ig=$(git ls-files --others --exclude-standard \"tests/*.py\" \"tests/**/*.py\" 2>/dev/null | sed \"s/^/--ignore=/\" | tr \"\\n\" \" \"); out=$(.venv/bin/python -m pytest tests/ -x -q $ig 2>&1); rc=$?; echo \"$out\" | tail -20; if [ $rc -ne 0 ]; then exit 2; fi; true",
+            "command": "cd /Users/theceo/DevSkyy && git status --porcelain -- '*.py' | grep -q . || exit 0; ig=$(git ls-files --others --exclude-standard \"tests/*.py\" \"tests/**/*.py\" 2>/dev/null | sed \"s/^/--ignore=/\" | tr \"\\n\" \" \"); out=$(.venv/bin/python -m pytest tests/ -x -q $ig 2>&1); rc=$?; echo \"$out\" | tail -20; if [ $rc -ne 0 ]; then exit 2; fi; true",
             "timeout": 600,
             "statusMessage": "Running test suite (background)",
             "asyncRewake": true,
