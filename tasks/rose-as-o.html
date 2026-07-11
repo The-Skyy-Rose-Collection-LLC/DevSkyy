@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Mini 3D Rose Cutouts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hanken+Grotesk:wght@400;500;700&family=Cinzel:wght@600&family=Pacifico&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:oklch(0.15 0.006 25);--ink-2:oklch(0.20 0.008 25);--line:oklch(0.33 0.008 25);
+    --paper:oklch(0.94 0.004 60);--muted:oklch(0.70 0.006 40);
+    --silver:#C0C0C0;--crimson:#DC143C;--gold:#D4AF37;--rose:#B76E79;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--ink);color:var(--paper);font-family:'Hanken Grotesk',sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;padding:64px 24px 120px}
+  .wrap{max-width:1140px;margin:0 auto}
+  .eyebrow{font-family:'Cinzel';font-weight:600;letter-spacing:.32em;text-transform:uppercase;font-size:12px;color:var(--muted)}
+  h1{font-family:'Archivo';font-variation-settings:'wdth' 118,'wght' 900;font-size:clamp(28px,4vw,46px);line-height:1;margin:16px 0 8px}
+  .lede{color:var(--muted);max-width:64ch;margin-bottom:56px}
+
+  /* cutout showcase */
+  .shelf{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:24px}
+  .cut{background:radial-gradient(120% 100% at 50% 22%, var(--ink-2), var(--ink));
+    border:1px solid var(--line);border-radius:3px;padding:28px 16px 18px;text-align:center}
+  .cut img{height:150px;width:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6));}
+  .cut .l{font-family:'Cinzel';font-weight:600;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:16px}
+  .cut .l b{display:block;color:var(--paper);letter-spacing:.14em;margin-top:3px}
+
+  .block{padding:44px 0;border-top:1px solid var(--line)}
+  .tag{font-family:'Cinzel';font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:11px;margin-bottom:22px}
+  .br .tag{color:var(--silver)} .lh .tag{color:var(--crimson)} .sig .tag{color:var(--gold)}
+
+  .mark{font-family:'Archivo';font-variation-settings:'wdth' 125,'wght' 900;
+    font-size:clamp(46px,10.5vw,120px);line-height:1;letter-spacing:-0.01em;display:flex;align-items:center;flex-wrap:wrap}
+  .br .mark{color:var(--silver)} .lh .mark{color:var(--crimson)} .sig .mark{color:var(--gold)}
+  /* rose-O: transparent bloom seated as the O, shadow follows the shape */
+  .ro{height:0.92em;width:auto;vertical-align:-0.14em;margin:0 -0.02em;
+    filter:drop-shadow(0 5px 7px rgba(0,0,0,.55));}
+
+  .script{margin-top:26px;display:flex;align-items:center;line-height:1}
+  .br .script{font-family:'Pacifico';color:var(--silver);font-size:clamp(30px,6vw,62px)}
+  .sig .script{font-family:'Pinyon Script';color:var(--gold);font-size:clamp(34px,7vw,72px)}
+  .ro-s{height:0.78em;width:auto;vertical-align:-0.2em;margin:0 -0.01em;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5))}
+
+  .note{color:var(--muted);font-size:13px;margin-top:18px;max-width:62ch}
+  .foot{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;max-width:72ch}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SkyyRose · one rose, cut four ways</div>
+  <h1>Mini 3D rose cutouts.</h1>
+  <p class="lede">Your rose-gold rose — background removed, internal metallic highlights kept, feathered edge — then re-tinted per collection while holding the 3D shading. Each becomes the O in its wordmark, lifted with a drop shadow so it reads as a cutout sitting on the type.</p>
+
+  <div class="shelf">
+    <div class="cut"><img src="assets/rose-3d-rosegold.png" alt="rose-gold"><div class="l">Global · Kids<b>Rose Gold</b></div></div>
+    <div class="cut"><img src="assets/rose-3d-black.png" alt="black chrome"><div class="l">Black Rose<b>Black Chrome</b></div></div>
+    <div class="cut"><img src="assets/rose-3d-crimson.png" alt="crimson"><div class="l">Love Hurts<b>Crimson</b></div></div>
+    <div class="cut"><img src="assets/rose-3d-gold.png" alt="gold"><div class="l">Signature<b>Gold</b></div></div>
+  </div>
+
+  <section class="block br">
+    <div class="tag">Black Rose · silver</div>
+    <div class="mark">BLACK&nbsp;R<img class="ro" src="assets/bloom-black.png" alt="O">SE</div>
+    <div class="script">Black&nbsp;R<img class="ro-s" src="assets/bloom-black.png" alt="o">se</div>
+    <p class="note">Black-chrome rose as the O in R⊙se. Clean transparent cutout — no star edges.</p>
+  </section>
+
+  <section class="block lh">
+    <div class="tag">Love Hurts · crimson</div>
+    <div class="mark">L<img class="ro" src="assets/bloom-crimson.png" alt="O">VE&nbsp;HURTS</div>
+    <p class="note">Crimson rose as the O in L⊙ve. Script version once the custom graffiti face is built.</p>
+  </section>
+
+  <section class="block sig">
+    <div class="tag">Signature · gold · the original</div>
+    <div class="mark">SKYY&nbsp;R<img class="ro" src="assets/bloom-rosegold.png" alt="O">SE</div>
+    <div class="script">Skyy&nbsp;R<img class="ro-s" src="assets/bloom-rosegold.png" alt="o">se</div>
+    <p class="note">Rose-gold — the original device, now a clean self-hostable cutout.</p>
+  </section>
+
+  <p class="foot">Cutouts made locally from your rose-gold rose (rembg was broken on this box; used a connected-corner floodfill instead — dependency-free, keeps the metallic highlights). Recolors are duotone gradient-maps over the luminance, so the 3D shading survives the tint. Ships as small self-hosted PNGs. Nothing deployed.</p>
+</div>
+</body>
+</html>
