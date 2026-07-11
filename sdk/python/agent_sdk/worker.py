@@ -92,7 +92,7 @@ class BackgroundWorker:
         if not self._redis:
             import redis.asyncio as redis
 
-            self._redis = await redis.from_url(
+            self._redis = redis.from_url(
                 self.redis_url,
                 encoding="utf-8",
                 decode_responses=True,
@@ -258,6 +258,7 @@ class BackgroundWorker:
 
             # Enterprise hardening: Store result with Pub/Sub notification
             await self._task_queue.store_result(task_id, result, ttl=300)
+            await self._task_queue.update_task_status(task_id, TaskStatus.COMPLETED)
 
             logger.info(f"✅ Task {task_id} completed (status: {result.get('status')})")
 
@@ -273,6 +274,7 @@ class BackgroundWorker:
             }
 
             await self._task_queue.store_result(task_id, error_result, ttl=300)
+            await self._task_queue.update_task_status(task_id, TaskStatus.FAILED)
 
             # Enterprise hardening: Dead Letter Queue for failed tasks
             # Preserves failed tasks for debugging (7 day TTL)
