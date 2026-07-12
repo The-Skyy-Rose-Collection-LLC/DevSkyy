@@ -26,6 +26,8 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  GraduationCap,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   useAssets,
@@ -35,7 +37,7 @@ import {
   type AssetType,
 } from '@/hooks';
 import { api, type Asset } from '@/lib/api';
-import type { SkuImageCounts, HfDatasetsResponse } from '@/lib/api/types';
+import type { SkuImageCounts, HfDatasetsResponse, TrainingReadinessResponse } from '@/lib/api/types';
 
 // Extracted Components
 import { AssetCard } from '@/components/admin/assets/AssetCard';
@@ -97,6 +99,9 @@ export default function AssetsPage() {
   const [perSkuCounts, setPerSkuCounts] = useState<SkuImageCounts | null>(null);
   const [hfDatasets, setHfDatasets] = useState<HfDatasetsResponse | null>(null);
   const [skuBreakdownOpen, setSkuBreakdownOpen] = useState(false);
+  const [trainingReadiness, setTrainingReadiness] = useState<TrainingReadinessResponse | null>(null);
+  const [trainingReadinessError, setTrainingReadinessError] = useState<string | null>(null);
+  const [trainingReadinessLoading, setTrainingReadinessLoading] = useState(true);
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -110,6 +115,19 @@ export default function AssetsPage() {
   useEffect(() => {
     api.assets.perSku().then(setPerSkuCounts).catch(() => null);
     api.assets.datasets().then(setHfDatasets).catch(() => null);
+  }, []);
+
+  const loadTrainingReadiness = () => {
+    setTrainingReadinessLoading(true);
+    setTrainingReadinessError(null);
+    api.brandAssets.trainingReadiness()
+      .then(setTrainingReadiness)
+      .catch((err) => setTrainingReadinessError(err instanceof Error ? err.message : 'Failed to load training readiness'))
+      .finally(() => setTrainingReadinessLoading(false));
+  };
+
+  useEffect(() => {
+    loadTrainingReadiness();
   }, []);
 
   const { job: batchJob } = useBatchJob(batchJobId);
@@ -532,6 +550,112 @@ export default function AssetsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Training Readiness */}
+      <Card className="bg-gray-900/80 border-gray-700">
+        <CardContent className="py-5">
+          <div className="flex items-center gap-2 mb-4">
+            <GraduationCap className="h-4 w-4 text-rose-400" />
+            <h3 className="text-white font-semibold">Training Readiness</h3>
+            {trainingReadiness && (
+              <Badge
+                variant="outline"
+                className={
+                  trainingReadiness.status === 'ready'
+                    ? 'border-emerald-600 text-emerald-400 ml-auto'
+                    : trainingReadiness.status === 'needs_review'
+                      ? 'border-amber-600 text-amber-400 ml-auto'
+                      : 'border-gray-600 text-gray-400 ml-auto'
+                }
+              >
+                {trainingReadiness.status.replace('_', ' ')}
+              </Badge>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-gray-700 text-gray-400 hover:text-white"
+              onClick={loadTrainingReadiness}
+              disabled={trainingReadinessLoading}
+            >
+              {trainingReadinessLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Refresh'
+              )}
+            </Button>
+          </div>
+
+          {trainingReadinessError && (
+            <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              {trainingReadinessError}
+            </div>
+          )}
+
+          {trainingReadinessLoading && !trainingReadiness && !trainingReadinessError && (
+            <Skeleton className="h-24 bg-gray-800" />
+          )}
+
+          {!trainingReadinessLoading && !trainingReadinessError && trainingReadiness && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                  <p className="text-xs text-gray-400">Approved</p>
+                  <p className="font-semibold text-lg text-white">{trainingReadiness.approved_assets}</p>
+                </div>
+                <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                  <p className="text-xs text-gray-400">Total Ingested</p>
+                  <p className="font-semibold text-lg text-white">{trainingReadiness.total_assets}</p>
+                </div>
+                <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                  <p className="text-xs text-gray-400">Minimum Required</p>
+                  <p className="font-semibold text-lg text-white">{trainingReadiness.minimum_required}</p>
+                </div>
+              </div>
+
+              <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-rose-500 to-purple-600 transition-all"
+                  style={{
+                    width: `${Math.min(100, (trainingReadiness.approved_assets / Math.max(1, trainingReadiness.minimum_required)) * 100)}%`,
+                  }}
+                />
+              </div>
+
+              {trainingReadiness.estimated_training_time && (
+                <p className="text-xs text-gray-500">
+                  Estimated training time: {trainingReadiness.estimated_training_time}
+                </p>
+              )}
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {trainingReadiness.categories
+                  .filter((cat) => cat.total > 0)
+                  .map((cat) => (
+                    <div key={cat.category} className="bg-gray-800 rounded px-2 py-1.5">
+                      <p className="text-xs text-gray-300 truncate">{cat.category.replace('_', ' ')}</p>
+                      <p className="text-xs text-gray-500">
+                        <span className="text-emerald-400">{cat.approved}</span> / {cat.total}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+
+              {trainingReadiness.recommendations.length > 0 && (
+                <ul className="space-y-1">
+                  {trainingReadiness.recommendations.map((rec, i) => (
+                    <li key={i} className="text-xs text-gray-400 flex items-start gap-2">
+                      <span className="text-gray-600 mt-0.5">&bull;</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Preview Modal */}
       {previewAsset && (

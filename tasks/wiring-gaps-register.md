@@ -190,17 +190,17 @@ These capabilities have routing infrastructure and response models in place, but
 - **Backend partial:** `api/v1/approval.py:333,355,373,392` — calls `sync.is_configured`, `sync.sync_item`, `sync.sync_approved_items`, `sync.skipped` — all absent from `sync/wordpress_media_approval_sync.py`
 - **Wire:** Add the 4 missing symbols to `sync/wordpress_media_approval_sync.py`: `is_configured: bool` property, `sync_item(item)`, `sync_approved_items(limit)`, `skipped: int = 0` field on `BatchSyncResult`
 
-### T3-6: AI Image Enhancement — unmounted router (subsuming dead duplicate)
+### T3-6: AI Image Enhancement — unmounted router — ✅ CLOSED-AS-DELETED (2026-07-12 census: files removed in 8391e987c, zero surviving refs across api/, services/, mcp_tools/, main_enterprise.py)
 - **Backend partial:** `api/v1/ai_enhancement.py:23-276` — real imports: `fal_client`, `replicate`, `rembg`, `clip_interrogator`, `runwayml` at `services/ai_image_enhancement.py:12-17`; `/enhancement-status` is a hardcoded stub at lines 297-303
 - **Dead duplicate:** `api/v1/ai_image_enhancement.py` — zero importers, not mounted, blurhash returns `'placeholder_...'` at line 153; **delete this file**
 - **Wire:** Mount `ai_enhancement_router` in `main_enterprise.py` + create `frontend/lib/api/endpoints/ai-enhancement.ts` with typed wrappers for the 5 live routes
 - **STATUS:** `api/v1/ai_enhancement.py` and `api/v1/ai_image_enhancement.py` are SLATED FOR DELETION in a sibling branch as of this session — do not delete from this workstream; re-verify before any action to avoid a merge/census conflict.
 
-### T3-7: Brand Assets — in-memory store, partial feature extraction
+### T3-7: Brand Assets — in-memory store, partial feature extraction — ✅ FRONTEND WIRED 2026-07-12 (readiness card + 4-endpoint client; approve/reject wiring = named follow-up; in-memory store = backend follow-on)
 - **Backend partial:** `api/v1/brand_assets.py:537-573` (bulk ingest + R2 upload), `api/v1/brand_assets.py:286-343` (Gemini vision), `api/v1/brand_assets.py:259` (in-memory `_brand_assets`), `api/v1/brand_assets.py:734-810` (training readiness fully computed)
 - **Wire:** New `frontend/lib/api/endpoints/brand-assets.ts` wrapping 4 live endpoints + `TrainingReadiness` card on admin/assets page
 
-### T3-8: Asset Ingestion + Job Tracking — TODO in handler body
+### T3-8: Asset Ingestion + Job Tracking — TODO in handler body — ✅ FRONTEND WIRED 2026-07-12 (ingest()+getJob(); R2/queue TODOs = backend follow-on)
 - **Backend partial:** `api/v1/assets.py:283` (`# TODO: Store original image to R2`), line 285 (hardcoded fake URL), line 315 (`# TODO: Add to processing queue`)
 - **Wire:** Add `ingest()` + `getJob()` to `frontend/lib/api/endpoints/assets.ts` (unblocks the surfacing; R2 + queue TODOs are separate infrastructure work)
 
@@ -208,7 +208,7 @@ These capabilities have routing infrastructure and response models in place, but
 - **Backend partial:** `api/v1/monitoring.py:429,441,453,463` — four `MetricSeries` data points are hardcoded constants; `summary` dict carries real psutil values
 - **Wire:** Add `metrics()` method to `frontend/lib/api/endpoints/monitoring.ts` + update `useMonitoring`; hardcoded series constants are a backend follow-on
 
-### T3-10: Competitors — in-memory store, stub attribute extraction
+### T3-10: Competitors — in-memory store, stub attribute extraction — ✅ FRONTEND WIRED 2026-07-12 (CORRECTION: api/v1/competitors.py router exists + mounted, register claimed no REST surface; page + client shipped, 403 role-gate handled)
 - **Backend partial:** `services/competitive/competitor_analysis.py:41-42` — module-level in-memory dicts (no persistence); line 447-457 stub `_extract_attributes` with comment
 - **Wire:** Add `frontend/src/app/admin/competitors/page.tsx` (table + analytics panel); style categories will show as `OTHER` until vision model is wired — acceptable for initial surface
 
@@ -216,7 +216,7 @@ These capabilities have routing infrastructure and response models in place, but
 - **Backend partial:** `api/v1/sync.py:87,100-101,110,149-150,170,195` — real implementation; no `Depends(get_current_user)` on any of the 3 route handlers
 - **Wire:** Add `Depends(get_current_user)` to `get_sync_status`, `trigger_sync`, `sync_round_table_to_hf` — identical pattern to `api/v1/monitoring.py:305`
 
-### T3-12: ML pricing optimize — frontend surface missing (MCP already wired)
+### T3-12: ML pricing optimize — frontend surface missing (MCP already wired) — ✅ CLOSED 2026-07-12 (pricing page + client vs /commerce/pricing/optimize; skipped-SKU count surfaced)
 - **Backend partial:** `api/v1/commerce.py:466-518` — real agent call with `ml_module` guard; `agents/commerce_agent.py:949-959` returns error dict when `ml_module` is None
 - **MCP:** `mcp_tools/tools/ecommerce.py:230-238` — correct call to `pricing/optimize` (already wired)
 - **Wire:** Add `frontend/src/app/admin/pricing/page.tsx` POSTing to `/api/pricing/optimize` — frontend surface only; no backend changes
