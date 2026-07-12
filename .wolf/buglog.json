@@ -3525,7 +3525,7 @@
     "last_seen": "2026-07-11"
   },
   {
-    "id": "bug-224",
+    "id": "bug-226",
     "timestamp": "2026-07-10",
     "error_message": "Kids Capsule teaser wordmark (\"Kids Capsule\") renders with overlapping/illegible glyphs on live page; DOM span rects do NOT overlap (paint-layer artifact, not layout).",
     "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
@@ -3588,7 +3588,7 @@
       "double-animation-system"
     ],
     "related_bugs": [
-      "bug-224"
+      "bug-226"
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10"
