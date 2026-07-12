@@ -3567,5 +3567,30 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-225",
+    "timestamp": "2026-07-10",
+    "error_message": "Kids Capsule teaser hero content (badge+wordmark+tagline) 100% invisible on live prod after v1.10.2 deploy \u2014 opacity:0 stuck via inline style, both mobile+desktop.",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
+    "root_cause": "Two reveal systems collided on .kc-teaser__hero-content children. kids-capsule-launch.js:82 gsap.from(children,{opacity:0,y:40}) with immediateRender snapshots each child CURRENT opacity as the tween target; the children carried CSS reveal classes (rv-clip-up/rv-blur) that rest at opacity:0, so GSAP captured 0 and tweened 0->0, leaving inline opacity:0 that outranks the later .is-visible reveal -> permanently invisible. bug-224 fix (rv-split-word->rv-clip-up on the h1) newly pulled the WORDMARK into this same race (previously rv-split-word only zeroed child .sr-word spans, not the h1, so GSAP captured 1 for the h1). Badge+tagline were ALREADY invisible pre-deploy (pre-existing, same race).",
+    "fix": "Removed the CSS reveal classes (rv-clip-up on badge+wordmark, rv-blur on tagline) from the 3 hero children in teaser.php, making GSAP the SOLE reveal owner: elements default to CSS opacity:1, gsap.from tweens 0->1 visibly; reduced-motion path early-returns in initAnimations() so those users get instant opacity:1. Also eliminates the original overlap bug (no rv-split-word span-splitting). One coherent change; no JS/.min change.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "kids-capsule",
+      "gsap",
+      "gsap-from",
+      "reveal-animation",
+      "opacity",
+      "regression",
+      "typography-release",
+      "double-animation-system"
+    ],
+    "related_bugs": [
+      "bug-224"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
   }
 ]
