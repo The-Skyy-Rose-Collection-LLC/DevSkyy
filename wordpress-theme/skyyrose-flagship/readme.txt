@@ -136,7 +136,7 @@ Typography, header layout, footer layout, and collection palette overrides are c
 == Changelog ==
 
 = 1.11.0 =
-* Feat: Love Hurts Girl walk-on cameo — the collection's resident 3D character (draco GLB, 1.1MB) walks once across the embedded immersive scene on /collections/love-hurts/; enters left, self-disposes after crossing; no-op under reduced-motion or missing WebGL
+* Feat: new mascot body — the site host is now the in-house-built Love Hurts Girl character (full rig, hand-authored walk + breathing idle, draco GLB 1.1MB), live on every page via the existing mascot system; chat, greetings, and reduced-motion behavior unchanged
 
 = 1.10.3 =
 * Feat: bespoke collection display fonts — Black Rose now uses SkyyRose Black Rose Script (replaces Pacifico); Love Hurts uses SkyyRose Love Hurts Graffiti (replaces the interim Kaushan Script). Both built in-house from glyph sheets, self-hosted, full latin a-z/A-Z
