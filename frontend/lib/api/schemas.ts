@@ -416,3 +416,284 @@ export const TrainingJobsListSchema = z.object({
     jobs: z.array(TrainingJobInfoSchema),
     retrieved_at: z.string(),
 });
+
+// Brand Assets Schemas (api/v1/brand_assets.py)
+export const BrandAssetCategorySchema = z.enum([
+    'product', 'lifestyle', 'campaign', 'mood_board', 'texture', 'color_reference',
+]);
+
+export const AssetApprovalStatusSchema = z.enum(['pending', 'approved', 'rejected']);
+
+export const IngestionJobStatusSchema = z.enum([
+    'pending', 'processing', 'completed', 'failed', 'partial',
+]);
+
+export const TrainingReadinessStatusSchema = z.enum(['ready', 'not_ready', 'needs_review']);
+
+export const BrandAssetMetadataSchema = z.object({
+    campaign: z.string().nullable().optional(),
+    season: z.string().nullable().optional(),
+    photographer: z.string().nullable().optional(),
+    location: z.string().nullable().optional(),
+    shoot_date: z.string().nullable().optional(),
+    tags: z.array(z.string()).default([]),
+    notes: z.string().nullable().optional(),
+});
+
+export const ColorPaletteSchema = z.object({
+    primary: z.string(),
+    secondary: z.array(z.string()).default([]),
+    accent: z.string().nullable().optional(),
+});
+
+export const CompositionAnalysisSchema = z.object({
+    type: z.string(),
+    focal_point: z.string().nullable().optional(),
+    balance: z.string(),
+});
+
+export const LightingProfileSchema = z.object({
+    type: z.string(),
+    direction: z.string().nullable().optional(),
+    mood: z.string().nullable().optional(),
+});
+
+export const VisualFeaturesSchema = z.object({
+    color_palette: ColorPaletteSchema.nullable().optional(),
+    composition: CompositionAnalysisSchema.nullable().optional(),
+    lighting: LightingProfileSchema.nullable().optional(),
+    style_tags: z.array(z.string()).default([]),
+    quality_score: z.number(),
+});
+
+export const BrandAssetSchema = z.object({
+    id: z.string(),
+    url: z.string(),
+    category: BrandAssetCategorySchema,
+    approval_status: AssetApprovalStatusSchema,
+    metadata: BrandAssetMetadataSchema,
+    visual_features: VisualFeaturesSchema.nullable().optional(),
+    file_size_bytes: z.number(),
+    width: z.number().nullable().optional(),
+    height: z.number().nullable().optional(),
+    mime_type: z.string().nullable().optional(),
+    r2_key: z.string().nullable().optional(),
+    created_at: z.string(),
+    created_by: z.string().nullable().optional(),
+});
+
+export const BrandAssetsListResponseSchema = z.object({
+    assets: z.array(BrandAssetSchema),
+    total: z.number(),
+    page: z.number(),
+    page_size: z.number(),
+    has_more: z.boolean(),
+});
+
+export const CategoryStatsSchema = z.object({
+    category: BrandAssetCategorySchema,
+    total: z.number(),
+    approved: z.number(),
+    pending: z.number(),
+    rejected: z.number(),
+});
+
+export const TrainingReadinessResponseSchema = z.object({
+    status: TrainingReadinessStatusSchema,
+    total_assets: z.number(),
+    approved_assets: z.number(),
+    minimum_required: z.number(),
+    categories: z.array(CategoryStatsSchema),
+    recommendations: z.array(z.string()).default([]),
+    estimated_training_time: z.string().nullable().optional(),
+});
+
+export const IngestionJobResultSchema = z.object({
+    url: z.string(),
+    success: z.boolean(),
+    asset_id: z.string().nullable().optional(),
+    error: z.string().nullable().optional(),
+});
+
+export const BulkIngestionJobSchema = z.object({
+    id: z.string(),
+    status: IngestionJobStatusSchema,
+    total: z.number(),
+    processed: z.number(),
+    succeeded: z.number(),
+    failed: z.number(),
+    results: z.array(IngestionJobResultSchema).default([]),
+    created_at: z.string(),
+    completed_at: z.string().nullable().optional(),
+    created_by: z.string().nullable().optional(),
+});
+
+// Asset Ingestion + Job Tracking Schemas (api/v1/assets.py — distinct from BatchJob/3D pipeline jobs)
+export const AssetIngestResponseSchema = z.object({
+    job_id: z.string(),
+    status: z.string(),
+    message: z.string(),
+    original_url: z.string(),
+    created_at: z.string(),
+    correlation_id: z.string(),
+});
+
+export const AssetProcessingStageSchema = z.object({
+    name: z.string(),
+    status: z.string(),
+    started_at: z.string().nullable().optional(),
+    completed_at: z.string().nullable().optional(),
+    duration_ms: z.number().nullable().optional(),
+    output_url: z.string().nullable().optional(),
+});
+
+export const AssetJobResponseSchema = z.object({
+    job_id: z.string(),
+    status: z.string(),
+    current_stage: z.string(),
+    progress_percent: z.number(),
+    stages: z.array(AssetProcessingStageSchema),
+    input_url: z.string(),
+    output_urls: z.record(z.string(), z.string()),
+    product_id: z.string().nullable().optional(),
+    source: z.string(),
+    created_at: z.string(),
+    started_at: z.string().nullable().optional(),
+    completed_at: z.string().nullable().optional(),
+    error_message: z.string().nullable().optional(),
+    total_duration_ms: z.number(),
+    correlation_id: z.string(),
+});
+
+// Competitor Analysis Schemas (api/v1/competitors.py + services/competitive/schemas.py)
+export const CompetitorCategorySchema = z.enum(['direct', 'indirect', 'aspirational', 'emerging']);
+
+export const PricePositioningSchema = z.enum([
+    'budget', 'mid_range', 'premium', 'luxury', 'ultra_luxury',
+]);
+
+export const CompositionTypeSchema = z.enum([
+    'flat_lay', 'on_model', 'ghost_mannequin', 'still_life', 'lifestyle', 'detail_shot', 'other',
+]);
+
+export const StyleCategorySchema = z.enum([
+    'minimalist', 'bold', 'classic', 'avant_garde', 'streetwear', 'bohemian', 'romantic', 'edgy', 'sporty', 'other',
+]);
+
+export const CompetitorSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    category: CompetitorCategorySchema,
+    price_positioning: PricePositioningSchema,
+    website: z.string().nullable().optional(),
+    notes: z.string().nullable().optional(),
+    created_at: z.string(),
+    created_by: z.string().nullable().optional(),
+});
+
+export const CompetitorListResponseSchema = z.object({
+    total: z.number().default(0),
+    competitors: z.array(CompetitorSchema).default([]),
+});
+
+export const ExtractedAttributesSchema = z.object({
+    composition_type: CompositionTypeSchema,
+    style_category: StyleCategorySchema,
+    primary_colors: z.array(z.string()).default([]),
+    detected_materials: z.array(z.string()).default([]),
+    mood_tags: z.array(z.string()).default([]),
+    quality_assessment: z.string().nullable().optional(),
+    confidence_score: z.number(),
+});
+
+export const CompetitorAssetSchema = z.object({
+    id: z.string(),
+    competitor_id: z.string(),
+    url: z.string(),
+    product_type: z.string().nullable().optional(),
+    product_name: z.string().nullable().optional(),
+    estimated_price: z.number().nullable().optional(),
+    currency: z.string(),
+    extracted_attributes: ExtractedAttributesSchema.nullable().optional(),
+    manual_tags: z.array(z.string()).default([]),
+    notes: z.string().nullable().optional(),
+    created_at: z.string(),
+    created_by: z.string().nullable().optional(),
+    source_url: z.string().nullable().optional(),
+});
+
+export const CompetitorAssetListResponseSchema = z.object({
+    total: z.number().default(0),
+    page: z.number().default(1),
+    page_size: z.number().default(20),
+    assets: z.array(CompetitorAssetSchema).default([]),
+});
+
+export const StyleDistributionSchema = z.object({
+    style: StyleCategorySchema,
+    count: z.number(),
+    percentage: z.number(),
+});
+
+export const CompositionDistributionSchema = z.object({
+    composition: CompositionTypeSchema,
+    count: z.number(),
+    percentage: z.number(),
+});
+
+export const TopColorSchema = z.object({
+    color: z.string(),
+    count: z.number(),
+});
+
+export const TopMaterialSchema = z.object({
+    material: z.string(),
+    count: z.number(),
+});
+
+export const PriceAnalyticsSchema = z.object({
+    competitor_id: z.string(),
+    competitor_name: z.string(),
+    average_price: z.number().nullable(),
+    min_price: z.number().nullable(),
+    max_price: z.number().nullable(),
+    asset_count: z.number(),
+});
+
+export const StyleAnalyticsResponseSchema = z.object({
+    total_assets: z.number().default(0),
+    style_distribution: z.array(StyleDistributionSchema).default([]),
+    composition_distribution: z.array(CompositionDistributionSchema).default([]),
+    top_colors: z.array(TopColorSchema).default([]),
+    top_materials: z.array(TopMaterialSchema).default([]),
+    price_by_competitor: z.array(PriceAnalyticsSchema).default([]),
+});
+
+export const CompetitorAnalyticsSummarySchema = z.object({
+    total_competitors: z.number(),
+    total_assets: z.number(),
+    competitors_by_category: z.record(z.string(), z.number()),
+    competitors_by_price_positioning: z.record(z.string(), z.number()),
+    assets_per_competitor: z.record(z.string(), z.number()),
+});
+
+// Dynamic Pricing Schemas (api/v1/commerce.py)
+export const PriceOptimizationSchema = z.object({
+    product_id: z.string(),
+    current_price: z.number(),
+    optimized_price: z.number(),
+    price_change: z.number(),
+    price_change_pct: z.number(),
+    estimated_revenue_impact: z.number().nullable().optional(),
+    confidence: z.number(),
+});
+
+export const DynamicPricingResponseSchema = z.object({
+    optimization_id: z.string(),
+    status: z.string(),
+    timestamp: z.string(),
+    strategy: z.string(),
+    total_products: z.number(),
+    optimizations: z.array(PriceOptimizationSchema),
+    aggregate_metrics: z.record(z.string(), z.unknown()),
+});
