@@ -3592,5 +3592,23 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-231",
+    "timestamp": "2026-07-12T15:45:00-07:00",
+    "error_message": "freshness-guard STALE: readme.txt=1.10.3 while style.css/functions.php=1.11.0; then blanket sed bumping readme.txt renamed the '= 1.10.3 =' CHANGELOG heading to '= 1.11.0 =', mislabeling the prior release's notes",
+    "file": "wordpress-theme/skyyrose-flagship/readme.txt",
+    "root_cause": "Theme version lives in THREE files (style.css, functions.php, readme.txt 'Stable tag') and readme.txt contains historical version strings in its changelog; a global sed on the version number cannot distinguish the Stable-tag field from changelog headings. (ID note: renumbered from wolf_bug_id.py's bug-227 \u2014 PR #736's branch already claims bug-227..230.)",
+    "fix": "Restored the '= 1.10.3 =' heading, added a real '= 1.11.0 =' changelog entry above it. Rule: bump versions with targeted replacements (Stable tag line only) and always add a changelog entry; freshness-guard check 3 enforces the three-file sync.",
+    "tags": [
+      "theme-version",
+      "readme-changelog",
+      "sed",
+      "freshness-guard",
+      "release-hygiene"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
   }
 ]
