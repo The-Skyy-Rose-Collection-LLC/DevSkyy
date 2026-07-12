@@ -137,6 +137,12 @@ Typography, header layout, footer layout, and collection palette overrides are c
 
 = 1.10.3 =
 * Feat: bespoke collection display fonts — Black Rose now uses SkyyRose Black Rose Script (replaces Pacifico); Love Hurts uses SkyyRose Love Hurts Graffiti (replaces the interim Kaushan Script). Both built in-house from glyph sheets, self-hosted, full latin a-z/A-Z
+* Feat: collection feature-scroll section — sticky image cross-fades per feature while the philosophy items scroll (GSAP ScrollTrigger, IntersectionObserver fallback, stacked on mobile); wires the per-collection `features` canon copy that previously had no renderer
+* Fix: /cart/ and /checkout/ rendered without the theme shell (stale skyyrose-canvas page meta) — template_include override restores header/footer
+* Fix: anonymous visitors no longer receive a WooCommerce session cookie on every page view (edge-cache killer) — cookie now set only at guest wishlist write time
+* Security: POST /analytics/events write route now requires a shared ingest key (removes bare __return_true)
+* Fix: policy pages (privacy/terms/cookie/refund) regained their branded document titles
+* Fix: immersive lockup images regained explicit height attributes (CLS)
 
 = 1.10.2 =
 * Fix: Kids Capsule teaser wordmark rendered with overlapping/illegible glyphs — the `rv-split-word` reveal split the heading into filter-isolated spans that broke `background-clip:text` compositing; switched to `rv-clip-up` (no per-span filter), restoring legibility (bug-224)

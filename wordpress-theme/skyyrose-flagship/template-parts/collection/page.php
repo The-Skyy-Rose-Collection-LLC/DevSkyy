@@ -232,6 +232,18 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		</section>
 	<?php endif; ?>
 
+	<!-- ════ Feature Scroll (sticky image + scrolling philosophy items) ════ -->
+	<?php
+	get_template_part(
+		'template-parts/collection/feature-scroll',
+		null,
+		array(
+			'slug'    => $slug,
+			'content' => $c,
+		)
+	);
+	?>
+
 	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
 	// Build subheading: kids-capsule uses a dynamic piece count, others

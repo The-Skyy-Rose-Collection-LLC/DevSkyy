@@ -3953,3 +3953,12 @@ Admin-only console JS for mcp-bridge.php. Fetches tools/list, invokes tools/call
 - `setup-claude-config.sh` `claude-mem-settings.sh` `install_agy.sh` `run_generation.sh` `pre-build-check.sh` → `scripts/`; `autonomous_agent_demo.py` → `examples/`
 - `redirects.csv` `skyyrose_clothing_barcodes.txt` → `data/`; `autotrain_config.yaml` → `config/`; `deployment_summary.json` `wordpress-health-check-results.json` → `.reports/`
 - Domain config index: `SOT.md` → "Domain configuration map" (read that before old docs)
+
+### wordpress-theme/skyyrose-flagship/template-parts/collection/feature-scroll.php
+Sticky-image feature scroll section: renders per-collection `features` canon (icon/title/text/image) as a 50/50 desktop layout — left sticky frame cross-fades images per active item, right items scroll; mobile stacks per-item image above text. File-gates every image (bug-221 single-path rule). ~105 lines, ~900 tokens.
+
+### wordpress-theme/skyyrose-flagship/assets/css/collection-feature-scroll.css
+Styles for the feature-scroll section: sticky frame (top 10vh, 80vh), 0.4s cross-fade, active item = 3px var(--skyyrose-accent) left border + accent title, inactive 0.4 opacity; ≤900px stacks + hides sticky column; reduced-motion kills transitions. ~170 lines, ~1.1k tokens.
+
+### wordpress-theme/skyyrose-flagship/assets/js/collection-feature-scroll.js
+Active-state driver: GSAP ScrollTrigger create() per item (onEnter/onEnterBack, no scrub) on desktop; IntersectionObserver fallback (mobile/reduced-motion/no-GSAP). Class toggles only, no innerHTML. ~95 lines, ~650 tokens.
