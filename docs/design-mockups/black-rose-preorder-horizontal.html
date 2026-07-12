@@ -1,0 +1,317 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black Rose · Pre-Order — Oakland After Dark (horizontal)</title>
+<style>
+  :root{
+    --silver:#C0C0C0; --black:#0A0A0A; --faint:#8a8b8f; --amber:#e0a86a; --gold:#D4AF37;
+    --grotesk:"Archivo","Helvetica Neue",-apple-system,system-ui,Arial,sans-serif;
+    --grade:rgba(10,12,24,.30); --moon:.55; --star:1;
+    --hx:0px; --fx:0px;                 /* parallax offsets set by JS */
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;background:var(--black);color:var(--silver);font-family:var(--grotesk);
+    -webkit-font-smoothing:antialiased}
+  /* ── section shell ─────────────────────────────────────────────── */
+  .scene{position:relative;height:100svh;overflow:hidden;background:var(--black)}
+  /* horizon = real Bay Bridge night band, parallaxed */
+  .horizon{position:absolute;top:0;left:-6%;width:118%;height:52%;
+    background:url("oakland-horizon.webp") center top/cover no-repeat;
+    transform:translateX(var(--hx));will-change:transform}
+  .horizon::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 46%,rgba(10,10,12,.5) 78%,var(--black) 100%)}
+  /* specular sheen drifting across the skyline — reads as city/bridge twinkle */
+  .sheen{position:absolute;top:0;left:0;width:118%;height:52%;pointer-events:none;mix-blend-mode:screen;
+    opacity:.5;transform:translateX(var(--hx));
+    background:linear-gradient(105deg,transparent 38%,rgba(224,168,106,.10) 48%,rgba(238,240,246,.14) 51%,transparent 62%);
+    background-size:220% 100%;animation:sweep 14s ease-in-out infinite}
+  @keyframes sweep{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
+  /* night floor where the pieces stand */
+  .floor{position:absolute;bottom:0;left:0;width:100%;height:56%;
+    transform:translateX(var(--fx));
+    background:
+      radial-gradient(140% 90% at 50% 120%,rgba(30,26,30,.65),transparent 60%),
+      linear-gradient(180deg,var(--black),#070708 60%,#050506)}
+  .floor::before{content:"";position:absolute;inset:0;top:auto;height:2px;
+    background:linear-gradient(90deg,transparent,rgba(192,192,192,.16),transparent)}
+  /* night-cycle atmosphere */
+  .grade{position:absolute;inset:0;background:var(--grade);mix-blend-mode:soft-light;
+    transition:background 5s ease-in-out;pointer-events:none}
+  .stars{position:absolute;inset:0 0 auto;height:52%;pointer-events:none;opacity:var(--star);
+    transition:opacity 3s;mix-blend-mode:screen}
+  .moon{position:absolute;top:4%;right:12%;width:min(30vw,300px);aspect-ratio:1;pointer-events:none;
+    opacity:var(--moon);transition:opacity 3s;transform:translateX(calc(var(--hx)*1.4));
+    background:radial-gradient(circle,rgba(224,226,232,.20),rgba(200,202,210,.05) 42%,transparent 66%)}
+  .vig{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(130% 105% at 50% 40%,transparent 52%,rgba(0,0,0,.62))}
+
+  /* ── horizontal track ──────────────────────────────────────────── */
+  .track{position:absolute;inset:0;display:flex;align-items:stretch;
+    overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+  .track::-webkit-scrollbar{display:none}
+  .panel{position:relative;flex:0 0 clamp(300px,74vw,880px);scroll-snap-align:center;
+    display:grid;grid-template-rows:1fr auto;justify-items:center;
+    padding:clamp(4rem,9vh,7rem) clamp(1rem,3vw,2.5rem) clamp(1.6rem,5vh,3rem)}
+
+  /* intro + outro panels */
+  .edge{flex-basis:clamp(300px,52vw,620px);align-content:center;text-align:center;gap:1.1rem}
+  .edge .kicker{font-size:.66rem;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
+  .edge h1{font-size:clamp(2.1rem,6vw,4.2rem);line-height:.96;text-transform:uppercase;
+    letter-spacing:.06em;font-weight:800;color:#eef0f3;font-stretch:expanded;text-wrap:balance}
+  .edge p{max-width:34ch;color:#c7c8cc;font-size:.9rem;line-height:1.6;letter-spacing:.01em}
+  .edge .go{margin-top:.4rem;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;color:var(--silver);
+    display:inline-flex;align-items:center;gap:.6rem}
+  .edge .go::after{content:"→";animation:nudge 2.4s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+  /* the staged piece */
+  .stage{position:relative;display:grid;place-items:end center;width:100%}
+  .stage .pool{position:absolute;bottom:-2%;left:50%;width:min(70%,420px);height:26%;
+    transform:translateX(-50%);pointer-events:none;mix-blend-mode:screen;
+    background:radial-gradient(closest-side,rgba(224,168,106,.20),rgba(238,240,246,.06) 55%,transparent 72%)}
+  .model{position:relative;height:min(58vh,600px);width:auto;object-fit:contain;z-index:1;
+    filter:drop-shadow(0 26px 30px rgba(0,0,0,.7)) drop-shadow(0 3px 3px rgba(0,0,0,.6))}
+  .reflect{position:absolute;bottom:-1px;left:50%;height:min(58vh,600px);width:auto;object-fit:contain;
+    transform:translateX(-50%) scaleY(-1);opacity:.14;pointer-events:none;
+    -webkit-mask-image:linear-gradient(to bottom,#000,transparent 42%);
+            mask-image:linear-gradient(to bottom,#000,transparent 42%)}
+  /* knocked-out garment (no model on the floor) — lit specimen, tighter pool */
+  .model.specimen,.reflect.specimen{height:min(46vh,470px)}
+  .has-specimen .pool{width:min(52%,320px);height:20%;bottom:5%;
+    background:radial-gradient(closest-side,rgba(224,168,106,.24),rgba(238,240,246,.07) 55%,transparent 72%)}
+
+  /* caption */
+  .meta{text-align:center;display:grid;gap:.5rem;margin-top:1.1rem;justify-items:center;z-index:2}
+  .meta .eyebrow{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--amber)}
+  .meta .name{font-size:clamp(1rem,2.4vw,1.5rem);text-transform:uppercase;letter-spacing:.1em;
+    font-weight:700;color:#eef0f3;font-stretch:expanded}
+  .meta .spec{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+    display:flex;gap:.6rem;align-items:center}
+  .meta .spec b{color:var(--silver);font-weight:600}
+  .meta .spec .dot{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.5}
+  .reserve{margin-top:.5rem;display:inline-flex;align-items:center;gap:.55rem;
+    padding:.72rem 1.6rem;border:1px solid rgba(192,192,192,.45);color:#eef0f3;text-decoration:none;
+    font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;background:rgba(8,8,10,.4);
+    backdrop-filter:blur(4px);transition:background .3s,border-color .3s,transform .3s}
+  .reserve:hover,.reserve:focus-visible{background:rgba(192,192,192,.14);border-color:var(--silver);
+    transform:translateY(-2px);outline:none}
+  .reserve .arw{color:var(--amber)}
+
+  /* ── chrome: title / state / controls ─────────────────────────── */
+  .hud{position:absolute;inset:0;z-index:5;pointer-events:none;
+    padding:clamp(1.2rem,3.6vw,2.4rem);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+  .hud .eyebrow{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
+  .hud h2{font-size:clamp(1.1rem,2.6vw,1.7rem);text-transform:uppercase;letter-spacing:.16em;
+    font-weight:800;color:#eef0f3;margin-top:.35rem;font-stretch:expanded;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+  .hud .state{text-align:right;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver)}
+  .hud .state small{display:block;color:#a9aaae;letter-spacing:.14em;font-size:.58rem;margin-top:.3rem}
+
+  .controls{position:absolute;left:0;right:0;bottom:clamp(1rem,3vh,1.8rem);z-index:6;
+    display:flex;align-items:center;justify-content:center;gap:1.1rem;padding:0 1.2rem;pointer-events:none}
+  .controls button,.controls .count{pointer-events:auto}
+  .nav{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:1px solid rgba(192,192,192,.4);
+    background:rgba(8,8,10,.5);color:var(--silver);font-size:1.1rem;cursor:pointer;
+    display:grid;place-items:center;backdrop-filter:blur(6px);transition:background .3s,border-color .3s}
+  .nav:hover,.nav:focus-visible{background:rgba(192,192,192,.16);border-color:var(--silver);outline:none}
+  .nav[disabled]{opacity:.28;cursor:default}
+  .rail{position:relative;flex:1 1 min(46vw,520px);height:1px;background:rgba(192,192,192,.2)}
+  .rail .fill{position:absolute;inset:0 auto 0 0;width:12%;background:var(--silver);transition:width .25s,left .25s}
+  .count{font-size:.64rem;letter-spacing:.2em;color:var(--faint);min-width:5.2ch;text-align:center;font-variant-numeric:tabular-nums}
+  .count b{color:var(--silver)}
+
+  @media (max-width:640px){
+    .horizon,.floor{height:44%} .floor{height:60%}
+    .model,.reflect{height:min(46vh,440px)}
+    .controls .rail{flex-basis:40vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sheen,.edge .go::after{animation:none}
+    .horizon,.sheen,.floor,.moon{transform:none}
+    .track{scroll-behavior:auto}
+    .grade,.stars,.moon{transition:none}
+    .reflect{display:none}
+  }
+</style>
+
+<section class="scene" aria-label="Black Rose pre-order — Oakland After Dark">
+  <div class="horizon" aria-hidden="true"></div>
+  <canvas class="stars" aria-hidden="true"></canvas>
+  <div class="sheen" aria-hidden="true"></div>
+  <div class="moon" aria-hidden="true"></div>
+  <div class="floor" aria-hidden="true"></div>
+  <div class="grade" aria-hidden="true"></div>
+  <div class="vig" aria-hidden="true"></div>
+
+  <div class="hud" aria-hidden="true">
+    <div><p class="eyebrow">Black Rose · Collection 02 — The Refusal</p>
+      <h2>Oakland After Dark</h2></div>
+    <div class="state"><span id="sn">Deep Night</span><small id="sh">the armor light</small></div>
+  </div>
+
+  <div class="track" id="track" tabindex="0" role="region"
+       aria-label="BLACK is Beautiful pre-order pieces — scroll horizontally">
+    <!-- panels injected by JS -->
+  </div>
+
+  <div class="controls" role="group" aria-label="Scene navigation">
+    <button class="nav" id="prev" aria-label="Previous piece">‹</button>
+    <div class="rail" aria-hidden="true"><span class="fill" id="fill"></span></div>
+    <span class="count" aria-live="polite"><b id="cur">01</b> / <span id="tot">11</span></span>
+    <button class="nav" id="next" aria-label="Next piece">›</button>
+  </div>
+</section>
+
+<script>
+(function(){
+  var REDUCE=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var IMG="../../wordpress-theme/skyyrose-flagship/assets/images/products/";
+  // Black Rose pre-order set — real SOT on-model images, real prices/editions (catalog-verified)
+  var PIECES=[
+    {sku:"br-012",img:"br-012-cutout.webp",local:true,cut:true,name:"Baseball · Last Oakland",series:"Series 5 · Baseball",price:100,ed:80},
+    {sku:"br-008",img:"br-008-onmodel.webp",name:"SF Inspired · Football",series:"Series 1 · Football",price:115,ed:80},
+    {sku:"br-009",img:"br-009-onmodel.webp",name:"Last Oakland · Football",series:"Series 2 · Football",price:115,ed:80},
+    {sku:"br-010",img:"br-010-onmodel.webp",name:"The Bay · Basketball",series:"Series 3 · Basketball",price:100,ed:80},
+    {sku:"br-011",img:"br-011-onmodel.webp",name:"The Rose · Hockey",series:"Series 4 · Hockey",price:115,ed:80},
+    {sku:"br-003",img:"br-003-onmodel.webp",name:"Baseball Classic · Black",series:"Series 0 · Baseball",price:100,ed:250},
+    {sku:"br-014",img:"br-014-onmodel.webp",name:"Baseball Classic · Giants",series:"Series 0 · Baseball",price:100,ed:250},
+    {sku:"br-015",img:"br-015-onmodel.webp",name:"Baseball Classic · White",series:"Series 0 · Baseball",price:100,ed:250},
+    {sku:"br-006",img:"br-006-onmodel.webp",name:"Rose Sherpa Jacket",series:"Outerwear",price:95,ed:250}
+  ];
+  var track=document.getElementById('track');
+  function el(tag,cls){var e=document.createElement(tag);if(cls)e.className=cls;return e;}
+
+  // intro panel
+  (function(){
+    var p=el('div','panel edge');
+    var k=el('p','kicker');k.textContent='BLACK is Beautiful — Pre-Order';
+    var h=el('h1');h.textContent='The pieces, staged in the night.';
+    var sub=el('p');sub.textContent='Nine limited editions from the Black Rose collection. Reserve before the run closes — no reprints, no restocks.';
+    var go=el('span','go');go.textContent='Walk the pieces';
+    p.append(k,h,sub,go);track.appendChild(p);
+  })();
+
+  // product panels
+  PIECES.forEach(function(pc,i){
+    var p=el('div','panel');p.setAttribute('aria-roledescription','pre-order piece');
+    var stage=el('div','stage');
+    if(pc.cut)p.classList.add('has-specimen');
+    var pool=el('span','pool');pool.setAttribute('aria-hidden','true');
+    var srcPath=pc.local?pc.img:IMG+pc.img;
+    var img=el('img','model'+(pc.cut?' specimen':''));img.src=srcPath;
+    img.alt=pc.name+(pc.cut?'':' — on model');
+    img.decoding='async';img.loading=(i<2?'eager':'lazy');
+    var refl=el('img','reflect'+(pc.cut?' specimen':''));refl.src=srcPath;refl.setAttribute('aria-hidden','true');
+    refl.decoding='async';refl.loading='lazy';
+    stage.append(pool,refl,img);
+
+    var meta=el('div','meta');
+    var eb=el('span','eyebrow');eb.textContent=pc.series;
+    var nm=el('span','name');nm.textContent=pc.name;
+    var spec=el('span','spec');
+    var sk=el('b');sk.textContent=pc.sku.toUpperCase();
+    var d1=el('span','dot');var pr=el('b');pr.textContent='$'+pc.price;
+    var d2=el('span','dot');var ed=document.createElement('span');ed.textContent='Edition of '+pc.ed;
+    spec.append(sk,d1,pr,d2,ed);
+    var res=el('a','reserve');res.href='#'; res.setAttribute('data-sku',pc.sku);
+    res.setAttribute('aria-label','Reserve '+pc.name);
+    res.textContent='Reserve';var arw=el('span','arw');arw.textContent='→';res.appendChild(arw);
+    meta.append(eb,nm,spec,res);
+    p.append(stage,meta);track.appendChild(p);
+  });
+
+  // outro panel
+  (function(){
+    var p=el('div','panel edge');
+    var k=el('p','kicker');k.textContent='Luxury Grows from Concrete';
+    var h=el('h1');h.textContent='Claim your number.';
+    var sub=el('p');sub.textContent='Every piece is one of a defined run. When it closes, it stays closed. This is not a drop — it is a record.';
+    var res=el('a','reserve');res.href='#';res.textContent='Reserve your piece';
+    var arw=el('span','arw');arw.textContent='→';res.appendChild(arw);
+    p.append(k,h,sub,res);track.appendChild(p);
+  })();
+
+  var panels=[].slice.call(track.querySelectorAll('.panel'));
+  document.getElementById('tot').textContent=String(panels.length).padStart(2,'0');
+
+  // ── parallax: skyline drifts slower than the pieces ──────────────
+  var R=document.documentElement.style;
+  function parallax(){
+    if(REDUCE)return;
+    var x=track.scrollLeft;
+    R.setProperty('--hx',(-x*0.16).toFixed(1)+'px');
+    R.setProperty('--fx',(-x*0.05).toFixed(1)+'px');
+  }
+  // ── progress rail + counter + arrow enable/disable ───────────────
+  var fill=document.getElementById('fill'),cur=document.getElementById('cur'),
+      prev=document.getElementById('prev'),next=document.getElementById('next');
+  function progress(){
+    var max=track.scrollWidth-track.clientWidth;
+    var r=max>0?track.scrollLeft/max:0;
+    var seg=100/panels.length;
+    fill.style.width=seg.toFixed(2)+'%';
+    fill.style.left=(r*(100-seg)).toFixed(2)+'%';
+    // nearest panel index by center
+    var c=track.scrollLeft+track.clientWidth/2,idx=0,best=1e9;
+    panels.forEach(function(p,i){var pc=p.offsetLeft+p.offsetWidth/2,dd=Math.abs(pc-c);
+      if(dd<best){best=dd;idx=i;}});
+    cur.textContent=String(idx+1).padStart(2,'0');
+    prev.disabled=track.scrollLeft<=2;
+    next.disabled=track.scrollLeft>=max-2;
+  }
+  function onScroll(){parallax();progress();}
+  track.addEventListener('scroll',onScroll,{passive:true});
+
+  function panelWidth(){return panels[1]?panels[1].offsetWidth:track.clientWidth*.7;}
+  function step(dir){track.scrollBy({left:dir*panelWidth(),behavior:REDUCE?'auto':'smooth'});}
+  prev.addEventListener('click',function(){step(-1);});
+  next.addEventListener('click',function(){step(1);});
+
+  // keyboard on the track
+  track.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'){e.preventDefault();step(1);}
+    else if(e.key==='ArrowLeft'){e.preventDefault();step(-1);}
+  });
+
+  // wheel → horizontal while pointer is over the scene (release at the ends → page scroll resumes)
+  if(!REDUCE){
+    track.addEventListener('wheel',function(e){
+      var d=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+      var max=track.scrollWidth-track.clientWidth;
+      var atStart=track.scrollLeft<=0&&d<0, atEnd=track.scrollLeft>=max&&d>0;
+      if(atStart||atEnd)return;            // let the page take over at the edges
+      e.preventDefault();
+      track.scrollLeft+=d;
+    },{passive:false});
+  }
+
+  // ── night cycle ─────────────────────────────────────────────────
+  var STATES=[
+    {name:'Deep Night',hint:'the armor light',grade:'rgba(10,12,24,.30)',moon:.5,star:1},
+    {name:'Bay Fog',hint:'mist off the water',grade:'rgba(26,28,36,.26)',moon:.32,star:.4},
+    {name:'Moonhigh',hint:'silver rim',grade:'rgba(18,26,46,.22)',moon:.85,star:.7},
+    {name:'Oxblood Hour',hint:'one warmth before dawn',grade:'rgba(46,14,18,.26)',moon:.5,star:.5}
+  ];
+  var sn=document.getElementById('sn'),sh=document.getElementById('sh'),si=0;
+  function applyState(s){R.setProperty('--grade',s.grade);R.setProperty('--moon',s.moon);
+    R.setProperty('--star',s.star);sn.textContent=s.name;sh.textContent=s.hint;}
+  if(REDUCE)applyState(STATES[2]);
+  else{applyState(STATES[0]);setInterval(function(){si=(si+1)%STATES.length;applyState(STATES[si]);},7000);}
+
+  // ── starfield ───────────────────────────────────────────────────
+  var cv=document.querySelector('.stars'),cx=cv.getContext('2d'),ST=[],W,H;
+  function size(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;ST=[];
+    var n=Math.round(W*H/12000);
+    for(var k=0;k<n;k++)ST.push({x:Math.random()*W,y:Math.random()*H*.9,r:Math.random()*1+.2,
+      p:Math.random()*6.28,s:Math.random()*.6+.2});}
+  function draw(t){cx.clearRect(0,0,W,H);
+    for(var k=0;k<ST.length;k++){var s=ST[k];
+      cx.globalAlpha=REDUCE?.7:(.45+.5*Math.sin(t*.001*s.s+s.p));
+      cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.283);cx.fillStyle='#eef0f6';cx.fill();}
+    if(!REDUCE)requestAnimationFrame(draw);}
+  size();addEventListener('resize',function(){size();progress();parallax();});
+  if(REDUCE)draw(0);else requestAnimationFrame(draw);
+
+  progress();parallax();
+})();
+</script>

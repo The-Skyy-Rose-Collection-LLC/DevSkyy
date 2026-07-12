@@ -472,3 +472,9 @@ tasks/assets/
 
 # --- Frontend skill screenshots (regenerated every run) ---
 frontend/.claude/skills/*/screenshots/
+
+# --- Session verification screenshots at repo root (Playwright verify output) ---
+/live-desktop-*.jpeg
+/live-mobile-*.jpeg
+/v8-hero-slides.jpeg
+/BlackRoseScene.png
