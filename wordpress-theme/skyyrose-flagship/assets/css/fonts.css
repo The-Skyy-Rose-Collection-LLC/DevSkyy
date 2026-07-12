@@ -158,3 +158,36 @@
 		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
 		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BESPOKE SKYYROSE COLLECTION FACES
+   Custom display scripts built from AI glyph sheets (scripts/fonts/,
+   sources in assets/fonts-src/). Full latin a-z / A-Z, 54 glyphs each.
+   Used as the collection script accent via --skyyrose-font-script.
+   - SkyyRose Black Rose Script  → Black Rose (replaces Pacifico)
+   - SkyyRose Love Hurts Graffiti → Love Hurts (replaces Kaushan Script)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── SkyyRose Black Rose Script (Black Rose — bespoke) ────────────── */
+@font-face {
+	font-family: 'SkyyRose Black Rose Script';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/skyyrose-black-rose-script-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ─── SkyyRose Love Hurts Graffiti (Love Hurts — bespoke) ─────────── */
+@font-face {
+	font-family: 'SkyyRose Love Hurts Graffiti';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/skyyrose-love-hurts-graffiti-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+		U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

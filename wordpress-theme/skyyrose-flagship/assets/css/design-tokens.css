@@ -273,7 +273,7 @@ html {
 	--skyyrose-accent-rgb:   192, 192, 192;
 	--skyyrose-accent-dark:  #999999;
 	--skyyrose-secondary:    #FFFFFF;
-	--skyyrose-font-script:  'Pacifico', cursive;
+	--skyyrose-font-script:  'SkyyRose Black Rose Script', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);
 }
@@ -293,7 +293,7 @@ html {
 	--skyyrose-accent-rgb:   220, 20, 60;
 	--skyyrose-accent-dark:  #9B0F2E;
 	--skyyrose-secondary:    #FFFFFF;
-	--skyyrose-font-script:  'Kaushan Script', cursive;
+	--skyyrose-font-script:  'SkyyRose Love Hurts Graffiti', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);
 }

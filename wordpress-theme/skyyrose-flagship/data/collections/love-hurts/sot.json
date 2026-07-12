@@ -21,9 +21,9 @@
   },
   "fonts": {
     "script": {
-      "family": "Kaushan Script",
-      "woff2": "assets/fonts/kaushan-script-latin.woff2",
-      "source": "OFL / Google Fonts"
+      "family": "SkyyRose Love Hurts Graffiti",
+      "woff2": "assets/fonts/skyyrose-love-hurts-graffiti-latin.woff2",
+      "source": "SkyyRose custom (graffiti face from lockup)"
     },
     "caps": {
       "family": "Cinzel",

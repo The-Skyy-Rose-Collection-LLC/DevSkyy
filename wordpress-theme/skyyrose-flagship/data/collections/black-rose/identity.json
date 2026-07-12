@@ -19,11 +19,25 @@
     "text": "#F5F5F5"
   },
   "fonts": {
-    "script": {"family": "Pacifico", "woff2": "assets/fonts/pacifico-latin.woff2", "source": "OFL / Google Fonts"},
-    "caps": {"family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "source": "OFL (already hosted)"},
-    "body": {"family": "Hanken Grotesk", "woff2": "assets/fonts/hanken-grotesk-latin.woff2", "source": "OFL (already hosted)"}
+    "script": {
+      "family": "SkyyRose Black Rose Script",
+      "woff2": "assets/fonts/skyyrose-black-rose-script-latin.woff2",
+      "source": "SkyyRose custom (built from AI glyph sheets)"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
-  "lockup": {"ref": "images/lockups/black-rose-lockup.webp"},
+  "lockup": {
+    "ref": "images/lockups/black-rose-lockup.webp"
+  },
   "imagery": {
     "hero": {
       "path": "branding/hero/forbidden-midnight",

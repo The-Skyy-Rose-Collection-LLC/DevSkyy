@@ -20,9 +20,9 @@
   },
   "fonts": {
     "script": {
-      "family": "Pacifico",
-      "woff2": "assets/fonts/pacifico-latin.woff2",
-      "source": "OFL / Google Fonts"
+      "family": "SkyyRose Black Rose Script",
+      "woff2": "assets/fonts/skyyrose-black-rose-script-latin.woff2",
+      "source": "SkyyRose custom (built from AI glyph sheets)"
     },
     "caps": {
       "family": "Cinzel",
