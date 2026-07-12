@@ -32,10 +32,12 @@ EXPECTED_PALETTE = {
     "signature": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
     "kids-capsule": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
 }
-# Canon pins — founder typography overhaul 2026-07-10 (typography.json is the SOT summary)
+# Canon pins — founder typography overhaul 2026-07-10; bespoke faces landed
+# 2026-07-11 (13c61beda): BR Pacifico -> SkyyRose Black Rose Script,
+# LH Kaushan Script (interim) -> SkyyRose Love Hurts Graffiti.
 SCRIPT_FONT = {
-    "black-rose": "Pacifico",
-    "love-hurts": "Kaushan Script",
+    "black-rose": "SkyyRose Black Rose Script",
+    "love-hurts": "SkyyRose Love Hurts Graffiti",
     "signature": "Pinyon Script",
     "kids-capsule": "Grand Hotel",
 }
