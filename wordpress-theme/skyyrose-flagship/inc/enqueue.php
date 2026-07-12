@@ -1044,6 +1044,34 @@ function skyyrose_enqueue_template_scripts() {
 		}
 	}
 
+	// Love Hurts Girl — scene-resident walk-on cameo (draco GLB, single walk
+	// clip). Loads ONLY on the Love Hurts collection page; the script no-ops
+	// under prefers-reduced-motion, missing WebGL, or a missing scene
+	// container, so it is never load-bearing.
+	if ( 'collection-standalone' === $slug && is_page_template( 'template-collection-love-hurts.php' ) ) {
+		$lhgirl_js  = $use_min && file_exists( $base_js_dir . '/lh-girl-3d.min.js' ) ? 'lh-girl-3d.min.js' : 'lh-girl-3d.js';
+		$lhgirl_glb = get_theme_file_path( 'assets/models/lh-girl.glb' );
+		if ( file_exists( $base_js_dir . '/' . $lhgirl_js ) && file_exists( $lhgirl_glb ) ) {
+			wp_enqueue_script(
+				'skyyrose-lh-girl-3d',
+				$base_js_uri . '/' . $lhgirl_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+			// The GLB fetch happens at runtime, outside wp_enqueue_script — it
+			// needs an explicit ?ver= or the WP.com edge cache keeps serving
+			// stale bytes after an asset swap (same rule as skyy.glb).
+			wp_localize_script(
+				'skyyrose-lh-girl-3d',
+				'LH_GIRL_CONFIG',
+				array(
+					'modelUrl' => esc_url_raw( add_query_arg( 'ver', SKYYROSE_VERSION, SKYYROSE_ASSETS_URI . '/models/lh-girl.glb' ) ),
+				)
+			);
+		}
+	}
+
 	// WooCommerce AJAX add-to-cart on custom (non-WC-native) templates.
 	// WC_Frontend_Scripts::register_scripts() always registers 'wc-add-to-cart'
 	// on every frontend pageload, but WooCommerce only ENQUEUES it sitewide when
