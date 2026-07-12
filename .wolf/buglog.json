@@ -3748,5 +3748,254 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-233",
+    "timestamp": "2026-07-09T07:58:00-07:00",
+    "error_message": "Mascot crotch 'candy-wrapper' LBS fold in wave/walk/talk/point/joy clips; 3 prior same-night fix attempts (weight smoothing, flexion clamp, manual-blend, 3 shape-key iterations) all failed or regressed (v3's closed-form shape key SHATTERED the wave crotch geometry into jagged radiating facets, worse than pristine).",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb (built fresh from pristine skyy-v6-merged.glb, not chained on any failed attempt)",
+    "root_cause": "Two distinct bugs conflated as one: (1) SCOPE error \u2014 the task assumed all 5 gesture clips needed a fix, but fresh pristine renders (tight crotch-zoom, both math-measured and given peak frames) showed walk/talk/point/joy have smooth, defect-free crotch fabric at peak flexion; only 'wave' (crossed-leg pose, held for its ENTIRE 129-frame duration, not a narrow peak) shows a genuine sharp angular pinch. (2) The prior v3 attempt's 'shattered geometry' was a scale-unit misdiagnosis at the time \u2014 mesh/armature world scale is 0.01 (cm-to-m), so a local-space shape-key delta of ~0.94 units (which looks huge vs a 0.257 world-space torso reference) is actually only ~0.0094 world units, i.e. correct and stable; a true closed-form LBS inverse (A_blend.inverted() @ desired_world) is fine as long as both numeric gates (forward-formula matches depsgraph; reapplying A_blend to corrected rest reproduces the desired posed target) are checked in the SAME unit space. Separately, re-exporting the pristine file through Blender's NLA_TRACKS round-trip introduced a spurious +1/24s (1-frame) time-axis shift on the 'idle' clip only, because idle's NLA strip (frame_start=1) doesn't match its action's own frame numbering (action_frame_start=0) \u2014 every other clip's strip/action numbering already agree at 1, so only idle was affected. (ID note: renumbered from bug-218 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Rebuilt end-to-end from pristine only. Measured true peak frames via a closed-form LBS divergence metric (100%-Hips vs 100%-dominant-UpLeg bind, mean-top-50 across ~367 crotch vertices) instead of trusting given peak_frames blindly; validated the closed-form skinning formula against Blender's own depsgraph-evaluated positions (error ~1.7e-7, machine precision). Identified the actual folding vertex subset (top-60 by posed-vs-rest Laplacian delta, +104 halo neighbors at 0.4 falloff weight) instead of the whole 367-vertex crotch region. Computed ONE corrective shape key ('CrotchFoldCorrective_wave') via the closed-form LBS inverse with both numeric gates passing (gate2 error 2.3e-16), targeting a neighbor-averaged smoothing of the actual posed fold at wave's true peak (frame 27). Because the crossed-leg defect pose is held for the wave clip's full 1-129 frame range (verified by rendering 12+ frames spanning the whole clip, not just near the peak), keyframed the shape key value flat at 1.0 across the entire clip rather than a narrow 0->1->0 ramp \u2014 measured per-clip, not assumed. Left walk/talk/point/joy/idle completely untouched (no shape key, no Key NLA track). Fixed the idle NLA strip's frame_start/frame_end (1->0, 73->72, matching its action's own 0-72 numbering) purely as an export re-basing correction \u2014 zero idle keyframe VALUES touched \u2014 which made idle's exported time axis exactly match pristine (0.0 diff, vs +0.041667s before the fix). Verified via gltf-transform inspect + raw glTF JSON/accessor parsing: all 6 clips present, mesh carries exactly 1 morph target (CrotchFoldCorrective_wave), wave's animation channel list includes rotation/translation/scale (bone) channels AND a weights channel targeting the mesh node, the other 4 gesture clips have zero weights channels (fully untouched), and per-clip max animation-value diff vs pristine (~0.0007 quaternion units, ~0.04\u00b0) is IDENTICAL in magnitude across touched (wave, idle) and untouched (walk/talk/point/joy) clips \u2014 proving it's inherent Blender round-trip float32 requantization, not content drift from this fix. Eyes-on render comparison (tight crotch-zoom, pristine vs fixed, at peak\u00b12/\u00b15 and a 12-frame full-clip bracket) confirms the sharp jagged facet pinch is replaced by a smooth single fold with no popping anywhere in the ramp.",
+    "tags": [
+      "3d",
+      "mascot",
+      "skinning",
+      "shape-key",
+      "gltf",
+      "blender",
+      "lbs",
+      "candy-wrapper",
+      "scope-verification",
+      "unit-scale",
+      "nla-export-rebasing"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T07:58:00-07:00"
+  },
+  {
+    "id": "bug-234",
+    "timestamp": "2026-07-10T00:00:00-07:00",
+    "error_message": "Phase 3 retargeting-compatibility gate (gate_bone_direction.py) FAILED with any_critical_bone_failed=true before mascot-walk-to-girl-rig skin weighting; per locked plan fork, this mandates skipping the retarget smoke test entirely and pivoting to Plan B (fresh keyframed walk cycle authored directly on the girl rig).",
+    "file": "renders/3d/girl-love-hurts/gate_bone_direction.py",
+    "root_cause": "girl rig rest pose and skyy.glb mascot rest pose diverge far beyond the locked per-bone-category angle thresholds on CRITICAL bones: Hips 97.4 deg (10 max), Spine 34.0 deg (10 max), neck 43.2 deg (10 max), Head 23.4 deg (10 max), LeftArm 22.5/RightArm 22.3 deg (10 max), LeftForeArm 126.2/RightForeArm 130.5 deg (10 max, near-inverted), LeftLeg 11.8 deg (10 max). 15/24 bones failed overall. Local-space Copy Rotation retargeting assumes near-matching rest poses; a >120 deg forearm rest-direction mismatch would map into inverted-elbow geometry once mascot walk-clip local rotations are copied onto the girl armature. (ID note: renumbered from bug-219 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "No retarget smoke test built (fork rule: Phase-3-failed already satisfies the STOP condition on its own, independent of any smoke-test outcome -- running the smoke test could only ever downgrade a pass, never upgrade this fail). Decision: abandon Local-Space Copy Rotation retargeting for this rig pair. Pivot to Plan B -- author a fresh walk cycle directly on the girl own rig via 8-16 hand-placed pose keys (contact-L, passing-R-up, high-point, contact-R, passing-L-up, high-point, back to contact-L), skipping retargeting entirely.",
+    "tags": [
+      "retargeting",
+      "mascot",
+      "skin-weight",
+      "girl-rig",
+      "gate-bone-direction",
+      "plan-b",
+      "love-hurts"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T00:00:00-07:00"
+  },
+  {
+    "id": "bug-235",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "First self-check of skin_weight_body.py's own verification pass reported hip/shoulder/armpit_gusset boundaries as FAIL (non-monotonic weight transition) even though the underlying weighting formula (smoothstep on an axis projection) is monotonic by construction.",
+    "file": "renders/3d/girl-love-hurts/skin_weight_body.py",
+    "root_cause": "Two distinct bugs, both in the VERIFICATION sampling, not the weighting math: (1) several bones are written by TWO independent, unrelated pathways (e.g. Hips gets weight from both the spine-chain's own Hips<->Spine02 internal joint AND the leg-chains' hip branch blend; Shoulder from both the arm-chain branch blend AND the Phase-2 gusset) -- sorting ALL vertices with nonzero weight on a bone by an unrelated axis projection mixes two populations and breaks monotonicity even though each pathway is independently monotonic. (2) Even after restricting to the correct chain/segment, verification for a branch joint (hip, shoulder) still included vertices already inside the NEXT internal joint's own blend band (e.g. thigh vertices already blending into the knee), whose partial weight on the root bone comes from that unrelated joint, not the hip. A follow-on idempotency check then surfaced a third issue: gusset_verts was recomputed each run as 'len(v.groups)>0', which silently widens to ALL vertices after the first run and corrupts the persisted marker verification depends on. (ID note: renumbered from bug-220 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "classify_all_vertices() recomputes the SAME nearest-chain-polyline assignment the weighting pass used, and every verify_* function filters its sample population by that assignment (chain_name, and for branch joints, seg==0 AND s below the next joint's blend band) instead of by 'bone X has nonzero weight'. gusset_vertex_indices is now persisted as a custom ID property on the mesh ONCE (read back, not recomputed, on subsequent runs) so a second run is a true no-op: 0 newly weighted verts, all 4 boundaries still verify PASS.",
+    "tags": [
+      "blender",
+      "skin-weight",
+      "verification",
+      "sampling-bias",
+      "idempotency",
+      "girl-rig"
+    ],
+    "related_bugs": [
+      "bug-234"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
+  },
+  {
+    "id": "bug-236",
+    "timestamp": "2026-07-10T07:10:00-07:00",
+    "error_message": "AttributeError: 'Action' object has no attribute 'fcurves' when reading back the walk-cycle source/baked action's F-curves for the location-channel audit.",
+    "file": "renders/3d/girl-love-hurts/bake_walk_retarget.py",
+    "root_cause": "Blender 5.1.2 uses the new layered-Action data model (Animation 2.0 slotted actions): F-curves no longer live at the flat `action.fcurves` used pre-5.0. They are nested under `action.layers[*].strips[*].channelbags[*].fcurves`, one channelbag per animation slot (slot.identifier e.g. 'OBGirlArmature'). High-level APIs like `pose_bone.keyframe_insert()` still work unchanged and auto-create the layer/strip/channelbag structure, but any code that reads F-curves back directly (verification/audit scripts, action introspection) must walk the new nesting -- `action.fcurves` raises AttributeError, it does not silently return an empty list. (ID note: renumbered from bug-221 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added `iter_action_fcurves(action)` helper in bake_walk_retarget.py that flattens `action.layers -> strip.channelbags -> fcurves` (filtering strips to type=='KEYFRAME') into a single iterable, matching the pre-5.x flat-list contract. All F-curve consumers (source-action location sanity check, baked-action location-leak audit, fcurve counts) route through this helper instead of `action.fcurves`. Verified via a fresh reload+re-parse of the saved .blend in a separate Blender process.",
+    "tags": [
+      "blender",
+      "blender-5.1",
+      "python-api",
+      "action-fcurves",
+      "animation-2.0",
+      "girl-rig",
+      "version-specific-api"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T07:10:00-07:00"
+  },
+  {
+    "id": "bug-237",
+    "timestamp": "2026-07-10T07:30:00-07:00",
+    "error_message": "Known-limitation state record (not a re-derived diagnosis): the Love Hurts girl rig's full 8-phase build run finished with Phase 5 (corrective shape key for the armpit-gusset region) not built and Phase 6 (`gate_armpit_gusset.py`, the read-only numeric gate that pose-tests the gusset at named arm-raise test poses) not passing, yet Phase 8's final recommendation was recommend_ship=true.",
+    "file": "renders/3d/girl-love-hurts/gate_armpit_gusset.py (Phase 6); no Phase 5 shape-key script exists in renders/3d/girl-love-hurts/ as of this run",
+    "root_cause": "NOT DIAGNOSED THIS PASS. gate_armpit_gusset.py emits its result as `print(\"GATE_RESULT_JSON:\" + json.dumps(summary))` to stdout only (verified by reading the script) -- no report file was persisted to disk for this run, so the specific failing margins/poses are not recoverable from any artifact and are not re-derived here. This entry exists to record the state (per the run's own Phase 5/6/8 summary) so a future session does not have to rediscover that a ship-blocking-shaped gap was accepted, rather than to explain why. (ID note: renumbered from bug-222 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "NONE ATTEMPTED. If reopened: re-run `blender --background --factory-startup --python gate_armpit_gusset.py` against the current love-hurts-girl-rig.blend to capture fresh failing-pose margins to a saved report file (the script currently has no report-file output -- add one), then decide whether a corrective shape key (Phase 5, same technique as the mascot's bug-198/218 corrective-shape-key fix) is warranted before shipping.",
+    "tags": [
+      "3d",
+      "blender",
+      "girl-rig",
+      "skin-weight",
+      "armpit-gusset",
+      "shape-key",
+      "known-limitation",
+      "state-record",
+      "unresolved"
+    ],
+    "related_bugs": [
+      "bug-234",
+      "bug-235"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T07:30:00-07:00"
+  },
+  {
+    "id": "bug-238",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "raise GateFailure(msg, metric=..., value=..., threshold=...) would crash with 'got multiple values for argument metric'",
+    "file": "skyyrose/character_pipeline/verify.py",
+    "root_cause": "@dataclass decorating an Exception subclass replaces Exception's own __init__ with a dataclass-generated one; the first positional arg (the message string) then binds to the first declared field (metric) instead of being treated as the exception message, colliding with the explicit metric= keyword. (ID note: renumbered from bug-223 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Removed @dataclass from GateFailure; wrote an explicit __init__(self, message, *, metric, value, threshold) that calls super().__init__(message) and sets the three attributes directly.",
+    "tags": [
+      "python",
+      "dataclass",
+      "exception",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-239",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "tex_bytes assigned twice in write_rigged_glb: a dead call to _glb_io.image_bytes() with a nonsensical index expression, immediately overwritten by a hand-inlined duplicate of the same slicing logic",
+    "file": "skyyrose/character_pipeline/weights.py",
+    "root_cause": "Draft-writing error while assembling write_rigged_glb() -- wrote the buffer-view slice manually before remembering _glb_io.image_bytes() already implements it, leaving the first assignment as dead code with a confusing `x and 0 or 0` expression. (ID note: renumbered from bug-224 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Replaced both lines with a single `tex_bytes = _glb_io.image_bytes(clean, blob, 0)` call.",
+    "tags": [
+      "python",
+      "dead-code",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-240",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "example character.yaml included z_hip: 0.0 / z_chest: 0.0 / z_head: 0.0 as 'auto-detect' placeholders, which would silently override real detected landmarks with zero",
+    "file": "skyyrose/character_pipeline/characters/love_hurts_girl.yaml",
+    "root_cause": "landmarks.detect_landmarks() treats KEY PRESENCE in config.landmark_overrides as the override signal (overrides.get('z_hip', auto_detected_value)), not the value -- including a key with a placeholder 0.0 unconditionally uses 0.0 instead of falling through to auto-detection. (ID note: renumbered from bug-225 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Removed the z_hip/z_chest/z_head placeholder keys entirely from the example yaml; only crotch_y/neck_y (real measured values) are pinned, everything else auto-detects.",
+    "tags": [
+      "config",
+      "yaml",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-241",
+    "timestamp": "2026-07-10T09:15:00-07:00",
+    "error_message": "verify_character() FAILED: look.below_neck_max_disp=0.06023 (<= 0.002 required) -- chest-height verts moved 6cm under a pure Head rotation",
+    "file": "skyyrose/character_pipeline/weights.py",
+    "root_cause": "Head/HeadTop_End carry an oversized radius (0.40m, sized for the afro) in the radius-normalized capsule weight solve (w = 1/(distance/radius)^4). Every other bone group (arm, leg) has an explicit region-mask gate confining its influence; Head never got one -- its large radius let it out-compete much-closer, small-radius Spine bones for real chest/torso vertices far below the neck (dn=distance/radius made a farther-but-bigger-radius bone win over a closer-but-smaller one). This is a pre-existing gap in the ORIGINAL validated reference algorithm (rig_girl.py has the identical mask structure), not something the port introduced -- it only surfaced because this was the first time any test ran the pipeline against real, complex geometry instead of a small synthetic mesh. (ID note: renumbered from bug-226 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added an explicit region-mask gate in weights.py's _region_masks(): Head/HeadTop_End may only influence vertices at or above the neck joint's Y position (allowed[:, is_head_only] &= (y >= neck_y)), mirroring the existing pattern for arm/leg bone gating. Verified on the real fixture: all 13 WS6 gates now pass (previously 1 failed); confirmed no regression across the existing 24 synthetic-mesh unit tests.",
+    "tags": [
+      "character-pipeline",
+      "skinning",
+      "algorithm",
+      "weight-solve"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T09:15:00-07:00"
+  },
+  {
+    "id": "bug-242",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "read_accessor silently returns garbage vertex data on interleaved (byteStride) bufferViews \u2014 no exception, wrong geometry",
+    "file": "skyyrose/character_pipeline/_glb_io.py",
+    "root_cause": "np.frombuffer(blob, dtype, count, offset) assumes tight-packed attribute data; glTF legally allows attributes to share a strided bufferView (byteStride set, e.g. POSITION+NORMAL interleaved). GLBWriter (the module's own writer) never interleaves, so no round-trip test could catch it \u2014 the exposure is entirely externally-produced GLBs (FBX2glTF output, user passthrough input). Found by python-reviewer agent during /code-review. (ID note: renumbered from bug-227 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "read_accessor now checks bv.byteStride: when set and != tight element size, gathers per-element byte windows via uint8 fancy indexing (start + arange(count)*stride + arange(tight)) before the dtype view. TDD: 3 new tests in tests/character_pipeline/test_glb_io_interleaved.py written RED first (interleaved positions, interleaved normals, tight-stride-set fast-path equivalence).",
+    "tags": [
+      "character-pipeline",
+      "gltf",
+      "numpy",
+      "silent-corruption",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-243",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "clean.py baked normals with the linear part of the node transform instead of its inverse-transpose \u2014 wrong-direction normals under any non-uniformly-scaled ancestor node, no error raised",
+    "file": "skyyrose/character_pipeline/clean.py",
+    "root_cause": "n' = M @ n is only direction-correct for rotations/isotropic scale. clean.py's own selling point is composing the ACTUAL node TRS chain (including matrix-form nodes), which explicitly admits non-uniform scale \u2014 where the correct transform is the normal matrix inv(M[:3,:3]).T. Failure is invisible in geometry gates (positions unaffected); it manifests only as broken lighting at runtime. Found by python-reviewer agent during /code-review. (ID note: renumbered from bug-228 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "_bake_transform now uses np.linalg.inv(lin).T (identical behavior for the rotation-only case every real asset so far uses \u2014 golden fixture regenerated byte-identical, sha256-confirmed); singular transform raises PipelineError. TDD: tests/character_pipeline/test_clean_normals.py written RED first, with a hand-derived 45deg-plane/Y-squash case where naive and correct transforms tilt in OPPOSITE directions. Bonus: RED run exposed a hand-derivation error in my own rotation-case expectation (Rx(-90) maps +z to +y, not -y) \u2014 the code was right, the test draft was wrong.",
+    "tags": [
+      "character-pipeline",
+      "normals",
+      "linear-algebra",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-244",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "Three failure modes escaped devskyy-character's documented clean-error contract (nonzero exit + report.json + stderr message), crashing with raw tracebacks instead: landmark auto-detection failures (ValueError x4 sites), FBX2glTF converter failures (CalledProcessError, with the converter's stderr swallowed by capture_output), and bad/malformed --config paths (FileNotFoundError/yaml.YAMLError before the try block)",
+    "file": "skyyrose/character_pipeline/cli.py",
+    "root_cause": "cli.py's except clause only caught PipelineError, but three real failure paths raise other types: landmarks.py raised bare ValueError (a failure mode PROVEN to happen \u2014 crotch-detection fails on real clothed-mesh noise, bug-226 session); subprocess.run(check=True, capture_output=True) raises CalledProcessError whose str() omits the captured stderr entirely; and load_character_yaml ran before the guarded region. Found via convergent evidence: my own review pass (ValueError), security-reviewer (CalledProcessError), python-reviewer (CalledProcessError + config-load placement). (ID note: renumbered from bug-229 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "landmarks.py's 4 raise sites converted to PipelineError (same import pattern segment.py already uses); convert.py wraps CalledProcessError into PipelineError surfacing the decoded stderr tail; cli.py moved config load inside the try and widened the except to (PipelineError, FileNotFoundError, yaml.YAMLError).",
+    "tags": [
+      "character-pipeline",
+      "cli",
+      "error-handling",
+      "exception-contract",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-241"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-245",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "setup_character_pipeline_vendor.sh fetched executables with no integrity verification (no checksum pinning) and no curl --fail (HTTP error pages written to disk as 'binaries' with exit 0)",
+    "file": "scripts/setup_character_pipeline_vendor.sh",
+    "root_cause": "GitHub release assets can be replaced under an existing tag and raw.githubusercontent tag refs are movable via force-push, so a URL pin alone is not an integrity guarantee for binaries the pipeline chmod +x's and executes (FBX2glTF). Separately, curl without -f treats an HTTP 404 body as a successful download, so set -euo pipefail never fires and the corruption surfaces later as an opaque exec error. Found by security-reviewer agent during /code-review (MEDIUM + LOW). (ID note: renumbered from bug-230 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added per-file sha256 pins (derived 2026-07-10 from official upstream URLs; FBX2glTF is archived upstream and publishes no official checksums) verified after every fetch AND on the skip-existing path, mismatch deletes the file and exits 1; curl now -fsSL. Verified: all 5 pins green against real files, mismatch branch red-tested to exit 1.",
+    "tags": [
+      "security",
+      "supply-chain",
+      "vendored-binaries",
+      "checksum",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
   }
 ]
