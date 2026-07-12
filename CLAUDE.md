@@ -212,6 +212,16 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 ## Learnings
 
 Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Knowledge base, not per-turn behavioral rules.
+
+<!-- wolf:recurring:start -->
+### Recurring issues (synced from `.wolf/buglog.json` — regenerate via `python scripts/wolf_recurring_sync.py`, do not hand-edit)
+- **bug-096** (×30, 2026-05-08): Tripo generate_multiview_image hallucinated brand canon on 30 SKUs (120 renders… → fix: scripts/tripo_dispatch.py — added classify_skus() function that blocks at the d…
+- **bug-172** (×24, 2026-06-30): OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does n… → fix: FIXED 2026-06-30: config.py defines INPUT_FIDELITY_SUPPORTED_MODELS = {gpt-imag…
+- **bug-230** (×6, 2026-07-10): PATTERN: fail-open guards / silent fallbacks — gates that pass when their input… → fix: Rule: every gate fails CLOSED — absent manifest/config/token = block, exception…
+- **bug-098** (×4, 2026-05-12): DATA-01: /collection-black-rose/, /collection-love-hurts/, /collection-signatur… → fix: Bumped SKYYROSE_SETUP_VERSION constant from '4.0.0' to '4.1.0' in inc/theme-act…
+- **bug-231** (×4, 2026-07-12): PATTERN: test isolation / shared-state pollution — tests failing only in full-s… → fix: Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (neve…
+<!-- wolf:recurring:end -->
+
 ## Behavioral Standards — How Claude Operates in This Project
 
 These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.

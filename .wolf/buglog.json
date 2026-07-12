@@ -1748,7 +1748,8 @@
     ],
     "related_bugs": [
       "bug-119",
-      "bug-124"
+      "bug-124",
+      "bug-230"
     ],
     "occurrences": 1,
     "last_seen": "2026-06-11"
@@ -1913,7 +1914,9 @@
       "load_project_env",
       "r2_client"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-231"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-18"
   },
@@ -2081,7 +2084,9 @@
       "hermetic",
       "stop-hook"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-231"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-22T20:37:53Z"
   },
@@ -2212,7 +2217,9 @@
       "no-silent-fallback",
       "sceneerror"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-230"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-24T12:30:00Z"
   },
@@ -2339,7 +2346,9 @@
       "cors",
       "3d"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-164"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-28T00:00:00-07:00"
   },
@@ -2400,7 +2409,9 @@
       "file-protocol",
       "lazy-loading"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-132"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-28T12:00:00-07:00"
   },
@@ -2464,7 +2475,8 @@
       "stop-hook"
     ],
     "related_bugs": [
-      "bug-164"
+      "bug-164",
+      "bug-231"
     ],
     "occurrences": 1,
     "last_seen": "2026-06-29T14:30:00-07:00"
@@ -2526,7 +2538,9 @@
       "webp",
       "fidelity"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-230"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-30T12:40:00-07:00"
   },
@@ -2645,7 +2659,7 @@
     "error_message": "OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does not support the input_fidelity parameter' (code invalid_input_fidelity_model)",
     "file": "scripts/oai_render/client.py",
     "root_cause": "OAIImageClient.edit() (client.py:74-85) unconditionally sends input_fidelity=config.INPUT_FIDELITY ('high', config.py:37) on every edit() call. config.py's comment claims this is 'verified via Context7... supported for gpt-image-1.5+ (incl. gpt-image-2)' but the LIVE API rejects it for gpt-image-2 specifically -- reproduced 24/24 times in a real call. Context7 (openai/openai-openapi, images/edits schema) lists input_fidelity support for gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only -- gpt-image-2 is not in that list. This means every product-render edit() call through this client is currently failing the same way, separate from any font-generation work.",
-    "fix": "NOT YET FIXED (discovered incidentally during an unrelated font-pilot task, flagged to founder rather than patched unprompted since it touches the shared production render pipeline). Workaround used in the font pilot: bypass OAIImageClient.edit() and call openai.OpenAI().images.edit() directly, omitting input_fidelity entirely. Real fix needed in client.py/config.py: stop sending input_fidelity when model=='gpt-image-2', or make it conditional on model name.",
+    "fix": "FIXED 2026-06-30: config.py defines INPUT_FIDELITY_SUPPORTED_MODELS = {gpt-image-1, gpt-image-1-mini, gpt-image-1.5} (Context7-verified against openai-openapi images/edits schema); client.edit() only sends input_fidelity when config.MODEL is in that set (scripts/oai_render/client.py:88). gpt-image-2 calls omit the param \u2014 no more 400s. Buglog entry previously stale ('NOT YET FIXED'); corrected 2026-07-12.",
     "tags": [
       "oai-render",
       "gpt-image-2",
@@ -2655,7 +2669,7 @@
     ],
     "related_bugs": [],
     "occurrences": 24,
-    "last_seen": "2026-06-30T17:05:00-07:00"
+    "last_seen": "2026-06-30"
   },
   {
     "id": "bug-188",
@@ -2796,7 +2810,9 @@
       "live-defect",
       "open"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-189"
+    ],
     "occurrences": 1,
     "last_seen": "2026-07-07"
   },
@@ -2835,7 +2851,11 @@
       "silent-failure",
       "qc-blind-spot"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-190",
+      "bug-193",
+      "bug-194"
+    ],
     "occurrences": 1,
     "last_seen": "2026-07-07T11:30:00-07:00"
   },
@@ -2852,7 +2872,9 @@
       "fail-open",
       "embeddings-hardening"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-230"
+    ],
     "occurrences": 1,
     "last_seen": "2026-07-07T21:43:04Z"
   },
@@ -2871,6 +2893,7 @@
       "pageerror-vs-console"
     ],
     "related_bugs": [
+      "bug-176",
       "bug-178"
     ],
     "occurrences": 1,
@@ -2891,7 +2914,10 @@
       "animation-fill-mode",
       "mascot"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-178",
+      "bug-194"
+    ],
     "occurrences": 1,
     "last_seen": "2026-07-07T16:45:00-07:00"
   },
@@ -2965,7 +2991,10 @@
       "cli-flag-mismatch",
       "texture-compression"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-178",
+      "bug-193"
+    ],
     "occurrences": 1,
     "last_seen": "2026-07-08T01:25:00-07:00"
   },
@@ -3289,7 +3318,8 @@
       "fail-open"
     ],
     "related_bugs": [
-      "bug-216"
+      "bug-216",
+      "bug-230"
     ],
     "occurrences": 1,
     "last_seen": "2026-07-09T08:55:00-07:00"
@@ -3412,7 +3442,8 @@
       "code-review"
     ],
     "related_bugs": [
-      "bug-216"
+      "bug-216",
+      "bug-230"
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10T11:00:00-07:00"
@@ -3592,5 +3623,112 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-227",
+    "timestamp": "2026-07-11",
+    "error_message": "Landing-page loader stuck at 99% forever; page content never revealed (all first-pass QC screenshots showed loader)",
+    "file": "jobs/bdb7266f/tmp/flagship-landing/index.html",
+    "root_cause": "Loader progress used lerp-toward-target (p += (target-p)*0.12) with completion check Math.floor(p)>=100 \u2014 lerp asymptotically approaches 100 so floor never reaches it",
+    "fix": "Replaced lerp with time-based eased progress (k=elapsed/DUR, cubic ease-out) and finish on k>=1",
+    "tags": [
+      "landing-page",
+      "lerp-asymptote",
+      "loader",
+      "animation",
+      "qc-caught"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-228",
+    "timestamp": "2026-07-11",
+    "error_message": "Hero headline/eyebrow/CTAs invisible on desktop+mobile; hero section inflated to 2291px (2.7x viewport)",
+    "file": "jobs/bdb7266f/tmp/flagship-landing/index.html",
+    "root_cause": "#hero>*{position:relative} has same specificity as #particles{position:absolute} but appears later in stylesheet, so the canvas entered flex flow; JS sized canvas to parent height creating a self-inflation loop that pushed flex-centered text below the fold",
+    "fix": "Scoped the rule to content elements only: #hero>.eyebrow,#hero>h1,#hero>.sub,#hero>.ctas \u2014 absolutes untouched",
+    "tags": [
+      "css-specificity",
+      "source-order",
+      "canvas",
+      "flex",
+      "hero",
+      "qc-caught"
+    ],
+    "related_bugs": [
+      "bug-227"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-229",
+    "timestamp": "2026-07-12T13:45:00-07:00",
+    "error_message": "Stop-hook full suite: tests/test_tripo_agent.py::TestAssetValidation::test_validate_file_size_checks FAILED (assert False on any('too large' in e)) \u2014 passes in isolation",
+    "file": "tests/test_tripo_agent.py",
+    "root_cause": "test_model_dir fixture used hardcoded shared path /tmp/test_models with shutil.rmtree cleanup. Concurrent pytest processes (parallel Claude sessions / stop-hook suites on same repo) race: one process's cleanup rmtrees the dir while another is mid-test, deleting the 60MB large.glb between write and validate \u2014 validation then errors 'file not found' instead of 'too large'.",
+    "fix": "Fixture now returns pytest's per-test tmp_path (unique dir per test, pytest-managed cleanup). No shared /tmp path, no manual rmtree. 31/31 file tests green.",
+    "tags": [
+      "tests",
+      "flake",
+      "race-condition",
+      "tmp-path",
+      "tripo",
+      "fixture"
+    ],
+    "related_bugs": [
+      "bug-231"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-230",
+    "timestamp": "2026-07-12T14:05:00-07:00",
+    "error_message": "PATTERN: fail-open guards / silent fallbacks \u2014 gates that pass when their input is absent or their check errors (asset-integrity gate w/o manifest, stage_f swallowing PIL errors, MCP denylist, MCP token compare, scene fallback, hub override fallback)",
+    "file": "cross-component (imagery, theme PHP, MCP bridge, asset hub)",
+    "root_cause": "Guards written as 'block if bad' instead of 'allow only if proven good' \u2014 missing input or a raised exception skips the check entirely. Recurred 6x across 4 components Jun-11\u2192Jul-10 because each guard is written fresh without the fail-closed rule.",
+    "fix": "Rule: every gate fails CLOSED \u2014 absent manifest/config/token = block, exception in the check = block. Escape hatch must be explicit+logged. Instances all individually fixed; this entry tracks the class.",
+    "tags": [
+      "pattern",
+      "fail-open",
+      "silent-fallback",
+      "guard-design"
+    ],
+    "related_bugs": [
+      "bug-127",
+      "bug-159",
+      "bug-179",
+      "bug-181",
+      "bug-211",
+      "bug-218"
+    ],
+    "occurrences": 6,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-231",
+    "timestamp": "2026-07-12T14:05:00-07:00",
+    "error_message": "PATTERN: test isolation / shared-state pollution \u2014 tests failing only in full-suite or parallel runs (os.getenv default shadowing, design-tokens fixture race, snapshot drift, shared /tmp rmtree race)",
+    "file": "tests/ (cross-file)",
+    "root_cause": "Tests share mutable state: hardcoded /tmp paths (racy across concurrent pytest processes), module-level env reads, session-scoped snapshots. Recurred 4x Jun-18\u2192Jul-12. Concurrent suites (parallel Claude sessions + Stop-hook runs) make shared /tmp a live race, not theoretical.",
+    "fix": "Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (never bare os.environ), no cross-test file reuse. 2026-07-12 sweep converted all 4 real /tmp writers (test_tripo_agent, test_p0_ssrf_replicate, test_skyyrose_agents x2) to tmp_path; remaining /tmp literals are mock-string args that never touch disk.",
+    "tags": [
+      "pattern",
+      "tests",
+      "test-isolation",
+      "race-condition",
+      "tmp-path"
+    ],
+    "related_bugs": [
+      "bug-145",
+      "bug-153",
+      "bug-167",
+      "bug-229"
+    ],
+    "occurrences": 4,
+    "last_seen": "2026-07-12"
   }
 ]
