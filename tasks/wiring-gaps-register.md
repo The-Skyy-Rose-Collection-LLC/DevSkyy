@@ -204,7 +204,7 @@ These capabilities have routing infrastructure and response models in place, but
 - **Backend partial:** `api/v1/assets.py:283` (`# TODO: Store original image to R2`), line 285 (hardcoded fake URL), line 315 (`# TODO: Add to processing queue`)
 - **Wire:** Add `ingest()` + `getJob()` to `frontend/lib/api/endpoints/assets.ts` (unblocks the surfacing; R2 + queue TODOs are separate infrastructure work)
 
-### T3-9: Monitoring metrics — hardcoded time-series constants
+### T3-9: Monitoring metrics — hardcoded time-series constants — ✅ FRONTEND WIRED 2026-07-12
 - **Backend partial:** `api/v1/monitoring.py:429,441,453,463` — four `MetricSeries` data points are hardcoded constants; `summary` dict carries real psutil values
 - **Wire:** Add `metrics()` method to `frontend/lib/api/endpoints/monitoring.ts` + update `useMonitoring`; hardcoded series constants are a backend follow-on
 
@@ -212,7 +212,7 @@ These capabilities have routing infrastructure and response models in place, but
 - **Backend partial:** `services/competitive/competitor_analysis.py:41-42` — module-level in-memory dicts (no persistence); line 447-457 stub `_extract_attributes` with comment
 - **Wire:** Add `frontend/src/app/admin/competitors/page.tsx` (table + analytics panel); style categories will show as `OTHER` until vision model is wired — acceptable for initial surface
 
-### T3-11: Sync pipeline — missing auth guards
+### T3-11: Sync pipeline — missing auth guards — ✅ CLOSED 2026-07-12
 - **Backend partial:** `api/v1/sync.py:87,100-101,110,149-150,170,195` — real implementation; no `Depends(get_current_user)` on any of the 3 route handlers
 - **Wire:** Add `Depends(get_current_user)` to `get_sync_status`, `trigger_sync`, `sync_round_table_to_hf` — identical pattern to `api/v1/monitoring.py:305`
 
