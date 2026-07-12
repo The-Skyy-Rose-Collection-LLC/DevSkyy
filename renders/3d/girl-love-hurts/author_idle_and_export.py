@@ -28,6 +28,7 @@ Run:
 
 import json
 import math
+import os
 import shutil
 
 import bpy
@@ -102,10 +103,17 @@ def detect_sign(arm_obj, bone_name):
 
 def clear_pose(arm_obj):
     """Rest pose everywhere before authoring — the saved file leaves the walk
-    action assigned, and baking evaluates the CURRENT animation state."""
+    action assigned, and baking evaluates the CURRENT animation state.
+
+    Returns the pre-call NLA mute states ({track_name: mute}) so the caller
+    can hand them to restore_nla_mutes() before saving — muting must never
+    leak into the saved .blend (harmless today at 0 tracks, wrong if tracks
+    ever appear)."""
+    saved_mutes = {}
     if arm_obj.animation_data:
         arm_obj.animation_data.action = None
         for track in arm_obj.animation_data.nla_tracks:
+            saved_mutes[track.name] = track.mute
             track.mute = True
     for pb in arm_obj.pose.bones:
         pb.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
@@ -113,6 +121,15 @@ def clear_pose(arm_obj):
         pb.location = (0.0, 0.0, 0.0)
         pb.scale = (1.0, 1.0, 1.0)
     bpy.context.view_layer.update()
+    return saved_mutes
+
+
+def restore_nla_mutes(arm_obj, saved_mutes):
+    if not arm_obj.animation_data:
+        return
+    for track in arm_obj.animation_data.nla_tracks:
+        if track.name in saved_mutes:
+            track.mute = saved_mutes[track.name]
 
 
 def author_idle(arm_obj):
@@ -205,32 +222,24 @@ def verify_idle(action):
     return {"fcurves": len(fcurves), "location_fcurves": 0, "loop_max_delta": worst}
 
 
-def main():
-    shutil.copy2(BLEND_PATH, BACKUP_PATH)
-    print(f"Backup: {BACKUP_PATH}")
-
+def open_and_check():
+    """Open the blend and assert the exact pre-run state this one-shot
+    pipeline requires (fails loudly on a re-run — the walk action is renamed
+    by rename_to_contract, so a second pass cannot silently double-apply)."""
     bpy.ops.wm.open_mainfile(filepath=BLEND_PATH)
     arm = bpy.data.objects.get(ARMATURE_NAME)
     mesh = bpy.data.objects.get(MESH_NAME)
     if arm is None or arm.type != "ARMATURE" or mesh is None:
         raise RuntimeError(f"expected {ARMATURE_NAME} + {MESH_NAME} in blend")
-
     walk = bpy.data.actions.get(WALK_BAKED)
     if walk is None:
         raise RuntimeError(f"{WALK_BAKED} action missing — wrong blend state")
+    return arm, mesh, walk
 
-    print("=== rest pose ===")
-    clear_pose(arm)
 
-    print("=== author idle (sign-probed, rotation-only) ===")
-    author_idle(arm)
-
-    print("=== bake idle (whole armature, ROTATION only) ===")
-    baked = bake_idle(arm)
-    summary = verify_idle(baked)
-    print("idle verify:", json.dumps(summary))
-
-    print("=== rename to mascot clip contract + drop Source actions ===")
+def rename_to_contract(walk, baked):
+    """Rename actions to the mascot clip contract and drop the Source
+    actions (ACTIONS export mode ships every action — Sources must not)."""
     walk.name = CLIP_WALK
     baked.name = CLIP_IDLE
     for src_name in (WALK_SOURCE, IDLE_SOURCE):
@@ -242,14 +251,10 @@ def main():
     if exported_actions != [CLIP_IDLE, CLIP_WALK]:
         raise RuntimeError(f"expected exactly ['idle','walk'], got {exported_actions}")
 
-    # Leave the armature in rest state with no active action so the export's
-    # base pose is neutral (ACTIONS mode exports every action regardless).
-    clear_pose(arm)
 
-    bpy.ops.wm.save_as_mainfile(filepath=BLEND_PATH)
-    print(f"Saved: {BLEND_PATH}")
-
-    print("=== export girl-mascot-raw.glb (v1-verified exporter args) ===")
+def export_glb(arm, mesh):
+    """Export the mascot-body GLB with the exact exporter args that produced
+    the independently-verified v1.glb (export_for_verification.py)."""
     bpy.ops.object.select_all(action="DESELECT")
     for o in (arm, mesh):
         o.select_set(True)
@@ -275,13 +280,43 @@ def main():
         export_image_format="AUTO",
     )
 
-    import os
-
     size = os.path.getsize(GLB_OUT)
     with open(GLB_OUT, "rb") as f:
         if f.read(4) != b"glTF":
             raise RuntimeError("exported file lacks glTF magic")
     print(f"EXPORT_OK {GLB_OUT} ({size} bytes)")
+
+
+def main():
+    shutil.copy2(BLEND_PATH, BACKUP_PATH)
+    print(f"Backup: {BACKUP_PATH}")
+
+    arm, mesh, walk = open_and_check()
+
+    print("=== rest pose ===")
+    saved_mutes = clear_pose(arm)
+
+    print("=== author idle (sign-probed, rotation-only) ===")
+    author_idle(arm)
+
+    print("=== bake idle (whole armature, ROTATION only) ===")
+    baked = bake_idle(arm)
+    print("idle verify:", json.dumps(verify_idle(baked)))
+
+    print("=== rename to mascot clip contract + drop Source actions ===")
+    rename_to_contract(walk, baked)
+
+    # Neutral base pose for export (ACTIONS mode exports every action
+    # regardless), then restore the original NLA mute states so muting
+    # never leaks into the saved .blend.
+    clear_pose(arm)
+    restore_nla_mutes(arm, saved_mutes)
+
+    bpy.ops.wm.save_as_mainfile(filepath=BLEND_PATH)
+    print(f"Saved: {BLEND_PATH}")
+
+    print("=== export girl-mascot-raw.glb (v1-verified exporter args) ===")
+    export_glb(arm, mesh)
 
 
 if __name__ == "__main__":
