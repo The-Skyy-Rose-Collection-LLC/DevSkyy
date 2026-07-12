@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from services.approval_queue_manager import ApprovalItem, ApprovalStatus
+from services.approval_queue_manager import ApprovalItem, ApprovalStatus, get_approval_manager
 
 from sync.wordpress_media_approval_sync import (
     BatchSyncResult,
@@ -480,3 +480,184 @@ class TestConfiguration:
         # Should handle gracefully or raise appropriate error
         # Implementation depends on actual sync logic
         assert sync.wordpress_client.is_configured is False
+
+
+# =============================================================================
+# T3-5 Wiring Gap: is_configured / sync_item / sync_approved_items / skipped
+# =============================================================================
+
+
+class TestIsConfiguredProperty:
+    """Tests for the `is_configured` property on WordPressMediaApprovalSync."""
+
+    def test_is_configured_false_without_client(self):
+        """Should report not configured when no client is attached."""
+        sync = WordPressMediaApprovalSync()
+        assert sync.is_configured is False
+
+    def test_is_configured_true_with_configured_client(self, sync_service):
+        """Should report configured when the client says it is."""
+        assert sync_service.is_configured is True
+
+    def test_is_configured_false_with_unconfigured_client(self):
+        """Should defer to the client's own is_configured flag."""
+        unconfigured_client = MagicMock()
+        unconfigured_client.is_configured = False
+        sync = WordPressMediaApprovalSync(wordpress_client=unconfigured_client)
+        assert sync.is_configured is False
+
+    def test_is_configured_true_when_client_has_no_flag(self):
+        """A client with no is_configured attribute (e.g. WordPressClient) is assumed configured."""
+        bare_client = object()
+        sync = WordPressMediaApprovalSync(wordpress_client=bare_client)
+        assert sync.is_configured is True
+
+
+class TestSyncItem:
+    """Tests for the `sync_item` method on WordPressMediaApprovalSync."""
+
+    @pytest.mark.asyncio
+    async def test_sync_item_approved_delegates_and_rekeys_item_id(
+        self, sync_service, sample_approval_item
+    ):
+        """Should sync an approved item and key the result by approval item id."""
+        result = await sync_service.sync_item(sample_approval_item)
+
+        assert result.item_id == sample_approval_item.id
+        assert result.status == SyncStatus.COMPLETED
+        assert result.success is True
+
+    @pytest.mark.asyncio
+    async def test_sync_item_not_approved_returns_pending(self, sync_service):
+        """Should not sync a non-approved item and should report it as pending."""
+        pending_item = ApprovalItem(
+            id="pending-item-1",
+            asset_id="asset-pending",
+            job_id="job-pending",
+            original_url="https://cdn.example.com/original/pending.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/pending.jpg",
+            status=ApprovalStatus.PENDING,
+        )
+
+        result = await sync_service.sync_item(pending_item)
+
+        assert result.status == SyncStatus.PENDING
+        assert result.success is False
+        assert result.item_id == pending_item.id
+
+    @pytest.mark.asyncio
+    async def test_sync_item_unconfigured_client_returns_failed(self, sample_approval_item):
+        """Should fail closed when no WordPress client is configured."""
+        sync = WordPressMediaApprovalSync()  # no client => not configured
+
+        result = await sync.sync_item(sample_approval_item)
+
+        assert result.status == SyncStatus.FAILED
+        assert result.success is False
+        assert "not configured" in result.error
+
+
+class TestSyncApprovedItems:
+    """Tests for the `sync_approved_items` method on WordPressMediaApprovalSync."""
+
+    @pytest.fixture
+    def clean_approval_manager(self):
+        """Isolate the approval-queue singleton for the duration of a test."""
+        manager = get_approval_manager()
+        original_items = dict(manager._items)
+        manager._items.clear()
+        try:
+            yield manager
+        finally:
+            manager._items.clear()
+            manager._items.update(original_items)
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_items_syncs_only_unsynced_approved_items(
+        self, sync_service, clean_approval_manager
+    ):
+        """Should sync approved+unsynced items only, skipping synced and non-approved ones."""
+        approved_unsynced = ApprovalItem(
+            id="approved-unsynced",
+            asset_id="asset-a",
+            job_id="job-a",
+            original_url="https://cdn.example.com/original/a.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/a.jpg",
+            status=ApprovalStatus.APPROVED,
+        )
+        approved_synced = ApprovalItem(
+            id="approved-synced",
+            asset_id="asset-b",
+            job_id="job-b",
+            original_url="https://cdn.example.com/original/b.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/b.jpg",
+            status=ApprovalStatus.APPROVED,
+            wordpress_media_id=999,
+            wordpress_synced_at=datetime.now(UTC),
+        )
+        pending = ApprovalItem(
+            id="pending-item",
+            asset_id="asset-c",
+            job_id="job-c",
+            original_url="https://cdn.example.com/original/c.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/c.jpg",
+            status=ApprovalStatus.PENDING,
+        )
+        clean_approval_manager._items[approved_unsynced.id] = approved_unsynced
+        clean_approval_manager._items[approved_synced.id] = approved_synced
+        clean_approval_manager._items[pending.id] = pending
+
+        result = await sync_service.sync_approved_items()
+
+        assert result.total == 1
+        assert result.synced == 1
+        assert result.failed == 0
+        assert result.skipped == 0
+        assert len(result.results) == 1
+        assert result.results[0].item_id == approved_unsynced.id
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_items_respects_limit(self, sync_service, clean_approval_manager):
+        """Should cap the number of items synced to `limit`."""
+        for i in range(3):
+            item = ApprovalItem(
+                id=f"approved-{i}",
+                asset_id=f"asset-{i}",
+                job_id=f"job-{i}",
+                original_url=f"https://cdn.example.com/original/{i}.jpg",
+                enhanced_url=f"https://cdn.example.com/enhanced/{i}.jpg",
+                status=ApprovalStatus.APPROVED,
+            )
+            clean_approval_manager._items[item.id] = item
+
+        result = await sync_service.sync_approved_items(limit=2)
+
+        assert result.total == 2
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_items_empty_queue(self, sync_service, clean_approval_manager):
+        """Should return an empty, successful result when nothing is eligible."""
+        result = await sync_service.sync_approved_items()
+
+        assert result.total == 0
+        assert result.synced == 0
+        assert result.success is True
+
+
+class TestSyncResultErrorMessageAlias:
+    """Tests for the `error_message` alias on SyncResult."""
+
+    def test_error_message_mirrors_error(self):
+        """Should expose the same value as `error` under the `error_message` name."""
+        result = SyncResult(
+            item_id="x",
+            success=False,
+            status=SyncStatus.FAILED,
+            error="boom",
+        )
+        assert result.error_message == "boom"
+
+    def test_error_message_none_when_no_error(self):
+        """Should be None when there is no error."""
+        result = SyncResult(item_id="x", success=True, status=SyncStatus.COMPLETED)
+        assert result.error_message is None
