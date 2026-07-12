@@ -2,11 +2,13 @@ import { API_URL } from '../config';
 import { ApiError } from '../errors';
 import { getAuthHeaders, fetchWithTimeout, handleResponse } from '../client';
 import {
+    BrandAssetSchema,
     BrandAssetsListResponseSchema,
     BulkIngestionJobSchema,
     TrainingReadinessResponseSchema,
 } from '../schemas';
 import type {
+    BrandAsset,
     BrandAssetsListResponse,
     BrandAssetListFilters,
     BulkIngestionJob,
@@ -63,5 +65,32 @@ export const brandAssets = {
             headers: await getAuthHeaders(),
         });
         return handleResponse(res, BulkIngestionJobSchema);
+    },
+
+    /** PATCH /brand-assets/assets/{asset_id}/approve — approve an asset for training use. */
+    approve: async (assetId: string): Promise<BrandAsset> => {
+        if (!assetId || !/^[a-zA-Z0-9_-]+$/.test(assetId)) {
+            throw new ApiError('Invalid asset ID format', 400, 'INVALID_INPUT');
+        }
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/assets/${assetId}/approve`, {
+            method: 'PATCH',
+            headers: await getAuthHeaders(),
+        });
+        return handleResponse(res, BrandAssetSchema);
+    },
+
+    /** PATCH /brand-assets/assets/{asset_id}/reject — reject an asset from training use; optional reason is stored in metadata.notes. */
+    reject: async (assetId: string, reason?: string): Promise<BrandAsset> => {
+        if (!assetId || !/^[a-zA-Z0-9_-]+$/.test(assetId)) {
+            throw new ApiError('Invalid asset ID format', 400, 'INVALID_INPUT');
+        }
+        const params = new URLSearchParams();
+        if (reason) params.set('reason', reason);
+        const query = params.toString();
+        const res = await fetchWithTimeout(
+            `${API_URL}${BASE}/assets/${assetId}/reject${query ? `?${query}` : ''}`,
+            { method: 'PATCH', headers: await getAuthHeaders() }
+        );
+        return handleResponse(res, BrandAssetSchema);
     },
 };
