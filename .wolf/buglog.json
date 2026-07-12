@@ -3730,5 +3730,23 @@
     ],
     "occurrences": 4,
     "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-232",
+    "timestamp": "2026-07-12T14:20:00-07:00",
+    "error_message": "re.error: bad escape \\U \u2014 wolf_recurring_sync passed generated block to re.sub as replacement template; any backslash sequence in a buglog message (Windows path, regex snippet) crashes the sync, and the Stop hook's output suppression made it a silently frozen digest",
+    "file": "scripts/wolf_recurring_sync.py",
+    "root_cause": "re.sub replacement strings interpret \\ escapes (\\g<...>, \\1). Dynamic text must never be passed as the repl argument directly.",
+    "fix": "repl as lambda (lambda _: block) so text inserts literally; Stop hook now echoes a failure notice instead of full suppression. Caught by /code-review before any bad entry existed.",
+    "tags": [
+      "python",
+      "re-sub",
+      "replacement-template",
+      "silent-failure",
+      "code-review-catch"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
   }
 ]
