@@ -1,5 +1,22 @@
 # Current Tasks
 
+## DONE — Robust Stop test-gate hook (2026-07-12)
+
+Stop-hook pytest gate false-blocked twice in one session: a load-timeout flake
+(`test_ml_optional` — 60s import guard trips under machine saturation; import itself
+succeeds ~7s unloaded) and a concurrent-session mid-edit race (`content_agent` fixture
+caught half-edited → `tmp_path` NameError). Both passed clean on re-run.
+
+- [x] Extracted the inline `.claude/settings.json` pytest one-liner → `.claude/hooks/stop-test-gate.sh`
+- [x] Retry-on-failure: on a red run, settle 5s then re-run `pytest --last-failed`; block (exit 2)
+      ONLY if the failure reproduces. Kills both false-block modes; never masks a real failure.
+- [x] Verified: decision logic green→0 / flake→0 / real-fail→2; `bash -n` clean; `--last-failed` valid.
+- [ ] **FOLLOW-UP (real backend task, founder-gated):** `import main_enterprise` makes blocking
+      connect attempts at import time (DB via `api/gdpr.py`, `skyyrose.elite_studio.queue.consumer`,
+      `mcp_tools.http_mount`) → ~7s unloaded vs ~62s under load. Make them lazy / short-timeout so the
+      import is fast + non-blocking (the in-memory fallback already exists — it just runs AFTER a slow
+      connect timeout). This is the ROOT fix for the `ml_optional` flake; the retry only papers over it.
+
 ## ACTIVE — Build the Signature Collection (all assets) — 2026-07-11
 
 Founder: emblem + bespoke font + page pass. Sequence each; gate every money/deploy step. 3 scouts running.
