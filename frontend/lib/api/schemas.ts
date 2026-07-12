@@ -298,6 +298,26 @@ export const MonitoringHealthResponseSchema = z.object({
     events: z.array(HealthEventSchema),
 });
 
+export const MetricDataPointSchema = z.object({
+    timestamp: z.string(),
+    value: z.number(),
+    labels: z.record(z.string(), z.string()).nullable().optional(),
+});
+
+export const MetricSeriesSchema = z.object({
+    metric_name: z.string(),
+    unit: z.string(),
+    data_points: z.array(MetricDataPointSchema),
+    aggregation: z.string().nullable().optional(),
+});
+
+export const MonitoringMetricsResponseSchema = z.object({
+    timestamp: z.string(),
+    time_range: z.string(),
+    metrics: z.array(MetricSeriesSchema),
+    summary: z.record(z.string(), z.unknown()),
+});
+
 // Autonomous Operation Schemas
 export const AutonomousOperationSchema = z.object({
     id: z.string(),

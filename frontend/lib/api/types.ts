@@ -26,6 +26,9 @@ export type ServiceHealthStatus = z.infer<typeof schemas.ServiceHealthStatusSche
 export type SystemStats = z.infer<typeof schemas.SystemStatsSchema>;
 export type HealthEvent = z.infer<typeof schemas.HealthEventSchema>;
 export type MonitoringHealthResponse = z.infer<typeof schemas.MonitoringHealthResponseSchema>;
+export type MetricDataPoint = z.infer<typeof schemas.MetricDataPointSchema>;
+export type MetricSeries = z.infer<typeof schemas.MetricSeriesSchema>;
+export type MonitoringMetricsResponse = z.infer<typeof schemas.MonitoringMetricsResponseSchema>;
 
 
 
