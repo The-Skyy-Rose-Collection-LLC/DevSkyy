@@ -71,6 +71,7 @@
 	text-transform: uppercase;
 	color: var(--skyyrose-accent);
 	margin-bottom: 56px; /* clears the script lockup ascender (eyebrow overlapped 'THE') */
+	text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85); /* gold accent on bright hero photography (Signature curtains) washed out without it */
 }
 
 .col-hero__title {
@@ -140,6 +141,26 @@
 	color: #fff;
 }
 .col-hero__cta--secondary:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+/* Scroll cue is a direct flex child of .col-hero — without absolute
+   positioning it sits IN flex flow beside __content and shoves the whole
+   hero block ~43px off-center (the width of this cue / 2). */
+.col-hero__scroll {
+	position: absolute;
+	bottom: 28px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 10px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.55);
+}
 
 /* ==========================================================================
    MARQUEE (Technical Strip)
