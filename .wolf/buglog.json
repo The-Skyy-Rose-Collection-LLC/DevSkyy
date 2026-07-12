@@ -3748,5 +3748,40 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-233",
+    "timestamp": "2026-07-12",
+    "error_message": "GET /api/v1/agents served by dashboard.py's unauthenticated agent_registry handler, not monitoring.py's directory-scan handler \u2014 identical path registered twice",
+    "file": "api/dashboard.py:490-493 + main_enterprise.py:302 vs :353",
+    "root_cause": "dashboard_router mounts /agents at main_enterprise.py:302, monitoring_router mounts the same path at :353; Starlette matches in registration order so dashboard's handler shadows monitoring's \u2014 one is dead code serving nothing, and the LIVE one is unauthenticated.",
+    "fix": "NOT FIXED YET (flagged by fu-metrics during T3-9 follow-up). Needs a dedicated pass: pick the canonical /agents source, remove or re-path the other, add auth to whichever survives.",
+    "tags": [
+      "fastapi",
+      "route-shadowing",
+      "auth-gap",
+      "agents-endpoint"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-234",
+    "timestamp": "2026-07-12",
+    "error_message": "upload_media_from_url validated media URLs against the global SSRF singleton whose production allowlist is 5 API hosts \u2014 every real media URL (skyyrose.co, CDN, S3) raised ValueError, making approval-sync uploads fail 100% of the time (fail-safe but always-fail)",
+    "file": "integrations/wordpress_client.py:526 + security/ssrf_protection.py:280-293",
+    "root_cause": "Global ssrf_protection singleton's narrow API allowlist applied to a media-download path it was never designed for. Found by fu-uploader while implementing the real upload under T3-5 follow-up.",
+    "fix": "Module-scoped _media_ssrf = SSRFProtection(allowed_domains=None, block_private_ips/localhost/metadata=True) \u2014 same documented pattern as services/three_d/replicate_provider.py:50. Network-layer SSRF blocks intact; domain allowlist removed only for the media path.",
+    "tags": [
+      "ssrf",
+      "allowlist",
+      "wordpress-client",
+      "media-upload",
+      "fail-closed"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
   }
 ]
