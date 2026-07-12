@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.10.3
+Stable tag: 1.10.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,10 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.10.4 =
+* Fix: collection hero block rendered ~43px left of center on all four collection pages — the .col-hero__scroll cue had no CSS, so it sat in flex flow beside the hero content and pushed it off-center; now absolutely positioned bottom-center with proper cue styling
+* Fix: collection hero eyebrow (gold accent) unreadable against bright hero photography (Signature curtains) — added drop shadow
 
 = 1.10.3 =
 * Feat: bespoke collection display fonts — Black Rose now uses SkyyRose Black Rose Script (replaces Pacifico); Love Hurts uses SkyyRose Love Hurts Graffiti (replaces the interim Kaushan Script). Both built in-house from glyph sheets, self-hosted, full latin a-z/A-Z
