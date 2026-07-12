@@ -116,7 +116,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_logo'           => '/branding/love-hurts-logo-hero.webp',
 			'hero_logo_alt'       => __( 'Love Hurts', 'skyyrose' ),
 			'hero_logo_w'         => 400,
-			'hero_logo_h'         => 400,
+			'hero_logo_h'         => 307, // 1600x1228 SOT lockup (1.30:1) — was 400 (1:1), CLS drift.
 			'hero_bg'             => '/branding/hero/beauty-and-beast-1280w.webp',
 			'hero_bg_base'        => '/branding/hero/beauty-and-beast',
 			'hero_bg_alt'         => __( 'Love Hurts Collection — enchanted rose under glass', 'skyyrose' ),
@@ -205,7 +205,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_logo'           => '/branding/signature-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The SkyyRose Signature Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
-			'hero_logo_h'         => 280,
+			'hero_logo_h'         => 189, // 1600x540 SOT lockup (2.96:1) — was 280 (2:1), CLS drift.
 			'hero_bg'             => '/branding/hero/luxury-nighttime-1280w.webp',
 			'hero_bg_base'        => '/branding/hero/luxury-nighttime',
 			'hero_bg_alt'         => __( 'Signature Collection — Oakland skyline', 'skyyrose' ),

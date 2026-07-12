@@ -274,10 +274,21 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 	);
 	?>
 
-	<?php // Black Rose only: founder pull quote anchors the page in Corey's voice. ?>
+	<?php // Founder pull quote — Corey's voice. Black Rose + Signature (origin/heritage register). ?>
 	<?php
 	if ( 'black-rose' === $slug ) {
-		get_template_part( 'template-parts/collection/founder-pullquote' ); }
+		get_template_part( 'template-parts/collection/founder-pullquote' );
+	} elseif ( 'signature' === $slug ) {
+		get_template_part(
+			'template-parts/collection/founder-pullquote',
+			null,
+			array(
+				'quote_text' => isset( $c['quote_text'] ) ? $c['quote_text'] : '',
+				'quote_name' => __( 'Corey Foster', 'skyyrose' ),
+				'quote_role' => __( 'Founder · The origin', 'skyyrose' ),
+			)
+		);
+	}
 	?>
 
 	<!-- ════ Story (condensed — after products) ════ -->

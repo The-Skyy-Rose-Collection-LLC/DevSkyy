@@ -1,5 +1,21 @@
 # Current Tasks
 
+## ACTIVE — Build the Signature Collection (all assets) — 2026-07-11
+
+Founder: emblem + bespoke font + page pass. Sequence each; gate every money/deploy step. 3 scouts running.
+
+> ⏸ Queued: bespoke BR Script + LH Graffiti fonts committed (`13c61beda`, v1.10.3) with clean-worktree
+> deploy manifest shown — awaiting founder `y`. Sits atop the v1.10.2 deploy train (also gated, line below).
+
+- [ ] **Track A — Signature font** (replace Pinyon Script): feasibility pending scout → build if autonomous,
+      STOP-AND-SHOW if paid glyph gen. Wire like BR/LH (fonts.css/identity/sot/typography/design-tokens/.impeccable).
+- [ ] **Track B — Signature emblem** (gold star-rose): source pending scout → compose from existing gold-rose+star
+      (zero-paid) OR STOP-AND-SHOW paid render. Output `assets/images/emblems/signature-emblem.webp`; auto-wires via
+      file-gated `.col-hero__emblem`. Eyes-on pixels before it touches the site.
+- [ ] **Track C — Signature page pass**: autonomous copy/layout/imagery/experience per .impeccable.md; gate any new
+      render (money) or WooCommerce/live-data write; verify all 12 SIG products resolve via SOT.
+- [ ] Batch to ONE gated deploy (no drip); bundle with the queued font deploy if founder wants.
+
 ## ACTIVE — WS7 launch-night wiring + gap closure (2026-07-11)
 
 Spec: `.planning/SKYYROSE_LAUNCH_NIGHT_SPEC_V2.html` (committed to main 2026-07-11).
