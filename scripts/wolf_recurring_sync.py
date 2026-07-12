@@ -74,8 +74,15 @@ def main() -> int:
         return 1
 
     block = render_block(bugs)
+    # lambda replacement: block is literal text, not a replacement template —
+    # backslashes in bug messages (Windows paths, regex snippets) must not be
+    # interpreted as \g<...> escapes.
     new_text = re.sub(
-        re.escape(START) + r".*?" + re.escape(END), block, text, count=1, flags=re.DOTALL
+        re.escape(START) + r".*?" + re.escape(END),
+        lambda _: block,
+        text,
+        count=1,
+        flags=re.DOTALL,
     )
     if new_text == text:
         print(f"CLAUDE.md up to date ({len(bugs)} recurring)")

@@ -301,7 +301,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/theceo/DevSkyy/scripts/wolf_recurring_sync.py >/dev/null 2>&1; true",
+            "command": "python3 /Users/theceo/DevSkyy/scripts/wolf_recurring_sync.py >/dev/null 2>&1 || echo '[wolf-recurring-sync] FAILED — run python3 scripts/wolf_recurring_sync.py to see the error'; true",
             "timeout": 10
           }
         ]
