@@ -29,6 +29,9 @@ def mock_wordpress_client():
     client.upload_media = AsyncMock(
         return_value={"id": 12345, "url": "https://example.com/media/12345.jpg"}
     )
+    client.upload_media_from_url = AsyncMock(
+        return_value={"id": 12345, "url": "https://example.com/media/12345.jpg"}
+    )
     client.update_media = AsyncMock(return_value={"id": 12345, "updated": True})
     client.delete_media = AsyncMock(return_value={"deleted": True})
     client.is_configured = True
@@ -661,3 +664,144 @@ class TestSyncResultErrorMessageAlias:
         """Should be None when there is no error."""
         result = SyncResult(item_id="x", success=True, status=SyncStatus.COMPLETED)
         assert result.error_message is None
+
+
+# =============================================================================
+# Real WordPress upload implementation (sync_approved_asset with item context)
+# =============================================================================
+
+
+class TestSyncApprovedAssetRealUpload:
+    """Tests for the real WordPress media upload behind `sync_approved_asset`."""
+
+    @pytest.fixture
+    def upload_item(self):
+        """Approved item with a real source URL to upload."""
+        return ApprovalItem(
+            id="item-upload-1",
+            asset_id="asset-upload-1",
+            job_id="job-upload-1",
+            original_url="https://cdn.example.com/original/upload.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/upload.jpg",
+            product_name="Signature Hoodie",
+            status=ApprovalStatus.APPROVED,
+        )
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_without_item_is_noop_success(self, sync_service):
+        """Backward compatibility: a bare asset_id with no item performs no upload."""
+        result = await sync_service.sync_approved_asset("bare-asset-id")
+
+        assert result.success is True
+        assert result.status == SyncStatus.COMPLETED
+        assert result.wordpress_id is None
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_upload_success_maps_id(
+        self, sync_service, mock_wordpress_client, upload_item
+    ):
+        """Should map the WordPress-returned media id onto wordpress_id."""
+        mock_wordpress_client.upload_media_from_url.return_value = {
+            "id": 77777,
+            "url": "https://skyyrose.co/media/77777.jpg",
+        }
+
+        result = await sync_service.sync_approved_asset(upload_item.asset_id, item=upload_item)
+
+        assert result.success is True
+        assert result.status == SyncStatus.COMPLETED
+        assert result.wordpress_id == 77777
+        mock_wordpress_client.upload_media_from_url.assert_awaited_once_with(
+            upload_item.enhanced_url,
+            title=upload_item.product_name,
+            alt_text=upload_item.product_name,
+        )
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_upload_failure_maps_error(
+        self, sync_service, mock_wordpress_client, upload_item
+    ):
+        """Should surface the underlying upload exception in SyncResult.error."""
+        mock_wordpress_client.upload_media_from_url.side_effect = Exception(
+            "WordPress API Error: 500 Internal Server Error"
+        )
+
+        result = await sync_service.sync_approved_asset(upload_item.asset_id, item=upload_item)
+
+        assert result.success is False
+        assert result.status == SyncStatus.FAILED
+        assert "500 Internal Server Error" in result.error
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_missing_source_file(
+        self, sync_service, mock_wordpress_client
+    ):
+        """Should fail closed when the approved item has no enhanced_url to upload."""
+        item_without_source = ApprovalItem(
+            id="item-missing-source",
+            asset_id="asset-missing-source",
+            job_id="job-missing-source",
+            original_url="https://cdn.example.com/original/missing.jpg",
+            enhanced_url="",
+            status=ApprovalStatus.APPROVED,
+        )
+
+        result = await sync_service.sync_approved_asset(
+            item_without_source.asset_id, item=item_without_source
+        )
+
+        assert result.success is False
+        assert result.status == SyncStatus.FAILED
+        assert "enhanced_url" in result.error
+        mock_wordpress_client.upload_media_from_url.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_unexpected_response_shape(
+        self, sync_service, mock_wordpress_client, upload_item
+    ):
+        """Should fail closed when the client returns a response without a usable id."""
+        mock_wordpress_client.upload_media_from_url.return_value = {"url": "no-id-here"}
+
+        result = await sync_service.sync_approved_asset(upload_item.asset_id, item=upload_item)
+
+        assert result.success is False
+        assert result.status == SyncStatus.FAILED
+        assert "media id" in result.error.lower()
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_unconfigured_client_with_item_fails(self, upload_item):
+        """Should fail closed when a real upload is attempted without a configured client."""
+        sync = WordPressMediaApprovalSync()  # no client => not configured
+
+        result = await sync.sync_approved_asset(upload_item.asset_id, item=upload_item)
+
+        assert result.success is False
+        assert result.status == SyncStatus.FAILED
+        assert "not configured" in result.error
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_asset_client_without_upload_from_url_fails(self, upload_item):
+        """Should fail closed if the attached client can't upload from a URL."""
+        bare_client = MagicMock(spec=[])  # no upload_media_from_url attribute
+        bare_client.is_configured = True
+        sync = WordPressMediaApprovalSync(wordpress_client=bare_client)
+
+        result = await sync.sync_approved_asset(upload_item.asset_id, item=upload_item)
+
+        assert result.success is False
+        assert result.status == SyncStatus.FAILED
+        assert "upload" in result.error.lower()
+
+    @pytest.mark.asyncio
+    async def test_sync_item_real_upload_maps_id_through_rekey(
+        self, sync_service, mock_wordpress_client, upload_item
+    ):
+        """sync_item should surface the real upload's wordpress_id under the rekeyed result."""
+        mock_wordpress_client.upload_media_from_url.return_value = {"id": 55555}
+
+        result = await sync_service.sync_item(upload_item)
+
+        assert result.item_id == upload_item.id
+        assert result.success is True
+        assert result.status == SyncStatus.COMPLETED
+        assert result.wordpress_id == 55555
