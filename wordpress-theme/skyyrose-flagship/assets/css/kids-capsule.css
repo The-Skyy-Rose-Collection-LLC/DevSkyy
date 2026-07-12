@@ -29,7 +29,7 @@
 .kc-teaser {
 	background-color: var(--kc-night);
 	color: var(--kc-cloud);
-	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-family: var(--font-body, 'Hanken Grotesk', sans-serif);
 	overflow-x: hidden;
 }
 
@@ -67,7 +67,7 @@
 	padding: 0.4em 1.2em;
 	border: 1px solid var(--kc-bloom);
 	border-radius: 2em;
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-xs, 0.75rem);
 	text-transform: uppercase;
 	letter-spacing: 0.15em;
@@ -76,7 +76,7 @@
 }
 
 .kc-teaser__wordmark {
-	font-family: var(--font-display, 'Playfair Display', serif);
+	font-family: var(--font-display, 'Archivo', sans-serif);
 	font-size: clamp(2.5rem, 8vw, 6rem);
 	font-weight: 700;
 	line-height: 1.1;
@@ -138,7 +138,7 @@
 }
 
 .kc-teaser__quote-text {
-	font-family: var(--font-display, 'Playfair Display', serif);
+	font-family: var(--font-display, 'Archivo', sans-serif);
 	font-size: clamp(1.5rem, 4vw, 3rem);
 	font-weight: 600;
 	font-style: italic;
@@ -164,7 +164,7 @@
 }
 
 .kc-teaser__section-title {
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-sm, 0.875rem);
 	text-transform: uppercase;
 	letter-spacing: 0.2em;
@@ -187,7 +187,7 @@
 }
 
 .kc-countdown__num {
-	font-family: var(--font-display, 'Playfair Display', serif);
+	font-family: var(--font-display, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 6vw, 4.5rem);
 	font-weight: 700;
 	line-height: 1;
@@ -195,7 +195,7 @@
 }
 
 .kc-countdown__label {
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-xs, 0.75rem);
 	text-transform: uppercase;
 	letter-spacing: 0.15em;
@@ -263,7 +263,7 @@
 }
 
 .kc-teaser__silhouette-label {
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-xs, 0.75rem);
 	text-transform: uppercase;
 	letter-spacing: 0.15em;
@@ -327,7 +327,7 @@
 	border-radius: 0 4px 4px 0;
 	background: var(--kc-bloom);
 	color: var(--kc-night);
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-sm, 0.875rem);
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
@@ -366,7 +366,7 @@
 }
 
 .kc-teaser__anchor-text {
-	font-family: var(--font-display, 'Playfair Display', serif);
+	font-family: var(--font-display, 'Archivo', sans-serif);
 	font-size: clamp(1.25rem, 3vw, 2.25rem);
 	font-weight: 600;
 	font-style: italic;
@@ -376,7 +376,7 @@
 }
 
 .kc-teaser__anchor-tagline {
-	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-family: var(--font-ui, 'Anton', sans-serif);
 	font-size: var(--text-sm, 0.875rem);
 	text-transform: uppercase;
 	letter-spacing: 0.2em;

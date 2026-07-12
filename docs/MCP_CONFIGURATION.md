@@ -239,7 +239,7 @@ The 21 MCP tools are organized into categories:
 
 ### Discovery (1 tool)
 
-- `devskyy_list_agents` - View all 54 agents
+- `devskyy_list_agents` - List the DevSkyy agent fleet (dynamic count; do not hardcode — see `agents/CLAUDE.md`)
 
 ---
 

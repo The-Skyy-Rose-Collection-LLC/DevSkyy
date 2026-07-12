@@ -8,10 +8,10 @@
 
 /* ── collection palette (self-contained; mirrors brand tokens) ── */
 .v7card[data-collection="black-rose"]   { --v7-accent:#C0C0C0; --v7-accent-rgb:192,192,192; --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="love-hurts"]   { --v7-accent:#DC143C; --v7-accent-rgb:220,20,60;  --v7-caps:'Bebas Neue',sans-serif; }
+.v7card[data-collection="love-hurts"]   { --v7-accent:#DC143C; --v7-accent-rgb:220,20,60;  --v7-caps:'Anton',sans-serif; }
 .v7card[data-collection="signature"]    { --v7-accent:#D4AF37; --v7-accent-rgb:212,175,55;  --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Bebas Neue',sans-serif; }
-.v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Bebas Neue',sans-serif; }
+.v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
+.v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
 
 .v7card {
 	position: relative;
@@ -104,7 +104,7 @@
 	top: 12px;
 	left: 12px;
 	z-index: 3;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	letter-spacing: .18em;
 	font-size: 10px;
 	text-transform: uppercase;
@@ -116,18 +116,18 @@
 
 .v7card__meta { position: relative; z-index: 1; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
 .v7card__eyebrow { font-family: var(--v7-caps); letter-spacing: .26em; font-size: 10px; text-transform: uppercase; color: var(--v7-accent); }
-.v7card__name { font-family: 'Playfair Display', serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
+.v7card__name { font-family: 'Archivo', sans-serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
 .v7card__name a { color: #f5e6d3; text-decoration: none; }
 .v7card__name a:hover { color: var(--v7-accent); }
 .v7card__pricerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.v7card__price { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent); }
+.v7card__price { font-family: 'Anton', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent); }
 .v7card__price del { opacity: .5; font-size: .85em; }
 .v7card__edition { font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .08em; color: #8a8175; }
 
 .v7card__add {
 	display: inline-block;
 	margin-top: 6px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	letter-spacing: .16em;
 	font-size: 13px;
 	text-transform: uppercase;
@@ -152,7 +152,7 @@
 	display: inline-block;
 	margin-top: 6px;
 	margin-left: 8px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	letter-spacing: .16em;
 	font-size: 13px;
 	text-transform: uppercase;

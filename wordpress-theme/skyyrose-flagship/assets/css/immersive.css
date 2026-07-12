@@ -58,7 +58,7 @@
 }
 
 .scene-loading-monogram {
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 5vw, 4rem);
 	font-weight: 700;
 	letter-spacing: 0.3em;
@@ -287,7 +287,7 @@
 }
 
 .scene-title-overlay h1 {
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 5vw, 4rem);
 	font-weight: 700;
 	color: #fff;
@@ -415,7 +415,7 @@
 }
 
 .product-panel-name {
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.25rem, 3vw, 1.75rem);
 	font-weight: 600;
 	color: #fff;

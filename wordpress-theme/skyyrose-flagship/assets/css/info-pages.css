@@ -36,7 +36,7 @@
 
 .info-page__badge {
 	display: inline-block;
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.75rem;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
@@ -48,7 +48,7 @@
 }
 
 .info-page__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(2rem, 5vw, 3.5rem);
 	font-weight: 400;
 	letter-spacing: 0.02em;
@@ -60,7 +60,7 @@
 }
 
 .info-page__subtitle {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(1rem, 2vw, 1.2rem);
 	color: rgba(255, 255, 255, 0.6);
 	max-width: 560px;
@@ -79,7 +79,7 @@
 }
 
 .faq-category__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.3rem, 3vw, 1.8rem);
 	font-weight: 400;
 	color: #fff;
@@ -129,7 +129,7 @@
 }
 
 .faq-item__q-text {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(1rem, 1.8vw, 1.15rem);
 	color: rgba(255, 255, 255, 0.85);
 	line-height: 1.5;
@@ -156,7 +156,7 @@
 }
 
 .faq-item__answer p {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
 	line-height: 1.8;
 	color: rgba(255, 255, 255, 0.55);
@@ -172,7 +172,7 @@
 }
 
 .ship-section__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.3rem, 3vw, 1.8rem);
 	font-weight: 400;
 	color: #fff;
@@ -213,7 +213,7 @@
 }
 
 .ship-card h3 {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1rem, 2vw, 1.2rem);
 	font-weight: 400;
 	color: #fff;
@@ -221,7 +221,7 @@
 }
 
 .ship-card p {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
 	line-height: 1.8;
 	color: rgba(255, 255, 255, 0.55);
@@ -239,7 +239,7 @@
 .ship-table td {
 	text-align: left;
 	padding: 0.75rem 1rem;
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: 0.95rem;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -272,7 +272,7 @@
 }
 
 .ship-steps li {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
 	color: rgba(255, 255, 255, 0.55);
 	line-height: 1.6;
@@ -296,11 +296,11 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 }
 
 .ship-list li {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
 	color: rgba(255, 255, 255, 0.55);
 	line-height: 1.6;
@@ -332,7 +332,7 @@
 }
 
 .info-page__cta h2 {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.5rem, 3vw, 2rem);
 	font-weight: 400;
 	color: #fff;
@@ -340,7 +340,7 @@
 }
 
 .info-page__cta p {
-	font-family: var(--ff-body, 'Cormorant Garamond', serif);
+	font-family: var(--ff-body, 'Hanken Grotesk', sans-serif);
 	font-size: 1.05rem;
 	color: rgba(255, 255, 255, 0.5);
 	margin: 0 0 2rem;
@@ -348,7 +348,7 @@
 
 .info-page__cta-btn {
 	display: inline-block;
-	font-family: var(--ff-cta, 'Bebas Neue', sans-serif);
+	font-family: var(--ff-cta, 'Anton', sans-serif);
 	font-size: 0.85rem;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -405,14 +405,14 @@
 	margin: 0 0 18px;
 }
 .sg-page__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: 'Archivo', sans-serif;
 	font-size: clamp(32px, 5vw, 52px);
 	font-weight: 500;
 	color: #fff;
 	margin: 0 0 16px;
 }
 .sg-page__subtitle {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-size: 18px;
 	line-height: 1.6;
 	color: rgba(237, 230, 223, 0.7);
@@ -424,7 +424,7 @@
 	padding: 24px 28px;
 }
 .sg-page__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: 'Archivo', sans-serif;
 	font-size: 24px;
 	font-weight: 500;
 	color: var(--color-rose-gold, #B76E79);
@@ -467,7 +467,7 @@
 	margin: 0 auto;
 	padding: 40px 28px 120px;
 	text-align: center;
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-size: 17px;
 	color: rgba(237, 230, 223, 0.7);
 }

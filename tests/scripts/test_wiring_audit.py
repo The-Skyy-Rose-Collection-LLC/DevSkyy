@@ -57,16 +57,26 @@ class TestCheckCategoryTotalsSane:
 
 
 class TestFindLeakedSecrets:
+    # Real WooCommerce keys are ck_/cs_ + 40 lowercase hex chars.
+    REAL_CK = "ck_" + "a1b2c3d4e5" * 4
+    REAL_CS = "cs_" + "0f9e8d7c6b" * 4
+
     def test_finds_consumer_key_fragment(self):
-        leaked = wiring_audit.find_leaked_secrets("const x = 'ck_abcdefghijklmno';")
+        leaked = wiring_audit.find_leaked_secrets(f"const x = '{self.REAL_CK}';")
         assert len(leaked) == 1
 
     def test_finds_consumer_secret_fragment(self):
-        leaked = wiring_audit.find_leaked_secrets("cs_abcdefghijklmno")
+        leaked = wiring_audit.find_leaked_secrets(self.REAL_CS)
         assert len(leaked) == 1
 
     def test_clean_bundle_finds_nothing(self):
         assert wiring_audit.find_leaked_secrets("export function foo() { return 1; }") == []
+
+    def test_ui_placeholder_does_not_false_positive(self):
+        # Admin settings inputs ship literal placeholders in client chunks
+        # (bug-223): 'x' is not a hex digit, so these must NOT match.
+        text = 'placeholder:"ck_xxxxxxxxxxxxx",placeholder:"cs_xxxxxxxxxxxxx"'
+        assert wiring_audit.find_leaked_secrets(text) == []
 
 
 class TestCheckBurstTiming:
@@ -257,18 +267,24 @@ class TestProductMetaRoundtrip:
 
 
 class TestSettingsRoundtrip:
+    # The endpoint whitelists its keys, so the round-trip uses the real
+    # `fastapi_url` key and the PATCH response echoes accepted keys in
+    # `updated` (see skyyrose_see_rest_update_settings).
+    MARKER = "https://wiring-check-1000.invalid"
+
     def test_writes_reads_back_and_restores(self):
         wp_auth = ("svc", "pw")
         before_response = MagicMock()
         before_response.raise_for_status.return_value = None
-        before_response.json.return_value = {}  # key not previously present
+        before_response.json.return_value = {"fastapi_url": "https://api.devskyy.app"}
 
         after_response = MagicMock()
         after_response.raise_for_status.return_value = None
-        after_response.json.return_value = {"devskyy_wiring_check": "wiring-audit-1000"}
+        after_response.json.return_value = {"fastapi_url": self.MARKER}
 
         patch_response = MagicMock()
         patch_response.raise_for_status.return_value = None
+        patch_response.json.return_value = {"updated": ["fastapi_url"]}
 
         with (
             patch(
@@ -287,32 +303,58 @@ class TestSettingsRoundtrip:
         assert "restored" in note
         assert mock_patch.call_count == 2  # write the marker, then restore
         _, restore_kwargs = mock_patch.call_args
-        assert restore_kwargs["json"] == {
-            "devskyy_wiring_check": None
-        }  # restores absent key to None
+        assert restore_kwargs["json"] == {"fastapi_url": "https://api.devskyy.app"}
 
     def test_marker_mismatch_reports_failure(self):
         wp_auth = ("svc", "pw")
         before_response = MagicMock()
         before_response.raise_for_status.return_value = None
-        before_response.json.return_value = {}
+        before_response.json.return_value = {"fastapi_url": ""}
         after_response = MagicMock()
         after_response.raise_for_status.return_value = None
-        after_response.json.return_value = {}  # PATCH didn't take
+        after_response.json.return_value = {"fastapi_url": ""}  # PATCH didn't take
         patch_response = MagicMock()
         patch_response.raise_for_status.return_value = None
+        patch_response.json.return_value = {"updated": ["fastapi_url"]}
 
         with (
             patch(
                 "scripts.remediation.wiring_audit.requests.get",
                 side_effect=[before_response, after_response],
             ),
-            patch("scripts.remediation.wiring_audit.requests.patch", return_value=patch_response),
+            patch(
+                "scripts.remediation.wiring_audit.requests.patch", return_value=patch_response
+            ) as mock_patch,
         ):
             _name, ok, note = wiring_audit._settings_roundtrip("https://example.test", wp_auth)
 
         assert ok is False
         assert "mismatch" in note
+        assert mock_patch.call_count == 2  # restore still runs on failure
+
+    def test_unaccepted_key_reports_failure_and_restores(self):
+        wp_auth = ("svc", "pw")
+        before_response = MagicMock()
+        before_response.raise_for_status.return_value = None
+        before_response.json.return_value = {"fastapi_url": "https://api.devskyy.app"}
+        patch_response = MagicMock()
+        patch_response.raise_for_status.return_value = None
+        patch_response.json.return_value = {"updated": []}  # whitelist rejected the key
+
+        with (
+            patch(
+                "scripts.remediation.wiring_audit.requests.get",
+                return_value=before_response,
+            ),
+            patch(
+                "scripts.remediation.wiring_audit.requests.patch", return_value=patch_response
+            ) as mock_patch,
+        ):
+            _name, ok, note = wiring_audit._settings_roundtrip("https://example.test", wp_auth)
+
+        assert ok is False
+        assert "did not accept" in note
+        assert mock_patch.call_count == 2  # restore still runs
 
 
 class TestMainGate:

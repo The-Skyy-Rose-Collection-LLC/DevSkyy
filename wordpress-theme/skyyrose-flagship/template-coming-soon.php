@@ -13,8 +13,8 @@
  * Design notes (frontend-design skill v2, Register C — Expressive Brand):
  *   - Brand canon palette: deep black #0A0A0A, cream #F5E6D3, rose gold
  *     #B76E79, gold #D4AF37. No blue, no neon, no glassmorphism, no grain.
- *   - Typography: Cinzel display (brand), Cormorant Garamond body,
- *     Bebas Neue eyebrow. All self-hosted via the theme fonts dir.
+ *   - Typography: Cinzel display (brand), Hanken Grotesk body,
+ *     Anton eyebrow. All self-hosted via the theme fonts dir.
  *   - Motion: ONE entrance — opacity + 12px translateY, 700ms cinematic.
  *     Respects prefers-reduced-motion.
  *   - Hierarchy through size + space, not boxes and shadows.
@@ -52,8 +52,8 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 	<meta property="og:url" content="<?php echo esc_url( home_url( '/' ) ); ?>">
 
 	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/cinzel-latin.woff2' ); ?>" crossorigin>
-	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/cormorant-garamond-latin.woff2' ); ?>" crossorigin>
-	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/bebas-neue-latin.woff2' ); ?>" crossorigin>
+	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/hanken-grotesk-latin.woff2' ); ?>" crossorigin>
+	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/anton-latin.woff2' ); ?>" crossorigin>
 
 	<style id="skyyrose-coming-soon-css">
 		@font-face {
@@ -62,18 +62,13 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			font-weight: 400 900; font-style: normal; font-display: swap;
 		}
 		@font-face {
-			font-family: 'Cormorant Garamond';
-			src: url('<?php echo esc_url( $skyyrose_fonts_uri . '/cormorant-garamond-latin.woff2' ); ?>') format('woff2');
+			font-family: 'Hanken Grotesk';
+			src: url('<?php echo esc_url( $skyyrose_fonts_uri . '/hanken-grotesk-latin.woff2' ); ?>') format('woff2');
 			font-weight: 300 700; font-style: normal; font-display: swap;
 		}
 		@font-face {
-			font-family: 'Cormorant Garamond';
-			src: url('<?php echo esc_url( $skyyrose_fonts_uri . '/cormorant-garamond-italic-latin.woff2' ); ?>') format('woff2');
-			font-weight: 300 700; font-style: italic; font-display: swap;
-		}
-		@font-face {
-			font-family: 'Bebas Neue';
-			src: url('<?php echo esc_url( $skyyrose_fonts_uri . '/bebas-neue-latin.woff2' ); ?>') format('woff2');
+			font-family: 'Anton';
+			src: url('<?php echo esc_url( $skyyrose_fonts_uri . '/anton-latin.woff2' ); ?>') format('woff2');
 			font-weight: 400; font-style: normal; font-display: swap;
 		}
 
@@ -86,9 +81,9 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			--c-rose-gold: #B76E79;
 			--c-gold:      #D4AF37;
 			--c-rule:      rgba(245, 230, 211, 0.12);
-			--ff-display:  'Cinzel', 'Playfair Display', Georgia, serif;
-			--ff-body:     'Cormorant Garamond', Georgia, serif;
-			--ff-ui:       'Bebas Neue', 'Helvetica Neue', system-ui, sans-serif;
+			--ff-display:  'Cinzel', 'Archivo', system-ui, sans-serif;
+			--ff-body:     'Hanken Grotesk', system-ui, sans-serif;
+			--ff-ui:       'Anton', 'Helvetica Neue', system-ui, sans-serif;
 			--ease:        cubic-bezier(0.16, 1, 0.3, 1);
 		}
 
@@ -198,7 +193,7 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			display: block;
 			color: var(--c-rose-gold);
 			font-style: italic;
-			font-family: 'Cormorant Garamond', Georgia, serif;
+			font-family: 'Hanken Grotesk', system-ui, sans-serif;
 			font-weight: 400;
 			text-transform: none;
 			letter-spacing: 0;

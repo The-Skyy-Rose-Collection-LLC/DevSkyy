@@ -66,6 +66,84 @@ inspector_template.html — the scripts that shipped Love Hurts Girl) into the s
       three.js r128 `three.min.js`/`GLTFLoader.js`/`OrbitControls.js` — no local copy exists in-repo
       (theme loads three.js via CDN ESM, not a vendorable UMD build). Code fails loudly with a
       setup-script pointer until fetched; mirrors existing `vendor/README.md` convention.
+## DONE — Robust Stop test-gate hook (2026-07-12)
+
+Stop-hook pytest gate false-blocked twice in one session: a load-timeout flake
+(`test_ml_optional` — 60s import guard trips under machine saturation; import itself
+succeeds ~7s unloaded) and a concurrent-session mid-edit race (`content_agent` fixture
+caught half-edited → `tmp_path` NameError). Both passed clean on re-run.
+
+- [x] Extracted the inline `.claude/settings.json` pytest one-liner → `.claude/hooks/stop-test-gate.sh`
+- [x] Retry-on-failure: on a red run, settle 5s then re-run `pytest --last-failed`; block (exit 2)
+      ONLY if the failure reproduces. Kills both false-block modes; never masks a real failure.
+- [x] Verified: decision logic green→0 / flake→0 / real-fail→2; `bash -n` clean; `--last-failed` valid.
+- [ ] **FOLLOW-UP (real backend task, founder-gated):** `import main_enterprise` makes blocking
+      connect attempts at import time (DB via `api/gdpr.py`, `skyyrose.elite_studio.queue.consumer`,
+      `mcp_tools.http_mount`) → ~7s unloaded vs ~62s under load. Make them lazy / short-timeout so the
+      import is fast + non-blocking (the in-memory fallback already exists — it just runs AFTER a slow
+      connect timeout). This is the ROOT fix for the `ml_optional` flake; the retry only papers over it.
+
+## ACTIVE — Build the Signature Collection (all assets) — 2026-07-11
+
+Founder: emblem + bespoke font + page pass. Sequence each; gate every money/deploy step. 3 scouts running.
+
+> ⏸ Queued: bespoke BR Script + LH Graffiti fonts committed (`13c61beda`, v1.10.3) with clean-worktree
+> deploy manifest shown — awaiting founder `y`. Sits atop the v1.10.2 deploy train (also gated, line below).
+
+- [ ] **Track A — Signature font** (replace Pinyon Script): feasibility pending scout → build if autonomous,
+      STOP-AND-SHOW if paid glyph gen. Wire like BR/LH (fonts.css/identity/sot/typography/design-tokens/.impeccable).
+- [ ] **Track B — Signature emblem** (gold star-rose): source pending scout → compose from existing gold-rose+star
+      (zero-paid) OR STOP-AND-SHOW paid render. Output `assets/images/emblems/signature-emblem.webp`; auto-wires via
+      file-gated `.col-hero__emblem`. Eyes-on pixels before it touches the site.
+- [ ] **Track C — Signature page pass**: autonomous copy/layout/imagery/experience per .impeccable.md; gate any new
+      render (money) or WooCommerce/live-data write; verify all 12 SIG products resolve via SOT.
+- [ ] Batch to ONE gated deploy (no drip); bundle with the queued font deploy if founder wants.
+
+## ACTIVE — WS7 launch-night wiring + gap closure (2026-07-11)
+
+Spec: `.planning/SKYYROSE_LAUNCH_NIGHT_SPEC_V2.html` (committed to main 2026-07-11).
+This workstream previously had NO todo.md entry — tracked only in project memory. Register created
+during the 2026-07-11 gap-closure sweep; full detail in memory `project_structural_remediation_2026_07_05`.
+
+- [x] Sync: main==origin/main; launch spec + typography previews committed; feeds/ + tasks/assets/ gitignored
+- [x] bug-222 /cart/ + /checkout/ shell restored (template_include override, commit 940665873, v1.10.2)
+- [x] HG-5 skip links — verified ALREADY CLOSED (live audit 99/0, 2026-07-11)
+- [x] WS5.4 root fix — session cookie now set at guest wishlist write time, not every pageview (f75c92cb4)
+- [x] C5 /analytics/events shared-key gate — __return_true removed from write route (cdb76a951)
+- [x] C6 wiring_audit.py FIRST RUN: 8/8 read-only PASS (after .env WP_APP_PASSWORD quoting fix +
+      audit scope/pattern fixes). Write round-trips still gated (--write + STOPSHOW_ACK=1).
+- [x] WS4.7 orphan categorization DONE 2026-07-11 (founder-approved): lh-005→love-hurts,
+      sg-015→signature. Live verified: 33/33 in collections, uncategorized=0.
+- [x] C4 webhooks REGISTERED 2026-07-11 (founder-approved): 5 topics active →
+      https://www.devskyy.app/api/webhooks/woocommerce (product.create/update/delete, order.create/update).
+- [x] Cookie-policy duplicate <h1> removed from page 10143 body (founder-approved) —
+      live renders exactly one h1.
+- [x] wiring_audit.py --write: **10/10 PASS** 2026-07-11 (after fixing the audit's settings
+      round-trip to use whitelisted fastapi_url — endpoint whitelist was correct, probe was wrong).
+- [ ] ⛔ GATED (founder y — NOT yet approved): theme deploy train v1.10.2 — 6 committed fixes
+      (cart shell, session cookie, analytics key, policy titles, lockup CLS, PDP size-chip)
+      inert on live until deployed.
+- [ ] FOUNDER DECISION: dashboard font migration (spec C5: Fraunces/Archivo/JetBrains vs current
+      Playfair/Cormorant/Space Mono in frontend/lib/fonts.ts) — spec cites nonexistent skyyrose-tokens.css;
+      brand canon cut Playfair/Cormorant 2026-07-10. Needs a call, then execution.
+- [ ] FOUNDER/OPS: `agents-manager` REST namespace live on production but in NO repo source — identify
+      what serves it (plugin? leftover deploy?), bring under version control or retire.
+- [ ] FOUNDER: HG-3 real pre-order ship window for /faq/; HG-1 TikTok/X handle confirm.
+- [ ] Spec DoD amendment needed: "zero __return_true on write routes" now satisfied; consider
+      documenting the shared-key analytics exemption model in the spec.
+- [x] Go-live sweep reconcile: 9/11 theme fixes hold; 2 regressions (policy bare <title>,
+      scene.php lockup CLS heights) re-fixed 2026-07-11
+- [ ] WP-ADMIN (not code): site title "The Skyy Rose Collection"→"SkyyRose"; Jetpack SEO Tools
+      duplicate meta-description toggle (now SITEWIDE, worse than register said); /kids-capsule/
+      → /collections/kids-capsule/ redirect rule (live 404 today)
+- [ ] ⛔ GATED (live content edit): cookie-policy page body carries its own <h1> duplicating the
+      template's — remove via wp-admin editor
+- [ ] IMAGERY (founder-gated, paid): KC hero brand-script lockup asset (Grand Hotel per canon) —
+      scene.php still falls back to sr-monogram
+- [ ] PERF BACKLOG: homepage stylesheet count grew 37→40
+- [ ] SDK regressions (2026-04-15 consolidation kept the UNFIXED duplicate): 4 fixes being
+      re-applied to sdk/python/agent_sdk — worker await-crash is production-critical
+      (docker-compose runs agent_sdk.worker)
 
 ## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
 

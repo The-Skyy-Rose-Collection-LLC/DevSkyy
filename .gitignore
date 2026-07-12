@@ -467,3 +467,18 @@ scripts/oai-render-review.py
 
 # --- Binary 3D proof-of-concept assets in planning handoffs ---
 .planning/handoffs/*.glb
+
+# --- Generated OpenAI product feed output (scripts/openai_feed/) ---
+feeds/
+
+# --- Design-session working binaries (finals tracked in theme assets) ---
+tasks/assets/
+
+# --- Frontend skill screenshots (regenerated every run) ---
+frontend/.claude/skills/*/screenshots/
+
+# --- Session verification screenshots at repo root (Playwright verify output) ---
+/live-desktop-*.jpeg
+/live-mobile-*.jpeg
+/v8-hero-slides.jpeg
+/BlackRoseScene.png

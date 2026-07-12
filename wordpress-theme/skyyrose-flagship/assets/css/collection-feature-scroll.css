@@ -1,0 +1,170 @@
+/**
+ * Collection Feature Scroll — sticky image + scrolling feature items.
+ *
+ * Desktop (>900px): 50/50 grid; left media frame sticks from top 10vh while
+ * the right column's items scroll; images cross-fade 0.4s per active item.
+ * Active item: 3px accent left border + accent heading; inactive 0.4 opacity.
+ * Mobile (≤900px): stacked — per-item image above text, no sticky column.
+ *
+ * Accent resolves per collection via the [data-collection] token cascade
+ * (--skyyrose-accent, design-tokens.css §2).
+ *
+ * @package SkyyRose
+ * @since   1.10.3
+ */
+
+.col-featscroll {
+	padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+}
+
+.col-featscroll__header {
+	max-width: 640px;
+	margin: 0 auto clamp(2.5rem, 6vw, 5rem);
+	text-align: center;
+}
+
+.col-featscroll__heading {
+	margin: 0 0 0.75rem;
+}
+
+.col-featscroll__subheading {
+	margin: 0;
+	opacity: 0.7;
+}
+
+/* ── Desktop layout ─────────────────────────────────────────────── */
+
+.col-featscroll__layout {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(2rem, 5vw, 4.5rem);
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
+.col-featscroll__media {
+	position: relative;
+}
+
+.col-featscroll__frame {
+	position: sticky;
+	top: 10vh;
+	height: 80vh;
+	overflow: hidden;
+	border-radius: 12px;
+	background: rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.06);
+}
+
+.col-featscroll__img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.col-featscroll__img.is-active {
+	opacity: 1;
+}
+
+/* ── Feature items ──────────────────────────────────────────────── */
+
+.col-featscroll__items {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.col-featscroll__item {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: 70vh;
+	padding: 2rem 0 2rem 1.75rem;
+	border-left: 3px solid transparent;
+	opacity: 0.4;
+	transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+.col-featscroll__item.is-active {
+	opacity: 1;
+	border-left-color: var(--skyyrose-accent, #B76E79);
+}
+
+.col-featscroll__item.is-active .col-featscroll__title {
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent, #B76E79));
+}
+
+.col-featscroll__icon {
+	display: block;
+	font-size: 1.75rem;
+	line-height: 1;
+	margin-bottom: 1rem;
+}
+
+.col-featscroll__title {
+	margin: 0 0 0.75rem;
+	transition: color 0.3s ease;
+}
+
+.col-featscroll__text {
+	margin: 0;
+	max-width: 44ch;
+	line-height: 1.7;
+}
+
+/* Per-item figures are a mobile-only presentation of the same asset the
+   sticky frame shows on desktop (same URL — one download, served from cache). */
+.col-featscroll__item-figure {
+	display: none;
+	margin: 0 0 1.25rem;
+}
+
+/* ── Mobile: stacked, no sticky ─────────────────────────────────── */
+
+@media (max-width: 900px) {
+	.col-featscroll__layout {
+		display: block;
+	}
+
+	.col-featscroll__media {
+		display: none;
+	}
+
+	.col-featscroll__item {
+		min-height: 0;
+		padding: 0 0 3rem;
+		border-left: 0;
+		opacity: 1;
+	}
+
+	.col-featscroll__item-figure {
+		display: block;
+		border-radius: 10px;
+		overflow: hidden;
+	}
+
+	.col-featscroll__item-img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+}
+
+@media (min-width: 901px) {
+	.col-featscroll__item-figure {
+		display: none;
+	}
+}
+
+/* ── Reduced motion: no cross-fade, no dimming choreography ─────── */
+
+@media (prefers-reduced-motion: reduce) {
+	.col-featscroll__img,
+	.col-featscroll__item,
+	.col-featscroll__title {
+		transition: none;
+	}
+}

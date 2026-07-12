@@ -116,6 +116,8 @@ OpenWolf's value comes from learning across sessions. You MUST update `.wolf/cer
 
 **The threshold is LOW.** When in doubt, log it. A false positive in the bug log costs nothing. A missed bug means repeating the same mistake later.
 
+**Recurring bugs sync to CLAUDE.md.** If you log a bug that already exists (bump its `occurrences` + `last_seen` instead of duplicating), or any entry reaches `occurrences >= 2`, run `python scripts/wolf_recurring_sync.py` — it regenerates the 1-line recurring-issues digest between the `wolf:recurring` markers in CLAUDE.md so every future session loads it automatically. (A Stop hook in `.claude/settings.json` also runs this sync at every turn end as a backstop — per-clone wiring, like the claude-mem sync hook.)
+
 ## Token Discipline
 
 - Never re-read a file already read this session unless it was modified since.

@@ -25,10 +25,12 @@
 	--silver: #C0C0C0;
 	--crimson: #DC143C;
 	--gold: #D4AF37;
-	--ff-brand: var(--font-heading, 'Cinzel', serif);
-	--ff-editorial: var(--font-body, 'Playfair Display', serif);
+	/* --ff-brand / --ff-editorial / --ff-cta intentionally NOT redeclared here —
+	   design-tokens.css §1.12 already defines them as back-compat aliases of
+	   --skyyrose-font-*. A local redefinition previously shadowed that (and
+	   --ff-editorial's fallback referenced an undefined --font-body, resolving
+	   to a dead literal once its font-face was retired). Let the global win. */
 	--ff-mono: ui-monospace, 'SF Mono', Menlo, monospace;
-	--ff-cta: 'Bebas Neue', sans-serif;
 	--ease-luxury: cubic-bezier(.16, 1, .3, 1);
 	--space-sm: 16px;
 	--space-md: 32px;
@@ -42,7 +44,7 @@
 .homepage-v2 {
 	background: var(--void, #050505);
 	color: #fff;
-	font-family: 'Cormorant Garamond', serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	overflow-x: hidden;
 	line-height: 1.7;
@@ -248,7 +250,7 @@
 /* Hero typography — bracketed mark: OAKLAND ⌄ SkyyRose ⌄ EST. 2020 */
 .hero-mark-top,
 .hero-mark-bot {
-	font-family: var(--ff-cta, 'Bebas Neue'), 'Helvetica Neue', sans-serif;
+	font-family: var(--ff-cta, 'Anton'), 'Helvetica Neue', sans-serif;
 	font-size: clamp(11px, 1.05vw, 14px);
 	letter-spacing: clamp(8px, 1.2vw, 14px);
 	text-transform: uppercase;
@@ -284,9 +286,18 @@
 }
 .hero-title {
 	font-family: var(--ff-brand);
-	font-weight: 400; /* Luxury elegance — never bold */
-	font-size: clamp(50px, 16vw, 220px);
-	letter-spacing: clamp(10px, 2.5vw, 36px);
+	font-weight: 900; /* Archivo expanded monument treatment (typography.json) */
+	font-variation-settings: 'wdth' 125, 'wght' 900;
+	font-size: clamp(38px, 11.5vw, 160px);
+	/* letter-spacing max tightened 36px→24px (audit item C): measured live at
+	   1440px viewport, the old 36px ceiling rendered the box at 1487px wide —
+	   23.6px past each edge, clipped by .hero's overflow:hidden (confirmed via
+	   Range/getBoundingClientRect, not estimated). Width here is exact and
+	   additive: 7.4952px/1px font-size + 8px/1px letter-spacing (8 characters).
+	   font-size max (160px) is the locked Archivo "monument" scale and stays
+	   untouched; 24px restores the original-intent 24px .hero-content gutter
+	   on both sides with zero risk to legibility. */
+	letter-spacing: clamp(10px, 2.5vw, 24px);
 	text-transform: uppercase;
 	line-height: 0.9;
 	white-space: nowrap;
@@ -930,8 +941,10 @@
 /* ==========================================================================
    KIDS CAPSULE — HEIR APPARENT (ported from design-system .sr-heir)
    "Hover to break the seal" — envelope opens, wax cracks, letter rises.
-   Replaces the prior split-screen .kc-reveal. Script copy uses Cormorant
-   Garamond italic (Great Vibes is canonical; self-host pending).
+   Replaces the prior split-screen .kc-reveal. Title/sub use the display and
+   body tokens; Grand Hotel (self-hosted, --skyyrose-font-script within
+   [data-collection="kids-capsule"]) is available if a script treatment is
+   wanted here — not currently wired to any element in this block.
    ========================================================================== */
 .kc-heir {
 	padding: clamp(72px, 10vw, 140px) clamp(20px, 6vw, 48px);

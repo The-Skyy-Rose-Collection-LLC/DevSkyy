@@ -903,6 +903,13 @@ function skyyrose_pre_document_title( $title ) {
 			}
 			return $collection_ctx['label'] . ' — Immersive Experience | ' . $brand;
 		}
+
+		// Policy pages use the default page template — no template slug to key
+		// on above, and the WP.com SEO layer strips the brand suffix, leaving a
+		// bare <title> (go-live sweep P1, regressed in the seo.php rewrite).
+		if ( is_page( array( 'privacy-policy', 'terms-of-service', 'cookie-policy', 'refund-policy' ) ) ) {
+			return get_the_title() . ' | ' . $brand;
+		}
 	}
 
 	return $title;

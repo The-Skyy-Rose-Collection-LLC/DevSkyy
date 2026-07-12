@@ -17,7 +17,7 @@
    silently fall back to a system serif (the "where are the collection fonts" bug).
    Duplicate of fonts.css declarations — browsers dedupe by URL. */
 @font-face { font-family: 'Pinyon Script'; src: url('../fonts/pinyon-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Yellowtail'; src: url('../fonts/yellowtail-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Pacifico'; src: url('../fonts/pacifico-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Kaushan Script'; src: url('../fonts/kaushan-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 
 /* Page-scoped scroll-snap (this CSS only loads on the hub). */
@@ -71,7 +71,7 @@ html {
 	transform: translateX(-50%);
 	z-index: 55;
 	white-space: nowrap;
-	font-family: 'Cormorant Garamond', serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-size: 0.72rem;
 	font-weight: 300;
 	letter-spacing: 0.3em;
@@ -258,7 +258,7 @@ html {
 	margin-top: 28px;
 	padding-bottom: 2px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	font-size: 0.8rem;
 	letter-spacing: 0.22em;
 	color: rgba(255, 255, 255, 0.6);
@@ -294,7 +294,7 @@ html {
 }
 
 .exp-hint span {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	font-size: 0.65rem;
 	letter-spacing: 0.3em;
 	color: rgba(255, 255, 255, 0.4);

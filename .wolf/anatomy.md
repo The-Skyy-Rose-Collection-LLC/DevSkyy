@@ -4023,3 +4023,11 @@ Git-ignored, fetched via scripts/setup_character_pipeline_vendor.sh — FBX2glTF
 ## scripts/prepare_character_pipeline_fixture.py, scripts/setup_character_pipeline_vendor.sh
 - `prepare_character_pipeline_fixture.py` — regenerates tests/character_pipeline/fixtures/love_hurts_girl_static.glb from the real Blender export + observes real WS3-6 pipeline numbers (~950 tok)
 - `setup_character_pipeline_vendor.sh` — fetches FBX2glTF v0.9.7 binaries + three.js r128 UMD build into skyyrose/character_pipeline/vendor/ (~400 tok)
+### wordpress-theme/skyyrose-flagship/template-parts/collection/feature-scroll.php
+Sticky-image feature scroll section: renders per-collection `features` canon (icon/title/text/image) as a 50/50 desktop layout — left sticky frame cross-fades images per active item, right items scroll; mobile stacks per-item image above text. File-gates every image (bug-221 single-path rule). ~105 lines, ~900 tokens.
+
+### wordpress-theme/skyyrose-flagship/assets/css/collection-feature-scroll.css
+Styles for the feature-scroll section: sticky frame (top 10vh, 80vh), 0.4s cross-fade, active item = 3px var(--skyyrose-accent) left border + accent title, inactive 0.4 opacity; ≤900px stacks + hides sticky column; reduced-motion kills transitions. ~170 lines, ~1.1k tokens.
+
+### wordpress-theme/skyyrose-flagship/assets/js/collection-feature-scroll.js
+Active-state driver: GSAP ScrollTrigger create() per item (onEnter/onEnterBack, no scrub) on desktop; IntersectionObserver fallback (mobile/reduced-motion/no-GSAP). Class toggles only, no innerHTML. ~95 lines, ~650 tokens.

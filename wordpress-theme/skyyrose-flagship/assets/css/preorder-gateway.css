@@ -19,8 +19,8 @@
   --po-accent:    var(--skyyrose-accent,   #c0c0c0);
   --po-accent2:   var(--skyyrose-secondary,#D4AF37);
   --po-font-d:    var(--skyyrose-font-display, 'Cinzel', serif);
-  --po-font-b:    var(--skyyrose-font-body,    'Cormorant Garamond', serif);
-  --po-font-ui:   var(--skyyrose-font-ui,      'Bebas Neue', sans-serif);
+  --po-font-b:    var(--skyyrose-font-body,    'Hanken Grotesk', sans-serif);
+  --po-font-ui:   var(--skyyrose-font-ui,      'Anton', sans-serif);
   --po-ease:      var(--skyyrose-ease,     cubic-bezier(.22,1,.36,1));
   --po-radius:    var(--skyyrose-radius,   4px);
 

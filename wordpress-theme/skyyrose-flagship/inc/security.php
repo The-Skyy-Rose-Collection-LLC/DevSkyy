@@ -99,7 +99,7 @@ function skyyrose_send_security_headers() {
 	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 
 	// Permissions policy (restrict sensor APIs not needed by a fashion site).
-	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self), interest-cohort=(), browsing-topics=(), autoplay=(self), accelerometer=(), gyroscope=(), magnetometer=(), usb=()' );
+	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self "https://js.stripe.com"), interest-cohort=(), browsing-topics=(), autoplay=(self), accelerometer=(), gyroscope=(), magnetometer=(), usb=()' );
 
 	// Cross-Origin policies for asset isolation.
 	header( 'Cross-Origin-Opener-Policy: same-origin' );

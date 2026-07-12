@@ -633,7 +633,7 @@
 	max-width: 28rem;
 }
 .sr-ed__edition-badge-label {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	font-size: 11px;
 	letter-spacing: 0.3em;
 	text-transform: uppercase;
@@ -650,7 +650,7 @@
 	letter-spacing: 0.02em;
 }
 .sr-ed__edition-badge-note {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	font-style: italic;
 	font-size: 14px;
 	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.55));

@@ -155,14 +155,23 @@ async def lifespan(app: FastAPI):
 # App
 # =============================================================================
 
+
+def _resolve_schema_url(environment: str, path: str) -> str | None:
+    """Gate a docs/schema endpoint by environment.
+
+    Returns None in production to DISABLE the endpoint, else ``path``. Disabling
+    docs_url/redoc_url alone still leaves /openapi.json publicly readable —
+    disclosing every route and parameter on the internet-facing backend — so the
+    OpenAPI schema is gated the same way (None also disables the Swagger/ReDoc
+    pages that depend on it).
+    """
+    return None if environment == "production" else path
+
+
 _environment = os.getenv("ENVIRONMENT", "development")
-_docs_url = None if _environment == "production" else "/docs"
-_redoc_url = None if _environment == "production" else "/redoc"
-# Gate the raw OpenAPI schema too: disabling docs_url/redoc_url alone still
-# leaves /openapi.json publicly readable, disclosing every route and parameter
-# on the now internet-facing backend. None disables the schema endpoint (and
-# the Swagger/ReDoc pages that depend on it) in production.
-_openapi_url = None if _environment == "production" else "/openapi.json"
+_docs_url = _resolve_schema_url(_environment, "/docs")
+_redoc_url = _resolve_schema_url(_environment, "/redoc")
+_openapi_url = _resolve_schema_url(_environment, "/openapi.json")
 
 app = FastAPI(
     title="DevSkyy Enterprise Platform",

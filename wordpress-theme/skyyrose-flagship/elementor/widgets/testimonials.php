@@ -166,7 +166,7 @@ class SkyyRose_Testimonials_Widget extends \Elementor\Widget_Base {
 						<?php echo esc_html( str_repeat( "\u{2605}", $rating ) . str_repeat( "\u{2606}", 5 - $rating ) ); ?>
 					</div>
 
-					<blockquote style="font-family:'Cormorant Garamond',serif;font-style:italic;
+					<blockquote style="font-family:'Hanken Grotesk',sans-serif;font-style:italic;
 						font-size:clamp(18px,2.5vw,28px);color:rgba(255,255,255,.7);
 						max-width:700px;margin:0 auto 24px;line-height:1.7;">
 						&ldquo;<?php echo esc_html( $t['quote'] ); ?>&rdquo;

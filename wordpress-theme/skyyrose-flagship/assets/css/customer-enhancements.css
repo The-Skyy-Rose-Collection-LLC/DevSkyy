@@ -27,7 +27,7 @@
 }
 
 .sr-fit-block__label {
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 11px;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
@@ -50,7 +50,7 @@
 
 .sr-fit-block__model-specs dt {
 	display: inline;
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 10px;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
@@ -120,7 +120,7 @@
 }
 
 .sr-drop-block__collection-label {
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 11px;
 	letter-spacing: 0.25em;
 	color: #b76e79;
@@ -130,7 +130,7 @@
 .sr-drop-block__title {
 	/* clamp: 2rem minimum, 5vw preferred, 3.5rem ceiling */
 	font-size: clamp(2rem, 5vw, 3.5rem);
-	font-family: "Playfair Display", serif;
+	font-family: "Archivo", sans-serif;
 	font-weight: 700;
 	line-height: 1.1;
 	color: #ffffff;
@@ -139,7 +139,7 @@
 
 .sr-drop-block__cta {
 	display: inline-block;
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -217,7 +217,7 @@
 }
 
 .sr-sticky-atc__name {
-	font-family: "Playfair Display", serif;
+	font-family: "Archivo", sans-serif;
 	font-size: 13px;
 	color: rgba(255, 255, 255, 0.85);
 	flex: 1 1 auto;
@@ -229,7 +229,7 @@
 }
 
 .sr-sticky-atc__price {
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 15px;
 	letter-spacing: 0.06em;
 	color: #ffffff;
@@ -244,7 +244,7 @@
 	background-color: transparent;
 	border: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.5);
 	color: rgba(255, 255, 255, 0.75);
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 13px;
 	letter-spacing: 0.1em;
 	padding: 8px 32px 8px 12px;
@@ -269,7 +269,7 @@
 	color: #ffffff;
 }
 
-/* CTA button — accent filled per collection, Bebas Neue, matches sitewide
+/* CTA button — accent filled per collection, Anton, matches sitewide
    ATC style. Text color uses --sr-on-accent (single-product.css) so gold/
    silver/rose-gold get black text and Love Hurts crimson keeps white —
    both meet WCAG AA 4.5:1 against their own fill. */
@@ -277,7 +277,7 @@
 	appearance: none;
 	background-color: var(--skyyrose-accent, #b76e79);
 	color: var(--sr-on-accent, #000000);
-	font-family: "Bebas Neue", sans-serif;
+	font-family: "Anton", sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;

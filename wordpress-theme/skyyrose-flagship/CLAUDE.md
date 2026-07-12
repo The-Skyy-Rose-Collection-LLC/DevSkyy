@@ -1,8 +1,44 @@
 # SkyyRose Theme — scoped context
 
-Loads on top of root. Root already covers: `.min` is `SCRIPT_DEBUG`-gated (rebuild after every CSS/JS edit),
-`index.php?rest_route=` not `/wp-json/`, escape/sanitize, nonce+capability, no `innerHTML`, PHPCS. The items
-below are NOT in root and a fresh session trips on them.
+**Commercial marketplace theme. Production at skyyrose.co**
+**Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
+
+```
+wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
+  assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
+  inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
+  template-parts/          product-card-holo.php = holo card system
+  patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
+  *.php                    collection + landing + immersive + builder templates
+```
+
+**Key systems:**
+- `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
+- `inc/enqueue.php` — All CSS/JS loading, template slug detection
+- `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
+- `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
+- `inc/patterns.php` — Block pattern registration for all collections
+- `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
+- `functions.php` — Theme constants (`SKYYROSE_VERSION`), includes array
+
+**PHPCS compliance:**
+- `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
+- Run: `cd wordpress-theme/skyyrose-flagship && vendor/bin/phpcs --standard=.phpcs.xml -s .`
+- Auto-fix: `vendor/bin/phpcbf --standard=.phpcs.xml .`
+- Composer must be installed first: `~/.local/bin/composer install`
+
+## WordPress Rules
+
+- **Theme serves `.min` in production** (`$use_min = ! SCRIPT_DEBUG`). After ANY CSS/JS edit, rebuild with `node scripts/build-css.js && node scripts/build-js.js` or the change is inert live. Re-verify the `.min` output, not just the source.
+- Extend via hooks (actions/filters), never modify core
+- API: `index.php?rest_route=` NOT `/wp-json/`
+- Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
+- Sanitize input: `sanitize_text_field()`, `absint()`
+- Always `$wpdb->prepare()` — never concatenate untrusted input
+- Nonce + capability checks on all write actions
+- No `innerHTML` in JS — use `createElement` + `textContent`
+
+The gotchas below trip fresh sessions.
 
 ## Build commands run from `wordpress-theme/` (the PARENT), not here
 

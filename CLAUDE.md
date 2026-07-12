@@ -65,26 +65,7 @@ The diligence spine. These are the standard for every task — not aspirational,
 
 ## Commands by Workspace
 
-### Python API (root)
-```bash
-make install                         # pip install -e ".[all]"
-make dev                             # install + dev deps
-uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload
-make test                            # pytest tests/
-make test-fast                       # pytest -x --timeout=10
-make test-cov                        # pytest --cov
-make format                          # isort . && ruff check --fix && black .
-make lint                            # ruff check . && black --check .
-```
-
-### Dashboard (frontend/)
-```bash
-cd frontend
-npm install                          # install deps
-npm run dev                          # dev server
-npm run type-check && npm run lint   # verify
-npm run build                        # production build
-```
+Python API and Dashboard use the standard `Makefile` / `frontend/package.json` invocations — read those manifests.
 
 ### WordPress (wordpress-theme/)
 ```bash
@@ -102,20 +83,6 @@ npm run verify                       # full verification
 
 **AI-driven luxury fashion e-commerce platform (SkyyRose brand)**
 Python 3.11+ · FastAPI · Next.js · WordPress/WooCommerce · Three.js
-
-```
-core/           → Foundation: auth, cache, events, registry (zero external deps)
-security/       → JWT, OAuth2, AES-256-GCM encryption
-database/       → Alembic migrations, models
-llm/            → 6 providers: OpenAI, Anthropic, Google, Mistral, Cohere, Groq
-orchestration/  → RAG, LangGraph, CrewAI workflows
-services/       → ML models, 3D generation, analytics
-agents/         → Specialized agents (base_super_agent.py = foundation)
-api/            → FastAPI REST (v1/) + GraphQL (graphql/)
-frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (commercial; version in style.css)
-scripts/        → Deploy, sync, generation scripts
-```
 
 **Dependency flow:** `core → security → database/llm → orchestration/services → agents → api`
 
@@ -145,51 +112,9 @@ scripts/        → Deploy, sync, generation scripts
 
 ## WordPress Theme (SkyyRose)
 
-**Commercial marketplace theme. Production at skyyrose.co**
-**Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
-
-```
-wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
-  assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
-  inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
-  template-parts/          product-card-holo.php = holo card system
-  patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
-  *.php                    collection + landing + immersive + builder templates
-```
-
-**Active templates:**
-- `front-page.php` — Three.js portals (3 collection rings + particles)
-- `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
-- `template-landing-{black-rose,love-hurts,signature}.php` — Conversion landing pages
-- `template-preorder-gateway.php` — Pre-order with collection selector
-- `template-immersive-{signature,black-rose,love-hurts,kids-capsule}.php` — 3D experiences
-- `template-about.php` — Brand story + timeline
-- `template-elementor-canvas.php` / `template-elementor-fullwidth.php` — Builder templates
-
-**Key systems:**
-- `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
-- `inc/enqueue.php` — All CSS/JS loading, template slug detection
-- `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
-- `inc/patterns.php` — Block pattern registration for all collections
-- `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
-- `functions.php` — Theme constants (`SKYYROSE_VERSION`), includes array
-
-**PHPCS compliance:**
-- `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
-- Run: `cd wordpress-theme/skyyrose-flagship && vendor/bin/phpcs --standard=.phpcs.xml -s .`
-- Auto-fix: `vendor/bin/phpcbf --standard=.phpcs.xml .`
-- Composer must be installed first: `~/.local/bin/composer install`
-
-### WordPress Rules
-- **Theme serves `.min` in production** (`$use_min = ! SCRIPT_DEBUG`). After ANY CSS/JS edit, rebuild with `node scripts/build-css.js && node scripts/build-js.js` or the change is inert live. Re-verify the `.min` output, not just the source.
-- Extend via hooks (actions/filters), never modify core
-- API: `index.php?rest_route=` NOT `/wp-json/`
-- Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
-- Sanitize input: `sanitize_text_field()`, `absint()`
-- Always `$wpdb->prepare()` — never concatenate untrusted input
-- Nonce + capability checks on all write actions
-- No `innerHTML` in JS — use `createElement` + `textContent`
+Theme specifics — structure, `.min` build rule, escaping/sanitize/nonce conventions, PHPCS — live in
+`wordpress-theme/skyyrose-flagship/CLAUDE.md`, which loads automatically when working under the theme.
+Production at skyyrose.co · Text Domain `skyyrose` · version = `SKYYROSE_VERSION` in `functions.php`.
 
 ---
 
@@ -267,8 +192,8 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 
 - Tagline: "Luxury Grows from Concrete."
 - Collections: Signature, Black Rose, Love Hurts, Kids Capsule
-- Fonts: Cinzel (BR headings), Playfair Display (SIG/LH/KC), Cormorant Garamond (body), Bebas Neue (UI), Inter (system)
-- All 9 font families declared in `theme.json` via WordPress Font Library (zero external CDN)
+- Fonts: **Archivo** (display/hero — expanded via `font-variation-settings 'wdth' 125`), **Hanken Grotesk** (body/UI), **Anton** (drop/UI accent), **Cinzel** (engraved caps). Per-collection scripts: **Pacifico** (BR), **Pinyon Script** (SIG), **Grand Hotel** (KC), **Kaushan Script** (LH — interim; custom graffiti face from lockup pending). **Inter** = system fallback.
+- Cut 2026-07-10: Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail (do NOT reintroduce — not in any brand lockup; they pulled toward the European-serif lineage the founder locked out). Self-hosted woff2, zero CDN, declared in `theme.json` Font Library + `assets/css/fonts.css`; the `--skyyrose-font-*` vars are generated from `data/brand/typography.json` via `gen-design-tokens.py`.
 
 ---
 
@@ -287,6 +212,16 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 ## Learnings
 
 Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Knowledge base, not per-turn behavioral rules.
+
+<!-- wolf:recurring:start -->
+### Recurring issues (synced from `.wolf/buglog.json` — regenerate via `python scripts/wolf_recurring_sync.py`, do not hand-edit)
+- **bug-096** (×30, 2026-05-08): Tripo generate_multiview_image hallucinated brand canon on 30 SKUs (120 renders… → fix: scripts/tripo_dispatch.py — added classify_skus() function that blocks at the d…
+- **bug-172** (×24, 2026-06-30): OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does n… → fix: FIXED 2026-06-30: config.py defines INPUT_FIDELITY_SUPPORTED_MODELS = {gpt-imag…
+- **bug-230** (×6, 2026-07-10): PATTERN: fail-open guards / silent fallbacks — gates that pass when their input… → fix: Rule: every gate fails CLOSED — absent manifest/config/token = block, exception…
+- **bug-098** (×4, 2026-05-12): DATA-01: /collection-black-rose/, /collection-love-hurts/, /collection-signatur… → fix: Bumped SKYYROSE_SETUP_VERSION constant from '4.0.0' to '4.1.0' in inc/theme-act…
+- **bug-231** (×4, 2026-07-12): PATTERN: test isolation / shared-state pollution — tests failing only in full-s… → fix: Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (neve…
+<!-- wolf:recurring:end -->
+
 ## Behavioral Standards — How Claude Operates in This Project
 
 These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.

@@ -19,8 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * GDPR-compliant: zero external requests to Google Fonts.
  * 5 universal families + 3 collection scripts served locally from assets/fonts/ as woff2.
- * Universal: Inter, Playfair Display, Cinzel, Cormorant Garamond, Bebas Neue.
- * Collection scripts: Yellowtail, Kaushan Script, Pinyon Script.
+ * Universal: Inter, Archivo, Cinzel, Hanken Grotesk, Anton.
+ * Collection scripts: Pacifico, Kaushan Script, Pinyon Script.
  *
  * @since 3.2.1
  * @updated 4.1.0 — self-hosted all Google Fonts families
@@ -639,6 +639,20 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Sticky-image feature scroll — collection pages (feature-scroll.php part).
+	if ( 'collection-standalone' === $slug ) {
+		$featscroll_css = $use_min && file_exists( $base_css_dir . '/collection-feature-scroll.min.css' )
+			? 'collection-feature-scroll.min.css' : 'collection-feature-scroll.css';
+		if ( file_exists( $base_css_dir . '/' . $featscroll_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-collection-feature-scroll',
+				$base_css_uri . '/' . $featscroll_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Embedded experience layer (WS3): collection pages render the immersive
 	// scene as their opening layer, so they need immersive.css too. The handle
 	// matches the filename-derived one the 'immersive' slug produces, keeping
@@ -868,10 +882,30 @@ function skyyrose_enqueue_template_scripts() {
 	// Immersive rooms animate via gsap.timeline/fromTo/set only (immersive-core.js
 	// + immersive.js, 0 ScrollTrigger refs), so shipping ScrollTrigger there was
 	// ~40KB of dead main-thread parse during the scene intro. preorder-gateway.js
-	// (5 refs) and kids-capsule-launch.js (3 refs) genuinely use it.
-	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch' );
+	// (5 refs), kids-capsule-launch.js (3 refs), and collection-feature-scroll.js
+	// (sticky feature section) genuinely use it.
+	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch', 'collection-standalone' );
 	if ( in_array( $slug, $gsap_st_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
+	}
+
+	// Sticky-image feature scroll (collection pages) — ScrollTrigger drives the
+	// active state on desktop; the script self-falls-back to IntersectionObserver
+	// when GSAP is absent, motion is reduced, or the viewport is mobile.
+	if ( 'collection-standalone' === $slug ) {
+		$featscroll_js = $use_min && file_exists( $base_js_dir . '/collection-feature-scroll.min.js' )
+			? 'collection-feature-scroll.min.js' : 'collection-feature-scroll.js';
+		if ( file_exists( $base_js_dir . '/' . $featscroll_js ) ) {
+			$featscroll_deps = wp_script_is( 'skyyrose-gsap-st', 'enqueued' )
+				? array( 'skyyrose-gsap-st' ) : array();
+			wp_enqueue_script(
+				'skyyrose-collection-feature-scroll',
+				$base_js_uri . '/' . $featscroll_js,
+				$featscroll_deps,
+				SKYYROSE_VERSION,
+				true
+			);
+		}
 	}
 
 	// Phase 2 — Lenis smooth-scroll lib: preorder gateway only.

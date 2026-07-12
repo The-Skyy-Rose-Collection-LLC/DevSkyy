@@ -32,11 +32,14 @@ EXPECTED_PALETTE = {
     "signature": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
     "kids-capsule": {"gold", "rose_gold", "accent", "accent_dark", "secondary", "bg", "text"},
 }
+# Canon pins — founder typography overhaul 2026-07-10; bespoke faces landed
+# 2026-07-11 (13c61beda): BR Pacifico -> SkyyRose Black Rose Script,
+# LH Kaushan Script (interim) -> SkyyRose Love Hurts Graffiti.
 SCRIPT_FONT = {
-    "black-rose": "Yellowtail",
-    "love-hurts": "Kaushan Script",
+    "black-rose": "SkyyRose Black Rose Script",
+    "love-hurts": "SkyyRose Love Hurts Graffiti",
     "signature": "Pinyon Script",
-    "kids-capsule": "Pinyon Script",
+    "kids-capsule": "Grand Hotel",
 }
 
 
@@ -52,7 +55,7 @@ def test_identity_validates_and_matches_canon(slug):
     assert EXPECTED_PALETTE[slug].issubset(set(ident["palette"]))
     assert ident["fonts"]["script"]["family"] == SCRIPT_FONT[slug]
     assert ident["fonts"]["caps"]["family"] == "Cinzel"
-    assert ident["fonts"]["body"]["family"] == "Cormorant Garamond"
+    assert ident["fonts"]["body"]["family"] == "Hanken Grotesk"
 
 
 import sys

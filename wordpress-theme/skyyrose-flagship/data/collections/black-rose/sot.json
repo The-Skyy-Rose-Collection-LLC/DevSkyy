@@ -20,9 +20,9 @@
   },
   "fonts": {
     "script": {
-      "family": "Yellowtail",
-      "woff2": "assets/fonts/yellowtail-latin.woff2",
-      "source": "OFL / Google Fonts"
+      "family": "SkyyRose Black Rose Script",
+      "woff2": "assets/fonts/skyyrose-black-rose-script-latin.woff2",
+      "source": "SkyyRose custom (built from AI glyph sheets)"
     },
     "caps": {
       "family": "Cinzel",
@@ -30,8 +30,8 @@
       "source": "OFL (already hosted)"
     },
     "body": {
-      "family": "Cormorant Garamond",
-      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
       "source": "OFL (already hosted)"
     }
   },

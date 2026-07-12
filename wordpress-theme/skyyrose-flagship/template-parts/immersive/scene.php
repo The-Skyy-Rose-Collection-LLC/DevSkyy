@@ -204,29 +204,35 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 
 	<?php
 	// Per-collection lockup (hero title is an image, never type-rendered).
+	// 'height' pairs with the width="480" attr below for CLS protection —
+	// hero-overlay lockups are 1600x900 (→ 270), the KC monogram 720x720 (→ 480).
 	$lockup_map = array(
 		'black-rose'   => array(
 			'dir'     => 'hero-overlays',
 			'base'    => 'br-brand-script-logotype',
 			'has_png' => true,
+			'height'  => 270,
 			'alt'     => __( 'Black Rose', 'skyyrose' ),
 		),
 		'love-hurts'   => array(
 			'dir'     => 'hero-overlays',
 			'base'    => 'lh-logo-combined',
 			'has_png' => true,
+			'height'  => 270,
 			'alt'     => __( 'Love Hurts', 'skyyrose' ),
 		),
 		'signature'    => array(
 			'dir'     => 'hero-overlays',
 			'base'    => 'sig-brand-skyy-rose-gold',
 			'has_png' => true,
+			'height'  => 270,
 			'alt'     => __( 'Signature', 'skyyrose' ),
 		),
 		'kids-capsule' => array(
 			'dir'     => 'logos',
 			'base'    => 'sr-monogram-rose-gold',
 			'has_png' => false,
+			'height'  => 480,
 			'alt'     => __( 'Kids Capsule', 'skyyrose' ),
 		),
 	);
@@ -246,11 +252,11 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 				?>
 				<?php if ( $lockup_info['has_png'] ) : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.png' ); ?>"
-						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( $lockup_info['height'] ); ?>"
 						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php else : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>"
-						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( $lockup_info['height'] ); ?>"
 						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php endif; ?>
 			</picture>

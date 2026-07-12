@@ -41,7 +41,10 @@ OK, FAIL, WARN, SKIP = (
     "\033[36m SKIP \033[0m",
 )
 
-_SECRET_PATTERNS = (re.compile(r"ck_[a-zA-Z0-9]{10,}"), re.compile(r"cs_[a-zA-Z0-9]{10,}"))
+# WooCommerce keys are ck_/cs_ + 40 lowercase hex chars. Requiring hex (not
+# [a-zA-Z0-9]) keeps UI input placeholders like "ck_xxxxxxxxxxxxx" from
+# false-positiving — 'x' is not a hex digit.
+_SECRET_PATTERNS = (re.compile(r"ck_[a-f0-9]{20,}"), re.compile(r"cs_[a-f0-9]{20,}"))
 
 # Category slugs the dashboard's wc/store/v1/products?category= reads use
 # (verified live 2026-07-07: black-rose=14, love-hurts=4, signature=11,
@@ -163,38 +166,41 @@ def _product_meta_roundtrip(base: str, wc_auth: tuple[str, str]) -> tuple[str, b
 
 
 def _settings_roundtrip(base: str, wp_auth: tuple[str, str]) -> tuple[str, bool, str]:
-    """GET -> PATCH -> GET a marker key on skyyrose/v1/settings, then restore
-    the original value (or clear it if it wasn't present before)."""
+    """GET -> PATCH -> GET the whitelisted `fastapi_url` key on
+    skyyrose/v1/settings, then restore the original value.
+
+    The endpoint whitelists its accepted keys (correct boundary validation),
+    so an arbitrary marker key is silently dropped — the round-trip must use
+    a real key. `fastapi_url` is the only non-module string key; the marker
+    window is a few hundred ms and restore runs in a finally block.
+    """
     name = "settings PATCH round-trip"
-    marker_key = "devskyy_wiring_check"
+    url = f"{base}/wp-json/skyyrose/v1/settings"
+    key = "fastapi_url"
+    original_value = None
+    patched = False
     try:
-        before = requests.get(f"{base}/wp-json/skyyrose/v1/settings", auth=wp_auth, timeout=20)
+        before = requests.get(url, auth=wp_auth, timeout=20)
         before.raise_for_status()
-        original_value = before.json().get(marker_key)
+        original_value = before.json().get(key, "")
 
-        marker_value = f"wiring-audit-{int(time.time())}"
-        patch_response = requests.patch(
-            f"{base}/wp-json/skyyrose/v1/settings",
-            auth=wp_auth,
-            json={marker_key: marker_value},
-            timeout=20,
-        )
+        marker_value = f"https://wiring-check-{int(time.time())}.invalid"
+        patch_response = requests.patch(url, auth=wp_auth, json={key: marker_value}, timeout=20)
         patch_response.raise_for_status()
+        patched = True
+        if key not in patch_response.json().get("updated", []):
+            return name, False, f"endpoint did not accept whitelisted key {key!r}"
 
-        after = requests.get(f"{base}/wp-json/skyyrose/v1/settings", auth=wp_auth, timeout=20)
+        after = requests.get(url, auth=wp_auth, timeout=20)
         after.raise_for_status()
-        wrote_ok = after.json().get(marker_key) == marker_value
-
-        requests.patch(
-            f"{base}/wp-json/skyyrose/v1/settings",
-            auth=wp_auth,
-            json={marker_key: original_value},
-            timeout=20,
-        )
+        wrote_ok = after.json().get(key) == marker_value
         note = "wrote, read back, restored" if wrote_ok else "marker mismatch after PATCH"
         return name, wrote_ok, note
     except requests.RequestException as e:
         return name, False, f"{type(e).__name__}: {e}"
+    finally:
+        if patched:
+            requests.patch(url, auth=wp_auth, json={key: original_value or ""}, timeout=20)
 
 
 def run(write: bool) -> int:
@@ -289,11 +295,14 @@ def run(write: bool) -> int:
     else:
         report("webhook signature accept/reject simulation", False, "WP_WEBHOOK_SECRET not set")
 
-    # 7. client-bundle secret grep
-    next_dir = Path("frontend/.next")
+    # 7. client-bundle secret grep — .next/static only: that is what ships to
+    # browsers. Server chunks (.next/server) legitimately contain ck_/cs_
+    # placeholder strings from the admin settings page UI and false-positive.
+    next_dir = Path("frontend/.next/static")
     if not next_dir.exists():
         print(
-            f"{WARN} client-bundle secret grep — frontend/.next not found; run `npm run build` first"
+            f"{WARN} client-bundle secret grep — frontend/.next/static not found; "
+            "run `npm run build` first"
         )
     else:
         leaked: list[str] = []

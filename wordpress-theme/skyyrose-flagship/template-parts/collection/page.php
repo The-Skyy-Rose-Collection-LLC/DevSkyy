@@ -60,6 +60,11 @@ $resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_lo
 $has_hero_bg = ! empty( $resolved_hero_bg );
 $has_logo    = ! empty( $resolved_hero_logo );
 
+// Collection emblem (3D star-rose mark) — file-existence gated, so only
+// collections that have an emblem asset render it. Decorative; aria-hidden.
+$emblem_rel = '/images/emblems/' . $slug . '-emblem.webp';
+$has_emblem = file_exists( get_theme_file_path( 'assets' . $emblem_rel ) );
+
 /* Kids Capsule uses pre-order URL for product links */
 $preorder_url  = $is_kids ? home_url( '/pre-order/' ) : '';
 $product_count = $is_kids ? count( $products ) : 0;
@@ -96,7 +101,12 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			</div>
 		<?php endif; ?>
 		<div class="col-hero__content col-reveal">
-			<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
+			<?php
+			if ( $has_emblem ) :
+				?>
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>" alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
+				<?php endif; ?>
+				<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
 				<?php
 				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
@@ -222,6 +232,18 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		</section>
 	<?php endif; ?>
 
+	<!-- ════ Feature Scroll (sticky image + scrolling philosophy items) ════ -->
+	<?php
+	get_template_part(
+		'template-parts/collection/feature-scroll',
+		null,
+		array(
+			'slug'    => $slug,
+			'content' => $c,
+		)
+	);
+	?>
+
 	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
 	// Build subheading: kids-capsule uses a dynamic piece count, others
@@ -252,10 +274,21 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 	);
 	?>
 
-	<?php // Black Rose only: founder pull quote anchors the page in Corey's voice. ?>
+	<?php // Founder pull quote — Corey's voice. Black Rose + Signature (origin/heritage register). ?>
 	<?php
 	if ( 'black-rose' === $slug ) {
-		get_template_part( 'template-parts/collection/founder-pullquote' ); }
+		get_template_part( 'template-parts/collection/founder-pullquote' );
+	} elseif ( 'signature' === $slug ) {
+		get_template_part(
+			'template-parts/collection/founder-pullquote',
+			null,
+			array(
+				'quote_text' => isset( $c['quote_text'] ) ? $c['quote_text'] : '',
+				'quote_name' => __( 'Corey Foster', 'skyyrose' ),
+				'quote_role' => __( 'Founder · The origin', 'skyyrose' ),
+			)
+		);
+	}
 	?>
 
 	<!-- ════ Story (condensed — after products) ════ -->
