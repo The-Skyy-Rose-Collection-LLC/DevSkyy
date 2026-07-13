@@ -89,6 +89,7 @@ export default function CompetitorsPage() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
@@ -113,11 +114,20 @@ export default function CompetitorsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    // Backend cascade-deletes all of this competitor's assets — irreversible.
+    if (!window.confirm(`Delete "${name}" and all of its tracked assets? This cannot be undone.`)) {
+      return;
+    }
     setDeletingId(id);
+    setDeleteError(null);
     try {
       await api.competitors.remove(id);
       await queryClient.invalidateQueries({ queryKey: ['competitors'] });
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? `Failed to delete "${name}": ${err.message}` : `Failed to delete "${name}".`
+      );
     } finally {
       setDeletingId(null);
     }
@@ -171,7 +181,7 @@ export default function CompetitorsPage() {
                       value={form.category}
                       onValueChange={(v) => setForm({ ...form, category: v as CompetitorCategory })}
                     >
-                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                      <SelectTrigger aria-label="Category" className="bg-gray-800 border-gray-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -187,7 +197,7 @@ export default function CompetitorsPage() {
                       value={form.price_positioning}
                       onValueChange={(v) => setForm({ ...form, price_positioning: v as PricePositioning })}
                     >
-                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                      <SelectTrigger aria-label="Price positioning" className="bg-gray-800 border-gray-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -304,7 +314,11 @@ export default function CompetitorsPage() {
                   onAction={() => setShowCreate(true)}
                 />
               ) : (
-                <Table>
+                <>
+                  {deleteError && (
+                    <p className="text-sm text-red-400 mb-2" role="alert">{deleteError}</p>
+                  )}
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-800 hover:bg-transparent">
                       <TableHead className="text-gray-400">Name</TableHead>
@@ -348,9 +362,10 @@ export default function CompetitorsPage() {
                           <Button
                             size="icon"
                             variant="ghost"
+                            aria-label={`Delete ${competitor.name}`}
                             className="h-8 w-8 text-gray-500 hover:text-red-400"
                             disabled={deletingId === competitor.id}
-                            onClick={() => handleDelete(competitor.id)}
+                            onClick={() => handleDelete(competitor.id, competitor.name)}
                           >
                             {deletingId === competitor.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -363,6 +378,7 @@ export default function CompetitorsPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </>
               )}
             </CardContent>
           </Card>

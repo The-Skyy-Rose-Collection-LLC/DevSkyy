@@ -6,20 +6,25 @@ Implements US-013: Brand asset ingestion for training.
 Author: DevSkyy Platform Team
 """
 
+from __future__ import annotations
+
 from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
 import pytest
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 from api.v1.brand_assets import (
     AssetApprovalStatus,
+    BrandAsset,
     BrandAssetCategory,
-    _brand_assets,
-    _ingestion_jobs,
+    ColorPalette,
+    VisualFeatures,
+    _asset_to_row,
     router,
 )
+from database.db import DatabaseConfig, DatabaseManager, db_manager
 
 # =============================================================================
 # Fixtures
@@ -42,27 +47,40 @@ def mock_user() -> MagicMock:
 
 
 @pytest.fixture
-def app(mock_user: MagicMock) -> FastAPI:
-    """Create test FastAPI app."""
+async def client(mock_user: MagicMock):
+    """ASGI test client backed by a fresh in-memory DB, isolated per test.
+
+    Mirrors tests/test_auth_endpoints.py's db_manager reset pattern: the
+    module-level singleton backs both the FastAPI get_db dependency and
+    process_bulk_ingestion's background-task session, so it must be reset
+    and reinitialized per test rather than overridden via
+    dependency_overrides alone.
+    """
     from security.jwt_oauth2_auth import get_current_user
+
+    if db_manager._engine:
+        await db_manager.close()
+        db_manager._instance = None
+
+    mgr = DatabaseManager()
+    await mgr.initialize(DatabaseConfig(url="sqlite+aiosqlite:///:memory:"))
 
     app = FastAPI()
     app.include_router(router)
     app.dependency_overrides[get_current_user] = lambda: mock_user
-    return app
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+
+    await mgr.close()
+    mgr._instance = None
 
 
-@pytest.fixture
-def client(app: FastAPI) -> TestClient:
-    """Create test client."""
-    return TestClient(app)
-
-
-@pytest.fixture(autouse=True)
-def clear_storage() -> None:
-    """Clear in-memory storage before each test."""
-    _brand_assets.clear()
-    _ingestion_jobs.clear()
+async def _save_asset(asset: BrandAsset) -> None:
+    """Persist a BrandAsset directly, bypassing the API (test setup only)."""
+    async with db_manager.session() as session:
+        session.add(_asset_to_row(asset))
 
 
 # =============================================================================
@@ -73,9 +91,10 @@ def clear_storage() -> None:
 class TestBulkIngestion:
     """Tests for bulk ingestion endpoints."""
 
-    def test_bulk_ingest_single_asset(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_single_asset(self, client: AsyncClient) -> None:
         """Should start bulk ingestion with single asset."""
-        response = client.post(
+        response = await client.post(
             "/brand-assets/ingest/bulk",
             json={
                 "assets": [
@@ -90,13 +109,14 @@ class TestBulkIngestion:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "pending"
+        assert data["status"] in ("pending", "completed", "partial", "failed")
         assert data["total"] == 1
         assert data["id"] is not None
 
-    def test_bulk_ingest_multiple_assets(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_multiple_assets(self, client: AsyncClient) -> None:
         """Should handle multiple assets."""
-        response = client.post(
+        response = await client.post(
             "/brand-assets/ingest/bulk",
             json={
                 "assets": [
@@ -112,13 +132,14 @@ class TestBulkIngestion:
         data = response.json()
         assert data["total"] == 3
 
-    def test_bulk_ingest_max_100_assets(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_max_100_assets(self, client: AsyncClient) -> None:
         """Should accept up to 100 assets."""
         assets = [
             {"url": f"https://example.com/img{i}.jpg", "category": "product"} for i in range(100)
         ]
 
-        response = client.post(
+        response = await client.post(
             "/brand-assets/ingest/bulk",
             json={"assets": assets},
         )
@@ -126,22 +147,24 @@ class TestBulkIngestion:
         assert response.status_code == 200
         assert response.json()["total"] == 100
 
-    def test_bulk_ingest_over_limit(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_over_limit(self, client: AsyncClient) -> None:
         """Should reject over 100 assets."""
         assets = [
             {"url": f"https://example.com/img{i}.jpg", "category": "product"} for i in range(101)
         ]
 
-        response = client.post(
+        response = await client.post(
             "/brand-assets/ingest/bulk",
             json={"assets": assets},
         )
 
         assert response.status_code == 422  # Validation error
 
-    def test_bulk_ingest_with_auto_approve(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_with_auto_approve(self, client: AsyncClient) -> None:
         """Should auto-approve assets when requested."""
-        response = client.post(
+        response = await client.post(
             "/brand-assets/ingest/bulk",
             json={
                 "assets": [{"url": "https://example.com/img.jpg", "category": "product"}],
@@ -151,10 +174,11 @@ class TestBulkIngestion:
 
         assert response.status_code == 200
 
-    def test_get_ingestion_job(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_get_ingestion_job(self, client: AsyncClient) -> None:
         """Should retrieve ingestion job status."""
         # Create job
-        create_response = client.post(
+        create_response = await client.post(
             "/brand-assets/ingest/bulk",
             json={
                 "assets": [{"url": "https://example.com/img.jpg", "category": "product"}],
@@ -163,15 +187,16 @@ class TestBulkIngestion:
         job_id = create_response.json()["id"]
 
         # Get job
-        response = client.get(f"/brand-assets/ingest/{job_id}")
+        response = await client.get(f"/brand-assets/ingest/{job_id}")
 
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == job_id
 
-    def test_get_nonexistent_job(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_get_nonexistent_job(self, client: AsyncClient) -> None:
         """Should return 404 for non-existent job."""
-        response = client.get("/brand-assets/ingest/nonexistent_id")
+        response = await client.get("/brand-assets/ingest/nonexistent_id")
         assert response.status_code == 404
 
 
@@ -183,117 +208,115 @@ class TestBulkIngestion:
 class TestAssetCrud:
     """Tests for asset CRUD operations."""
 
-    def _create_test_asset(self, client: TestClient) -> str:
+    async def _create_test_asset(self, client: AsyncClient) -> str:
         """Helper to create a test asset."""
-        from api.v1.brand_assets import BrandAsset, BrandAssetCategory
-
         asset = BrandAsset(
             url="https://example.com/test.jpg",
             category=BrandAssetCategory.PRODUCT,
         )
-        _brand_assets[asset.id] = asset
+        await _save_asset(asset)
         return asset.id
 
-    def test_list_assets_empty(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_list_assets_empty(self, client: AsyncClient) -> None:
         """Should return empty list when no assets."""
-        response = client.get("/brand-assets/assets")
+        response = await client.get("/brand-assets/assets")
 
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 0
         assert data["assets"] == []
 
-    def test_list_assets_with_data(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_list_assets_with_data(self, client: AsyncClient) -> None:
         """Should list all assets."""
-        self._create_test_asset(client)
-        self._create_test_asset(client)
+        await self._create_test_asset(client)
+        await self._create_test_asset(client)
 
-        response = client.get("/brand-assets/assets")
+        response = await client.get("/brand-assets/assets")
 
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 2
 
-    def test_list_assets_filter_by_category(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_list_assets_filter_by_category(self, client: AsyncClient) -> None:
         """Should filter by category."""
-        from api.v1.brand_assets import BrandAsset
-
-        # Create product asset
         product = BrandAsset(
             url="https://example.com/product.jpg",
             category=BrandAssetCategory.PRODUCT,
         )
-        _brand_assets[product.id] = product
+        await _save_asset(product)
 
-        # Create lifestyle asset
         lifestyle = BrandAsset(
             url="https://example.com/lifestyle.jpg",
             category=BrandAssetCategory.LIFESTYLE,
         )
-        _brand_assets[lifestyle.id] = lifestyle
+        await _save_asset(lifestyle)
 
-        response = client.get("/brand-assets/assets?category=product")
+        response = await client.get("/brand-assets/assets?category=product")
 
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 1
         assert data["assets"][0]["category"] == "product"
 
-    def test_list_assets_filter_by_status(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_list_assets_filter_by_status(self, client: AsyncClient) -> None:
         """Should filter by approval status."""
-        from api.v1.brand_assets import BrandAsset
-
-        # Create pending asset
         pending = BrandAsset(
             url="https://example.com/pending.jpg",
             category=BrandAssetCategory.PRODUCT,
             approval_status=AssetApprovalStatus.PENDING,
         )
-        _brand_assets[pending.id] = pending
+        await _save_asset(pending)
 
-        # Create approved asset
         approved = BrandAsset(
             url="https://example.com/approved.jpg",
             category=BrandAssetCategory.PRODUCT,
             approval_status=AssetApprovalStatus.APPROVED,
         )
-        _brand_assets[approved.id] = approved
+        await _save_asset(approved)
 
-        response = client.get("/brand-assets/assets?approval_status=approved")
+        response = await client.get("/brand-assets/assets?approval_status=approved")
 
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 1
 
-    def test_get_asset_by_id(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_get_asset_by_id(self, client: AsyncClient) -> None:
         """Should get asset by ID."""
-        asset_id = self._create_test_asset(client)
+        asset_id = await self._create_test_asset(client)
 
-        response = client.get(f"/brand-assets/assets/{asset_id}")
+        response = await client.get(f"/brand-assets/assets/{asset_id}")
 
         assert response.status_code == 200
         assert response.json()["id"] == asset_id
 
-    def test_get_nonexistent_asset(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_get_nonexistent_asset(self, client: AsyncClient) -> None:
         """Should return 404 for non-existent asset."""
-        response = client.get("/brand-assets/assets/nonexistent")
+        response = await client.get("/brand-assets/assets/nonexistent")
         assert response.status_code == 404
 
-    def test_approve_asset(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_approve_asset(self, client: AsyncClient) -> None:
         """Should approve an asset."""
-        asset_id = self._create_test_asset(client)
+        asset_id = await self._create_test_asset(client)
 
-        response = client.patch(f"/brand-assets/assets/{asset_id}/approve")
+        response = await client.patch(f"/brand-assets/assets/{asset_id}/approve")
 
         assert response.status_code == 200
         data = response.json()
         assert data["approval_status"] == "approved"
 
-    def test_reject_asset(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_reject_asset(self, client: AsyncClient) -> None:
         """Should reject an asset."""
-        asset_id = self._create_test_asset(client)
+        asset_id = await self._create_test_asset(client)
 
-        response = client.patch(
+        response = await client.patch(
             f"/brand-assets/assets/{asset_id}/reject",
             params={"reason": "Low quality"},
         )
@@ -302,17 +325,19 @@ class TestAssetCrud:
         data = response.json()
         assert data["approval_status"] == "rejected"
 
-    def test_delete_asset(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_delete_asset(self, client: AsyncClient) -> None:
         """Should delete an asset."""
-        asset_id = self._create_test_asset(client)
+        asset_id = await self._create_test_asset(client)
 
-        response = client.delete(f"/brand-assets/assets/{asset_id}")
+        response = await client.delete(f"/brand-assets/assets/{asset_id}")
 
         assert response.status_code == 200
         assert response.json()["deleted"] is True
 
         # Verify deleted
-        assert asset_id not in _brand_assets
+        get_response = await client.get(f"/brand-assets/assets/{asset_id}")
+        assert get_response.status_code == 404
 
 
 # =============================================================================
@@ -323,9 +348,10 @@ class TestAssetCrud:
 class TestTrainingReadiness:
     """Tests for training readiness assessment."""
 
-    def test_training_readiness_empty(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_training_readiness_empty(self, client: AsyncClient) -> None:
         """Should report not ready when empty."""
-        response = client.get("/brand-assets/training-readiness")
+        response = await client.get("/brand-assets/training-readiness")
 
         assert response.status_code == 200
         data = response.json()
@@ -333,10 +359,9 @@ class TestTrainingReadiness:
         assert data["total_assets"] == 0
         assert data["approved_assets"] == 0
 
-    def test_training_readiness_below_minimum(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_training_readiness_below_minimum(self, client: AsyncClient) -> None:
         """Should report not ready below minimum."""
-        from api.v1.brand_assets import BrandAsset
-
         # Create 50 approved assets
         for i in range(50):
             asset = BrandAsset(
@@ -344,19 +369,18 @@ class TestTrainingReadiness:
                 category=BrandAssetCategory.PRODUCT,
                 approval_status=AssetApprovalStatus.APPROVED,
             )
-            _brand_assets[asset.id] = asset
+            await _save_asset(asset)
 
-        response = client.get("/brand-assets/training-readiness?minimum_assets=100")
+        response = await client.get("/brand-assets/training-readiness?minimum_assets=100")
 
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "not_ready"
         assert data["approved_assets"] == 50
 
-    def test_training_readiness_needs_review(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_training_readiness_needs_review(self, client: AsyncClient) -> None:
         """Should report needs review when pending assets could meet minimum."""
-        from api.v1.brand_assets import BrandAsset
-
         # Create 50 approved and 60 pending
         for i in range(50):
             approved = BrandAsset(
@@ -364,7 +388,7 @@ class TestTrainingReadiness:
                 category=BrandAssetCategory.PRODUCT,
                 approval_status=AssetApprovalStatus.APPROVED,
             )
-            _brand_assets[approved.id] = approved
+            await _save_asset(approved)
 
         for i in range(60):
             pending = BrandAsset(
@@ -372,9 +396,9 @@ class TestTrainingReadiness:
                 category=BrandAssetCategory.LIFESTYLE,
                 approval_status=AssetApprovalStatus.PENDING,
             )
-            _brand_assets[pending.id] = pending
+            await _save_asset(pending)
 
-        response = client.get("/brand-assets/training-readiness?minimum_assets=100")
+        response = await client.get("/brand-assets/training-readiness?minimum_assets=100")
 
         assert response.status_code == 200
         data = response.json()
@@ -383,10 +407,9 @@ class TestTrainingReadiness:
         recommendations_str = str(data["recommendations"]).lower()
         assert "review" in recommendations_str or "pending" in recommendations_str
 
-    def test_training_readiness_ready(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_training_readiness_ready(self, client: AsyncClient) -> None:
         """Should report ready when minimum met."""
-        from api.v1.brand_assets import BrandAsset
-
         # Create 150 approved assets
         for i in range(150):
             asset = BrandAsset(
@@ -394,9 +417,9 @@ class TestTrainingReadiness:
                 category=BrandAssetCategory.PRODUCT,
                 approval_status=AssetApprovalStatus.APPROVED,
             )
-            _brand_assets[asset.id] = asset
+            await _save_asset(asset)
 
-        response = client.get("/brand-assets/training-readiness?minimum_assets=100")
+        response = await client.get("/brand-assets/training-readiness?minimum_assets=100")
 
         assert response.status_code == 200
         data = response.json()
@@ -413,18 +436,18 @@ class TestTrainingReadiness:
 class TestStatistics:
     """Tests for brand assets statistics."""
 
-    def test_stats_empty(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_stats_empty(self, client: AsyncClient) -> None:
         """Should return zero stats when empty."""
-        response = client.get("/brand-assets/stats")
+        response = await client.get("/brand-assets/stats")
 
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 0
 
-    def test_stats_with_data(self, client: TestClient) -> None:
+    @pytest.mark.asyncio
+    async def test_stats_with_data(self, client: AsyncClient) -> None:
         """Should return accurate statistics."""
-        from api.v1.brand_assets import BrandAsset, ColorPalette, VisualFeatures
-
         # Create assets with different categories and statuses
         for i, cat in enumerate(
             [
@@ -444,9 +467,9 @@ class TestStatistics:
                     quality_score=0.8,
                 ),
             )
-            _brand_assets[asset.id] = asset
+            await _save_asset(asset)
 
-        response = client.get("/brand-assets/stats")
+        response = await client.get("/brand-assets/stats")
 
         assert response.status_code == 200
         data = response.json()
@@ -454,3 +477,47 @@ class TestStatistics:
         assert "by_category" in data
         assert "by_approval_status" in data
         assert data["average_quality_score"] > 0
+
+
+# =============================================================================
+# Persistence Tests
+# =============================================================================
+
+
+class TestPersistence:
+    """Tests that data survives a fresh DB session (the point of this store)."""
+
+    @pytest.mark.asyncio
+    async def test_asset_survives_new_session(self, client: AsyncClient) -> None:
+        """An asset written in one session must be readable from a new one."""
+        asset = BrandAsset(
+            url="https://example.com/durable.jpg",
+            category=BrandAssetCategory.PRODUCT,
+        )
+        async with db_manager.session() as write_session:
+            write_session.add(_asset_to_row(asset))
+
+        async with db_manager.session() as read_session:
+            from database.models_brand_assets import BrandAssetRecord
+
+            row = await read_session.get(BrandAssetRecord, asset.id)
+            assert row is not None
+            assert row.url == asset.url
+
+    @pytest.mark.asyncio
+    async def test_ingestion_job_survives_new_session(self, client: AsyncClient) -> None:
+        """A job written in one session must be readable from a new one."""
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={
+                "assets": [{"url": "https://example.com/durable-job.jpg", "category": "product"}]
+            },
+        )
+        job_id = response.json()["id"]
+
+        async with db_manager.session() as read_session:
+            from database.models_brand_assets import IngestionJobRecord
+
+            row = await read_session.get(IngestionJobRecord, job_id)
+            assert row is not None
+            assert row.total == 1

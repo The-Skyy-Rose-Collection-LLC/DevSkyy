@@ -229,3 +229,9 @@ These capabilities have routing infrastructure and response models in place, but
 - **Training Status** (T2-2) and **Training Export to HF** (T1-14) are separate concerns in the same file (`api/v1/training_status.py`) but have independent consumers — do not conflate.
 - **WordPress Content Sync** (T1-11) and **WooCommerce Product Sync** (T1-13) are different routers (`wordpress.py` vs `wordpress_integration.py`) with a shared symptom: `worker.ts:77` points at the wrong URL. Fix both in one PR.
 - **Marketing campaign** (T1-7), **ML prediction** (T1-8), and **orchestration workflow** (T1-9) are all single-line endpoint string fixes in MCP tool files — batch these into one PR.
+
+
+## Review follow-ups (2026-07-13 range review)
+- LOW: api/v1/sync.py trigger/rt-to-hf routes are authenticated but not role-gated — external-write endpoints should adopt the ALLOWED_ROLES pattern from competitors.py.
+- INFO: brand-assets ingestion tests pass even with a broken upload/extraction pipeline (R2 no-op + visual-feature silent default) — pin behavior by mocking upload_to_r2/extract_visual_features and asserting persisted r2_key/visual_features. Root silent-fallback lives in services/ml/visual_feature_extractor.py (bug-230 pattern).
+- PRE-EXISTING: /api/v1/agents route double-registered, dashboard's unauthenticated handler shadows monitoring's (bug-233).

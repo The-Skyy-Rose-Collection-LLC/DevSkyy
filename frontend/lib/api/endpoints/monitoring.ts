@@ -1,4 +1,5 @@
 import { fetchWithTimeout, getAuthHeaders, handleResponse } from '../client';
+import { API_URL } from '../config';
 import { MonitoringHealthResponseSchema, MonitoringMetricsResponseSchema } from '../schemas';
 import type { MonitoringHealthResponse, MonitoringMetricsResponse } from '../types';
 
@@ -13,7 +14,7 @@ export interface MonitoringMetricsOptions {
 
 export const monitoring = {
     async health(): Promise<MonitoringHealthResponse> {
-        const res = await fetchWithTimeout(`${BASE}/monitoring/health`, {
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/monitoring/health`, {
             headers: await getAuthHeaders(),
         });
         return handleResponse(res, MonitoringHealthResponseSchema);
@@ -28,7 +29,7 @@ export const monitoring = {
             params.set('time_range', options.timeRange);
         }
         const query = params.toString();
-        const res = await fetchWithTimeout(`${BASE}/monitoring/metrics${query ? `?${query}` : ''}`, {
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/monitoring/metrics${query ? `?${query}` : ''}`, {
             headers: await getAuthHeaders(),
         });
         return handleResponse(res, MonitoringMetricsResponseSchema);

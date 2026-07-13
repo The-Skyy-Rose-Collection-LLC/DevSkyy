@@ -28,6 +28,7 @@ import {
   ExternalLink,
   GraduationCap,
   AlertTriangle,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   useAssets,
@@ -37,7 +38,7 @@ import {
   type AssetType,
 } from '@/hooks';
 import { api, type Asset } from '@/lib/api';
-import type { SkuImageCounts, HfDatasetsResponse, TrainingReadinessResponse } from '@/lib/api/types';
+import type { SkuImageCounts, HfDatasetsResponse, TrainingReadinessResponse, BrandAsset } from '@/lib/api/types';
 
 // Extracted Components
 import { AssetCard } from '@/components/admin/assets/AssetCard';
@@ -102,6 +103,10 @@ export default function AssetsPage() {
   const [trainingReadiness, setTrainingReadiness] = useState<TrainingReadinessResponse | null>(null);
   const [trainingReadinessError, setTrainingReadinessError] = useState<string | null>(null);
   const [trainingReadinessLoading, setTrainingReadinessLoading] = useState(true);
+  const [pendingBrandAssets, setPendingBrandAssets] = useState<BrandAsset[]>([]);
+  const [pendingBrandAssetsError, setPendingBrandAssetsError] = useState<string | null>(null);
+  const [pendingBrandAssetsLoading, setPendingBrandAssetsLoading] = useState(true);
+  const [brandAssetActionId, setBrandAssetActionId] = useState<string | null>(null);
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -129,6 +134,45 @@ export default function AssetsPage() {
   useEffect(() => {
     loadTrainingReadiness();
   }, []);
+
+  const loadPendingBrandAssets = () => {
+    setPendingBrandAssetsLoading(true);
+    setPendingBrandAssetsError(null);
+    api.brandAssets.list({ approvalStatus: 'pending', pageSize: 12 })
+      .then((res) => setPendingBrandAssets(res.assets))
+      .catch((err) => setPendingBrandAssetsError(err instanceof Error ? err.message : 'Failed to load pending assets'))
+      .finally(() => setPendingBrandAssetsLoading(false));
+  };
+
+  useEffect(() => {
+    loadPendingBrandAssets();
+  }, []);
+
+  const handleApproveBrandAsset = async (assetId: string) => {
+    setBrandAssetActionId(assetId);
+    try {
+      await api.brandAssets.approve(assetId);
+      setPendingBrandAssets((prev) => prev.filter((a) => a.id !== assetId));
+      loadTrainingReadiness();
+    } catch (err) {
+      setPendingBrandAssetsError(err instanceof Error ? err.message : 'Failed to approve asset');
+    } finally {
+      setBrandAssetActionId(null);
+    }
+  };
+
+  const handleRejectBrandAsset = async (assetId: string) => {
+    setBrandAssetActionId(assetId);
+    try {
+      await api.brandAssets.reject(assetId);
+      setPendingBrandAssets((prev) => prev.filter((a) => a.id !== assetId));
+      loadTrainingReadiness();
+    } catch (err) {
+      setPendingBrandAssetsError(err instanceof Error ? err.message : 'Failed to reject asset');
+    } finally {
+      setBrandAssetActionId(null);
+    }
+  };
 
   const { job: batchJob } = useBatchJob(batchJobId);
 
@@ -550,6 +594,102 @@ export default function AssetsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Pending Brand Assets */}
+      <Card className="bg-gray-900/80 border-gray-700">
+        <CardContent className="py-5">
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldCheck className="h-4 w-4 text-rose-400" />
+            <h3 className="text-white font-semibold">Pending Brand Assets</h3>
+            <Badge variant="outline" className="border-gray-600 text-gray-300 ml-auto">
+              {pendingBrandAssets.length} pending
+            </Badge>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-gray-700 text-gray-400 hover:text-white"
+              onClick={loadPendingBrandAssets}
+              disabled={pendingBrandAssetsLoading}
+            >
+              {pendingBrandAssetsLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Refresh'
+              )}
+            </Button>
+          </div>
+
+          {pendingBrandAssetsError && (
+            <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              {pendingBrandAssetsError}
+            </div>
+          )}
+
+          {pendingBrandAssetsLoading && pendingBrandAssets.length === 0 && !pendingBrandAssetsError && (
+            <Skeleton className="h-24 bg-gray-800" />
+          )}
+
+          {!pendingBrandAssetsLoading && pendingBrandAssets.length === 0 && !pendingBrandAssetsError && (
+            <p className="text-gray-500 text-sm">No brand assets awaiting review.</p>
+          )}
+
+          {pendingBrandAssets.length > 0 && (
+            <div className="space-y-2">
+              {pendingBrandAssets.map((asset) => (
+                <div
+                  key={asset.id}
+                  className="flex items-center gap-3 bg-gray-800/50 rounded-lg p-3"
+                >
+                  <img
+                    src={asset.url}
+                    alt={asset.metadata.campaign || asset.category}
+                    className="h-12 w-12 rounded object-cover shrink-0 bg-gray-800"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white truncate">
+                      {asset.metadata.campaign || asset.category.replace('_', ' ')}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {asset.category.replace('_', ' ')} &middot; {new Date(asset.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      aria-label="Approve asset"
+                      className="border-emerald-700 text-emerald-400 hover:text-emerald-300"
+                      onClick={() => handleApproveBrandAsset(asset.id)}
+                      disabled={brandAssetActionId === asset.id}
+                    >
+                      {brandAssetActionId === asset.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      aria-label="Reject asset"
+                      className="border-red-700 text-red-400 hover:text-red-300"
+                      onClick={() => handleRejectBrandAsset(asset.id)}
+                      disabled={brandAssetActionId === asset.id}
+                    >
+                      {brandAssetActionId === asset.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <XCircle className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Training Readiness */}
       <Card className="bg-gray-900/80 border-gray-700">

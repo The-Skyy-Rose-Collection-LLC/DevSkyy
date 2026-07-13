@@ -129,7 +129,7 @@ export default function PricingPage() {
               <div className="space-y-2">
                 <Label>Strategy</Label>
                 <Select value={strategy} onValueChange={(v) => setStrategy(v as typeof strategy)}>
-                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger aria-label="Pricing strategy" className="bg-gray-800 border-gray-700 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

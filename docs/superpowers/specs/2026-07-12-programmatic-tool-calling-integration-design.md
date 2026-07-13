@@ -39,7 +39,7 @@ DevSkyy has the **entire PTC kit built and unit-tested but unwired** — `core/r
 
 **The strict rules (all enforced in the driver's tool-fulfillment step):**
 
-1. **Per-run spend budget.** Each PTC run carries a hard USD ceiling (reuse the `scripts/oai_render/cost.py` `SpendTracker` pattern). Paid tool calls decrement it; reaching the ceiling **aborts the run** — never overspends. Default conservative (number set by founder, §12).
+1. **Per-run spend budget.** Each PTC run carries a hard USD ceiling (reuse the `scripts/oai_render/cost.py` `SpendTracker` pattern). Paid tool calls decrement it; reaching the ceiling **aborts the run** — never overspends. **Default: $25 / run** (founder-set 2026-07-12); raise later per surface.
 2. **Per-tool policy** (a registry field extending `ToolSpec`):
    ```
    ptc: { autonomy: "auto" | "gated" | "forbidden",
@@ -75,6 +75,8 @@ Isolated + testable: the gate is a pure function `(tool_call, run_budget, policy
 
 Data-driven `ptc` policy (§3) on the ~80 tools, held in one **policy registry** (not scattered literals). `tool_registry` already serializes `allowed_callers`, so external MCP clients (Claude Code) that do their own PTC benefit too — the marks are the single source of truth for both the internal driver and external callers.
 
+**Founder decision 2026-07-12:** the full registry (every tool tagged `auto` / `gated` / `forbidden` + `cost_cap_usd`) is **drafted for founder tool-by-tool review; NO tool goes `auto` until explicitly approved.** Until then every paid/mutating tool defaults to `gated`.
+
 ---
 
 ## 6. Rollout flag
@@ -91,13 +93,13 @@ Per representative workflow, run **PTC vs classic tool-use** and report: input/o
 
 ## 8. Version currency
 
-DevSkyy uses `code_execution_20250825` + beta `advanced-tool-use-2025-11-20`. Context7 confirms the SDK now exposes `code_execution_20260120` / `20260521`. **Verify the current recommended tool-version ↔ beta-header pairing against Anthropic docs before building the loop** — a mismatched version means the response blocks won't parse. Decide upgrade vs stay in P1.
+DevSkyy uses `code_execution_20250825` + beta `advanced-tool-use-2025-11-20`. Context7 confirms the SDK now exposes `code_execution_20260120` / `20260521`. **Founder decision 2026-07-12: upgrade to `code_execution_20260521` in P1.** Because a mismatched tool-version ↔ beta-header pairing means the response blocks won't parse, P1 **first verifies the exact `20260521` header string against Anthropic docs (Context7/live)** — do not hardcode a guessed beta-header — then upgrades `llm/base.py`, `anthropic.py`, and the tests together.
 
 ---
 
 ## 9. Phasing
 
-- **P1 — Foundation:** version check → driver + Controlled-Autonomy Gate (§3, §4) → policy registry seed → wire **read-only + one bounded-paid** tool → integration test (E2E loop + gate-denies-over-budget + savings measured). Ships NO silent write/deploy autonomy.
+- **P1 — Foundation:** verify + **upgrade to `code_execution_20260521`** (§8) → driver + Controlled-Autonomy Gate (§3, §4) with the **$25/run** budget → policy registry seed → wire **read-only + one bounded-paid** tool → integration test (E2E loop + gate-denies-over-budget + savings measured). Ships NO silent write/deploy autonomy.
 - **P2 — Breadth:** `ptc` policy across the ~80 MCP tools (§5) + the eval harness (§7) + the CI guard test (§3.5).
 - **P3 — Rollout:** flag (§6) → dark-launch → measure → enable per surface; reconcile the `commerce_tools` write marks (§3) to `gated`/dry-run; add the STOP-AND-SHOW PTC-carve-out clause to `CLAUDE.md`.
 
@@ -122,8 +124,13 @@ DevSkyy uses `code_execution_20250825` + beta `advanced-tool-use-2025-11-20`. Co
 
 ---
 
-## 12. Open questions (for spec review)
+## 12. Decisions (founder, 2026-07-12) + remaining
 
-1. **The numbers:** default per-run budget ceiling + per-tool `cost_cap_usd` for the paid tools that go `auto`. (Founder sets.)
-2. **The allowlist:** which specific tools are `auto` vs `gated` vs `forbidden` — I'll draft the policy registry from the ~80 tools for founder review.
-3. **Version:** upgrade `code_execution_20250825` → `20260120`/`20260521`, or stay? (Decided in P1 after the docs check.)
+Resolved at spec review:
+1. **Run budget:** **$25 / run** hard cap (§3.1).
+2. **Version:** **upgrade to `code_execution_20260521`** in P1, header verified first (§8).
+3. **Allowlist:** founder reviews **tool-by-tool** — I draft the full ~80-tool policy registry (`auto`/`gated`/`forbidden` + `cost_cap_usd`); nothing goes `auto` until approved; paid/mutating defaults to `gated` until then (§5).
+
+Remaining (produced during the plan, for founder sign-off before P2 enablement):
+- The **drafted policy registry** itself (per-tool tags + caps).
+- Per-tool `cost_cap_usd` values for whichever paid tools the founder promotes to `auto`.

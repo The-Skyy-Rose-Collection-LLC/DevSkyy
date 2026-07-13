@@ -23,6 +23,22 @@ logger = logging.getLogger(__name__)
 _SYNC_BATCH_PAGE_SIZE = 1000
 
 
+def _extract_media_id(response: Any) -> int | None:
+    """Best-effort extraction of a WordPress media id from an upload response.
+
+    Handles both attribute-style responses (`MediaUploadResult`, as returned by
+    the real `WordPressClient`) and plain dict payloads (as returned by test
+    doubles). Returns None when no usable id is present.
+    """
+    value = response.get("id") if isinstance(response, dict) else getattr(response, "id", None)
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class SyncStatus(StrEnum):
     """Status of synchronization operations."""
 
@@ -84,25 +100,102 @@ class WordPressMediaApprovalSync:
             return False
         return bool(getattr(self.wordpress_client, "is_configured", True))
 
-    async def sync_approved_asset(self, asset_id: str) -> SyncResult:
+    async def sync_approved_asset(
+        self, asset_id: str, item: ApprovalItem | None = None
+    ) -> SyncResult:
         """Sync a single approved asset to WordPress.
 
+        Uploads the item's `enhanced_url` (the reviewed/approved image) to the
+        WordPress media library via the attached client's `upload_media_from_url`,
+        reusing that client's own transport (URL validation, download, and the
+        wp.com `index.php?rest_route=` REST convention live entirely inside the
+        client — this method does not perform any HTTP I/O of its own).
+
         Args:
-            asset_id: ID of the asset to sync
+            asset_id: ID of the asset to sync. Always used as `SyncResult.item_id`.
+            item: The approval-queue item backing this asset, supplying the
+                source URL to upload. Without it there is nothing to upload, so
+                the call is a no-op success — this keeps the legacy bare-id
+                signature (used directly by `batch_sync` and older callers)
+                working unchanged. `sync_item` always supplies `item`.
 
         Returns:
             SyncResult with operation outcome
         """
-        # TODO: Implement actual sync logic
+        if item is None:
+            return SyncResult(
+                item_id=asset_id,
+                success=True,
+                status=SyncStatus.COMPLETED,
+                wordpress_id=None,
+            )
+
+        if not self.is_configured:
+            return SyncResult(
+                item_id=asset_id,
+                success=False,
+                status=SyncStatus.FAILED,
+                error="WordPress client is not configured",
+            )
+
+        source_url = item.enhanced_url
+        if not source_url:
+            return SyncResult(
+                item_id=asset_id,
+                success=False,
+                status=SyncStatus.FAILED,
+                error=f"No enhanced_url available to sync for asset {asset_id}",
+            )
+
+        upload_media_from_url = getattr(self.wordpress_client, "upload_media_from_url", None)
+        if upload_media_from_url is None:
+            return SyncResult(
+                item_id=asset_id,
+                success=False,
+                status=SyncStatus.FAILED,
+                error="WordPress client does not support media upload from URL",
+            )
+
+        title = item.product_name or item.metadata.get("title") or asset_id
+
+        try:
+            response = await upload_media_from_url(source_url, title=title, alt_text=title)
+        except Exception as exc:
+            logger.error("WordPress media upload failed for asset %s: %s", asset_id, exc)
+            return SyncResult(
+                item_id=asset_id,
+                success=False,
+                status=SyncStatus.FAILED,
+                error=f"WordPress upload failed: {exc}",
+            )
+
+        media_id = _extract_media_id(response)
+        if media_id is None:
+            return SyncResult(
+                item_id=asset_id,
+                success=False,
+                status=SyncStatus.FAILED,
+                error=f"WordPress upload returned no media id (response={response!r})",
+            )
+
         return SyncResult(
             item_id=asset_id,
             success=True,
             status=SyncStatus.COMPLETED,
-            wordpress_id=None,
+            wordpress_id=media_id,
         )
 
     async def batch_sync(self, asset_ids: list[str]) -> BatchSyncResult:
-        """Sync multiple assets to WordPress.
+        """Sync multiple assets to WordPress by bare id.
+
+        NOTE: this takes ids only, with no item/source-URL context, so each
+        call lands on `sync_approved_asset`'s no-item branch — a no-op success,
+        never a real upload. There is no reverse lookup from asset_id to an
+        ApprovalItem to source a real upload from. Nothing in this codebase
+        calls this method today; production sync goes through `sync_item` /
+        `sync_approved_items`, which supply full item context and do perform
+        real uploads. Treat this as legacy surface pending a redesign that
+        accepts items (or asset_id + source URL) rather than bare ids.
 
         Args:
             asset_ids: List of asset IDs to sync
@@ -162,7 +255,31 @@ class WordPressMediaApprovalSync:
                 error="WordPress client is not configured",
             )
 
-        result = await self.sync_approved_asset(item.asset_id)
+        result = await self.sync_approved_asset(item.asset_id, item=item)
+
+        # Persist the sync outcome on the approval item — without this, the
+        # wordpress_synced_at filter in sync_approved_items never turns over
+        # and every re-run re-uploads the same media (review finding, bug-246).
+        if result.success and result.wordpress_id is not None:
+            try:
+                await get_approval_manager().update_wordpress_sync(
+                    item.id, wordpress_media_id=result.wordpress_id
+                )
+            except Exception as exc:
+                logger.error(
+                    "Uploaded media %s for item %s but failed to record sync state: %s",
+                    result.wordpress_id,
+                    item.id,
+                    exc,
+                )
+                return SyncResult(
+                    item_id=item.id,
+                    success=False,
+                    status=SyncStatus.FAILED,
+                    wordpress_id=result.wordpress_id,
+                    error=f"Upload succeeded (media {result.wordpress_id}) but sync-state update failed: {exc}",
+                )
+
         return result.model_copy(update={"item_id": item.id})
 
     async def sync_approved_items(self, limit: int | None = None) -> BatchSyncResult:
