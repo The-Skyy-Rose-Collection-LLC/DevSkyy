@@ -71,7 +71,15 @@
 			});
 		});
 
+		var ptLastPath = location.pathname + location.search;
 		window.addEventListener('popstate', function () {
+			var ptNow = location.pathname + location.search;
+			// Hash-only or synthetic popstate (scroll restoration, injected
+			// history entries) must not hard-reload the page mid-scroll.
+			if (ptNow === ptLastPath) {
+				return;
+			}
+			ptLastPath = ptNow;
 			if (document.startViewTransition) {
 				document.startViewTransition(function () {
 					location.reload();

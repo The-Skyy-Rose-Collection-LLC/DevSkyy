@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.6.5' );
+define( 'SKYYROSE_VERSION', '1.11.0' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -69,6 +69,7 @@ $skyyrose_core_includes = array(
 	'/inc/enqueue-performance.php',
 	'/inc/enqueue-phases.php',
 	'/inc/customizer.php',
+	'/inc/mascot-config.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
 	'/inc/accessibility-fix.php',
@@ -77,8 +78,10 @@ $skyyrose_core_includes = array(
 	'/inc/ajax-handlers.php',
 	'/inc/collection-content.php',
 	'/inc/collection-sot-reader.php',
+	'/inc/experience-rooms.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
+	'/inc/v7-cards.php',
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
@@ -95,6 +98,10 @@ $skyyrose_core_includes = array(
 	'/inc/image-placements.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
+	'/inc/fashion-chrome.php',
+	// Customer enhancements: fit notes metabox, drop block customizer, sticky ATC helper.
+	// Loaded in core (not WC-only) so the Customizer section registers on all pages.
+	'/inc/customer-enhancements.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
@@ -169,4 +176,4 @@ foreach ( $skyyrose_builder_stubs as $skyyrose_stub ) {
 
 /* Admin includes and brand styles removed in v5.2.0 — dead code cleanup. */
 
-/* Mascot + brand-ambassador removed in v5.2.0. */
+/* Mascot reinstated in v1.9.0 — Skyy 3D character host (inc/mascot-config.php). */

@@ -323,7 +323,7 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -e ".[all]"
       - name: Run tests
         run: |
           pytest tests/

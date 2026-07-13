@@ -3,7 +3,7 @@
 # Unified development commands for Python + TypeScript
 # SkyyRose - Luxury Grows from Concrete.
 
-.PHONY: install dev lint format test clean help \
+.PHONY: install dev lint lint-gitignore format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
         demo security \
@@ -84,10 +84,14 @@ dev:
 lint:
 	ruff check .
 	mypy --ignore-missing-imports . || echo "⚠️  Mypy warnings in legacy/scripts (non-blocking)"
+	$(MAKE) lint-gitignore
 
 lint-strict:
 	ruff check .
 	mypy --ignore-missing-imports .
+
+lint-gitignore:  ## Flag exact-duplicate + redundant **/X lines in .gitignore
+	$(PYTHON) scripts/check_gitignore_health.py
 
 format:
 	isort .

@@ -5,7 +5,7 @@
  *
  * System:
  *   - Two grounds alternate: deep black #0A0A0A (chapters) + concrete cream #F5F1EB (mission, oakland).
- *   - Type: Cinzel display (massive, all-caps), Bebas Neue tags/years, Cormorant Garamond body, system mono date stamps.
+ *   - Type: Cinzel display (massive, all-caps), Anton tags/years, Hanken Grotesk body, system mono date stamps.
  *   - Lookbook chapter numbering (CH. 01 / CH. 02 / CH. 03 / CH. 04).
  *   - Editorial moves: drop caps, full-bleed pull-quote breakouts, vertical-rule timeline, newspaper press grid.
  *
@@ -162,13 +162,17 @@
 .abt-hero__portrait {
 	margin: 0;
 	width: 100%;
-	max-width: 560px;
+	max-width: 640px; /* headroom over the ~520-580px column so it fills the grid track instead of leaving a gap on wide desktops */
 	position: relative;
 }
+/* 2:3 = the source asset's native ratio (724x1086) — the previous 4:5 box
+   center-cropped it, clipping the hair buns and shoes. Full-frame at the
+   native ratio reads taller and more editorial ("enlarge" via composition,
+   not a bare number bump) while showing the whole figure. */
 .abt-hero__portrait img {
 	display: block;
 	width: 100%;
-	aspect-ratio: 4 / 5;
+	aspect-ratio: 2 / 3;
 	object-fit: cover;
 	filter: grayscale(8%) contrast(1.05);
 }

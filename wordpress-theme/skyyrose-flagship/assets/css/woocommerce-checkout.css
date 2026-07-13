@@ -156,7 +156,7 @@
 }
 
 .skyy-checkout__panel-title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1.5rem;
 	color: #fff;
 	margin: 0 0 8px;
@@ -447,7 +447,7 @@
 }
 
 .skyy-checkout__sidebar-title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1.25rem;
 	color: #fff;
 	margin: 0 0 24px;

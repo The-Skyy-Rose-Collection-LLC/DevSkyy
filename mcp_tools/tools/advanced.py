@@ -124,7 +124,7 @@ async def multi_agent_workflow(params: MultiAgentWorkflowInput) -> str:
         ... })
     """
     data = await _make_api_request(
-        "workflows/execute",
+        "orchestration/workflows",
         method="POST",
         data={
             "workflow_name": params.workflow_name,

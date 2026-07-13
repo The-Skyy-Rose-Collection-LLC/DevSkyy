@@ -738,10 +738,6 @@ class TestUploadToR2:
 class TestQueueForProcessing:
     """Test _queue_for_processing method."""
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_queue_returns_job_id(
         self,
@@ -764,10 +760,6 @@ class TestQueueForProcessing:
         # UUID format check
         assert len(job_id) == 36
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_queue_with_optional_fields(
         self,
@@ -795,10 +787,6 @@ class TestQueueForProcessing:
 class TestIngest:
     """Test full ingest method."""
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_successful_ingestion(
         self,
@@ -862,10 +850,6 @@ class TestIngest:
         # R2 upload should NOT have been called
         service._r2_client.upload_object.assert_not_called()
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_ingestion_skip_dedup_check(
         self,
@@ -954,10 +938,6 @@ class TestIngest:
         assert result.status == IngestionStatus.FAILED
         assert "Unexpected error" in result.error_message
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_ingestion_generates_correlation_id(
         self,
@@ -985,10 +965,6 @@ class TestIngest:
 class TestIngestBatch:
     """Test batch ingestion functionality."""
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_batch_ingestion_success(
         self,
@@ -1010,10 +986,6 @@ class TestIngestBatch:
         assert len(results) == 3
         assert all(r.status == IngestionStatus.COMPLETED for r in results)
 
-    @pytest.mark.xfail(
-        reason="services/image_ingestion.py:546 _queue_for_processing raises NotImplementedError until ProcessingQueue is wired",
-        strict=False,
-    )
     @pytest.mark.asyncio
     async def test_batch_ingestion_partial_failure(
         self,

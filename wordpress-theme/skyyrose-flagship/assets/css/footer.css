@@ -24,7 +24,7 @@
 .footer-newsletter__content { flex: 1; }
 
 .footer-newsletter__title {
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.125rem, 2vw, 1.5rem);
 	font-weight: 600;
 	color: #fff;
@@ -149,7 +149,7 @@
 }
 
 .footer-brand__tagline {
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 0.9375rem;
 	font-style: italic;
 	color: rgba(255, 255, 255, 0.55);

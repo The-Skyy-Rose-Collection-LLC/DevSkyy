@@ -23,8 +23,12 @@ if ( ! is_a( $product, WC_Product::class ) || ! $product->is_visible() ) {
 
 <li <?php wc_product_class( '', $product ); ?>>
 	<?php
+	$skyyrose_card_type = apply_filters( 'skyyrose_product_card_type', 'holo' );
+	if ( ! in_array( $skyyrose_card_type, array( 'holo', 'v7-lookbook' ), true ) ) {
+		$skyyrose_card_type = 'holo';
+	}
 	get_template_part(
-		'template-parts/product-card-holo',
+		'template-parts/product-card-' . $skyyrose_card_type,
 		null,
 		array(
 			'product' => $product,

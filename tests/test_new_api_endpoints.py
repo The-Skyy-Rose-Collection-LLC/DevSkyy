@@ -265,6 +265,46 @@ class TestMonitoringEndpoints:
             assert "metrics" in data
             assert "summary" in data
 
+    def test_get_metrics_values_are_not_hardcoded(self, client, auth_headers):
+        """Metric series must be computed from real sources, not fixed constants.
+
+        Regression test for the previously hardcoded system_uptime=86400.0,
+        agent_status=54.0, api_latency_p95=125.5, requests_per_second=45.2.
+        """
+        response = client.get(
+            "/api/v1/monitoring/metrics?metrics=health&metrics=performance&time_range=1h",
+            headers=auth_headers,
+        )
+        assert response.status_code in [200, 401]
+        if response.status_code != 200:
+            return
+
+        data = response.json()
+        series_by_name = {s["metric_name"]: s for s in data["metrics"]}
+
+        # system_uptime must track real elapsed system time, not a fixed 24h.
+        assert "system_uptime" in series_by_name
+        uptime_value = series_by_name["system_uptime"]["data_points"][0]["value"]
+        assert uptime_value != 86400.0
+        assert uptime_value > 0
+
+        # agent_status must reflect the real filesystem-scanned agent count.
+        assert "agent_status" in series_by_name
+        agent_count = series_by_name["agent_status"]["data_points"][0]["value"]
+        assert agent_count != 54.0
+        assert agent_count == data["summary"]["active_agents"]
+
+        # requests_per_second must be a real, non-magic derived rate.
+        assert "requests_per_second" in series_by_name
+        rps = series_by_name["requests_per_second"]["data_points"][0]["value"]
+        assert rps != 45.2
+
+        # api_latency_p95 is omitted (not fabricated as 125.5) when no requests
+        # have been observed yet in the live rolling window.
+        if "api_latency_p95" in series_by_name:
+            p95 = series_by_name["api_latency_p95"]["data_points"][0]["value"]
+            assert p95 != 125.5
+
     def test_list_agents(self, client, auth_headers):
         """Test GET /api/v1/agents."""
         response = client.get("/api/v1/agents", headers=auth_headers)

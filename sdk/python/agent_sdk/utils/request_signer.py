@@ -105,7 +105,7 @@ class RequestSigner:
         elif isinstance(body, dict):
             import json
 
-            body_bytes = json.dumps(body).encode()
+            body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
         elif isinstance(body, str):
             body_bytes = body.encode()
         else:
@@ -166,7 +166,7 @@ class RequestSigner:
         elif isinstance(body, dict):
             import json
 
-            body_bytes = json.dumps(body).encode()
+            body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
         elif isinstance(body, str):
             body_bytes = body.encode()
         else:
@@ -216,7 +216,7 @@ class RequestSigner:
         elif isinstance(body, dict):
             import json
 
-            body_bytes = json.dumps(body).encode()
+            body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
         elif isinstance(body, str):
             body_bytes = body.encode()
         else:

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!-- SKYYROSE — LOVE HURTS GIRL / RIG INSPECTOR. Fully self-contained: opens anywhere, no server, no network. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOVE HURTS GIRL — Rig Inspector</title>
+<style>
+:root{--void:#0A0A0A;--rose:#B76E79;--blood:#8B0000;--bone:#F5F5F0;--mono:'JetBrains Mono','SF Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--bone);font-family:var(--mono)}
+#scene{position:fixed;inset:0}
+.hud{position:fixed;top:24px;left:24px;z-index:10;pointer-events:none}
+.hud h1{font-size:13px;letter-spacing:.35em;font-weight:400;color:var(--rose)}
+.hud p{font-size:10px;letter-spacing:.15em;color:#777;margin-top:6px}
+.controls{position:fixed;bottom:24px;left:24px;z-index:10;display:flex;gap:10px;flex-wrap:wrap}
+.controls button{background:transparent;border:1px solid rgba(183,110,121,.4);color:var(--bone);font-family:var(--mono);font-size:10px;letter-spacing:.2em;padding:10px 16px;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1)}
+.controls button:hover,.controls button.on{border-color:var(--rose);color:var(--rose);background:rgba(183,110,121,.08)}
+#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:15;font-size:10px;letter-spacing:.4em;color:var(--rose)}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div class="hud"><h1>LOVE HURTS GIRL</h1><p>25-JOINT MIXAMO RIG &middot; 52,145 VERTS &middot; SELF-CONTAINED</p></div>
+<div class="controls">
+  <button id="btnSkel">SKELETON</button>
+  <button id="btnWire">WIREFRAME</button>
+  <button id="btnSpin" class="on">TURNTABLE</button>
+  <button id="btnWave">WAVE</button>
+</div>
+<div id="loading">LOADING</div>
+<script>@@THREE@@</script>
+<script>@@GLTFLOADER@@</script>
+<script>@@ORBIT@@</script>
+<script>
+(function(){
+"use strict";
+var GLB_B64 = "@@GLB64@@";
+var PI = Math.PI;
+var container = document.getElementById('scene');
+var W = window.innerWidth, H = window.innerHeight;
+
+var renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(W,H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0A0A0A);
+scene.fog = new THREE.Fog(0x0A0A0A, 6, 14);
+
+var camera = new THREE.PerspectiveCamera(38, W/H, 0.05, 60);
+camera.position.set(0, 1.35, 3.4);
+
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.95, 0);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 0.8; controls.maxDistance = 8;
+
+scene.add(new THREE.AmbientLight(0xF5EDE8, 0.35));
+var key = new THREE.DirectionalLight(0xFFF2E6, 1.15);
+key.position.set(2.5,4,3); key.castShadow = true;
+key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.left=-2; key.shadow.camera.right=2; key.shadow.camera.top=3; key.shadow.camera.bottom=-1;
+scene.add(key);
+var fill = new THREE.DirectionalLight(0xB76E79, 0.45); fill.position.set(-3,2,1); scene.add(fill);
+var rim = new THREE.DirectionalLight(0x8B0000, 0.7); rim.position.set(0,2.5,-4); scene.add(rim);
+
+var ground = new THREE.Mesh(new THREE.CircleGeometry(2.2,64),
+  new THREE.MeshStandardMaterial({color:0x141414,roughness:0.95,metalness:0}));
+ground.rotation.x = -PI/2; ground.receiveShadow = true; scene.add(ground);
+var ring = new THREE.Mesh(new THREE.RingGeometry(2.18,2.2,128),
+  new THREE.MeshBasicMaterial({color:0xB76E79,side:THREE.DoubleSide}));
+ring.rotation.x = -PI/2; ring.position.y = 0.001; scene.add(ring);
+
+var pivot = new THREE.Group(); scene.add(pivot);
+var skelHelper = null, mats = [], rArm = null, rFore = null, waveT = -1;
+
+function b64ToArrayBuffer(b64){
+  var bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for (var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function findBone(list, suffix){
+  for (var i=0;i<list.length;i++)
+    if (list[i].name.indexOf(suffix, list[i].name.length - suffix.length) !== -1) return list[i];
+  return null;
+}
+
+new THREE.GLTFLoader().parse(b64ToArrayBuffer(GLB_B64), '', function(gltf){
+  document.getElementById('loading').style.display = 'none';
+  gltf.scene.traverse(function(o){
+    if (o.isMesh || o.isSkinnedMesh){ o.castShadow = true; o.frustumCulled = false; mats.push(o.material); }
+    if (o.isSkinnedMesh){
+      rArm = findBone(o.skeleton.bones, 'RightArm');
+      rFore = findBone(o.skeleton.bones, 'RightForeArm');
+    }
+  });
+  pivot.add(gltf.scene);
+  skelHelper = new THREE.SkeletonHelper(gltf.scene);
+  skelHelper.visible = false;
+  scene.add(skelHelper);
+}, function(e){ if (window.console) console.error(e); });
+
+var spin = true;
+function toggle(btn, fn){ btn.addEventListener('click', function(){ btn.classList.toggle('on'); fn(btn.classList.contains('on')); }); }
+toggle(document.getElementById('btnSkel'), function(on){ if(skelHelper) skelHelper.visible = on; });
+toggle(document.getElementById('btnWire'), function(on){ mats.forEach(function(m){ m.wireframe = on; }); });
+toggle(document.getElementById('btnSpin'), function(on){ spin = on; });
+document.getElementById('btnWave').addEventListener('click', function(){ waveT = 0; });
+
+var clock = new THREE.Clock();
+(function animate(){
+  requestAnimationFrame(animate);
+  var dt = clock.getDelta();
+  if (spin) pivot.rotation.y += dt * 0.35;
+  if (skelHelper) skelHelper.rotation.y = pivot.rotation.y;
+  if (waveT >= 0 && rArm && rFore){
+    waveT += dt;
+    var D = 2.0, p = Math.min(1, waveT / D);
+    var lift = Math.sin(Math.min(1, p*3) * PI/2);
+    var drop = p > 0.7 ? (p-0.7)/0.3 : 0;
+    var amp = lift * (1 - drop*drop);
+    rArm.rotation.z = -1.15 * amp;
+    rFore.rotation.z = -0.35 * amp + 0.28 * amp * Math.sin(waveT * 11);
+    if (p >= 1){ waveT = -1; rArm.rotation.z = 0; rFore.rotation.z = 0; }
+  }
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+window.addEventListener('resize', function(){
+  W = window.innerWidth; H = window.innerHeight;
+  camera.aspect = W/H; camera.updateProjectionMatrix();
+  renderer.setSize(W,H);
+});
+})();
+</script>
+</body>
+</html>

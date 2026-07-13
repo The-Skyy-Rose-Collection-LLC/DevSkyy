@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Collection Logo Cutouts + Size Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hanken+Grotesk:wght@400;500;700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:oklch(0.15 0.006 25);--ink-2:oklch(0.20 0.008 25);--line:oklch(0.33 0.008 25);
+    --paper:oklch(0.94 0.004 60);--muted:oklch(0.70 0.006 40);--silver:#C0C0C0;--crimson:#DC143C;}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--ink);color:var(--paper);font-family:'Hanken Grotesk',sans-serif;line-height:1.6;padding:60px 24px 120px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto}
+  .eyebrow{font-family:'Cinzel';font-weight:600;letter-spacing:.32em;text-transform:uppercase;font-size:12px;color:var(--muted)}
+  h1{font-family:'Archivo';font-variation-settings:'wdth' 118,'wght' 900;font-size:clamp(28px,4vw,44px);line-height:1;margin:14px 0 8px}
+  .lede{color:var(--muted);max-width:66ch;margin-bottom:48px}
+  section{padding:44px 0;border-top:1px solid var(--line)}
+  h2{font-family:'Cinzel';font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:13px;color:var(--muted);margin-bottom:28px}
+
+  /* hero logos */
+  .heroes{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:720px){.heroes{grid-template-columns:1fr}}
+  .hero{background:radial-gradient(120% 100% at 50% 20%,var(--ink-2),var(--ink));border:1px solid var(--line);border-radius:3px;padding:36px;text-align:center}
+  .hero img{height:240px;width:auto;filter:drop-shadow(0 16px 22px rgba(0,0,0,.55))}
+  .hero .cap{margin-top:20px;font-family:'Cinzel';font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:var(--muted)}
+  .hero .cap b{display:block;color:var(--paper);font-size:13px;margin-top:4px}
+
+  /* size ladder */
+  .ladder{display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap}
+  .rung{text-align:center}
+  .rung img{width:auto;display:block;margin:0 auto 10px}
+  .rung .px{font-family:'Cinzel';font-size:10px;letter-spacing:.14em;color:var(--muted)}
+  .h200{height:200px} .h96{height:96px} .h48{height:48px} .h24{height:24px} .h16{height:16px}
+  .verdict{font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+  .ok{color:#7cc47c} .meh{color:#d4af37} .bad{color:var(--crimson)}
+
+  /* logo as character */
+  .demo{font-family:'Archivo';font-variation-settings:'wdth' 122,'wght' 900;line-height:1;display:flex;align-items:center;flex-wrap:wrap;color:var(--silver)}
+  .demo.big{font-size:clamp(44px,9vw,104px)}
+  .demo.small{font-size:26px;color:var(--muted);margin-top:20px}
+  .demo img{width:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .demo.big img{height:1.15em;vertical-align:-0.28em;margin:0 -0.06em}
+  .demo.small img{height:1.15em;vertical-align:-0.28em;margin:0 -0.02em}
+
+  .note{color:var(--muted);font-size:13px;margin-top:22px;max-width:70ch}
+  .note code{font-family:'Archivo';color:var(--silver)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SkyyRose · collection logos · transparent cutouts</div>
+  <h1>The logos, cut out — and where they read.</h1>
+  <p class="lede">Both emblems: white background removed, feathered, transparent. Ship as WebP — <b>512px ≈ 37KB, 256px ≈ 12KB, 64px ≈ 2KB.</b> Crisp when scaled down. No SVG — vector tracing would flatten the glass and metal. Below: the same logo at shrinking sizes so you can see exactly where the detail stops reading.</p>
+
+  <section>
+    <h2>As hero / collection marks</h2>
+    <div class="heroes">
+      <div class="hero"><img src="assets/emblem-br-soft.png" alt="Black Rose emblem"><div class="cap">Black Rose<b>Star · Black Rose · Heart base</b></div></div>
+      <div class="hero"><img src="assets/emblem-lh-soft.png" alt="Love Hurts emblem"><div class="cap">Love Hurts<b>Star · Red Rose · Broken Heart</b></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Size ladder — Black Rose</h2>
+    <div class="ladder">
+      <div class="rung"><img class="h200" src="assets/emblem-br-soft.png"><div class="px">200px</div><div class="verdict ok">hero ✓</div></div>
+      <div class="rung"><img class="h96" src="assets/emblem-br-soft.png"><div class="px">96px</div><div class="verdict ok">card ✓</div></div>
+      <div class="rung"><img class="h48" src="assets/emblem-br-soft.png"><div class="px">48px</div><div class="verdict meh">drop-cap ~</div></div>
+      <div class="rung"><img class="h24" src="assets/emblem-br-soft.png"><div class="px">24px</div><div class="verdict bad">blob ✗</div></div>
+      <div class="rung"><img class="h16" src="assets/emblem-br-soft.png"><div class="px">16px</div><div class="verdict bad">blob ✗</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Size ladder — Love Hurts</h2>
+    <div class="ladder">
+      <div class="rung"><img class="h200" src="assets/emblem-lh-soft.png"><div class="px">200px</div><div class="verdict ok">hero ✓</div></div>
+      <div class="rung"><img class="h96" src="assets/emblem-lh-soft.png"><div class="px">96px</div><div class="verdict ok">card ✓</div></div>
+      <div class="rung"><img class="h48" src="assets/emblem-lh-soft.png"><div class="px">48px</div><div class="verdict meh">drop-cap ~</div></div>
+      <div class="rung"><img class="h24" src="assets/emblem-lh-soft.png"><div class="px">24px</div><div class="verdict bad">blob ✗</div></div>
+      <div class="rung"><img class="h16" src="assets/emblem-lh-soft.png"><div class="px">16px</div><div class="verdict bad">blob ✗</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Logo as a character — the tradeoff</h2>
+    <div class="demo big">BLACK&nbsp;R<img src="assets/emblem-br-soft.png" alt="O">SE</div>
+    <div class="demo small">reads at hero size ↑ &nbsp;·&nbsp; at body size ↓ it's a smudge: SKYY&nbsp;R<img src="assets/emblem-lh-soft.png" alt="o">SE</div>
+    <p class="note">Verdict: the <b>full emblem</b> works as a large hero mark or an oversized display character (≥ ~64px). For a small inline glyph it needs to become a <b>simpler crop</b> — just the rose, or star+rose without the heart base. Same asset, cropped two ways: detailed for hero, minimal for inline. Format stays <code>WebP</code>, not SVG. Nothing deployed.</p>
+  </section>
+</div>
+</body>
+</html>

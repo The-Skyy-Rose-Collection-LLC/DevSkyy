@@ -1,6 +1,6 @@
 # DevSkyy JavaScript/TypeScript SDK
 
-Complete JavaScript and TypeScript SDK for the DevSkyy Enterprise Platform's 54-agent ecosystem.
+Complete JavaScript and TypeScript SDK for the DevSkyy Enterprise Platform's agent fleet (dynamic count — query `devskyy_list_agents` / `GET /api/v1/agents`; never hardcoded).
 
 ## 🚀 Quick Start
 
@@ -35,7 +35,7 @@ console.log(`Available agents: ${agents.length}`);
 
 ### Core Platform
 
-- **54-Agent Ecosystem**: Complete integration with all DevSkyy agents
+- **DevSkyy Agent Fleet**: Complete integration with all DevSkyy agents (fleet count is dynamic — query `devskyy_list_agents` / `GET /api/v1/agents`, never hardcoded)
 - **TypeScript Support**: Full type safety and IntelliSense
 - **Real-time Monitoring**: Live agent status and task tracking
 - **Error Handling**: Comprehensive error management and recovery
@@ -88,7 +88,7 @@ await platform.shutdown();
 
 #### `AgentService`
 
-Manages the 54-agent ecosystem:
+Manages the DevSkyy agent fleet (dynamic count — query `devskyy_list_agents` / `GET /api/v1/agents`):
 
 ```typescript
 import { AgentService } from 'devskyy';

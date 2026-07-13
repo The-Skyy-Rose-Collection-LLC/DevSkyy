@@ -164,7 +164,7 @@
 	padding: 12px;
 	font-size: 0.8rem;
 	font-weight: 700;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.12em; /* Uppercase chrome — matches nav/eyebrow standard */
 	text-transform: uppercase;
 	border-radius: var(--skyy-woo-radius-sm);
 	cursor: pointer;
@@ -185,7 +185,7 @@
 }
 
 .skyy-product-card__content .woocommerce-loop-product__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1rem;
 	font-weight: 600;
 	color: var(--skyy-woo-text);
@@ -276,6 +276,54 @@
 .skyy-product-card__actions .add_to_cart_button:focus-visible {
 	outline: 2px solid #fff;
 	outline-offset: 2px;
+}
+
+/* ==================================================
+   SHOP ARCHIVE GRID — 3 columns (mirrors loop_shop_columns filter)
+   WooCommerce adds columns-3 class to ul.products; these rules enforce
+   the editorial 3-column density on the main shop/archive template.
+   ================================================== */
+
+.woocommerce ul.products,
+.woocommerce-page ul.products {
+	display: grid !important;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 40px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+@media (max-width: 1024px) {
+	.woocommerce ul.products,
+	.woocommerce-page ul.products {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24px;
+	}
+}
+
+@media (max-width: 768px) {
+	.woocommerce ul.products,
+	.woocommerce-page ul.products {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.woocommerce ul.products,
+	.woocommerce-page ul.products {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Uppercase chrome — WC native button / v7-card CTA */
+.woocommerce .button,
+.woocommerce button.button,
+.woocommerce a.button,
+.v7card__add-style {
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 }
 
 /* Reduced motion — WooCommerce elements only (scoped to avoid overriding

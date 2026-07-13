@@ -1,0 +1,905 @@
+{
+  "clips": {
+    "walk": {
+      "frame_range": [
+        1,
+        102
+      ],
+      "bones": {
+        "LeftUpLeg": {
+          "peak_frame": 1,
+          "peak_angle_before_deg": 129.84,
+          "threshold_80pct_deg": 103.87,
+          "keyframes_edited": 89,
+          "keyframes_total": 102,
+          "peak_angle_after_deg": 116.85,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 129.84,
+              "angle_after_deg": 116.85
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 129.63,
+              "angle_after_deg": 116.75
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 128.56,
+              "angle_after_deg": 116.22
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 127.46,
+              "angle_after_deg": 115.66
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 126.55,
+              "angle_after_deg": 115.21
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 126.35,
+              "angle_after_deg": 115.11
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 125.61,
+              "angle_after_deg": 114.74
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 124.31,
+              "angle_after_deg": 114.09
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 122.9,
+              "angle_after_deg": 113.39
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 121.25,
+              "angle_after_deg": 112.56
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 120.08,
+              "angle_after_deg": 111.97
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 118.67,
+              "angle_after_deg": 111.27
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 117.06,
+              "angle_after_deg": 110.47
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 115.66,
+              "angle_after_deg": 109.77
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 114.31,
+              "angle_after_deg": 109.09
+            }
+          ]
+        },
+        "RightUpLeg": {
+          "peak_frame": 86,
+          "peak_angle_before_deg": 138.19,
+          "threshold_80pct_deg": 110.55,
+          "keyframes_edited": 102,
+          "keyframes_total": 102,
+          "peak_angle_after_deg": 124.37,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 118.24,
+              "angle_after_deg": 114.39
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 118.32,
+              "angle_after_deg": 114.43
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 118.4,
+              "angle_after_deg": 114.48
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 117.98,
+              "angle_after_deg": 114.26
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 117.63,
+              "angle_after_deg": 114.09
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 117.29,
+              "angle_after_deg": 113.92
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 117.62,
+              "angle_after_deg": 114.08
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 118.34,
+              "angle_after_deg": 114.45
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 119.67,
+              "angle_after_deg": 115.11
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 122.15,
+              "angle_after_deg": 116.35
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 125.84,
+              "angle_after_deg": 118.2
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 128.21,
+              "angle_after_deg": 119.38
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 129.05,
+              "angle_after_deg": 119.8
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 130.15,
+              "angle_after_deg": 120.35
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 131.39,
+              "angle_after_deg": 120.97
+            }
+          ]
+        }
+      }
+    },
+    "talk": {
+      "frame_range": [
+        1,
+        97
+      ],
+      "bones": {
+        "LeftUpLeg": {
+          "peak_frame": 25,
+          "peak_angle_before_deg": 107.63,
+          "threshold_80pct_deg": 86.1,
+          "keyframes_edited": 97,
+          "keyframes_total": 97,
+          "peak_angle_after_deg": 96.86,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 105.78,
+              "angle_after_deg": 95.94
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 105.78,
+              "angle_after_deg": 95.94
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 105.77,
+              "angle_after_deg": 95.93
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 105.76,
+              "angle_after_deg": 95.93
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 105.77,
+              "angle_after_deg": 95.94
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 105.87,
+              "angle_after_deg": 95.98
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 106.06,
+              "angle_after_deg": 96.08
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 106.29,
+              "angle_after_deg": 96.19
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 106.47,
+              "angle_after_deg": 96.28
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 106.51,
+              "angle_after_deg": 96.31
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 106.41,
+              "angle_after_deg": 96.26
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 106.2,
+              "angle_after_deg": 96.15
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 105.93,
+              "angle_after_deg": 96.01
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 105.66,
+              "angle_after_deg": 95.88
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 105.53,
+              "angle_after_deg": 95.82
+            }
+          ]
+        },
+        "RightUpLeg": {
+          "peak_frame": 15,
+          "peak_angle_before_deg": 126.1,
+          "threshold_80pct_deg": 100.88,
+          "keyframes_edited": 97,
+          "keyframes_total": 97,
+          "peak_angle_after_deg": 113.49,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 124.89,
+              "angle_after_deg": 112.89
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 124.89,
+              "angle_after_deg": 112.89
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 124.86,
+              "angle_after_deg": 112.87
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 124.83,
+              "angle_after_deg": 112.86
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 124.82,
+              "angle_after_deg": 112.85
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 124.89,
+              "angle_after_deg": 112.89
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 125.07,
+              "angle_after_deg": 112.97
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 125.27,
+              "angle_after_deg": 113.08
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 125.44,
+              "angle_after_deg": 113.16
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 125.55,
+              "angle_after_deg": 113.21
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 125.67,
+              "angle_after_deg": 113.27
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 125.77,
+              "angle_after_deg": 113.33
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 125.9,
+              "angle_after_deg": 113.39
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 126.03,
+              "angle_after_deg": 113.46
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 126.1,
+              "angle_after_deg": 113.49
+            }
+          ]
+        }
+      }
+    },
+    "point": {
+      "frame_range": [
+        1,
+        157
+      ],
+      "bones": {
+        "LeftUpLeg": {
+          "peak_frame": 35,
+          "peak_angle_before_deg": 121.81,
+          "threshold_80pct_deg": 97.45,
+          "keyframes_edited": 157,
+          "keyframes_total": 157,
+          "peak_angle_after_deg": 109.63,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 108.49,
+              "angle_after_deg": 102.97
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 108.4,
+              "angle_after_deg": 102.93
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 108.08,
+              "angle_after_deg": 102.77
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 108.02,
+              "angle_after_deg": 102.74
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 108.08,
+              "angle_after_deg": 102.76
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 108.1,
+              "angle_after_deg": 102.78
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 108.15,
+              "angle_after_deg": 102.8
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 108.17,
+              "angle_after_deg": 102.81
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 108.14,
+              "angle_after_deg": 102.8
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 108.11,
+              "angle_after_deg": 102.78
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 108.09,
+              "angle_after_deg": 102.77
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 108.08,
+              "angle_after_deg": 102.76
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 108.07,
+              "angle_after_deg": 102.76
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 108.07,
+              "angle_after_deg": 102.76
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 108.11,
+              "angle_after_deg": 102.78
+            }
+          ]
+        },
+        "RightUpLeg": {
+          "peak_frame": 59,
+          "peak_angle_before_deg": 137.91,
+          "threshold_80pct_deg": 110.33,
+          "keyframes_edited": 157,
+          "keyframes_total": 157,
+          "peak_angle_after_deg": 124.12,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 129.49,
+              "angle_after_deg": 119.91
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 129.45,
+              "angle_after_deg": 119.89
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 129.24,
+              "angle_after_deg": 119.78
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 129.07,
+              "angle_after_deg": 119.7
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 128.97,
+              "angle_after_deg": 119.65
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 128.93,
+              "angle_after_deg": 119.63
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 128.88,
+              "angle_after_deg": 119.6
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 128.83,
+              "angle_after_deg": 119.58
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 128.79,
+              "angle_after_deg": 119.56
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 128.76,
+              "angle_after_deg": 119.54
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 128.72,
+              "angle_after_deg": 119.52
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 128.68,
+              "angle_after_deg": 119.51
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 128.63,
+              "angle_after_deg": 119.48
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 128.58,
+              "angle_after_deg": 119.45
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 128.56,
+              "angle_after_deg": 119.45
+            }
+          ]
+        }
+      }
+    },
+    "wave": {
+      "frame_range": [
+        1,
+        129
+      ],
+      "bones": {
+        "LeftUpLeg": {
+          "peak_frame": 54,
+          "peak_angle_before_deg": 113.78,
+          "threshold_80pct_deg": 91.03,
+          "keyframes_edited": 126,
+          "keyframes_total": 129,
+          "peak_angle_after_deg": 102.41,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 104.69,
+              "angle_after_deg": 97.86
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 104.66,
+              "angle_after_deg": 97.84
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 104.52,
+              "angle_after_deg": 97.78
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 104.43,
+              "angle_after_deg": 97.73
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 104.33,
+              "angle_after_deg": 97.68
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 104.21,
+              "angle_after_deg": 97.62
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 104.09,
+              "angle_after_deg": 97.56
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 104.06,
+              "angle_after_deg": 97.54
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 104.18,
+              "angle_after_deg": 97.6
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 104.65,
+              "angle_after_deg": 97.84
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 105.55,
+              "angle_after_deg": 98.29
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 106.85,
+              "angle_after_deg": 98.94
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 108.32,
+              "angle_after_deg": 99.67
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 108.85,
+              "angle_after_deg": 99.94
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 108.45,
+              "angle_after_deg": 99.74
+            }
+          ]
+        },
+        "RightUpLeg": {
+          "peak_frame": 27,
+          "peak_angle_before_deg": 138.1,
+          "threshold_80pct_deg": 110.48,
+          "keyframes_edited": 129,
+          "keyframes_total": 129,
+          "peak_angle_after_deg": 124.29,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 121.55,
+              "angle_after_deg": 116.02
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 121.52,
+              "angle_after_deg": 116.0
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 121.4,
+              "angle_after_deg": 115.94
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 121.27,
+              "angle_after_deg": 115.88
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 121.13,
+              "angle_after_deg": 115.81
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 120.99,
+              "angle_after_deg": 115.73
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 120.88,
+              "angle_after_deg": 115.68
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 120.92,
+              "angle_after_deg": 115.7
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 121.1,
+              "angle_after_deg": 115.79
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 121.31,
+              "angle_after_deg": 115.9
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 121.9,
+              "angle_after_deg": 116.19
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 122.96,
+              "angle_after_deg": 116.72
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 124.33,
+              "angle_after_deg": 117.41
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 126.78,
+              "angle_after_deg": 118.63
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 129.17,
+              "angle_after_deg": 119.83
+            }
+          ]
+        }
+      }
+    },
+    "joy": {
+      "frame_range": [
+        1,
+        47
+      ],
+      "bones": {
+        "LeftUpLeg": {
+          "peak_frame": 11,
+          "peak_angle_before_deg": 136.29,
+          "threshold_80pct_deg": 109.04,
+          "keyframes_edited": 47,
+          "keyframes_total": 47,
+          "peak_angle_after_deg": 122.67,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 119.21,
+              "angle_after_deg": 114.13
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 119.23,
+              "angle_after_deg": 114.13
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 119.34,
+              "angle_after_deg": 114.19
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 119.51,
+              "angle_after_deg": 114.27
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 119.9,
+              "angle_after_deg": 114.47
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 121.1,
+              "angle_after_deg": 115.07
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 123.82,
+              "angle_after_deg": 116.43
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 127.83,
+              "angle_after_deg": 118.43
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 132.33,
+              "angle_after_deg": 120.68
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 135.26,
+              "angle_after_deg": 122.15
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 136.29,
+              "angle_after_deg": 122.67
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 135.37,
+              "angle_after_deg": 122.2
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 133.31,
+              "angle_after_deg": 121.17
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 130.53,
+              "angle_after_deg": 119.78
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 128.61,
+              "angle_after_deg": 118.82
+            }
+          ]
+        },
+        "RightUpLeg": {
+          "peak_frame": 12,
+          "peak_angle_before_deg": 138.34,
+          "threshold_80pct_deg": 110.67,
+          "keyframes_edited": 47,
+          "keyframes_total": 47,
+          "peak_angle_after_deg": 124.5,
+          "edits_sample": [
+            {
+              "frame": 1,
+              "angle_before_deg": 129.03,
+              "angle_after_deg": 119.85
+            },
+            {
+              "frame": 2,
+              "angle_before_deg": 129.0,
+              "angle_after_deg": 119.83
+            },
+            {
+              "frame": 3,
+              "angle_before_deg": 128.75,
+              "angle_after_deg": 119.71
+            },
+            {
+              "frame": 4,
+              "angle_before_deg": 128.38,
+              "angle_after_deg": 119.52
+            },
+            {
+              "frame": 5,
+              "angle_before_deg": 128.01,
+              "angle_after_deg": 119.34
+            },
+            {
+              "frame": 6,
+              "angle_before_deg": 127.97,
+              "angle_after_deg": 119.32
+            },
+            {
+              "frame": 7,
+              "angle_before_deg": 128.84,
+              "angle_after_deg": 119.75
+            },
+            {
+              "frame": 8,
+              "angle_before_deg": 130.98,
+              "angle_after_deg": 120.82
+            },
+            {
+              "frame": 9,
+              "angle_before_deg": 133.89,
+              "angle_after_deg": 122.28
+            },
+            {
+              "frame": 10,
+              "angle_before_deg": 136.1,
+              "angle_after_deg": 123.39
+            },
+            {
+              "frame": 11,
+              "angle_before_deg": 138.3,
+              "angle_after_deg": 124.49
+            },
+            {
+              "frame": 12,
+              "angle_before_deg": 138.34,
+              "angle_after_deg": 124.5
+            },
+            {
+              "frame": 13,
+              "angle_before_deg": 136.94,
+              "angle_after_deg": 123.8
+            },
+            {
+              "frame": 14,
+              "angle_before_deg": 134.46,
+              "angle_after_deg": 122.57
+            },
+            {
+              "frame": 15,
+              "angle_before_deg": 132.59,
+              "angle_after_deg": 121.63
+            }
+          ]
+        }
+      }
+    }
+  },
+  "params": {
+    "threshold_fraction": 0.8,
+    "excess_reduction": 0.5
+  },
+  "render_paths": {
+    "walk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/flexionclamp_walk.png",
+    "talk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/flexionclamp_talk.png",
+    "point": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/flexionclamp_point.png",
+    "wave": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/flexionclamp_wave.png",
+    "joy": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/flexionclamp_joy.png"
+  }
+}

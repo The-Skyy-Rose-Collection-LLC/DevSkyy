@@ -142,7 +142,7 @@ All 13 DevSkyy MCP tools are available when using critical-fuchsia-ape:
 10. **devskyy_marketing_campaign** - Multi-channel marketing automation
 11. **devskyy_multi_agent_workflow** - Complex workflow orchestration
 12. **devskyy_system_monitoring** - Real-time platform monitoring
-13. **devskyy_list_agents** - View all 54 agents
+13. **devskyy_list_agents** - List the DevSkyy agent fleet (dynamic count; do not hardcode — see `agents/CLAUDE.md`)
 
 ## Switching Between Backends
 

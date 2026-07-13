@@ -1,0 +1,278 @@
+{
+  "prerequisites": {
+    "mesh_parented_to_armature": true,
+    "modifiers": [
+      "ARMATURE"
+    ]
+  },
+  "armature_nla_tracks": {
+    "idle": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 73.0,
+      "action_frame_start": 0.0,
+      "action_frame_end": 72.0
+    },
+    "walk": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 102.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 102.0
+    },
+    "wave": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 129.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 129.0
+    },
+    "point": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 157.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 157.0
+    },
+    "talk": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 97.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 97.0
+    },
+    "joy": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 47.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 47.0
+    }
+  },
+  "clip_flexion_scan": {
+    "walk": {
+      "action_frame_range": [
+        1,
+        102
+      ],
+      "scanned_peak_frame": 86,
+      "scanned_peak_value_deg": 138.19,
+      "scanned_peak_leg": "RightUpLeg",
+      "seed_peak_frame": 86,
+      "seed_matches_scan": true,
+      "ramp_start": 1,
+      "ramp_end": 102,
+      "discrepancy_at_peak_frac_torso": 0.3111,
+      "discrepancy_trace_own_peak_frame": 1
+    },
+    "talk": {
+      "action_frame_range": [
+        1,
+        97
+      ],
+      "scanned_peak_frame": 15,
+      "scanned_peak_value_deg": 126.1,
+      "scanned_peak_leg": "RightUpLeg",
+      "seed_peak_frame": 15,
+      "seed_matches_scan": true,
+      "ramp_start": 1,
+      "ramp_end": 97,
+      "discrepancy_at_peak_frac_torso": 0.3363,
+      "discrepancy_trace_own_peak_frame": 25
+    },
+    "point": {
+      "action_frame_range": [
+        1,
+        157
+      ],
+      "scanned_peak_frame": 59,
+      "scanned_peak_value_deg": 137.91,
+      "scanned_peak_leg": "RightUpLeg",
+      "seed_peak_frame": 59,
+      "seed_matches_scan": true,
+      "ramp_start": 1,
+      "ramp_end": 157,
+      "discrepancy_at_peak_frac_torso": 0.3519,
+      "discrepancy_trace_own_peak_frame": 36
+    },
+    "wave": {
+      "action_frame_range": [
+        1,
+        129
+      ],
+      "scanned_peak_frame": 27,
+      "scanned_peak_value_deg": 138.1,
+      "scanned_peak_leg": "RightUpLeg",
+      "seed_peak_frame": 27,
+      "seed_matches_scan": true,
+      "ramp_start": 1,
+      "ramp_end": 129,
+      "discrepancy_at_peak_frac_torso": 0.3519,
+      "discrepancy_trace_own_peak_frame": 26
+    },
+    "joy": {
+      "action_frame_range": [
+        1,
+        47
+      ],
+      "scanned_peak_frame": 12,
+      "scanned_peak_value_deg": 138.34,
+      "scanned_peak_leg": "RightUpLeg",
+      "seed_peak_frame": 12,
+      "seed_matches_scan": true,
+      "ramp_start": 1,
+      "ramp_end": 47,
+      "discrepancy_at_peak_frac_torso": 0.3606,
+      "discrepancy_trace_own_peak_frame": 11
+    }
+  },
+  "candidate_vertex_count": 369,
+  "candidate_vertex_index_range": [
+    36488,
+    47230
+  ],
+  "clip_discrepancy": {
+    "walk": {
+      "peak_frame": 86,
+      "max_discrepancy_frac_torso": 0.6814,
+      "mean_top50_discrepancy_frac_torso": 0.5256,
+      "n_vertices_over_threshold": 365
+    },
+    "talk": {
+      "peak_frame": 15,
+      "max_discrepancy_frac_torso": 0.6748,
+      "mean_top50_discrepancy_frac_torso": 0.5348,
+      "n_vertices_over_threshold": 359
+    },
+    "point": {
+      "peak_frame": 59,
+      "max_discrepancy_frac_torso": 0.6928,
+      "mean_top50_discrepancy_frac_torso": 0.5487,
+      "n_vertices_over_threshold": 359
+    },
+    "wave": {
+      "peak_frame": 27,
+      "max_discrepancy_frac_torso": 0.7334,
+      "mean_top50_discrepancy_frac_torso": 0.5578,
+      "n_vertices_over_threshold": 363
+    },
+    "joy": {
+      "peak_frame": 12,
+      "max_discrepancy_frac_torso": 0.6381,
+      "mean_top50_discrepancy_frac_torso": 0.5759,
+      "n_vertices_over_threshold": 346
+    }
+  },
+  "worst_clip": "joy",
+  "folding_set_size": 346,
+  "folding_set_index_range": [
+    36488,
+    47230
+  ],
+  "laplacian_relaxation": {
+    "iterations": 12,
+    "max_move_world_units": 0.04911,
+    "mean_move_world_units": 0.01167
+  },
+  "blend_matrix_formula_max_error": 0.0,
+  "rest_space_delta_count": 346,
+  "skipped_singular_count": 0,
+  "max_reapply_verification_error": 1.2e-05,
+  "rest_space_delta_magnitude": {
+    "max": 8.56547,
+    "mean": 1.92782
+  },
+  "per_clip_ramp": {
+    "walk": {
+      "keyframes": [
+        [
+          1,
+          0.0
+        ],
+        [
+          86,
+          1.0
+        ],
+        [
+          102,
+          0.0
+        ]
+      ],
+      "peak_frame": 86,
+      "ramp_start": 1,
+      "ramp_end": 102
+    },
+    "talk": {
+      "keyframes": [
+        [
+          1,
+          0.0
+        ],
+        [
+          15,
+          1.0
+        ],
+        [
+          97,
+          0.0
+        ]
+      ],
+      "peak_frame": 15,
+      "ramp_start": 1,
+      "ramp_end": 97
+    },
+    "point": {
+      "keyframes": [
+        [
+          1,
+          0.0
+        ],
+        [
+          59,
+          1.0
+        ],
+        [
+          157,
+          0.0
+        ]
+      ],
+      "peak_frame": 59,
+      "ramp_start": 1,
+      "ramp_end": 157
+    },
+    "wave": {
+      "keyframes": [
+        [
+          1,
+          0.0
+        ],
+        [
+          27,
+          1.0
+        ],
+        [
+          129,
+          0.0
+        ]
+      ],
+      "peak_frame": 27,
+      "ramp_start": 1,
+      "ramp_end": 129
+    },
+    "joy": {
+      "keyframes": [
+        [
+          1,
+          0.0
+        ],
+        [
+          12,
+          1.0
+        ],
+        [
+          47,
+          0.0
+        ]
+      ],
+      "peak_frame": 12,
+      "ramp_start": 1,
+      "ramp_end": 47
+    }
+  },
+  "output_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb",
+  "worst_clip_used_for_correction": "joy"
+}

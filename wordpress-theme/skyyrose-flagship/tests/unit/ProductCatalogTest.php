@@ -241,7 +241,8 @@ class ProductCatalogTest extends TestCase {
 
 	public function test_product_url_non_preorder_product_returns_collection_anchor(): void {
 		$url = skyyrose_product_url( 'br-001' );
-		$this->assertStringContainsString( 'collection-black-rose', $url );
+		// Canonical route (structural remediation WS2) — never /collection-{slug}/.
+		$this->assertStringContainsString( '/collections/black-rose/', $url );
 		$this->assertStringContainsString( 'br-001', $url );
 	}
 

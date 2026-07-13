@@ -38,10 +38,36 @@ function skyyrose_see_get_fastapi_url(): string {
 }
 
 /**
+ * Hosts the theme may make backend HTTP requests to. The FastAPI backend URL
+ * and the MCP URL are admin-settable but must only ever point at known DevSkyy
+ * infrastructure; restricting the host to this allowlist (whose DNS we control)
+ * is the PRIMARY SSRF defense and defeats DNS-rebinding — a rebindable attacker
+ * domain can never be one of these, so a validate-then-refetch TOCTOU cannot
+ * point the actual connection at an internal address. Extend via the filter for
+ * a custom backend deployment.
+ *
+ * @return string[] Lowercase host names.
+ */
+function skyyrose_see_allowed_backend_hosts(): array {
+	return apply_filters(
+		'skyyrose_see_allowed_backend_hosts',
+		array(
+			'api.devskyy.app',         // custom domain — REST backend + /mcp mount.
+			'devskyy-backend.fly.dev', // REST backend Fly app.
+			'devskyy-api.fly.dev',     // MCP Fly app.
+			'localhost',               // local dev only (loopback still range-gated below).
+			'127.0.0.1',
+		)
+	);
+}
+
+/**
  * Validate a URL is safe for HTTP requests.
  *
- * Only allows http/https schemes. Blocks private IP ranges, localhost
- * aliases, and metadata endpoints to prevent SSRF.
+ * Only http/https schemes, and the host MUST be on the DevSkyy backend
+ * allowlist (primary SSRF/DNS-rebind defense). Private/reserved IP ranges,
+ * localhost aliases, and cloud-metadata endpoints are additionally blocked as
+ * defense-in-depth.
  *
  * @param string $url URL to validate.
  * @return bool True if safe.
@@ -57,26 +83,43 @@ function skyyrose_see_is_safe_url( string $url ): bool {
 		return false;
 	}
 
-	$host = strtolower( $parsed['host'] );
+	$host = strtolower( trim( $parsed['host'], '[]' ) );
 
-	// Block metadata endpoints and obvious internal addresses.
-	$blocked_hosts = array( '169.254.169.254', 'metadata.google.internal' );
-	if ( in_array( $host, $blocked_hosts, true ) ) {
+	// Primary defense: the host must be known DevSkyy infrastructure. This runs
+	// BEFORE any DNS resolution, so a rebindable attacker domain is refused
+	// outright and the check-time/connect-time TOCTOU window is closed by
+	// construction (the connection can only target an allowlisted host whose DNS
+	// we control). The range filtering below is retained as defense-in-depth.
+	if ( ! in_array( $host, skyyrose_see_allowed_backend_hosts(), true ) ) {
 		return false;
 	}
 
-	// Resolve hostname and block private + reserved IP ranges. filter_var with
-	// NO_PRIV_RANGE covers RFC 1918 (10/8, 172.16/12, 192.168/16); NO_RES_RANGE
-	// covers loopback (127.0/8), link-local (169.254/16), multicast, etc.
-	$ip = gethostbyname( $host );
-	if ( $ip !== $host && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
-		// Allow loopback in local development only.
-		if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
-			return true;
-		}
-		if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+	// Resolve to a target IP. Critically: if the host is ALREADY an IP literal
+	// (v4 or v6), use it directly — gethostbyname() returns a literal unchanged,
+	// and the previous `$ip !== $host` guard then SKIPPED the range check
+	// entirely, letting http://10.0.0.1/, http://127.0.0.1/, http://[::1]/ etc.
+	// pass. Now the private+reserved-range filter runs unconditionally.
+	if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+		$ip = $host;
+	} else {
+		$ip = gethostbyname( $host ); // IPv4 resolution; returns $host on failure.
+		if ( $ip === $host ) {
+			// Unresolvable (or IPv6-only host gethostbyname can't handle) — fail
+			// closed rather than allow an unvalidated destination.
 			return false;
 		}
+	}
+
+	// Allow loopback in local development only.
+	if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
+		return true;
+	}
+
+	// Always apply private + reserved range filtering, for both IPv4 and IPv6.
+	// NO_PRIV_RANGE covers RFC 1918; NO_RES_RANGE covers loopback, link-local
+	// (169.254/16 — the cloud-metadata range), multicast, and IPv6 equivalents.
+	if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+		return false;
 	}
 
 	return true;

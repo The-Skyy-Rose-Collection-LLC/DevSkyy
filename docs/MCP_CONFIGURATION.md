@@ -239,7 +239,7 @@ The 21 MCP tools are organized into categories:
 
 ### Discovery (1 tool)
 
-- `devskyy_list_agents` - View all 54 agents
+- `devskyy_list_agents` - List the DevSkyy agent fleet (dynamic count; do not hardcode — see `agents/CLAUDE.md`)
 
 ---
 
@@ -502,8 +502,8 @@ Create `Dockerfile`:
 FROM python:3.11-slim
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -e ".[mcp]"
 
 COPY devskyy_mcp.py .
 COPY .env .

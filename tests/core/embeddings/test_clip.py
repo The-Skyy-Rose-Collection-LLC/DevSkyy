@@ -7,8 +7,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 import torch
+from transformers import CLIPModel, CLIPProcessor
 
-from skyyrose.core.embeddings import clip as clip_mod
 from skyyrose.core.embeddings.clip import ClipEncoder
 from skyyrose.core.embeddings.config import EmbeddingConfig
 from skyyrose.core.embeddings.device import dtype_load_kwargs
@@ -60,8 +60,8 @@ def patched(monkeypatch):
         calls["proc"] = {"model_id": model_id, **kwargs}
         return _FakeProcessor()
 
-    monkeypatch.setattr(clip_mod.CLIPModel, "from_pretrained", fake_model_fp)
-    monkeypatch.setattr(clip_mod.CLIPProcessor, "from_pretrained", fake_proc_fp)
+    monkeypatch.setattr(CLIPModel, "from_pretrained", fake_model_fp)
+    monkeypatch.setattr(CLIPProcessor, "from_pretrained", fake_proc_fp)
     return calls
 
 

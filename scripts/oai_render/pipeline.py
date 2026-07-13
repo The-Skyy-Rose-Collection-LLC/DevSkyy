@@ -437,6 +437,12 @@ def render_sku(
                 tags=list(verdict.failure_tags),
                 reason=verdict.reason,
                 analysis=verdict.analysis,
+                # Q-fusion: record the centroid signal next to the judge for joint
+                # calibration (None unless the centroid gate is on). Advisory until the
+                # threshold is calibrated for oai_render — these don't gate accept here.
+                centroid_score=verdict.centroid_score,
+                centroid_threshold=verdict.centroid_threshold,
+                on_brand=verdict.on_brand,
             )
 
         if verdict is not None and verdict.needs_review:

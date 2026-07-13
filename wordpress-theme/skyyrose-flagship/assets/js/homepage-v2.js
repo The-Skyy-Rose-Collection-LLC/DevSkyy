@@ -61,25 +61,7 @@
 		}
 	} )();
 
-	/* ======================================================================
-	   NAV SCROLL — Toggle .scrolled class on main nav
-	   ====================================================================== */
-	( function initNavScroll() {
-		var navTick = false;
-		var nav = document.getElementById( 'mainNav' );
-		if ( ! nav ) {
-			return;
-		}
-		window.addEventListener( 'scroll', function () {
-			if ( ! navTick ) {
-				requestAnimationFrame( function () {
-					nav.classList.toggle( 'scrolled', window.scrollY > 80 );
-					navTick = false;
-				} );
-				navTick = true;
-			}
-		} );
-	} )();
+	/* NAV SCROLL removed (audit 2026-07-01) — #mainNav deleted; WP header handles nav. */
 
 	/* ======================================================================
 	   REVEAL ANIMATIONS — IntersectionObserver for .rv elements
@@ -157,7 +139,6 @@
 				var target = document.querySelector( href );
 				if ( target ) {
 					e.preventDefault();
-					closeMobileMenu();
 					target.scrollIntoView( {
 						behavior: 'smooth',
 						block: 'start',
@@ -167,46 +148,7 @@
 		} );
 	} )();
 
-	/* ======================================================================
-	   MOBILE MENU — Open/close full-screen overlay
-	   ====================================================================== */
-	var mobMenu = document.getElementById( 'mobMenu' );
-
-	function openMobileMenu() {
-		if ( mobMenu ) {
-			mobMenu.classList.add( 'open' );
-			document.body.style.overflow = 'hidden';
-		}
-	}
-
-	function closeMobileMenu() {
-		if ( mobMenu ) {
-			mobMenu.classList.remove( 'open' );
-			document.body.style.overflow = '';
-		}
-	}
-
-	// Bind hamburger button.
-	var hamBtn = document.querySelector( '.nav-ham' );
-	if ( hamBtn ) {
-		hamBtn.addEventListener( 'click', openMobileMenu );
-	}
-
-	// Bind close button.
-	var closeBtn = document.querySelector( '.mob-close' );
-	if ( closeBtn ) {
-		closeBtn.addEventListener( 'click', closeMobileMenu );
-	}
-
-	// Bind mobile menu links to close on click.
-	if ( mobMenu ) {
-		mobMenu.querySelectorAll( 'a' ).forEach( function ( link ) {
-			link.addEventListener( 'click', closeMobileMenu );
-		} );
-	}
-
-	// Make closeMobileMenu available globally for smooth scroll.
-	window.closeMob = closeMobileMenu;
+	/* MOBILE MENU removed (audit 2026-07-01) — WP header mobile panel handles navigation. */
 
 	/* ======================================================================
 	   NEWSLETTER — WordPress AJAX submission
@@ -315,23 +257,7 @@
 		}
 	} )();
 
-	/* ======================================================================
-	   CART — WooCommerce integration
-	   ====================================================================== */
-	( function initCart() {
-		var bagBtn = document.querySelector( '.nav-bag' );
-		if ( ! bagBtn ) {
-			return;
-		}
-		bagBtn.addEventListener( 'click', function () {
-			if (
-				typeof window.skyyrose_homepage !== 'undefined' &&
-				window.skyyrose_homepage.cart_url
-			) {
-				window.location.href = window.skyyrose_homepage.cart_url;
-			}
-		} );
-	} )();
+	/* CART (initCart) removed (audit 2026-07-01) — .nav-bag deleted with #mainNav; WP header handles bag. */
 
 	/* ======================================================================
 	   SCROLL PROGRESS — Rose-gold bar at top of page

@@ -11,18 +11,32 @@
   "palette": {
     "gold": "#D4AF37",
     "rose_gold": "#B76E79",
-    "accent": "#D4AF37",
+    "accent": "#B76E79",
     "accent_dark": "#B8960C",
     "secondary": "#B76E79",
     "bg": "#0A0A0A",
     "text": "#F5E6D3"
   },
   "fonts": {
-    "script": {"family": "Pinyon Script", "woff2": "assets/fonts/pinyon-script-latin.woff2", "source": "OFL / Google Fonts"},
-    "caps": {"family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "source": "OFL (already hosted)"},
-    "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
+    "script": {
+      "family": "Grand Hotel",
+      "woff2": "assets/fonts/grand-hotel-latin.woff2",
+      "source": "OFL / Google Fonts"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
-  "lockup": {"ref": "images/logos/sr-monogram-rose-gold"},
+  "lockup": {
+    "ref": "images/logos/sr-monogram-rose-gold"
+  },
   "imagery": {
     "hero": {
       "path": "branding/hero/luxury-nighttime",

@@ -15,6 +15,7 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -28,7 +29,11 @@ from services.ml.visual_feature_extractor import (
     get_visual_feature_extractor,
 )
 from services.storage.r2_client import R2Client, R2Config, R2Error
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.db import db_manager, get_db
+from database.models_brand_assets import BrandAssetRecord, IngestionJobRecord
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
@@ -252,12 +257,84 @@ class TrainingReadinessResponse(BaseModel):
 
 
 # =============================================================================
-# In-Memory Storage (Replace with DB in production)
+# Persistence (SQLAlchemy — see database/models_brand_assets.py)
 # =============================================================================
 
 
-_brand_assets: dict[str, BrandAsset] = {}
-_ingestion_jobs: dict[str, BulkIngestionJob] = {}
+def _asset_to_row(asset: BrandAsset) -> BrandAssetRecord:
+    """Serialize a BrandAsset into its persisted row."""
+    return BrandAssetRecord(
+        id=asset.id,
+        url=asset.url,
+        category=asset.category.value,
+        approval_status=asset.approval_status.value,
+        metadata_json=asset.metadata.model_dump_json(),
+        visual_features_json=(
+            asset.visual_features.model_dump_json() if asset.visual_features else None
+        ),
+        file_size_bytes=asset.file_size_bytes,
+        width=asset.width,
+        height=asset.height,
+        mime_type=asset.mime_type,
+        r2_key=asset.r2_key,
+        created_at=asset.created_at,
+        created_by=asset.created_by,
+    )
+
+
+def _row_to_asset(row: BrandAssetRecord) -> BrandAsset:
+    """Deserialize a persisted row back into a BrandAsset."""
+    return BrandAsset(
+        id=row.id,
+        url=row.url,
+        category=row.category,
+        approval_status=row.approval_status,
+        metadata=BrandAssetMetadata.model_validate_json(row.metadata_json),
+        visual_features=(
+            VisualFeatures.model_validate_json(row.visual_features_json)
+            if row.visual_features_json
+            else None
+        ),
+        file_size_bytes=row.file_size_bytes,
+        width=row.width,
+        height=row.height,
+        mime_type=row.mime_type,
+        r2_key=row.r2_key,
+        created_at=row.created_at,
+        created_by=row.created_by,
+    )
+
+
+def _job_to_row(job: BulkIngestionJob) -> IngestionJobRecord:
+    """Serialize a BulkIngestionJob into its persisted row."""
+    return IngestionJobRecord(
+        id=job.id,
+        status=job.status.value,
+        total=job.total,
+        processed=job.processed,
+        succeeded=job.succeeded,
+        failed=job.failed,
+        results_json=json.dumps([r.model_dump(mode="json") for r in job.results]),
+        created_at=job.created_at,
+        completed_at=job.completed_at,
+        created_by=job.created_by,
+    )
+
+
+def _row_to_job(row: IngestionJobRecord) -> BulkIngestionJob:
+    """Deserialize a persisted row back into a BulkIngestionJob."""
+    return BulkIngestionJob(
+        id=row.id,
+        status=row.status,
+        total=row.total,
+        processed=row.processed,
+        succeeded=row.succeeded,
+        failed=row.failed,
+        results=[IngestionJobResult(**r) for r in json.loads(row.results_json)],
+        created_at=row.created_at,
+        completed_at=row.completed_at,
+        created_by=row.created_by,
+    )
 
 
 # =============================================================================
@@ -432,101 +509,111 @@ async def process_bulk_ingestion(
 ) -> None:
     """Process bulk ingestion in background.
 
+    Runs as a FastAPI BackgroundTask, which cannot use Depends(get_db) —
+    it opens its own session and commits incrementally so job progress is
+    visible to concurrent GET /ingest/{job_id} requests as it runs.
+
     Args:
         job_id: Job identifier
         request: Ingestion request
         user_id: User who initiated the job
     """
-    job = _ingestion_jobs.get(job_id)
-    if not job:
-        return
+    async with db_manager.session() as db:
+        job_row = await db.get(IngestionJobRecord, job_id)
+        if not job_row:
+            return
 
-    job.status = IngestionJobStatus.PROCESSING
+        job_row.status = IngestionJobStatus.PROCESSING.value
+        await db.commit()
 
-    for asset_upload in request.assets:
-        try:
-            # Generate asset ID first (needed for R2 key)
-            asset_id = str(uuid4())
+        for asset_upload in request.assets:
+            results = json.loads(job_row.results_json)
+            try:
+                # Generate asset ID first (needed for R2 key)
+                asset_id = str(uuid4())
 
-            # Upload to R2 storage
-            r2_key, file_size, width, height, mime_type = await upload_to_r2(
-                asset_upload.url,
-                asset_id,
-                asset_upload.category,
-                correlation_id=job_id,
-            )
-
-            # Extract features if requested
-            features = None
-            if request.extract_features:
-                features = await extract_visual_features(
+                # Upload to R2 storage
+                r2_key, file_size, width, height, mime_type = await upload_to_r2(
                     asset_upload.url,
+                    asset_id,
+                    asset_upload.category,
                     correlation_id=job_id,
                 )
 
-            # Create asset with all extracted data
-            asset = BrandAsset(
-                id=asset_id,
-                url=asset_upload.url,
-                category=asset_upload.category,
-                approval_status=(
-                    AssetApprovalStatus.APPROVED
-                    if request.auto_approve
-                    else AssetApprovalStatus.PENDING
-                ),
-                metadata=asset_upload.metadata,
-                visual_features=features,
-                file_size_bytes=file_size,
-                width=width,
-                height=height,
-                mime_type=mime_type,
-                r2_key=r2_key,
-                created_by=user_id,
-            )
+                # Extract features if requested
+                features = None
+                if request.extract_features:
+                    features = await extract_visual_features(
+                        asset_upload.url,
+                        correlation_id=job_id,
+                    )
 
-            # Apply campaign name if provided
-            if request.campaign_name:
-                asset.metadata.campaign = request.campaign_name
-
-            _brand_assets[asset.id] = asset
-
-            job.results.append(
-                IngestionJobResult(
+                # Create asset with all extracted data
+                asset = BrandAsset(
+                    id=asset_id,
                     url=asset_upload.url,
-                    success=True,
-                    asset_id=asset.id,
+                    category=asset_upload.category,
+                    approval_status=(
+                        AssetApprovalStatus.APPROVED
+                        if request.auto_approve
+                        else AssetApprovalStatus.PENDING
+                    ),
+                    metadata=asset_upload.metadata,
+                    visual_features=features,
+                    file_size_bytes=file_size,
+                    width=width,
+                    height=height,
+                    mime_type=mime_type,
+                    r2_key=r2_key,
+                    created_by=user_id,
                 )
-            )
-            job.succeeded += 1
 
-        except Exception as e:
-            logger.error(
-                f"Failed to ingest {asset_upload.url}: {e}",
-                extra={"job_id": job_id},
-            )
-            job.results.append(
-                IngestionJobResult(
-                    url=asset_upload.url,
-                    success=False,
-                    error=str(e),
+                # Apply campaign name if provided
+                if request.campaign_name:
+                    asset.metadata.campaign = request.campaign_name
+
+                db.add(_asset_to_row(asset))
+
+                results.append(
+                    IngestionJobResult(
+                        url=asset_upload.url,
+                        success=True,
+                        asset_id=asset.id,
+                    ).model_dump(mode="json")
                 )
-            )
-            job.failed += 1
+                job_row.succeeded += 1
 
-        job.processed += 1
+            except Exception as e:
+                logger.error(
+                    f"Failed to ingest {asset_upload.url}: {e}",
+                    extra={"job_id": job_id},
+                )
+                results.append(
+                    IngestionJobResult(
+                        url=asset_upload.url,
+                        success=False,
+                        error=str(e),
+                    ).model_dump(mode="json")
+                )
+                job_row.failed += 1
 
-    # Finalize job
-    job.completed_at = datetime.now(UTC)
-    if job.failed == 0:
-        job.status = IngestionJobStatus.COMPLETED
-    elif job.succeeded == 0:
-        job.status = IngestionJobStatus.FAILED
-    else:
-        job.status = IngestionJobStatus.PARTIAL
+            job_row.results_json = json.dumps(results)
+            job_row.processed += 1
+            await db.commit()
 
-    logger.info(
-        f"Bulk ingestion job {job_id} completed: {job.succeeded}/{job.total} succeeded",
-    )
+        # Finalize job
+        job_row.completed_at = datetime.now(UTC)
+        if job_row.failed == 0:
+            job_row.status = IngestionJobStatus.COMPLETED.value
+        elif job_row.succeeded == 0:
+            job_row.status = IngestionJobStatus.FAILED.value
+        else:
+            job_row.status = IngestionJobStatus.PARTIAL.value
+        await db.commit()
+
+        logger.info(
+            f"Bulk ingestion job {job_id} completed: {job_row.succeeded}/{job_row.total} succeeded",
+        )
 
 
 # =============================================================================
@@ -538,6 +625,7 @@ async def process_bulk_ingestion(
 async def bulk_ingest_brand_assets(
     request: BulkIngestionRequest,
     background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BulkIngestionJob:
     """
@@ -555,7 +643,8 @@ async def bulk_ingest_brand_assets(
         total=len(request.assets),
         created_by=current_user.sub,
     )
-    _ingestion_jobs[job.id] = job
+    db.add(_job_to_row(job))
+    await db.flush()
 
     # Process in background
     background_tasks.add_task(
@@ -576,6 +665,7 @@ async def bulk_ingest_brand_assets(
 @router.get("/ingest/{job_id}", response_model=BulkIngestionJob)
 async def get_ingestion_job(
     job_id: str,
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BulkIngestionJob:
     """
@@ -583,13 +673,13 @@ async def get_ingestion_job(
 
     Returns current progress and results of individual asset ingestions.
     """
-    job = _ingestion_jobs.get(job_id)
-    if not job:
+    row = await db.get(IngestionJobRecord, job_id)
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Ingestion job not found: {job_id}",
         )
-    return job
+    return _row_to_job(row)
 
 
 # =============================================================================
@@ -604,6 +694,7 @@ async def list_brand_assets(
     campaign: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BrandAssetsListResponse:
     """
@@ -614,7 +705,8 @@ async def list_brand_assets(
     - **approval_status**: pending, approved, rejected
     - **campaign**: Campaign name
     """
-    assets = list(_brand_assets.values())
+    result = await db.execute(select(BrandAssetRecord))
+    assets = [_row_to_asset(row) for row in result.scalars().all()]
 
     # Apply filters
     if category:
@@ -645,6 +737,7 @@ async def list_brand_assets(
 @router.get("/assets/{asset_id}", response_model=BrandAsset)
 async def get_brand_asset(
     asset_id: str,
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BrandAsset:
     """
@@ -652,18 +745,19 @@ async def get_brand_asset(
 
     Returns full asset details including extracted visual features.
     """
-    asset = _brand_assets.get(asset_id)
-    if not asset:
+    row = await db.get(BrandAssetRecord, asset_id)
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Brand asset not found: {asset_id}",
         )
-    return asset
+    return _row_to_asset(row)
 
 
 @router.patch("/assets/{asset_id}/approve", response_model=BrandAsset)
 async def approve_brand_asset(
     asset_id: str,
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BrandAsset:
     """
@@ -671,21 +765,23 @@ async def approve_brand_asset(
 
     Only approved assets are included in training datasets.
     """
-    asset = _brand_assets.get(asset_id)
-    if not asset:
+    row = await db.get(BrandAssetRecord, asset_id)
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Brand asset not found: {asset_id}",
         )
 
-    asset.approval_status = AssetApprovalStatus.APPROVED
-    return asset
+    row.approval_status = AssetApprovalStatus.APPROVED.value
+    await db.flush()
+    return _row_to_asset(row)
 
 
 @router.patch("/assets/{asset_id}/reject", response_model=BrandAsset)
 async def reject_brand_asset(
     asset_id: str,
     reason: str | None = Query(None),
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> BrandAsset:
     """
@@ -693,22 +789,26 @@ async def reject_brand_asset(
 
     Rejected assets are excluded from training datasets.
     """
-    asset = _brand_assets.get(asset_id)
-    if not asset:
+    row = await db.get(BrandAssetRecord, asset_id)
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Brand asset not found: {asset_id}",
         )
 
-    asset.approval_status = AssetApprovalStatus.REJECTED
+    row.approval_status = AssetApprovalStatus.REJECTED.value
     if reason:
-        asset.metadata.notes = f"Rejected: {reason}"
-    return asset
+        metadata = BrandAssetMetadata.model_validate_json(row.metadata_json)
+        metadata.notes = f"Rejected: {reason}"
+        row.metadata_json = metadata.model_dump_json()
+    await db.flush()
+    return _row_to_asset(row)
 
 
 @router.delete("/assets/{asset_id}")
 async def delete_brand_asset(
     asset_id: str,
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> dict[str, bool]:
     """
@@ -716,13 +816,14 @@ async def delete_brand_asset(
 
     This permanently removes the asset from the training library.
     """
-    if asset_id not in _brand_assets:
+    row = await db.get(BrandAssetRecord, asset_id)
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Brand asset not found: {asset_id}",
         )
 
-    del _brand_assets[asset_id]
+    await db.delete(row)
     return {"deleted": True}
 
 
@@ -734,6 +835,7 @@ async def delete_brand_asset(
 @router.get("/training-readiness", response_model=TrainingReadinessResponse)
 async def check_training_readiness(
     minimum_assets: int = Query(500, ge=100, description="Minimum assets required"),
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> TrainingReadinessResponse:
     """
@@ -745,7 +847,8 @@ async def check_training_readiness(
     - Quality scores
     - Recommendations for improvement
     """
-    assets = list(_brand_assets.values())
+    result = await db.execute(select(BrandAssetRecord))
+    assets = [_row_to_asset(row) for row in result.scalars().all()]
     approved = [a for a in assets if a.approval_status == AssetApprovalStatus.APPROVED]
 
     # Calculate category stats
@@ -818,6 +921,7 @@ async def check_training_readiness(
 
 @router.get("/stats", response_model=dict[str, Any])
 async def get_brand_assets_stats(
+    db: AsyncSession = Depends(get_db),
     current_user: TokenPayload = Depends(get_current_user),
 ) -> dict[str, Any]:
     """
@@ -825,7 +929,8 @@ async def get_brand_assets_stats(
 
     Returns counts by category, approval status, and quality metrics.
     """
-    assets = list(_brand_assets.values())
+    result = await db.execute(select(BrandAssetRecord))
+    assets = [_row_to_asset(row) for row in result.scalars().all()]
 
     # Count by category
     by_category = {}

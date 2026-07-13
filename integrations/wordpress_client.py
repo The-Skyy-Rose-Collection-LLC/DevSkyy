@@ -11,6 +11,7 @@ import base64
 import hashlib
 import hmac
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
@@ -19,7 +20,19 @@ from typing import Any, Literal
 import httpx
 from pydantic import BaseModel, Field
 
-from security.ssrf_protection import ssrf_protection
+from security.ssrf_protection import SSRFProtection
+
+# Media source URLs (own-site media, CDNs, approved-render hosts) are not in
+# the global singleton's narrow API allowlist — production restricts it to 5
+# API hosts, which would reject EVERY real media URL (bug-234). Same pattern
+# as services/three_d/replicate_provider.py: no domain allowlist, but keep
+# every network-layer SSRF block (private IPs, localhost, metadata services).
+_media_ssrf = SSRFProtection(
+    allowed_domains=None,
+    block_private_ips=True,
+    block_localhost=True,
+    block_metadata_services=True,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -228,6 +241,39 @@ class WordPressClient:
 
     async def __aexit__(self, *args: Any) -> None:
         await self.close()
+
+    @classmethod
+    def from_env(cls) -> WordPressClient:
+        """Construct a client from environment credentials.
+
+        Reads the URL under any of three conventions in this codebase
+        (WORDPRESS_URL / WP_SITE_URL / WC_BASE_URL) and the key/secret under
+        WC_CONSUMER_KEY/WOOCOMMERCE_KEY + WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET.
+        WC_BASE_URL is the full REST base (…/wp-json/wc/v3); this client wants
+        the site root and appends the REST path itself, so any /wp-json/… suffix
+        is stripped. Raises ValueError when creds are missing so callers can fall
+        back gracefully instead of constructing a credential-less client.
+        """
+        raw_url = (
+            os.getenv("WORDPRESS_URL") or os.getenv("WP_SITE_URL") or os.getenv("WC_BASE_URL") or ""
+        )
+        # Normalize a full REST base (…/wp-json/wc/v3) back to the site root.
+        site_url = raw_url.split("/wp-json/")[0].rstrip("/")
+        consumer_key = os.getenv("WC_CONSUMER_KEY") or os.getenv("WOOCOMMERCE_KEY") or ""
+        consumer_secret = os.getenv("WC_CONSUMER_SECRET") or os.getenv("WOOCOMMERCE_SECRET") or ""
+        if not (site_url and consumer_key and consumer_secret):
+            raise ValueError(
+                "WooCommerce credentials not configured (set the site URL via "
+                "WORDPRESS_URL / WP_SITE_URL / WC_BASE_URL plus WC_CONSUMER_KEY "
+                "and WC_CONSUMER_SECRET)"
+            )
+        api_type = APIType.WPCOM if "wordpress.com" in site_url else APIType.SELF_HOSTED
+        return cls(
+            site_url=site_url,
+            consumer_key=consumer_key,
+            consumer_secret=consumer_secret,
+            api_type=api_type,
+        )
 
     # ==================== Product Operations ====================
 
@@ -489,7 +535,7 @@ class WordPressClient:
     ) -> MediaUploadResult:
         """Upload media from a URL."""
         # Download image — validate against SSRF before fetching
-        ssrf_protection.validate_url(image_url)
+        _media_ssrf.validate_url(image_url)
         async with httpx.AsyncClient() as download_client:
             response = await download_client.get(image_url)
             response.raise_for_status()
@@ -670,3 +716,8 @@ class WordPressClient:
                 "error": str(e),
                 "site_url": self.site_url,
             }
+
+
+# Backwards-compatible alias — consumers (agents/commerce_agent.py,
+# api/dashboard.py) import the client under this name.
+WordPressWooCommerceClient = WordPressClient

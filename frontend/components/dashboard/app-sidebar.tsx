@@ -27,6 +27,8 @@ import {
   Sparkles,
   ShoppingBag,
   ScanEye,
+  Binoculars,
+  Tag,
 } from 'lucide-react';
 
 import {
@@ -93,6 +95,16 @@ const mainNavItems = [
     title: 'Conversion Intel',
     url: '/admin/conversion',
     icon: TrendingUp,
+  },
+  {
+    title: 'Competitors',
+    url: '/admin/competitors',
+    icon: Binoculars,
+  },
+  {
+    title: 'Pricing',
+    url: '/admin/pricing',
+    icon: Tag,
   },
   {
     title: 'Fidelity QA',

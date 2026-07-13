@@ -57,6 +57,12 @@ $garment_lock = $dossier['garment_type_lock'] ?? '';
 $branding     = $dossier['branding'] ?? array();
 $edition_size = (int) ( $catalog_entry['edition_size'] ?? 0 );
 $sizes_raw    = $catalog_entry['sizes'] ?? '';
+
+// skyyrose_get_product_meta() backfills 'made_in' to 'USA' when the postmeta
+// is unset, so $meta['made_in'] is never empty. Check the raw postmeta
+// directly so the meta row/item only renders for products that actually
+// have _skyyrose_made_in set.
+$has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', true );
 ?>
 
 <article class="sr-editorial" data-collection="<?php echo esc_attr( $collection ); ?>">
@@ -71,6 +77,8 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 				src="<?php echo esc_url( $hero_image ); ?>"
 				alt="<?php echo esc_attr( $product->get_name() ); ?>"
 				class="sr-ed__encounter-img"
+				width="1024"
+				height="1280"
 				fetchpriority="high"
 			/>
 		<?php endif; ?>
@@ -104,6 +112,28 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<?php endif; ?>
 		<?php if ( $garment_lock ) : ?>
 			<p class="sr-ed__garment-lock"><?php echo esc_html( $garment_lock ); ?></p>
+		<?php endif; ?>
+		<?php if ( ! empty( $meta['material'] ) || ! empty( $meta['fit'] ) || $has_made_in ) : ?>
+			<div class="sr-ed__meta-row">
+				<?php if ( ! empty( $meta['material'] ) ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Material', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( $meta['material'] ); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ( ! empty( $meta['fit'] ) ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Fit', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( $meta['fit'] ); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ( $has_made_in ) : ?>
+					<div class="sr-ed__meta-item">
+						<span class="sr-ed__meta-label"><?php esc_html_e( 'Made In', 'skyyrose' ); ?></span>
+						<span class="sr-ed__meta-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>
+					</div>
+				<?php endif; ?>
+			</div>
 		<?php endif; ?>
 		<?php if ( ! empty( $branding['front'] ) ) : ?>
 			<div class="sr-ed__branding-detail">
@@ -152,12 +182,12 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 			<?php if ( $front_model ) : ?>
 				<img src="<?php echo esc_url( $front_model ); ?>"
 					alt="<?php echo esc_attr( $product->get_name() . ' — front' ); ?>"
-					class="sr-ed__fit-img" loading="lazy" />
+					class="sr-ed__fit-img" width="600" height="800" loading="lazy" />
 			<?php endif; ?>
 			<?php if ( $back_model ) : ?>
 				<img src="<?php echo esc_url( $back_model ); ?>"
 					alt="<?php echo esc_attr( $product->get_name() . ' — back' ); ?>"
-					class="sr-ed__fit-img" loading="lazy" />
+					class="sr-ed__fit-img" width="600" height="800" loading="lazy" />
 			<?php endif; ?>
 		</div>
 	</section>
@@ -173,7 +203,12 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<p class="sr-ed__price"><?php echo wp_kses_post( $price_html ); ?></p>
 
 		<?php if ( $sizes_raw ) : ?>
-			<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
+			<div class="sr-ed__sizes-header">
+				<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
+				<button type="button" class="sr-size-guide-link" data-open-size-guide>
+					<?php esc_html_e( 'Size Guide', 'skyyrose' ); ?>
+				</button>
+			</div>
 			<div class="sr-ed__sizes" role="group" aria-labelledby="sr-ed-sizes-label">
 				<?php foreach ( explode( '|', $sizes_raw ) as $size ) : ?>
 					<?php $size_clean = trim( $size ); ?>
@@ -185,6 +220,11 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<div class="sr-ed__atc-wrap">
 			<?php woocommerce_template_single_add_to_cart(); ?>
 		</div>
+		<?php
+		if ( function_exists( 'skyyrose_render_fit_block' ) ) {
+			skyyrose_render_fit_block( $product->get_id() );
+		}
+		?>
 
 		<div class="sr-ed__stock">
 			<span class="sr-ed__stock-dot"></span>
@@ -232,4 +272,9 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		</div>
 	</section>
 
+	<?php
+	if ( function_exists( 'skyyrose_render_ed_sticky_atc' ) ) {
+		skyyrose_render_ed_sticky_atc( $product, $price_html );
+	}
+	?>
 </article>

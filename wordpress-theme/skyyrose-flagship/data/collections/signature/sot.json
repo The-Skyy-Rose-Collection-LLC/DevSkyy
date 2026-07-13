@@ -29,8 +29,8 @@
       "source": "OFL (already hosted)"
     },
     "body": {
-      "family": "Cormorant Garamond",
-      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
       "source": "OFL (already hosted)"
     }
   },
@@ -89,6 +89,20 @@
         "kind": "collection-logo",
         "status": "verified",
         "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
+      },
+      {
+        "path": "images/immersive/scene-signature-golden-gate",
+        "resolved": "images/immersive/scene-signature-golden-gate.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG golden-gate immersive scene still."
+      },
+      {
+        "path": "images/immersive/scene-signature-bay-bridge",
+        "resolved": "images/immersive/scene-signature-bay-bridge.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
       }
     ],
     "patches": [],
@@ -140,8 +154,8 @@
           "resolved": "images/products/sg-001-bay-bridge-shorts.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/bridge-bay-bridge-shorts-front-model.webp",
-          "resolved": "images/products/bridge-bay-bridge-shorts-front-model.webp"
+          "path": "assets/images/products/sg-001-bay-bridge-shorts.webp",
+          "resolved": "images/products/sg-001-bay-bridge-shorts.webp"
         },
         "back_image": {
           "path": "assets/images/products/the-bay-set-back-model.webp",
@@ -167,8 +181,8 @@
           "resolved": "images/products/sg-002-stay-golden-shirt.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/stay-golden-tee-front-model.webp",
-          "resolved": "images/products/stay-golden-tee-front-model.webp"
+          "path": "assets/images/products/sg-002-stay-golden-shirt.webp",
+          "resolved": "images/products/sg-002-stay-golden-shirt.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/stay-golden-tee-back-model.webp",
@@ -190,8 +204,8 @@
           "resolved": "images/products/sg-003-stay-golden-shorts.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/bridge-stay-golden-shorts-front-model.webp",
-          "resolved": "images/products/bridge-stay-golden-shorts-front-model.webp"
+          "path": "assets/images/products/hub/sg-003-front.webp",
+          "resolved": "images/products/hub/sg-003-front.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/bridge-stay-golden-shorts-back-model.webp",
@@ -263,8 +277,8 @@
           "resolved": "images/products/sg-007-signature-beanie.png"
         },
         "front_model_image": {
-          "path": "assets/images/products/sg-007-onmodel.webp",
-          "resolved": "images/products/sg-007-onmodel.webp"
+          "path": "assets/images/products/sg-007-signature-beanie.webp",
+          "resolved": "images/products/sg-007-signature-beanie.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/signature-beanie-back-model.webp",
@@ -321,8 +335,8 @@
           "resolved": "images/products/original-label-tee-white-back-model.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/original-label-tee-white-back-model.webp",
-          "resolved": "images/products/original-label-tee-white-back-model.webp"
+          "path": "assets/images/products/hub/sg-011-back.webp",
+          "resolved": "images/products/hub/sg-011-back.webp"
         }
       },
       "dossier": "data/dossiers/original-label-tee-white.md",
@@ -390,8 +404,8 @@
           "resolved": "images/products/sg-014-mint-lavender-sweatpants.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/sg-014-ghost-front.webp",
-          "resolved": "images/products/ghost/sg-014-ghost-front.webp"
+          "path": "assets/images/products/hub/sg-014-front.webp",
+          "resolved": "images/products/hub/sg-014-front.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/mint-lavender-sweatpants-back-model.webp",
@@ -413,8 +427,8 @@
           "resolved": "images/products/sg-015-windbreaker-set.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/sg-015-onmodel.webp",
-          "resolved": "images/products/sg-015-onmodel.webp"
+          "path": "assets/images/products/hub/sg-015-front.webp",
+          "resolved": "images/products/hub/sg-015-front.webp"
         },
         "back_model_image": {
           "path": "assets/images/products/signature-windbreaker-set-back-model.webp",

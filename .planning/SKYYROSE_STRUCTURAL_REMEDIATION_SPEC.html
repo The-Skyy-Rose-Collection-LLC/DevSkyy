@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyyRose Structural Remediation — One-Shot Execution Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0A0A0A;
+    --ink: #171310;
+    --paper: #14100D;
+    --warm-100: #EDE6DF;
+    --warm-300: #C9BBAD;
+    --warm-500: #8F8276;
+    --rose-gold: #B76E79;
+    --rose-gold-soft: #D8A1AA;
+    --blood: #8B0000;
+    --hairline: rgba(183,110,121,.22);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--void); color: var(--warm-100);
+    font-family: 'Archivo', sans-serif; font-size: 16px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 64px 28px 120px; }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.6rem);
+    line-height: 1.12; letter-spacing: .01em; color: var(--warm-100);
+    border-bottom: 1px solid var(--hairline); padding-bottom: 28px; margin: 0 0 8px;
+  }
+  h1 + p strong { color: var(--rose-gold-soft); }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.45rem;
+    color: var(--rose-gold-soft); margin: 64px 0 16px; letter-spacing: .01em;
+  }
+  h3 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.15rem;
+    color: var(--warm-100); margin: 44px 0 12px;
+  }
+  p { margin: 0 0 16px; color: var(--warm-100); }
+  strong { color: #FFFFFF; font-weight: 600; }
+  em { color: var(--warm-300); }
+  a { color: var(--rose-gold); text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  hr { border: none; border-top: 1px solid var(--hairline); margin: 56px 0; }
+  ul, ol { padding-left: 26px; margin: 0 0 18px; }
+  li { margin: 7px 0; }
+  li::marker { color: var(--rose-gold); font-family: 'JetBrains Mono', monospace; font-size: .85em; }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: .84em;
+    background: rgba(183,110,121,.10); color: var(--rose-gold-soft);
+    padding: 2px 6px; border-radius: 4px;
+  }
+  pre {
+    background: var(--ink); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 18px 20px; overflow-x: auto; margin: 0 0 20px;
+  }
+  pre code { background: none; padding: 0; color: var(--warm-100); font-size: .82rem; line-height: 1.6; }
+  blockquote {
+    margin: 0 0 18px; padding: 4px 22px; border-left: 2px solid var(--rose-gold);
+    color: var(--warm-300); font-style: italic;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0 0 20px; font-size: .92rem; }
+  th {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--rose-gold-soft); text-align: left;
+    padding: 10px 14px; border-bottom: 1px solid var(--rose-gold);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  input[type="checkbox"] { accent-color: var(--rose-gold); margin-right: 8px; }
+  ::selection { background: var(--rose-gold); color: var(--void); }
+  @media print {
+    body { background: #FFFFFF; color: #1C1C1C; }
+    .wrap { padding: 24px; max-width: none; }
+    h1, h3 { color: #0A0A0A; }
+    h2 { color: var(--blood); }
+    p, li, td { color: #1C1C1C; }
+    strong { color: #0A0A0A; }
+    code { background: #F2EDE8; color: var(--blood); }
+    pre { background: #F7F3EF; border-color: #DDD2C8; }
+    pre code { color: #1C1C1C; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+<h1>SKYYROSE STRUCTURAL REMEDIATION — ONE-SHOT EXECUTION SPEC</h1>
+<p><strong>Target:</strong> skyyrose.co (WordPress/WooCommerce, <code>skyyrose-flagship</code> theme, Elementor 4.1.4)
+<strong>Repo:</strong> The-Skyy-Rose-Collection-LLC/DevSkyy (monorepo — scope is the WordPress theme + WP site state only)
+<strong>Mode:</strong> Single-session, end-to-end execution. Understand → verify → implement → test → document. No partial deliverables.
+<strong>Branch:</strong> <code>fix/structural-remediation</code> off default. Atomic commits per workstream, <code>git am</code>-ready.</p>
+<hr />
+<h2>0. MISSION</h2>
+<p>The live site is straddling two template generations. The <code>skyyrose-flagship</code> shell runs the homepage and About; <code>/collections/</code> and <code>/pre-order/</code> still run the legacy shell ("Enter the Universe" nav, no Kids Capsule, Quick View grids, divergent footer/social handles). Every structural defect below is a symptom of that fault line plus missing redirect/data discipline. This spec closes the migration in one pass.</p>
+<p>Six workstreams, dependency-ordered. Each has verified live evidence, implementation direction, and executable acceptance criteria. The session is DONE when <code>scripts/structural_audit.py</code> exits 0 against a staging/preview build and all human gates are documented in the PR.</p>
+<hr />
+<h2>1. NON-NEGOTIABLE GROUND RULES</h2>
+<ol>
+<li><strong>Source discipline.</strong> Name the verified source before acting. Phase 0 locates every file/DB object you will touch. No fishing across globs. If a target cannot be located and confirmed, log it in <code>BLOCKED.md</code> with what you searched and move on — do not guess.</li>
+<li><strong>Anti-hallucination.</strong> Re-fetch the live page and reproduce each finding before fixing it. A finding that no longer reproduces is marked <code>N/A — resolved upstream</code> in the PR body and skipped.</li>
+<li><strong>Brand law (hard constraints, enforced by audit script):</strong>
+   - No blue anywhere. Blue-dominant hex = any color where B channel &gt; R and B &gt; G. Applies to CSS, tokens, inline styles, SVG fills.
+   - No urgency mechanics. Countdown timers are <strong>removed, not repaired</strong> (see WS5).
+   - No e-comm furniture: no sticky add-to-cart, no related-products rails, no urgency banners.
+   - Collection pages are cinematic scroll-driven editorial — never product grids. The product is a moment inside the story.
+   - Gender-neutral copy everywhere. No "menswear/womenswear/for her" framing.
+   - Palette: void black <code>#0A0A0A</code>, rose gold <code>#B76E79</code>, blood red <code>#8B0000</code>, warm-biased neutrals. Type: Fraunces / Archivo / JetBrains Mono.
+   - Oakland canon used straight, never footnoted.</li>
+<li><strong>Two change surfaces, two mechanisms:</strong>
+   - <strong>Theme code</strong> → edit in repo (<code>wp-content/themes/skyyrose-flagship/</code> or wherever Phase 0 locates it), deploy via the repo's existing pipeline.
+   - <strong>Site state</strong> (Elementor page JSON, WP menus, options, redirects, permalink flush) → idempotent Python scripts under <code>scripts/remediation/</code> using the WP REST client pattern already established in the repo (HTTPBasicAuth + application password from <code>.env</code>: <code>WP_BASE_URL</code>, <code>WP_USERNAME</code>, <code>WP_APP_PASSWORD</code>). Every state script must support <code>--dry-run</code> and print a diff before writing. <strong>Never run destructive site-state scripts without <code>--confirm</code>.</strong></li>
+<li><strong>Act vs Ask gate:</strong> production WP state mutation, DNS/edge changes, and permalink structure changes are <strong>Ask</strong> (human gates, Section 8). Everything else is <strong>Act</strong>.</li>
+<li>Real validation only. The audit script runs against real HTTP responses, not fixtures.</li>
+</ol>
+<hr />
+<h2>2. PHASE 0 — DISCOVERY &amp; VERIFICATION (do first, ~15 min)</h2>
+<ol>
+<li>Fetch live: <code>/</code>, <code>/collections/</code>, <code>/pre-order/</code>, <code>/about/</code>, <code>/collection-black-rose/</code>, <code>/experience-black-rose/</code>, one PDP. Save raw HTML to <code>artifacts/live-snapshot/&lt;date&gt;/</code> for before/after diffing.</li>
+<li>Reproduce and log each finding in Section 3 against the snapshot (grep assertions listed per workstream).</li>
+<li>Locate in repo and record exact paths in <code>REMEDIATION_MAP.md</code>:
+   - Theme root, <code>header.php</code> / <code>footer.php</code> / template parts, <code>functions.php</code>, nav registration (<code>register_nav_menus</code>).
+   - Which pages are Elementor documents vs theme templates (query <code>wp/v2/pages?per_page=100&amp;_fields=id,slug,template,meta</code> via REST; Elementor pages carry <code>_elementor_data</code> meta).
+   - Canonical catalog CSV consumed by <code>scripts/preflight_audit.py</code> (SKU source of truth).
+   - Existing redirect mechanism (Redirection plugin? <code>.htaccess</code>? nginx? theme-level?). Record which one is live — <code>/home/</code> currently 301s to <code>/</code>, so one mechanism already works; find it and extend it rather than adding a second.
+   - Deployment path for theme code (CI workflow, or document manual deploy as a human gate).</li>
+<li>If the live theme code is <strong>not</strong> in the repo, pull it via REST/SFTP is out of scope — instead generate all theme changes as a patch series under <code>patches/</code> with exact target paths, and mark deploy as human gate HG-4.</li>
+</ol>
+<hr />
+<h2>3. WORKSTREAMS (dependency order)</h2>
+<h3>WS1 — SHELL UNIFICATION (root cause)</h3>
+<p><strong>Evidence (verify each reproduces):</strong>
+- Homepage renders the identical full nav menu twice consecutively, plus three skip links ("Skip to main content", "Skip to content", "Skip to the story").
+- <code>/pre-order/</code> and <code>/collections/</code> render the legacy header (contains "Enter the Universe", omits Kids Capsule, links Pre-Order to <code>/preorder/</code>) and a legacy footer with social handles <code>theskyyrosecollection</code> / <code>skyyrosellc</code>, support link <code>/contact/#faq</code>.
+- Flagship footer uses <code>skyyroseco</code> handles and <code>/faq/</code>; footer "Contact" is a <code>mailto:</code> while nav Contact is <code>/contact/</code>; "About" and "Our Story" both point to <code>/about/</code>.</p>
+<p><strong>Implementation:</strong>
+1. Single canonical header/footer as theme template parts. One registered menu location (<code>primary</code>), one footer nav, one mobile drawer that toggles the <em>same</em> DOM node (<code>aria-expanded</code> + <code>hidden</code>), not a second copy. Exactly one skip link → <code>#main</code>.
+2. Footer socials, contact email, and support URL read from a single options source (ACF options page or <code>theme_mod</code>) — never hardcoded. Seed with the flagship set (<code>instagram.com/skyyroseco</code>, <code>x.com/skyyroseco</code>, <code>facebook.com/TheSkyyRoseCollection</code>, contact <code>corey@skyyrose.co</code> per brand DNA). Flag the final handle choice in the PR body for Corey's 10-second confirmation (HG-1, non-blocking).
+3. Strip page-level header/footer Elementor sections from <code>/collections/</code> and <code>/pre-order/</code> documents (site-state script: <code>scripts/remediation/strip_legacy_shell.py</code>, operates on <code>_elementor_data</code>, <code>--dry-run</code> prints the section IDs it will remove).
+4. Canonical nav tree (one source, WP Menus):
+   <code>Home · Collections ▾ (Black Rose / Love Hurts / Signature / Kids Capsule) · Pre-Order · Our Story · Contact</code> — Experiences entries removed (absorbed by WS3). Footer dedupes About/Our Story to a single "Our Story" link; footer Contact points to <code>/contact/</code> (page), <code>mailto:</code> moves to a labeled email line.</p>
+<p><strong>Acceptance:</strong>
+- <code>grep -c</code> of the primary menu's first item markup on every crawled page == 1 per page.
+- Zero occurrences of "Enter the Universe", <code>/preorder/</code>, <code>theskyyrosecollection</code>, <code>skyyrosellc</code> in any page's rendered HTML.
+- Exactly one <code>&lt;nav&gt;</code> landmark with the primary menu; exactly one skip link.</p>
+<h3>WS2 — ROUTE ARCHITECTURE + REDIRECT LAYER</h3>
+<p><strong>Evidence:</strong> <code>/preorder/</code> referenced by legacy nav vs canonical <code>/pre-order/</code>; flat slugs <code>/collection-black-rose/</code>, <code>/experience-black-rose/</code>; legacy Shopify-era URLs still in Google's index now 404 on www (e.g. <code>www.skyyrose.co/products/black-rose-crop-set</code>); <code>/home/</code> correctly 301s → <code>/</code> (pattern exists, extend it).</p>
+<p><strong>Implementation:</strong>
+1. Canonical route map (LOCKED):
+   - <code>/collections/</code> → collections index (flagship shell)
+   - <code>/collections/{black-rose|love-hurts|signature|kids-capsule}/</code> → collection pages. Rewrite WooCommerce <code>product_cat</code> base to <code>collections</code> so the taxonomy archive <strong>is</strong> the collection page; cinematic layout via <code>taxonomy-product_cat-{slug}.php</code> overrides with products queried live. If Phase 0 shows collections are currently static pages rather than product categories, implement the routes as pages now and log the taxonomy migration as a follow-up in <code>REMEDIATION_MAP.md</code> — do not half-migrate.
+2. 301 map (extend the live redirect mechanism found in Phase 0):
+   - <code>/preorder/</code> → <code>/pre-order/</code>
+   - <code>/collection-{slug}/</code> → <code>/collections/{slug}/</code>
+   - <code>/experience-{slug}/</code> → <code>/collections/{slug}/</code> (post-WS3)
+   - <code>/experiences/</code> → <code>/collections/</code>
+   - Legacy Shopify era: <code>^/products/(.*)</code> → best-match <code>/product/$1</code>, fallback <code>/collections/</code>; <code>^/collections/custom-collection.*</code> → <code>/collections/</code>
+   - Case-normalize and trailing-slash-normalize.
+3. <code>www</code> → apex 301 must happen at DNS/edge (host/Cloudflare level) — generate the exact rule text in <code>REMEDIATION_MAP.md</code>, mark <strong>HG-2 (blocking, human)</strong>.
+4. Emit <code>redirects.csv</code> (from → to → status) as the auditable artifact; the audit script tests every row live.</p>
+<p><strong>Acceptance:</strong> every row of <code>redirects.csv</code> returns a single-hop 301 to the mapped target (no chains); <code>/collections/{slug}/</code> returns 200 on the flagship shell for all four collections; zero internal links to any legacy route in rendered HTML.</p>
+<h3>WS3 — MERGE EXPERIENCES INTO COLLECTIONS</h3>
+<p><strong>Evidence:</strong> nav carries parallel 1:1 trees (Collections + Experiences: Black Rose ↔ The Garden etc.); two competing URLs per collection split link equity and force a story-vs-shop choice pre-comprehension.</p>
+<p><strong>Implementation:</strong>
+1. The experience becomes the opening layer of each <code>/collections/{slug}/</code> page: cinematic scroll-driven intro (existing experience HTML/JS migrated, not rewritten) flowing into shoppable editorial moments. Product hotspots deep-link to PDPs. <strong>No grid.</strong>
+2. Performance guardrails: heavy canvas/3D mounts lazily via <code>IntersectionObserver</code>; <code>prefers-reduced-motion</code> gets a static art-directed fallback; LCP element must be static (image/text), not canvas. Budget: merged page LCP ≤ 3.0s on simulated 4G mid-tier mobile (verify with Lighthouse CI or <code>lighthouse</code> CLI against preview).
+3. Experience routes 301 per WS2. Nav loses the Experiences tree (WS1 nav is already the post-merge tree).
+4. Kids Capsule page is held to the highest standard — if its experience assets are incomplete, ship the collection page with the static editorial layer and log the experience layer as follow-up rather than shipping something diminished.</p>
+<p><strong>Acceptance:</strong> <code>/experience-black-rose/</code> 301s to <code>/collections/black-rose/</code>; each collection page contains the experience intro markup and zero <code>product-grid</code>/Quick View components; Lighthouse LCP budget passes.</p>
+<h3>WS4 — HOMEPAGE DOM RESTRUCTURE + DATA-DRIVEN CONTENT</h3>
+<p><strong>Evidence:</strong> in DOM order the © footer is followed by: "Made in Oakland" strip, testimonials, "Why SkyyRose", full FAQ, complete size-guide tables, cookie banner. Homepage claims Black Rose 14 / Love Hurts 5 / Signature 12 pieces while <code>/collections/</code> claims "18 pieces across 3 collections" and omits Kids. Fit Guide service item "02" is the only non-linked item in that row. <code>og:image</code> and <code>twitter:image</code> point to an <code>.mp4</code>.</p>
+<p><strong>Implementation:</strong>
+1. Landmark audit: exactly one <code>header</code>, <code>nav</code>, <code>main</code>, <code>footer</code>. Nothing renders after <code>&lt;/footer&gt;</code> except dialog/portal markup that is <code>hidden</code>/<code>aria-hidden</code> until invoked, plus the cookie banner.
+2. Testimonials + "Why SkyyRose": merge into one restrained section <strong>above</strong> the footer (the homepage currently does five pages of work — cut, don't just relocate; keep the strongest three testimonials).
+3. FAQ → canonical <code>/faq/</code> page with <code>FAQPage</code> JSON-LD; homepage FAQ section becomes a three-question teaser linking to it. Update stale copy: "ship Spring 2026" → pull the real window from Corey via PR flag (HG-3, non-blocking; placeholder: "ships in [WINDOW]" must NOT go live — if unanswered, restate as "ships on the date shown on each piece").
+4. Size guide → reusable <code>&lt;dialog&gt;</code> component (theme part), invoked from PDPs and Fit Guide card 02 (fixing the dead node). Tables render inside the dialog and on a canonical <code>/size-guide/</code> page for deep links.
+5. Piece counts become data-driven: single helper reading live Woo category counts (or the canonical catalog CSV at build), rendered on homepage and collections index. Hardcoded numerals removed. Collections index must include Kids Capsule.
+6. <code>og:image</code>/<code>twitter:image</code> → static 1200×630 image. Generate from existing brand assets (void black field, rose-gold script logo, Fraunces wordmark) if no photographic asset is production-grade — do NOT use AI-generated garment imagery (known blocker; not launch-approved).</p>
+<p><strong>Acceptance:</strong> post-<code>&lt;/footer&gt;</code> DOM contains only hidden dialogs + cookie banner; homepage and collections index piece counts derive from one function and agree; <code>/faq/</code> returns FAQPage JSON-LD that validates; <code>og:image</code> URL ends in <code>.webp|.jpg|.png</code> and returns 200 with image MIME.</p>
+<h3>WS5 — COMMERCE LAYER HARDENING</h3>
+<p><strong>Evidence:</strong> Featured grid uses <code>?add-to-cart={id}</code> GET anchors; pre-order page shows a zeroed <code>00:00:00:00</code> countdown, an empty product grid, and a <code>placeholder.jpg</code> product image.</p>
+<p><strong>Implementation:</strong>
+1. Replace all GET add-to-cart anchors with Woo AJAX add-to-cart (archive setting + <code>wc-add-to-cart</code> script) or POST + nonce. Add <code>rel="nofollow"</code> regardless. Confirm cart/checkout/account are excluded from page cache and that no cached page sets Woo session cookies.
+2. Rebuild <code>/pre-order/</code> on the flagship shell (WS1 gives you the shell for free): editorial layout, driven by the canonical catalog — render READY SKUs only; PENDING_USER_ASSETS SKUs (<code>br-007</code>, <code>sg-009</code>, <code>sg-012</code>, <code>br-012</code>, <code>lh-006</code>, <code>sg-015</code>) never render. <strong>Delete the countdown timer entirely — urgency mechanics are banned by brand law. Do not repair it.</strong> No placeholder images may render; a SKU without a production image does not appear.
+3. Featured section on homepage: keep, but buttons become "View Piece" → PDP (editorial posture) with AJAX quick-add as secondary — no sticky cart behavior.</p>
+<p><strong>Acceptance:</strong> zero <code>add-to-cart=</code> substrings in any anchor <code>href</code> site-wide; <code>/pre-order/</code> contains no countdown markup, no <code>placeholder</code> image URLs, and renders ≥1 READY SKU; fetching a product page twice shows no cart-session cookie on a cached response.</p>
+<h3>WS6 — VERIFICATION SUITE (ships with the PR)</h3>
+<p>Create <code>scripts/structural_audit.py</code> (stdlib + <code>requests</code> + <code>beautifulsoup4</code>): crawls a target base URL (env <code>AUDIT_BASE_URL</code>, defaults to production) and asserts, exiting non-zero on any failure:</p>
+<ol>
+<li>Shell: one nav landmark, one skip link, no legacy-shell markers (strings from WS1), no banned social handles.</li>
+<li>Routes: every <code>redirects.csv</code> row → single-hop 301; canonical pages → 200.</li>
+<li>DOM: nothing after <code>&lt;/footer&gt;</code> except hidden dialogs/cookie banner (parse, don't regex).</li>
+<li>Data: piece counts scraped from homepage == collections index == live Woo category counts.</li>
+<li>Commerce: no <code>add-to-cart=</code> hrefs; no <code>placeholder</code> images; no countdown markup; <code>og:image</code> is a static image MIME.</li>
+<li>Brand: no blue-dominant hex in any linked stylesheet or inline style (reuse the RGB channel-comparison approach — B &gt; R and B &gt; G — already proven in the repo; do not use grep pattern lists). No gendered merch framing strings ("menswear", "womenswear", "for her", "for him").</li>
+<li>Meta: exactly one canonical link per page; no page canonicalizes to a legacy route.</li>
+</ol>
+<p>Wire into CI if a workflow exists (Phase 0); otherwise document the invocation in <code>REMEDIATION_MAP.md</code>.</p>
+<hr />
+<h2>4. COMMIT PLAN</h2>
+<p>One commit per workstream (WS1–WS6) plus <code>docs: remediation map + redirects manifest</code>. Each commit message body lists evidence → change → acceptance check. Patch series must apply clean with <code>git am</code> on the default branch.</p>
+<hr />
+<h2>5. HUMAN GATES (list in PR body; only HG-2/HG-4 block launch of this work)</h2>
+<ul>
+<li><strong>HG-1 (non-blocking):</strong> confirm canonical social handle set.</li>
+<li><strong>HG-2 (blocking):</strong> apply www → apex 301 at DNS/edge using the rule text generated in WS2.</li>
+<li><strong>HG-3 (non-blocking):</strong> confirm real pre-order ship window for FAQ copy.</li>
+<li><strong>HG-4 (blocking if theme code isn't repo-deployed):</strong> deploy theme patch series + run site-state scripts with <code>--confirm</code>; flush permalinks after any rewrite-base change.</li>
+</ul>
+<hr />
+<h2>6. OUT OF SCOPE — DO NOT TOUCH</h2>
+<ul>
+<li>AI-generated product imagery pipeline (Elite Studio) and GarmentFidelityAgent thresholds.</li>
+<li>Next.js frontend (devskyy.app) and Python/FastAPI backend (except the new audit + remediation scripts).</li>
+<li>The six PENDING_USER_ASSETS SKUs' content — they are gated on source files, not code.</li>
+<li>Payment/checkout configuration beyond cache exclusions.</li>
+<li>Any copy rewrite beyond what's specified (FAQ date, nav labels, footer dedupe).</li>
+</ul>
+<h2>7. DEFINITION OF DONE</h2>
+<ul>
+<li>[ ] All WS1–WS5 acceptance criteria pass via <code>scripts/structural_audit.py</code> (exit 0) against staging/preview.</li>
+<li>[ ] <code>redirects.csv</code>, <code>REMEDIATION_MAP.md</code>, and (if applicable) <code>BLOCKED.md</code> committed.</li>
+<li>[ ] Before/after snapshots in <code>artifacts/live-snapshot/</code>.</li>
+<li>[ ] PR opened with evidence table, human gates, and rollback note (revert = <code>git revert</code> of the series + re-run of state scripts with <code>--rollback</code> where implemented).</li>
+<li>[ ] Zero regressions on brand law checks (WS6 items 6).</li>
+</ul>
+</main>
+</body>
+</html>

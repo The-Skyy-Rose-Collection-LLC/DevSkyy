@@ -109,6 +109,40 @@
   2. **Internal split** (best for reusable components and pages): rename the original function to `*Content`, then export a small wrapper that does `<Suspense fallback={<Skeleton/>}><Content /></Suspense>`.
 - For decorative chrome (sidebar, tab bar, mascot bubble), `fallback={null}` is fine — the component would render nothing pre-hydration anyway. For data-heavy pages, the fallback is a skeleton matching the eventual content shape.
 - Routes that correctly use the pattern show as `◐ (Partial Prerender)` in the build's route table — that's the desired Cache Components outcome (static shell + streaming dynamic content). See `frontend/app/admin/elite-studio/operations/[id]/page.tsx` for the canonical split. (PR #493, 2026-05-07).
+- **`middleware.ts` is deprecated in favor of `proxy.ts` in Next.js 16** — not removed: both conventions still resolve (`MIDDLEWARE_FILENAME` and `PROXY_FILENAME` both exist in `next/dist/lib/constants`; a lone `middleware.ts` only warns, `proxy.ts` alone is clean, and having BOTH is a hard error). The named export `middleware` → `proxy`; `export const config.matcher` is unchanged; config flags rename (`skipMiddlewareUrlNormalize` → `skipProxyUrlNormalize`). A `proxy.ts` exporting `proxy` + `config` IS the registered gate and DOES run — do NOT assume a `proxy.ts` with no `middleware.ts` means the gate is dead. (A code-review agent flagged exactly that false alarm from pre-16 knowledge; Context7 + reading the installed `next@16.2.7` package confirmed it runs.) Caveat: `proxy` runs the **nodejs** runtime — edge is NOT supported in `proxy`; keep a `middleware.ts` if you need edge. `frontend/proxy.ts` is the dashboard's auth gate. (2026-06-30)
 
 ---
 
+### Git & Repo Hygiene
+- **`.gitignore` does NOT support trailing inline comments.** `pattern  # note` is parsed as a literal pattern (a filename containing spaces and `#`), so it silently matches nothing — the rule looks "done" but ignores nothing. Comments go on their own line. Always `git check-ignore <file>` to confirm a new ignore rule actually fires. (2026-06-30)
+- **Graceful-degrade vs fail-loud for a gitignored data dependency.** `skyyrose/core/asset_hub.py` reads `assets/hub/manifest.json` (gitignored) and is hard-imported by `build-collection-sot.py`. `_manifest()` catches `FileNotFoundError → {}` (absent manifest = truthful "nothing promoted yet"; every consumer degrades to None/empty, hard importers stay safe on a manifest-less env) but lets `JSONDecodeError` propagate (corrupt manifest = data-integrity failure, never silently masked). Pinned by `tests/test_asset_hub_degrade.py` (both the degrade AND the corrupt-raises case). The reusable rule: **absent is normal, corrupt is a bug.** (2026-06-30)
+- **Agent SDK (`claude-agent-sdk`): `tools=[]` removes built-in tools to drop below the CLI's tool-search threshold.** Otherwise the model runs a `ToolSearch` round-trip before every custom MCP tool call (~52% extra cost, measured). `allowed_tools` is *permission* (pre-approve), `tools` is *availability* (presence); tool-search keys off availability count. **Permission ≠ presence** — pre-approving 3 tools doesn't help; you must remove the ~15 built-ins. See `devskyy-sdk-app/main.py`. (2026-06-30)
+
+
+## 3D Character Animation Pipeline — hardening checklist (2026-07-06, deep-research synthesis, cited in session)
+
+**Retarget (same-topology rigs, Blender world-space constraint-bake):**
+- `transform_apply(scale=True)` on BOTH armatures BEFORE constraints (glTF imports carry 0.01 object scale; multiplying ratios into object.scale produces ~100x root-translation bake errors and glTF export round-trip bugs).
+- `COPY_ROTATION` world/world with `mix_mode='REPLACE'` explicitly — other mixes double-count rest orientation (Blender #85350).
+- Bake every frame (`step=1`, `visual_keying=True`, `clear_constraints=True`), then run a quaternion continuity pass per bone (seed from rest quat; `dot(q, q_prev) < 0` → negate all 4 components) — Blender bakes emit double-cover sign flips (T71924/T83351); the Euler discontinuity filter does NOT fix quaternions. Simplify curves only AFTER.
+- `nla.action_pushdown()` before baking the next clip on the same armature.
+
+**Clips for fixed-canvas web (Three.js):**
+- In-place conversion at SOURCE: flatten Hips location X/Z fcurves to first value (keep Y bob); `SkeletonUtils.extractRootMotion` does not exist in shipped three.js.
+- `THREE.LoopRepeat` blends NOTHING at the wrap — trim clips to true cycle boundaries or pose-match last key to frame 0.
+- Trim sub-ranges via NLA strip `action_frame_start/end` + `nla.bake(use_current_action=False)` — direct keyframe surgery desyncs Bezier handles; F-curve modifiers evaluate against the old range.
+- glTF import attaches CUSTOM SPLIT NORMALS — `shade_smooth` is a no-op until `customdata_custom_splitnormals_clear()`.
+- gltf-transform `--compress meshopt` is unreadable by plain GLTFLoader+DRACOLoader — draco only. Draco needs self-hosted decoders + `'wasm-unsafe-eval'` in CSP script-src.
+
+**QC (what single-frame screenshots miss):**
+- Sample uniform phases PLUS gesture apexes (local maxima of per-bone angular displacement); scrub deterministically via `mixer.setTime`, never rAF deltas.
+- Bone-level assertions: elbow hyperextension = 3-joint dot-product angle > ~170°; root drift = Hips XZ vs t=0; loop closure = per-bone stable quat angle `2·asin(|vec(q1·conj(q2))|)`; ALL thresholds are tunables calibrated on known-good clips — no industry constants exist.
+- gltf-validator checks structure only — pose plausibility must be hand-built.
+- Auto-rig face contamination: face verts pick up neck/spine/shoulder weights → face smears during motion. Fix: 100% Head-bone weights above the anatomical neck (find by cross-sectional radius scan — the neck JOINT can sit at shoulder height on chibi rigs).
+
+## Deploy integrity — tracked view vs working tree (2026-07-07)
+
+- **"Exists on disk" ≠ "exists after a clean-tree deploy."** `.gitignore` blanket-ignores theme webp (`wordpress-theme/skyyrose-flagship/assets/**/*.webp`), while the products dir convention is tracked-for-deploy — so a repoint PR can reference a binary that works from a dirty working tree and 404s from a clean checkout (bug-175: `br-014-giants-back.webp`, PR #724). Land referenced binaries with `git add -f` in the same change as the repoint.
+- **Census against `git ls-files` / `git cat-file -e HEAD:<path>`, never `ls`.** Guard now permanent: `tests/test_sot_assets_tracked.py` sweeps data/sot-images.json + all collection sot.json + the catalog CSV and fails on any referenced-but-untracked image.
+- **Parametrizing a deploy script's source requires parametrizing its destination.** `deploy-mu-plugin.sh` gained `MU_SRC` but kept a hardcoded SCP dest — deploying plugin B would silently overwrite plugin A on production (bug-174). Derive dest from `basename "$SRC"`.
+- **SOT regen must use the default `--updated GENERATED` stamp** — the guard test byte-compares against default generator output; a date stamp breaks determinism by design.

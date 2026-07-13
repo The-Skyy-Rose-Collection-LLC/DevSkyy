@@ -46,7 +46,14 @@ _ROLE_KEYS: dict[str, tuple[str, ...]] = {
 
 @functools.lru_cache(maxsize=1)
 def _index() -> dict[str, dict]:
-    """Build ``sku -> product`` from every collection's ``sot.json`` (cached)."""
+    """Build ``sku -> product`` from every collection's ``sot.json`` (cached).
+
+    The verified asset hub's overrides are baked into ``sot.json`` upstream by
+    ``build-collection-sot.py`` (the single seam), so this resolver — and every
+    surface it feeds (Python ``resolve_image``, the PHP theme via ``sot.json``, the
+    dashboard via ``data/sot-images.json``) — honors the hub verdict uniformly
+    without a parallel override here.
+    """
     idx: dict[str, dict] = {}
     # Enumerate collections from the filesystem so a newly-added collection is
     # picked up automatically — never a hardcoded slug list that silently omits it.
@@ -155,6 +162,25 @@ def build_manifest() -> dict[str, dict[str, str]]:
 MANIFEST_PATH: Path = REPO_ROOT / "data" / "sot-images.json"
 
 
+def serialize_manifest(manifest: dict | None = None) -> str:
+    """Canonical serialized bytes of the SOT imagery manifest.
+
+    The SINGLE byte-authority for ``data/sot-images.json``: both
+    :func:`write_manifest` and the catalog validator's ``sot_images_current`` drift
+    guard call this, so the committed file and the CI check can never disagree on
+    formatting (the way two independent serializers would). Pass a pre-built
+    ``manifest`` to avoid rebuilding it.
+    """
+    payload = {
+        "_generated_by": "skyyrose.core.sot_images.write_manifest — DO NOT EDIT. "
+        "Regenerate after build-collection-sot.py.",
+        "_authority": "SOT product-imagery contract. Front-first fallback "
+        "(on-model render before flat packshot).",
+        "images": build_manifest() if manifest is None else manifest,
+    }
+    return json.dumps(payload, indent=2) + "\n"
+
+
 def write_manifest(out_path: Path | None = None, manifest: dict | None = None) -> Path:
     """Write the manifest to ``out_path`` (default :data:`MANIFEST_PATH`).
 
@@ -166,14 +192,7 @@ def write_manifest(out_path: Path | None = None, manifest: dict | None = None) -
     if out_path is not None and not str(out.resolve()).startswith(str(REPO_ROOT)):
         raise ValueError(f"write_manifest: out_path must be within the repo: {out_path}")
     out.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "_generated_by": "skyyrose.core.sot_images.write_manifest — DO NOT EDIT. "
-        "Regenerate after build-collection-sot.py.",
-        "_authority": "SOT product-imagery contract. Front-first fallback "
-        "(on-model render before flat packshot).",
-        "images": build_manifest() if manifest is None else manifest,
-    }
-    out.write_text(json.dumps(payload, indent=2) + "\n")
+    out.write_text(serialize_manifest(manifest))
     return out
 
 

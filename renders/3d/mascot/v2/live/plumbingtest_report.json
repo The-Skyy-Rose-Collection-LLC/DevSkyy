@@ -1,0 +1,102 @@
+{
+  "mesh_parented_to_armature": true,
+  "mesh_modifiers": [
+    "ARMATURE"
+  ],
+  "armature_nla_tracks": {
+    "idle": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 73.0,
+      "action_frame_start": 0.0,
+      "action_frame_end": 72.0,
+      "action_name": "idle"
+    },
+    "walk": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 102.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 102.0,
+      "action_name": "walk"
+    },
+    "wave": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 129.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 129.0,
+      "action_name": "wave"
+    },
+    "point": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 157.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 157.0,
+      "action_name": "point"
+    },
+    "talk": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 97.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 97.0,
+      "action_name": "talk"
+    },
+    "joy": {
+      "strip_frame_start": 1.0,
+      "strip_frame_end": 47.0,
+      "action_frame_start": 1.0,
+      "action_frame_end": 47.0,
+      "action_name": "joy"
+    }
+  },
+  "test_vertex_indices_sample": [
+    42744,
+    42745,
+    42741,
+    42739,
+    42740,
+    42749,
+    42750,
+    42751,
+    42743,
+    43198
+  ],
+  "test_vertex_count": 50,
+  "key_action_keyframes": [
+    [
+      1,
+      0.0
+    ],
+    [
+      86,
+      1.0
+    ],
+    [
+      102,
+      0.0
+    ]
+  ],
+  "key_action_frame_range": [
+    1.0,
+    102.0
+  ],
+  "key_nla_strip": {
+    "frame_start": 1.0,
+    "frame_end": 102.0,
+    "action_frame_start": 1.0,
+    "action_frame_end": 102.0
+  },
+  "strip_alignment_matches_armature_walk_track": true,
+  "output_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/plumbingtest-merged.glb",
+  "reimport_has_shape_keys": true,
+  "reimport_key_block_names": [
+    "Basis",
+    "PlumbingTest"
+  ],
+  "reimport_max_restspace_delta": 3.00001,
+  "reimport_max_restspace_delta_vertex": 44271,
+  "shape_key_data_survived_export": true,
+  "sample_vertex_index": 44271,
+  "sample_vertex_moved_distance": 0.01952,
+  "deformation_renders_at_runtime": true,
+  "render_before": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/plumbingtest_before.png",
+  "render_after": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/plumbingtest_after.png"
+}

@@ -1,8 +1,8 @@
 /**
  * Homepage V2 — Impeccable Luxury Refinement
  *
- * Cinematic homepage design with loader, hero, press strip, marquee,
- * story, quote, collections grid, lookbook, craft, newsletter, footer.
+ * Cinematic homepage design with loader, hero (on-model scroll strip), press
+ * strip, marquee, story, quote, collections grid, craft, newsletter, footer.
  *
  * Depends on: system design tokens
  * Load: Conditional — front page only (via inc/enqueue.php)
@@ -25,10 +25,12 @@
 	--silver: #C0C0C0;
 	--crimson: #DC143C;
 	--gold: #D4AF37;
-	--ff-brand: var(--font-heading, 'Cinzel', serif);
-	--ff-editorial: var(--font-body, 'Playfair Display', serif);
+	/* --ff-brand / --ff-editorial / --ff-cta intentionally NOT redeclared here —
+	   design-tokens.css §1.12 already defines them as back-compat aliases of
+	   --skyyrose-font-*. A local redefinition previously shadowed that (and
+	   --ff-editorial's fallback referenced an undefined --font-body, resolving
+	   to a dead literal once its font-face was retired). Let the global win. */
 	--ff-mono: ui-monospace, 'SF Mono', Menlo, monospace;
-	--ff-cta: 'Bebas Neue', sans-serif;
 	--ease-luxury: cubic-bezier(.16, 1, .3, 1);
 	--space-sm: 16px;
 	--space-md: 32px;
@@ -40,9 +42,9 @@
    BASE RESETS (homepage body context)
    ========================================================================== */
 .homepage-v2 {
-	background: var(--void);
+	background: var(--void, #050505);
 	color: #fff;
-	font-family: 'Cormorant Garamond', serif;
+	font-family: 'Hanken Grotesk', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	overflow-x: hidden;
 	line-height: 1.7;
@@ -53,8 +55,8 @@
 .homepage-v2 a { color: inherit; text-decoration: none; }
 .homepage-v2 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-.site-header { display: none !important; }
-.site-footer { display: none !important; }
+/* .site-header / .site-footer display:none removed (audit 2026-07-01) —
+   WP header/footer now serve the homepage; suppressing them breaks navigation. */
 
 /* ==========================================================================
    LOADER (Cinematic Fade)
@@ -63,7 +65,7 @@
 	position: fixed;
 	inset: 0;
 	z-index: 10000;
-	background: var(--void);
+	background: var(--void, #050505);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -108,157 +110,15 @@
 	to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================================================
-   NAVIGATION (Homepage Override)
-   ========================================================================== */
-.nav {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: 8000;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 24px 64px;
-	background: transparent;
-	transition: all 0.8s var(--ease-luxury);
-	border-bottom: 1px solid transparent;
-}
-.nav.scrolled {
-	padding: 16px 64px;
-	background: rgba(5, 5, 5, .85);
-	backdrop-filter: blur(24px) saturate(1.5);
-	border-bottom-color: var(--glass);
-}
-.nav-brand { display: flex; flex-direction: column; }
-.nav-name {
-	font-family: var(--ff-brand);
-	font-size: 15px;
-	letter-spacing: 10px;
-	text-transform: uppercase;
-	color: #fff;
-	transition: letter-spacing .6s var(--ease-luxury);
-}
-.nav.scrolled .nav-name { letter-spacing: 8px; }
-.nav-sub {
-	font-family: var(--ff-mono);
-	font-size: 9px;
-	letter-spacing: 5px;
-	text-transform: uppercase;
-	color: var(--haze);
-	margin-top: 4px;
-}
-.nav-center {
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	gap: 40px; /* Increased breathing room */
-}
-.nav-link {
-	font-family: var(--ff-mono);
-	font-size: 11px;
-	letter-spacing: 4px;
-	text-transform: uppercase;
-	color: var(--haze);
-	transition: color .4s ease;
-	position: relative;
-	padding-bottom: 6px;
-}
-.nav-link::after {
-	content: '';
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 1px;
-	background: var(--rose);
-	transform: scaleX(0);
-	transform-origin: right;
-	transition: transform .5s var(--ease-luxury);
-}
-.nav-link:hover { color: #fff; }
-.nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
-.nav-right { display: flex; align-items: center; gap: 24px; }
-.nav-bag {
-	color: #fff;
-	font-family: var(--ff-cta);
-	font-size: 13px;
-	letter-spacing: 5px;
-	padding: 12px 28px;
-	border: 1px solid var(--ghost);
-	transition: all .5s var(--ease-luxury);
-	position: relative;
-}
-.nav-bag:hover { border-color: rgba(255,255,255,0.2); }
-.bag-ct {
-	position: absolute;
-	top: -8px;
-	right: -8px;
-	background: var(--rose);
-	color: #fff;
-	font-family: var(--ff-mono);
-	font-size: 10px;
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	opacity: 0;
-	transform: scale(0);
-	transition: all .5s cubic-bezier(.16, 1, .3, 1.2);
-}
-.bag-ct.show { opacity: 1; transform: scale(1); }
-.nav-ham {
-	display: none;
-	flex-direction: column;
-	gap: 6px;
-	padding: 8px;
-}
-.nav-ham span { width: 24px; height: 1px; background: #fff; transition: all .4s; }
-
-/* Mobile menu overlay */
-.mob-menu {
-	display: none;
-	position: fixed;
-	inset: 0;
-	z-index: 7500;
-	background: rgba(5, 5, 5, .98);
-	backdrop-filter: blur(40px);
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 40px;
-	opacity: 0;
-	visibility: hidden;
-	transition: all .6s var(--ease-luxury);
-}
-.mob-menu.open { opacity: 1; visibility: visible; display: flex; }
-.mob-menu a {
-	font-family: var(--ff-brand);
-	font-size: 24px;
-	letter-spacing: 12px;
-	text-transform: uppercase;
-	color: var(--haze);
-	transition: color .4s, transform .4s var(--ease-luxury);
-}
-.mob-menu a:hover { color: #fff; transform: translateX(8px); }
-.mob-close {
-	position: absolute;
-	top: 32px;
-	right: 32px;
-	color: var(--haze);
-	font-size: 32px;
-	padding: 12px;
-}
+/* NAVIGATION section removed (audit 2026-07-01) — #mainNav and .mob-menu deleted;
+   WP site-header handles navigation. */
 
 /* ==========================================================================
    HERO (Cinematic Perfection)
    ========================================================================== */
 .hero {
 	position: relative;
+	padding-top: var(--header-height, 80px); /* offset fixed WP site-header; token in design-tokens.css must match .navbar height in header.css */
 	min-height: 100vh;
 	min-height: 100dvh;
 	display: flex;
@@ -326,6 +186,58 @@
 	100% { transform: translateY(-10vh) scale(1); opacity: 0; }
 }
 
+/* Hero on-model scroll strip — auto-scrolling editorial photography behind
+   the hero title. z-index sits above hero-bg/hero-ov/hero-particles (all
+   z-index:auto, stack at DOM order) but below .hero-content (z-index:3).
+   Vignette mask + low opacity keep the "SkyyRose" lockup dominant. */
+.hero-strip {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	z-index: 1;
+	opacity: 0.22;
+	-webkit-mask-image: linear-gradient(180deg, transparent 0%, var(--color-black, #000) 20%, var(--color-black, #000) 76%, transparent 100%);
+	mask-image: linear-gradient(180deg, transparent 0%, var(--color-black, #000) 20%, var(--color-black, #000) 76%, transparent 100%);
+}
+.hero-strip-track {
+	display: flex;
+	width: max-content;
+	height: 100%;
+	animation: heroStripScroll 70s linear infinite;
+	will-change: transform;
+}
+.hero-strip-item {
+	flex: 0 0 auto;
+	width: clamp(140px, 14vw, 220px);
+	height: 100%;
+	margin-right: 24px; /* baked into item (not track gap) so translateX(-50%) lands on an exact set boundary — see .mq-item for the same pattern */
+	overflow: hidden;
+	filter: grayscale(0.35) brightness(0.75) contrast(1.05);
+}
+.hero-strip-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center 18%;
+	display: block;
+}
+@keyframes heroStripScroll {
+	from { transform: translateX(0); }
+	to   { transform: translateX(-50%); }
+}
+@media (max-width: 768px) {
+	.hero-strip {
+		opacity: 0.16;
+	}
+	.hero-strip-track {
+		animation-duration: 110s;
+	}
+	.hero-strip-item {
+		width: clamp(90px, 26vw, 130px);
+		margin-right: 14px;
+	}
+}
+
 .hero-content {
 	position: relative;
 	z-index: 3;
@@ -338,7 +250,7 @@
 /* Hero typography — bracketed mark: OAKLAND ⌄ SkyyRose ⌄ EST. 2020 */
 .hero-mark-top,
 .hero-mark-bot {
-	font-family: var(--ff-cta, 'Bebas Neue'), 'Helvetica Neue', sans-serif;
+	font-family: var(--ff-cta, 'Anton'), 'Helvetica Neue', sans-serif;
 	font-size: clamp(11px, 1.05vw, 14px);
 	letter-spacing: clamp(8px, 1.2vw, 14px);
 	text-transform: uppercase;
@@ -374,9 +286,18 @@
 }
 .hero-title {
 	font-family: var(--ff-brand);
-	font-weight: 400; /* Luxury elegance — never bold */
-	font-size: clamp(50px, 16vw, 220px);
-	letter-spacing: clamp(10px, 2.5vw, 36px);
+	font-weight: 900; /* Archivo expanded monument treatment (typography.json) */
+	font-variation-settings: 'wdth' 125, 'wght' 900;
+	font-size: clamp(38px, 11.5vw, 160px);
+	/* letter-spacing max tightened 36px→24px (audit item C): measured live at
+	   1440px viewport, the old 36px ceiling rendered the box at 1487px wide —
+	   23.6px past each edge, clipped by .hero's overflow:hidden (confirmed via
+	   Range/getBoundingClientRect, not estimated). Width here is exact and
+	   additive: 7.4952px/1px font-size + 8px/1px letter-spacing (8 characters).
+	   font-size max (160px) is the locked Archivo "monument" scale and stays
+	   untouched; 24px restores the original-intent 24px .hero-content gutter
+	   on both sides with zero risk to legibility. */
+	letter-spacing: clamp(10px, 2.5vw, 24px);
 	text-transform: uppercase;
 	line-height: 0.9;
 	white-space: nowrap;
@@ -441,9 +362,11 @@
 	position: relative;
 	overflow: hidden;
 }
-.hero-cta-primary {
+.hero-cta.hero-cta-primary {
+	/* Double-class beats `.homepage-v2 a { color: inherit }` (0,1,1) — a bare
+	   .hero-cta-primary (0,1,0) loses that cascade and inherits white-on-white. */
 	background: #fff;
-	color: var(--void);
+	color: var(--void, #050505);
 }
 .hero-cta-primary:hover {
 	background: var(--rose);
@@ -505,7 +428,7 @@
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
-	opacity: .6;
+	opacity: .9; /* AA contrast at rest (was .6 = 2.5:1) */
 	margin-bottom: 32px;
 }
 .press-logos {
@@ -521,7 +444,7 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--haze);
-	opacity: .4;
+	opacity: .75; /* AA contrast at rest (was .4 = 1.85:1) */
 	transition: opacity .5s var(--ease-luxury), color .5s var(--ease-luxury);
 }
 .press-item:hover { opacity: 1; }
@@ -657,8 +580,8 @@
 	background: rgba(255, 255, 255, 0.02);
 	isolation: isolate;
 	transform: translate3d(
-		calc(var(--mag-x, 0) * 8px),
-		calc(var(--mag-y, 0) * 8px),
+		calc(var(--mag-x, 0) * 14px),
+		calc(var(--mag-y, 0) * 14px),
 		0
 	);
 	transition: border-color .6s var(--ease-luxury), transform .6s var(--ease-luxury);
@@ -823,7 +746,7 @@
 	position: absolute;
 	bottom: -32px;
 	left: -32px;
-	background: var(--void);
+	background: var(--void, #050505);
 	border: 1px solid var(--ghost);
 	padding: 24px 32px;
 	z-index: 3;
@@ -1000,7 +923,7 @@
 	transition: all .5s var(--ease-luxury);
 	color: #fff;
 }
-.col-card:hover .col-card-cta { border-color: #fff; background: #fff; color: var(--void); }
+.col-card:hover .col-card-cta { border-color: #fff; background: #fff; color: var(--void, #050505); }
 
 /* Collection name lockup — image replaces type-rendered heading */
 .col-card-name {
@@ -1018,8 +941,10 @@
 /* ==========================================================================
    KIDS CAPSULE — HEIR APPARENT (ported from design-system .sr-heir)
    "Hover to break the seal" — envelope opens, wax cracks, letter rises.
-   Replaces the prior split-screen .kc-reveal. Script copy uses Cormorant
-   Garamond italic (Great Vibes is canonical; self-host pending).
+   Replaces the prior split-screen .kc-reveal. Title/sub use the display and
+   body tokens; Grand Hotel (self-hosted, --skyyrose-font-script within
+   [data-collection="kids-capsule"]) is available if a script treatment is
+   wanted here — not currently wired to any element in this block.
    ========================================================================== */
 .kc-heir {
 	padding: clamp(72px, 10vw, 140px) clamp(20px, 6vw, 48px);
@@ -1416,7 +1341,7 @@
 .style-atelier__cta:focus-visible {
 	border-color: var(--rose);
 	background: var(--rose);
-	color: var(--void);
+	color: var(--void, #050505);
 }
 
 /* ==========================================================================
@@ -1496,94 +1421,6 @@
 }
 
 /* ==========================================================================
-   LOOKBOOK (Asymmetric Editorial Layout)
-   ========================================================================== */
-.lookbook {
-	position: relative;
-	padding: clamp(100px, 12vw, 180px) 0;
-}
-.lookbook-header {
-	text-align: center;
-	margin-bottom: clamp(48px, 6vw, 80px);
-	padding: 0 48px;
-}
-.lookbook-eyebrow {
-	font-family: var(--ff-mono);
-	font-size: 11px;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-	color: var(--rose);
-	margin-bottom: 24px;
-}
-.lookbook-header h2 {
-	font-family: var(--ff-brand);
-	font-size: clamp(28px, 4vw, 48px);
-	font-weight: 400;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-}
-.lookbook-tagline {
-	font-family: var(--ff-editorial);
-	font-style: italic;
-	font-size: 1.2rem;
-	color: var(--haze);
-	margin-top: 16px;
-}
-.lookbook-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	grid-auto-rows: 400px;
-	gap: 16px;
-	max-width: 1600px;
-	margin: 0 auto;
-	padding: 0 48px;
-}
-.lookbook-grid .lb-img {
-	position: relative;
-	overflow: hidden;
-}
-/* The Bento Arrangement */
-.lookbook-grid .lb-img:nth-child(1) { grid-column: span 2; grid-row: span 2; }
-.lookbook-grid .lb-img:nth-child(2) { grid-column: span 2; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(3) { grid-column: span 1; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(4) { grid-column: span 1; grid-row: span 1; }
-.lookbook-grid .lb-img:nth-child(5) { grid-column: span 4; grid-row: span 1; }
-
-.lookbook-grid .lb-img img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	/* Editorial grade — masks source-quality variance across the bento grid. */
-	filter: contrast(1.04) saturate(0.94) brightness(0.97);
-	will-change: transform;
-	transition: transform 1.5s var(--ease-luxury), filter 0.4s var(--ease-luxury);
-}
-.lookbook-grid .lb-img:hover img {
-	transform: scale(1.05);
-	filter: contrast(1.06) saturate(1) brightness(1);
-}
-.lb-label {
-	position: absolute;
-	bottom: 24px;
-	left: 24px;
-	z-index: 2;
-	font-family: var(--ff-mono);
-	font-size: 11px;
-	letter-spacing: 6px;
-	text-transform: uppercase;
-	opacity: 1;
-	transition: all .6s var(--ease-luxury);
-	transform: translateY(0);
-	background: rgba(5,5,5,0.8);
-	padding: 8px 16px;
-	backdrop-filter: blur(8px);
-}
-@media (hover: hover) {
-	.lb-label { opacity: 0; transform: translateY(12px); }
-	.lb-img:hover .lb-label { opacity: 1; transform: translateY(0); }
-}
-
-/* ==========================================================================
    CRAFT (Tactile Concrete)
    ========================================================================== */
 .craft {
@@ -1619,6 +1456,37 @@
 	transition: all .6s var(--ease-luxury);
 	display: flex;
 	flex-direction: column;
+}
+/* Featured card — this section now sits directly under .service-promise__list,
+   another 4-up card row, once .lookbook's asymmetric bento was removed as the
+   in-between visual break (audit 2026-07-06). One broken element restores the
+   rhythm without reintroducing imagery: span + a flat rose wash + a type-scale
+   bump on "Oakland Made Mentality" (2nd card — the founder-story anchor,
+   already the most narratively load-bearing copy in the row). No border-left
+   accent stripe, no gradient fill, no new glass surface (impeccable BAN 1/2;
+   project glassmorphism ban stays scoped to product-card-holo).
+   Specificity (0,2,0) — .craft-card is a <div>, never a <a>, so this never
+   contests `.homepage-v2 a { color: inherit }` (0,1,1); placed BEFORE
+   .craft-card:hover below so hover wins the (0,2,0) tie and card 2 still gets
+   the shared hover feedback instead of freezing on the resting tint. */
+.craft-card:nth-child(2) {
+	background: rgba(183, 110, 121, 0.035);
+}
+.craft-card:nth-child(2) .craft-label {
+	font-size: 13px;
+	letter-spacing: 5px;
+}
+.craft-card:nth-child(2) .craft-desc {
+	font-size: 1.1rem;
+	max-width: 46ch;
+}
+@media (min-width: 1025px) {
+	/* grid-column: span 2 is guarded to the 4-col breakpoint only — at the
+	   2-up (1024px) and 1-up (768px) reflows below, a span:2 on the 2nd
+	   child leaves an orphaned gap next to card 1 (sparse auto-placement). */
+	.craft-card:nth-child(2) {
+		grid-column: span 2;
+	}
 }
 .craft-card:hover {
 	border-color: rgba(255,255,255,0.15);
@@ -1704,7 +1572,7 @@
 	padding: 16px 40px;
 	background: #fff;
 	border: 1px solid transparent;
-	color: var(--void);
+	color: var(--void, #050505);
 	font-family: var(--ff-cta);
 	font-size: 14px;
 	letter-spacing: 6px;
@@ -1841,14 +1709,6 @@
 	.craft-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
-	.lookbook-grid {
-		grid-template-columns: repeat(2, 1fr);
-		grid-auto-rows: 300px;
-	}
-	.lookbook-grid .lb-img:nth-child(n) {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
 	.ft-inner {
 		grid-template-columns: 1fr 1fr;
 	}
@@ -1957,10 +1817,6 @@
 	.craft-grid {
 		grid-template-columns: 1fr;
 	}
-	.lookbook-grid {
-		grid-template-columns: 1fr;
-		grid-auto-rows: 400px;
-	}
 	.ft-inner {
 		grid-template-columns: 1fr;
 	}
@@ -1997,13 +1853,6 @@
 		min-height: 44px;
 	}
 	/* Mobile menu links: generous tap targets */
-	.mob-menu a {
-		padding: 12px 0;
-		min-height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
 	/* Footer social links: enough tap area */
 	.ft-social a {
 		padding: 8px 0;
@@ -2112,10 +1961,9 @@
 		animation: none;
 	}
 
-	/* Lookbook filter transition */
-	.lb-img {
-		transition: none;
-		filter: contrast(1.04) saturate(0.94) brightness(0.97);
+	/* Hero on-model scroll strip */
+	.hero-strip-track {
+		animation: none;
 	}
 
 	/* Marquee scroll */

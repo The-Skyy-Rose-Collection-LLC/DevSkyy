@@ -64,8 +64,8 @@ any role pointing at a missing file.
 | Logos / monograms | `data/logo-registry.json` |
 | Palette + font CSS tokens | `assets/css/design-tokens.css` (generated from identity) |
 
-Per-collection fonts are self-hosted woff2 in `assets/fonts/` (Yellowtail, Kaushan
-Script, Pinyon Script + Cinzel/Cormorant), zero external CDN. The collection NAME is
+Per-collection fonts are self-hosted woff2 in `assets/fonts/` (Pacifico, Kaushan
+Script, Pinyon Script, Grand Hotel + Cinzel/Hanken Grotesk), zero external CDN. The collection NAME is
 always the lockup image; the fonts are interior heading/accent voice.
 
 ## Known data bugs surfaced (fix in the catalog CSV)

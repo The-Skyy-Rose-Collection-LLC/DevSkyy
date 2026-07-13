@@ -19,12 +19,12 @@ $desc       = $collection ? $collection['description'] : '';
 <!-- wp:group {"align":"full","style":{"color":{"background":"#0A0A0A"},"spacing":{"padding":{"top":"var:preset|spacing|2xl","bottom":"var:preset|spacing|2xl","left":"var:preset|spacing|lg","right":"var:preset|spacing|lg"}}},"layout":{"type":"constrained","contentSize":"1200px"}} -->
 <div class="wp-block-group alignfull has-background" style="background-color:#0A0A0A;padding-top:var(--wp--preset--spacing--2xl);padding-right:var(--wp--preset--spacing--lg);padding-bottom:var(--wp--preset--spacing--2xl);padding-left:var(--wp--preset--spacing--lg)">
 
-<!-- wp:heading {"level":1,"style":{"typography":{"fontStyle":"normal","fontWeight":"700","letterSpacing":"-0.025em"}},"textColor":"pink","fontFamily":"playfair-display"} -->
-<h1 class="wp-block-heading has-pink-color has-text-color has-playfair-display-font-family" style="font-style:normal;font-weight:700;letter-spacing:-0.025em"><?php echo esc_html( $label ); ?></h1>
+<!-- wp:heading {"level":1,"style":{"typography":{"fontStyle":"normal","fontWeight":"700","letterSpacing":"-0.025em"}},"textColor":"pink","fontFamily":"archivo"} -->
+<h1 class="wp-block-heading has-pink-color has-text-color has-archivo-font-family" style="font-style:normal;font-weight:700;letter-spacing:-0.025em"><?php echo esc_html( $label ); ?></h1>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph {"style":{"typography":{"fontSize":"1.25rem","lineHeight":"1.6"}},"textColor":"text-secondary","fontFamily":"cormorant-garamond"} -->
-<p class="has-text-secondary-color has-text-color has-cormorant-garamond-font-family" style="font-size:1.25rem;line-height:1.6"><?php echo esc_html( $tagline ); ?></p>
+<!-- wp:paragraph {"style":{"typography":{"fontSize":"1.25rem","lineHeight":"1.6"}},"textColor":"text-secondary","fontFamily":"hanken-grotesk"} -->
+<p class="has-text-secondary-color has-text-color has-hanken-grotesk-font-family" style="font-size:1.25rem;line-height:1.6"><?php echo esc_html( $tagline ); ?></p>
 <!-- /wp:paragraph -->
 
 <?php if ( $desc ) : ?>

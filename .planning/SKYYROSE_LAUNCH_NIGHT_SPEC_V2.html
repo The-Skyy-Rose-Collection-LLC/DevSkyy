@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyyRose Launch-Night Spec v2 — Remediation + Wiring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0A0A0A;
+    --ink: #171310;
+    --paper: #14100D;
+    --warm-100: #EDE6DF;
+    --warm-300: #C9BBAD;
+    --warm-500: #8F8276;
+    --rose-gold: #B76E79;
+    --rose-gold-soft: #D8A1AA;
+    --blood: #8B0000;
+    --hairline: rgba(183,110,121,.22);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--void); color: var(--warm-100);
+    font-family: 'Archivo', sans-serif; font-size: 16px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 64px 28px 120px; }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.6rem);
+    line-height: 1.12; letter-spacing: .01em; color: var(--warm-100);
+    border-bottom: 1px solid var(--hairline); padding-bottom: 28px; margin: 0 0 8px;
+  }
+  h1 + p strong { color: var(--rose-gold-soft); }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.45rem;
+    color: var(--rose-gold-soft); margin: 64px 0 16px; letter-spacing: .01em;
+  }
+  h3 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.15rem;
+    color: var(--warm-100); margin: 44px 0 12px;
+  }
+  p { margin: 0 0 16px; color: var(--warm-100); }
+  strong { color: #FFFFFF; font-weight: 600; }
+  em { color: var(--warm-300); }
+  a { color: var(--rose-gold); text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  hr { border: none; border-top: 1px solid var(--hairline); margin: 56px 0; }
+  ul, ol { padding-left: 26px; margin: 0 0 18px; }
+  li { margin: 7px 0; }
+  li::marker { color: var(--rose-gold); font-family: 'JetBrains Mono', monospace; font-size: .85em; }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: .84em;
+    background: rgba(183,110,121,.10); color: var(--rose-gold-soft);
+    padding: 2px 6px; border-radius: 4px;
+  }
+  pre {
+    background: var(--ink); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 18px 20px; overflow-x: auto; margin: 0 0 20px;
+  }
+  pre code { background: none; padding: 0; color: var(--warm-100); font-size: .82rem; line-height: 1.6; }
+  blockquote {
+    margin: 0 0 18px; padding: 4px 22px; border-left: 2px solid var(--rose-gold);
+    color: var(--warm-300); font-style: italic;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 0 0 20px; font-size: .92rem; }
+  th {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--rose-gold-soft); text-align: left;
+    padding: 10px 14px; border-bottom: 1px solid var(--rose-gold);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  input[type="checkbox"] { accent-color: var(--rose-gold); margin-right: 8px; }
+  ::selection { background: var(--rose-gold); color: var(--void); }
+  @media print {
+    body { background: #FFFFFF; color: #1C1C1C; }
+    .wrap { padding: 24px; max-width: none; }
+    h1, h3 { color: #0A0A0A; }
+    h2 { color: var(--blood); }
+    p, li, td { color: #1C1C1C; }
+    strong { color: #0A0A0A; }
+    code { background: #F2EDE8; color: var(--blood); }
+    pre { background: #F7F3EF; border-color: #DDD2C8; }
+    pre code { color: #1C1C1C; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+<h1>SKYYROSE LAUNCH-NIGHT SPEC v2 — STRUCTURAL REMEDIATION + DASHBOARD↔WP WIRING</h1>
+<p><strong>Supersedes:</strong> SKYYROSE_STRUCTURAL_REMEDIATION_SPEC.md (v1). Carry forward everything in v1 not amended below.
+<strong>Targets:</strong>
+- skyyrose.co — WordPress.com <strong>Atomic</strong> hosting (a8c CDN + nginx, LiteSpeed plugin present), WooCommerce, <code>skyyrose-flagship</code> theme, Elementor 4.1.4
+- devskyy.app → 307 → <strong>www.devskyy.app</strong> — Next.js on Vercel (the dashboard)
+<strong>Execution surface:</strong> BOTH repos local and editable. Theme deploys to WP.com Atomic; dashboard deploys via Vercel.
+<strong>Finish line tonight:</strong> WS1–WS6 (v1, as amended) + WS7 (wiring) pass <code>scripts/structural_audit.py</code> and <code>scripts/wiring_audit.py</code> with exit 0.
+<strong>Mode:</strong> Single session. No mocks in final validation — every wiring check hits the live WP REST API.</p>
+<hr />
+<h2>A. RECONNAISSANCE DELTAS — v1 ASSUMPTIONS CORRECTED (verified live, 2026-07-05)</h2>
+<p>These are facts, verified against production. Trust them over v1 where they conflict.</p>
+<ol>
+<li><strong>Hosting is WordPress.com Atomic.</strong> No <code>.htaccess</code>/nginx access. All redirects implement via WP layer (Redirection plugin if installed — Phase 0 checks — else <code>template_redirect</code>/<code>wp_redirect</code> rules in a theme <code>inc/redirects.php</code> with a <code>redirects.csv</code> source). <strong>HG-2 (www→apex) is CLOSED</strong> — nginx already 301s <code>www.skyyrose.co/*</code> → apex. Only the apex-side legacy path map remains.</li>
+<li><strong>Custom REST namespace <code>skyyrose/v1</code> is LIVE</strong> with these routes (enumerated from production):
+   - <code>GET /skyyrose/v1/collections</code> — returns 4 collections with labels, category slugs, fallback images, accent colors
+   - <code>GET /skyyrose/v1/products/3d/{category}</code> (limit ≤ 50)
+   - <code>GET /skyyrose/v1/stock/{sku}</code>
+   - <code>GET /skyyrose/v1/kids-capsule/matching-set/{id}</code>
+   - <code>GET|POST|PUT|PATCH /skyyrose/v1/settings</code> + <code>POST /skyyrose/v1/settings/narrative</code>
+   - <code>POST /skyyrose/v1/analytics/events</code>, <code>GET /skyyrose/v1/analytics/summary</code>
+   - <code>GET /skyyrose/v1/personalization/{hash}</code>
+   - <code>GET /skyyrose/v1/wishlist</code>, <code>POST /skyyrose/v1/wishlist/{add|remove|clear}</code></li>
+<li><strong><code>agents-manager</code> namespace is LIVE:</strong> <code>GET /agents-manager</code>, <code>GET|POST|PUT|PATCH /agents-manager/open-state</code>.</li>
+<li><strong>Auth infrastructure already installed on WP:</strong> Application Passwords (enabled), <code>jwt-auth/v1</code>, WP OAuth Server (oauth2 authorize/token/me at <code>/oauth/*</code>). <code>wc/v3</code> returns 401 unauthenticated (correct).</li>
+<li><strong>Catalog truth (public Store API <code>wc/store/v1/products</code>, X-WP-Total):</strong> <strong>33 published products.</strong> Black Rose 14, Signature 11, Love Hurts 4, Kids Capsule 2, <strong>UNCATEGORIZED 2 ("The Fannie", "The Windbreaker Set")</strong>.</li>
+<li><strong>Real category slugs:</strong> <code>black-rose-collection</code>, <code>love-hurts-collection</code>, <code>signature-collection</code> (Kids Capsule slug: discover in Phase 0). v1's WS2 rewrite plan must map pretty routes <code>/collections/black-rose/</code> → these actual term slugs (rename term slugs to the clean form OR keep slugs and use rewrite endpoints — Phase 0 decides based on Elementor template bindings; renaming slugs requires adding old-slug 301s).</li>
+<li><strong>CONFIRMED LIVE DEFECT:</strong> plain <code>GET /</code> sets <code>wp_woocommerce_session_*</code> cookie and the a8c CDN reports <code>MISS</code> — sessions are being initialized for anonymous visitors, defeating page cache site-wide. WS5 gains a subtask (below).</li>
+<li><strong>Dashboard identity:</strong> www.devskyy.app serves title "SkyyRose | Luxury Grows from Concrete." on Vercel; <code>/api/health</code> and <code>/dashboard</code> currently 404. Dashboard fonts are Playfair Display / Cormorant Garamond / Space Mono — <strong>off brand-stack</strong> (Fraunces / Archivo / JetBrains Mono).</li>
+<li>Rate limiting is active on the WP origin (429 observed). All scripts must honor <code>Retry-After</code>, cap at 2 req/s, exponential backoff.</li>
+<li>Live brand-law hit: product "Kids Colorblock Hoodie Set — Purple/Black" (garment colorway naming — flag HG-5, do not change product data unilaterally).</li>
+</ol>
+<hr />
+<h2>B. AMENDMENTS TO v1 WORKSTREAMS</h2>
+<p><strong>WS2 (routes):</strong>
+- Delete the "www → apex at DNS/edge, HG-2 blocking" item — done at host.
+- Implement legacy-path 301 map at WP layer per delta A1. Add rows: <code>/products/*</code> (Shopify era) → best SKU match via slug similarity against the 33 live products, fallback <code>/collections/</code>; <code>/collection-{slug}/</code> and <code>/experience-{slug}/</code> → <code>/collections/{slug}/</code>.
+- Use real term slugs from delta A6 in all taxonomy work.</p>
+<p><strong>WS4 (data-driven counts):</strong>
+- Counts source = live Woo term counts (which the audit cross-checks against Store API <code>X-WP-Total</code> math). Homepage claims (14/5/12) vs reality (14/4/11 + 2 Kids + 2 uncategorized) — the mismatch is confirmed; hardcoded copy is provably stale.
+- <strong>New subtask WS4.7 — categorize the orphans:</strong> assign "The Fannie" and "The Windbreaker Set" to their correct collections. If collection membership isn't inferable from the canonical catalog CSV, list them in the PR body under <strong>HG-6 (non-blocking)</strong> for Corey's 10-second call, defaulting them to Signature (accessories/foundation posture) with the gate noting the default taken. Uncategorized products are invisible to the collections-as-taxonomy routing and break count integrity.</p>
+<p><strong>WS5 (commerce):</strong>
+- <strong>New subtask WS5.4 — kill anonymous session initialization (highest performance ROI of the night).</strong> Root-cause: identify what calls <code>WC()-&gt;session-&gt;set_customer_session_cookie(true)</code> on non-cart pages — usual suspects: mini-cart fragment rendering on every page, a widget calling cart totals, <code>?add-to-cart</code> GET links being crawled, or a plugin hook. Fix pattern: gate session creation to actual cart mutations; enable cart-fragment lazy load; verify LiteSpeed ESI/exclusion config for cart/checkout/account only. Acceptance: <code>curl -sI https://skyyrose.co/</code> shows <strong>no</strong> <code>set-cookie: wp_woocommerce_session*</code> and repeat request shows CDN <code>HIT</code> (<code>x-ac: ... HIT</code> or <code>server-timing: cache;desc=HIT</code>).</p>
+<p><strong>WS6 (audit):</strong> add checks — no Set-Cookie session on anonymous GET of <code>/</code>, <code>/collections/</code>, one PDP list page; CDN HIT on second anonymous fetch of <code>/</code>; category coverage == 100% of published products; rate-limit compliance built into the crawler.</p>
+<p><strong>Human gates revised:</strong> HG-2 CLOSED. New: <strong>HG-5</strong> (Purple/Black colorway naming — brand call, non-blocking), <strong>HG-6</strong> (orphan product categorization — non-blocking, defaulted), <strong>HG-7</strong> (create WP credentials — see WS7, blocking for wiring, 3 minutes in wp-admin).</p>
+<hr />
+<h2>C. WS7 — DASHBOARD ↔ WORDPRESS WIRING (full read+write, real endpoints)</h2>
+<h3>C1. Auth decision (LOCKED): two credentials, one pattern — server-side only</h3>
+<p>All three auth systems are installed; use the right one per API and ignore OAuth2 entirely (interactive-grant overhead, wrong fit for machine-to-machine tonight):</p>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>API</th>
+<th>Auth</th>
+<th>Credential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Catalog/orders/customers R+W</td>
+<td><code>wc/v3/*</code></td>
+<td>Basic auth over HTTPS</td>
+<td><strong>WooCommerce REST consumer key/secret</strong> (wp-admin → WooCommerce → Settings → Advanced → REST API → Add key, permission Read/Write)</td>
+</tr>
+<tr>
+<td>WP core + custom namespaces R+W (<code>wp/v2</code>, <code>skyyrose/v1/settings</code>, <code>agents-manager</code>)</td>
+<td>everything non-WC</td>
+<td>Basic auth</td>
+<td><strong>Application Password</strong> on a dedicated <code>devskyy-service</code> user (role: Shop Manager + capability grant for the custom routes' <code>permission_callback</code>; Phase 0 reads the theme source to confirm which capability those routes check — likely <code>manage_options</code> — and documents the minimal role)</td>
+</tr>
+<tr>
+<td>Public reads (products for display, collections map, stock)</td>
+<td><code>wc/store/v1/*</code>, <code>skyyrose/v1/collections</code>, <code>skyyrose/v1/stock/{sku}</code></td>
+<td>none</td>
+<td>none — these are already public</td>
+</tr>
+</tbody>
+</table>
+<p>JWT (<code>jwt-auth/v1</code>) is redundant given Application Passwords; do not wire it. <strong>HG-7 (blocking):</strong> Corey creates both credentials and drops them into Vercel env + local <code>.env</code>. Never in chat, never committed. The spec's scripts fail fast with a clear message if env is missing.</p>
+<h3>C2. Environment contract (both repos)</h3>
+<pre><code># dashboard (.env.local + Vercel project env — ALL server-side, no NEXT_PUBLIC_ for secrets)
+WP_BASE_URL=https://skyyrose.co
+WP_APP_USER=devskyy-service
+WP_APP_PASSWORD=***            # Application Password
+WC_CONSUMER_KEY=ck_***
+WC_CONSUMER_SECRET=cs_***
+WP_WEBHOOK_SECRET=***          # HMAC secret for Woo webhooks (generate: openssl rand -hex 32)
+REVALIDATE_SECRET=***          # for Next.js on-demand revalidation
+</code></pre>
+<h3>C3. Dashboard integration layer (Next.js repo)</h3>
+<p>Build a single typed WP client module — <code>lib/wp/client.ts</code> — no scattered fetches:</p>
+<ol>
+<li><strong><code>wpFetch(path, opts)</code></strong> — server-only (import 'server-only'), base URL from env, auth header selected by namespace prefix (<code>/wc/v3</code> → WC keys; <code>/wc/store</code> + public skyyrose routes → none; else app password), 2 req/s throttle + retry w/ <code>Retry-After</code> honor (delta A9), JSON error normalization.</li>
+<li><strong>Typed methods over the REAL routes:</strong>
+   - <code>getCollections()</code> → <code>GET /wp-json/skyyrose/v1/collections</code>
+   - <code>getProducts({category, page})</code> → <code>GET /wp-json/wc/store/v1/products</code> (public, paginated via X-WP-Total)
+   - <code>getStock(sku)</code> → <code>GET /wp-json/skyyrose/v1/stock/{sku}</code>
+   - <code>get3DProducts(category)</code> → <code>GET /wp-json/skyyrose/v1/products/3d/{category}</code>
+   - <code>getOrders({status})</code>, <code>updateOrder(id, patch)</code> → <code>wc/v3/orders</code> (auth)
+   - <code>updateProduct(id, patch)</code>, <code>batchProducts(ops)</code> → <code>wc/v3/products(/batch)</code> (auth) — reuse the repo's established batch pattern
+   - <code>getSettings()/updateSettings(patch)</code> → <code>skyyrose/v1/settings</code> (auth)
+   - <code>pushNarrative(payload)</code> → <code>POST /skyyrose/v1/settings/narrative</code> (auth)
+   - <code>getAnalyticsSummary()</code> → <code>skyyrose/v1/analytics/summary</code> (confirm auth requirement in Phase 0 — if public, flag as <strong>finding: should be authenticated</strong>, and add auth in theme)
+   - <code>agentsOpenState(get|set)</code> → <code>/agents-manager/open-state</code> (auth)</li>
+<li><strong>Route handlers (the dashboard's real API):</strong>
+   - <code>GET /api/health</code> → returns <code>{dashboard:"ok", wp:{reachable, authed_wp, authed_wc}, latency_ms}</code> by hitting <code>skyyrose/v1/collections</code> (public) + a 1-item authed <code>wc/v3/products?per_page=1</code> — this endpoint currently 404s in production; it becomes the wiring heartbeat.
+   - <code>GET /api/catalog/summary</code> → live counts by collection + uncategorized list (powers launch-readiness widget; same numbers the WS6 audit checks).
+   - <code>POST /api/webhooks/woocommerce</code> → receiver for Woo webhooks (below): verifies <code>X-WC-Webhook-Signature</code> HMAC-SHA256 base64 against <code>WP_WEBHOOK_SECRET</code>, then triggers <code>revalidateTag('catalog')</code>/<code>revalidatePath</code> for affected views. Reject unsigned/invalid with 401.</li>
+<li><strong>Dashboard pages consume ONLY the typed client</strong> (server components / route handlers). Remove any hardcoded/mock catalog data found in the dashboard repo — Phase 0 inventories all fetch/axios calls and dead mock JSON; delete or migrate every one.</li>
+</ol>
+<h3>C4. WordPress → dashboard push (write-back loop)</h3>
+<p>Register WooCommerce webhooks (idempotent script <code>scripts/remediation/register_webhooks.py</code>, via <code>wc/v3/webhooks</code>, <code>--dry-run</code> default):
+- <code>product.updated</code>, <code>product.created</code>, <code>product.deleted</code> → <code>https://www.devskyy.app/api/webhooks/woocommerce</code>
+- <code>order.created</code>, <code>order.updated</code> → same receiver
+- Secret = <code>WP_WEBHOOK_SECRET</code>. Acceptance: update a product field via API, observe webhook delivery (Woo logs delivery status) and dashboard revalidation within 60s.</p>
+<h3>C5. Hardening findings to fix while in there</h3>
+<ul>
+<li><code>skyyrose/v1/analytics/events</code> is a public POST — verify nonce/rate protection in theme source; if bare, add a lightweight shared-key header check (dashboard + theme both read it from config) to stop junk ingest.</li>
+<li>Confirm <code>skyyrose/v1/settings</code> and <code>agents-manager/open-state</code> have proper <code>permission_callback</code> (NOT <code>__return_true</code>). Any write route with <code>__return_true</code> is a launch blocker — fix in theme immediately.</li>
+<li>Dashboard font stack: migrate Playfair/Cormorant/Space Mono → Fraunces/Archivo/JetBrains Mono (tokens exist: <code>skyyrose-tokens.css/json</code>). One commit, low risk, closes the brand split between properties.</li>
+<li>Vercel: ensure <code>devskyy.app</code> → <code>www.devskyy.app</code> 307 becomes a 308/301 permanent redirect in project settings (cheap SEO/consistency fix).</li>
+</ul>
+<h3>C6. <code>scripts/wiring_audit.py</code> (ships with PR, exit 0 = wired)</h3>
+<p>Real-integration checks, no mocks: (1) <code>/api/health</code> on the deployed preview returns all-green; (2) public reads return live data matching Store API totals; (3) authed <code>wc/v3</code> read succeeds and a write round-trip works — PATCH a product's <code>meta_data</code> key <code>devskyy_wiring_check</code> with a timestamp, read it back, delete it; (4) settings GET→PATCH→GET round-trip on <code>skyyrose/v1/settings</code> restoring original value; (5) webhook signature validation rejects a forged payload and accepts a signed one; (6) no secret appears in any client bundle (<code>grep</code> the <code>.next</code> client output for <code>ck_</code>, <code>cs_</code>, app password fragments); (7) rate-limit compliance (no 429s during the run).</p>
+<hr />
+<h2>D. TONIGHT'S RUN ORDER</h2>
+<ol>
+<li><strong>Phase 0</strong> (both repos + live): v1 Phase 0 + dashboard repo inventory (fetch calls, mocks, env usage) + theme source read of <code>skyyrose/v1</code>/<code>agents-manager</code> permission callbacks + locate Redirection plugin. 20 min.</li>
+<li><strong>HG-7</strong> (Corey, parallel, 3 min): create WC REST key + Application Password → Vercel env + <code>.env</code>.</li>
+<li><strong>WS7</strong> C2→C3→C5 (client layer, health, hardening) — the wiring core.</li>
+<li><strong>WS1 shell → WS2 routes → WS5 (incl. 5.4 session fix) → WS4 (incl. 4.7 orphans) → WS3 experience merge</strong> (WS3 is the largest; if the night runs short it degrades gracefully: collection pages ship on flagship shell with static editorial layer, experience layer flagged as followup — everything else is launch-blocking, WS3's cinematic layer is not).</li>
+<li><strong>C4 webhooks</strong> (needs deployed receiver — after first Vercel preview deploy).</li>
+<li><strong>WS6 + C6 audits</strong> against preview; fix until exit 0; snapshot before/after; PR with evidence table + gates HG-1/3/5/6/7 status.</li>
+</ol>
+<h2>E. OUT OF SCOPE (REVISED — v1's list, minus what this spec pulls in)</h2>
+<ul>
+<li>Elite Studio imagery pipeline + GarmentFidelityAgent thresholds — untouched.</li>
+<li>The six PENDING_USER_ASSETS SKUs' content — still gated on source files.</li>
+<li>Payment/checkout config beyond cache/session exclusions.</li>
+<li>FastAPI backend business logic — untouched EXCEPT: if Phase 0 finds the dashboard currently proxies through FastAPI for any WP call, preserve that path and point the typed client at it rather than duplicating; document which pattern is live.</li>
+<li>Copy rewrites beyond v1's list + orphan categorization.</li>
+</ul>
+<h2>F. DEFINITION OF DONE (TONIGHT)</h2>
+<ul>
+<li>[ ] <code>structural_audit.py</code> exit 0 (v1 checks + B amendments)</li>
+<li>[ ] <code>wiring_audit.py</code> exit 0 against deployed preview (real read+write round-trips)</li>
+<li>[ ] <code>/api/health</code> live and green on www.devskyy.app</li>
+<li>[ ] Anonymous <code>/</code> sets no Woo session cookie; second fetch = CDN HIT</li>
+<li>[ ] 33/33 products categorized; homepage/index counts data-driven and equal</li>
+<li>[ ] Webhooks registered + signed delivery verified</li>
+<li>[ ] Zero secrets in client bundles; zero <code>__return_true</code> on write routes</li>
+<li>[ ] PR per repo: evidence table, gate statuses, rollback notes</li>
+</ul>
+</main>
+</body>
+</html>

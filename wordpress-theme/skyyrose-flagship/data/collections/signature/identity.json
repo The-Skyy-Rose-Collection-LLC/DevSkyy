@@ -20,7 +20,7 @@
   "fonts": {
     "script": {"family": "Pinyon Script", "woff2": "assets/fonts/pinyon-script-latin.woff2", "source": "OFL / Google Fonts"},
     "caps": {"family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "source": "OFL (already hosted)"},
-    "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
+    "body": {"family": "Hanken Grotesk", "woff2": "assets/fonts/hanken-grotesk-latin.woff2", "source": "OFL (already hosted)"}
   },
   "lockup": {"ref": "images/lockups/signature-lockup.webp"},
   "imagery": {

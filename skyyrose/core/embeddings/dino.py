@@ -14,12 +14,9 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-import torch
 from PIL import Image
-from transformers import AutoImageProcessor, AutoModel
 
 from skyyrose.core.embeddings.base import BaseEncoder
-from skyyrose.core.embeddings.device import dtype_load_kwargs, resolve_dtype
 from skyyrose.core.embeddings.space import EmbeddingSpace
 
 
@@ -37,6 +34,15 @@ class DinoEncoder(BaseEncoder):
         )
 
     def _load(self, device: str) -> tuple[Any, Any]:
+        try:
+            from transformers import AutoImageProcessor, AutoModel
+
+            from skyyrose.core.embeddings.device import dtype_load_kwargs, resolve_dtype
+        except ImportError as exc:
+            raise ImportError(
+                "DINOv2 embeddings require the 'ml' extra. Install with: pip install -e '.[ml]'"
+            ) from exc
+
         c = self._config
         dtype = resolve_dtype(c.dtype)
         model = (
@@ -56,6 +62,8 @@ class DinoEncoder(BaseEncoder):
         return model, processor
 
     def _encode_pils(self, images: list[Image.Image]) -> np.ndarray:
+        import torch
+
         inputs = self._processor(images=images, return_tensors="pt").to(self._device)
         with torch.no_grad():
             outputs = self._model(**inputs)

@@ -91,6 +91,37 @@ Review each changed file for:
 - Missing error handling
 - Potential edge cases
 
+### WordPress Theme Gates
+
+For changes touching `wordpress-theme/`, run these in addition to the phases above — they catch failure modes the generic JS/Python checks above miss (PHP syntax, coding standard, stale production assets, live-site drift).
+
+```bash
+# PHPCS — WordPress coding standard
+cd wordpress-theme/skyyrose-flagship && vendor/bin/phpcs --standard=.phpcs.xml -s .
+
+# php -l on every touched file (fast syntax check, run before phpcs)
+git diff --name-only -- '*.php' | xargs -n1 php -l
+```
+
+**Rebuild `.min` after any CSS/JS edit.** The theme serves `.min` in production (`$use_min = ! SCRIPT_DEBUG` in `inc/enqueue.php`) — editing the source and stopping there ships no change live.
+
+```bash
+node scripts/build-css.js && node scripts/build-js.js
+# Re-verify the .min OUTPUT, not just the source — diff or grep the built file for the change
+```
+
+**Cache-busted live curl** — never `WebFetch` a live page, it strips `<script>` tags (JSON-LD, OG tags) and WP.com Batcache can serve stale HTML:
+
+```bash
+curl -s "https://skyyrose.co/path/?cb=$(date +%s)" | grep -A2 "expected-marker"
+```
+
+**Playwright eyes-on** — after any change reaches skyyrose.co, navigate and screenshot both breakpoints, not just the curl check:
+
+```bash
+# mobile (375px) and desktop (1440px) viewports, check console for errors
+```
+
 ## Output Format
 
 After running all phases, produce a verification report:

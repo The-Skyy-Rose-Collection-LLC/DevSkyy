@@ -34,9 +34,9 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	<section class="kc-teaser__hero" id="kc-hero" aria-label="<?php esc_attr_e( 'Kids Capsule Coming Soon', 'skyyrose' ); ?>">
 		<div class="kc-teaser__hero-bg" aria-hidden="true"></div>
 		<div class="kc-teaser__hero-content">
-			<span class="kc-teaser__badge rv-clip-up"><?php esc_html_e( 'Coming Soon', 'skyyrose' ); ?></span>
-			<h1 class="kc-teaser__wordmark rv-split-word"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></h1>
-			<p class="kc-teaser__tagline rv-blur"><?php esc_html_e( 'Luxury runs in the family.', 'skyyrose' ); ?></p>
+			<span class="kc-teaser__badge"><?php esc_html_e( 'Coming Soon', 'skyyrose' ); ?></span>
+			<h1 class="kc-teaser__wordmark"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></h1>
+			<p class="kc-teaser__tagline"><?php esc_html_e( 'Luxury runs in the family.', 'skyyrose' ); ?></p>
 		</div>
 		<div class="kc-teaser__scroll" aria-hidden="true">
 			<span><?php esc_html_e( 'Scroll', 'skyyrose' ); ?></span>

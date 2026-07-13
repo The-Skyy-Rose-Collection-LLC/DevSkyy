@@ -21,9 +21,9 @@
   },
   "fonts": {
     "script": {
-      "family": "Kaushan Script",
-      "woff2": "assets/fonts/kaushan-script-latin.woff2",
-      "source": "OFL / Google Fonts"
+      "family": "SkyyRose Love Hurts Graffiti",
+      "woff2": "assets/fonts/skyyrose-love-hurts-graffiti-latin.woff2",
+      "source": "SkyyRose custom (graffiti face from lockup)"
     },
     "caps": {
       "family": "Cinzel",
@@ -31,8 +31,8 @@
       "source": "OFL (already hosted)"
     },
     "body": {
-      "family": "Cormorant Garamond",
-      "woff2": "assets/fonts/cormorant-garamond-latin.woff2",
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
       "source": "OFL (already hosted)"
     }
   },
@@ -268,8 +268,8 @@
           "resolved": "images/products/lh-003-shorts.jpeg"
         },
         "front_model_image": {
-          "path": "assets/images/products/ghost/lh-003-ghost-front.webp",
-          "resolved": "images/products/ghost/lh-003-ghost-front.webp"
+          "path": "assets/images/products/hub/lh-003-front.webp",
+          "resolved": "images/products/hub/lh-003-front.webp"
         },
         "back_image": {
           "path": "assets/images/products/lh-003-real-back.jpg",
