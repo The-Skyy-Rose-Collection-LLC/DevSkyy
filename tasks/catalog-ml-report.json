@@ -10,360 +10,318 @@
   "dim": 512,
   "clustering": {
     "k": 4,
-    "silhouette": 0.14103178679943085,
+    "silhouette": 0.16446538269519806,
     "cluster_to_collection": {
-      "0": "black-rose",
+      "0": "love-hurts",
       "1": "signature",
       "2": "black-rose",
-      "3": "signature"
+      "3": "black-rose"
     },
     "disagreements": [
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "human_collection": "black-rose",
-        "ml_collection_guess": "signature",
-        "cluster_id": 3
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "human_collection": "black-rose",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
-      },
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "human_collection": "black-rose",
-        "ml_collection_guess": "signature",
-        "cluster_id": 3
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "human_collection": "black-rose",
-        "ml_collection_guess": "signature",
-        "cluster_id": 3
-      },
-      {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "human_collection": "black-rose",
-        "ml_collection_guess": "signature",
-        "cluster_id": 3
-      },
       {
         "sku": "kids-001",
         "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
         "human_collection": "kids-capsule",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
+        "ml_collection_guess": "love-hurts",
+        "cluster_id": 0
       },
       {
         "sku": "kids-002",
         "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
         "human_collection": "kids-capsule",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
-      },
-      {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "human_collection": "love-hurts",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
-      },
-      {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "human_collection": "love-hurts",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
-      },
-      {
-        "sku": "lh-004",
-        "name": "Love Hurts Bomber Jacket",
-        "human_collection": "love-hurts",
-        "ml_collection_guess": "signature",
+        "ml_collection_guess": "black-rose",
         "cluster_id": 3
       },
       {
-        "sku": "lh-005",
-        "name": "The Fannie",
-        "human_collection": "love-hurts",
-        "ml_collection_guess": "signature",
-        "cluster_id": 1
+        "sku": "sg-001",
+        "name": "The Bridge Series 'The Bay Bridge' Shorts",
+        "human_collection": "signature",
+        "ml_collection_guess": "black-rose",
+        "cluster_id": 3
+      },
+      {
+        "sku": "sg-002",
+        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "human_collection": "signature",
+        "ml_collection_guess": "black-rose",
+        "cluster_id": 3
+      },
+      {
+        "sku": "sg-007",
+        "name": "The Signature Beanie",
+        "human_collection": "signature",
+        "ml_collection_guess": "black-rose",
+        "cluster_id": 3
       }
     ],
     "labels": {
-      "br-001": 3,
-      "br-002": 1,
+      "br-001": 2,
+      "br-002": 3,
       "br-003": 2,
-      "br-003-giants": 2,
-      "br-003-oakland": 2,
-      "br-003-white": 2,
-      "br-004": 3,
+      "br-004": 2,
       "br-005": 3,
-      "br-006": 3,
+      "br-006": 2,
       "br-007": 2,
       "br-008": 2,
       "br-009": 2,
-      "br-010": 0,
-      "br-011": 0,
-      "br-012": 2,
-      "kids-001": 1,
-      "kids-002": 1,
-      "lh-002": 1,
-      "lh-003": 1,
-      "lh-004": 3,
-      "lh-005": 1,
-      "sg-001": 1,
+      "br-010": 2,
+      "br-011": 2,
+      "br-012": 3,
+      "br-014": 2,
+      "br-015": 2,
+      "kids-001": 0,
+      "kids-002": 3,
+      "lh-002": 0,
+      "lh-003": 0,
+      "lh-004": 0,
+      "lh-005": 0,
+      "lh-006": 0,
+      "sg-001": 3,
       "sg-002": 3,
       "sg-003": 1,
-      "sg-005": 3,
-      "sg-006": 3,
+      "sg-005": 1,
+      "sg-006": 1,
       "sg-007": 3,
       "sg-009": 1,
-      "sg-011": 3,
-      "sg-012": 3,
-      "sg-013": 3,
-      "sg-014": 3,
+      "sg-011": 1,
+      "sg-012": 1,
+      "sg-013": 1,
+      "sg-014": 1,
       "sg-015": 1
     }
   },
   "outliers": [
     {
-      "collection": "signature",
-      "outlier_sku": "sg-015",
-      "outlier_name": "The Windbreaker Set",
-      "cosine_to_collection_centroid": 0.7585421204566956,
-      "best_in_collection_cosine": 0.9159201383590698,
-      "size": 12
+      "collection": "black-rose",
+      "outlier_sku": "br-012",
+      "outlier_name": "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)",
+      "cosine_to_collection_centroid": 0.6608090996742249,
+      "best_in_collection_cosine": 0.9410661458969116,
+      "size": 14
     },
     {
-      "collection": "black-rose",
-      "outlier_sku": "br-010",
-      "outlier_name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
-      "cosine_to_collection_centroid": 0.7678234577178955,
-      "best_in_collection_cosine": 0.9100313782691956,
-      "size": 15
+      "collection": "signature",
+      "outlier_sku": "sg-007",
+      "outlier_name": "The Signature Beanie",
+      "cosine_to_collection_centroid": 0.7042092680931091,
+      "best_in_collection_cosine": 0.9271500110626221,
+      "size": 12
     },
     {
       "collection": "love-hurts",
       "outlier_sku": "lh-005",
       "outlier_name": "The Fannie",
-      "cosine_to_collection_centroid": 0.855257511138916,
-      "best_in_collection_cosine": 0.9268587827682495,
-      "size": 4
+      "cosine_to_collection_centroid": 0.8040899038314819,
+      "best_in_collection_cosine": 0.9415388703346252,
+      "size": 5
     },
     {
       "collection": "kids-capsule",
-      "outlier_sku": "kids-001",
-      "outlier_name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-      "cosine_to_collection_centroid": 0.9674818515777588,
-      "best_in_collection_cosine": 0.9674820303916931,
+      "outlier_sku": "kids-002",
+      "outlier_name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "cosine_to_collection_centroid": 0.9191594123840332,
+      "best_in_collection_cosine": 0.9191595315933228,
       "size": 2
     }
   ],
   "name_image": [
     {
-      "sku": "lh-005",
-      "name": "The Fannie",
+      "sku": "lh-006",
+      "name": "Love Hurts Joggers (White)",
       "collection": "love-hurts",
-      "name_image_cosine": 0.26399949193000793
+      "name_image_cosine": 0.23366500437259674
     },
     {
       "sku": "lh-003",
       "name": "Love Hurts Basketball Shorts",
       "collection": "love-hurts",
-      "name_image_cosine": 0.2643589377403259
-    },
-    {
-      "sku": "sg-009",
-      "name": "The Sherpa Jacket",
-      "collection": "signature",
-      "name_image_cosine": 0.26609694957733154
-    },
-    {
-      "sku": "sg-002",
-      "name": "The Bridge Series 'Stay Golden' Shirt",
-      "collection": "signature",
-      "name_image_cosine": 0.26821961998939514
-    },
-    {
-      "sku": "br-011",
-      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
-      "collection": "black-rose",
-      "name_image_cosine": 0.2685650885105133
-    },
-    {
-      "sku": "lh-002",
-      "name": "Love Hurts Joggers",
-      "collection": "love-hurts",
-      "name_image_cosine": 0.274446964263916
-    },
-    {
-      "sku": "lh-004",
-      "name": "Love Hurts Bomber Jacket",
-      "collection": "love-hurts",
-      "name_image_cosine": 0.2818097770214081
-    },
-    {
-      "sku": "sg-005",
-      "name": "The Bridge Series 'The Bay Bridge' Shirt",
-      "collection": "signature",
-      "name_image_cosine": 0.28530991077423096
-    },
-    {
-      "sku": "br-007",
-      "name": "BLACK Rose x Love Hurts Basketball Shorts",
-      "collection": "black-rose",
-      "name_image_cosine": 0.28828540444374084
-    },
-    {
-      "sku": "sg-003",
-      "name": "The Bridge Series 'Stay Golden' Shorts",
-      "collection": "signature",
-      "name_image_cosine": 0.2887077033519745
-    },
-    {
-      "sku": "kids-001",
-      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-      "collection": "kids-capsule",
-      "name_image_cosine": 0.28896406292915344
-    },
-    {
-      "sku": "br-006",
-      "name": "BLACK Rose Sherpa Jacket",
-      "collection": "black-rose",
-      "name_image_cosine": 0.2899143099784851
-    },
-    {
-      "sku": "sg-015",
-      "name": "The Windbreaker Set",
-      "collection": "signature",
-      "name_image_cosine": 0.29184818267822266
-    },
-    {
-      "sku": "br-005",
-      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-      "collection": "black-rose",
-      "name_image_cosine": 0.29539161920547485
-    },
-    {
-      "sku": "br-010",
-      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
-      "collection": "black-rose",
-      "name_image_cosine": 0.30125588178634644
-    },
-    {
-      "sku": "br-008",
-      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
-      "collection": "black-rose",
-      "name_image_cosine": 0.3018556833267212
-    },
-    {
-      "sku": "sg-007",
-      "name": "The Signature Beanie",
-      "collection": "signature",
-      "name_image_cosine": 0.3123006224632263
-    },
-    {
-      "sku": "sg-012",
-      "name": "Original Label Tee (Orchid)",
-      "collection": "signature",
-      "name_image_cosine": 0.31298571825027466
-    },
-    {
-      "sku": "sg-013",
-      "name": "Mint & Lavender Crewneck",
-      "collection": "signature",
-      "name_image_cosine": 0.3216073513031006
-    },
-    {
-      "sku": "br-001",
-      "name": "BLACK Rose Crewneck",
-      "collection": "black-rose",
-      "name_image_cosine": 0.3231540620326996
+      "name_image_cosine": 0.239532470703125
     },
     {
       "sku": "sg-011",
       "name": "Original Label Tee (White)",
       "collection": "signature",
-      "name_image_cosine": 0.3238067626953125
+      "name_image_cosine": 0.24190199375152588
     },
     {
-      "sku": "br-012",
-      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "name_image_cosine": 0.24658465385437012
+    },
+    {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers (Black)",
+      "collection": "love-hurts",
+      "name_image_cosine": 0.2468884140253067
+    },
+    {
+      "sku": "br-006",
+      "name": "BLACK Rose Sherpa Jacket",
       "collection": "black-rose",
-      "name_image_cosine": 0.3251957893371582
+      "name_image_cosine": 0.24717143177986145
     },
     {
-      "sku": "sg-014",
-      "name": "Mint & Lavender Sweatpants",
-      "collection": "signature",
-      "name_image_cosine": 0.33061832189559937
-    },
-    {
-      "sku": "kids-002",
-      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "sku": "kids-001",
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
       "collection": "kids-capsule",
-      "name_image_cosine": 0.3308647871017456
-    },
-    {
-      "sku": "br-002",
-      "name": "BLACK Rose Joggers",
-      "collection": "black-rose",
-      "name_image_cosine": 0.3339327275753021
+      "name_image_cosine": 0.25044792890548706
     },
     {
       "sku": "br-004",
       "name": "BLACK Rose Hoodie",
       "collection": "black-rose",
-      "name_image_cosine": 0.335993230342865
+      "name_image_cosine": 0.2526480257511139
+    },
+    {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "name_image_cosine": 0.255090594291687
+    },
+    {
+      "sku": "lh-004",
+      "name": "Love Hurts Bomber Jacket",
+      "collection": "love-hurts",
+      "name_image_cosine": 0.26429277658462524
+    },
+    {
+      "sku": "br-001",
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "name_image_cosine": 0.266424298286438
+    },
+    {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "name_image_cosine": 0.2686823904514313
+    },
+    {
+      "sku": "sg-015",
+      "name": "The Windbreaker Set",
+      "collection": "signature",
+      "name_image_cosine": 0.26892849802970886
+    },
+    {
+      "sku": "sg-002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "name_image_cosine": 0.27025431394577026
+    },
+    {
+      "sku": "br-010",
+      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.270352840423584
     },
     {
       "sku": "br-009",
       "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
       "collection": "black-rose",
-      "name_image_cosine": 0.3404710292816162
+      "name_image_cosine": 0.28586170077323914
+    },
+    {
+      "sku": "br-007",
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "name_image_cosine": 0.28681647777557373
+    },
+    {
+      "sku": "br-011",
+      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.28893354535102844
+    },
+    {
+      "sku": "sg-003",
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "name_image_cosine": 0.2941867411136627
+    },
+    {
+      "sku": "br-003",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.2946546673774719
+    },
+    {
+      "sku": "br-008",
+      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.30065757036209106
+    },
+    {
+      "sku": "sg-013",
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "name_image_cosine": 0.300966739654541
+    },
+    {
+      "sku": "sg-005",
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "name_image_cosine": 0.3038944602012634
+    },
+    {
+      "sku": "sg-014",
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "name_image_cosine": 0.3060078024864197
+    },
+    {
+      "sku": "br-002",
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "name_image_cosine": 0.3125491738319397
+    },
+    {
+      "sku": "sg-007",
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "name_image_cosine": 0.3128826916217804
+    },
+    {
+      "sku": "br-015",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.3138183355331421
     },
     {
       "sku": "sg-006",
       "name": "Mint & Lavender Hoodie",
       "collection": "signature",
-      "name_image_cosine": 0.3447028398513794
+      "name_image_cosine": 0.31715381145477295
     },
     {
-      "sku": "br-003-giants",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+      "sku": "kids-002",
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "collection": "kids-capsule",
+      "name_image_cosine": 0.3269796073436737
+    },
+    {
+      "sku": "br-014",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
       "collection": "black-rose",
-      "name_image_cosine": 0.3727028965950012
+      "name_image_cosine": 0.3292620778083801
+    },
+    {
+      "sku": "br-005",
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "collection": "black-rose",
+      "name_image_cosine": 0.33770591020584106
+    },
+    {
+      "sku": "br-012",
+      "name": "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)",
+      "collection": "black-rose",
+      "name_image_cosine": 0.3563660681247711
     },
     {
       "sku": "sg-001",
       "name": "The Bridge Series 'The Bay Bridge' Shorts",
       "collection": "signature",
-      "name_image_cosine": 0.3748537600040436
-    },
-    {
-      "sku": "br-003-oakland",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-      "collection": "black-rose",
-      "name_image_cosine": 0.38337215781211853
-    },
-    {
-      "sku": "br-003-white",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-      "collection": "black-rose",
-      "name_image_cosine": 0.38489386439323425
-    },
-    {
-      "sku": "br-003",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-      "collection": "black-rose",
-      "name_image_cosine": 0.3879989981651306
+      "name_image_cosine": 0.37269705533981323
     }
   ],
   "top_similar": {
@@ -372,319 +330,223 @@
         "sku": "br-004",
         "name": "BLACK Rose Hoodie",
         "collection": "black-rose",
-        "score": 0.838378369808197
+        "score": 0.8685669302940369
+      },
+      {
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+        "collection": "black-rose",
+        "score": 0.8658069968223572
       },
       {
         "sku": "br-006",
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 0.8338047862052917
+        "score": 0.8521922826766968
       },
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.8395836353302002
+      },
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.8299472332000732
+      }
+    ],
+    "br-002": [
       {
         "sku": "br-005",
         "name": "BLACK Rose Hoodie \u2014 Signature Edition",
         "collection": "black-rose",
-        "score": 0.8329648375511169
+        "score": 0.7773796319961548
+      },
+      {
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.7694684267044067
+      },
+      {
+        "sku": "sg-007",
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "score": 0.7655286192893982
+      },
+      {
+        "sku": "sg-001",
+        "name": "The Bridge Series 'The Bay Bridge' Shorts",
+        "collection": "signature",
+        "score": 0.7652482986450195
       },
       {
         "sku": "sg-005",
         "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
-        "score": 0.8154999613761902
-      },
-      {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "score": 0.809617817401886
-      }
-    ],
-    "br-002": [
-      {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "score": 0.9019956588745117
-      },
-      {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "score": 0.8513214588165283
-      },
-      {
-        "sku": "kids-001",
-        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-        "collection": "kids-capsule",
-        "score": 0.8316603302955627
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.830610990524292
-      },
-      {
-        "sku": "sg-014",
-        "name": "Mint & Lavender Sweatpants",
-        "collection": "signature",
-        "score": 0.826820433139801
+        "score": 0.7141186594963074
       }
     ],
     "br-003": [
       {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-012",
-        "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
+        "score": 0.8697472810745239
       },
       {
         "sku": "br-009",
         "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
         "collection": "black-rose",
-        "score": 0.7656868696212769
-      }
-    ],
-    "br-003-giants": [
-      {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-        "collection": "black-rose",
-        "score": 1.000000238418579
+        "score": 0.8689261674880981
       },
       {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
         "collection": "black-rose",
-        "score": 1.000000238418579
+        "score": 0.8432983756065369
       },
       {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
+        "sku": "br-008",
+        "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
         "collection": "black-rose",
-        "score": 1.000000238418579
+        "score": 0.8249062299728394
       },
       {
-        "sku": "br-012",
-        "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+        "sku": "br-014",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
         "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      }
-    ],
-    "br-003-oakland": [
-      {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-012",
-        "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      }
-    ],
-    "br-003-white": [
-      {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-        "collection": "black-rose",
-        "score": 1.000000238418579
-      },
-      {
-        "sku": "br-012",
-        "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
+        "score": 0.8157422542572021
       }
     ],
     "br-004": [
       {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "score": 0.8981263041496277
+        "sku": "br-001",
+        "name": "BLACK Rose Crewneck",
+        "collection": "black-rose",
+        "score": 0.8685669302940369
+      },
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.8608748912811279
       },
       {
         "sku": "br-006",
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 0.8630077838897705
+        "score": 0.8494716286659241
       },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
         "collection": "black-rose",
-        "score": 0.8443464636802673
+        "score": 0.83841872215271
       },
       {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
         "collection": "black-rose",
-        "score": 0.838378369808197
+        "score": 0.8241293430328369
+      }
+    ],
+    "br-005": [
+      {
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.8509695529937744
       },
       {
         "sku": "sg-002",
         "name": "The Bridge Series 'Stay Golden' Shirt",
         "collection": "signature",
-        "score": 0.8301867842674255
-      }
-    ],
-    "br-005": [
-      {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "score": 0.8787814378738403
+        "score": 0.8142123818397522
       },
       {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
+        "sku": "sg-007",
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "score": 0.8137038946151733
+      },
+      {
+        "sku": "br-002",
+        "name": "BLACK Rose Joggers",
         "collection": "black-rose",
-        "score": 0.8443464636802673
+        "score": 0.7773796319961548
       },
       {
         "sku": "sg-014",
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "score": 0.8373404741287231
+        "score": 0.6878044605255127
+      }
+    ],
+    "br-006": [
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.878666341304779
       },
       {
-        "sku": "kids-001",
-        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-        "collection": "kids-capsule",
-        "score": 0.8360356092453003
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.8697472810745239
       },
       {
         "sku": "br-001",
         "name": "BLACK Rose Crewneck",
         "collection": "black-rose",
-        "score": 0.8329648375511169
-      }
-    ],
-    "br-006": [
+        "score": 0.8521922826766968
+      },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
         "collection": "black-rose",
-        "score": 0.8787814378738403
+        "score": 0.8504729270935059
       },
       {
         "sku": "br-004",
         "name": "BLACK Rose Hoodie",
         "collection": "black-rose",
-        "score": 0.8630077838897705
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.8513214588165283
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.8338047862052917
-      },
-      {
-        "sku": "lh-004",
-        "name": "Love Hurts Bomber Jacket",
-        "collection": "love-hurts",
-        "score": 0.8039712309837341
+        "score": 0.8494716286659241
       }
     ],
     "br-007": [
       {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "score": 0.7202467322349548
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.7899823188781738
       },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
         "collection": "black-rose",
-        "score": 0.6998772025108337
+        "score": 0.7875182628631592
       },
       {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
         "collection": "black-rose",
-        "score": 0.6936112642288208
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.6889833807945251
+        "score": 0.7869653701782227
       },
       {
         "sku": "br-006",
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 0.6545618176460266
+        "score": 0.7856168150901794
+      },
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.7658557891845703
       }
     ],
     "br-008": [
@@ -692,575 +554,671 @@
         "sku": "br-009",
         "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
         "collection": "black-rose",
-        "score": 0.8403279781341553
+        "score": 0.868437647819519
       },
       {
         "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
         "collection": "black-rose",
-        "score": 0.7079605460166931
+        "score": 0.8249062299728394
       },
       {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
         "collection": "black-rose",
-        "score": 0.7079605460166931
-      },
-      {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-        "collection": "black-rose",
-        "score": 0.7079605460166931
-      },
-      {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-        "collection": "black-rose",
-        "score": 0.7079605460166931
-      }
-    ],
-    "br-009": [
-      {
-        "sku": "br-008",
-        "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
-        "collection": "black-rose",
-        "score": 0.8403279781341553
-      },
-      {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      },
-      {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      },
-      {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      },
-      {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-        "collection": "black-rose",
-        "score": 0.7656868696212769
-      }
-    ],
-    "br-010": [
-      {
-        "sku": "br-011",
-        "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
-        "collection": "black-rose",
-        "score": 0.7184485793113708
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.6976522207260132
-      },
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.6746190786361694
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.6688480377197266
-      },
-      {
-        "sku": "br-012",
-        "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
-        "collection": "black-rose",
-        "score": 0.6437023282051086
-      }
-    ],
-    "br-011": [
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.7382541298866272
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.727507472038269
+        "score": 0.8182970285415649
       },
       {
         "sku": "br-010",
         "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
         "collection": "black-rose",
-        "score": 0.7184485793113708
-      },
-      {
-        "sku": "lh-004",
-        "name": "Love Hurts Bomber Jacket",
-        "collection": "love-hurts",
-        "score": 0.6789846420288086
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.6732237339019775
-      }
-    ],
-    "br-012": [
-      {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-003-giants",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-003-oakland",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-003-white",
-        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
-        "collection": "black-rose",
-        "score": 0.8291505575180054
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.7649396657943726
-      }
-    ],
-    "kids-001": [
-      {
-        "sku": "kids-002",
-        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
-        "collection": "kids-capsule",
-        "score": 0.8720418810844421
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.8360356092453003
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.8316603302955627
-      },
-      {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "score": 0.8210665583610535
-      },
-      {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "score": 0.7868521213531494
-      }
-    ],
-    "kids-002": [
-      {
-        "sku": "kids-001",
-        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-        "collection": "kids-capsule",
-        "score": 0.8720418810844421
-      },
-      {
-        "sku": "sg-013",
-        "name": "Mint & Lavender Crewneck",
-        "collection": "signature",
-        "score": 0.811676025390625
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.8055616021156311
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.7888392210006714
-      },
-      {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "score": 0.7814992666244507
-      }
-    ],
-    "lh-002": [
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.9019956588745117
-      },
-      {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "score": 0.8276167511940002
-      },
-      {
-        "sku": "kids-001",
-        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-        "collection": "kids-capsule",
-        "score": 0.8210665583610535
-      },
-      {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "score": 0.7757852077484131
+        "score": 0.8169251680374146
       },
       {
         "sku": "br-006",
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 0.774799644947052
+        "score": 0.8143547773361206
+      }
+    ],
+    "br-009": [
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.9023396968841553
+      },
+      {
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "score": 0.878666341304779
+      },
+      {
+        "sku": "br-014",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+        "collection": "black-rose",
+        "score": 0.8712159395217896
+      },
+      {
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.8689261674880981
+      },
+      {
+        "sku": "br-008",
+        "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+        "collection": "black-rose",
+        "score": 0.868437647819519
+      }
+    ],
+    "br-010": [
+      {
+        "sku": "br-001",
+        "name": "BLACK Rose Crewneck",
+        "collection": "black-rose",
+        "score": 0.8658069968223572
+      },
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.8609536290168762
+      },
+      {
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "score": 0.8504729270935059
+      },
+      {
+        "sku": "br-004",
+        "name": "BLACK Rose Hoodie",
+        "collection": "black-rose",
+        "score": 0.83841872215271
+      },
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.8270013928413391
+      }
+    ],
+    "br-011": [
+      {
+        "sku": "br-008",
+        "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+        "collection": "black-rose",
+        "score": 0.8070641160011292
+      },
+      {
+        "sku": "br-014",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+        "collection": "black-rose",
+        "score": 0.8023103475570679
+      },
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.79559725522995
+      },
+      {
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "score": 0.7866817712783813
+      },
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.7864719033241272
+      }
+    ],
+    "br-012": [
+      {
+        "sku": "br-014",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+        "collection": "black-rose",
+        "score": 0.6710805892944336
+      },
+      {
+        "sku": "br-002",
+        "name": "BLACK Rose Joggers",
+        "collection": "black-rose",
+        "score": 0.6235681772232056
+      },
+      {
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.618066132068634
+      },
+      {
+        "sku": "br-005",
+        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "collection": "black-rose",
+        "score": 0.5995699167251587
+      },
+      {
+        "sku": "sg-001",
+        "name": "The Bridge Series 'The Bay Bridge' Shorts",
+        "collection": "signature",
+        "score": 0.5967569351196289
+      }
+    ],
+    "br-014": [
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.8712159395217896
+      },
+      {
+        "sku": "br-015",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+        "collection": "black-rose",
+        "score": 0.8388543128967285
+      },
+      {
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+        "collection": "black-rose",
+        "score": 0.8233414888381958
+      },
+      {
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.8157422542572021
+      },
+      {
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "score": 0.8083016872406006
+      }
+    ],
+    "br-015": [
+      {
+        "sku": "br-009",
+        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+        "collection": "black-rose",
+        "score": 0.9023396968841553
+      },
+      {
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.8432983756065369
+      },
+      {
+        "sku": "br-014",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+        "collection": "black-rose",
+        "score": 0.8388543128967285
+      },
+      {
+        "sku": "br-001",
+        "name": "BLACK Rose Crewneck",
+        "collection": "black-rose",
+        "score": 0.8299472332000732
+      },
+      {
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+        "collection": "black-rose",
+        "score": 0.8270013928413391
+      }
+    ],
+    "kids-001": [
+      {
+        "sku": "lh-002",
+        "name": "Love Hurts Joggers (Black)",
+        "collection": "love-hurts",
+        "score": 0.8128500580787659
+      },
+      {
+        "sku": "sg-014",
+        "name": "Mint & Lavender Sweatpants",
+        "collection": "signature",
+        "score": 0.7633941769599915
+      },
+      {
+        "sku": "lh-004",
+        "name": "Love Hurts Bomber Jacket",
+        "collection": "love-hurts",
+        "score": 0.7520727515220642
+      },
+      {
+        "sku": "lh-003",
+        "name": "Love Hurts Basketball Shorts",
+        "collection": "love-hurts",
+        "score": 0.7388036847114563
+      },
+      {
+        "sku": "lh-006",
+        "name": "Love Hurts Joggers (White)",
+        "collection": "love-hurts",
+        "score": 0.7220717072486877
+      }
+    ],
+    "kids-002": [
+      {
+        "sku": "br-005",
+        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "collection": "black-rose",
+        "score": 0.8509695529937744
+      },
+      {
+        "sku": "sg-007",
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "score": 0.7797150611877441
+      },
+      {
+        "sku": "br-002",
+        "name": "BLACK Rose Joggers",
+        "collection": "black-rose",
+        "score": 0.7694684267044067
+      },
+      {
+        "sku": "sg-002",
+        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "collection": "signature",
+        "score": 0.7564837336540222
+      },
+      {
+        "sku": "sg-014",
+        "name": "Mint & Lavender Sweatpants",
+        "collection": "signature",
+        "score": 0.7344173789024353
+      }
+    ],
+    "lh-002": [
+      {
+        "sku": "lh-003",
+        "name": "Love Hurts Basketball Shorts",
+        "collection": "love-hurts",
+        "score": 0.8836870193481445
+      },
+      {
+        "sku": "lh-006",
+        "name": "Love Hurts Joggers (White)",
+        "collection": "love-hurts",
+        "score": 0.8500849604606628
+      },
+      {
+        "sku": "lh-004",
+        "name": "Love Hurts Bomber Jacket",
+        "collection": "love-hurts",
+        "score": 0.846386194229126
+      },
+      {
+        "sku": "kids-001",
+        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+        "collection": "kids-capsule",
+        "score": 0.8128500580787659
+      },
+      {
+        "sku": "sg-013",
+        "name": "Mint & Lavender Crewneck",
+        "collection": "signature",
+        "score": 0.8094279766082764
       }
     ],
     "lh-003": [
       {
         "sku": "lh-002",
-        "name": "Love Hurts Joggers",
+        "name": "Love Hurts Joggers (Black)",
         "collection": "love-hurts",
-        "score": 0.8276167511940002
+        "score": 0.8836870193481445
       },
       {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.8151119351387024
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.7903481125831604
+        "sku": "lh-006",
+        "name": "Love Hurts Joggers (White)",
+        "collection": "love-hurts",
+        "score": 0.8428062200546265
       },
       {
         "sku": "lh-004",
         "name": "Love Hurts Bomber Jacket",
         "collection": "love-hurts",
-        "score": 0.7893032431602478
+        "score": 0.827170729637146
       },
-      {
-        "sku": "sg-003",
-        "name": "The Bridge Series 'Stay Golden' Shorts",
-        "collection": "signature",
-        "score": 0.7633234262466431
-      }
-    ],
-    "lh-004": [
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8165044784545898
-      },
-      {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "score": 0.8039712309837341
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.8027483820915222
-      },
-      {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "score": 0.7893032431602478
-      },
-      {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "score": 0.7890084981918335
-      }
-    ],
-    "lh-005": [
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.7219957113265991
-      },
-      {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "score": 0.7134676575660706
-      },
-      {
-        "sku": "sg-011",
-        "name": "Original Label Tee (White)",
-        "collection": "signature",
-        "score": 0.7075182199478149
-      },
-      {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "score": 0.7049420475959778
-      },
-      {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "score": 0.6966830492019653
-      }
-    ],
-    "sg-001": [
-      {
-        "sku": "sg-003",
-        "name": "The Bridge Series 'Stay Golden' Shorts",
-        "collection": "signature",
-        "score": 0.7940256595611572
-      },
-      {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "score": 0.7558349370956421
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.7416470646858215
-      },
-      {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "score": 0.7110600471496582
-      },
-      {
-        "sku": "sg-014",
-        "name": "Mint & Lavender Sweatpants",
-        "collection": "signature",
-        "score": 0.7020673751831055
-      }
-    ],
-    "sg-002": [
       {
         "sku": "sg-005",
         "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
-        "score": 0.9241180419921875
+        "score": 0.7899006009101868
       },
       {
-        "sku": "sg-011",
-        "name": "Original Label Tee (White)",
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
         "collection": "signature",
-        "score": 0.8588860630989075
-      },
-      {
-        "sku": "sg-012",
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "score": 0.8477047085762024
-      },
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8301867842674255
-      },
-      {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.8071308732032776
+        "score": 0.7890455722808838
       }
     ],
-    "sg-003": [
+    "lh-004": [
       {
-        "sku": "sg-001",
-        "name": "The Bridge Series 'The Bay Bridge' Shorts",
-        "collection": "signature",
-        "score": 0.7940256595611572
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.7705492973327637
+        "sku": "lh-002",
+        "name": "Love Hurts Joggers (Black)",
+        "collection": "love-hurts",
+        "score": 0.846386194229126
       },
       {
         "sku": "lh-003",
         "name": "Love Hurts Basketball Shorts",
         "collection": "love-hurts",
-        "score": 0.7633234262466431
+        "score": 0.827170729637146
       },
       {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
+        "sku": "lh-006",
+        "name": "Love Hurts Joggers (White)",
         "collection": "love-hurts",
-        "score": 0.7358441948890686
+        "score": 0.8218998908996582
       },
       {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "score": 0.7112680673599243
-      }
-    ],
-    "sg-005": [
-      {
-        "sku": "sg-002",
-        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "sku": "sg-009",
+        "name": "The Sherpa Jacket",
         "collection": "signature",
-        "score": 0.9241180419921875
-      },
-      {
-        "sku": "sg-011",
-        "name": "Original Label Tee (White)",
-        "collection": "signature",
-        "score": 0.8396556377410889
+        "score": 0.7941184639930725
       },
       {
         "sku": "br-001",
         "name": "BLACK Rose Crewneck",
         "collection": "black-rose",
-        "score": 0.8154999613761902
-      },
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8154818415641785
-      },
-      {
-        "sku": "sg-012",
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "score": 0.8106513619422913
+        "score": 0.785480260848999
       }
     ],
-    "sg-006": [
+    "lh-005": [
       {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8981263041496277
+        "sku": "lh-002",
+        "name": "Love Hurts Joggers (Black)",
+        "collection": "love-hurts",
+        "score": 0.6733977794647217
       },
       {
-        "sku": "sg-013",
-        "name": "Mint & Lavender Crewneck",
+        "sku": "lh-006",
+        "name": "Love Hurts Joggers (White)",
+        "collection": "love-hurts",
+        "score": 0.6729787588119507
+      },
+      {
+        "sku": "kids-001",
+        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+        "collection": "kids-capsule",
+        "score": 0.6722251772880554
+      },
+      {
+        "sku": "sg-015",
+        "name": "The Windbreaker Set",
         "collection": "signature",
-        "score": 0.8528958559036255
+        "score": 0.6462312936782837
       },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+        "sku": "lh-003",
+        "name": "Love Hurts Basketball Shorts",
+        "collection": "love-hurts",
+        "score": 0.6433519721031189
+      }
+    ],
+    "lh-006": [
+      {
+        "sku": "lh-002",
+        "name": "Love Hurts Joggers (Black)",
+        "collection": "love-hurts",
+        "score": 0.8500849604606628
+      },
+      {
+        "sku": "lh-003",
+        "name": "Love Hurts Basketball Shorts",
+        "collection": "love-hurts",
+        "score": 0.8428062200546265
+      },
+      {
+        "sku": "lh-004",
+        "name": "Love Hurts Bomber Jacket",
+        "collection": "love-hurts",
+        "score": 0.8218998908996582
+      },
+      {
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
         "collection": "black-rose",
-        "score": 0.8128869533538818
+        "score": 0.7552624940872192
       },
       {
-        "sku": "sg-012",
-        "name": "Original Label Tee (Orchid)",
+        "sku": "br-006",
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "score": 0.7317554354667664
+      }
+    ],
+    "sg-001": [
+      {
+        "sku": "br-002",
+        "name": "BLACK Rose Joggers",
+        "collection": "black-rose",
+        "score": 0.7652482986450195
+      },
+      {
+        "sku": "sg-005",
+        "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
-        "score": 0.8035700917243958
+        "score": 0.7062349319458008
+      },
+      {
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.6810836791992188
       },
       {
         "sku": "sg-014",
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "score": 0.8033589124679565
+        "score": 0.6690518260002136
+      },
+      {
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
+        "collection": "signature",
+        "score": 0.6585152745246887
       }
     ],
-    "sg-007": [
-      {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8190531134605408
-      },
+    "sg-002": [
       {
         "sku": "br-005",
         "name": "BLACK Rose Hoodie \u2014 Signature Edition",
         "collection": "black-rose",
-        "score": 0.8092902898788452
+        "score": 0.8142123818397522
+      },
+      {
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.7564837336540222
+      },
+      {
+        "sku": "sg-007",
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "score": 0.7509012818336487
+      },
+      {
+        "sku": "br-002",
+        "name": "BLACK Rose Joggers",
+        "collection": "black-rose",
+        "score": 0.7016091346740723
+      },
+      {
+        "sku": "br-010",
+        "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+        "collection": "black-rose",
+        "score": 0.6808372139930725
+      }
+    ],
+    "sg-003": [
+      {
+        "sku": "sg-005",
+        "name": "The Bridge Series 'The Bay Bridge' Shirt",
+        "collection": "signature",
+        "score": 0.8745172619819641
+      },
+      {
+        "sku": "sg-012",
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "score": 0.8708307147026062
       },
       {
         "sku": "sg-011",
         "name": "Original Label Tee (White)",
         "collection": "signature",
-        "score": 0.8089547157287598
+        "score": 0.8488832116127014
+      },
+      {
+        "sku": "sg-014",
+        "name": "Mint & Lavender Sweatpants",
+        "collection": "signature",
+        "score": 0.8408702611923218
       },
       {
         "sku": "sg-006",
         "name": "Mint & Lavender Hoodie",
         "collection": "signature",
-        "score": 0.795644998550415
+        "score": 0.8128678202629089
+      }
+    ],
+    "sg-005": [
+      {
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
+        "collection": "signature",
+        "score": 0.8745172619819641
+      },
+      {
+        "sku": "sg-011",
+        "name": "Original Label Tee (White)",
+        "collection": "signature",
+        "score": 0.8403785228729248
+      },
+      {
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "score": 0.8389238119125366
+      },
+      {
+        "sku": "sg-014",
+        "name": "Mint & Lavender Sweatpants",
+        "collection": "signature",
+        "score": 0.8365989923477173
       },
       {
         "sku": "sg-012",
         "name": "Original Label Tee (Orchid)",
         "collection": "signature",
-        "score": 0.7923417091369629
+        "score": 0.8310756683349609
       }
     ],
-    "sg-009": [
+    "sg-006": [
+      {
+        "sku": "sg-011",
+        "name": "Original Label Tee (White)",
+        "collection": "signature",
+        "score": 0.8867816925048828
+      },
+      {
+        "sku": "sg-013",
+        "name": "Mint & Lavender Crewneck",
+        "collection": "signature",
+        "score": 0.8481329679489136
+      },
+      {
+        "sku": "sg-012",
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "score": 0.8406187295913696
+      },
+      {
+        "sku": "sg-005",
+        "name": "The Bridge Series 'The Bay Bridge' Shirt",
+        "collection": "signature",
+        "score": 0.8389238119125366
+      },
+      {
+        "sku": "sg-009",
+        "name": "The Sherpa Jacket",
+        "collection": "signature",
+        "score": 0.8360899686813354
+      }
+    ],
+    "sg-007": [
       {
         "sku": "br-005",
         "name": "BLACK Rose Hoodie \u2014 Signature Edition",
         "collection": "black-rose",
-        "score": 0.8157981038093567
+        "score": 0.8137038946151733
       },
       {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "score": 0.809617817401886
+        "sku": "kids-002",
+        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+        "collection": "kids-capsule",
+        "score": 0.7797150611877441
       },
       {
         "sku": "br-002",
         "name": "BLACK Rose Joggers",
         "collection": "black-rose",
-        "score": 0.798234760761261
+        "score": 0.7655286192893982
+      },
+      {
+        "sku": "sg-002",
+        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "collection": "signature",
+        "score": 0.7509012818336487
+      },
+      {
+        "sku": "sg-001",
+        "name": "The Bridge Series 'The Bay Bridge' Shorts",
+        "collection": "signature",
+        "score": 0.6179383397102356
+      }
+    ],
+    "sg-009": [
+      {
+        "sku": "sg-012",
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "score": 0.8423386216163635
+      },
+      {
+        "sku": "sg-011",
+        "name": "Original Label Tee (White)",
+        "collection": "signature",
+        "score": 0.8415348529815674
+      },
+      {
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "score": 0.8360899686813354
       },
       {
         "sku": "br-006",
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "score": 0.7943693399429321
+        "score": 0.8151244521141052
       },
       {
-        "sku": "sg-012",
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "score": 0.7913672924041748
+        "sku": "br-003",
+        "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+        "collection": "black-rose",
+        "score": 0.8082700967788696
       }
     ],
     "sg-011": [
@@ -1268,31 +1226,31 @@
         "sku": "sg-012",
         "name": "Original Label Tee (Orchid)",
         "collection": "signature",
-        "score": 0.9232785105705261
+        "score": 0.930115282535553
       },
       {
-        "sku": "sg-002",
-        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
         "collection": "signature",
-        "score": 0.8588860630989075
+        "score": 0.8867816925048828
+      },
+      {
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
+        "collection": "signature",
+        "score": 0.8488832116127014
+      },
+      {
+        "sku": "sg-009",
+        "name": "The Sherpa Jacket",
+        "collection": "signature",
+        "score": 0.8415348529815674
       },
       {
         "sku": "sg-005",
         "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
-        "score": 0.8396556377410889
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.8147173523902893
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.8093680739402771
+        "score": 0.8403785228729248
       }
     ],
     "sg-012": [
@@ -1300,63 +1258,63 @@
         "sku": "sg-011",
         "name": "Original Label Tee (White)",
         "collection": "signature",
-        "score": 0.9232785105705261
+        "score": 0.930115282535553
       },
       {
-        "sku": "sg-002",
-        "name": "The Bridge Series 'Stay Golden' Shirt",
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
         "collection": "signature",
-        "score": 0.8477047085762024
-      },
-      {
-        "sku": "sg-005",
-        "name": "The Bridge Series 'The Bay Bridge' Shirt",
-        "collection": "signature",
-        "score": 0.8106513619422913
-      },
-      {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "score": 0.8035700917243958
+        "score": 0.8708307147026062
       },
       {
         "sku": "sg-014",
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "score": 0.800079882144928
+        "score": 0.8534703254699707
+      },
+      {
+        "sku": "sg-009",
+        "name": "The Sherpa Jacket",
+        "collection": "signature",
+        "score": 0.8423386216163635
+      },
+      {
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "score": 0.8406187295913696
       }
     ],
     "sg-013": [
       {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "score": 0.8528958559036255
-      },
-      {
         "sku": "sg-014",
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "score": 0.8508540987968445
+        "score": 0.8707835674285889
       },
       {
-        "sku": "kids-002",
-        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
-        "collection": "kids-capsule",
-        "score": 0.811676025390625
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "score": 0.8481329679489136
       },
       {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "score": 0.8027083873748779
+        "sku": "sg-011",
+        "name": "Original Label Tee (White)",
+        "collection": "signature",
+        "score": 0.8363047242164612
       },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.7815548181533813
+        "sku": "sg-012",
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "score": 0.8248168230056763
+      },
+      {
+        "sku": "lh-002",
+        "name": "Love Hurts Joggers (Black)",
+        "collection": "love-hurts",
+        "score": 0.8094279766082764
       }
     ],
     "sg-014": [
@@ -1364,156 +1322,120 @@
         "sku": "sg-013",
         "name": "Mint & Lavender Crewneck",
         "collection": "signature",
-        "score": 0.8508540987968445
-      },
-      {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.8373404741287231
-      },
-      {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "score": 0.826820433139801
-      },
-      {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "score": 0.8033589124679565
+        "score": 0.8707835674285889
       },
       {
         "sku": "sg-012",
         "name": "Original Label Tee (Orchid)",
         "collection": "signature",
-        "score": 0.800079882144928
+        "score": 0.8534703254699707
+      },
+      {
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
+        "collection": "signature",
+        "score": 0.8408702611923218
+      },
+      {
+        "sku": "sg-005",
+        "name": "The Bridge Series 'The Bay Bridge' Shirt",
+        "collection": "signature",
+        "score": 0.8365989923477173
+      },
+      {
+        "sku": "sg-006",
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "score": 0.8353116512298584
       }
     ],
     "sg-015": [
       {
-        "sku": "kids-002",
-        "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
-        "collection": "kids-capsule",
-        "score": 0.698669970035553
-      },
-      {
-        "sku": "br-009",
-        "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
-        "collection": "black-rose",
-        "score": 0.6854994297027588
-      },
-      {
         "sku": "sg-014",
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "score": 0.6711850166320801
+        "score": 0.7919175028800964
       },
       {
-        "sku": "kids-001",
-        "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
-        "collection": "kids-capsule",
-        "score": 0.6676395535469055
+        "sku": "sg-013",
+        "name": "Mint & Lavender Crewneck",
+        "collection": "signature",
+        "score": 0.7174100875854492
       },
       {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie \u2014 Signature Edition",
-        "collection": "black-rose",
-        "score": 0.657994270324707
+        "sku": "sg-009",
+        "name": "The Sherpa Jacket",
+        "collection": "signature",
+        "score": 0.7104427814483643
+      },
+      {
+        "sku": "sg-012",
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "score": 0.7079692482948303
+      },
+      {
+        "sku": "sg-003",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
+        "collection": "signature",
+        "score": 0.7018824219703674
       }
     ]
   },
   "cross_collection": [
     {
-      "sku": "br-002",
-      "name": "BLACK Rose Joggers",
+      "sku": "br-005",
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
       "sku_collection": "black-rose",
-      "nearest_sku": "lh-002",
-      "nearest_name": "Love Hurts Joggers",
-      "nearest_collection": "love-hurts",
-      "score": 0.9019956588745117
+      "nearest_sku": "kids-002",
+      "nearest_name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "nearest_collection": "kids-capsule",
+      "score": 0.8509695529937744
     },
     {
-      "sku": "lh-002",
-      "name": "Love Hurts Joggers",
-      "sku_collection": "love-hurts",
-      "nearest_sku": "br-002",
-      "nearest_name": "BLACK Rose Joggers",
+      "sku": "kids-002",
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "sku_collection": "kids-capsule",
+      "nearest_sku": "br-005",
+      "nearest_name": "BLACK Rose Hoodie \u2014 Signature Edition",
       "nearest_collection": "black-rose",
-      "score": 0.9019956588745117
+      "score": 0.8509695529937744
     },
     {
-      "sku": "br-004",
-      "name": "BLACK Rose Hoodie",
-      "sku_collection": "black-rose",
-      "nearest_sku": "sg-006",
-      "nearest_name": "Mint & Lavender Hoodie",
-      "nearest_collection": "signature",
-      "score": 0.8981263041496277
-    },
-    {
-      "sku": "sg-006",
-      "name": "Mint & Lavender Hoodie",
+      "sku": "sg-002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
       "sku_collection": "signature",
-      "nearest_sku": "br-004",
-      "nearest_name": "BLACK Rose Hoodie",
+      "nearest_sku": "br-005",
+      "nearest_name": "BLACK Rose Hoodie \u2014 Signature Edition",
       "nearest_collection": "black-rose",
-      "score": 0.8981263041496277
+      "score": 0.8142123818397522
     },
     {
       "sku": "sg-007",
       "name": "The Signature Beanie",
       "sku_collection": "signature",
-      "nearest_sku": "br-004",
-      "nearest_name": "BLACK Rose Hoodie",
-      "nearest_collection": "black-rose",
-      "score": 0.8190531134605408
-    },
-    {
-      "sku": "lh-004",
-      "name": "Love Hurts Bomber Jacket",
-      "sku_collection": "love-hurts",
-      "nearest_sku": "br-004",
-      "nearest_name": "BLACK Rose Hoodie",
-      "nearest_collection": "black-rose",
-      "score": 0.8165044784545898
-    },
-    {
-      "sku": "sg-009",
-      "name": "The Sherpa Jacket",
-      "sku_collection": "signature",
       "nearest_sku": "br-005",
       "nearest_name": "BLACK Rose Hoodie \u2014 Signature Edition",
       "nearest_collection": "black-rose",
-      "score": 0.8157981038093567
+      "score": 0.8137038946151733
     },
     {
-      "sku": "lh-005",
-      "name": "The Fannie",
-      "sku_collection": "love-hurts",
+      "sku": "kids-001",
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "sku_collection": "kids-capsule",
+      "nearest_sku": "lh-002",
+      "nearest_name": "Love Hurts Joggers (Black)",
+      "nearest_collection": "love-hurts",
+      "score": 0.8128500580787659
+    },
+    {
+      "sku": "sg-001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "sku_collection": "signature",
       "nearest_sku": "br-002",
       "nearest_name": "BLACK Rose Joggers",
       "nearest_collection": "black-rose",
-      "score": 0.7219957113265991
-    },
-    {
-      "sku": "br-007",
-      "name": "BLACK Rose x Love Hurts Basketball Shorts",
-      "sku_collection": "black-rose",
-      "nearest_sku": "lh-003",
-      "nearest_name": "Love Hurts Basketball Shorts",
-      "nearest_collection": "love-hurts",
-      "score": 0.7202467322349548
-    },
-    {
-      "sku": "sg-015",
-      "name": "The Windbreaker Set",
-      "sku_collection": "signature",
-      "nearest_sku": "kids-002",
-      "nearest_name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
-      "nearest_collection": "kids-capsule",
-      "score": 0.698669970035553
+      "score": 0.7652482986450195
     }
   ]
 }

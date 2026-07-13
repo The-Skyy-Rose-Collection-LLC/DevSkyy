@@ -43,14 +43,14 @@
   "lockup": {
     "canonical": "images/lockups/signature-lockup.webp",
     "display_webp": {
-      "path": "images/lockups/signature-lockup.webp",
+      "path": "images/lockups/signature-lockup",
       "resolved": "images/lockups/signature-lockup.webp",
       "kind": "collection-lockup-display",
       "status": "verified",
       "notes": "CANONICAL display lockup \u2014 gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
     },
     "svg_master": {
-      "path": "branding/vectorized/signature-script.svg",
+      "path": "branding/vectorized/signature-script",
       "resolved": "branding/vectorized/signature-script.svg",
       "kind": "collection-lockup-vector",
       "status": "verified",
@@ -74,7 +74,13 @@
       "status": "verified",
       "notes": "Signature world art. Collection cards/panels/portals."
     },
-    "hero_backdrop": null,
+    "hero_backdrop": {
+      "path": "branding/hero/signature-golden-gate-yacht",
+      "resolved": "branding/hero/signature-golden-gate-yacht-1280w.webp",
+      "kind": "cinematic-backdrop",
+      "status": "verified",
+      "notes": "SkyyRose yacht at the pier, Golden Gate at night \u2014 founder-supplied render (2026-07-12, OpenAI Playground). Signature cinematic scene-hero still. Master PNG: assets/scenes/signature/signature-golden-gate-yacht.png."
+    },
     "atmospherics": [
       {
         "path": "images/logos/rose-gold-rose",

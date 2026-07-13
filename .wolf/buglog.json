@@ -4057,5 +4057,64 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-249",
+    "timestamp": "2026-07-12",
+    "error_message": "Built a PR-merge plan on a prior-session audit; treated #672/#684/#686/#689 as open needing conflict resolution. Reality: #684/#686/#689 already MERGED, #672 CLOSED (superseded by #691, also closed). Resolved conflicts on the CLOSED #672 branch (wasted); nearly dispatched resolver agents for 3 already-merged PRs.",
+    "file": "(process) PR triage; N/A code",
+    "root_cause": "Stale cross-session audit used as current truth without re-verifying live PR state. Compounded by misreading gh `mergeable`: a MERGED or CLOSED PR returns mergeable=UNKNOWN, identical to an open PR GitHub hasn't computed yet \u2014 so UNKNOWN was read as 'recomputing after main moved' when it meant 'not open'. Never queried `state`. merge-tree=0-conflicts also misread as 'auto-mergeable' when it meant 'head is already an ancestor of main (merged)'.",
+    "fix": "Re-baseline against `gh pr list --state open` (authoritative; excludes merged/closed) BEFORE acting on any PR plan. Never infer open/closed from `mergeable`. Single-PR checks MUST include `state`+`mergedAt`. 0 merge-tree conflicts can mean already-merged, not mergeable.",
+    "tags": [
+      "pr-automation",
+      "stale-data",
+      "gh-cli",
+      "mergeable-unknown",
+      "cross-session",
+      "re-baseline"
+    ],
+    "related_bugs": [
+      "bug-246"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-250",
+    "timestamp": "2026-07-12",
+    "error_message": "verify-visual-manifest.py exit 1 \u2014 7 MISSING: 6 double-extension paths (.webp.webp/.svg.svg) + kids-capsule.avif absent; verifier itself orphaned from CI so it failed silently for months",
+    "file": "wordpress-theme/skyyrose-flagship/data/visual-manifest.json",
+    "root_cause": "6 manifest entries put the file extension inside `path`, breaking the extension-less path + formats[] convention the verifier appends to; and no CI workflow ever ran verify-visual-manifest.py so the drift was never surfaced",
+    "fix": "Stripped extensions from the 6 path fields; generated kids-capsule.avif from the verified webp (same pixels); registered signature yacht + LH hero ladders while in the file; verifier now exit 0 (163 files). CI wiring recommended (catalog-validate.yml).",
+    "tags": [
+      "visual-manifest",
+      "verifier",
+      "orphaned-check",
+      "double-extension",
+      "data-sync"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-251",
+    "timestamp": "2026-07-12",
+    "error_message": "csv.reader->writer round-trip of skyyrose-catalog.csv rewrote all 34 lines (68-line diff) for a 7-cell edit \u2014 CRLF endings flattened to LF and quoting re-normalized",
+    "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+    "root_cause": "catalog CSV uses CRLF + minimal quoting; python csv module round-trip is NOT lossless (lineterminator + re-quoting). Caught by diff-stat gate before commit; reverted.",
+    "fix": "Reverted; redid as per-row regex substitution on the raw text preserving CRLF \u2014 diff exactly 7 rows/7 cells. Rule: never round-trip the catalog CSV through csv.writer; edit rows surgically or use the /admin/catalog lossless writer.",
+    "tags": [
+      "catalog-csv",
+      "lossless-write",
+      "crlf",
+      "near-miss",
+      "data-sync"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
   }
 ]
