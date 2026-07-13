@@ -155,9 +155,9 @@
   - `assets/images/emblems/love-hurts-emblem.png` + `.webp`
   - `assets/images/mascot/skyy-canonical-v2.png`
   - `assets/images/avatar/skyy-rose-reference.avif` + `.jpeg` + `.webp`
-  - `assets/scenes/black-rose/black-rose-rooftop-garden-lookbook.webp` + `-v2-avatar.webp`
-  - `assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber-lookbook.webp` + `-v2-avatar.webp`
-  - `assets/scenes/signature/signature-golden-gate-showroom-lookbook.webp` + `-v2-avatar.webp`
+  - `assets/scenes/black-rose/black-rose-rooftop-garden-lookbook.webp` + `black-rose-rooftop-garden-v2-avatar.webp` (note: the v2-avatar file drops the `-lookbook` infix — do NOT curl `…-lookbook-v2-avatar.webp`, it 404s)
+  - `assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber-lookbook.webp` + `love-hurts-cathedral-rose-chamber-v2-avatar.webp`
+  - `assets/scenes/signature/signature-golden-gate-showroom-lookbook.webp` + `signature-golden-gate-showroom-v2-avatar.webp`
   - `assets/images/products/br-008-front-only.jpg`
   - `data/product-references/techflat-review.json` + `techflat-vision-analysis.json`
 - **Proof this bites:** live 1.10.3 was deployed from a source missing the *tracked* `signature-emblem.webp` (committed `700d43178`) → Signature emblem 404 on production, while the *ignored* BR/LH emblems stayed 200 (they were on the deploying tree's disk). "Committed" and "on the deploy tree" are independent axes — a complete deploy source needs both checked.
@@ -165,3 +165,5 @@
 - **Tar-exclude gap:** `--exclude='CLAUDE.md'` does NOT match `CLAUDE.local.md` — that is how they shipped. Add `--exclude='CLAUDE.local.md'` (and consider `._*`, `__pycache__`) to `tar_excludes` in `scripts/deploy-theme.sh`.
 - **Byte-size = identity spot-check:** live emblem sizes (35,996 / 39,686 B) matched the primary-checkout files exactly — confirm provenance this way before overlaying.
 - **Staged deploy-ready source for v1.10.4:** worktree `.claude/worktrees/deploy-v1104` = clean `origin/main @ 9aaa88a52` (triple-verified 1.10.4, 1734 tracked files) + the 17 riders already overlaid.
+- **EMPIRICAL CORRECTION — the transport is ADDITIVE, not wholesale-replace (v1.10.4 deploy, 2026-07-13):** The v1.10.4 deploy ran from `deploy-v1104`, whose `assets/scenes/` dir was **empty** (riders were overlaid into `emblems/` only, not `scenes/`). After deploy, **all live scene files still served HTTP 200** — a wholesale dir-replace from an empty-scenes source would have 404'd every scene. Proof that the primary `try_rsync()` path (tar → scp → **extract-over-existing**) does NOT delete remote files absent from the source; it overlays. The only path that *would* delete is the `try_lftp()` fallback (`mirror --reverse --delete`), and it is **unreachable on this host** because it hardcodes `ssh -i ~/.ssh/skyyrose-deploy`, a key that does not exist (primary path uses password auth via `.env.wordpress`). Net: on the current config, clean-tree / fresh-worktree / CI deploys are SAFE for the riders — they persist. The overlay dance is belt-and-suspenders, not load-bearing. (The line-152 "deletes them from production" warning holds ONLY if the SSH key is later added AND the primary scp path fails 3× into the lftp fallback.)
+- **Corollary — additive means junk does NOT self-clean:** because the transport overlays, the ~40 exposed `CLAUDE.local.md` files (public HTTP 200 on the live server) are NOT dropped by a normal deploy — they must be removed explicitly (server-side `rm`, a STOP-AND-SHOW production write) or blocked at the webserver. The `tar_excludes` + `RSYNC_EXCLUDES` gap was closed 2026-07-13 (`CLAUDE.local.md`, `._*`, `__pycache__` now excluded) so future deploys stop *adding* them, but existing exposed copies persist until purged.
