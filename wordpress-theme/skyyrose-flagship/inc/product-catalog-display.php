@@ -96,6 +96,13 @@ function skyyrose_resolve_display_products( array $catalog_entries ) {
 			continue;
 		}
 
+		// Production-image gate (mirrors the pre-order gateway): a SKU with
+		// no real display image on disk must not render a placeholder card.
+		$display_img = skyyrose_get_product_display_image( $cat );
+		if ( '' === $display_img || ! file_exists( get_theme_file_path( $display_img ) ) ) {
+			continue;
+		}
+
 		// Try to match to a WC product by SKU (primary, then normalized).
 		$wc_product = null;
 		if ( $has_wc ) {
@@ -371,4 +378,67 @@ add_action( 'woocommerce_update_product', 'skyyrose_flush_featured_display_cache
 add_action( 'woocommerce_delete_product', 'skyyrose_flush_featured_display_cache' );
 add_action( 'woocommerce_trash_product', 'skyyrose_flush_featured_display_cache' );
 add_action( 'trashed_post', 'skyyrose_flush_featured_display_cache' );
+
+/**
+ * Resolve a single mixed display item (WC_Product or static card) into the
+ * plain field set a spotlight/feature surface needs — title, price markup,
+ * SKU, front image, and permalink.
+ *
+ * Mirrors the SOT-first image precedence used inline by
+ * template-parts/product-card-holo.php (catalog/SOT render → WC featured
+ * image → placeholder) so a surface that only needs primitives (no gallery,
+ * no add-to-cart) does not have to re-derive that precedence itself.
+ *
+ * @since  1.8.1
+ * @param  WC_Product|array $item One entry from skyyrose_resolve_display_products().
+ * @return array{title:string,price_html:string,sku:string,image_url:string,permalink:string}
+ */
+function skyyrose_get_display_product_fields( $item ) {
+	$wc_product = ( $item instanceof WC_Product ) ? $item : null;
+	$product_id = $wc_product ? $wc_product->get_id() : 0;
+
+	$title      = $wc_product ? $wc_product->get_name() : (string) ( $item['title'] ?? '' );
+	$price_html = $wc_product ? $wc_product->get_price_html() : (string) ( $item['price'] ?? '' );
+	$sku        = $wc_product ? $wc_product->get_sku() : (string) ( $item['sku'] ?? '' );
+	$permalink  = $wc_product ? '' : (string) ( $item['permalink'] ?? '' );
+
+	// SOT-first image resolution (canon, 2026-06-16) — same precedence as
+	// the holo card: catalog/SOT front_model_image first, WC featured image
+	// only when the catalog has no render, placeholder last.
+	$image_url = '';
+	if ( '' !== $sku && function_exists( 'skyyrose_get_product' ) ) {
+		$lookup_sku      = function_exists( 'skyyrose_normalize_sku' ) ? skyyrose_normalize_sku( $sku ) : $sku;
+		$catalog_product = skyyrose_get_product( $lookup_sku );
+		if ( $catalog_product ) {
+			$catalog_image = ( $catalog_product['front_model_image'] ?? '' ) ?: ( $catalog_product['image'] ?? '' );
+			if ( '' !== $catalog_image ) {
+				$image_url = skyyrose_product_image_uri( $catalog_image );
+			}
+		}
+	}
+	if ( '' === $image_url && is_array( $item ) ) {
+		$image_url = (string) ( $item['image_url'] ?? '' );
+	}
+	if ( '' === $image_url && $wc_product ) {
+		$image_url = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) ?: '';
+	}
+	if ( '' === $image_url ) {
+		$image_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+	}
+
+	if ( '' === $permalink && $product_id > 0 ) {
+		$permalink = get_permalink( $product_id ) ?: '';
+	}
+	if ( '' === $permalink ) {
+		$permalink = '#';
+	}
+
+	return array(
+		'title'      => $title,
+		'price_html' => $price_html,
+		'sku'        => $sku,
+		'image_url'  => $image_url,
+		'permalink'  => $permalink,
+	);
+}
 add_action( 'untrashed_post', 'skyyrose_flush_featured_display_cache' );

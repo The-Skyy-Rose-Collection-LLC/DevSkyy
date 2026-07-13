@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — The Type System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Anton&family=Hanken+Grotesk:wght@400;500;700;800&family=Cinzel:wght@400;600;800&family=Pacifico&family=Pinyon+Script&family=Grand+Hotel&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:      oklch(0.15 0.006 25);
+    --ink-2:    oklch(0.20 0.008 25);
+    --ink-3:    oklch(0.25 0.008 25);
+    --line:     oklch(0.33 0.008 25);
+    --paper:    oklch(0.94 0.004 60);
+    --muted:    oklch(0.70 0.006 40);
+    --rose:     #B76E79;
+    --silver:   #C0C0C0;
+    --crimson:  #DC143C;
+    --gold:     #D4AF37;
+    --space-sm:8px; --space-md:16px; --space-lg:24px; --space-xl:40px; --space-2xl:72px; --space-3xl:120px;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--ink);color:var(--paper);font-family:'Hanken Grotesk',system-ui,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .disp{font-family:'Archivo';font-variation-settings:'wdth' 125,'wght' 900;line-height:.92;letter-spacing:-0.005em}
+  .eyebrow{font-family:'Cinzel';font-weight:600;letter-spacing:.34em;text-transform:uppercase;font-size:12px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 var(--space-lg)}
+  section{padding:var(--space-3xl) 0;border-bottom:1px solid var(--line)}
+  .lede{color:var(--muted);max-width:60ch}
+
+  /* ---------- HERO ---------- */
+  .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+  .hero .eyebrow{color:var(--silver);margin-bottom:var(--space-lg)}
+  .hero .disp{font-size:clamp(64px,15vw,190px);color:var(--paper)}
+  .hero .script{font-family:'Pacifico';color:var(--silver);font-size:clamp(26px,4.5vw,46px);
+    line-height:1;margin-top:var(--space-md);transform:rotate(-2deg);transform-origin:left}
+  .hero .tag{font-family:'Hanken Grotesk';font-weight:500;font-size:clamp(15px,2vw,20px);
+    color:var(--muted);margin-top:var(--space-xl);max-width:44ch}
+  .hero .tag b{color:var(--paper);font-weight:800}
+  .conc{position:absolute;inset:auto 0 -2px 0;height:34%;pointer-events:none;
+    background:linear-gradient(180deg,transparent, oklch(0.20 0.01 25));z-index:-1}
+
+  /* ---------- TYPE SCALE ---------- */
+  .scale-row{display:flex;align-items:baseline;gap:var(--space-lg);padding:var(--space-md) 0;border-top:1px solid var(--line)}
+  .scale-row .k{flex:0 0 92px;font-family:'Hanken Grotesk';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .scale-row .v{min-width:0}
+  .s-hero{font-family:'Archivo';font-variation-settings:'wdth' 125,'wght' 900;font-size:52px;line-height:1}
+  .s-h1{font-family:'Archivo';font-variation-settings:'wdth' 110,'wght' 800;font-size:34px;line-height:1.05}
+  .s-h2{font-family:'Archivo';font-variation-settings:'wdth' 100,'wght' 700;font-size:22px}
+  .s-body{font-family:'Hanken Grotesk';font-weight:400;font-size:17px;color:var(--paper)}
+  .s-cap{font-family:'Cinzel';font-weight:600;letter-spacing:.24em;text-transform:uppercase;font-size:14px;color:var(--gold)}
+  .s-anton{font-family:'Anton';font-size:44px;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+
+  /* ---------- COLLECTIONS STRIP ---------- */
+  .cols{display:grid;gap:var(--space-md);grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .col{background:var(--ink-2);border:1px solid var(--line);border-radius:2px;padding:var(--space-lg);
+    display:flex;flex-direction:column;gap:var(--space-sm);min-height:190px;justify-content:space-between}
+  .col .eyebrow{font-size:10px;letter-spacing:.28em}
+  .col .name{font-size:38px;line-height:1}
+  .col .foot{font-family:'Hanken Grotesk';font-size:12px;color:var(--muted)}
+  .c-br .eyebrow{color:var(--silver)} .c-br .name{font-family:'Pacifico';color:var(--silver);font-size:34px}
+  .c-lh .eyebrow{color:var(--crimson)} .c-lh .name{font-family:'Anton';color:var(--crimson);font-size:40px;text-transform:uppercase;letter-spacing:.01em}
+  .c-sig .eyebrow{color:var(--gold)} .c-sig .name{font-family:'Pinyon Script';color:var(--gold);font-size:44px}
+  .c-kc .eyebrow{color:var(--rose)} .c-kc .name{font-family:'Grand Hotel';color:var(--rose);font-size:40px}
+
+  /* ---------- APPLIED UI ---------- */
+  .applied{display:grid;gap:var(--space-xl);grid-template-columns:1.1fr .9fr;align-items:start}
+  @media(max-width:820px){.applied{grid-template-columns:1fr}}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:var(--space-lg);
+    padding-bottom:var(--space-lg);border-bottom:1px solid var(--line);margin-bottom:var(--space-xl)}
+  .nav .brand{font-family:'Archivo';font-variation-settings:'wdth' 120,'wght' 800;font-size:20px;letter-spacing:.02em}
+  .nav ul{display:flex;gap:var(--space-lg);list-style:none;font-family:'Hanken Grotesk';font-weight:500;font-size:14px;color:var(--muted)}
+  .card{background:var(--ink-2);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .card .ph{height:230px;background:radial-gradient(120% 90% at 50% 10%, var(--ink-3), var(--ink));
+    display:grid;place-items:center}
+  .card .ph .disp{font-size:56px;color:oklch(0.4 0.01 25)}
+  .card .body{padding:var(--space-lg);display:flex;flex-direction:column;gap:var(--space-md)}
+  .card .pname{font-family:'Archivo';font-variation-settings:'wdth' 108,'wght' 800;font-size:23px;line-height:1.05}
+  .card .desc{font-family:'Hanken Grotesk';font-size:14px;color:var(--muted);max-width:40ch}
+  .card .row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-md)}
+  .card .price{font-family:'Archivo';font-variation-settings:'wdth' 100,'wght' 800;font-size:20px;color:var(--silver)}
+  .card .meta{font-family:'Cinzel';font-weight:600;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .btns{display:flex;gap:var(--space-sm)}
+  .btn{border:0;cursor:pointer;padding:12px 20px;border-radius:2px;font-family:'Hanken Grotesk';font-weight:700;
+    font-size:13px;letter-spacing:.04em;transition:transform .18s cubic-bezier(.2,.7,.2,1),background .18s,border-color .18s,color .18s}
+  .btn-p{background:var(--silver);color:var(--ink)}
+  .btn-g{background:transparent;color:var(--paper);border:1px solid var(--line)}
+  .btn:hover{transform:translateY(-1px)} .btn-g:hover{border-color:var(--silver);color:var(--silver)}
+
+  .aside{background:var(--ink-2);border:1px solid var(--line);border-radius:2px;padding:var(--space-xl)}
+  .aside h3{font-family:'Archivo';font-variation-settings:'wdth' 108,'wght' 800;font-size:15px;
+    letter-spacing:.02em;text-transform:uppercase;margin-bottom:var(--space-lg);color:var(--paper)}
+  .lst{list-style:none;display:flex;flex-direction:column;gap:var(--space-md)}
+  .lst li{display:flex;gap:var(--space-md);align-items:baseline;font-family:'Hanken Grotesk';font-size:14px}
+  .lst .role{flex:0 0 96px;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .lst .val{color:var(--paper);font-weight:700}
+  .cut{margin-top:var(--space-xl);padding-top:var(--space-lg);border-top:1px solid var(--line);
+    font-family:'Hanken Grotesk';font-size:13px;color:var(--muted)}
+  .cut s{color:var(--crimson);opacity:.85}
+  .cut .keep{color:var(--gold)}
+
+  h2.title{font-family:'Archivo';font-variation-settings:'wdth' 115,'wght' 900;font-size:clamp(26px,4vw,40px);
+    line-height:1;margin-bottom:var(--space-md)}
+  .sec-eyebrow{color:var(--rose);margin-bottom:var(--space-md)}
+  .foot-note{padding:var(--space-2xl) 0;color:var(--muted);font-size:13px;max-width:74ch}
+  .foot-note code{font-family:'Archivo';font-variation-settings:'wght' 700;color:var(--silver)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}.hero .script{transform:none}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">The SkyyRose Collection · The Town</div>
+  <div class="disp">BLACK<br>ROSE</div>
+  <div class="script">The Black Rose Collection</div>
+  <p class="tag"><b>Luxury Grows from Concrete.</b> Type poured wide and heavy — a monument, not a caption. Every piece is the concrete answering back.</p>
+</div><div class="conc"></div></header>
+
+<!-- TYPE SCALE -->
+<section><div class="wrap">
+  <div class="eyebrow sec-eyebrow">01 — The Voices</div>
+  <h2 class="title">One system, five voices.</h2>
+  <p class="lede" style="margin-bottom:40px">Archivo Expanded carries every headline; Hanken Grotesk carries every word you read. Anton shows up only when a drop needs to shout. Cinzel engraves the labels. Scripts stay per-collection.</p>
+
+  <div class="scale-row"><div class="k">Hero · Archivo Exp</div><div class="v"><div class="s-hero">Concrete Luxury</div></div></div>
+  <div class="scale-row"><div class="k">Drop · Anton</div><div class="v"><div class="s-anton">Pre-Order Live</div></div></div>
+  <div class="scale-row"><div class="k">H1 · Archivo</div><div class="v"><div class="s-h1">Fall Reserve — Black Rose</div></div></div>
+  <div class="scale-row"><div class="k">H2 · Archivo</div><div class="v"><div class="s-h2">Sport-patch heritage, Oakland-made</div></div></div>
+  <div class="scale-row"><div class="k">Label · Cinzel</div><div class="v"><div class="s-cap">The Signature Collection</div></div></div>
+  <div class="scale-row"><div class="k">Body · Hanken</div><div class="v"><div class="s-body">In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission — it forces its way through the cracks.</div></div></div>
+</div></section>
+
+<!-- COLLECTIONS -->
+<section><div class="wrap">
+  <div class="eyebrow sec-eyebrow">02 — Per-collection scripts</div>
+  <h2 class="title">Each collection keeps its hand.</h2>
+  <p class="lede" style="margin-bottom:40px">The script is the collection's signature, matched to its lockup. Names still ship as the lockup image on heroes — these faces carry the interior accents.</p>
+  <div class="cols">
+    <div class="col c-sig"><div class="eyebrow">Signature · gold</div><div class="name">Skyy Rose</div><div class="foot">Pinyon Script — kept, matches the copperplate lockup.</div></div>
+    <div class="col c-br"><div class="eyebrow">Black Rose · silver</div><div class="name">Black Rose</div><div class="foot">Pacifico — rounded brush, matches the glossy lockup.</div></div>
+    <div class="col c-lh"><div class="eyebrow">Love Hurts · crimson</div><div class="name">LOVE HURTS</div><div class="foot">Custom face — vectorized from your graffiti-drip lockup (in progress). Anton stands in here.</div></div>
+    <div class="col c-kc"><div class="eyebrow">Kids Capsule · rose</div><div class="name">Kids Capsule</div><div class="foot">Grand Hotel — friendly rounded, warm.</div></div>
+  </div>
+</div></section>
+
+<!-- APPLIED -->
+<section><div class="wrap">
+  <div class="eyebrow sec-eyebrow">03 — In the wild</div>
+  <h2 class="title">On a real surface.</h2>
+  <div class="applied" style="margin-top:40px">
+    <div>
+      <nav class="nav">
+        <div class="brand">SKYYROSE</div>
+        <ul><li>Shop</li><li>Collections</li><li>The Town</li><li>Pre-Order</li></ul>
+      </nav>
+      <div class="card">
+        <div class="ph"><div class="disp">BR</div></div>
+        <div class="body">
+          <div class="pname">The Rose — Hockey Jersey</div>
+          <div class="desc">Hooded hockey jersey in black and teal. Rose crest on front. Exclusive edition, 80 pieces.</div>
+          <div class="row"><span class="price">$115</span><span class="meta">Pre-Order · Black Rose</span></div>
+          <div class="btns"><button class="btn btn-p">Pre-Order</button><button class="btn btn-g">View Lookbook</button></div>
+        </div>
+      </div>
+    </div>
+    <aside class="aside">
+      <h3>The stack</h3>
+      <ul class="lst">
+        <li><span class="role">Hero</span><span class="val">Archivo Expanded</span></li>
+        <li><span class="role">Body / UI</span><span class="val">Hanken Grotesk</span></li>
+        <li><span class="role">Drop</span><span class="val">Anton</span></li>
+        <li><span class="role">Eng. caps</span><span class="val">Cinzel</span></li>
+        <li><span class="role">SIG script</span><span class="val">Pinyon Script</span></li>
+        <li><span class="role">BR script</span><span class="val">Pacifico</span></li>
+        <li><span class="role">KC script</span><span class="val">Grand Hotel</span></li>
+        <li><span class="role">LH script</span><span class="val">Custom (lockup)</span></li>
+      </ul>
+      <div class="cut">
+        <span class="keep">Kept:</span> Cinzel (it's in your Signature lockup).<br>
+        <span>Cut:</span> <s>Playfair Display</s> · <s>Cormorant Garamond</s> · <s>Bebas Neue</s> — in none of your lockups.
+      </div>
+    </aside>
+  </div>
+</div></section>
+
+<div class="wrap"><p class="foot-note">Preview loads fonts from Google's CDN for comparison speed only. Production self-hosts subset <code>*-latin.woff2</code> in <code>assets/fonts/</code> (zero external CDN), bakes the stack into <code>CLAUDE.md</code> + <code>design-tokens.css</code> + <code>theme.json</code> so it stops drifting back, rebuilds <code>.min</code>, and touches skyyrose.co only on your explicit go-ahead. Reduced-motion honored.</p></div>
+
+</body>
+</html>

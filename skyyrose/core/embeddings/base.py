@@ -154,7 +154,13 @@ class BaseEncoder(ABC):
             if self._loaded:
                 return
             # Imported here (not at module top) so the package imports without torch.
-            from skyyrose.core.embeddings.device import select_device
+            try:
+                from skyyrose.core.embeddings.device import select_device
+            except ImportError as exc:
+                raise ImportError(
+                    f"{type(self).__name__} requires the 'ml' extra. "
+                    "Install with: pip install -e '.[ml]'"
+                ) from exc
 
             self._device = self._config.device or select_device()
             logger.info("Loading %s on %s", self.space.key(), self._device)

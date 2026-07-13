@@ -1,0 +1,319 @@
+/**
+ * Customer Enhancements — Batch C (2026-07-01)
+ *
+ * Covers three independently-scoped components:
+ *   1. .sr-fit-block      — PDP Fit Notes (single-product + editorial)
+ *   2. .sr-drop-block     — Homepage Drop Block (front-page.php)
+ *   3. .sr-sticky-atc     — Sticky ATC bar (editorial PDP only)
+ *
+ * Loaded on single-product and front-page slugs only via inc/enqueue.php.
+ * All transitions respect prefers-reduced-motion.
+ * Color tokens: rose-gold #B76E79, dark bg #0A0A0A, silver #C0C0C0.
+ *
+ * @package SkyyRose
+ * @since   1.6.8
+ */
+
+/* ═══════════════════════════════════════════════════════
+ * 1. Fit Notes Block
+ * ═══════════════════════════════════════════════════════ */
+
+.sr-fit-block {
+	/* Hairline rose-gold separator — strong enough to read on dark bg,
+	   soft enough not to compete with the ATC button above it. */
+	border-top: 1px solid rgba(183, 110, 121, 0.25);
+	margin-top: 20px;
+	padding-top: 16px;
+}
+
+.sr-fit-block__label {
+	font-family: "Anton", sans-serif;
+	font-size: 11px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.45);
+	margin: 0 0 8px;
+}
+
+.sr-fit-block__note {
+	font-size: 13px;
+	line-height: 1.55;
+	color: rgba(255, 255, 255, 0.75);
+	margin: 0 0 10px;
+}
+
+/* Model reference — dl keeps the label/value pairing semantically correct
+   for screen readers while rendering inline. */
+.sr-fit-block__model-specs {
+	margin: 0;
+}
+
+.sr-fit-block__model-specs dt {
+	display: inline;
+	font-family: "Anton", sans-serif;
+	font-size: 10px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.35);
+}
+
+.sr-fit-block__model-specs dt::after {
+	content: " — ";
+	color: rgba(255, 255, 255, 0.2);
+}
+
+.sr-fit-block__model-specs dd {
+	display: inline;
+	font-size: 12px;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+ * 2. Drop Block
+ * ═══════════════════════════════════════════════════════ */
+
+.sr-drop-block {
+	position: relative;
+	min-height: 480px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	background-color: #0a0a0a;
+	overflow: hidden;
+}
+
+/* Full-bleed background image. aria-hidden on the wrapper so
+   the decorative image is invisible to assistive tech. */
+.sr-drop-block__media {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+}
+
+.sr-drop-block__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+}
+
+/* Left-to-right dark film — ensures text contrast regardless of image content.
+   Gradient skews toward the left where the copy lives. */
+.sr-drop-block__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to right,
+		rgba(10, 10, 10, 0.90) 0%,
+		rgba(10, 10, 10, 0.65) 50%,
+		rgba(10, 10, 10, 0.20) 100%
+	);
+}
+
+.sr-drop-block__content {
+	position: relative;
+	z-index: 1;
+	padding: 56px 40px;
+	max-width: 560px;
+}
+
+.sr-drop-block__collection-label {
+	font-family: "Anton", sans-serif;
+	font-size: 11px;
+	letter-spacing: 0.25em;
+	color: #b76e79;
+	margin: 0 0 12px;
+}
+
+.sr-drop-block__title {
+	/* clamp: 2rem minimum, 5vw preferred, 3.5rem ceiling */
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-family: "Archivo", sans-serif;
+	font-weight: 700;
+	line-height: 1.1;
+	color: #ffffff;
+	margin: 0 0 28px;
+}
+
+.sr-drop-block__cta {
+	display: inline-block;
+	font-family: "Anton", sans-serif;
+	font-size: 14px;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #ffffff;
+	background-color: #b76e79;
+	padding: 14px 36px;
+	transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.sr-drop-block__cta:hover,
+.sr-drop-block__cta:focus-visible {
+	background-color: #9a5a64;
+	transform: translateY(-1px);
+	color: #ffffff;
+}
+
+.sr-drop-block__cta:focus-visible {
+	outline: 2px solid #b76e79;
+	outline-offset: 3px;
+}
+
+@media (min-width: 1024px) {
+	.sr-drop-block {
+		min-height: 600px;
+	}
+
+	.sr-drop-block__content {
+		padding: 80px 80px;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════
+ * 3. Sticky ATC Bar — Editorial PDPs
+ * ═══════════════════════════════════════════════════════ */
+
+/* Start off-screen and invisible. JS adds .is-visible when the trigger
+   element scrolls out of view. Separate transition from prefers-reduced-motion
+   block so the visibility logic still functions — only the animation is removed. */
+.sr-sticky-atc {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 900; /* Header sits at 1000; stays below it. */
+	background-color: #0a0a0a;
+	/* Per-collection accent (--skyyrose-accent cascades via [data-collection]
+	   on the .sr-editorial ancestor); rgba fallback keeps rose-gold default
+	   for any context without the token. */
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.35);
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 14px 20px;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(100%);
+	transition: opacity 0.28s ease, transform 0.28s ease;
+	/* Will-change hint so browser composites the layer before the animation. */
+	will-change: opacity, transform;
+}
+
+/* Visible state toggled by IntersectionObserver in the inline script. */
+.sr-sticky-atc.is-visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0);
+}
+
+/* Respect user's motion preferences — kill transitions, keep the toggle itself. */
+@media (prefers-reduced-motion: reduce) {
+	.sr-sticky-atc {
+		transition: none;
+	}
+}
+
+.sr-sticky-atc__name {
+	font-family: "Archivo", sans-serif;
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.85);
+	flex: 1 1 auto;
+	/* Truncate long product names gracefully. */
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-width: 0;
+}
+
+.sr-sticky-atc__price {
+	font-family: "Anton", sans-serif;
+	font-size: 15px;
+	letter-spacing: 0.06em;
+	color: #ffffff;
+	flex-shrink: 0;
+}
+
+/* Size select — mirrors the main WC variation form.
+   Custom arrow via SVG background replaces native OS arrow. */
+.sr-sticky-atc__size {
+	appearance: none;
+	-webkit-appearance: none;
+	background-color: transparent;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.5);
+	color: rgba(255, 255, 255, 0.75);
+	font-family: "Anton", sans-serif;
+	font-size: 13px;
+	letter-spacing: 0.1em;
+	padding: 8px 32px 8px 12px;
+	cursor: pointer;
+	flex-shrink: 0;
+	/* Inline SVG arrow — rose-gold; decorative caret, not collection-critical. */
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23B76E79'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	min-width: 90px;
+}
+
+.sr-sticky-atc__size:focus-visible {
+	outline: 1px solid var(--skyyrose-accent, #b76e79);
+	outline-offset: 2px;
+}
+
+/* Options inside the select inherit from the select itself. Dark bg needed
+   because browser-rendered option dropdowns can default to white. */
+.sr-sticky-atc__size option {
+	background-color: #0a0a0a;
+	color: #ffffff;
+}
+
+/* CTA button — accent filled per collection, Anton, matches sitewide
+   ATC style. Text color uses --sr-on-accent (single-product.css) so gold/
+   silver/rose-gold get black text and Love Hurts crimson keeps white —
+   both meet WCAG AA 4.5:1 against their own fill. */
+.sr-sticky-atc__btn {
+	appearance: none;
+	background-color: var(--skyyrose-accent, #b76e79);
+	color: var(--sr-on-accent, #000000);
+	font-family: "Anton", sans-serif;
+	font-size: 14px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	border: none;
+	padding: 10px 24px;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: background-color 0.2s ease;
+}
+
+.sr-sticky-atc__btn:hover,
+.sr-sticky-atc__btn:focus-visible {
+	background-color: var(--skyyrose-accent-dark, #9a5a64);
+	/* accent-dark is a different shade than accent — needs its own
+	   contrast token (Love Hurts flips to white here too; Kids Capsule
+	   stays black — white on its #B8960C dark shade fails contrast at
+	   2.84:1, black passes at 7.41:1. See single-product.css
+	   --sr-on-accent-dark). */
+	color: var(--sr-on-accent-dark, #000000);
+}
+
+.sr-sticky-atc__btn:focus-visible {
+	outline: 2px solid var(--skyyrose-accent, #b76e79);
+	outline-offset: 2px;
+}
+
+/* Desktop: pill anchored to bottom-right instead of full-width bar. */
+@media (min-width: 1024px) {
+	.sr-sticky-atc {
+		left: auto;
+		right: 32px;
+		bottom: 32px;
+		width: auto;
+		max-width: 480px;
+		border-radius: 2px;
+		border: 1px solid rgba(183, 110, 121, 0.35);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+	}
+}

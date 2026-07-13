@@ -19,6 +19,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Custom-logo URL for og:image / twitter:image — image MIME types only.
+ *
+ * The live custom_logo attachment has at times been a VideoPress .mp4, which
+ * silently produced og:image="…logo_400x100.mp4" and broke link previews
+ * everywhere (structural remediation WS4, F13). Social cards require a
+ * static image, so any non-image attachment yields '' and callers fall back
+ * to the static brand asset.
+ *
+ * @since 1.8.0
+ * @return string Attachment URL, or '' when unset or not an image.
+ */
+function skyyrose_og_logo_url() {
+	$logo_id = get_theme_mod( 'custom_logo' );
+	if ( ! $logo_id ) {
+		return '';
+	}
+	// Raster formats only — social crawlers (Facebook, X, LinkedIn) do not
+	// render SVG in og:image/twitter:image, so allowing it through recreates
+	// the same broken-preview class this function exists to prevent.
+	$raster_mimes = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif' );
+	$mime         = (string) get_post_mime_type( $logo_id );
+	if ( ! in_array( $mime, $raster_mimes, true ) ) {
+		return '';
+	}
+	return (string) wp_get_attachment_url( $logo_id );
+}
+
+/**
  * Add Schema.org markup for products.
  *
  * Skips output when Yoast SEO (with WooCommerce SEO add-on) is active
@@ -130,11 +158,7 @@ function skyyrose_organization_schema() {
 		return;
 	}
 
-	$logo_url = '';
-	$logo_id  = get_theme_mod( 'custom_logo' );
-	if ( $logo_id ) {
-		$logo_url = wp_get_attachment_url( $logo_id );
-	}
+	$logo_url = skyyrose_og_logo_url();
 
 	$schema = array(
 		'@context'    => 'https://schema.org',
@@ -161,7 +185,7 @@ function skyyrose_organization_schema() {
 
 	// Canonical brand social profiles — always present in sameAs.
 	$default_profiles = array(
-		'https://instagram.com/skyyroseco',
+		'https://instagram.com/skyyrose.co',
 		'https://tiktok.com/@skyyroseco',
 	);
 
@@ -603,12 +627,8 @@ function skyyrose_open_graph_tags() {
 		echo '<meta property="og:description" content="' . esc_attr( get_bloginfo( 'description' ) ) . '" />' . "\n";
 		echo '<meta property="og:url" content="' . esc_url( home_url( '/' ) ) . '" />' . "\n";
 
-		$logo_id = get_theme_mod( 'custom_logo' );
-		if ( $logo_id ) {
-			echo '<meta property="og:image" content="' . esc_url( wp_get_attachment_url( $logo_id ) ) . '" />' . "\n";
-		} else {
-			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
-		}
+		$logo_url = skyyrose_og_logo_url();
+		echo '<meta property="og:image" content="' . esc_url( $logo_url ? $logo_url : $fallback_og_image ) . '" />' . "\n";
 	} elseif ( is_tax( 'product_cat' ) ) {
 		$term = get_queried_object();
 		echo '<meta property="og:type" content="website" />' . "\n";
@@ -717,8 +737,8 @@ function skyyrose_twitter_card_tags() {
 		echo '<meta name="twitter:title" content="' . esc_attr( get_bloginfo( 'name' ) . ' — Luxury Grows from Concrete.' ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( get_bloginfo( 'description' ) ) . '" />' . "\n";
 
-		$logo_id = get_theme_mod( 'custom_logo' );
-		echo '<meta name="twitter:image" content="' . esc_url( $logo_id ? wp_get_attachment_url( $logo_id ) : $fallback_image ) . '" />' . "\n";
+		$logo_url = skyyrose_og_logo_url();
+		echo '<meta name="twitter:image" content="' . esc_url( $logo_url ? $logo_url : $fallback_image ) . '" />' . "\n";
 	} elseif ( is_tax( 'product_cat' ) ) {
 		$term = get_queried_object();
 		echo '<meta name="twitter:title" content="' . esc_attr( $term->name . ' Collection | SkyyRose' ) . '" />' . "\n";
@@ -882,6 +902,13 @@ function skyyrose_pre_document_title( $title ) {
 				return 'Shop ' . $collection_ctx['label'] . ' — Luxury Streetwear | ' . $brand;
 			}
 			return $collection_ctx['label'] . ' — Immersive Experience | ' . $brand;
+		}
+
+		// Policy pages use the default page template — no template slug to key
+		// on above, and the WP.com SEO layer strips the brand suffix, leaving a
+		// bare <title> (go-live sweep P1, regressed in the seo.php rewrite).
+		if ( is_page( array( 'privacy-policy', 'terms-of-service', 'cookie-policy', 'refund-policy' ) ) ) {
+			return get_the_title() . ' | ' . $brand;
 		}
 	}
 

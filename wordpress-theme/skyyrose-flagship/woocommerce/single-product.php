@@ -32,6 +32,12 @@ while ( have_posts() ) :
 	$meta       = skyyrose_get_product_meta();
 	$sku        = $product->get_sku();
 
+	// skyyrose_get_product_meta() backfills 'made_in' to 'USA' when the
+	// postmeta is unset, so $meta['made_in'] is never empty. Check the raw
+	// postmeta directly so the spec row only renders for products that
+	// actually have _skyyrose_made_in set.
+	$has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', true );
+
 	// Technical Garment Lock logic.
 	$catalog_entry = function_exists( 'skyyrose_get_product' ) ? skyyrose_get_product( $sku ) : null;
 
@@ -57,6 +63,9 @@ while ( have_posts() ) :
 		$main_image   = wp_get_attachment_url( $product->get_image_id() );
 		$price_html   = $product->get_price_html();
 		$stock_status = $product->get_stock_status();
+		$description  = ! empty( $catalog_entry['description'] )
+			? $catalog_entry['description']
+			: wp_strip_all_tags( $product->get_short_description() );
 		?>
 
 		<main id="product-<?php the_ID(); ?>" <?php wc_product_class( 'sr-product', $product ); ?> data-collection="<?php echo esc_attr( $collection ); ?>">
@@ -76,6 +85,8 @@ while ( have_posts() ) :
 									class="sr-gallery-img"
 									id="srMainImg"
 									alt="<?php echo esc_attr( get_the_title() ); ?>"
+									width="640"
+									height="800"
 									loading="eager"
 									decoding="async"
 									fetchpriority="high">
@@ -103,6 +114,10 @@ while ( have_posts() ) :
 							<h1 class="sr-info-name"><?php the_title(); ?></h1>
 							<div class="sr-info-price"><?php echo wp_kses_post( $price_html ); ?></div>
 
+							<?php if ( $description ) : ?>
+								<p class="sr-info-desc"><?php echo esc_html( $description ); ?></p>
+							<?php endif; ?>
+
 							<div class="sr-info-specs">
 								<div class="sr-spec">
 									<span class="sr-spec-label"><?php esc_html_e( 'GARMENT TYPE', 'skyyrose' ); ?></span>
@@ -118,7 +133,23 @@ while ( have_posts() ) :
 									<span class="sr-spec-value"><?php echo esc_html( $meta['material'] ); ?></span>
 								</div>
 								<?php endif; ?>
+								<?php if ( ! empty( $meta['fit'] ) ) : ?>
+								<div class="sr-spec">
+									<span class="sr-spec-label"><?php esc_html_e( 'FIT', 'skyyrose' ); ?></span>
+									<span class="sr-spec-value"><?php echo esc_html( $meta['fit'] ); ?></span>
+								</div>
+								<?php endif; ?>
+								<?php if ( $has_made_in ) : ?>
+								<div class="sr-spec">
+									<span class="sr-spec-label"><?php esc_html_e( 'MADE IN', 'skyyrose' ); ?></span>
+									<span class="sr-spec-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>
+								</div>
+								<?php endif; ?>
 							</div>
+
+							<button type="button" class="sr-size-guide-link sr-info-size-guide" data-open-size-guide>
+								<?php esc_html_e( 'Size Guide', 'skyyrose' ); ?>
+							</button>
 
 							<div class="sr-atc-wrap magnetic btn-sweep">
 								<?php woocommerce_template_single_add_to_cart(); ?>
@@ -132,6 +163,11 @@ while ( have_posts() ) :
 									: esc_html__( 'Pre-Order', 'skyyrose' );
 								?>
 							</div>
+							<?php
+							if ( function_exists( 'skyyrose_render_fit_block' ) ) {
+								skyyrose_render_fit_block( $product->get_id() );
+							}
+							?>
 						</div>
 					</div>
 				</div>

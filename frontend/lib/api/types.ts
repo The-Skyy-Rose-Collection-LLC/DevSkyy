@@ -26,6 +26,9 @@ export type ServiceHealthStatus = z.infer<typeof schemas.ServiceHealthStatusSche
 export type SystemStats = z.infer<typeof schemas.SystemStatsSchema>;
 export type HealthEvent = z.infer<typeof schemas.HealthEventSchema>;
 export type MonitoringHealthResponse = z.infer<typeof schemas.MonitoringHealthResponseSchema>;
+export type MetricDataPoint = z.infer<typeof schemas.MetricDataPointSchema>;
+export type MetricSeries = z.infer<typeof schemas.MetricSeriesSchema>;
+export type MonitoringMetricsResponse = z.infer<typeof schemas.MonitoringMetricsResponseSchema>;
 
 
 
@@ -105,4 +108,93 @@ export interface CatalogSearchRequest {
     q: string;
     top_k?: number;
     collection?: string;
+}
+
+// Brand Assets types
+export type BrandAssetCategory = z.infer<typeof schemas.BrandAssetCategorySchema>;
+export type AssetApprovalStatus = z.infer<typeof schemas.AssetApprovalStatusSchema>;
+export type IngestionJobStatus = z.infer<typeof schemas.IngestionJobStatusSchema>;
+export type TrainingReadinessStatus = z.infer<typeof schemas.TrainingReadinessStatusSchema>;
+export type BrandAsset = z.infer<typeof schemas.BrandAssetSchema>;
+export type BrandAssetsListResponse = z.infer<typeof schemas.BrandAssetsListResponseSchema>;
+export type CategoryStats = z.infer<typeof schemas.CategoryStatsSchema>;
+export type TrainingReadinessResponse = z.infer<typeof schemas.TrainingReadinessResponseSchema>;
+export type BulkIngestionJob = z.infer<typeof schemas.BulkIngestionJobSchema>;
+
+export interface BrandAssetUploadInput {
+    url: string;
+    category: BrandAssetCategory;
+    metadata?: {
+        campaign?: string;
+        season?: string;
+        photographer?: string;
+        location?: string;
+        tags?: string[];
+        notes?: string;
+    };
+}
+
+export interface BulkIngestionRequest {
+    assets: BrandAssetUploadInput[];
+    campaign_name?: string;
+    auto_approve?: boolean;
+    extract_features?: boolean;
+}
+
+export interface BrandAssetListFilters {
+    category?: BrandAssetCategory;
+    approvalStatus?: AssetApprovalStatus;
+    campaign?: string;
+    page?: number;
+    pageSize?: number;
+}
+
+// Asset Ingestion + Job Tracking types (distinct from the Asset gallery CRUD types above)
+export type AssetIngestResponse = z.infer<typeof schemas.AssetIngestResponseSchema>;
+export type AssetProcessingStage = z.infer<typeof schemas.AssetProcessingStageSchema>;
+export type AssetJobResponse = z.infer<typeof schemas.AssetJobResponseSchema>;
+
+export interface AssetIngestOptions {
+    source?: 'api' | 'woocommerce' | 'dashboard';
+    productId?: string;
+    processingProfile?: 'full' | 'quick' | 'background_only' | 'reformat';
+    callbackUrl?: string;
+}
+
+// Competitor Analysis types
+export type CompetitorCategory = z.infer<typeof schemas.CompetitorCategorySchema>;
+export type PricePositioning = z.infer<typeof schemas.PricePositioningSchema>;
+export type CompositionType = z.infer<typeof schemas.CompositionTypeSchema>;
+export type StyleCategory = z.infer<typeof schemas.StyleCategorySchema>;
+export type Competitor = z.infer<typeof schemas.CompetitorSchema>;
+export type CompetitorListResponse = z.infer<typeof schemas.CompetitorListResponseSchema>;
+export type CompetitorAsset = z.infer<typeof schemas.CompetitorAssetSchema>;
+export type CompetitorAssetListResponse = z.infer<typeof schemas.CompetitorAssetListResponseSchema>;
+export type StyleAnalyticsResponse = z.infer<typeof schemas.StyleAnalyticsResponseSchema>;
+export type CompetitorAnalyticsSummary = z.infer<typeof schemas.CompetitorAnalyticsSummarySchema>;
+
+export interface CompetitorCreateRequest {
+    name: string;
+    category?: CompetitorCategory;
+    price_positioning?: PricePositioning;
+    website?: string;
+    notes?: string;
+}
+
+export interface CompetitorAssetListFilters {
+    competitorId?: string;
+    competitorCategory?: CompetitorCategory;
+    pricePositioning?: PricePositioning;
+    page?: number;
+    pageSize?: number;
+}
+
+// Dynamic Pricing types
+export type PriceOptimization = z.infer<typeof schemas.PriceOptimizationSchema>;
+export type DynamicPricingResponse = z.infer<typeof schemas.DynamicPricingResponseSchema>;
+
+export interface DynamicPricingRequest {
+    product_ids: string[];
+    strategy?: 'competitive' | 'demand_based' | 'ml_optimized' | 'time_based';
+    constraints?: Record<string, unknown>;
 }

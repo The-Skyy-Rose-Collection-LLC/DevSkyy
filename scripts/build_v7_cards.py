@@ -63,6 +63,12 @@ _URI_PREFIX = "assets/images/products/v7"
 # reported by --check via the integrity note, never silently shipped).
 _FACE_ORDER: tuple[str, ...] = ("front", "alt", "back")
 
+# Base-shot raster formats in preference order. The base shot is the universal
+# ``<img>`` fallback; ``.avif`` is an enhancement sibling served via the card
+# template's ``<picture><source type="image/avif">`` and is NEVER the base URI
+# (a raw ``<img src=".avif">`` would break browsers without AVIF support).
+_BASE_EXTS: tuple[str, ...] = (".webp", ".png", ".jpg", ".jpeg")
+
 _AUTHORITY = "verdict:verified hub images only — see feedback_real_products_only"
 _GENERATED_BY = (
     "scripts/build_v7_cards.py — DO NOT EDIT. "
@@ -74,20 +80,21 @@ _GENERATED_BY = (
 def _shots_for(sku: str) -> list[dict[str, str]]:
     """Return the ordered shot list for a SKU by scanning its served V7 dir.
 
-    Picks the on-disk file per face regardless of extension (webp/png/jpg), so
-    mixed-extension promotions resolve correctly. Returns ``[]`` when the SKU
-    has no served dir.
+    Picks the base raster file per face in ``_BASE_EXTS`` preference order
+    (webp → png → jpg), so mixed-extension promotions resolve deterministically.
+    ``.avif`` siblings are ignored here — they are the ``<picture>`` enhancement,
+    not the base ``<img>`` src. Returns ``[]`` when the SKU has no served dir.
     """
     sku_dir = _V7_IMG_DIR / sku
     if not sku_dir.is_dir():
         return []
     shots: list[dict[str, str]] = []
     for face in _FACE_ORDER:
-        matches = sorted(sku_dir.glob(f"{face}.*"))
-        if not matches:
+        cands = [p for p in sku_dir.glob(f"{face}.*") if p.suffix.lower() in _BASE_EXTS]
+        if not cands:
             continue
-        filename = matches[0].name
-        shots.append({"face": face, "uri": f"{_URI_PREFIX}/{sku}/{filename}"})
+        cands.sort(key=lambda p: (_BASE_EXTS.index(p.suffix.lower()), p.name))
+        shots.append({"face": face, "uri": f"{_URI_PREFIX}/{sku}/{cands[0].name}"})
     return shots
 
 

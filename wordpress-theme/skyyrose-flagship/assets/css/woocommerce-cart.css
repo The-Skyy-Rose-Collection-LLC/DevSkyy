@@ -45,7 +45,7 @@
 }
 
 .skyy-cart__empty-title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1.75rem;
 	color: var(--color-text-primary, #fff);
 	margin: 0 0 12px;
@@ -88,7 +88,7 @@
 }
 
 .skyy-cart__title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: clamp(1.5rem, 3vw, 2.25rem);
 	color: var(--color-text-primary, #fff);
 	margin: 0;
@@ -395,7 +395,7 @@
 }
 
 .skyy-cart__summary-title {
-	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
 	font-size: 1.25rem;
 	color: var(--color-text-primary, #fff);
 	margin: 0 0 24px;

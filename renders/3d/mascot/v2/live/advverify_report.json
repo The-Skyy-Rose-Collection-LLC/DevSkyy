@@ -1,0 +1,17 @@
+{
+  "pristine": {
+    "walk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_walk_pristine.png",
+    "talk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_talk_pristine.png",
+    "point": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_point_pristine.png",
+    "wave": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_wave_pristine.png",
+    "joy": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_joy_pristine.png"
+  },
+  "fixed": {
+    "walk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_walk_fixed.png",
+    "talk": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_talk_fixed.png",
+    "point": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_point_fixed.png",
+    "wave": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_wave_fixed.png",
+    "joy": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/advverify_joy_fixed.png"
+  },
+  "idle_check": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manual-blend_idle_check.png"
+}

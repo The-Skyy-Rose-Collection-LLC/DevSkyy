@@ -111,6 +111,11 @@ def build_options() -> ClaudeAgentOptions:
     return ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT,
         model="claude-sonnet-4-6",  # pinned for reproducibility; swap to taste
+        # tools=[] removes ALL built-in tools (Bash/Read/Edit/…) from context. A commerce
+        # concierge needs none of them, and shrinking the tool surface to just our 3 MCP
+        # tools keeps the CLI below its tool-search threshold — so tools load eagerly
+        # instead of the model running a ToolSearch round-trip before every catalog call.
+        tools=[],
         mcp_servers={"catalog": catalog_server},
         allowed_tools=[
             "mcp__catalog__lookup_product",
@@ -128,20 +133,25 @@ async def ask(prompt: str, options: ClaudeAgentOptions) -> None:
     """Send one prompt and stream the response, surfacing tool calls and the final cost."""
     print(f"\n\033[1m▶ {prompt}\033[0m")
 
-    async for message in query(prompt=prompt, options=options):
-        if isinstance(message, AssistantMessage):
-            for block in message.content:
-                if isinstance(block, ToolUseBlock):
-                    # Show when Claude reaches for a catalog tool, and with what arguments.
-                    print(f"  \033[2m[tool] {block.name} {block.input}\033[0m")
-                elif isinstance(block, TextBlock):
-                    print(f"  {block.text}")
-        elif isinstance(message, ResultMessage):
-            if message.is_error:
-                print(f"  \033[31m[error] {message.subtype}\033[0m")
-            cost = message.total_cost_usd
-            if cost is not None:
-                print(f"  \033[2m(session {message.session_id[:8]} · ${cost:.4f})\033[0m")
+    # The SDK raises on an error result (e.g. credit balance too low, rate limit) AFTER
+    # yielding it, so wrap the stream and report cleanly instead of crashing the script.
+    try:
+        async for message in query(prompt=prompt, options=options):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, ToolUseBlock):
+                        # Show when Claude reaches for a catalog tool, and with what arguments.
+                        print(f"  \033[2m[tool] {block.name} {block.input}\033[0m")
+                    elif isinstance(block, TextBlock):
+                        print(f"  {block.text}")
+            elif isinstance(message, ResultMessage):
+                if message.is_error:
+                    print(f"  \033[31m[error] {message.subtype}\033[0m")
+                cost = message.total_cost_usd
+                if cost is not None:
+                    print(f"  \033[2m(session {message.session_id[:8]} · ${cost:.4f})\033[0m")
+    except Exception as exc:  # noqa: BLE001 - surface any SDK/transport error as one clean line
+        print(f"  \033[31m[api error] {exc}\033[0m")
 
 
 async def main() -> None:

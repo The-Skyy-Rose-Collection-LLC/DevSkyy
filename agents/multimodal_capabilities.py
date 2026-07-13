@@ -48,7 +48,7 @@ except ImportError:
 
 from llm.model_ids import CLAUDE_SONNET_MODEL, OPENAI_VISION_MODEL
 
-# Optional: HuggingFace multimodal (requires torch - only in requirements-full.txt)
+# Optional: HuggingFace multimodal (requires torch — install the [ml] extra from pyproject.toml)
 try:
     from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
 except ImportError:

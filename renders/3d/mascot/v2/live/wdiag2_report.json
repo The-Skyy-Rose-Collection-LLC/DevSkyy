@@ -1,0 +1,2064 @@
+{
+  "median_crotch_edge_length": 0.008832195767613007,
+  "pass1_neighbor_dist_used": 0.005833823607196753,
+  "pass1_check_was_null": true,
+  "hips_vs_rightupleg_axis_band": [
+    {
+      "index": 45917,
+      "axis_pos": -0.01485,
+      "w_hips": 0.8252,
+      "w_right": 0.0
+    },
+    {
+      "index": 46331,
+      "axis_pos": -0.01425,
+      "w_hips": 0.8322,
+      "w_right": 0.0
+    },
+    {
+      "index": 45578,
+      "axis_pos": 0.00263,
+      "w_hips": 0.8671,
+      "w_right": 0.0
+    },
+    {
+      "index": 45579,
+      "axis_pos": 0.00263,
+      "w_hips": 0.8671,
+      "w_right": 0.0
+    },
+    {
+      "index": 46332,
+      "axis_pos": 0.01116,
+      "w_hips": 0.8967,
+      "w_right": 0.0
+    },
+    {
+      "index": 46333,
+      "axis_pos": 0.01116,
+      "w_hips": 0.8967,
+      "w_right": 0.0
+    },
+    {
+      "index": 45912,
+      "axis_pos": 0.01153,
+      "w_hips": 0.8517,
+      "w_right": 0.0094
+    },
+    {
+      "index": 45916,
+      "axis_pos": 0.01185,
+      "w_hips": 0.8755,
+      "w_right": 0.0049
+    },
+    {
+      "index": 47228,
+      "axis_pos": 0.01404,
+      "w_hips": 0.9122,
+      "w_right": 0.0
+    },
+    {
+      "index": 47229,
+      "axis_pos": 0.01404,
+      "w_hips": 0.9122,
+      "w_right": 0.0
+    },
+    {
+      "index": 47230,
+      "axis_pos": 0.01404,
+      "w_hips": 0.9122,
+      "w_right": 0.0
+    },
+    {
+      "index": 46330,
+      "axis_pos": 0.01689,
+      "w_hips": 0.8866,
+      "w_right": 0.006
+    },
+    {
+      "index": 46329,
+      "axis_pos": 0.0172,
+      "w_hips": 0.8687,
+      "w_right": 0.0103
+    },
+    {
+      "index": 45580,
+      "axis_pos": 0.01755,
+      "w_hips": 0.921,
+      "w_right": 0.0017
+    },
+    {
+      "index": 45581,
+      "axis_pos": 0.01755,
+      "w_hips": 0.921,
+      "w_right": 0.0017
+    },
+    {
+      "index": 45582,
+      "axis_pos": 0.01755,
+      "w_hips": 0.921,
+      "w_right": 0.0017
+    },
+    {
+      "index": 45583,
+      "axis_pos": 0.01755,
+      "w_hips": 0.921,
+      "w_right": 0.0017
+    },
+    {
+      "index": 45913,
+      "axis_pos": 0.02004,
+      "w_hips": 0.9191,
+      "w_right": 0.0007
+    },
+    {
+      "index": 45914,
+      "axis_pos": 0.02004,
+      "w_hips": 0.9191,
+      "w_right": 0.0007
+    },
+    {
+      "index": 45915,
+      "axis_pos": 0.02004,
+      "w_hips": 0.9191,
+      "w_right": 0.0007
+    },
+    {
+      "index": 45909,
+      "axis_pos": 0.02136,
+      "w_hips": 0.8543,
+      "w_right": 0.0166
+    },
+    {
+      "index": 45910,
+      "axis_pos": 0.02136,
+      "w_hips": 0.8543,
+      "w_right": 0.0166
+    },
+    {
+      "index": 45574,
+      "axis_pos": 0.02274,
+      "w_hips": 0.8208,
+      "w_right": 0.023
+    },
+    {
+      "index": 45575,
+      "axis_pos": 0.02274,
+      "w_hips": 0.8208,
+      "w_right": 0.023
+    },
+    {
+      "index": 45911,
+      "axis_pos": 0.02289,
+      "w_hips": 0.8731,
+      "w_right": 0.0134
+    },
+    {
+      "index": 45223,
+      "axis_pos": 0.02431,
+      "w_hips": 0.8991,
+      "w_right": 0.0229
+    },
+    {
+      "index": 45224,
+      "axis_pos": 0.02431,
+      "w_hips": 0.8991,
+      "w_right": 0.0229
+    },
+    {
+      "index": 45576,
+      "axis_pos": 0.02722,
+      "w_hips": 0.8379,
+      "w_right": 0.0383
+    },
+    {
+      "index": 45577,
+      "axis_pos": 0.02722,
+      "w_hips": 0.8379,
+      "w_right": 0.0383
+    },
+    {
+      "index": 45221,
+      "axis_pos": 0.02881,
+      "w_hips": 0.8495,
+      "w_right": 0.0479
+    },
+    {
+      "index": 45222,
+      "axis_pos": 0.02881,
+      "w_hips": 0.8495,
+      "w_right": 0.0479
+    },
+    {
+      "index": 45225,
+      "axis_pos": 0.03386,
+      "w_hips": 0.9199,
+      "w_right": 0.0298
+    },
+    {
+      "index": 45226,
+      "axis_pos": 0.03386,
+      "w_hips": 0.9199,
+      "w_right": 0.0298
+    },
+    {
+      "index": 45227,
+      "axis_pos": 0.0359,
+      "w_hips": 0.919,
+      "w_right": 0.0321
+    },
+    {
+      "index": 45228,
+      "axis_pos": 0.0359,
+      "w_hips": 0.919,
+      "w_right": 0.0321
+    },
+    {
+      "index": 45229,
+      "axis_pos": 0.0359,
+      "w_hips": 0.919,
+      "w_right": 0.0321
+    },
+    {
+      "index": 45230,
+      "axis_pos": 0.0359,
+      "w_hips": 0.919,
+      "w_right": 0.0321
+    },
+    {
+      "index": 45219,
+      "axis_pos": 0.04119,
+      "w_hips": 0.7499,
+      "w_right": 0.1141
+    },
+    {
+      "index": 45220,
+      "axis_pos": 0.04119,
+      "w_hips": 0.7499,
+      "w_right": 0.1141
+    },
+    {
+      "index": 44876,
+      "axis_pos": 0.0414,
+      "w_hips": 0.88,
+      "w_right": 0.0525
+    },
+    {
+      "index": 44877,
+      "axis_pos": 0.0414,
+      "w_hips": 0.88,
+      "w_right": 0.0525
+    },
+    {
+      "index": 44878,
+      "axis_pos": 0.0414,
+      "w_hips": 0.88,
+      "w_right": 0.0525
+    },
+    {
+      "index": 44879,
+      "axis_pos": 0.0414,
+      "w_hips": 0.88,
+      "w_right": 0.0525
+    },
+    {
+      "index": 44598,
+      "axis_pos": 0.04365,
+      "w_hips": 0.8873,
+      "w_right": 0.0649
+    },
+    {
+      "index": 44599,
+      "axis_pos": 0.04365,
+      "w_hips": 0.8873,
+      "w_right": 0.0649
+    },
+    {
+      "index": 44600,
+      "axis_pos": 0.04365,
+      "w_hips": 0.8873,
+      "w_right": 0.0649
+    },
+    {
+      "index": 44867,
+      "axis_pos": 0.04387,
+      "w_hips": 0.7324,
+      "w_right": 0.1275
+    },
+    {
+      "index": 44868,
+      "axis_pos": 0.04387,
+      "w_hips": 0.7324,
+      "w_right": 0.1275
+    },
+    {
+      "index": 44869,
+      "axis_pos": 0.04387,
+      "w_hips": 0.7324,
+      "w_right": 0.1275
+    },
+    {
+      "index": 44872,
+      "axis_pos": 0.04449,
+      "w_hips": 0.7613,
+      "w_right": 0.1251
+    },
+    {
+      "index": 44873,
+      "axis_pos": 0.04449,
+      "w_hips": 0.7613,
+      "w_right": 0.1251
+    },
+    {
+      "index": 43748,
+      "axis_pos": 0.04481,
+      "w_hips": 0.8831,
+      "w_right": 0.0674
+    },
+    {
+      "index": 43749,
+      "axis_pos": 0.04481,
+      "w_hips": 0.8831,
+      "w_right": 0.0674
+    },
+    {
+      "index": 43750,
+      "axis_pos": 0.04481,
+      "w_hips": 0.8831,
+      "w_right": 0.0674
+    },
+    {
+      "index": 44587,
+      "axis_pos": 0.04603,
+      "w_hips": 0.7282,
+      "w_right": 0.142
+    },
+    {
+      "index": 44588,
+      "axis_pos": 0.04603,
+      "w_hips": 0.7282,
+      "w_right": 0.142
+    },
+    {
+      "index": 44589,
+      "axis_pos": 0.04603,
+      "w_hips": 0.7282,
+      "w_right": 0.142
+    },
+    {
+      "index": 44249,
+      "axis_pos": 0.04672,
+      "w_hips": 0.6993,
+      "w_right": 0.1543
+    },
+    {
+      "index": 44250,
+      "axis_pos": 0.04672,
+      "w_hips": 0.6993,
+      "w_right": 0.1543
+    },
+    {
+      "index": 44245,
+      "axis_pos": 0.04941,
+      "w_hips": 0.7134,
+      "w_right": 0.1726
+    },
+    {
+      "index": 44246,
+      "axis_pos": 0.04941,
+      "w_hips": 0.7134,
+      "w_right": 0.1726
+    },
+    {
+      "index": 44247,
+      "axis_pos": 0.04941,
+      "w_hips": 0.7134,
+      "w_right": 0.1726
+    },
+    {
+      "index": 44248,
+      "axis_pos": 0.04941,
+      "w_hips": 0.7134,
+      "w_right": 0.1726
+    },
+    {
+      "index": 43205,
+      "axis_pos": 0.0501,
+      "w_hips": 0.7084,
+      "w_right": 0.198
+    },
+    {
+      "index": 43206,
+      "axis_pos": 0.0501,
+      "w_hips": 0.7084,
+      "w_right": 0.198
+    },
+    {
+      "index": 42343,
+      "axis_pos": 0.05035,
+      "w_hips": 0.8405,
+      "w_right": 0.0941
+    },
+    {
+      "index": 42344,
+      "axis_pos": 0.05035,
+      "w_hips": 0.8405,
+      "w_right": 0.0941
+    },
+    {
+      "index": 43198,
+      "axis_pos": 0.05057,
+      "w_hips": 0.6984,
+      "w_right": 0.2068
+    },
+    {
+      "index": 43199,
+      "axis_pos": 0.05057,
+      "w_hips": 0.6984,
+      "w_right": 0.2068
+    },
+    {
+      "index": 43730,
+      "axis_pos": 0.05103,
+      "w_hips": 0.7193,
+      "w_right": 0.1859
+    },
+    {
+      "index": 43731,
+      "axis_pos": 0.05103,
+      "w_hips": 0.7193,
+      "w_right": 0.1859
+    },
+    {
+      "index": 43732,
+      "axis_pos": 0.05103,
+      "w_hips": 0.7193,
+      "w_right": 0.1859
+    },
+    {
+      "index": 43197,
+      "axis_pos": 0.05148,
+      "w_hips": 0.7126,
+      "w_right": 0.1852
+    },
+    {
+      "index": 41580,
+      "axis_pos": 0.05323,
+      "w_hips": 0.8123,
+      "w_right": 0.1091
+    },
+    {
+      "index": 41581,
+      "axis_pos": 0.05323,
+      "w_hips": 0.8123,
+      "w_right": 0.1091
+    },
+    {
+      "index": 42749,
+      "axis_pos": 0.05325,
+      "w_hips": 0.6807,
+      "w_right": 0.2332
+    },
+    {
+      "index": 42750,
+      "axis_pos": 0.05325,
+      "w_hips": 0.6807,
+      "w_right": 0.2332
+    },
+    {
+      "index": 42751,
+      "axis_pos": 0.05325,
+      "w_hips": 0.6807,
+      "w_right": 0.2332
+    },
+    {
+      "index": 42744,
+      "axis_pos": 0.05411,
+      "w_hips": 0.6701,
+      "w_right": 0.2285
+    },
+    {
+      "index": 42745,
+      "axis_pos": 0.05411,
+      "w_hips": 0.6701,
+      "w_right": 0.2285
+    },
+    {
+      "index": 43200,
+      "axis_pos": 0.05493,
+      "w_hips": 0.6817,
+      "w_right": 0.2435
+    },
+    {
+      "index": 43201,
+      "axis_pos": 0.05493,
+      "w_hips": 0.6817,
+      "w_right": 0.2435
+    },
+    {
+      "index": 43728,
+      "axis_pos": 0.05626,
+      "w_hips": 0.7048,
+      "w_right": 0.2295
+    },
+    {
+      "index": 43729,
+      "axis_pos": 0.05626,
+      "w_hips": 0.7048,
+      "w_right": 0.2295
+    },
+    {
+      "index": 44596,
+      "axis_pos": 0.05715,
+      "w_hips": 0.7191,
+      "w_right": 0.2265
+    },
+    {
+      "index": 44597,
+      "axis_pos": 0.05715,
+      "w_hips": 0.7191,
+      "w_right": 0.2265
+    },
+    {
+      "index": 43202,
+      "axis_pos": 0.05779,
+      "w_hips": 0.6836,
+      "w_right": 0.2552
+    },
+    {
+      "index": 43203,
+      "axis_pos": 0.05779,
+      "w_hips": 0.6836,
+      "w_right": 0.2552
+    },
+    {
+      "index": 43204,
+      "axis_pos": 0.05779,
+      "w_hips": 0.6836,
+      "w_right": 0.2552
+    },
+    {
+      "index": 42743,
+      "axis_pos": 0.05783,
+      "w_hips": 0.6735,
+      "w_right": 0.2488
+    },
+    {
+      "index": 44267,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 44268,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 44269,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 44270,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 44271,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 44272,
+      "axis_pos": 0.05789,
+      "w_hips": 0.7086,
+      "w_right": 0.2342
+    },
+    {
+      "index": 41177,
+      "axis_pos": 0.05803,
+      "w_hips": 0.7663,
+      "w_right": 0.1467
+    },
+    {
+      "index": 41178,
+      "axis_pos": 0.05803,
+      "w_hips": 0.7663,
+      "w_right": 0.1467
+    },
+    {
+      "index": 41179,
+      "axis_pos": 0.05803,
+      "w_hips": 0.7663,
+      "w_right": 0.1467
+    },
+    {
+      "index": 42739,
+      "axis_pos": 0.05812,
+      "w_hips": 0.6067,
+      "w_right": 0.2802
+    },
+    {
+      "index": 42740,
+      "axis_pos": 0.05812,
+      "w_hips": 0.6067,
+      "w_right": 0.2802
+    },
+    {
+      "index": 42741,
+      "axis_pos": 0.05928,
+      "w_hips": 0.6182,
+      "w_right": 0.2827
+    },
+    {
+      "index": 44594,
+      "axis_pos": 0.06022,
+      "w_hips": 0.7046,
+      "w_right": 0.247
+    },
+    {
+      "index": 44595,
+      "axis_pos": 0.06022,
+      "w_hips": 0.7046,
+      "w_right": 0.247
+    },
+    {
+      "index": 43191,
+      "axis_pos": 0.0615,
+      "w_hips": 0.5556,
+      "w_right": 0.312
+    },
+    {
+      "index": 43194,
+      "axis_pos": 0.06161,
+      "w_hips": 0.6587,
+      "w_right": 0.2799
+    },
+    {
+      "index": 43195,
+      "axis_pos": 0.06161,
+      "w_hips": 0.6587,
+      "w_right": 0.2799
+    },
+    {
+      "index": 43196,
+      "axis_pos": 0.06161,
+      "w_hips": 0.6587,
+      "w_right": 0.2799
+    },
+    {
+      "index": 44265,
+      "axis_pos": 0.06298,
+      "w_hips": 0.6841,
+      "w_right": 0.271
+    },
+    {
+      "index": 44266,
+      "axis_pos": 0.06298,
+      "w_hips": 0.6841,
+      "w_right": 0.271
+    },
+    {
+      "index": 42737,
+      "axis_pos": 0.06494,
+      "w_hips": 0.5212,
+      "w_right": 0.3632
+    },
+    {
+      "index": 42738,
+      "axis_pos": 0.06494,
+      "w_hips": 0.5212,
+      "w_right": 0.3632
+    },
+    {
+      "index": 44253,
+      "axis_pos": 0.06569,
+      "w_hips": 0.6352,
+      "w_right": 0.3146
+    },
+    {
+      "index": 44254,
+      "axis_pos": 0.06569,
+      "w_hips": 0.6352,
+      "w_right": 0.3146
+    },
+    {
+      "index": 43742,
+      "axis_pos": 0.06736,
+      "w_hips": 0.6631,
+      "w_right": 0.3036
+    },
+    {
+      "index": 43743,
+      "axis_pos": 0.06736,
+      "w_hips": 0.6631,
+      "w_right": 0.3036
+    },
+    {
+      "index": 43744,
+      "axis_pos": 0.06736,
+      "w_hips": 0.6631,
+      "w_right": 0.3036
+    },
+    {
+      "index": 42333,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42334,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42335,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42336,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42337,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42338,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 42339,
+      "axis_pos": 0.0675,
+      "w_hips": 0.6789,
+      "w_right": 0.295
+    },
+    {
+      "index": 43207,
+      "axis_pos": 0.06827,
+      "w_hips": 0.6263,
+      "w_right": 0.3396
+    },
+    {
+      "index": 43208,
+      "axis_pos": 0.06827,
+      "w_hips": 0.6263,
+      "w_right": 0.3396
+    },
+    {
+      "index": 43209,
+      "axis_pos": 0.06827,
+      "w_hips": 0.6263,
+      "w_right": 0.3396
+    },
+    {
+      "index": 42746,
+      "axis_pos": 0.07,
+      "w_hips": 0.6315,
+      "w_right": 0.3449
+    },
+    {
+      "index": 42747,
+      "axis_pos": 0.07,
+      "w_hips": 0.6315,
+      "w_right": 0.3449
+    },
+    {
+      "index": 42748,
+      "axis_pos": 0.07,
+      "w_hips": 0.6315,
+      "w_right": 0.3449
+    },
+    {
+      "index": 43189,
+      "axis_pos": 0.0713,
+      "w_hips": 0.4235,
+      "w_right": 0.4321
+    },
+    {
+      "index": 43190,
+      "axis_pos": 0.0713,
+      "w_hips": 0.4235,
+      "w_right": 0.4321
+    },
+    {
+      "index": 43722,
+      "axis_pos": 0.07272,
+      "w_hips": 0.4724,
+      "w_right": 0.4293
+    },
+    {
+      "index": 42013,
+      "axis_pos": 0.07291,
+      "w_hips": 0.6267,
+      "w_right": 0.3595
+    },
+    {
+      "index": 42014,
+      "axis_pos": 0.07291,
+      "w_hips": 0.6267,
+      "w_right": 0.3595
+    },
+    {
+      "index": 42015,
+      "axis_pos": 0.07291,
+      "w_hips": 0.6267,
+      "w_right": 0.3595
+    },
+    {
+      "index": 42009,
+      "axis_pos": 0.07357,
+      "w_hips": 0.6202,
+      "w_right": 0.3667
+    },
+    {
+      "index": 42010,
+      "axis_pos": 0.07357,
+      "w_hips": 0.6202,
+      "w_right": 0.3667
+    },
+    {
+      "index": 42011,
+      "axis_pos": 0.07357,
+      "w_hips": 0.6202,
+      "w_right": 0.3667
+    },
+    {
+      "index": 42012,
+      "axis_pos": 0.07357,
+      "w_hips": 0.6202,
+      "w_right": 0.3667
+    },
+    {
+      "index": 44244,
+      "axis_pos": 0.07481,
+      "w_hips": 0.4695,
+      "w_right": 0.4514
+    },
+    {
+      "index": 42004,
+      "axis_pos": 0.07611,
+      "w_hips": 0.6106,
+      "w_right": 0.3791
+    },
+    {
+      "index": 42005,
+      "axis_pos": 0.07611,
+      "w_hips": 0.6106,
+      "w_right": 0.3791
+    },
+    {
+      "index": 42006,
+      "axis_pos": 0.07611,
+      "w_hips": 0.6106,
+      "w_right": 0.3791
+    },
+    {
+      "index": 42007,
+      "axis_pos": 0.07611,
+      "w_hips": 0.6106,
+      "w_right": 0.3791
+    },
+    {
+      "index": 43192,
+      "axis_pos": 0.07776,
+      "w_hips": 0.4464,
+      "w_right": 0.4858
+    },
+    {
+      "index": 43193,
+      "axis_pos": 0.07776,
+      "w_hips": 0.4464,
+      "w_right": 0.4858
+    },
+    {
+      "index": 42003,
+      "axis_pos": 0.07859,
+      "w_hips": 0.5818,
+      "w_right": 0.4071
+    },
+    {
+      "index": 42331,
+      "axis_pos": 0.07916,
+      "w_hips": 0.6088,
+      "w_right": 0.3763
+    },
+    {
+      "index": 42332,
+      "axis_pos": 0.07916,
+      "w_hips": 0.6088,
+      "w_right": 0.3763
+    },
+    {
+      "index": 42016,
+      "axis_pos": 0.0792,
+      "w_hips": 0.6136,
+      "w_right": 0.3694
+    },
+    {
+      "index": 42017,
+      "axis_pos": 0.0792,
+      "w_hips": 0.6136,
+      "w_right": 0.3694
+    },
+    {
+      "index": 42018,
+      "axis_pos": 0.0792,
+      "w_hips": 0.6136,
+      "w_right": 0.3694
+    },
+    {
+      "index": 42008,
+      "axis_pos": 0.08394,
+      "w_hips": 0.5577,
+      "w_right": 0.4287
+    },
+    {
+      "index": 41577,
+      "axis_pos": 0.08405,
+      "w_hips": 0.5799,
+      "w_right": 0.4044
+    },
+    {
+      "index": 41578,
+      "axis_pos": 0.08405,
+      "w_hips": 0.5799,
+      "w_right": 0.4044
+    },
+    {
+      "index": 41579,
+      "axis_pos": 0.08405,
+      "w_hips": 0.5799,
+      "w_right": 0.4044
+    },
+    {
+      "index": 41174,
+      "axis_pos": 0.08547,
+      "w_hips": 0.5804,
+      "w_right": 0.3936
+    },
+    {
+      "index": 41175,
+      "axis_pos": 0.08547,
+      "w_hips": 0.5804,
+      "w_right": 0.3936
+    },
+    {
+      "index": 41176,
+      "axis_pos": 0.08547,
+      "w_hips": 0.5804,
+      "w_right": 0.3936
+    },
+    {
+      "index": 44221,
+      "axis_pos": 0.0875,
+      "w_hips": 0.3034,
+      "w_right": 0.5927
+    },
+    {
+      "index": 39918,
+      "axis_pos": 0.08934,
+      "w_hips": 0.5534,
+      "w_right": 0.4244
+    },
+    {
+      "index": 39919,
+      "axis_pos": 0.08934,
+      "w_hips": 0.5534,
+      "w_right": 0.4244
+    },
+    {
+      "index": 39916,
+      "axis_pos": 0.08962,
+      "w_hips": 0.5354,
+      "w_right": 0.4462
+    },
+    {
+      "index": 39917,
+      "axis_pos": 0.08962,
+      "w_hips": 0.5354,
+      "w_right": 0.4462
+    },
+    {
+      "index": 44222,
+      "axis_pos": 0.09236,
+      "w_hips": 0.2975,
+      "w_right": 0.6291
+    },
+    {
+      "index": 38964,
+      "axis_pos": 0.09301,
+      "w_hips": 0.5273,
+      "w_right": 0.4502
+    },
+    {
+      "index": 38965,
+      "axis_pos": 0.09301,
+      "w_hips": 0.5273,
+      "w_right": 0.4502
+    },
+    {
+      "index": 38966,
+      "axis_pos": 0.09301,
+      "w_hips": 0.5273,
+      "w_right": 0.4502
+    },
+    {
+      "index": 38967,
+      "axis_pos": 0.09301,
+      "w_hips": 0.5273,
+      "w_right": 0.4502
+    },
+    {
+      "index": 36493,
+      "axis_pos": 0.09665,
+      "w_hips": 0.5055,
+      "w_right": 0.4625
+    },
+    {
+      "index": 42736,
+      "axis_pos": 0.09867,
+      "w_hips": 0.3908,
+      "w_right": 0.5973
+    },
+    {
+      "index": 41170,
+      "axis_pos": 0.10164,
+      "w_hips": 0.3673,
+      "w_right": 0.6299
+    },
+    {
+      "index": 41171,
+      "axis_pos": 0.10164,
+      "w_hips": 0.3673,
+      "w_right": 0.6299
+    },
+    {
+      "index": 41172,
+      "axis_pos": 0.10164,
+      "w_hips": 0.3673,
+      "w_right": 0.6299
+    },
+    {
+      "index": 41173,
+      "axis_pos": 0.10164,
+      "w_hips": 0.3673,
+      "w_right": 0.6299
+    },
+    {
+      "index": 42325,
+      "axis_pos": 0.10493,
+      "w_hips": 0.2795,
+      "w_right": 0.6926
+    },
+    {
+      "index": 43168,
+      "axis_pos": 0.11426,
+      "w_hips": 0.1564,
+      "w_right": 0.8095
+    }
+  ],
+  "max_single_step_w_hips_jump": 0.277,
+  "max_single_step_jump_pair": [
+    41176,
+    44221
+  ],
+  "clips": {
+    "walk": {
+      "peak_frame": 86,
+      "eval_live": true,
+      "same_leg_fold_pair_count": 5,
+      "cross_leg_pair_count": 0,
+      "same_leg_fold_pairs_sample": [
+        {
+          "vert_a": 43181,
+          "vert_b": 44239,
+          "deformed_dist": 0.00736,
+          "weight_diff": 0.602,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.661,
+            0.287,
+            0.052
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 44240,
+          "deformed_dist": 0.00736,
+          "weight_diff": 0.602,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.661,
+            0.287,
+            0.052
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 44262,
+          "deformed_dist": 0.00852,
+          "weight_diff": 0.622,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.68,
+            0.277,
+            0.043
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 44263,
+          "deformed_dist": 0.00852,
+          "weight_diff": 0.622,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.68,
+            0.277,
+            0.043
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 44264,
+          "deformed_dist": 0.00852,
+          "weight_diff": 0.622,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.68,
+            0.277,
+            0.043
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        }
+      ],
+      "cross_leg_pairs_sample": []
+    },
+    "talk": {
+      "peak_frame": 15,
+      "eval_live": true,
+      "same_leg_fold_pair_count": 109,
+      "cross_leg_pair_count": 2,
+      "same_leg_fold_pairs_sample": [
+        {
+          "vert_a": 41165,
+          "vert_b": 41177,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41165,
+          "vert_b": 41178,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41165,
+          "vert_b": 41179,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41166,
+          "vert_b": 41177,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41166,
+          "vert_b": 41178,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41166,
+          "vert_b": 41179,
+          "deformed_dist": 0.00782,
+          "weight_diff": 0.974,
+          "weight_a": [
+            0.026,
+            0.586,
+            0.387
+          ],
+          "weight_b": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 41574,
+          "deformed_dist": 0.00612,
+          "weight_diff": 0.894,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.068,
+            0.43,
+            0.503
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 42730,
+          "deformed_dist": 0.00429,
+          "weight_diff": 0.798,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.152,
+            0.265,
+            0.583
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 42731,
+          "deformed_dist": 0.00429,
+          "weight_diff": 0.798,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.152,
+            0.265,
+            0.583
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 42732,
+          "deformed_dist": 0.00429,
+          "weight_diff": 0.798,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.152,
+            0.265,
+            0.583
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43161,
+          "deformed_dist": 0.00754,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43162,
+          "deformed_dist": 0.00754,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43163,
+          "deformed_dist": 0.00754,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43170,
+          "deformed_dist": 0.00831,
+          "weight_diff": 0.772,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.173,
+            0.265,
+            0.563
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43171,
+          "deformed_dist": 0.00831,
+          "weight_diff": 0.772,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.173,
+            0.265,
+            0.563
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43172,
+          "deformed_dist": 0.00831,
+          "weight_diff": 0.772,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.173,
+            0.265,
+            0.563
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43173,
+          "deformed_dist": 0.00831,
+          "weight_diff": 0.772,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.173,
+            0.265,
+            0.563
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43688,
+          "deformed_dist": 0.00675,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43689,
+          "deformed_dist": 0.00675,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43690,
+          "deformed_dist": 0.0088,
+          "weight_diff": 0.751,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.19,
+            0.253,
+            0.557
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        }
+      ],
+      "cross_leg_pairs_sample": [
+        {
+          "vert_a": 36489,
+          "vert_b": 43168,
+          "deformed_dist": 0.00865,
+          "weight_diff": 0.615,
+          "weight_a": [
+            0.012,
+            0.522,
+            0.465
+          ],
+          "weight_b": [
+            0.156,
+            0.033,
+            0.809
+          ],
+          "dominant_a": "left",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 36490,
+          "vert_b": 43168,
+          "deformed_dist": 0.00905,
+          "weight_diff": 0.69,
+          "weight_a": [
+            0.003,
+            0.58,
+            0.417
+          ],
+          "weight_b": [
+            0.156,
+            0.033,
+            0.809
+          ],
+          "dominant_a": "left",
+          "dominant_b": "right"
+        }
+      ]
+    },
+    "point": {
+      "peak_frame": 59,
+      "eval_live": true,
+      "same_leg_fold_pair_count": 3,
+      "cross_leg_pair_count": 0,
+      "same_leg_fold_pairs_sample": [
+        {
+          "vert_a": 43181,
+          "vert_b": 43735,
+          "deformed_dist": 0.00766,
+          "weight_diff": 0.609,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.676,
+            0.29,
+            0.033
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 43736,
+          "deformed_dist": 0.00766,
+          "weight_diff": 0.609,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.676,
+            0.29,
+            0.033
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        },
+        {
+          "vert_a": 43181,
+          "vert_b": 43737,
+          "deformed_dist": 0.00766,
+          "weight_diff": 0.609,
+          "weight_a": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "weight_b": [
+            0.676,
+            0.29,
+            0.033
+          ],
+          "dominant_a": "left",
+          "dominant_b": "hips"
+        }
+      ],
+      "cross_leg_pairs_sample": []
+    },
+    "wave": {
+      "peak_frame": 27,
+      "eval_live": true,
+      "same_leg_fold_pair_count": 23,
+      "cross_leg_pair_count": 0,
+      "same_leg_fold_pairs_sample": [
+        {
+          "vert_a": 41177,
+          "vert_b": 43161,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43162,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43163,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43688,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 43689,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 44223,
+          "deformed_dist": 0.00471,
+          "weight_diff": 0.727,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.224,
+            0.181,
+            0.596
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41177,
+          "vert_b": 44224,
+          "deformed_dist": 0.00471,
+          "weight_diff": 0.727,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.224,
+            0.181,
+            0.596
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 43161,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 43162,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 43163,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 43688,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 43689,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 44223,
+          "deformed_dist": 0.00471,
+          "weight_diff": 0.727,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.224,
+            0.181,
+            0.596
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41178,
+          "vert_b": 44224,
+          "deformed_dist": 0.00471,
+          "weight_diff": 0.727,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.224,
+            0.181,
+            0.596
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 43161,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 43162,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 43163,
+          "deformed_dist": 0.00478,
+          "weight_diff": 0.776,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.186,
+            0.188,
+            0.626
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 43688,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 43689,
+          "deformed_dist": 0.00653,
+          "weight_diff": 0.768,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.185,
+            0.212,
+            0.603
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        },
+        {
+          "vert_a": 41179,
+          "vert_b": 44223,
+          "deformed_dist": 0.00471,
+          "weight_diff": 0.727,
+          "weight_a": [
+            0.766,
+            0.0,
+            0.147
+          ],
+          "weight_b": [
+            0.224,
+            0.181,
+            0.596
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "right"
+        }
+      ],
+      "cross_leg_pairs_sample": []
+    },
+    "joy": {
+      "peak_frame": 12,
+      "eval_live": true,
+      "same_leg_fold_pair_count": 2,
+      "cross_leg_pair_count": 0,
+      "same_leg_fold_pairs_sample": [
+        {
+          "vert_a": 42341,
+          "vert_b": 43181,
+          "deformed_dist": 0.00846,
+          "weight_diff": 0.731,
+          "weight_a": [
+            0.753,
+            0.195,
+            0.0
+          ],
+          "weight_b": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "left"
+        },
+        {
+          "vert_a": 42342,
+          "vert_b": 43181,
+          "deformed_dist": 0.00846,
+          "weight_diff": 0.731,
+          "weight_a": [
+            0.753,
+            0.195,
+            0.0
+          ],
+          "weight_b": [
+            0.26,
+            0.734,
+            0.006
+          ],
+          "dominant_a": "hips",
+          "dominant_b": "left"
+        }
+      ],
+      "cross_leg_pairs_sample": []
+    }
+  }
+}

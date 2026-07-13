@@ -6,15 +6,21 @@
  * - Image element simultaneously runs a walk-step cycle (body bob + sway)
  * Together these produce a believable character walking across the screen.
  *
+ * Motion is OPT-IN (see mascot.css's "Motion — opt-in only" note): every
+ * rule in this file that applies an `animation` lives inside
+ * `@media (prefers-reduced-motion: no-preference)` below. Nothing here
+ * animates unconditionally.
+ *
  * @package SkyyRose_Flagship
  * @since   5.0.0
  */
 
 /* ==========================================================================
-   Walk Step — applied to the image during container walk-on
-   Simulates the stepping motion: subtle left-right sway + vertical bounce
+   Keyframes (inert until referenced inside the no-preference block)
    ========================================================================== */
 
+/* Walk Step — applied to the image during container walk-on.
+   Simulates the stepping motion: subtle left-right sway + vertical bounce. */
 @keyframes skyy-walk-step {
 	0%   { transform: rotate(-2deg)  translateY(0px)   scale(1);     }
 	12%  { transform: rotate(-3deg)  translateY(-5px)  scale(1.01);  }
@@ -27,26 +33,14 @@
 	100% { transform: rotate(-2deg)  translateY(0px)   scale(1);     }
 }
 
-/* Played during walk-on — image bobs while container slides */
-.skyyrose-mascot--entering .skyyrose-mascot__image {
-	animation: skyy-walk-step 0.42s ease-in-out infinite;
-}
-
-/* On walk-off — slight lean forward as she exits */
+/* On walk-off — slight lean forward as she exits. */
 @keyframes skyy-walk-off-lean {
 	0%   { transform: rotate(0deg) scale(1); }
 	30%  { transform: rotate(5deg) scale(0.96); }
 	100% { transform: rotate(8deg) scale(0.85); }
 }
 
-.skyyrose-mascot--exiting .skyyrose-mascot__image {
-	animation: skyy-walk-off-lean 0.6s ease-in forwards !important;
-}
-
-/* ==========================================================================
-   Enhanced Idle — richer breathing with subtle hair sway
-   ========================================================================== */
-
+/* Enhanced Idle — richer breathing with subtle hair sway. */
 @keyframes skyy-breathe-enhanced {
 	0%   {
 		transform: translateY(0px) rotate(0deg);
@@ -70,15 +64,7 @@
 	}
 }
 
-/* Override mascot.min.css idle animation with richer version */
-.skyyrose-mascot--idle .skyyrose-mascot__image {
-	animation: skyy-breathe-enhanced 3.8s ease-in-out infinite !important;
-}
-
-/* ==========================================================================
-   Speaking — character leans toward bubble, pulses with speech rhythm
-   ========================================================================== */
-
+/* Speaking — character leans toward bubble, pulses with speech rhythm. */
 @keyframes skyy-talk {
 	0%   { transform: translateX(0)    rotate(0deg)    scale(1.000); }
 	15%  { transform: translateX(-4px) rotate(-1deg)   scale(1.015); }
@@ -89,14 +75,7 @@
 	100% { transform: translateX(0)    rotate(0deg)    scale(1.000); }
 }
 
-.skyy--speaking .skyyrose-mascot__image {
-	animation: skyy-talk 0.72s ease-in-out infinite !important;
-}
-
-/* ==========================================================================
-   Excited — Pixar jump (overshoot + settle)
-   ========================================================================== */
-
+/* Excited — Pixar jump (overshoot + settle). */
 @keyframes skyy-jump {
 	0%   { transform: translateY(0)    rotate(0deg)   scale(1);    }
 	20%  { transform: translateY(-3px) rotate(-2deg)  scale(1.02); }
@@ -107,26 +86,16 @@
 	100% { transform: translateY(0)    rotate(0deg)   scale(1);    }
 }
 
-.skyy--excited .skyyrose-mascot__image {
-	animation: skyy-jump 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
-}
-
-/* ==========================================================================
-   Glancing — turns head toward products (slight tilt + glow)
-   ========================================================================== */
-
+/* Glancing — turns head toward products (slight tilt + glow). */
 @keyframes skyy-glance {
 	0%,100% { transform: rotate(0deg); filter: drop-shadow(0 12px 32px rgba(0,0,0,0.35)); }
 	40%     { transform: rotate(-4deg) scale(1.02); filter: drop-shadow(0 12px 32px rgba(183,110,121,0.6)); }
 	60%     { transform: rotate(-5deg) scale(1.02); filter: drop-shadow(0 14px 36px rgba(183,110,121,0.65)); }
 }
 
-.skyy--glancing .skyyrose-mascot__image {
-	animation: skyy-glance 2s ease-in-out forwards !important;
-}
-
 /* ==========================================================================
-   Character placeholder (when image file not yet deployed)
+   Character placeholder (when image file not yet deployed) — static, no
+   animation, so it's unaffected by the motion opt-in below.
    ========================================================================== */
 
 .skyyrose-mascot__image-placeholder {
@@ -142,18 +111,36 @@
 }
 
 /* ==========================================================================
-   Reduced-motion overrides — all walk enhancements off
+   Motion — opt-in only (SC 2.3.3 / 2.2.2)
+
+   Every animation this file adds on top of mascot.css's base keyframes
+   lives here, gated behind prefers-reduced-motion: no-preference.
    ========================================================================== */
 
-@media (prefers-reduced-motion: reduce) {
-	.skyyrose-mascot--entering .skyyrose-mascot__image,
-	.skyyrose-mascot--exiting .skyyrose-mascot__image,
-	.skyyrose-mascot--idle .skyyrose-mascot__image,
-	.skyy--speaking .skyyrose-mascot__image,
-	.skyy--excited .skyyrose-mascot__image,
+@media (prefers-reduced-motion: no-preference) {
+	/* Played during walk-on — image bobs while container slides. */
+	.skyyrose-mascot--entering .skyyrose-mascot__image {
+		animation: skyy-walk-step 0.42s ease-in-out infinite;
+	}
+
+	.skyyrose-mascot--exiting .skyyrose-mascot__image {
+		animation: skyy-walk-off-lean 0.6s ease-in forwards;
+	}
+
+	/* Overrides mascot.css's base idle animation with the richer version. */
+	.skyyrose-mascot--idle .skyyrose-mascot__image {
+		animation: skyy-breathe-enhanced 3.8s ease-in-out infinite;
+	}
+
+	.skyy--speaking .skyyrose-mascot__image {
+		animation: skyy-talk 0.72s ease-in-out infinite;
+	}
+
+	.skyy--excited .skyyrose-mascot__image {
+		animation: skyy-jump 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+	}
+
 	.skyy--glancing .skyyrose-mascot__image {
-		animation: none !important;
-		transform: none !important;
-		filter: drop-shadow(0 12px 32px rgba(0,0,0,0.35)) !important;
+		animation: skyy-glance 2s ease-in-out forwards;
 	}
 }

@@ -1,9 +1,16 @@
 """
 tests.oai_render.test_client — gpt-image-2 edit client contract.
 
-Locks the input_fidelity="high" parameter (verified against the openai-python
-image_edit_params.py source via Context7, 2026-06-24: supported for gpt-image-2,
-default "low") so the render pipeline never silently drops back to low fidelity.
+CORRECTED 2026-06-30 (bug-172): the prior version of this test locked in
+input_fidelity="high" being sent unconditionally, based on a 2026-06-24
+Context7 read that turned out to be wrong for gpt-image-2 specifically -- the
+live API rejects the parameter for that model with a 400
+invalid_input_fidelity_model error (reproduced). Context7 (openai/openai-openapi,
+images/edits schema) confirms support is listed for gpt-image-1 /
+gpt-image-1-mini / gpt-image-1.5 only. client.edit() now sends input_fidelity
+only when config.MODEL is in config.INPUT_FIDELITY_SUPPORTED_MODELS -- this
+file locks BOTH the omit-for-gpt-image-2 case (today's production model) and
+the send-when-supported case, so neither direction can silently regress.
 No real OpenAI call is made — the SDK client is replaced with a mock.
 """
 
@@ -32,7 +39,10 @@ def _build_client_with_mock(monkeypatch: pytest.MonkeyPatch) -> tuple[OAIImageCl
     return client, fake_sdk
 
 
-def test_edit_sends_input_fidelity_high(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_edit_omits_input_fidelity_for_unsupported_model(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """gpt-image-2 (today's production model) rejects input_fidelity outright (bug-172)."""
     client, fake_sdk = _build_client_with_mock(monkeypatch)
     img = tmp_path / "ref.png"
     img.write_bytes(_FAKE_PNG)
@@ -43,7 +53,25 @@ def test_edit_sends_input_fidelity_high(tmp_path: Path, monkeypatch: pytest.Monk
     fake_sdk.images.edit.assert_called_once()
     kwargs = fake_sdk.images.edit.call_args.kwargs
     assert kwargs["model"] == "gpt-image-2"
-    assert kwargs["input_fidelity"] == "high"  # the fix: not omitted, not "low"
+    assert "input_fidelity" not in kwargs  # gpt-image-2 400s on this param
+    assert config.MODEL not in config.INPUT_FIDELITY_SUPPORTED_MODELS
+
+
+def test_edit_sends_input_fidelity_for_supported_model(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """When the configured model DOES support it, input_fidelity="high" is still sent."""
+    monkeypatch.setattr(config, "MODEL", "gpt-image-1.5")
+    client, fake_sdk = _build_client_with_mock(monkeypatch)
+    img = tmp_path / "ref.png"
+    img.write_bytes(_FAKE_PNG)
+
+    out = client.edit(prompt="SKYYROSE varsity, studio", image_paths=[img])
+
+    assert out == b"image-bytes"
+    kwargs = fake_sdk.images.edit.call_args.kwargs
+    assert kwargs["model"] == "gpt-image-1.5"
+    assert kwargs["input_fidelity"] == "high"  # not omitted, not "low"
     assert config.INPUT_FIDELITY == "high"
 
 

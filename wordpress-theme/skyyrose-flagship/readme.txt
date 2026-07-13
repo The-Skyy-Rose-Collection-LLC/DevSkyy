@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.6.5
+Stable tag: 1.10.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ SkyyRose is a premium dark luxury WooCommerce theme built for fashion, streetwea
 * **Cinematic Mode Toggle** — Immersive viewing mode for product and scene pages
 * **Glassmorphism Navigation** — Frosted-glass header with scroll-triggered effects
 * **Film Grain SVG Overlay** — Subtle texture applied to all pages
-* **Self-Hosted Typography** — Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue, and more — GDPR-compliant, no external requests
+* **Self-Hosted Typography** — Cinzel, Archivo, Hanken Grotesk, Anton, and more — GDPR-compliant, no external requests
 * **Responsive Design** — Breakpoints at 1200px, 768px, and 480px
 * **WCAG 2.2 AA Accessibility** — Full prefers-reduced-motion support for animations and transitions
 * **Security Hardened** — Content Security Policy, HSTS headers, XML-RPC disabled, nonce protection on all forms
@@ -135,6 +135,83 @@ Typography, header layout, footer layout, and collection palette overrides are c
 
 == Changelog ==
 
+= 1.10.4 =
+* Fix: collection hero block rendered ~43px left of center on all four collection pages — the .col-hero__scroll cue had no CSS, so it sat in flex flow beside the hero content and pushed it off-center; now absolutely positioned bottom-center with proper cue styling
+* Fix: collection hero eyebrow (gold accent) unreadable against bright hero photography (Signature curtains) — added drop shadow
+
+= 1.10.3 =
+* Feat: bespoke collection display fonts — Black Rose now uses SkyyRose Black Rose Script (replaces Pacifico); Love Hurts uses SkyyRose Love Hurts Graffiti (replaces the interim Kaushan Script). Both built in-house from glyph sheets, self-hosted, full latin a-z/A-Z
+* Feat: collection feature-scroll section — sticky image cross-fades per feature while the philosophy items scroll (GSAP ScrollTrigger, IntersectionObserver fallback, stacked on mobile); wires the per-collection `features` canon copy that previously had no renderer
+* Fix: /cart/ and /checkout/ rendered without the theme shell (stale skyyrose-canvas page meta) — template_include override restores header/footer
+* Fix: anonymous visitors no longer receive a WooCommerce session cookie on every page view (edge-cache killer) — cookie now set only at guest wishlist write time
+* Security: POST /analytics/events write route now requires a shared ingest key (removes bare __return_true)
+* Fix: policy pages (privacy/terms/cookie/refund) regained their branded document titles
+* Fix: immersive lockup images regained explicit height attributes (CLS)
+
+= 1.10.2 =
+* Fix: Kids Capsule teaser wordmark rendered with overlapping/illegible glyphs — the `rv-split-word` reveal split the heading into filter-isolated spans that broke `background-clip:text` compositing; switched to `rv-clip-up` (no per-span filter), restoring legibility (bug-224)
+* Fix: homepage hero title overflowed the viewport at 1440px (box 1487px, clipped both edges) — tightened `letter-spacing` max 36px→24px, preserving the locked Archivo monument font-size
+
+= 1.10.1 =
+* Fix: collection emblem (3D star-rose mark) 404'd on Black Rose + Love Hurts heroes — asset URL was missing a path separator (`assetsimages`); corrected the slash seam so the emblem renders
+* Chore: version bump busts the CDN edge cache, refreshing the homepage hero-title clamp that had been pinned under the prior release stamp
+
+= 1.10.0 =
+* Typography overhaul: Archivo (display, expanded hero treatment), Hanken Grotesk (body), Anton (UI); collection scripts Pacifico (Black Rose) and Grand Hotel (Kids Capsule)
+* Old font families retired (Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail) with census-verified zero remaining references
+* Permissions-Policy: payment now delegates to js.stripe.com — unblocks Apple Pay / Google Pay wallet buttons on product pages
+
+= 1.9.6 =
+* Security: admin MCP bridge now uses a fail-closed allowlist — only read-only, non-paid tools are invocable; all paid generation, all writes, and any new/untagged tool are refused by default (a denylist previously failed open, leaving paid LoRA/Claude-SDK tools reachable by a compromised admin session)
+* Security: the public personalization endpoint's `collection` parameter is now validated against the canonical collection slugs, closing a transient-cache-key storage-growth vector
+* Security: outbound backend requests (FastAPI + MCP URLs) are now restricted to an allowlist of known DevSkyy hosts, closing a DNS-rebinding (TOCTOU) SSRF vector where a validated hostname could resolve to an internal address at connect time
+
+= 1.9.5 =
+* Fix: mascot body posture in the idle animation was hunched forward with head pitched down — re-keyed the idle clip's Hips bone rotation at both loop keyframes using a verified world-space correction (Hips world-X rotation was previously being applied in the bone's skewed local rest-space, producing the wrong effect); walk/talk/joy clips were already correctly authored and are unchanged
+
+= 1.9.4 =
+* Fix: mascot rendered as an untextured white silhouette — CSP connect-src now allows blob: (GLTFLoader loads embedded textures via fetch of blob: URLs); GLB textures re-encoded as universal JPEG (EXT_texture_webp was in extensionsRequired, a hard fail on loaders without WebP ImageBitmap support); model normalization scales before centering (she floated in the top half of the canvas); skinned meshes exempt from frustum culling
+
+= 1.9.3 =
+* Mascot: first entrance now greets arrivals ~4.5s after load regardless of visitor activity (idle-only gating meant actively-browsing visitors never saw her); idle-triggered re-entries, session cap, dismissal, and recall pill unchanged
+
+= 1.9.2 =
+* Fix: page transitions (pageEnter/pageExit) are opacity-only — the held translateY keyframe on body made it a containing block, breaking position:fixed for the mascot and any fixed overlay
+
+= 1.9.1 =
+* Fix: Skyy 3D loader imports three.js via jsdelivr /+esm endpoints (bare 'three' specifiers in the jsm loaders are unresolvable without an importmap); version bump to cache-bust served assets
+
+= 1.9.0 =
+* Skyy 3D mascot site host: draco GLB character (6 animation clips), guide brain with Tier-1/Tier-2 answers, conversation-synced gestures, live-by-default via Customizer kill switch, checkout excluded, WCAG-conscious (reduced-motion static frame, Escape dismissal, recall pill)
+* Homepage: hero on-model scroll strip, featured/lookbook sections retired
+* Product pages: per-collection theming, editorial layout, sticky add-to-cart
+* Collection pages: product feature in pin-narrative stage, lookbook imagery
+* Immersive: verified scene imagery wired
+* Header: rotating TSRC lockup (video + reduced-motion static)
+* Accessibility: text-safe accent tokens (WCAG AA small text on dark)
+
+= 1.8.0 =
+* Structural remediation: shell unification (single header/footer/nav, one skip link across all templates)
+* Route architecture: /collections/{slug}/ canonical URLs with a redirect layer (redirects.csv) for legacy paths
+* Experiences merged into Collections as an embedded scene layer, retiring the standalone Experiences surface
+* Homepage DOM restructured to data-driven content blocks
+* Commerce layer hardening: AJAX add-to-cart now enqueued on custom templates (homepage, collection, pre-order gateway) that render .ajax_add_to_cart buttons outside WooCommerce-native pages
+* scripts/structural_audit.py — new automated verification suite for shell, routes, and DOM invariants
+* SEO: og:image/twitter:image now excludes SVG logos (unsupported by social crawlers); canonical collection slugs derived from a single source of truth
+* Accessibility: <noscript> fallback restores primary navigation in the mobile drawer when JavaScript is unavailable
+
+= 1.7.0 =
+* Full-site audit batch: CSP fix restores Stripe express checkout (Apple/Google Pay); standard header converged on every page incl. homepage
+* Header refinement: transparent-to-solid condensing navbar, centered logo, Bag language + cart badge, Customizer announcement bar
+* Editorial 3-column product grids; imagery sizing fixes; Jetpack CSS conditional dequeue; AVIF/WebP product-image bases
+* PDP fit notes + model specs, homepage Drop Block (Customizer), sticky Add-to-Bag on editorial PDPs; pre-order hero video stacking fix
+* /immersive-* 301 redirects; review hardening (double-submit guard, redirect query strings)
+
+= 1.6.7 =
+* Product images now resolve through the catalog/dossier SOT chain: collection-sot-reader.php gained a per-SKU image resolver, front-page.php and template-landing-kids-capsule.php migrated off all hardcoded image paths
+* Verified asset hub wired as the upstream authority feeding the SOT image manifest, with no-hardcoded-product-image regression guard added to CI
+* Version triple re-synced: style.css, readme.txt Stable tag, and SKYYROSE_VERSION constant all set to 1.6.7
+
 = 1.6.5 =
 * SEO: static front page now emits og:type=website (was article). The is_singular() branches in the Open Graph, Twitter, and meta-description functions now defer to is_front_page(), so the homepage gets website OG + the brand-tagline description. Exposed when the 1.6.4 Jetpack OG dedup removed the masking duplicate website tag.
 
@@ -222,10 +299,10 @@ Initial release. Requires WordPress 6.8+, WooCommerce 9.9+, and PHP 8.2+.
 All typefaces are self-hosted in /assets/fonts/ for GDPR compliance and performance.
 
 * Inter — https://github.com/rsms/inter (SIL Open Font License 1.1)
-* Playfair Display — https://github.com/clauseggers/Playfair-Display (SIL Open Font License 1.1)
+* Archivo — https://github.com/Omnibus-Type/Archivo (SIL Open Font License 1.1)
 * Cinzel — https://github.com/nicholasgross/Cinzel (SIL Open Font License 1.1)
-* Cormorant Garamond — https://github.com/CatharsisFonts/Cormorant (SIL Open Font License 1.1)
-* Bebas Neue — https://github.com/dharmatype/Bebas-Neue (SIL Open Font License 1.1)
+* Hanken Grotesk — https://github.com/marcologous/hanken-grotesk (SIL Open Font License 1.1)
+* Anton — https://github.com/googlefonts/AntonFont (SIL Open Font License 1.1)
 * Barlow — https://github.com/jpt/barlow (SIL Open Font License 1.1)
 * Oswald — https://github.com/googlefonts/OswaldFont (SIL Open Font License 1.1)
 * DM Sans — https://github.com/googlefonts/dm-fonts (SIL Open Font License 1.1)
@@ -234,9 +311,10 @@ All typefaces are self-hosted in /assets/fonts/ for GDPR compliance and performa
 
 Collection script accent fonts (per-collection interior headings, self-hosted):
 
-* Yellowtail — https://fonts.google.com/specimen/Yellowtail (SIL Open Font License 1.1) — Black Rose accent
+* Pacifico — https://fonts.google.com/specimen/Pacifico (SIL Open Font License 1.1) — Black Rose accent
 * Kaushan Script — https://fonts.google.com/specimen/Kaushan+Script (SIL Open Font License 1.1) — Love Hurts accent
-* Pinyon Script — https://fonts.google.com/specimen/Pinyon+Script (SIL Open Font License 1.1) — Signature + Kids Capsule accent
+* Pinyon Script — https://fonts.google.com/specimen/Pinyon+Script (SIL Open Font License 1.1) — Signature accent
+* Grand Hotel — https://fonts.google.com/specimen/Grand+Hotel (SIL Open Font License 1.1) — Kids Capsule accent
 
 = JavaScript Libraries =
 

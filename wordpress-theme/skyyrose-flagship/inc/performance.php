@@ -134,6 +134,15 @@ function skyyrose_dequeue_google_fonts() {
 add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_google_fonts', 999 );
 add_action( 'wp_print_styles', 'skyyrose_dequeue_google_fonts', 999 );
 
+/*
+--------------------------------------------------------------
+ * Elementor Telemetry Opt-Out
+ *--------------------------------------------------------------*/
+
+// Elementor sends usage data to Mixpanel. Disable via the experiments
+// opt-in filter — fires before Elementor initializes its tracking module.
+add_filter( 'elementor/experiments/usage_data_opt_in', '__return_false' );
+
 /**
  * Remove Google Fonts DNS prefetch hints.
  *

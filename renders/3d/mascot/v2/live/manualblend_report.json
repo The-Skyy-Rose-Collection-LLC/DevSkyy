@@ -1,0 +1,324 @@
+{
+  "approach": "manual_vertex_weight_redistribution",
+  "source_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-v6-merged.glb",
+  "output_glb": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/skyy-fix-manualblend-merged.glb",
+  "band_fraction_of_thigh_length": 0.5,
+  "left_thigh_len": 0.2191,
+  "right_thigh_len": 0.2191,
+  "left_band_half_width": 0.1095,
+  "right_band_half_width": 0.1095,
+  "full_band_width_left": 0.2191,
+  "full_band_width_right": 0.2191,
+  "prior_diagnosed_narrow_ramp_width": 0.129,
+  "vertices_touched_left_band_only": 343,
+  "vertices_touched_right_band_only": 308,
+  "vertices_touched_both_thighs_crotch_seam": 907,
+  "both_thighs_note": "NOT rare -- these are genuine crotch-seam vertices carrying substantial weight on Hips + BOTH LeftUpLeg/RightUpLeg simultaneously (e.g. vertex 16102: hips=0.31 left=0.46 right=0.22), anatomically expected where the pants mesh spans the actual junction between both legs. Handled by splitting the Hips share proportionally to the left:right ratio and running each side's smoothstep band independently.",
+  "total_vertices_touched": 1236,
+  "total_mesh_vertices_at_fix_time": 48550,
+  "note_on_reimported_vertex_count": "The post-export reimport reports 48561 verts vs 48550 at fix time -- a +11 delta from glTF's normal vertex-splitting on export (e.g. UV seams), not data loss or corruption. The 1236-vertex touched count above was computed on the correct pre-export 48550-vert mesh.",
+  "idle_regression_check": "Idle's action/keyframes were never touched (verified: idle action survives export with its original sparse+dense fcurve structure intact). Rendered idle at frames 1/36/73 from both source and fixed GLB and diffed: only the same crotch-region pixels changed (localized bbox x:353-512 y:435-642 across all 3 frames), magnitude comparable to the other clips' deltas, and visual inspection shows a benign, subtle silhouette change with NO new crease/fold introduced -- idle's shallow flexion keeps old vs new weights close. Not a regression.",
+  "sample_weight_deltas": [
+    {
+      "index": 16102,
+      "old": [
+        0.3116,
+        0.4632,
+        0.2239
+      ],
+      "new": [
+        0.2667,
+        0.5041,
+        0.2278
+      ]
+    },
+    {
+      "index": 16103,
+      "old": [
+        0.3537,
+        0.449,
+        0.1945
+      ],
+      "new": [
+        0.322,
+        0.4826,
+        0.1926
+      ]
+    },
+    {
+      "index": 16104,
+      "old": [
+        0.2836,
+        0.5518,
+        0.163
+      ],
+      "new": [
+        0.2299,
+        0.6046,
+        0.1639
+      ]
+    },
+    {
+      "index": 16105,
+      "old": [
+        0.3289,
+        0.5512,
+        0.1154
+      ],
+      "new": [
+        0.2903,
+        0.5953,
+        0.11
+      ]
+    },
+    {
+      "index": 16106,
+      "old": [
+        0.2932,
+        0.1171,
+        0.5812
+      ],
+      "new": [
+        0.2847,
+        0.1122,
+        0.5948
+      ]
+    },
+    {
+      "index": 16107,
+      "old": [
+        0.3647,
+        0.1517,
+        0.4731
+      ],
+      "new": [
+        0.3686,
+        0.1466,
+        0.4742
+      ]
+    },
+    {
+      "index": 16108,
+      "old": [
+        0.2782,
+        0.1527,
+        0.5629
+      ],
+      "new": [
+        0.2494,
+        0.1539,
+        0.5905
+      ]
+    },
+    {
+      "index": 16109,
+      "old": [
+        0.353,
+        0.1922,
+        0.4477
+      ],
+      "new": [
+        0.3434,
+        0.193,
+        0.4564
+      ]
+    },
+    {
+      "index": 16110,
+      "old": [
+        0.2905,
+        0.2248,
+        0.48
+      ],
+      "new": [
+        0.257,
+        0.2334,
+        0.5048
+      ]
+    },
+    {
+      "index": 16111,
+      "old": [
+        0.4048,
+        0.496,
+        0.0904
+      ],
+      "new": [
+        0.3911,
+        0.5195,
+        0.0806
+      ]
+    },
+    {
+      "index": 16112,
+      "old": [
+        0.4941,
+        0.3753,
+        0.1185
+      ],
+      "new": [
+        0.5133,
+        0.3738,
+        0.1006
+      ]
+    },
+    {
+      "index": 16113,
+      "old": [
+        0.3235,
+        0.0766,
+        0.5884
+      ],
+      "new": [
+        0.3476,
+        0.0672,
+        0.5736
+      ]
+    },
+    {
+      "index": 16114,
+      "old": [
+        0.4148,
+        0.1178,
+        0.4527
+      ],
+      "new": [
+        0.4555,
+        0.1041,
+        0.4257
+      ]
+    },
+    {
+      "index": 16115,
+      "old": [
+        0.4435,
+        0.129,
+        0.4118
+      ],
+      "new": [
+        0.4906,
+        0.1136,
+        0.3802
+      ]
+    },
+    {
+      "index": 16116,
+      "old": [
+        0.4234,
+        0.1805,
+        0.385
+      ],
+      "new": [
+        0.4503,
+        0.1704,
+        0.3682
+      ]
+    },
+    {
+      "index": 16564,
+      "old": [
+        0.232,
+        0.178,
+        0.5857
+      ],
+      "new": [
+        0.1861,
+        0.1847,
+        0.6248
+      ]
+    },
+    {
+      "index": 16565,
+      "old": [
+        0.1732,
+        0.1185,
+        0.7051
+      ],
+      "new": [
+        0.1295,
+        0.1199,
+        0.7474
+      ]
+    },
+    {
+      "index": 16566,
+      "old": [
+        0.2508,
+        0.2428,
+        0.5029
+      ],
+      "new": [
+        0.2043,
+        0.2565,
+        0.5356
+      ]
+    },
+    {
+      "index": 16567,
+      "old": [
+        0.1752,
+        0.1716,
+        0.6503
+      ],
+      "new": [
+        0.1256,
+        0.1779,
+        0.6936
+      ]
+    },
+    {
+      "index": 16568,
+      "old": [
+        0.1855,
+        0.0926,
+        0.7179
+      ],
+      "new": [
+        0.1477,
+        0.0919,
+        0.7564
+      ]
+    }
+  ],
+  "pre_export_normalization_pass": {
+    "max_pre_existing_drift_from_1": 0.0,
+    "vertices_renormalized": 0
+  },
+  "post_export_verification": {
+    "max_weight_sum_drift_from_1": 0.0,
+    "zero_group_vertices": 0,
+    "all_6_clip_actions_present": true
+  },
+  "renders": {
+    "walk": {
+      "peak_frame": 86,
+      "right_upleg_flexion_deg": 138.19,
+      "eval_live_sanity_check": true,
+      "render_path": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manualblend_walk.png"
+    },
+    "talk": {
+      "peak_frame": 15,
+      "right_upleg_flexion_deg": 126.1,
+      "eval_live_sanity_check": true,
+      "render_path": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manualblend_talk.png"
+    },
+    "point": {
+      "peak_frame": 59,
+      "right_upleg_flexion_deg": 137.91,
+      "eval_live_sanity_check": true,
+      "render_path": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manualblend_point.png"
+    },
+    "wave": {
+      "peak_frame": 27,
+      "right_upleg_flexion_deg": 138.1,
+      "eval_live_sanity_check": true,
+      "render_path": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manualblend_wave.png"
+    },
+    "joy": {
+      "peak_frame": 12,
+      "right_upleg_flexion_deg": 138.34,
+      "eval_live_sanity_check": true,
+      "render_path": "/Users/theceo/DevSkyy/.claude/worktrees/mascot-skin-weight-fix/renders/3d/mascot/v2/live/manualblend_joy.png"
+    }
+  }
+}

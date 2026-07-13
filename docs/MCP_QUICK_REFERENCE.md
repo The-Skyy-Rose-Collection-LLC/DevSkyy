@@ -20,8 +20,8 @@ source ~/.zshrc
 
 | Server | Purpose | Key Features |
 |--------|---------|--------------|
-| **devskyy-openai** | OpenAI models | GPT-4o, vision, code gen, function calling |
-| **devskyy-main** | 54-agent ecosystem | WordPress, SEO, content, analytics, ML |
+| **devskyy-openai** *(historical — OpenAI is now tools inside the single devskyy MCP, not a separate server; 2026-07-10)* | OpenAI models | GPT-4o, vision, code gen, function calling |
+| **devskyy-main** | DevSkyy agent fleet (dynamic — query `devskyy_list_agents` / `GET /api/v1/agents`, never hardcoded) | WordPress, SEO, content, analytics, ML |
 | **filesystem** | File operations | Read, write, search files |
 | **git** | Version control | Status, diff, commit, branch |
 | **github** | GitHub API | Issues, PRs, workflows |
@@ -35,7 +35,7 @@ source ~/.zshrc
 
 ```bash
 # Essential
-export OPENAI_API_KEY="sk-..."           # For devskyy-openai
+export OPENAI_API_KEY="sk-..."           # For devskyy-openai (historical — see note above)
 export DEVSKYY_API_KEY="..."             # For devskyy-main
 
 # Optional
@@ -86,7 +86,7 @@ Uses:
 Ask Claude: "Analyze this product photo"
 
 Uses:
-- devskyy-openai → vision_analysis (GPT-4o)
+- devskyy-openai → vision_analysis (GPT-4o) (historical — now `devskyy_oai_render_*` tools inside the devskyy MCP)
 - devskyy-main → seo_agent for alt text
 ```
 

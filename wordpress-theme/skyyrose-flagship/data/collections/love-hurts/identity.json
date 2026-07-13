@@ -20,11 +20,25 @@
     "text": "#F5F5F5"
   },
   "fonts": {
-    "script": {"family": "Kaushan Script", "woff2": "assets/fonts/kaushan-script-latin.woff2", "source": "OFL / Google Fonts"},
-    "caps": {"family": "Cinzel", "woff2": "assets/fonts/cinzel-latin.woff2", "source": "OFL (already hosted)"},
-    "body": {"family": "Cormorant Garamond", "woff2": "assets/fonts/cormorant-garamond-latin.woff2", "source": "OFL (already hosted)"}
+    "script": {
+      "family": "SkyyRose Love Hurts Graffiti",
+      "woff2": "assets/fonts/skyyrose-love-hurts-graffiti-latin.woff2",
+      "source": "SkyyRose custom (graffiti face from lockup)"
+    },
+    "caps": {
+      "family": "Cinzel",
+      "woff2": "assets/fonts/cinzel-latin.woff2",
+      "source": "OFL (already hosted)"
+    },
+    "body": {
+      "family": "Hanken Grotesk",
+      "woff2": "assets/fonts/hanken-grotesk-latin.woff2",
+      "source": "OFL (already hosted)"
+    }
   },
-  "lockup": {"ref": "images/lockups/love-hurts-lockup.webp"},
+  "lockup": {
+    "ref": "images/lockups/love-hurts-lockup.webp"
+  },
   "imagery": {
     "hero": {
       "path": "branding/hero/beauty-and-beast",

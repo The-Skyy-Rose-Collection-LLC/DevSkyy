@@ -1,4 +1,5 @@
 import { fetchWithTimeout, getAuthHeaders, handleResponse } from '../client';
+import { API_URL } from '../config';
 import {
     AutonomousOperationSchema,
     AutonomousHistoryEntrySchema,
@@ -15,14 +16,14 @@ const BASE = '/api/v1';
 
 export const autonomous = {
     async list(): Promise<AutonomousOperationsResponse> {
-        const res = await fetchWithTimeout(`${BASE}/autonomous/operations`, {
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/autonomous/operations`, {
             headers: await getAuthHeaders(),
         });
         return handleResponse(res, AutonomousOperationsResponseSchema);
     },
 
     async start(id: string): Promise<AutonomousOperation> {
-        const res = await fetchWithTimeout(`${BASE}/autonomous/operations/${id}/start`, {
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/autonomous/operations/${id}/start`, {
             method: 'POST',
             headers: await getAuthHeaders(),
         });
@@ -30,7 +31,7 @@ export const autonomous = {
     },
 
     async stop(id: string): Promise<AutonomousOperation> {
-        const res = await fetchWithTimeout(`${BASE}/autonomous/operations/${id}/stop`, {
+        const res = await fetchWithTimeout(`${API_URL}${BASE}/autonomous/operations/${id}/stop`, {
             method: 'POST',
             headers: await getAuthHeaders(),
         });

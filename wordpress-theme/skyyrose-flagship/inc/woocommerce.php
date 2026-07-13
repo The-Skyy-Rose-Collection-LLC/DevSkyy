@@ -63,7 +63,7 @@ add_action( 'after_setup_theme', 'skyyrose_woocommerce_support' );
 function skyyrose_woocommerce_loop_columns() {
 	return 4;
 }
-add_filter( 'loop_shop_columns', 'skyyrose_woocommerce_loop_columns' );
+// loop_shop_columns handled by skyyrose_editorial_shop_columns() in inc/fashion-chrome.php (3-col editorial grid).
 
 /**
  * Set products per page (multiple of column count for even grids).

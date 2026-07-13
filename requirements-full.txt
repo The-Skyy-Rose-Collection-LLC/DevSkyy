@@ -1,7 +1,0 @@
-# DevSkyy - Full ML/3D Dependencies
-# ==================================
-# DEPRECATED: Use pip install -e ".[ml]"
-#
-# This installs all ML, 3D, and advanced features.
-
--e .[ml,mcp]

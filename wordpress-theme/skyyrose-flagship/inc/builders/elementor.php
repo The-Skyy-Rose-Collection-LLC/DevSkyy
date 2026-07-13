@@ -212,7 +212,7 @@ function skyyrose_set_elementor_default_schemes() {
 
 	// Elementor scheme defaults are written once on theme activation and persist
 	// in wp_options. They cannot read CSS custom properties, so we pin them to
-	// the collection-agnostic Playfair Display headline. Black Rose pages with
+	// the collection-agnostic Archivo headline. Black Rose pages with
 	// `[data-collection="black-rose"]` already override to Cinzel at the CSS
 	// token layer (design-tokens.css), so Elementor widgets on BR pages still
 	// render in Cinzel via `var(--skyyrose-font-display)` in elementor-widgets.css.
@@ -220,19 +220,19 @@ function skyyrose_set_elementor_default_schemes() {
 		'elementor_scheme_typography',
 		array(
 			'1' => array( // Primary Headline.
-				'font_family' => 'Playfair Display',
+				'font_family' => 'Archivo',
 				'font_weight' => '700',
 			),
 			'2' => array( // Secondary Headline.
-				'font_family' => 'Playfair Display',
+				'font_family' => 'Archivo',
 				'font_weight' => '600',
 			),
 			'3' => array( // Body Text.
-				'font_family' => 'Cormorant Garamond',
+				'font_family' => 'Hanken Grotesk',
 				'font_weight' => '400',
 			),
 			'4' => array( // Accent / Labels.
-				'font_family' => 'Bebas Neue',
+				'font_family' => 'Anton',
 				'font_weight' => '400',
 			),
 		)

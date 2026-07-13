@@ -242,6 +242,17 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	}
 	set_transient( $rate_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 
+	// Also rate-limit per IP: the per-email limit alone lets one client script
+	// arbitrary third-party emails into the list (spam-subscription abuse,
+	// CAN-SPAM/GDPR exposure). 20 distinct submissions per IP per 15 min.
+	$ip_key      = 'skyyrose_klav_ip_' . md5( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) ) );
+	$ip_attempts = (int) get_transient( $ip_key );
+	if ( $ip_attempts >= 20 ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ) ) );
+		return;
+	}
+	set_transient( $ip_key, $ip_attempts + 1, 15 * MINUTE_IN_SECONDS );
+
 	// Build properties.
 	$properties = array();
 	$first_name = sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) );
@@ -339,6 +350,14 @@ function skyyrose_rest_stock_handler( $request ) {
 
 	$product = wc_get_product( $product_id );
 	if ( ! $product ) {
+		return new WP_Error( 'not_found', 'Product not found.', array( 'status' => 404 ) );
+	}
+
+	// Public endpoint: only expose published products. wc_get_product_id_by_sku()
+	// does not filter by post_status, so without this a SKU guess could reveal
+	// the existence + edition_size/claimed count of a draft/private pre-launch
+	// drop. Treat anything not published as not found.
+	if ( 'publish' !== $product->get_status() ) {
 		return new WP_Error( 'not_found', 'Product not found.', array( 'status' => 404 ) );
 	}
 

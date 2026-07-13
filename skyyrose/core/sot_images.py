@@ -46,7 +46,14 @@ _ROLE_KEYS: dict[str, tuple[str, ...]] = {
 
 @functools.lru_cache(maxsize=1)
 def _index() -> dict[str, dict]:
-    """Build ``sku -> product`` from every collection's ``sot.json`` (cached)."""
+    """Build ``sku -> product`` from every collection's ``sot.json`` (cached).
+
+    The verified asset hub's overrides are baked into ``sot.json`` upstream by
+    ``build-collection-sot.py`` (the single seam), so this resolver — and every
+    surface it feeds (Python ``resolve_image``, the PHP theme via ``sot.json``, the
+    dashboard via ``data/sot-images.json``) — honors the hub verdict uniformly
+    without a parallel override here.
+    """
     idx: dict[str, dict] = {}
     # Enumerate collections from the filesystem so a newly-added collection is
     # picked up automatically — never a hardcoded slug list that silently omits it.

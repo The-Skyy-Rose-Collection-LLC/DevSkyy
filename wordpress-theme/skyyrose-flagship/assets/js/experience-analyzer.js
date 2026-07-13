@@ -83,7 +83,10 @@
   }
 
   function getEndpoint() {
-    return '/?rest_route=/skyyrose/v1/analytics/events';
+    // Shared ingest key localized by skyyrose_enqueue_phase3_experience_analyzer()
+    // (sendBeacon cannot set headers, so the key rides the query string).
+    var key = window.skyyroseSEE && window.skyyroseSEE.key ? window.skyyroseSEE.key : '';
+    return '/?rest_route=/skyyrose/v1/analytics/events&k=' + encodeURIComponent(key);
   }
 
   function buildPayload() {

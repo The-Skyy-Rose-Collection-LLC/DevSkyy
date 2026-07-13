@@ -228,8 +228,8 @@
 	pointer-events: none;
 	z-index: 1;
 	background-image:
-		radial-gradient(1px 1px at 20% 15%, rgba(200, 210, 230, 0.35) 0%, transparent 100%),
-		radial-gradient(1px 1px at 50% 10%, rgba(200, 210, 230, 0.25) 0%, transparent 100%),
+		radial-gradient(1px 1px at 20% 15%, rgba(192, 192, 192, 0.35) 0%, transparent 100%),
+		radial-gradient(1px 1px at 50% 10%, rgba(192, 192, 192, 0.25) 0%, transparent 100%),
 		radial-gradient(1px 1px at 75% 20%, rgba(220, 20, 60, 0.3) 0%, transparent 100%);
 	animation: particleDrift 16s ease-in-out infinite alternate;
 }

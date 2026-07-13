@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import Image from 'next/image';
 import type { CollectionProduct } from '@/lib/collections';
 
 interface ProductCardProps {
@@ -64,13 +63,17 @@ export default function ProductCard({
       <div className="relative overflow-hidden rounded-lg bg-white/[0.02] border border-white/5 backdrop-blur-sm transition-all duration-300 group-hover:border-white/10 group-hover:bg-white/[0.04]">
         {/* Image */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-b from-white/[0.03] to-transparent">
-          {!imageError ? (
-            <Image
-              src={product.image}
+          {!imageError && product.image ? (
+            // SOT paths are theme assets served by skyyrose.co, not the dashboard's
+            // own public/ dir — next/image throws synchronously on an unconfigured
+            // host before onError can ever fire, so a plain <img> with graceful
+            // onError degrade is the established pattern here (see
+            // app/admin/catalog/page.tsx's ImagePreview for the same tradeoff).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/${product.image.replace(/^\/+/, '')}`}
               alt={product.name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={() => setImageError(true)}
             />
           ) : (

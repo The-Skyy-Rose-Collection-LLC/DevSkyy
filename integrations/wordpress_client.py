@@ -20,7 +20,19 @@ from typing import Any, Literal
 import httpx
 from pydantic import BaseModel, Field
 
-from security.ssrf_protection import ssrf_protection
+from security.ssrf_protection import SSRFProtection
+
+# Media source URLs (own-site media, CDNs, approved-render hosts) are not in
+# the global singleton's narrow API allowlist — production restricts it to 5
+# API hosts, which would reject EVERY real media URL (bug-234). Same pattern
+# as services/three_d/replicate_provider.py: no domain allowlist, but keep
+# every network-layer SSRF block (private IPs, localhost, metadata services).
+_media_ssrf = SSRFProtection(
+    allowed_domains=None,
+    block_private_ips=True,
+    block_localhost=True,
+    block_metadata_services=True,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -523,7 +535,7 @@ class WordPressClient:
     ) -> MediaUploadResult:
         """Upload media from a URL."""
         # Download image — validate against SSRF before fetching
-        ssrf_protection.validate_url(image_url)
+        _media_ssrf.validate_url(image_url)
         async with httpx.AsyncClient() as download_client:
             response = await download_client.get(image_url)
             response.raise_for_status()

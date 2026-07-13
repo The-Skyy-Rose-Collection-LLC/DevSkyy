@@ -100,6 +100,77 @@
 }
 .pin-beat__accent { color: var(--skyyrose-accent); font-style: italic; }
 
+/* closing feature beat — real product, so the pinned stage never ends on
+   empty space (founder feedback: put a product in this section). Shares
+   the .pin-beat crossfade/pointer-events lifecycle above; only the inner
+   content differs. */
+.pin-feature {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	text-decoration: none;
+	color: inherit;
+}
+
+.pin-feature__media {
+	display: block;
+	width: clamp(160px, 18vw, 240px);
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.pin-feature__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.4s var(--skyyrose-ease, ease);
+}
+
+.pin-feature:hover .pin-feature__img,
+.pin-feature:focus-visible .pin-feature__img {
+	transform: scale(1.04);
+}
+
+.pin-feature__name {
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(1.125rem, 2vw, 1.5rem);
+	color: var(--skyyrose-text);
+}
+
+.pin-feature__price {
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.8125rem;
+	letter-spacing: 0.08em;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+}
+
+.pin-feature__cta {
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.6875rem;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-text-muted);
+	border-bottom: 1px solid rgba(var(--skyyrose-accent-rgb), 0.5);
+	padding-bottom: 0.15rem;
+	transition: color 0.25s var(--skyyrose-ease, ease), border-color 0.25s var(--skyyrose-ease, ease);
+}
+
+.pin-feature:hover .pin-feature__cta,
+.pin-feature:focus-visible .pin-feature__cta {
+	color: var(--skyyrose-accent);
+	border-color: var(--skyyrose-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pin-feature__img { transition: none; }
+	.pin-feature:hover .pin-feature__img,
+	.pin-feature:focus-visible .pin-feature__img { transform: none; }
+}
+
 /* progress pips + counter */
 .pin-progress {
 	position: absolute;

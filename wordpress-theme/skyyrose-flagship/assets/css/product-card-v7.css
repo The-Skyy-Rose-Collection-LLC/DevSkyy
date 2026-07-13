@@ -8,10 +8,10 @@
 
 /* ── collection palette (self-contained; mirrors brand tokens) ── */
 .v7card[data-collection="black-rose"]   { --v7-accent:#C0C0C0; --v7-accent-rgb:192,192,192; --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="love-hurts"]   { --v7-accent:#DC143C; --v7-accent-rgb:220,20,60;  --v7-caps:'Bebas Neue',sans-serif; }
+.v7card[data-collection="love-hurts"]   { --v7-accent:#DC143C; --v7-accent-rgb:220,20,60;  --v7-caps:'Anton',sans-serif; }
 .v7card[data-collection="signature"]    { --v7-accent:#D4AF37; --v7-accent-rgb:212,175,55;  --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Bebas Neue',sans-serif; }
-.v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Bebas Neue',sans-serif; }
+.v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
+.v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
 
 .v7card {
 	position: relative;
@@ -50,6 +50,19 @@
 	z-index: 0;
 }
 .v7card:hover .v7card__logo { opacity: .26; transform: scale(1.04); }
+
+/* Star-plaque backdrops (dark full-scene art needs more presence than the
+   light logo marks to read against the void-black card). */
+.v7card[data-collection="black-rose"] .v7card__logo,
+.v7card[data-collection="love-hurts"] .v7card__logo {
+	background-size: contain;
+	opacity: .24;
+	filter: none;
+}
+.v7card[data-collection="black-rose"]:hover .v7card__logo,
+.v7card[data-collection="love-hurts"]:hover .v7card__logo {
+	opacity: .34;
+}
 
 .v7card__carousel { position: absolute; inset: 0; z-index: 1; }
 .v7card__shot {
@@ -91,7 +104,7 @@
 	top: 12px;
 	left: 12px;
 	z-index: 3;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	letter-spacing: .18em;
 	font-size: 10px;
 	text-transform: uppercase;
@@ -103,18 +116,18 @@
 
 .v7card__meta { position: relative; z-index: 1; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
 .v7card__eyebrow { font-family: var(--v7-caps); letter-spacing: .26em; font-size: 10px; text-transform: uppercase; color: var(--v7-accent); }
-.v7card__name { font-family: 'Playfair Display', serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
+.v7card__name { font-family: 'Archivo', sans-serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
 .v7card__name a { color: #f5e6d3; text-decoration: none; }
 .v7card__name a:hover { color: var(--v7-accent); }
 .v7card__pricerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.v7card__price { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent); }
+.v7card__price { font-family: 'Anton', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent); }
 .v7card__price del { opacity: .5; font-size: .85em; }
 .v7card__edition { font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .08em; color: #8a8175; }
 
 .v7card__add {
 	display: inline-block;
 	margin-top: 6px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: 'Anton', sans-serif;
 	letter-spacing: .16em;
 	font-size: 13px;
 	text-transform: uppercase;
@@ -134,6 +147,38 @@
 .v7card__add.loading { opacity: .6; pointer-events: none; }
 .v7card__add.added::after { content: " ✓"; }
 
+/* Secondary AJAX quick-add (WS5) — ghost variant beside the primary View Piece. */
+.v7card__quickadd {
+	display: inline-block;
+	margin-top: 6px;
+	margin-left: 8px;
+	font-family: 'Anton', sans-serif;
+	letter-spacing: .16em;
+	font-size: 13px;
+	text-transform: uppercase;
+	text-align: center;
+	color: var(--v7-accent);
+	background: transparent;
+	border: 1px solid var(--v7-accent);
+	border-radius: 8px;
+	padding: 10px 14px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background .25s, color .25s, transform .15s;
+}
+.v7card__quickadd:hover { background: var(--v7-accent); color: #0a0a0a; }
+.v7card__quickadd:active { transform: scale(.97); }
+.v7card__quickadd.loading { opacity: .6; pointer-events: none; }
+.v7card__quickadd.added::after { content: " ✓"; }
+
 @media (prefers-reduced-motion: reduce) {
 	.v7card, .v7card__shot, .v7card__logo, .v7card__add { transition: none !important; }
+}
+
+/* Love Hurts CTA contrast: brand crimson #DC143C with dark ink computes 3.97:1
+   (below AA). CTA surface uses a deepened crimson with white ink (6.4:1);
+   the collection accent token itself is unchanged. */
+.v7card[data-collection="love-hurts"] .v7card__add {
+	background: #a50f2d;
+	color: #fff;
 }

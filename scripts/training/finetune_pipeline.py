@@ -488,7 +488,7 @@ class HuggingFaceTrainer:
         }
 
         # Save config
-        config_path = PROJECT_ROOT / "autotrain_config.yaml"
+        config_path = PROJECT_ROOT / "config" / "autotrain_config.yaml"
         import yaml
 
         with open(config_path, "w") as f:

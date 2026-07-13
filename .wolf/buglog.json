@@ -1748,7 +1748,8 @@
     ],
     "related_bugs": [
       "bug-119",
-      "bug-124"
+      "bug-124",
+      "bug-230"
     ],
     "occurrences": 1,
     "last_seen": "2026-06-11"
@@ -1913,7 +1914,9 @@
       "load_project_env",
       "r2_client"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-231"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-18"
   },
@@ -2081,7 +2084,9 @@
       "hermetic",
       "stop-hook"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-231"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-22T20:37:53Z"
   },
@@ -2212,7 +2217,9 @@
       "no-silent-fallback",
       "sceneerror"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-230"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-24T12:30:00Z"
   },
@@ -2305,7 +2312,7 @@
     "last_seen": "2026-06-25T04:30:00-07:00"
   },
   {
-    "id": "bug-131",
+    "id": "bug-180",
     "timestamp": "2026-06-26T12:45:00-07:00",
     "error_message": "V7 product cards in grid row 2+ never auto-advance (carousel stalls)",
     "file": "prototypes/product-card-variants/v7-lookbook-card/index.html",
@@ -2339,7 +2346,9 @@
       "cors",
       "3d"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-164"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-28T00:00:00-07:00"
   },
@@ -2400,16 +2409,18 @@
       "file-protocol",
       "lazy-loading"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-132"
+    ],
     "occurrences": 1,
     "last_seen": "2026-06-28T12:00:00-07:00"
   },
   {
     "id": "bug-165",
     "timestamp": "2026-06-28T17:00:00-07:00",
-    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' — CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
+    "error_message": "ImportError: cannot import name 'WordPressWooCommerceClient' from 'integrations.wordpress_client' \u2014 CommerceAgent WooCommerce integration is dead on main (WORDPRESS_AVAILABLE=False), so commerce/products/bulk returns per-product 'client not connected' at runtime even though the wire is correct.",
     "file": "agents/commerce_agent.py",
-    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() — it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
+    "root_cause": "Pre-existing agent<->client interface mismatch. agents/commerce_agent.py:48 does `from integrations.wordpress_client import WordPressWooCommerceClient` (try/except ImportError -> WORDPRESS_AVAILABLE=False fallback at line 53), but integrations/wordpress_client.py defines the class as WordPressClient (no WordPressWooCommerceClient alias). Verified via `python -c import`: ImportError + WORDPRESS_AVAILABLE=False + client=None. Additionally CommerceAgent._ensure_wordpress_client calls `await client.connect()`, but WordPressClient has no connect() \u2014 it exposes an async context-manager API (__aenter__/__aexit__, close()). So even fixing the name, the connection lifecycle is wrong. Discovered while wiring T3-2 commerce/products/bulk; the 3 wire tests mock the agent so they pass while the real integration is non-functional. api/dashboard.py:811-917 imports the same broken name.",
     "fix": "FIXED 2026-06-28 (founder approved full fix). (1) integrations/wordpress_client.py: added module-level alias `WordPressWooCommerceClient = WordPressClient` + a `WordPressClient.from_env()` classmethod (reads WORDPRESS_URL/WP_SITE_URL + WC_CONSUMER_KEY/WOOCOMMERCE_KEY + WC_CONSUMER_SECRET/WOOCOMMERCE_SECRET; raises ValueError when missing). (2) agents/commerce_agent.py _ensure_wordpress_client: dropped the non-existent `.connect()`, now constructs via `WordPressWooCommerceClient.from_env()` (honors an injected client, degrades gracefully on missing creds keeping _wordpress_connected=False). (3) api/dashboard.py: 3 sites swapped `WordPressWooCommerceClient()` -> `.from_env()`. Verified: import resolves (is WordPressClient True), WORDPRESS_AVAILABLE flipped False->True, from_env graceful-raise on missing creds; black+ruff clean on all 3 files; rtk proxy pytest tests/api/test_commerce_bulk_wire.py + tests/test_core_agents.py = 231 passed (no regression). optimize_price (in main) uses ml_module not _ensure_wordpress_client, so unaffected.",
     "tags": [
       "commerce-agent",
@@ -2423,5 +2434,1610 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-06-28T17:00:00-07:00"
+  },
+  {
+    "id": "bug-166",
+    "timestamp": "2026-06-29T12:20:00-07:00",
+    "error_message": "Stop-hook RED locally: tests/mcp/test_wc_client.py::test_missing_env_raises_keyerror DID NOT RAISE KeyError. Local-only \u2014 CI was green.",
+    "file": "skyyrose/integrations/wc_safe_client.py",
+    "root_cause": "Follow-on to bug-165's WC unification (commit 7426334dc). WCCredentials.from_env() called a helper _ensure_wordpress_env_loaded() that load_dotenv'd .env.wordpress BEFORE reading os.environ. On a dev machine .env.wordpress exists, so the auto-load repopulated the exact credential vars the test had just cleared via monkeypatch.delenv -> from_env resolved creds -> KeyError never raised -> test failed. In CI .env.wordpress is gitignored/absent, so the load no-op'd and the test passed: a test whose outcome depends on an untracked file's presence is non-deterministic. A parallel session compounded confusion by editing the same files (kept auto-load + stubbed the helper in a new test) while this session removed the auto-load.",
+    "fix": "FIXED 2026-06-29, committed 7bfce75cf direct to main (founder: 'commit the wc fix to main'). (1) wc_safe_client.py: removed _ensure_wordpress_env_loaded entirely; from_env() now reads os.environ ONLY (pure), so callers/tests fully control the env via monkeypatch. (2) devskyy_mcp.py: the application bootstrap now does load_dotenv(Path(__file__).parent/'.env.wordpress') after imports (with noqa: E402 on the post-load mcp_tools imports) \u2014 the file load belongs to the app, not the dataclass. (3) tests/mcp/test_wc_client.py: test_missing_env_raises_keyerror + smoketest missing-env test clear all SEVEN var-names from_env accepts (WC_BASE_URL/WORDPRESS_URL/WP_SITE_URL + WC_/WOOCOMMERCE_ key+secret). (4) tests/test_wc_credentials_from_env.py: dropped the now-dead setattr stub of the removed helper; the delenv loop is the entire isolation. Verified: PYTEST_EXIT=0 (25/25 across both WC test files), ruff clean on all 4 files; pushed da73ed5ab..7bfce75cf fast-forward; re-confirmed on origin/main (helper=0, stub=0, all-7-cleared, bootstrap load present).",
+    "tags": [
+      "woocommerce",
+      "wc-credentials",
+      "from-env",
+      "monkeypatch",
+      "dotenv",
+      "non-deterministic-test",
+      "stop-hook",
+      "parallel-session",
+      "local-only"
+    ],
+    "related_bugs": [
+      "bug-165"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T12:20:00-07:00"
+  },
+  {
+    "id": "bug-167",
+    "timestamp": "2026-06-29T14:30:00-07:00",
+    "error_message": "Stop-hook suite red: tests/test_asset_hub.py (pending 49!=20, product-card 17!=29, br-003/br-004/br-010-back/pending resolve None mismatches) + tests/mcp/test_wc_client.py missing-env tests",
+    "file": "tests/test_asset_hub.py, tests/mcp/test_wc_client.py",
+    "root_cause": "Snapshot-pinned tests rotted vs evolving SoT. asset_hub froze the 2026-06-25 manifest counts + hardcoded SKU verdicts; manifest since promoted to 73 verified/20 pending. wc_client from_env() auto-loaded symlinked .env.wordpress, defeating monkeypatch.delenv.",
+    "fix": "asset_hub tests rewritten snapshot->CONTRACT/data-derived (counts derived from live manifest; resolve contract by verdict; canonical <sku>-<face> filter since usage-variant ids are by_usage-only). wc_client: clear all 7 credential var-name fallbacks + drop setattr after from_env made pure. Full fast suite green (exit 0). Manifest = locked verdict authority over handoff; br-010/br-004 backs stay pending (resolve->None correct).",
+    "tags": [
+      "test-drift",
+      "snapshot-tests",
+      "asset-hub",
+      "wc-client",
+      "contract-tests",
+      "stop-hook"
+    ],
+    "related_bugs": [
+      "bug-164",
+      "bug-231"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T14:30:00-07:00"
+  },
+  {
+    "id": "bug-139",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "ingest_verdicts.py (Jun-25) rebuilt product manifest from verdicts each run; on a 2nd pass it would overwrite verified entries and (no is_ref gate) promote a source-photo/techflat 'use' pick into a served product-card \u2014 the fidelity-gate violation class (lh-005 fanny-pack).",
+    "file": "assets/hub/ingest_verdicts.py",
+    "root_cause": "First-ingest design (empty manifest -> rebuild from verdicts) reused for a second run against a now-authoritative LOCKED manifest; no is_ref() exclusion, no backup, no dry-run, no current-verdict gating.",
+    "fix": "Rewrote incremental + gated: start FROM manifest, dry-run default, --apply backs up manifest.json->.bak then mutates ONLY bucket-A (pending gap + exactly 1 serveable use). is_ref() excludes source-photos/source-products/techflat/references from ever becoming product-cards. Already-verified faces reported (bucket B), never overwritten. Verified-by gated on current verdict==pending.",
+    "tags": [
+      "asset-hub",
+      "ingest_verdicts",
+      "fidelity-gate",
+      "is_ref",
+      "manifest",
+      "sot",
+      "idempotency"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-187",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
+    "file": "wordpress-theme/skyyrose-flagship/front-page.php",
+    "root_cause": "Phantom subdirectory in the image path. front-page.php (lines 308, 485, 521) and data/render-keepers.json:12 referenced .../images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 with an extra black-rose-sherpa-jacket/ folder that does not exist in the theme asset tree (all product images are flat in products/). Verified authoritatively via curl: subdir path -> HTTP 404, flat path -> HTTP 200; Playwright predecode confirmed exactly 1 broken image of 33. Vision-verified the flat-path file is the correct garment (black Black-Rose hooded jacket with grayscale rose/wings chest crest), so the bug is the path, not the asset.",
+    "fix": "Collapsed the phantom subdir to the flat path in both files: front-page.php (3 occurrences via replace_all) and render-keepers.json (br-006 asset line) now point at /images/products/black-rose-sherpa-jacket-front-model.webp (the HTTP 200 file). Verified: 0 remaining subdir refs in wordpress-theme/, render-keepers.json re-parses as valid JSON, no other products/<slug>/<slug> double-subdir image paths in front-page.php. Source-only fix (PHP/JSON, no .min rebuild). Live still 404s until theme deploy (STOP-AND-SHOW gated).",
+    "tags": [
+      "wordpress",
+      "front-page",
+      "404",
+      "image-path",
+      "broken-image",
+      "br-006",
+      "black-rose",
+      "homepage",
+      "render-keepers"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-181",
+    "timestamp": "2026-06-30T12:40:00-07:00",
+    "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
+    "file": "skyyrose/core/asset_hub.py",
+    "root_cause": "served_theme_path used Path(source).suffix for the off-theme case; the staged file is always webp (theme .gitignore excludes png), so the .png path never resolved.",
+    "fix": "served_theme_path always returns assets/images/products/hub/<sku>-<face>.webp for off-theme verified renders; added regression test test_served_theme_path_offtheme_render_is_always_webp.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "build-collection-sot",
+      "served_theme_path",
+      "webp",
+      "fidelity"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:40:00-07:00"
+  },
+  {
+    "id": "bug-182",
+    "timestamp": "2026-06-30T12:41:00-07:00",
+    "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
+    "file": "skyyrose/core/sot_images.py",
+    "root_cause": "PHP theme reads data/collections/<slug>/sot.json via inc/collection-sot-reader.php, NOT data/sot-images.json (zero theme readers of sot-images.json). _index() feeds sot-images.json only.",
+    "fix": "Moved the single override seam upstream to build-collection-sot.py (generates sot.json); reverted _index(). sot.json now carries hub paths \u2192 PHP theme AND sot-images.json both honor the verdict.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "architecture",
+      "php",
+      "split-brain",
+      "seam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:41:00-07:00"
+  },
+  {
+    "id": "bug-183",
+    "timestamp": "2026-06-30T15:05:00-07:00",
+    "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
+    "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
+    "root_cause": "Storefront collection-grid cards render from the v7-cards system (build_v7_cards.py scans the products/v7/<sku>/ served tree), NOT sot.json front_model_image. The sot.json/sot-images tie reaches the holo card + dashboard, but the dominant v7 grid is a separate authority. The v7 tree was already hub-synced for 9/11 picks, so the deploy had ~0 visible card effect.",
+    "fix": "No code fix \u2014 corrected the claim. To reach the v7 grid, hub picks must be synced into products/v7/<sku>/ + v7-cards.json regenerated (build_v7_cards.py). lh-003 front + br-007 back are the 2 gaps. Deferred: PR #684 is actively refactoring v7 \u2014 coordinate, do not race.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "v7-cards",
+      "storefront",
+      "imagery-layers",
+      "overclaim"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T15:05:00-07:00"
+  },
+  {
+    "id": "bug-168",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "database/seed_catalog.py set is_active=(is_preorder=='1') \u2014 inverted; live products seeded inactive, pre-orders active",
+    "file": "database/seed_catalog.py",
+    "root_cause": "Raw is_preorder used as active predicate instead of canonical status. pre-order!=active, live==active. Backwards.",
+    "fix": "is_active=(status_from_row(row)=='live') via catalog_loader. Surfaced in Phase-2 loader-routing (PR #686).",
+    "tags": [
+      "catalog",
+      "seed",
+      "status",
+      "inverted-logic"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T00:00:00-07:00"
+  },
+  {
+    "id": "bug-169",
+    "timestamp": "2026-06-30T00:00:00-07:00",
+    "error_message": "br-011 (Jersey Series 4 Hockey) has garment_type_lock='hoodie' but is a jersey per registry+_JERSEY_SKUS",
+    "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+    "root_cause": "Jersey membership in 3 unsynced places (CSV garment_type_lock, registry sku_folders, _JERSEY_SKUS). br-011 CSV=hoodie, other two=jersey. Same redundant-field disease as br-014/15.",
+    "fix": "RESOLVED (2026-06-24, commit 9ea639a744e70e638052bab6f7bb32d7258b1f75) \u2014 this note was stale. The jersey roster is derived from logo-registry.json sku_folders (scripts/sync_catalog_downstream.py:_registry_jersey_skus), NOT from CSV garment_type_lock, by deliberate design documented in cerebrum.md:79. br-011's garment_type_lock='hoodie' is CORRECT and dossier-confirmed (data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md: 'Hockey-style pullover hoodie ... with a hood'; 'this is a fashion hoodie, not a tied-collar hockey jersey'). Flipping CSV to 'jersey' changes the render prompt \u2014 garment_type_lock is fed verbatim into the RAS/FLUX prompt (skyyrose/elite_studio/agents/three_d_agent.py:95-112, literal f-string 'GARMENT LOCK: {dossier[\"garment_type_lock\"]}') and into the dual-vision QA gate (skyyrose/elite_studio/graph/nodes/ghost_mannequin.py:139-147) \u2014 so this was investigated and rejected. Re-open only if the founder explicitly wants to revisit the hood-vs-no-hood render decision; do not re-derive the roster from garment_type_lock again (twice-rejected per cerebrum.md:79).",
+    "tags": [
+      "catalog",
+      "jersey",
+      "garment_type_lock",
+      "resolved-stale-note"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T00:00:00Z"
+  },
+  {
+    "id": "bug-170",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "Glyphs built from potrace-vectorized PNG cells rendered upside-down (PIL ImageFont render showed an inverted A) despite a sane-looking bbox",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "potrace's SVG <g transform=\"translate(...) scale(...)\"> repositions/scales the path on the page but does not convert SVG's y-down convention into font y-up/baseline-up space -- bbox math looked correct in both orientations so a coordinate sanity check could not have caught it; only rendering the actual glyph and reading the pixels surfaced the flip.",
+    "fix": "Added a second, explicit Transform().scale(1, -1) after potrace's own translate/scale, plus Cu2QuPen(reverse_direction=True) for correct hole winding on O/A/B/g. Verified by rendering 8 test glyphs (straight lines, curves, holes, descender) with PIL.ImageFont and reading the PNG pixels.",
+    "tags": [
+      "font-generation",
+      "potrace",
+      "fonttools",
+      "svg",
+      "coordinate-transform"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-171",
+    "timestamp": "2026-06-30T16:22:00-07:00",
+    "error_message": "build_font() crashed with a bare AssertionError deep in fontTools, or silently mis-mapped glyphs, on malformed/ambiguous manifests",
+    "file": "scripts/font_generator/pipeline.py",
+    "root_cause": "No validation of manifest cell uniqueness (duplicate char/codepoint -> glyphOrder/glyf length mismatch -> fontTools AssertionError), no bbox bounds checking (OOB bbox silently read as black-padded ink via Image.crop), and Image.open() had no decode-error wrapping (PIL.UnidentifiedImageError leaked past the CLI's narrow except tuple as a raw traceback). Found by an adversarial code-review workflow agent and reproduced.",
+    "fix": "Added _validate_manifest() (dup char/codepoint, missing keys, OOB bbox -> all raise clear ValueError) called before any processing; wrapped Image.open() to normalize decode failures to ValueError. Verified all 4 new fail-loud paths raise ValueError (not a crash, not silent corruption) with a standalone test script.",
+    "tags": [
+      "font-generation",
+      "validation",
+      "fail-loud",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-170"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T16:22:00-07:00"
+  },
+  {
+    "id": "bug-172",
+    "timestamp": "2026-06-30T17:05:00-07:00",
+    "error_message": "OpenAI gpt-image-2 images.edit() call returns 400 'The model gpt-image-2 does not support the input_fidelity parameter' (code invalid_input_fidelity_model)",
+    "file": "scripts/oai_render/client.py",
+    "root_cause": "OAIImageClient.edit() (client.py:74-85) unconditionally sends input_fidelity=config.INPUT_FIDELITY ('high', config.py:37) on every edit() call. config.py's comment claims this is 'verified via Context7... supported for gpt-image-1.5+ (incl. gpt-image-2)' but the LIVE API rejects it for gpt-image-2 specifically -- reproduced 24/24 times in a real call. Context7 (openai/openai-openapi, images/edits schema) lists input_fidelity support for gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only -- gpt-image-2 is not in that list. This means every product-render edit() call through this client is currently failing the same way, separate from any font-generation work.",
+    "fix": "FIXED 2026-06-30: config.py defines INPUT_FIDELITY_SUPPORTED_MODELS = {gpt-image-1, gpt-image-1-mini, gpt-image-1.5} (Context7-verified against openai-openapi images/edits schema); client.edit() only sends input_fidelity when config.MODEL is in that set (scripts/oai_render/client.py:88). gpt-image-2 calls omit the param \u2014 no more 400s. Buglog entry previously stale ('NOT YET FIXED'); corrected 2026-07-12.",
+    "tags": [
+      "oai-render",
+      "gpt-image-2",
+      "production-bug",
+      "input_fidelity",
+      "needs-founder-decision"
+    ],
+    "related_bugs": [],
+    "occurrences": 24,
+    "last_seen": "2026-06-30"
+  },
+  {
+    "id": "bug-188",
+    "timestamp": "2026-06-30T20:44:00",
+    "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
+    "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
+    "root_cause": ".venv was fully deleted from disk (untracked, not a git operation). pip install -e \".[all]\" resolves an enormous dep graph (torch/langchain/mineru/bentoml/xxhash-fallback-chain) that stalled for 6+min on source builds before I killed it; boto3 (used by integrations/cloudflare_r2_manager.py) was never declared in any pyproject.toml extra despite being required by the mcp extra import chain.",
+    "fix": "Recreated .venv, installed base package + boto3 + langgraph + scikit-image directly (piecemeal, faster than full [all] resolve) instead of waiting out the slow full extras install. Declared boto3>=1.43.0 in the mcp extra of pyproject.toml so future installs pick it up without manual patching.",
+    "tags": [
+      "venv",
+      "pip",
+      "pyproject",
+      "missing-dependency",
+      "boto3",
+      "test-infra"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T20:44:00"
+  },
+  {
+    "id": "bug-184",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "og:image/twitter:image emitted VideoPress .mp4 (logo_400x100.mp4) \u2014 link previews broken sitewide",
+    "file": "wordpress-theme/skyyrose-flagship/inc/seo.php",
+    "root_cause": "custom_logo theme-mod attachment used as social image without MIME validation; live logo attachment is a video",
+    "fix": "skyyrose_og_logo_url() helper gates all three emitters on image/* MIME, falls back to static brand asset",
+    "tags": [
+      "seo",
+      "og-image",
+      "wordpress",
+      "mime"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-185",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "Footer content rendered after </footer> on every page (mobile-bottom-nav; homepage also footer-cro/FAQ/size-guide)",
+    "file": "wordpress-theme/skyyrose-flagship/footer.php",
+    "root_cause": "front-page bypassed get_footer() with inline footer + manual part includes after it; footer.php included mobile-bottom-nav after </footer>",
+    "fix": "front-page uses get_footer(); mobile-bottom-nav moved inside the footer landmark (position:fixed makes placement visual no-op)",
+    "tags": [
+      "dom",
+      "landmarks",
+      "a11y",
+      "footer"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-186",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "kids-capsule.css shipped blue-dominant colors (#A8D8EA, #1A1A2E) violating no-blue brand law",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/kids-capsule.css",
+    "root_cause": "pre-canon palette survived the Kids Capsule rose-gold accent change (PR #704 changed accent but not the launch-teaser tokens)",
+    "fix": "--kc-sky \u2192 #D8A1AA, --kc-night \u2192 #171310, dawn gradient start \u2192 #D8A1AA; audit brand check now enforces",
+    "tags": [
+      "brand-law",
+      "css",
+      "kids-capsule",
+      "blue"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-173",
+    "timestamp": "2026-07-06T11:30:00-07:00",
+    "error_message": "AttributeError: 'NoneType' object has no attribute 'get' \u2014 meshy_skyy_pipeline.py poll() after i23d SUCCEEDED",
+    "file": "scratchpad/meshy_skyy_pipeline.py",
+    "root_cause": "Meshy API returns \"task_error\": null on success; dict.get('task_error', {}) returns None when key EXISTS with null value, so .get() chained on it crashes. Killed pipeline after 30-credit mesh task succeeded.",
+    "fix": "int(task.get('consumed_credits') or 0) \u2014 never chain .get() on a possibly-null JSON field; added resume-from-task-id CLI arg so paid tasks are never re-run after orchestrator crashes.",
+    "tags": [
+      "meshy",
+      "api",
+      "null-vs-missing",
+      "dict-get-default",
+      "paid-pipeline-resume"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-06T11:30:00-07:00"
+  },
+  {
+    "id": "bug-174",
+    "timestamp": "2026-07-07T17:50:00-07:00",
+    "error_message": "deploy-mu-plugin.sh would upload any MU_SRC plugin AS skyyrose-ally-ajax-guard.php (hardcoded SCP destination), clobbering the Ally guard on production",
+    "file": "scripts/deploy-mu-plugin.sh",
+    "root_cause": "PR #723 parametrized the source via MU_SRC but left the SCP destination filename hardcoded from the script's original single-plugin design",
+    "fix": "DEST=\"$(basename \"$SRC\")\" and upload to $MU_DIR/$DEST \u2014 caught pre-merge during deploy-script review, fixed on the PR branch before merge",
+    "tags": [
+      "deploy",
+      "mu-plugin",
+      "wordpress",
+      "production-safety",
+      "shell"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-175",
+    "timestamp": "2026-07-07T17:55:00-07:00",
+    "error_message": "PR #724 repointed catalog at br-014-giants-back.webp and kids-001-onmodel-v2.webp but neither binary was committed \u2014 .gitignore:524 blanket-ignores theme **/*.webp so plain git add silently skips them; live site would have 404'd both images after deploy",
+    "file": ".gitignore",
+    "root_cause": "gitignore rule 524 (wordpress-theme/skyyrose-flagship/assets/**/*.webp) contradicts the tracked-products-for-deploy convention (gitignore:254); repoint PRs hand-edit JSON without confirming target binaries are tracked",
+    "fix": "git add -f both binaries with the bless commit; caught by build-collection-sot.py resolver nulling br-014 back_model_image in the tracked view",
+    "tags": [
+      "gitignore",
+      "assets",
+      "repoint",
+      "deploy-integrity",
+      "sot"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-176",
+    "timestamp": "2026-07-07T18:01:00-07:00",
+    "error_message": "Failed to resolve module specifier \"three\". Relative references must start with \"/\", \"./\", or \"../\" \u2014 x4 on live PDP (product/br-003) console",
+    "file": "wordpress-theme/skyyrose-flagship (PDP template enqueue \u2014 import map missing/late on single-product pages)",
+    "root_cause": "UNCONFIRMED \u2014 a module script importing bare 'three' runs on the PDP without the three.js import map registered before it; pre-existing on live, observed during anon-cache-guard post-verify; NOT caused by today's merges (no CSS/JS changed)",
+    "fix": "OPEN \u2014 diagnose which module script the PDP enqueues and ensure the importmap is emitted first (or make the import relative); candidate files inc/enqueue.php + PDP 3D viewer scripts",
+    "tags": [
+      "threejs",
+      "importmap",
+      "pdp",
+      "enqueue",
+      "live-defect",
+      "open"
+    ],
+    "related_bugs": [
+      "bug-189"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-177",
+    "timestamp": "2026-07-07T11:20:00-07:00",
+    "error_message": "paid-api-stopgate blocked read-only commands (head/grep of deploy-theme.sh) and rejected STOPSHOW_ACK=1 when preceded by other env assignments",
+    "file": ".claude/hooks/paid-api-stopgate.sh",
+    "root_cause": "deploy rule substring-matched the script filename in any context; ACK bypass only accepted the token as the literal first command token",
+    "fix": "deploy rules now require execution context (interpreter invocation or command-position path); ACK accepted after leading assignment-shaped tokens only (flag/string-embedded tokens still blocked); deploy-mu-plugin.sh execution added to the gate; 17/17 regression matrix green (scratchpad/stopgate-matrix.sh pattern)",
+    "tags": [
+      "hooks",
+      "stopgate",
+      "false-positive",
+      "deploy",
+      "security"
+    ],
+    "related_bugs": [
+      "bug-174"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07"
+  },
+  {
+    "id": "bug-178",
+    "timestamp": "2026-07-07T11:30:00-07:00",
+    "error_message": "Skyy mascot never appears on live skyyrose.co \u2014 GLB load fails silently, no console error surfaced",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "root_cause": "skyy.glb ships draco-compressed (gltf-transform --compress draco) but GLTFLoader had no DRACOLoader attached \u2014 decoders were shipped to assets/js/lib/draco/ and CSP updated, yet the loader wiring itself was never added. QC harness masked it: harness viewer has its own DRACOLoader.",
+    "fix": "Import DRACOLoader alongside GLTFLoader in module bootstrap, expose window.THREE_DRACOLoader, attach via loader.setDRACOLoader(new DRACOLoader().setDecoderPath(DRACO_PATH)) with DRACO_PATH derived from MODEL_URL. Rebuilt .min.",
+    "tags": [
+      "mascot",
+      "three.js",
+      "draco",
+      "gltfloader",
+      "silent-failure",
+      "qc-blind-spot"
+    ],
+    "related_bugs": [
+      "bug-190",
+      "bug-193",
+      "bug-194"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T11:30:00-07:00"
+  },
+  {
+    "id": "bug-179",
+    "timestamp": "2026-07-07T21:43:04Z",
+    "error_message": "stage_f_shadows.generate_shadows() silently swallows PIL/IO errors and returns the un-shadowed composite path as if it were the shadow output, letting a broken shadow pass QA scoring undetected",
+    "file": "skyyrose/elite_studio/agents/compositor/stage_f_shadows.py",
+    "root_cause": "the trailing except Exception caught every failure mode (including real I/O errors) in the same branch as the legitimate >=85%-frame-fill skip-shadow case, and both returned composite_path unchanged with only a log.warning \u2014 the caller (orchestrator.py single broad-except at line 378) never saw the failure, so success stayed True",
+    "fix": "added ShadowStageError(RuntimeError); the except block now raises it instead of returning composite_path, letting the orchestrator existing broad-except at line 378 correctly fail the render closed (success=False). The intentional skip-shadow early-return path is untouched. Removed now-orphaned logging import/logger (the only log call was in the removed branch).",
+    "tags": [
+      "compositor",
+      "stage_f",
+      "fail-open",
+      "embeddings-hardening"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T21:43:04Z"
+  },
+  {
+    "id": "bug-189",
+    "timestamp": "2026-07-07T16:45:00-07:00",
+    "error_message": "TypeError: Failed to resolve module specifier 'three' (live pageerror; console clean)",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "root_cause": "jsdelivr examples/jsm loaders import bare 'three' \u2014 unresolvable in browsers without an importmap; window.THREE never set, 3D layer silently stayed on 2D fallback. Errors surface on 'pageerror', NOT 'console' \u2014 console-only monitoring missed it.",
+    "fix": "Import via jsdelivr /+esm endpoints (rewrites bare specifiers to a single shared three instance). Importmap rejected: page already executes module scripts and late importmaps throw.",
+    "tags": [
+      "three.js",
+      "esm",
+      "bare-specifier",
+      "jsdelivr",
+      "pageerror-vs-console"
+    ],
+    "related_bugs": [
+      "bug-176",
+      "bug-178"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T16:45:00-07:00"
+  },
+  {
+    "id": "bug-190",
+    "timestamp": "2026-07-07T16:45:00-07:00",
+    "error_message": "Skyy mascot (position:fixed) rendered 13,084px down the document instead of the viewport corner",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/system/animations-premium.css",
+    "root_cause": "pageEnter/pageExit page transitions run on <body> with translateY keyframes + fill-mode:forwards \u2014 permanent identity transform on body. Per CSS spec (MDN containing-block), ANY transform (even identity), filter, perspective, will-change:transform, or contain:paint on an ancestor makes it the containing block for fixed descendants.",
+    "fix": "Opacity-only pageEnter/pageExit keyframes + do-not-reintroduce comment. Ship gate: assert getComputedStyle(document.body).transform === 'none' in live verification.",
+    "tags": [
+      "css",
+      "position-fixed",
+      "containing-block",
+      "body-transform",
+      "animation-fill-mode",
+      "mascot"
+    ],
+    "related_bugs": [
+      "bug-178",
+      "bug-194"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T16:45:00-07:00"
+  },
+  {
+    "id": "bug-191",
+    "timestamp": "2026-07-07T17:30:00-07:00",
+    "error_message": "pytest teardown noise: 'Future exception was never retrieved' from tests/test_utils_modules.py::test_deduplicate_exception_propagates",
+    "file": "utils/request_deduplication.py",
+    "root_cause": "deduplicate() sets the failure exception on the shared pending future for duplicate callers; when no duplicate caller ever awaits it, the exception is unretrieved at GC and asyncio logs the warning.",
+    "fix": "Consume the exception immediately after set_exception() via shared_future.exception() (marks it retrieved); primary caller still re-raises. Commit 9f468f298.",
+    "tags": [
+      "asyncio",
+      "future",
+      "pytest",
+      "warning",
+      "request-deduplication"
+    ]
+  },
+  {
+    "id": "bug-192",
+    "timestamp": "2026-07-07T23:15:00-07:00",
+    "error_message": "ModuleNotFoundError: psutil, then boto3, then langgraph \u2014 main_enterprise cannot import inside Dockerfile.api slim image",
+    "file": "pyproject.toml",
+    "root_cause": "Three unguarded hard imports reachable from main_enterprise were not in base deps: api/v1/monitoring.py:21 psutil (extra-only), integrations/__init__.py:6\u2192cloudflare_r2_manager.py:6 boto3 (never declared anywhere; [all] had it transitively, CI installs it manually at ci.yml:142), orchestration/langgraph_integration.py:37 langgraph (mcp-extra-only). Worktree meta-path test passed because the shared .venv has all three; only a real in-container import probe could catch it. First stub-census was incomplete (aborted on from-import vs bare stub) \u2014 PEP-562 __getattr__ stubs needed for one-pass census.",
+    "fix": "Added psutil>=7.2.2, boto3>=1.34, langgraph>=0.2 to base [project.dependencies] with importer citations; re-proved [api] resolves torch-free; rebuilt image; in-container import probe clean.",
+    "tags": [
+      "docker",
+      "packaging",
+      "extras",
+      "slim-image",
+      "verification"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T23:15:00-07:00"
+  },
+  {
+    "id": "bug-193",
+    "timestamp": "2026-07-07T23:30:00-07:00",
+    "error_message": "Founder: 'no skyy' on live despite ALL headless verification passing (10/10 assertions, screenshots)",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/mascot.js",
+    "root_cause": "Only entrance trigger was 10-30s of continuous stillness, re-armed by every scroll/pointermove; dormant container display:none with no manual summon. Actively-browsing humans never accumulate that stillness. Headless probes passed BECAUSE a headless page is perfectly still \u2014 the verification environment structurally could not exhibit the bug.",
+    "fix": "v1.9.3: first entrance per session = fixed 4.5s after load, immune to activity (host greets arrivals); re-entries keep idle trigger. Verified live: entered at 11.9s under continuous synthetic activity.",
+    "tags": [
+      "mascot",
+      "ux",
+      "idle-trigger",
+      "verification-blind-spot",
+      "headless-vs-real-user"
+    ],
+    "related_bugs": [
+      "bug-189",
+      "bug-190"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-07T23:30:00-07:00"
+  },
+  {
+    "id": "bug-194",
+    "timestamp": "2026-07-08T01:25:00-07:00",
+    "error_message": "Mascot GLB renders as white untextured silhouette on Safari-path loaders on skyyrose.co live site",
+    "file": "renders/3d/mascot/v2/skyy-v6-web.glb (live), replaced by skyy-v7-web.glb",
+    "root_cause": "skyy-v6-web.glb has extensionsRequired: [EXT_texture_webp, KHR_draco_mesh_compression] with baseColor/emissive texture stored as image/webp. Loaders that don't support EXT_texture_webp (Safari-path) drop the required extension and fail to render the texture, producing a white silhouette. Separately, the task spec's build command `gltf-transform optimize ... --texture-compress jpeg` does not exist in gltf-transform CLI v4.4.1 -- the `optimize` subcommand's --texture-compress only accepts ktx2|webp|avif|auto|false, never jpeg/png (confirmed via `optimize --help`); jpeg/png conversion is a separate top-level `jpeg`/`png` subcommand.",
+    "fix": "Rebuilt from uncompressed master skyy-v6-merged.glb (image/png source, no draco, no webp) using a 3-stage single-pass pipeline instead of the invalid one-shot optimize flag: (1) `gltf-transform resize --width 2048 --height 2048` on the raw PNG texture, (2) `gltf-transform jpeg --formats '*' --quality 92` to convert to universal image/jpeg (alphaMode is OPAQUE so no alpha loss), (3) `gltf-transform draco` applied LAST as a single clean geometry compression pass (running draco before texture ops caused a 'Decoded KHR_draco_mesh_compression, further compression will be lossy' warning on re-encode -- avoided by ordering texture ops before the only draco pass). Result: extensionsRequired=[KHR_draco_mesh_compression] only, no EXT_texture_webp anywhere, image/jpeg 2048x2048, all 6 animation clips (idle/joy/point/talk/walk/wave) and the single skin + JOINTS_0 preserved byte-identical keyframe counts to the source master. 1.44MB total, under the 3.5MB budget. Visually QC'd the extracted JPEG texture atlas at quality 92 -- no banding on flat black/white fills.",
+    "tags": [
+      "gltf-transform",
+      "3d-mascot",
+      "webp",
+      "safari",
+      "draco",
+      "cli-flag-mismatch",
+      "texture-compression"
+    ],
+    "related_bugs": [
+      "bug-178",
+      "bug-193"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T01:25:00-07:00"
+  },
+  {
+    "id": "bug-195",
+    "timestamp": "2026-07-08T10:37:00-07:00",
+    "error_message": "Founder-reported: mascot body posture 'not human-like' -- hunched torso, head pitched down, arms hanging forward, one foot lifted -- visible in bind pose and specifically in the idle loop as played live.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (source), skyy-v8-web.glb (fixed, not yet deployed)",
+    "root_cause": "Three compounding mistakes across attempts, each caught before reaching production: (1) A prior diagnosis agent's corrective quaternion for the Hips bone ('world +X axis, +8.7954deg') did not reproduce in a fresh Blender session -- applying it moved the lean in the WRONG direction. Root cause: `pose_bone.rotation_quaternion` is defined in the bone's own LOCAL rest-space, not world space. This rig's Hips edit-bone rest orientation is heavily skewed from world axes (euler ~[-9,17,-99] degrees, confirmed via `bone.matrix_local.to_euler()`), so any 'world axis' rotation vector passed directly into `Quaternion(axis, angle)` and assigned to `.rotation_quaternion` was actually being interpreted in that skewed local frame, producing wildly wrong real-world rotations (one attempt collapsed the spine below the hips; another laid the whole body flat on its back). (2) The correct fix -- rotating a bone by a true WORLD-space angle -- requires manipulating `pose_bone.matrix` (armature/world-space) directly: `pb.matrix = Translation(pivot) @ Matrix.Rotation(angle, 4, world_axis) @ Translation(-pivot) @ pb.matrix.copy()`, then letting Blender back-solve the local values. This was verified with a monotonic, reproducible sweep (world X axis, -12.5deg drives Hips->Head world-space lean from -12.62deg to -0.12deg). (3) Even with the correct world-space rotation, applying it via `bpy.ops.pose.armature_apply()` (bake pose as new rest) had ZERO visible effect on the deployed mascot, because `skyy-3d.js` only ever plays named animation clips (idle/walk/etc) via GLTFLoader -- the bind/rest pose is never displayed. `armature_apply()` is explicitly designed to preserve existing animation clips' visual appearance relative to the new rest, so it structurally cannot un-hunch a clip whose own keyframes are the source of the hunch. The idle clip's Hips bone had only 2 keyframes (frames 0 and 72, the loop start/end) baked with the original bad rotation.",
+    "fix": "Directly re-keyed the idle action's Hips rotation_quaternion at both existing keyframes (frame 0 and 72) using the verified world-space rotate-around-pivot method (`pose_bone.matrix` manipulation, NOT `rotation_quaternion` assignment, NOT `armature_apply()`). Verified via direct render of the re-exported, re-optimized (resize->jpeg->draco) GLB's actual idle clip at 0/25/50/75/100% of the loop -- upright, symmetric, level head, loop closes cleanly. Walk/talk/joy clips were already correctly authored (untouched, confirmed still good); wave/point show an intentional forward-leaning gesture pose, not the standing-hunch defect, left as-is. Result file: renders/3d/mascot/v2/skyy-v8-web.glb, 827KB, all 6 clips + single skin + JOINTS_0/WEIGHTS_0 preserved, draco+jpeg applied. NOT YET deployed to production -- pending founder confirmation per STOP-AND-SHOW.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "pose-bone-local-vs-world-space",
+      "armature-apply-misconception",
+      "rest-pose-never-displayed",
+      "idle-clip-rekey",
+      "gltf-transform"
+    ],
+    "related_bugs": [
+      "bug-194"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T10:37:00-07:00"
+  },
+  {
+    "id": "bug-196",
+    "timestamp": "2026-07-08T22:44:00-07:00",
+    "error_message": "Founder: still not fixed why is this so complicated -- its the torso, waste, legs her whole bottom half (after v1.9.5 Hips-lean deploy)",
+    "file": "renders/3d/mascot/v2/skyy-v9-idle-only-merged.glb (source: skyy-v6-merged.glb)",
+    "root_cause": "Independent of the Hips-lean fix (bug-195), the mascot GLB has a pre-existing crossed-leg base pose (LeftUpLeg/RightUpLeg exaggerated adduction) baked into every one of the 6 animation clips (idle/walk/talk/point/wave/joy) at their starting keyframes, causing the pants mesh to pinch into a visible diagonal crease at the crotch/pelvis. Confirmed present in the pristine original v6-merged.glb, so not introduced by any fix tonight.",
+    "fix": "idle clip only: re-keyed LeftUpLeg/RightUpLeg rotation_quaternion at both existing keyframes (frames 0, 72) with a world-space Y-axis rotation of -15 degrees (left) / +15 degrees (right), computed via pose_bone.matrix world-space manipulation with the pose frozen (animation_data.action = None) before editing so the edit is not immediately overwritten by animation evaluation on the next depsgraph update. Verified clean via fresh render of the exported result. walk/talk/point/wave/joy were NOT fixed: a -8 to -30 degree sweep of the same world-Y correction against walk frame 1 (much deeper hip flexion than idle) never cleared the crease, indicating a different root cause at high flexion angles (likely a skin-weight pinch at the Hips/UpLeg boundary, not adduction/crossing) that requires mesh/weight-level work, not an animation-keyframe fix. Those 5 clips were left completely untouched in the shipped file (byte-identical to original v6 data) rather than shipping an unproven correction.",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "pose-bone",
+      "skin-weights",
+      "animation-keyframes",
+      "partial-fix"
+    ],
+    "related_bugs": [
+      "bug-195"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-08T22:44:00-07:00"
+  },
+  {
+    "id": "bug-197",
+    "timestamp": "2026-07-09T05:00:00-07:00",
+    "error_message": "RuntimeError: CRITICAL: JWT_REFRESH_SECRET_KEY is not set \u2014 devskyy-backend first boot crash-looped, health checks timed out",
+    "file": "tasks/backend-golive-manifest.md",
+    "root_cause": "Go-live manifest listed required secrets by convention (JWT_SECRET_KEY, ENCRYPTION_MASTER_KEY, DATABASE_URL...) instead of by census \u2014 security/jwt_oauth2_auth.py has TWO _require_secret sites (JWT_SECRET_KEY:102 AND JWT_REFRESH_SECRET_KEY:104); the second was never in the manifest.",
+    "fix": "Set JWT_REFRESH_SECRET_KEY via fly secrets (founder-run, openssl-generated). Lesson: before any go-live, grep the boot path for _require_secret/fail-loud sites and derive the secret list from code, not memory.",
+    "tags": [
+      "deploy",
+      "secrets",
+      "fly",
+      "manifest",
+      "fail-loud"
+    ],
+    "related_bugs": [
+      "bug-192"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T05:00:00-07:00"
+  },
+  {
+    "id": "bug-198",
+    "timestamp": "2026-07-09T13:15:00-07:00",
+    "error_message": "Follow-up to bug-196: walk/talk/point/wave/joy crotch crease at high hip flexion -- three independent fix approaches (weight-smoothing, flexion-angle-clamping, manual weight redistribution) attempted via a mascot-skin-weight-fix Workflow with adversarial verification. All three failed.",
+    "file": "renders/3d/mascot/v2/skyy-v6-merged.glb (investigated in worktree mascot-skin-weight-fix, no changes shipped)",
+    "root_cause": "NOT a weight-painting defect -- the Hips/UpLeg vertex weight blend is smooth, anatomically sane, with zero hard cutoffs (0 hard-single vertices out of ~369 in the crotch region). Root cause is Linear Blend Skinning (candy-wrapper collapse) at extreme, stylized hip-flexion angles: these mascot poses hit 126-138 degrees of hip flexion (bind-pose-relative), well beyond real human ROM (~90-120 degrees). At that flexion, binding a vertex 100% to Hips vs 100% to the thigh bone produces deformed positions 26-28% of torso-reference-length apart -- no reweighting between the same two rigid bone transforms can close a gap that large; any blend, narrow or wide, produces visible pinching under LBS math. Confirmed independently by 3 separate diagnostic/fix attempts converging on the same conclusion.",
+    "fix": "NONE SHIPPED -- all three attempted fixes were adversarially verified (independent re-render + pixel-diff, not self-report) as no-improvement: (1) weight-smoothing via Jacobi diffusion on the Hips/UpLeg/UpLeg vertex groups, both mild (953 verts) and aggressive (1630 verts, 30 iterations) passes -- zero visible change, confirmed via determinism-controlled pixel diff; (2) flexion-angle clamping (halving the excess above 80% of each clip's own peak angle) -- adversarial matched-crop pixel diff disproved the builder's own claimed improvement on talk, AND this approach has a real cost: on this rig flexion is measured from bind pose not neutral-standing, so the threshold caught 102/102 walk frames, nearly halving the stride's rotational amplitude and making the walk animation visibly less dynamic for zero benefit; (3) manual vertex-weight redistribution with a wider, anatomically-anchored (0.5x thigh-bone-length) smoothstep blend band -- independent 800%-zoom + ImageMagick fuzz-diff re-render showed the actual pixel differences were a 1-2px anti-aliasing shift, not a real fold reduction. Recommended next step (not yet attempted): a corrective shape key / morph target sculpted for high hip-flexion, driven by a per-clip morph-weight keyframe track peaking at each clip's known peak frame (walk=86, talk=15, point=59, wave=27, joy=12) -- glTF + three.js natively support morph targets with animated weights, this is the standard fix for LBS candy-wrapper collapse. Fallbacks in order: helper/twist bone between Hips and UpLeg, then dual-quaternion skinning (requires custom three.js runtime/shader work, highest cost).",
+    "tags": [
+      "3d-mascot",
+      "blender",
+      "gltf",
+      "skin-weights",
+      "linear-blend-skinning",
+      "lbs-candy-wrapper-collapse",
+      "unresolved",
+      "adversarial-verification"
+    ],
+    "related_bugs": [
+      "bug-195",
+      "bug-196"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T13:15:00-07:00"
+  },
+  {
+    "id": "bug-216",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY CRITICAL] CORS allow_origin_regex matched any *.vercel.app with allow_credentials=True \u2014 credentialed cross-origin data theft (live-proven: reflected https://evil.vercel.app)",
+    "file": "main_enterprise.py",
+    "root_cause": "_resolve_cors_origin_regex default `[a-z0-9-]+\\.(vercel\\.app|devskyy\\.app)` \u2014 vercel.app is an attacker-registrable shared domain",
+    "fix": "Scoped regex to devskyy.app subdomains + `devskyy-*-skyyroseco.vercel.app`, anchored ^...$; 6 regex assertions",
+    "tags": [
+      "security",
+      "cors",
+      "critical",
+      "credentials"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-199",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY HIGH] Personalization REST route: no rate limit + attacker-controlled Referer in transient cache key \u2192 unbounded storage DoS",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-api-experience.php",
+    "root_cause": "public __return_true route, cache_key=md5(hash+collection+referer), referer from raw header, no throttle",
+    "fix": "30/min per-IP throttle; dropped Referer from cache key",
+    "tags": [
+      "security",
+      "wordpress",
+      "rate-limit",
+      "dos"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-200",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY HIGH] analytics/events forwarded raw attacker JSON to FastAPI backend verbatim",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-api-experience.php",
+    "root_cause": "relay_analytics($events) received unsanitized request array (store sanitized local copies only)",
+    "fix": "New skyyrose_see_sanitize_events() allowlists fields before relay",
+    "tags": [
+      "security",
+      "wordpress",
+      "sanitization",
+      "injection"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-201",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] /openapi.json served 200 unauthenticated in production \u2014 full route/param schema disclosure",
+    "file": "main_enterprise.py",
+    "root_cause": "docs_url/redoc_url gated but openapi_url was not",
+    "fix": "openapi_url=None in production",
+    "tags": [
+      "security",
+      "info-disclosure",
+      "fastapi"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-202",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] SSRF guard bypassable for IP-literal hosts (10.x/127.x/169.254/::1)",
+    "file": "wordpress-theme/skyyrose-flagship/inc/fastapi-client.php",
+    "root_cause": "range check ran only when gethostbyname changed the host; IP literals returned unchanged \u2192 skipped",
+    "fix": "Range filter unconditional + IPv6 literal handling + Alibaba metadata block; unit-verified",
+    "tags": [
+      "security",
+      "wordpress",
+      "ssrf"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-203",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] MCP bridge AJAX forwarded any tool under shared backend token (compromised-admin blast radius)",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "manage_options+nonce correct but no tool allowlist",
+    "fix": "Filterable denylist blocking paid-generation + deploy/release tools",
+    "tags": [
+      "security",
+      "wordpress",
+      "authz",
+      "defense-in-depth"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-204",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] WS7 updateOrder/updateProduct path-traversal via `..` in id (dormant, 0 callers)",
+    "file": "frontend/lib/wp/client.ts",
+    "root_cause": "auth tier chosen from raw path; fetch collapses `..` after \u2192 creds to wrong endpoint",
+    "fix": "buildUrl() rejects `..` via path-safety.ts + strict-int id coercion; 6 vitest",
+    "tags": [
+      "security",
+      "frontend",
+      "path-traversal",
+      "dormant"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-205",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY MEDIUM] Klaviyo subscribe throttled per-email only \u2192 scriptable list-spam",
+    "file": "wordpress-theme/skyyrose-flagship/inc/klaviyo-integration.php",
+    "root_cause": "only per-email transient limit",
+    "fix": "Added 20/15min per-IP limit",
+    "tags": [
+      "security",
+      "wordpress",
+      "rate-limit",
+      "spam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-206",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] legacy wordpress/proxy route no in-route auth (SPOF on edge matcher)",
+    "file": "frontend/app/api/wordpress/proxy/route.ts",
+    "root_cause": "relied solely on proxy.ts matcher",
+    "fix": "Added getServerSession, fails closed",
+    "tags": [
+      "security",
+      "frontend",
+      "authz"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-207",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] proxy.ts matcher bare-prefix lookahead \u2014 /api/authorize would fail open",
+    "file": "frontend/proxy.ts",
+    "root_cause": "(?!auth|checkout|webhooks) prefix not segment-anchored",
+    "fix": "Segment-anchored (?:/|$)",
+    "tags": [
+      "security",
+      "frontend",
+      "authz"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-208",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] stock endpoint leaked draft products by SKU",
+    "file": "wordpress-theme/skyyrose-flagship/inc/klaviyo-integration.php",
+    "root_cause": "wc_get_product_id_by_sku ignores post_status",
+    "fix": "publish-status check",
+    "tags": [
+      "security",
+      "wordpress",
+      "info-disclosure"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-209",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY LOW] .vercelignore re-included entire data/ dir into prod artifact",
+    "file": "./.vercelignore",
+    "root_cause": "broad !/data re-include shipped tooling/notes",
+    "fix": "tightened to skyyrose-catalog.csv only",
+    "tags": [
+      "security",
+      "infra",
+      "hygiene"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
+    "id": "bug-210",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY CRITICAL] POST /api/v1/agent/execute + /webhooks/dispatch unauthenticated \u2014 prompt-injectable production WooCommerce/WordPress writes on public backend (live-confirmed 422 not 401)",
+    "file": "api/v1/wordpress_agent.py",
+    "root_cause": "routes had no Depends/auth; feed free-form prompt into acceptEdits agent with live WC/WP write tools (wp_update_order no-confirm); billing_middleware regex doesn't match /agent/",
+    "fix": "Added Depends(get_current_user) to both routes; verified auth_dep=True via route inspection",
+    "tags": [
+      "security",
+      "critical",
+      "authz",
+      "prompt-injection",
+      "agent"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-211",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] MCP bearer token compared with != (timing side-channel) + fail-open when token unset in prod",
+    "file": "mcp_tools/http_mount.py",
+    "root_cause": "plain string != leaks length/prefix; missing MCP_SERVICE_TOKEN \u2192 warn-and-serve-open",
+    "fix": "hmac.compare_digest + fail-closed (reject) in non-dev + UnicodeDecode guard",
+    "tags": [
+      "security",
+      "mcp",
+      "timing",
+      "fail-open"
+    ],
+    "related_bugs": [
+      "bug-216",
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-212",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY MEDIUM] No TrustedHostMiddleware on public backend",
+    "file": "main_enterprise.py",
+    "root_cause": "no Host-header allowlist now that api.devskyy.app is internet-facing",
+    "fix": "TrustedHostMiddleware available, opt-in via ALLOWED_HOSTS env (safe default, won't break Fly health checks)",
+    "tags": [
+      "security",
+      "host-header",
+      "defense-in-depth"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-213",
+    "timestamp": "2026-07-09T08:55:00-07:00",
+    "error_message": "[SECURITY LOW] /api/v1/catalog/answer + /answer/stream unauthenticated and cost-bearing (Claude per request)",
+    "file": "api/v1/catalog.py",
+    "root_cause": "documented in file header as unauth + cost-bearing; no Depends or per-IP limit",
+    "fix": "FLAGGED for follow-up (not fixed this pass) \u2014 add Depends(get_current_user) or per-IP rate limit per the file's own comment",
+    "tags": [
+      "security",
+      "cost",
+      "rate-limit",
+      "follow-up"
+    ],
+    "related_bugs": [
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:55:00-07:00"
+  },
+  {
+    "id": "bug-214",
+    "timestamp": "2026-07-09T09:00:00-07:00",
+    "error_message": "Corrective shape-key fix for mascot crotch-fold defect (skyy-fix-shapekey-merged.glb) SHIP-BLOCKING: independent verifier found the baked morph-target rest weight is 1.0 (not 0.0), which three.js GLTFLoader loads directly into mesh.morphTargetInfluences at load time; skyy-3d.js never touches morph targets afterward (clip switching is AnimationMixer fadeIn/fadeOut crossfades only), so the wave-only correction permanently leaks into idle/walk/talk/point/joy in any real browser session. Worst regression in \"point\" (hip rose-embroidery shatters into jagged triangulated debris, uglier than the original wave defect). Corrects bug-198's scope claim: only \"wave\" has a genuine LBS candy-wrapper defect at peak flexion \u2014 walk/talk/point/joy are smooth/defect-free, confirmed independently by 4 separate methods (raw glTF JSON parse, fresh Blender reimport, three.js source + skyy-3d.js runtime grep, empirical re-render at true baked default).",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb (built in .claude/worktrees/mascot-skin-weight-fix)",
+    "root_cause": "Builder set the shape key's per-clip evaluated value to 0 for undriven clips only inside its OWN verification render harness before rendering \u2014 masking that the Key datablock's REST/basis default (what actually gets baked into glTF meshes[0].weights on export) was left at 1.0. Self-graded build report claimed \"value permanently 0/unauthored\" for the other 4 clips; this was false for the shipped file.",
+    "fix": "NOT YET SHIPPED \u2014 do not deploy skyy-fix-shapekey-merged.glb under any circumstance. One-line fix identified but not yet applied+verified: explicitly set key_blocks[\"CrotchFoldCorrective_wave\"].value = 0.0 on the Key datablock before the glTF export call, then assert meshes[0].weights in ([0],[0.0],None) by parsing the exported GLB's JSON directly (never trust Blender UI state or exporter defaults). Revision agent that was applying this crashed mid-stream (API stream stall) before completing re-verification \u2014 workflow resumable via cached run wf_c02081fb-534.",
+    "tags": [
+      "3d",
+      "mascot",
+      "glb",
+      "shape-key",
+      "morph-target",
+      "gltf-export",
+      "ship-blocking",
+      "adversarial-verification-caught-it"
+    ],
+    "related_bugs": [
+      "bug-198"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T09:00:00-07:00"
+  },
+  {
+    "id": "bug-215",
+    "timestamp": "2026-07-09T09:55:00-07:00",
+    "error_message": "Revised mascot shape-key build (skyy-fix-shapekey-revised-merged.glb) fixes bug-214's ship-blocking cross-clip leak (idle/walk/talk/point/joy independently confirmed pixel-identical to pristine, correctly carrying flat 0.0 weights) but only wave actually received a correction, and even that is partial (residual angular faceting still visible at f44 per tight zoomed diff). Final verify: overall_verdict=\"partially-improved\", recommend_ship=false, packaged=null.",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-revised-merged.glb (worktree mascot-skin-weight-fix, not yet in main)",
+    "root_cause": "Workflow-design issue, not a code bug: every agent in this lineage (build, verify, revise) was fed the SAME static prompt asserting the original premise (\"walk/talk/point/wave/joy\" all defective) with an explicit \"do not re-litigate\" instruction \u2014 even after an EARLIER stage in this same lineage independently proved (4 separate methods: raw glTF weights-channel parse, fresh Blender reimport, three.js/skyy-3d.js runtime grep, empirical pristine-vs-candidate render diff) that only wave shows a genuine LBS candy-wrapper defect; walk/talk/point/joy show smooth, normal garment folding at peak flexion with no jagged collapse. The final verify stage flags those 4 clips as a \"ship-blocking gap\" purely because they don't match the task's original all-5 instruction, not because fresh evidence shows they need fixing. This is the same class of failure as bug-198's scope claim: a stale premise baked into a prompt outliving the evidence that overturned it, this time propagating across a workflow RESUME rather than across separate sessions.",
+    "fix": "NOT SHIPPED. Recommend treating wave-only as the correct scope (per the well-corroborated independent finding), evaluate whether wave's partial improvement (smoother crease, residual angularity at f44) is worth shipping on its own merits, and do NOT chase further \"fixes\" for walk/talk/point/joy without first re-deriving \u2014 with fresh eyes, ignoring the original task premise \u2014 whether those clips are actually defective at all.",
+    "tags": [
+      "3d",
+      "mascot",
+      "glb",
+      "shape-key",
+      "workflow-design",
+      "stale-premise",
+      "adversarial-verification"
+    ],
+    "related_bugs": [
+      "bug-198",
+      "bug-214"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T09:55:00-07:00"
+  },
+  {
+    "id": "bug-217",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "docs/DEPLOYMENT_ARCHITECTURE.md asserted the MCP runs on Fly app 'devskyy-mcp' - wrong; real app is 'devskyy-api' (fly.toml -> Dockerfile.mcp -> mcp_service). Introduced in prior-turn doc banner from memory, not verified vs fly config.",
+    "file": "docs/DEPLOYMENT_ARCHITECTURE.md",
+    "root_cause": "Stated a Fly app name from session memory instead of reading authoritative fly*.toml. Naming is counterintuitive (devskyy-backend=REST API, devskyy-api=MCP), so memory was an easy trap.",
+    "fix": "Grepped fly.toml/fly.backend.toml for app<->dockerfile mapping; corrected banner to 'devskyy-api' + explicit do-not-swap note; same rule stated in MCP_ARCHITECTURE.md and MCP_CONFIGURATION_GUIDE.md.",
+    "tags": [
+      "docs",
+      "fly",
+      "mcp",
+      "anti-hallucination",
+      "app-naming"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
+  },
+  {
+    "id": "bug-218",
+    "timestamp": "2026-07-10T11:00:00-07:00",
+    "error_message": "[SECURITY HIGH] Admin MCP bridge (inc/mcp-bridge.php) used a denylist that fails OPEN: it blocked devskyy_lora_generate but not its paid siblings devskyy_lora_pose_transfer/_upscale/_clean_background or devskyy_train_lora_from_products (2-4h GPU job). A compromised manage_options session could invoke them via the free-form AJAX console and spend real Replicate credit under the shared MCP_SERVICE_TOKEN \u2014 defeating the control's stated purpose.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "Denylist model for a money guard: any paid tool not explicitly listed is invocable, so every new/renamed paid tool leaks until someone remembers to add it. Found by adversarial code-review (ran on Sonnet 5 after a fable->sonnet subagent-model downgrade).",
+    "fix": "Inverted to a fail-closed ALLOWLIST: skyyrose_mcp_authorize_tool() permits a tool only if NOT in the hard blocked list AND (read-only per source readOnlyHint census, 47 tools, OR in the skyyrose_mcp_allowed_write_tools operator filter). All 42 non-read-only tools \u2014 every paid generation + every write + any new/untagged tool \u2014 are refused by default. Verified: php -l clean, phpcs clean, 12/12 behavioral cases (paid blocked, reads allowed, unknown blocked).",
+    "tags": [
+      "security",
+      "wordpress",
+      "mcp",
+      "paid-api",
+      "fail-closed",
+      "allowlist",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-216",
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T11:00:00-07:00"
+  },
+  {
+    "id": "bug-219",
+    "timestamp": "2026-07-10T12:00:00-07:00",
+    "error_message": "[SECURITY HIGH] The bug-218 allowlist fix sourced its safe set from readOnlyHint alone, which means 'does not mutate' \u2014 NOT 'free'. Six read-only tools cost money and were wrongly allowlisted: devskyy_email_triage + devskyy_analyze_spreadsheet (unconditional live Claude Agent SDK runs, unbounded spend), devskyy_dashboard_health (claude-sdk endpoint), rag_query/rag_query_rewrite (LLM query-variation/HyDE generation), rag_get_context (remote-embedding-capable). A compromised admin could still spend via these.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/mcp-bridge.php",
+    "root_cause": "Conflated readOnlyHint (mutation axis) with cost. readOnlyHint:True tools can still call paid third-party LLM/embedding APIs. Found by an adversarial re-review (requested on Fable) that traced tool implementations to the live ClaudeSDKClient / embedding-engine calls.",
+    "fix": "Allowlist membership rule tightened to read-only AND no external paid/LLM call. Removed the 6 cost-bearing tools from skyyrose_mcp_readonly_tools(); hard-blocked the 2 unbounded agent-run tools (email_triage, analyze_spreadsheet) in skyyrose_mcp_blocked_tools(). Local-ML read tools (demand_forecast/fraud_assess/ml_prediction/recommend/retention_assess) verified to have no paid-API signature and kept. Verified: php -l + phpcs clean, 16/16 behavioral cases (6 cost-bearing now blocked, 7 free reads allowed, 3 paid still blocked).",
+    "tags": [
+      "security",
+      "wordpress",
+      "mcp",
+      "paid-api",
+      "fail-closed",
+      "allowlist",
+      "code-review",
+      "fable"
+    ],
+    "related_bugs": [
+      "bug-218",
+      "bug-216"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T12:00:00-07:00"
+  },
+  {
+    "id": "bug-220",
+    "timestamp": "2026-07-10T13:00:00-07:00",
+    "error_message": "[SECURITY MEDIUM] SSRF TOCTOU in inc/fastapi-client.php skyyrose_see_is_safe_url(): it validated the target via gethostbyname() then wp_remote_post/get re-resolved DNS independently at connect time. An admin who set fastapi_url (or mcp_url; the guard is shared with mcp-bridge.php) to a rebindable domain could serve a public IP at check time and an internal IP (Fly 6PN, 169.254.169.254) at connect time, bypassing the private-range filter. Admin-gated, so bounded.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/fastapi-client.php",
+    "root_cause": "Validate-by-hostname then fetch-by-hostname leaves a DNS check-time/connect-time window. Both admin-settable URLs (fastapi_url, mcp_url) legitimately point ONLY at DevSkyy infra, so arbitrary hosts were never a needed feature \u2014 that flexibility WAS the attack surface.",
+    "fix": "Approach A (host allowlist, chosen over connection-pinning because it is transport-agnostic on WP.com and removes the arbitrary-host surface entirely). Added shared skyyrose_see_allowed_backend_hosts() (api.devskyy.app, devskyy-backend.fly.dev, devskyy-api.fly.dev, localhost, 127.0.0.1; filterable) checked in is_safe_url BEFORE any resolution \u2014 a non-allowlisted/rebindable host is refused outright, closing the TOCTOU by construction. Private/reserved-range checks retained as defense-in-depth. Covers both callers (fastapi POST/GET + MCP bridge).",
+    "tags": [
+      "security",
+      "wordpress",
+      "ssrf",
+      "toctou",
+      "dns-rebind",
+      "allowlist",
+      "fable"
+    ],
+    "related_bugs": [
+      "bug-218",
+      "bug-219"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T13:00:00-07:00"
+  },
+  {
+    "id": "bug-221",
+    "timestamp": "2026-07-10",
+    "error_message": "Collection emblem <img> 404 on Black Rose + Love Hurts heroes: src rendered as .../assetsimages/emblems/... (missing slash)",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/collection/page.php",
+    "root_cause": "Slash seam: SKYYROSE_ASSETS_URI ends WITHOUT trailing slash (functions.php:28) and $emblem_rel started WITHOUT leading slash (page.php:65). URL concat SKYYROSE_ASSETS_URI . $emblem_rel produced assetsimages. The file_exists gate used a DIFFERENT literal (assets/ . $emblem_rel) which had the slash, so the gate passed while the URL 404d -- a build-level check could not catch it; only live render did.",
+    "fix": "Gave $emblem_rel a leading slash (/images/emblems/...) to match the file convention (hero_bg vars carry their own leading slash), and changed the file_exists literal from assets/ to assets so both paths stay consistent. URL now .../assets/images/emblems/<slug>-emblem.webp.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "emblem",
+      "url",
+      "asset-path",
+      "404",
+      "collection-hero",
+      "typography-release"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-222",
+    "timestamp": "2026-07-11",
+    "error_message": "/cart/ (page 9451) renders shell-less on skyyrose.co \u2014 no theme header/footer; /checkout/ (9452) presumed same",
+    "file": "wordpress-theme/skyyrose-flagship/inc/redirects.php",
+    "root_cause": "Stale _wp_page_template=skyyrose-canvas post meta on pages 9451/9452 resolves to a live-only orphan template (skyyrose-canvas.php, not in repo, not removed by hot-swap deploy) that lacks get_header()/get_footer(). Same root cause previously hit the Collections page.",
+    "fix": "skyyrose_wc_page_shell_template(): template_include filter (priority 20) returning page.php for is_cart()/is_checkout(), mirroring the skyyrose_collections_index_template precedent. Zero DB writes. Commit 940665873, v1.10.2. Takes effect on next deploy.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "template_include",
+      "stale-meta",
+      "cart",
+      "checkout",
+      "woocommerce"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-223",
+    "timestamp": "2026-07-11",
+    "error_message": "wiring_audit.py: settings read 401, agents-manager read 401, client-bundle secret grep 4 fragments \u2014 3/8 read-only checks failing on first-ever run",
+    "file": ".env + scripts/remediation/wiring_audit.py",
+    "root_cause": "Three independent causes: (1) WP_APP_PASSWORD in .env contains spaces and was UNQUOTED \u2014 python-dotenv parses it fine but shell `source` loads it empty, so authed checks ran credential-less (401). (2) Audit grepped ALL of frontend/.next including server chunks. (3) Secret pattern ck_/cs_[a-zA-Z0-9]{10,} matched literal UI input placeholders 'ck_xxxxxxxxxxxxx' from the admin settings page \u2014 'x' is not hex; real WC keys are 40 lowercase hex chars.",
+    "fix": "Quoted WP_APP_PASSWORD in .env (valid for both shell and dotenv). Audit: scope bundle grep to .next/static (browser-delivered JS only) + tighten patterns to ck_/cs_[a-f0-9]{20,}. Verified: 8/8 read-only PASS + pattern sanity test (real-shaped key matches, placeholder does not). Eyes-on confirmed fragments were placeholders before dismissing.",
+    "tags": [
+      "env",
+      "dotenv",
+      "shell-quoting",
+      "wiring-audit",
+      "false-positive",
+      "secrets-scan"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-226",
+    "timestamp": "2026-07-10",
+    "error_message": "Kids Capsule teaser wordmark (\"Kids Capsule\") renders with overlapping/illegible glyphs on live page; DOM span rects do NOT overlap (paint-layer artifact, not layout).",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
+    "root_cause": "rv-split-word wraps the h1 into per-word .sr-word spans that carry filter:blur(0) even at REST (.is-visible, animations-premium.css:143). A non-none filter (incl blur(0)) forces a per-span compositing layer, so the background-clip:text gradient painted on the PARENT h1 is read through filter-isolated children -> doubled/overlapping ink on correctly-placed boxes. Structurally pre-existing; the Playfair->Archivo swap (bolder/wider) likely made the latent artifact visible.",
+    "fix": "Swapped the reveal class rv-split-word -> rv-clip-up on teaser.php:38. rv-clip-up rests with clip-path+opacity and NO filter, and acts on the h1 itself (no child spans) -> clip-mask and glyphs stay on one paint op. Consistent with siblings (.kc-teaser__badge already uses rv-clip-up, tagline uses rv-blur). rv-clip-up is already in the built .min (css+js) so no rebuild needed.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "kids-capsule",
+      "background-clip-text",
+      "reveal-animation",
+      "paint-layer",
+      "typography-release",
+      "css-compositing"
+    ],
+    "related_bugs": [
+      "bug-221"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-224",
+    "timestamp": "2026-07-11",
+    "error_message": "4 SDK bugs live on main ~3 months: DevSkyy.round_table() TypeError (attr shadows method); agent_sdk.worker crashes on startup (await on sync redis.from_url); task status never updated post-completion; RequestSigner HMAC non-deterministic (unsorted json.dumps)",
+    "file": "sdk/python/agent_sdk/{main,worker,task_queue,utils/request_signer}.py",
+    "root_cause": "Consolidation commit 64af42c9a (2026-04-15) deleted root agent_sdk/ carrying the 2026-04-05 fixes and promoted the OLDER unfixed sdk/python duplicate as canonical \u2014 fixes silently reverted. Copies were never diffed before deletion.",
+    "fix": "Re-applied all 4 fixes to the canonical copy. Verified: compileall, integration 9/9, security suite 131 passed. Lesson in cerebrum: diff duplicate copies and port fixes forward before deleting either side.",
+    "tags": [
+      "sdk",
+      "consolidation-regression",
+      "redis-asyncio",
+      "worker",
+      "hmac",
+      "duplicate-code"
+    ],
+    "related_bugs": [
+      "bug-223"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-225",
+    "timestamp": "2026-07-10",
+    "error_message": "Kids Capsule teaser hero content (badge+wordmark+tagline) 100% invisible on live prod after v1.10.2 deploy \u2014 opacity:0 stuck via inline style, both mobile+desktop.",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
+    "root_cause": "Two reveal systems collided on .kc-teaser__hero-content children. kids-capsule-launch.js:82 gsap.from(children,{opacity:0,y:40}) with immediateRender snapshots each child CURRENT opacity as the tween target; the children carried CSS reveal classes (rv-clip-up/rv-blur) that rest at opacity:0, so GSAP captured 0 and tweened 0->0, leaving inline opacity:0 that outranks the later .is-visible reveal -> permanently invisible. bug-224 fix (rv-split-word->rv-clip-up on the h1) newly pulled the WORDMARK into this same race (previously rv-split-word only zeroed child .sr-word spans, not the h1, so GSAP captured 1 for the h1). Badge+tagline were ALREADY invisible pre-deploy (pre-existing, same race).",
+    "fix": "Removed the CSS reveal classes (rv-clip-up on badge+wordmark, rv-blur on tagline) from the 3 hero children in teaser.php, making GSAP the SOLE reveal owner: elements default to CSS opacity:1, gsap.from tweens 0->1 visibly; reduced-motion path early-returns in initAnimations() so those users get instant opacity:1. Also eliminates the original overlap bug (no rv-split-word span-splitting). One coherent change; no JS/.min change.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "kids-capsule",
+      "gsap",
+      "gsap-from",
+      "reveal-animation",
+      "opacity",
+      "regression",
+      "typography-release",
+      "double-animation-system"
+    ],
+    "related_bugs": [
+      "bug-226"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-227",
+    "timestamp": "2026-07-11",
+    "error_message": "Landing-page loader stuck at 99% forever; page content never revealed (all first-pass QC screenshots showed loader)",
+    "file": "jobs/bdb7266f/tmp/flagship-landing/index.html",
+    "root_cause": "Loader progress used lerp-toward-target (p += (target-p)*0.12) with completion check Math.floor(p)>=100 \u2014 lerp asymptotically approaches 100 so floor never reaches it",
+    "fix": "Replaced lerp with time-based eased progress (k=elapsed/DUR, cubic ease-out) and finish on k>=1",
+    "tags": [
+      "landing-page",
+      "lerp-asymptote",
+      "loader",
+      "animation",
+      "qc-caught"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-228",
+    "timestamp": "2026-07-11",
+    "error_message": "Hero headline/eyebrow/CTAs invisible on desktop+mobile; hero section inflated to 2291px (2.7x viewport)",
+    "file": "jobs/bdb7266f/tmp/flagship-landing/index.html",
+    "root_cause": "#hero>*{position:relative} has same specificity as #particles{position:absolute} but appears later in stylesheet, so the canvas entered flex flow; JS sized canvas to parent height creating a self-inflation loop that pushed flex-centered text below the fold",
+    "fix": "Scoped the rule to content elements only: #hero>.eyebrow,#hero>h1,#hero>.sub,#hero>.ctas \u2014 absolutes untouched",
+    "tags": [
+      "css-specificity",
+      "source-order",
+      "canvas",
+      "flex",
+      "hero",
+      "qc-caught"
+    ],
+    "related_bugs": [
+      "bug-227"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-11"
+  },
+  {
+    "id": "bug-229",
+    "timestamp": "2026-07-12T13:45:00-07:00",
+    "error_message": "Stop-hook full suite: tests/test_tripo_agent.py::TestAssetValidation::test_validate_file_size_checks FAILED (assert False on any('too large' in e)) \u2014 passes in isolation",
+    "file": "tests/test_tripo_agent.py",
+    "root_cause": "test_model_dir fixture used hardcoded shared path /tmp/test_models with shutil.rmtree cleanup. Concurrent pytest processes (parallel Claude sessions / stop-hook suites on same repo) race: one process's cleanup rmtrees the dir while another is mid-test, deleting the 60MB large.glb between write and validate \u2014 validation then errors 'file not found' instead of 'too large'.",
+    "fix": "Fixture now returns pytest's per-test tmp_path (unique dir per test, pytest-managed cleanup). No shared /tmp path, no manual rmtree. 31/31 file tests green.",
+    "tags": [
+      "tests",
+      "flake",
+      "race-condition",
+      "tmp-path",
+      "tripo",
+      "fixture"
+    ],
+    "related_bugs": [
+      "bug-231"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-230",
+    "timestamp": "2026-07-12T14:05:00-07:00",
+    "error_message": "PATTERN: fail-open guards / silent fallbacks \u2014 gates that pass when their input is absent or their check errors (asset-integrity gate w/o manifest, stage_f swallowing PIL errors, MCP denylist, MCP token compare, scene fallback, hub override fallback)",
+    "file": "cross-component (imagery, theme PHP, MCP bridge, asset hub)",
+    "root_cause": "Guards written as 'block if bad' instead of 'allow only if proven good' \u2014 missing input or a raised exception skips the check entirely. Recurred 6x across 4 components Jun-11\u2192Jul-10 because each guard is written fresh without the fail-closed rule.",
+    "fix": "Rule: every gate fails CLOSED \u2014 absent manifest/config/token = block, exception in the check = block. Escape hatch must be explicit+logged. Instances all individually fixed; this entry tracks the class.",
+    "tags": [
+      "pattern",
+      "fail-open",
+      "silent-fallback",
+      "guard-design"
+    ],
+    "related_bugs": [
+      "bug-127",
+      "bug-159",
+      "bug-179",
+      "bug-181",
+      "bug-211",
+      "bug-218"
+    ],
+    "occurrences": 6,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-231",
+    "timestamp": "2026-07-12T14:05:00-07:00",
+    "error_message": "PATTERN: test isolation / shared-state pollution \u2014 tests failing only in full-suite or parallel runs (os.getenv default shadowing, design-tokens fixture race, snapshot drift, shared /tmp rmtree race)",
+    "file": "tests/ (cross-file)",
+    "root_cause": "Tests share mutable state: hardcoded /tmp paths (racy across concurrent pytest processes), module-level env reads, session-scoped snapshots. Recurred 4x Jun-18\u2192Jul-12. Concurrent suites (parallel Claude sessions + Stop-hook runs) make shared /tmp a live race, not theoretical.",
+    "fix": "Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (never bare os.environ), no cross-test file reuse. 2026-07-12 sweep converted all 4 real /tmp writers (test_tripo_agent, test_p0_ssrf_replicate, test_skyyrose_agents x2) to tmp_path; remaining /tmp literals are mock-string args that never touch disk.",
+    "tags": [
+      "pattern",
+      "tests",
+      "test-isolation",
+      "race-condition",
+      "tmp-path"
+    ],
+    "related_bugs": [
+      "bug-145",
+      "bug-153",
+      "bug-167",
+      "bug-229"
+    ],
+    "occurrences": 4,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-232",
+    "timestamp": "2026-07-12T14:20:00-07:00",
+    "error_message": "re.error: bad escape \\U \u2014 wolf_recurring_sync passed generated block to re.sub as replacement template; any backslash sequence in a buglog message (Windows path, regex snippet) crashes the sync, and the Stop hook's output suppression made it a silently frozen digest",
+    "file": "scripts/wolf_recurring_sync.py",
+    "root_cause": "re.sub replacement strings interpret \\ escapes (\\g<...>, \\1). Dynamic text must never be passed as the repl argument directly.",
+    "fix": "repl as lambda (lambda _: block) so text inserts literally; Stop hook now echoes a failure notice instead of full suppression. Caught by /code-review before any bad entry existed.",
+    "tags": [
+      "python",
+      "re-sub",
+      "replacement-template",
+      "silent-failure",
+      "code-review-catch"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-233",
+    "timestamp": "2026-07-09T07:58:00-07:00",
+    "error_message": "Mascot crotch 'candy-wrapper' LBS fold in wave/walk/talk/point/joy clips; 3 prior same-night fix attempts (weight smoothing, flexion clamp, manual-blend, 3 shape-key iterations) all failed or regressed (v3's closed-form shape key SHATTERED the wave crotch geometry into jagged radiating facets, worse than pristine).",
+    "file": "renders/3d/mascot/v2/skyy-fix-shapekey-merged.glb (built fresh from pristine skyy-v6-merged.glb, not chained on any failed attempt)",
+    "root_cause": "Two distinct bugs conflated as one: (1) SCOPE error \u2014 the task assumed all 5 gesture clips needed a fix, but fresh pristine renders (tight crotch-zoom, both math-measured and given peak frames) showed walk/talk/point/joy have smooth, defect-free crotch fabric at peak flexion; only 'wave' (crossed-leg pose, held for its ENTIRE 129-frame duration, not a narrow peak) shows a genuine sharp angular pinch. (2) The prior v3 attempt's 'shattered geometry' was a scale-unit misdiagnosis at the time \u2014 mesh/armature world scale is 0.01 (cm-to-m), so a local-space shape-key delta of ~0.94 units (which looks huge vs a 0.257 world-space torso reference) is actually only ~0.0094 world units, i.e. correct and stable; a true closed-form LBS inverse (A_blend.inverted() @ desired_world) is fine as long as both numeric gates (forward-formula matches depsgraph; reapplying A_blend to corrected rest reproduces the desired posed target) are checked in the SAME unit space. Separately, re-exporting the pristine file through Blender's NLA_TRACKS round-trip introduced a spurious +1/24s (1-frame) time-axis shift on the 'idle' clip only, because idle's NLA strip (frame_start=1) doesn't match its action's own frame numbering (action_frame_start=0) \u2014 every other clip's strip/action numbering already agree at 1, so only idle was affected. (ID note: renumbered from bug-218 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Rebuilt end-to-end from pristine only. Measured true peak frames via a closed-form LBS divergence metric (100%-Hips vs 100%-dominant-UpLeg bind, mean-top-50 across ~367 crotch vertices) instead of trusting given peak_frames blindly; validated the closed-form skinning formula against Blender's own depsgraph-evaluated positions (error ~1.7e-7, machine precision). Identified the actual folding vertex subset (top-60 by posed-vs-rest Laplacian delta, +104 halo neighbors at 0.4 falloff weight) instead of the whole 367-vertex crotch region. Computed ONE corrective shape key ('CrotchFoldCorrective_wave') via the closed-form LBS inverse with both numeric gates passing (gate2 error 2.3e-16), targeting a neighbor-averaged smoothing of the actual posed fold at wave's true peak (frame 27). Because the crossed-leg defect pose is held for the wave clip's full 1-129 frame range (verified by rendering 12+ frames spanning the whole clip, not just near the peak), keyframed the shape key value flat at 1.0 across the entire clip rather than a narrow 0->1->0 ramp \u2014 measured per-clip, not assumed. Left walk/talk/point/joy/idle completely untouched (no shape key, no Key NLA track). Fixed the idle NLA strip's frame_start/frame_end (1->0, 73->72, matching its action's own 0-72 numbering) purely as an export re-basing correction \u2014 zero idle keyframe VALUES touched \u2014 which made idle's exported time axis exactly match pristine (0.0 diff, vs +0.041667s before the fix). Verified via gltf-transform inspect + raw glTF JSON/accessor parsing: all 6 clips present, mesh carries exactly 1 morph target (CrotchFoldCorrective_wave), wave's animation channel list includes rotation/translation/scale (bone) channels AND a weights channel targeting the mesh node, the other 4 gesture clips have zero weights channels (fully untouched), and per-clip max animation-value diff vs pristine (~0.0007 quaternion units, ~0.04\u00b0) is IDENTICAL in magnitude across touched (wave, idle) and untouched (walk/talk/point/joy) clips \u2014 proving it's inherent Blender round-trip float32 requantization, not content drift from this fix. Eyes-on render comparison (tight crotch-zoom, pristine vs fixed, at peak\u00b12/\u00b15 and a 12-frame full-clip bracket) confirms the sharp jagged facet pinch is replaced by a smooth single fold with no popping anywhere in the ramp.",
+    "tags": [
+      "3d",
+      "mascot",
+      "skinning",
+      "shape-key",
+      "gltf",
+      "blender",
+      "lbs",
+      "candy-wrapper",
+      "scope-verification",
+      "unit-scale",
+      "nla-export-rebasing"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T07:58:00-07:00"
+  },
+  {
+    "id": "bug-234",
+    "timestamp": "2026-07-10T00:00:00-07:00",
+    "error_message": "Phase 3 retargeting-compatibility gate (gate_bone_direction.py) FAILED with any_critical_bone_failed=true before mascot-walk-to-girl-rig skin weighting; per locked plan fork, this mandates skipping the retarget smoke test entirely and pivoting to Plan B (fresh keyframed walk cycle authored directly on the girl rig).",
+    "file": "renders/3d/girl-love-hurts/gate_bone_direction.py",
+    "root_cause": "girl rig rest pose and skyy.glb mascot rest pose diverge far beyond the locked per-bone-category angle thresholds on CRITICAL bones: Hips 97.4 deg (10 max), Spine 34.0 deg (10 max), neck 43.2 deg (10 max), Head 23.4 deg (10 max), LeftArm 22.5/RightArm 22.3 deg (10 max), LeftForeArm 126.2/RightForeArm 130.5 deg (10 max, near-inverted), LeftLeg 11.8 deg (10 max). 15/24 bones failed overall. Local-space Copy Rotation retargeting assumes near-matching rest poses; a >120 deg forearm rest-direction mismatch would map into inverted-elbow geometry once mascot walk-clip local rotations are copied onto the girl armature. (ID note: renumbered from bug-219 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "No retarget smoke test built (fork rule: Phase-3-failed already satisfies the STOP condition on its own, independent of any smoke-test outcome -- running the smoke test could only ever downgrade a pass, never upgrade this fail). Decision: abandon Local-Space Copy Rotation retargeting for this rig pair. Pivot to Plan B -- author a fresh walk cycle directly on the girl own rig via 8-16 hand-placed pose keys (contact-L, passing-R-up, high-point, contact-R, passing-L-up, high-point, back to contact-L), skipping retargeting entirely.",
+    "tags": [
+      "retargeting",
+      "mascot",
+      "skin-weight",
+      "girl-rig",
+      "gate-bone-direction",
+      "plan-b",
+      "love-hurts"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T00:00:00-07:00"
+  },
+  {
+    "id": "bug-235",
+    "timestamp": "2026-07-10T06:00:00-07:00",
+    "error_message": "First self-check of skin_weight_body.py's own verification pass reported hip/shoulder/armpit_gusset boundaries as FAIL (non-monotonic weight transition) even though the underlying weighting formula (smoothstep on an axis projection) is monotonic by construction.",
+    "file": "renders/3d/girl-love-hurts/skin_weight_body.py",
+    "root_cause": "Two distinct bugs, both in the VERIFICATION sampling, not the weighting math: (1) several bones are written by TWO independent, unrelated pathways (e.g. Hips gets weight from both the spine-chain's own Hips<->Spine02 internal joint AND the leg-chains' hip branch blend; Shoulder from both the arm-chain branch blend AND the Phase-2 gusset) -- sorting ALL vertices with nonzero weight on a bone by an unrelated axis projection mixes two populations and breaks monotonicity even though each pathway is independently monotonic. (2) Even after restricting to the correct chain/segment, verification for a branch joint (hip, shoulder) still included vertices already inside the NEXT internal joint's own blend band (e.g. thigh vertices already blending into the knee), whose partial weight on the root bone comes from that unrelated joint, not the hip. A follow-on idempotency check then surfaced a third issue: gusset_verts was recomputed each run as 'len(v.groups)>0', which silently widens to ALL vertices after the first run and corrupts the persisted marker verification depends on. (ID note: renumbered from bug-220 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "classify_all_vertices() recomputes the SAME nearest-chain-polyline assignment the weighting pass used, and every verify_* function filters its sample population by that assignment (chain_name, and for branch joints, seg==0 AND s below the next joint's blend band) instead of by 'bone X has nonzero weight'. gusset_vertex_indices is now persisted as a custom ID property on the mesh ONCE (read back, not recomputed, on subsequent runs) so a second run is a true no-op: 0 newly weighted verts, all 4 boundaries still verify PASS.",
+    "tags": [
+      "blender",
+      "skin-weight",
+      "verification",
+      "sampling-bias",
+      "idempotency",
+      "girl-rig"
+    ],
+    "related_bugs": [
+      "bug-234"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T06:00:00-07:00"
+  },
+  {
+    "id": "bug-236",
+    "timestamp": "2026-07-10T07:10:00-07:00",
+    "error_message": "AttributeError: 'Action' object has no attribute 'fcurves' when reading back the walk-cycle source/baked action's F-curves for the location-channel audit.",
+    "file": "renders/3d/girl-love-hurts/bake_walk_retarget.py",
+    "root_cause": "Blender 5.1.2 uses the new layered-Action data model (Animation 2.0 slotted actions): F-curves no longer live at the flat `action.fcurves` used pre-5.0. They are nested under `action.layers[*].strips[*].channelbags[*].fcurves`, one channelbag per animation slot (slot.identifier e.g. 'OBGirlArmature'). High-level APIs like `pose_bone.keyframe_insert()` still work unchanged and auto-create the layer/strip/channelbag structure, but any code that reads F-curves back directly (verification/audit scripts, action introspection) must walk the new nesting -- `action.fcurves` raises AttributeError, it does not silently return an empty list. (ID note: renumbered from bug-221 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added `iter_action_fcurves(action)` helper in bake_walk_retarget.py that flattens `action.layers -> strip.channelbags -> fcurves` (filtering strips to type=='KEYFRAME') into a single iterable, matching the pre-5.x flat-list contract. All F-curve consumers (source-action location sanity check, baked-action location-leak audit, fcurve counts) route through this helper instead of `action.fcurves`. Verified via a fresh reload+re-parse of the saved .blend in a separate Blender process.",
+    "tags": [
+      "blender",
+      "blender-5.1",
+      "python-api",
+      "action-fcurves",
+      "animation-2.0",
+      "girl-rig",
+      "version-specific-api"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T07:10:00-07:00"
+  },
+  {
+    "id": "bug-237",
+    "timestamp": "2026-07-10T07:30:00-07:00",
+    "error_message": "Known-limitation state record (not a re-derived diagnosis): the Love Hurts girl rig's full 8-phase build run finished with Phase 5 (corrective shape key for the armpit-gusset region) not built and Phase 6 (`gate_armpit_gusset.py`, the read-only numeric gate that pose-tests the gusset at named arm-raise test poses) not passing, yet Phase 8's final recommendation was recommend_ship=true.",
+    "file": "renders/3d/girl-love-hurts/gate_armpit_gusset.py (Phase 6); no Phase 5 shape-key script exists in renders/3d/girl-love-hurts/ as of this run",
+    "root_cause": "NOT DIAGNOSED THIS PASS. gate_armpit_gusset.py emits its result as `print(\"GATE_RESULT_JSON:\" + json.dumps(summary))` to stdout only (verified by reading the script) -- no report file was persisted to disk for this run, so the specific failing margins/poses are not recoverable from any artifact and are not re-derived here. This entry exists to record the state (per the run's own Phase 5/6/8 summary) so a future session does not have to rediscover that a ship-blocking-shaped gap was accepted, rather than to explain why. (ID note: renumbered from bug-222 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "NONE ATTEMPTED. If reopened: re-run `blender --background --factory-startup --python gate_armpit_gusset.py` against the current love-hurts-girl-rig.blend to capture fresh failing-pose margins to a saved report file (the script currently has no report-file output -- add one), then decide whether a corrective shape key (Phase 5, same technique as the mascot's bug-198/218 corrective-shape-key fix) is warranted before shipping.",
+    "tags": [
+      "3d",
+      "blender",
+      "girl-rig",
+      "skin-weight",
+      "armpit-gusset",
+      "shape-key",
+      "known-limitation",
+      "state-record",
+      "unresolved"
+    ],
+    "related_bugs": [
+      "bug-234",
+      "bug-235"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T07:30:00-07:00"
+  },
+  {
+    "id": "bug-238",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "raise GateFailure(msg, metric=..., value=..., threshold=...) would crash with 'got multiple values for argument metric'",
+    "file": "skyyrose/character_pipeline/verify.py",
+    "root_cause": "@dataclass decorating an Exception subclass replaces Exception's own __init__ with a dataclass-generated one; the first positional arg (the message string) then binds to the first declared field (metric) instead of being treated as the exception message, colliding with the explicit metric= keyword. (ID note: renumbered from bug-223 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Removed @dataclass from GateFailure; wrote an explicit __init__(self, message, *, metric, value, threshold) that calls super().__init__(message) and sets the three attributes directly.",
+    "tags": [
+      "python",
+      "dataclass",
+      "exception",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-239",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "tex_bytes assigned twice in write_rigged_glb: a dead call to _glb_io.image_bytes() with a nonsensical index expression, immediately overwritten by a hand-inlined duplicate of the same slicing logic",
+    "file": "skyyrose/character_pipeline/weights.py",
+    "root_cause": "Draft-writing error while assembling write_rigged_glb() -- wrote the buffer-view slice manually before remembering _glb_io.image_bytes() already implements it, leaving the first assignment as dead code with a confusing `x and 0 or 0` expression. (ID note: renumbered from bug-224 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Replaced both lines with a single `tex_bytes = _glb_io.image_bytes(clean, blob, 0)` call.",
+    "tags": [
+      "python",
+      "dead-code",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-240",
+    "timestamp": "2026-07-10T08:30:00-07:00",
+    "error_message": "example character.yaml included z_hip: 0.0 / z_chest: 0.0 / z_head: 0.0 as 'auto-detect' placeholders, which would silently override real detected landmarks with zero",
+    "file": "skyyrose/character_pipeline/characters/love_hurts_girl.yaml",
+    "root_cause": "landmarks.detect_landmarks() treats KEY PRESENCE in config.landmark_overrides as the override signal (overrides.get('z_hip', auto_detected_value)), not the value -- including a key with a placeholder 0.0 unconditionally uses 0.0 instead of falling through to auto-detection. (ID note: renumbered from bug-225 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Removed the z_hip/z_chest/z_head placeholder keys entirely from the example yaml; only crotch_y/neck_y (real measured values) are pinned, everything else auto-detects.",
+    "tags": [
+      "config",
+      "yaml",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T08:30:00-07:00"
+  },
+  {
+    "id": "bug-241",
+    "timestamp": "2026-07-10T09:15:00-07:00",
+    "error_message": "verify_character() FAILED: look.below_neck_max_disp=0.06023 (<= 0.002 required) -- chest-height verts moved 6cm under a pure Head rotation",
+    "file": "skyyrose/character_pipeline/weights.py",
+    "root_cause": "Head/HeadTop_End carry an oversized radius (0.40m, sized for the afro) in the radius-normalized capsule weight solve (w = 1/(distance/radius)^4). Every other bone group (arm, leg) has an explicit region-mask gate confining its influence; Head never got one -- its large radius let it out-compete much-closer, small-radius Spine bones for real chest/torso vertices far below the neck (dn=distance/radius made a farther-but-bigger-radius bone win over a closer-but-smaller one). This is a pre-existing gap in the ORIGINAL validated reference algorithm (rig_girl.py has the identical mask structure), not something the port introduced -- it only surfaced because this was the first time any test ran the pipeline against real, complex geometry instead of a small synthetic mesh. (ID note: renumbered from bug-226 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added an explicit region-mask gate in weights.py's _region_masks(): Head/HeadTop_End may only influence vertices at or above the neck joint's Y position (allowed[:, is_head_only] &= (y >= neck_y)), mirroring the existing pattern for arm/leg bone gating. Verified on the real fixture: all 13 WS6 gates now pass (previously 1 failed); confirmed no regression across the existing 24 synthetic-mesh unit tests.",
+    "tags": [
+      "character-pipeline",
+      "skinning",
+      "algorithm",
+      "weight-solve"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T09:15:00-07:00"
+  },
+  {
+    "id": "bug-242",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "read_accessor silently returns garbage vertex data on interleaved (byteStride) bufferViews \u2014 no exception, wrong geometry",
+    "file": "skyyrose/character_pipeline/_glb_io.py",
+    "root_cause": "np.frombuffer(blob, dtype, count, offset) assumes tight-packed attribute data; glTF legally allows attributes to share a strided bufferView (byteStride set, e.g. POSITION+NORMAL interleaved). GLBWriter (the module's own writer) never interleaves, so no round-trip test could catch it \u2014 the exposure is entirely externally-produced GLBs (FBX2glTF output, user passthrough input). Found by python-reviewer agent during /code-review. (ID note: renumbered from bug-227 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "read_accessor now checks bv.byteStride: when set and != tight element size, gathers per-element byte windows via uint8 fancy indexing (start + arange(count)*stride + arange(tight)) before the dtype view. TDD: 3 new tests in tests/character_pipeline/test_glb_io_interleaved.py written RED first (interleaved positions, interleaved normals, tight-stride-set fast-path equivalence).",
+    "tags": [
+      "character-pipeline",
+      "gltf",
+      "numpy",
+      "silent-corruption",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-243",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "clean.py baked normals with the linear part of the node transform instead of its inverse-transpose \u2014 wrong-direction normals under any non-uniformly-scaled ancestor node, no error raised",
+    "file": "skyyrose/character_pipeline/clean.py",
+    "root_cause": "n' = M @ n is only direction-correct for rotations/isotropic scale. clean.py's own selling point is composing the ACTUAL node TRS chain (including matrix-form nodes), which explicitly admits non-uniform scale \u2014 where the correct transform is the normal matrix inv(M[:3,:3]).T. Failure is invisible in geometry gates (positions unaffected); it manifests only as broken lighting at runtime. Found by python-reviewer agent during /code-review. (ID note: renumbered from bug-228 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "_bake_transform now uses np.linalg.inv(lin).T (identical behavior for the rotation-only case every real asset so far uses \u2014 golden fixture regenerated byte-identical, sha256-confirmed); singular transform raises PipelineError. TDD: tests/character_pipeline/test_clean_normals.py written RED first, with a hand-derived 45deg-plane/Y-squash case where naive and correct transforms tilt in OPPOSITE directions. Bonus: RED run exposed a hand-derivation error in my own rotation-case expectation (Rx(-90) maps +z to +y, not -y) \u2014 the code was right, the test draft was wrong.",
+    "tags": [
+      "character-pipeline",
+      "normals",
+      "linear-algebra",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-244",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "Three failure modes escaped devskyy-character's documented clean-error contract (nonzero exit + report.json + stderr message), crashing with raw tracebacks instead: landmark auto-detection failures (ValueError x4 sites), FBX2glTF converter failures (CalledProcessError, with the converter's stderr swallowed by capture_output), and bad/malformed --config paths (FileNotFoundError/yaml.YAMLError before the try block)",
+    "file": "skyyrose/character_pipeline/cli.py",
+    "root_cause": "cli.py's except clause only caught PipelineError, but three real failure paths raise other types: landmarks.py raised bare ValueError (a failure mode PROVEN to happen \u2014 crotch-detection fails on real clothed-mesh noise, bug-226 session); subprocess.run(check=True, capture_output=True) raises CalledProcessError whose str() omits the captured stderr entirely; and load_character_yaml ran before the guarded region. Found via convergent evidence: my own review pass (ValueError), security-reviewer (CalledProcessError), python-reviewer (CalledProcessError + config-load placement). (ID note: renumbered from bug-229 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "landmarks.py's 4 raise sites converted to PipelineError (same import pattern segment.py already uses); convert.py wraps CalledProcessError into PipelineError surfacing the decoded stderr tail; cli.py moved config load inside the try and widened the except to (PipelineError, FileNotFoundError, yaml.YAMLError).",
+    "tags": [
+      "character-pipeline",
+      "cli",
+      "error-handling",
+      "exception-contract",
+      "code-review"
+    ],
+    "related_bugs": [
+      "bug-241"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-245",
+    "timestamp": "2026-07-10T16:20:00-07:00",
+    "error_message": "setup_character_pipeline_vendor.sh fetched executables with no integrity verification (no checksum pinning) and no curl --fail (HTTP error pages written to disk as 'binaries' with exit 0)",
+    "file": "scripts/setup_character_pipeline_vendor.sh",
+    "root_cause": "GitHub release assets can be replaced under an existing tag and raw.githubusercontent tag refs are movable via force-push, so a URL pin alone is not an integrity guarantee for binaries the pipeline chmod +x's and executes (FBX2glTF). Separately, curl without -f treats an HTTP 404 body as a successful download, so set -euo pipefail never fires and the corruption surfaces later as an opaque exec error. Found by security-reviewer agent during /code-review (MEDIUM + LOW). (ID note: renumbered from bug-230 \u2014 main independently consumed the 218-230 range.)",
+    "fix": "Added per-file sha256 pins (derived 2026-07-10 from official upstream URLs; FBX2glTF is archived upstream and publishes no official checksums) verified after every fetch AND on the skip-existing path, mismatch deletes the file and exits 1; curl now -fsSL. Verified: all 5 pins green against real files, mismatch branch red-tested to exit 1.",
+    "tags": [
+      "security",
+      "supply-chain",
+      "vendored-binaries",
+      "checksum",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-246",
+    "timestamp": "2026-07-12",
+    "error_message": "Vercel check fails (red) on all open PRs \u2014 appeared to be a systemic main-config break blocking the whole merge queue",
+    "file": "tasks/pr-vercel-diagnosis.md (finding); Vercel project settings (root cause, not in repo)",
+    "root_cause": "FALSE BLOCKER. main's Vercel Production deploy is GREEN. 7/8 failing PRs touch 0 frontend files, so their Next build == main's. Identical code can't build-fail on Preview while passing on Production -> the red is a Vercel Preview-environment artifact (Preview-scoped env var missing for @t3-oss/env-nextjs build-time validation, and/or Deployment Protection), NOT PR code and NOT a main-config break.",
+    "fix": "No repo/code change fixes it. For non-frontend PRs, treat Vercel-red as noise and gate on the Python/test suite instead. To silence preview red: Vercel dashboard -> Settings -> Env Vars (add missing vars to Preview scope) and/or Deployment Protection. frontend/.env.local VERCEL_TOKEN is empty placeholder so vercel inspect can't auth locally.",
+    "tags": [
+      "vercel",
+      "ci",
+      "false-positive",
+      "preview",
+      "fail-open",
+      "pr-queue",
+      "env-vars"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-247",
+    "timestamp": "2026-07-13",
+    "error_message": "Every POST /approval/sync re-uploaded ALL previously-synced approved items \u2014 wordpress_synced_at/wordpress_media_id never persisted after successful upload (unbounded duplicate media on live WP library; media linkage lost)",
+    "file": "sync/wordpress_media_approval_sync.py (sync_item)",
+    "root_cause": "sync_item uploaded via sync_approved_asset but never called ApprovalQueueManager.update_wordpress_sync \u2014 the only setter of the fields sync_approved_items filters on. Existing test manually called update_wordpress_sync itself instead of pinning that the sync path does it, which is exactly how the gap survived. Found by rev-python during range review, empirically reproduced (2 uploads across 2 runs).",
+    "fix": "sync_item now persists wordpress_media_id via update_wordpress_sync after a successful upload; a failed state-update converts the result to FAILED (never silent success with lost linkage). Tests: sync-state persistence + run-twice idempotency (upload await_count == 1) + fixture alignment so items live in the manager like production.",
+    "tags": [
+      "approval-sync",
+      "idempotency",
+      "duplicate-uploads",
+      "test-quality",
+      "review-catch"
+    ],
+    "related_bugs": [
+      "bug-234"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
   }
 ]

@@ -1,6 +1,151 @@
 # Current Tasks
 
-## ACTIVE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
+## DONE — golden-fixture CI wiring for character_pipeline, spec DoD #2 (2026-07-10)
+
+Plan-mode task (2 Explore agents + 1 Plan agent dispatched first). Built
+`scripts/prepare_character_pipeline_fixture.py`, derived a real 2.98MB fixture from the actual
+Love Hurts Girl Blender export, wrote `tests/character_pipeline/test_love_hurts_girl_golden.py`
+(golden-path + corruption/mutation tests, no pytest marker — CI's `pytest tests/` has no `-m`
+override so a marked test would silently never run). Running the pipeline against real geometry
+for the first time immediately surfaced bug-226 (Head's oversized radius had no region-mask gate,
+causing 6cm chest-vertex displacement under a pure Head rotation) — fixed in `weights.py`, not
+worked around. Also resolved a real crotch_y auto-detection unreliability on clothed-mesh noise via
+the existing `character.yaml` override mechanism (not a hack — that's what it's for). 26/26 tests
+green, ruff+mypy clean, negative test confirmed non-vacuous (disabled injection, confirmed it fails).
+
+- [x] `scripts/prepare_character_pipeline_fixture.py` — rerunnable fixture-prep + real-number observability script
+- [x] `tests/character_pipeline/fixtures/love_hurts_girl_static.glb` — committed real mesh fixture (no LFS, matches `tests/fixtures/qc_ground_truth/` precedent)
+- [x] `tests/character_pipeline/test_love_hurts_girl_golden.py` — golden-path + corruption tests
+- [x] `weights.py` bug-226 fix — Head/HeadTop_End region-gated to `y >= neck_y`
+- [x] Verification: full suite green, ruff+mypy clean, negative test proven non-vacuous
+
+## DONE — CHARACTER_PIPELINE_SPEC.md → skyyrose/character_pipeline/ (2026-07-10)
+
+11 modules, 2794 lines, 24 pytest unit tests + 3 one-off e2e smoke scripts (all green), ruff+mypy
+clean. Deviations from literal spec text, all deliberate and documented in-file: FBX2glTF has no
+darwin-arm64 release upstream (used darwin-x64, runs under Rosetta 2); `devskyy-character` is a new
+console script, not folded into the existing `devskyy` (that's `main_enterprise:main`, unrelated).
+3 real bugs found+fixed this session, logged as bug-223/224/225. Golden-fixture CI wiring against
+the real Love Hurts Girl asset (spec DoD #2) is a flagged follow-up — that binary wasn't available
+this session.
+
+Port validated reference implementation (clean_static.py, rig_girl.py, widget_template.html,
+inspector_template.html — the scripts that shipped Love Hurts Girl) into the spec's clean
+8-workstream package. numpy/scipy/pygltflib/Pillow already in pyproject.toml — zero new deps.
+
+- [x] `_glb_io.py` — shared `read_accessor()` + `GLBWriter` (dedupes the `add()` chunk-accumulator
+      boilerplate that's copy-pasted across both reference scripts)
+- [x] `config.py` — constants registry (verbatim §3 table) + `character.yaml` loader + `CharacterConfig`
+- [x] `convert.py` (WS1) — FBX/GLB ingest, pre-flight rigged/texture scan, vendored `FBX2glTF` invoke
+- [x] `clean.py` (WS2) — transform bake generalized to read actual node TRS (delta 1: no hardcoded
+      S=100/-90°X), ground+center, PBR fix, dead-emissive drop, texture re-encode, degenerate gate
+- [x] `landmarks.py` (WS3a) — delta 1: height-normalized slice-clustering auto-detect (fractional
+      bands derived from reference measurements) + `character.yaml` override layer
+- [x] `skeleton.py` (WS3b) — 25-joint mixamorig builder off `Landmarks`, column-major IBM
+- [x] `segment.py` (WS4) — geodesic Dijkstra seg + arm-tube filter + iterative weld-cut (the
+      "204 welded bridge triangles" algorithm), shoulder-relative cut gate instead of the reference's
+      absolute `y<1.05` (which only worked because it matched one model's shoulder height)
+- [x] `weights.py` (WS5) — radius-normalized capsule LBS weights + region masks, radii scaled by
+      `target_height`
+- [x] `verify.py` (WS6, hard gate) — delta 3: formalize wave_R/wave_L/bow/look as named `PoseGate`s,
+      pure-numpy FK, matplotlib QA renders, round-trip/texture-last/hash asserts, `report.json`,
+      nonzero exit on failure
+- [x] `package.py` (WS7) — surgical texture-swap (byte-splice, never full rebuild), `@@PLACEHOLDER@@`
+      template assembly + `node --check` gate, base64 + `widget-external.html` variants
+- [x] `cli.py` (WS8) — `build`/`verify` subcommands; new `devskyy-character` console script (existing
+      `devskyy` entry is `main_enterprise:main`, a FastAPI dev-launcher — reusing that name would collide)
+- [x] `templates/widget.html`, `templates/inspector.html` — copied verbatim, already match spec's
+      WS7.3 contract exactly (confirmed by full read)
+- [x] `pyproject.toml` — add `"skyyrose*"` to `packages.find.include` (currently absent — needed for
+      the new console script to resolve), register `devskyy-character`
+- [x] `tests/character_pipeline/` — unit tests on synthetic fixtures (small dumbbell mesh, 2-bone
+      skinned cube) for `_glb_io`, `segment`, `weights`, `verify` FK math. Real golden-fixture CI
+      wiring against the actual Love Hurts Girl asset (spec DoD #2) is a separate follow-up — that
+      binary isn't available in this session.
+- [x] STOP-AND-SHOW before fetching: vendored `FBX2glTF` v0.9.7 binary (linux-x64+darwin-arm64) and
+      three.js r128 `three.min.js`/`GLTFLoader.js`/`OrbitControls.js` — no local copy exists in-repo
+      (theme loads three.js via CDN ESM, not a vendorable UMD build). Code fails loudly with a
+      setup-script pointer until fetched; mirrors existing `vendor/README.md` convention.
+## DONE — Robust Stop test-gate hook (2026-07-12)
+
+Stop-hook pytest gate false-blocked twice in one session: a load-timeout flake
+(`test_ml_optional` — 60s import guard trips under machine saturation; import itself
+succeeds ~7s unloaded) and a concurrent-session mid-edit race (`content_agent` fixture
+caught half-edited → `tmp_path` NameError). Both passed clean on re-run.
+
+- [x] Extracted the inline `.claude/settings.json` pytest one-liner → `.claude/hooks/stop-test-gate.sh`
+- [x] Retry-on-failure: on a red run, settle 5s then re-run `pytest --last-failed`; block (exit 2)
+      ONLY if the failure reproduces. Kills both false-block modes; never masks a real failure.
+- [x] Verified: decision logic green→0 / flake→0 / real-fail→2; `bash -n` clean; `--last-failed` valid.
+- [ ] **FOLLOW-UP (real backend task, founder-gated):** `import main_enterprise` makes blocking
+      connect attempts at import time (DB via `api/gdpr.py`, `skyyrose.elite_studio.queue.consumer`,
+      `mcp_tools.http_mount`) → ~7s unloaded vs ~62s under load. Make them lazy / short-timeout so the
+      import is fast + non-blocking (the in-memory fallback already exists — it just runs AFTER a slow
+      connect timeout). This is the ROOT fix for the `ml_optional` flake; the retry only papers over it.
+
+## ACTIVE — Build the Signature Collection (all assets) — 2026-07-11
+
+Founder: emblem + bespoke font + page pass. Sequence each; gate every money/deploy step. 3 scouts running.
+
+> ⏸ Queued: bespoke BR Script + LH Graffiti fonts committed (`13c61beda`, v1.10.3) with clean-worktree
+> deploy manifest shown — awaiting founder `y`. Sits atop the v1.10.2 deploy train (also gated, line below).
+
+- [ ] **Track A — Signature font** (replace Pinyon Script): feasibility pending scout → build if autonomous,
+      STOP-AND-SHOW if paid glyph gen. Wire like BR/LH (fonts.css/identity/sot/typography/design-tokens/.impeccable).
+- [ ] **Track B — Signature emblem** (gold star-rose): source pending scout → compose from existing gold-rose+star
+      (zero-paid) OR STOP-AND-SHOW paid render. Output `assets/images/emblems/signature-emblem.webp`; auto-wires via
+      file-gated `.col-hero__emblem`. Eyes-on pixels before it touches the site.
+- [ ] **Track C — Signature page pass**: autonomous copy/layout/imagery/experience per .impeccable.md; gate any new
+      render (money) or WooCommerce/live-data write; verify all 12 SIG products resolve via SOT.
+- [ ] Batch to ONE gated deploy (no drip); bundle with the queued font deploy if founder wants.
+
+## ACTIVE — WS7 launch-night wiring + gap closure (2026-07-11)
+
+Spec: `.planning/SKYYROSE_LAUNCH_NIGHT_SPEC_V2.html` (committed to main 2026-07-11).
+This workstream previously had NO todo.md entry — tracked only in project memory. Register created
+during the 2026-07-11 gap-closure sweep; full detail in memory `project_structural_remediation_2026_07_05`.
+
+- [x] Sync: main==origin/main; launch spec + typography previews committed; feeds/ + tasks/assets/ gitignored
+- [x] bug-222 /cart/ + /checkout/ shell restored (template_include override, commit 940665873, v1.10.2)
+- [x] HG-5 skip links — verified ALREADY CLOSED (live audit 99/0, 2026-07-11)
+- [x] WS5.4 root fix — session cookie now set at guest wishlist write time, not every pageview (f75c92cb4)
+- [x] C5 /analytics/events shared-key gate — __return_true removed from write route (cdb76a951)
+- [x] C6 wiring_audit.py FIRST RUN: 8/8 read-only PASS (after .env WP_APP_PASSWORD quoting fix +
+      audit scope/pattern fixes). Write round-trips still gated (--write + STOPSHOW_ACK=1).
+- [x] WS4.7 orphan categorization DONE 2026-07-11 (founder-approved): lh-005→love-hurts,
+      sg-015→signature. Live verified: 33/33 in collections, uncategorized=0.
+- [x] C4 webhooks REGISTERED 2026-07-11 (founder-approved): 5 topics active →
+      https://www.devskyy.app/api/webhooks/woocommerce (product.create/update/delete, order.create/update).
+- [x] Cookie-policy duplicate <h1> removed from page 10143 body (founder-approved) —
+      live renders exactly one h1.
+- [x] wiring_audit.py --write: **10/10 PASS** 2026-07-11 (after fixing the audit's settings
+      round-trip to use whitelisted fastapi_url — endpoint whitelist was correct, probe was wrong).
+- [ ] ⛔ GATED (founder y — NOT yet approved): theme deploy train v1.10.2 — 6 committed fixes
+      (cart shell, session cookie, analytics key, policy titles, lockup CLS, PDP size-chip)
+      inert on live until deployed.
+- [ ] FOUNDER DECISION: dashboard font migration (spec C5: Fraunces/Archivo/JetBrains vs current
+      Playfair/Cormorant/Space Mono in frontend/lib/fonts.ts) — spec cites nonexistent skyyrose-tokens.css;
+      brand canon cut Playfair/Cormorant 2026-07-10. Needs a call, then execution.
+- [ ] FOUNDER/OPS: `agents-manager` REST namespace live on production but in NO repo source — identify
+      what serves it (plugin? leftover deploy?), bring under version control or retire.
+- [ ] FOUNDER: HG-3 real pre-order ship window for /faq/; HG-1 TikTok/X handle confirm.
+- [ ] Spec DoD amendment needed: "zero __return_true on write routes" now satisfied; consider
+      documenting the shared-key analytics exemption model in the spec.
+- [x] Go-live sweep reconcile: 9/11 theme fixes hold; 2 regressions (policy bare <title>,
+      scene.php lockup CLS heights) re-fixed 2026-07-11
+- [ ] WP-ADMIN (not code): site title "The Skyy Rose Collection"→"SkyyRose"; Jetpack SEO Tools
+      duplicate meta-description toggle (now SITEWIDE, worse than register said); /kids-capsule/
+      → /collections/kids-capsule/ redirect rule (live 404 today)
+- [ ] ⛔ GATED (live content edit): cookie-policy page body carries its own <h1> duplicating the
+      template's — remove via wp-admin editor
+- [ ] IMAGERY (founder-gated, paid): KC hero brand-script lockup asset (Grand Hotel per canon) —
+      scene.php still falls back to sr-monogram
+- [ ] PERF BACKLOG: homepage stylesheet count grew 37→40
+- [ ] SDK regressions (2026-04-15 consolidation kept the UNFIXED duplicate): 4 fixes being
+      re-applied to sdk/python/agent_sdk — worker await-crash is production-critical
+      (docker-compose runs agent_sdk.worker)
+
+## DONE — Tier-3 stub-body wires → real agent delegation (2026-06-28)
 
 Replace 4 hardcoded-fixture handler bodies with real agent delegation. TDD, tests green, scope-clean.
 Wiring is autonomous-safe; runtime paid/prod gates stay intact (tests MUST mock paid/prod calls).
@@ -20,8 +165,8 @@ Register: `tasks/wiring-gaps-register.md` (T3-1..T3-4) — but 3 of its 4 specif
       (flag-driven: `--dry-run`/`--with-maintenance`, NOT env). non-prod env→`--dry-run`. PROD-touching at runtime → MOCK subprocess in tests, never run live.
 
 ### Verify (main thread, after agents — never on a subagent's word)
-- [ ] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
-- [ ] Update buglog/anatomy/cerebrum/memory; mark register items done; report
+- [x] Re-run pytest for all 4 modules myself · `git diff --name-only` scope-clean · ruff/black/isort clean on touched files
+- [x] Update buglog/anatomy/cerebrum/memory; mark register items done; report
 
 ## ACTIVE — Phase 2 `skyyrose/core/embeddings/` package (Track E) — 2026-06-24
 
@@ -43,7 +188,8 @@ DEFER:      store.py (sqlite LocalVectorStore) — no consumer, YAGNI; E-store c
 
 ## ACTIVE — MCP over HTTP, connected to dashboard + WordPress (2026-06-15)
 
-Goal: expose the devskyy MCP (38 tools) over authenticated HTTP so the Next.js
+Goal: expose the devskyy MCP (tool count computed at runtime — see mcp_service.py
+/health) over authenticated HTTP so the Next.js
 dashboard (AI console) and skyyrose.co (wp-admin buttons) can both consume it, AND
 the tools can read/act on those surfaces' data. Branch `feat/mcp-http-surfaces`.
 Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` at
@@ -60,7 +206,8 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       MCP_SERVICE_TOKEN set). Pivoted from the torch monolith to a SLIM standalone MCP service
       (`mcp_service.py` + `Dockerfile.mcp`, no ML stack) — the full main_enterprise image is a
       ~6-10GB torch monolith with a broken Dockerfile + unsatisfiable [all] dep graph. Verified live:
-      initialize→200+Mcp-Session-Id, tools/list→42 tools, 401 w/o Bearer, foreign Host→421.
+      initialize→200+Mcp-Session-Id, tools/list→42 tools (stale point-in-time reading;
+      live count is now served by /health's tool_count field), 401 w/o Bearer, foreign Host→421.
       Commit f08691b6b. Follow-up: `fly secrets set WC_CONSUMER_KEY/SECRET` to make WC tools callable.
 - [x] P4 Dashboard AI console — `app/api/mcp` NextAuth-gated proxy (token server-side) + `app/admin/mcp`
       console UI; @modelcontextprotocol/sdk added (commit 8977cc5c1). type-check+lint+build green.
@@ -73,17 +220,23 @@ Architecture: mount the FastMCP `streamable_http_app()` into `main_enterprise` a
       WC catalog/orders read = ALREADY covered by `mcp_tools/tools/wc_client.py`
       (`wc_get_products`/`wc_get_product`/`wc_get_orders`) — no redundant resources built.
       php -l + PHPCS clean. Deploy skyyrose.co ⚠️ PENDING (gate on backend live first).
-- [ ] P6 E2E + docs — both surfaces invoke a tool against live /mcp; document the architecture.
+- [x] P6 docs — `docs/mcp-http-architecture.md` covers the mount, Bearer auth, both consumer
+      surfaces (dashboard proxy + WP bridge), env var matrix, and failure modes (401/421).
+      `scripts/verify-mcp-surfaces.sh` is a read-only E2E verifier (initialize -> tools/list,
+      401-without-token) — CI-safe (SKIPPED + exit 0 when MCP_URL/MCP_SERVICE_TOKEN unset).
+      Live E2E (both surfaces invoking a tool against production /mcp) is prepared — pending
+      gated go-live, see `tasks/mcp-golive-manifest.md`.
 
-  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/):
-  - P4 Vercel env: set MCP_URL=https://devskyy-api.fly.dev/mcp/ + MCP_SERVICE_TOKEN=<token> (Production),
-    redeploy frontend. ⚠️
-  - P5 WP deploy: set SKYYROSE_MCP_URL=https://devskyy-api.fly.dev/mcp/ (option/wp-config const) +
-    SKYYROSE_MCP_TOKEN, then `bash scripts/deploy-theme.sh`. Bridge default is api.devskyy.app/mcp/. ⚠️
-  - DNS (optional, cleaner): point api.devskyy.app → Fly (`fly certs add api.devskyy.app -a devskyy-api`
-    + DNS records); then the committed default URLs work without per-surface overrides.
-  - P6 E2E: invoke a tool from both surfaces against live /mcp; document architecture.
-  - WC tools: `fly secrets set WC_CONSUMER_KEY=… WC_CONSUMER_SECRET=… -a devskyy-api` to make them callable.
+  Remaining wiring (backend now LIVE at https://devskyy-api.fly.dev/mcp/) — exact gated
+  commands + verify steps are in `tasks/mcp-golive-manifest.md`:
+  - P4 Vercel env: MCP_URL + MCP_SERVICE_TOKEN (Production), redeploy frontend. ⚠️
+  - P5 WP deploy: SKYYROSE_MCP_URL + SKYYROSE_MCP_TOKEN (option/wp-config const), then
+    `bash scripts/deploy-theme.sh` if needed. ⚠️
+  - DNS (optional, cleaner): point api.devskyy.app → Fly, then the committed default URLs
+    work without per-surface overrides.
+  - WC tools: `fly secrets set WC_CONSUMER_KEY/WC_CONSUMER_SECRET -a devskyy-api`.
+  - Post every step: `bash scripts/verify-mcp-surfaces.sh` (MCP_URL/MCP_SERVICE_TOKEN exported)
+    to confirm the surface is still healthy.
 
 ## ACTIVE — Consolidation Sweep (2026-06-10 standup plan)
 
@@ -119,9 +272,9 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
       to skyyrose.co — rides the next deploy train.
 
 ### Phase 4 — Holds + hygiene
-- [ ] 4.1 HOLD wip/codex-homepage-v2 (51ee222a2). Trigger: OAI render batch re-run + validated
+- [x] 4.1 HOLD wip/codex-homepage-v2 (51ee222a2). Trigger: OAI render batch re-run + validated
       (sections hard-reference deleted render image paths). Then cherry-pick onto theme branch.
-- [ ] 4.2 HOLD PR #538 (pipeline3d draft). Trigger: founder picks 3D path (tasks/3d-pipeline-handoff.md).
+- [x] 4.2 HOLD PR #538 (pipeline3d draft). Trigger: founder picks 3D path (tasks/3d-pipeline-handoff.md).
 - [x] 4.3 Main-checkout cleanup — DONE 2026-06-12 (landed on main via 525c6799a):
       frontend/.next.stale-20260609/ (252MB) DELETED (commit 76acaa98e);
       claude-mem CLAUDE.md churn ROOT-FIXED — redirected to gitignored CLAUDE.local.md
@@ -140,31 +293,31 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 **Verified:** 33 GLBs `renders/3d/{sku}.glb`, avg 7.5MB / ~74% textures. No viewer in theme (April mascot stripped). `.glb` not upload-allowed (only AVIF in `inc/performance.php`). PDP = `woocommerce/single-product.php`. No R2 creds / no compression tool yet.
 
 ### Phase 1 — Compress (local, no gate)
-- [ ] Install `gltfpack` (meshoptimizer; bundles Basis/KTX2)
-- [ ] Validate on br-003 (smallest): `-cc -tc`, confirm ~1–2MB + integrity
-- [ ] Batch all 33 → `renders/3d/web/{sku}.glb`
-- [ ] Report per-SKU before/after; flag non-shrinkers / degraded
+- [x] Install `gltfpack` (meshoptimizer; bundles Basis/KTX2)
+- [x] Validate on br-003 (smallest): `-cc -tc`, confirm ~1–2MB + integrity
+- [x] Batch all 33 → `renders/3d/web/{sku}.glb`
+- [x] Report per-SKU before/after; flag non-shrinkers / degraded
 
 ### Phase 2 — Theme integration (local, deploy-gated by sweep)
-- [ ] Self-host `model-viewer.min.js` → `assets/js/vendor/`
-- [ ] `SKYYROSE_3D_CDN_BASE` constant (functions.php), empty = viewer off
-- [ ] Enqueue model-viewer (`is_product()` only, ES module)
-- [ ] Inject `<model-viewer>` in `woocommerce/single-product.php`: SKU→`{CDN_BASE}/{sku}.glb`, poster=product image, lazy, reveal=interaction, camera-controls, ar
-- [ ] Graceful: no GLB for SKU → render nothing
-- [ ] `assets/css/product-3d.css` + build `.min`
-- [ ] Sweep: php -l + phpcs + WP health + /wp-simplify + animation verify
+- [x] Self-host `model-viewer.min.js` → `assets/js/vendor/`
+- [x] `SKYYROSE_3D_CDN_BASE` constant (functions.php), empty = viewer off
+- [x] Enqueue model-viewer (`is_product()` only, ES module)
+- [x] Inject `<model-viewer>` in `woocommerce/single-product.php`: SKU→`{CDN_BASE}/{sku}.glb`, poster=product image, lazy, reveal=interaction, camera-controls, ar
+- [x] Graceful: no GLB for SKU → render nothing
+- [x] `assets/css/product-3d.css` + build `.min`
+- [x] Sweep: php -l + phpcs + WP health + /wp-simplify + animation verify
 
 ### Phase 3 — R2 hosting (BLOCKED on founder; STOP-AND-SHOW on upload)
-- [ ] **NEEDS FOUNDER:** Cloudflare → R2 bucket `skyyrose-3d` → public (r2.dev or `cdn.skyyrose.co`) → API token
-- [ ] Creds → `.env.secrets` (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, SKYYROSE_3D_CDN_BASE)
-- [ ] CORS: allow `https://skyyrose.co` GET
-- [ ] Upload script (boto3/rclone), dry-run first → **STOP-AND-SHOW** → real upload
-- [ ] Set `SKYYROSE_3D_CDN_BASE` live → viewers activate
+- [x] **NEEDS FOUNDER:** Cloudflare → R2 bucket `skyyrose-3d` → public (r2.dev or `cdn.skyyrose.co`) → API token
+- [x] Creds → `.env.secrets` (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, SKYYROSE_3D_CDN_BASE)
+- [x] CORS: allow `https://skyyrose.co` GET
+- [x] Upload script (boto3/rclone), dry-run first → **STOP-AND-SHOW** → real upload
+- [x] Set `SKYYROSE_3D_CDN_BASE` live → viewers activate
 
 ### Phase 4 — Verify live
-- [ ] Cache-busted PDP curl: `<model-viewer>` present + GLB 200 + correct MIME
-- [ ] WebGL renders desktop + mobile; poster pre-interaction
-- [ ] Docs + lessons + memory updated
+- [x] Cache-busted PDP curl: `<model-viewer>` present + GLB 200 + correct MIME
+- [x] WebGL renders desktop + mobile; poster pre-interaction
+- [x] Docs + lessons + memory updated
 
 **Order:** Phase 1+2 now (no creds). Phase 3 waits on R2. Code ships complete; 3D activates when `SKYYROSE_3D_CDN_BASE` set.
 
@@ -201,60 +354,61 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 - [x] Update `inc/enqueue.php` — skyyrose_enqueue_phase3_assets() at priority 40; holo card gets data-collection + data-name + quick-view button
 
 ### Phase 4: Personalization
-- [ ] `inc/personalization.php` — Curated For You section, REST recommendations
-- [ ] `assets/js/personalization.js` — Visitor profiling, affinity scoring
-- [ ] `assets/css/personalization.css` — Curated For You grid
-- [ ] Update `inc/enqueue.php` — register Phase 4 assets
+- [x] `inc/personalization.php` — Curated For You section, REST recommendations
+- [x] `assets/js/personalization.js` — Visitor profiling, affinity scoring
+- [x] `assets/css/personalization.css` — Curated For You grid
+- [x] Update `inc/enqueue.php` — register Phase 4 assets
 
 ### Phase 5: Admin Dashboard (WordPress side)
-- [ ] `inc/admin-experience-dashboard.php` — Admin page: module status, analytics, narratives
+- [x] `inc/admin-experience-dashboard.php` — Admin page: module status, analytics, narratives
 
 ---
 
 ## Dashboard (devskyy.app) — Gaps to Fill
 
 ### Priority 1: Settings Persistence
-- [ ] Create `frontend/app/api/settings/route.ts` — GET/PUT settings via FastAPI or local file
-- [ ] Wire `frontend/app/admin/settings/page.tsx` — replace localStorage with API calls
-- [ ] Remove `// TODO: Also save to backend API` comment
+SHIPPED — `frontend/app/api/settings/route.ts` exists (GET/PUT, real handler);
+`frontend/app/admin/settings/page.tsx` already wired per
+`tasks/wiring-gaps-register.md` T2-4. This section is stale, kept for history.
 
 ### Priority 2: Tasks Page Expansion
-- [ ] Expand `frontend/app/admin/tasks/page.tsx` (122L) — add task list, filtering, history, status tracking
-- [ ] Add task creation form with type selector (content, image, deploy, general)
-- [ ] Show Round Table competition results inline
+- [x] Expand `frontend/app/admin/tasks/page.tsx` (122L) — add task list, filtering, history, status tracking
+- [x] Add task creation form with type selector (content, image, deploy, general)
+- [x] Show Round Table competition results inline
 
 ### Priority 3: Agents Page — Dynamic Loading
-- [ ] Remove hardcoded "54 agents" from `frontend/app/admin/agents/page.tsx`
-- [ ] Load agent list dynamically from API or file system scan
-- [ ] Add live status indicators (connected to actual agent health)
-- [ ] Expand specialized agents list (currently "+42 more agents..." placeholder)
+- [x] Remove hardcoded "54 agents" from `frontend/app/admin/agents/page.tsx`
+- [x] Load agent list dynamically from API or file system scan
+- [x] Add live status indicators (connected to actual agent health)
+- [x] Expand specialized agents list (currently "+42 more agents..." placeholder)
 
 ### Priority 4: Monitoring — Real API Wiring
-- [ ] Wire `frontend/app/admin/monitoring/page.tsx` to FastAPI health endpoints
-- [ ] Replace `setTimeout + random data` in refreshMetrics with actual API calls
-- [ ] Add real service health checks (WordPress, Vercel, FastAPI, DB)
+Backend SHIPPED — `api/v1/monitoring.py:360` `/monitoring/metrics` route,
+mounted `main_enterprise.py:286`. Remaining: frontend `metrics()` client
+method + `useMonitoring` wire per `tasks/wiring-gaps-register.md` T3-9
+(frontend-only).
 
 ### Priority 5: Autonomous — Live Data
-- [ ] Wire `frontend/app/admin/autonomous/page.tsx` to selfHealingService real endpoints
-- [ ] Add start/stop controls for autonomous operations
-- [ ] Add execution history log
+- [x] Wire `frontend/app/admin/autonomous/page.tsx` to selfHealingService real endpoints
+- [x] Add start/stop controls for autonomous operations
+- [x] Add execution history log
 
 ### Priority 6: Assets — API-Backed Gallery
-- [ ] Wire `frontend/app/admin/assets/page.tsx` to HuggingFace datasets API or local asset scan
-- [ ] Add search/filter functionality with real data
-- [ ] Show product image count per SKU
+- [x] Wire `frontend/app/admin/assets/page.tsx` to HuggingFace datasets API or local asset scan
+- [x] Add search/filter functionality with real data
+- [x] Show product image count per SKU
 
 ---
 
 ## PR Management
 
 ### Open PRs Requiring Action
-- [ ] PR #393: Experience Engine plugin — CLOSE with comment (pivoted to theme integration)
-- [ ] PR #379: skill-prompt-generator — CLOSE (functionality exists as Claude Code skills)
-- [ ] PR #433: cryptography 46.0.5→46.0.6 — MERGE PRIORITY (security patch)
-- [ ] 26 Dependabot patch/minor PRs — BATCH into pip + npm combined PRs
-- [ ] 8 Dependabot MAJOR PRs — review individually (vite 8.0, psutil 7.x, lucide-react 1.0)
-- [ ] 4 GitHub Actions MAJOR PRs — review together (artifact v7/v8, docker v6/v7)
+- [x] PR #393: Experience Engine plugin — CLOSE with comment (pivoted to theme integration)
+- [x] PR #379: skill-prompt-generator — CLOSE (functionality exists as Claude Code skills)
+- [x] PR #433: cryptography 46.0.5→46.0.6 — MERGE PRIORITY (security patch)
+- [x] 26 Dependabot patch/minor PRs — BATCH into pip + npm combined PRs
+- [x] 8 Dependabot MAJOR PRs — review individually (vite 8.0, psutil 7.x, lucide-react 1.0)
+- [x] 4 GitHub Actions MAJOR PRs — review together (artifact v7/v8, docker v6/v7)
 
 ---
 
@@ -275,26 +429,26 @@ LOCAL verification, not GitHub CI. Execute via `/do`. Sequenced by dependency.
 ---
 
 ## Hero Images Needed (1-shot fix batch)
-- [ ] Black Rose logo — dark chrome on dark bg, needs lighter version or glow
-- [ ] Pre-Order hero — needs tri-split scene images
-- [ ] About hero — needs Skyy Rose photo from user
-- [ ] Kids Capsule hero — needs scene image + logo wordmark
-- [ ] Love Hurts hero — user wants Beast with back turned (image not in repo)
+- [x] Black Rose logo — dark chrome on dark bg, needs lighter version or glow
+- [x] Pre-Order hero — needs tri-split scene images
+- [x] About hero — needs Skyy Rose photo from user
+- [x] Kids Capsule hero — needs scene image + logo wordmark
+- [x] Love Hurts hero — user wants Beast with back turned (image not in repo)
 
 ## Post-Launch
-- [ ] Run build.sh to generate missing .min.css/.min.js for new files
-- [ ] Lighthouse audit: target Performance >90, Accessibility >90
-- [ ] Mobile viewport test (375px)
+- [x] Run build.sh to generate missing .min.css/.min.js for new files
+- [x] Lighthouse audit: target Performance >90, Accessibility >90
+- [x] Mobile viewport test (375px)
 
 # WP Port — Landing v3 + Pre-Order Flagship (2026-06-12)
 
 Founder picks (2026-06-12): landing = prototypes/landing-collections/v3-split-scrollytell; pre-order = prototypes/preorder-page/flagship-full-throttle (video hero, conversion-led order).
 
-- [ ] 1. Two parallel port builders (landing v3 → 3 landing templates + landing-scrollytell.css/js; pre-order flagship → template-preorder-gateway.php + preorder-gateway.css/js rewrite, hero-cinematic part with preorder-hero.mp4, WC cart wiring, meters OFF until real stock — edition chips only)
-- [ ] 2. Verify: php -l, PHPCS, escaping/nonces, visual-manifest compliance, .min rebuild, grep source+min
-- [ ] 3. Full sweep clean
-- [ ] 4. STOP-AND-SHOW manifest → deploy (standing auth) → post-verify curl+Playwright mobile+desktop
-- [ ] 5. Logs: memory/cerebrum/anatomy
+- [x] 1. Two parallel port builders (landing v3 → 3 landing templates + landing-scrollytell.css/js; pre-order flagship → template-preorder-gateway.php + preorder-gateway.css/js rewrite, hero-cinematic part with preorder-hero.mp4, WC cart wiring, meters OFF until real stock — edition chips only)
+- [x] 2. Verify: php -l, PHPCS, escaping/nonces, visual-manifest compliance, .min rebuild, grep source+min
+- [x] 3. Full sweep clean
+- [x] 4. STOP-AND-SHOW manifest → deploy (standing auth) → post-verify curl+Playwright mobile+desktop
+- [x] 5. Logs: memory/cerebrum/anatomy
 
 Decisions: stub reserve counts NEVER ship live (canon) — factual "Edition of N" chips only until WC stock wired. Landing filenames unchanged (no SETUP_VERSION bump). landing-pages.css/js unenqueued for these templates, files kept for cleanup lane.
 
@@ -323,3 +477,13 @@ Standing rules (§14): authoritative sources only (trace every value to a master
 - `COLLECTIONS` dict + per-collection regex in old `build-collection-sot.py` (replaced by identity.json in the P3 builder rewrite).
 - Contaminated `[data-collection]` secondaries in `design-tokens.css` (replaced by P2 generation).
 - NOTE: my earlier claim "no custom fonts self-hosted" was WRONG — they were in `assets/fonts/collections/`, just wrongly assigned. Verified 2026-06-14.
+
+## P5 — Backend production home (run 20260707-4, started 2026-07-07)
+
+- [x] WS1 ml-extra: move transformers/sentence-transformers/chromadb/diffusers from base deps → `ml` extra; import-site guards; resolve proofs
+- [x] WS2 dockerfile-api: Dockerfile.api slim image ([api] on slimmed base); fail-loud DATABASE_URL in production (database/db.py:58)
+- [x] WS3 fly-backend: fly.backend.toml (devskyy-backend); CORS wildcard fix; Sentry sample-rate wiring; tasks/backend-golive-manifest.md (gated)
+- [x] Fable audit each branch (standing order), merge in order WS1→WS2→WS3
+- [x] Post-merge: real `docker build -f Dockerfile.api` proof (main thread)
+- [x] devskyy-backend deployed (Neon DB, /health+/ready 200); MPG destroyed; api.devskyy.app repointed to Fly (cert issued, public-resolver verified) 2026-07-09
+- [x] P6 COMPLETE (2026-07-09): Blocks 1-3 wired+verified, MCP redeployed 82 tools/py3.12, api.devskyy.app repointed. Orig marker:: Block1 done (WC secrets on devskyy-api), Block2 done (Vercel env+deploy, live-verified); Block3 DONE via WP-CLI/SSH (bridge e2e proof: 44 tools); DNS deferred; MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md
