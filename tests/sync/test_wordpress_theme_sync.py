@@ -524,7 +524,14 @@ class TestSyncItem:
         self, sync_service, sample_approval_item
     ):
         """Should sync an approved item and key the result by approval item id."""
-        result = await sync_service.sync_item(sample_approval_item)
+        # Production items always live in the queue manager; sync_item persists
+        # wordpress sync state back onto them (bug-246), so register the fixture.
+        manager = get_approval_manager()
+        manager._items[sample_approval_item.id] = sample_approval_item
+        try:
+            result = await sync_service.sync_item(sample_approval_item)
+        finally:
+            manager._items.pop(sample_approval_item.id, None)
 
         assert result.item_id == sample_approval_item.id
         assert result.status == SyncStatus.COMPLETED
@@ -645,6 +652,50 @@ class TestSyncApprovedItems:
         assert result.total == 0
         assert result.synced == 0
         assert result.success is True
+
+    @pytest.mark.asyncio
+    async def test_sync_item_persists_wordpress_sync_state(
+        self, sync_service, clean_approval_manager
+    ):
+        """sync_item must record wordpress_media_id/synced_at on the item (bug-246)."""
+        item = ApprovalItem(
+            id="persist-check",
+            asset_id="asset-p",
+            job_id="job-p",
+            original_url="https://cdn.example.com/original/p.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/p.jpg",
+            status=ApprovalStatus.APPROVED,
+        )
+        clean_approval_manager._items[item.id] = item
+
+        result = await sync_service.sync_item(item)
+
+        assert result.success is True
+        stored = clean_approval_manager._items[item.id]
+        assert stored.wordpress_media_id == 12345
+        assert stored.wordpress_synced_at is not None
+
+    @pytest.mark.asyncio
+    async def test_sync_approved_items_is_idempotent_across_runs(
+        self, sync_service, clean_approval_manager, mock_wordpress_client
+    ):
+        """A second batch run must not re-upload items synced by the first (bug-246)."""
+        item = ApprovalItem(
+            id="idempotent-check",
+            asset_id="asset-i",
+            job_id="job-i",
+            original_url="https://cdn.example.com/original/i.jpg",
+            enhanced_url="https://cdn.example.com/enhanced/i.jpg",
+            status=ApprovalStatus.APPROVED,
+        )
+        clean_approval_manager._items[item.id] = item
+
+        first = await sync_service.sync_approved_items()
+        second = await sync_service.sync_approved_items()
+
+        assert first.synced == 1
+        assert second.total == 0
+        assert mock_wordpress_client.upload_media_from_url.await_count == 1
 
 
 class TestSyncResultErrorMessageAlias:
@@ -799,9 +850,15 @@ class TestSyncApprovedAssetRealUpload:
         """sync_item should surface the real upload's wordpress_id under the rekeyed result."""
         mock_wordpress_client.upload_media_from_url.return_value = {"id": 55555}
 
-        result = await sync_service.sync_item(upload_item)
+        manager = get_approval_manager()
+        manager._items[upload_item.id] = upload_item
+        try:
+            result = await sync_service.sync_item(upload_item)
+        finally:
+            manager._items.pop(upload_item.id, None)
 
         assert result.item_id == upload_item.id
         assert result.success is True
         assert result.status == SyncStatus.COMPLETED
         assert result.wordpress_id == 55555
+        assert upload_item.wordpress_media_id == 55555

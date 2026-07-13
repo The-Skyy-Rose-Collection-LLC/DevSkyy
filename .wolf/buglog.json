@@ -3997,5 +3997,47 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-10T16:20:00-07:00"
+  },
+  {
+    "id": "bug-246",
+    "timestamp": "2026-07-12",
+    "error_message": "Vercel check fails (red) on all open PRs \u2014 appeared to be a systemic main-config break blocking the whole merge queue",
+    "file": "tasks/pr-vercel-diagnosis.md (finding); Vercel project settings (root cause, not in repo)",
+    "root_cause": "FALSE BLOCKER. main's Vercel Production deploy is GREEN. 7/8 failing PRs touch 0 frontend files, so their Next build == main's. Identical code can't build-fail on Preview while passing on Production -> the red is a Vercel Preview-environment artifact (Preview-scoped env var missing for @t3-oss/env-nextjs build-time validation, and/or Deployment Protection), NOT PR code and NOT a main-config break.",
+    "fix": "No repo/code change fixes it. For non-frontend PRs, treat Vercel-red as noise and gate on the Python/test suite instead. To silence preview red: Vercel dashboard -> Settings -> Env Vars (add missing vars to Preview scope) and/or Deployment Protection. frontend/.env.local VERCEL_TOKEN is empty placeholder so vercel inspect can't auth locally.",
+    "tags": [
+      "vercel",
+      "ci",
+      "false-positive",
+      "preview",
+      "fail-open",
+      "pr-queue",
+      "env-vars"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-247",
+    "timestamp": "2026-07-13",
+    "error_message": "Every POST /approval/sync re-uploaded ALL previously-synced approved items \u2014 wordpress_synced_at/wordpress_media_id never persisted after successful upload (unbounded duplicate media on live WP library; media linkage lost)",
+    "file": "sync/wordpress_media_approval_sync.py (sync_item)",
+    "root_cause": "sync_item uploaded via sync_approved_asset but never called ApprovalQueueManager.update_wordpress_sync \u2014 the only setter of the fields sync_approved_items filters on. Existing test manually called update_wordpress_sync itself instead of pinning that the sync path does it, which is exactly how the gap survived. Found by rev-python during range review, empirically reproduced (2 uploads across 2 runs).",
+    "fix": "sync_item now persists wordpress_media_id via update_wordpress_sync after a successful upload; a failed state-update converts the result to FAILED (never silent success with lost linkage). Tests: sync-state persistence + run-twice idempotency (upload await_count == 1) + fixture alignment so items live in the manager like production.",
+    "tags": [
+      "approval-sync",
+      "idempotency",
+      "duplicate-uploads",
+      "test-quality",
+      "review-catch"
+    ],
+    "related_bugs": [
+      "bug-234"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
   }
 ]

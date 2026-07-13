@@ -256,6 +256,30 @@ class WordPressMediaApprovalSync:
             )
 
         result = await self.sync_approved_asset(item.asset_id, item=item)
+
+        # Persist the sync outcome on the approval item — without this, the
+        # wordpress_synced_at filter in sync_approved_items never turns over
+        # and every re-run re-uploads the same media (review finding, bug-246).
+        if result.success and result.wordpress_id is not None:
+            try:
+                await get_approval_manager().update_wordpress_sync(
+                    item.id, wordpress_media_id=result.wordpress_id
+                )
+            except Exception as exc:
+                logger.error(
+                    "Uploaded media %s for item %s but failed to record sync state: %s",
+                    result.wordpress_id,
+                    item.id,
+                    exc,
+                )
+                return SyncResult(
+                    item_id=item.id,
+                    success=False,
+                    status=SyncStatus.FAILED,
+                    wordpress_id=result.wordpress_id,
+                    error=f"Upload succeeded (media {result.wordpress_id}) but sync-state update failed: {exc}",
+                )
+
         return result.model_copy(update={"item_id": item.id})
 
     async def sync_approved_items(self, limit: int | None = None) -> BatchSyncResult:
