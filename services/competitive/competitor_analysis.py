@@ -9,6 +9,7 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import json
 import logging
 from collections import Counter
 from typing import Any
@@ -30,16 +31,12 @@ from services.competitive.schemas import (
     StyleCategory,
     StyleDistribution,
 )
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.models_competitors import CompetitorAssetRecord, CompetitorRecord
 
 logger = logging.getLogger(__name__)
-
-
-# =============================================================================
-# In-Memory Storage (Replace with DB in production)
-# =============================================================================
-
-_competitors: dict[str, Competitor] = {}
-_competitor_assets: dict[str, CompetitorAsset] = {}
 
 
 # =============================================================================
@@ -48,13 +45,23 @@ _competitor_assets: dict[str, CompetitorAsset] = {}
 
 
 class CompetitorAnalysisService:
-    """Service for managing competitor assets and analysis."""
+    """Service for managing competitor assets and analysis.
+
+    Persistence is SQLAlchemy-backed (database/models_competitors.py) —
+    each request gets its own AsyncSession via Depends(get_db), threaded
+    in through api/v1/competitors.py's get_analysis_service().
+    """
 
     # RBAC: Allowed roles for competitor management
     ALLOWED_ROLES = {"admin", "strategy", "marketing"}
 
-    def __init__(self) -> None:
-        """Initialize service."""
+    def __init__(self, session: AsyncSession) -> None:
+        """Initialize service.
+
+        Args:
+            session: Request-scoped async DB session
+        """
+        self._session = session
         self._vision_client: Any = None
 
     def check_access(self, user_roles: list[str]) -> bool:
@@ -67,6 +74,86 @@ class CompetitorAnalysisService:
             True if user has access
         """
         return bool(set(user_roles) & self.ALLOWED_ROLES)
+
+    # =========================================================================
+    # Persistence helpers
+    # =========================================================================
+
+    @staticmethod
+    def _competitor_to_row(competitor: Competitor) -> CompetitorRecord:
+        return CompetitorRecord(
+            id=competitor.id,
+            name=competitor.name,
+            category=competitor.category.value,
+            price_positioning=competitor.price_positioning.value,
+            website=str(competitor.website) if competitor.website else None,
+            notes=competitor.notes,
+            created_at=competitor.created_at,
+            created_by=competitor.created_by,
+        )
+
+    @staticmethod
+    def _row_to_competitor(row: CompetitorRecord) -> Competitor:
+        return Competitor(
+            id=row.id,
+            name=row.name,
+            category=row.category,
+            price_positioning=row.price_positioning,
+            website=row.website,
+            notes=row.notes,
+            created_at=row.created_at,
+            created_by=row.created_by,
+        )
+
+    @staticmethod
+    def _asset_to_row(asset: CompetitorAsset) -> CompetitorAssetRecord:
+        return CompetitorAssetRecord(
+            id=asset.id,
+            competitor_id=asset.competitor_id,
+            url=asset.url,
+            product_type=asset.product_type,
+            product_name=asset.product_name,
+            estimated_price=asset.estimated_price,
+            currency=asset.currency,
+            extracted_attributes_json=(
+                asset.extracted_attributes.model_dump_json() if asset.extracted_attributes else None
+            ),
+            manual_tags_json=json.dumps(asset.manual_tags),
+            notes=asset.notes,
+            created_at=asset.created_at,
+            created_by=asset.created_by,
+            source_url=str(asset.source_url) if asset.source_url else None,
+        )
+
+    @staticmethod
+    def _row_to_asset(row: CompetitorAssetRecord) -> CompetitorAsset:
+        return CompetitorAsset(
+            id=row.id,
+            competitor_id=row.competitor_id,
+            url=row.url,
+            product_type=row.product_type,
+            product_name=row.product_name,
+            estimated_price=row.estimated_price,
+            currency=row.currency,
+            extracted_attributes=(
+                ExtractedAttributes.model_validate_json(row.extracted_attributes_json)
+                if row.extracted_attributes_json
+                else None
+            ),
+            manual_tags=json.loads(row.manual_tags_json),
+            notes=row.notes,
+            created_at=row.created_at,
+            created_by=row.created_by,
+            source_url=row.source_url,
+        )
+
+    async def list_all_competitors(self) -> list[Competitor]:
+        result = await self._session.execute(select(CompetitorRecord))
+        return [self._row_to_competitor(row) for row in result.scalars().all()]
+
+    async def list_all_assets(self) -> list[CompetitorAsset]:
+        result = await self._session.execute(select(CompetitorAssetRecord))
+        return [self._row_to_asset(row) for row in result.scalars().all()]
 
     # =========================================================================
     # Competitor CRUD
@@ -96,7 +183,8 @@ class CompetitorAnalysisService:
             created_by=created_by,
         )
 
-        _competitors[competitor.id] = competitor
+        self._session.add(self._competitor_to_row(competitor))
+        await self._session.flush()
 
         logger.info(f"Created competitor: {competitor.name} (ID: {competitor.id})")
         return competitor
@@ -110,7 +198,8 @@ class CompetitorAnalysisService:
         Returns:
             Competitor or None if not found
         """
-        return _competitors.get(competitor_id)
+        row = await self._session.get(CompetitorRecord, competitor_id)
+        return self._row_to_competitor(row) if row else None
 
     async def list_competitors(self) -> CompetitorListResponse:
         """List all competitors.
@@ -118,7 +207,7 @@ class CompetitorAnalysisService:
         Returns:
             List of competitors
         """
-        competitors = list(_competitors.values())
+        competitors = await self.list_all_competitors()
         return CompetitorListResponse(
             total=len(competitors),
             competitors=competitors,
@@ -133,21 +222,23 @@ class CompetitorAnalysisService:
         Returns:
             True if deleted
         """
-        if competitor_id not in _competitors:
+        row = await self._session.get(CompetitorRecord, competitor_id)
+        if not row:
             return False
 
         # Delete associated assets
-        asset_ids_to_delete = [
-            asset_id
-            for asset_id, asset in _competitor_assets.items()
-            if asset.competitor_id == competitor_id
-        ]
-        for asset_id in asset_ids_to_delete:
-            del _competitor_assets[asset_id]
+        asset_result = await self._session.execute(
+            select(CompetitorAssetRecord).where(
+                CompetitorAssetRecord.competitor_id == competitor_id
+            )
+        )
+        asset_rows = asset_result.scalars().all()
+        for asset_row in asset_rows:
+            await self._session.delete(asset_row)
 
-        del _competitors[competitor_id]
+        await self._session.delete(row)
 
-        logger.info(f"Deleted competitor {competitor_id} and {len(asset_ids_to_delete)} assets")
+        logger.info(f"Deleted competitor {competitor_id} and {len(asset_rows)} assets")
         return True
 
     # =========================================================================
@@ -172,7 +263,8 @@ class CompetitorAnalysisService:
             Created asset
         """
         # Verify competitor exists
-        if request.competitor_id not in _competitors:
+        competitor_row = await self._session.get(CompetitorRecord, request.competitor_id)
+        if not competitor_row:
             raise ValueError(f"Competitor not found: {request.competitor_id}")
 
         # Create asset
@@ -193,7 +285,8 @@ class CompetitorAnalysisService:
         if extract_features:
             asset.extracted_attributes = await self._extract_attributes(str(request.url))
 
-        _competitor_assets[asset.id] = asset
+        self._session.add(self._asset_to_row(asset))
+        await self._session.flush()
 
         logger.info(f"Uploaded competitor asset: {asset.id} (competitor: {request.competitor_id})")
         return asset
@@ -207,7 +300,8 @@ class CompetitorAnalysisService:
         Returns:
             Asset or None if not found
         """
-        return _competitor_assets.get(asset_id)
+        row = await self._session.get(CompetitorAssetRecord, asset_id)
+        return self._row_to_asset(row) if row else None
 
     async def list_assets(
         self,
@@ -226,7 +320,7 @@ class CompetitorAnalysisService:
         Returns:
             Paginated list of assets
         """
-        assets = list(_competitor_assets.values())
+        assets = await self.list_all_assets()
 
         # Apply filters
         if filter_params:
@@ -234,17 +328,17 @@ class CompetitorAnalysisService:
                 assets = [a for a in assets if a.competitor_id == filter_params.competitor_id]
 
             if filter_params.competitor_category:
+                competitors = await self.list_all_competitors()
                 competitor_ids = {
-                    c.id
-                    for c in _competitors.values()
-                    if c.category == filter_params.competitor_category
+                    c.id for c in competitors if c.category == filter_params.competitor_category
                 }
                 assets = [a for a in assets if a.competitor_id in competitor_ids]
 
             if filter_params.price_positioning:
+                competitors = await self.list_all_competitors()
                 competitor_ids = {
                     c.id
-                    for c in _competitors.values()
+                    for c in competitors
                     if c.price_positioning == filter_params.price_positioning
                 }
                 assets = [a for a in assets if a.competitor_id in competitor_ids]
@@ -298,28 +392,28 @@ class CompetitorAnalysisService:
         Returns:
             Updated asset or None if not found
         """
-        asset = _competitor_assets.get(asset_id)
-        if not asset:
+        row = await self._session.get(CompetitorAssetRecord, asset_id)
+        if not row:
             return None
 
         # Update fields
         if request.product_type is not None:
-            asset.product_type = request.product_type
+            row.product_type = request.product_type
         if request.product_name is not None:
-            asset.product_name = request.product_name
+            row.product_name = request.product_name
         if request.estimated_price is not None:
-            asset.estimated_price = request.estimated_price
+            row.estimated_price = request.estimated_price
         if request.currency is not None:
-            asset.currency = request.currency
+            row.currency = request.currency
         if request.manual_tags is not None:
-            asset.manual_tags = request.manual_tags
+            row.manual_tags_json = json.dumps(request.manual_tags)
         if request.notes is not None:
-            asset.notes = request.notes
+            row.notes = request.notes
 
-        _competitor_assets[asset_id] = asset
+        await self._session.flush()
 
         logger.info(f"Updated competitor asset: {asset_id}")
-        return asset
+        return self._row_to_asset(row)
 
     async def delete_asset(self, asset_id: str) -> bool:
         """Delete a competitor asset.
@@ -330,8 +424,9 @@ class CompetitorAnalysisService:
         Returns:
             True if deleted
         """
-        if asset_id in _competitor_assets:
-            del _competitor_assets[asset_id]
+        row = await self._session.get(CompetitorAssetRecord, asset_id)
+        if row:
+            await self._session.delete(row)
             logger.info(f"Deleted competitor asset: {asset_id}")
             return True
         return False
@@ -353,7 +448,7 @@ class CompetitorAnalysisService:
         Returns:
             Style analytics
         """
-        assets = list(_competitor_assets.values())
+        assets = await self.list_all_assets()
 
         if competitor_id:
             assets = [a for a in assets if a.competitor_id == competitor_id]
@@ -406,7 +501,8 @@ class CompetitorAnalysisService:
 
         # Price analytics by competitor
         price_by_competitor: list[PriceAnalytics] = []
-        for comp in _competitors.values():
+        competitors = await self.list_all_competitors()
+        for comp in competitors:
             comp_assets = [a for a in assets if a.competitor_id == comp.id]
             prices = [a.estimated_price for a in comp_assets if a.estimated_price]
 

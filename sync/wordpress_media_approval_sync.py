@@ -186,7 +186,16 @@ class WordPressMediaApprovalSync:
         )
 
     async def batch_sync(self, asset_ids: list[str]) -> BatchSyncResult:
-        """Sync multiple assets to WordPress.
+        """Sync multiple assets to WordPress by bare id.
+
+        NOTE: this takes ids only, with no item/source-URL context, so each
+        call lands on `sync_approved_asset`'s no-item branch — a no-op success,
+        never a real upload. There is no reverse lookup from asset_id to an
+        ApprovalItem to source a real upload from. Nothing in this codebase
+        calls this method today; production sync goes through `sync_item` /
+        `sync_approved_items`, which supply full item context and do perform
+        real uploads. Treat this as legacy surface pending a redesign that
+        accepts items (or asset_id + source URL) rather than bare ids.
 
         Args:
             asset_ids: List of asset IDs to sync
