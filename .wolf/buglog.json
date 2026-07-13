@@ -4120,5 +4120,24 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-254",
+    "timestamp": "2026-07-13",
+    "error_message": "pip check: litellm 1.83.7 requires openai==2.30.0 and python-dotenv==1.0.1, but env has openai 1.109.1 / python-dotenv 1.2.2. Surfaced installing .[all].",
+    "file": "pyproject.toml + llm/providers/litellm_provider.py",
+    "root_cause": "litellm is imported by llm/providers/litellm_provider.py but NOT declared in pyproject.toml (any group). Installed litellm 1.83.7 pins openai==2.30.0, conflicting with the project's openai<2 cap (via langchain-openai / llama-index-llms-openai). Pre-existing; not in the .[all] install delta.",
+    "fix": "OPEN - needs a deliberate decision, NOT auto-repinned: (A) declare litellm at a version compatible with openai 1.x and pin it; or (B) migrate all openai usage to 2.x. litellm still imports and the full suite is green, so this is a declared-requirement mismatch (pip check advisory), not a runtime break today. Flagged to founder.",
+    "tags": [
+      "dependency",
+      "litellm",
+      "openai",
+      "pip-check",
+      "undeclared-dep",
+      "open"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
   }
 ]
