@@ -18,6 +18,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+from tests.sparse_guard import requires_tree
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
@@ -76,6 +78,11 @@ class TestCollectionSotGenerator:
         assert all(d["updated"] == "2026-06-14" for d in dated.values())
         assert all(d["updated"] == "GENERATED" for d in gen.build_documents().values())
 
+    # build_documents() resolves imagery through assets/hub/manifest.json; in a
+    # sparse worktree (assets/ excluded) it resolves hub->ghost fallback paths and
+    # would report the (correct) committed sot.json as "stale". The freshness gate
+    # runs in full checkouts and CI, where the hub tree is present.
+    @requires_tree("assets/hub")
     def test_committed_files_are_fresh(self):
         """Every tracked sot.json equals fresh generator output — the guard's premise.
 
