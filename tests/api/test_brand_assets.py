@@ -308,6 +308,68 @@ class TestBulkIngestion:
         assert "R2 upload exploded" in result["error"]
 
     @pytest.mark.asyncio
+    async def test_bulk_ingest_mixed_results_marks_job_partial(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Mixed success/failure across assets must yield status "partial", not silent completed/failed."""
+        good_url = "https://example.com/good.jpg"
+        bad_url = "https://example.com/bad.jpg"
+
+        async def fake_upload(
+            image_url: str,
+            asset_id: str,
+            category: BrandAssetCategory,
+            *,
+            correlation_id: str | None = None,
+        ) -> tuple[str | None, int, int | None, int | None, str | None]:
+            if image_url == bad_url:
+                raise RuntimeError("R2 upload exploded")
+            return f"brand/{category.value}/{asset_id}.png", 1234, 800, 600, "image/png"
+
+        async def fake_extract(
+            image_url: str,
+            *,
+            correlation_id: str | None = None,
+        ) -> VisualFeatures:
+            return VisualFeatures()
+
+        monkeypatch.setattr(brand_assets_module, "upload_to_r2", fake_upload)
+        monkeypatch.setattr(brand_assets_module, "extract_visual_features", fake_extract)
+
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={
+                "assets": [
+                    {"url": good_url, "category": "product"},
+                    {"url": bad_url, "category": "product"},
+                ],
+            },
+        )
+        assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "partial"
+        assert job["succeeded"] == 1
+        assert job["failed"] == 1
+        assert job["processed"] == 2
+
+        results_by_url = {result["url"]: result for result in job["results"]}
+        good_result = results_by_url[good_url]
+        assert good_result["success"] is True
+        assert good_result["asset_id"] is not None
+
+        bad_result = results_by_url[bad_url]
+        assert bad_result["success"] is False
+        assert bad_result["asset_id"] is None
+        assert "R2 upload exploded" in bad_result["error"]
+
+        asset_response = await client.get(f"/brand-assets/assets/{good_result['asset_id']}")
+        assert asset_response.status_code == 200
+        asset_id = good_result["asset_id"]
+        assert asset_response.json()["r2_key"] == f"brand/product/{asset_id}.png"
+
+    @pytest.mark.asyncio
     async def test_bulk_ingest_extract_features_false_skips_extraction(
         self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
