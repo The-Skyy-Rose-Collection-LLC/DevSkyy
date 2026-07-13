@@ -4127,14 +4127,15 @@
     "error_message": "pip check: litellm 1.83.7 requires openai==2.30.0 and python-dotenv==1.0.1, but env has openai 1.109.1 / python-dotenv 1.2.2. Surfaced installing .[all].",
     "file": "pyproject.toml + llm/providers/litellm_provider.py",
     "root_cause": "litellm is imported by llm/providers/litellm_provider.py but NOT declared in pyproject.toml (any group). Installed litellm 1.83.7 pins openai==2.30.0, conflicting with the project's openai<2 cap (via langchain-openai / llama-index-llms-openai). Pre-existing; not in the .[all] install delta.",
-    "fix": "OPEN - needs a deliberate decision, NOT auto-repinned: (A) declare litellm at a version compatible with openai 1.x and pin it; or (B) migrate all openai usage to 2.x. litellm still imports and the full suite is green, so this is a declared-requirement mismatch (pip check advisory), not a runtime break today. Flagged to founder.",
+    "fix": "RESOLVED (holding fix, openai 1.x preserved): (1) declared the previously-UNDECLARED litellm as `litellm>=1.80,<1.81` in pyproject base deps \u2014 1.80.x is the last litellm line admitting openai 1.x (1.81+ requires openai>=2.8); (2) capped `openai>=1.6,<2` (base) and `openai>=1.57.2,<2` (mcp group) so the resolver can't silently drift to openai 2.x. Env reconciled to openai 1.109.1 + litellm 1.80.0; `pip check` clean; llm/litellm-provider tests green. NOTE: openai 2.x IS API-compatible for our usage (Context7-verified: chat.completions/images.generate/images.edit/AsyncOpenAI unchanged in v2; 486 mocked openai-touching tests passed on openai 2.45.0) BUT the live paid gpt-image-2 pipeline was not exercised \u2014 so the openai 2.x migration is deferred as a deliberate founder-gated task (lift the two <2 caps + the litellm <1.81 cap together, then live-verify imagery). Rationale documented inline at both cap sites.",
     "tags": [
       "dependency",
       "litellm",
       "openai",
       "pip-check",
       "undeclared-dep",
-      "open"
+      "resolved",
+      "openai-2x-migration-deferred"
     ],
     "related_bugs": [],
     "occurrences": 1,

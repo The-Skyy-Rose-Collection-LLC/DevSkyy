@@ -75,7 +75,11 @@ dependencies = [
     "aiodataloader>=0.2.0",  # DataLoader pattern for N+1 query prevention
 
     # AI/ML & MCP Server
-    "openai>=1.6",
+    # Capped <2 deliberately: the codebase + paid gpt-image-2 pipeline run on the
+    # openai 1.x client (verified green). openai 2.x is API-compatible for our usage
+    # (Context7-checked, 486 mocked tests pass) but the live imagery path is unverified;
+    # lifting this cap is the deliberate 2.x migration, not a routine bump (bug-254).
+    "openai>=1.6,<2",
     "mcp>=1.23.0",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
     "claude-agent-sdk>=0.1.0",  # Claude Agent SDK for multi-agent orchestration
 
@@ -86,6 +90,11 @@ dependencies = [
     "mistralai>=1.10.1",  # Updated for security and compatibility
     "groq>=0.37.0",
     "voyageai>=0.2.4",  # Asymmetric document/query embeddings (RAG-optimized)
+    # llm/providers/litellm_provider.py universal fallback. Capped <1.81 on purpose:
+    # litellm 1.81+ requires openai>=2.8, but this codebase runs on the openai 1.x
+    # client (verified green). 1.80.0 needs only openai>=1.99.5. Lifting this cap is
+    # part of the deliberate openai 2.x migration, not a routine bump (bug-254).
+    "litellm>=1.80,<1.81",
 
     # Monitoring
     "prometheus-client>=0.19",
@@ -167,7 +176,7 @@ api = [
 mcp = [
     "mcp>=1.23.0",
     "fastmcp==3.4.2",  # standalone FastMCP 3.0 (pinned; SDK-bundled mcp.server.fastmcp still used by devskyy_mcp)
-    "openai>=1.57.2",
+    "openai>=1.57.2,<2",  # keep in lockstep with the base openai<2 cap (bug-254)
     "anthropic>=0.75.0",
     "google-genai>=1.50.0",
     "fastapi>=0.119.0",
