@@ -4039,5 +4039,26 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-248",
+    "timestamp": "2026-07-12",
+    "error_message": "TestBulkIngestion tests pass even with the entire upload/extraction pipeline broken \u2014 upload_to_r2 silently no-ops without R2 creds (r2_key=None) and extract_visual_features returns fabricated brand-default VisualFeatures on any error; tests only checked job existence/counts and a loose 4-way status assertion",
+    "file": "tests/api/test_brand_assets.py",
+    "root_cause": "Both pipeline steps fail open by design (api/v1/brand_assets.py upload_to_r2 + extract_visual_features fallbacks; services/ml/visual_feature_extractor.py _fallback_features), so job status/counts are unfalsifiable signals \u2014 no test ever fetched the persisted BrandAsset to assert r2_key/visual_features carried real pipeline outputs",
+    "fix": "Added _pin_pipeline helper monkeypatching upload_to_r2/extract_visual_features to known values + 3 tests asserting the persisted asset (GET /brand-assets/assets/{id}) carries exactly those values (r2_key, size, dims, mime, features), a raising-step-marks-job-failed test, and extract_features=False skip test; tightened POST status assertion to == 'pending' and auto_approve to assert persisted approval_status. Mutation-verified: severing r2_key persistence fails the new test.",
+    "tags": [
+      "tests",
+      "fail-open",
+      "brand-assets",
+      "pipeline",
+      "unfalsifiable-test",
+      "bug-230-pattern"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
   }
 ]
