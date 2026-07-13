@@ -23,7 +23,7 @@ from core.runtime.tool_registry import ToolCallContext, ToolRegistry
 
 
 @pytest.fixture
-def tripo_config() -> TripoConfig:
+def tripo_config(tmp_path: Path) -> TripoConfig:
     """Create test Tripo configuration."""
     return TripoConfig(
         api_key="test-api-key",
@@ -31,7 +31,7 @@ def tripo_config() -> TripoConfig:
         timeout=300.0,
         poll_interval=0.1,  # Fast polling for tests
         max_retries=2,
-        output_dir="/tmp/test_3d_assets",
+        output_dir=str(tmp_path / "3d_assets"),
     )
 
 
@@ -240,15 +240,10 @@ class TestAssetValidation:
     """Test 3D asset validation."""
 
     @pytest.fixture
-    def test_model_dir(self) -> Path:
-        """Create a temporary test model directory."""
-        test_dir = Path("/tmp/test_models")
-        test_dir.mkdir(parents=True, exist_ok=True)
-        yield test_dir
-        # Cleanup
-        import shutil
-
-        shutil.rmtree(test_dir, ignore_errors=True)
+    def test_model_dir(self, tmp_path: Path) -> Path:
+        """Per-test model directory (pytest-managed; unique path avoids
+        cross-process races on a shared /tmp dir)."""
+        return tmp_path
 
     async def test_validate_missing_file(self, agent: TripoAssetAgent) -> None:
         """Test validation of missing file."""

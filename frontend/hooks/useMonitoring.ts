@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { monitoring as monitoringApi } from '@/lib/api/endpoints/monitoring';
-import type { MonitoringHealthResponse } from '@/lib/api/types';
+import type { MonitoringHealthResponse, MonitoringMetricsResponse } from '@/lib/api/types';
 
 interface UseMonitoringState {
     data: MonitoringHealthResponse | null;
+    metrics: MonitoringMetricsResponse | null;
     loading: boolean;
     error: string | null;
 }
@@ -13,22 +14,34 @@ interface UseMonitoringState {
 export function useMonitoring() {
     const [state, setState] = useState<UseMonitoringState>({
         data: null,
+        metrics: null,
         loading: true,
         error: null,
     });
 
     const load = useCallback(async () => {
         setState((prev) => ({ ...prev, loading: true, error: null }));
-        try {
-            const data = await monitoringApi.health();
-            setState({ data, loading: false, error: null });
-        } catch (err) {
-            setState((prev) => ({
-                ...prev,
-                loading: false,
-                error: err instanceof Error ? err.message : 'Failed to load monitoring data',
-            }));
-        }
+        // Health and metrics load independently — one failing must not blank
+        // the other, so settle both and surface the first error (if any).
+        const [health, metrics] = await Promise.allSettled([
+            monitoringApi.health(),
+            monitoringApi.metrics(),
+        ]);
+        setState((prev) => ({
+            data: health.status === 'fulfilled' ? health.value : prev.data,
+            metrics: metrics.status === 'fulfilled' ? metrics.value : prev.metrics,
+            loading: false,
+            error:
+                health.status === 'rejected'
+                    ? health.reason instanceof Error
+                        ? health.reason.message
+                        : 'Failed to load monitoring data'
+                    : metrics.status === 'rejected'
+                        ? metrics.reason instanceof Error
+                            ? metrics.reason.message
+                            : 'Failed to load monitoring metrics'
+                        : null,
+        }));
     }, []);
 
     useEffect(() => {

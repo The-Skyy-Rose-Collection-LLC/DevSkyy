@@ -1,0 +1,34 @@
+# Love Hurts Girl — validated landmark measurements from the session that
+# shipped the production rig (rig_girl.py's hardcoded absolute-meter values,
+# carried forward here as the explicit override rather than relying on
+# auto-detection alone). Confirms the reproduce-check: running the pipeline
+# with this config should match the original session's "cut 204 welded
+# bridge triangles" result.
+name: love_hurts_girl
+target_height: 1.911
+
+# Only crotch_y/neck_y are pinned — every other landmark (z-depths, shoulder/hand
+# positions) is auto-detected. landmarks.py treats KEY PRESENCE as the override
+# signal, not the value, so an unused key here would silently clobber a real
+# detected measurement with whatever placeholder value sat next to it.
+landmarks:
+  crotch_y: 0.64
+  neck_y: 1.28
+
+bot_name: SkyyRose Concierge
+endpoint: ""
+teasers:
+  - "Where fashion meets emotion ✨"
+  - "The BLACK Rose awaits 🖤"
+  - "Oakland's finest, baby 🏙️"
+  - "Every piece tells a story 🥀"
+  - "Love hurts. The fit heals."
+  - "Ask me about the collections"
+  - "Made in The Town."
+  - "Autobiography, made wearable."
+fallbacks:
+  - "Four chapters: BLACK ROSE, LOVE HURTS, SIGNATURE, and the Kids Capsule. Each one's a piece of the story — which one calls you?"
+  - "LOVE HURTS is the heart of it — thorned roses growing out of a breaking heart. Beauty and pain, worn honest."
+  - "BLACK ROSE is the dark elegance chapter — limited pieces, midnight energy."
+  - "SIGNATURE is the foundation — the pieces you build a life around."
+  - "The Kids Capsule is a love letter, father to daughter. Held to the highest standard of everything we make."

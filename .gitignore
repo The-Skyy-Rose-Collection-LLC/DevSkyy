@@ -240,6 +240,10 @@ hf_enhancement_cache/
 vendor/*
 !vendor/.gitignore
 !vendor/README.md
+# Vendored FBX2glTF binaries + pinned three.js r128 UMD build (fetched via
+# scripts/setup_character_pipeline_vendor.sh, not authored here).
+skyyrose/character_pipeline/vendor/*
+!skyyrose/character_pipeline/vendor/README.md
 
 # --- Git internal / temp ---
 .git-rewrite/
@@ -472,3 +476,9 @@ tasks/assets/
 
 # --- Frontend skill screenshots (regenerated every run) ---
 frontend/.claude/skills/*/screenshots/
+
+# --- Session verification screenshots at repo root (Playwright verify output) ---
+/live-desktop-*.jpeg
+/live-mobile-*.jpeg
+/v8-hero-slides.jpeg
+/BlackRoseScene.png

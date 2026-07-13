@@ -306,7 +306,7 @@ class TestSkyyRoseContentAgent:
     """Tests for SkyyRose Content Agent."""
 
     @pytest.fixture
-    def agent(self) -> SkyyRoseContentAgent:
+    def agent(self, tmp_path) -> SkyyRoseContentAgent:
         """Create content agent with mocked dependencies."""
         with patch("agents.skyyrose_content_agent.BrandContextInjector") as mock_injector:
             mock_instance = MagicMock()
@@ -316,7 +316,7 @@ class TestSkyyRoseContentAgent:
             mock_injector.return_value = mock_instance
             agent = SkyyRoseContentAgent()
         # Override learning state path to avoid filesystem writes
-        agent._learning_state_path = "/tmp/test_skyyrose_learning.json"
+        agent._learning_state_path = str(tmp_path / "skyyrose_learning.json")
         return agent
 
     @pytest.fixture
@@ -752,7 +752,7 @@ class TestDualAgentIntegration:
             return SkyyRoseImageryAgent()
 
     @pytest.fixture
-    def content_agent(self) -> SkyyRoseContentAgent:
+    def content_agent(self, tmp_path) -> SkyyRoseContentAgent:
         """Create content agent."""
         with patch("agents.skyyrose_content_agent.BrandContextInjector") as mock_injector:
             mock_instance = MagicMock()
@@ -761,7 +761,7 @@ class TestDualAgentIntegration:
             mock_instance.inject.side_effect = lambda msgs, **kwargs: msgs
             mock_injector.return_value = mock_instance
             agent = SkyyRoseContentAgent()
-            agent._learning_state_path = "/tmp/test_dual_learning.json"
+            agent._learning_state_path = str(tmp_path / "dual_learning.json")
             return agent
 
     @pytest.mark.asyncio

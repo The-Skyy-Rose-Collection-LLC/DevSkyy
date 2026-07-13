@@ -138,6 +138,10 @@ Typography, header layout, footer layout, and collection palette overrides are c
 = 1.11.0 =
 * Feat: new mascot body — the site host is now the in-house-built Love Hurts Girl character (full rig, hand-authored walk + breathing idle, draco GLB 1.1MB), live on every page via the existing mascot system; chat, greetings, and reduced-motion behavior unchanged
 
+= 1.10.4 =
+* Fix: collection hero block rendered ~43px left of center on all four collection pages — the .col-hero__scroll cue had no CSS, so it sat in flex flow beside the hero content and pushed it off-center; now absolutely positioned bottom-center with proper cue styling
+* Fix: collection hero eyebrow (gold accent) unreadable against bright hero photography (Signature curtains) — added drop shadow
+
 = 1.10.3 =
 * Feat: bespoke collection display fonts — Black Rose now uses SkyyRose Black Rose Script (replaces Pacifico); Love Hurts uses SkyyRose Love Hurts Graffiti (replaces the interim Kaushan Script). Both built in-house from glyph sheets, self-hosted, full latin a-z/A-Z
 * Feat: collection feature-scroll section — sticky image cross-fades per feature while the philosophy items scroll (GSAP ScrollTrigger, IntersectionObserver fallback, stacked on mobile); wires the per-collection `features` canon copy that previously had no renderer

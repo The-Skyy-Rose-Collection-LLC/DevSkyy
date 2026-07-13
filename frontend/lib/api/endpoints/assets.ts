@@ -1,8 +1,25 @@
 import { ApiError } from '../errors';
 import { API_URL } from '../config';
 import { getAuthToken, getAuthHeaders, fetchWithTimeout, handleResponse } from '../client';
-import { AssetListResponseSchema, AssetSchema, SkuImageCountsSchema, HfDatasetsResponseSchema } from '../schemas';
-import type { AssetListResponse, Asset, AssetFilters, AssetUpdateRequest, SkuImageCounts, HfDatasetsResponse } from '../types';
+import {
+    AssetListResponseSchema,
+    AssetSchema,
+    SkuImageCountsSchema,
+    HfDatasetsResponseSchema,
+    AssetIngestResponseSchema,
+    AssetJobResponseSchema,
+} from '../schemas';
+import type {
+    AssetListResponse,
+    Asset,
+    AssetFilters,
+    AssetUpdateRequest,
+    SkuImageCounts,
+    HfDatasetsResponse,
+    AssetIngestResponse,
+    AssetIngestOptions,
+    AssetJobResponse,
+} from '../types';
 
 export const assets = {
     getList: async (filters?: AssetFilters): Promise<AssetListResponse> => {
@@ -75,6 +92,42 @@ export const assets = {
             body: formData,
         }, 120000); // 2 minute timeout for uploads
         return handleResponse(res, AssetSchema);
+    },
+
+    /** POST /assets/ingest — submit an image for the ML processing pipeline; returns a job_id to poll via getJob(). */
+    ingest: async (file: File, options?: AssetIngestOptions): Promise<AssetIngestResponse> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('source', options?.source ?? 'dashboard');
+        if (options?.productId) formData.append('product_id', options.productId);
+        formData.append('processing_profile', options?.processingProfile ?? 'full');
+        if (options?.callbackUrl) formData.append('callback_url', options.callbackUrl);
+
+        const token = getAuthToken();
+        const headers: HeadersInit = {
+            'X-Request-ID': crypto.randomUUID(),
+        };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetchWithTimeout(`${API_URL}/api/v1/assets/ingest`, {
+            method: 'POST',
+            headers,
+            body: formData,
+        }, 120000); // 2 minute timeout for uploads
+        return handleResponse(res, AssetIngestResponseSchema);
+    },
+
+    /** GET /assets/jobs/{job_id} — poll ML processing pipeline job status. */
+    getJob: async (jobId: string): Promise<AssetJobResponse> => {
+        if (!jobId || !/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+            throw new ApiError('Invalid job ID format', 400, 'INVALID_INPUT');
+        }
+        const res = await fetchWithTimeout(`${API_URL}/api/v1/assets/jobs/${jobId}`, {
+            headers: await getAuthHeaders(),
+        });
+        return handleResponse(res, AssetJobResponseSchema);
     },
 
     getCollectionStats: async (): Promise<Record<string, number>> => {

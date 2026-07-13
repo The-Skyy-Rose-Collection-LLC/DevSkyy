@@ -95,12 +95,12 @@ class TestDownloadModelSSRFGuard:
     """_download_model must raise ThreeDProviderError on blocked URLs."""
 
     @pytest.fixture
-    def provider(self):
+    def provider(self, tmp_path):
         from services.three_d.replicate_provider import ReplicateProvider
 
         p = ReplicateProvider.__new__(ReplicateProvider)
         p.config = MagicMock()
-        p.config.output_dir = "/tmp/replicate_test"
+        p.config.output_dir = str(tmp_path)
         p._http_client = None
         p._client = None
         return p
@@ -165,7 +165,7 @@ class TestDownloadModelSSRFGuard:
 
         import os
 
-        os.makedirs("/tmp/replicate_test", exist_ok=True)
+        os.makedirs(provider.config.output_dir, exist_ok=True)
 
         result = await provider._download_model(
             url="https://replicate.delivery/pbxt/abc123/model.glb",
