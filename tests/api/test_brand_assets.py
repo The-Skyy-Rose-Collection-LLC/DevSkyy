@@ -203,6 +203,8 @@ class TestBulkIngestion:
         self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Should persist the asset as approved when auto_approve is requested."""
+        # Pinned for determinism/speed only (no real R2/Gemini calls); pipeline
+        # fidelity is asserted by test_bulk_ingest_persists_pipeline_outputs.
         _pin_pipeline(monkeypatch)
 
         response = await client.post(
