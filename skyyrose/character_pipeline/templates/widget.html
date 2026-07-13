@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<!--
+  SKYYROSE — LOVE HURTS GIRL / 3D CHATBOT WIDGET
+  Self-contained: three.js r128 + GLTFLoader + rigged model embedded. Zero network deps.
+
+  EMBED ON SKYYROSE.CO:
+    Copy everything between the WIDGET-START and WIDGET-END markers and paste
+    before </body> (or enqueue as a footer HTML block). The widget is
+    position:fixed and will not affect page layout. 3D init is deferred via
+    requestIdleCallback — it never blocks the WordPress render thread.
+
+  WIRE THE BRAIN:
+    Set window.SKYYROSE_CHAT_ENDPOINT = "https://api.devskyy.app/chat"
+    (or edit CONFIG.endpoint below). POST: {message, history}. The widget
+    accepts {reply} | {message} | {content} | OpenAI-style choices[0].
+    No endpoint -> on-brand concierge fallback lines.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyyRose — Concierge Widget</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Archivo:wght@300;400;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  body{background:#0A0A0A;min-height:100vh;margin:0;display:grid;place-items:center;font-family:'Archivo',sans-serif}
+  .demo-hint{color:#5a5a5a;text-align:center;letter-spacing:.3em;font-size:11px;font-family:'JetBrains Mono',monospace;line-height:2.4}
+  .demo-hint b{color:#B76E79;font-weight:400}
+</style>
+</head>
+<body>
+<div class="demo-hint">SKYYROSE &middot; CONCIERGE WIDGET DEMO<br><b>SHE'S IN THE CORNER &rarr;</b></div>
+
+<!-- ============ SKYYROSE WIDGET-START ============ -->
+<style>
+#srw-root{
+  --srw-void:#0A0A0A; --srw-charcoal:#1C1C1C; --srw-smoke:#2D2D2D;
+  --srw-rose:#B76E79; --srw-blood:#8B0000; --srw-bone:#F5F5F0;
+  --srw-display:'Fraunces',Georgia,serif;
+  --srw-body:'Archivo',-apple-system,sans-serif;
+  --srw-mono:'JetBrains Mono','SF Mono',monospace;
+  position:fixed; right:20px; bottom:20px; z-index:2147483000;
+  font-family:var(--srw-body); color:var(--srw-bone);
+}
+#srw-root *{margin:0;padding:0;box-sizing:border-box}
+
+/* collapsed stage */
+#srw-stage{
+  position:relative; width:110px; height:170px; cursor:pointer;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+#srw-stage:hover{transform:translateY(-4px)}
+#srw-stage::after{
+  content:''; position:absolute; left:50%; bottom:6px; width:70px; height:14px;
+  transform:translateX(-50%); border-radius:50%;
+  background:radial-gradient(ellipse, rgba(183,110,121,.45), transparent 70%);
+  filter:blur(4px); pointer-events:none;
+}
+#srw-canvas-holder{position:absolute; inset:0}
+#srw-canvas-holder canvas{width:100%!important; height:100%!important; display:block}
+
+/* teaser bubble */
+#srw-bubble{
+  position:absolute; bottom:150px; right:8px; max-width:210px;
+  background:var(--srw-bone); color:var(--srw-void);
+  font-size:12px; line-height:1.5; padding:10px 14px; border-radius:14px 14px 2px 14px;
+  opacity:0; transform:translateY(8px) scale(.94); pointer-events:none;
+  transition:opacity .45s cubic-bezier(.16,1,.3,1), transform .45s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  white-space:nowrap;
+}
+#srw-bubble.on{opacity:1; transform:translateY(0) scale(1)}
+
+/* expanded panel */
+#srw-panel{
+  position:absolute; right:0; bottom:0;
+  width:min(400px, calc(100vw - 32px)); height:min(660px, calc(100vh - 40px));
+  background:rgba(10,10,10,.94); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(183,110,121,.32); border-radius:18px;
+  display:none; flex-direction:column; overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.7), 0 0 40px rgba(183,110,121,.10);
+}
+#srw-root.open #srw-panel{display:flex; animation:srwIn .5s cubic-bezier(.16,1,.3,1)}
+#srw-root.open #srw-stage, #srw-root.open #srw-bubble{display:none}
+@keyframes srwIn{from{opacity:0; transform:translateY(24px) scale(.97)} to{opacity:1; transform:none}}
+
+#srw-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px 12px; border-bottom:1px solid rgba(183,110,121,.18);
+}
+#srw-head .t{font-family:var(--srw-mono); font-size:11px; letter-spacing:.4em; color:var(--srw-rose)}
+#srw-head .s{font-size:10px; letter-spacing:.18em; color:#777; margin-top:4px; font-family:var(--srw-mono)}
+#srw-close{
+  background:none; border:1px solid rgba(245,245,240,.2); color:var(--srw-bone);
+  width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:13px; line-height:1;
+  transition:all .3s;
+}
+#srw-close:hover{border-color:var(--srw-rose); color:var(--srw-rose)}
+
+#srw-panel-stage{position:relative; flex:0 0 246px; border-bottom:1px solid rgba(183,110,121,.12);
+  background:radial-gradient(ellipse at 50% 90%, rgba(139,0,0,.12), transparent 65%)}
+
+#srw-msgs{flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:var(--srw-smoke) transparent}
+.srw-m{max-width:82%; padding:10px 14px; font-size:13.5px; line-height:1.55; border-radius:14px; word-wrap:break-word}
+.srw-m.bot{align-self:flex-start; background:var(--srw-charcoal); border:1px solid rgba(183,110,121,.14); border-bottom-left-radius:3px}
+.srw-m.usr{align-self:flex-end; background:var(--srw-rose); color:var(--srw-void); border-bottom-right-radius:3px; font-weight:400}
+.srw-m.typing span{display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--srw-rose); margin:0 2px; animation:srwDot 1.2s infinite}
+.srw-m.typing span:nth-child(2){animation-delay:.15s}
+.srw-m.typing span:nth-child(3){animation-delay:.3s}
+@keyframes srwDot{0%,60%,100%{opacity:.25; transform:translateY(0)} 30%{opacity:1; transform:translateY(-3px)}}
+
+#srw-form{display:flex; gap:10px; padding:14px 16px 16px; border-top:1px solid rgba(183,110,121,.14)}
+#srw-input{
+  flex:1; background:var(--srw-charcoal); border:1px solid rgba(183,110,121,.2);
+  color:var(--srw-bone); font-family:var(--srw-body); font-size:13.5px;
+  padding:11px 15px; border-radius:12px; outline:none; transition:border-color .3s;
+}
+#srw-input:focus{border-color:var(--srw-rose)}
+#srw-input::placeholder{color:#666}
+#srw-send{
+  background:var(--srw-rose); color:var(--srw-void); border:none; border-radius:12px;
+  font-family:var(--srw-mono); font-size:10px; letter-spacing:.2em; padding:0 18px;
+  cursor:pointer; transition:background .3s;
+}
+#srw-send:hover{background:#c98490}
+
+@media (max-width:480px){
+  #srw-root{right:12px; bottom:12px}
+  #srw-panel{width:calc(100vw - 24px); height:calc(100vh - 24px); height:calc(100dvh - 24px)}
+}
+@media (prefers-reduced-motion:reduce){
+  #srw-stage, #srw-panel{transition:none; animation:none}
+}
+</style>
+
+<div id="srw-root" aria-live="polite">
+  <div id="srw-bubble" role="status"></div>
+  <div id="srw-stage" role="button" tabindex="0" aria-label="Open SkyyRose concierge chat">
+    <div id="srw-canvas-holder"></div>
+  </div>
+  <div id="srw-panel" role="dialog" aria-label="SkyyRose concierge">
+    <div id="srw-head">
+      <div><div class="t">SKYYROSE</div><div class="s">CONCIERGE &middot; THE TOWN</div></div>
+      <button id="srw-close" aria-label="Close chat">&#10005;</button>
+    </div>
+    <div id="srw-panel-stage"></div>
+    <div id="srw-msgs"></div>
+    <form id="srw-form" autocomplete="off">
+      <input id="srw-input" type="text" placeholder="Ask about the collections&hellip;" aria-label="Message">
+      <button id="srw-send" type="submit">SEND</button>
+    </form>
+  </div>
+</div>
+
+<script>@@THREE@@</script>
+<script>@@GLTFLOADER@@</script>
+<script>
+(function(){
+"use strict";
+var GLB_B64 = "@@GLB64@@";
+
+var CONFIG = {
+  endpoint: (typeof window.SKYYROSE_CHAT_ENDPOINT === "string" && window.SKYYROSE_CHAT_ENDPOINT) || "",
+  greeting: "Welcome to SkyyRose \u2014 where love meets luxury. I\u2019m here for anything: the collections, the story, your order. What can I show you?",
+  teasers: [
+    "Where fashion meets emotion \u2728",
+    "The BLACK Rose awaits \ud83d\udda4",
+    "Oakland\u2019s finest, baby \ud83c\udfd9\ufe0f",
+    "Every piece tells a story \ud83e\udd40",
+    "Love hurts. The fit heals.",
+    "Ask me about the collections",
+    "Made in The Town.",
+    "Autobiography, made wearable."
+  ],
+  fallbacks: [
+    "Four chapters: BLACK ROSE, LOVE HURTS, SIGNATURE, and the Kids Capsule. Each one\u2019s a piece of the story \u2014 which one calls you?",
+    "LOVE HURTS is the heart of it \u2014 thorned roses growing out of a breaking heart. Beauty and pain, worn honest.",
+    "BLACK ROSE is the dark elegance chapter \u2014 limited pieces, midnight energy.",
+    "SIGNATURE is the foundation \u2014 the pieces you build a life around.",
+    "The Kids Capsule is a love letter, father to daughter. Held to the highest standard of everything we make."
+  ],
+  reducedMotion: window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+};
+
+var root = document.getElementById("srw-root");
+var stage = document.getElementById("srw-stage");
+var holder = document.getElementById("srw-canvas-holder");
+var panelStage = document.getElementById("srw-panel-stage");
+var bubble = document.getElementById("srw-bubble");
+var msgs = document.getElementById("srw-msgs");
+var form = document.getElementById("srw-form");
+var input = document.getElementById("srw-input");
+
+/* ---------------- three.js ---------------- */
+var renderer, scene, camera, pivot, bones = {}, clock, waveT = -1, greeted = false;
+var pointerTarget = {x:0, y:0};
+
+function b64ToArrayBuffer(b64){
+  var bin = atob(b64), len = bin.length, bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function findBone(list, suffix){
+  for (var i = 0; i < list.length; i++)
+    if (list[i].name.indexOf(suffix, list[i].name.length - suffix.length) !== -1) return list[i];
+  return null;
+}
+
+function init3D(){
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.setClearColor(0x000000, 0);
+  holder.appendChild(renderer.domElement);
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(30, 1, 0.05, 40);
+  camera.position.set(0, 1.02, 4.7);
+  camera.lookAt(0, 0.95, 0);
+
+  scene.add(new THREE.AmbientLight(0xF5EDE8, 0.55));
+  var key = new THREE.DirectionalLight(0xFFF2E6, 1.25); key.position.set(2.2, 4, 3); scene.add(key);
+  var fill = new THREE.DirectionalLight(0xB76E79, 0.5); fill.position.set(-3, 1.6, 1.5); scene.add(fill);
+  var rim = new THREE.DirectionalLight(0x8B0000, 0.8); rim.position.set(0, 2.4, -4); scene.add(rim);
+
+  pivot = new THREE.Group();
+  scene.add(pivot);
+
+  new THREE.GLTFLoader().parse(b64ToArrayBuffer(GLB_B64), "", function(gltf){
+    var skinned = null;
+    gltf.scene.traverse(function(o){ if (o.isSkinnedMesh) skinned = o; });
+    if (skinned){
+      skinned.frustumCulled = false;
+      var list = skinned.skeleton.bones;
+      bones.spine2 = findBone(list, "Spine2");
+      bones.head = findBone(list, "Head");
+      bones.rArm = findBone(list, "RightArm");
+      bones.rFore = findBone(list, "RightForeArm");
+    }
+    pivot.add(gltf.scene);
+    resize3D();
+    clock = new THREE.Clock();
+    animate();
+  }, function(err){ if (window.console) console.error("SkyyRose widget model failed:", err); });
+
+  window.addEventListener("resize", resize3D);
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden && clock) clock.getDelta();
+  });
+  document.addEventListener("pointermove", function(e){
+    if (!root.classList.contains("open")) return;
+    var r = panelStage.getBoundingClientRect();
+    pointerTarget.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width/2)) / (r.width)));
+    pointerTarget.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height/2)) / (r.height)));
+  });
+}
+
+function currentHolder(){ return root.classList.contains("open") ? panelStage : holder; }
+
+function resize3D(){
+  if (!renderer) return;
+  var el = currentHolder();
+  var w = el.clientWidth || 110, h = el.clientHeight || 170;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  /* keep her full body in frame regardless of aspect */
+  camera.position.z = (camera.aspect < 0.75) ? 4.7 : 3.9;
+  camera.updateProjectionMatrix();
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  if (document.hidden) return;
+  var dt = clock.getDelta(), t = clock.elapsedTime;
+  var rm = CONFIG.reducedMotion;
+
+  if (!rm){
+    pivot.position.y = 0.025 * Math.sin(t * 1.5);
+    pivot.rotation.y = 0.10 * Math.sin(t * 0.45);
+    if (bones.spine2) bones.spine2.rotation.x = 0.022 * Math.sin(t * 2.0);
+  }
+  if (bones.head){
+    var ty = root.classList.contains("open") ? pointerTarget.x * 0.30 : 0.06 * Math.sin(t * 0.7);
+    var tx = root.classList.contains("open") ? pointerTarget.y * 0.14 : 0;
+    bones.head.rotation.y += (ty - bones.head.rotation.y) * Math.min(1, dt * 6);
+    bones.head.rotation.x += (tx - bones.head.rotation.x) * Math.min(1, dt * 6);
+  }
+  /* wave gesture */
+  if (waveT >= 0 && bones.rArm && bones.rFore){
+    waveT += dt;
+    var D = 2.0, p = Math.min(1, waveT / D);
+    var lift = Math.sin(Math.min(1, p * 3) * Math.PI / 2);        /* ease up */
+    var drop = p > 0.7 ? (p - 0.7) / 0.3 : 0;                      /* ease down */
+    var amp = lift * (1 - drop * drop);
+    bones.rArm.rotation.z = -1.15 * amp;
+    bones.rFore.rotation.z = -0.35 * amp + 0.28 * amp * Math.sin(waveT * 11);
+    if (p >= 1){ waveT = -1; bones.rArm.rotation.z = 0; bones.rFore.rotation.z = 0; }
+  }
+  renderer.render(scene, camera);
+}
+
+/* ---------------- teaser bubble ---------------- */
+var teaseIdx = 0;
+function tease(){
+  if (root.classList.contains("open")) return;
+  bubble.textContent = CONFIG.teasers[teaseIdx % CONFIG.teasers.length];
+  teaseIdx++;
+  bubble.classList.add("on");
+  setTimeout(function(){ bubble.classList.remove("on"); }, 4500);
+}
+setTimeout(tease, 3500);
+setInterval(tease, 14000);
+
+/* ---------------- chat ---------------- */
+var history = [];
+function addMsg(text, who){
+  var d = document.createElement("div");
+  d.className = "srw-m " + who;
+  d.textContent = text;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+function addTyping(){
+  var d = document.createElement("div");
+  d.className = "srw-m bot typing";
+  d.innerHTML = "<span></span><span></span><span></span>";
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+var fbIdx = 0;
+function fallbackReply(){ return CONFIG.fallbacks[(fbIdx++) % CONFIG.fallbacks.length]; }
+
+function botReply(userText){
+  var typing = addTyping();
+  var finish = function(text){
+    typing.remove();
+    addMsg(text, "bot");
+    history.push({role:"assistant", content:text});
+  };
+  if (!CONFIG.endpoint){
+    setTimeout(function(){ finish(fallbackReply()); }, 700 + Math.random() * 600);
+    return;
+  }
+  fetch(CONFIG.endpoint, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:userText, history:history.slice(-12)})
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var text = data.reply || data.message || data.content ||
+      (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || fallbackReply();
+    finish(text);
+  }).catch(function(){ finish(fallbackReply()); });
+}
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+  addMsg(text, "usr");
+  history.push({role:"user", content:text});
+  botReply(text);
+});
+
+/* ---------------- open/close ---------------- */
+function openPanel(){
+  root.classList.add("open");
+  if (renderer) panelStage.appendChild(renderer.domElement);
+  resize3D();
+  waveT = 0;
+  if (!greeted){ greeted = true; setTimeout(function(){ addMsg(CONFIG.greeting, "bot"); }, 450); }
+  setTimeout(function(){ input.focus(); }, 300);
+}
+function closePanel(){
+  root.classList.remove("open");
+  if (renderer) holder.appendChild(renderer.domElement);
+  resize3D();
+}
+stage.addEventListener("click", openPanel);
+stage.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") openPanel(); });
+document.getElementById("srw-close").addEventListener("click", closePanel);
+
+/* deferred init — never block the host page render */
+if ("requestIdleCallback" in window) requestIdleCallback(init3D, {timeout:2500});
+else setTimeout(init3D, 800);
+})();
+</script>
+<!-- ============ SKYYROSE WIDGET-END ============ -->
+</body>
+</html>
