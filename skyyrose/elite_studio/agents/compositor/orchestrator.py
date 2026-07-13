@@ -40,6 +40,7 @@ import io
 import json
 import logging
 import os
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -61,6 +62,7 @@ from .infra import (
     upload_to_fal,
 )
 from .lighting import SCENE_LOOKBOOK, load_lighting_spec
+from .stage_c_relight import RelightStageError
 from .stage_e_cleanup import gimp_pixel_cleanup
 from .stage_f_shadows import generate_shadows
 
@@ -179,6 +181,16 @@ class CompositorAgent(FluxProviderMixin):
         budget: Any = None,
     ) -> CompositorResult:
         """Run the 6-stage compositing pipeline."""
+        from skyyrose.core.catalog_loader import CATALOG_CSV, read_catalog_rows
+
+        # Validate the SKU against the canonical catalog before any filesystem
+        # mutation or paid stage — a typo must fail fast, not run the whole
+        # pipeline and score an unapprovable render. read_catalog_rows is
+        # @cache-d, so this parses the CSV at most once per process.
+        known_skus = frozenset(row.get("sku", "").strip() for row in read_catalog_rows())
+        if sku not in known_skus:
+            raise ValueError(f"unknown SKU {sku!r} — not in catalog {CATALOG_CSV}")
+
         out = Path(output_dir or self.DEFAULT_OUTPUT_DIR)
         out.mkdir(parents=True, exist_ok=True)
 
@@ -263,7 +275,6 @@ class CompositorAgent(FluxProviderMixin):
                 stages["relight"] = {
                     "path": relit_path,
                     "duration_s": round(time.perf_counter() - started, 3),
-                    "fallback_to_alpha": relit_path == alpha_path,
                 }
                 stages_done = 3
 
@@ -322,8 +333,17 @@ class CompositorAgent(FluxProviderMixin):
                     prompt=prompt,
                     budget=budget,
                 )
-                composite_path = str(out / f"{sku}-composite.png")
-                Path(composite_path).write_bytes(composite_bytes)
+                composite_path = str(out / f"{sku}-{scene_name}-composite.png")
+                # Atomic write so a crash mid-write can't leave a truncated PNG
+                # for the shadow/QA stages to read.
+                _fd, _tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
+                try:
+                    with os.fdopen(_fd, "wb") as _f:
+                        _f.write(composite_bytes)
+                    os.replace(_tmp, composite_path)
+                except Exception:
+                    Path(_tmp).unlink(missing_ok=True)
+                    raise
                 stages["composite"] = {
                     "path": composite_path,
                     "provider": provider,
@@ -347,7 +367,7 @@ class CompositorAgent(FluxProviderMixin):
 
             # ------------------------------ Stage 5: shadows
             started = time.perf_counter()
-            shadow_path = self._generate_shadows(composite_path, sku, str(out))
+            shadow_path = self._generate_shadows(composite_path, sku, str(out), scene_name)
             stages["shadow"] = {
                 "path": shadow_path,
                 "duration_s": round(time.perf_counter() - started, 3),
@@ -358,12 +378,12 @@ class CompositorAgent(FluxProviderMixin):
             started = time.perf_counter()
             qa = self._maybe_apply_gate(shadow_path, scene_name, collection)
             stages["qa"] = {
-                "status": qa.get("status", "warn"),
+                "status": qa.get("status", "fail"),
                 "details": qa,
                 "duration_s": round(time.perf_counter() - started, 3),
             }
             stages_done = 6
-            result_kwargs["qa_status"] = qa.get("status", "warn")
+            result_kwargs["qa_status"] = qa.get("status", "fail")
             result_kwargs["qa_details"] = qa
             result_kwargs["output_path"] = shadow_path
             result_kwargs["alpha_path"] = alpha_path
@@ -560,7 +580,12 @@ class CompositorAgent(FluxProviderMixin):
         except Exception as exc:
             logger.warning("IC-Light local fallback failed for %s: %s", sku, exc)
 
-        return alpha_path
+        # Both providers failed — fail closed (see RelightStageError). The old
+        # `return alpha_path` let an unrelit composite pass QC silently.
+        raise RelightStageError(
+            f"_relight_subject: all providers failed for SKU {sku!r} "
+            "(Replicate IC-Light + local libcom both unavailable)"
+        )
 
     def _run_iclight_replicate(
         self,
@@ -666,8 +691,10 @@ class CompositorAgent(FluxProviderMixin):
 
     # --------------------------------------------------- Stage 5: shadows
 
-    def _generate_shadows(self, composite_path: str, sku: str, output_dir: str) -> str:
-        return generate_shadows(composite_path, sku, output_dir)
+    def _generate_shadows(
+        self, composite_path: str, sku: str, output_dir: str, scene_name: str = ""
+    ) -> str:
+        return generate_shadows(composite_path, sku, output_dir, scene_name)
 
     # --------------------------------------------------- Stage 6: visual QA
 
@@ -704,7 +731,8 @@ class CompositorAgent(FluxProviderMixin):
 
         if not result.get("success"):
             return {
-                "status": "warn",
+                "status": "fail",
+                "error_type": "qa_provider_error",
                 "error": result.get("error", "QA provider returned no body"),
                 "model": COMPOSITOR_QA_MODEL,
             }
@@ -716,7 +744,8 @@ class CompositorAgent(FluxProviderMixin):
             return {**parsed, "status": status, "model": COMPOSITOR_QA_MODEL}
         except Exception:
             return {
-                "status": "warn",
+                "status": "fail",
+                "error_type": "qa_parse_error",
                 "error": f"could not parse QA JSON: {text[:120]}",
                 "model": COMPOSITOR_QA_MODEL,
             }

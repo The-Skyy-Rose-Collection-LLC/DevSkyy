@@ -6,6 +6,8 @@ gaussian blur. GPSDiffusion can be hooked in later by replacing this body.
 
 from __future__ import annotations
 
+import os
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageFilter
@@ -24,6 +26,7 @@ def generate_shadows(
     composite_path: str,
     sku: str,
     output_dir: str,
+    scene_name: str = "",
 ) -> str:
     """Add a soft contact shadow to anchor the subject in the scene.
 
@@ -91,8 +94,17 @@ def generate_shadows(
             black.alpha_composite(shadow_rgba)
             final = Image.alpha_composite(black, composite)
 
-        dest = out / f"{sku}-shadow.png"
-        final.save(dest, format="PNG")
+        dest = out / (f"{sku}-{scene_name}-shadow.png" if scene_name else f"{sku}-shadow.png")
+        # Atomic write: render to a temp file then os.replace, so a crash
+        # mid-write can't leave a truncated PNG the QA gate reads as garbage.
+        fd, tmp = tempfile.mkstemp(dir=str(out), suffix=".png")
+        try:
+            os.close(fd)
+            final.save(tmp, format="PNG")
+            os.replace(tmp, dest)
+        except Exception:
+            Path(tmp).unlink(missing_ok=True)
+            raise
         return str(dest)
     except Exception as exc:
         raise ShadowStageError(f"Shadow stage failed for {sku}: {exc}") from exc

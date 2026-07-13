@@ -91,7 +91,7 @@ def rasterize_composite(
 
     # Cache key over all three inputs — re-running with the same files is
     # free.
-    cache_key = _composite_cache_key(mockup_p, scene_p, mask_p)
+    cache_key = _composite_cache_key(mockup_p, scene_p, mask_p, sku)
     cached = _cache_dir("rasterize") / f"{cache_key}.png"
     dest = out / f"{sku}-rasterize.png"
 
@@ -226,9 +226,15 @@ def align_mask_to_scene(
     return str(dest)
 
 
-def _composite_cache_key(mockup_p: Path, scene_p: Path, mask_p: Path) -> str:
-    """Hash of the three input file contents — composites are deterministic."""
+def _composite_cache_key(mockup_p: Path, scene_p: Path, mask_p: Path, sku: str) -> str:
+    """Hash of SKU + the three input file contents.
+
+    SKU is mixed in so two garments sharing a base studio photo (common within
+    a collection) can't collide on a cached composite — composites are
+    otherwise deterministic in their inputs.
+    """
     h = hashlib.sha256()
+    h.update(sku.encode())
     for p in (mockup_p, scene_p, mask_p):
         with open(p, "rb") as f:
             # Stream-hash to keep memory bounded for large scenes.
