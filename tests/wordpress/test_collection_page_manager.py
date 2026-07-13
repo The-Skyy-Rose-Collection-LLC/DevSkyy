@@ -15,6 +15,7 @@ import pytest
 
 from skyyrose.elite_studio.brand import BrandConfig
 from skyyrose.elite_studio.catalog import Catalog
+from tests.sparse_guard import requires_tree
 from wordpress.collection_page_manager import (
     CollectionDesignTemplates,
     CollectionTemplate,
@@ -22,6 +23,10 @@ from wordpress.collection_page_manager import (
 )
 
 pytest.importorskip("yaml")
+
+# BrandConfig.load()/Catalog.load() read assets/brand/*.yaml — sparse worktrees
+# exclude assets/ by design; full checkouts and CI still fail closed if missing.
+pytestmark = requires_tree("assets/brand")
 
 
 def test_all_four_collections_resolve() -> None:
@@ -71,9 +76,9 @@ def test_no_retired_tagline_anywhere_in_templates() -> None:
         as_dict = t.to_dict()
         serialized = str(as_dict)
         for retired in brand.retired_taglines:
-            assert (
-                retired not in serialized
-            ), f"{ct.value}: retired tagline {retired!r} leaked into template"
+            assert retired not in serialized, (
+                f"{ct.value}: retired tagline {retired!r} leaked into template"
+            )
 
 
 def test_to_agent_reference_includes_recovery_steps() -> None:
