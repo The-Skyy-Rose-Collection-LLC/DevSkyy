@@ -1,23 +1,35 @@
 #!/usr/bin/env bash
-# Stop test-gate — runs the fast pytest suite when Python files are dirty, and
-# RETRIES a failure once (last-failed only, after a short settle) to absorb the
-# two false-block modes this shared worktree produces:
-#   1. load-timeout flakes — e.g. test_ml_optional's 60s import guard trips when
-#      the machine is saturated; the import itself succeeds (~7s unloaded).
-#   2. concurrent-session mid-edit races — a second session editing a test file
-#      is caught half-written (e.g. a fixture using tmp_path a beat before the
-#      param lands), an error that does not reproduce once the edit completes.
-# Blocks the Stop (exit 2) ONLY when a failure reproduces on a clean re-run.
-# Everything else exits 0 so a genuinely-passing suite never false-blocks.
+# Stop test-gate (WORKTREE-AWARE) — runs the fast pytest suite for the STOPPING
+# session's OWN worktree, not a hardcoded path.
+#
+# Why worktree-aware: one git worktree = one HEAD, but multiple Claude sessions can
+# run concurrently in DIFFERENT worktrees of the same repo (e.g. a Ralph loop churning
+# `main` while another session works in .claude/worktrees/<x>). A path-hardcoded gate
+# blocks EVERY session on main's state, so one session's broken WIP false-blocks another
+# session's clean Stop. This gate reads the stopping session's cwd (Claude Code passes
+# it as JSON on stdin: {"cwd": "...", ...}) and gates only the tree that session is in.
+#
+# Flake handling: on a red run, settle 5s then re-run `pytest --last-failed`; block
+# (exit 2) ONLY if the failure reproduces — absorbs load-timeout flakes and mid-edit
+# races without ever masking a real, reproducible failure.
 set -uo pipefail
 
-REPO="/Users/theceo/DevSkyy"
+# The stopping session's cwd arrives as JSON on stdin. Fall back to $PWD if absent
+# (jq missing / non-JSON invocation) so the gate still works.
+input=$(cat 2>/dev/null || true)
+cwd=$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null || true)
+[ -n "$cwd" ] && [ -d "$cwd" ] || cwd="$PWD"
+
+# Resolve THAT worktree's git root; if it isn't a repo, don't block the Stop.
+REPO=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null) || exit 0
 cd "$REPO" || exit 0
 
+# Worktrees have no venv of their own — they share the primary checkout's .venv.
 PY="$REPO/.venv/bin/python"
-[ -x "$PY" ] || exit 0   # no venv resolvable → don't block the Stop
+[ -x "$PY" ] || PY="/Users/theceo/DevSkyy/.venv/bin/python"
+[ -x "$PY" ] || exit 0
 
-# Gate only when Python actually changed (same trigger as the original hook).
+# Gate only when Python actually changed in THIS worktree.
 git status --porcelain -- '*.py' | grep -q . || exit 0
 
 # Half-written NEW test files (untracked) are not a gate — ignore them.
@@ -30,9 +42,9 @@ run_lastfailed() { $PY -m pytest --last-failed -q $ig 2>&1; }
 out=$(run_full); rc=$?
 [ "$rc" -eq 0 ] && exit 0   # green on the first try
 
-# First run failed. Settle (load drains / the other session's edit completes),
-# then re-run only what failed. pytest's --last-failed uses the cache from the
-# run above; if the cache is empty it falls back to the full suite (still safe).
+# First run failed. Settle (load drains / the other session's edit completes), then
+# re-run only what failed. --last-failed uses the cache from the run above; empty cache
+# falls back to the full suite (still safe).
 sleep 5
 out2=$(run_lastfailed); rc2=$?
 if [ "$rc2" -eq 0 ]; then
@@ -41,5 +53,5 @@ if [ "$rc2" -eq 0 ]; then
 fi
 
 echo "$out2" | tail -25
-echo "Stop-gate: failure reproduced on re-run — blocking Stop."
+echo "Stop-gate: failure reproduced on re-run — blocking Stop (worktree: $REPO)."
 exit 2
