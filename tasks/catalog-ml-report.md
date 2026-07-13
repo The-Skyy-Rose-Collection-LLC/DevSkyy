@@ -6,22 +6,16 @@
 
 ## 1. Visual clustering vs collections (k=4)
 
-- **Silhouette score:** 0.1410 (higher = clusters more separable; >0.5 is strong)
-- **Disagreements:** 11 SKUs land in a cluster whose dominant collection is NOT the SKU's collection.
+- **Silhouette score:** 0.1645 (higher = clusters more separable; >0.5 is strong)
+- **Disagreements:** 5 SKUs land in a cluster whose dominant collection is NOT the SKU's collection.
 
 | sku | name | tagged | ML guess |
 |-----|------|--------|----------|
-| `br-001` | BLACK Rose Crewneck | black-rose | **signature** |
-| `br-002` | BLACK Rose Joggers | black-rose | **signature** |
-| `br-004` | BLACK Rose Hoodie | black-rose | **signature** |
-| `br-005` | BLACK Rose Hoodie — Signature Edition | black-rose | **signature** |
-| `br-006` | BLACK Rose Sherpa Jacket | black-rose | **signature** |
-| `kids-001` | Kids Colorblock Hoodie Set — Red/Black | kids-capsule | **signature** |
-| `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | kids-capsule | **signature** |
-| `lh-002` | Love Hurts Joggers | love-hurts | **signature** |
-| `lh-003` | Love Hurts Basketball Shorts | love-hurts | **signature** |
-| `lh-004` | Love Hurts Bomber Jacket | love-hurts | **signature** |
-| `lh-005` | The Fannie | love-hurts | **signature** |
+| `kids-001` | Kids Colorblock Hoodie Set — Red/Black | kids-capsule | **love-hurts** |
+| `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | kids-capsule | **black-rose** |
+| `sg-001` | The Bridge Series 'The Bay Bridge' Shorts | signature | **black-rose** |
+| `sg-002` | The Bridge Series 'Stay Golden' Shirt | signature | **black-rose** |
+| `sg-007` | The Signature Beanie | signature | **black-rose** |
 
 ## 2. Per-collection visual outliers
 
@@ -29,10 +23,10 @@ Lowest cosine to its collection centroid = most visually unlike its peers.
 
 | collection | size | outlier sku | name | cosine | best |
 |-----------|-----:|-------------|------|-------:|-----:|
-| signature | 12 | `sg-015` | The Windbreaker Set | 0.759 | 0.916 |
-| black-rose | 15 | `br-010` | BLACK is Beautiful Jersey Series: 3. The Bay (Basketball) | 0.768 | 0.910 |
-| love-hurts | 4 | `lh-005` | The Fannie | 0.855 | 0.927 |
-| kids-capsule | 2 | `kids-001` | Kids Colorblock Hoodie Set — Red/Black | 0.967 | 0.967 |
+| black-rose | 14 | `br-012` | BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland) | 0.661 | 0.941 |
+| signature | 12 | `sg-007` | The Signature Beanie | 0.704 | 0.927 |
+| love-hurts | 5 | `lh-005` | The Fannie | 0.804 | 0.942 |
+| kids-capsule | 2 | `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | 0.919 | 0.919 |
 
 ## 3. Name vs image alignment (lowest = potential mis-attached image)
 
@@ -41,21 +35,21 @@ Low score = name and image are about different things.
 
 | sku | collection | name | cosine |
 |-----|-----------|------|-------:|
-| `lh-005` | love-hurts | The Fannie | 0.264 |
-| `lh-003` | love-hurts | Love Hurts Basketball Shorts | 0.264 |
-| `sg-009` | signature | The Sherpa Jacket | 0.266 |
-| `sg-002` | signature | The Bridge Series 'Stay Golden' Shirt | 0.268 |
-| `br-011` | black-rose | BLACK is Beautiful Jersey Series: 4. The Rose (Hockey) | 0.269 |
-| `lh-002` | love-hurts | Love Hurts Joggers | 0.274 |
-| `lh-004` | love-hurts | Love Hurts Bomber Jacket | 0.282 |
-| `sg-005` | signature | The Bridge Series 'The Bay Bridge' Shirt | 0.285 |
-| `br-007` | black-rose | BLACK Rose x Love Hurts Basketball Shorts | 0.288 |
-| `sg-003` | signature | The Bridge Series 'Stay Golden' Shorts | 0.289 |
-| `kids-001` | kids-capsule | Kids Colorblock Hoodie Set — Red/Black | 0.289 |
-| `br-006` | black-rose | BLACK Rose Sherpa Jacket | 0.290 |
-| `sg-015` | signature | The Windbreaker Set | 0.292 |
-| `br-005` | black-rose | BLACK Rose Hoodie — Signature Edition | 0.295 |
-| `br-010` | black-rose | BLACK is Beautiful Jersey Series: 3. The Bay (Basketball) | 0.301 |
+| `lh-006` | love-hurts | Love Hurts Joggers (White) | 0.234 |
+| `lh-003` | love-hurts | Love Hurts Basketball Shorts | 0.240 |
+| `sg-011` | signature | Original Label Tee (White) | 0.242 |
+| `lh-005` | love-hurts | The Fannie | 0.247 |
+| `lh-002` | love-hurts | Love Hurts Joggers (Black) | 0.247 |
+| `br-006` | black-rose | BLACK Rose Sherpa Jacket | 0.247 |
+| `kids-001` | kids-capsule | Kids Colorblock Hoodie Set — Red/Black | 0.250 |
+| `br-004` | black-rose | BLACK Rose Hoodie | 0.253 |
+| `sg-012` | signature | Original Label Tee (Orchid) | 0.255 |
+| `lh-004` | love-hurts | Love Hurts Bomber Jacket | 0.264 |
+| `br-001` | black-rose | BLACK Rose Crewneck | 0.266 |
+| `sg-009` | signature | The Sherpa Jacket | 0.269 |
+| `sg-015` | signature | The Windbreaker Set | 0.269 |
+| `sg-002` | signature | The Bridge Series 'Stay Golden' Shirt | 0.270 |
+| `br-010` | black-rose | BLACK is Beautiful Jersey Series: 3. The Bay (Basketball) | 0.270 |
 
 _(showing 15 lowest of 33 total)_
 
@@ -66,24 +60,20 @@ Could be intentional (cross-collection callbacks) or a tagging error.
 
 | sku | tagged | nearest sku | nearest collection | score |
 |-----|--------|-------------|--------------------|------:|
-| `br-002` | black-rose | `lh-002` | **love-hurts** | 0.902 |
-| `lh-002` | love-hurts | `br-002` | **black-rose** | 0.902 |
-| `br-004` | black-rose | `sg-006` | **signature** | 0.898 |
-| `sg-006` | signature | `br-004` | **black-rose** | 0.898 |
-| `sg-007` | signature | `br-004` | **black-rose** | 0.819 |
-| `lh-004` | love-hurts | `br-004` | **black-rose** | 0.817 |
-| `sg-009` | signature | `br-005` | **black-rose** | 0.816 |
-| `lh-005` | love-hurts | `br-002` | **black-rose** | 0.722 |
-| `br-007` | black-rose | `lh-003` | **love-hurts** | 0.720 |
-| `sg-015` | signature | `kids-002` | **kids-capsule** | 0.699 |
+| `br-005` | black-rose | `kids-002` | **kids-capsule** | 0.851 |
+| `kids-002` | kids-capsule | `br-005` | **black-rose** | 0.851 |
+| `sg-002` | signature | `br-005` | **black-rose** | 0.814 |
+| `sg-007` | signature | `br-005` | **black-rose** | 0.814 |
+| `kids-001` | kids-capsule | `lh-002` | **love-hurts** | 0.813 |
+| `sg-001` | signature | `br-002` | **black-rose** | 0.765 |
 
 ## 5. Top-5 visually similar SKUs (drives the /shortcode widget)
 
 Sample (first 6 SKUs, full set in JSON):
 
-- **`br-001`** → `br-004` (0.84), `br-006` (0.83), `br-005` (0.83)
-- **`br-002`** → `lh-002` (0.90), `br-006` (0.85), `kids-001` (0.83)
-- **`br-003`** → `br-003-giants` (1.00), `br-003-oakland` (1.00), `br-003-white` (1.00)
-- **`br-003-giants`** → `br-003` (1.00), `br-003-oakland` (1.00), `br-003-white` (1.00)
-- **`br-003-oakland`** → `br-003` (1.00), `br-003-giants` (1.00), `br-003-white` (1.00)
-- **`br-003-white`** → `br-003` (1.00), `br-003-giants` (1.00), `br-003-oakland` (1.00)
+- **`br-001`** → `br-004` (0.87), `br-010` (0.87), `br-006` (0.85)
+- **`br-002`** → `br-005` (0.78), `kids-002` (0.77), `sg-007` (0.77)
+- **`br-003`** → `br-006` (0.87), `br-009` (0.87), `br-015` (0.84)
+- **`br-004`** → `br-001` (0.87), `br-009` (0.86), `br-006` (0.85)
+- **`br-005`** → `kids-002` (0.85), `sg-002` (0.81), `sg-007` (0.81)
+- **`br-006`** → `br-009` (0.88), `br-003` (0.87), `br-001` (0.85)

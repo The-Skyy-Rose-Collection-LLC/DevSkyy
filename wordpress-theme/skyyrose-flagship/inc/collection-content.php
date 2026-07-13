@@ -206,9 +206,9 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_logo_alt'       => __( 'The SkyyRose Signature Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 189, // 1600x540 SOT lockup (2.96:1) — was 280 (2:1), CLS drift.
-			'hero_bg'             => '/branding/hero/luxury-nighttime-1280w.webp',
-			'hero_bg_base'        => '/branding/hero/luxury-nighttime',
-			'hero_bg_alt'         => __( 'Signature Collection — Oakland skyline', 'skyyrose' ),
+			'hero_bg'             => '/branding/hero/signature-golden-gate-yacht-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/signature-golden-gate-yacht',
+			'hero_bg_alt'         => __( 'Signature Collection — SkyyRose yacht at the pier, Golden Gate Bridge at night', 'skyyrose' ),
 			'hero_tagline'        => __( 'The origin. The main event. The birth of it all.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Discover', 'skyyrose' ),

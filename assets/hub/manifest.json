@@ -842,7 +842,7 @@
       "sku": "br-010",
       "face": "front",
       "engine": "legacy-theme",
-      "verdict": "verified",
+      "verdict": "pending",
       "verified_by": "founder verdict 2026-06-25",
       "source": "wordpress-theme/skyyrose-flagship/assets/images/products/br-010-onmodel.webp",
       "note": null,
@@ -850,7 +850,8 @@
         "digital_source_type": "unknown",
         "ai_system_used": null,
         "generation_date": null
-      }
+      },
+      "reason": "demoted 2026-07-12: 'THE BAY' wordmark renders white/grey; dossier specifies gold/yellow (black-is-beautiful-jersey-series-3-the-bay-basketball.md:37-38). Re-render queued (founder-gated)."
     },
     "br-010-front-product-card-alt": {
       "path": "collections/black-rose/products/br-010/front-product-card-alt.png",
@@ -1092,7 +1093,7 @@
       "sku": "kids-002",
       "face": "front",
       "engine": "legacy-theme",
-      "verdict": "verified",
+      "verdict": "pending",
       "verified_by": "founder verdict 2026-06-25",
       "source": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/kids-002-ghost-front.webp",
       "note": null,
@@ -1100,7 +1101,8 @@
         "digital_source_type": "unknown",
         "ai_system_used": null,
         "generation_date": null
-      }
+      },
+      "reason": "demoted 2026-07-12: right-arm patch reads 'THE BEAUTY OF ... BLACK AND WHITE' \u2014 branding_spec requires 'Skyy Rose' arched top / 'Collection' arched bottom. Re-render queued (founder-gated)."
     },
     "kids-002-front-product-card-alt": {
       "path": "collections/kids-capsule/products/kids-002/front-product-card-alt.jpg",

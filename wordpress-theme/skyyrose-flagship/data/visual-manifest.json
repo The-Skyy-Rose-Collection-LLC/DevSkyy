@@ -146,7 +146,7 @@
    "notes": "THE Black Rose Collection script with rose. BLACK lettering — on dark grounds apply filter: invert(1) grayscale(1) brightness(1.05) (silver register) or place over light/imagery panels. The lockup IS the collection name; never type-render 'Black Rose' as a hero/panel title."
   },
   "lockup_display": {
-   "path": "images/lockups/black-rose-lockup.webp",
+   "path": "images/lockups/black-rose-lockup",
    "formats": [
     "webp"
    ],
@@ -155,7 +155,7 @@
    "notes": "CANONICAL display lockup — high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
   },
   "lockup_svg_master": {
-   "path": "branding/vectorized/black-rose-script.svg",
+   "path": "branding/vectorized/black-rose-script",
    "formats": [
     "svg"
    ],
@@ -340,7 +340,7 @@
    "notes": "Love Hurts combined red script. The lockup IS the collection name."
   },
   "lockup_display": {
-   "path": "images/lockups/love-hurts-lockup.webp",
+   "path": "images/lockups/love-hurts-lockup",
    "formats": [
     "webp"
    ],
@@ -349,7 +349,7 @@
    "notes": "CANONICAL display lockup — full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
   },
   "lockup_svg_master": {
-   "path": "branding/vectorized/love-hurts-full-lettering.svg",
+   "path": "branding/vectorized/love-hurts-full-lettering",
    "formats": [
     "svg"
    ],
@@ -523,6 +523,30 @@
     "kind": "cinematic-backdrop",
     "status": "verified",
     "notes": "Love Hurts cinematic backdrop (founder-assigned 2026-06-11). LH heroes/manifesto surfaces."
+   },
+   {
+    "path": "branding/hero/love-hurts-beast-room",
+    "formats": [
+     "480w.webp",
+     "768w.webp",
+     "1280w.webp",
+     "1600w.webp"
+    ],
+    "kind": "cinematic-backdrop",
+    "status": "verified",
+    "notes": "Beast's room \u2014 founder-supplied render (2026-07-12), responsive ladder. Love Hurts scene-hero still."
+   },
+   {
+    "path": "branding/hero/love-hurts-enchanted-rose",
+    "formats": [
+     "480w.webp",
+     "768w.webp",
+     "1280w.webp",
+     "1600w.webp"
+    ],
+    "kind": "cinematic-backdrop",
+    "status": "verified",
+    "notes": "Enchanted rose \u2014 founder-supplied render (2026-07-12), responsive ladder. Love Hurts scene-hero still."
    }
   ]
  },
@@ -539,7 +563,7 @@
    "notes": "Gold script — doubles as brand lockup (see brand_global). The lockup IS the collection name."
   },
   "lockup_display": {
-   "path": "images/lockups/signature-lockup.webp",
+   "path": "images/lockups/signature-lockup",
    "formats": [
     "webp"
    ],
@@ -548,7 +572,7 @@
    "notes": "CANONICAL display lockup — gold \"The Skyy Rose Collection\" script + gradient, transparent WebP. Doubles as brand lockup. Use FIRST on web/homepage."
   },
   "lockup_svg_master": {
-   "path": "branding/vectorized/signature-script.svg",
+   "path": "branding/vectorized/signature-script",
    "formats": [
     "svg"
    ],
@@ -556,6 +580,21 @@
    "status": "verified",
    "notes": "Vector master (flat single-colour). Use only where infinite scale or CSS recolor is required; otherwise prefer lockup_display."
   },
+  "hero_backdrops": [
+   {
+    "path": "branding/hero/signature-golden-gate-yacht",
+    "formats": [
+     "480w.webp",
+     "768w.webp",
+     "1280w.webp",
+     "1680w.webp",
+     "1680w.jpg"
+    ],
+    "kind": "cinematic-backdrop",
+    "status": "verified",
+    "notes": "SkyyRose yacht at the pier, Golden Gate at night \u2014 founder-supplied render (2026-07-12, OpenAI Playground). Signature cinematic scene-hero still. Master PNG: assets/scenes/signature/signature-golden-gate-yacht.png."
+   }
+  ],
   "atmospherics": [
    {
     "path": "images/homepage-col-signature",

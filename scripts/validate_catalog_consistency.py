@@ -36,6 +36,8 @@ Available check names (pass comma-separated to --checks):
   sot_images_current    sot-images.json equals fresh sot_images.serialize_manifest()
   collection_sot_current  collections/<slug>/sot.json equal fresh build-collection-sot.py output
   no_hardcoded_product_images  Fail if any template hardcodes an /images/products/... path literal
+  csv_image_columns_resolve  every non-empty value in the 4 CSV image columns resolves to a file
+  product_embeddings_current  product-embeddings.json covers the current catalog SKU set (dim=512)
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
@@ -85,6 +87,18 @@ _COLLECTIONS_DIR: Path = (
 )
 _BUILD_COLLECTION_SOT: Path = (
     _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "build-collection-sot.py"
+)
+_SOT_COMMON_PY: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "sot_common.py"
+)
+
+# The 4 CSV columns build-collection-sot.py resolves via sot_common.resolve_asset()
+# (rooted at skyyrose.core.paths.WP_ASSETS_DIR) when building the per-collection SOT view.
+_IMAGE_COLUMNS: tuple[str, ...] = (
+    "image",
+    "front_model_image",
+    "back_image",
+    "back_model_image",
 )
 
 _THEME_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship"
@@ -169,6 +183,27 @@ def _load_csv() -> list[dict[str, str]] | None:
         from skyyrose.core.catalog_loader import read_catalog_rows
 
         return list(read_catalog_rows(_CATALOG_CSV))
+    except Exception:
+        return None
+
+
+def _load_sot_common_resolver() -> Any | None:
+    """Import sot_common.py the same way build-collection-sot.py does; returns None on error.
+
+    sot_common.resolve_asset() is the single resolver the served-view pipeline uses (rooted
+    at skyyrose.core.paths.WP_ASSETS_DIR) — importing it directly (rather than reimplementing
+    the resolution rules here) guarantees this check enforces the exact same semantics the
+    pipeline depends on, not a second copy that can drift from it.
+    """
+    if not _SOT_COMMON_PY.exists():
+        return None
+    data_dir = str(_SOT_COMMON_PY.parent)
+    if data_dir not in sys.path:
+        sys.path.insert(0, data_dir)
+    try:
+        import sot_common
+
+        return sot_common
     except Exception:
         return None
 
@@ -975,6 +1010,94 @@ def check_no_hardcoded_product_images() -> CheckResult:
     return _ok(name, "no hardcoded product-image paths in templates")
 
 
+def check_csv_image_columns_resolve() -> CheckResult:
+    """Verify every non-empty value in the 4 CSV image columns resolves to a real file.
+
+    Uses the SAME resolver the served-view pipeline uses — ``sot_common.resolve_asset()``,
+    rooted at ``skyyrose.core.paths.WP_ASSETS_DIR`` (the theme's ``assets/`` tree) — so this
+    check enforces the exact semantics ``build-collection-sot.py`` depends on when it builds
+    ``collections/<slug>/sot.json``. A CSV image-column value that fails to resolve here would
+    silently drop out of that generated view (or the row would keep a value that looks valid
+    in the CSV but points at nothing on disk) without ever failing loud upstream — this check
+    institutionalizes correct semantics so future CSV-image-column drift fails loud instead.
+    """
+    name = "csv_image_columns_resolve"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check image columns — CSV not readable")
+
+    resolver = _load_sot_common_resolver()
+    if resolver is None:
+        return _fail(name, f"Cannot import sot_common resolver from {_SOT_COMMON_PY}")
+
+    bad: list[str] = []
+    checked = 0
+    for row in rows:
+        sku = row.get("sku", "?")
+        for col in _IMAGE_COLUMNS:
+            val = (row.get(col) or "").strip()
+            if not val:
+                continue
+            checked += 1
+            if resolver.resolve_asset(val) is None:
+                bad.append(f"  {sku}.{col}={val!r} does not resolve under {resolver.ASSETS}")
+    if bad:
+        return _fail(
+            name,
+            f"{len(bad)} CSV image-column value(s) do not resolve to a real file",
+            bad,
+        )
+    return _ok(name, f"All {checked} non-empty CSV image-column values resolve to real files")
+
+
+def check_product_embeddings_current() -> CheckResult:
+    """Verify product-embeddings.json covers the current catalog SKU set.
+
+    Freshness guard for the CLIP embedding artifact consumed by
+    ``catalog_ml_audit.py`` / ``build_product_similarities.py`` /
+    ``check_catalog_duplicates.py`` (all hardcode this path). Compares SKU
+    coverage + declared model/dim — NOT vector values — so it needs no CLIP
+    model at validation time. A catalog SKU add/remove without a regen
+    (``scripts/generate_product_embeddings.py``) fails here instead of
+    silently serving stale vectors (mirror of the sot_images_current pattern).
+    """
+    name = "product_embeddings_current"
+    emb_path = _REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/product-embeddings.json"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check embeddings — CSV not readable")
+    if not emb_path.is_file():
+        return _fail(
+            name,
+            f"embeddings file missing: {emb_path} — run scripts/generate_product_embeddings.py",
+        )
+    try:
+        emb = json.loads(emb_path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        return _fail(name, f"embeddings file unreadable: {exc}")
+    products = emb.get("products")
+    if not isinstance(products, dict):
+        return _fail(name, "embeddings 'products' must be a dict keyed by SKU")
+    catalog = {row["sku"] for row in rows}
+    have = set(products.keys())
+    problems: list[str] = []
+    missing = sorted(catalog - have)
+    phantom = sorted(have - catalog)
+    if missing:
+        problems.append(f"  catalog SKUs missing from embeddings: {missing}")
+    if phantom:
+        problems.append(f"  phantom SKUs in embeddings (not in catalog): {phantom}")
+    if emb.get("dim") != 512:
+        problems.append(f"  dim={emb.get('dim')!r}, expected 512 (CLIP)")
+    if problems:
+        return _fail(
+            name,
+            "product-embeddings.json is stale vs the catalog — run scripts/generate_product_embeddings.py",
+            problems,
+        )
+    return _ok(name, f"embeddings cover all {len(catalog)} catalog SKUs (dim=512, no phantoms)")
+
+
 # ---------------------------------------------------------------------------
 # Check registry
 # ---------------------------------------------------------------------------
@@ -1003,6 +1126,8 @@ ALL_CHECKS: dict[str, Any] = {
     "sot_images_current": check_sot_images_current,
     "collection_sot_current": check_collection_sot_current,
     "no_hardcoded_product_images": check_no_hardcoded_product_images,
+    "csv_image_columns_resolve": check_csv_image_columns_resolve,
+    "product_embeddings_current": check_product_embeddings_current,
 }
 
 # Checks that must pass before others can meaningfully run
