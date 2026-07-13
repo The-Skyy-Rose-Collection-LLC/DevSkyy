@@ -9,7 +9,10 @@
  * Body: { method: string, endpoint: string, body?: object }
  */
 
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+
+import { authOptions } from '@/lib/auth';
 
 const WORDPRESS_URL = process.env.WORDPRESS_URL;
 const WP_CONSUMER_KEY = process.env.WOOCOMMERCE_KEY;
@@ -19,6 +22,15 @@ const WP_CONSUMER_SECRET = process.env.WOOCOMMERCE_SECRET;
 const ALLOWED_PREFIXES = ['/wp/', '/wc/'];
 
 export async function POST(request: NextRequest) {
+  // Defense in depth: this route injects WooCommerce write credentials, so it
+  // authenticates itself rather than trusting proxy.ts's matcher alone. If that
+  // edge gate ever regresses, this check still fails an unauthenticated caller
+  // closed instead of exposing a credentialed arbitrary-WC-write primitive.
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   if (!WORDPRESS_URL || !WP_CONSUMER_KEY || !WP_CONSUMER_SECRET) {
     return NextResponse.json(
       { error: 'WordPress credentials not configured' },

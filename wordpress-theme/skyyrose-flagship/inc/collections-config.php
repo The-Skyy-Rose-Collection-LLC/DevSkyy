@@ -42,7 +42,7 @@ function skyyrose_get_collections_config(): array {
 			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SILVER, 0.3 ),
 			'tagline'     => __( 'Gothic elegance, dark romance', 'skyyrose' ),
 			'description' => __( 'Monochromatic pieces that channel mystery and silver-toned refinement.', 'skyyrose' ),
-			'page_url'    => home_url( '/collection-black-rose/' ),
+			'page_url'    => home_url( '/collections/black-rose/' ),
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_DEEP_BLACK,
 				'secondary' => SKYYROSE_COLOR_DARK,
@@ -66,7 +66,7 @@ function skyyrose_get_collections_config(): array {
 			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_CRIMSON, 0.3 ),
 			'tagline'     => __( 'Dramatic, passionate, fearless', 'skyyrose' ),
 			'description' => __( 'Bold crimson statements for those who wear their heart on their sleeve.', 'skyyrose' ),
-			'page_url'    => home_url( '/collection-love-hurts/' ),
+			'page_url'    => home_url( '/collections/love-hurts/' ),
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_DEEP_RED,
 				'secondary' => SKYYROSE_COLOR_PURPLE,
@@ -90,7 +90,7 @@ function skyyrose_get_collections_config(): array {
 			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_GOLD, 0.3 ),
 			'tagline'     => __( 'Elevated, confident, refined', 'skyyrose' ),
 			'description' => __( 'Gold luxe essentials for building the foundation wardrobe.', 'skyyrose' ),
-			'page_url'    => home_url( '/collection-signature/' ),
+			'page_url'    => home_url( '/collections/signature/' ),
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_GOLD,
 				'secondary' => SKYYROSE_COLOR_DARK,
@@ -114,11 +114,11 @@ function skyyrose_get_collections_config(): array {
 			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SOFT_PINK, 0.3 ),
 			'tagline'     => __( 'Joyful luxury, playful sophistication', 'skyyrose' ),
 			'description' => __( 'Mini versions of our signature pieces for the youngest trendsetters.', 'skyyrose' ),
-			'page_url'    => home_url( '/collection-kids-capsule/' ),
+			'page_url'    => home_url( '/collections/kids-capsule/' ),
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_SOFT_PINK,
 				'secondary' => SKYYROSE_COLOR_LAVENDER,
-				'accent'    => SKYYROSE_COLOR_GOLD,
+				'accent'    => SKYYROSE_COLOR_ROSE_GOLD,
 			),
 			'front_page'  => array(
 				'title'          => 'Kids<br>Capsule',
@@ -150,7 +150,10 @@ function skyyrose_get_cross_nav( string $exclude_slug ): array {
 			continue;
 		}
 		$out[] = array(
-			'slug'  => 'collection-' . $slug,
+			'slug'  => $slug,
+			// Canonical route from the single source of truth — never a
+			// reconstructed /collection-{slug}/ legacy path (WS2 review fix).
+			'url'   => $config['page_url'],
 			'name'  => $config['label'],
 			'desc'  => $config['short_desc'],
 			'class' => 'col-crossnav__link--' . $slug,

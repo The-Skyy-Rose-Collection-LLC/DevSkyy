@@ -29,12 +29,19 @@ BACKGROUND = "auto"  # "transparent" | "opaque" | "auto"
 N = 1
 MAX_REFERENCE_IMAGES = 16  # gpt-image edit hard limit
 # input_fidelity controls how hard the model matches the reference images'
-# style/features. Verified via Context7 (openai-python image_edit_params.py,
-# 2026-06-24): supported for gpt-image-1.5+ (incl. gpt-image-2), values
-# "high" | "low", DEFAULT "low". We send "high" so garment graphics, logos,
-# and the style-reference anchor are reproduced as faithfully as possible.
-# Cost note: "high" raises per-image input-token cost vs the "low" default.
+# style/features, values "high" | "low", DEFAULT "low". We send "high" so
+# garment graphics, logos, and the style-reference anchor are reproduced as
+# faithfully as possible -- but ONLY for models that accept the parameter.
+# CORRECTED 2026-06-30: the 2026-06-24 comment claiming gpt-image-2 support
+# was wrong -- the LIVE API rejects input_fidelity for gpt-image-2 with a 400
+# invalid_input_fidelity_model error (reproduced; bug-172). Context7
+# (openai/openai-openapi, images/edits schema) confirms support is listed for
+# gpt-image-1 / gpt-image-1-mini / gpt-image-1.5 only. client.edit() now only
+# sends this parameter when config.MODEL is in INPUT_FIDELITY_SUPPORTED_MODELS.
+# Cost note: "high" raises per-image input-token cost vs the "low" default,
+# on models where it applies.
 INPUT_FIDELITY = "high"
+INPUT_FIDELITY_SUPPORTED_MODELS = frozenset({"gpt-image-1", "gpt-image-1-mini", "gpt-image-1.5"})
 
 # ── Networking / resilience ─────────────────────────────────────────────────
 REQUEST_TIMEOUT_S = 180.0
@@ -93,6 +100,15 @@ QC_MAX_RENDER_RETRIES = 2  # judged re-renders per plan before quarantine
 # Per-judge-call cost ceiling for the cap math. OpenAI gpt-4.1@high ≈ $0.005-0.008;
 # Anthropic claude-sonnet-4-6 (1 candidate + 3 refs, full-res) ≈ $0.04-0.05.
 EST_JUDGE_COST_USD = 0.05
+
+# Q-fusion centroid gate mode: "off" (default) | "advisory" | "hard".
+#   off      — centroid never runs (no CLIP/DINO cost); the verdict carries no centroid fields.
+#   advisory — centroid runs and is RECORDED alongside the judge, but never rejects
+#              (verdict.passed = judge only) → collects centroid-vs-judge calibration data.
+#   hard     — passed = on_brand AND judge.pass. Enable ONLY after the centroid threshold is
+#              calibrated for oai_render; the compositor-tuned threshold can over-reject here.
+# Env-overridable so promotion (advisory → hard) is a one-value flip with no code change.
+QC_CENTROID_GATE = os.environ.get("OAI_QC_CENTROID_GATE", "off").strip().lower()
 
 
 EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above

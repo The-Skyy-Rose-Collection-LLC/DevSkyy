@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Type Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Black&family=Anton&family=Hanken+Grotesk:wght@400;500;700;800&family=Bricolage+Grotesque:wght@400;700;800&family=Schibsted+Grotesk:wght@400;500;700&family=Pacifico&family=Pinyon+Script&family=Grand+Hotel&display=swap" rel="stylesheet">
+<style>
+  /* ---- SkyyRose tokens (Black Rose surface) ---- */
+  :root{
+    --ink:      oklch(0.16 0.006 20);      /* near-black, faintly warm (tinted, not #000) */
+    --ink-2:    oklch(0.21 0.008 20);      /* raised surface */
+    --line:     oklch(0.32 0.008 20);      /* hairlines */
+    --silver:   #C0C0C0;                   /* Black Rose accent */
+    --silver-d: #9a9a9a;
+    --rose:     #B76E79;                   /* brand secondary */
+    --paper:    oklch(0.93 0.004 60);      /* body text, warm off-white (not #fff) */
+    --muted:    oklch(0.72 0.006 40);      /* secondary text */
+    --space-xs:4px; --space-sm:8px; --space-md:16px; --space-lg:24px;
+    --space-xl:40px; --space-2xl:72px; --space-3xl:112px;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Hanken Grotesk',system-ui,sans-serif;
+    line-height:1.6; text-rendering:optimizeLegibility;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1500px;margin:0 auto;padding:var(--space-2xl) var(--space-lg) var(--space-3xl)}
+  .masthead{max-width:64ch;margin-bottom:var(--space-2xl)}
+  .kicker{font-family:'Archivo';font-weight:600;letter-spacing:.28em;text-transform:uppercase;
+    font-size:12px;color:var(--silver);margin-bottom:var(--space-md)}
+  .masthead h1{font-family:'Archivo Black';font-size:clamp(28px,4vw,44px);line-height:1.05;
+    letter-spacing:-0.01em;color:var(--paper)}
+  .masthead p{margin-top:var(--space-md);color:var(--muted);max-width:60ch;font-size:17px}
+  .masthead b{color:var(--paper);font-weight:700}
+
+  /* ---- panels ---- */
+  .panels{display:grid;gap:var(--space-lg);
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .panel{background:var(--ink-2);border:1px solid var(--line);border-radius:2px;
+    padding:var(--space-xl) var(--space-lg) var(--space-lg);display:flex;flex-direction:column;gap:var(--space-lg)}
+  .tag{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-md);
+    padding-bottom:var(--space-md);border-bottom:1px solid var(--line)}
+  .tag .letter{font-family:'Archivo Black';font-size:22px;color:var(--silver)}
+  .tag .names{text-align:right;font-family:'Archivo';font-size:12px;line-height:1.5;color:var(--muted)}
+  .tag .names b{color:var(--paper);font-weight:600}
+
+  /* the hero name — the thing you actually judge */
+  .hero-name{line-height:.9;color:var(--paper);margin-top:var(--space-sm)}
+  .hero-sub{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--silver-d);margin-top:var(--space-md)}
+  .script{font-size:34px;color:var(--rose);line-height:1;margin-top:var(--space-xs)}
+  .tagline{font-size:15px;color:var(--muted);font-style:italic}
+  .body p{font-size:15px;color:var(--paper);max-width:42ch}
+  .body p+p{margin-top:var(--space-md);color:var(--muted)}
+
+  /* product card — real surface */
+  .card{background:var(--ink);border:1px solid var(--line);border-radius:2px;padding:var(--space-lg);
+    display:flex;flex-direction:column;gap:var(--space-md)}
+  .card .swatch{height:120px;border-radius:2px;
+    background:
+      radial-gradient(120% 100% at 50% 0%, oklch(0.28 0.01 20), var(--ink));
+    display:grid;place-items:center;color:var(--silver);letter-spacing:.2em;font-size:11px;text-transform:uppercase;
+    border:1px solid var(--line)}
+  .card .pname{line-height:1.15;color:var(--paper)}
+  .card .prow{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-md)}
+  .card .price{color:var(--silver)}
+  .card .meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .btns{display:flex;gap:var(--space-sm);flex-wrap:wrap}
+  .btn{border:0;cursor:pointer;padding:11px 18px;border-radius:2px;font-size:13px;letter-spacing:.06em;
+    transition:transform .18s cubic-bezier(.2,.7,.2,1),background .18s,color .18s}
+  .btn-primary{background:var(--silver);color:var(--ink)}
+  .btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--line)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-ghost:hover{border-color:var(--silver);color:var(--silver)}
+
+  .footnote{margin-top:var(--space-3xl);max-width:70ch;color:var(--muted);font-size:14px;
+    border-top:1px solid var(--line);padding-top:var(--space-lg)}
+  .footnote code{font-family:'Archivo';color:var(--silver);font-size:13px}
+
+  /* ---- Direction A: Archivo (industrial grotesque) ---- */
+  .dir-a .hero-name{font-family:'Archivo Black';font-size:clamp(40px,7vw,64px);letter-spacing:-0.02em}
+  .dir-a .body,.dir-a .card{font-family:'Archivo'}
+  .dir-a .pname{font-family:'Archivo';font-weight:700;font-size:19px}
+  .dir-a .price{font-family:'Archivo';font-weight:700;font-size:19px}
+  .dir-a .btn{font-family:'Archivo';font-weight:600}
+
+  /* ---- Direction B: Anton + Hanken (varsity heritage) ---- */
+  .dir-b .hero-name{font-family:'Anton';font-size:clamp(48px,8.5vw,78px);letter-spacing:.005em;text-transform:uppercase}
+  .dir-b .body,.dir-b .card{font-family:'Hanken Grotesk'}
+  .dir-b .pname{font-family:'Anton';font-weight:400;font-size:24px;text-transform:uppercase;letter-spacing:.01em}
+  .dir-b .price{font-family:'Hanken Grotesk';font-weight:800;font-size:19px}
+  .dir-b .btn{font-family:'Hanken Grotesk';font-weight:700}
+
+  /* ---- Direction C: Bricolage + Schibsted (editorial grotesque) ---- */
+  .dir-c .hero-name{font-family:'Bricolage Grotesque';font-weight:800;font-size:clamp(40px,7vw,66px);letter-spacing:-0.015em}
+  .dir-c .body,.dir-c .card{font-family:'Schibsted Grotesk'}
+  .dir-c .pname{font-family:'Bricolage Grotesque';font-weight:700;font-size:20px;letter-spacing:-0.01em}
+  .dir-c .price{font-family:'Schibsted Grotesk';font-weight:700;font-size:19px}
+  .dir-c .btn{font-family:'Schibsted Grotesk';font-weight:700}
+
+  /* scripts row */
+  .scripts{margin-top:var(--space-2xl);display:grid;gap:var(--space-md);
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .scard{background:var(--ink-2);border:1px solid var(--line);border-radius:2px;padding:var(--space-lg)}
+  .scard .lbl{font-family:'Archivo';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--space-sm)}
+  .scard .spec{font-size:40px;line-height:1.1}
+  .s-sig{font-family:'Pinyon Script';color:#D4AF37}
+  .s-br{font-family:'Pacifico';color:var(--silver);font-size:34px}
+  .s-kc{font-family:'Grand Hotel';color:var(--rose)}
+  .s-lh{font-family:'Schibsted Grotesk';color:#DC143C;font-size:22px;font-style:italic}
+  .scard .note{font-size:12px;color:var(--muted);margin-top:var(--space-sm)}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker">SkyyRose · Type Directions · pick one</div>
+    <h1>Same content, three type systems.</h1>
+    <p>Rendered on a real <b>Black Rose</b> surface — dark, silver + rose-gold, your decided scripts.
+       Judge the <b>display</b> and <b>body</b> only; everything else is identical. All three drop the
+       Playfair/Cormorant serif lineage and align to your Five (Kith / FOG / Palm Angels). Whichever you
+       pick gets baked into <code>CLAUDE.md</code>, <code>design-tokens.css</code> and <code>theme.json</code> so it stops drifting back.</p>
+  </header>
+
+  <div class="panels">
+
+    <!-- A -->
+    <section class="panel dir-a">
+      <div class="tag"><span class="letter">A</span>
+        <span class="names">Display · <b>Archivo Black</b><br>Body · <b>Archivo</b><br>industrial grotesque</span></div>
+      <div>
+        <div class="hero-name">BLACK ROSE</div>
+        <div class="script s-br-inline" style="font-family:'Pacifico';color:var(--silver);font-size:30px;margin-top:6px">The Black Rose Collection</div>
+        <div class="hero-sub">Fall Reserve · The Town</div>
+      </div>
+      <div class="body">
+        <p>In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission.</p>
+        <p>It forces its way through the cracks. You don't wear it to stand out — you wear it because you already stood up.</p>
+      </div>
+      <div class="card">
+        <div class="swatch">Garment</div>
+        <div class="pname">The Rose — Hockey Jersey</div>
+        <div class="prow"><span class="price">$115</span><span class="meta">Pre-Order · 80 pieces</span></div>
+        <div class="btns"><button class="btn btn-primary">Pre-Order</button><button class="btn btn-ghost">View Lookbook</button></div>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section class="panel dir-b">
+      <div class="tag"><span class="letter">B</span>
+        <span class="names">Display · <b>Anton</b><br>Body · <b>Hanken Grotesk</b><br>varsity heritage</span></div>
+      <div>
+        <div class="hero-name">BLACK ROSE</div>
+        <div class="script" style="font-family:'Pacifico';color:var(--silver);font-size:30px;margin-top:6px">The Black Rose Collection</div>
+        <div class="hero-sub">Fall Reserve · The Town</div>
+      </div>
+      <div class="body">
+        <p>In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission.</p>
+        <p>It forces its way through the cracks. You don't wear it to stand out — you wear it because you already stood up.</p>
+      </div>
+      <div class="card">
+        <div class="swatch">Garment</div>
+        <div class="pname">The Rose — Hockey Jersey</div>
+        <div class="prow"><span class="price">$115</span><span class="meta">Pre-Order · 80 pieces</span></div>
+        <div class="btns"><button class="btn btn-primary">Pre-Order</button><button class="btn btn-ghost">View Lookbook</button></div>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="panel dir-c">
+      <div class="tag"><span class="letter">C</span>
+        <span class="names">Display · <b>Bricolage Grotesque</b><br>Body · <b>Schibsted Grotesk</b><br>editorial grotesque</span></div>
+      <div>
+        <div class="hero-name">Black Rose</div>
+        <div class="script" style="font-family:'Pacifico';color:var(--silver);font-size:30px;margin-top:6px">The Black Rose Collection</div>
+        <div class="hero-sub">Fall Reserve · The Town</div>
+      </div>
+      <div class="body">
+        <p>In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission.</p>
+        <p>It forces its way through the cracks. You don't wear it to stand out — you wear it because you already stood up.</p>
+      </div>
+      <div class="card">
+        <div class="swatch">Garment</div>
+        <div class="pname">The Rose — Hockey Jersey</div>
+        <div class="prow"><span class="price">$115</span><span class="meta">Pre-Order · 80 pieces</span></div>
+        <div class="btns"><button class="btn btn-primary">Pre-Order</button><button class="btn btn-ghost">View Lookbook</button></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- decided scripts, in context -->
+  <div class="scripts">
+    <div class="scard"><div class="lbl">Signature · keep</div><div class="spec s-sig">Skyy Rose</div><div class="note">Pinyon Script — already matches the copperplate lockup.</div></div>
+    <div class="scard"><div class="lbl">Black Rose · swap</div><div class="spec s-br">Black Rose</div><div class="note">Yellowtail → Pacifico (rounded bold brush).</div></div>
+    <div class="scard"><div class="lbl">Kids Capsule · new</div><div class="spec s-kc">Kids Capsule</div><div class="note">Grand Hotel — friendly rounded, warm.</div></div>
+    <div class="scard"><div class="lbl">Love Hurts · build</div><div class="spec s-lh">Love Hurts</div><div class="note">Custom face from the lockup (placeholder shown). Vectorize → partial webfont.</div></div>
+  </div>
+
+  <p class="footnote">Preview loads fonts from Google's CDN for speed of comparison only. The production build
+    self-hosts subset <code>*-latin.woff2</code> in <code>assets/fonts/</code> (zero external CDN), rebuilds <code>.min</code>,
+    and nothing touches skyyrose.co without your explicit go-ahead. Reduced-motion is honored.</p>
+
+</div>
+</body>
+</html>

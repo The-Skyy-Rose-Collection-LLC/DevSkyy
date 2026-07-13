@@ -51,14 +51,19 @@ $has_3d    = ! empty( $c['experience_url'] );
  * skyyrose_sot_lockup() → lockup.display_webp.resolved     (maps to hero_logo)
  * Falls back to the hand-maintained $c values when SOT returns ''.
  */
-$sot_hero_bg  = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
+$sot_hero_bg   = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $slug ) : '';
 $sot_hero_logo = function_exists( 'skyyrose_sot_lockup' ) ? skyyrose_sot_lockup( $slug ) : '';
 
-$resolved_hero_bg  = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
+$resolved_hero_bg   = ( '' !== $sot_hero_bg ) ? $sot_hero_bg : ( $c['hero_bg'] ?? '' );
 $resolved_hero_logo = ( '' !== $sot_hero_logo ) ? $sot_hero_logo : ( $c['hero_logo'] ?? '' );
 
 $has_hero_bg = ! empty( $resolved_hero_bg );
 $has_logo    = ! empty( $resolved_hero_logo );
+
+// Collection emblem (3D star-rose mark) — file-existence gated, so only
+// collections that have an emblem asset render it. Decorative; aria-hidden.
+$emblem_rel = '/images/emblems/' . $slug . '-emblem.webp';
+$has_emblem = file_exists( get_theme_file_path( 'assets' . $emblem_rel ) );
 
 /* Kids Capsule uses pre-order URL for product links */
 $preorder_url  = $is_kids ? home_url( '/pre-order/' ) : '';
@@ -96,7 +101,12 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			</div>
 		<?php endif; ?>
 		<div class="col-hero__content col-reveal">
-			<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
+			<?php
+			if ( $has_emblem ) :
+				?>
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>" alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
+				<?php endif; ?>
+				<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
 				<?php
 				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
@@ -118,20 +128,118 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			<div class="col-hero__cta-group">
 				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>
-					<a href="<?php echo esc_url( home_url( $c['experience_url'] ) ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
+					<?php
+					// Experience merged into this page (WS3): anchor URLs ('#experience')
+					// link in-page; anything else still routes through home_url().
+					$exp_href = ( 0 === strpos( $c['experience_url'], '#' ) )
+						? $c['experience_url']
+						: home_url( $c['experience_url'] );
+					?>
+					<a href="<?php echo esc_url( $exp_href ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php echo esc_html( $c['hero_3d_label'] ); ?></a>
 				<?php endif; ?>
 			</div>
 		</div>
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
+	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
+	<?php
+	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;
+	if ( $experience && ! empty( $experience['rooms'] ) ) :
+		?>
+		<section id="experience" class="col-experience" aria-label="<?php echo esc_attr( $experience['world_name'] ); ?>">
+			<?php
+			get_template_part(
+				'template-parts/immersive/scene',
+				null,
+				array(
+					'collection_slug' => $slug,
+					'collection_name' => $experience['collection_name'],
+					'world_name'      => $experience['world_name'],
+					'tagline'         => $experience['tagline'],
+					'accent_color'    => $experience['accent_color'],
+					'collection_url'  => '',
+					'rooms'           => $experience['rooms'],
+					'embedded'        => true,
+				)
+			);
+			?>
+		</section>
+	<?php endif; ?>
+
 	<?php
 	get_template_part(
 		'template-parts/pin-narrative',
 		null,
 		array(
-			'slug'  => $slug,
-			'beats' => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+			'slug'     => $slug,
+			'beats'    => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+			// Reuses the same $products list the grid below renders — no
+			// second catalog/WC query — so the narrative's closing beat can
+			// spotlight the collection's flagship piece instead of ending
+			// on empty stage space (founder: "it's just wasted space").
+			'products' => $products,
+		)
+	);
+	?>
+
+	<!-- ════ Lookbook (editorial imagery, narrative → shop bridge) ════ -->
+	<?php
+	$lookbook_by_collection = array(
+		'signature'    => array(
+			array(
+				'file' => 'lb-rose-hoodie-beanie',
+				'alt'  => __( 'Rose hoodie and beanie, worn — Signature editorial', 'skyyrose' ),
+			),
+		),
+		'black-rose'   => array(
+			array(
+				'file' => 'lb-black-rose-football',
+				'alt'  => __( 'Black Rose football jersey, worn — editorial', 'skyyrose' ),
+			),
+			array(
+				'file' => 'lb-black-rose-hockey',
+				'alt'  => __( 'Black Rose hockey jersey, worn — editorial', 'skyyrose' ),
+			),
+		),
+		'love-hurts'   => array(
+			array(
+				'file' => 'lb-love-hurts-varsity',
+				'alt'  => __( 'Love Hurts varsity jacket, worn — editorial', 'skyyrose' ),
+			),
+		),
+		'kids-capsule' => array(
+			array(
+				'file' => 'lb-kid-black-rose',
+				'alt'  => __( 'Child wearing a Black Rose piece — Kids Capsule editorial', 'skyyrose' ),
+			),
+		),
+	);
+	$lookbook_images        = $lookbook_by_collection[ $slug ] ?? array();
+	$lookbook_grid_class    = 'col-lookbook__grid' . ( count( $lookbook_images ) > 1 ? ' col-lookbook__grid--2up' : '' );
+	if ( ! empty( $lookbook_images ) ) :
+		?>
+		<section class="col-lookbook rv-clip-up" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>" style="content-visibility:auto;contain-intrinsic-size:0 500px;">
+			<div class="<?php echo esc_attr( $lookbook_grid_class ); ?>">
+				<?php foreach ( $lookbook_images as $lb ) : ?>
+					<figure class="col-lookbook__figure">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'] . '-960w.webp?v=' . SKYYROSE_VERSION ); ?>"
+							alt="<?php echo esc_attr( $lb['alt'] ); ?>"
+							loading="lazy" decoding="async" width="960" height="1200" class="col-lookbook__img">
+					</figure>
+				<?php endforeach; ?>
+			</div>
+		</section>
+	<?php endif; ?>
+
+	<!-- ════ Feature Scroll (sticky image + scrolling philosophy items) ════ -->
+	<?php
+	get_template_part(
+		'template-parts/collection/feature-scroll',
+		null,
+		array(
+			'slug'    => $slug,
+			'content' => $c,
 		)
 	);
 	?>
@@ -166,10 +274,21 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 	);
 	?>
 
-	<?php // Black Rose only: founder pull quote anchors the page in Corey's voice. ?>
+	<?php // Founder pull quote — Corey's voice. Black Rose + Signature (origin/heritage register). ?>
 	<?php
 	if ( 'black-rose' === $slug ) {
-		get_template_part( 'template-parts/collection/founder-pullquote' ); }
+		get_template_part( 'template-parts/collection/founder-pullquote' );
+	} elseif ( 'signature' === $slug ) {
+		get_template_part(
+			'template-parts/collection/founder-pullquote',
+			null,
+			array(
+				'quote_text' => isset( $c['quote_text'] ) ? $c['quote_text'] : '',
+				'quote_name' => __( 'Corey Foster', 'skyyrose' ),
+				'quote_role' => __( 'Founder · The origin', 'skyyrose' ),
+			)
+		);
+	}
 	?>
 
 	<!-- ════ Story (condensed — after products) ════ -->
@@ -196,7 +315,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose' ); ?></h3>
 		<div class="col-crossnav__grid stagger-grid">
 			<?php foreach ( $cross_nav as $nav ) : ?>
-				<a href="<?php echo esc_url( home_url( '/' . $nav['slug'] . '/' ) ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
+				<a href="<?php echo esc_url( $nav['url'] ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
 					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
 					<p><?php echo esc_html( $nav['desc'] ); ?></p>
 				</a>

@@ -146,7 +146,7 @@ async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
         ... })
     """
     data = await _make_api_request(
-        "3d/generate-from-description",
+        "media/3d/generate/text",
         method="POST",
         data={
             "product_name": params.product_name,
@@ -200,7 +200,7 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
         str: Formatted result containing generated model URLs/paths and related metadata.
     """
     data = await _make_api_request(
-        "3d/generate-from-image",
+        "media/3d/generate/image",
         method="POST",
         data={
             "product_name": params.product_name,

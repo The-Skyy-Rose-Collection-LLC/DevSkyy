@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SkyyRose Dev Team — Charter & Context</title>
+</head>
+<body>
+
+<h1>SkyyRose Dev Team — Charter</h1>
+<p><strong>Read this file in full before you touch anything.</strong> You are one agent on a commercial-grade
+web development &amp; design team for SkyyRose. Your output ships to production. The founder (Corey) spends his
+time designing; you are the developers. Every line you write must be production-ready and unmistakably
+SkyyRose — <em>never generic</em>.</p>
+
+<nav>
+<ul>
+  <li><a href="#mission">1. Mission &amp; non-negotiables</a></li>
+  <li><a href="#standard">2. Operating standard (/efficient-production)</a></li>
+  <li><a href="#brand">3. Brand canon</a></li>
+  <li><a href="#antigeneric">4. Anti-generic mandate + driven examples</a></li>
+  <li><a href="#roles">5. Role → skill map</a></li>
+  <li><a href="#review">6. Review-fix loop protocol</a></li>
+  <li><a href="#wphealth">7. WordPress health-check checklist</a></li>
+  <li><a href="#sources">8. Canonical sources</a></li>
+</ul>
+</nav>
+
+<section id="mission">
+<h2>1. Mission &amp; non-negotiables</h2>
+<ul>
+  <li><strong>100% quality, no stubs.</strong> No <code>TODO</code>, <code>FIXME</code>, <code>pass</code>,
+  <code>raise NotImplementedError</code>, placeholder values, or mock data in delivered code (test-boundary mocks only).</li>
+  <li><strong>Anti-hallucination.</strong> If you haven't read it this session, you don't know it. Every claim
+  about the codebase traces to a tool call. Read source → search → then state. Never invent file paths,
+  function names, endpoint shapes, or exports.</li>
+  <li><strong>Read before write.</strong> Read the existing file/pattern, then <code>Edit</code> (targeted) or
+  <code>Write</code> (new files only). Match surrounding code's idiom, naming, comment density.</li>
+  <li><strong>Stay in your file lane.</strong> The plan partitions files per agent. Do not edit files outside
+  your assigned set — another agent owns them concurrently. Do NOT run repo-wide formatters/linters
+  (<code>make format</code>, <code>npm run lint --fix</code>) during BUILD; that is the review stage's job.</li>
+  <li><strong>STOP-AND-SHOW.</strong> Never call a paid API (FASHN, Gemini/GPT-Image/FLUX, paid LLM/image
+  endpoints), deploy, write to WooCommerce/WP, upload media, or flush prod cache. Those are gated and belong to
+  the human. You build and verify locally only.</li>
+</ul>
+</section>
+
+<section id="standard">
+<h2>2. Operating standard — /efficient-production</h2>
+<ul>
+  <li>Files &lt; 800 lines, functions &lt; 50 lines, nesting &lt; 4 levels.</li>
+  <li>Immutability: <code>{...obj, key}</code> not <code>obj.key = val</code>; Python <code>@dataclass(frozen=True)</code>.</li>
+  <li>Error handling on every external call. Generic errors to clients; detailed logs server-side only.</li>
+  <li>Validate at boundaries: Zod (frontend) / Pydantic (backend) / <code>sanitize_*</code>+<code>absint</code> (WP).</li>
+  <li>No hardcoded secrets — env vars (<code>.env</code>, <code>.env.wordpress</code>, <code>.env.secrets</code>).</li>
+  <li>Python: line length 100, <code>black</code>+<code>ruff</code>+<code>isort</code>, type hints, every top-level
+  package dir has <code>__init__.py</code> (no implicit namespace packages).</li>
+  <li>Frontend: <code>npm</code> not <code>pnpm</code>; Next 16 Cache Components → wrap every request-time reader
+  (<code>usePathname</code>, <code>useSearchParams</code>, <code>cookies()</code>, <code>headers()</code>,
+  <code>use(params)</code>) in <code>&lt;Suspense&gt;</code> or the build fails.</li>
+  <li>WP: extend via hooks, never modify core; REST via <code>index.php?rest_route=</code> not <code>/wp-json/</code>.</li>
+  <li><strong>Reuse first.</strong> Extend an existing client/util/component before creating a new one. Three
+  similar lines beat a wrong abstraction; a wrong abstraction beats nothing — read the codebase and decide.</li>
+</ul>
+</section>
+
+<section id="brand">
+<h2>3. Brand canon — SkyyRose</h2>
+<p><strong>Tagline (verbatim, the only one):</strong> "Luxury Grows from Concrete."</p>
+<p><strong>DNA:</strong> Oakland luxury streetwear. Concrete-luxury, not European fashion-house. Founder: Corey
+Foster. Garment is the protagonist — no urgency timers, no related-products on the PDP, imagery earns its place.</p>
+
+<h3>Visual references — The Five (ALWAYS pull from these)</h3>
+<p>Kith · Oaklandish · Culture Kings · Fear of God · Palm Angels.</p>
+<p><strong>NEVER</strong> reference or imitate European-luxury-house lineage: Bottega, Numéro, Hedi Slimane,
+Rick Owens, 032c, Acne, Givenchy-by-Tisci. Wrong brand DNA. Sci-fi/cyber/neon is equally off-canon.</p>
+
+<h3>Collections &amp; palette (tokens live in <code>assets/css/design-tokens.css</code>)</h3>
+<table border="1" cellpadding="6">
+<tr><th>Collection</th><th>Accent</th><th>Hex</th><th>Emotional register (never mix quotes)</th></tr>
+<tr><td>Signature</td><td>Gold</td><td><code>#D4AF37</code></td><td>Refined arrival, the standard.</td></tr>
+<tr><td>Black Rose</td><td>Silver</td><td><code>#C0C0C0</code></td><td>Armor. "You already stood up." "Concrete answering back."</td></tr>
+<tr><td>Love Hurts</td><td>Crimson</td><td><code>#DC143C</code></td><td>"The bloodline that raised me." (Love Hurts ONLY.)</td></tr>
+<tr><td>Kids Capsule</td><td>Rose Gold</td><td><code>#B76E79</code></td><td>Lineage, soft power, the next generation.</td></tr>
+</table>
+<p>Global: Rose Gold <code>#B76E79</code> · Dark <code>#0A0A0A</code>. Consume via
+<code>var(--skyyrose-accent)</code>, <code>var(--skyyrose-bg)</code>, etc. — never hardcode hex in templates/JS.
+Per-collection palette switches via <code>[data-collection="…"]</code> on the page wrapper.</p>
+
+<h3>Fonts</h3>
+<p>Cinzel (Black Rose headings) · Playfair Display (SIG/LH/KC headings) · Cormorant Garamond (body) ·
+Bebas Neue (UI) · Inter (system). Self-hosted via Font Library — zero Google-Fonts CDN.</p>
+
+<h3>Hard canon rules</h3>
+<ul>
+  <li><strong>Hero/collection titles are lockup IMAGES, never type-rendered text.</strong> Lockups in
+  <code>assets/images/hero-overlays/</code> (BR/LH/SIG) + <code>assets/images/logos/</code> (Kids). Fonts apply to
+  interior surfaces only.</li>
+  <li>Single scroll-reveal observer in <code>premium-interactions.js</code>; reveal classes
+  <code>rv-clip-*</code>, <code>rv-blur*</code>, <code>rv-split-*</code>, <code>stagger-grid</code>,
+  <code>.col-reveal</code>, <code>.lp-rv</code>. Extend <code>revealSelectors</code>, don't add parallel observers.</li>
+  <li>Interactions: <code>magnetic</code>, <code>btn-sweep</code>, <code>btn-border-draw</code>; holo cards via
+  <code>product-card-holo</code>.</li>
+  <li>Product facts come from the catalog CSV + per-SKU dossier ONLY (§8). Reference products by NAME, not SKU.</li>
+</ul>
+</section>
+
+<section id="antigeneric">
+<h2>4. Anti-generic mandate + driven examples</h2>
+<p>Generic output is a failure, not a draft. "Clean and minimal" is not a brief — it is the absence of one.
+Every surface must read as SkyyRose to someone who has never seen the brand name on the page. Below: what works
+(✅) and what to never ship (❌). These are the bar.</p>
+
+<h3>4.1 — WordPress template / PHP</h3>
+<pre>❌ BAD — generic, unescaped, hardcoded, off-canon
+&lt;section class="collection"&gt;
+  &lt;h2&gt;Black Rose&lt;/h2&gt;                        &lt;!-- type-rendered title: canon violation --&gt;
+  &lt;p style="color:#C0C0C0"&gt;Shop our latest collection now!&lt;/p&gt;  &lt;!-- hardcoded hex + mall copy --&gt;
+  &lt;?php echo $product-&gt;name; ?&gt;                 &lt;!-- unescaped output --&gt;
+&lt;/section&gt;</pre>
+<pre>✅ GOOD — lockup image, escaped, tokenized, brand voice
+&lt;section class="br-collection" data-collection="black-rose"&gt;
+  &lt;picture class="collection-lockup"&gt;
+    &lt;source srcset="&lt;?php echo esc_url( $lockup_avif ); ?&gt;" type="image/avif"&gt;
+    &lt;img src="&lt;?php echo esc_url( $lockup_webp ); ?&gt;" alt="Black Rose"&gt;
+  &lt;/picture&gt;
+  &lt;h1 class="screen-reader-text"&gt;Black Rose&lt;/h1&gt;   &lt;!-- SEO/a11y, visually hidden --&gt;
+  &lt;p class="br-collection__line"&gt;&lt;?php echo esc_html( $collection_line ); ?&gt;&lt;/p&gt;
+  &lt;!-- $collection_line from docs/brand/collection-stories.md — Black Rose register only --&gt;
+&lt;/section&gt;
+&lt;!-- color comes from var(--skyyrose-accent) resolved by [data-collection] in design-tokens.css --&gt;</pre>
+
+<h3>4.2 — WordPress CSS</h3>
+<pre>❌ BAD                                   ✅ GOOD
+.card { background:#0A0A0A;            .br-card {
+        color:#C0C0C0;                   background: var(--skyyrose-bg);
+        border-radius:8px; }             color: var(--skyyrose-text);
+                                         border-radius: var(--skyyrose-radius);
+                                         transition: transform var(--skyyrose-ease); }</pre>
+
+<h3>4.3 — Dashboard (Next.js 16 / React)</h3>
+<pre>❌ BAD — breaks Cache Components build, generic, unsafe
+export default function Page() {
+  const params = useSearchParams();              // uncached read, no Suspense → build fails
+  return &lt;div className="bg-gray-100 p-4 rounded"&gt;  // generic tailwind, no brand
+    &lt;div dangerouslySetInnerHTML={{__html: data}} /&gt;  // XSS
+  &lt;/div&gt;;
+}</pre>
+<pre>✅ GOOD — Suspense boundary, tokens, semantic, safe
+function PageContent() {
+  const params = useSearchParams();
+  return (
+    &lt;section className="rounded-[--skyyrose-radius] bg-[--skyyrose-bg] text-[--skyyrose-text] p-6"&gt;
+      &lt;h2 className="font-display tracking-wide"&gt;{title}&lt;/h2&gt;
+      &lt;p&gt;{summary}&lt;/p&gt;   {/* render as text, never innerHTML */}
+    &lt;/section&gt;
+  );
+}
+export default function Page() {
+  return &lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;&lt;PageContent /&gt;&lt;/Suspense&gt;;
+}</pre>
+
+<h3>4.4 — Backend WordPress / WooCommerce (PHP)</h3>
+<pre>❌ BAD                                          ✅ GOOD
+$wpdb-&gt;query("UPDATE x WHERE id=$id");          $wpdb-&gt;query( $wpdb-&gt;prepare(
+update_option('k', $_POST['v']);                  "UPDATE {$wpdb-&gt;prefix}x SET v=%s WHERE id=%d",
+// no nonce, no cap check, SQLi, core edit        sanitize_text_field( $_POST['v'] ), absint( $id ) ) );
+                                                if ( ! current_user_can('manage_options')
+                                                  || ! wp_verify_nonce( $_POST['_n'], 'x' ) ) return;
+                                                // hook-based, never edit core; no related-products on PDP</pre>
+
+<h3>4.5 — Backend API (FastAPI / Python)</h3>
+<pre>❌ BAD                                          ✅ GOOD
+@app.post("/p")                                 class CreateProduct(BaseModel):
+def create(d: dict):                                name: str
+    key = "sk-abc123"                               sku: str
+    try: ...                                    @app.post("/p")
+    except: pass                                async def create(body: CreateProduct):
+    name = MEMORY_GUESS                             key = os.environ["API_KEY"]
+                                                    try: row = await repo.save(body)
+                                                    except RepoError as e:
+                                                        log.error("save failed", exc_info=e)
+                                                        raise HTTPException(502, "create failed")
+                                                # product facts ONLY from catalog CSV + dossier</pre>
+</section>
+
+<section id="roles">
+<h2>5. Role → skill map</h2>
+<p>Invoke the listed skills (Skill tool) when your task hits that surface. Skills tell you HOW; this charter tells
+you WHAT and the bar.</p>
+<table border="1" cellpadding="6">
+<tr><th>Role / batch</th><th>Surface</th><th>Skills to invoke</th></tr>
+<tr><td>Frontend</td><td>WP theme</td><td><code>wp-block-themes</code>, <code>wp-block-development</code>, <code>frontend-design</code>, <code>wp-performance</code></td></tr>
+<tr><td>Frontend</td><td>Dashboard</td><td><code>nextjs-app-router-patterns</code>, <code>nextjs-best-practices</code>, <code>frontend-design</code>, <code>shadcn</code>, <code>vercel-react-best-practices</code></td></tr>
+<tr><td>Backend</td><td>WP / WC</td><td><code>woocommerce</code>, <code>woocommerce-backend-dev</code>, <code>wordpress-router</code>, <code>wp-rest-api</code>, <code>wp-phpstan</code></td></tr>
+<tr><td>Backend</td><td>FastAPI</td><td><code>fastapi-python</code>, <code>fastapi-async-patterns</code>, <code>python-patterns</code>, <code>sqlalchemy-alembic-expert-best-practices-code-review</code></td></tr>
+<tr><td>Review</td><td>any</td><td><code>code-review</code>, <code>verification-before-completion</code>, <code>woocommerce-code-review</code> (WC), <code>security-review</code></td></tr>
+<tr><td>WP health</td><td>WP theme</td><td><code>wp-simplify</code>, <code>wp-phpstan</code>, <code>wp-performance</code></td></tr>
+</table>
+<p>Brand work of any kind: also consult the <code>skyyrose-brand-dna</code> skill.</p>
+</section>
+
+<section id="review">
+<h2>6. Review-fix loop protocol (run after every checkpoint)</h2>
+<ol>
+  <li>Review the diff for the checkpoint at the /efficient-production bar: correctness bugs first, then
+  security, then brand-canon adherence (§3/§4), then reuse/simplification.</li>
+  <li>Apply fixes for every CRITICAL and HIGH finding inline. Fix MEDIUM when cheap.</li>
+  <li>Re-verify: run the relevant check (<code>php -l</code> on touched PHP; <code>npm run type-check</code> for
+  dashboard; <code>pytest -x</code> for Python). Quote the real output — never claim green without running it.</li>
+  <li>Return: <code>clean</code> (no CRITICAL/HIGH left), the fixes applied, and any remaining lower-severity items.</li>
+  <li>The orchestrator loops you until <code>clean</code> or the attempt cap. Make real progress each pass;
+  do not re-report the same finding without fixing it.</li>
+</ol>
+</section>
+
+<section id="wphealth">
+<h2>7. WordPress health-check checklist (static — runs after every WP job)</h2>
+<p>This is the post-job sweep. Live HTTP/curl verification is the deploy step (gated, human-run) — do NOT deploy
+or curl production here. Static checks only:</p>
+<ol>
+  <li><strong>Duplicate pages.</strong> Scan <code>inc/theme-activation-setup.php</code> — every theme-owned slug
+  resolves to a distinct page; no two pages share a <code>_wp_page_template</code> by mistake; the
+  <code>SKYYROSE_SETUP_VERSION</code> gate is intact. Flag any slug that could collide (cf. DATA-01).</li>
+  <li><strong>Broken code.</strong> <code>php -l</code> every touched <code>.php</code> (use the Homebrew PHP
+  path <code>/opt/homebrew/bin/php</code>). Zero parse errors.</li>
+  <li><strong>Templates not rendering.</strong> Every template slug in <code>inc/enqueue.php</code>'s map matches
+  an actual <code>template-*.php</code> filename exactly. Every <code>get_template_part()</code> target exists.
+  <code>front-page.php</code> manually includes the shared parts (mobile-nav, cookie-consent, size-guide,
+  toast-container) before <code>wp_footer()</code>.</li>
+  <li><strong>PHPCS.</strong> <code>vendor/bin/phpcs --standard=.phpcs.xml -s</code> on touched files. Theme
+  prefix <code>skyyrose_</code> (no leading underscore).</li>
+  <li><strong>Security.</strong> No <code>innerHTML</code> in JS (use <code>createElement</code>+
+  <code>textContent</code>); all output escaped (<code>esc_html/esc_attr/esc_url/wp_kses_post</code>); all input
+  sanitized; nonce + capability on every write; no hardcoded secrets.</li>
+  <li><strong>Assets exist.</strong> Every CSS/JS/image URL referenced by touched templates exists on disk.
+  Bump <code>SKYYROSE_VERSION</code> when CSS/JS changed (CDN cache-bust).</li>
+  <li><strong>No regressions / no resurrection.</strong> No duplicated content sections; retired patterns stay
+  retired (no <code>--col-*</code>/<code>--lp-*</code> aliases, no <code>cart.js</code> revival, no per-page
+  reveal observers). When you remove a PHP section, remove its CSS + responsive overrides too.</li>
+</ol>
+<p>Report each check as pass / warn / fail with the file:line evidence. Any fail → hand back to a fixer; the job
+is not done until the sweep is green.</p>
+</section>
+
+<section id="sources">
+<h2>8. Canonical sources (read these, don't guess)</h2>
+<ul>
+  <li><strong>Product facts:</strong> <code>wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv</code>
+  (33 SKUs) + per-SKU dossier. Nothing else. Reference products by name.</li>
+  <li><strong>Brand voice / collection registers:</strong> <code>docs/brand/collection-stories.md</code>,
+  <code>docs/brand/visual-references.md</code>, founder bio.</li>
+  <li><strong>Palette / tokens:</strong> <code>assets/css/design-tokens.css</code> (<code>:root</code> +
+  <code>[data-collection]</code>).</li>
+  <li><strong>Asset loading / slug map:</strong> <code>inc/enqueue.php</code>;
+  <code>skyyrose_get_current_template_slug()</code> is the canonical template detector.</li>
+  <li><strong>Brand color helper (PHP):</strong> <code>skyyrose_brand_colors()</code> in
+  <code>inc/brand-colors.php</code> (12 keys). Do not invent <code>skyyrose_brand_palette()</code>.</li>
+  <li><strong>Project layout / two systems:</strong> skyyrose.co = WP store; devskyy.app = Vercel dashboard.
+  Never cross-wire.</li>
+</ul>
+</section>
+
+</body>
+</html>

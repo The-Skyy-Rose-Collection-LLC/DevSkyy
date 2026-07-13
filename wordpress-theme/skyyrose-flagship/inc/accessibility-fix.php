@@ -69,7 +69,7 @@ class SkyyRose_Accessibility_Fix {
 		// ══════════════════════════════════════════════
 		// 1. INJECT SCREEN-READER-TEXT CSS
 		// ══════════════════════════════════════════════
-		// header.php renders the canonical skip-link (.skip-link → #primary).
+		// header.php renders the canonical skip-link (.skip-link → #content).
 		// Do not inject a second one — duplicate skip links confuse AT.
 		// Keep the .screen-reader-text utility class for use across templates.
 		$css = '<style id="skyyrose-a11y-fix-v3">'

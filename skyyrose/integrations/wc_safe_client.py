@@ -54,11 +54,38 @@ class WCCredentials:
 
     @classmethod
     def from_env(cls) -> WCCredentials:
-        """Load credentials from env. Raises KeyError if any are missing."""
+        """Load credentials from the one canonical source (.env.wordpress + env).
+
+        Accepts every WC URL/key convention in this repo and derives the REST
+        base from a bare site root, so the MCP path resolves the same creds the
+        WordPressClient path does. Raises KeyError (surfaced by callers) when the
+        URL or key/secret cannot be resolved under any known name. Reads
+        os.environ only — the application bootstrap (devskyy_mcp.py) loads
+        .env.wordpress; this stays pure so callers can monkeypatch the env.
+        """
+        site_or_base = (
+            os.environ.get("WC_BASE_URL")
+            or os.environ.get("WORDPRESS_URL")
+            or os.environ.get("WP_SITE_URL")
+        )
+        if not site_or_base:
+            raise KeyError("WC_BASE_URL / WORDPRESS_URL / WP_SITE_URL")
+        # WCSafeClient appends the REST route itself (index.php?rest_route=/wc/v3/…),
+        # so base_url must be the SITE ROOT — strip any /wp-json/… or other REST
+        # suffix back to scheme+host(+subpath).
+        base_url = site_or_base.split("/wp-json/")[0].split("/index.php")[0].rstrip("/")
+        consumer_key = os.environ.get("WC_CONSUMER_KEY") or os.environ.get("WOOCOMMERCE_KEY")
+        consumer_secret = os.environ.get("WC_CONSUMER_SECRET") or os.environ.get(
+            "WOOCOMMERCE_SECRET"
+        )
+        if not consumer_key:
+            raise KeyError("WC_CONSUMER_KEY / WOOCOMMERCE_KEY")
+        if not consumer_secret:
+            raise KeyError("WC_CONSUMER_SECRET / WOOCOMMERCE_SECRET")
         return cls(
-            base_url=os.environ["WC_BASE_URL"].rstrip("/"),
-            consumer_key=os.environ["WC_CONSUMER_KEY"],
-            consumer_secret=os.environ["WC_CONSUMER_SECRET"],
+            base_url=base_url,
+            consumer_key=consumer_key,
+            consumer_secret=consumer_secret,
         )
 
     def __str__(self) -> str:

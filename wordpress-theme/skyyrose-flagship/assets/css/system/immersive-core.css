@@ -150,6 +150,41 @@
 		rgba( var(--skyyrose-accent-rgb), 0.14 ),
 		var(--skyyrose-bg)
 	);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/*
+ * Caption inside the fallback gradient (scene.php room loop, else branch).
+ * Reuses the lockup/tagline token surface so an empty room reads as a
+ * deliberate "next chapter" moment, not a broken image — static, no
+ * animation, so it needs no prefers-reduced-motion carve-out.
+ */
+.scene-layer-fallback {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	text-align: center;
+	padding: 0 1.5rem;
+}
+
+.scene-layer-fallback__name {
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(1.25rem, 3vw, 1.75rem);
+	letter-spacing: 0.04em;
+	color: var(--skyyrose-text);
+	opacity: 0.85;
+}
+
+.scene-layer-fallback__note {
+	font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	opacity: 0.75;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

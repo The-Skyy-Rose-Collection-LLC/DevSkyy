@@ -12,6 +12,7 @@ from __future__ import annotations
 import pytest
 
 from evaluation.agents import CopyEvaluator
+from evaluation.budget import CostCapExceeded
 from evaluation.domains.copy import CopyAdapter, CopyBrief
 
 
@@ -123,3 +124,51 @@ async def test_gate_caps_revisions_when_never_passes():
 
     assert v.passed is False
     assert v.attempts == 2
+
+
+@pytest.mark.asyncio
+async def test_gate_default_budget_blocks_runaway_revisions():
+    """CopyEvaluator.gate() with no budget/unbounded arg is bounded by a conservative
+    default -- a caller who forgets budget= does not get unlimited paid judge calls."""
+    calls = {"judge": 0}
+
+    def judge(req):
+        calls["judge"] += 1
+        return (_good_output(brand_voice_fidelity=0, correct_collection_canon=0), 0.20)
+
+    async def regenerate_fn(ref, critique):
+        return "still weak draft"
+
+    async def producer(ref):
+        return "weak draft"
+
+    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+
+    with pytest.raises(CostCapExceeded):
+        await agent.gate(ref=_brief(), producer=producer, cap=50)
+
+    # The conservative default stops well short of the 50-revision cap -- proof the
+    # budget (not the revision cap) is what halted the loop.
+    assert calls["judge"] < 10
+
+
+@pytest.mark.asyncio
+async def test_gate_unbounded_opt_out_still_runs_full_cap():
+    """Explicit unbounded=True preserves the old no-budget (unlimited) behavior."""
+    calls = {"judge": 0}
+
+    def judge(req):
+        calls["judge"] += 1
+        return (_good_output(brand_voice_fidelity=0, correct_collection_canon=0), 0.0)
+
+    async def regenerate_fn(ref, critique):
+        return "still weak draft"
+
+    async def producer(ref):
+        return "weak draft"
+
+    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+    v = await agent.gate(ref=_brief(), producer=producer, cap=5, unbounded=True)
+
+    assert v.attempts == 5
+    assert calls["judge"] == 6

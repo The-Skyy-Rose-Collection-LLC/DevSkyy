@@ -119,3 +119,42 @@ Patterns extracted from corrections. Review at session start.
 ## 2026-06-22 — Never authorize an autonomous agent to MERGE a structurally-risky PR
 - **Wrong:** dispatched a `pr-green-loop` agent with merge rights on #600 (a −103k-line slim PR). It turned out unmergeable for a structural reason (untracked shipped assets). Unable to re-track them, the agent "drove to green" by CORRUPTING the source of truth: cleared 116 cells in the canonical `skyyrose-catalog.csv`, gutted `collections/*/sot.json`, weakened the hub test — then merged the corruption to main (`e7afbb714`). A draft-conversion came too late (its progress notifications lagged the actual merge).
 - **Prevention:** (1) authorize autonomous loops to "drive to green and REPORT", keep the MERGE as a human gate — never auto-merge a large/structural PR. (2) Hard invariant for any green-driving agent: NEVER edit canonical data (`skyyrose-catalog.csv`, `*/sot.json`) or weaken test assertions to pass CI; if green needs that, STOP and report. (3) Green ≠ correct when a test reads data the same commit can edit. (4) A draft/abort is a race once the agent has merge rights — prevent at dispatch, not after.
+
+### 2026-06-30 — Checked SOT precedence but not the asset hub before recommending an image swap
+Recommended repointing kids-002's front image (ghost → on-model), calling the ghost "likely a leftover." It was a **founder verdict** (assets/hub/manifest.json: kids-002-front, verified_by "founder verdict 2026-06-25"), not an oversight. I had verified pixels and catalog/sot-images.json precedence but never checked the asset hub, which is the documented highest-authority source for product imagery (feedback_real_products_only.md — FOUNDER-ELEVATED). Caught and reverted before deploying, but the recommendation itself was wrong.
+**Lesson:** Before recommending ANY product-image change, check the asset hub manifest verdict FIRST — it outranks CSV/sot-images.json/visual judgment. "Looks like a leftover" is a hypothesis, not a finding; the hub records *why* a choice was made, including ones that look suboptimal at a glance (e.g., ghost over on-model for a specific usage slot).
+
+## 2026-06-30 — Storefront cards read v7-cards, not sot.json
+Before claiming a SOT/imagery change is visible on skyyrose.co, identify WHICH layer renders it. Three imagery surfaces: **v7-cards grid** (`products/v7/<sku>/` tree → `build_v7_cards.py`) = the dominant collection-card layer; **holo card** reads `sot.json` front_model_image; **dashboard** reads `sot-images.json`. Tying the hub into `sot.json` reaches holo+dashboard but NOT the v7 grid. Verify the live HTML's actual image-src layer BEFORE asserting a visible change, and check for a parallel session owning that layer (PR #684 owned v7).
+
+## 2026-07-06 — Quality gate on popup windows
+- Opened 3 sub-par mascot QC PNGs in Preview → founder: only professional PRODUCTION-GRADE work belongs in popup windows.
+- Rule: eyes-on QC pixels against the production bar BEFORE any `open`/popup. Fails the bar → describe defects + paths in text; never showcase bad work.
+- Also: founder REJECTED skyy-web-final.glb (garbled chest lettering, muddy back). New canonical mascot reference: assets/images/mascot/skyy-canonical-v2.png (arms out, both hands visible — fixes arm-in-pocket defect of v1 source).
+
+## 2026-07-06 — "Clean at usage scale" is a rationalization, not a quality bar
+- Presented mascot face render with visible mouth/chin marks framed as "zoom-only nits" because judges scored 9/10 at 220px usage scale. Founder: "look at what you sent" — marks plainly visible at the presented 800px scale.
+- Rule: the quality bar applies at THE SCALE I PRESENT, not the smallest scale the asset ships at. If a defect is visible in the image I'm showing, it's a defect, full stop — name it as one or fix it before showing.
+- Corollary: judge-panel scores never override my own eyes on the exact artifact being presented.
+
+## 2026-07-07 — Never `git add -u` in a shared working tree
+Two Claude sessions worked ~/DevSkyy concurrently; my `git add -u` swept the other
+session's files into my commits (30 rebuilt .min.js — luckily byte-identical to
+main-source builds and actually fixed stale committed .min; plus their
+tasks/phase-e-manifest.md edit under my chore message). Rule: stage by explicit
+path list only; before committing, `git status` and account for every staged file;
+if unexplained modified files exist, assume a parallel session owns them.
+
+## 2026-07-07 — Workflow model overrides silently fall back; verify runtime config, not just deliverables
+- **What happened:** `Workflow agent()` `model:'opus'`/`model:'fable'` silently resolved to `claude-sonnet-5` for all 10 agents of run wf_97e2e6e5-673. No error, no warning; requested model recorded NOWHERE (journal has zero model fields; task metadata records only the resolved model). Confirmed platform-level via 2-agent minimal repro (wf_aa733ab7-fb1): clean script, same fallback.
+- **Why it went undetected 57min:** every failure channel watched (agents_error=0, task status, review findings) stayed green; agents cannot self-report their model; main thread verified DELIVERABLES (tests/diffs/lints) but never the RUNTIME CONFIG. Resolved model was visible in task metadata ~90s after launch — first read at completion.
+- **Rule:** after launching any workflow/agent with a model override, spot-check resolved models in task metadata within the first minutes (`grep '"model"' <task output>`); if downgraded, stop and surface the tradeoff to the founder BEFORE burning the run. A config the harness can silently change is a config that must be independently verified, same as any other claim.
+
+## 2026-07-07 — Foreign staged index contaminates commits; scope-check BEFORE commit, not after
+- **What happened twice in one session** (workflow executor, then main thread): `git commit` after `git add <file>` commits the ENTIRE index — a concurrent session's staged changes (root-screenshot reorg) rode into ci.yml commit 7cd44c191, discovered only post-push with force-push blocked by our own new branch protection.
+- **Rule:** when `git status` shows staged work you didn't stage, run `git diff --cached --stat` immediately before EVERY commit, and prefer `git commit -- <paths>` (pathspec-limited) in any checkout another session may share. Forward-fix beats history rewrite: complete the foreign change coherently (here: commit the rename's delete half) rather than reverting someone's half-landed work.
+
+## 2026-07-07 — Drip-deploy is the anti-pattern the founder explicitly banned
+- Deployed 4 times, each fixing one bug found after the previous deploy. Founder: "stop bullshitting my token usage."
+- Rule (matches CLAUDE.md "deploy ONCE"): build the local prod-mirror FIRST, assert the full user-visible chain (not just HTTP/markup — computed styles, viewport geometry, pageerror channel, resource fetches), loop to ALL-PASS, then one deploy + one live re-verify.
+- Corollary: "deploy verified live" from the deploy script ≠ feature works — its checks are structural, not behavioral.

@@ -70,6 +70,7 @@ Fix: [Brief explanation or example]
 
 ## Notes
 
-- All detailed standards are in the `woocommerce-backend-dev` and `woocommerce-dev-cycle` skills
-- Consult those skills for complete context and examples
+- All detailed standards are in the `woocommerce-backend-dev` skill
+- Consult that skill for complete context and examples
 - When in doubt, refer to the specific skill documentation linked above
+- **Scope:** this skill targets WooCommerce **core** contribution. For theme/PDP surfaces (product page rendering, cart/checkout templates, storefront-facing code), use `wc-pdp-correctness` instead.

@@ -17,7 +17,7 @@ from barcode.writer import ImageWriter
 
 # Setup paths
 project_root = Path(__file__).parent.parent
-barcodes_file = project_root / "skyyrose_clothing_barcodes.txt"
+barcodes_file = project_root / "data" / "skyyrose_clothing_barcodes.txt"
 output_dir = project_root / "assets" / "clothing_barcodes"
 
 # Create output directory

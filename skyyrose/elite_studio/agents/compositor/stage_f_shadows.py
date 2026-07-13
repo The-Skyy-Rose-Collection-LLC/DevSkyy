@@ -6,14 +6,11 @@ gaussian blur. GPSDiffusion can be hooked in later by replacing this body.
 
 from __future__ import annotations
 
-import logging
 import os
 import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageFilter
-
-logger = logging.getLogger(__name__)
 
 
 class ShadowStageError(RuntimeError):
@@ -49,7 +46,7 @@ def generate_shadows(
 
     Raises:
         ShadowStageError: on any PIL/IO failure — fail-closed, never silently
-            returns an un-shadowed image labeled as a shadow path.
+            returns an un-shadowed image mislabeled as a shadow path.
     """
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)

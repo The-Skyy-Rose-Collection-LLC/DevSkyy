@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Preflight audit — classify every canonical SKU before any paid API call.
 
-Classifies all 30 SKUs in the canonical catalog into one of:
+Classifies every SKU in the canonical catalog (the CSV is the SOT — the
+count is read from it, never hardcoded) into one of:
   READY                — bundle dir exists AND techflat-front.* on disk
-  SKIPPED              — render_is_accessory == "1" (sg-007, lh-005)
+  SKIPPED              — render_is_accessory == "1"
   PENDING_USER_ASSETS  — garment missing bundle dir or techflat-front file
-                         (sg-009, sg-012, br-012, sg-015)
 
 Writes `renders/ghost-mannequin/SKIPPED.json` (accessories only, machine-readable).
 
 Exit codes:
-  0 — all 30 classified (READY + SKIPPED + PENDING = 30), even when PENDING > 0
+  0 — every catalog SKU classified (READY + SKIPPED + PENDING == catalog
+      rows), even when PENDING > 0
   1 — unexpected error (CSV unreadable, bundles root missing, etc.)
 
 PENDING_USER_ASSETS is treated as an INFORMATIONAL WARNING, not a hard failure.
@@ -157,7 +158,7 @@ def _print_entries(entries: list[AuditEntry]) -> None:
     print(_SEP)
 
 
-def _print_summary(entries: list[AuditEntry]) -> None:
+def _print_summary(entries: list[AuditEntry], catalog_total: int) -> None:
     ready = [e for e in entries if e.status == Status.READY]
     skipped = [e for e in entries if e.status == Status.SKIPPED]
     pending = [e for e in entries if e.status == Status.PENDING_USER_ASSETS]
@@ -168,7 +169,7 @@ def _print_summary(entries: list[AuditEntry]) -> None:
     print(f"  SKIPPED:             {len(skipped):3d}  (out-of-scope accessories)")
     print(f"  PENDING_USER_ASSETS: {len(pending):3d}  (user must provide source assets)")
     print(f"  {'─' * 40}")
-    print(f"  TOTAL:               {len(entries):3d} / 30")
+    print(f"  TOTAL:               {len(entries):3d} / {catalog_total}")
     print(_SEP)
 
     if pending:
@@ -230,17 +231,10 @@ def main(
 
     entries = [classify_sku(row, bundles_dir=bundles_dir) for row in rows]
     _print_entries(entries)
-    _print_summary(entries)
+    _print_summary(entries, catalog_total=len(rows))
 
     out_path = skipped_out if skipped_out is not None else DEFAULT_SKIPPED_OUT
     _write_skipped_json(entries, out_path)
-
-    total = len(entries)
-    if total != 30:
-        print(
-            f"WARN: expected 30 total SKUs in catalog, got {total}",
-            file=sys.stderr,
-        )
 
     return 0
 

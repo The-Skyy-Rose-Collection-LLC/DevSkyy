@@ -48,7 +48,12 @@ def score_against_centroid(image: Path | str | Image.Image, centroid: BrandCentr
 
 
 def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVerdict:
-    """Decide whether `image` is on-brand enough to proceed to paid QA."""
+    """Decide whether `image` is on-brand enough to proceed to paid QA.
+
+    Emits the verdict score to the token tracker (Track-OBS) so ``EmbeddingObserver`` can
+    compute PSI drift over the gate-score distribution. Emission is the single chokepoint
+    every gate site funnels through, and never affects the returned verdict.
+    """
     if isinstance(image, (str, Path)) and not Path(image).is_file():
         # Fail closed: a missing render path (e.g. an upstream stage was skipped
         # or its output deleted) must reject here, not raise FileNotFoundError
@@ -61,15 +66,37 @@ def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVe
         )
     score = score_against_centroid(image, centroid)
     if score >= centroid.threshold:
-        return GateVerdict(
+        verdict = GateVerdict(
             accepted=True,
             score=score,
             threshold=centroid.threshold,
             reason=f"on-brand (score {score:.3f} >= threshold {centroid.threshold:.3f})",
         )
-    return GateVerdict(
-        accepted=False,
-        score=score,
-        threshold=centroid.threshold,
-        reason=(f"below brand threshold (score {score:.3f} < threshold {centroid.threshold:.3f})"),
-    )
+    else:
+        verdict = GateVerdict(
+            accepted=False,
+            score=score,
+            threshold=centroid.threshold,
+            reason=f"below brand threshold (score {score:.3f} < threshold {centroid.threshold:.3f})",
+        )
+    _emit_gate_score(centroid.model_id, verdict)
+    return verdict
+
+
+def _emit_gate_score(model_id: str, verdict: GateVerdict) -> None:
+    """Record the gate verdict's score for PSI-drift observability (Track-OBS).
+
+    Telemetry must NEVER break the gate, so both the import and the call are guarded — the
+    verdict is returned regardless of the tracker's availability or failure.
+    """
+    try:
+        from core.token_tracker import record_gate_score
+
+        record_gate_score(
+            model=model_id,
+            score=verdict.score,
+            accepted=verdict.accepted,
+            threshold=verdict.threshold,
+        )
+    except Exception:  # noqa: BLE001 — observability must not affect gating
+        pass

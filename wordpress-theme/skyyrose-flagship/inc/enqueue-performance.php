@@ -51,9 +51,9 @@ function skyyrose_preload_fonts() {
 	$fonts_dir = SKYYROSE_ASSETS_URI . '/fonts';
 	?>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cormorant-garamond-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/bebas-neue-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/archivo-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/hanken-grotesk-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/anton-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<?php
 	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
 	// templates). Skip the preload elsewhere so non-BR pages don't waste
@@ -183,24 +183,34 @@ function skyyrose_preload_hero_image() {
 		// callbacks fire before wp_head priority 4 — only adopt a fresh
 		// resolution when the helper returns a valid WC_Product so we never
 		// write null/false back to the global.
-		global $product;
-		if ( ! $product instanceof WC_Product ) {
-			$resolved = skyyrose_current_wc_product();
-			if ( $resolved instanceof WC_Product ) {
-				$product = $resolved;
+		//
+		// Jetpack Photon rewrites product image URLs to its CDN on delivery.
+		// Preloading the local URL wastes a connection — the browser loads
+		// the local URL then immediately redirects to the Photon CDN URL,
+		// losing the preload benefit. Skip the preload entirely when Photon
+		// is active so the browser's own LCP heuristic takes over.
+		if ( ! function_exists( 'jetpack_photon_url' ) ) {
+			global $product;
+			if ( ! $product instanceof WC_Product ) {
+				$resolved = skyyrose_current_wc_product();
+				if ( $resolved instanceof WC_Product ) {
+					$product = $resolved;
+				}
 			}
-		}
-		if ( $product instanceof WC_Product && $product->get_image_id() ) {
-			// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
-			// of wp_get_attachment_url() which returns the raw original
-			// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
-			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
-			if ( ! $image_url ) {
-				$image_url = wp_get_attachment_url( $product->get_image_id() );
+			if ( $product instanceof WC_Product && $product->get_image_id() ) {
+				// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
+				// of wp_get_attachment_url() which returns the raw original
+				// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
+				$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+				if ( ! $image_url ) {
+					$image_url = wp_get_attachment_url( $product->get_image_id() );
+				}
 			}
 		}
 	} elseif ( is_page() ) {
 		// Collection and immersive pages: preload featured image if set.
+		// 'large' (max 1024px) instead of 'full' — full is typically 2-4MB
+		// and far exceeds what any viewport needs for a hero preload.
 		$template       = get_page_template_slug();
 		$hero_templates = array(
 			'template-collection-black-rose.php',
@@ -214,7 +224,7 @@ function skyyrose_preload_hero_image() {
 			'template-about.php',
 		);
 		if ( $template && in_array( $template, $hero_templates, true ) && has_post_thumbnail() ) {
-			$image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+			$image_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
 		}
 	}
 
@@ -275,6 +285,53 @@ function skyyrose_dequeue_block_styles() {
 	wp_dequeue_style( 'global-styles' );
 }
 
+/**
+ * Dequeue Jetpack and MediaElement styles not needed on most pages.
+ *
+ * Jetpack registers several feature-specific stylesheets globally even when
+ * the corresponding feature is not used on the current page. This function
+ * removes those whose context is clear:
+ *
+ * - Search chunk styles  → only needed on search results pages.
+ * - Podcast player       → theme has no podcast pages; safe to remove globally.
+ * - Grunion/forms CSS    → theme routes contact via Elementor, not Jetpack Forms.
+ * - MediaElement.js      → only needed for native audio/video blocks; theme
+ *                          uses YouTube embeds and Three.js, no <audio>/<video>.
+ *
+ * All wp_dequeue_style() / wp_dequeue_script() calls are no-ops when the
+ * handle is not registered, so this is safe to run on all themes.
+ *
+ * @since 7.1.0
+ * @return void
+ */
+function skyyrose_dequeue_jetpack_non_context_styles() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Search chunk styles — only meaningful on search results pages.
+	if ( ! is_search() ) {
+		wp_dequeue_style( 'jetpack-search-widget' );
+		wp_dequeue_style( 'jetpack-instant-search' );
+		wp_dequeue_style( 'jetpack-search-chunk' );
+	}
+
+	// Podcast player — theme has no podcast pages; safe to remove globally.
+	wp_dequeue_style( 'jetpack-podcast-player' );
+
+	// Jetpack / Grunion contact forms — theme uses Elementor for contact pages.
+	wp_dequeue_style( 'grunion-front-end' );
+	wp_dequeue_style( 'jetpack-forms' );
+
+	// MediaElement.js — only required for native audio/video blocks.
+	// Theme uses YouTube embeds and custom Three.js scenes; no native players.
+	if ( function_exists( 'has_blocks' ) && ! has_blocks() ) {
+		wp_dequeue_style( 'wp-mediaelement' );
+		wp_dequeue_script( 'wp-mediaelement' );
+		wp_dequeue_script( 'mediaelement' );
+	}
+}
+
 /*
 --------------------------------------------------------------
  * Hook Registration — Performance Optimizations
@@ -303,3 +360,6 @@ add_action( 'wp_default_scripts', 'skyyrose_remove_jquery_migrate' );
 
 // Dequeue Gutenberg block styles on non-block pages.
 add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_block_styles', 100 );
+
+// Dequeue Jetpack feature styles not needed outside their context (search, podcast, forms, MediaElement).
+add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_jetpack_non_context_styles', 101 );

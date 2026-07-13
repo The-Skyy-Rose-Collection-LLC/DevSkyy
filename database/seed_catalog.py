@@ -12,7 +12,7 @@ import asyncio
 import json
 import uuid
 
-from skyyrose.core.catalog_loader import read_catalog_rows
+from skyyrose.core.catalog_loader import read_catalog_rows, status_from_row
 
 
 def _to_float(value: str, default: float) -> float:
@@ -82,7 +82,7 @@ def _load_products() -> list[dict]:
                 "category": _infer_category(row["name"]),
                 "description": row["description"].strip(),
                 "quantity": _to_int(row["edition_size"], 250),
-                "is_active": row["is_preorder"].strip() == "1",
+                "is_active": status_from_row(row) == "live",
                 "sizes": sizes,
                 "color": row["color"].strip(),
             }
@@ -94,7 +94,7 @@ PRODUCTS = _load_products()
 
 
 async def seed():
-    """Seed all 28 SkyyRose products into the database."""
+    """Seed all 33 SkyyRose products into the database."""
     from database.db import Product, db_manager
 
     await db_manager.initialize()

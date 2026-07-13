@@ -699,12 +699,25 @@ Recommended Actions:
     # =========================================================================
 
     async def _ensure_wordpress_client(self) -> None:
-        """Ensure WordPress client is initialized and connected."""
-        if self._wordpress_client is None and WORDPRESS_AVAILABLE:
-            self._wordpress_client = WordPressWooCommerceClient()
-            await self._wordpress_client.connect()
-            self._wordpress_connected = True
-            logger.info("WordPress/WooCommerce client connected")
+        """Ensure the WooCommerce client is initialized from environment creds.
+
+        WordPressClient connects in __post_init__ (there is no separate
+        connect()); a client injected via the constructor is honored as-is.
+        Missing creds are non-fatal — the agent stays disconnected and the WC
+        methods return an error dict the caller maps to a per-item failure.
+        """
+        if self._wordpress_connected:
+            return
+        if self._wordpress_client is None:
+            if not WORDPRESS_AVAILABLE:
+                return
+            try:
+                self._wordpress_client = WordPressWooCommerceClient.from_env()
+            except Exception as exc:
+                logger.warning("WooCommerce client not configured: %s", exc)
+                return
+        self._wordpress_connected = True
+        logger.info("WooCommerce client ready")
 
     async def close_wordpress_client(self) -> None:
         """Close WordPress client connection."""

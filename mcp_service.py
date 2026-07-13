@@ -23,7 +23,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from utils.logging_utils import get_logger
 
-from mcp_tools.http_mount import MCP_MOUNT_PATH, build_mcp_app, mcp_session_manager
+from mcp_tools.http_mount import MCP_MOUNT_PATH, build_mcp_app, mcp_session_manager, tool_count
 
 logger = get_logger(__name__)
 
@@ -49,8 +49,12 @@ app = FastAPI(
 
 @app.get("/health")
 async def health() -> JSONResponse:
-    """Liveness probe for the Fly health check."""
-    return JSONResponse({"status": "ok", "service": "mcp"})
+    """Liveness probe for the Fly health check.
+
+    ``tool_count`` is computed at runtime (never hand-typed) — see
+    :func:`mcp_tools.http_mount.tool_count`.
+    """
+    return JSONResponse({"status": "ok", "service": "mcp", "tool_count": await tool_count()})
 
 
 @app.get("/ready")

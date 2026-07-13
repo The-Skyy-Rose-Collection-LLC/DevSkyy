@@ -10,6 +10,7 @@ Version: 1.0.0
 
 import asyncio
 import logging
+import math
 import time
 import uuid
 from collections import deque
@@ -296,6 +297,32 @@ def _compute_system_stats() -> SystemStats:
     )
 
 
+def _compute_latency_p95() -> float | None:
+    """95th-percentile request latency from the live rolling window (`_req_window`),
+    which `timing_middleware` (main_enterprise.py) populates on every real request via
+    `track_request()`. Returns None when no requests have been observed yet — a
+    percentile over zero samples is undefined, not zero.
+
+    Note: `security.prometheus_exporter.api_request_duration_seconds` is a formal
+    Prometheus histogram for this same purpose, but nothing in the app currently
+    calls `record_api_request()`/`finish_api_request()` to feed it, so it always
+    reports empty. `_req_window` is the only in-process collector with real data.
+    """
+    latencies = sorted(r[2] for r in _req_window)
+    if not latencies:
+        return None
+    idx = min(math.ceil(0.95 * len(latencies)) - 1, len(latencies) - 1)
+    return round(latencies[max(idx, 0)], 1)
+
+
+def _compute_requests_per_second(window_seconds: float = 60.0) -> float:
+    """Real observed request rate over the trailing window, from `_req_window`."""
+    now = time.time()
+    window_start = now - window_seconds
+    recent_count = sum(1 for r in _req_window if r[0] >= window_start)
+    return round(recent_count / window_seconds, 2)
+
+
 @router.get(
     "/monitoring/health",
     response_model=MonitoringHealthResponse,
@@ -418,6 +445,7 @@ async def get_metrics(
 
     try:
         metric_series = []
+        agents_snapshot = _get_agents_snapshot()
 
         if "health" in metrics:
             metric_series.append(
@@ -425,7 +453,10 @@ async def get_metrics(
                     metric_name="system_uptime",
                     unit="seconds",
                     data_points=[
-                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=86400.0)
+                        MetricDataPoint(
+                            timestamp=datetime.now(UTC).isoformat(),
+                            value=round(time.time() - psutil.boot_time(), 1),
+                        )
                     ],
                     aggregation="last",
                 )
@@ -437,7 +468,7 @@ async def get_metrics(
                     data_points=[
                         MetricDataPoint(
                             timestamp=datetime.now(UTC).isoformat(),
-                            value=54.0,
+                            value=float(agents_snapshot.active_agents),
                             labels={"status": "active"},
                         )
                     ],
@@ -446,22 +477,27 @@ async def get_metrics(
             )
 
         if "performance" in metrics:
-            metric_series.append(
-                MetricSeries(
-                    metric_name="api_latency_p95",
-                    unit="milliseconds",
-                    data_points=[
-                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=125.5)
-                    ],
-                    aggregation="p95",
+            p95 = _compute_latency_p95()
+            if p95 is not None:
+                metric_series.append(
+                    MetricSeries(
+                        metric_name="api_latency_p95",
+                        unit="milliseconds",
+                        data_points=[
+                            MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=p95)
+                        ],
+                        aggregation="p95",
+                    )
                 )
-            )
             metric_series.append(
                 MetricSeries(
                     metric_name="requests_per_second",
                     unit="requests/sec",
                     data_points=[
-                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=45.2)
+                        MetricDataPoint(
+                            timestamp=datetime.now(UTC).isoformat(),
+                            value=_compute_requests_per_second(),
+                        )
                     ],
                     aggregation="avg",
                 )
@@ -473,7 +509,7 @@ async def get_metrics(
             "total_requests": len(_req_window),
             "error_rate": round(1.0 - stats.success_rate / 100, 4),
             "avg_latency_ms": stats.avg_latency_ms,
-            "active_agents": _agents_cache["data"].total_agents if _agents_cache["data"] else 0,
+            "active_agents": agents_snapshot.active_agents,
         }
 
         return MonitoringMetricsResponse(
@@ -539,6 +575,19 @@ def _scan_agents_directory() -> "AgentListResponse":
     )
 
 
+def _get_agents_snapshot() -> AgentListResponse:
+    """Return the cached agent directory scan, refreshing it if the TTL has expired.
+
+    Shared by the /agents endpoint and /monitoring/metrics so both report the same
+    real, filesystem-derived agent count instead of independent guesses.
+    """
+    now = time.time()
+    if _agents_cache["data"] is None or now - _agents_cache["timestamp"] > _AGENT_CACHE_TTL:
+        _agents_cache["data"] = _scan_agents_directory()
+        _agents_cache["timestamp"] = now
+    return _agents_cache["data"]
+
+
 @router.get("/agents", response_model=AgentListResponse, status_code=status.HTTP_200_OK)
 async def list_agents(
     user: TokenPayload = Depends(get_current_user),
@@ -567,11 +616,7 @@ async def list_agents(
     logger.info(f"Fetching agent list for user {user.sub}")
 
     try:
-        now = time.time()
-        if _agents_cache["data"] is None or now - _agents_cache["timestamp"] > _AGENT_CACHE_TTL:
-            _agents_cache["data"] = _scan_agents_directory()
-            _agents_cache["timestamp"] = now
-        return _agents_cache["data"]
+        return _get_agents_snapshot()
 
     except Exception as e:
         logger.error(f"Agent listing failed: {e}", exc_info=True)

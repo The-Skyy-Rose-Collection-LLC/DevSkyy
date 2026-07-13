@@ -20,7 +20,7 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
     # --exclude belt-and-suspenders: keeps git worktree duplicates AND the gitignored
     # autonomous-agent scratch dir (my_project/) out of the discovery scan even if
     # mypy.ini exclude filtering runs too late. gitignore is invisible to mypy's walk.
-    mypy . --ignore-missing-imports --exclude '(\.claude/|my_project/|prototypes/|skyyrose-suite/)'
+    mypy . --ignore-missing-imports --exclude '(\.claude/|my_project/|prototypes/|skyyrose-suite/|devskyy-sdk-app/)'
   fi
 fi
 

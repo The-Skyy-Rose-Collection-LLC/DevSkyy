@@ -13,11 +13,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from services.competitive.competitor_analysis import (
-    CompetitorAnalysisService,
-    _competitor_assets,
-    _competitors,
-)
+from services.competitive.competitor_analysis import CompetitorAnalysisService
 from services.competitive.schemas import (
     Competitor,
     CompetitorAsset,
@@ -33,7 +29,9 @@ from services.competitive.schemas import (
     StyleAnalyticsResponse,
     StyleCategory,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.db import get_db
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
@@ -46,9 +44,9 @@ router = APIRouter(prefix="/competitors", tags=["competitors"])
 # =============================================================================
 
 
-def get_analysis_service() -> CompetitorAnalysisService:
-    """Get competitor analysis service."""
-    return CompetitorAnalysisService()
+def get_analysis_service(session: AsyncSession = Depends(get_db)) -> CompetitorAnalysisService:
+    """Get competitor analysis service bound to the request's DB session."""
+    return CompetitorAnalysisService(session)
 
 
 def check_competitor_access(
@@ -101,8 +99,8 @@ async def get_analytics_summary(
 
     Restricted to strategy/marketing roles.
     """
-    competitors = list(_competitors.values())
-    assets = list(_competitor_assets.values())
+    competitors = (await service.list_competitors()).competitors
+    assets = await service.list_all_assets()
 
     # Count by category
     by_category = {}

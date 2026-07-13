@@ -89,6 +89,9 @@ dependencies = [
 
     # Monitoring
     "prometheus-client>=0.19",
+    "psutil>=7.2.2",  # api/v1/monitoring.py:21 hard-imports; was only in an extra — broke .[api] image boot
+    "boto3>=1.34",  # integrations/cloudflare_r2_manager.py:6 hard-imports via integrations/__init__.py:6; was transitive-only in [all]
+    "langgraph>=0.2",  # orchestration/langgraph_integration.py:37 hard-imports (reached at boot via router from-imports); was mcp-extra-only
 
     # Utilities
     "python-dotenv>=1.0",
@@ -106,6 +109,7 @@ dependencies = [
     # 3D & Visual Generation
     "Pillow>=10.0",
     "opencv-python>=4.8",
+    "fonttools>=4.55",  # scripts/font_generator: PNG-template -> TTF vectorization
 
     # Performance & Async I/O
     "aiofiles>=24.1.0",
@@ -121,14 +125,12 @@ dependencies = [
     # Kafka — Real-time event streaming and analytics
     "confluent-kafka>=2.3.0",
 
-    # ML/AI - Critical for Round Table and RAG
+    # ML/AI - Critical for Round Table and RAG. Heavy transformer/vector-store
+    # libs (transformers, sentence-transformers, chromadb, diffusers) live in
+    # the `ml` extra so `pip install -e ".[api]"` never pulls torch — see `ml`.
     "numpy>=2.1.3",
     "scipy>=1.14.1",
-    "transformers>=4.53.0",
-    "sentence-transformers>=5.6.0",
     "tiktoken>=0.8.0",
-    "chromadb>=0.6.0",
-    "diffusers>=0.38.0",
 ]
 
 [project.optional-dependencies]
@@ -179,7 +181,7 @@ mcp = [
     # requires aiofiles<25.0; base needs >=24.1.0. Neither fastmcp nor the mcp
     # SDK depend on aiofiles (verified via PyPI requires-dist), so the prior
     # ==25.1.0 pin was arbitrary and made .[all] unsatisfiable in Docker.
-    "aiofiles>=24.1.0,<25.0",
+    "aiofiles>=24.1.0,<26.0",
     "orjson==3.11.9",
     "python-dotenv==1.2.2",
     "structlog==25.5.0",
@@ -187,9 +189,10 @@ mcp = [
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
+    "boto3>=1.43.0",  # integrations/cloudflare_r2_manager.py — was undeclared, install -e .[all] never pulled it
     "cryptography==49.0.0",
     "pyjwt==2.13.0",
-    "sqlalchemy==2.0.45",
+    "sqlalchemy==2.0.51",
     "aiosqlite==0.22.1",
     "redis==8.0.0",
     "pyyaml==6.0.3",
@@ -206,14 +209,14 @@ mcp = [
     "langgraph-checkpoint-postgres>=2.0.0",
     "psycopg[binary,pool]>=3.2",
     "chromadb>=0.6.0",
-    "faiss-cpu==1.14.2",
+    "faiss-cpu==1.14.3",
     "beautifulsoup4>=4.13.5",  # Fixed: raganything>=1.2.10 requires >=4.13.5 via mineru
     "requests==2.33.0",
     "pypdf>=6.6.2",
     "python-docx>=1.1.2",
     "python-pptx>=1.0.2",
     "pillow>=12.2.0",
-    "soundfile==0.13.1",
+    "soundfile==0.14.0",
     "rich==15.0.0",
     "click>=8.1.8",  # Fixed: raganything>=1.2.10 requires >=8.1.8 via mineru/pdftext
     "pytest==9.1.1",
@@ -221,8 +224,8 @@ mcp = [
     "healthcheck==1.3.3",
     "psutil==7.2.2",
     # OpenTelemetry compatibility (google-adk requires <=1.37.0)
-    "opentelemetry-api>=1.37.0,<=1.42.1",
-    "opentelemetry-sdk>=1.37.0,<=1.42.1",
+    "opentelemetry-api>=1.37.0,<=1.43.0",
+    "opentelemetry-sdk>=1.37.0,<=1.43.0",
     "opentelemetry-semantic-conventions>=0.48b0,<0.64",  # Required by mistralai
 ]
 
@@ -234,8 +237,11 @@ ml = [
     # test-validated set. Bump all three together (and re-validate) if upgrading.
     "torch==2.9.1",
     "torchvision==0.24.1",
-    "torchaudio==2.9.1",
+    "torchaudio==2.11.0",
     "transformers>=4.53.0",
+    "sentence-transformers>=5.6.0",
+    "chromadb>=0.6.0",
+    "diffusers>=0.38.0",
     "huggingface-hub>=0.27.0",
     "numpy>=2.1.3",
     "pandas>=2.2.3",
@@ -272,7 +278,7 @@ ml = [
     #     prophet's cmdstan build never succeeded in the py3.12 image anyway).
     #   gymnasium, stable-baselines3, soundfile, lime → dead RL/audio/explainability
     # This unbreaks `uv pip install .[all]` on Python 3.12.
-    "polars==1.41.2",
+    "polars==1.42.0",
     "pyarrow==24.0.0",
     "hydra-core==1.3.3",
     "omegaconf==2.3.1",
@@ -282,7 +288,7 @@ ml = [
     "fastapi>=0.119.0",
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
-    "sqlalchemy==2.0.45",
+    "sqlalchemy==2.0.51",
     "pymongo==4.17.0",
     # Compatibility constraints for dependency resolution
     "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
@@ -345,12 +351,14 @@ Changelog = "https://github.com/devskyy/devskyy/blob/main/CHANGELOG.md"
 [project.scripts]
 devskyy = "main_enterprise:main"
 prompt-enhance = "cli.prompt_enhance:cli"
+devskyy-character = "skyyrose.character_pipeline.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
     "core*",
     "api*",
+    "skyyrose*",
     "security*",
     "database*",
     "wordpress*",

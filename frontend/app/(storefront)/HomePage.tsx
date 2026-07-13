@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Play, Sparkles, ChevronDown } from 'lucide-react';
-import { getAllCollections } from '@/lib/collections';
+import type { CollectionConfig } from '@/lib/collections';
 
 const RotatingLogoFallback = lazy(
   () => import('@/components/3d/RotatingLogoFallback')
@@ -19,8 +19,11 @@ interface Particle {
   delay: number;
 }
 
-export default function HomePage() {
-  const collections = getAllCollections();
+interface HomePageProps {
+  collections: CollectionConfig[];
+}
+
+export default function HomePage({ collections }: HomePageProps) {
   const [heroLoaded, setHeroLoaded] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);

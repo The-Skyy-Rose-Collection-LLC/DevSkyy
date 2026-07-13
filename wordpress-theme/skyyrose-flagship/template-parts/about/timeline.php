@@ -3,7 +3,7 @@
  * About page — Chapter III: The Journey (Timeline).
  *
  * Editorial vertical-rule timeline. Each milestone is a row with the year as a
- * massive Bebas tag on the left of a center vertical rule and event/description
+ * massive Anton tag on the left of a center vertical rule and event/description
  * on the right (alternates left/right at md+).
  *
  * Called via get_template_part( 'template-parts/about/timeline', null, $args ).

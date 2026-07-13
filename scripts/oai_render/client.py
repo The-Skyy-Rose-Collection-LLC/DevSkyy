@@ -80,9 +80,13 @@ class OAIImageClient:
             "size": config.SIZE,
             "output_format": config.OUTPUT_FORMAT,
             "background": config.BACKGROUND,
-            "input_fidelity": config.INPUT_FIDELITY,
             "n": config.N,
         }
+        # input_fidelity is rejected outright (400) by models that don't
+        # support it -- e.g. gpt-image-2 (bug-172). Only send it when the
+        # configured model is known to accept it.
+        if config.MODEL in config.INPUT_FIDELITY_SUPPORTED_MODELS:
+            kwargs["input_fidelity"] = config.INPUT_FIDELITY
         if mask_path is not None:
             kwargs["mask"] = _as_upload(mask_path)
 

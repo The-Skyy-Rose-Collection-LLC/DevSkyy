@@ -85,7 +85,7 @@ get_header();
 				</div>
 
 				<div class="lp-story__image lp-rv" data-delay="2">
-					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-purple-set-front-model.webp' ); ?>"
+					<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'kids-002', 'front' ) ); ?>"
 						alt="<?php echo esc_attr__( 'Kids Capsule purple set, model shot', 'skyyrose' ); ?>"
 						loading="lazy" decoding="async"
 						width="896" height="1200"
@@ -134,9 +134,9 @@ get_header();
 			</div>
 
 			<div class="lp-editorial__grid lp-editorial__grid--top">
-				<div class="lp-editorial__item lp-rv" data-delay="1"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-red-set-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
-				<div class="lp-editorial__item lp-rv" data-delay="2"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-purple-set-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule purple set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
-				<div class="lp-editorial__item lp-rv" data-delay="3"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-red-set-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="1"><img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'kids-001', 'front' ) ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="2"><img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'kids-002', 'back' ) ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule purple set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="3"><img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'kids-001', 'back' ) ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
 			</div>
 		</div>
 	</section>

@@ -1,0 +1,14 @@
+from,to,status,note
+/preorder/,/pre-order/,301,pre-existing (verified live 2026-07-05); audit-asserted
+/home/,/,301,pre-existing (verified live 2026-07-05); audit-asserted
+/collection-black-rose/,/collections/black-rose/,301,WS2 canonical flip
+/collection-love-hurts/,/collections/love-hurts/,301,WS2 canonical flip
+/collection-signature/,/collections/signature/,301,WS2 canonical flip
+/collection-kids-capsule/,/collections/kids-capsule/,301,WS2 canonical flip
+/experience-black-rose/,/collections/black-rose/,301,WS3 merge
+/experience-love-hurts/,/collections/love-hurts/,301,WS3 merge
+/experience-signature/,/collections/signature/,301,WS3 merge
+/experience-kids-capsule/,/collections/kids-capsule/,301,WS3 merge
+/experiences/,/collections/,301,WS3 merge
+/products/black-rose-crop-set,/collections/,301,Shopify-era dynamic best-match; fallback when no product slug matches
+/PRE-ORDER/,/pre-order/,301,case-normalization probe

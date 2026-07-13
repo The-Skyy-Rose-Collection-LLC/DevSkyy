@@ -8,11 +8,11 @@ Full OFL 1.1 text: https://scripts.sil.org/OFL
 | Font                | License | URL                                              |
 |---------------------|---------|--------------------------------------------------|
 | Inter               | OFL 1.1 | https://github.com/rsms/inter                    |
-| Playfair Display    | OFL 1.1 | https://github.com/clauseggers/Playfair-Display  |
-| Bebas Neue          | OFL 1.1 | https://github.com/dharmatype/Bebas-Neue         |
+| Archivo             | OFL 1.1 | https://github.com/Omnibus-Type/Archivo          |
+| Anton               | OFL 1.1 | https://github.com/googlefonts/AntonFont         |
 | DM Sans             | OFL 1.1 | https://github.com/googlefonts/dm-fonts          |
 | Cinzel              | OFL 1.1 | https://github.com/nicholasgross/Cinzel          |
-| Cormorant Garamond  | OFL 1.1 | https://github.com/CatharsisFonts/Cormorant      |
+| Hanken Grotesk      | OFL 1.1 | https://github.com/marcologous/hanken-grotesk    |
 | Barlow              | OFL 1.1 | https://github.com/jpt/barlow                    |
 | Oswald              | OFL 1.1 | https://github.com/googlefonts/OswaldFont        |
 | Instrument Serif    | OFL 1.1 | https://fonts.google.com/specimen/Instrument+Serif |
@@ -24,9 +24,10 @@ Per-collection interior heading/accent voice. All licensed under SIL Open Font L
 
 | Font          | License | Usage                             | URL                                              |
 |---------------|---------|-----------------------------------|--------------------------------------------------|
-| Yellowtail    | OFL 1.1 | Black Rose script accent          | https://fonts.google.com/specimen/Yellowtail     |
+| Pacifico      | OFL 1.1 | Black Rose script accent          | https://fonts.google.com/specimen/Pacifico       |
 | Kaushan Script| OFL 1.1 | Love Hurts script accent          | https://fonts.google.com/specimen/Kaushan+Script |
-| Pinyon Script | OFL 1.1 | Signature + Kids Capsule accent   | https://fonts.google.com/specimen/Pinyon+Script  |
+| Pinyon Script | OFL 1.1 | Signature script accent           | https://fonts.google.com/specimen/Pinyon+Script  |
+| Grand Hotel   | OFL 1.1 | Kids Capsule script accent        | https://fonts.google.com/specimen/Grand+Hotel    |
 
 ## JavaScript Libraries
 

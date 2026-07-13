@@ -1,6 +1,6 @@
 # DevSkyy Production Runbook
 
-**Last Updated**: 2026-04-05
+**Last Updated**: 2026-07-06
 **Production URL**: devskyy.app (Vercel)
 **WordPress**: SkyyRose Flagship theme at skyyrose.co
 
@@ -58,7 +58,7 @@ git push origin main   # Triggers Vercel auto-deploy
 
 ### WordPress Theme
 
-Single-command pipeline (build → rsync → maintenance mode → verify):
+Single-command pipeline (build → deploy → verify):
 
 ```bash
 bash scripts/deploy-pipeline.sh        # Full deploy + verify
@@ -67,23 +67,62 @@ bash scripts/deploy-pipeline.sh --dry-run  # Preview without deploying
 
 Individual steps:
 ```bash
-bash scripts/deploy-theme.sh           # Transfer theme files only
-bash scripts/verify-deploy.sh          # Verify 11 pages post-deploy
+cd wordpress-theme && npm run deploy        # Wraps: bash ../scripts/deploy-theme.sh
+cd wordpress-theme && npm run deploy:dry    # --dry-run, no server contact
+bash scripts/verify-deploy.sh               # Verify pages post-deploy
 WORDPRESS_URL=https://staging.skyyrose.co bash scripts/verify-deploy.sh  # Staging
 ```
 
-Pages verified (11 total): Homepage, REST API, Collections ×3, About, Immersive ×3, Pre-Order Gateway, Experiences Hub.
+`deploy-theme.sh` transfers via **tar + scp with an atomic hot-swap on the remote by default** (not maintenance mode). Pass `--with-maintenance` (`npm run deploy:full`) only for deploys that include DB migrations or plugin changes — that path is kept as a legacy fallback. The script already has: a concurrency lock (refuses a second concurrent deploy), retention of the last 2 `.old.*` swap directories, and **auto-rollback** if `verify_live()` fails post-swap (reverses the swap and flushes caches without human intervention). Manual `git checkout` rollback (below) is the fallback if auto-rollback itself can't recover.
 
-Credentials required in `.env.wordpress`: `SSH_HOST`, `SSH_USER`, `SSH_PASS`, `WP_THEME_PATH`, `SFTP_HOST`, `SFTP_USER`, `SFTP_PASS`.
+Credentials required in `.env.wordpress`: `SSH_HOST`, `SSH_USER`, `SSH_PASS`, `WP_THEME_PATH`, `SFTP_HOST`, `SFTP_USER`, `SFTP_PASS`. Override the path with `ENV_FILE=<path>`.
 
-Note: Binary assets in `assets/images/` are gitignored — rsync uploads them from local disk each deploy.
+Note: theme product imagery under `assets/images/products/` is **tracked in git**
+(deploy-from-clean-tree convention) even though `.gitignore` blanket-ignores theme
+webp — land new binaries with `git add -f` in the same change that references them.
+Guard: `tests/test_sot_assets_tracked.py` fails CI on any SOT-referenced image that
+isn't a tracked blob (bug-175). Deploy from a checkout of `main`, never from a
+feature-branch working tree.
+
+### WordPress MU-Plugins
+
+Production MU-plugins live in `wordpress/mu-plugins/` and deploy individually
+(SCP to `wp-content/mu-plugins/`, destination filename = source basename):
+
+```bash
+# Ally AJAX guard (default source) — keeps Ally out of AJAX/REST JSON responses
+STOPSHOW_ACK=1 bash scripts/deploy-mu-plugin.sh
+
+# Anonymous-cache guard — withholds WC session/cart cookies on anon GETs so the
+# Atomic/Batcache edge can cache them (TTFB 1.8s → ~0.06s on edge HIT)
+STOPSHOW_ACK=1 MU_SRC=wordpress/mu-plugins/skyyrose-anon-cache-guard.php \
+  bash scripts/deploy-mu-plugin.sh
+```
+
+The script php-lints the plugin, uploads, flushes cache, and verifies the
+CommerceKit nonce endpoint returns clean JSON. Post-deploy checks for the
+anon-cache guard: anonymous `curl -sI https://skyyrose.co/` must emit **no**
+`Set-Cookie`, repeat request must show `x-ac: … HIT`, and a fresh-session
+add-to-cart must still populate the cart (session starts on the wc-ajax POST).
+
+**Never trust the deploy command's exit code alone** — a broken pipe (e.g. piping deploy output through `grep`/`tail`) can report exit 0 on a failed transfer. Verify with a live-state check (`npm run deploy:verify` or a cache-busted `curl`), not just the shell exit status.
+
+Mascot (Skyy) post-deploy checks — each catches a real shipped regression (bugs 178/189/190/193):
+1. Any JS/CSS change is INERT until the `?ver=` version triple bumps — the edge caches assets by full URL.
+2. `getComputedStyle(document.body).transform` must be `'none'` — any body transform (even a keyframe held by `fill-mode: forwards`) silently re-anchors every `position: fixed` overlay to the page.
+3. Watch the `pageerror` channel, not just console — browser module failures (e.g. bare `'three'` import specifiers) never appear in console.error.
+4. Behavioral check must SIMULATE ACTIVITY: scroll + move the mouse continuously and assert the mascot still enters. A motionless headless page structurally cannot exhibit idle-gating bugs.
 
 ### Backend (Docker)
 
 ```bash
-docker-compose up -d                    # Local
-docker-compose -f docker-compose.staging.yml up -d  # Staging
+make docker-secrets   # First time only: generates .env.docker with strong random secrets
+make docker-up        # Build + start core stack (postgres/redis/app/worker/elite-worker)
+make docker-logs       # Tail all services
+make docker-up-monitoring  # Core stack + prometheus + grafana (--profile monitoring)
 ```
+
+One image (`devskyy:local`) serves all three Python roles (API / task worker / elite-studio worker); the compose `command:` selects the role. Secrets come from `.env.docker` (never committed) — compose fails loudly (`${VAR:?...}`) if a required secret is missing, rather than booting with a placeholder. Full workflow: `docs/DOCKER.md`.
 
 Entry point: `main_enterprise.py` — `uvicorn main_enterprise:app --host 0.0.0.0 --port 8000`
 
@@ -112,7 +151,8 @@ Verify: `curl https://huggingface.co/api/spaces/skyyrose/<space-name>`.
 ```bash
 # Backend + API
 curl https://api.devskyy.app/health
-curl https://api.devskyy.app/metrics
+curl https://api.devskyy.app/ready
+curl https://api.devskyy.app/live
 open https://api.devskyy.app/docs
 
 # Frontend
@@ -126,18 +166,22 @@ curl -u "ck_xxx:cs_xxx" "https://skyyrose.co/index.php?rest_route=/wc/v3/product
 
 ## Health Endpoints
 
+Verified against `main_enterprise.py` (2026-07-06) — the paths below are the actual registered routes, not `/health/*` sub-paths:
+
 | Endpoint | Purpose | Expected |
 |----------|---------|----------|
-| `/health` | Basic liveness | `{"status": "healthy"}` |
-| `/health/ready` | Readiness (DB, cache) | `{"status": "ready"}` |
-| `/health/live` | Kubernetes liveness | `{"status": "live"}` |
-| `/metrics` | Prometheus metrics | Prometheus text format |
+| `/health` | Basic liveness (checks DB via `db.health_check()`) | `{"status": "healthy", "services": {"api": "operational", "database": "..."}}` |
+| `/ready` | Readiness | `{"ready": true}` |
+| `/live` | Liveness | `{"alive": true}` |
+| `/api/v1/monitoring/metrics` | Application metrics (JSON, not Prometheus text) | `MonitoringMetricsResponse` — accepts `?metrics=health,performance` |
+
+**`/metrics` at the app root does not exist.** `prometheus.yml` is configured to scrape `devskyy-app:8000/metrics`, but `main_enterprise.py` exposes no such route today — that scrape target will 404 until either a Prometheus-format `/metrics` endpoint is added (e.g. via `prometheus-client`'s ASGI app) or the scrape config is pointed at `/api/v1/monitoring/metrics` with a JSON-to-Prometheus adapter. Don't assume Prometheus metrics are flowing without checking the Prometheus targets page first.
 
 ## Monitoring
 
 | Service | Purpose | Config |
 |---------|---------|--------|
-| Prometheus | Metrics collection | `prometheus.yml`, `PROMETHEUS_ENABLED=true` |
+| Prometheus | Metrics collection (see gap noted above — scrape target currently unimplemented) | `prometheus.yml`, `PROMETHEUS_ENABLED=true`, `make docker-up-monitoring` |
 | Sentry | Error tracking | `SENTRY_DSN` env var |
 | Vercel Analytics | Frontend performance | `@vercel/analytics` |
 | GitGuardian | Secret scanning | GitHub integration |
@@ -184,6 +228,24 @@ curl -u "ck_xxx:cs_xxx" "https://skyyrose.co/index.php?rest_route=/wc/v3/product
 **Symptom**: SFTP deploy hangs or fails authentication.
 **Fix**: Ensure `sshpass` is installed (`brew install hudochenkov/sshpass/sshpass`). If auth still fails, the WordPress.com SFTP password has likely rotated — regenerate at WP.com Dashboard → Users → Security → SFTP/SSH credentials and update `.env.wordpress`.
 
+### Deploy Reports Success But Site Didn't Change
+
+**Symptom**: `deploy-theme.sh` exits 0, but the live site still shows old content.
+**Cause**: Piping deploy output through `grep`/`tail` makes the pipeline's exit code that of the last command in the pipe, masking a failed transfer underneath.
+**Fix**: Never wrap a deploy invocation in a pipe without checking `PIPESTATUS`/`pipefail`. Verify with a live-state check (`npm run deploy:verify`, a cache-busted `curl`, or Playwright) — never trust the exit code alone.
+
+### Collections Page Renders Stale Template After Deploy
+
+**Symptom**: `/collections/` (or another page) keeps rendering an old/orphan template after a hot-swap deploy, even though the new theme files are live.
+**Cause**: The tar+scp hot-swap deploy replaces theme files but does not touch WordPress's `_wp_page_template` post-meta — a page still resolves to whatever template slug was saved on it, orphan or not.
+**Fix**: For a specific page, force the correct template via a `template_include` filter (see `skyyrose_collections_index_template()` in the theme) rather than relying on the deploy to fix stored meta. Zero DB writes required.
+
+### SFTP Fallback (lftp) Fails With Regex Error
+
+**Symptom**: `lftp mirror: Invalid preceding regular expression` when the primary `scp` transfer fails and the script falls back to `lftp`.
+**Cause**: The exclude list was built for rsync's glob syntax (`*.map`) but passed straight into `lftp --exclude`, which expects a regex.
+**Fix**: Already patched in `deploy-theme.sh` — the exclude-building step now converts glob to regex (escape dots, `*` → `.*`, strip trailing slash) before handing it to `lftp`.
+
 ### Backend 500 Internal Server Error
 
 **Check logs**: `docker-compose logs -f api` or `fly logs -a devskyy`.
@@ -210,7 +272,7 @@ echo $CORS_ORIGINS
 
 **Symptom**: All product links go to `/pre-order/` instead of collection pages.
 **Cause**: `skyyrose_product_url()` fallback routes to pre-order when WooCommerce doesn't have the product.
-**Fix**: Verify `is_preorder` flags in `data/product-catalog.csv` (canonical source). The PHP theme reads this at runtime; `inc/product-catalog.php` is now a CSV reader, not a hardcoded array. Non-preorder products must have `is_preorder=0` in the CSV.
+**Fix**: Verify `is_preorder` flags in `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (the canonical catalog — `inc/product-catalog.php:28` resolves it via `get_theme_file_path('data/skyyrose-catalog.csv')`, not the root-level `data/product-catalog.csv`). The PHP theme reads this at runtime, not a hardcoded array. Non-preorder products must have `is_preorder=0` in the CSV.
 
 ## Rollback Procedures
 

@@ -19,29 +19,29 @@ $collection_data = array(
 		'title' => 'Signature',
 		'tag'   => 'The Origin',
 		'desc'  => 'The first rose, the first script. Where SkyyRose began — gold-accented luxury streetwear, gender-neutral by default.',
-		'link'  => '/collection-signature/',
-		'img'   => '',
+		'link'  => '/collections/signature/',
+		'img'   => 'assets/images/lookbook/lb-rose-hoodie-beanie-960w.webp',
 	),
 	'black-rose'   => array(
 		'title' => 'Black Rose',
 		'tag'   => 'The Refusal',
 		'desc'  => 'Dark, powerful, unapologetic. Silver-on-black, gothic restraint. Streetwear armor for everyone who refused to apologize first.',
-		'link'  => '/collection-black-rose/',
-		'img'   => '',
+		'link'  => '/collections/black-rose/',
+		'img'   => 'assets/images/lookbook/lb-black-rose-football-960w.webp',
 	),
 	'love-hurts'   => array(
 		'title' => 'Love Hurts',
 		'tag'   => 'The Grief',
 		'desc'  => 'A collection named after grief, made to be worn anyway. Crimson and deep red, Beauty &amp; the Beast cadence — luxury or witchcraft, take your pick.',
-		'link'  => '/collection-love-hurts/',
-		'img'   => '',
+		'link'  => '/collections/love-hurts/',
+		'img'   => 'assets/images/lookbook/lb-love-hurts-varsity-960w.webp',
 	),
 	'kids-capsule' => array(
 		'title' => 'Kids Capsule',
 		'tag'   => 'The Heir',
 		'desc'  => 'Rose gold and soft pink. The fourth chapter, smaller silhouettes, same craftsmanship. Passing the torch on the same terms that built the brand.',
-		'link'  => '/collection-kids-capsule/',
-		'img'   => '',
+		'link'  => '/collections/kids-capsule/',
+		'img'   => 'assets/images/lookbook/lb-kid-black-rose-960w.webp',
 	),
 );
 
@@ -81,7 +81,12 @@ foreach ( $catalog as $product ) {
 		foreach ( $collection_data as $slug => $data ) :
 			++$i;
 			$index   = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
-			$img_url = ! empty( $data['img'] ) ? $data['img'] : get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+			// Theme-relative paths (curated lookbook defaults) resolve via
+			// get_theme_file_uri; catalog overrides arrive as full URLs.
+			$img_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+			if ( ! empty( $data['img'] ) ) {
+				$img_url = ( 0 === strpos( $data['img'], 'http' ) ) ? $data['img'] : get_theme_file_uri( $data['img'] );
+			}
 			?>
 			<li class="abt-coll-row" data-collection="<?php echo esc_attr( $slug ); ?>" role="listitem">
 				<a href="<?php echo esc_url( home_url( $data['link'] ) ); ?>" class="abt-coll-row__link">

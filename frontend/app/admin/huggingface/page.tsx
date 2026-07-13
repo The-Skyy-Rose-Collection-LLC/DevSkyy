@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { training } from '@/lib/api/endpoints/training';
+import type { TrainingProgress, TrainingJobsList } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -234,8 +236,14 @@ export default function HuggingFacePage() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Training state
+  const [trainingStatus, setTrainingStatus] = useState<TrainingProgress | null>(null);
+  const [trainingJobs, setTrainingJobs] = useState<TrainingJobsList | null>(null);
+  const [trainingLoading, setTrainingLoading] = useState(true);
+  const [trainingError, setTrainingError] = useState<string | null>(null);
+
   // Settings state
-  const [tokenStatus, setTokenStatus] = useState<'valid' | 'expired' | 'missing'>('valid');
+  const [tokenStatus] = useState<'valid' | 'expired' | 'missing'>('valid');
   const [defaultOrg, setDefaultOrg] = useState('damBruh');
   const [autoDeploy, setAutoDeploy] = useState(true);
 
@@ -272,7 +280,7 @@ export default function HuggingFacePage() {
           body: JSON.stringify({ action, spaceId }),
         });
         if (!res.ok) throw new Error(`Action failed: ${res.status}`);
-      } catch (err) {
+      } catch {
         setError(`Failed to ${action} space. Please try again.`);
       } finally {
         setActionLoading(null);
@@ -293,7 +301,7 @@ export default function HuggingFacePage() {
           body: JSON.stringify({ action, endpointId }),
         });
         if (!res.ok) throw new Error(`Action failed: ${res.status}`);
-      } catch (err) {
+      } catch {
         setError(`Failed to ${action} endpoint. Please try again.`);
       } finally {
         setActionLoading(null);
@@ -303,9 +311,30 @@ export default function HuggingFacePage() {
     [fetchData]
   );
 
+  const fetchTraining = useCallback(async () => {
+    setTrainingLoading(true);
+    try {
+      const [status, jobs] = await Promise.all([
+        training.getStatus(),
+        training.getJobs(),
+      ]);
+      setTrainingStatus(status);
+      setTrainingJobs(jobs);
+      setTrainingError(null);
+    } catch (err) {
+      setTrainingError(err instanceof Error ? err.message : 'Failed to load training data');
+    } finally {
+      setTrainingLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    fetchTraining();
+  }, [fetchTraining]);
 
   if (loading) {
     return <HuggingFaceSkeleton />;
@@ -402,6 +431,10 @@ export default function HuggingFacePage() {
           <TabsTrigger value="generate" className="data-[state=active]:bg-gray-700">
             <Sparkles className="mr-2 h-4 w-4" />
             Generate
+          </TabsTrigger>
+          <TabsTrigger value="training" className="data-[state=active]:bg-gray-700">
+            <TrendingUp className="mr-2 h-4 w-4" />
+            LoRA Training
           </TabsTrigger>
           <TabsTrigger value="settings" className="data-[state=active]:bg-gray-700">
             <Settings className="mr-2 h-4 w-4" />
@@ -680,6 +713,201 @@ export default function HuggingFacePage() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* LoRA Training Tab */}
+        <TabsContent value="training" className="space-y-4">
+          {trainingLoading ? (
+            <div className="space-y-3">
+              {[...Array(2)].map((_, i) => (
+                <Skeleton key={i} className="h-40 bg-gray-800" />
+              ))}
+            </div>
+          ) : trainingError ? (
+            <div className="flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <p className="text-sm flex-1">{trainingError}</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-400 hover:text-red-300"
+                onClick={fetchTraining}
+              >
+                <RefreshCw className="mr-1 h-4 w-4" />
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Current Training Status */}
+              <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-[#FF9D00]" />
+                      Training Status
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <TrainingStatusBadge status={trainingStatus?.status ?? 'idle'} />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-white h-8 w-8 p-0"
+                        title="Refresh"
+                        onClick={fetchTraining}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {trainingStatus?.status === 'idle' ? (
+                    <div className="py-6 text-center">
+                      <Activity className="h-10 w-10 text-gray-600 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">No training runs yet</p>
+                      <p className="text-gray-600 text-xs mt-1">
+                        Trigger a training run from the backend to see progress here
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Progress Bar */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Progress</span>
+                          <span className="text-white font-medium">
+                            {trainingStatus?.progress_percentage.toFixed(1) ?? 0}%
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full bg-gray-800">
+                          <div
+                            className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79] transition-all duration-500"
+                            style={{ width: `${trainingStatus?.progress_percentage ?? 0}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Epoch / Step */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-gray-800/50 px-4 py-3">
+                          <p className="text-xs text-gray-500 mb-1">Epoch</p>
+                          <p className="text-lg font-bold text-white">
+                            {trainingStatus?.current_epoch ?? 0}
+                            <span className="text-gray-500 text-sm font-normal">
+                              {' '}/ {trainingStatus?.total_epochs ?? 0}
+                            </span>
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-gray-800/50 px-4 py-3">
+                          <p className="text-xs text-gray-500 mb-1">Step</p>
+                          <p className="text-lg font-bold text-white">
+                            {trainingStatus?.current_step ?? 0}
+                            <span className="text-gray-500 text-sm font-normal">
+                              {' '}/ {trainingStatus?.total_steps ?? 0}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Loss Metrics */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-gray-800/50 px-4 py-3">
+                          <p className="text-xs text-gray-500 mb-1">Current Loss</p>
+                          <p className="text-lg font-bold text-white">
+                            {trainingStatus?.loss.toFixed(4) ?? '—'}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-gray-800/50 px-4 py-3">
+                          <p className="text-xs text-gray-500 mb-1">Best Loss</p>
+                          <p className="text-lg font-bold text-[#FF9D00]">
+                            {trainingStatus?.best_loss != null
+                              ? trainingStatus.best_loss.toFixed(4)
+                              : '—'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Message */}
+                      {trainingStatus?.message && (
+                        <div className="rounded-lg border border-gray-700 bg-gray-800/30 px-4 py-3">
+                          <p className="text-xs text-gray-500 mb-1">Status Message</p>
+                          <p className="text-sm text-gray-300">{trainingStatus.message}</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Training Jobs List */}
+              <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Cpu className="h-5 w-5 text-[#FF9D00]" />
+                    Training Jobs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Job counts */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="rounded-lg bg-gray-800/50 px-3 py-2 text-center">
+                      <p className="text-xl font-bold text-[#FF9D00]">
+                        {trainingJobs?.running ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500">Running</p>
+                    </div>
+                    <div className="rounded-lg bg-gray-800/50 px-3 py-2 text-center">
+                      <p className="text-xl font-bold text-green-400">
+                        {trainingJobs?.completed ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500">Completed</p>
+                    </div>
+                    <div className="rounded-lg bg-gray-800/50 px-3 py-2 text-center">
+                      <p className="text-xl font-bold text-red-400">
+                        {trainingJobs?.failed ?? 0}
+                      </p>
+                      <p className="text-xs text-gray-500">Failed</p>
+                    </div>
+                  </div>
+
+                  {/* Per-job rows */}
+                  {trainingJobs?.jobs.length === 0 ? (
+                    <div className="py-6 text-center">
+                      <Layers className="h-10 w-10 text-gray-600 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">No training runs yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {trainingJobs?.jobs.map((job) => (
+                        <div
+                          key={job.job_id}
+                          className="flex items-center justify-between rounded-lg border border-gray-800 bg-gray-800/30 px-4 py-3"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-white truncate">
+                              {job.version}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {job.total_images} images · {job.total_products} products
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                            {job.final_loss != null && (
+                              <span className="text-xs text-gray-400">
+                                loss {job.final_loss.toFixed(4)}
+                              </span>
+                            )}
+                            <TrainingStatusBadge status={job.status} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
         </TabsContent>
 
         {/* Settings Tab */}
@@ -1204,6 +1432,31 @@ function HuggingFaceSkeleton() {
         ))}
       </div>
     </div>
+  );
+}
+
+function TrainingStatusBadge({
+  status,
+}: {
+  status: 'idle' | 'preparing' | 'training' | 'completed' | 'failed' | 'pending' | 'running';
+}) {
+  const cfg: Record<string, { border: string; text: string; pulse?: boolean; label: string }> = {
+    idle:      { border: 'border-gray-600',       text: 'text-gray-500',  label: 'Idle' },
+    preparing: { border: 'border-amber-500',      text: 'text-amber-400', pulse: true, label: 'Preparing' },
+    training:  { border: 'border-[#FF9D00]',      text: 'text-[#FF9D00]', pulse: true, label: 'Training' },
+    running:   { border: 'border-[#FF9D00]',      text: 'text-[#FF9D00]', pulse: true, label: 'Running' },
+    pending:   { border: 'border-amber-500',      text: 'text-amber-400', label: 'Pending' },
+    completed: { border: 'border-green-500',      text: 'text-green-400', label: 'Completed' },
+    failed:    { border: 'border-red-500',        text: 'text-red-400',   label: 'Failed' },
+  };
+  const c = cfg[status] ?? cfg['idle'];
+  return (
+    <Badge variant="outline" className={`${c.border} ${c.text} text-xs`}>
+      {c.pulse && (
+        <div className={`h-2 w-2 rounded-full mr-2 ${c.text.replace('text-', 'bg-')} animate-pulse`} />
+      )}
+      {c.label}
+    </Badge>
   );
 }
 

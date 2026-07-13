@@ -3,7 +3,7 @@
  * About page — Chapter IV: Press Room.
  *
  * Newspaper-style 2-column grid: each feature is a column-of-type with a
- * masthead, date stamp, italic headline, short Cormorant excerpt, and a
+ * masthead, date stamp, italic headline, short Hanken Grotesk excerpt, and a
  * monospace "READ →" link. No card chrome — rules between columns/rows.
  * The Blox YouTube embed renders above the grid as a letterboxed module.
  *
