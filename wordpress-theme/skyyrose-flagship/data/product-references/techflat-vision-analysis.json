@@ -1,0 +1,158 @@
+{
+  "lh-002-techflat.jpeg": {
+    "garment_count": 1,
+    "layout": "lr",
+    "regions": [
+      {
+        "bbox": [
+          0.08,
+          0.02,
+          0.91,
+          0.43
+        ],
+        "garment": "hooded snap-front varsity jacket",
+        "colorway": "white body, black sleeves and hood, red and black striped trim",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.08,
+          0.45,
+          0.91,
+          0.84
+        ],
+        "garment": "hooded snap-front varsity jacket",
+        "colorway": "white body, black sleeves and hood, red and black striped trim",
+        "view": "back"
+      }
+    ]
+  },
+  "lh-003-techflat.jpeg": {
+    "garment_count": 2,
+    "layout": "lr",
+    "regions": [
+      {
+        "bbox": [
+          0.088,
+          0.101,
+          0.287,
+          0.896
+        ],
+        "garment": "sweatpants",
+        "colorway": "white with black side stripes and red graphic",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.575,
+          0.101,
+          0.774,
+          0.896
+        ],
+        "garment": "sweatpants",
+        "colorway": "black with white side stripes and red graphic",
+        "view": "front"
+      }
+    ]
+  },
+  "sg-007-techflat.jpeg": {
+    "garment_count": 4,
+    "layout": "other",
+    "regions": [
+      {
+        "bbox": [
+          0.378,
+          0.144,
+          0.528,
+          0.291
+        ],
+        "garment": "cuffed beanie",
+        "colorway": "black with purple rose embroidery",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.378,
+          0.327,
+          0.528,
+          0.474
+        ],
+        "garment": "cuffed beanie",
+        "colorway": "black with white rose embroidery",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.376,
+          0.514,
+          0.526,
+          0.663
+        ],
+        "garment": "cuffed beanie",
+        "colorway": "black with red rose embroidery",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.372,
+          0.714,
+          0.524,
+          0.862
+        ],
+        "garment": "cuffed beanie",
+        "colorway": "black with two red roses embroidery",
+        "view": "front"
+      }
+    ]
+  },
+  "sg-013-mint-lavender-crewneck-set-techflat.jpeg": {
+    "garment_count": 2,
+    "layout": "grid_2x2",
+    "regions": [
+      {
+        "bbox": [
+          0.128,
+          0.025,
+          0.486,
+          0.395
+        ],
+        "garment": "crewneck sweatshirt",
+        "colorway": "mint green with purple floral graphic",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.513,
+          0.028,
+          0.871,
+          0.396
+        ],
+        "garment": "crewneck sweatshirt",
+        "colorway": "mint green with small purple floral graphic",
+        "view": "back"
+      },
+      {
+        "bbox": [
+          0.201,
+          0.442,
+          0.46,
+          0.98
+        ],
+        "garment": "sweatpants",
+        "colorway": "mint green with purple floral graphic",
+        "view": "front"
+      },
+      {
+        "bbox": [
+          0.547,
+          0.442,
+          0.806,
+          0.978
+        ],
+        "garment": "sweatpants",
+        "colorway": "mint green",
+        "view": "back"
+      }
+    ]
+  }
+}
