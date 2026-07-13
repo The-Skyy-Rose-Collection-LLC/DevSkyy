@@ -30,6 +30,8 @@
   ],
   "exclude": [
     "node_modules",
-    "../dist"
+    "../dist",
+    "**/__mocks__/**",
+    "**/__tests__/**"
   ]
 }

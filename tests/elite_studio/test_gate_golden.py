@@ -8,6 +8,10 @@ reject branches, or the verdict shape.
 
 Oracle: clip_embedder.cosine_similarity is `float(np.dot(a, b))` for L2-normalized
 inputs, so `float(np.dot(e, c))` is an independent (non-circular) expected value.
+
+Note: a real temp file is passed (not a bare "ignored.png") because evaluate()
+now fails closed on a missing path (Phase 1 / P-existcheck) — the encoder is
+still mocked, so the path's contents are irrelevant.
 """
 
 from __future__ import annotations
@@ -37,40 +41,46 @@ def _centroid(threshold: float) -> BrandCentroid:
     )
 
 
-def test_gate_score_equals_cosine_oracle(monkeypatch) -> None:
+def _real_image(tmp_path) -> str:
+    img = tmp_path / "render.png"
+    img.write_bytes(b"x")  # contents irrelevant — embed_image is monkeypatched
+    return str(img)
+
+
+def test_gate_score_equals_cosine_oracle(monkeypatch, tmp_path) -> None:
     e = _unit_vec(11)
     monkeypatch.setattr(clip_embedder, "embed_image", lambda *_a, **_kw: e)
 
-    verdict = embedding_gate.evaluate("ignored.png", _centroid(threshold=0.0))
+    verdict = embedding_gate.evaluate(_real_image(tmp_path), _centroid(threshold=0.0))
 
     expected = float(np.dot(e, _unit_vec(7)))
     assert verdict.score == pytest.approx(expected, abs=1e-6)
     assert isinstance(verdict, embedding_gate.GateVerdict)
 
 
-def test_gate_accepts_at_or_above_threshold(monkeypatch) -> None:
+def test_gate_accepts_at_or_above_threshold(monkeypatch, tmp_path) -> None:
     e = _unit_vec(11)
     monkeypatch.setattr(clip_embedder, "embed_image", lambda *_a, **_kw: e)
     expected = float(np.dot(e, _unit_vec(7)))
 
-    verdict = embedding_gate.evaluate("ignored.png", _centroid(threshold=expected - 0.01))
+    verdict = embedding_gate.evaluate(_real_image(tmp_path), _centroid(threshold=expected - 0.01))
 
     assert verdict.accepted is True
     assert "on-brand" in verdict.reason.lower()
 
 
-def test_gate_rejects_below_threshold(monkeypatch) -> None:
+def test_gate_rejects_below_threshold(monkeypatch, tmp_path) -> None:
     e = _unit_vec(11)
     monkeypatch.setattr(clip_embedder, "embed_image", lambda *_a, **_kw: e)
     expected = float(np.dot(e, _unit_vec(7)))
 
-    verdict = embedding_gate.evaluate("ignored.png", _centroid(threshold=expected + 0.01))
+    verdict = embedding_gate.evaluate(_real_image(tmp_path), _centroid(threshold=expected + 0.01))
 
     assert verdict.accepted is False
     assert "below brand threshold" in verdict.reason.lower()
 
 
-def test_gate_dispatches_dino_by_model_id(monkeypatch) -> None:
+def test_gate_dispatches_dino_by_model_id(monkeypatch, tmp_path) -> None:
     """E-encoder-gate: a model_id containing 'dino' routes to dino_embedder, not clip."""
     from skyyrose.core import clip_embedder as clip_mod
     from skyyrose.core import dino_embedder as dino_mod
@@ -95,7 +105,7 @@ def test_gate_dispatches_dino_by_model_id(monkeypatch) -> None:
         sample_count=10,
         model_id="facebook/dinov2-base",
     )
-    verdict = embedding_gate.evaluate("ignored.png", centroid)
+    verdict = embedding_gate.evaluate(_real_image(tmp_path), centroid)
 
     assert called["dino"] is True
     assert called["clip"] is False
