@@ -658,6 +658,7 @@ export default function AssetsPage() {
                     <Button
                       size="sm"
                       variant="outline"
+                      aria-label="Approve asset"
                       className="border-emerald-700 text-emerald-400 hover:text-emerald-300"
                       onClick={() => handleApproveBrandAsset(asset.id)}
                       disabled={brandAssetActionId === asset.id}
@@ -671,6 +672,7 @@ export default function AssetsPage() {
                     <Button
                       size="sm"
                       variant="outline"
+                      aria-label="Reject asset"
                       className="border-red-700 text-red-400 hover:text-red-300"
                       onClick={() => handleRejectBrandAsset(asset.id)}
                       disabled={brandAssetActionId === asset.id}
