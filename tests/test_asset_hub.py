@@ -18,13 +18,15 @@ import pytest
 
 import skyyrose.core.asset_hub as hub
 
-# The hub manifest lives under the gitignored ``assets/hub/`` tree, so an env without it
-# (fresh checkout / CI) has no live manifest to assert the contract against. Skip the whole
-# module there rather than fail — ``asset_hub`` itself degrades to an empty manifest, which
-# is verified in ``tests/test_asset_hub_degrade.py`` (always runs, manifest or not).
-pytestmark = pytest.mark.skipif(
-    not hub._MANIFEST_PATH.exists(),
-    reason="hub manifest absent (assets/hub/ is gitignored) — nothing to assert against",
+# FAIL-CLOSED (bug-230): the manifest itself is GIT-TRACKED (only the image blobs
+# under assets/hub/ are gitignored), so a missing manifest is a checkout/path
+# regression that must FAIL loud — test_hub_dir_contains_manifest and every
+# manifest() test below do exactly that. Only the tests that touch the actual
+# blob FILES (absent on a fresh checkout / CI) skip, individually, via this marker.
+_HUB_BLOBS_PRESENT = (hub.HUB_DIR / "collections").is_dir()
+requires_hub_blobs = pytest.mark.skipif(
+    not _HUB_BLOBS_PRESENT,
+    reason="hub image blobs absent (gitignored; fresh checkout / CI) — disk assertions n/a",
 )
 
 
@@ -133,6 +135,7 @@ def test_refresh_clears_cache():
 # ---------------------------------------------------------------------------
 
 
+@requires_hub_blobs
 def test_resolve_all_verified_with_path_resolve_and_exist():
     """CONTRACT: every CANONICAL ('<sku>-<face>') verified entry with a non-null
     path resolves to exactly that path, and the file exists under HUB_DIR. Data-
@@ -323,6 +326,7 @@ def test_verify_integrity_null_path_problems_mention_null():
         assert "null" in p or "does not exist" in p
 
 
+@requires_hub_blobs
 def test_verify_integrity_all_with_paths_exist_on_disk():
     """Verified entries that DO have paths must all exist on disk (zero missing-file
     problems in the current manifest).

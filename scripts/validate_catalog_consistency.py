@@ -37,6 +37,7 @@ Available check names (pass comma-separated to --checks):
   collection_sot_current  collections/<slug>/sot.json equal fresh build-collection-sot.py output
   no_hardcoded_product_images  Fail if any template hardcodes an /images/products/... path literal
   csv_image_columns_resolve  every non-empty value in the 4 CSV image columns resolves to a file
+  product_embeddings_current  product-embeddings.json covers the current catalog SKU set (dim=512)
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
@@ -1049,6 +1050,54 @@ def check_csv_image_columns_resolve() -> CheckResult:
     return _ok(name, f"All {checked} non-empty CSV image-column values resolve to real files")
 
 
+def check_product_embeddings_current() -> CheckResult:
+    """Verify product-embeddings.json covers the current catalog SKU set.
+
+    Freshness guard for the CLIP embedding artifact consumed by
+    ``catalog_ml_audit.py`` / ``build_product_similarities.py`` /
+    ``check_catalog_duplicates.py`` (all hardcode this path). Compares SKU
+    coverage + declared model/dim — NOT vector values — so it needs no CLIP
+    model at validation time. A catalog SKU add/remove without a regen
+    (``scripts/generate_product_embeddings.py``) fails here instead of
+    silently serving stale vectors (mirror of the sot_images_current pattern).
+    """
+    name = "product_embeddings_current"
+    emb_path = _REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/product-embeddings.json"
+    rows = _load_csv()
+    if rows is None:
+        return _fail(name, "Cannot check embeddings — CSV not readable")
+    if not emb_path.is_file():
+        return _fail(
+            name,
+            f"embeddings file missing: {emb_path} — run scripts/generate_product_embeddings.py",
+        )
+    try:
+        emb = json.loads(emb_path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        return _fail(name, f"embeddings file unreadable: {exc}")
+    products = emb.get("products")
+    if not isinstance(products, dict):
+        return _fail(name, "embeddings 'products' must be a dict keyed by SKU")
+    catalog = {row["sku"] for row in rows}
+    have = set(products.keys())
+    problems: list[str] = []
+    missing = sorted(catalog - have)
+    phantom = sorted(have - catalog)
+    if missing:
+        problems.append(f"  catalog SKUs missing from embeddings: {missing}")
+    if phantom:
+        problems.append(f"  phantom SKUs in embeddings (not in catalog): {phantom}")
+    if emb.get("dim") != 512:
+        problems.append(f"  dim={emb.get('dim')!r}, expected 512 (CLIP)")
+    if problems:
+        return _fail(
+            name,
+            "product-embeddings.json is stale vs the catalog — run scripts/generate_product_embeddings.py",
+            problems,
+        )
+    return _ok(name, f"embeddings cover all {len(catalog)} catalog SKUs (dim=512, no phantoms)")
+
+
 # ---------------------------------------------------------------------------
 # Check registry
 # ---------------------------------------------------------------------------
@@ -1078,6 +1127,7 @@ ALL_CHECKS: dict[str, Any] = {
     "collection_sot_current": check_collection_sot_current,
     "no_hardcoded_product_images": check_no_hardcoded_product_images,
     "csv_image_columns_resolve": check_csv_image_columns_resolve,
+    "product_embeddings_current": check_product_embeddings_current,
 }
 
 # Checks that must pass before others can meaningfully run
