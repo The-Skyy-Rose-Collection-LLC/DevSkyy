@@ -94,6 +94,10 @@ dependencies = [
     # litellm 1.81+ requires openai>=2.8, but this codebase runs on the openai 1.x
     # client (verified green). 1.80.0 needs only openai>=1.99.5. Lifting this cap is
     # part of the deliberate openai 2.x migration, not a routine bump (bug-254).
+    # SECURITY: 1.80.x carries 7 GHSA advisories (fixed 1.84.0) — ALL scoped to
+    # litellm.proxy, which this repo neither installs ([proxy] extra) nor runs; usage
+    # is SDK-only (acompletion/completion_cost), so unreachable here. The 2.x migration
+    # MUST target litellm>=1.84.0 (not just >=1.81) to clear them in the same step.
     "litellm>=1.80,<1.81",
 
     # Monitoring

@@ -4127,15 +4127,17 @@
     "error_message": "pip check: litellm 1.83.7 requires openai==2.30.0 and python-dotenv==1.0.1, but env has openai 1.109.1 / python-dotenv 1.2.2. Surfaced installing .[all].",
     "file": "pyproject.toml + llm/providers/litellm_provider.py",
     "root_cause": "litellm is imported by llm/providers/litellm_provider.py but NOT declared in pyproject.toml (any group). Installed litellm 1.83.7 pins openai==2.30.0, conflicting with the project's openai<2 cap (via langchain-openai / llama-index-llms-openai). Pre-existing; not in the .[all] install delta.",
-    "fix": "RESOLVED (holding fix, openai 1.x preserved): (1) declared the previously-UNDECLARED litellm as `litellm>=1.80,<1.81` in pyproject base deps \u2014 1.80.x is the last litellm line admitting openai 1.x (1.81+ requires openai>=2.8); (2) capped `openai>=1.6,<2` (base) and `openai>=1.57.2,<2` (mcp group) so the resolver can't silently drift to openai 2.x. Env reconciled to openai 1.109.1 + litellm 1.80.0; `pip check` clean; llm/litellm-provider tests green. NOTE: openai 2.x IS API-compatible for our usage (Context7-verified: chat.completions/images.generate/images.edit/AsyncOpenAI unchanged in v2; 486 mocked openai-touching tests passed on openai 2.45.0) BUT the live paid gpt-image-2 pipeline was not exercised \u2014 so the openai 2.x migration is deferred as a deliberate founder-gated task (lift the two <2 caps + the litellm <1.81 cap together, then live-verify imagery). Rationale documented inline at both cap sites.",
+    "fix": "RESOLVED (holding fix, openai 1.x preserved): (1) declared the previously-UNDECLARED litellm as `litellm>=1.80,<1.81` in pyproject base deps \u2014 1.80.x is the last litellm line admitting openai 1.x (1.81+ requires openai>=2.8); (2) capped `openai>=1.6,<2` (base) and `openai>=1.57.2,<2` (mcp group) so the resolver can't silently drift to openai 2.x. Env reconciled to openai 1.109.1 + litellm 1.80.0; `pip check` clean; llm/litellm-provider tests green. NOTE: openai 2.x IS API-compatible for our usage (Context7-verified: chat.completions/images.generate/images.edit/AsyncOpenAI unchanged in v2; 486 mocked openai-touching tests passed on openai 2.45.0) BUT the live paid gpt-image-2 pipeline was not exercised \u2014 so the openai 2.x migration is deferred as a deliberate founder-gated task (lift the two <2 caps + the litellm <1.81 cap together, then live-verify imagery). Rationale documented inline at both cap sites. SECURITY (code-review): litellm 1.80.x sits inside 7 GHSA advisories (fixed 1.84.0), ALL scoped to litellm.proxy \u2014 unreachable here (SDK-only acompletion/completion_cost, no [proxy] extra installed/run). The openai 2.x migration MUST target litellm>=1.84.0 (not just >=1.81) to clear the CVE range in the same step; pin comment updated at pyproject.toml.",
     "tags": [
+      "cve-context",
       "dependency",
       "litellm",
+      "litellm-proxy-unreachable",
       "openai",
+      "openai-2x-migration-deferred",
       "pip-check",
-      "undeclared-dep",
       "resolved",
-      "openai-2x-migration-deferred"
+      "undeclared-dep"
     ],
     "related_bugs": [],
     "occurrences": 1,
