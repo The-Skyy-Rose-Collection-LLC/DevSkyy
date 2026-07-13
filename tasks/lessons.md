@@ -158,3 +158,8 @@ if unexplained modified files exist, assume a parallel session owns them.
 - Deployed 4 times, each fixing one bug found after the previous deploy. Founder: "stop bullshitting my token usage."
 - Rule (matches CLAUDE.md "deploy ONCE"): build the local prod-mirror FIRST, assert the full user-visible chain (not just HTTP/markup — computed styles, viewport geometry, pageerror channel, resource fetches), loop to ALL-PASS, then one deploy + one live re-verify.
 - Corollary: "deploy verified live" from the deploy script ≠ feature works — its checks are structural, not behavioral.
+
+## 2026-07-12 — Never act on a stale PR audit; verify live `state` first
+**Pattern:** Resumed from a compacted prior-session PR audit and treated its "open PR" list as current. Spent a full conflict-resolution pass on #672 — which was already **CLOSED** — and nearly dispatched agents for #684/#686/#689, all already **MERGED**.
+**Root cause:** (1) stale cross-session data used without re-checking; (2) `gh pr view <n> --json mergeable` returns `UNKNOWN` for merged/closed PRs *and* for uncomputed-open PRs — indistinguishable without the `state` field, which I never queried.
+**Rule:** Before acting on any multi-PR plan, `gh pr list --state open` for the authoritative open set. Never infer open/closed from `mergeable`. Any single-PR read includes `state` + `mergedAt`. `git merge-tree` showing 0 conflicts vs main can mean "already merged," not "clean to merge."
