@@ -83,6 +83,7 @@ npm run verify                       # full verification
 
 **AI-driven luxury fashion e-commerce platform (SkyyRose brand)**
 Python 3.11+ · FastAPI · Next.js · WordPress/WooCommerce · Three.js
+Production surfaces: **skyyrose.co** (WP storefront) · **devskyy.app** (agent dashboard, Vercel) · **api.devskyy.app** (FastAPI on Fly)
 
 **Dependency flow:** `core → security → database/llm → orchestration/services → agents → api`
 
@@ -193,7 +194,7 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 
 - Tagline: "Luxury Grows from Concrete."
 - Collections: Signature, Black Rose, Love Hurts, Kids Capsule
-- Fonts: **Archivo** (display/hero — expanded via `font-variation-settings 'wdth' 125`), **Hanken Grotesk** (body/UI), **Anton** (drop/UI accent), **Cinzel** (engraved caps). Per-collection scripts: **Pacifico** (BR), **Pinyon Script** (SIG), **Grand Hotel** (KC), **Kaushan Script** (LH — interim; custom graffiti face from lockup pending). **Inter** = system fallback.
+- Fonts: **Archivo** (display/hero — expanded via `font-variation-settings 'wdth' 125`), **Hanken Grotesk** (body/UI), **Anton** (drop/UI accent), **Cinzel** (engraved caps). Per-collection scripts: **SkyyRose Black Rose Script** (BR — bespoke, replaced Pacifico 2026-07-11), **SkyyRose Love Hurts Graffiti** (LH — bespoke, replaced Kaushan 2026-07-11), **Pinyon Script** (SIG — kept; bespoke candidate built + rejected), **Grand Hotel** (KC). **Inter** = system fallback.
 - Cut 2026-07-10: Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail (do NOT reintroduce — not in any brand lockup; they pulled toward the European-serif lineage the founder locked out). Self-hosted woff2, zero CDN, declared in `theme.json` Font Library + `assets/css/fonts.css`; the `--skyyrose-font-*` vars are generated from `data/brand/typography.json` via `gen-design-tokens.py`.
 
 ---
@@ -207,6 +208,8 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 | Frontend | `cd frontend && npm run deploy` | `vercel.json` |
 | API | `docker compose up -d` | `docker-compose.yml` |
 | HF Spaces | `bash scripts/deploy_hf_spaces.sh` | `.env` |
+
+> **Theme deploy = atomic hot-swap; the source tree must be COMPLETE.** 17 functional live assets are gitignored and exist in no commit — deploying from a clean checkout/worktree/CI deletes them from production (BR/LH emblems, mascot png, avatar refs, scene backdrops). Rider manifest + census method: `docs/engineering-learnings.md` → "Deploy-source completeness" (bug-252).
 
 ---
 
