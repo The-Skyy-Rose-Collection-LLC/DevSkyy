@@ -502,3 +502,21 @@ Branch: feat/love-hurts-girl-web (off origin/main) · Source: mascot-worktree re
 - [ ] C2 npm run build (.min) + SKYYROSE_VERSION bump · verify: .min contains new module
 - [ ] D1 php -l + prod-mirror Playwright battery (canvas, glb fetch, no pageerrors, reduced-motion skip, mobile+desktop)
 - [ ] D2 commit + PR
+
+## DEPLOY HANDOFF — founder deploying via his newer-version pipeline (2026-07-13)
+
+Context: v1.10.4 deploy fully prepared (source pinned + verified) then handed to founder's own newer-version deploy. Live = **1.10.3 with signature-emblem.webp 404**.
+
+Pre-deploy checklist for ANY deploy source (else production regresses):
+- [ ] Source contains the **17 gitignored live riders** — manifest in `docs/engineering-learnings.md` → "Deploy-source completeness" (hot-swap deletes whatever the source lacks: BR/LH emblems, mascot png, avatar refs, 6 scene backdrops, br-008 jpg, techflat JSONs)
+- [ ] Source contains `assets/images/emblems/signature-emblem.webp` (tracked since `700d43178`; deploying it FIXES the live 404)
+- [ ] Version triple synced: `style.css` / `functions.php` / `readme.txt`
+- Ready-made source if useful: `.claude/worktrees/deploy-v1104` = `origin/main @ 9aaa88a52` (v1.10.4) + riders overlaid, triple-verified
+
+Post-deploy verify matrix:
+- [ ] Live `style.css` Version = deployed version (cache-busted curl)
+- [ ] Signature emblem 200 + visible on `/collections/signature/` hero
+- [ ] Signature founder pull-quote renders; Black Rose quote byte-unchanged
+- [ ] `.exp-name` renders bespoke scripts; both new woff2 200 (`skyyrose-black-rose-script-latin`, `skyyrose-love-hurts-graffiti-latin`)
+- [ ] BR/LH emblems still 200 · KC teaser hero visible · homepage hero un-clipped @1440px · cart shell present
+- [ ] Playwright eyes-on mobile + desktop, console clean

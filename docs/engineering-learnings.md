@@ -146,3 +146,22 @@
 - **Census against `git ls-files` / `git cat-file -e HEAD:<path>`, never `ls`.** Guard now permanent: `tests/test_sot_assets_tracked.py` sweeps data/sot-images.json + all collection sot.json + the catalog CSV and fails on any referenced-but-untracked image.
 - **Parametrizing a deploy script's source requires parametrizing its destination.** `deploy-mu-plugin.sh` gained `MU_SRC` but kept a hardcoded SCP dest — deploying plugin B would silently overwrite plugin A on production (bug-174). Derive dest from `basename "$SRC"`.
 - **SOT regen must use the default `--updated GENERATED` stamp** — the guard test byte-compares against default generator output; a date stamp breaks determinism by design.
+
+## Deploy-source completeness — gitignored live riders (2026-07-13)
+
+- **The live theme dir contains 17 functional assets that exist in NO git commit** — blanket-gitignored binaries that have ridden along on every deploy from the primary checkout's working tree (`deploy-theme.sh` is git-unaware; it tars the directory on disk). The hot-swap replaces the remote dir wholesale, so **any deploy from a clean checkout / fresh worktree / CI deletes them from production** (BR/LH hero emblems vanish via `page.php`'s `file_exists` gate; mascot/avatar/scene refs 404). Overlay them into the deploy source first, or `git add -f` them (preferred, per the 2026-07-07 rule above).
+- **Rider manifest (verified against the live server listing, 2026-07-13):**
+  - `assets/images/emblems/black-rose-emblem.png` + `.webp`
+  - `assets/images/emblems/love-hurts-emblem.png` + `.webp`
+  - `assets/images/mascot/skyy-canonical-v2.png`
+  - `assets/images/avatar/skyy-rose-reference.avif` + `.jpeg` + `.webp`
+  - `assets/scenes/black-rose/black-rose-rooftop-garden-lookbook.webp` + `-v2-avatar.webp`
+  - `assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber-lookbook.webp` + `-v2-avatar.webp`
+  - `assets/scenes/signature/signature-golden-gate-showroom-lookbook.webp` + `-v2-avatar.webp`
+  - `assets/images/products/br-008-front-only.jpg`
+  - `data/product-references/techflat-review.json` + `techflat-vision-analysis.json`
+- **Proof this bites:** live 1.10.3 was deployed from a source missing the *tracked* `signature-emblem.webp` (committed `700d43178`) → Signature emblem 404 on production, while the *ignored* BR/LH emblems stayed 200 (they were on the deploying tree's disk). "Committed" and "on the deploy tree" are independent axes — a complete deploy source needs both checked.
+- **Exact census method (read-only):** `ssh <deploy creds> "find $WP_THEME_PATH -type f"` vs `(cd $THEME_DIR && find . -type f | sed 's|^\./||' | sort)`, then `comm -23`. The 2026-07-13 diff: 100 live-only files = 17 functional riders + 83 junk (~40 `CLAUDE.local.md`, `._*` AppleDouble forks, `__pycache__`, lock/cache files). The junk SHOULD fall off on the next deploy — the ~40 `CLAUDE.local.md` are internal agent instructions sitting on a public webserver.
+- **Tar-exclude gap:** `--exclude='CLAUDE.md'` does NOT match `CLAUDE.local.md` — that is how they shipped. Add `--exclude='CLAUDE.local.md'` (and consider `._*`, `__pycache__`) to `tar_excludes` in `scripts/deploy-theme.sh`.
+- **Byte-size = identity spot-check:** live emblem sizes (35,996 / 39,686 B) matched the primary-checkout files exactly — confirm provenance this way before overlaying.
+- **Staged deploy-ready source for v1.10.4:** worktree `.claude/worktrees/deploy-v1104` = clean `origin/main @ 9aaa88a52` (triple-verified 1.10.4, 1734 tracked files) + the 17 riders already overlaid.
