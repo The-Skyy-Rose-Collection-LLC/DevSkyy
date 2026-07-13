@@ -4100,5 +4100,25 @@
     ],
     "occurrences": 2,
     "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-253",
+    "timestamp": "2026-07-13",
+    "error_message": "security/aes256_gcm_encryption.py _initialize_master_key() fails OPEN: with ENCRYPTION_MASTER_KEY unset it always generated an ephemeral key + warning, even in production \u2014 silently making every previously-encrypted value unrecoverable on the next restart.",
+    "file": "security/aes256_gcm_encryption.py",
+    "root_cause": "The missing-key else-branch had no ENVIRONMENT=production guard, unlike JWT's _require_secret() which raises in production. A gate that passes when its input is absent (bug-230 fail-open pattern). Surfaced while investigating the ephemeral-key warnings in the test suite.",
+    "fix": "Added `elif os.getenv('ENVIRONMENT','').lower() == 'production': raise EncryptionError(...)` before the ephemeral fallback, mirroring JWT. Dev/test still get an ephemeral key + warning; production now refuses to start without the key. Regression tests test_missing_key_in_production_fails_closed / test_missing_key_in_dev_uses_ephemeral added to tests/test_security.py (mutation-verified: with the guard disabled the production test fails 'DID NOT RAISE'). Also set deterministic test secrets in tests/conftest.py (setdefault) so the suite is hermetic and no longer logs the warnings.",
+    "tags": [
+      "security",
+      "fail-open",
+      "bug-230-pattern",
+      "encryption",
+      "fail-closed"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
   }
 ]

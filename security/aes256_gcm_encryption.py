@@ -233,6 +233,14 @@ class AESGCMEncryption:
             except Exception as e:
                 logger.error(f"Invalid master key format: {e}")
                 raise EncryptionError("Invalid ENCRYPTION_MASTER_KEY format") from e
+        elif os.getenv("ENVIRONMENT", "").lower() == "production":
+            # Fail closed in production: an ephemeral key would silently render
+            # every previously-encrypted value unrecoverable on the next restart.
+            # Mirrors JWT's _require_secret() production guard.
+            raise EncryptionError(
+                "CRITICAL: ENCRYPTION_MASTER_KEY is not set. "
+                "Set ENCRYPTION_MASTER_KEY before starting the application in production."
+            )
         else:
             logger.warning(
                 "ENCRYPTION_MASTER_KEY not set. "

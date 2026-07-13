@@ -11,6 +11,7 @@ from security.aes256_gcm_encryption import (
     AESGCMEncryption,
     DataMasker,
     DecryptionError,
+    EncryptionError,
     FieldEncryption,
 )
 from security.jwt_oauth2_auth import (
@@ -27,6 +28,24 @@ from security.rate_limiting import RATE_LIMIT_TIERS, AdvancedRateLimiter
 
 class TestAESGCMEncryption:
     """Test AES-256-GCM encryption."""
+
+    def test_missing_key_in_production_fails_closed(self, monkeypatch):
+        """No ENCRYPTION_MASTER_KEY in production must REFUSE to start.
+
+        An ephemeral fallback in production silently makes every previously
+        encrypted value unrecoverable on the next restart (bug-230 fail-open).
+        """
+        monkeypatch.delenv("ENCRYPTION_MASTER_KEY", raising=False)
+        monkeypatch.setenv("ENVIRONMENT", "production")
+        with pytest.raises(EncryptionError, match="ENCRYPTION_MASTER_KEY is not set"):
+            AESGCMEncryption()
+
+    def test_missing_key_in_dev_uses_ephemeral(self, monkeypatch):
+        """Outside production, a missing key still yields a working ephemeral cipher."""
+        monkeypatch.delenv("ENCRYPTION_MASTER_KEY", raising=False)
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        enc = AESGCMEncryption()  # must not raise
+        assert enc.decrypt_to_string(enc.encrypt("ok")) == "ok"
 
     def test_encrypt_decrypt_string(self):
         """Should encrypt and decrypt string."""
