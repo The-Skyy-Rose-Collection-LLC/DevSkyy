@@ -1,6 +1,6 @@
 # SkyyRose Suite — Hardening Skills
 
-16 skills added to strengthen the suite and close gaps that map directly to this
+17 skills added to strengthen the suite and close gaps that map directly to this
 project's recurring buglog patterns and hard-won lessons. Skills **auto-discover** from
 each plugin's `skills/` dir. Every new skill follows one standard so the team produces
 production-quality work in any prompt scheme:
@@ -31,6 +31,7 @@ production-quality work in any prompt scheme:
 | `memory-system` | read OpenWolf + claude-mem before acting, write lessons after |
 | `self-learning` | every correction/fix → durable cerebrum + buglog entry |
 | `boris-mind` | parallelize (worktrees/subagents), plan-first, verify-always posture |
+| `source-of-truth` | resolve product/imagery/brand facts from SOT.md canon, never memory (lh-005) |
 | `adversarial-planning` | imported — a different model (Codex) challenges the plan first |
 
 ### skyyrose-design — design & storefront
