@@ -5,6 +5,7 @@ FastAPI endpoints for WordPress/WooCommerce integration.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import logging
@@ -18,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from integrations.wordpress_com_client import create_wordpress_client
 from integrations.wordpress_product_sync import SkyyRoseProduct, WordPressProductSync
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 router = APIRouter(prefix="/wordpress", tags=["wordpress"])
 
@@ -82,12 +84,17 @@ def verify_webhook_signature(
     Returns:
         True if signature valid
     """
+    if not secret:
+        # Fail closed: an unset WC_WEBHOOK_SECRET makes the HMAC forgeable with
+        # an empty key, so reject every webhook rather than trust it (bug-230).
+        return False
     expected = hmac.new(
         secret.encode(),
         payload,
         hashlib.sha256,
     ).digest()
-    expected_b64 = expected.hex()
+    # WooCommerce sends X-WC-Webhook-Signature base64-encoded, not hex.
+    expected_b64 = base64.b64encode(expected).decode()
     return hmac.compare_digest(expected_b64, signature)
 
 
@@ -129,6 +136,7 @@ async def verify_webhook(
 async def sync_product(
     product: SkyyRoseProduct,
     settings: WordPressSettings = Depends(get_settings),
+    _current_user: TokenPayload = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Sync single product to WooCommerce.
 
@@ -157,6 +165,7 @@ async def sync_collection(
     collection: str,
     products: list[SkyyRoseProduct],
     settings: WordPressSettings = Depends(get_settings),
+    _current_user: TokenPayload = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Sync all products in a collection.
 

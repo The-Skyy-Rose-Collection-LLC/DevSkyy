@@ -48,7 +48,13 @@ def _get_api_key_dependency():
     async def _check_api_key(x_api_key: str | None = Header(default=None, alias="X-API-Key")):
         expected = os.getenv("API_KEY", "")
         if not expected:
-            return None
+            # Fail closed outside dev — a missing API_KEY must not allow through.
+            if os.getenv("ENVIRONMENT", "").lower() in ("development", "dev", "local", "test"):
+                return None
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="API_KEY not configured",
+            )
         if x_api_key != expected:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

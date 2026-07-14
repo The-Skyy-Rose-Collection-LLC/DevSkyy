@@ -394,7 +394,10 @@ async def wp_create_page(args: dict[str, Any]) -> dict[str, Any]:
         title = args.get("title", "")
         slug = args.get("slug", "")
         content = args.get("content", "")
-        status = args.get("status", "draft")
+        # Clamp to draft — the autonomous agent must never publish arbitrary
+        # (possibly prompt-injected) HTML/JS live. Publishing is a separate,
+        # human-gated step, not something the SDK loop can trigger.
+        status = "draft"
 
         if not title or not slug:
             raise ValueError("'title' and 'slug' are required")

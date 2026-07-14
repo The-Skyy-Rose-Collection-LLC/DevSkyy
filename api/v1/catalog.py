@@ -37,11 +37,12 @@ from collections import OrderedDict
 from collections.abc import AsyncIterator
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from orchestration.catalog_retriever import CatalogAnswer, CatalogMatch, CatalogRetriever
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/catalog", tags=["Catalog"])
@@ -635,7 +636,9 @@ async def cache_stats() -> CacheStatsResponse:
 
 
 @router.post("/cache/clear")
-async def cache_clear() -> dict[str, str]:
+async def cache_clear(
+    _current_user: TokenPayload = Depends(get_current_user),
+) -> dict[str, str]:
     """Drop all cached /answer responses. Use after re-indexing the catalog
     so stale answers don't linger past their TTL."""
     await _get_answer_cache().clear()

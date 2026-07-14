@@ -17,11 +17,17 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+
+from security.jwt_oauth2_auth import RoleChecker, UserRole
 
 router = APIRouter(prefix="/claude-sdk", tags=["Claude Agent SDK"])
 
 logger = logging.getLogger(__name__)
+
+# Operator-only tooling — every route here can execute code, orchestrate agents,
+# or trigger production deploys/rollbacks. Gate the entire router behind ADMIN.
+require_admin = RoleChecker([UserRole.ADMIN])
 
 
 # ------------------------------------------------------------------
@@ -34,6 +40,7 @@ async def trigger_research(
     topic: str,
     subtopics: list[str] | None = None,
     model: str = "haiku",
+    _current_user: dict = Depends(require_admin),
 ):
     """Trigger a multi-agent research pipeline.
 
@@ -75,6 +82,7 @@ async def triage_email(
     mailbox: str = "INBOX",
     limit: int = 10,
     unread_only: bool = True,
+    _current_user: dict = Depends(require_admin),
 ):
     """Triage emails from IMAP with AI classification.
 
@@ -120,6 +128,7 @@ async def handle_excel(
     description: str,
     input_file: str | None = None,
     output_filename: str | None = None,
+    _current_user: dict = Depends(require_admin),
 ):
     """Create or analyze Excel spreadsheets with AI.
 
@@ -175,6 +184,7 @@ async def manage_session(
     session_id: str | None = None,
     model: str = "sonnet",
     system_prompt: str | None = None,
+    _current_user: dict = Depends(require_admin),
 ):
     """Create, resume, or execute one-shot V2 sessions.
 
@@ -248,6 +258,7 @@ async def manage_session(
 async def execute_dashboard_actions(
     actions: list[dict],
     parallel: bool = True,
+    _current_user: dict = Depends(require_admin),
 ):
     """Execute actions across SDK domain agents.
 
@@ -290,7 +301,7 @@ async def execute_dashboard_actions(
 
 
 @router.get("/dashboard/health")
-async def get_dashboard_health():
+async def get_dashboard_health(_current_user: dict = Depends(require_admin)):
     """Get health status of all registered SDK dashboard agents.
 
     Returns the list of all 27 SDK agents across 15 domains with
@@ -315,6 +326,7 @@ async def get_dashboard_health():
 @router.get("/dashboard/agents")
 async def list_dashboard_agents(
     domain: str | None = None,
+    _current_user: dict = Depends(require_admin),
 ):
     """List all registered SDK dashboard agents, optionally filtered by domain.
 
@@ -358,6 +370,7 @@ async def list_dashboard_agents(
 @router.post("/dashboard/find")
 async def find_agents_by_capability(
     capability: str,
+    _current_user: dict = Depends(require_admin),
 ):
     """Find SDK agents that have a specific capability.
 

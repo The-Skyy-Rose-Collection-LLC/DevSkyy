@@ -73,14 +73,18 @@ def handle_stripe_webhook(payload: bytes, signature: str) -> dict[str, Any]:
     try:
         if webhook_secret:
             event = stripe_mod.Webhook.construct_event(payload, signature, webhook_secret)
-        else:
-            # Dev/test: parse without verification
+        elif os.getenv("ENVIRONMENT", "").lower() in ("development", "dev", "local", "test"):
+            # Dev/test only: parse without verification.
             import json
 
             logger.warning(
                 "STRIPE_WEBHOOK_SECRET not set — skipping signature verification (dev mode)"
             )
             event = stripe_mod.Event.construct_from(json.loads(payload), stripe_mod.api_key)
+        else:
+            # Fail closed: never process an unverified Stripe webhook in prod.
+            logger.error("STRIPE_WEBHOOK_SECRET not set — rejecting unverified webhook")
+            return {"event": "signature_missing", "processed": False}
     except stripe_mod.error.SignatureVerificationError as exc:
         logger.error("Webhook signature verification failed: %s", exc)
         return {"event": "signature_invalid", "processed": False}

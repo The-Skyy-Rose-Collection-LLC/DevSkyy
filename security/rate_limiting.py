@@ -254,6 +254,23 @@ class AdvancedRateLimiter:
                 requests_per_hour=50,
                 burst_limit=10,
             ),
+            # Public, cost-bearing RAG Q&A (Voyage embed + Pinecone + Haiku).
+            # Tight per-endpoint cap so an anonymous caller can't run up LLM
+            # spend, but generous enough for real interactive shoppers.
+            "/api/v1/catalog/answer": RateLimitRule(
+                name="catalog_answer_endpoint",
+                limit_type=RateLimitType.ENDPOINT_BASED,
+                requests_per_minute=20,
+                requests_per_hour=300,
+                burst_limit=30,
+            ),
+            "/api/v1/catalog/answer/stream": RateLimitRule(
+                name="catalog_answer_stream_endpoint",
+                limit_type=RateLimitType.ENDPOINT_BASED,
+                requests_per_minute=20,
+                requests_per_hour=300,
+                burst_limit=30,
+            ),
         }
 
     def get_client_identifier(self, request: Request, limit_type: RateLimitType) -> str:

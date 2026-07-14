@@ -109,6 +109,12 @@ def client(fake_matches, monkeypatch):
 
     app = FastAPI()
     app.include_router(catalog_router, prefix="/api/v1")
+    # /answer, /answer/stream, and /cache/clear now require auth; override the
+    # dependency with a stub user so these tests exercise endpoint logic, not
+    # the 401 gate (the gate itself is covered by test_api_auth_hardening.py).
+    from security.jwt_oauth2_auth import get_current_user
+
+    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-user", "role": "admin"}
     return TestClient(app)
 
 

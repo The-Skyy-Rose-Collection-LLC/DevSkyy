@@ -23,7 +23,7 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from services.ml.visual_feature_extractor import (
     VisualFeatureExtractor,
     get_visual_feature_extractor,
@@ -35,6 +35,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import db_manager, get_db
 from database.models_brand_assets import BrandAssetRecord, IngestionJobRecord
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.ssrf_protection import SSRFProtection
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,16 @@ class BrandAssetUpload(BaseModel):
     url: str = Field(..., description="URL of image to ingest")
     category: BrandAssetCategory
     metadata: BrandAssetMetadata = Field(default_factory=BrandAssetMetadata)
+
+    @field_validator("url")
+    @classmethod
+    def _validate_url(cls, v: str) -> str:
+        # SSRF guard at the ingest boundary — block internal hosts / cloud
+        # metadata before any fetch (upload_to_r2 + visual feature extraction).
+        # Block-internal-only: brand assets legitimately come from many domains.
+        if v.startswith(("http://", "https://")):
+            SSRFProtection().validate_url(v)
+        return v
 
 
 class BulkIngestionRequest(BaseModel):
@@ -467,8 +478,13 @@ async def upload_to_r2(
 
         # Generate key and upload
         from pathlib import Path
+        from urllib.parse import urlparse
 
-        ext = Path(image_url).suffix or ".jpg"
+        # Allowlist the extension derived from the (attacker-influenced) URL so
+        # it can't inject path-like segments into the R2 object key.
+        ext = Path(urlparse(image_url).path).suffix.lower()
+        if ext not in (".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif"):
+            ext = ".jpg"
         key = f"brand/{category.value}/{asset_id}{ext}"
 
         result = r2_client.upload_bytes(
