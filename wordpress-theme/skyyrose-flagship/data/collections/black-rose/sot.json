@@ -44,14 +44,14 @@
   "lockup": {
     "canonical": "images/lockups/black-rose-lockup.webp",
     "display_webp": {
-      "path": "images/lockups/black-rose-lockup.webp",
+      "path": "images/lockups/black-rose-lockup",
       "resolved": "images/lockups/black-rose-lockup.webp",
       "kind": "collection-lockup-display",
       "status": "verified",
       "notes": "CANONICAL display lockup \u2014 high-detail silver \"The Black Rose Collection\" script + rose, transparent WebP, dark-ground ready. Use FIRST on web/homepage. Supersedes lockup_primary (br-brand-script-logotype = low-res source art, not for direct placement)."
     },
     "svg_master": {
-      "path": "branding/vectorized/black-rose-script.svg",
+      "path": "branding/vectorized/black-rose-script",
       "resolved": "branding/vectorized/black-rose-script.svg",
       "kind": "collection-lockup-vector",
       "status": "verified",

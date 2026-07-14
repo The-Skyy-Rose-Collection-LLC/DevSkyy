@@ -62,7 +62,8 @@ Color constants (`SKYYROSE_COLOR_ROSE_GOLD` / `_GOLD` / `_CRIMSON` / `_SILVER`) 
 - Clip contract: lowercase `idle`/`walk` required, `wave`/`point`/`talk`/`joy` optional. mascot.js emits `skyy:*` CustomEvents; skyy-3d.js maps them to clips by name.
 - Gate: `skyyrose_mascot_is_enabled()` (inc/mascot-config.php) — Customizer theme_mod `skyyrose_mascot_enabled`, **live by default**, but an explicit stored `false` in the DB overrides code defaults (bit us on first deploy).
 - Mounts ONLY via footer.php (front-page.php uses `get_footer()`); checkout excluded.
-- `window.SKYY_3D_CONFIG` is optional — nothing emits it; loader uses hardcoded theme-path fallbacks.
+- `window.SKYY_3D_CONFIG` IS emitted by `inc/enqueue.php` (~447) whenever a GLB URL resolves (`modelUrl` + `walkSide`); the hardcoded theme-path fallbacks in skyy-3d.js only cover the localize-missing edge case.
+- **Mascot body v7 = the Love Hurts Girl** (2026-07-12, founder-directed): `assets/models/skyy.glb` now carries the in-house-rigged girl (25-joint rig, geodesic-capsule skin weights, hand-authored walk + breathing idle; source rig in the mascot worktree / PR #736). Clips shipped: `idle` (3s breath loop) + `walk` (1s cycle) — `wave/point/talk/joy` intentionally absent, they fall back to idle via `playFirstAvailable`. Same filename → all loader/ver-busting/CSP wiring unchanged.
 
 ## Kill-switch awareness
 

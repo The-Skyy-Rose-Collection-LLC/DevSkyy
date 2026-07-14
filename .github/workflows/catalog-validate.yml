@@ -76,6 +76,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
 
+      - name: Verify visual manifest (all declared imagery exists on disk)
+        # bug-250: this verifier existed but was wired into nothing — a gate that
+        # never runs is drift cover. Every path+format declared in
+        # visual-manifest.json must exist in the tracked theme assets.
+        run: |
+          python wordpress-theme/skyyrose-flagship/data/verify-visual-manifest.py
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
       - name: Run pytest — catalog consistency tests
         run: |
           pytest skyyrose/elite_studio/tests/test_catalog_consistency.py \

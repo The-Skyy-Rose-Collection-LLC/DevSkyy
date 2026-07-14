@@ -54,6 +54,16 @@ def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVe
     compute PSI drift over the gate-score distribution. Emission is the single chokepoint
     every gate site funnels through, and never affects the returned verdict.
     """
+    if isinstance(image, (str, Path)) and not Path(image).is_file():
+        # Fail closed: a missing render path (e.g. an upstream stage was skipped
+        # or its output deleted) must reject here, not raise FileNotFoundError
+        # deep inside the CLIP encoder and abort the batch.
+        return GateVerdict(
+            accepted=False,
+            score=0.0,
+            threshold=centroid.threshold,
+            reason=f"image path does not exist: {image}",
+        )
     score = score_against_centroid(image, centroid)
     if score >= centroid.threshold:
         verdict = GateVerdict(

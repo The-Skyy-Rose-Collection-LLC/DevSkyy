@@ -300,6 +300,71 @@ wp_remote() {
 }
 
 # ---------------------------------------------------------------------------
+# Source-completeness gate (bug-252) -- fail CLOSED
+#
+# Catches the two deploy-defect classes that actually shipped:
+#   - version-triple drift (style.css / functions.php / readme.txt): stale
+#     ?ver= keeps the WP.com edge cache serving old assets after deploy
+#   - incomplete source tree (sparse worktree / missing binaries): the
+#     remote hot-swap DELETES anything the source lacks (v1.10.3 shipped
+#     without its tracked signature emblem -> live 404)
+# Emergency override: PREFLIGHT_SKIP_COMPLETENESS=1 (logged loudly).
+# ---------------------------------------------------------------------------
+preflight_completeness() {
+    if [[ "${PREFLIGHT_SKIP_COMPLETENESS:-0}" == "1" ]]; then
+        log_warn "Source-completeness gate SKIPPED (PREFLIGHT_SKIP_COMPLETENESS=1) -- deploying an UNVERIFIED tree"
+        return 0
+    fi
+
+    # 1. Version triple must agree; unparseable = fail closed.
+    local v_style v_func v_readme
+    v_style=$(awk '/^Version:/ {print $2; exit}' "$THEME_DIR/style.css")
+    v_func=$(sed -nE "s/^define\( 'SKYYROSE_VERSION', '([^']+)' \);.*/\1/p" "$THEME_DIR/functions.php" | head -1)
+    v_readme=$(awk '/^Stable tag:/ {print $3; exit}' "$THEME_DIR/readme.txt")
+    if [[ -z "$v_style" || -z "$v_func" || -z "$v_readme" ]]; then
+        log_error "Version triple unreadable (style.css='${v_style:-?}' functions.php='${v_func:-?}' readme.txt='${v_readme:-?}') -- refusing to deploy"
+        exit 1
+    fi
+    if [[ "$v_style" != "$v_func" || "$v_style" != "$v_readme" ]]; then
+        log_error "Version triple DRIFT: style.css=$v_style functions.php=$v_func readme.txt=$v_readme -- sync all three before deploying"
+        exit 1
+    fi
+    log_success "Version triple in sync: $v_style"
+
+    # 2. Every git-tracked file must exist on disk. Catches sparse
+    #    checkouts and deleted-but-uncommitted files. Extra untracked
+    #    files are allowed (riders shipped that way for months).
+    if git -C "$THEME_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
+        local missing=0 tracked=0 f
+        while IFS= read -r f; do
+            tracked=$((tracked + 1))
+            if [[ ! -e "$THEME_DIR/$f" ]]; then
+                log_error "Tracked file missing from deploy source: $f"
+                missing=$((missing + 1))
+            fi
+        done < <(git -C "$THEME_DIR" ls-files)
+        if (( missing > 0 )); then
+            log_error "$missing tracked file(s) absent from the source tree -- the hot-swap would delete them from production"
+            exit 1
+        fi
+        log_success "Tracked-file completeness: $tracked/$tracked on disk"
+    else
+        log_warn "Deploy source is not a git work tree -- relying on critical-asset floor only"
+    fi
+
+    # 3. Critical-asset floor (git-independent; static minimums, not exact counts).
+    local emblems fonts glb_state="MISSING"
+    emblems=$({ find "$THEME_DIR/assets/images/emblems" -maxdepth 1 -name '*.webp' 2>/dev/null || true; } | wc -l | tr -d ' ')
+    fonts=$({ find "$THEME_DIR/assets/fonts" -maxdepth 1 -name '*.woff2' 2>/dev/null || true; } | wc -l | tr -d ' ')
+    if [[ -f "$THEME_DIR/assets/models/skyy.glb" ]]; then glb_state="present"; fi
+    if (( emblems < 3 )) || (( fonts < 10 )) || [[ "$glb_state" == "MISSING" ]]; then
+        log_error "Critical-asset floor FAILED: emblems=$emblems (need >=3), woff2=$fonts (need >=10), skyy.glb $glb_state"
+        exit 1
+    fi
+    log_success "Critical-asset floor: $emblems emblem webp, $fonts woff2, mascot GLB $glb_state"
+}
+
+# ---------------------------------------------------------------------------
 # Preflight checks
 # ---------------------------------------------------------------------------
 preflight() {
@@ -331,6 +396,9 @@ preflight() {
         exit 1
     fi
     log_success "Theme directory exists: $THEME_DIR"
+
+    # Source-completeness gate (bug-252) -- cheap checks before the PHP lint sweep.
+    preflight_completeness
 
     # PHP syntax check — scope matches tarball (vendor/node_modules/tests
     # are gitignored and excluded from deploy, so don't lint them either).
@@ -393,6 +461,9 @@ RSYNC_EXCLUDES=(
     --exclude='webpack.config.js'
     --exclude='deploy.sh'
     --exclude='CLAUDE.md'
+    --exclude='CLAUDE.local.md'
+    --exclude='._*'
+    --exclude='__pycache__'
     --exclude='IMMERSIVE-WORLDS-PLAN.md'
     --exclude='scripts/'
     --exclude='.deploy-archives/'
@@ -460,6 +531,7 @@ try_rsync() {
         --exclude='tests' --exclude='test-results' --exclude='_archive'
         --exclude='.env*' --exclude='*.map' --exclude='*.log'
         --exclude='.DS_Store' --exclude='deploy.sh' --exclude='CLAUDE.md'
+        --exclude='CLAUDE.local.md' --exclude='._*' --exclude='__pycache__'
         --exclude='IMMERSIVE-WORLDS-PLAN.md' --exclude='.deploy-archives'
         --exclude='.gitignore' --exclude='.phpcs.xml' --exclude='.eslintrc*'
         --exclude='.prettierrc*' --exclude='.editorconfig'

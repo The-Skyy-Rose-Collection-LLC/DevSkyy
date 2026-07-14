@@ -23,7 +23,7 @@ When working on **anything visual, brand-touching, or collection-specific**, rea
 
 These come from `~/.claude/projects/-Users-theceo-DevSkyy/memory/` and apply to every agent / session:
 
-1. **Hero titles = collection lockup IMAGES, never type-rendered.** Each collection has a canonical brand-script lockup in `assets/images/hero-overlays/` (BR/LH/SIG) or `assets/images/logos/` (Kids). Fonts (Cinzel, Italiana, Yellowtail) apply only to interior surfaces.
+1. **Hero titles = collection lockup IMAGES, never type-rendered.** Each collection has a canonical brand-script lockup in `assets/images/hero-overlays/` (BR/LH/SIG) or `assets/images/logos/` (Kids). Fonts (per `data/brand/typography.json` + per-collection `identity.json` — Italiana/Yellowtail retired 2026-07-10) apply only to interior surfaces.
 2. **Each collection has its own canon — never mix quotes.** "Hurts is the bloodline that raised me" = Love Hurts ONLY. Black Rose canon = armor / "you already stood up" / "concrete answering back". Never substitute one collection's voice for another.
 3. **Always reference The Five.** Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels. Never Bottega / Numéro / Hedi Slimane / Rick Owens / 032c / Acne FW24 / Givenchy by Tisci / Khaite / Bode / The Row — those are locked OUT.
 4. **Catalog is the source of truth.** `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` is the only product manifest. Never reference retired SKUs or invent SKUs.

@@ -487,3 +487,36 @@ Standing rules (§14): authoritative sources only (trace every value to a master
 - [x] Post-merge: real `docker build -f Dockerfile.api` proof (main thread)
 - [x] devskyy-backend deployed (Neon DB, /health+/ready 200); MPG destroyed; api.devskyy.app repointed to Fly (cert issued, public-resolver verified) 2026-07-09
 - [x] P6 COMPLETE (2026-07-09): Blocks 1-3 wired+verified, MCP redeployed 82 tools/py3.12, api.devskyy.app repointed. Orig marker:: Block1 done (WC secrets on devskyy-api), Block2 done (Vercel env+deploy, live-verified); Block3 DONE via WP-CLI/SSH (bridge e2e proof: 44 tools); DNS deferred; MCP go-live (Fly WC secrets → Vercel env → WP config + theme deploy) per tasks/mcp-golive-manifest.md
+
+## ACTIVE — Love Hurts Girl web build + world integration — 2026-07-12 (this session)
+
+Branch: feat/love-hurts-girl-web (off origin/main) · Source: mascot-worktree renders/3d/girl-love-hurts/love-hurts-girl-v1.glb (25.5MB, 1 walk clip) · PR #736 = source assets
+
+- [ ] A1 Context7: @gltf-transform/cli v4 draco+webp+resize flags · verify: docs quote
+- [ ] A2 Compress → lh-girl.glb (prune, dedup, webp 2048, draco; NO meshopt) · verify: inspect shows walk anim + skin intact, ≤2.5MB
+- [ ] B1 Read skyy-3d.js / enqueue.php regions / scene.php / mascot-config.php
+- [ ] B2 theme assets/models/lh-girl.glb
+- [ ] B3 assets/js/lh-girl-3d.js — walk-on cameo, enters LEFT (Skyy owns right), IntersectionObserver once, dispose after exit; reduced-motion/no-WebGL/no-container → no-op; DPR cap; hidden-tab pause
+- [ ] B4 enqueue gated to /collections/love-hurts/ only; model URL ?ver=SKYYROSE_VERSION (mascot pattern)
+- [ ] C1 fix stale skyyrose-flagship/CLAUDE.md SKYY_3D_CONFIG line
+- [ ] C2 npm run build (.min) + SKYYROSE_VERSION bump · verify: .min contains new module
+- [ ] D1 php -l + prod-mirror Playwright battery (canvas, glb fetch, no pageerrors, reduced-motion skip, mobile+desktop)
+- [ ] D2 commit + PR
+
+## DEPLOY HANDOFF — founder deploying via his newer-version pipeline (2026-07-13)
+
+Context: v1.10.4 deploy fully prepared (source pinned + verified) then handed to founder's own newer-version deploy. Live = **1.10.3 with signature-emblem.webp 404**.
+
+Pre-deploy checklist for ANY deploy source (else production regresses):
+- [ ] Source contains the **17 gitignored live riders** — manifest in `docs/engineering-learnings.md` → "Deploy-source completeness" (hot-swap deletes whatever the source lacks: BR/LH emblems, mascot png, avatar refs, 6 scene backdrops, br-008 jpg, techflat JSONs)
+- [ ] Source contains `assets/images/emblems/signature-emblem.webp` (tracked since `700d43178`; deploying it FIXES the live 404)
+- [ ] Version triple synced: `style.css` / `functions.php` / `readme.txt`
+- Ready-made source if useful: `.claude/worktrees/deploy-v1104` = `origin/main @ 9aaa88a52` (v1.10.4) + riders overlaid, triple-verified
+
+Post-deploy verify matrix:
+- [ ] Live `style.css` Version = deployed version (cache-busted curl)
+- [ ] Signature emblem 200 + visible on `/collections/signature/` hero
+- [ ] Signature founder pull-quote renders; Black Rose quote byte-unchanged
+- [ ] `.exp-name` renders bespoke scripts; both new woff2 200 (`skyyrose-black-rose-script-latin`, `skyyrose-love-hurts-graffiti-latin`)
+- [ ] BR/LH emblems still 200 · KC teaser hero visible · homepage hero un-clipped @1440px · cart shell present
+- [ ] Playwright eyes-on mobile + desktop, console clean

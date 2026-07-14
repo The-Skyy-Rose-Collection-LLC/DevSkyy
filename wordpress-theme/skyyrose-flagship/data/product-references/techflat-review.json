@@ -1,0 +1,26 @@
+{
+  "lh-002-techflat.jpeg": {
+    "layout": "unset",
+    "note": "remove sizing and numbers whi;e you split and move to correct sku"
+  },
+  "lh-003-techflat.jpeg": {
+    "layout": "unset",
+    "note": "split them add the white to its sku same for black"
+  },
+  "lh-004-techflat.jpeg": {
+    "layout": "wrong",
+    "note": "shows shorts not the bomber - lh-003 product"
+  },
+  "sg-006-and-sg-014-mint-lavender-set-techflat.jpeg": {
+    "layout": "wrong",
+    "note": ""
+  },
+  "sg-007-techflat.jpeg": {
+    "layout": "unset",
+    "note": "4 different beanie colors"
+  },
+  "sg-013-mint-lavender-crewneck-set-techflat.jpeg": {
+    "layout": "unset",
+    "note": "split and add sweats to its sku"
+  }
+}

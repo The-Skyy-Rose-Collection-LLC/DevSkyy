@@ -17,7 +17,7 @@ production-quality work in any prompt scheme:
 |-------|-------------------------|
 | `fail-closed-audit` | bug-230 (×6) fail-open gates — absent input must BLOCK, never pass |
 | `mutation-testing` | test falsifiability — a test that survives a mutation tested nothing |
-| `test-isolation` | bug-231 (×4) shared state + bug-250 sparse-worktree gating |
+| `test-isolation` | bug-231 (×4) shared state + bug-257 sparse-worktree gating |
 | `self-healing` | detect → root-cause → fix → **independent** re-verify (theme-heal-verifier pattern) |
 | `adversarial-verification` | imported — refute "the fix worked" before trusting it |
 

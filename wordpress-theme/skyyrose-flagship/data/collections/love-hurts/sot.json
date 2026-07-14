@@ -45,14 +45,14 @@
   "lockup": {
     "canonical": "images/lockups/love-hurts-lockup.webp",
     "display_webp": {
-      "path": "images/lockups/love-hurts-lockup.webp",
+      "path": "images/lockups/love-hurts-lockup",
       "resolved": "images/lockups/love-hurts-lockup.webp",
       "kind": "collection-lockup-display",
       "status": "verified",
       "notes": "CANONICAL display lockup \u2014 full red \"Love Hurts\" emblem with heart graphic, transparent WebP. Use FIRST on web/homepage."
     },
     "svg_master": {
-      "path": "branding/vectorized/love-hurts-full-lettering.svg",
+      "path": "branding/vectorized/love-hurts-full-lettering",
       "resolved": "branding/vectorized/love-hurts-full-lettering.svg",
       "kind": "collection-lockup-vector",
       "status": "verified",

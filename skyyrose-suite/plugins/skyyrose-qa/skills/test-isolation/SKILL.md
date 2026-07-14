@@ -10,12 +10,12 @@ The most dangerous test in this codebase is not one that fails — it is one tha
 **only because of who ran before it**. A test that is green alone but red in the full
 suite is not tested, it is lucky. Worse: a test that silently rewrites tracked files isn't
 a test at all, it's an uncommitted mutation wearing a green checkmark. This is **bug-231**
-(recurred ×4) — shared-state pollution surfacing only in full-suite runs — and **bug-250**
+(recurred ×4) — shared-state pollution surfacing only in full-suite runs — and **bug-257**
 (today) — a `test_verify_drift` run that executed the collection-SOT builder IN-TREE and
 silently rewrote tracked `wordpress-theme/.../collections/*/sot.json`.
 
 > **Boot first:** read the canonical sources — `SOT.md` → `.wolf/anatomy.md` →
-> `.wolf/cerebrum.md` → `.wolf/buglog.json` (grep `bug-231` and `bug-250` — the leak may
+> `.wolf/cerebrum.md` → `.wolf/buglog.json` (grep `bug-231` and `bug-257` — the leak may
 > already be logged) → `CLAUDE.md`. Do not fix an isolation bug from memory.
 
 ## When to Use
@@ -52,7 +52,7 @@ silently rewrote tracked `wordpress-theme/.../collections/*/sot.json`.
 5. **Never write to the tracked tree from a test.** If a test exercises a builder/generator
    that writes to a real repo path (e.g. `collections/*/sot.json`), redirect its output to
    `tmp_path` via a fixture-injected output root or dependency override — do not let it run
-   against the live working tree, in-place, ever. bug-250 is what happens when this is
+   against the live working tree, in-place, ever. bug-257 is what happens when this is
    skipped: a "verify drift" test became a silent write.
 
 ## Loop until isolated
@@ -80,7 +80,7 @@ The fix is only real if both runs are **observed**, never assumed:
   differs from the first, the leak isn't fixed, it's relocated.
 - **`git status --short` after the full suite must show zero tracked-file changes.** Any
   diff — even a whitespace-only rewrite of a generated file — is a hard fail. This is the
-  check that would have caught bug-250 before it shipped.
+  check that would have caught bug-257 before it shipped.
 - **Cite `file:line`** for the fixture or `monkeypatch` call that closed the leak; quote
   the actual code, not a paraphrase.
 
@@ -101,7 +101,7 @@ The fix is only real if both runs are **observed**, never assumed:
 - A test-isolation fix that leaves the suite green only by accident → drive it properly
   with [[drive-to-green]], then re-verify with this skill.
 - Log every isolation leak or tree-mutation to `.wolf/buglog.json` under the `bug-231` (or
-  `bug-250`) lineage — bump `occurrences`, never duplicate — run
+  `bug-257`) lineage — bump `occurrences`, never duplicate — run
   `scripts/wolf_recurring_sync.py`, and record the lesson via [[continuous-learning]].
 - Handoff per `CROSS-PLUGIN.md`: isolation defects that trace to backend/service code go to
   `skyyrose-core`; theme/build-output defects go to `skyyrose-design` — then **re-verify
