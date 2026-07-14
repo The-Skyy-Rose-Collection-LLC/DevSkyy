@@ -147,7 +147,7 @@ DevSkyy/
 - 3 immersive storytelling scenes (cathedral, castle, city tour)
 - Pre-order gateway with checkout integration
 - Full WooCommerce template overrides (archive, single, cart, checkout)
-- Design system: Inter + Playfair Display, dark luxury palette
+- Design system: dark luxury palette (fonts at v3.2.0 were Inter + Playfair Display — since replaced by the Archivo / Hanken Grotesk canon, see `SOT.md` → `typography.json`)
 - Luxury Cursor, Cinematic Mode, Wishlist, Toast notifications
 - Backend modules: enqueue, theme-setup, customizer, woocommerce, security, template-functions, ajax-handlers
 
@@ -365,7 +365,7 @@ skyyrose-flagship/
 
 ### Design System
 
-- **Fonts**: Inter (body) + Playfair Display (headings)
+- **Fonts**: Archivo (display/headings), Hanken Grotesk (body/UI), Anton (UI caps/accent), Cinzel (engraved caps), Inter (system fallback) — see `SOT.md` → `typography.json`
 - **Colors**: `#0A0A0A` (background), `#111111` (cards), `#B76E79` (rose gold), `#D4AF37` (gold)
 - **Features**: Luxury Cursor, Cinematic Mode, Pre-order Gateway, Wishlist
 

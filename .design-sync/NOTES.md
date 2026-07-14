@@ -37,10 +37,15 @@ The converter copies woff2 files and the @font-face CSS into `ds-bundle/fonts/`.
 
 Only fonts referenced by DS components or tokens are included. Provenance:
 - `wordpress-theme/skyyrose-flagship/data/collections/<slug>/identity.json` `fonts` key
-  blesses: Cinzel (caps), Cormorant Garamond (body), Yellowtail/Pinyon Script/Kaushan Script
-  (per-collection scripts — Black Rose=Yellowtail, Love Hurts=Kaushan Script,
-  Signature=Pinyon Script, Kids Capsule=Pinyon Script)
-- `design-tokens.css` :root blesses: Playfair Display, Bebas Neue, Inter, Cormorant Garamond
+  blesses: Cinzel (caps), Hanken Grotesk (body), per-collection name-scripts —
+  Black Rose=SkyyRose Black Rose Script, Love Hurts=SkyyRose Love Hurts Graffiti,
+  Signature=Pinyon Script, Kids Capsule=Grand Hotel
+- `design-tokens.css` :root blesses: Archivo (display), Hanken Grotesk + Inter (body),
+  Anton (UI), SF Mono/Menlo (mono)
+
+⚠ DRIFT (2026-07-13): `CANON_WOFF2`/`CURATED` in `scripts/sync-theme-assets.mjs` still pin
+the pre-2026-07-11 set (Playfair/Cormorant/Bebas/Yellowtail/Kaushan) — update both maps to
+the roster above and re-run `npm run sync` before trusting the DS font bundle.
 
 Excluded (legacy/retired — in theme.json but referenced by nothing in the DS):
 - Barlow, Oswald, Instrument Serif
@@ -68,6 +73,8 @@ created in claude.ai/design. Do not add a placeholder value.
 
 ## Collection scripts
 
-Yellowtail, Pinyon Script, and Kaushan Script are NOT in `theme.json` fontFamilies —
-they are covered by the `CURATED` map in `sync-theme-assets.mjs` and are included in
-`CANON_WOFF2`. If a new collection script font is added, update both maps.
+The collection name-scripts (SkyyRose Black Rose Script, SkyyRose Love Hurts Graffiti,
+Pinyon Script, Grand Hotel) are NOT all in `theme.json` fontFamilies — script fonts are
+covered by the `CURATED` map in `sync-theme-assets.mjs` and included in `CANON_WOFF2`
+(⚠ those maps still list the retired Yellowtail/Kaushan Script — see DRIFT note above).
+If a new collection script font is added, update both maps.

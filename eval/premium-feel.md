@@ -49,7 +49,7 @@ The 10 small moves that, individually, no one notices — but collectively make 
 ### 6. Buttons don't shout
 
 - **Rule:** No gradient buttons. No box-shadows on buttons. No all-caps unless the type system asks for it.
-- **Auto-check:** Grep `assets/css/` for `linear-gradient` on `.btn`, `.button`, `[type=submit]`. Grep for `box-shadow` on same. Grep for `text-transform: uppercase` on same — flag if not Bebas Neue (which is designed for caps).
+- **Auto-check:** Grep `assets/css/` for `linear-gradient` on `.btn`, `.button`, `[type=submit]`. Grep for `box-shadow` on same. Grep for `text-transform: uppercase` on same — flag if not Anton (which is designed for caps).
 - **Manual check:** Are buttons quiet but clear?
 
 ### 7. Loading states are designed

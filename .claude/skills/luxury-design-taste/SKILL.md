@@ -18,7 +18,7 @@ Every surface serves the product photography. Copy, chrome, and motion are suppo
 
 - One accent per collection surface: Signature `#D4AF37`, Black Rose `#C0C0C0`, Love Hurts `#DC143C`, Kids Capsule `#B76E79`, on dark `#0A0A0A`. Two accents on one screen = flea market.
 - Whitespace is the luxury signal. If a section feels empty, that's usually correct. Density is for dashboards, not storefronts.
-- Type scale: big editorial serif moments (Playfair/Cormorant) + tiny wide-tracked utility labels (Bebas Neue, 10-13px, 4-8px letter-spacing). The MIDDLE sizes are where generic creeps in — avoid 16-20px workhorse type on marketing surfaces.
+- Type scale: big display moments (Archivo, expanded via `font-variation-settings: 'wdth' 125`) + tiny wide-tracked utility labels (Anton, 10-13px, 4-8px letter-spacing). The MIDDLE sizes are where generic creeps in — avoid 16-20px workhorse type on marketing surfaces.
 - Materials: glass (rgba white 0.04-0.08 + blur), hairline borders (1px, low-alpha white), metallic gradients ONLY on brand-token hues. No drop shadows heavier than `0 24px 80px rgba(0,0,0,.4)` on dark.
 
 ## Motion taste
@@ -40,4 +40,4 @@ Centered-everything symmetric layouts; gradient text on headings; emoji in UI; 1
 
 ## Precedence
 
-When design sources disagree: project `.impeccable.md` > this skill > impeccable > ui-ux-pro-max tables > interactive-web-development examples. ui-ux-pro-max's html-tailwind default and Liquid Glass recommendation are overridden for this project (vanilla CSS; glassmorphism banned outside `product-card-holo`). impeccable's reflex-font rejection does not apply to locked brand fonts (Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue, Inter).
+When design sources disagree: project `.impeccable.md` > this skill > impeccable > ui-ux-pro-max tables > interactive-web-development examples. ui-ux-pro-max's html-tailwind default and Liquid Glass recommendation are overridden for this project (vanilla CSS; glassmorphism banned outside `product-card-holo`). impeccable's reflex-font rejection does not apply to locked brand fonts (Archivo, Hanken Grotesk, Anton, Cinzel, Inter, plus the per-collection name-scripts: SkyyRose Black Rose Script, SkyyRose Love Hurts Graffiti, Pinyon Script, Grand Hotel — lockup images only, never interior).

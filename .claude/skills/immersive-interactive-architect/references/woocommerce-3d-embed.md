@@ -361,7 +361,7 @@ add_action( 'woocommerce_process_product_meta', 'skyyrose_save_3d_product_fields
     color: #fff;
     border: none;
     border-radius: 4px;
-    font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+    font-family: var(--skyyrose-font-ui, 'Anton', sans-serif);
     font-size: 0.875rem;
     letter-spacing: 0.08em;
     cursor: pointer;
@@ -396,7 +396,7 @@ add_action( 'woocommerce_process_product_meta', 'skyyrose_save_3d_product_fields
     background: transparent;
     color: rgba(255,255,255,0.5);
     border: none;
-    font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+    font-family: var(--skyyrose-font-ui, 'Anton', sans-serif);
     font-size: 0.8rem;
     letter-spacing: 0.1em;
     cursor: pointer;

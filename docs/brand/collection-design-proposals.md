@@ -13,8 +13,8 @@ Register: Black Rose = brutalist · Love Hurts = expressive · Signature = edito
 - Background: `#0A0A0A`
 - Accent (all interactive + headlines): `--skyyrose-accent` → `#C0C0C0` (silver)
 - Secondary (blood flash, used sparingly): `--skyyrose-secondary` → `#DC143C`
-- Display: Cinzel Decorative
-- Body: Cormorant Garamond 16px / lh 1.7
+- Display: Cinzel
+- Body: Hanken Grotesk 16px / lh 1.7
 
 ---
 
@@ -27,7 +27,7 @@ Register: Black Rose = brutalist · Love Hurts = expressive · Signature = edito
 ┌─────────────────────────────────────────────┐
 │                                              │
 │                                              │
-│  YOU WEAR IT BECAUSE                         │  ← Cinzel Decorative, --text-5xl
+│  YOU WEAR IT BECAUSE                         │  ← Cinzel, --text-5xl
 │  YOU ALREADY STOOD UP.                       │     silver, flush left, 8pt grid
 │                                              │
 │                                              │
@@ -37,7 +37,7 @@ Register: Black Rose = brutalist · Love Hurts = expressive · Signature = edito
 │   garment centered, near-black BG           │     object-fit: cover
 │                                              │
 │                                              │
-│  BLACK ROSE  ↓                               │  ← Bebas Neue, label size
+│  BLACK ROSE  ↓                               │  ← Anton, label size
 └─────────────────────────────────────────────┘
 ```
 
@@ -45,13 +45,13 @@ Hero image is the only decoration. No overlay, no gradient, no text on image. He
 
 **Below-fold sections:**
 
-1. **Story block** — two columns on desktop, single on mobile. Left: `"Black Rose is not a collection. It is a stance."` — Cormorant Garamond italic, 24px, silver. Right: 3 lines founder voice, Cormorant Garamond regular 16px. No pull quotes, no decorative elements.
+1. **Story block** — two columns on desktop, single on mobile. Left: `"Black Rose is not a collection. It is a stance."` — Hanken Grotesk italic, 24px, silver. Right: 3 lines founder voice, Hanken Grotesk regular 16px. No pull quotes, no decorative elements.
 
 2. **Single product feature** — full-bleed horizontal layout. 60vw image left, 40vw text right. Product name in Cinzel, 32px. One sentence about the garment. One `btn-sweep` CTA: "WEAR IT" — never "Shop Now", never "Buy".
 
 3. **Press bar** — `.lp-press.lp-rv` existing component. Silver text, no logos unless monochrome. 1px silver rule above and below.
 
-4. **Footer CTA** — single sentence, centered: `"You already know if this is yours."` Below: one text link, no button. Bebas Neue 14px. Nothing else.
+4. **Footer CTA** — single sentence, centered: `"You already know if this is yours."` Below: one text link, no button. Anton 14px. Nothing else.
 
 **Color application:** Silver is structural. Crimson appears once — on the CTA button hover state only. No gradients. No shadows. `--shadow-sm` permitted on cards only.
 
@@ -77,7 +77,7 @@ Hero image is the only decoration. No overlay, no gradient, no text on image. He
 **Hero / Above-fold treatment:**
 ```
 ┌─────────────────────────────────────────────┐
-│ BLACK ROSE          [current season]         │  ← Cinzel, silver / Bebas Neue, muted
+│ BLACK ROSE          [current season]         │  ← Cinzel, silver / Anton, muted
 │                                              │
 │ ─────────────────────────────────────────── │  ← 1px rule
 └─────────────────────────────────────────────┘
@@ -94,7 +94,7 @@ Hero image is the only decoration. No overlay, no gradient, no text on image. He
 
 No hero image section — the grid IS the hero. Collection name + rule is the full above-fold treatment. This is a catalog, not an experience page. Trust the garments.
 
-**Grid rhythm:** 2 columns desktop, 1 column mobile. No masonry, no feature card, no "hero" first item that breaks the grid. All cards identical width. Vertical gap: 48px (--space-12). Horizontal gap: 32px (--space-8). Product name: Cinzel 14px, silver. Price: Bebas Neue 13px, muted silver (`#666`). No category labels, no badges, no sale indicators.
+**Grid rhythm:** 2 columns desktop, 1 column mobile. No masonry, no feature card, no "hero" first item that breaks the grid. All cards identical width. Vertical gap: 48px (--space-12). Horizontal gap: 32px (--space-8). Product name: Cinzel 14px, silver. Price: Anton 13px, muted silver (`#666`). No category labels, no badges, no sale indicators.
 
 **Below-fold sections:** No content below the grid except pagination. No "explore more" CTA, no editorial insertion between rows.
 
@@ -122,9 +122,9 @@ No hero image section — the grid IS the hero. Collection name + rule is the fu
 │  ┌──────────────────────┐                   │
 │  │                      │  PRODUCT NAME     │  ← Cinzel, --text-5xl
 │  │                      │                   │
-│  │    [main image]      │  One sentence.    │  ← Cormorant Garamond italic
+│  │    [main image]      │  One sentence.    │  ← Hanken Grotesk italic
 │  │                      │                   │
-│  │                      │  $XXX             │  ← Bebas Neue, large
+│  │                      │  $XXX             │  ← Anton, large
 │  │                      │                   │
 │  └──────────────────────┘  [SIZE]  [ADD]   │
 │                                              │
@@ -136,11 +136,11 @@ Left: 60% — single image, full container height, no crop. Right: 40% — produ
 
 **Below-fold sections:**
 
-1. **Details accordion** — three items max: "Construction", "Fabric", "Care". Cinzel labels, Cormorant Garamond content. 1px silver rule as divider. No icons. Open state shows crimson 1px left border.
+1. **Details accordion** — three items max: "Construction", "Fabric", "Care". Cinzel labels, Hanken Grotesk content. 1px silver rule as divider. No icons. Open state shows crimson 1px left border.
 
-2. **Garment story** — if editorial dossier exists, full dossier text in Cormorant Garamond 18px, 680px max-width, centered. No sidebar. No column layout. This is prose, not UI.
+2. **Garment story** — if editorial dossier exists, full dossier text in Hanken Grotesk 18px, 680px max-width, centered. No sidebar. No column layout. This is prose, not UI.
 
-3. **Sizing** — text-only. No size charts as tables — a paragraph per size range. Cormorant Garamond italic.
+3. **Sizing** — text-only. No size charts as tables — a paragraph per size range. Hanken Grotesk italic.
 
 **Color application:** Right column background: `#0D0D0D` (3 steps off black). Size selector active state: silver border 2px, no fill. Add-to-cart: `btn-border-draw` — silver border draws on hover, fills on active. No primary fill button.
 
@@ -157,14 +157,14 @@ Left: 60% — single image, full container height, no crop. Right: 40% — produ
 
 ## LOVE HURTS
 
-**Register:** Expressive. Grief made wearable. The design does not soothe — it confirms. McQueen show notes, not retail. Crimson bleeds. Cormorant Garamond carries the weight. Sentences that don't apologize. Every transition is earned with duration. Nothing is decorative for its own sake.
+**Register:** Expressive. Grief made wearable. The design does not soothe — it confirms. McQueen show notes, not retail. Crimson bleeds. Hanken Grotesk carries the weight. Sentences that don't apologize. Every transition is earned with duration. Nothing is decorative for its own sake.
 
 **Palette application:**
 - Background: `#0A0A0A`
 - Accent: `--skyyrose-accent` → `#DC143C` (crimson)
 - Secondary: `--skyyrose-secondary` → `#B76E79` (rose gold, grief's warmer underside)
-- Display: Playfair Display
-- Body: Cormorant Garamond 16px / lh 1.8 (more generous — text needs room to breathe)
+- Display: Archivo
+- Body: Hanken Grotesk 16px / lh 1.8 (more generous — text needs room to breathe)
 
 ---
 
@@ -181,23 +181,23 @@ Left: 60% — single image, full container height, no crop. Right: 40% — produ
 │                                              │
 │                                              │
 │                                              │
-│  THEY CALLED ME BEAST.                       │  ← Playfair Display italic
+│  THEY CALLED ME BEAST.                       │  ← Archivo italic
 │  THEY WERE RIGHT.                            │     --text-decorative-lg, crimson
 │                                              │     bottom-aligned, 64px from bottom
 └─────────────────────────────────────────────┘
 ```
 
-Unlike Black Rose (text above image), Love Hurts places the tagline OVER the image — bottom-left, large, crimson Playfair Display italic. The image is not suppressed — the text lands on top of the garment, owned. `text-shadow: none`. Let the crimson do the work. Overlay: `linear-gradient(to top, rgba(10,10,10,0.7) 30%, transparent)` — enough to ensure contrast, not enough to dim the garment.
+Unlike Black Rose (text above image), Love Hurts places the tagline OVER the image — bottom-left, large, crimson Archivo italic. The image is not suppressed — the text lands on top of the garment, owned. `text-shadow: none`. Let the crimson do the work. Overlay: `linear-gradient(to top, rgba(10,10,10,0.7) 30%, transparent)` — enough to ensure contrast, not enough to dim the garment.
 
 **Below-fold sections:**
 
-1. **Verse block** — full-width, centered. 3–5 lines from the dossier or collection brief, Cormorant Garamond italic 28px, maximum 720px wide. Line height 1.9. No attribution line. This is not a pull quote — it is a statement. Rose gold color.
+1. **Verse block** — full-width, centered. 3–5 lines from the dossier or collection brief, Hanken Grotesk italic 28px, maximum 720px wide. Line height 1.9. No attribution line. This is not a pull quote — it is a statement. Rose gold color.
 
 2. **Gallery strip** — horizontal scroll, 4–5 images, each 320px wide × 480px tall. Spacing 16px. No captions. Crimson scrollbar on desktop (custom `::scrollbar-thumb`).
 
-3. **Single product feature** — asymmetric two-column. Right side: 55% image, editorial bleeding past the column boundary by 40px (CSS `margin-right: -40px`). Left side: product name Playfair Display, 40px; two-sentence story line; price; CTA `btn-sweep`. The bleed is the design statement.
+3. **Single product feature** — asymmetric two-column. Right side: 55% image, editorial bleeding past the column boundary by 40px (CSS `margin-right: -40px`). Left side: product name Archivo, 40px; two-sentence story line; price; CTA `btn-sweep`. The bleed is the design statement.
 
-4. **Closing line** — full-width, centered, 80px vertical padding: `"You wore the weight before the collection existed."` — Cormorant Garamond italic, 22px, rose gold. No CTA below it.
+4. **Closing line** — full-width, centered, 80px vertical padding: `"You wore the weight before the collection existed."` — Hanken Grotesk italic, 22px, rose gold. No CTA below it.
 
 **Color application:** Crimson for headlines and primary CTAs only. Rose gold for secondary text, verse, and closing line. Never both crimson and rose gold in the same sentence. Background stays `#0A0A0A` — no section background changes.
 
@@ -206,7 +206,7 @@ Unlike Black Rose (text above image), Love Hurts places the tagline OVER the ima
 - Verse block: `rv-blur-down`, threshold 0.2, `--reveal-slow: 1.2s`
 - Gallery strip: `rv-clip-up` on strip container, horizontal scroll inertia via `scroll-snap-type: x mandatory` on container
 - Product feature image bleed: `rv-clip-right` with 1.6s — the bleed is part of the reveal
-- `btn-sweep` on CTA: crimson sweep, Bebas Neue label
+- `btn-sweep` on CTA: crimson sweep, Anton label
 - Closing line: `rv-blur`, `--reveal-cinematic` — last element on page, deserves the full duration
 
 **Mobile adaptation:**
@@ -226,7 +226,7 @@ Unlike Black Rose (text above image), Love Hurts places the tagline OVER the ima
 ┌─────────────────────────────────────────────┐
 │  [full-width editorial image, 60vh]          │
 │                                              │
-│  LOVE HURTS                                  │  ← Playfair Display italic, crimson
+│  LOVE HURTS                                  │  ← Archivo italic, crimson
 │  ─────────────────                           │  ← partial rule, 280px, crimson
 └─────────────────────────────────────────────┘
 
@@ -247,7 +247,7 @@ Unlike Black Rose (text above image), Love Hurts places the tagline OVER the ima
 
 Love Hurts gets a cinematic hero above the grid — a 60vh editorial image with the collection name overlaid bottom-left. The grid rhythm alternates: row 1 is 3-equal, row 2 is 2:1 feature, row 3 is 3-equal again. This is not arbitrary — it mirrors the emotional rhythm of the collection. `grid-template-columns` variations handled with nth-child selectors on the grid container.
 
-**Color application:** Card background `#0F0F0F`. Rose gold product name, Playfair Display italic 15px. Price: Bebas Neue, muted. Hover state: thin crimson left-border on card (2px, full card height).
+**Color application:** Card background `#0F0F0F`. Rose gold product name, Archivo italic 15px. Price: Anton, muted. Hover state: thin crimson left-border on card (2px, full card height).
 
 **Interaction layer:**
 - Hero image: `rv-clip-up`, `--reveal-cinematic`
@@ -272,7 +272,7 @@ Love Hurts gets a cinematic hero above the grid — a 60vh editorial image with 
 │                                              │
 │  ─────────────────────────────────────────  │  ← 1px crimson rule
 │                                              │
-│  PRODUCT NAME          $XXX  [ADD TO BAG]   │  ← Playfair italic / Bebas Neue
+│  PRODUCT NAME          $XXX  [ADD TO BAG]   │  ← Archivo italic / Anton
 │                                              │
 │  [SIZE: S  M  L  XL]                        │
 └─────────────────────────────────────────────┘
@@ -282,13 +282,13 @@ Love Hurts PDP breaks the side-by-side layout. The garment gets the full viewpor
 
 **Below-fold sections:**
 
-1. **Dossier prose** — if exists, full text Cormorant Garamond italic 20px, rose gold, max-width 680px, centered, 80px top/bottom padding. No heading, no label. It reads like a letter.
+1. **Dossier prose** — if exists, full text Hanken Grotesk italic 20px, rose gold, max-width 680px, centered, 80px top/bottom padding. No heading, no label. It reads like a letter.
 
 2. **Construction accordion** — same as BR-3 but crimson left-border on open state instead of silver.
 
 3. **Gallery** — 3-image horizontal strip below accordion, same specs as LH-2 gallery strip.
 
-**Color application:** Add-to-bag: `btn-sweep` — crimson sweep. Bebas Neue label "ADD TO BAG" — never "Add to Cart". Size selector active: crimson 2px underline, no border-box. Inactive sizes: muted silver text, no border.
+**Color application:** Add-to-bag: `btn-sweep` — crimson sweep. Anton label "ADD TO BAG" — never "Add to Cart". Size selector active: crimson 2px underline, no border-box. Inactive sizes: muted silver text, no border.
 
 **Interaction layer:**
 - Hero image: `rv-clip-up`, `--reveal-cinematic: 1.6s`, `--ease-dramatic`
@@ -303,14 +303,14 @@ Love Hurts PDP breaks the side-by-side layout. The garment gets the full viewpor
 
 ## SIGNATURE
 
-**Register:** Editorial. Origin, Chapter One. Not minimalism — warmth and precision coexisting. **Kith meets Aimé Leon Dore** (canon-aligned 2026-05-25, see `docs/brand/visual-references.md`): deliberate, confident, bookish. Playfair Display for display, but warmer weight than Love Hurts. Gold accent. No silver. No crimson. Every page reads like the first page of something important.
+**Register:** Editorial. Origin, Chapter One. Not minimalism — warmth and precision coexisting. **Kith meets Aimé Leon Dore** (canon-aligned 2026-05-25, see `docs/brand/visual-references.md`): deliberate, confident, bookish. Archivo for display, but warmer weight than Love Hurts. Gold accent. No silver. No crimson. Every page reads like the first page of something important.
 
 **Palette application:**
 - Background: `#0A0A0A`
 - Accent: `--skyyrose-accent` → `#D4AF37` (gold)
 - Secondary: `--skyyrose-secondary` → `#F7E7CE` (warm cream — body text tint option)
-- Display: Playfair Display (regular weight, not italic-dominant)
-- Body: Cormorant Garamond 16px / lh 1.65
+- Display: Archivo (regular weight, not italic-dominant)
+- Body: Hanken Grotesk 16px / lh 1.65
 
 ---
 
@@ -322,7 +322,7 @@ Love Hurts PDP breaks the side-by-side layout. The garment gets the full viewpor
 ```
 ┌─────────────────────────────────────────────┐
 │                                              │
-│  NOT BASICS.                                 │  ← Playfair Display, --text-5xl
+│  NOT BASICS.                                 │  ← Archivo, --text-5xl
 │  BLUEPRINTS.                                 │     gold, flush left, 56px padding
 │                                              │
 │  [garment — 3/4 shot, warm editorial light] │  ← 80vh, slightly warm treatment
@@ -335,15 +335,15 @@ Like Black Rose, headline lives above image — but warmer. The rule is right-al
 
 **Below-fold sections:**
 
-1. **Founder note** — narrow column, left-aligned, 560px max-width. 3–4 sentences from Corey's voice. Cormorant Garamond 18px, warm cream (`#F7E7CE`). Above it: "FROM COREY" in Bebas Neue 11px, gold, letter-spacing 4px.
+1. **Founder note** — narrow column, left-aligned, 560px max-width. 3–4 sentences from Corey's voice. Hanken Grotesk 18px, warm cream (`#F7E7CE`). Above it: "FROM COREY" in Anton 11px, gold, letter-spacing 4px.
 
-2. **Blueprint grid** — 2×2 grid, equal cards. Each card: garment image top, product name Playfair Display 16px gold, one-line note below. This is the full browse invitation. 4 cards only (the blueprint, not the catalog).
+2. **Blueprint grid** — 2×2 grid, equal cards. Each card: garment image top, product name Archivo 16px gold, one-line note below. This is the full browse invitation. 4 cards only (the blueprint, not the catalog).
 
-3. **Story block** — full-width, 80px padding. Left-aligned headline: "Chapter One." in Playfair Display italic 48px, gold. Below: 2 sentences, Cormorant Garamond 18px. Right of text at 60% width: a single architectural detail shot of garment construction (seam, label, fabric texture).
+3. **Story block** — full-width, 80px padding. Left-aligned headline: "Chapter One." in Archivo italic 48px, gold. Below: 2 sentences, Hanken Grotesk 18px. Right of text at 60% width: a single architectural detail shot of garment construction (seam, label, fabric texture).
 
 4. **Press bar** — existing `.lp-press.lp-rv`, gold text.
 
-**Color application:** Gold for all headlines, rules, and primary interactive states. Cream for supporting text (Cormorant body). No rose gold, no crimson, no silver. Background stays `#0A0A0A`.
+**Color application:** Gold for all headlines, rules, and primary interactive states. Cream for supporting text (Hanken Grotesk body). No rose gold, no crimson, no silver. Background stays `#0A0A0A`.
 
 **Interaction layer:**
 - Headline: `rv-split-line` (line by line), `--reveal-slow: 1.2s`, `--ease-cinematic`
@@ -367,8 +367,8 @@ Like Black Rose, headline lives above image — but warmer. The rule is right-al
 **Hero / Above-fold treatment:**
 ```
 ┌─────────────────────────────────────────────┐
-│  SIGNATURE                                   │  ← Playfair Display, 36px, gold
-│  Chapter One                                 │  ← Cormorant Garamond italic, cream
+│  SIGNATURE                                   │  ← Archivo, 36px, gold
+│  Chapter One                                 │  ← Hanken Grotesk italic, cream
 │                                              │
 │  ─────────────────────────────────────────  │  ← 1px gold rule
 └─────────────────────────────────────────────┘
@@ -376,7 +376,7 @@ Like Black Rose, headline lives above image — but warmer. The rule is right-al
 
 No hero image above the grid — same philosophy as Black Rose. The chapter subtitle "Chapter One" under the collection name is the only concession to narrative. The grid is the work.
 
-**Grid rhythm:** 3 columns desktop (unlike Black Rose's strict 2). Cards slightly narrower and taller — portrait proportion. Vertical gap 40px, horizontal 24px. Product name: Playfair Display 14px, gold. Price: Bebas Neue 13px, cream. Below price: one-line material note ("Japanese cotton", "Portuguese wool") — sourced from dossier. This one line differentiates Signature's grid from every other collection's.
+**Grid rhythm:** 3 columns desktop (unlike Black Rose's strict 2). Cards slightly narrower and taller — portrait proportion. Vertical gap 40px, horizontal 24px. Product name: Archivo 14px, gold. Price: Anton 13px, cream. Below price: one-line material note ("Japanese cotton", "Portuguese wool") — sourced from dossier. This one line differentiates Signature's grid from every other collection's.
 
 **Color application:** Card background `#0F0F0F`. Hover: gold border bottom 2px (bottom only — like underlining a book passage). No card lift animation — the border is the signal.
 
@@ -399,9 +399,9 @@ No hero image above the grid — same philosophy as Black Rose. The chapter subt
 ┌─────────────────────────────────────────────┐
 │                                              │
 │  ┌────────────────────┐                     │
-│  │                    │  PRODUCT NAME        │  ← Playfair Display, 48px, gold
+│  │                    │  PRODUCT NAME        │  ← Archivo, 48px, gold
 │  │  [garment image]   │                     │
-│  │                    │  Material note.      │  ← Cormorant italic, cream, 18px
+│  │                    │  Material note.      │  ← Hanken Grotesk italic, cream, 18px
 │  │  + construction    │                     │
 │  │    detail inset    │  $XXX               │
 │  │                    │                     │
@@ -409,15 +409,15 @@ No hero image above the grid — same philosophy as Black Rose. The chapter subt
 └─────────────────────────────────────────────┘
 ```
 
-The layout is Side-by-side like BR-3, but Signature adds a construction detail inset — a smaller image (20% width, bottom-right of main image, 16px gap, same container) showing a seam, label, or fabric close-up. This is the "Blueprint" made literal: you see the garment AND the craft. CTA label: "ACQUIRE" — not "Add to Bag", not "Buy". Bebas Neue.
+The layout is Side-by-side like BR-3, but Signature adds a construction detail inset — a smaller image (20% width, bottom-right of main image, 16px gap, same container) showing a seam, label, or fabric close-up. This is the "Blueprint" made literal: you see the garment AND the craft. CTA label: "ACQUIRE" — not "Add to Bag", not "Buy". Anton.
 
 **Below-fold sections:**
 
-1. **Blueprint prose** — if editorial dossier exists: Cormorant Garamond 18px, cream, 600px max-width, 80px padding. Title: "The Blueprint" in Playfair Display 22px, gold, above prose.
+1. **Blueprint prose** — if editorial dossier exists: Hanken Grotesk 18px, cream, 600px max-width, 80px padding. Title: "The Blueprint" in Archivo 22px, gold, above prose.
 
-2. **Construction details** — three labeled specs in a row (not accordion for Signature): "SHELL", "LINING", "HARDWARE". Bebas Neue label 11px, gold, letter-spacing 4px. Below each: 1-line value, Cormorant Garamond.
+2. **Construction details** — three labeled specs in a row (not accordion for Signature): "SHELL", "LINING", "HARDWARE". Anton label 11px, gold, letter-spacing 4px. Below each: 1-line value, Hanken Grotesk.
 
-3. **Care** — single paragraph, Cormorant Garamond italic, muted, cream.
+3. **Care** — single paragraph, Hanken Grotesk italic, muted, cream.
 
 **Color application:** ACQUIRE button: `btn-sweep`, gold sweep. Size active: gold 2px bottom border. Construction detail inset: `1px solid rgba(212,175,55,0.2)` border.
 
@@ -434,14 +434,14 @@ The layout is Side-by-side like BR-3, but Signature adds a construction detail i
 
 ## KIDS CAPSULE
 
-**Register:** Minimalist. Legacy in smaller silhouette. This is not a children's brand — it is the brand, scaled. The same dark `#0A0A0A`, the same Playfair Display, the same rose gold. No concession to playfulness, no primary colors, no cartoon energy. Hermès Petit h, not Gap Kids. The only warmth is intentional: rose gold is warmer than gold, and this collection earns warmth.
+**Register:** Minimalist. Legacy in smaller silhouette. This is not a children's brand — it is the brand, scaled. The same dark `#0A0A0A`, the same Archivo, the same rose gold. No concession to playfulness, no primary colors, no cartoon energy. Hermès Petit h, not Gap Kids. The only warmth is intentional: rose gold is warmer than gold, and this collection earns warmth.
 
 **Palette application:**
 - Background: `#0A0A0A`
 - Accent: `--skyyrose-accent` → `#B76E79` (rose gold)
 - Secondary: `--skyyrose-secondary` → `#D4AF37` (gold — subtle richness)
-- Display: Playfair Display regular
-- Body: Cormorant Garamond 16px / lh 1.6
+- Display: Archivo regular
+- Body: Hanken Grotesk 16px / lh 1.6
 
 ---
 
@@ -453,7 +453,7 @@ The layout is Side-by-side like BR-3, but Signature adds a construction detail i
 ```
 ┌─────────────────────────────────────────────┐
 │                                              │
-│  Luxury runs                                 │  ← Playfair Display italic
+│  Luxury runs                                 │  ← Archivo italic
 │  in the family.                              │     --text-5xl, rose gold
 │                                              │     flush left, 56px from top
 │                                              │
@@ -462,15 +462,15 @@ The layout is Side-by-side like BR-3, but Signature adds a construction detail i
 └─────────────────────────────────────────────┘
 ```
 
-Unique visual move: two garments shown together in the hero, styled as a set — adult/child silhouette or two pieces from the capsule. Not a "family shoot" — editorial. Both garments equal. The image is 85vh, headline above in the same letterbox-band pattern as Black Rose. Rose gold text, italic Playfair — softer weight than Black Rose's Cinzel but still authoritative.
+Unique visual move: two garments shown together in the hero, styled as a set — adult/child silhouette or two pieces from the capsule. Not a "family shoot" — editorial. Both garments equal. The image is 85vh, headline above in the same letterbox-band pattern as Black Rose. Rose gold text, italic Archivo — softer weight than Black Rose's Cinzel but still authoritative.
 
 **Below-fold sections:**
 
-1. **Legacy note** — 2 sentences, Cormorant Garamond 18px, centered, max-width 540px, rose gold. No heading. `"Legacy isn't inherited. It is worn."` — representative tone.
+1. **Legacy note** — 2 sentences, Hanken Grotesk 18px, centered, max-width 540px, rose gold. No heading. `"Legacy isn't inherited. It is worn."` — representative tone.
 
-2. **Product pair** — if 2 SKUs only, display them in a two-column feature layout, equal columns, no hierarchy between them. Each: image, name Playfair Display 18px, 1-line note, price. No "featured" card. Equal luxury.
+2. **Product pair** — if 2 SKUs only, display them in a two-column feature layout, equal columns, no hierarchy between them. Each: image, name Archivo 18px, 1-line note, price. No "featured" card. Equal luxury.
 
-3. **Pre-order note** (if applicable) — existing `.preorder-note` pattern. Cormorant italic, gold, centered. 1 sentence max.
+3. **Pre-order note** (if applicable) — existing `.preorder-note` pattern. Hanken Grotesk italic, gold, centered. 1 sentence max.
 
 **Color application:** Rose gold for headlines, primary text. Gold for price and secondary labels. Background stays `#0A0A0A`. No section breaks, no background changes. White space is the separating element.
 
@@ -493,7 +493,7 @@ Unique visual move: two garments shown together in the hero, styled as a set —
 >
 > **Option A:** Suppress the grid. Redirect `/collection/kids-capsule/` to the landing page and surface both products as feature cards on the landing page only. No separate grid route.
 >
-> **Option B:** 2-column grid, full-width cards, equal weight. The grid only shows 2 columns and only 2 cards — the constraint IS the design. Copy above: "The full capsule." — Cormorant Garamond italic, centered.
+> **Option B:** 2-column grid, full-width cards, equal weight. The grid only shows 2 columns and only 2 cards — the constraint IS the design. Copy above: "The full capsule." — Hanken Grotesk italic, centered.
 >
 > **Option C:** Treat as an editorial single-flow page: both products stacked full-width, editorial-magazine style with dossier text between them. This is closest to how Hermès Petit h presents limited collections.
 
@@ -501,7 +501,7 @@ Unique visual move: two garments shown together in the hero, styled as a set —
 ```
 ┌─────────────────────────────────────────────┐
 │                                              │
-│         The full capsule.                    │  ← Cormorant italic, rose gold
+│         The full capsule.                    │  ← Hanken Grotesk italic, rose gold
 │                                              │
 │  ┌──────────────────┐  ┌──────────────────┐ │
 │  │                  │  │                  │ │  ← 2-column, full-width
@@ -532,11 +532,11 @@ Unique visual move: two garments shown together in the hero, styled as a set —
 ┌─────────────────────────────────────────────┐
 │                                              │
 │  ┌────────────────────┐                     │
-│  │                    │  PRODUCT NAME        │  ← Playfair Display, 40px, rose gold
+│  │                    │  PRODUCT NAME        │  ← Archivo, 40px, rose gold
 │  │  [garment image]   │                     │
-│  │  editorial, clean  │  Legacy note.        │  ← Cormorant italic, gold, 16px
+│  │  editorial, clean  │  Legacy note.        │  ← Hanken Grotesk italic, gold, 16px
 │  │                    │                     │
-│  │                    │  $XXX               │  ← Bebas Neue, large
+│  │                    │  $XXX               │  ← Anton, large
 │  │                    │                     │
 │  └────────────────────┘  [SIZE]  [ACQUIRE] │
 └─────────────────────────────────────────────┘
@@ -546,9 +546,9 @@ Same structural layout as Signature PDP — side-by-side. No construction inset 
 
 **Below-fold sections:**
 
-1. **Dossier** — if exists: same as Signature format. Playfair Display heading "For the inheritors." (or from actual dossier). Cormorant Garamond body, cream.
+1. **Dossier** — if exists: same as Signature format. Archivo heading "For the inheritors." (or from actual dossier). Hanken Grotesk body, cream.
 
-2. **Care** — single paragraph. Rose gold label "CARE" in Bebas Neue 11px, 4px letter-spacing. Cormorant Garamond body.
+2. **Care** — single paragraph. Rose gold label "CARE" in Anton 11px, 4px letter-spacing. Hanken Grotesk body.
 
 3. **The other piece** — if 2 SKUs exist: one card, below everything, 400px wide, centered, no heading. Just the other product image, name, price, and a text link: "See the full capsule →". No heading like "You may also like" — explicitly prohibited. Just the companion piece, no framing.
 
@@ -568,8 +568,8 @@ Same structural layout as Signature PDP — side-by-side. No construction inset 
 
 ### Shared foundations (do not change per collection)
 - Background: `#0A0A0A` everywhere
-- Body font: Cormorant Garamond all collections
-- UI labels: Bebas Neue all collections
+- Body font: Hanken Grotesk all collections
+- UI labels: Anton all collections
 - All animation via existing `rv-*`, `stagger-grid`, `magnetic`, `btn-*` classes only
 - 8pt grid: all spacing in 8px increments (4px for fine adjustments)
 - WCAG AA: all text/background combinations at ≥4.5:1

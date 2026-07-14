@@ -1,5 +1,7 @@
 # Learn Codebase: WordPress Theme (skyyrose-flagship) — Progress
 
+> **SUPERSEDED 2026-07-10 (fonts)** — the font-family facts below (8–12 families incl. Playfair Display / Cormorant Garamond / Bebas Neue / Oswald / Barlow / Instrument Serif) predate the brand-font cut. Current canon per `SOT.md` → `data/brand/typography.json` (Archivo display / Hanken Grotesk body / Anton UI / Cinzel caps + per-collection name-scripts). Historical progress log — do NOT source font canon from here.
+
 Scope: `wordpress-theme/skyyrose-flagship/` read IN FULL (main thread → claude-mem PostToolUse `observation` hook captures, keyed to real paths; also gets `file-context` digest of prior obs).
 Size: ~319 source files / ~113k lines (php 32k, css 21k, js 18k, html 27k, json 14k). Multi-session certain.
 

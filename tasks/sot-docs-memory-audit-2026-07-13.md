@@ -91,3 +91,24 @@ Recommended: delete the ~59-file dead cluster + prompts/ as ONE repoint-first co
 4. Memory sync (§5) — **needs founder nod** (LOCKED files).
 5. Dead-prototype delete (§6) — **STOP-AND-SHOW** the file list.
 6. Data-store + fragmentation reconcile (§3, §6) — separate design task.
+
+---
+
+## 8. Discovered DURING the sync (2026-07-14) — code drift + follow-ups
+
+**Done in the sync batch:** ~57 docs + eval rubrics (eval/brand.md, brand-story.md, banned-elements.md, premium-feel.md, design-system.json) + agents/elite_web_builder (prd/run.py/knowledge/*) + agents/core/creative/brand_creative.py + .claude/skills/luxury-design-taste + .ralph + .design-sync + collections/README + brand.yaml typography block (was live-loaded by `skyyrose/elite_studio/brand.py`) + 2 LOCKED auto-memory files + cerebrum count + new `project_typography_canon.md`. 24 dated docs bannered SUPERSEDED.
+
+**CODE drift still live (NOT docs — separate change each, flagged by the sync agents):**
+- `orchestration/brand_context.py:78-79` — ships Playfair Display / Montserrat (a doc quotes it verbatim; fix code then doc).
+- `frontend/tailwind.config.ts:13-14` — `--font-playfair` / `--font-cormorant` tokens (dashboard, devskyy.app — separate surface).
+- `design-system/skyyrose-storefront/scripts/sync-theme-assets.mjs:31-43,97-101` — `CANON_WOFF2`/`CURATED` still pin retired woff2s → **re-syncs cut fonts into the DS bundle on every `npm run sync`.** Highest-risk code item.
+- `agents/llm_roundtable/ui/LLMRoundtable.tsx:271` — Google Fonts `@import` (internal dashboard UI).
+- Residual `pacifico-latin.woff2` + `kaushan-script-latin.woff2` on disk in theme `assets/fonts/` (unreferenced by identity.json) — census-gated binary cleanup.
+
+**Doc long-tail not yet swept:**
+- `docs/brand/design-mockups/collection-designs.html` + `v2-visual-fixes.md` — dated mockup artifacts with Google-CDN + cut fonts. Banner or leave as historical mockups.
+
+**Memory maintenance follow-ups:**
+- `MEMORY.md` auto-memory index is 19.8KB (near 24.4KB read limit) → compact (one line/entry, move detail to topic files).
+- `.wolf/anatomy.md` stale (7 deleted-dir headers; misses `data/brand/`, `assets/hub/`) → regenerate via `openwolf scan` (auto-generated — do not hand-edit).
+- The auto-memory store (`~/.claude/projects/-Users-theceo-DevSkyy/memory/`) is not referenced in SOT.md (lives outside repo; add a pointer note).

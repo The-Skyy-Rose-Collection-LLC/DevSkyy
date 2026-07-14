@@ -32,7 +32,7 @@ Operationalizes WP §2 (brand canon) and WP §1.3 (banned elements) as a machine
 | Rule | Pass criterion |
 |------|----------------|
 | Color palette restricted to: `#B76E79` rose-gold, `#0A0A0A` dark, `#D4AF37` gold, `#DC143C` crimson, `#C0C0C0` silver, plus 5 grays + semantic | No off-system colors anywhere on customer-facing surfaces. Brand black (`#0A0A0A`) is the *only* black; brand white the only white. |
-| Type system: Cinzel (BR headings), Playfair Display (SIG/LH/KC headings), Cormorant Garamond (body), Bebas Neue (UI), Inter (system) | All 9 font families declared in `theme.json` Font Library; zero Google Fonts CDN |
+| Type system: Archivo (display/hero headings, all collections), Hanken Grotesk (body/UI), Anton (UI caps/accent), Cinzel (engraved-caps accent), Inter (system fallback) — see `SOT.md` → `typography.json` | All font families self-hosted woff2, declared in `theme.json` Font Library + `assets/css/fonts.css`; zero Google Fonts CDN |
 | Spacing: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128 token scale | No arbitrary spacing values |
 | Radius: 0, 2, 4, 8, 16, full | Most surfaces 0 or 2; 8+ only when intentional |
 | Shadow: none / subtle / soft / lifted (4 named tokens) | No drop-shadow stacks |

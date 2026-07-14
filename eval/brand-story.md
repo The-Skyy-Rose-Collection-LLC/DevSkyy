@@ -120,13 +120,13 @@ Plus 5 grays + semantic (success/warning/error). No off-system colors anywhere.
 
 | Family | Use |
 |--------|-----|
-| Cinzel | Black Rose collection headings |
-| Playfair Display | Signature / Love Hurts / Kids Capsule headings |
-| Cormorant Garamond | Body |
-| Bebas Neue | UI elements |
+| Archivo | Display / hero / headings (all collections) |
+| Hanken Grotesk | Body / UI |
+| Anton | UI caps / accent |
+| Cinzel | Engraved-caps accent |
 | Inter | System / fallback |
 
-All 9 font families declared in `theme.json` Font Library — **zero Google Fonts CDN.**
+All font families self-hosted (woff2) and declared in `theme.json` Font Library — **zero Google Fonts CDN.** Collection name-scripts (SkyyRose Black Rose Script, SkyyRose Love Hurts Graffiti, Pinyon Script, Grand Hotel) appear only as lockup images, never as interior text. See `SOT.md` → `typography.json`.
 
 ---
 

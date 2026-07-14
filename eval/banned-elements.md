@@ -77,7 +77,7 @@ These aren't banned outright but get flagged for review:
 |---------|-----------------|
 | Gradient backgrounds | Almost always reads as 2014; usually replaceable with a single color or photograph |
 | Drop-shadow stacks | Premium = restrained shadows; multiple shadows usually = trying to fake depth |
-| All-caps text larger than 16px outside the type system | Type system specifies all-caps cases (Bebas Neue UI); arbitrary all-caps reads as shouting |
+| All-caps text larger than 16px outside the type system | Type system specifies all-caps cases (Anton UI); arbitrary all-caps reads as shouting |
 | Ghost buttons with thin borders on photographs | Low contrast + low brand presence |
 | Box-shadows on buttons | Premium buttons don't have shadows (per WP §5.3 #6) |
 | Hover states that scale + shadow + color flip | Mash of three effects; usually one is right (per WP §5.3 #5) |

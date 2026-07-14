@@ -35,14 +35,14 @@
 
 ```css
 @font-face {
-  font-family: 'Playfair Display';
+  font-family: 'Archivo';
   font-display: swap;
-  src: url('playfair.woff2') format('woff2');
+  src: url('../fonts/archivo-latin.woff2') format('woff2');
 }
 ```
 
 - Use `font-display: swap` on ALL web fonts
-- Preconnect to Google Fonts: `<link rel="preconnect" href="https://fonts.googleapis.com">`
+- Self-host all fonts as woff2 in `assets/fonts/` (declared via theme.json Font Library / `assets/css/fonts.css`) — NO Google Fonts CDN, no preconnect
 - Subset fonts to used characters when possible
 
 ## Image Optimization

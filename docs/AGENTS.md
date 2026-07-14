@@ -183,7 +183,7 @@ async def create_product(data: ProductCreate) -> ProductResponse:
 class FashionRules:
     PDP_IMAGE_HIERARCHY = ["hero", "detail", "lifestyle", "flat_lay"]
     COLLECTION_GRID = {"columns": 4, "aspect_ratio": "3:4"}
-    TYPOGRAPHY = {"h1": "Playfair Display 700", "body": "Inter 400"}
+    TYPOGRAPHY = {"h1": "Archivo 700", "body": "Hanken Grotesk 400"}
     LUXURY_SPACING = {"section": "120px", "element": "24px"}
 ```
 

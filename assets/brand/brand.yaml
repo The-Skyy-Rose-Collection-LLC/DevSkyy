@@ -148,28 +148,32 @@ collections:
 # ── Typography ──────────────────────────────────────────────────────────────
 
 typography:
-  # Canonical font stacks. Each surface (WP theme, frontend) imports these.
+  # Canonical font ROLES. SOURCE OF TRUTH = data/brand/typography.json (see SOT.md);
+  # this block mirrors it and feeds skyyrose/elite_studio/brand.py — keep in sync.
+  # Collection NAME identity = bespoke script lockup IMAGES (never interior type):
+  #   black-rose: SkyyRose Black Rose Script · love-hurts: SkyyRose Love Hurts Graffiti
+  #   signature: Pinyon Script · kids-capsule: Grand Hotel
   families:
     display:
-      name: "Cinzel"
-      usage: "BLACK ROSE headings, dramatic calls-out"
-      weights: [400, 600, 700]
-      source: "self-hosted woff2"
-    serif_elegant:
-      name: "Playfair Display"
-      usage: "SIGNATURE / LOVE HURTS / KIDS headings"
+      name: "Archivo"
+      usage: "display / hero / headings — all collections (expanded via 'wdth' 125)"
       weights: [400, 600, 700, 900]
-    serif_body:
-      name: "Cormorant Garamond"
-      usage: "long-form body copy, editorial text"
+      source: "self-hosted woff2"
+    serif_elegant:  # legacy key — now the engraved-caps accent
+      name: "Cinzel"
+      usage: "engraved caps, eyebrows — accent"
+      weights: [400, 600, 700]
+    serif_body:  # legacy key — now body/UI copy
+      name: "Hanken Grotesk"
+      usage: "body / UI copy, editorial text"
       weights: [300, 400, 500, 600]
     condensed:
-      name: "Bebas Neue"
-      usage: "UI labels, button text"
+      name: "Anton"
+      usage: "UI labels, caps, drop accent"
       weights: [400]
     system:
       name: "Inter"
-      usage: "system UI, dashboards, forms"
+      usage: "system fallback, dashboards, forms"
       weights: [400, 500, 600, 700]
 
 

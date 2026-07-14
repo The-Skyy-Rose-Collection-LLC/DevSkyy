@@ -16,7 +16,7 @@
 
 ## Source of Truth
 
-- **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` is the SINGLE source of truth** for all live SKUs (30 products as of 2026-04-19). Every consumer — the WP theme's `inc/product-catalog.php` loader, any Python pipeline, any script — must read through this file. **Do not introduce a second catalog.**
+- **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` is the SINGLE source of truth** for all live SKUs (33 products as of 2026-07-13). Every consumer — the WP theme's `inc/product-catalog.php` loader, any Python pipeline, any script — must read through this file. **Do not introduce a second catalog.**
 - **WP theme loader**: `wordpress-theme/skyyrose-flagship/inc/product-catalog.php` parses the CSV and exposes `skyyrose_get_product_catalog()`, `skyyrose_get_product($sku)`, `skyyrose_get_collection_products($collection)`, `skyyrose_product_url($sku)`, etc. PHP code inside the theme MUST go through these helpers — never read the CSV directly.
 - **Retired 2026-04-19** (deleted): `assets/product-masters/catalog.yaml`, `assets/product-masters/manifest.json`. Generators `scripts/generate_catalog.py` and `scripts/sync_manifest_from_catalog.py` are now obsolete — remove in a follow-up commit.
 - **Broken Python readers pending rewrite to the CSV**: `skyyrose/elite_studio/catalog.py`, `wordpress/collection_page_manager.py`, `skyyrose/elite_studio/master_registry.py`, and their tests (`skyyrose/elite_studio/tests/test_catalog*.py`, `tests/wordpress/test_collection_page_manager.py`). These will throw on import until they read `data/skyyrose-catalog.csv` — flag when running the compositor/fidelity/collection-page pipelines.
@@ -366,3 +366,22 @@ gltfpack web GLBs use EXT_meshopt_compression + KHR_texture_basisu. model-viewer
 
 ## Do-Not-Repeat — 2026-07-12: verify live PR state before acting on an audit
 Resuming from a compacted session, I acted on a stale PR audit: resolved conflicts on CLOSED #672 (wasted) and nearly ran agents on already-MERGED #684/#686/#689. `gh pr view --json mergeable` returns UNKNOWN for BOTH merged/closed PRs and uncomputed-open PRs — do NOT infer open/closed from it. Always `gh pr list --state open` to re-baseline; include `state`+`mergedAt` on any single-PR check. See buglog bug-249, [[feedback_verify_authoritative_proof]].
+
+## 2026-07-13 — Skills that COPY brand canon drift silently; verify fonts against the THEME, not skill text
+~26 skill/plugin files (skyyrose-brand-dna, 3d-web-os, wp-platform, the dev-team charter
+`skyyrose-suite/plugins/skyyrose/workflows/skyyrose-dev-team-context.html`, most skyyrose-market social skills,
+skyyrose-design code-ref examples, all 8 wordpress-copilot skills) had fallen ~1 month behind CLAUDE.md brand
+canon: they still prescribed Playfair Display / Cormorant Garamond / Bebas Neue (cut 2026-07-10) as CURRENT.
+Fixed to the unified model: Archivo (display/headings, all collections) · Hanken Grotesk (body/UI) · Anton (UI
+caps/accent) · Cinzel (engraved-caps accent, KEPT) · Inter (fallback); collection NAMES = bespoke-script lockup
+IMAGES (BR Script / LH Graffiti / Pinyon SIG / Grand Hotel KC), never live type. Pacifico->BR Script,
+Kaushan->LH Graffiti (name-scripts, replaced 2026-07-11). NEVER map an interior font to a per-collection script.
+DO-NOT-REPEAT: claude-mem auto-observation #24324 is mis-titled "Cinzel/Playfair/Cormorant/Bebas Remain Current"
+- it summarized the STALE skill text as if it were canon. It is WRONG. Authoritative font source = the theme:
+`wordpress-theme/skyyrose-flagship/assets/css/fonts.css` @font-face + `theme.json` Font Library + shipped
+`assets/fonts/*.woff2`. Playfair/Cormorant/Bebas/Yellowtail have NO woff2 and are absent from both -> cut.
+Never verify a font-canon claim against a skill file or auto-observation; verify against fonts.css/theme.json/woff2.
+STILL STALE (out of scope, flagged): the `skyyrose/` static-app tree uses cut fonts via Google-Fonts CDN - app
+code + a zero-CDN-policy question, separate pass. Plugin cache is a LOCAL copy
+(`~/.claude/plugins/cache/skyyrose-suite/<plugin>/1.0.0/`) - edit source THEN mirror to cache; wordpress-copilot
+loads directly from repo (no cache).

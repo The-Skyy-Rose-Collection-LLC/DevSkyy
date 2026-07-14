@@ -1,3 +1,5 @@
+> SUPERSEDED 2026-07-10/11 — fonts now per SOT.md → typography.json (Archivo / Hanken Grotesk / Anton / Cinzel + bespoke collection name-scripts; zero-CDN self-hosted woff2). Font/CDN references below are historical.
+
 # SkyyRose Elementor Page Customization Guide
 
 **Complete step-by-step guide to customize your 6 pages using Elementor**

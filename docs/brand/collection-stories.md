@@ -41,7 +41,7 @@ Mood board peers from `knowledge-base/seed/from-interview.md`: KITH, Palm Angels
 ### Visual Language
 
 - **Primary accent:** Silver `#C0C0C0` on black `#0A0A0A` background
-- **Typography:** Cinzel for display headings (gothic restraint, classical weight); Cormorant Garamond for body
+- **Typography:** Cinzel for display headings (gothic restraint, classical weight); Hanken Grotesk for body
 - **Motifs:** Thorn motif, dark-on-dark texture, monochrome mastery — no color pop, no contrast as decoration
 - **Format:** Cinematic editorial. Not a grid. Every shot is a story beat.
 - **Gestalt application:** Figure-ground contrast at maximum (silver on black ≥ 3 visual properties distinct); Continuity drives the eye along thorns toward the rose
@@ -108,7 +108,7 @@ Mood: *Beauty & the Beast cadence — luxury or witchcraft, take your pick.* (`s
 
 - **Primary accent:** Crimson `#DC143C`; palette extends to deep purple (bruises that became wisdom) and burgundy
 - **Verbatim palette rationale from `collection-content.php`:** "Crimson for the blood we share. Deep purple for the bruises that became wisdom. Burgundy for the wine grandmama poured when she said, 'Baby, you survived another one.'"
-- **Typography:** Playfair Display for headings; Cormorant Garamond for body
+- **Typography:** Archivo for headings; Hanken Grotesk for body
 - **Motifs:** Heart-and-thorns, enchanted rose under glass, red rose clusters — visible on lh-004 Bomber: "Love" embroidered left chest, "Hurts" right chest, split by button-front placket; back features heart-and-thorns + red roses cluster; hood lining has sublimated red rose silhouettes on white
 - **Format:** Emotional weight carried through silhouette and color density, not surface decoration
 - **Gestalt:** Similarity links crimson accents across every garment as a visual category without a label; Closure drives the Beast/rose motif — the story the viewer completes in their head is the brand message
@@ -182,7 +182,7 @@ Mood peers (aligned 2026-05-25 to locked canon at `docs/brand/visual-references.
 ### Visual Language
 
 - **Primary accent:** Gold `#D4AF37`
-- **Typography:** Playfair Display for headings; Cormorant Garamond for body
+- **Typography:** Archivo for headings; Hanken Grotesk for body
 - **Badge:** "Where It All Began" — used in hero block of `collection-content.php`
 - **Label:** "Chapter One" / title "The First Rose" — the framing is literary, not product-catalog
 - **Motifs:** Script logo as anchor; gold on dark; the rose before the thorns
@@ -252,7 +252,7 @@ Mood from `skyyrose.co/about/` description: *"Rose gold and soft pink. The fourt
 ### Visual Language
 
 - **Primary accent:** Rose Gold `#B76E79` (global brand accent; Kids Capsule is its canonical home)
-- **Typography:** Playfair Display for headings; Cormorant Garamond for body
+- **Typography:** Archivo for headings; Hanken Grotesk for body
 - **Palette:** Rose gold + soft pink, but NO pastels, NO cartoons — the softness is in the color, not the attitude
 - **Silhouette:** Scaled down, never dumbed down. Same construction weight, smaller form.
 - **Current products:** Red/Black and Purple/Black colorways — dark-first, matching the brand's primary register even in kids wear
