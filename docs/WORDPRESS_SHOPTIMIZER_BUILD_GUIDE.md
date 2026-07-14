@@ -110,9 +110,9 @@ add_filter('rest_api_init', function() {
   },
   "typography": {
     "fontFamily": {
-      "display": "'Playfair Display', serif",
-      "heading": "'Montserrat', sans-serif",
-      "body": "'Inter', sans-serif"
+      "display": "'Archivo', sans-serif",
+      "heading": "'Archivo', sans-serif",
+      "body": "'Hanken Grotesk', sans-serif"
     },
     "fontSize": {
       "display-xl": "4.5rem",
@@ -144,9 +144,9 @@ add_filter('rest_api_init', function() {
   --color-primary-silver: #C0C0C0;
   --color-black: #0D0D0D;
   --color-white: #FFFFFF;
-  --font-display: 'Playfair Display', serif;
-  --font-heading: 'Montserrat', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'Archivo', sans-serif;
+  --font-heading: 'Archivo', sans-serif;
+  --font-body: 'Hanken Grotesk', sans-serif;
 }
 
 body {

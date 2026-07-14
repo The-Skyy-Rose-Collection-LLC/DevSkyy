@@ -159,12 +159,15 @@ Immersive pages: Collection logo watermark (bottom-right, 8% opacity)
 ### Typography
 
 ```css
-/* Font stack — MUST use Inter + Playfair Display */
-/* DO NOT use Montserrat, Cormorant Garamond, or other fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+/* Font stack — MUST use Hanken Grotesk (body) + Archivo (display/headings) */
+/* DO NOT use Montserrat, Playfair Display, Cormorant Garamond, or other fonts */
+/* Self-hosted woff2 ONLY (assets/fonts/ + theme.json Font Library / assets/css/fonts.css) —
+   NO Google Fonts CDN, no @import, no preconnect */
+@font-face { font-family: 'Archivo'; src: url('../fonts/archivo-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Hanken Grotesk'; src: url('../fonts/hanken-grotesk-latin.woff2') format('woff2'); font-display: swap; }
 
-body { font-family: 'Inter', -apple-system, sans-serif; }
-h1, h2, h3, .display-text { font-family: 'Playfair Display', serif; }
+body { font-family: 'Hanken Grotesk', 'Inter', -apple-system, sans-serif; }
+h1, h2, h3, .display-text { font-family: 'Archivo', system-ui, sans-serif; font-variation-settings: 'wdth' 125; }
 
 /* Size scale */
 --font-xs: 0.75rem;   /* 12px — badges, labels */
@@ -468,7 +471,7 @@ No static HTML reference exists. **Derive from other collection templates** with
 
 No static reference. **Create branded 404 page:**
 - Dark background matching site theme
-- Large "404" in Playfair Display with gold gradient
+- Large "404" in Archivo with gold gradient
 - "Page Not Found" subtext
 - Collection quick links (3 cards)
 - "Return Home" CTA button
@@ -714,7 +717,7 @@ class ImmersiveScene {
 8. **Sign-in panel** — Slide-in from right (420px), email/password, member perks list
 
 ### Key Design Patterns:
-- Fonts: Playfair Display (display), Bebas Neue (UI buttons), Space Mono (labels), Cormorant Garamond (body)
+- Fonts: Archivo (display), Anton (UI buttons), Space Mono (labels), Hanken Grotesk (body)
 - Ultra-dark: `--db: #020004` background
 - Glass panels: `rgba(255,255,255,0.03)` + `backdrop-filter: blur(20px)`
 - Accent colors per tab: Rose Gold (all), Crimson (black-rose), Rose (#E91E63 love-hurts), Gold (signature)
@@ -905,7 +908,7 @@ The product display must feel premium like drakerelated.com but using our **AI f
 ## Critical Rules
 
 1. **STATIC HTML IS LAW** — Every PHP template must match the static HTML design exactly.
-2. **INTER + PLAYFAIR DISPLAY** — These are the ONLY body/heading fonts. Never use Montserrat.
+2. **HANKEN GROTESK + ARCHIVO** — These are the ONLY body/heading fonts (Anton = UI caps, Cinzel = engraved caps, Inter = fallback). Self-hosted woff2 only — never Google Fonts CDN, never Montserrat.
 3. **DARK THEME DEFAULT** — Background is `#0A0A0A`, not white. Film grain overlay on all pages.
 4. **DRAFT FIRST** — Never publish directly. Always create as draft.
 5. **PRESET SLUGS** — Use design token slugs in WordPress blocks, never hardcoded hex/px.
@@ -925,7 +928,7 @@ The product display must feel premium like drakerelated.com but using our **AI f
 
 Before marking any story as GREEN:
 - [ ] Matches static HTML design reference exactly
-- [ ] Uses Inter + Playfair Display fonts (not Montserrat)
+- [ ] Uses Hanken Grotesk + Archivo fonts, self-hosted woff2 (not Montserrat, no Google Fonts CDN)
 - [ ] Dark theme (#0A0A0A) with film grain overlay
 - [ ] Content created as draft (not published)
 - [ ] Design tokens used (no hardcoded values in WP blocks)

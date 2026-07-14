@@ -86,12 +86,17 @@ Before ANY create/update/delete operation:
 ### Font Families
 | Slug | Stack | Usage |
 |------|-------|-------|
-| `heading` | 'Playfair Display', Georgia, serif | h1-h3, hero text, display headlines |
-| `body` | 'Inter', -apple-system, BlinkMacSystemFont, sans-serif | Body text, UI elements, buttons |
+| `heading` | 'Archivo', system-ui, sans-serif | h1-h3, hero text, display headlines (expanded: `font-variation-settings: 'wdth' 125`) |
+| `body` | 'Hanken Grotesk', 'Inter', -apple-system, sans-serif | Body text, buttons |
+| `ui` | 'Anton', sans-serif | UI caps, accent labels |
+| `caps` | 'Cinzel', serif | Engraved-caps accent |
 
-**CRITICAL:** These are the ONLY two font families for the theme. Do NOT use Montserrat, Cormorant Garamond, Bebas Neue, or system-font defaults. Import via Google Fonts:
+**CRITICAL:** These are the ONLY font families for the theme. Do NOT use Montserrat, Playfair Display, Cormorant Garamond, Bebas Neue, or system-font defaults. Fonts are self-hosted woff2 in `assets/fonts/`, declared via the theme.json Font Library (`settings.typography.fontFamilies` → `fontFace`) or `assets/css/fonts.css`. NO Google Fonts CDN — never `fonts.googleapis.com`/`fonts.gstatic.com` link, `@import`, or preconnect:
 ```
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+@font-face { font-family: 'Archivo'; src: url('../fonts/archivo-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Hanken Grotesk'; src: url('../fonts/hanken-grotesk-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Anton'; src: url('../fonts/anton-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Cinzel'; src: url('../fonts/cinzel-latin.woff2') format('woff2'); font-display: swap; }
 ```
 
 ### Spacing Scale

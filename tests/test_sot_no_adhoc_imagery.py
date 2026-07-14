@@ -108,6 +108,6 @@ def test_allowlist_only_shrinks_no_phantoms():
         p = REPO / rel
         assert p.is_file(), f"Allowlisted file no longer exists; remove from ALLOWLIST: {rel}"
         text = p.read_text(encoding="utf-8", errors="ignore")
-        assert SCENE_FAKE.search(text) or PRODUCT_PATH_LITERAL.search(text), (
-            f"{rel} no longer violates — remove it from ALLOWLIST (the ratchet only shrinks)."
-        )
+        assert SCENE_FAKE.search(text) or PRODUCT_PATH_LITERAL.search(
+            text
+        ), f"{rel} no longer violates — remove it from ALLOWLIST (the ratchet only shrinks)."

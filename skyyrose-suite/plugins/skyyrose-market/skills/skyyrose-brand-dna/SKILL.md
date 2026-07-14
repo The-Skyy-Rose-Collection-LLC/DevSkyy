@@ -75,7 +75,7 @@ Each collection is its **own emotional register**. Never cross-attribute voices,
 - Colors: Deep blacks, midnight tones, Silver `#C0C0C0` accent
 - Pieces: Statement items, collector editions
 - Mood: Elevated darkness, refined edge
-- Display font: Cinzel (serif, architectural) — for interior surfaces only (see lockup rule below)
+- Display font: Archivo — for interior surfaces only (see lockup rule below); Cinzel available as optional engraved-caps accent; collection NAME identity = SkyyRose Black Rose Script lockup image, never live type
 - Hero lockup asset: `assets/images/hero-overlays/br-brand-script.png` (embossed script logotype)
 - Patches: NFL, NBA, MLB, Hockey (sport-specific per jersey)
 - **Reserved voice:** "armor / you already stood up / concrete answering back" = Black Rose ONLY
@@ -89,7 +89,7 @@ Each collection is its **own emotional register**. Never cross-attribute voices,
 - Colors: Crimson `#DC143C`, deep blacks, emotional contrasts
 - Pieces: Expressive graphics, meaningful typography
 - Mood: Authentic pain transformed into beauty
-- Display font: Playfair Display (elegant serif) — for interior surfaces only
+- Display font: Archivo — for interior surfaces only; collection NAME identity = SkyyRose Love Hurts Graffiti lockup image, never live type
 - Hero lockup asset: `assets/images/hero-overlays/lh-logo-combined.png` (red graffiti drip "Love" + "Hurts")
 - **Reserved voice:** "bloodline that raised me" = Love Hurts ONLY
 
@@ -101,7 +101,7 @@ Each collection is its **own emotional register**. Never cross-attribute voices,
 - Colors: Gold `#D4AF37` accent, neutral palette, timeless tones
 - Pieces: Wardrobe staples, quality basics (tees, hoodies, joggers)
 - Mood: Understated confidence, daily elevation
-- Display font: Playfair Display — for interior surfaces only
+- Display font: Archivo — for interior surfaces only; collection NAME identity = Pinyon Script lockup image, never live type
 - Hero lockup asset: `assets/images/hero-overlays/sig-brand-skyy-rose-gold.png` (gold calligraphy with rose)
 
 ### Kids Capsule Collection
@@ -121,7 +121,7 @@ Each collection is its **own emotional register**. Never cross-attribute voices,
 
 > **Cross-reference:** `brand-guardrails.md § 4` has the full lockup rule with asset paths.
 
-A collection's **name** in any hero / cover / title position is a brand-script **lockup image**, not live typeset text. Fonts (Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue) apply only to interior surfaces — body copy, captions, slide subtext, UI labels — **never** to the collection name itself. The lockup IS the name.
+A collection's **name** in any hero / cover / title position is a brand-script **lockup image**, not live typeset text. Fonts (Archivo, Hanken Grotesk, Anton, Cinzel) apply only to interior surfaces — body copy, captions, slide subtext, UI labels — **never** to the collection name itself. The lockup IS the name.
 
 | Collection | Lockup asset location |
 |------------|----------------------|
@@ -152,12 +152,13 @@ A collection's **name** in any hero / cover / title position is a brand-script *
 
 | Role | Font | Notes |
 |------|------|-------|
-| BR headings (interior) | Cinzel | Serif, architectural — NEVER for collection name lockup |
-| SIG / LH / KC headings (interior) | Playfair Display | Elegant serif — NEVER for collection name lockup |
-| Editorial body | Cormorant Garamond | Long-form copy, product narrative |
-| UI / system | Inter | Interface, navigation, system text |
+| Display / hero / headings (interior, ALL collections) | Archivo | Display sans, expanded width — NEVER for collection name lockup |
+| Editorial body | Hanken Grotesk | Long-form copy, product narrative |
+| UI / system | Inter | System fallback — interface, navigation, system text |
 | Prices / technical data | Space Mono | Numbers, SKU-adjacent UI |
-| Buttons / labels | Bebas Neue | CTA text, tag labels |
+| Buttons / labels | Anton | CTA text, tag labels, caps, drop accent |
+| Engraved-caps accent (optional) | Cinzel | Generic engraved-caps accent — NEVER for collection name lockup |
+| Collection NAME (hero / cover / title) | Lockup image only — SkyyRose Black Rose Script (BR), SkyyRose Love Hurts Graffiti (LH), Pinyon Script (SIG), Grand Hotel (KC) | Never live type |
 
 All 9 font families are declared in `theme.json` via WordPress Font Library. Zero external CDN (Google Fonts removed).
 

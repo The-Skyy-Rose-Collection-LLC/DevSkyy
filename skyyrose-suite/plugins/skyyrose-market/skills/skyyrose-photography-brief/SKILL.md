@@ -54,7 +54,7 @@ The collection name must **never** appear as typed text in any photograph — pr
 - Black Rose, Love Hurts, Signature → `assets/images/hero-overlays/`
 - Kids Capsule → `assets/images/logos/`
 
-Fonts (Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue, Inter) are for interior copy surfaces only — never for the collection name itself, and never burned into photography.
+Fonts (Archivo, Hanken Grotesk, Anton, Cinzel, Inter) are for interior copy surfaces only — never for the collection name itself, and never burned into photography.
 
 ### Color Tokens (verbatim, enforce in grade direction)
 

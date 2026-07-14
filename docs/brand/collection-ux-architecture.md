@@ -102,7 +102,7 @@ The `kc-launch` → `kids-capsule.css` entry at `enqueue.php:478` already proves
 
 **Template slug detection:** `skyyrose_get_current_template_slug()` (`enqueue.php:386-447`) must return `'pdp-{collection}'` for WooCommerce single-product pages. Detect via `get_queried_object()` → product → taxonomy term → collection slug. Add before the existing `is_product()` → `'single-product'` branch.
 
-**Per-collection token blocks** already exist in `design-tokens.css:302-348`. No new tokens needed for Phase 1. Font-display token (`--skyyrose-font-display`) already switches Cinzel for Black Rose, Playfair for the rest.
+**Per-collection token blocks** already exist in `design-tokens.css` (generated — font tokens come from `typography.json` + per-collection `identity.json`, see `SOT.md` → `typography.json`). No new tokens needed for Phase 1.
 
 **Total CSS budget:** see Section 7.
 

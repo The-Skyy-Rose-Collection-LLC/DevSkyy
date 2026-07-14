@@ -55,7 +55,7 @@ There is exactly one tagline. It is "Luxury Grows from Concrete." It appears as 
 
 | Collection | Thesis | Visual language |
 |------------|--------|-----------------|
-| **Black Rose** | Grief that became armor. Oakland night, gothic gravity. | Cinzel headings, dark/silver/charcoal palette, BAY BRIDGE / Oakland street references |
+| **Black Rose** | Grief that became armor. Oakland night, gothic gravity. | Archivo headings, Cinzel engraved-caps accent, dark/silver/charcoal palette, BAY BRIDGE / Oakland street references |
 | **Love Hurts** | The romanticism of being from a place the world misjudges. Beauty-and-the-Beast from BEAST's perspective. | Crimson accent, gothic cathedral, enchanted-rose-dome immersive |
 | **Signature** | What you wear when you've stopped explaining yourself. Bay Area / SF, golden hour. | Gold accent, GOLDEN GATE BRIDGE references, fashion-runway sensibility |
 | **Kids Capsule** | (Carry the brand DNA into kidswear.) | Rose-gold accent, playful but not childish |
@@ -120,13 +120,13 @@ Plus 5 grays + semantic (success/warning/error). No off-system colors anywhere.
 
 | Family | Use |
 |--------|-----|
-| Cinzel | Black Rose collection headings |
-| Playfair Display | Signature / Love Hurts / Kids Capsule headings |
-| Cormorant Garamond | Body |
-| Bebas Neue | UI elements |
+| Archivo | Display / hero / headings (all collections) |
+| Hanken Grotesk | Body / UI |
+| Anton | UI caps / accent |
+| Cinzel | Engraved-caps accent |
 | Inter | System / fallback |
 
-All 9 font families declared in `theme.json` Font Library — **zero Google Fonts CDN.**
+All font families self-hosted (woff2) and declared in `theme.json` Font Library — **zero Google Fonts CDN.** Collection name-scripts (SkyyRose Black Rose Script, SkyyRose Love Hurts Graffiti, Pinyon Script, Grand Hotel) appear only as lockup images, never as interior text. See `SOT.md` → `typography.json`.
 
 ---
 

@@ -102,7 +102,7 @@ DevSkyy is ready for production launch with the following key components:
 
 - [x] Backend API functional with all routers
 - [x] Frontend builds and deploys to Vercel
-- [ ] **FIX**: Google Fonts fallback for offline builds
+- [ ] **FIX**: self-hosted font fallback for offline builds (woff2 in `assets/fonts`, zero-CDN — no Google Fonts)
 - [ ] **FIX**: CORS configuration hardening
 - [x] WordPress theme with 3D experiences
 - [x] CI/CD pipeline operational
@@ -294,7 +294,7 @@ curl -s -o /dev/null -w "%{http_code}" https://skyyrose.com
 
 1. **Cold Starts**: Vercel/Render may have 2-3s cold starts
 2. **HF Spaces**: GPU spaces may sleep after inactivity
-3. **Font Loading**: Google Fonts may fail in restricted networks (fallbacks added)
+3. **Font Loading**: fonts are self-hosted woff2 (zero-CDN) — no external font-network dependency
 
 ### Post-Launch Tasks
 

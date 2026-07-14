@@ -25,7 +25,7 @@ allowed-tools: Read Write Edit Glob
 - **Founder:** Corey Foster. Oakland / Bay Area. Voice is earned, direct, unhurried — not a hype-merchant bio. The bio should read like a person, not a press release.
 - **Products by NAME, not SKU** in all public-facing copy. "Black Rose Crewneck" in the one-sheet, not "br-001."
 - **Collection voices are isolated.** Do not mix Black Rose copy into the Signature one-sheet. Each collection has its own register.
-- **Hero titles = lockup IMAGES, not live type.** In the digital PDF, collection names in header positions use the official lockup image — not Cinzel or Playfair rendered as text.
+- **Hero titles = lockup IMAGES, not live type.** In the digital PDF, collection names in header positions use the official lockup image — not Cinzel or Archivo rendered as text.
 
 Full canon: `../skyyrose-content-engine/brand-guardrails.md`
 
@@ -78,7 +78,7 @@ skyyroseco@gmail.com
 - Background: Dark `#0A0A0A`
 - Logo and text: white
 - Collection lockup (if featured): use official PNG from `assets/images/hero-overlays/` (BR/LH/SIG) or `assets/images/logos/` (Kids)
-- Font for body text only: Cormorant Garamond or Playfair Display — NOT Cinzel or any font rendered as the collection name itself
+- Font for body text only: Hanken Grotesk or Archivo — NOT Cinzel or any font rendered as the collection name itself
 
 ---
 

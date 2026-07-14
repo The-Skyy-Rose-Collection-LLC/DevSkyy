@@ -93,14 +93,14 @@ themes/shopify/
   {
     "name": "Typography",
     "settings": [
-      { "type": "font_picker", "id": "sr_heading_font", "label": "Heading Font", "default": "playfair_display_n4" },
-      { "type": "font_picker", "id": "sr_body_font", "label": "Body Font", "default": "cormorant_garamond_n4" }
+      { "type": "font_picker", "id": "sr_heading_font", "label": "Heading Font", "default": "archivo_n4" },
+      { "type": "font_picker", "id": "sr_body_font", "label": "Body Font", "default": "inter_n4" }
     ]
   }
 ]
 ```
 
-Note: Shopify's `font_picker` uses Shopify's font library. Self-hosted fonts still shipped via `assets/fonts/` + `@font-face` in `theme.css` — the picker is a fallback.
+Note: Shopify's `font_picker` uses Shopify's font library. The brand-canon fonts (Archivo display, Hanken Grotesk body, Anton UI caps, Cinzel engraved caps) still ship self-hosted via `assets/fonts/` + `@font-face` in `theme.css` — the picker defaults are library fallbacks only (Hanken Grotesk is not confirmed in Shopify's library, hence `inter_n4` as the body fallback).
 
 ---
 

@@ -136,8 +136,8 @@ This theme must be structured as a PROFESSIONAL commercial-grade WordPress theme
 ## Design System Requirements
 - MANDATORY dark theme: #0A0A0A page background (NOT white), #111111 card backgrounds
 - Glass morphism: rgba(17,17,17,0.95) with backdrop-filter: blur(20px) for panels
-- Fonts: Inter (body) + Playfair Display (headings) — Google Fonts import ONLY
-  - Do NOT use Montserrat, Cormorant Garamond, Bebas Neue, or system defaults
+- Fonts: Hanken Grotesk (body/UI) + Archivo (display/headings) + Anton (UI caps) + Cinzel (engraved-caps accent); Inter = fallback only — self-hosted woff2 ONLY (assets/fonts/ + theme.json Font Library / assets/css/fonts.css; NO Google Fonts CDN, no @import, no preconnect)
+  - Do NOT use Montserrat, Playfair Display, Cormorant Garamond, Bebas Neue, or system defaults
 - Film grain SVG overlay at 3% opacity on ALL pages (luxury texture effect)
 - Official collection colors (OWNER-CONFIRMED, do not change):
   - BLACK ROSE: Black #000000, White #FFFFFF, Metallic Silver #C0C0C0
@@ -171,7 +171,7 @@ playful rounded cards, joyful voice (NEW — no static reference, derive from ot
 9. woocommerce/cart/cart.php — Dark luxury cart with 150px item images + sticky order summary (400px)
 10. woocommerce/checkout/form-checkout.php — 4-step progress (Cart > Info > Payment > Confirm) \
 + multi-step form + sticky order summary (420px)
-11. 404.php — Dark bg, "404" in Playfair with gold gradient, collection quick links, CTA (NEW)
+11. 404.php — Dark bg, "404" in Archivo with gold gradient, collection quick links, CTA (NEW)
 
 ## Shared Components
 - Header: Fixed dark navbar rgba(10,10,10,0.95) + blur(20px), SR Monogram logo (48px), \
@@ -180,7 +180,7 @@ mobile hamburger slide-in from right
 - Footer: 5-column grid (2fr 1fr 1fr 1fr 1fr) — Brand/Shop/Help/Legal/Social, \
 newsletter signup bar, copyright, stacks to single column on mobile
 - Product Card: #111 bg, 3:4 aspect image, hover: translateY(-8px) + shadow, \
-quick actions overlay (wishlist, quickview, add-to-cart), name (Inter 600), \
+quick actions overlay (wishlist, quickview, add-to-cart), name (Hanken Grotesk 600), \
 price in collection accent color
 - Toast Notifications: fixed bottom-right, slide-in, dark glass, auto-dismiss 3s
 

@@ -49,7 +49,7 @@
 - Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
 - Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
 - **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
-- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
+- **Version source = `SKYYROSE_VERSION`** in `functions.php` — style.css and readme.txt sync to it; never hardcode a release number in docs (check the constant, don't assume)
 - **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
 - Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
 - `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls

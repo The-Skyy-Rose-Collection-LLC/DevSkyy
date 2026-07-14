@@ -76,9 +76,9 @@ def test_no_retired_tagline_anywhere_in_templates() -> None:
         as_dict = t.to_dict()
         serialized = str(as_dict)
         for retired in brand.retired_taglines:
-            assert retired not in serialized, (
-                f"{ct.value}: retired tagline {retired!r} leaked into template"
-            )
+            assert (
+                retired not in serialized
+            ), f"{ct.value}: retired tagline {retired!r} leaked into template"
 
 
 def test_to_agent_reference_includes_recovery_steps() -> None:

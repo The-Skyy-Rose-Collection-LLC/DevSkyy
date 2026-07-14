@@ -89,15 +89,17 @@ grep -q "'unsafe-inline'" inc/security-hardening.php || echo "WARNING: Missing '
 
 ### 4. Asset Verification
 ```bash
-# Check CDN URLs are accessible
+# Verify self-hosted fonts are served — skyyrose.co self-hosts fonts (zero Google-Fonts CDN)
+# (JS/CDN delivery is out of scope for this font check — the theme's enqueue is the source of truth for JS loading)
+base="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets"
 urls=(
-  "https://cdn.babylonjs.com/babylon.js"
-  "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
-  "https://fonts.googleapis.com/css2?family=Playfair+Display"
+  "$base/css/fonts.css"
+  "$base/fonts/archivo-latin.woff2"
+  "$base/fonts/hanken-grotesk-latin.woff2"
 )
 
 for url in "${urls[@]}"; do
-  curl -I "$url" 2>&1 | grep "200 OK" || echo "ERROR: $url not accessible"
+  curl -sI "$url" 2>&1 | grep -q "200" || echo "ERROR: $url not accessible"
 done
 ```
 
@@ -202,7 +204,7 @@ checkConsoleErrors();
 #### C. CSS Loading Verification
 ```bash
 # Verify style.css loads successfully
-curl -I "https://skyyrose.co/wp-content/themes/skyyrose-2025/style.css" 2>&1 | grep "200 OK"
+curl -I "https://skyyrose.co/wp-content/themes/skyyrose-flagship/style.css" 2>&1 | grep "200 OK"
 ```
 
 #### D. Performance Check

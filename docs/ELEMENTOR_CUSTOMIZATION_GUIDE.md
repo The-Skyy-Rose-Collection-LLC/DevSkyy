@@ -19,8 +19,8 @@ Text Light:       #FFFFFF (White)
 
 **Typography**:
 
-- Headings: Bold, serif fonts (Georgia, Playfair Display)
-- Body: Clean sans-serif (Open Sans, Roboto)
+- Headings: Bold display fonts (Archivo)
+- Body: Clean sans-serif (Hanken Grotesk)
 - Logo: "SkyyRose - Where Love Meets Luxury"
 
 ---

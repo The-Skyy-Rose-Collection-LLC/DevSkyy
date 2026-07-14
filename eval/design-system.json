@@ -32,12 +32,13 @@
     }
   },
   "typography": {
-    "_note": "5 type families per WP §5.1 + brand-story.md. All declared in theme.json Font Library. Zero Google Fonts CDN.",
+    "_note": "6 universal type roles (+ 4 bespoke collection name-scripts as lockup images, never interior type). All declared in theme.json Font Library. Zero Google Fonts CDN. Source of truth: SOT.md -> data/brand/typography.json.",
     "family": {
-      "display_br": { "value": "Cinzel", "use": "Black Rose collection headings" },
-      "display_general": { "value": "Playfair Display", "use": "Signature / Love Hurts / Kids Capsule headings" },
-      "body": { "value": "Cormorant Garamond", "use": "Body copy" },
-      "ui": { "value": "Bebas Neue", "use": "UI elements (buttons, labels — designed for caps)" },
+      "display": { "value": "Archivo", "use": "Display / hero / headings — all collections (expanded 'wdth' 125)" },
+      "caps_accent": { "value": "Cinzel", "use": "Engraved caps / eyebrows — accent" },
+      "body": { "value": "Hanken Grotesk", "use": "Body / UI copy" },
+      "ui": { "value": "Anton", "use": "UI labels, caps, drop accent" },
+      "mono": { "value": "SF Mono", "use": "Code / technical labels — system monospace (ui-monospace, no woff2)" },
       "system": { "value": "Inter", "use": "System / fallback" }
     },
     "scale": {

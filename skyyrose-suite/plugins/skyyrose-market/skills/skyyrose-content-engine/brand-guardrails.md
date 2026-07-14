@@ -52,8 +52,8 @@ line on another. Pull per-collection lines from `docs/brand/collection-stories.m
 
 A collection's **name** in any hero / cover / title position is a brand-script **lockup image**
 (`assets/images/hero-overlays/` for BR/LH/SIG, `assets/images/logos/` for Kids), NOT live type.
-Fonts (Cinzel for BR headings, Playfair Display for SIG/LH/KC, Cormorant Garamond body,
-Bebas Neue UI) apply ONLY to interior surfaces — body copy, captions, slide subtext — never to
+Fonts (Archivo headings — all collections, Hanken Grotesk body, Anton UI labels,
+Cinzel optional engraved-caps accent) apply ONLY to interior surfaces — body copy, captions, slide subtext — never to
 the collection name itself. The lockup IS the name.
 
 ## 5. Founder canon — what we NEVER do

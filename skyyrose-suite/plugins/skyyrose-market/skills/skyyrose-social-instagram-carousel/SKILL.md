@@ -99,7 +99,7 @@ For each slide deliver:
 - Headline: 3-7 words (the point, not a sentence)
 - Supporting text: 1-2 short sentences. Total under 40 words per slide.
 - Alternate layout (left-heavy / right-heavy / centered) to signal new slide at a glance.
-- Design note must specify font choice: Cormorant Garamond body, Bebas Neue for UI labels.
+- Design note must specify font choice: Hanken Grotesk body, Anton for UI labels.
 
 **CTA Slide**
 - Single action. If pre-order: "Pre-order open. Link in bio." If live: "Shop now. skyyrose.co"
@@ -134,8 +134,8 @@ Caption complements — does not repeat — slide content.
 | Element | Rule |
 |---------|------|
 | **Slide dimensions** | 1080×1350px (4:5 — maximum feed real estate) |
-| **Headlines** | 40-60pt Bebas Neue or Cinzel (Black Rose only) |
-| **Body text** | 24-30pt Cormorant Garamond |
+| **Headlines** | 40-60pt Archivo or Anton (Cinzel as optional engraved-caps accent) |
+| **Body text** | 24-30pt Hanken Grotesk |
 | **Words per slide** | Under 40 |
 | **Collection name in hero** | Lockup image ONLY — never live type |
 | **Hashtags** | First comment, not caption |
@@ -219,33 +219,33 @@ python -m skyyrose.elite_studio.ventures.social smoke --sku br-001
 COVER SLIDE
 Headline:    "Armor doesn't ask permission."
 Supporting:  BLACK Rose Crewneck. Pre-order open.
-Design note: Dark #0A0A0A background. BLACK Rose lockup image (assets/images/hero-overlays/black-rose-lockup.png) centered upper third. Silver #C0C0C0 thin rule below lockup. Headline in Bebas Neue 56pt bottom-left. No other elements.
+Design note: Dark #0A0A0A background. BLACK Rose lockup image (assets/images/hero-overlays/black-rose-lockup.png) centered upper third. Silver #C0C0C0 thin rule below lockup. Headline in Anton 56pt bottom-left. No other elements.
 
 SLIDE 2
 Headline:    "Built for the town that built you."
 Supporting:  Oakland doesn't do soft. Neither does this crewneck. French terry construction. Weight that means something when you put it on.
-Design note: Full bleed product flat-lay on dark concrete background. Headline top-left, Bebas Neue 44pt silver. Body Cormorant Garamond 26pt white.
+Design note: Full bleed product flat-lay on dark concrete background. Headline top-left, Anton 44pt silver. Body Hanken Grotesk 26pt white.
 
 SLIDE 3
 Headline:    "The details you earn."
 Supporting:  Embroidered Black Rose chest script. Reinforced ribbed cuffs and hem. Preshrunk so the drop doesn't leave you.
-Design note: Two-panel layout: left panel = close-up embroidery detail; right panel = ribbed cuff detail. Minimal white labels (Bebas Neue 18pt) pointing to each detail.
+Design note: Two-panel layout: left panel = close-up embroidery detail; right panel = ribbed cuff detail. Minimal white labels (Anton 18pt) pointing to each detail.
 
 SLIDE 4
 Headline:    "Concrete answering back."
 Supporting:  Black Rose is the collection for those who already stood up. This piece doesn't try to prove anything. It simply is.
-Design note: Lifestyle editorial — model in full Black Rose look, outdoor Oakland location, overcast light. Headline bottom-center, Cormorant Garamond italic 34pt, silver.
+Design note: Lifestyle editorial — model in full Black Rose look, outdoor Oakland location, overcast light. Headline bottom-center, Archivo 44pt, silver.
 
 SLIDE 5
 Headline:    "250 made. That's the run."
 Supporting:  No restock. No restocking announcement. When it's gone, it's gone — stated once.
-Design note: Near-black background. Single centered text block. Cormorant Garamond 30pt white. Silver horizontal rule above and below the block. No product imagery.
+Design note: Near-black background. Single centered text block. Hanken Grotesk 30pt white. Silver horizontal rule above and below the block. No product imagery.
 
 CTA SLIDE
 Headline:    "Pre-order now."
 Supporting:  skyyrose.co | @SkyyRose
              Luxury Grows from Concrete.
-Design note: Dark #0A0A0A. Rose Gold #B76E79 accent left border. Headline Bebas Neue 52pt white centered. Handle + tagline Cormorant Garamond 22pt silver below.
+Design note: Dark #0A0A0A. Rose Gold #B76E79 accent left border. Headline Anton 52pt white centered. Handle + tagline Hanken Grotesk 22pt silver below.
 ```
 
 **Caption:**

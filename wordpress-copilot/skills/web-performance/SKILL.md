@@ -50,7 +50,7 @@ import Image from 'next/image';
 // 2. Preload critical resources
 <link
   rel="preload"
-  href="/fonts/playfair-display.woff2"
+  href="/fonts/archivo.woff2"
   as="font"
   type="font/woff2"
   crossOrigin="anonymous"
@@ -137,8 +137,8 @@ async function processLargeDataset(items: any[]) {
 // 3. Optimize font loading
 // In CSS
 @font-face {
-  font-family: 'Playfair Display';
-  src: url('/fonts/playfair.woff2') format('woff2');
+  font-family: 'Archivo';
+  src: url('/fonts/archivo.woff2') format('woff2');
   font-display: swap; /* Prevents invisible text */
   font-weight: 400;
 }
@@ -146,7 +146,7 @@ async function processLargeDataset(items: any[]) {
 // Preload critical fonts
 <link
   rel="preload"
-  href="/fonts/playfair.woff2"
+  href="/fonts/archivo.woff2"
   as="font"
   type="font/woff2"
   crossOrigin="anonymous"

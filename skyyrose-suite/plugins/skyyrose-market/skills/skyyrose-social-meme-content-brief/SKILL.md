@@ -216,7 +216,7 @@ Punchline (bottom): "French terry. Embroidered. Preshrunk. 250 made.
                     [image: same energy as handing them the ingredient list]"
 Image direction: Left panel — person shrugging/confused expression (stock-style reaction still).
                  Right panel — extreme close-up of the Black Rose Crewneck embroidery detail.
-                 Minimal text overlay in Bebas Neue, silver on dark.
+                 Minimal text overlay in Anton, silver on dark.
 Brand alignment: Positions the price as a construction story, not a label story.
 Risk level: Low
 
@@ -243,7 +243,7 @@ Register: Brand-level
 
 Setup (top):    [Drake dismissive face] "Brands that explain their logo"
 Punchline (bottom): [Drake approving face] "Brands where the garment does the talking"
-Image direction: Standard Drake meme panels. Text in clean Bebas Neue overlay, dark background.
+Image direction: Standard Drake meme panels. Text in clean Anton overlay, dark background.
                  No SkyyRose branding in the meme itself — let the post account do the attribution.
 Brand alignment: Reinforces "garment is the protagonist" without stating it as a brand claim.
 Risk level: Low
@@ -272,7 +272,7 @@ Setup:   "250 made."
 Punchline: "That's not a marketing line.
             That's the run."
 Image direction: Clean dark frame (#0A0A0A). Gold accent rule above the text.
-                Cormorant Garamond 30pt white. No image — text is the full visual.
+                Hanken Grotesk 30pt white. No image — text is the full visual.
                 Post stands alone as a statement. No further caption needed.
 Brand alignment: Signature collection's "stay golden / the standard" register — quiet, factual, earned.
 Risk level: Low

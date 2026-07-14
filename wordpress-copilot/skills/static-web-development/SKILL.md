@@ -39,9 +39,8 @@ Activate when working on:
   <meta property="og:image" content="https://skyyrose.co/og-image.jpg">
   <meta property="og:type" content="website">
 
-  <!-- Preconnect to CDNs -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="dns-prefetch" href="https://cdn.babylonjs.com">
+  <!-- Fonts self-hosted, zero CDN — preload the critical face -->
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/archivo-latin.woff2" crossorigin>
 
   <link rel="stylesheet" href="/style.css">
 </head>
@@ -152,7 +151,7 @@ Activate when working on:
   --color-accent: #E8C5A5;
 
   /* Typography */
-  --font-heading: 'Playfair Display', serif;
+  --font-heading: 'Archivo', system-ui, sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;
@@ -458,7 +457,7 @@ p {
   </style>
 
   <!-- Preload fonts -->
-  <link rel="preload" href="/fonts/playfair.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Async load non-critical CSS -->
   <link rel="stylesheet" href="/style.css" media="print" onload="this.media='all'">

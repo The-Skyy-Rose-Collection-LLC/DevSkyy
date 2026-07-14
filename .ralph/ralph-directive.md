@@ -91,7 +91,7 @@ These files are OFF-LIMITS — do NOT modify them:
 - **RETIRED**: "Where Love Meets Luxury" — NEVER use this
 - **Colors**: Rose Gold `#B76E79`, Dark `#0A0A0A`, Gold `#D4AF37`
 - **Collection accents**: Black Rose `#C0C0C0` (silver), Love Hurts `#DC143C` (crimson), Signature `#D4AF37` (gold)
-- **Fonts**: Cinzel, Cormorant Garamond, Space Mono, Bebas Neue, Playfair Display
+- **Fonts**: Archivo (display/headings), Hanken Grotesk (body/UI), Anton (UI caps), Cinzel (engraved caps), Inter (system/fallback) — self-hosted woff2 only, no Google Fonts CDN
 - **API**: Use `index.php?rest_route=` (NOT `/wp-json/`)
 
 ### 7. Brand Asset Optimization & Injection (MANDATORY — Section 1)
@@ -204,7 +204,7 @@ Homepage → Landing Pages → Collection Pages → Single Product → Pre-Order
    - Schema.org markup for products
 7. **Configuration**:
    - `wp_enqueue_style/script` for all new assets with conditional loading
-   - Google Fonts preconnect
+   - Self-hosted woff2 fonts (assets/fonts/ via theme.json Font Library / assets/css/fonts.css) — NO Google Fonts CDN, no preconnect
    - Critical CSS inlining for above-fold
    - `prefers-reduced-motion` support globally
 
@@ -258,7 +258,7 @@ The homepage hero is NOT the one in the HTML package. Use this custom design ins
   - Rose gold shimmer gradient on the text: `background: linear-gradient(135deg, #B76E79, #D4AF37, #B76E79); -webkit-background-clip: text;`
   - Font size: `clamp(32px, 6vw, 72px)` — scales but stays on ONE LINE
   - `white-space: nowrap` to enforce single row
-- **Tagline**: "Luxury Grows from Concrete." — Cormorant Garamond italic, below brand name
+- **Tagline**: "Luxury Grows from Concrete." — Hanken Grotesk italic, below brand name
 - **CTA buttons**: Two side-by-side — "SHOP NOW" (solid rose gold) + "EXPLORE" (outline)
 - **Background**: Keep the atmospheric particles, grain overlay, and vignette from the package design
 - **Mobile**: Monogram scales down to 200px wide, text shrinks, CTAs stack vertically
@@ -827,7 +827,7 @@ function skyyrose_enqueue_page_assets() {
 - `design-tokens.css`
 - `header.css` + `footer.css`
 - `navigation.js`
-- Google Fonts preconnect
+- Self-hosted @font-face declarations (assets/css/fonts.css — no Google Fonts CDN, no preconnect)
 
 **Everything else is per-page.** Audit every `wp_enqueue_*` call and wrap in the appropriate conditional.
 

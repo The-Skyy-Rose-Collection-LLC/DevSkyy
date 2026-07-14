@@ -31,7 +31,7 @@ atoms/
 ├── Button/              # Primary CTA buttons (#B76E79)
 ├── Input/               # Form inputs with luxury styling
 ├── Icon/                # SVG icon system
-└── Typography/          # Playfair Display, sans-serif
+└── Typography/          # Archivo, sans-serif
 
 molecules/
 ├── FormField/           # Label + Input + Error
@@ -191,7 +191,7 @@ export const useCart = create<CartStore>()(
 }
 
 .card__title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Archivo', system-ui, sans-serif;
   color: #B76E79; /* SkyyRose primary */
   font-size: 1.5rem;
 }
@@ -312,7 +312,7 @@ export const tokens = {
 
   typography: {
     fontFamily: {
-      heading: "'Playfair Display', serif",
+      heading: "'Archivo', system-ui, sans-serif",
       body: "'Inter', sans-serif",
       mono: "'JetBrains Mono', monospace",
     },
@@ -562,7 +562,7 @@ root.render(
 1. **Component naming**: `Skyy` prefix for custom components (`SkyyProductCard`, `SkyyCheckout`)
 2. **Brand tokens**: Always use `tokens.colors.brand.primary` not hardcoded `#B76E79`
 3. **Animations**: Use `tokens.animation.easing.luxury` for smooth, premium feel
-4. **Typography**: Playfair Display for headings, Inter for body
+4. **Typography**: Archivo for headings, Inter for body
 5. **Spacing**: Use design tokens, not arbitrary values
 
 ---

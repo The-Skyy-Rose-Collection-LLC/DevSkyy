@@ -24,7 +24,7 @@ COLLECTION_DNA = {
         "aesthetic": "gothic luxury, noir elegance, Oakland nightlife",
         "mood": "dark romance, refined edge, elevated darkness",
         "accent_color": "#C0C0C0 (silver)",
-        "font": "Cinzel",
+        "font": "SkyyRose Black Rose Script",
         "tagline": "where darkness meets elegance in limited edition form",
     },
     "love-hurts": {
@@ -32,7 +32,7 @@ COLLECTION_DNA = {
         "aesthetic": "raw emotion, vulnerability as strength, street passion",
         "mood": "authentic pain transformed into beauty, fire and devotion",
         "accent_color": "#DC143C (crimson)",
-        "font": "Playfair Display",
+        "font": "SkyyRose Love Hurts Graffiti",
         "tagline": "emotional expression through wearable art, bearing the Hurts family legacy",
     },
     "signature": {
@@ -40,7 +40,7 @@ COLLECTION_DNA = {
         "aesthetic": "everyday luxury, West Coast prestige, Bay Area pride",
         "mood": "understated confidence, daily elevation, versatile refinement",
         "accent_color": "#D4AF37 (gold)",
-        "font": "Playfair Display",
+        "font": "Pinyon Script",
         "tagline": "refined essentials that form the foundation of elevated everyday wear",
     },
     "kids-capsule": {
@@ -48,7 +48,7 @@ COLLECTION_DNA = {
         "aesthetic": "playful luxury, bold color blocks, next-generation style",
         "mood": "joyful, confident, family-forward",
         "accent_color": "#B76E79 (rose gold)",
-        "font": "Playfair Display",
+        "font": "Grand Hotel",
         "tagline": "little ones deserve luxury too",
     },
 }
@@ -487,7 +487,7 @@ def _build_templates() -> dict[str, PromptTemplate]:
                 "graffiti-stained concrete. "
                 "References: Gothic cathedrals, Oakland street murals, "
                 "Beauty and the Beast enchanted rose, burning love letters. "
-                "Typography: Playfair Display for headlines, hand-drawn graffiti accents. "
+                "Typography: Archivo headlines with the SkyyRose Love Hurts Graffiti script for the collection name, hand-drawn graffiti accents. "
                 "Include: 6-9 reference images, color swatches, "
                 "texture samples, typography samples, mood keywords."
             ),
