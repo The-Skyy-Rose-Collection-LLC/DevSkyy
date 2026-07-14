@@ -5,7 +5,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+  font-family: var(--skyyrose-font-ui, 'Anton', sans-serif);
   letter-spacing: var(--tracking-wider, 0.1em);
   text-transform: uppercase;
   text-decoration: none;

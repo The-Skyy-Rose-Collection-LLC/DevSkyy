@@ -21,25 +21,26 @@ const FONT_DEST = resolve(PKG, 'src/fonts')
 
 // ---------------------------------------------------------------------------
 // CANON font set — the ONLY families referenced by DS components + tokens.
-// Source of truth:
-//   - collection identity.json `fonts` keys: Cinzel (caps), Cormorant Garamond (body),
-//     Yellowtail/Pinyon Script/Kaushan Script (per-collection scripts)
-//   - design-tokens.css :root: Playfair Display, Bebas Neue, Inter, Cormorant Garamond
-//   - NOT canon: Barlow, Oswald, Instrument Serif (in theme.json but referenced
-//     by nothing in the DS — these are legacy/retired families)
+// Source of truth = data/brand/typography.json (SOT.md) + shipped assets/fonts/*.woff2:
+//   - universal roles (in theme.json fontFamilies -> woff2Map): Archivo (display),
+//     Hanken Grotesk (body/UI), Anton (UI caps/accent), Cinzel (engraved accent), Inter (fallback)
+//   - per-collection name-scripts (NOT in theme.json fontFamilies -> CURATED below):
+//     SkyyRose Black Rose Script, SkyyRose Love Hurts Graffiti, Pinyon Script, Grand Hotel
+//   - RETIRED 2026-07-10, excluded: Playfair Display, Cormorant Garamond, Bebas Neue, Yellowtail
+//     (woff2 removed from the theme). Legacy Pacifico/Kaushan woff2 remain on disk but are
+//     superseded by the bespoke BR/LH scripts and are NOT canon.
 // ---------------------------------------------------------------------------
 const CANON_WOFF2 = new Set([
+  'archivo-latin.woff2',
+  'hanken-grotesk-latin.woff2',
+  'anton-latin.woff2',
   'cinzel-latin.woff2',
-  'cormorant-garamond-latin.woff2',
-  'cormorant-garamond-italic-latin.woff2',
-  'playfair-display-latin.woff2',
-  'playfair-display-latin-ext.woff2',
-  'bebas-neue-latin.woff2',
   'inter-latin.woff2',
   'inter-latin-ext.woff2',
-  'yellowtail-latin.woff2',
+  'skyyrose-black-rose-script-latin.woff2',
+  'skyyrose-love-hurts-graffiti-latin.woff2',
   'pinyon-script-latin.woff2',
-  'kaushan-script-latin.woff2',
+  'grand-hotel-latin.woff2',
 ])
 
 let drift = 0
@@ -92,12 +93,13 @@ function buildFontsCss() {
   }
 
   // Curated names for collection script fonts not in theme.json fontFamilies.
-  // These names match the CSS variable values in tokens.css:
-  //   --skyyrose-font-script: 'Yellowtail' | 'Pinyon Script' | 'Kaushan Script'
+  // These names match the per-collection --skyyrose-font-script values in tokens.css
+  // (BR=SkyyRose Black Rose Script, LH=SkyyRose Love Hurts Graffiti, SIG=Pinyon Script, KC=Grand Hotel).
   const CURATED = new Map([
-    ['yellowtail-latin.woff2',    { family: 'Yellowtail',    weight: '400', style: 'normal' }],
-    ['pinyon-script-latin.woff2', { family: 'Pinyon Script', weight: '400', style: 'normal' }],
-    ['kaushan-script-latin.woff2',{ family: 'Kaushan Script',weight: '400', style: 'normal' }],
+    ['skyyrose-black-rose-script-latin.woff2',   { family: 'SkyyRose Black Rose Script',   weight: '400', style: 'normal' }],
+    ['skyyrose-love-hurts-graffiti-latin.woff2', { family: 'SkyyRose Love Hurts Graffiti', weight: '400', style: 'normal' }],
+    ['pinyon-script-latin.woff2',                { family: 'Pinyon Script',                weight: '400', style: 'normal' }],
+    ['grand-hotel-latin.woff2',                  { family: 'Grand Hotel',                  weight: '400', style: 'normal' }],
   ])
 
   // Iterate canon set in deterministic order for reproducible output.

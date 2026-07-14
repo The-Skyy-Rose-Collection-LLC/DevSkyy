@@ -1,11 +1,10 @@
-@font-face{font-family:'Bebas Neue';src:url('./bebas-neue-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Anton';src:url('./anton-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Archivo';src:url('./archivo-latin.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
 @font-face{font-family:'Cinzel';src:url('./cinzel-latin.woff2') format('woff2');font-weight:400 900;font-style:normal;font-display:swap;}
-@font-face{font-family:'Cormorant Garamond';src:url('./cormorant-garamond-italic-latin.woff2') format('woff2');font-weight:300 600;font-style:italic;font-display:swap;}
-@font-face{font-family:'Cormorant Garamond';src:url('./cormorant-garamond-latin.woff2') format('woff2');font-weight:300 700;font-style:normal;font-display:swap;}
+@font-face{font-family:'Grand Hotel';src:url('./grand-hotel-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Hanken Grotesk';src:url('./hanken-grotesk-latin.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
 @font-face{font-family:'Inter';src:url('./inter-latin-ext.woff2') format('woff2');font-weight:300 700;font-style:normal;font-display:swap;}
 @font-face{font-family:'Inter';src:url('./inter-latin.woff2') format('woff2');font-weight:300 700;font-style:normal;font-display:swap;}
-@font-face{font-family:'Kaushan Script';src:url('./kaushan-script-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
 @font-face{font-family:'Pinyon Script';src:url('./pinyon-script-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
-@font-face{font-family:'Playfair Display';src:url('./playfair-display-latin-ext.woff2') format('woff2');font-weight:400 800;font-style:normal;font-display:swap;}
-@font-face{font-family:'Playfair Display';src:url('./playfair-display-latin.woff2') format('woff2');font-weight:400 800;font-style:normal;font-display:swap;}
-@font-face{font-family:'Yellowtail';src:url('./yellowtail-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'SkyyRose Black Rose Script';src:url('./skyyrose-black-rose-script-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'SkyyRose Love Hurts Graffiti';src:url('./skyyrose-love-hurts-graffiti-latin.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
