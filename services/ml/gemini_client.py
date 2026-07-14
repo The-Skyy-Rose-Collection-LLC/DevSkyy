@@ -172,6 +172,14 @@ class ImageInput(BaseModel):
     @classmethod
     async def from_url(cls, url: str, timeout: float = 30.0) -> ImageInput:
         """Create ImageInput from URL by downloading and encoding."""
+        # SSRF guard: reject internal hosts / cloud-metadata IPs before fetching
+        # a caller-supplied URL. Shared primitive — this closes every call site
+        # (brand-assets ingest, creative/multimodal agents, 3D providers).
+        # Block-internal-only (empty allowlist) so legitimate public image URLs
+        # from any domain still resolve.
+        from security.ssrf_protection import SSRFProtection
+
+        SSRFProtection().validate_url(url)
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.get(url)
             response.raise_for_status()

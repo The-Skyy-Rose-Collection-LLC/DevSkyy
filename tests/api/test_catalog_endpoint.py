@@ -109,6 +109,15 @@ def client(fake_matches, monkeypatch):
 
     app = FastAPI()
     app.include_router(catalog_router, prefix="/api/v1")
+    # /cache/clear requires auth (POST, admin-mutating); /answer + /answer/stream
+    # are intentionally PUBLIC (shopper Q&A, bounded by per-IP rate limits, not a
+    # JWT gate — see the module docstring). Override get_current_user with a stub
+    # so the /cache/clear test exercises endpoint logic, not the 401 gate (that
+    # gate is covered by test_api_auth_hardening.py). The override is a harmless
+    # no-op for the two public routes, which don't depend on get_current_user.
+    from security.jwt_oauth2_auth import get_current_user
+
+    app.dependency_overrides[get_current_user] = lambda: {"sub": "test-user", "role": "admin"}
     return TestClient(app)
 
 

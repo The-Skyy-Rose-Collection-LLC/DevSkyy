@@ -28,6 +28,12 @@ function parseRedisUrl(url: string) {
 
 const connection = parseRedisUrl(REDIS_URL);
 
+// Machine-to-machine credential for backend routes that require auth (e.g.
+// /api/v1/wordpress/sync). This worker has no user session, so it presents a
+// service token instead of a user JWT. Server-only env (NOT NEXT_PUBLIC_) — it
+// must never reach the browser. Unset => the header is omitted and the call 401s.
+const WP_SYNC_SERVICE_TOKEN = process.env.WORDPRESS_SYNC_SERVICE_TOKEN;
+
 // Job handlers
 async function handleGenerate3D(job: Job<JobData['generate-3d-asset']>) {
   const { productId, prompt, provider, outputFormat } = job.data;
@@ -76,7 +82,10 @@ async function handleSyncWordPress(job: Job<JobData['sync-wordpress']>) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   const response = await fetch(`${apiUrl}/api/v1/wordpress/sync`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(WP_SYNC_SERVICE_TOKEN ? { 'X-Service-Token': WP_SYNC_SERVICE_TOKEN } : {}),
+    },
     body: JSON.stringify({ action, productIds, force }),
   });
 

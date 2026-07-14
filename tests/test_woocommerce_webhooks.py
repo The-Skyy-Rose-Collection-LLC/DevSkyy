@@ -6,6 +6,7 @@ Signature verification is delegated to api.v1.wordpress_integration.verify_webho
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import json
@@ -18,7 +19,8 @@ SECRET = "test-wc-webhook-secret"
 
 
 def _sign(body: bytes, secret: str = SECRET) -> str:
-    return hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    # WooCommerce sends X-WC-Webhook-Signature base64-encoded (not hex).
+    return base64.b64encode(hmac.new(secret.encode(), body, hashlib.sha256).digest()).decode()
 
 
 @pytest.fixture

@@ -10,12 +10,17 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+
+from security.jwt_oauth2_auth import RoleChecker, UserRole
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/flags", tags=["feature-flags"])
+
+# Flags (including kill_switch) control live production behavior — admin only.
+require_admin = RoleChecker([UserRole.ADMIN])
 
 
 class FlagCreateRequest(BaseModel):
@@ -40,7 +45,7 @@ class RolloutRequest(BaseModel):
 
 
 @router.get("", response_model=list[FlagResponse])
-async def list_flags() -> list[FlagResponse]:
+async def list_flags(_current_user: dict = Depends(require_admin)) -> list[FlagResponse]:
     """List all feature flags."""
     from core.feature_flags.flag_manager import flag_manager
 
@@ -59,7 +64,11 @@ async def list_flags() -> list[FlagResponse]:
 
 
 @router.put("/{flag_name}", response_model=FlagResponse)
-async def upsert_flag(flag_name: str, request: FlagCreateRequest) -> FlagResponse:
+async def upsert_flag(
+    flag_name: str,
+    request: FlagCreateRequest,
+    _current_user: dict = Depends(require_admin),
+) -> FlagResponse:
     """Create or update a feature flag."""
     from core.feature_flags.flag_manager import FeatureFlag, flag_manager
 
@@ -83,7 +92,11 @@ async def upsert_flag(flag_name: str, request: FlagCreateRequest) -> FlagRespons
 
 
 @router.post("/{flag_name}/rollout", response_model=FlagResponse)
-async def update_rollout(flag_name: str, request: RolloutRequest) -> FlagResponse:
+async def update_rollout(
+    flag_name: str,
+    request: RolloutRequest,
+    _current_user: dict = Depends(require_admin),
+) -> FlagResponse:
     """Update rollout percentage for a flag."""
     from core.feature_flags.flag_manager import flag_manager
 
@@ -106,7 +119,10 @@ async def update_rollout(flag_name: str, request: RolloutRequest) -> FlagRespons
 
 
 @router.delete("/{flag_name}")
-async def delete_flag(flag_name: str) -> dict[str, str]:
+async def delete_flag(
+    flag_name: str,
+    _current_user: dict = Depends(require_admin),
+) -> dict[str, str]:
     """Delete a feature flag."""
     from core.feature_flags.flag_manager import flag_manager
 

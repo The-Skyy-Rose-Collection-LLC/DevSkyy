@@ -998,6 +998,48 @@ def _create_role_checker_class():
 RoleChecker = _create_role_checker_class()
 
 
+def service_or_user_auth_dependency(service_token_env: str = "WORDPRESS_SYNC_SERVICE_TOKEN"):
+    """Dependency authorizing EITHER a valid Bearer JWT (any authenticated user)
+    OR a machine-to-machine service token.
+
+    Background workers (e.g. the BullMQ queue worker) call state-changing routes
+    with no user session — they present X-Service-Token, compared constant-time
+    against os.environ[service_token_env]. Fails closed: if the env token is unset
+    the service-token path is disabled and only a valid JWT is accepted; a caller
+    with neither always gets 401. Never reveals which path failed.
+    """
+    from fastapi import Header, HTTPException, status
+
+    async def _service_or_user(
+        authorization: str | None = Header(None, alias="Authorization"),
+        x_service_token: str | None = Header(None, alias="X-Service-Token"),
+    ) -> TokenPayload | dict[str, str]:
+        # Machine-to-machine path: constant-time match against the configured token.
+        expected = os.getenv(service_token_env, "")
+        if x_service_token and expected and secrets.compare_digest(x_service_token, expected):
+            return {"sub": "service", "auth": "service_token", "token_env": service_token_env}
+
+        # User path: a valid Bearer JWT.
+        token = _extract_token_from_header(authorization or "")
+        if token:
+            try:
+                return jwt_manager.validate_token(token)
+            except (ExpiredSignatureError, InvalidTokenError):
+                pass  # fall through to the generic 401 — never leak which path failed
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return _service_or_user
+
+
+# Create the dependency - this is what gets exported
+service_or_user_auth = service_or_user_auth_dependency()
+
+
 # =============================================================================
 # Module-level Instances
 # =============================================================================
@@ -1327,6 +1369,8 @@ __all__ = [
     # Dependencies
     "get_current_user",
     "require_roles",
+    "service_or_user_auth",
+    "service_or_user_auth_dependency",
     # Routers
     "auth_router",
     # Instances
