@@ -89,8 +89,8 @@ grep -q "'unsafe-inline'" inc/security-hardening.php || echo "WARNING: Missing '
 
 ### 4. Asset Verification
 ```bash
-# Verify self-hosted assets are served — skyyrose.co is zero-CDN
-# (fonts are self-hosted woff2; three.js and other JS are bundled in the theme, never from a CDN)
+# Verify self-hosted fonts are served — skyyrose.co self-hosts fonts (zero Google-Fonts CDN)
+# (JS/CDN delivery is out of scope for this font check — the theme's enqueue is the source of truth for JS loading)
 base="https://skyyrose.co/wp-content/themes/skyyrose-flagship/assets"
 urls=(
   "$base/css/fonts.css"
