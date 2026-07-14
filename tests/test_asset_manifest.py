@@ -20,9 +20,12 @@ from pathlib import Path
 import pytest
 
 from skyyrose.core.asset_manifest import AssetManifest
+from tests.sparse_guard import requires_tree
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = REPO_ROOT / "assets" / "products" / "manifest.json"
+
+requires_asset_tree = requires_tree("assets/products")
 
 
 def _load_builder():
@@ -36,14 +39,16 @@ def _load_builder():
     return mod
 
 
+@requires_asset_tree
 def test_manifest_exists_and_loads():
-    assert (
-        MANIFEST.exists()
-    ), "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
+    assert MANIFEST.exists(), (
+        "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
+    )
     m = AssetManifest.load()
     assert m.skus, "manifest registered zero SKUs"
 
 
+@requires_asset_tree
 def test_committed_manifest_matches_regenerated_tree():
     """The committed manifest must equal a fresh regeneration (no silent drift)."""
     builder = _load_builder()
@@ -55,6 +60,7 @@ def test_committed_manifest_matches_regenerated_tree():
     )
 
 
+@requires_asset_tree
 def test_every_pinned_asset_exists_and_hash_matches():
     """verify() over the whole committed manifest must report zero drift."""
     drift = AssetManifest.load().verify()
@@ -63,6 +69,7 @@ def test_every_pinned_asset_exists_and_hash_matches():
     )
 
 
+@requires_asset_tree
 def test_catalog_sha_is_pinned():
     m = AssetManifest.load()
     assert m.catalog_sha and m.catalog_sha.startswith("sha256:")

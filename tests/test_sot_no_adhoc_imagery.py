@@ -29,6 +29,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from tests.sparse_guard import sparse_checkout_enabled
+
 REPO = Path(__file__).resolve().parent.parent
 
 # Fabricated scene-placeholder images — banned outright, anywhere.
@@ -65,7 +67,12 @@ def test_no_fabricated_scene_product_images():
     for rel in _tracked_files():
         if rel in ALLOWLIST:
             continue
-        text = (REPO / rel).read_text(encoding="utf-8", errors="ignore")
+        path = REPO / rel
+        if not path.exists() and sparse_checkout_enabled():
+            # Tracked but deliberately absent (sparse worktree excludes e.g.
+            # archive/); CI and full checkouts still scan it.
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
         if SCENE_FAKE.search(text):
             offenders.append(rel)
     assert not offenders, (
@@ -82,7 +89,10 @@ def test_no_hardcoded_product_image_in_display_layer():
             continue
         if not rel.startswith(DISPLAY_DIRS):
             continue
-        text = (REPO / rel).read_text(encoding="utf-8", errors="ignore")
+        path = REPO / rel
+        if not path.exists() and sparse_checkout_enabled():
+            continue  # sparse-excluded; scanned in full checkouts and CI
+        text = path.read_text(encoding="utf-8", errors="ignore")
         for m in PRODUCT_PATH_LITERAL.finditer(text):
             offenders.append(f"{rel}: {m.group(0)}")
     assert not offenders, (
@@ -98,6 +108,6 @@ def test_allowlist_only_shrinks_no_phantoms():
         p = REPO / rel
         assert p.is_file(), f"Allowlisted file no longer exists; remove from ALLOWLIST: {rel}"
         text = p.read_text(encoding="utf-8", errors="ignore")
-        assert SCENE_FAKE.search(text) or PRODUCT_PATH_LITERAL.search(
-            text
-        ), f"{rel} no longer violates — remove it from ALLOWLIST (the ratchet only shrinks)."
+        assert SCENE_FAKE.search(text) or PRODUCT_PATH_LITERAL.search(text), (
+            f"{rel} no longer violates — remove it from ALLOWLIST (the ratchet only shrinks)."
+        )

@@ -19,8 +19,14 @@ from pathlib import Path
 
 import pytest
 
+from tests.sparse_guard import requires_tree
+
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "assets" / "products" / "source-photos" / "manifest.json"
+
+# Every test reads the manifest under assets/ — sparse worktrees exclude that
+# tree by design; full checkouts and CI still fail closed on a missing manifest.
+pytestmark = requires_tree("assets/products/source-photos")
 
 # Promote to True after every active SKU has at least front + back. Until then,
 # the warning surfaces gaps without blocking the build.
@@ -28,9 +34,9 @@ ENFORCE_MINIMUM_COVERAGE = False
 
 
 def test_manifest_exists():
-    assert (
-        MANIFEST_PATH.exists()
-    ), "assets/products/source-photos/manifest.json missing — run `python scripts/audit_source_photos.py` first."
+    assert MANIFEST_PATH.exists(), (
+        "assets/products/source-photos/manifest.json missing — run `python scripts/audit_source_photos.py` first."
+    )
 
 
 def test_manifest_schema():
@@ -79,9 +85,9 @@ def test_required_angles_defined_for_each_garment_type(garment_type):
     """Every garment type the inferrer can emit must have a required-angles list."""
     data = json.loads(MANIFEST_PATH.read_text())
     required = data["required_angles_by_garment_type"]
-    assert (
-        garment_type in required
-    ), f"manifest missing required_angles for garment type {garment_type!r}"
-    assert (
-        len(required[garment_type]) >= 2
-    ), f"{garment_type}: required angles list too short ({required[garment_type]})"
+    assert garment_type in required, (
+        f"manifest missing required_angles for garment type {garment_type!r}"
+    )
+    assert len(required[garment_type]) >= 2, (
+        f"{garment_type}: required angles list too short ({required[garment_type]})"
+    )

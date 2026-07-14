@@ -5,7 +5,23 @@ Pytest Configuration
 Shared fixtures and configuration.
 """
 
+import base64
+import os
+
 import pytest
+
+# Deterministic TEST secrets, set before any security module reads the env.
+# These are NOT production secrets — they only make the suite hermetic so it
+# doesn't fall back to ephemeral keys (which log noisy per-run warnings).
+# `setdefault` means a real env value wins, and a test that needs the key
+# ABSENT can still `monkeypatch.delenv` it. Production supplies these via the
+# real environment and fails closed without them (security/*.py).
+os.environ.setdefault("JWT_SECRET_KEY", "test-jwt-secret-not-for-production")
+os.environ.setdefault("JWT_REFRESH_SECRET_KEY", "test-jwt-refresh-secret-not-for-production")
+os.environ.setdefault(
+    "ENCRYPTION_MASTER_KEY",
+    base64.b64encode(b"devskyy-test-encryption-key-0032").decode(),  # exactly 32 bytes
+)
 
 # =============================================================================
 # Async HTTP Client Fixtures (for GDPR and API tests)
