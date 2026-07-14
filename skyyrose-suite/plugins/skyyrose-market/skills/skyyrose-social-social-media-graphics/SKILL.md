@@ -24,7 +24,7 @@ allowed-tools: Read Write Edit Glob
 ## Brand Canon (non-negotiable)
 
 - **The Five visual references — only these:** Kith (editorial product storytelling, elevated retail polish), Oaklandish (Oakland pride, town authenticity, community rootedness), Culture Kings (hype energy, bold streetwear merchandising), Fear of God (quiet luxury, tonal restraint, negative space discipline), Palm Angels (street-luxe graphic confidence). Never Bottega Veneta, Hedi Slimane, Rick Owens, 032c, Acne, Givenchy-by-Tisci, or any European luxury-house graphic lineage — wrong brand DNA.
-- **Lockup images, never live type:** Collection names in any hero or title position are brand-script lockup assets — `assets/images/hero-overlays/` for Black Rose, Love Hurts, and Signature; `assets/images/logos/` for Kids Capsule. These are placed as image assets, never typed with Cinzel, Playfair, or any other font. Fonts apply only to body copy, captions, slide text, CTAs, and graphic subtext.
+- **Lockup images, never live type:** Collection names in any hero or title position are brand-script lockup assets — `assets/images/hero-overlays/` for Black Rose, Love Hurts, and Signature; `assets/images/logos/` for Kids Capsule. These are placed as image assets, never typed with Cinzel, Archivo, or any other font. Fonts apply only to body copy, captions, slide text, CTAs, and graphic subtext.
 - **Color tokens — use exactly:** Rose Gold `#B76E79` (global brand accent), Dark `#0A0A0A` (background default), Silver `#C0C0C0` (Black Rose accent), Crimson `#DC143C` (Love Hurts accent), Gold `#D4AF37` (Signature accent). No off-brand colors, no approximations.
 - **Per-collection design register (never cross-attribute):** Black Rose = dark, cool-dramatic, silver. Love Hurts = dark, crimson-warm, raw. Signature = warm, gold, West Coast elevated. Kids Capsule = bright, rose gold, playful-premium.
 - **Tagline (verbatim, only):** `Luxury Grows from Concrete.` — period included. Never paraphrase.
@@ -79,7 +79,7 @@ Apply this direction consistently across all platform variants in the set.
 
 - **Background:** `#0A0A0A` (full-bleed dark) or dark concrete texture as base. No white, no light surfaces.
 - **Accent color:** Silver `#C0C0C0` — use for headline text, rule lines, or thin graphic accents.
-- **Typography (body/subtext):** Bebas Neue for UI labels and caps; Cormorant Garamond for body copy. Never Playfair Display or Cinzel — those are collection-specific and not for graphics subtext on Black Rose.
+- **Typography (body/subtext):** Anton for UI labels and caps; Hanken Grotesk for body copy. Cinzel available as an optional engraved-caps accent. Never Playfair Display — cut from brand canon.
 - **Lockup placement:** Black Rose brand-script lockup from `assets/images/hero-overlays/` placed in the upper third or center — always as an image asset, never typed.
 - **Layout mood:** Architectural. Strong grid. Generous negative space. Typography is sparse and weighted. One visual anchor, nothing competing.
 - **Photo treatment (if photography is included):** Desaturate toward cool-neutral. Darken shadows. Silver highlights. Blend mode options: Multiply or Luminosity for text overlay integration.
@@ -89,7 +89,7 @@ Apply this direction consistently across all platform variants in the set.
 
 - **Background:** `#0A0A0A` (dark base) with Crimson `#DC143C` used as a bold accent — not the background.
 - **Accent color:** Crimson `#DC143C` — headline, geometric accent shapes, or a color block behind key text.
-- **Typography (body/subtext):** Bebas Neue for strong caps; Cormorant Garamond italic for emotive lines. Never Cinzel — that's Black Rose.
+- **Typography (body/subtext):** Anton for strong caps; Hanken Grotesk italic for emotive lines. Cinzel available as an optional engraved-caps accent.
 - **Lockup placement:** Love Hurts brand-script lockup from `assets/images/hero-overlays/` — upper third or full-width horizontal band.
 - **Layout mood:** Tension and rawness. Asymmetric compositions acceptable. Bold type over dark ground. Crimson as punctuation, not wallpaper.
 - **Photo treatment:** High contrast, deep shadows, slight warm push in crimson-adjacent tones.
@@ -99,7 +99,7 @@ Apply this direction consistently across all platform variants in the set.
 
 - **Background:** Warm cream, `#0A0A0A` (dark with gold accents), or warm-toned gradient (dark-to-rich-brown).
 - **Accent color:** Gold `#D4AF37` — headline, rule lines, badge outlines, subtle graphic accents.
-- **Typography (body/subtext):** Playfair Display for display copy; Cormorant Garamond for body; Bebas Neue for labels. Elevated and refined.
+- **Typography (body/subtext):** Archivo for display copy; Hanken Grotesk for body; Anton for labels. Elevated and refined.
 - **Lockup placement:** Signature brand-script lockup from `assets/images/hero-overlays/` — wide horizontal, centered or left-anchored.
 - **Layout mood:** Elevated, worldwide. Editorial confidence. More white space than Black Rose. Photography carries the frame; text is secondary.
 - **Photo treatment:** Warm-golden grade. Lifted shadows. Sun-flare effects acceptable if not stock-looking.
@@ -109,7 +109,7 @@ Apply this direction consistently across all platform variants in the set.
 
 - **Background:** Warm white or cream — never `#0A0A0A`. Light backgrounds only.
 - **Accent color:** Rose Gold `#B76E79` — headline, graphic accents, rule lines.
-- **Typography (body/subtext):** Playfair Display (warm, approachable); Cormorant Garamond for body. Never Bebas Neue — too hard.
+- **Typography (body/subtext):** Archivo (warm, approachable); Hanken Grotesk for body. Never Bebas Neue — too hard.
 - **Lockup placement:** Kids Capsule logo from `assets/images/logos/` — sized appropriately for small faces around it.
 - **Layout mood:** Clean, warm, premium but approachable. Playful without being childish. Heritage feeling.
 - **Photo treatment:** Bright, even, natural. No dramatic shadow treatments.
@@ -190,8 +190,8 @@ The skill produces a single graphic brief document structured for a designer (or
 **Background:** Full-bleed `#0A0A0A` on all canvases. No surface texture for this set — pure flat dark.
 **Accent:** Silver `#C0C0C0` for headline "The drop is here." and thin rule line above CTA.
 **Lockup:** Black Rose brand-script lockup from `assets/images/hero-overlays/` — placed in upper third of each canvas, centered horizontally. This is an image asset — NOT typed text.
-**Headline:** "The drop is here." — Bebas Neue, large, Silver `#C0C0C0`, centered below the lockup. Maximum 3 words per line.
-**CTA:** "Pre-order now at skyyrose.co" — Cormorant Garamond, smaller weight, white `#FFFFFF` or Silver `#C0C0C0`, bottom third of each canvas.
+**Headline:** "The drop is here." — Anton, large, Silver `#C0C0C0`, centered below the lockup. Maximum 3 words per line.
+**CTA:** "Pre-order now at skyyrose.co" — Hanken Grotesk, smaller weight, white `#FFFFFF` or Silver `#C0C0C0`, bottom third of each canvas.
 **Rule line:** 1px Silver horizontal rule separating headline from CTA block.
 **AVOID:** Any warm tones, rounded fonts, Gold or Rose Gold accents, drop shadows that soften the edges, decorative elements that dilute the spare precision.
 **Reference aesthetic:** Fear of God's tonal restraint in type-heavy lookbook layouts + Palm Angels's graphic street-luxe confidence — applied to SkyyRose's Black Rose register.
@@ -271,7 +271,7 @@ Run before delivering any graphic set. Do not skip.
 - **Never export as JPEG as the default.** PNG is the default for social graphics — lossless, preserves any transparency in the lockup asset. JPEG only when file size is a hard constraint confirmed by the user.
 - **Never skip the safe-zone check on Story and TikTok formats.** The top 14% and bottom 20% of a 9:16 canvas are obscured by platform UI. A CTA or lockup buried there is invisible at posting time.
 - **Never use more than 3 props or visual elements per graphic.** SkyyRose graphics are not busy. One anchor (lockup or photo), one headline, one CTA. Everything else is noise.
-- **Never use rounded or playful typefaces on Black Rose or Love Hurts graphics.** Bebas Neue and Cormorant Garamond are the permitted UI/body voices. Introducing a rounded or display sans undermines the collection register.
+- **Never use rounded or playful typefaces on Black Rose or Love Hurts graphics.** Anton and Hanken Grotesk are the permitted UI/body voices. Introducing a rounded or display sans undermines the collection register.
 
 ---
 

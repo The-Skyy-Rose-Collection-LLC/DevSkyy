@@ -48,7 +48,7 @@
     "lighthouse_best_practices": 100,
     "wcag_level": "AA",
     "image_format_priority": ["avif", "webp", "jpg"],
-    "font_loading": "self-hosted woff2, font-display: swap, preload Cinzel + Playfair Display",
+    "font_loading": "self-hosted woff2, font-display: swap, preload Cinzel + Archivo",
     "js_budget_kb": 200,
     "css_budget_kb": 100
   },

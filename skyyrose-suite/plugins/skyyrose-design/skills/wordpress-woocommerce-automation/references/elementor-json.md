@@ -93,7 +93,7 @@ Elementor pages are stored as nested JSON with three element types:
     "align": "center",
     "title_color": "#FFFFFF",
     "typography_typography": "custom",
-    "typography_font_family": "Bebas Neue",
+    "typography_font_family": "Anton",
     "typography_font_size": {"unit": "px", "size": 72},
     "typography_font_weight": "700",
     "typography_text_transform": "uppercase",
@@ -138,7 +138,7 @@ Elementor pages are stored as nested JSON with three element types:
     "button_text_color": "#FFFFFF",
     "border_radius": {"unit": "px", "size": 0},
     "typography_typography": "custom",
-    "typography_font_family": "Bebas Neue",
+    "typography_font_family": "Anton",
     "typography_font_size": {"unit": "px", "size": 18},
     "typography_letter_spacing": {"unit": "px", "size": 2}
   }
@@ -235,7 +235,7 @@ Interactive product hotspots for lookbook images:
 ```json
 {
   "typography_typography": "custom",
-  "typography_font_family": "Bebas Neue",
+  "typography_font_family": "Anton",
   "typography_font_size": {"unit": "px", "size": 48},
   "typography_font_weight": "700",
   "typography_text_transform": "uppercase",

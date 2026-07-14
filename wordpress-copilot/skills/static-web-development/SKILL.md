@@ -152,7 +152,7 @@ Activate when working on:
   --color-accent: #E8C5A5;
 
   /* Typography */
-  --font-heading: 'Playfair Display', serif;
+  --font-heading: 'Archivo', serif;
   --font-body: 'Inter', sans-serif;
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;
@@ -458,7 +458,7 @@ p {
   </style>
 
   <!-- Preload fonts -->
-  <link rel="preload" href="/fonts/playfair.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Async load non-critical CSS -->
   <link rel="stylesheet" href="/style.css" media="print" onload="this.media='all'">

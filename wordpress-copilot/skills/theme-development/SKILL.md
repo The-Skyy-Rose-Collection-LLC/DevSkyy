@@ -245,7 +245,7 @@ function skyyrose_enqueue_assets() {
     // Google Fonts
     wp_enqueue_style(
         'skyyrose-fonts',
-        'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap',
+        'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap',
         [],
         null
     );

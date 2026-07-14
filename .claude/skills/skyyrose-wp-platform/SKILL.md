@@ -22,11 +22,15 @@ WooCommerce theme, it's wrong and should be rewritten until it can't.
 ## Brand doctrine (the part a generic skill has no way to know)
 
 - **Four collections, four identities, never interchangeable**: Signature (gold `#D4AF37`,
-  Playfair Display, city-tour immersive world), Black Rose (silver `#C0C0C0`, Cinzel headings,
-  gothic cathedral immersive world, armor as its visual language), Love Hurts (crimson
-  `#DC143C`, Playfair Display, romantic castle immersive world, "the bloodline that raised
-  me" -- that line belongs to Love Hurts alone, never borrowed for another collection), Kids
-  Capsule (rose gold `#B76E79`, Playfair Display). Rose Gold `#B76E79` is also the global accent
+  Archivo headings, Pinyon Script name-lockup, city-tour immersive world), Black Rose (silver
+  `#C0C0C0`, Archivo headings with Cinzel as engraved-caps accent, SkyyRose Black Rose Script
+  name-lockup, gothic cathedral immersive world, armor as its visual language), Love Hurts
+  (crimson `#DC143C`, Archivo headings, SkyyRose Love Hurts Graffiti name-lockup, romantic
+  castle immersive world, "the bloodline that raised me" -- that line belongs to Love Hurts
+  alone, never borrowed for another collection), Kids Capsule (rose gold `#B76E79`, Archivo
+  headings, Grand Hotel name-lockup). Collection name-lockups are bespoke-script images, never
+  live type; interior copy is unified (Archivo display, Hanken Grotesk body/UI, Anton UI caps).
+  Rose Gold `#B76E79` is also the global accent
   across the whole storefront; `#0A0A0A` is the dark background every collection sits on.
 - **Visual lineage is Kith, Oaklandish, Culture Kings, Fear of God, Palm Angels — never
   European luxury.** This is a locked canon decision, not a style preference. A build,

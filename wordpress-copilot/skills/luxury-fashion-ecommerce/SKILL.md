@@ -48,9 +48,9 @@ Color Palette:
     - "#8B4C54"  # Dark Rose
 
 Typography:
-  Headings: "Playfair Display" (Elegant Serif)
+  Headings: "Archivo" (Expanded Display Sans)
   Body: "Inter" (Clean Sans-Serif)
-  Accents: "Cormorant" (Refined Serif)
+  Accents: "Hanken Grotesk" (Refined Sans-Serif)
 
 Voice:
   Tone: Sophisticated yet warm, poetic yet clear

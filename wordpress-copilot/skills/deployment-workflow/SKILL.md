@@ -93,7 +93,7 @@ grep -q "'unsafe-inline'" inc/security-hardening.php || echo "WARNING: Missing '
 urls=(
   "https://cdn.babylonjs.com/babylon.js"
   "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"
-  "https://fonts.googleapis.com/css2?family=Playfair+Display"
+  "https://fonts.googleapis.com/css2?family=Archivo"
 )
 
 for url in "${urls[@]}"; do

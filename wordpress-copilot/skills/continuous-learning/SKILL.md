@@ -125,7 +125,7 @@ curl -sI https://site.com/ | grep -i content-security
 
 **Primary Color**: #B76E79 (rose gold)
 **Tagline**: "Where Love Meets Luxury"
-**Typography**: Playfair Display (headings), Inter (body)
+**Typography**: Archivo (headings), Inter (body)
 
 **CSS Convention**:
 ```css

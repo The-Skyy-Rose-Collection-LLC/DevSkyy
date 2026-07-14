@@ -27,9 +27,9 @@ JSON-LD you're trying to verify).
 
 ## Performance — nine brand fonts and a walk-on mascot is not a lightweight page
 
-`inc/performance.php` handles Google Fonts removal — all nine brand font families (Cinzel for
-Black Rose headings, Playfair Display for Signature/Love Hurts/Kids Capsule, Cormorant
-Garamond for body copy, Bebas Neue for UI, Inter for system text, plus the rest of the family)
+`inc/performance.php` handles Google Fonts removal — all nine brand font families (Archivo for
+display and headings, Hanken Grotesk for body/UI copy, Anton for UI caps and accent, Cinzel as
+the engraved-caps accent, Inter for system fallback, plus the four per-collection script faces)
 are self-hosted via the WordPress Font Library declared in `theme.json` — zero external Google
 Fonts CDN calls, by design, not by omission. That design choice only pays off if the `.min`
 build pipeline is actually rebuilt after every source change (see `build-and-templates.md`) —
@@ -73,6 +73,6 @@ founder-authored product dossiers, not placeholder content.
   `inc/security.php` source doesn't prove it's the header actually being served after a
   deploy (cache layers can serve stale headers too).
 - **Brand-token/canon compliance**: a Playwright screenshot of the specific collection page
-  being touched, read against its own token (Black Rose = silver/Cinzel/gothic, Love Hurts =
+  being touched, read against its own token (Black Rose = silver/Black Rose Script lockup/gothic, Love Hurts =
   crimson/castle, Signature = gold/city, Kids Capsule = rose gold) — not a diff against a
   generic design-system baseline that doesn't know the four collections apart.

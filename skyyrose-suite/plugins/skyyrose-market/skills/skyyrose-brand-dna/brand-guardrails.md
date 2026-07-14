@@ -83,8 +83,8 @@ NOT live typeset text.
 | Signature | `assets/images/hero-overlays/sig-brand-skyy-rose-gold.png` |
 | Kids Capsule | `assets/images/logos/` (Kids Capsule lockup) |
 
-Fonts (Cinzel for BR headings, Playfair Display for SIG/LH/KC, Cormorant Garamond body,
-Bebas Neue UI) apply **only** to interior surfaces — body copy, captions, slide subtext,
+Fonts (Archivo headings — all collections, Hanken Grotesk body, Anton UI labels,
+Cinzel optional engraved-caps accent) apply **only** to interior surfaces — body copy, captions, slide subtext,
 UI labels — never to the collection name itself. The lockup IS the name.
 
 Confirmed locked: 2026-05-25.

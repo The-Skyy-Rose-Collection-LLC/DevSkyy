@@ -482,7 +482,7 @@ These platform labels **supplement** #ad/#sponsored — they do not replace the 
 - Brand logo PNG (white on transparent)
 - Hashtag reference card (#SkyyRose, #LuxuryGrowsFromConcrete, collection-specific hashtags)
 - Product photography — hi-res, for reference or B-roll backdrop
-- Font reference card (Cinzel for Black Rose headings, Playfair Display for SIG/LH/KC, Cormorant Garamond for body, Bebas Neue for UI labels) — for captions/graphics if creator designs overlays
+- Font reference card (Archivo for headings — all collections, Hanken Grotesk for body, Anton for UI labels, Cinzel as optional engraved-caps accent) — for captions/graphics if creator designs overlays
 
 ---
 

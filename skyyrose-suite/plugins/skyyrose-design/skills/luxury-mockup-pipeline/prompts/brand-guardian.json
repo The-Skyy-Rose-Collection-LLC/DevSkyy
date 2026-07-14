@@ -74,7 +74,7 @@
       "Brand-mark micro-interaction on navbar (rotate + scale on hover, GPU-accelerated)",
       "Per-collection palette inheritance via data-collection attribute + CSS custom property cascade",
       "Color-mix() palette derivation — tints/shades from --sr-accent at runtime",
-      "Cinzel-to-Playfair font crossfade between cover and hero sections (collection-coded)"
+      "Cinzel-to-Archivo font crossfade between cover and hero sections (collection-coded)"
     ],
     "constraints": {
       "self_contained": true,

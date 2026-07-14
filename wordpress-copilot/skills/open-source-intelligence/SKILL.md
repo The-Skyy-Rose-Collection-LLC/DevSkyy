@@ -99,7 +99,7 @@ const evaluation = {
 // Apply SkyyRose branding
 const branded = adaptComponent(component, {
   primaryColor: '#B76E79', // Rose gold
-  fontFamily: 'Playfair Display',
+  fontFamily: 'Archivo',
   spacing: 'luxury', // More whitespace
   animations: 'smooth' // Elegant transitions
 });
@@ -210,7 +210,7 @@ npx bundle-phobia <package-name>
 
 ### Branding Rules
 1. Replace colors with #B76E79 (rose gold)
-2. Use Playfair Display for headings
+2. Use Archivo for headings
 3. Add elegant animations (0.3s ease-in-out)
 4. Increase whitespace for luxury feel
 5. Add SkyyRose attribution
