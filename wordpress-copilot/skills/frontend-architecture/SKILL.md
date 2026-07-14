@@ -191,7 +191,7 @@ export const useCart = create<CartStore>()(
 }
 
 .card__title {
-  font-family: 'Archivo', serif;
+  font-family: 'Archivo', system-ui, sans-serif;
   color: #B76E79; /* SkyyRose primary */
   font-size: 1.5rem;
 }
@@ -312,7 +312,7 @@ export const tokens = {
 
   typography: {
     fontFamily: {
-      heading: "'Archivo', serif",
+      heading: "'Archivo', system-ui, sans-serif",
       body: "'Inter', sans-serif",
       mono: "'JetBrains Mono', monospace",
     },

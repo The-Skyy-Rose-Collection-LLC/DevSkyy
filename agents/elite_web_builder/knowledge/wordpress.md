@@ -95,6 +95,8 @@ Before ANY create/update/delete operation:
 ```
 @font-face { font-family: 'Archivo'; src: url('../fonts/archivo-latin.woff2') format('woff2'); font-display: swap; }
 @font-face { font-family: 'Hanken Grotesk'; src: url('../fonts/hanken-grotesk-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Anton'; src: url('../fonts/anton-latin.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Cinzel'; src: url('../fonts/cinzel-latin.woff2') format('woff2'); font-display: swap; }
 ```
 
 ### Spacing Scale

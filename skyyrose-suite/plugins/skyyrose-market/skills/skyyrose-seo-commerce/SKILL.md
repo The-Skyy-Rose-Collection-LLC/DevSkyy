@@ -693,7 +693,7 @@ Disallow: /*?rating_filter=
 - [ ] Critical CSS inlined in `<head>`
 - [ ] JavaScript deferred (`defer` attribute)
 - [ ] Third-party scripts (analytics, chat) loaded async
-- [ ] Font preloading for Archivo, Hanken Grotesk, Cinzel (self-hosted woff2 only — zero Google Fonts CDN)
+- [ ] Font preloading for Archivo, Hanken Grotesk, Anton, Cinzel (self-hosted woff2 only — zero Google Fonts CDN)
 - [ ] CDN cache headers set correctly (bump `SKYYROSE_VERSION` for busting)
 - [ ] `.min.css` / `.min.js` served in production (`$use_min = !SCRIPT_DEBUG`) — every CSS/JS edit must rebuild via `scripts/build-css.js` + `build-js.js` or the fix is inert
 

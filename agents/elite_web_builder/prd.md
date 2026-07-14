@@ -66,7 +66,7 @@ Static HTML designs in wp-playground/SKyyRose Flagship/Flagship static/ are the 
 ## Shared Components
 - Header: Fixed dark navbar rgba(10,10,10,0.95) + blur(20px), SR Monogram logo (48px), gradient text "SKYY ROSE", nav links + icon buttons (search, account, cart with count badge), mobile hamburger slide-in from right
 - Footer: 5-column grid (2fr 1fr 1fr 1fr 1fr) — Brand/Shop/Help/Legal/Social, newsletter signup bar, copyright, stacks to single column on mobile
-- Product Card: #111 bg, 3:4 aspect image, hover: translateY(-8px) + shadow, quick actions overlay (wishlist, quickview, add-to-cart), name (Inter 600), price in collection accent color
+- Product Card: #111 bg, 3:4 aspect image, hover: translateY(-8px) + shadow, quick actions overlay (wishlist, quickview, add-to-cart), name (Hanken Grotesk 600), price in collection accent color
 - Toast Notifications: fixed bottom-right, slide-in, dark glass, auto-dismiss 3s
 
 ## drakerelated.com-Style Product Display & Immersive Scenes

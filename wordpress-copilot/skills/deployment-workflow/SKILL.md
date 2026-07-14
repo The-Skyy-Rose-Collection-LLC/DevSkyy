@@ -204,7 +204,7 @@ checkConsoleErrors();
 #### C. CSS Loading Verification
 ```bash
 # Verify style.css loads successfully
-curl -I "https://skyyrose.co/wp-content/themes/skyyrose-2025/style.css" 2>&1 | grep "200 OK"
+curl -I "https://skyyrose.co/wp-content/themes/skyyrose-flagship/style.css" 2>&1 | grep "200 OK"
 ```
 
 #### D. Performance Check

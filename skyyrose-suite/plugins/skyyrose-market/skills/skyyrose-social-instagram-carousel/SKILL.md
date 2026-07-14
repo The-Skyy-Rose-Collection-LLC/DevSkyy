@@ -234,7 +234,7 @@ Design note: Two-panel layout: left panel = close-up embroidery detail; right pa
 SLIDE 4
 Headline:    "Concrete answering back."
 Supporting:  Black Rose is the collection for those who already stood up. This piece doesn't try to prove anything. It simply is.
-Design note: Lifestyle editorial — model in full Black Rose look, outdoor Oakland location, overcast light. Headline bottom-center, Hanken Grotesk italic 34pt, silver.
+Design note: Lifestyle editorial — model in full Black Rose look, outdoor Oakland location, overcast light. Headline bottom-center, Archivo 44pt, silver.
 
 SLIDE 5
 Headline:    "250 made. That's the run."

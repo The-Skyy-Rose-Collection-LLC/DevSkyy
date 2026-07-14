@@ -55,7 +55,7 @@ There is exactly one tagline. It is "Luxury Grows from Concrete." It appears as 
 
 | Collection | Thesis | Visual language |
 |------------|--------|-----------------|
-| **Black Rose** | Grief that became armor. Oakland night, gothic gravity. | Cinzel headings, dark/silver/charcoal palette, BAY BRIDGE / Oakland street references |
+| **Black Rose** | Grief that became armor. Oakland night, gothic gravity. | Archivo headings, Cinzel engraved-caps accent, dark/silver/charcoal palette, BAY BRIDGE / Oakland street references |
 | **Love Hurts** | The romanticism of being from a place the world misjudges. Beauty-and-the-Beast from BEAST's perspective. | Crimson accent, gothic cathedral, enchanted-rose-dome immersive |
 | **Signature** | What you wear when you've stopped explaining yourself. Bay Area / SF, golden hour. | Gold accent, GOLDEN GATE BRIDGE references, fashion-runway sensibility |
 | **Kids Capsule** | (Carry the brand DNA into kidswear.) | Rose-gold accent, playful but not childish |

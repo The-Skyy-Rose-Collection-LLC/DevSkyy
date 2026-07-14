@@ -1,4 +1,4 @@
-> SUPERSEDED 2026-07-10/11 — fonts now per SOT.md → typography.json (Archivo / Hanken Grotesk / Anton / Cinzel + bespoke collection name-scripts; zero-CDN self-hosted woff2). Font/CDN references below are historical.
+> SUPERSEDED 2026-07-10/11 — fonts now per SOT.md → typography.json (Archivo / Hanken Grotesk / Anton / Cinzel / Inter + bespoke collection name-scripts; zero-CDN self-hosted woff2). Font/CDN references below are historical.
 
 # DevSkyy Dashboard — Design System
 

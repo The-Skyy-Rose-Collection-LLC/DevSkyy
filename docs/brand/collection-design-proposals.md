@@ -13,7 +13,7 @@ Register: Black Rose = brutalist · Love Hurts = expressive · Signature = edito
 - Background: `#0A0A0A`
 - Accent (all interactive + headlines): `--skyyrose-accent` → `#C0C0C0` (silver)
 - Secondary (blood flash, used sparingly): `--skyyrose-secondary` → `#DC143C`
-- Display: Cinzel
+- Display: Archivo (Cinzel = engraved-caps accent)
 - Body: Hanken Grotesk 16px / lh 1.7
 
 ---

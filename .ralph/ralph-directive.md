@@ -91,7 +91,7 @@ These files are OFF-LIMITS — do NOT modify them:
 - **RETIRED**: "Where Love Meets Luxury" — NEVER use this
 - **Colors**: Rose Gold `#B76E79`, Dark `#0A0A0A`, Gold `#D4AF37`
 - **Collection accents**: Black Rose `#C0C0C0` (silver), Love Hurts `#DC143C` (crimson), Signature `#D4AF37` (gold)
-- **Fonts**: Archivo (display/headings), Hanken Grotesk (body/UI), Anton (UI caps), Cinzel (engraved caps), Space Mono (labels) — self-hosted woff2 only, no Google Fonts CDN
+- **Fonts**: Archivo (display/headings), Hanken Grotesk (body/UI), Anton (UI caps), Cinzel (engraved caps), Inter (system/fallback) — self-hosted woff2 only, no Google Fonts CDN
 - **API**: Use `index.php?rest_route=` (NOT `/wp-json/`)
 
 ### 7. Brand Asset Optimization & Injection (MANDATORY — Section 1)

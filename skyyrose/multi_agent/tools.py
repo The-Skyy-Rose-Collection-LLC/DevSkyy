@@ -230,7 +230,7 @@ async def get_brand_guidelines(args: dict[str, Any]) -> dict[str, Any]:
         "typography": {
             "display": "Archivo",
             "body": "Hanken Grotesk",
-            "mono": "Space Mono",
+            "mono": "SF Mono",
             "cta": "Anton",
             "accent": "Cinzel",
         },
