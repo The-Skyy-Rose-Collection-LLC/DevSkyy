@@ -444,3 +444,28 @@ class TestCompletenessGate:
         )
         assert result.returncode == 0, f"skip override should pass; stderr: {result.stderr}"
         assert "SKIPPED" in result.stdout
+
+    def test_git_error_fails_closed(self, fake_env):
+        """A corrupt git index must fail the gate CLOSED with a clear message,
+        never silently pass as '0/0 on disk' (bug-260 fail-open). Engages the
+        tracked-file check by making the theme dir a real work tree, then
+        corrupts .git/index so `git ls-files` errors while
+        `rev-parse --is-inside-work-tree` still succeeds."""
+        tmp_path, env_file, theme_dir = fake_env
+        subprocess.run(["git", "init", "-q", str(theme_dir)], check=True)
+        # `git add` creates the index; corrupting it (vs deleting) forces
+        # ls-files to error rather than return an empty list.
+        subprocess.run(["git", "-C", str(theme_dir), "add", "-A"], check=True)
+        (theme_dir / ".git" / "index").write_bytes(b"garbage-not-a-git-index")
+        result = run_script(
+            "--dry-run",
+            env_overrides={"ENV_FILE": str(env_file), "THEME_DIR_OVERRIDE": str(theme_dir)},
+        )
+        assert result.returncode != 0
+        combined = result.stdout + result.stderr
+        assert (
+            "cannot verify tracked-file completeness" in combined
+        ), f"expected clean fail-closed message, got: {combined}"
+        assert (
+            "0/0 on disk" not in combined
+        ), "gate reported false completeness on a broken index (fail-open regression)"
