@@ -15,7 +15,7 @@
 .sr-hero--left { align-items: flex-start; text-align: left; }
 .sr-hero__lockup { max-width: min(680px, 80vw); height: auto; }
 .sr-hero__tagline {
-  font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+  font-family: var(--skyyrose-font-body, 'Inter', sans-serif);
   font-size: var(--text-xl, 1.375rem);
   line-height: var(--leading-normal, 1.6);
   color: var(--skyyrose-text-muted, rgba(245, 230, 211, 0.7));
