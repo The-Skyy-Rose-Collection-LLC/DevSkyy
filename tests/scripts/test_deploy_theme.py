@@ -33,10 +33,36 @@ def fake_env(tmp_path):
         "SFTP_PASS=fake-password\n"
     )
     theme_dir = tmp_path / "wordpress-theme" / "skyyrose-flagship"
-    theme_dir.mkdir(parents=True)
-    (theme_dir / "style.css").write_text("/* Theme */")
-    (theme_dir / "functions.php").write_text("<?php // ok")
+    _make_deployable_theme(theme_dir, version="1.0.0")
     return tmp_path, env_file, theme_dir
+
+
+def _make_deployable_theme(theme_dir: Path, *, version: str = "1.0.0") -> None:
+    """Write a minimal but *gate-passing* theme.
+
+    preflight_completeness() requires a synced version triple + the
+    critical-asset floor (>=3 emblem webp, >=10 woff2, skyy.glb). Transport/
+    ordering/cache tests need a theme that clears the gate, not an exhaustive
+    one — so this is the smallest tree that deploys. Kept in one helper so the
+    floor's magic numbers live in a single place if they ever change.
+    """
+    theme_dir.mkdir(parents=True, exist_ok=True)
+    (theme_dir / "style.css").write_text(
+        f"/*\nTheme Name: Test\nVersion:             {version}\n*/\n"
+    )
+    (theme_dir / "functions.php").write_text(f"<?php\ndefine( 'SKYYROSE_VERSION', '{version}' );\n")
+    (theme_dir / "readme.txt").write_text(f"Stable tag: {version}\n")
+    emblems = theme_dir / "assets" / "images" / "emblems"
+    emblems.mkdir(parents=True, exist_ok=True)
+    for name in ("black-rose", "love-hurts", "signature"):
+        (emblems / f"{name}-emblem.webp").write_bytes(b"")
+    fonts = theme_dir / "assets" / "fonts"
+    fonts.mkdir(parents=True, exist_ok=True)
+    for i in range(10):
+        (fonts / f"font-{i}-latin.woff2").write_bytes(b"")
+    models = theme_dir / "assets" / "models"
+    models.mkdir(parents=True, exist_ok=True)
+    (models / "skyy.glb").write_bytes(b"")
 
 
 def run_script(*args, env_overrides=None):
@@ -358,3 +384,63 @@ class TestShellcheck:
             timeout=30,
         )
         assert result.returncode == 0, f"shellcheck errors:\n{result.stdout}"
+
+
+class TestCompletenessGate:
+    """Test 9: preflight_completeness() fails CLOSED on an incomplete source
+    tree (bug-252 gate) and never crashes with a raw awk/sed error (bug-253)."""
+
+    def test_missing_version_file_fails_closed_cleanly(self, fake_env):
+        """A missing readme.txt must exit non-zero with the gate's own clear
+        message -- not a raw 'awk: can't open file' crash (regression bug-253)."""
+        tmp_path, env_file, theme_dir = fake_env
+        (theme_dir / "readme.txt").unlink()
+        result = run_script(
+            "--dry-run",
+            env_overrides={"ENV_FILE": str(env_file), "THEME_DIR_OVERRIDE": str(theme_dir)},
+        )
+        assert result.returncode != 0
+        combined = result.stdout + result.stderr
+        assert "Version file missing" in combined, f"expected clean gate message, got: {combined}"
+        assert (
+            "can't open file" not in combined
+        ), "raw awk crash leaked -- gate did not fail closed gracefully"
+
+    def test_version_drift_fails_closed(self, fake_env):
+        """A synced-but-mismatched version triple must block the deploy."""
+        tmp_path, env_file, theme_dir = fake_env
+        (theme_dir / "readme.txt").write_text("Stable tag: 9.9.9\n")
+        result = run_script(
+            "--dry-run",
+            env_overrides={"ENV_FILE": str(env_file), "THEME_DIR_OVERRIDE": str(theme_dir)},
+        )
+        assert result.returncode != 0
+        assert "DRIFT" in (result.stdout + result.stderr)
+
+    def test_asset_floor_fails_closed(self, fake_env):
+        """Dropping below the critical-asset floor (emblems) must block."""
+        tmp_path, env_file, theme_dir = fake_env
+        for webp in (theme_dir / "assets" / "images" / "emblems").glob("*.webp"):
+            webp.unlink()
+        result = run_script(
+            "--dry-run",
+            env_overrides={"ENV_FILE": str(env_file), "THEME_DIR_OVERRIDE": str(theme_dir)},
+        )
+        assert result.returncode != 0
+        assert "Critical-asset floor" in (result.stdout + result.stderr)
+
+    def test_skip_env_bypasses_gate(self, fake_env):
+        """PREFLIGHT_SKIP_COMPLETENESS=1 must let an incomplete tree through
+        the gate (emergency override) -- dry-run then reaches exit 0."""
+        tmp_path, env_file, theme_dir = fake_env
+        (theme_dir / "readme.txt").unlink()  # deliberately incomplete
+        result = run_script(
+            "--dry-run",
+            env_overrides={
+                "ENV_FILE": str(env_file),
+                "THEME_DIR_OVERRIDE": str(theme_dir),
+                "PREFLIGHT_SKIP_COMPLETENESS": "1",
+            },
+        )
+        assert result.returncode == 0, f"skip override should pass; stderr: {result.stderr}"
+        assert "SKIPPED" in result.stdout

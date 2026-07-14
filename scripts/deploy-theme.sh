@@ -316,20 +316,32 @@ preflight_completeness() {
         return 0
     fi
 
-    # 1. Version triple must agree; unparseable = fail closed.
-    local v_style v_func v_readme
-    v_style=$(awk '/^Version:/ {print $2; exit}' "$THEME_DIR/style.css")
-    v_func=$(sed -nE "s/^define\( 'SKYYROSE_VERSION', '([^']+)' \);.*/\1/p" "$THEME_DIR/functions.php" | head -1)
-    v_readme=$(awk '/^Stable tag:/ {print $3; exit}' "$THEME_DIR/readme.txt")
+    # 1. The three version-carrying files must exist and agree. A MISSING
+    #    file is checked explicitly first: awk/sed on an absent path exit
+    #    non-zero, which under `set -e` would crash the script (raw "can't
+    #    open file", exit 2) BEFORE the -z fail-closed handler below runs.
+    #    The 2>/dev/null || true on the reads is defense-in-depth for the
+    #    exists-but-unreadable (permissions) edge -> empty -> clean exit 1.
+    local vf v_style v_func v_readme
+    for vf in style.css functions.php readme.txt; do
+        if [[ ! -f "$THEME_DIR/$vf" ]]; then
+            log_error "Version file missing from deploy source: $vf -- refusing to deploy"
+            exit 1
+        fi
+    done
+    v_style=$(awk '/^Version:/ {print $2; exit}' "$THEME_DIR/style.css" 2>/dev/null || true)
+    v_func=$(sed -nE "s/^define\( 'SKYYROSE_VERSION', '([^']+)' \);.*/\1/p" "$THEME_DIR/functions.php" 2>/dev/null | head -1 || true)
+    v_readme=$(awk '/^Stable tag:/ {print $3; exit}' "$THEME_DIR/readme.txt" 2>/dev/null || true)
     if [[ -z "$v_style" || -z "$v_func" || -z "$v_readme" ]]; then
         log_error "Version triple unreadable (style.css='${v_style:-?}' functions.php='${v_func:-?}' readme.txt='${v_readme:-?}') -- refusing to deploy"
         exit 1
     fi
-    if [[ "$v_style" != "$v_func" || "$v_style" != "$v_readme" ]]; then
+    if [[ "$v_style" == "$v_func" && "$v_func" == "$v_readme" ]]; then
+        log_success "Version triple in sync: $v_style"
+    else
         log_error "Version triple DRIFT: style.css=$v_style functions.php=$v_func readme.txt=$v_readme -- sync all three before deploying"
         exit 1
     fi
-    log_success "Version triple in sync: $v_style"
 
     # 2. Every git-tracked file must exist on disk. Catches sparse
     #    checkouts and deleted-but-uncommitted files. Extra untracked

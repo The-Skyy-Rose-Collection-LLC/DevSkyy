@@ -4242,5 +4242,28 @@
     ],
     "occurrences": 2,
     "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-258",
+    "timestamp": "2026-07-14",
+    "error_message": "tests/scripts/test_deploy_theme.py::TestDryRun::test_dry_run_exits_zero -> awk: can't open file .../readme.txt, deploy-theme.sh exit 2 (Stop-hook blocked)",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "preflight_completeness() (bug-252 gate) read style.css/functions.php/readme.txt with bare awk/sed. On a source tree missing one of them, awk/sed exit non-zero and under `set -euo pipefail` the command substitution crashed the script (raw exit 2) BEFORE the intended -z fail-closed handler ran. The minimal test fixture (2-file theme, no readme.txt) tripped it. Secondary: the drift check `[[ A != B || A != C ]]` triggered shellcheck SC2055 (logic correct, but pattern flagged; suite requires clean shellcheck).",
+    "fix": "Added explicit file-existence pre-check for the three version files -> clean `exit 1` with a precise message; added `2>/dev/null || true` to the awk/sed reads (defense-in-depth for exists-but-unreadable). Rewrote the drift check to the positive `[[ A == B && B == C ]]` form (logically identical, SC2055-clean). Enhanced test fixture into a minimal *deployable* theme (synced version triple + asset floor) so transport tests clear the gate; added TestCompletenessGate (missing-file / drift / asset-floor / skip-bypass).",
+    "tags": [
+      "deploy",
+      "wordpress",
+      "shell",
+      "set-e",
+      "fail-closed",
+      "preflight",
+      "shellcheck",
+      "regression"
+    ],
+    "related_bugs": [
+      "bug-252"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-14"
   }
 ]
