@@ -532,7 +532,6 @@ try_rsync() {
         --exclude='.env*' --exclude='*.map' --exclude='*.log'
         --exclude='.DS_Store' --exclude='deploy.sh' --exclude='CLAUDE.md'
         --exclude='CLAUDE.local.md' --exclude='._*' --exclude='__pycache__'
-        --exclude='CLAUDE.local.md' --exclude='._*' --exclude='__pycache__'
         --exclude='IMMERSIVE-WORLDS-PLAN.md' --exclude='.deploy-archives'
         --exclude='.gitignore' --exclude='.phpcs.xml' --exclude='.eslintrc*'
         --exclude='.prettierrc*' --exclude='.editorconfig'
