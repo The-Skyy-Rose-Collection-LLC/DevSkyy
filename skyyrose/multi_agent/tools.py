@@ -228,11 +228,11 @@ async def get_brand_guidelines(args: dict[str, Any]) -> dict[str, Any]:
             "white": "#FFFFFF",
         },
         "typography": {
-            "display": "Cinzel",
-            "body": "Cormorant Garamond",
+            "display": "Archivo",
+            "body": "Hanken Grotesk",
             "mono": "Space Mono",
-            "cta": "Bebas Neue",
-            "accent": "Playfair Display",
+            "cta": "Anton",
+            "accent": "Cinzel",
         },
         "collections": {
             "black_rose": {

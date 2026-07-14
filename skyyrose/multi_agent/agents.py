@@ -186,7 +186,7 @@ YOUR INSPECTION AREAS:
 
 KNOWN FIXED ISSUES (verify these stay fixed):
 - design-tokens.css must NOT redefine --text-sm through --text-5xl
-- enqueue-brand-styles.php must use Cormorant Garamond for --font-body (not Inter)
+- enqueue-brand-styles.php must use Hanken Grotesk for --font-body (not Inter)
 - No external Google Fonts requests (GDPR)
 - No font sizes below 10px / 0.625rem
 - skyyrose-main CSS depends on 'skyyrose-fonts' (not 'skyyrose-google-fonts')

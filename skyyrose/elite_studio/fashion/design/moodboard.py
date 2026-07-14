@@ -178,12 +178,12 @@ class MoodboardComposer:
 
         # Typography
         typography_map = {
-            "black-rose": "Cinzel Decorative — gothic roman serifs. Thin weight for elegance. Silver on black.",
-            "love-hurts": "Playfair Display — high-contrast serif. Italic for emotion. Crimson on dark.",
-            "signature": "Playfair Display + Bebas Neue — serif editorial meets clean sans. Gold on dark.",
-            "kids-capsule": "Playfair Display — approachable, friendly, still premium. Rose gold on dark.",
+            "black-rose": "SkyyRose Black Rose Script for the name + Cinzel engraved caps + Archivo display — gothic elegance. Silver on black.",
+            "love-hurts": "SkyyRose Love Hurts Graffiti script + Archivo display — raw expressive lettering meets clean expanded sans, italic accents for emotion. Crimson on dark.",
+            "signature": "Pinyon Script + Archivo — refined script meets clean expanded editorial sans, Anton for caps. Gold on dark.",
+            "kids-capsule": "Grand Hotel script + Archivo — approachable, friendly, still premium. Rose gold on dark.",
         }
-        typography = typography_map.get(collection.lower(), "Playfair Display — SkyyRose standard.")
+        typography = typography_map.get(collection.lower(), "Archivo — SkyyRose standard display.")
 
         # Lighting
         lighting_map = {
