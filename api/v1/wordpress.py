@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from integrations.wordpress_com_client import create_wordpress_client
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.jwt_oauth2_auth import service_or_user_auth
 
 router = APIRouter(tags=["wordpress"], prefix="/wordpress")
 
@@ -52,9 +52,13 @@ def _get_wp_creds() -> dict[str, str | None]:
 @router.post("/sync", response_model=WordPressSyncResponse, summary="Sync content to WordPress")
 async def sync_to_wordpress(
     request: WordPressSyncRequest,
-    _current_user: TokenPayload = Depends(get_current_user),
+    _principal=Depends(service_or_user_auth),
 ):
-    """Create a post/page on WordPress."""
+    """Create a post/page on WordPress.
+
+    Auth: a user JWT (dashboard) OR the X-Service-Token machine-to-machine token
+    (background queue worker). See security.jwt_oauth2_auth.service_or_user_auth.
+    """
     creds = _get_wp_creds()
     try:
         async with await create_wordpress_client(**creds) as client:

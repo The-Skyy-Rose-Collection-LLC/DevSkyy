@@ -157,5 +157,52 @@ class TestBrandAssetSsrfGuard:
             BrandAssetUpload(url="file:///etc/passwd", category="product")
 
 
+class TestServiceTokenAuth:
+    """/wordpress/sync accepts a machine-to-machine X-Service-Token (queue worker
+    has no user session) as an alternative to a user JWT — constant-time matched,
+    fails closed when the env token is unset. No user JWT is required for the
+    service path, and no service path exists without the configured secret.
+    """
+
+    def test_valid_service_token_passes_auth(self, monkeypatch):
+        monkeypatch.setenv("WORDPRESS_SYNC_SERVICE_TOKEN", "s3cr3t-worker-token")
+        from api.v1.wordpress import router
+
+        c = _client(router, prefix="/api/v1")
+        r = c.post(
+            "/api/v1/wordpress/sync",
+            json={"title": "x", "content": "y"},
+            headers={"X-Service-Token": "s3cr3t-worker-token"},
+        )
+        # Auth passed → NOT 401/403 (downstream may 503 on missing WP creds / 200).
+        assert r.status_code not in _UNAUTH, r.status_code
+
+    def test_wrong_service_token_rejected(self, monkeypatch):
+        monkeypatch.setenv("WORDPRESS_SYNC_SERVICE_TOKEN", "s3cr3t-worker-token")
+        from api.v1.wordpress import router
+
+        c = _client(router, prefix="/api/v1")
+        r = c.post(
+            "/api/v1/wordpress/sync",
+            json={"title": "x", "content": "y"},
+            headers={"X-Service-Token": "WRONG"},
+        )
+        assert r.status_code in _UNAUTH, r.status_code
+
+    def test_service_token_path_disabled_when_env_unset(self, monkeypatch):
+        # No configured secret => the service-token path must not exist; a header
+        # (even non-empty) can't authenticate. Fails closed.
+        monkeypatch.delenv("WORDPRESS_SYNC_SERVICE_TOKEN", raising=False)
+        from api.v1.wordpress import router
+
+        c = _client(router, prefix="/api/v1")
+        r = c.post(
+            "/api/v1/wordpress/sync",
+            json={"title": "x", "content": "y"},
+            headers={"X-Service-Token": "anything"},
+        )
+        assert r.status_code in _UNAUTH, r.status_code
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
