@@ -39,9 +39,8 @@ Activate when working on:
   <meta property="og:image" content="https://skyyrose.co/og-image.jpg">
   <meta property="og:type" content="website">
 
-  <!-- Preconnect to CDNs -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="dns-prefetch" href="https://cdn.babylonjs.com">
+  <!-- Fonts self-hosted, zero CDN — preload the critical face -->
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/archivo-latin.woff2" crossorigin>
 
   <link rel="stylesheet" href="/style.css">
 </head>

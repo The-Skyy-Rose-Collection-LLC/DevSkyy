@@ -242,12 +242,12 @@ function skyyrose_enqueue_assets() {
         SKYYROSE_VERSION
     );
 
-    // Google Fonts
+    // Fonts — self-hosted woff2, zero CDN (declared in theme.json Font Library + assets/css/fonts.css)
     wp_enqueue_style(
         'skyyrose-fonts',
-        'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap',
+        SKYYROSE_THEME_URI . '/assets/css/fonts.css',
         [],
-        null
+        SKYYROSE_VERSION
     );
 
     // Main JavaScript
