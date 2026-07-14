@@ -15,6 +15,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
+import api.v1.brand_assets as brand_assets_module
 from api.v1.brand_assets import (
     AssetApprovalStatus,
     BrandAsset,
@@ -83,6 +84,40 @@ async def _save_asset(asset: BrandAsset) -> None:
         session.add(_asset_to_row(asset))
 
 
+def _pin_pipeline(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    features: VisualFeatures | None = None,
+) -> None:
+    """Patch both ingestion pipeline steps to deterministic, assertable outputs.
+
+    The real steps fail open — upload_to_r2 silently no-ops without R2
+    credentials (r2_key=None) and extract_visual_features returns fabricated
+    brand defaults on any error — so unpatched tests cannot distinguish a
+    working pipeline from a broken one. Pinning both lets tests assert the
+    persisted BrandAsset carries the pipeline's actual outputs.
+    """
+
+    async def fake_upload(
+        image_url: str,
+        asset_id: str,
+        category: BrandAssetCategory,
+        *,
+        correlation_id: str | None = None,
+    ) -> tuple[str | None, int, int | None, int | None, str | None]:
+        return f"brand/{category.value}/{asset_id}.png", 1234, 800, 600, "image/png"
+
+    async def fake_extract(
+        image_url: str,
+        *,
+        correlation_id: str | None = None,
+    ) -> VisualFeatures:
+        return features if features is not None else VisualFeatures()
+
+    monkeypatch.setattr(brand_assets_module, "upload_to_r2", fake_upload)
+    monkeypatch.setattr(brand_assets_module, "extract_visual_features", fake_extract)
+
+
 # =============================================================================
 # Bulk Ingestion Tests
 # =============================================================================
@@ -109,7 +144,9 @@ class TestBulkIngestion:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] in ("pending", "completed", "partial", "failed")
+        # The endpoint returns the freshly created job before background
+        # processing starts, so its status is always exactly "pending".
+        assert data["status"] == "pending"
         assert data["total"] == 1
         assert data["id"] is not None
 
@@ -162,8 +199,14 @@ class TestBulkIngestion:
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.asyncio
-    async def test_bulk_ingest_with_auto_approve(self, client: AsyncClient) -> None:
-        """Should auto-approve assets when requested."""
+    async def test_bulk_ingest_with_auto_approve(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should persist the asset as approved when auto_approve is requested."""
+        # Pinned for determinism/speed only (no real R2/Gemini calls); pipeline
+        # fidelity is asserted by test_bulk_ingest_persists_pipeline_outputs.
+        _pin_pipeline(monkeypatch)
+
         response = await client.post(
             "/brand-assets/ingest/bulk",
             json={
@@ -171,8 +214,205 @@ class TestBulkIngestion:
                 "auto_approve": True,
             },
         )
-
         assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "completed"
+        asset_id = job["results"][0]["asset_id"]
+
+        asset = (await client.get(f"/brand-assets/assets/{asset_id}")).json()
+        assert asset["approval_status"] == "approved"
+
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_persists_pipeline_outputs(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Persisted asset must carry the pipeline's outputs, not fallback defaults.
+
+        Job status/counts alone cannot detect a broken pipeline (both steps
+        fail open), so this test pins upload_to_r2 and extract_visual_features
+        to known values and asserts the asset fetched via GET
+        /brand-assets/assets/{id} carries exactly those values.
+        """
+        pinned = VisualFeatures(
+            color_palette=ColorPalette(
+                primary="#123456",
+                secondary=["#654321"],
+                accent="#ABCDEF",
+            ),
+            style_tags=["pinned-tag"],
+            quality_score=0.91,
+        )
+        _pin_pipeline(monkeypatch, features=pinned)
+
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={"assets": [{"url": "https://example.com/img.jpg", "category": "product"}]},
+        )
+        assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "completed"
+        assert job["succeeded"] == 1
+        assert job["failed"] == 0
+        assert job["results"][0]["success"] is True
+        asset_id = job["results"][0]["asset_id"]
+
+        asset_response = await client.get(f"/brand-assets/assets/{asset_id}")
+        assert asset_response.status_code == 200
+        asset = asset_response.json()
+        assert asset["r2_key"] == f"brand/product/{asset_id}.png"
+        assert asset["file_size_bytes"] == 1234
+        assert asset["width"] == 800
+        assert asset["height"] == 600
+        assert asset["mime_type"] == "image/png"
+        assert asset["visual_features"]["color_palette"]["primary"] == "#123456"
+        assert asset["visual_features"]["color_palette"]["secondary"] == ["#654321"]
+        assert asset["visual_features"]["color_palette"]["accent"] == "#ABCDEF"
+        assert asset["visual_features"]["style_tags"] == ["pinned-tag"]
+        assert asset["visual_features"]["quality_score"] == 0.91
+
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_upload_failure_marks_job_failed(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A raising pipeline step must surface as a failed result, not silent success."""
+
+        async def broken_upload(
+            image_url: str,
+            asset_id: str,
+            category: BrandAssetCategory,
+            *,
+            correlation_id: str | None = None,
+        ) -> tuple[str | None, int, int | None, int | None, str | None]:
+            raise RuntimeError("R2 upload exploded")
+
+        monkeypatch.setattr(brand_assets_module, "upload_to_r2", broken_upload)
+
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={"assets": [{"url": "https://example.com/img.jpg", "category": "product"}]},
+        )
+        assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "failed"
+        assert job["succeeded"] == 0
+        assert job["failed"] == 1
+        result = job["results"][0]
+        assert result["success"] is False
+        assert result["asset_id"] is None
+        assert "R2 upload exploded" in result["error"]
+
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_mixed_results_marks_job_partial(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Mixed success/failure across assets must yield status "partial", not silent completed/failed."""
+        good_url = "https://example.com/good.jpg"
+        bad_url = "https://example.com/bad.jpg"
+
+        async def fake_upload(
+            image_url: str,
+            asset_id: str,
+            category: BrandAssetCategory,
+            *,
+            correlation_id: str | None = None,
+        ) -> tuple[str | None, int, int | None, int | None, str | None]:
+            if image_url == bad_url:
+                raise RuntimeError("R2 upload exploded")
+            return f"brand/{category.value}/{asset_id}.png", 1234, 800, 600, "image/png"
+
+        async def fake_extract(
+            image_url: str,
+            *,
+            correlation_id: str | None = None,
+        ) -> VisualFeatures:
+            return VisualFeatures()
+
+        monkeypatch.setattr(brand_assets_module, "upload_to_r2", fake_upload)
+        monkeypatch.setattr(brand_assets_module, "extract_visual_features", fake_extract)
+
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={
+                "assets": [
+                    {"url": good_url, "category": "product"},
+                    {"url": bad_url, "category": "product"},
+                ],
+            },
+        )
+        assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "partial"
+        assert job["succeeded"] == 1
+        assert job["failed"] == 1
+        assert job["processed"] == 2
+
+        results_by_url = {result["url"]: result for result in job["results"]}
+        good_result = results_by_url[good_url]
+        assert good_result["success"] is True
+        assert good_result["asset_id"] is not None
+
+        bad_result = results_by_url[bad_url]
+        assert bad_result["success"] is False
+        assert bad_result["asset_id"] is None
+        assert "R2 upload exploded" in bad_result["error"]
+
+        asset_response = await client.get(f"/brand-assets/assets/{good_result['asset_id']}")
+        assert asset_response.status_code == 200
+        asset_id = good_result["asset_id"]
+        assert asset_response.json()["r2_key"] == f"brand/product/{asset_id}.png"
+
+    @pytest.mark.asyncio
+    async def test_bulk_ingest_extract_features_false_skips_extraction(
+        self, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """extract_features=False must persist no features and never call the extractor."""
+        extract_calls: list[str] = []
+
+        async def fake_upload(
+            image_url: str,
+            asset_id: str,
+            category: BrandAssetCategory,
+            *,
+            correlation_id: str | None = None,
+        ) -> tuple[str | None, int, int | None, int | None, str | None]:
+            return None, 0, None, None, None
+
+        async def recording_extract(
+            image_url: str,
+            *,
+            correlation_id: str | None = None,
+        ) -> VisualFeatures:
+            extract_calls.append(image_url)
+            return VisualFeatures()
+
+        monkeypatch.setattr(brand_assets_module, "upload_to_r2", fake_upload)
+        monkeypatch.setattr(brand_assets_module, "extract_visual_features", recording_extract)
+
+        response = await client.post(
+            "/brand-assets/ingest/bulk",
+            json={
+                "assets": [{"url": "https://example.com/img.jpg", "category": "product"}],
+                "extract_features": False,
+            },
+        )
+        assert response.status_code == 200
+        job_id = response.json()["id"]
+
+        job = (await client.get(f"/brand-assets/ingest/{job_id}")).json()
+        assert job["status"] == "completed"
+        asset_id = job["results"][0]["asset_id"]
+
+        asset = (await client.get(f"/brand-assets/assets/{asset_id}")).json()
+        assert asset["visual_features"] is None
+        assert extract_calls == []
 
     @pytest.mark.asyncio
     async def test_get_ingestion_job(self, client: AsyncClient) -> None:

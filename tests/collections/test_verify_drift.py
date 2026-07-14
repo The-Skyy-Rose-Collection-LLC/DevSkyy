@@ -3,10 +3,18 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.sparse_guard import requires_tree
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "wordpress-theme/skyyrose-flagship/data"
 
 
+# build-collection-sot.py resolves imagery through assets/hub/manifest.json.
+# In a sparse worktree (assets/ excluded) the pipeline resolves DIFFERENT paths
+# (hub → ghost fallbacks) and, because it deliberately writes in-tree, silently
+# REWRITES the tracked collections/*/sot.json — then self-consistently verifies
+# its own drifted output. Skip there; the gate runs in full checkouts and CI.
+@requires_tree("assets/hub")
 def test_full_pipeline_then_verify_is_clean():
     # Runs the real pipeline against the real committed tree on purpose: this is
     # the gate that the checked-in SOT + tokens are self-consistent, so it must

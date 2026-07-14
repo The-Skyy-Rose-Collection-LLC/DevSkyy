@@ -4139,5 +4139,108 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-253",
+    "timestamp": "2026-07-13",
+    "error_message": "security/aes256_gcm_encryption.py _initialize_master_key() fails OPEN: with ENCRYPTION_MASTER_KEY unset it always generated an ephemeral key + warning, even in production — silently making every previously-encrypted value unrecoverable on the next restart.",
+    "file": "security/aes256_gcm_encryption.py",
+    "root_cause": "The missing-key else-branch had no ENVIRONMENT=production guard, unlike JWT's _require_secret() which raises in production. A gate that passes when its input is absent (bug-230 fail-open pattern). Surfaced while investigating the ephemeral-key warnings in the test suite.",
+    "fix": "Added `elif os.getenv('ENVIRONMENT','').lower() == 'production': raise EncryptionError(...)` before the ephemeral fallback, mirroring JWT. Dev/test still get an ephemeral key + warning; production now refuses to start without the key. Regression tests test_missing_key_in_production_fails_closed / test_missing_key_in_dev_uses_ephemeral added to tests/test_security.py (mutation-verified: with the guard disabled the production test fails 'DID NOT RAISE'). Also set deterministic test secrets in tests/conftest.py (setdefault) so the suite is hermetic and no longer logs the warnings.",
+    "tags": [
+      "security",
+      "fail-open",
+      "bug-230-pattern",
+      "encryption",
+      "fail-closed"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-254",
+    "timestamp": "2026-07-13",
+    "error_message": "pip check: litellm 1.83.7 requires openai==2.30.0 and python-dotenv==1.0.1, but env has openai 1.109.1 / python-dotenv 1.2.2. Surfaced installing .[all].",
+    "file": "pyproject.toml + llm/providers/litellm_provider.py",
+    "root_cause": "litellm is imported by llm/providers/litellm_provider.py but NOT declared in pyproject.toml (any group). Installed litellm 1.83.7 pins openai==2.30.0, conflicting with the project's openai<2 cap (via langchain-openai / llama-index-llms-openai). Pre-existing; not in the .[all] install delta.",
+    "fix": "RESOLVED (holding fix, openai 1.x preserved): (1) declared the previously-UNDECLARED litellm as `litellm>=1.80,<1.81` in pyproject base deps — 1.80.x is the last litellm line admitting openai 1.x (1.81+ requires openai>=2.8); (2) capped `openai>=1.6,<2` (base) and `openai>=1.57.2,<2` (mcp group) so the resolver can't silently drift to openai 2.x. Env reconciled to openai 1.109.1 + litellm 1.80.0; `pip check` clean; llm/litellm-provider tests green. NOTE: openai 2.x IS API-compatible for our usage (Context7-verified: chat.completions/images.generate/images.edit/AsyncOpenAI unchanged in v2; 486 mocked openai-touching tests passed on openai 2.45.0) BUT the live paid gpt-image-2 pipeline was not exercised — so the openai 2.x migration is deferred as a deliberate founder-gated task (lift the two <2 caps + the litellm <1.81 cap together, then live-verify imagery). Rationale documented inline at both cap sites. SECURITY (code-review): litellm 1.80.x sits inside 7 GHSA advisories (fixed 1.84.0), ALL scoped to litellm.proxy — unreachable here (SDK-only acompletion/completion_cost, no [proxy] extra installed/run). The openai 2.x migration MUST target litellm>=1.84.0 (not just >=1.81) to clear the CVE range in the same step; pin comment updated at pyproject.toml.",
+    "tags": [
+      "cve-context",
+      "dependency",
+      "litellm",
+      "litellm-proxy-unreachable",
+      "openai",
+      "openai-2x-migration-deferred",
+      "pip-check",
+      "resolved",
+      "undeclared-dep"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-13"
+  },
+  {
+    "id": "bug-255",
+    "timestamp": "2026-07-12",
+    "error_message": "TestBulkIngestion tests pass even with the entire upload/extraction pipeline broken — upload_to_r2 silently no-ops without R2 creds (r2_key=None) and extract_visual_features returns fabricated brand-default VisualFeatures on any error; tests only checked job existence/counts and a loose 4-way status assertion",
+    "file": "tests/api/test_brand_assets.py",
+    "root_cause": "Both pipeline steps fail open by design (api/v1/brand_assets.py upload_to_r2 + extract_visual_features fallbacks; services/ml/visual_feature_extractor.py _fallback_features), so job status/counts are unfalsifiable signals — no test ever fetched the persisted BrandAsset to assert r2_key/visual_features carried real pipeline outputs",
+    "fix": "Added _pin_pipeline helper monkeypatching upload_to_r2/extract_visual_features to known values + 3 tests asserting the persisted asset (GET /brand-assets/assets/{id}) carries exactly those values (r2_key, size, dims, mime, features), a raising-step-marks-job-failed test, and extract_features=False skip test; tightened POST status assertion to == 'pending' and auto_approve to assert persisted approval_status. Mutation-verified: severing r2_key persistence fails the new test.",
+    "tags": [
+      "tests",
+      "fail-open",
+      "brand-assets",
+      "pipeline",
+      "unfalsifiable-test",
+      "bug-230-pattern"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-256",
+    "timestamp": "2026-07-12",
+    "error_message": "Stop-gate full-suite run: ModuleNotFoundError: No module named 'matplotlib' — collection errors in tests/character_pipeline/test_verify_fk.py + test_love_hurts_girl_golden.py (skyyrose/character_pipeline/verify.py:20 module-level import)",
+    "file": ".venv (environment, no code change)",
+    "root_cause": "Env drift: matplotlib==3.11.0 is declared in pyproject.toml ml dep group (line 265) but was never installed into the shared .venv; character-pipeline tests landed on main via PR #736 assuming it present",
+    "fix": "pip install matplotlib==3.11.0 into .venv (the declared pin). tests/character_pipeline/ then collects and passes fully. If this env drifts again, alternative is pytest.importorskip('matplotlib') per the torchvision/pyotp convention — rejected here because the dep IS declared, so tests should run, not skip.",
+    "tags": [
+      "env-drift",
+      "dependency",
+      "test-collection",
+      "stop-gate",
+      "character-pipeline"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-12"
+  },
+  {
+    "id": "bug-257",
+    "timestamp": "2026-07-12",
+    "error_message": "Stop-gate: tests/test_asset_manifest.py::test_manifest_exists_and_loads fails in every new Claude worktree — assets/products/manifest.json missing",
+    "file": "tests/test_asset_manifest.py",
+    "root_cause": "Worktrees are sparse by design since 2026-07-12 (no assets/, archive/, renders/, screenshots/), but 5 test files gate on those trees, so every sparse-worktree full-suite run (incl. the Stop test-gate) failed: tests/test_asset_manifest.py (4), tests/test_source_photo_minimum.py (12, assets/products/source-photos), tests/wordpress/test_collection_page_manager.py (7, assets/brand/brand.yaml via skyyrose/elite_studio/brand.py:46), tests/test_sot_no_adhoc_imagery.py (git ls-files scan reads tracked-but-absent archive/ files). WRITER IDENTIFIED: tests/collections/test_verify_drift.py::test_full_pipeline_then_verify_is_clean runs build-collection-sot.py IN-TREE by design; without assets/hub/manifest.json it resolves hub->ghost fallback paths and silently REWRITES tracked collections/*/sot.json, then self-consistently verifies its own drifted output (passed while mutating).",
+    "fix": "Centralized guard in tests/sparse_guard.py: requires_tree(rel) skips ONLY when rel is absent AND git core.sparseCheckout=true; a full checkout with a missing tree still fails closed (bug-230 rule). Applied: test_asset_manifest.py (refactored to shared helper), test_source_photo_minimum.py + test_collection_page_manager.py (module pytestmark), test_sot_no_adhoc_imagery.py (per-file skip inside the ls-files scan loop), test_verify_drift.py full-pipeline gate (@requires_tree('assets/hub') - also stops the sot.json mutation). Mutated sot.json restored via git checkout. Verified: all 5 files green/skip in sparse worktree, collections/ tree clean after run.",
+    "tags": [
+      "sparse-worktree",
+      "test-isolation",
+      "stop-gate",
+      "asset-manifest",
+      "bug-231-pattern",
+      "fail-closed"
+    ],
+    "related_bugs": [
+      "bug-231",
+      "bug-256"
+    ],
+    "occurrences": 2,
+    "last_seen": "2026-07-13"
   }
 ]

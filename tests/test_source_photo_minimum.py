@@ -19,8 +19,14 @@ from pathlib import Path
 
 import pytest
 
+from tests.sparse_guard import requires_tree
+
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "assets" / "products" / "source-photos" / "manifest.json"
+
+# Every test reads the manifest under assets/ — sparse worktrees exclude that
+# tree by design; full checkouts and CI still fail closed on a missing manifest.
+pytestmark = requires_tree("assets/products/source-photos")
 
 # Promote to True after every active SKU has at least front + back. Until then,
 # the warning surfaces gaps without blocking the build.
