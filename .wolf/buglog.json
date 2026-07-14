@@ -4265,5 +4265,52 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-14"
+  },
+  {
+    "id": "bug-259",
+    "timestamp": "2026-07-14",
+    "error_message": "SSRF guard bypass: BrandAssetUpload.url validator gated on case-sensitive str.startswith(('http://','https://')); 'HTTP://169.254.169.254/...' skipped validate_url entirely and reached httpx.get() (cloud-metadata/IAM credential theft).",
+    "file": "api/v1/brand_assets.py",
+    "root_cause": "str.startswith is case-sensitive; urlparse/httpx normalize the scheme to lowercase, so a case-variant scheme evaded the startswith gate and the SSRF validator was never called. Guard should never be conditioned on a case-sensitive scheme prefix.",
+    "fix": "Call SSRFProtection().validate_url(v) UNCONDITIONALLY in the field_validator (validate_url itself rejects any scheme outside {http,https} and every internal/metadata host). Matches the already-correct services/ml/gemini_client.py call site. Added TestBrandAssetSsrfGuard (3 hermetic regression tests) in tests/test_api_auth_hardening.py; uppercase-scheme case fails against pre-fix code. Committed 5c1ff539a on fix/api-auth-hardening.",
+    "tags": [
+      "ssrf",
+      "security",
+      "case-sensitivity",
+      "startswith",
+      "code-review",
+      "brand-assets",
+      "fail-open"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-14"
+  },
+  {
+    "id": "bug-260",
+    "timestamp": "2026-07-14",
+    "error_message": "preflight_completeness() tracked-file check fails OPEN: `done < <(git ls-files)` process substitution never propagates git's exit status, so a corrupt .git/index (crash/disk-full/permissions) yields zero files and the gate prints 'Tracked-file completeness: 0/0 on disk' + passes (exit 0) — the bug-230 fail-open class, in the very gate meant to catch incomplete deploys. Surfaced by /code-review ultracode adversarial workflow (CONFIRMED HIGH).",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "Process substitution `< <(cmd)` runs cmd in a subshell whose exit status is invisible to `set -e`/pipefail; a git failure after `rev-parse --is-inside-work-tree` succeeds (rev-parse doesn't read the index) silently produces an empty stream.",
+    "fix": "Capture the list with explicit failure handling: `if ! ls_files=$(git -C \"$THEME_DIR\" ls-files 2>/dev/null); then log_error 'cannot verify tracked-file completeness; refusing to deploy'; exit 1; fi` then loop over `<<< \"$ls_files\"`. Fails CLOSED on any git error. Reproduced (truncated .git/index) pre/post-fix: before = '0/0 on disk' exit 0; after = clean error exit 1. Also narrowed the step-2 comment to 'SOURCE-tree completeness' (not deploy-artifact) since tar-excluded tracked files legitimately don't ship (#16).",
+    "tags": [
+      "deploy",
+      "wordpress",
+      "shell",
+      "fail-open",
+      "bug-230",
+      "preflight",
+      "code-review",
+      "process-substitution"
+    ],
+    "related_bugs": [
+      "bug-252",
+      "bug-258",
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-14"
   }
 ]

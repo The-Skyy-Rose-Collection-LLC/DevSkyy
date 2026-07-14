@@ -343,18 +343,32 @@ preflight_completeness() {
         exit 1
     fi
 
-    # 2. Every git-tracked file must exist on disk. Catches sparse
-    #    checkouts and deleted-but-uncommitted files. Extra untracked
-    #    files are allowed (riders shipped that way for months).
+    # 2. Every git-tracked file must exist on disk (SOURCE-tree completeness).
+    #    Catches sparse checkouts and deleted-but-uncommitted files. Extra
+    #    untracked files are allowed (riders shipped that way for months).
+    #    NOTE: "on disk" != "reaches production" -- a tracked file whose
+    #    basename matches a tar/rsync exclude (CLAUDE.local.md, ._*,
+    #    __pycache__) still passes here but is dropped from the artifact by
+    #    design; this check asserts the source is whole, not the tarball.
     if git -C "$THEME_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
-        local missing=0 tracked=0 f
+        # Capture the list with explicit failure handling. A bare
+        # `done < <(git ls-files)` process substitution does NOT propagate
+        # git's exit status, so a corrupt index / permissions / disk-full
+        # read would silently yield zero files -> false "0/0 OK" and pass the
+        # gate (the bug-230 fail-open class). `if ! ls=$(...)` fails CLOSED.
+        local ls_files missing=0 tracked=0 f
+        if ! ls_files=$(git -C "$THEME_DIR" ls-files 2>/dev/null); then
+            log_error "git ls-files failed -- cannot verify tracked-file completeness; refusing to deploy"
+            exit 1
+        fi
         while IFS= read -r f; do
+            [[ -n "$f" ]] || continue
             tracked=$((tracked + 1))
             if [[ ! -e "$THEME_DIR/$f" ]]; then
                 log_error "Tracked file missing from deploy source: $f"
                 missing=$((missing + 1))
             fi
-        done < <(git -C "$THEME_DIR" ls-files)
+        done <<< "$ls_files"
         if (( missing > 0 )); then
             log_error "$missing tracked file(s) absent from the source tree -- the hot-swap would delete them from production"
             exit 1
