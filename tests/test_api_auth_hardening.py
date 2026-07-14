@@ -119,5 +119,43 @@ class TestWebhookFailsClosed:
         assert r.status_code == 401, r.status_code
 
 
+class TestBrandAssetSsrfGuard:
+    """The bulk-ingest URL validator must reject internal / cloud-metadata targets
+    regardless of scheme case. `HTTP://…` was a bypass: str.startswith(("http://",
+    "https://")) is case-sensitive, but urlparse/httpx lowercase the scheme, so the
+    raw URL reached httpx.get() unvalidated (169.254.169.254 → IAM credential theft).
+    These assert the guard now runs unconditionally. All three targets are rejected
+    BEFORE any DNS resolution (blocked-domain / protocol checks), so no network.
+    """
+
+    def test_lowercase_metadata_ip_rejected(self):
+        from pydantic import ValidationError
+
+        from api.v1.brand_assets import BrandAssetUpload
+
+        with pytest.raises(ValidationError):
+            BrandAssetUpload(url="http://169.254.169.254/latest/meta-data/", category="product")
+
+    def test_uppercase_scheme_metadata_ip_rejected(self):
+        # The regression: "HTTP://" skipped the case-sensitive startswith gate.
+        from pydantic import ValidationError
+
+        from api.v1.brand_assets import BrandAssetUpload
+
+        with pytest.raises(ValidationError):
+            BrandAssetUpload(
+                url="HTTP://169.254.169.254/latest/meta-data/iam/security-credentials/",
+                category="product",
+            )
+
+    def test_non_http_scheme_rejected(self):
+        from pydantic import ValidationError
+
+        from api.v1.brand_assets import BrandAssetUpload
+
+        with pytest.raises(ValidationError):
+            BrandAssetUpload(url="file:///etc/passwd", category="product")
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -7,14 +7,16 @@ Voyage `voyage-3-large` embeddings + Pinecone serverless
 Prefix:  /api/v1/catalog
 Auth:    public for read-only catalog data (/search, /products/*, /collections/*).
 
-         CAVEAT: /answer and /answer/stream invoke Claude (cost-bearing, ~$0.002/req)
-         and are currently UNAUTHENTICATED. Other LLM-backed endpoints in this API
-         (api/v1/rag_anything.py, api/v1/commerce.py) gate via Depends(get_current_user)
-         + entitlement checks. Before exposing publicly, either:
-           (a) add Depends(get_current_user) and bill against tier, OR
-           (b) add per-IP rate limiting via security.rate_limiting.rate_limiter.
-         The /answer cache (1h TTL, 128 slots) provides some natural backpressure
-         on identical queries but does not bound spend from a malicious caller.
+         /answer and /answer/stream invoke Claude (cost-bearing, ~$0.002/req) and
+         are intentionally PUBLIC (shopper-facing Q&A). Spend is bounded by option
+         (b) rather than a JWT gate — a deliberate product choice:
+           (b) per-IP endpoint rate limiting via security.rate_limiting — 20 req/min
+               per IP on /answer + /answer/stream (ENDPOINT_BASED rules), layered
+               over the global IP_BASED default. The /answer cache (1h TTL, 128
+               slots) adds backpressure on identical queries.
+         /cache/clear is admin-mutating and DOES require Depends(get_current_user).
+         To later gate /answer behind auth + tier billing, add Depends(get_current_user)
+         here (option (a)) — the seam other LLM endpoints use (rag_anything, commerce).
 
 Endpoints:
     GET  /search                            — semantic search across all SKUs

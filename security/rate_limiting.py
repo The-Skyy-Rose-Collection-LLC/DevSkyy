@@ -255,8 +255,12 @@ class AdvancedRateLimiter:
                 burst_limit=10,
             ),
             # Public, cost-bearing RAG Q&A (Voyage embed + Pinecone + Haiku).
-            # Tight per-endpoint cap so an anonymous caller can't run up LLM
-            # spend, but generous enough for real interactive shoppers.
+            # Enforced as a per-IP sliding window (ENDPOINT_BASED keys on
+            # endpoint:path:ip): 20 req / 60s per IP. NOTE: for ENDPOINT_BASED
+            # rules only requests_per_minute is enforced — requests_per_hour and
+            # burst_limit are advisory metadata (kept for parity with the other
+            # rules, e.g. /auth/register), not a second window. Tight enough to
+            # cap an anonymous caller's LLM spend, generous enough for real shoppers.
             "/api/v1/catalog/answer": RateLimitRule(
                 name="catalog_answer_endpoint",
                 limit_type=RateLimitType.ENDPOINT_BASED,

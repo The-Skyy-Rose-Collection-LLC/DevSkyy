@@ -134,9 +134,13 @@ class BrandAssetUpload(BaseModel):
     def _validate_url(cls, v: str) -> str:
         # SSRF guard at the ingest boundary — block internal hosts / cloud
         # metadata before any fetch (upload_to_r2 + visual feature extraction).
-        # Block-internal-only: brand assets legitimately come from many domains.
-        if v.startswith(("http://", "https://")):
-            SSRFProtection().validate_url(v)
+        # Validate UNCONDITIONALLY: a case-variant scheme ("HTTP://…") or any
+        # non-http scheme must not slip past — urlparse/httpx lowercase the scheme,
+        # so a startswith("http://") gate was an SSRF bypass (HTTP://169.254.169.254
+        # reached the fetch). validate_url rejects any scheme outside {http, https}
+        # and any internal/metadata host. Block-internal-only: brand assets
+        # legitimately come from many public domains.
+        SSRFProtection().validate_url(v)
         return v
 
 
