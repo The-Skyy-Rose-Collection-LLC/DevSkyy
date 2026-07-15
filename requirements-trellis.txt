@@ -32,7 +32,7 @@ onnxruntime>=1.26.0
 usd-core>=24.0; platform_system != "Windows"
 
 # --- Replicate backend (optional) ---
-replicate>=0.30
+replicate>=1.0.7
 
 # --- S3 / R2 artifact store (optional) ---
 boto3>=1.34
