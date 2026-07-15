@@ -148,7 +148,10 @@ async def test_gate_default_budget_blocks_runaway_revisions():
     async def producer(ref):
         return "weak draft"
 
-    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+    agent = CopyEvaluator(
+        judge_fn=judge,
+        adapter=CopyAdapter(regenerate_fn=regenerate_fn, mode="hard_gate"),
+    )
 
     with pytest.raises(CostCapExceeded):
         await agent.gate(ref=_brief(), producer=producer, cap=50)
@@ -173,7 +176,10 @@ async def test_gate_unbounded_opt_out_still_runs_full_cap():
     async def producer(ref):
         return "weak draft"
 
-    agent = CopyEvaluator(judge_fn=judge, adapter=CopyAdapter(regenerate_fn=regenerate_fn))
+    agent = CopyEvaluator(
+        judge_fn=judge,
+        adapter=CopyAdapter(regenerate_fn=regenerate_fn, mode="hard_gate"),
+    )
     v = await agent.gate(ref=_brief(), producer=producer, cap=5, unbounded=True)
 
     assert v.attempts == 5
