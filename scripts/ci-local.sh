@@ -27,6 +27,15 @@ set -uo pipefail
 ROOT="${CI_LOCAL_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$ROOT" || { echo "ci-local: cannot cd to ROOT=$ROOT" >&2; exit 2; }
 
+# macOS fork-safety: block the _scproxy/Network.framework system-proxy lookup in
+# test processes. Once Network.framework is armed in a multi-threaded Python
+# parent, every subprocess fork child SIGSEGVs in nw_settings_child_has_forked()
+# before exec (macOS 26.4 + CPython 3.14 fork path). Offline CI — no proxies.
+if [[ "$(uname)" == "Darwin" ]]; then
+  export no_proxy="${no_proxy:-*}"
+  export NO_PROXY="${NO_PROXY:-*}"
+fi
+
 PHP_BIN="${PHP_BIN:-php}"
 command -v "$PHP_BIN" >/dev/null 2>&1 || PHP_BIN="/opt/homebrew/bin/php"
 THEME_DIR="wordpress-theme/skyyrose-flagship"   # source + built assets live here
