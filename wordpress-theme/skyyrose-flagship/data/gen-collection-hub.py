@@ -4,8 +4,11 @@
 Renders FROM the canonical assets/ tree via relative ../../../assets/ paths — no image
 duplication (single-asset-tree lock). Reads identity.json + the generated sot.json +
 copy.md. All dynamic text is HTML-escaped. DO NOT hand-edit index.html.
+
+USAGE: python3 gen-collection-hub.py [--out-dir DIR]
 """
 
+import argparse
 import html
 import json
 import sys
@@ -115,12 +118,29 @@ def page(ident: dict, sot: dict, copy_md: str) -> str:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Generate the per-collection designer hub index.html files."
+    )
+    parser.add_argument(
+        "--out-dir",
+        default=None,
+        help="Directory to write the per-slug index.html folders into. Defaults to "
+        "data/collections/ (the tracked hub view). Tests pass a tmp dir so they "
+        "never mutate tracked files.",
+    )
+    args = parser.parse_args()
+    out = Path(args.out_dir) if args.out_dir else OUT
+
     idents = sot_common.load_identity()
     for slug, ident in idents.items():
-        folder = OUT / slug
-        sot = json.loads((folder / "sot.json").read_text())
-        copy_md = (folder / "copy.md").read_text() if (folder / "copy.md").is_file() else ""
-        (folder / "index.html").write_text(page(ident, sot, copy_md))
+        # Inputs (sot.json, copy.md) always come from the tracked canonical tree;
+        # only the rendered index.html output is redirectable via --out-dir.
+        in_folder = OUT / slug
+        sot = json.loads((in_folder / "sot.json").read_text())
+        copy_md = (in_folder / "copy.md").read_text() if (in_folder / "copy.md").is_file() else ""
+        out_folder = out / slug
+        out_folder.mkdir(parents=True, exist_ok=True)
+        (out_folder / "index.html").write_text(page(ident, sot, copy_md))
         print(f"{slug}/index.html generated")
     return 0
 
