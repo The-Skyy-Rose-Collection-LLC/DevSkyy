@@ -16,12 +16,17 @@ from skyyrose.elite_studio.quality import brand_centroid
 pytestmark = pytest.mark.slow
 
 
+_N_APPROVED = 8  # must match MIN_APPROVED in brand_centroid
+
+
 @pytest.fixture
 def approved_dir(tmp_path: Path) -> Path:
     d = tmp_path / "approved"
     d.mkdir()
-    for i, color in enumerate([(20, 20, 20), (40, 40, 40), (10, 10, 10)]):
-        Image.new("RGB", (224, 224), color=color).save(d / f"shot_{i}.png")
+    # Use _N_APPROVED distinct grey shades so we meet the MIN_APPROVED floor.
+    shades = [int(i * 255 / (_N_APPROVED - 1)) for i in range(_N_APPROVED)]
+    for i, shade in enumerate(shades):
+        Image.new("RGB", (224, 224), color=(shade, shade, shade)).save(d / f"shot_{i}.png")
     return d
 
 
@@ -29,7 +34,7 @@ def test_build_centroid_returns_normalized_vector(approved_dir: Path) -> None:
     result = brand_centroid.build_centroid(approved_dir)
     assert result.centroid.shape == (512,)
     assert pytest.approx(float(np.linalg.norm(result.centroid)), abs=1e-4) == 1.0
-    assert result.sample_count == 3
+    assert result.sample_count == _N_APPROVED
 
 
 def test_build_centroid_records_threshold(approved_dir: Path) -> None:

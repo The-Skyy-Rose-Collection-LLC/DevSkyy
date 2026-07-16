@@ -37,10 +37,22 @@ def main() -> int:
         help="Vision encoder: 'clip' (CLIP-base, default) or 'dino' (DINOv2, "
         "stronger image-only similarity).",
     )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=None,
+        help="Optional JSON allowlist of approved filenames. Accepts a list "
+        '["a.png", ...] or an object {"approved": ["a.png", ...]}. '
+        "Only listed files are used; a missing file raises an error.",
+    )
     args = parser.parse_args()
 
     if not args.approved_dir.is_dir():
         print(f"FATAL: approved-dir not found: {args.approved_dir}", file=sys.stderr)
+        return 1
+
+    if args.manifest is not None and not args.manifest.is_file():
+        print(f"FATAL: manifest not found: {args.manifest}", file=sys.stderr)
         return 1
 
     print(f"Building {args.encoder} centroid from {args.approved_dir}...")
@@ -48,6 +60,7 @@ def main() -> int:
         args.approved_dir,
         threshold_percentile=args.threshold_percentile,
         encoder=args.encoder,
+        manifest=args.manifest,
     )
     save_centroid(centroid, args.output)
     print(
