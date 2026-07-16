@@ -14,7 +14,6 @@ def test_help_lists_score_alignment_flag() -> None:
         [sys.executable, str(REPO / "scripts" / "nano-banana-run.py"), "generate", "--help"],
         capture_output=True,
         text=True,
-        cwd=str(REPO),
     )
     assert result.returncode == 0, result.stderr
     assert "--score-alignment" in result.stdout

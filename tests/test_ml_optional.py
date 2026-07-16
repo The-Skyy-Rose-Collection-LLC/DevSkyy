@@ -14,6 +14,15 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# main_enterprise's load_dotenv() searches from the process cwd, so the child
+# needs to run from REPO_ROOT. Popen's own `cwd=` kwarg forces CPython's
+# subprocess machinery onto the fork() path unconditionally (posix_spawn
+# requires cwd=None -- see subprocess.py's _execute_child), which is unsafe
+# once any earlier test has armed a fork-unsafe framework (bug-263 follow-up).
+# chdir inside the child script instead, so the parent Popen call keeps
+# cwd=None and stays eligible for posix_spawn.
+_CHDIR_PREAMBLE = f"import os\nos.chdir({str(REPO_ROOT)!r})\n"
+
 _BLOCKER_SCRIPT = """
 import sys
 import importlib.abc
@@ -84,8 +93,7 @@ for label, fn in (
 def test_main_enterprise_imports_without_ml_libs() -> None:
     """`import main_enterprise` must succeed with zero torch-class ML libs importable."""
     result = subprocess.run(
-        [sys.executable, "-c", _BLOCKER_SCRIPT],
-        cwd=REPO_ROOT,
+        [sys.executable, "-c", _CHDIR_PREAMBLE + _BLOCKER_SCRIPT],
         capture_output=True,
         text=True,
         timeout=60,
@@ -104,8 +112,7 @@ def test_encoders_fail_loud_with_ml_extra_message() -> None:
     fallback: graceful at import time, fail-loud with an actionable message at
     use time)."""
     result = subprocess.run(
-        [sys.executable, "-c", _FAIL_LOUD_SCRIPT],
-        cwd=REPO_ROOT,
+        [sys.executable, "-c", _CHDIR_PREAMBLE + _FAIL_LOUD_SCRIPT],
         capture_output=True,
         text=True,
         timeout=60,
