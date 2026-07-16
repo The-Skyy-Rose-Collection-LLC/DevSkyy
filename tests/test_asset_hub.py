@@ -17,6 +17,12 @@ from __future__ import annotations
 import pytest
 
 import skyyrose.core.asset_hub as hub
+from tests.sparse_guard import requires_tree
+
+# asset_hub reads assets/hub/manifest.json — a tree deliberately excluded from sparse
+# Claude worktrees (bug-257 / sparse_guard). Skip this whole module there; it still runs
+# in CI and full checkouts, where a missing tree fails closed rather than silently skips.
+pytestmark = requires_tree("assets/hub")
 
 # FAIL-CLOSED (bug-230): the manifest itself is GIT-TRACKED (only the image blobs
 # under assets/hub/ are gitignored), so a missing manifest is a checkout/path
@@ -283,9 +289,9 @@ def test_pending_none_in_resolve():
         sku = entry.get("sku")
         face = entry.get("face", "front")
         if sku:
-            assert (
-                hub.resolve(sku, face) is None
-            ), f"Pending entry {entry['_id']} incorrectly resolved to a path"
+            assert hub.resolve(sku, face) is None, (
+                f"Pending entry {entry['_id']} incorrectly resolved to a path"
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -309,9 +315,9 @@ def test_verify_integrity_problem_count_matches_unpromoted():
         and (not e.get("path") or not (hub.HUB_DIR / e["path"]).exists())
     )
     problems = hub.verify_integrity()
-    assert (
-        len(problems) == expected
-    ), f"Expected {expected} integrity problems, got {len(problems)}:\n" + "\n".join(problems)
+    assert len(problems) == expected, (
+        f"Expected {expected} integrity problems, got {len(problems)}:\n" + "\n".join(problems)
+    )
 
 
 def test_verify_integrity_problems_are_strings():

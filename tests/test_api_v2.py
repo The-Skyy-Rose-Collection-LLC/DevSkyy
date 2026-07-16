@@ -86,6 +86,19 @@ def _fake_char_json(character_id: str = "char_abc123", name: str = "TestChar") -
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def _dev_auth_env(monkeypatch):
+    """Pin ENVIRONMENT so api.v2's fail-closed auth guard does not depend on
+    ambient env. The guard (_check_api_key) raises 503 "API_KEY not configured"
+    when API_KEY is unset AND ENVIRONMENT is not a dev value — so without this,
+    these tests pass only when the shell happens to export a dev ENVIRONMENT
+    (a bug-231 test-isolation violation). Tests that exercise real auth set
+    API_KEY themselves, which takes the header-validation branch and is
+    unaffected by this default.
+    """
+    monkeypatch.setenv("ENVIRONMENT", "test")
+
+
 @pytest.fixture(scope="module")
 def creative_client():
     from api.v2.creative import router
