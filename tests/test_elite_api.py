@@ -20,6 +20,17 @@ from fastapi.testclient import TestClient
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def _dev_auth_env(monkeypatch):
+    """Pin ENVIRONMENT so the elite-studio auth guard doesn't depend on ambient
+    env. The guard raises 503 'API_KEY not configured' when API_KEY is unset AND
+    ENVIRONMENT is not a dev value; these tests set API_KEY per-test but never
+    ENVIRONMENT (bug-231 — never rely on ambient env). Auth-active tests set
+    API_KEY to a real value, taking the header-validation branch, unaffected here.
+    """
+    monkeypatch.setenv("ENVIRONMENT", "test")
+
+
 @pytest.fixture(scope="module")
 def client():
     from fastapi import FastAPI
