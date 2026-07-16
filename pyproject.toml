@@ -197,7 +197,7 @@ mcp = [
     "aiofiles>=24.1.0,<26.0",
     "orjson==3.11.9",
     "python-dotenv==1.2.2",
-    "structlog==25.5.0",
+    "structlog==26.1.0",
     "loguru==0.7.3",
     "tenacity==9.1.2",
     "backoff==2.2.1",
