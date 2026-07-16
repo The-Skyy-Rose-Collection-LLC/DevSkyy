@@ -4410,5 +4410,27 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-16T05:50:00Z"
+  },
+  {
+    "id": "bug-265",
+    "timestamp": "2026-07-16T06:20:00Z",
+    "error_message": "PR 751 mergeable=CONFLICTING against main; git merge-tree showed .wolf/buglog.json as one giant 481-line conflict even though only 2 of 235 entries had real content changes.",
+    "file": ".wolf/buglog.json",
+    "root_cause": "Commit 71bfe0e76 appended the bug-264 entry and bumped bug-263 by loading buglog.json, mutating it in Python, and calling json.dump(data, f, indent=2) WITHOUT ensure_ascii=False. Python's json.dump defaults to ensure_ascii=True, so every existing non-ASCII character in the other 233 untouched entries (em-dash —, arrow →, etc.) got re-escaped to \\uXXXX on that single write. The file's actual UTF-8 content did not change, but every line containing one of those characters now diffed byte-for-byte against origin/main (which still had literal UTF-8), so git's 3-way merge flagged nearly the whole file as conflicting instead of the 2 lines that actually changed.",
+    "fix": "Reconstructed buglog.json from origin/main's copy (canonical UTF-8, 234 entries) instead of hand-resolving conflict markers: reconciled the two independently-added bug-263 entries (both branches discovered the same SIGSEGV bug post-fork) by taking the entry with the superset of fields (higher occurrences, populated related_bugs, later last_seen) rather than picking a side blindly; same treatment for bug-231 (branch had a real addendum main lacked); appended the new bug-264 entry; wrote back with json.dump(..., indent=2, ensure_ascii=False) plus a trailing newline to match the file's existing convention. Verified: git diff origin/main -- .wolf/buglog.json now shows only 36 insertions/7 deletions (the real bug-263/bug-231/bug-264 deltas), not ~250 lines of unicode-escape noise.",
+    "tags": [
+      "json",
+      "unicode",
+      "ensure_ascii",
+      "merge-conflict",
+      "wolf-buglog",
+      "git"
+    ],
+    "related_bugs": [
+      "bug-263",
+      "bug-264"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-16T06:20:00Z"
   }
 ]
