@@ -14,6 +14,14 @@
 # races without ever masking a real, reproducible failure.
 set -uo pipefail
 
+# bug-263: on macOS, Apple's _scproxy SIGSEGVs on the child side of subprocess
+# fork() (nw_settings_child_has_forked) unless proxy resolution is short-circuited.
+# conftest.py setdefault's no_proxy too late — networking can arm before conftest
+# imports — so export it HERE, before Python starts, which is the reliable fix.
+# Harmless off darwin (just an unused env var). Without this the gate false-blocks
+# on ~100 subprocess-spawning tests that crash with exit -11.
+export NO_PROXY='*' no_proxy='*'
+
 # The stopping session's cwd arrives as JSON on stdin. Fall back to $PWD if absent
 # (jq missing / non-JSON invocation) so the gate still works.
 input=$(cat 2>/dev/null || true)
