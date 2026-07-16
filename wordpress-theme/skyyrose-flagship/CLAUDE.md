@@ -58,7 +58,7 @@ Color constants (`SKYYROSE_COLOR_ROSE_GOLD` / `_GOLD` / `_CRIMSON` / `_SILVER`) 
 
 ## Skyy mascot (3D site host) — v1.9.0
 
-- `assets/models/skyy.glb` is **draco-compressed** — `skyy-3d.js` MUST keep its DRACOLoader wiring (`setDRACOLoader` + decoder path derived from `MODEL_URL`) or the load fails silently and she never appears. Decoders live in `assets/js/lib/draco/`; CSP needs `'wasm-unsafe-eval'` (inc/security.php).
+- `assets/models/skyy.glb` is **draco-compressed** — `skyy-3d.js` MUST keep its DRACOLoader wiring (`setDRACOLoader` + `DRACO_DECODER_PATH`) or the load fails silently and she never appears. The decoder path is `SKYYROSE_ASSETS_URI_3D() + '/js/lib/draco/'` (skyy-3d.js:29), derived from `assetsUri` and **independent of `MODEL_URL`** — so `MODEL_URL` safely carries a `?ver=SKYYROSE_VERSION` cache-bust (enqueue.php) without affecting the decoder. Decoders live in `assets/js/lib/draco/`; CSP needs `'wasm-unsafe-eval'` (inc/security.php).
 - Clip contract: lowercase `idle`/`walk` required, `wave`/`point`/`talk`/`joy` optional. mascot.js emits `skyy:*` CustomEvents; skyy-3d.js maps them to clips by name.
 - Gate: `skyyrose_mascot_is_enabled()` (inc/mascot-config.php) — Customizer theme_mod `skyyrose_mascot_enabled`, **live by default**, but an explicit stored `false` in the DB overrides code defaults (bit us on first deploy).
 - Mounts ONLY via footer.php (front-page.php uses `get_footer()`); checkout excluded.
