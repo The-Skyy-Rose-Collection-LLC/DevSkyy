@@ -4312,5 +4312,74 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-14"
+  },
+  {
+    "id": "bug-261",
+    "timestamp": "2026-07-15",
+    "error_message": "Founder: mascot 'walks funny' on live skyyrose.co (v1.11.0, Love Hurts Girl body v7). Chrome-devtools MCP eyes-on capture of the live walk cycle plus a deterministic mixer.setTime() scrub through wordpress-theme/skyyrose-flagship/assets/models/skyy.glb's 'walk' clip (duration 1.0417s) found TWO distinct authoring defects: (1) both UpLeg bones (thigh) hold a perfectly identical rotation quaternion across 4-5 consecutive keyframes (~0.167s, 16% of the cycle) at each swing extreme -- LeftUpLeg flat at t=0.375-0.542 (roll unwrapped 201.74deg), RightUpLeg flat at the same window (roll 145.55deg) -- producing a visible freeze/stutter where she reaches full stride and holds before snapping to the next pose, instead of a continuous swing. Confirmed both numerically (pygltflib keyframe dump) and visually (screenshot diff t=0.45 vs t=0.50 inside the window: 4.5% pixel delta = noise; t=0.30 vs t=0.45 crossing INTO the window: 12.0% pixel delta = real motion). (2) LeftArm/RightArm bones ARE keyframed with a ~40deg rotation delta across the cycle, but pitch/yaw stay bit-identical at every keyframe while only roll (the bone's own long/twist axis) changes -- so the authored rotation is a twist around the upper-arm's length, not a shoulder-flexion swing. Six keyframe-driven screenshots spanning the full cycle (t=0.0/0.15/0.30/0.45/0.65/0.80) show the arms in the IDENTICAL hanging-at-sides position in every frame -- zero visible arm counter-swing despite the keyframes existing. Net visual effect: legs step with a stutter-hold, arms stay rigid -- reads as a robotic/broken gait, matching the founder's 'funny' complaint.",
+    "file": "wordpress-theme/skyyrose-flagship/assets/models/skyy.glb (walk clip; authored via renders/3d/girl-love-hurts/bake_walk_retarget.py against renders/3d/girl-love-hurts/love-hurts-girl-rig.blend, mascot-skin-weight-fix worktree / PR #736 lineage)",
+    "root_cause": "The Plan-B fresh-keyframed walk (bug-219 decision: retargeting from the old skyy.glb rig failed Phase 3's bone-direction gate, so the walk was hand-authored directly on the girl's own rig as a sparse 6-pose sequence -- contact-L, passing-R-up, high-point, contact-R, passing-L-up, high-point -- then baked via bpy.ops.nla.bake(channel_types={'ROTATION'}) at a fixed sample rate. Two authoring artifacts survived the bake: (a) the source poses at each swing extreme were placed with an intentional or accidental hold/duplicate spacing in the timeline, so the bake emitted several back-to-back keyframes with byte-identical rotation values instead of a single apex keyframe -- LINEAR interpolation between identical values is a flat hold, not a byte error. (b) the arm poses were authored by rotating the LeftArm/RightArm bone around its local roll axis in Blender, but this rig's arm-bone rest orientation puts its long axis on that same local axis (unlike the leg bones, where local roll happens to be the hinge/flexion axis) -- so the same kind of rotation that correctly swings the leg only twists the arm in place.",
+    "fix": "Diagnosed + fixed same session. renders/3d/girl-love-hurts/fix_walk_dwell.py opens the already-baked 'walk' action in love-hurts-girl-rig.blend, finds each swing bone's rotation_euler[X] fcurve (LeftUpLeg/RightUpLeg/LeftArm/RightArm), and re-interpolates the interior baked keyframes of both dwell spans (frames 9-12 anchored between 8 and 13; frames 21-24 anchored between 20 and 25) as a straight linear ramp between the untouched outer anchors -- frame 13 keeps its authored contact-extreme value and frame 25 keeps its exact equality with frame 1 (loop-closure invariant preserved). No re-authoring, no re-bake, no change to knee/foot channels (already correct) or gait amplitude. Verified two ways: (1) pygltflib dump of the re-exported GLB shows continuous, monotonically-changing quaternion values through both former dwell spans (was bit-identical across 4-5 consecutive keys); (2) browser mixer.setTime() scrub against the corrected GLB (served locally, port 8934) shows a 6.9pct pixel diff between the exact two frames (old frame 9 vs frame 13) that were previously byte-identical (0pct diff) -- now in the same range as genuine motion elsewhere in the cycle (8.1pct for an adjacent real-motion comparison). Corrected artifacts written to NEW files only (love-hurts-girl-rig.walk-dwell-fix.blend, girl-mascot-raw.walk-dwell-fix.glb) -- canonical love-hurts-girl-rig.blend and the theme-served assets/models/skyy.glb were NOT modified; swapping the corrected animation into the production-compressed draco GLB and deploying is a separate STOP-AND-SHOW step pending founder approval (production asset write + deploy).",
+    "tags": [
+      "3d",
+      "mascot",
+      "walk-cycle",
+      "glb",
+      "keyframe-dwell",
+      "stutter",
+      "arm-twist-not-swing",
+      "love-hurts-girl",
+      "blender",
+      "gltf",
+      "founder-reported"
+    ],
+    "related_bugs": [
+      "bug-219",
+      "bug-198",
+      "bug-233"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-15"
+  },
+  {
+    "id": "bug-262",
+    "timestamp": "2026-07-15T19:49:33Z",
+    "error_message": "awk: newline in string tell me about the ca... at source line 1 (canon-prefetch.sh UserPromptSubmit hook exits non-zero / surfaces as blocked)",
+    "file": ".claude/hooks/lib/common.sh",
+    "root_cause": "scan_patterns() passed the user prompt to awk via -v prompt=\"$prompt\". macOS awk (BWK/nawk) rejects a literal newline in a -v assignment (newline in string), so any multi-line prompt (task-notification / XML blocks) crashed awk; set -euo pipefail propagated the failure and the hook exited 2.",
+    "fix": "Rewrote scan_patterns to match each pattern against the prompt via a here-string into grep -iqE (grep ... <<< \"$prompt\") instead of awk -v. Prompt is never an argv element, so arbitrary multi-line content is safe. Avoided printf|grep-q (SIGPIPE+pipefail false-fail on match) by using a here-string. Kept bash 3.2 compatibility (no ${var,,}). Also fixed stale 30->33 SKU count in canon-prefetch.sh directive text.",
+    "tags": [
+      "hooks",
+      "canon-prefetch",
+      "awk",
+      "multiline",
+      "bash",
+      "pipefail",
+      "UserPromptSubmit"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-15T19:49:33Z"
+  },
+  {
+    "id": "bug-263",
+    "timestamp": "2026-07-16T04:40:00Z",
+    "error_message": "SIGSEGV (EXC_BAD_ACCESS) 'crashed on child side of fork pre-exec' — 12+ Python crash reports 21:20-21:26 PDT; fork children of pytest die in nw_settings_child_has_forked -> NEFlowDirectorDestroy -> _os_log_preferences_refresh; parent sees subprocess returncode -11",
+    "file": "conftest.py",
+    "root_cause": "macOS 26.4 + CPython 3.14.3: subprocess takes the fork()+exec path whenever close_fds=True (default) because _HAVE_POSIX_SPAWN_CLOSEFROM is False on macOS. When the multi-threaded pytest parent has initialized Apple's Network.framework (armed via _scproxy system-proxy lookup from urllib/requests/httpx), Apple's atfork child handler nw_settings_child_has_forked() calls os_log whose preferences page is invalid in the fork child -> SIGSEGV pre-exec. Apple framework bug surface, not DevSkyy code. DEEPER CHECK 2026-07-15: crash is a RACE (fork landing while another thread updates os_log preferences — 0/400 forks crashed under synthetic arming incl. live nw_path_monitor). Apple DTS (forums thread 737464): fork() after ANY higher-level framework init is unsupported; posix_spawn is the only reliable fix (syscall — atfork handlers never run). Victims identified: tests spawning python3 generators (build-collection-sot.py, gen-collection-hub.py, gen-design-tokens.py) died Signals.SIGSEGV:11.",
+    "fix": "conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (setdefault) so getproxies_environment() is non-empty and _scproxy/Network.framework is never consulted in test processes. Verified: urllib.request.getproxies() -> {'no': '*'}. Residual risk: other Network.framework arming paths; robust per-call fix is posix_spawn conditions (close_fds=False, absolute exe, no cwd/preexec_fn). LAYER 2: conftest.py darwin-only Popen.__init__ patch defaults close_fds=False for test subprocesses (safe per PEP 446 — Python fds are CLOEXEC anyway), flipping them onto the posix_spawn path; explicit close_fds/preexec_fn/pass_fds callers untouched. Verified: 2/2 patched calls route through Popen._posix_spawn; tests/collections/test_build_collection_sot.py 6/6 pass. NOTE: worktree checkouts lack the fix until this lands on their branch — post-fix crashes at 22:23-22:25 traced to unfixed worktree collections-scroll-world running the full suite.",
+    "tags": [
+      "macos",
+      "fork",
+      "sigsegv",
+      "subprocess",
+      "network-framework",
+      "scproxy",
+      "pytest",
+      "python3.14"
+    ],
+    "related_bugs": [],
+    "occurrences": 2,
+    "last_seen": "2026-07-16T05:25:42Z"
   }
 ]

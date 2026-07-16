@@ -1,7 +1,43 @@
 """Pytest configuration for DevSkyy test suite."""
 
+import os
 import sys
 from pathlib import Path
+
+# macOS fork-safety: a multi-threaded pytest parent that has initialized Apple's
+# Network.framework (armed by the _scproxy system-proxy lookup in urllib/requests/
+# httpx) SIGSEGVs in nw_settings_child_has_forked() on the child side of every
+# subprocess fork — and CPython on macOS takes the fork path whenever
+# close_fds=True (the default), because _HAVE_POSIX_SPAWN_CLOSEFROM is False.
+# no_proxy="*" makes getproxies_environment() non-empty so _scproxy is never
+# consulted. Observed macOS 26.4 + Python 3.14.3; see .wolf/buglog.json.
+if sys.platform == "darwin":
+    os.environ.setdefault("no_proxy", "*")
+    os.environ.setdefault("NO_PROXY", "*")
+
+    # Second layer (Apple-confirmed the only reliable fix — DTS, forums thread
+    # 737464): fork() after ANY higher-level framework arming is unsupported;
+    # posix_spawn is a syscall, so no atfork handler ever runs in the child.
+    # CPython only takes posix_spawn when close_fds is False (no closefrom on
+    # macOS), so default close_fds=False for test subprocesses. Safe per
+    # PEP 446: Python-created fds are CLOEXEC/non-inheritable regardless.
+    # Callers that pass close_fds/preexec_fn/pass_fds explicitly are untouched
+    # (they opt into the fork path knowingly).
+    import subprocess as _subprocess
+
+    _orig_popen_init = _subprocess.Popen.__init__
+
+    def _spawn_friendly_init(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if (
+            len(args) <= 6  # close_fds/preexec_fn not passed positionally
+            and "close_fds" not in kwargs
+            and kwargs.get("preexec_fn") is None
+            and not kwargs.get("pass_fds")
+        ):
+            kwargs["close_fds"] = False
+        _orig_popen_init(self, *args, **kwargs)
+
+    _subprocess.Popen.__init__ = _spawn_friendly_init  # type: ignore[method-assign]
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent
