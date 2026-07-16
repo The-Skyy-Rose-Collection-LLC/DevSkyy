@@ -361,16 +361,16 @@
           "resolved": "images/products/br-007.jpg"
         },
         "front_model_image": {
-          "path": "assets/images/products/hub/br-007-front.webp",
-          "resolved": "images/products/hub/br-007-front.webp"
+          "path": "assets/images/products/ghost/br-007-ghost-front.webp",
+          "resolved": "images/products/ghost/br-007-ghost-front.webp"
         },
         "back_image": {
           "path": "assets/images/products/br-007-real-back.jpg",
           "resolved": "images/products/br-007-real-back.jpg"
         },
         "back_model_image": {
-          "path": "assets/images/products/hub/br-007-back.webp",
-          "resolved": "images/products/hub/br-007-back.webp"
+          "path": "assets/images/products/black-rose-love-hurts-basketball-shorts-back-model.webp",
+          "resolved": "images/products/black-rose-love-hurts-basketball-shorts-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-rose-x-love-hurts-basketball-shorts.md",
@@ -465,8 +465,8 @@
           "resolved": "images/products/black-is-beautiful-hockey-jersey-back-model.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/br-011-the-rose-hockey-back.webp",
-          "resolved": "images/products/br-011-the-rose-hockey-back.webp"
+          "path": "assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp",
+          "resolved": "images/products/black-is-beautiful-hockey-jersey-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md",
