@@ -393,7 +393,7 @@ exclude = ["tests*", "docs*", "legacy*"]
 # =============================================================================
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 100
 exclude = [
     "legacy/",
@@ -465,7 +465,7 @@ known-first-party = ["core", "api", "security", "database", "wordpress", "agents
 
 [tool.black]
 line-length = 100
-target-version = ["py312"]
+target-version = ["py313"]
 include = '\.pyi?$'
 exclude = '''
 /(
