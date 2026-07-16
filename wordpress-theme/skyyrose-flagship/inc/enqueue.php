@@ -449,7 +449,11 @@ function skyyrose_enqueue_global_scripts() {
 					'skyyrose-mascot-loader',
 					'SKYY_3D_CONFIG',
 					array(
-						'modelUrl' => esc_url_raw( $glb_url ),
+						// Cache-bust the GLB on version bump so a swapped skyy.glb is not
+						// masked by the WP.com edge cache (the model URL is otherwise
+						// unversioned). Safe: the Draco decoder path is DRACO_DECODER_PATH
+						// (derived from assetsUri in skyy-3d.js), independent of MODEL_URL.
+						'modelUrl' => esc_url_raw( add_query_arg( 'ver', SKYYROSE_VERSION, $glb_url ) ),
 						'walkSide' => skyyrose_get_skyy_walk_side( $skyy_context ),
 					)
 				);
