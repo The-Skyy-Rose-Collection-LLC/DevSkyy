@@ -3714,7 +3714,7 @@
     "error_message": "PATTERN: test isolation / shared-state pollution — tests failing only in full-suite or parallel runs (os.getenv default shadowing, design-tokens fixture race, snapshot drift, shared /tmp rmtree race)",
     "file": "tests/ (cross-file)",
     "root_cause": "Tests share mutable state: hardcoded /tmp paths (racy across concurrent pytest processes), module-level env reads, session-scoped snapshots. Recurred 4x Jun-18→Jul-12. Concurrent suites (parallel Claude sessions + Stop-hook runs) make shared /tmp a live race, not theoretical.",
-    "fix": "Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (never bare os.environ), no cross-test file reuse. 2026-07-12 sweep converted all 4 real /tmp writers (test_tripo_agent, test_p0_ssrf_replicate, test_skyyrose_agents x2) to tmp_path; remaining /tmp literals are mock-string args that never touch disk.",
+    "fix": "Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (never bare os.environ), no cross-test file reuse. 2026-07-12 sweep converted all 4 real /tmp writers (test_tripo_agent, test_p0_ssrf_replicate, test_skyyrose_agents x2) to tmp_path; remaining /tmp literals are mock-string args that never touch disk. ADDENDUM 2026-07-16 (bug-264 follow-up, NOT yet fixed): new instance found — tests/collections/test_gen_collection_hub.py::test_hub_renders_all_sections_and_escapes runs wordpress-theme/skyyrose-flagship/data/gen-collection-hub.py unconditionally against the REAL data/collections/ output dir (no tmp_path, no output-dir override), so every full-suite run rewrites tracked collections/{black-rose,love-hurts,signature}/sot.json + index.html as a side effect (confirmed pre-existing and independent of the bug-264 subprocess fix: this call uses sys.executable, an absolute path, with no cwd= kwarg, so neither the close_fds nor shutil.which layers touch it). Verified via 3+ full-suite runs this session, each requiring `git checkout --` before commit. Residual, unfixed — needs the generator or the test redirected to a tmp OUT dir.",
     "tags": [
       "pattern",
       "tests",
@@ -3726,10 +3726,11 @@
       "bug-145",
       "bug-153",
       "bug-167",
-      "bug-229"
+      "bug-229",
+      "bug-264"
     ],
-    "occurrences": 4,
-    "last_seen": "2026-07-12"
+    "occurrences": 5,
+    "last_seen": "2026-07-16"
   },
   {
     "id": "bug-232",
@@ -4378,8 +4379,58 @@
       "pytest",
       "python3.14"
     ],
-    "related_bugs": [],
-    "occurrences": 2,
-    "last_seen": "2026-07-16T05:25:42Z"
+    "related_bugs": [
+      "bug-264"
+    ],
+    "occurrences": 3,
+    "last_seen": "2026-07-16T05:50:00Z"
+  },
+  {
+    "id": "bug-264",
+    "timestamp": "2026-07-16T05:50:00Z",
+    "error_message": "bug-263 follow-up: full pytest suite still SIGSEGV(-11)'d on bare-executable subprocess calls (git/bash) and on cwd= calls even AFTER the close_fds=False conftest.py patch landed. 90 FAILED in a full-suite run despite the layer-2 fix; isolated re-run of each failing test alone passed clean (bug-231 pattern).",
+    "file": "conftest.py, scripts/ci-local.sh, tests/test_gitignore_claude_tracking.py, tests/test_sot_assets_tracked.py, tests/test_sot_no_adhoc_imagery.py, tests/scripts/test_check_catalog_duplicates.py, tests/scripts/test_nano_banana_alignment.py, tests/test_ml_optional.py",
+    "root_cause": "close_fds=False is necessary but NOT sufficient for CPython's subprocess module to take the posix_spawn (syscall, atfork-handler-free) path on macOS. subprocess.py:_execute_child's posix_spawn fast-path gate ALSO requires (a) os.path.dirname(executable) truthy -- i.e. the executable must already be an absolute/relative path, not a bare command name resolved via $PATH -- and (b) cwd is None, with NO CHDIR-file-action fallback in this CPython version. subprocess.run(['git', ...]) / ['bash', ...] (the overwhelming majority of calls in this repo) pass a bare name, so os.path.dirname('git') == '' and CPython silently falls back to fork() regardless of close_fds; any cwd=X kwarg blocks the fast path unconditionally. Empirically proved: importing agents.analytics_agent (pulls numpy/scipy/sklearn/torch transitively via .ml_module) is enough to arm a fork-unsafe framework; a subsequent bare subprocess.run(['git','--version']) then returns -11, while the identical call with executable=shutil.which('git') returns 0. asyncio.create_subprocess_exec also routes through subprocess.Popen internally (asyncio.unix_events._UnixSubprocessTransport._start) so it is covered by the same conftest.py patch. multiprocessing.resource_tracker calls _posixsubprocess.fork_exec() directly, bypassing Popen entirely -- unpatchable from conftest.py; it self-heals via relaunch (harmless UserWarning, 0 test failures, confirmed via --junit-xml) but explains a residual 'resource_tracker: process died unexpectedly' warning + a missing final pytest summary line in piped/redirected full-suite runs even on a fully green suite.",
+    "fix": "conftest.py: layered a THIRD fix onto the existing close_fds=False Popen patch -- resolve a bare args[0]/kwargs['args'][0] to an absolute path via shutil.which() and pass it as the executable= kwarg (Popen still presents the original argv[0] to the child, so behavior is unchanged for callers); skips shell=True (CPython already defaults executable to /bin/sh there) and any call where executable/cwd were already passed explicitly. Also added OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES (darwin, setdefault) to conftest.py + scripts/ci-local.sh as defense-in-depth for fork sites this file cannot intercept (e.g. resource_tracker) -- confirmed it does NOT fix resource_tracker's own fork (unpatchable, different mechanism) but is free and harmless. For the unpatchable cwd= call sites: tests/test_gitignore_claude_tracking.py, tests/test_sot_assets_tracked.py, tests/test_sot_no_adhoc_imagery.py switched cwd=ROOT + bare 'git' to git's own -C <dir> flag (matching tests/sparse_guard.py's already-safe pattern); tests/scripts/test_check_catalog_duplicates.py and test_nano_banana_alignment.py dropped an unnecessary cwd= (target scripts resolve all paths via Path(__file__), verified no cwd dependency); tests/test_ml_optional.py's two subprocess.run calls needed cwd=REPO_ROOT for real (load_dotenv()/import resolution), so kept cwd=None on Popen and instead prepended an os.chdir(repo_root) preamble to the injected child script. Full suite: 157 FAILED (clean baseline, no bug-263 fix at all) -> 90 FAILED (after cherry-picking bug-263's close_fds fix + bug-257/bug-231 sibling fixes from a concurrent session) -> 0 FAILED / 0 ERROR (after this fix), confirmed via --junit-xml (6579 tests, 80 skipped, exit 0) across two independent runs.",
+    "tags": [
+      "macos",
+      "fork",
+      "sigsegv",
+      "subprocess",
+      "posix_spawn",
+      "pytest",
+      "python3.14",
+      "test-isolation",
+      "bug-263-followup"
+    ],
+    "related_bugs": [
+      "bug-263",
+      "bug-231",
+      "bug-257"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-16T05:50:00Z"
+  },
+  {
+    "id": "bug-265",
+    "timestamp": "2026-07-16T06:20:00Z",
+    "error_message": "PR 751 mergeable=CONFLICTING against main; git merge-tree showed .wolf/buglog.json as one giant 481-line conflict even though only 2 of 235 entries had real content changes.",
+    "file": ".wolf/buglog.json",
+    "root_cause": "Commit 71bfe0e76 appended the bug-264 entry and bumped bug-263 by loading buglog.json, mutating it in Python, and calling json.dump(data, f, indent=2) WITHOUT ensure_ascii=False. Python's json.dump defaults to ensure_ascii=True, so every existing non-ASCII character in the other 233 untouched entries (em-dash —, arrow →, etc.) got re-escaped to \\uXXXX on that single write. The file's actual UTF-8 content did not change, but every line containing one of those characters now diffed byte-for-byte against origin/main (which still had literal UTF-8), so git's 3-way merge flagged nearly the whole file as conflicting instead of the 2 lines that actually changed.",
+    "fix": "Reconstructed buglog.json from origin/main's copy (canonical UTF-8, 234 entries) instead of hand-resolving conflict markers: reconciled the two independently-added bug-263 entries (both branches discovered the same SIGSEGV bug post-fork) by taking the entry with the superset of fields (higher occurrences, populated related_bugs, later last_seen) rather than picking a side blindly; same treatment for bug-231 (branch had a real addendum main lacked); appended the new bug-264 entry; wrote back with json.dump(..., indent=2, ensure_ascii=False) plus a trailing newline to match the file's existing convention. Verified: git diff origin/main -- .wolf/buglog.json now shows only 36 insertions/7 deletions (the real bug-263/bug-231/bug-264 deltas), not ~250 lines of unicode-escape noise.",
+    "tags": [
+      "json",
+      "unicode",
+      "ensure_ascii",
+      "merge-conflict",
+      "wolf-buglog",
+      "git"
+    ],
+    "related_bugs": [
+      "bug-263",
+      "bug-264"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-16T06:20:00Z"
   }
 ]

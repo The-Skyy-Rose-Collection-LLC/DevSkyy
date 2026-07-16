@@ -15,6 +15,15 @@ if sys.platform == "darwin":
     os.environ.setdefault("no_proxy", "*")
     os.environ.setdefault("NO_PROXY", "*")
 
+    # Belt-and-suspenders for fork paths we cannot route around Popen at all
+    # (e.g. multiprocessing.resource_tracker, which calls
+    # _posixsubprocess.fork_exec directly — no Popen call to patch). Tells the
+    # Objective-C runtime not to abort/crash a fork from a multi-threaded
+    # process. Free and harmless off darwin/off-ObjC; does not by itself fix
+    # the CPython posix_spawn gate below (kept for that reason), but covers
+    # fork() call sites this file structurally cannot intercept.
+    os.environ.setdefault("OBJC_DISABLE_INITIALIZE_FORK_SAFETY", "YES")
+
     # Second layer (Apple-confirmed the only reliable fix — DTS, forums thread
     # 737464): fork() after ANY higher-level framework arming is unsupported;
     # posix_spawn is a syscall, so no atfork handler ever runs in the child.
@@ -23,9 +32,50 @@ if sys.platform == "darwin":
     # PEP 446: Python-created fds are CLOEXEC/non-inheritable regardless.
     # Callers that pass close_fds/preexec_fn/pass_fds explicitly are untouched
     # (they opt into the fork path knowingly).
+    #
+    # Third layer (bug-263 follow-up): close_fds=False is necessary but NOT
+    # sufficient. CPython's own posix_spawn fast-path gate in
+    # subprocess.py:_execute_child additionally requires
+    # `os.path.dirname(executable)` to be non-empty — i.e. the executable must
+    # already be an absolute/relative PATH, not a bare command name. Every
+    # `subprocess.run(["git", ...])` / `["bash", ...])` call (the overwhelming
+    # majority in this repo — git, bash, npm, shellcheck) passes a bare name
+    # resolved via $PATH, so `os.path.dirname("git") == ""` and CPython
+    # silently falls through to the fork() path regardless of close_fds.
+    # Verified empirically: importing agents.analytics_agent (pulls in
+    # numpy/scipy/sklearn/torch transitively via ml_module) is enough to arm
+    # a fork-unsafe framework; a subsequent bare `["git", "--version"]` call
+    # then SIGSEGVs (-11) even with close_fds=False, while the identical call
+    # with `executable=shutil.which("git")` returns 0. Resolve bare names to
+    # an absolute path via shutil.which so the fast path actually engages;
+    # Popen still presents the original argv[0] to the child, so behavior is
+    # unchanged for callers. shell=True is left alone — CPython already
+    # defaults its `executable` to /bin/sh (absolute) in that case.
+    import shutil as _shutil
     import subprocess as _subprocess
 
     _orig_popen_init = _subprocess.Popen.__init__
+
+    def _resolve_bare_executable(args, kwargs):  # type: ignore[no-untyped-def]
+        if kwargs.get("shell") or kwargs.get("executable") is not None:
+            return
+        if len(args) >= 3:  # executable passed positionally (3rd positional arg)
+            return
+        cmd = kwargs["args"] if "args" in kwargs else (args[0] if args else None)
+        if isinstance(cmd, (list, tuple)) and cmd:
+            prog = cmd[0]
+        elif isinstance(cmd, (str, bytes, os.PathLike)):
+            prog = cmd
+        else:
+            return
+        prog = os.fspath(prog) if isinstance(prog, os.PathLike) else prog
+        if not isinstance(prog, str) or os.path.dirname(prog):
+            return  # already absolute/relative, or not a plain string name
+        env = kwargs.get("env")
+        search_path = env.get("PATH") if env is not None else None
+        resolved = _shutil.which(prog, path=search_path)
+        if resolved:
+            kwargs["executable"] = resolved
 
     def _spawn_friendly_init(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         if (
@@ -35,6 +85,7 @@ if sys.platform == "darwin":
             and not kwargs.get("pass_fds")
         ):
             kwargs["close_fds"] = False
+        _resolve_bare_executable(args, kwargs)
         _orig_popen_init(self, *args, **kwargs)
 
     _subprocess.Popen.__init__ = _spawn_friendly_init  # type: ignore[method-assign]

@@ -34,6 +34,9 @@ cd "$ROOT" || { echo "ci-local: cannot cd to ROOT=$ROOT" >&2; exit 2; }
 if [[ "$(uname)" == "Darwin" ]]; then
   export no_proxy="${no_proxy:-*}"
   export NO_PROXY="${NO_PROXY:-*}"
+  # Belt-and-suspenders for fork sites Python's own conftest.py patch cannot
+  # reach (e.g. multiprocessing.resource_tracker's direct fork_exec call).
+  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY="${OBJC_DISABLE_INITIALIZE_FORK_SAFETY:-YES}"
 fi
 
 PHP_BIN="${PHP_BIN:-php}"
