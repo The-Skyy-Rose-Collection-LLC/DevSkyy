@@ -289,9 +289,9 @@ def test_pending_none_in_resolve():
         sku = entry.get("sku")
         face = entry.get("face", "front")
         if sku:
-            assert hub.resolve(sku, face) is None, (
-                f"Pending entry {entry['_id']} incorrectly resolved to a path"
-            )
+            assert (
+                hub.resolve(sku, face) is None
+            ), f"Pending entry {entry['_id']} incorrectly resolved to a path"
 
 
 # ---------------------------------------------------------------------------
@@ -315,9 +315,9 @@ def test_verify_integrity_problem_count_matches_unpromoted():
         and (not e.get("path") or not (hub.HUB_DIR / e["path"]).exists())
     )
     problems = hub.verify_integrity()
-    assert len(problems) == expected, (
-        f"Expected {expected} integrity problems, got {len(problems)}:\n" + "\n".join(problems)
-    )
+    assert (
+        len(problems) == expected
+    ), f"Expected {expected} integrity problems, got {len(problems)}:\n" + "\n".join(problems)
 
 
 def test_verify_integrity_problems_are_strings():
