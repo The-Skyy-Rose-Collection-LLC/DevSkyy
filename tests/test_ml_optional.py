@@ -8,6 +8,7 @@ with an empty sys.modules, so the blocker is authoritative there.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -85,7 +86,10 @@ def test_main_enterprise_imports_without_ml_libs() -> None:
     """`import main_enterprise` must succeed with zero torch-class ML libs importable."""
     result = subprocess.run(
         [sys.executable, "-c", _BLOCKER_SCRIPT],
-        cwd=REPO_ROOT,
+        # PYTHONPATH instead of cwd: cwd= forces subprocess onto the fork()
+        # path on macOS, where fork after Network.framework arming SIGSEGVs
+        # the child (bug-263); posix_spawn requires cwd=None.
+        env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
         capture_output=True,
         text=True,
         timeout=60,
@@ -105,7 +109,7 @@ def test_encoders_fail_loud_with_ml_extra_message() -> None:
     use time)."""
     result = subprocess.run(
         [sys.executable, "-c", _FAIL_LOUD_SCRIPT],
-        cwd=REPO_ROOT,
+        env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
         capture_output=True,
         text=True,
         timeout=60,

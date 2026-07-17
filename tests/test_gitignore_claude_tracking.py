@@ -61,8 +61,9 @@ def test_critical_claude_path_is_not_gitignored(relative_path: str) -> None:
     match this path — otherwise a fresh worktree or clone would never see
     it, even though the currently-checked-out copy is tracked fine."""
     result = subprocess.run(
-        ["git", "check-ignore", "--no-index", "-q", relative_path],
-        cwd=ROOT,
+        # git -C instead of cwd=: cwd= forces the fork() path on macOS, where
+        # fork after Network.framework arming SIGSEGVs the child (bug-263).
+        ["git", "-C", str(ROOT), "check-ignore", "--no-index", "-q", relative_path],
         capture_output=True,
         check=False,
     )
@@ -79,8 +80,7 @@ def test_critical_claude_path_is_tracked(relative_path: str) -> None:
     """The path must actually be committed to git — existing only on disk
     in this worktree is exactly what made the engine invisible elsewhere."""
     result = subprocess.run(
-        ["git", "ls-files", "--error-unmatch", relative_path],
-        cwd=ROOT,
+        ["git", "-C", str(ROOT), "ls-files", "--error-unmatch", relative_path],
         capture_output=True,
         text=True,
         check=False,
