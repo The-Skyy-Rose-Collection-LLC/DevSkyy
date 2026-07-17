@@ -239,6 +239,6 @@ class TestStreamProcessorPollAsync:
         with patch("monitoring.stream_processor.asyncio.to_thread", side_effect=_to_thread_spy):
             await processor._run_loop()
 
-        assert run_count >= 1, (
-            "asyncio.to_thread was never called — consumer.poll() is still blocking the event loop"
-        )
+        assert (
+            run_count >= 1
+        ), "asyncio.to_thread was never called — consumer.poll() is still blocking the event loop"
