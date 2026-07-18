@@ -8,8 +8,8 @@ Schema lives at `skyyrose/core/dossier_schema.py`.
 - Total active SKUs: **33**
 - Passing schema: **33**
 - Failing schema: **0**
-- Average regions per dossier: **9.8**
-- Average hex-color coverage: **0.0%**
+- Average regions per dossier: **9.4**
+- Average hex-color coverage: **31.0%**
 - Average Pantone coverage: **0.0%**
 - SKUs with warnings: **33**
 
@@ -17,36 +17,36 @@ Schema lives at `skyyrose/core/dossier_schema.py`.
 
 | SKU | Name | Collection | Regions | Hex % | Pantone % | Warnings |
 |-----|------|------------|---------|-------|-----------|----------|
-| `br-001` | BLACK Rose Crewneck | black-rose | 6 | 0.0% | 0.0% | 6 region(s) missing color_hex |
-| `br-002` | BLACK Rose Joggers | black-rose | 6 | 0.0% | 0.0% | 6 region(s) missing color_hex |
-| `br-003` | BLACK is Beautiful Jersey Series — 0. Baseball Classic | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `br-003-giants` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (Giants Edition) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `br-003-oakland` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (Oakland Edition) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `br-003-white` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (White Edition) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
+| `br-001` | BLACK Rose Crewneck | black-rose | 5 | 60.0% | 0.0% | 2 region(s) missing color_hex |
+| `br-002` | BLACK Rose Joggers | black-rose | 6 | 66.7% | 0.0% | 2 region(s) missing color_hex |
+| `br-003` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (Black) | black-rose | 9 | 44.4% | 0.0% | 5 region(s) missing color_hex |
 | `br-004` | BLACK Rose Hoodie | black-rose | 2 | 0.0% | 0.0% | 2 region(s) missing color_hex |
-| `br-005` | BLACK Rose Hoodie — Signature Edition | black-rose | 5 | 0.0% | 0.0% | 5 region(s) missing color_hex |
-| `br-006` | BLACK Rose Sherpa Jacket | black-rose | 11 | 0.0% | 0.0% | 11 region(s) missing color_hex |
-| `br-007` | BLACK Rose x Love Hurts Basketball Shorts | black-rose | 14 | 0.0% | 0.0% | 14 region(s) missing color_hex |
+| `br-005` | BLACK Rose Hoodie — Signature Edition | black-rose | 5 | 20.0% | 0.0% | 4 region(s) missing color_hex |
+| `br-006` | The Black Rose Bomber Sherpa | black-rose | 11 | 72.7% | 0.0% | 3 region(s) missing color_hex |
+| `br-007` | BLACK Rose x Love Hurts Basketball Shorts | black-rose | 14 | 14.3% | 0.0% | 12 region(s) missing color_hex |
 | `br-008` | BLACK is Beautiful Jersey Series — 1. SF Inspired (Football) | black-rose | 7 | 0.0% | 0.0% | 7 region(s) missing color_hex |
-| `br-009` | BLACK is Beautiful Jersey Series — 2. Last Oakland (Football) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `br-010` | BLACK is Beautiful Jersey Series — 3. The Bay (Basketball) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `br-011` | BLACK is Beautiful Jersey Series — 4. The Rose (Hockey) | black-rose | 12 | 0.0% | 0.0% | 12 region(s) missing color_hex |
-| `br-012` | BLACK is Beautiful Jersey Series — 5. Last Oakland (Baseball) | black-rose | 9 | 0.0% | 0.0% | 9 region(s) missing color_hex |
-| `kids-001` | Kids Colorblock Hoodie Set — Red/Black | kids-capsule | 19 | 0.0% | 0.0% | 19 region(s) missing color_hex |
-| `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | kids-capsule | 19 | 0.0% | 0.0% | 19 region(s) missing color_hex |
-| `lh-002` | Love Hurts Joggers | love-hurts | 11 | 0.0% | 0.0% | 11 region(s) missing color_hex |
-| `lh-003` | Love Hurts Basketball Shorts | love-hurts | 10 | 0.0% | 0.0% | 10 region(s) missing color_hex |
-| `lh-004` | Love Hurts Bomber Jacket | love-hurts | 15 | 0.0% | 0.0% | 15 region(s) missing color_hex |
-| `lh-005` | The Fannie | love-hurts | 8 | 0.0% | 0.0% | 8 region(s) missing color_hex |
-| `sg-001` | The Bridge Series 'The Bay Bridge' Shorts | signature | 8 | 0.0% | 0.0% | 8 region(s) missing color_hex |
-| `sg-002` | The Bridge Series 'Stay Golden' Shirt | signature | 7 | 0.0% | 0.0% | 7 region(s) missing color_hex |
-| `sg-003` | The Bridge Series 'Stay Golden' Shorts | signature | 8 | 0.0% | 0.0% | 8 region(s) missing color_hex |
-| `sg-005` | The Bridge Series 'The Bay Bridge' Shirt | signature | 7 | 0.0% | 0.0% | 7 region(s) missing color_hex |
-| `sg-006` | Mint & Lavender Hoodie | signature | 16 | 0.0% | 0.0% | 16 region(s) missing color_hex |
-| `sg-007` | The Signature Beanie | signature | 4 | 0.0% | 0.0% | 4 region(s) missing color_hex |
-| `sg-009` | The Sherpa Jacket | signature | 14 | 0.0% | 0.0% | 14 region(s) missing color_hex |
-| `sg-011` | Original Label Tee (White) | signature | 2 | 0.0% | 0.0% | 2 region(s) missing color_hex |
-| `sg-012` | Original Label Tee (Orchid) | signature | 2 | 0.0% | 0.0% | 2 region(s) missing color_hex |
+| `br-009` | BLACK is Beautiful Jersey Series — 2. Last Oakland (Football) | black-rose | 9 | 22.2% | 0.0% | 7 region(s) missing color_hex |
+| `br-010` | BLACK is Beautiful Jersey Series — 3. The Bay (Basketball) | black-rose | 9 | 11.1% | 0.0% | 8 region(s) missing color_hex |
+| `br-011` | BLACK is Beautiful Jersey Series — 4. The Rose (Hockey) | black-rose | 12 | 8.3% | 0.0% | 11 region(s) missing color_hex |
+| `br-012` | BLACK is Beautiful Jersey Series — 5. Baseball Classic (Last Oakland) | black-rose | 9 | 11.1% | 0.0% | 8 region(s) missing color_hex |
+| `br-014` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (Giants) | black-rose | 9 | 11.1% | 0.0% | 8 region(s) missing color_hex |
+| `br-015` | BLACK is Beautiful Jersey Series — 0. Baseball Classic (White) | black-rose | 9 | 55.6% | 0.0% | 4 region(s) missing color_hex |
+| `kids-001` | Kids Colorblock Hoodie Set — Red/Black | kids-capsule | 17 | 35.3% | 0.0% | 11 region(s) missing color_hex |
+| `kids-002` | Kids Colorblock Hoodie Set — Purple/Black | kids-capsule | 17 | 11.8% | 0.0% | 15 region(s) missing color_hex |
+| `lh-002` | Love Hurts Joggers (Black) | love-hurts | 11 | 72.7% | 0.0% | 3 region(s) missing color_hex |
+| `lh-003` | Love Hurts Basketball Shorts | love-hurts | 10 | 40.0% | 0.0% | 6 region(s) missing color_hex |
+| `lh-004` | Love Hurts Bomber Jacket | love-hurts | 15 | 40.0% | 0.0% | 9 region(s) missing color_hex |
+| `lh-005` | The Fannie | love-hurts | 8 | 75.0% | 0.0% | 2 region(s) missing color_hex |
+| `lh-006` | Love Hurts Joggers (White) | love-hurts | 11 | 81.8% | 0.0% | 2 region(s) missing color_hex |
+| `sg-001` | The Bridge Series 'The Bay Bridge' Shorts | signature | 9 | 22.2% | 0.0% | 7 region(s) missing color_hex |
+| `sg-002` | The Bridge Series 'Stay Golden' Shirt | signature | 7 | 57.1% | 0.0% | 3 region(s) missing color_hex |
+| `sg-003` | The Bridge Series 'Stay Golden' Shorts | signature | 9 | 22.2% | 0.0% | 7 region(s) missing color_hex |
+| `sg-005` | The Bridge Series 'The Bay Bridge' Shirt | signature | 7 | 57.1% | 0.0% | 3 region(s) missing color_hex |
+| `sg-006` | Mint & Lavender Hoodie | signature | 10 | 0.0% | 0.0% | 10 region(s) missing color_hex |
+| `sg-007` | The Signature Beanie | signature | 4 | 50.0% | 0.0% | 2 region(s) missing color_hex |
+| `sg-009` | The Sherpa Jacket | signature | 14 | 28.6% | 0.0% | 10 region(s) missing color_hex |
+| `sg-011` | Original Label Tee (White) | signature | 1 | 0.0% | 0.0% | 1 region(s) missing color_hex |
+| `sg-012` | Original Label Tee (Orchid) | signature | 1 | 0.0% | 0.0% | 1 region(s) missing color_hex |
 | `sg-013` | Mint & Lavender Crewneck | signature | 11 | 0.0% | 0.0% | 11 region(s) missing color_hex |
-| `sg-014` | Mint & Lavender Sweatpants | signature | 11 | 0.0% | 0.0% | 11 region(s) missing color_hex |
-| `sg-015` | The Windbreaker Set | signature | 26 | 0.0% | 0.0% | 26 region(s) missing color_hex |
+| `sg-014` | Mint & Lavender Sweatpants | signature | 7 | 0.0% | 0.0% | 7 region(s) missing color_hex |
+| `sg-015` | The Windbreaker Set | signature | 26 | 30.8% | 0.0% | 18 region(s) missing color_hex |

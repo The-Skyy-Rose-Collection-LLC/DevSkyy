@@ -364,3 +364,4 @@ Authority chain confirmed: dossier md (wordpress-theme/skyyrose-flagship/data/do
 - Validator gap: dossiers/CLAUDE.local.md (claude-mem stub) is the 1 "FAILED" in validate_dossier.py — glob should exclude non-dossier files.
 Proof: validate_dossier 35/36 (fail=stub only) · lint clean on both key dossiers · pytest dossier schema+completeness+catalog integrity 107 passed 0 failed.
 FOUNDER (2026-07-18): br-006 display name FINAL = 'The Black Rose Bomber Sherpa' (dossier name adopted; CSV aligned).
+FOUNDER (2026-07-18): deterministic hex backfill APPROVED + committed — 100 regions, 26 dossiers, coverage 0->31%. Ambiguous 154 regions = Corey judgment tier, open.

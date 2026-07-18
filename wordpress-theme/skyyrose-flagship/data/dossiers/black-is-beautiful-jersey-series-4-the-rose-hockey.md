@@ -76,7 +76,7 @@ tank. NOT a baseball jersey. NOT a football jersey. NOT a sherpa jacket
 
 ### Sleeves / Hood / Hem / Other
 - **hood-exterior**: Black to match the body. **Technique:** stitched.
-  **Color:** black.
+  **Color:** black. **Hex:** #000000.
 - **hood-interior / hood-lining**: Bright teal/turquoise lining inside the
   hood (visible when the hood is laid back or worn down). **Technique:**
   stitched. **Color:** teal/turquoise.

@@ -27,24 +27,24 @@ extra_references:
 - **back-body color-block**: Mirrors the front color-block construction — the back has the same angular black/white upper panels and red lower body, with the diagonals continuing from the front around to the back. **Technique:** stitched. **Color:** black + white + red.
 
 ### Hoodie — Sleeves / Hood / Hem / Other
-- **left-sleeve**: Solid **black** to match the front-upper-left panel. **Technique:** stitched. **Color:** black.
-- **right-sleeve**: Solid **white** to match the front-upper-right panel. **Technique:** stitched. **Color:** white.
+- **left-sleeve**: Solid **black** to match the front-upper-left panel. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **right-sleeve**: Solid **white** to match the front-upper-right panel. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve): A small circular rose-cluster patch — Black Rose three-rose-cluster art rendered in greyscale on a circular patch backing with a contrast border ring. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
 - **hood**: Solid **red** (full hood, matching the red lower body). **Technique:** stitched. **Color:** red.
-- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white.
+- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **kangaroo-pocket**: Red front kangaroo pocket integrated into the lower-body red panel. No decoration on the pocket fabric.
 - **left-cuff / right-cuff**: Ribbed-knit cuffs at the wrists, color-matching their respective sleeve. **Technique:** stitched. **Color:** body-tone.
 - **hem / waistband**: Ribbed-knit waistband at the bottom, red to match the lower-body panel. **Technique:** stitched. **Color:** red.
 - **collar-inside / size-tag** (~1.25in × 0.5in): Branded woven size tag (universal SkyyRose product rule, scaled for kids). **Technique:** woven-label.
 
 ### Sweatpants — Front
-- **pants-body**: Solid **black** sweatpants. **Technique:** stitched. **Color:** black.
+- **pants-body**: Solid **black** sweatpants. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on black. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
-- **waistband-drawstring**: White flat drawstring at the waistband. **Technique:** stitched. **Color:** white.
+- **waistband-drawstring**: White flat drawstring at the waistband. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-pocket / right-pocket**: Slash-style hand pockets at both sides. **Technique:** stitched.
-- **pants-cuffs**: Ribbed-knit ankle cuffs (or straight-leg open hem). **Technique:** stitched. **Color:** black.
+- **pants-cuffs**: Ribbed-knit ankle cuffs (or straight-leg open hem). **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **pants-inside / waistband-tag**: Branded woven size tag. **Technique:** woven-label.
 
 ## Negative — what is NOT on this product (DO NOT render)

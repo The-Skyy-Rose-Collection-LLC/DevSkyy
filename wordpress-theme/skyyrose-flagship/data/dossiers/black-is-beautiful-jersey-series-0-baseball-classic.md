@@ -58,15 +58,15 @@ reference_image: assets/products/references/br-003-baseball-classic-techflat.jpe
 ### Sleeves / Collar / Hem / Other
 - **collar / V-neck binding**: White contrast piping/binding around the
   V-neck collar opening (1/4in–3/8in wide). **Technique:** stitched.
-  **Color:** white.
+  **Color:** white. **Hex:** #FFFFFF.
 - **left-cuff / right-cuff binding**: White contrast piping around both
-  sleeve cuff openings. **Technique:** stitched. **Color:** white.
+  sleeve cuff openings. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **front-placket binding**: White contrast piping running vertically down
   both sides of the front button placket. **Technique:** stitched. **Color:**
-  white.
+  white. **Hex:** #FFFFFF.
 - **front-placket buttons** (~6 buttons, plain white, evenly spaced down the
   placket from the V-neck to the upper-belly). **Technique:** patch (sewn-on
-  button hardware). **Color:** white.
+  button hardware). **Color:** white. **Hex:** #FFFFFF.
 - **collar-inside** (small, ~1.75in × 0.75in): Woven brand label sewn into
   the inside back of the collar. **Technique:** woven-label. **Color:**
   brand-label colors (typically black with brand-color accents).

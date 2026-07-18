@@ -25,8 +25,8 @@ extra_references:
 - **back-body** (entire field, continuation of front): Same Golden Gate sunset photographic print continuing seamlessly from the front around to the back. **Technique:** sublimated. **Color:** photographic full-color sunset, continuous wrap.
 
 ### Sleeves / Collar / Hem / Other
-- **waistband** (~1.5in tall, top of shorts): Black elasticated waistband at the top (matching sg-001 construction). **Technique:** stitched. **Color:** black.
-- **drawstring** (~24in long, threaded through waistband): White flat drawstring threaded through the waistband, hanging from the front center. **Technique:** stitched. **Color:** white.
+- **waistband** (~1.5in tall, top of shorts): Black elasticated waistband at the top (matching sg-001 construction). **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **drawstring** (~24in long, threaded through waistband): White flat drawstring threaded through the waistband, hanging from the front center. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-pocket** (front-side hand pocket on wearer's left): Vertical slash hand pocket with welt opening. **Technique:** stitched. **Color:** body-matching.
 - **right-pocket** (front-side hand pocket on wearer's right): Vertical slash hand pocket with welt opening. **Technique:** stitched. **Color:** body-matching.
 - **leg-hem** (each leg opening, clean hem): Plain finished hem — no contrast piping, no rib-knit band. **Technique:** stitched. **Color:** body-matching.

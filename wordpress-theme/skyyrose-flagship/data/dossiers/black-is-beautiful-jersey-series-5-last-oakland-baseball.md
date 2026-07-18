@@ -46,7 +46,7 @@ This is the OAKLAND colorway (separate SKU from the Classic black br-003 / Giant
 - **back-neck** (small, ~2in wide): The SR monogram, embroidered directly
   onto the jersey in **gold-tone thread** (matching the colorway theme — the
   SR mark renders in gold to match the gold satin-stitch edge and the gold
-  piping). **Technique:** embroidered. **Color:** gold-tone thread.
+  piping). **Technique:** embroidered. **Color:** gold-tone thread. **Hex:** #D4AF37.
 - **back-center** (~10in–12in tall): The Black Rose logo embroidered directly
   onto the jersey. The roses, stems, and thorny vines are rendered in
   **white thread**; the cloud at the base of the cluster is rendered in

@@ -38,7 +38,7 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 - **back-neck** (small, ~2in wide): The SR monogram, embroidered directly
   onto the jersey in **black or dark-tone thread** (the gold-on-white would
   read poorly; the colorway uses black thread to maintain the high-contrast
-  reading). **Technique:** embroidered. **Color:** black thread.
+  reading). **Technique:** embroidered. **Color:** black thread. **Hex:** #000000.
 - **back-center** (~10in–12in tall): The Black Rose logo embroidered directly
   onto the jersey in **black thread on the white fabric** (the inverse
   treatment of the Classic black colorway's white-on-black). The composition's
@@ -52,13 +52,13 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 ### Sleeves / Collar / Hem / Other
 - **collar / V-neck binding**: Black contrast piping/binding around the
   V-neck collar opening (1/4in–3/8in wide). **Technique:** stitched.
-  **Color:** black.
+  **Color:** black. **Hex:** #000000.
 - **left-cuff / right-cuff binding**: Black piping around both sleeve cuff
-  openings. **Technique:** stitched. **Color:** black.
+  openings. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **front-placket binding**: Black piping running vertically down both sides
-  of the front button placket. **Technique:** stitched. **Color:** black.
+  of the front button placket. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **front-placket buttons** (~5–6 buttons, plain BLACK or dark-tone, evenly
-  spaced). **Technique:** patch (sewn-on hardware). **Color:** black.
+  spaced). **Technique:** patch (sewn-on hardware). **Color:** black. **Hex:** #000000.
 - **collar-inside** (~1.75in × 0.75in): Woven brand label sewn into the
   inside back of the collar. **Technique:** woven-label.
 

@@ -51,7 +51,7 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 - **back-neck** (small, ~2in wide, top-center just below the collar yoke):
   The SR monogram embroidered directly onto the jersey in **black thread**
   (instead of canonical gold — black-on-white for this colorway).
-  **Technique:** embroidered. **Color:** black thread.
+  **Technique:** embroidered. **Color:** black thread. **Hex:** #000000.
 - **back-yoke / upper-back** (arched, ~9in wide): The phrase **"BLACK IS
   BEAUTIFUL"** in tackle-twill lettering, baseball-script style. Rendered in
   **black twill** on the white body. **Technique:** tackle-twill. **Color:**
@@ -68,7 +68,7 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 
 ### Collar / Hem / Other
 - **collar / V-neck binding**: Solid black neckband (~1in wide). **Technique:**
-  stitched. **Color:** black.
+  stitched. **Color:** black. **Hex:** #000000.
 - **left-cuff / right-cuff binding**: Black-and-white horizontal striped band
   at each short sleeve cuff (alternating black and white stripes, ~1in tall
   total). **Technique:** stitched. **Color:** alternating black + white.

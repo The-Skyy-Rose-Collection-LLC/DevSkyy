@@ -28,10 +28,10 @@ reference_image: assets/products/references/lh-003-techflat-front.jpeg
 - **back-body** (entire white mesh field, continues from front): Same all-over Red Roses Cloud Cluster pattern as the front, continuing seamlessly. **Technique:** sublimated. **Color:** canonical multi-color on white mesh.
 
 ### Sleeves / Collar / Hem / Other
-- **waistband** (~1.5in tall, top of shorts): Black ribbed-knit elasticated waistband. **Technique:** stitched. **Color:** black.
-- **drawstring** (waistband-thread, ~24in long): White flat drawstring threaded through the waistband. **Technique:** stitched. **Color:** white.
-- **left-pocket** (front-side hand pocket on wearer's left): Vertical hand pocket with welt opening. **Technique:** stitched. **Color:** white mesh body with subtle contrast welt.
-- **right-pocket** (front-side hand pocket on wearer's right): Vertical hand pocket with welt opening. **Technique:** stitched. **Color:** white mesh body with subtle contrast welt.
+- **waistband** (~1.5in tall, top of shorts): Black ribbed-knit elasticated waistband. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **drawstring** (waistband-thread, ~24in long): White flat drawstring threaded through the waistband. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **left-pocket** (front-side hand pocket on wearer's left): Vertical hand pocket with welt opening. **Technique:** stitched. **Color:** white mesh body with subtle contrast welt. **Hex:** #FFFFFF.
+- **right-pocket** (front-side hand pocket on wearer's right): Vertical hand pocket with welt opening. **Technique:** stitched. **Color:** white mesh body with subtle contrast welt. **Hex:** #FFFFFF.
 - **leg-binding** (each leg opening, ~1in wide): Black ribbed-knit binding with a thin red contrast piping accent running along the binding edge. **Technique:** stitched. **Color:** black with red piping.
 - **inside-waistband** (~1.5in × 0.5in, interior tag): Branded woven size tag. **Technique:** woven-label. **Color:** brand-label palette.
 

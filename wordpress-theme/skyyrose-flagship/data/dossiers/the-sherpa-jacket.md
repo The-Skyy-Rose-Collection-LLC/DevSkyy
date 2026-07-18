@@ -24,14 +24,14 @@ reference_image_interior: assets/products/references/sg-009-sherpa-interior.jpeg
 >   `assets/products/references/sg-009-sherpa-interior.jpeg`
 
 ### Front
-- **front-body** (entire black exterior field, between the stand-up collar and the bottom hem): Solid **black** nylon-style smooth shell fabric. **Technique:** stitched. **Color:** black.
+- **front-body** (entire black exterior field, between the stand-up collar and the bottom hem): Solid **black** nylon-style smooth shell fabric. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **front-left-chest** (~3in tall, on wearer's left chest, just right of the center-front zipper, ~4in below the stand-up collar): Canonical **Red Roses Cloud Cluster** logo embroidered onto the black exterior — three red roses with kelly-green stems and thorny vines, wrapping a small white-and-light-blue cumulus cloud at the base. Full-color thread embroidery. **Technique:** embroidered. **Color:** red petals + dark-red shading + kelly-green stems + white cloud + pale-blue cloud-shading thread on black.
 - **front-zipper** (vertical center-front, full body length from stand-up collar opening to bottom hem): Standard center-front zipper running the full length of the body. **Technique:** patch. **Color:** body-tone hardware (black or near-black teeth).
-- **front-left-pocket** (patch hand pocket at the lower-left body, ~6in × 5in, sewn-on patch construction with horizontal welt opening): Patch hand pocket. **Technique:** stitched. **Color:** black, matching the body.
-- **front-right-pocket** (patch hand pocket at the lower-right body, mirror of left): Patch hand pocket. **Technique:** stitched. **Color:** black, matching the body.
+- **front-left-pocket** (patch hand pocket at the lower-left body, ~6in × 5in, sewn-on patch construction with horizontal welt opening): Patch hand pocket. **Technique:** stitched. **Color:** black, matching the body. **Hex:** #000000.
+- **front-right-pocket** (patch hand pocket at the lower-right body, mirror of left): Patch hand pocket. **Technique:** stitched. **Color:** black, matching the body. **Hex:** #000000.
 
 ### Back
-- **back-body** (entire black exterior back field, between the stand-up collar seam and the bottom hem): Solid **black** nylon-style shell, no decoration. **Technique:** stitched. **Color:** black.
+- **back-body** (entire black exterior back field, between the stand-up collar seam and the bottom hem): Solid **black** nylon-style shell, no decoration. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **back-collar-inside** (small, ~1.5in × 0.5in interior tag at the back-neck, visible only when the collar is folded open): Branded **SR monogram** woven label — small rectangular woven brand label carrying the canonical SR cursive monogram. **Technique:** woven-label. **Color:** brand-label palette (black ground with white SR script, or matching brand label specification).
 
 ### Sleeves / Collar / Hem / Other

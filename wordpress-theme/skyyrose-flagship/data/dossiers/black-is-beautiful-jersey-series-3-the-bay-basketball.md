@@ -58,7 +58,7 @@ renderings only.
 ### Back
 - **back-neck** (small, ~2in wide): The SR monogram embroidered directly
   onto the jersey in **black thread** (NOT canonical gold — black-on-white
-  for visibility). **Technique:** embroidered. **Color:** black thread.
+  for visibility). **Technique:** embroidered. **Color:** black thread. **Hex:** #000000.
 - **back-upper-center** (stacked vertically on three lines, ~6in tall total):
   The phrase **"BLACK / IS / BEAUTIFUL"** stacked across three lines in
   gold/yellow serif lettering, centered on the upper back below the back-neck.

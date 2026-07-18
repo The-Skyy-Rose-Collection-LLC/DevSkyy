@@ -20,23 +20,23 @@ reference_image: assets/products/references/lh-004-techflat-front.jpeg
 > - Product techflat: `assets/products/references/lh-004-techflat-front.jpeg`
 
 ### Front
-- **front-body** (entire white field, between the raglan sleeve seams and excluding the placket): Solid **white** fabric. **Technique:** stitched. **Color:** white.
+- **front-body** (entire white field, between the raglan sleeve seams and excluding the placket): Solid **white** fabric. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **front-left-chest** (~3–4in tall, upper left chest panel — "Love" half of the wordmark): The **"Love"** portion of the canonical "Love Hurts" cursive script wordmark — wearer's LEFT chest, placket separates it from "Hurts" on the right. Hand-drawn graffiti-cursive style (see logo reference). **Technique:** embroidered. **Color:** canonical Love Hurts red.
 - **front-right-chest** (~3–4in tall, upper right chest panel — "Hurts" half of the wordmark): The **"Hurts"** portion of the canonical "Love Hurts" cursive script wordmark — wearer's RIGHT chest, placket separates it from "Love" on the left. Hand-drawn graffiti-cursive style (see logo reference). **Technique:** embroidered. **Color:** canonical Love Hurts red.
 - **front-placket** (vertical center-front closure, full length): Button or snap front placket running from the V-opening at the collar to the bottom of the ribbed waistband. **Technique:** patch (sewn-on snap/button hardware). **Color:** body-tone snaps/buttons on white.
-- **front-left-pocket** (vertical slash welt opening at the lower-left side of the body, just above the waistband): Slash hand pocket with vertical welt opening. **Technique:** stitched (welt-edge construction). **Color:** white body with subtle welt.
-- **front-right-pocket** (vertical slash welt opening at the lower-right side of the body, just above the waistband): Slash hand pocket with vertical welt opening. **Technique:** stitched (welt-edge construction). **Color:** white body with subtle welt.
+- **front-left-pocket** (vertical slash welt opening at the lower-left side of the body, just above the waistband): Slash hand pocket with vertical welt opening. **Technique:** stitched (welt-edge construction). **Color:** white body with subtle welt. **Hex:** #FFFFFF.
+- **front-right-pocket** (vertical slash welt opening at the lower-right side of the body, just above the waistband): Slash hand pocket with vertical welt opening. **Technique:** stitched (welt-edge construction). **Color:** white body with subtle welt. **Hex:** #FFFFFF.
 
 ### Back
 - **back-body** (large, ~10–12in tall, vertically centered on the back): The **canonical Love Hurts heart-and-thorns + roses lockup** — a bright red broken-heart-and-thorns illustration with **canonical red-roses-cluster art** wrapping around / accenting it. The composition fills most of the back upper-mid area. Rendered in canonical Love Hurts multi-color (red heart with dark cracks, brown/dark thorny vines, red rose petals, kelly-green stems). **Technique:** embroidered. **Color:** canonical Love Hurts multi-color (red + green + brown + black ink outlines).
 
 ### Sleeves / Hood / Hem / Other
-- **left-sleeve** (solid black raglan, diagonal seam from underarm to neck on the left): Solid **black** fabric, different color from the white body. **Technique:** stitched. **Color:** black.
-- **right-sleeve** (solid black raglan, diagonal seam from underarm to neck on the right): Solid **black** fabric, different color from the white body. **Technique:** stitched. **Color:** black.
+- **left-sleeve** (solid black raglan, diagonal seam from underarm to neck on the left): Solid **black** fabric, different color from the white body. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **right-sleeve** (solid black raglan, diagonal seam from underarm to neck on the right): Solid **black** fabric, different color from the white body. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **left-cuff** (ribbed-knit striped band at the left sleeve cuff, ~3–4 stripes): Ribbed-knit band with alternating white + red + black stripes. **Technique:** stitched (striped rib-knit). **Color:** alternating white + red + black.
 - **right-cuff** (ribbed-knit striped band at the right sleeve cuff, ~3–4 stripes): Ribbed-knit band with alternating white + red + black stripes. **Technique:** stitched (striped rib-knit). **Color:** alternating white + red + black.
 - **waistband** (ribbed-knit striped band at the bottom hem, ~3–4 stripes, matching the cuff accent): The bottom hem of the body has a **ribbed-knit waistband with the same white + red + black striped accent** as the cuffs. **Technique:** stitched. **Color:** alternating white + red + black.
-- **hood**: Solid **black** hood (matches the black raglan sleeves). **Technique:** stitched. **Color:** black.
+- **hood**: Solid **black** hood (matches the black raglan sleeves). **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **hood-lining** (inner hood lining, visible when hood is laid back or worn down): A **white-and-red rose-silhouette pattern** sublimated inside the hood lining — small red rose silhouettes scattered across the white inner-lining fabric. **Technique:** sublimated. **Color:** small red rose silhouettes on white inner-lining.
 - **collar-tag** (~1.75in × 0.75in, sewn at the interior back collar): Branded woven size tag (universal SkyyRose product rule). **Technique:** woven-label. **Color:** white label, black lettering.
 

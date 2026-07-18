@@ -33,7 +33,7 @@ extra_references:
 - **right-sleeve**: Solid **medium purple** to match the front-upper-right panel. **Technique:** stitched. **Color:** medium purple.
 - **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve and its exact artwork): A small round embroidered patch. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
 - **hood**: Solid **lavender / light pink-purple** (matching the upper-left panel). **Technique:** stitched. **Color:** lavender.
-- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white.
+- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **kangaroo-pocket**: Deep purple front kangaroo pocket integrated into the lower-body panel.
 - **left-cuff / right-cuff**: Ribbed-knit cuffs, color-matching their sleeves. **Technique:** stitched.
 - **hem / waistband**: Ribbed-knit waistband, deep purple to match the lower-body panel. **Technique:** stitched. **Color:** deep purple.
@@ -44,7 +44,7 @@ extra_references:
 - **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on deep purple. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
-- **waistband-drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white.
+- **waistband-drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-pocket / right-pocket**: Slash-style hand pockets. **Technique:** stitched.
 - **pants-cuffs**: Ribbed-knit ankle cuffs (or straight-leg open hem). **Technique:** stitched. **Color:** deep purple.
 - **pants-inside / waistband-tag**: Branded woven size tag. **Technique:** woven-label.

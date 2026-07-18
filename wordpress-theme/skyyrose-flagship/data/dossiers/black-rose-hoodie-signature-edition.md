@@ -45,7 +45,7 @@ reference_image: assets/products/references/br-005-signature-hoodie-real.jpeg
   lining fabric.
 - **hood-drawstring**: WHITE flat drawstring threaded through the hood
   (contrast against the black body fabric). Plain tips, no metal,
-  no branded tip. **Technique:** stitched. **Color:** white.
+  no branded tip. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **kangaroo-pocket** (front): clean, no embroidery, no logo on the
   pocket fabric.
 - **collar-inside / interior-back-collar** (~1.75in × 0.75in): Branded

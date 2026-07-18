@@ -30,19 +30,19 @@ extra_logos:
   approximately mirroring the position of the front-left silicone patch
   but on the back): The SR monogram, embroidered directly onto the fabric
   in **gold-tone thread** (matching the gold-to-copper gradient of the
-  canonical SR mark). **Technique:** embroidered. **Color:** gold-tone thread.
+  canonical SR mark). **Technique:** embroidered. **Color:** gold-tone thread. **Hex:** #D4AF37.
 
 ### Sleeves / Collar / Hem / Other
 - **inside-waistband** (~1in × 0.5in): Woven size tag (showing the size
   designation, e.g., "M", "L", "XL"). **Technique:** woven-label. **Color:**
   brand-standard (typically black with white/printed size text).
 - **waistband-rib**: White ribbed-knit waistband at the top of the joggers,
-  contrasting against the black body. **Technique:** stitched. **Color:** white.
+  contrasting against the black body. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-ankle-cuff / right-ankle-cuff**: White ribbed-knit cuffs at the
   ankle openings, contrasting against the black body. **Technique:** stitched.
-  **Color:** white.
+  **Color:** white. **Hex:** #FFFFFF.
 - **drawstring**: Flat **white** drawstring threaded through the waistband.
-  No metal tips, no branded tips. **Technique:** stitched. **Color:** white.
+  No metal tips, no branded tips. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 
 ## Negative — what is NOT on this product (DO NOT render)
 
