@@ -58,6 +58,8 @@ The diligence spine. These are the standard for every task — not aspirational,
 **Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
 
 > **MANDATORY — Product-image fidelity gate.** Before you **render anything, create content, or edit skyyrose.co**, every product image about to touch the site MUST be eyes-on verified as the *correct garment for that SKU* — read the actual pixels (vision), not the filename or manifest. Product renders come from **OAI-image-2 only** (see project memory). If you cannot visually confirm SKU ↔ garment match, do NOT render / publish / deploy — flag it. Wrong-garment imagery is the #1 recurring defect (lh-005 fanny-pack hallucination, never-made renders leaking onto cards).
+>
+> **Render playbook → `scripts/oai_render/CLAUDE.md`** (auto-loads in the render engine). It carries the recurring **Render Fidelity Checklist** (patches present · number fill+split · lettering treatment · set completeness · fabric read · colorway · wrong-garment), the **reference-priority** rule (real photo > techflat > prose; founder-shared photo → `assets/products/references/{sku}-*real*front*`), **dossier-precision** rules (write specs the model can't misread + a NEGATIVE per wrong reading), and the **render env** (both keys in `gemini/.env`, `sparse-checkout add assets/products`, regen all derived artifacts). Read it before any render instead of re-deriving these.
 
 > Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
 
