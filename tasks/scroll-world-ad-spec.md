@@ -416,3 +416,6 @@ Session OpenAI spend: $4.40 (batch1) + $2.40 (re-render) = $6.80. Higgsfield 852
 
 #### QC CORRECTION (2026-07-18): br-009 v2 back "3" WAS fixed — my error
 Full-res crop (br009-back-32-zoom.png) proves the center back "3" is PLAIN WHITE + black outline, rose in the "2" ONLY. My earlier "NOT FIXED — both digits rose" verdict was a MISREAD on the downscaled contact sheet (520px cells lose plain-vs-rose distinction at digit scale). ALL 3 br-009 fixes landed: white/black-border back letters ✓, rose-in-2-only ✓, full-"32"-rose sleeves ✓. The $2.40 re-render was fully successful. NO further fix/spend needed. Masked-inpaint research (gpt-image-2 images.edit + mask, pipeline supports client.edit(mask_path)) documented for future selective-edit needs but NOT required here.
+
+#### br-009 ON-MODEL sleeve defect (2026-07-18, full-res QC)
+Ghost CORRECT (full "32" + rose each sleeve). ON-MODEL WRONG: split single digit ("2" L, "3" R) — same dossier, model rendered views inconsistently (on-model sleeve = gpt-image-2 weak spot). Rose fill present, only the split is wrong. Fix: re-render br-009 --style on-model (1 img, ~$0.40); ghost proves the spec renders, but on-model sleeve is the model's weakest detail so first-try not guaranteed. QC at FULL-RES (lesson). Everything else on-model correct (front both-rose OK, patch present).

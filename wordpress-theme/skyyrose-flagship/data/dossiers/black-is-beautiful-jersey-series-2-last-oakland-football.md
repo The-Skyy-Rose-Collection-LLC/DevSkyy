@@ -39,10 +39,11 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 
 ### Front
 - **front-chest** (large, ~10in tall, vertically centered): The number
-  **"32"** rendered as athletic-block digits with a **black outline edge**
-  and greyscale Black Rose three-rose-cluster art filling the interior of
-  both digits. **Technique:** sublimated. **Color:** black outline +
-  greyscale rose-cluster fill on white ground.
+  **"32"** rendered as athletic-block digits with a **black outline edge**.
+  ROSE FILL IN THE "3" ONLY: the **"3" interior is filled with greyscale
+  Black Rose three-rose-cluster art**; the **"2" is a PLAIN WHITE digit with
+  a black outline only (NO rose fill)**. **Technique:** sublimated. **Color:**
+  "3" = black outline + greyscale rose-cluster fill; "2" = black outline on white ground.
 - **front-left-hem / front-belly-lower-left** (~2in × 2.5in): The NFL
   Authentic Collection patch sewn onto the lower-left hip. **Technique:**
   embroidered-patch.
@@ -66,14 +67,22 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
   **Color:** "3" = black outline on white ground; "2" = black outline + greyscale rose-cluster fill.
 
 ### Sleeves
-- **left-shoulder / right-shoulder** (small, ~3–4in tall, on each shoulder):
-  The FULL two-digit number **"32"** (both digits together) on EACH sleeve — a
-  smaller copy of the big front number, rendered IDENTICALLY: **black outline +
-  greyscale rose-cluster fill INSIDE both digits**, exactly like the big front
-  "32". Each sleeve shows the complete "32" — NOT a single split digit ("2" on
-  one sleeve, "3" on the other is WRONG). Keep the black-and-white striped cuff
-  band below it (jersey-1 stripe treatment). **Technique:** sublimated.
-  **Color:** black outline + greyscale rose-cluster fill.
+- **left-shoulder** (small, ~3–4in tall): The FULL two-digit number **"32"**
+  (both digits together) — same size/style as a small copy of the big number.
+  ROSE FILL IN THE "3" ONLY: the **"3" carries the greyscale rose-cluster fill**;
+  the **"2" is plain white with a black outline only**. Keep the black-and-white
+  striped cuff band below. **Technique:** sublimated. **Color:** "3" = black
+  outline + rose-cluster fill; "2" = black outline on white.
+- **right-shoulder** (small, ~3–4in tall): The FULL two-digit number **"32"**
+  (both digits together). ROSE FILL IN THE "2" ONLY: the **"2" carries the
+  greyscale rose-cluster fill**; the **"3" is plain white with a black outline
+  only**. Keep the black-and-white striped cuff band below. **Technique:**
+  sublimated. **Color:** "2" = black outline + rose-cluster fill; "3" = black
+  outline on white.
+- NOTE — the "left side = rose in the 3, right side = rose in the 2" rule is
+  consistent: front big number + LEFT sleeve = rose in the "3"; back big number
+  + RIGHT sleeve = rose in the "2". Each "32" shows BOTH digits; exactly ONE is
+  rose-filled.
 
 ### Collar / Hem / Other
 - **collar / V-neck binding**: Solid black neckband (~1in wide). **Technique:**
@@ -107,8 +116,9 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
   patches.
 - NO split single digit per sleeve — do NOT put "2" on one sleeve and "3" on the
   other; EACH sleeve shows the complete two-digit "32".
-- NO plain/empty sleeve digits — the sleeve "32" carries the SAME greyscale
-  rose-cluster fill as the big front number, never a hollow white digit.
+- NO rose fill in BOTH digits of any "32" — every "32" (front, back, each sleeve)
+  has EXACTLY ONE rose-filled digit + one plain-white digit: front="3", back="2",
+  left sleeve="3", right sleeve="2".
 - NO printed graphics other than the rose-fill inside digits and the sleeve
   number duplicates.
 - NO pinstripes.

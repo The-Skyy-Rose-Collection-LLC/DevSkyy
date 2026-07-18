@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-07-18T14:48:59+00:00",
+  "generated_at": "2026-07-18T20:13:48+00:00",
   "catalog_sha": "sha256:5bbd3d3b49e33a331dda78e55f3c0a0fca90b0f1426ca7282bb4ec4efe6e0e2b",
   "skus": {
     "br-001": {
@@ -281,7 +281,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
-          "sha256": "sha256:719fe94eb2d5f261441b78734af7ea7d057ea3b7c0449c8f58288d257b15eda8"
+          "sha256": "sha256:30068c841c9ec61a20bb7c9d8db8df74b7e33c1c0ab07c236c2a8ce78387d7f8"
         }
       ]
     },
