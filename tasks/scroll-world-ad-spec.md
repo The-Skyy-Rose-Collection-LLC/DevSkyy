@@ -386,3 +386,17 @@ Dry-run (assets+key present) — ALL 4 renderable, 11 images:
 Est ~$4.40 floor (@ $0.40/img); SpendTracker hard-caps actual at $50 (incl QC re-renders/judge).
 INPUT fidelity gate PASSED eyes-on: 2 authentic sport patches clean; jogger = deep-purple + rose; sg-015 techflat = correct nylon windbreaker (white body/pink hood/pastel chevron/SR back). OUTPUT gate = post-render vision QC before any site touch.
 STOP-AND-SHOW pending founder y (dollars). Bomber 0.5cr (credits) still pending separately.
+
+#### BATCH 1 FIRING (2026-07-18, founder-approved "Batch 1")
+Env setup (founder-authorized "import all keys"): sparse-checkout add assets/products (full tree, for correct manifest + refs); gemini/.env created with OPENAI_API_KEY (from .env.hf) + ANTHROPIC_API_KEY (founder ran the `!` append) — both gitignored, pipeline load_env picks them up. NOTE: first fire crashed at QCGate init (ANTHROPIC absent) BEFORE any spend — 0 render events.
+Run run-20260718-060212.jsonl: 11 plans (br-009 ×3, br-015 ×3, kids-002 ×3, sg-015 ×2), est $4.40, cap $50, judge claude-sonnet-4-6. Background id b34we6sy0.
+POST-RENDER: vision-QC every output vs dossier before any site touch (wrong-garment gate). Then present results.
+
+#### BATCH 1 RESULT + EYES-ON QC (2026-07-18) — all 4 defects FIXED
+Spend: $4.40 actual (11 imgs × ~$0.40, 0 re-renders). Higgsfield balance untouched (852). Images landed in renders/oai/_rejected/<slug>/ because the Claude QC judge ERRORED on all 11 ("Your credit balance is too low" — the ANTHROPIC judge account is out of credits, NOT a quality rejection). Manual vision QC done instead:
+- br-009 (was: missing patch): NFL AUTHENTIC gold patch now present at hem (ghost+back+on-model). PASS.
+- br-015 (was: patch/lettering too small): MLB gold patch present, "BLACK IS BEAUTIFUL" arched lettering substantial. PASS — recommend side-by-side vs br-003/br-014 to confirm "matches other baseball jerseys" scale.
+- kids-002 (was: joggers missing): FULL SET rendered — lavender/light-pink+purple colorblock hoodie + deep-purple joggers w/ rose emblem, paired on-model. PASS.
+- sg-015 (was: reads sweatsuit): now reads NYLON windbreaker (sheen/structure), white body/pink hood/pastel chevron/zip, matches techflat. PASS.
+No wrong-garment defects. Images are CANDIDATES in _rejected/ — promotion to keepers + SOT/catalog wiring + deploy = separate founder-gated step (production).
+FOLLOW-UP: Anthropic judge account (key in .env.judge-opus-thinking) out of credits — top up for future auto-QC, else pipeline QC always errors→needs-review.
