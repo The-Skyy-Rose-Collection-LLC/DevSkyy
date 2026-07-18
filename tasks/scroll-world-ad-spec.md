@@ -363,3 +363,4 @@ Authority chain confirmed: dossier md (wordpress-theme/skyyrose-flagship/data/do
 - OPEN for founder: display name "The Bomber Sherpa" (CSV, per your words) vs "The Black Rose Bomber Sherpa" (dossier) — pick one; sg-015 dossier CATALOG NOTE says CSV color=Black but CSV=White (stale note, Corey-authored file so left alone).
 - Validator gap: dossiers/CLAUDE.local.md (claude-mem stub) is the 1 "FAILED" in validate_dossier.py — glob should exclude non-dossier files.
 Proof: validate_dossier 35/36 (fail=stub only) · lint clean on both key dossiers · pytest dossier schema+completeness+catalog integrity 107 passed 0 failed.
+FOUNDER (2026-07-18): br-006 display name FINAL = 'The Black Rose Bomber Sherpa' (dossier name adopted; CSV aligned).
