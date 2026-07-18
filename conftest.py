@@ -63,7 +63,13 @@ if sys.platform == "darwin":
         if not isinstance(prog, str) or os.path.dirname(prog):
             return  # already absolute/relative, or not a plain string name
         env = kwargs.get("env")
-        search_path = env.get("PATH") if env is not None else None
+        if env is None:
+            search_path = None  # inherit parent PATH — matches exec behavior
+        else:
+            # execvpe semantics: a PATH-less env searches os.defpath, NOT the
+            # parent's PATH — shutil.which(path=None) would wrongly consult
+            # os.environ['PATH'] for callers that intentionally scrub PATH.
+            search_path = env.get("PATH", os.defpath)
         resolved = _shutil.which(prog, path=search_path)
         if resolved:
             kwargs["executable"] = resolved

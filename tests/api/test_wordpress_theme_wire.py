@@ -135,3 +135,30 @@ class TestDeployThemeWire:
         # log_tail should contain lines from stdout/stderr
         assert isinstance(body["log_tail"], list)
         assert len(body["log_tail"]) > 0
+
+    def test_deploy_timeout_kills_and_reaps_subprocess(self) -> None:
+        """On timeout the subprocess is killed + reaped (no orphan); returncode from proc."""
+        fake_proc = _make_fake_proc(returncode=-9, stdout=b"")
+        fake_proc.kill = MagicMock()
+        fake_proc.wait = AsyncMock(return_value=-9)
+
+        # communicate() raises TimeoutError → exercises the handler's timeout
+        # branch without patching wait_for (avoids a dangling unawaited coroutine).
+        fake_proc.communicate = AsyncMock(side_effect=TimeoutError)
+        with patch("asyncio.create_subprocess_exec", new_callable=AsyncMock) as mock_exec:
+            mock_exec.return_value = fake_proc
+
+            client = _build_client()
+            resp = client.post(
+                "/wordpress/theme/deploy",
+                json={"environment": "production", "backup_first": True},
+            )
+
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["success"] is False
+        assert body["returncode"] == -9
+        assert "killed" in body["message"].lower()
+        # The subprocess MUST be killed + reaped, not left orphaned
+        fake_proc.kill.assert_called_once()
+        fake_proc.wait.assert_awaited_once()
