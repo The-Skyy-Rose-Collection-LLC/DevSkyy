@@ -125,6 +125,8 @@ Production at skyyrose.co · Text Domain `skyyrose` · version = `SKYYROSE_VERSI
 → `Context7: resolve-library-id` → `Context7: query-docs` → verify signatures → THEN code.
 No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI, WooCommerce REST, and every non-stdlib library. Skipping costs more tokens fixing wrong usage than the lookup saves.
 
+**MANDATORY — MCP/PLUGIN DOCS-FIRST (founder-mandated 2026-07-16):** Before invoking ANY MCP server tool or plugin capability, read its verified docs FIRST — the server's instructions block, the tool's full schema (ToolSearch), its catalog/introspection endpoints (`models_explore`, `get_workflow_instructions`, `presets_show`, …), Context7 platform docs, or the plugin's SKILL.md. NEVER discover an API by trial-and-error calls — every failed probe, wrong param, and retry is paid tokens (and on paid platforms, risks credits). Every verified fact (cost, param shape, capability, media/job ID) is recorded the SAME TURN: rules → CLAUDE.md, artifacts → the governing spec's registry. A fact that lives only in a transcript is a fact paid for twice.
+
 1. **Context7 first** (see above — non-negotiable on every task)
 2. Read existing code first, then `Edit` (targeted) or `Write` (new files only)
 3. TDD: RED → GREEN → IMPROVE
@@ -213,6 +215,18 @@ Bias toward caution over speed. For trivial tasks, use judgment. ([source](https
 
 ---
 
+## Higgsfield (paid renders — READ BEFORE ANY generate call; do NOT re-discover any of this)
+
+- **Gate**: STOP-AND-SHOW manifest + explicit y before every paid call; `get_cost:true` preflight every fire (free). Check `balance` once per session, not per call.
+- **Verified costs (2026-07-16)**: gpt_image_2 1k/low = **0.5cr**, 2k/high ≈ 7cr · seedance_2_0_mini 480p/4s = **4cr** (omitting `resolution` quotes 10cr — always pass it) · seedance_2_0 fast/480p = 6cr, fast/720p = 14cr · durations clamp to 4s min.
+- **Param authority**: `models_explore(action:'get', model_id)` for the live MCP schema; Context7 `/llmstxt/higgsfield_ai_llms_txt` for platform REST. Media roles: seedance = `start_image/end_image/image_references`; gpt_image_2 = `image` only. Server auto-coerces — trust `adjustments` in the response.
+- **`preset_recommendation` notice** = NO job created, nothing charged → retry the same call once with `declined_preset_id` (tool contract, not a reroll).
+- **Identity = Elements** (`show_reference_elements action=create` — instant, free): embed `<<<element_id>>>` in the prompt; works with seedance_2_0/mini, gpt_image_2, kling3_0, nano-banana, seedream. Souls = soul_2/soul_cinema only (5-20 photos, ~10min). Character refs resolve ONLY from `assets/branding/mascot/` (bug-268); **THE SR monogram = `assets/branding/sr-monogram-rosegold-canonical.png`** (founder-locked 2026-07-16) — never the plain-gold variant for new work.
+- **Uploads**: `media_upload` → curl PUT → `media_confirm`. media_ids are account-durable — **record every media_id in `tasks/scroll-world-ad-spec.md` § Media Registry and REUSE; never re-upload a file that has one.**
+- **No brand-ad flow in `get_workflow_instructions`** (catalog = explainer only) — the custom pipeline `.claude/workflows/skyyrose-ad-previz.js` is the path (invoke via `scriptPath`, args defensively parsed; bug-266).
+- **Permissions**: 8 `mcp__higgsfield__*` allow rules live in project `settings.local.json` (founder-added 2026-07-16).
+- **RECONCILE BEFORE RE-FIRE (bug-269)**: after ANY session restart/interruption with paid calls in flight, check `transactions` + `show_generations` FIRST and fire only items with no matching account-side job — the dying process may have kept executing (12cr double-spend 2026-07-17).
+
 ## Learnings
 
 Detailed engineering learnings (Architecture, Python packaging, Google ADK, Security, WordPress theme + deploy, Audit Discipline, Hooks, Vercel, Frontend) live in **`docs/engineering-learnings.md`** — grep it before re-deriving a fix. Knowledge base, not per-turn behavioral rules.
@@ -224,8 +238,9 @@ Detailed engineering learnings (Architecture, Python packaging, Google ADK, Secu
 - **bug-230** (×6, 2026-07-10): PATTERN: fail-open guards / silent fallbacks — gates that pass when their input… → fix: Rule: every gate fails CLOSED — absent manifest/config/token = block, exception…
 - **bug-098** (×4, 2026-05-12): DATA-01: /collection-black-rose/, /collection-love-hurts/, /collection-signatur… → fix: Bumped SKYYROSE_SETUP_VERSION constant from '4.0.0' to '4.1.0' in inc/theme-act…
 - **bug-231** (×4, 2026-07-12): PATTERN: test isolation / shared-state pollution — tests failing only in full-s… → fix: Rule: per-test tmp_path (never hardcoded /tmp), monkeypatch.setenv/delenv (neve…
+- **bug-263** (×3, 2026-07-16): SIGSEGV (EXC_BAD_ACCESS) 'crashed on child side of fork pre-exec' — 12+ Python… → fix: conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (set…
 - **bug-257** (×2, 2026-07-13): Stop-gate: tests/test_asset_manifest.py::test_manifest_exists_and_loads fails i… → fix: Centralized guard in tests/sparse_guard.py: requires_tree(rel) skips ONLY when…
-- **bug-263** (×2, 2026-07-16): SIGSEGV (EXC_BAD_ACCESS) 'crashed on child side of fork pre-exec' — 12+ Python… → fix: conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (set…
+- **bug-266** (×2, 2026-07-16): Workflow tool args delivered to script as JSON STRING — args.phase undefined, P… → fix: Defensive parse at script top: const A = typeof args === 'string' ? JSON.parse(…
 <!-- wolf:recurring:end -->
 
 ## Behavioral Standards — How Claude Operates in This Project

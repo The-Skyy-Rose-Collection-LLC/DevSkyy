@@ -163,3 +163,11 @@ if unexplained modified files exist, assume a parallel session owns them.
 **Pattern:** Resumed from a compacted prior-session PR audit and treated its "open PR" list as current. Spent a full conflict-resolution pass on #672 — which was already **CLOSED** — and nearly dispatched agents for #684/#686/#689, all already **MERGED**.
 **Root cause:** (1) stale cross-session data used without re-checking; (2) `gh pr view <n> --json mergeable` returns `UNKNOWN` for merged/closed PRs *and* for uncomputed-open PRs — indistinguishable without the `state` field, which I never queried.
 **Rule:** Before acting on any multi-PR plan, `gh pr list --state open` for the authoritative open set. Never infer open/closed from `mergeable`. Any single-PR read includes `state` + `mergedAt`. `git merge-tree` showing 0 conflicts vs main can mean "already merged," not "clean to merge."
+
+## 2026-07-16 — Persist paid-platform knowledge immediately (founder correction)
+**Wrong:** re-derived Higgsfield facts (costs, param schemas, capabilities) and re-uploaded already-uploaded media across the session — tokens and credits are money, and discovery calls repeated what was already known.
+**Rule:** the moment a paid-platform fact is verified (cost, param, media_id, capability), write it to CLAUDE.md (rules) or the governing spec's registry (artifacts) IN THE SAME TURN — and check those BEFORE any discovery call or upload. A fact that lives only in a transcript is a fact you will pay for twice.
+
+## 2026-07-17 — Subagent briefs MUST carry the governing spec path
+**What happened:** Creative-director agent was dispatched with brand canon + EDL + chat directives but NOT `tasks/scroll-world-ad-spec.md`. It substituted a tagline end card for the founder-LOCKED end card copy and missed the second (cold-cut) deliverable entirely — reasoned correctly from general rules, wrong because a specific locked directive existed unread.
+**Lesson:** Every build/creative subagent brief includes the governing spec doc path as REQUIRED reading before execution, and states which sections are LOCKED. General brand rules never substitute for specific locked copy. Orchestrator owns this — the agent can't read what it wasn't pointed at.
