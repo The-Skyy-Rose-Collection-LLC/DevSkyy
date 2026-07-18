@@ -365,3 +365,24 @@ Authority chain confirmed: dossier md (wordpress-theme/skyyrose-flagship/data/do
 Proof: validate_dossier 35/36 (fail=stub only) · lint clean on both key dossiers · pytest dossier schema+completeness+catalog integrity 107 passed 0 failed.
 FOUNDER (2026-07-18): br-006 display name FINAL = 'The Black Rose Bomber Sherpa' (dossier name adopted; CSV aligned).
 FOUNDER (2026-07-18): deterministic hex backfill APPROVED + committed — 100 regions, 26 dossiers, coverage 0->31%. Ambiguous 154 regions = Corey judgment tier, open.
+
+#### PRIORITY-LIST EXECUTION (2026-07-18)
+DONE (free): kids-002 rename Purple/Black -> Lavender/Purple (commit 404ec4826).
+BATCH 1 (OAI render fixes) — BLOCKED, cannot fire from this worktree:
+- No .env/.env.secrets in sparse worktree -> OPENAI_API_KEY absent (renders run from main checkout only).
+- br-009: OAI pipeline REFUSES (patchless-jersey guard) — missing ref asset assets/products/techflats/hero-overlays/br-patch-nfl-football.png. The missing patch IS the defect root.
+- br-015: same refusal — missing assets/products/techflats/hero-overlays/br-patch-mlb-baseball.png.
+- kids-002 full-set: joggers SKIP — no usable jogger garment reference (front techflat exists, flatlay=None).
+- sg-015: READY (2 imgs, ~$0.80 @ $0.40/img floor) — dossier complete, refs present; only item unblocked, still needs key + STOP-AND-SHOW.
+  ACTION: create the 3 missing reference assets (2 sport-patch PNGs + 1 jogger flatlay) in main checkout, then render batch there. Not doable here.
+BATCH 2 (bomber path A) — FREE PREP DONE, awaiting founder y for the 0.5cr fire:
+- New canon Element garment-lh004-bomber-canon = 2d708bf2-7369-477f-908c-bd19fcc17f9e (media f6cb4712-bf82-4219-9b43-77bd43ca5f69, from ad/work/canon/lh004-canon-ref.png). Supersedes a40d0d89 (stale SOT).
+- get_cost preflight: gpt_image_2 1k/low/9:16 = 0.5cr EXACT. Balance 852.
+
+#### BATCH 1 UNBLOCKED (2026-07-18) — was sparse-exclusion, not missing assets
+Root correction: br-patch-nfl-football.png / br-patch-mlb-baseball.png / kids-purple-joggers-front.jpeg all EXIST in main — the sparse worktree excluded them. `git sparse-checkout add assets/products/techflats assets/products/references` materialized them (tracked files, reversible). OPENAI_API_KEY loaded from /Users/theceo/DevSkyy/.env.hf into render shell (value never printed, sk- prefix validated). REPO_ROOT = worktree, so renders use THIS branch's corrected dossiers (sg-015 nylon lock, hex backfill).
+Dry-run (assets+key present) — ALL 4 renderable, 11 images:
+  br-009 ghost+ghost-back+on-model (4 refs) · br-015 same (4 refs) · kids-002 ghost+ghost-back+on-model-paired (3 refs) · sg-015 ghost+on-model (2 refs).
+Est ~$4.40 floor (@ $0.40/img); SpendTracker hard-caps actual at $50 (incl QC re-renders/judge).
+INPUT fidelity gate PASSED eyes-on: 2 authentic sport patches clean; jogger = deep-purple + rose; sg-015 techflat = correct nylon windbreaker (white body/pink hood/pastel chevron/SR back). OUTPUT gate = post-render vision QC before any site touch.
+STOP-AND-SHOW pending founder y (dollars). Bomber 0.5cr (credits) still pending separately.

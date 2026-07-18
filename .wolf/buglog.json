@@ -4548,5 +4548,26 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-17"
+  },
+  {
+    "id": "bug-273",
+    "timestamp": "2026-07-18",
+    "error_message": "Stop-gate: test_asset_manifest.py::test_committed_manifest_matches_regenerated_tree FAILED \u2014 'asset manifest is stale'",
+    "file": "assets/products/manifest.json",
+    "root_cause": "Committed catalog renames (br-006, kids-002) + hex backfill (26 dossiers) without regenerating assets/products/manifest.json, which hashes dossier files + catalog names. Compounded by sparse worktree: first regen dropped 14 logo/source-photo entries because assets/products/logos + source-photos were sparse-excluded (would have corrupted the manifest if committed).",
+    "fix": "git sparse-checkout add assets/products (full tree) THEN python scripts/build_asset_manifest.py -> 147 assets, only dossier-hash + name churn, 0 dropped entries, 8/8 tests green. RULE: after ANY catalog CSV or dossier edit, run build_asset_manifest.py + build-collection-sot.py + sot_images; and NEVER regenerate a tree-derived manifest in a sparse worktree without materializing the full asset tree first.",
+    "tags": [
+      "asset-manifest",
+      "sparse-worktree",
+      "stale-derived-artifact",
+      "catalog",
+      "dossier"
+    ],
+    "related_bugs": [
+      "bug-252",
+      "bug-272"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-18"
   }
 ]

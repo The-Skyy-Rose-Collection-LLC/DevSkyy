@@ -171,3 +171,8 @@ if unexplained modified files exist, assume a parallel session owns them.
 ## 2026-07-17 — Subagent briefs MUST carry the governing spec path
 **What happened:** Creative-director agent was dispatched with brand canon + EDL + chat directives but NOT `tasks/scroll-world-ad-spec.md`. It substituted a tagline end card for the founder-LOCKED end card copy and missed the second (cold-cut) deliverable entirely — reasoned correctly from general rules, wrong because a specific locked directive existed unread.
 **Lesson:** Every build/creative subagent brief includes the governing spec doc path as REQUIRED reading before execution, and states which sections are LOCKED. General brand rules never substitute for specific locked copy. Orchestrator owns this — the agent can't read what it wasn't pointed at.
+
+## 2026-07-18 — Regenerate ALL derived artifacts after catalog/dossier edits
+Catalog CSV or dossier edits require regenerating THREE derived files, not just sot.json:
+`build-collection-sot.py` (collection sot.json) · `skyyrose.core.sot_images` (sot-images.json) · **`build_asset_manifest.py` (assets/products/manifest.json)** — the last one hashes dossier files + catalog names and has a Stop-gate test. Missing it = stale-manifest Stop-gate block.
+In a SPARSE worktree, `build_asset_manifest.py` hashes only checked-out files — regenerating without the full `assets/products` tree DROPS entries and corrupts the manifest. Always `git sparse-checkout add assets/products` first. (bug-273, class of bug-252.)

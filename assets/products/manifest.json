@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-07-07T19:19:32+00:00",
-  "catalog_sha": "sha256:18781bb5ca9f895dfec51da2c8d1a4b3c4a700f608112d1897d5ee3c5b925766",
+  "generated_at": "2026-07-18T11:54:13+00:00",
+  "catalog_sha": "sha256:5bbd3d3b49e33a331dda78e55f3c0a0fca90b0f1426ca7282bb4ec4efe6e0e2b",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -32,7 +32,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-crewneck.md",
-          "sha256": "sha256:c3443d005f8d9d06e59420f4631c8e6a58657abda30d43620de450b9db64e03c"
+          "sha256": "sha256:a19e0b38ebd57b1fda4514011ba47be34d5085c4d7f81da16aca4170588ba84e"
         }
       ]
     },
@@ -65,7 +65,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-joggers.md",
-          "sha256": "sha256:9d27c9a273c4b5ecd483be26f4aaba02d6c5358be5585668b29e2cefd5a7d1e4"
+          "sha256": "sha256:25f055b2e77d0639a2d84c75a9ed7c275a57cf50bddf92c24158d80f914f2ec3"
         }
       ]
     },
@@ -98,7 +98,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic.md",
-          "sha256": "sha256:270932b90c048e0eff087cf56bcf87d8f399cc4b4a2d2cf8aef57a2ba2ab950a"
+          "sha256": "sha256:556dc4dabf45764a695182947106361b781bea00f0f7835728a48aa2a86ab0c0"
         }
       ]
     },
@@ -154,13 +154,13 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-hoodie-signature-edition.md",
-          "sha256": "sha256:55a09ad64b4a0a9fa9ac03b7fb8c370378327bcbc4acafa5bcd466d7d90e0532"
+          "sha256": "sha256:32e95e52fb4b70fdd5a8c486cd6bf68a75933d15045bacfe8a20df5e9cd2df85"
         }
       ]
     },
     "br-006": {
       "sku": "br-006",
-      "name": "BLACK Rose Sherpa Jacket",
+      "name": "The Black Rose Bomber Sherpa",
       "collection": "black-rose",
       "garment_type": "jacket",
       "assets": [
@@ -186,8 +186,8 @@
         },
         {
           "role": "dossier",
-          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-sherpa-jacket.md",
-          "sha256": "sha256:0428bd9add76f6ae7c199285eb663bf3b7a8d59d8097d880552bca8a66d5091e"
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-bomber-sherpa.md",
+          "sha256": "sha256:d8555d0ddca0d91aca71a1f9db069fc48781404704982d64a90a132ddb7ab199"
         }
       ]
     },
@@ -215,7 +215,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-x-love-hurts-basketball-shorts.md",
-          "sha256": "sha256:dec60e3d018ffde9ec26339c89f42a699e0a5a6302671e8152e3cc55fd4e22fb"
+          "sha256": "sha256:e857fc891c6ddc5eb781400791496fa26eac274bd879fbe03f9fb6b490220b3a"
         }
       ]
     },
@@ -281,7 +281,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
-          "sha256": "sha256:f778d351a4cebcc9b331f37529a13223fff1510dbae2aa7a979dd3aae9254854"
+          "sha256": "sha256:97871b47a46ecfc696c71a2bb462a90e94601c0796c9a26ae1d6b49b545cf47a"
         }
       ]
     },
@@ -314,7 +314,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-3-the-bay-basketball.md",
-          "sha256": "sha256:c259ea02457085440bcf217fa22644f23d43a9e74a14a67d2501ac97501270b5"
+          "sha256": "sha256:20b81a9ef859fef858364f9f77d1f1309d3b35983ff05babaeb3eee266441c95"
         }
       ]
     },
@@ -347,7 +347,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md",
-          "sha256": "sha256:3869098ef12abc2d0f29628b3588ea768e7cb4829ecf69af70e92545a0bc824e"
+          "sha256": "sha256:537acdacb69ea1361994bdfcdbe0c0c3534925c2a55228f58d109064c453f259"
         }
       ]
     },
@@ -380,7 +380,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-5-last-oakland-baseball.md",
-          "sha256": "sha256:567695304955aa5cd03e8bb531759951b1f9a3478b7b25c291362cc95e82569d"
+          "sha256": "sha256:01f95becdbf2f26c8e2e45172b02d11581e96307f41d36e6c05dca878746a5a7"
         }
       ]
     },
@@ -413,7 +413,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-giants.md",
-          "sha256": "sha256:668a3c733a6f81a94d7d7a8dfdf0fc4c99db2cc8cb395ae8b65857036c671251"
+          "sha256": "sha256:b0f64b7a252b5df8410e911c53b157341c4ed0ad85e20ca375b387d3baf3a140"
         }
       ]
     },
@@ -446,7 +446,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",
-          "sha256": "sha256:8de09558baf3c484ebffe9d6acf342c6b9a01023e68a0daf49bc4c9913d48147"
+          "sha256": "sha256:cd733655da6ec7de2be389e6cab9c2fd8810c389e76b6f12176d16ceec504178"
         }
       ]
     },
@@ -474,13 +474,13 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-red-black.md",
-          "sha256": "sha256:af98b74131430762ffb05fbc7726fd6f483d15e2d71604315b4233eca3bb77ce"
+          "sha256": "sha256:18bff25e15087e50606f423b7a6385992972c80eb55ddec51bc38948c297fe5e"
         }
       ]
     },
     "kids-002": {
       "sku": "kids-002",
-      "name": "Kids Colorblock Hoodie Set — Purple/Black",
+      "name": "Kids Colorblock Hoodie Set — Lavender/Purple",
       "collection": "kids-capsule",
       "garment_type": "hoodie",
       "assets": [
@@ -502,7 +502,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
-          "sha256": "sha256:50f0ac3ce94c2d60e4a1b97e7959d06cb6a7cfedf51440f4b338bfc0376eee48"
+          "sha256": "sha256:ab7343a938063b1480491013c906c45b3b6223d519183d30c4df218286c72cd6"
         }
       ]
     },
@@ -530,7 +530,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-joggers.md",
-          "sha256": "sha256:796f623b0de1006b10f4259ed5ab29427af7453de1f998029734a142a194ab33"
+          "sha256": "sha256:1bf479da21601c6144374234aee881d3f293df7862204204d3ae1b37edcfb42e"
         }
       ]
     },
@@ -563,7 +563,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-basketball-shorts.md",
-          "sha256": "sha256:5340a30adaa2507c51adbb4d06e2bd52f0e21d2d82a2dbe8e5826160871b1e9d"
+          "sha256": "sha256:9fcd8d97892de2f17ca66769e9e681362c38e038ce1b3657833b52b955f12a46"
         }
       ]
     },
@@ -596,7 +596,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-bomber-jacket.md",
-          "sha256": "sha256:c432e4e0ab28987abaaee60d7223db1813e48c5e3c35a6ab10b809fad3b43765"
+          "sha256": "sha256:371f8334d18583556a01eba11f7910dc169101273917bbbe8538c0e4006bfb04"
         }
       ]
     },
@@ -624,7 +624,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-fannie.md",
-          "sha256": "sha256:016770b3c8d1b5389549c3c3830e7dc44d19c55542630bd855eed40c7cbe62c6"
+          "sha256": "sha256:5efe2994525a81e5879c649b48d2b4459c75afcd964bbed3797bc0c92bf212ae"
         }
       ]
     },
@@ -652,7 +652,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-joggers-white.md",
-          "sha256": "sha256:5e0d549dbbc8cb184c86d85b6c56b52a51e5023af0c9b64205a15658621157c1"
+          "sha256": "sha256:4068de00bb77402e47f76e2f81fc90567ddbc8e80ae84766618c29e3e4452f86"
         }
       ]
     },
@@ -685,7 +685,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shorts.md",
-          "sha256": "sha256:01196b736501e92c14c41135128970fe383e284b6d7dd3ff08eee93866eed99e"
+          "sha256": "sha256:9ae1be121d0e36786491da75bfecd694ae8b1bdcad767fb25652174b865caf49"
         }
       ]
     },
@@ -718,7 +718,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shirt.md",
-          "sha256": "sha256:59c76429f29cc9ec7f363928b7d3d5037c218ef3dd17f0c4fec4bc3fba857b85"
+          "sha256": "sha256:ed8f032b2f105cdae333afc10f418af07d7baea226815e292112ba7d8d766ef8"
         }
       ]
     },
@@ -751,7 +751,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shorts.md",
-          "sha256": "sha256:4deca5c523b2b4dde6fc5768a978a5e8b9af6a530a250da1c0a50518a3d3ca7d"
+          "sha256": "sha256:738b8631eed89a50633856402f1152c06535a91ed94448d57ed15f81763d12e8"
         }
       ]
     },
@@ -779,7 +779,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shirt.md",
-          "sha256": "sha256:8d85cab5b536b01b023500dce3935e0e0199f4396b813fa8f514c8ae541152c3"
+          "sha256": "sha256:3407ca7aeedc81daebe83b8f4a7ad85df9b4148248e679d76ff892af24da109c"
         }
       ]
     },
@@ -835,7 +835,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-signature-beanie.md",
-          "sha256": "sha256:98842ce4880b4734b210f389dbbce01b378e8354a0d6e8f6e62f8131aa133228"
+          "sha256": "sha256:f19731a58cc96f0ff9fb35daf53a34e290caf020a366018ff4dd77d089787f80"
         }
       ]
     },
@@ -863,7 +863,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-sherpa-jacket.md",
-          "sha256": "sha256:358c11e77f353575f26d6c1569cf0ae8f6d5d20b2e10727f548f39a549d3cd41"
+          "sha256": "sha256:5f8d62db578a80088e9c97ef1ee1e0b059ce3e5a9a55c45aaace67264f2070d7"
         }
       ]
     },
@@ -998,7 +998,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-windbreaker-set.md",
-          "sha256": "sha256:cd1f0678c09312983907e55698f406adf264e77855691795f4e582b5a9f4875d"
+          "sha256": "sha256:c3221d727c6a1c6d299b37e40dc445daebe2cd7bf3efc0494c7d1b7a367fe033"
         }
       ]
     }
