@@ -176,3 +176,6 @@ if unexplained modified files exist, assume a parallel session owns them.
 Catalog CSV or dossier edits require regenerating THREE derived files, not just sot.json:
 `build-collection-sot.py` (collection sot.json) · `skyyrose.core.sot_images` (sot-images.json) · **`build_asset_manifest.py` (assets/products/manifest.json)** — the last one hashes dossier files + catalog names and has a Stop-gate test. Missing it = stale-manifest Stop-gate block.
 In a SPARSE worktree, `build_asset_manifest.py` hashes only checked-out files — regenerating without the full `assets/products` tree DROPS entries and corrupts the manifest. Always `git sparse-checkout add assets/products` first. (bug-273, class of bug-252.)
+
+## 2026-07-18 — QC fine per-detail features on FULL-RES crops, never contact sheets
+Called br-009 back "3" as "still has rose" from a 520px-cell contact sheet; a full-res 2x zoom proved it was plain white (fix had landed). Downscaled QC sheets are fine for layout/presence checks but LOSE fine distinctions (plain digit vs rose-filled digit, small lettering weight). For any per-digit/per-region fidelity call, crop the region from the ORIGINAL render and view at ≥1x. Cost of the miss: told founder "UNACCEPTABLE", sent a deep-research tangent, for a render that was already correct.

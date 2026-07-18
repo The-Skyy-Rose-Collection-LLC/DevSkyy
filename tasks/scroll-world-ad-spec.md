@@ -400,3 +400,19 @@ Spend: $4.40 actual (11 imgs × ~$0.40, 0 re-renders). Higgsfield balance untouc
 - sg-015 (was: reads sweatsuit): now reads NYLON windbreaker (sheen/structure), white body/pink hood/pastel chevron/zip, matches techflat. PASS.
 No wrong-garment defects. Images are CANDIDATES in _rejected/ — promotion to keepers + SOT/catalog wiring + deploy = separate founder-gated step (production).
 FOLLOW-UP: Anthropic judge account (key in .env.judge-opus-thinking) out of credits — top up for future auto-QC, else pipeline QC always errors→needs-review.
+
+#### BATCH 1 RE-RENDER FIRING (2026-07-18, founder y) — judge restored
+Run: 6 plans (br-009 ghost/ghost-back/on-model + br-015 same), judge claude-sonnet-4-6 ACTIVE (founder topped up Anthropic acct). est ~$2.40, cap $50. bg id buw1pbphj.
+Fixes in this pass: br-009 back "32" rose-in-2-only + white/black-border letters + sleeves full-"32"-with-rose (not split); br-015 bigger front lettering + real product photo as ground-truth ref. Dossier fixes committed 727236286; playbook committed 50e53b170.
+POST: eyes-on QC all 6 vs corrected dossiers; with judge back, expect renders in renders/oai/<slug>/ (not _rejected).
+
+#### BATCH 1 RE-RENDER RESULT + QC (2026-07-18) — $2.40, judge STILL down
+Judge STILL errors "credit balance too low" — founder's top-up didn't reach THIS judge key's Anthropic account (.env.judge-opus-thinking). All 6 -> _rejected, manual QC:
+- br-009 back "BLACK IS BEAUTIFUL": WHITE letters + black border. ✓ FIXED.
+- br-009 sleeves: full "32" on each sleeve WITH rose fill (no longer split). ✓ FIXED.
+- br-009 back "32" rose-in-"2"-only: ✗ NOT FIXED — model still put rose in BOTH back digits; couldn't isolate one digit. Needs another attempt or founder accept.
+- br-015 front lettering: bigger than v1 ✓, but may not match the real photo's bold/wide scale — founder to judge.
+Session OpenAI spend: $4.40 (batch1) + $2.40 (re-render) = $6.80. Higgsfield 852 untouched.
+
+#### QC CORRECTION (2026-07-18): br-009 v2 back "3" WAS fixed — my error
+Full-res crop (br009-back-32-zoom.png) proves the center back "3" is PLAIN WHITE + black outline, rose in the "2" ONLY. My earlier "NOT FIXED — both digits rose" verdict was a MISREAD on the downscaled contact sheet (520px cells lose plain-vs-rose distinction at digit scale). ALL 3 br-009 fixes landed: white/black-border back letters ✓, rose-in-2-only ✓, full-"32"-rose sleeves ✓. The $2.40 re-render was fully successful. NO further fix/spend needed. Masked-inpaint research (gpt-image-2 images.edit + mask, pipeline supports client.edit(mask_path)) documented for future selective-edit needs but NOT required here.
