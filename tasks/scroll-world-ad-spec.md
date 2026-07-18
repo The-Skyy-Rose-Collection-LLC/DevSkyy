@@ -419,3 +419,9 @@ Full-res crop (br009-back-32-zoom.png) proves the center back "3" is PLAIN WHITE
 
 #### br-009 ON-MODEL sleeve defect (2026-07-18, full-res QC)
 Ghost CORRECT (full "32" + rose each sleeve). ON-MODEL WRONG: split single digit ("2" L, "3" R) — same dossier, model rendered views inconsistently (on-model sleeve = gpt-image-2 weak spot). Rose fill present, only the split is wrong. Fix: re-render br-009 --style on-model (1 img, ~$0.40); ghost proves the spec renders, but on-model sleeve is the model's weakest detail so first-try not guaranteed. QC at FULL-RES (lesson). Everything else on-model correct (front both-rose OK, patch present).
+
+#### br-009 ROSE-MAP RE-RENDER RESULT (2026-07-18, $1.20) — locked spec nailed it
+Explicit dossier (front=3, back=2, L-sleeve=3, R-sleeve=2; both-digits-filled negative) rendered ALL placements correctly in ONE pass — no roulette. Full-res QC:
+- ghost FRONT big rose-in-3 ✓ · ghost BACK big rose-in-2 ✓ · ghost L-sleeve 32 rose-in-3 ✓ · ghost R-sleeve 32 rose-in-2 ✓ · on-model big rose-in-3 ✓ · on-model L-sleeve rose-in-3 ✓
+- on-model R-sleeve: UNVERIFIED (arm-angle curl, can't read cleanly) — founder to eyeball; if off, targeted single-sleeve inpaint.
+Session OpenAI spend now: $6.80 + $1.20 = $8.00. Ghost product shots (catalog-critical) are perfect. Lands in _rejected (judge acct still out of credits, manual QC).
