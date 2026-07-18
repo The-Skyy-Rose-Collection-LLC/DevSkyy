@@ -50,7 +50,7 @@ dependencies = [
     "mangum>=0.18.0",  # ASGI adapter for serverless
     "pydantic>=2.5",
     "pydantic-settings>=2.1",
-    "python-multipart>=0.0.22",
+    "python-multipart>=0.0.30",
 
     # Database
     "sqlalchemy>=2.0",
@@ -59,10 +59,10 @@ dependencies = [
     "aiosqlite>=0.19",
 
     # Security
-    "PyJWT>=2.8",
+    "PyJWT>=2.13.0",
     "passlib[bcrypt]>=1.7",
     "argon2-cffi>=23.1",
-    "cryptography>=41",
+    "cryptography>=48.0.1",
     "bcrypt>=4.1",
 
     # HTTP
@@ -80,7 +80,7 @@ dependencies = [
     # (Context7-checked, 486 mocked tests pass) but the live imagery path is unverified;
     # lifting this cap is the deliberate 2.x migration, not a routine bump (bug-254).
     "openai>=1.6,<2",
-    "mcp>=1.23.0",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
+    "mcp>=1.28.1",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
     "claude-agent-sdk>=0.1.0",  # Claude Agent SDK for multi-agent orchestration
 
     # LLM Provider SDKs
@@ -174,11 +174,11 @@ api = [
     "fastapi>=0.104",
     "mangum>=0.18.0",
     "pydantic>=2.5",
-    "PyJWT>=2.8",
+    "PyJWT>=2.13.0",
 ]
 
 mcp = [
-    "mcp>=1.23.0",
+    "mcp>=1.28.1",
     "fastmcp==3.4.4",  # standalone FastMCP 3.0 (pinned; SDK-bundled mcp.server.fastmcp still used by devskyy_mcp)
     "openai>=1.57.2,<2",  # keep in lockstep with the base openai<2 cap (bug-254)
     "anthropic>=0.75.0",
@@ -249,7 +249,7 @@ ml = [
     # unresolvable and broke the Docker build; this is the locally-installed,
     # test-validated set. Bump all three together (and re-validate) if upgrading.
     "torch==2.9.1",
-    "torchvision==0.28.0",
+    "torchvision==0.24.1",
     "torchaudio==2.11.0",
     "transformers>=4.53.0",
     "sentence-transformers>=5.6.0",
@@ -266,7 +266,7 @@ ml = [
     "opencv-python>=4.10.0.84",
     "pillow>=12.2.0",
     "imageio>=2.36.1",
-    "nltk>=3.9.3",  # Fixed: CVE-2025-xxx path traversal, fixed in 3.9.3
+    "nltk>=3.10.0",  # Fixed: CVE-2025-xxx path traversal, fixed in 3.9.3
     "spacy>=3.8.2",
     "textblob>=0.18.0.post0",
     # mlflow removed 2026-06-22: imported in 0 files (dead dep) and its
