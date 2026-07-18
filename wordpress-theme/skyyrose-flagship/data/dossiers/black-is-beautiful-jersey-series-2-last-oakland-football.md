@@ -67,9 +67,13 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 
 ### Sleeves
 - **left-shoulder / right-shoulder** (small, ~3–4in tall, on each shoulder):
-  A smaller version of the same "32" digit composition (greyscale rose-cluster
-  fill with black outline) on each shoulder/sleeve area. **Technique:**
-  sublimated. **Color:** black outline + greyscale rose-cluster fill.
+  The FULL two-digit number **"32"** (both digits together) on EACH sleeve — a
+  smaller copy of the big front number, rendered IDENTICALLY: **black outline +
+  greyscale rose-cluster fill INSIDE both digits**, exactly like the big front
+  "32". Each sleeve shows the complete "32" — NOT a single split digit ("2" on
+  one sleeve, "3" on the other is WRONG). Keep the black-and-white striped cuff
+  band below it (jersey-1 stripe treatment). **Technique:** sublimated.
+  **Color:** black outline + greyscale rose-cluster fill.
 
 ### Collar / Hem / Other
 - **collar / V-neck binding**: Solid black neckband (~1in wide). **Technique:**
@@ -101,6 +105,10 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 - NO gold thread on the SR monogram — black thread for this colorway.
 - NO sleeve PATCHES — the sleeves carry duplicate "32" numerals, not woven
   patches.
+- NO split single digit per sleeve — do NOT put "2" on one sleeve and "3" on the
+  other; EACH sleeve shows the complete two-digit "32".
+- NO plain/empty sleeve digits — the sleeve "32" carries the SAME greyscale
+  rose-cluster fill as the big front number, never a hollow white digit.
 - NO printed graphics other than the rose-fill inside digits and the sleeve
   number duplicates.
 - NO pinstripes.

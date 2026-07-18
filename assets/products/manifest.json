@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-07-18T14:03:37+00:00",
+  "generated_at": "2026-07-18T14:48:59+00:00",
   "catalog_sha": "sha256:5bbd3d3b49e33a331dda78e55f3c0a0fca90b0f1426ca7282bb4ec4efe6e0e2b",
   "skus": {
     "br-001": {
@@ -281,7 +281,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
-          "sha256": "sha256:e0cd7d1b4078e2ddf81e37f8c11e039f593657c9681f1ae649561379b898db76"
+          "sha256": "sha256:719fe94eb2d5f261441b78734af7ea7d057ea3b7c0449c8f58288d257b15eda8"
         }
       ]
     },
@@ -425,8 +425,8 @@
       "assets": [
         {
           "role": "garment",
-          "path": "assets/products/references/br-015-techflat.jpeg",
-          "sha256": "sha256:7e419ef8285b3f07b9afe10c1e64220dcdba12f3f8441a842af4d973ecffa0ef"
+          "path": "assets/products/references/br-015-baseball-white-real-front.jpeg",
+          "sha256": "sha256:0ce949e7cb59b028113acfdd61b5d1775fa7db85e5fa33fcdb893a1a7d724df9"
         },
         {
           "role": "garment",
