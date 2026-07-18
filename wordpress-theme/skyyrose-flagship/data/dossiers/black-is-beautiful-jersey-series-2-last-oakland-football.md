@@ -53,12 +53,17 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
   (instead of canonical gold — black-on-white for this colorway).
   **Technique:** embroidered. **Color:** black thread. **Hex:** #000000.
 - **back-yoke / upper-back** (arched, ~9in wide): The phrase **"BLACK IS
-  BEAUTIFUL"** in tackle-twill lettering, baseball-script style. Rendered in
-  **black twill** on the white body. **Technique:** tackle-twill. **Color:**
-  black twill letters on white ground.
+  BEAUTIFUL"** in tackle-twill lettering, baseball-script style. Rendered as
+  **WHITE twill letters with a BLACK outline border** on the white body — each
+  letter is white with a crisp black edge that defines it against the white
+  jersey (NOT solid-black letters). **Technique:** tackle-twill. **Color:**
+  white letters with black border. **Hex:** #FFFFFF.
 - **back-center** (large, ~12in tall, vertically centered): The number
-  **"32"** rendered identically to the front. **Technique:** sublimated.
-  **Color:** black outline + greyscale rose-cluster fill.
+  **"32"** — the **"3" is a plain white digit with a black outline only (NO
+  rose-cluster fill)**, and ONLY the **"2" carries the black outline + greyscale
+  rose-cluster fill**. (The FRONT and SLEEVES keep rose fill in BOTH digits; the
+  back-center is the ONLY place the "3" is plain.) **Technique:** sublimated.
+  **Color:** "3" = black outline on white ground; "2" = black outline + greyscale rose-cluster fill.
 
 ### Sleeves
 - **left-shoulder / right-shoulder** (small, ~3–4in tall, on each shoulder):
@@ -81,7 +86,11 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 - NO multi-color rendering of the rose-cluster fill — greyscale only.
 - NO red anywhere on this colorway (this is the Last Oakland white away —
   NO 49ers red, NO Giants orange).
-- NO solid-color "32" digits — the digits have black outline + rose fill.
+- NO solid-color "32" digits — the FRONT + SLEEVE digits have black outline + rose fill.
+- NO rose-cluster fill inside the BACK-CENTER "3" — on the BACK only the "2" has
+  rose fill; the back "3" is a plain white digit with a black outline only.
+- NO solid-black "BLACK IS BEAUTIFUL" back lettering — the back-yoke letters are
+  WHITE with a black outline border, not filled solid black.
 - NO MLB Authentic Collection patch (baseball series only).
 - NO Hockey Championship patch.
 - NO NBA Authentic Collection patch.

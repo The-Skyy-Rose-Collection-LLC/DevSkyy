@@ -23,7 +23,9 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 > - Product techflat:              `assets/products/references/br-015-techflat.jpeg`
 
 ### Front
-- **front-chest** (large, arched, ~9in wide): The phrase **"BLACK IS BEAUTIFUL"**
+- **front-chest** (large, arched, ~11in wide — bold and prominent, spanning
+  most of the chest width to match the scale of the other Baseball Classic
+  jerseys): The phrase **"BLACK IS BEAUTIFUL"**
   as authentic tackle-twill lettering — pre-cut **black** fabric letters
   appliquéd onto the white jersey body in a baseball-script style, arched
   across the upper-front-chest. **Technique:** tackle-twill. **Color:** black

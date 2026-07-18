@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-07-18T11:54:13+00:00",
+  "generated_at": "2026-07-18T14:03:37+00:00",
   "catalog_sha": "sha256:5bbd3d3b49e33a331dda78e55f3c0a0fca90b0f1426ca7282bb4ec4efe6e0e2b",
   "skus": {
     "br-001": {
@@ -281,7 +281,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
-          "sha256": "sha256:97871b47a46ecfc696c71a2bb462a90e94601c0796c9a26ae1d6b49b545cf47a"
+          "sha256": "sha256:e0cd7d1b4078e2ddf81e37f8c11e039f593657c9681f1ae649561379b898db76"
         }
       ]
     },
@@ -446,7 +446,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",
-          "sha256": "sha256:cd733655da6ec7de2be389e6cab9c2fd8810c389e76b6f12176d16ceec504178"
+          "sha256": "sha256:4a798898cb14f6414a42cc70931b7d94011139b370cfa2cc840cb8921ab66a2e"
         }
       ]
     },
