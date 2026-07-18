@@ -52,8 +52,9 @@ ALLOWLIST: set[str] = set()
 @functools.lru_cache(maxsize=1)
 def _tracked_files() -> tuple[str, ...]:
     out = subprocess.run(
-        ["git", "ls-files", "*.ts", "*.tsx", "*.js", "*.jsx"],
-        cwd=REPO,
+        # git -C instead of cwd= — cwd forces macOS subprocess onto the
+        # crash-prone fork() path (bug-263).
+        ["git", "-C", str(REPO), "ls-files", "*.ts", "*.tsx", "*.js", "*.jsx"],
         capture_output=True,
         text=True,
         check=True,
