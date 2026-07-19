@@ -49,6 +49,15 @@
 	pointer-events: none;
 }
 
+/* The server renders the banner with [hidden] so the pre-CSS state is
+   invisible (lets this sheet load deferred). The UA's [hidden]→display:none
+   would be OVERRIDDEN by .cookie-consent's author-origin display:flex once
+   this sheet arrives — this rule restores the contract. JS removes the
+   attribute when consent is actually pending. */
+.cookie-consent[hidden] {
+	display: none;
+}
+
 /* ---- Message ---- */
 
 .cookie-consent__message {

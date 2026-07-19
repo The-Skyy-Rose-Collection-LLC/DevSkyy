@@ -115,8 +115,18 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 				// (Chromium 115+, Firefox 2026) honor it; others render the
 				// existing .rv-clip-up reveal. Reduced-motion respected.
 				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				// Photon width variants for the single-res lockup (199-417KB at
+				// 1600px, the mobile LCP element — audit Wave 2). Fallback src
+				// stays direct, so no Photon = today's behavior.
+				$hero_logo_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $resolved_hero_logo, array( 480, 640, 960, 1280 ) )
+					: '';
 				?>
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_logo . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php if ( '' !== $hero_logo_srcset ) : ?>
+						srcset="<?php echo esc_attr( $hero_logo_srcset ); ?>"
+						sizes="(max-width: 768px) 90vw, 720px"
+					<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
 					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager" fetchpriority="high" decoding="async">
 				<h1 class="screen-reader-text"><?php echo esc_html( $c['hero_logo_alt'] ); ?></h1>

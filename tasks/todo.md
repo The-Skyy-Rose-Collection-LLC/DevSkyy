@@ -6,16 +6,22 @@ Goal: skyyrose.co every page Lighthouse ≥90 (all 4 categories, mobile+desktop)
 aesthetics (headers aligned, heroes visually sound). Award-grade finish.
 Team charter: `tasks/wp-commercial-theme/team.md` (Atlas/Pixel/Bolt/Access/Sentinel).
 
-- [x] Enumerate pages — 30 published + PDPs + 404; 20-URL set covers every distinct template (`pages.txt`)
-- [ ] Baseline Lighthouse sweep, mobile+desktop (bg `lh-baseline.sh` → `baseline/summary.csv`)
-- [ ] Atlas: architecture census (templates↔URLs, enqueue map, perf hazards) → `architecture-census.md`
-- [ ] Pixel: visual audit all 20 pages mobile+desktop (headers/heroes) → `visual-audit.md`
-- [ ] Triage: baseline + census + visual → ranked fix list
-- [ ] Fix wave(s): Bolt=perf, Pixel=visual, Atlas=structure, Access=a11y/SEO; source edit → rebuild .min
-- [ ] Sweep: lint:php + npm run build + php -l + scope diff clean
-- [ ] Deploy from MAIN checkout only (17 riders; standing auth post-sweep, show manifest)
-- [ ] Sentinel: independent live re-verify (fresh Lighthouse + Playwright mobile/desktop, console clean)
-- [ ] Loop until every page ≥90 all categories + visual pass; final 30-page confirmation sweep + report
+- [x] Enumerate pages — 30 published + PDPs + 404; 18-URL set covers every distinct template (`pages.txt`)
+- [x] Baseline Lighthouse sweep, mobile+desktop → `baseline/summary.csv` (zero pages ≥90 all-cat mobile)
+- [x] Atlas: architecture census → `architecture-census.md` (2 live P0s found + fixed)
+- [x] Pixel: visual audit → `visual-audit.md` (dossier leak, shop collapse, font bug found)
+- [x] Triage + fix waves COMPLETE: Bolt (enqueue/preloads/header 637KB), Atlas (PDP LCP reveal-bug,
+      cart-empty shell, 3-layer dossier exposure seal bug-273), Pixel (shop grid, Hanken sitewide,
+      overlay clearance), Access (16 a11y/SEO root-cause fixes) — bug-266..274
+- [x] Sweep clean: php -l ×19, lint:php, build 34/34 + .min fresh, editorial index 35/35 parity
+- [x] Committed v1.12.0 (15e238068 + e812c8402 incl. newly-tracked tsrc lockup riders) + PUSHED origin
+- [ ] ⛔ DEPLOY BLOCKED — permission classifier denied `deploy-theme.sh` this session. Founder:
+      `STOPSHOW_ACK=1 bash scripts/deploy-theme.sh` (manifest shown in-session; report:
+      `tasks/wp-commercial-theme/wave1-report.md`)
+- [ ] AUTO-RESUMES on live=1.12.0 (loop probes every ~30 min): Sentinel fresh Lighthouse 18 URLs +
+      dossier-404 check + dequeue risk spots; Pixel Playwright per-fix harness
+- [ ] Loop until every page ≥90 all categories (cart/checkout SEO exempt by design) + visual pass;
+      final 30-page confirmation sweep. Founder decision queue in wave1-report.md §3
 
 ## DONE — golden-fixture CI wiring for character_pipeline, spec DoD #2 (2026-07-10)
 

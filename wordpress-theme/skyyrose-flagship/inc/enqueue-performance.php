@@ -84,7 +84,10 @@ function skyyrose_preload_fonts() {
  * Resource hints for external services.
  *
  * All Google Fonts preconnects removed — fonts fully self-hosted since 4.1.0.
- * Only external preconnect remaining: cdn.jsdelivr.net (model-viewer CDN).
+ * cdn.jsdelivr.net: skyy-3d.js imports three@0.170.0 from there, but only
+ * during the mascot's idle-time load — a head preconnect's socket would be
+ * closed long before that fetch, so warm the DNS only (dns-prefetch), and
+ * only on pages where the 3D mascot can actually load (Wave 2, 2026-07-19).
  *
  * @since  3.2.1
  * @param  array  $urls          URLs to print for resource hint.
@@ -92,13 +95,11 @@ function skyyrose_preload_fonts() {
  * @return array Modified URLs.
  */
 function skyyrose_resource_hints( $urls, $relation_type ) {
-	// Preconnect to model-viewer CDN (used on avatar pages).
-	if ( 'preconnect' === $relation_type ) {
-		$urls[] = array(
-			'href'        => 'https://cdn.jsdelivr.net',
-			'crossorigin' => 'anonymous',
-		);
-		// Google Fonts preconnects removed in 4.1.0 — all fonts self-hosted.
+	if ( 'dns-prefetch' === $relation_type
+		&& function_exists( 'skyyrose_mascot_is_enabled' ) && skyyrose_mascot_is_enabled()
+		&& function_exists( 'skyyrose_get_skyy_glb_url' ) && skyyrose_get_skyy_glb_url()
+		&& ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
+		$urls[] = '//cdn.jsdelivr.net';
 	}
 	return $urls;
 }
@@ -140,6 +141,55 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 	}
 
 	return $tag;
+}
+
+/**
+ * Load non-critical stylesheets asynchronously (print-media swap).
+ *
+ * Handles listed here style ONLY JS-created or navigation-time UI — verified
+ * per-sheet 2026-07-19 (fix-log Wave 2): no server-rendered above-fold markup
+ * depends on them on any template they load on. media='print' downloads the
+ * sheet without blocking render; onload flips it live; <noscript> keeps
+ * no-JS visitors styled.
+ *
+ * Deliberately NOT deferred (fail-closed — server-rendered markup would paint
+ * unstyled without them): mascot/skyy-walk (doc-end DOM,
+ * in-viewport on short pages like cart), skeleton (landing templates render
+ * .skeleton--* markup server-side), footer/footer-cro (in-viewport on short
+ * pages — the Wave 1 CLS fix), all reveal/animation sheets (initial states
+ * must exist at first paint), fonts.css (pairs with the font preloads).
+ *
+ * @since 1.11.2
+ * @param  string $html   Full <link> tag HTML.
+ * @param  string $handle Style handle.
+ * @return string Possibly-swapped tag.
+ */
+function skyyrose_async_noncritical_styles( $html, $handle ) {
+	$async_handles = array(
+		'skyyrose-size-guide',       // Modal at doc end, opened via JS trigger only.
+		'skyyrose-luxury-cursor',    // Cursor elements created by JS.
+		'skyyrose-smart-showcase',   // Quick-view dialog built by JS.
+		'skyyrose-personalization',  // JS-driven personalization UI.
+		'skyyrose-view-transitions', // view-transition-name + ::view-transition only, nav-time.
+		'skyyrose-brand-atmosphere', // JS-created canvas overlay.
+		'skyyrose-cookie-consent',   // Deferrable ONLY because the part renders with the
+									// [hidden] attribute AND cookie-consent.css restores
+									// .cookie-consent[hidden]{display:none} (author flex
+									// beats UA [hidden]) — both landed 2026-07-19. Do not
+									// defer without that contract.
+	);
+
+	if ( ! in_array( $handle, $async_handles, true ) ) {
+		return $html;
+	}
+
+	$swapped = str_replace( "media='all'", "media='print' onload=\"this.media='all'\"", $html );
+	if ( $swapped === $html ) {
+		// Unexpected tag shape — fail closed, keep render-blocking.
+		return $html;
+	}
+
+	return $swapped . '<noscript>' . $html . '</noscript>';
 }
 
 /**
@@ -482,6 +532,11 @@ add_filter( 'woocommerce_enqueue_styles', 'skyyrose_dequeue_woocommerce_styles' 
 
 // Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
+
+// Async-load stylesheets that only style JS-created / navigation-time UI.
+// Priority 20: runs after skyyrose_critical_style_priority (10) — disjoint
+// handle lists, but ordering keeps the critical-path filter's output stable.
+add_filter( 'style_loader_tag', 'skyyrose_async_noncritical_styles', 20, 2 );
 
 // Prioritize critical stylesheets for faster FCP/LCP.
 add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );

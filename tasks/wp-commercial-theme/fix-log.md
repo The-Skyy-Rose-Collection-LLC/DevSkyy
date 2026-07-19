@@ -371,3 +371,80 @@ allowlist + cart templates + spot-check assets present.
 - Verification: php -l clean; bash -n clean (tmp-copy route); tar manifest test above.
   Post-deploy check for Sentinel: /cart/ shows .skyy-cart__empty (styled state), and with an
   item added the cart table renders via cart.php unchanged.
+
+## Wave 2 — Bolt: CSS delivery + script defer (2026-07-19)
+
+All changes in `inc/enqueue-performance.php`, PHP-only, `php -l` clean, no build needed.
+
+**1. Async CSS (print-media swap + <noscript>)** — new `skyyrose_async_noncritical_styles()`
+on `style_loader_tag` prio 20, with a fail-closed shape check (tag not matching
+`media='all'` stays render-blocking untouched).
+- Deferred (6, each verified to style ONLY JS-created or navigation-time UI, no server
+  markup dependency on any loading template): `skyyrose-size-guide` (modal at doc end,
+  `aria-hidden`+`inert`, JS-opened), `skyyrose-luxury-cursor` (JS-created cursor elements),
+  `skyyrose-smart-showcase` + `skyyrose-personalization` (JS-built dialogs/UI — grep: zero
+  template markup), `skyyrose-view-transitions` (only `view-transition-name` assignments +
+  `::view-transition` pseudos — no static-paint properties), `skyyrose-brand-atmosphere`
+  (JS-created canvas). Homepage sheds 4 render-blocking sheets; collection pages 5-6.
+- KEPT render-blocking, fail-closed, with reasons: `cookie-consent` (hidden only via CSS
+  class `cookie-consent--hidden` — without CSS the banner paints unstyled; in-viewport on
+  short pages like cart; handoff: adding the `hidden` attribute in the part would make it
+  deferrable — template-parts is outside my lane), `mascot`+`skyy-walk` (skyy-mascot.php
+  renders real character DOM + image server-side; cart is short), `skeleton`
+  (template-landing-black-rose/signature render `.skeleton--*` markup server-side — deferring
+  = CLS on landing), `footer`/`footer-cro` (in-viewport on short pages — Wave 1 CLS fix),
+  all reveal/animation sheets (initial hidden states must exist at first paint or above-fold
+  elements flash), `fonts.css` + tokens/components/header/template sheets (above-fold).
+
+**2. Script defer audit — CLEAN, no changes.** Live homepage `<head>` has exactly one
+non-deferred script: `jquery-core` (WP core; `skyyrose_localize_scripts()` jquery fallback +
+WC inline handlers depend on it synchronously — correctly on the never-defer list). Every
+theme handle already gets `defer` via the prefix filter and/or footer placement; GSAP/
+ScrollTrigger/Lenis/motion-one all footer+defer. Wave-1 interplay verified: footer-cro's
+in-part `wp_print_styles` passes through the new filter untouched (handle not listed).
+
+**3. Resource-hint hygiene.** The theme's `cdn.jsdelivr.net` preconnect (stale "model-viewer"
+rationale) replaced: jsdelivr IS still used — `skyy-3d.js:128` imports three@0.170.0 — but
+only during the mascot's IDLE-TIME load, so a head preconnect's socket is closed long before
+the fetch. Demoted to `dns-prefetch`, emitted only when the 3D mascot can actually load
+(mascot enabled + GLB resolves + not checkout). Other live hints (i0.wp.com preconnect,
+s0.wp.com/gravatar/widgets dns-prefetch) are wp.com-platform-added, not theme code — left
+alone. No hint added for fonts.wp.com (that face is scheduled for operator removal).
+
+**4. Interplay sanity.** fonts.css + font preloads untouched (critical). No double-defer:
+style filter list is disjoint from `skyyrose_critical_style_priority`'s critical list; no
+script changes at all. `<noscript>` fallback duplicates the original render-blocking tag.
+
+## Wave 2 — Pixel (responsive images, 2026-07-19)
+
+### Photon mechanism — verified live before use
+- Theme-dir assets are NOT rewritten by Site Accelerator (live HTML serves skyyrose.co directly), but i0.wp.com proxies them on demand: `i0.wp.com/skyyrose.co/<path>?w=N` → 200, resized **image/webp** when the client Accepts webp (all srcset browsers). Non-webp clients get a jpeg/png transcode — still the requested WIDTH, so the resolution win holds. This is why srcset on plain `<img>` is safe while next-gen `<picture><source>` must stay direct (2026-05-21 transcode note in skyyrose_picture_sources()).
+- Measured: BR lockup 199KB→33KB (w=480); LH lockup is 417KB(!); strip product render 240KB→17.6KB (w=320); avif→Photon returns webp (63KB@640 vs 95KB avif full) but would falsify `<source type="image/avif">` — avif sources left alone.
+
+### Shipped
+1. **`inc/performance.php`** — new `skyyrose_photon_srcset( $src, $widths )` (sibling of skyyrose_picture_sources; guards: https-only, skips already-Photon URLs + non-raster; '' on any failure so callers no-op). phpcbf-clean.
+2. **Collection hero lockup** (`template-parts/collection/page.php`) — srcset 480/640/960/1280 + `sizes="(max-width:768px) 90vw, 720px"` on the fetchpriority=high LCP element. Direct fallback src unchanged. Covers BR (13.6s LCP evidence), LH, SIG + merged experience pages.
+3. **Homepage hero strip** (`front-page.php`, 12 imgs @ clamp(140px,14vw,220px) rendered from 1024px sources) — srcset 320/480/1024 + honest sizes; ~2.6MB → ~0.2MB strip total.
+
+### Already-responsive (no change needed — verified, not assumed)
+- Collection hero BG: 480/768/1280/1680w srcset live; pre-order BG (luxury-nighttime) same family; audit confirmed mobile fetches 480w.
+- Homepage strip discipline (dimensions, lazy after first 2, fetchpriority=low) already correct.
+
+### Deliberate skips (no silent caps)
+- **avif `<picture>` sources** (pre-order sig-brand, landing logotypes): Photon returns webp for avif input → type-attr mismatch; single-res avif ≤95KB is not an LCP driver. Needs on-disk width variants (paid/asset-gen lane) if wanted.
+- **PDP gallery + full dimension/CLS sweep of template-parts/ + woocommerce/**: not reached this dispatch (context budget); PDP markup is also mid-rework under Atlas's dossier-leak fix — sequencing them together avoids double churn. The v7/holo card parts already emit width/height (spot-checked emblem/strip/card markup).
+- **skyyrose_sot_product_image_uri consumers beyond the strip** (collection grids): same helper pattern applies; queued for the next image pass.
+
+**Verification**: php -l clean (page.php, front-page.php, performance.php); phpcbf 2 alignment fixes auto-applied; Photon URLs curl-verified 200 image/webp at exact emitted patterns. Source-only; .min/live verify at central deploy.
+
+### Wave 2 addendum — consent banner pre-CSS hidden state (Bolt handoff via team-lead)
+- `template-parts/cookie-consent.php`: banner root now renders with the `hidden` attribute;
+  the show path calls `banner.removeAttribute('hidden')` before removing the CSS class
+  (verified: show is the single classList.remove site; dismiss paths keep class-based hiding
+  so the slide-out transition survives).
+- `assets/css/cookie-consent.css`: added `.cookie-consent[hidden]{display:none}` — REQUIRED,
+  not decorative: the UA's [hidden]→display:none is author-overridden by `.cookie-consent`'s
+  own `display:flex` the moment the sheet loads, which would have re-revealed a dismissed-
+  before-CSS banner. Author-origin [hidden] rule restores the contract.
+- Unblocks: cookie-consent.css can join Bolt's deferred list (7th sheet off critical path).
+- php -l + brace-balance clean.

@@ -18,6 +18,7 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 
 <div id="skyyrose-cookie-consent"
 	class="cookie-consent cookie-consent--hidden"
+	hidden
 	role="dialog"
 	aria-modal="true"
 	aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose' ); ?>"
@@ -50,6 +51,10 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	var decline     = document.getElementById( 'skyyrose-cookie-decline' );
 	var returnFocus = document.activeElement || document.body;
 	if ( ! banner || ! accept || ! decline ) return;
+	// The [hidden] attribute keeps the banner invisible BEFORE the (deferred)
+	// stylesheet arrives; remove it only when we actually show. Dismiss paths
+	// re-hide via the CSS class so the slide-out transition still plays.
+	banner.removeAttribute( 'hidden' );
 	banner.classList.remove( 'cookie-consent--hidden' );
 	// Clearance contract: while the banner is visible, <html> carries this
 	// class so fixed bottom widgets (mascot, recall pill) read

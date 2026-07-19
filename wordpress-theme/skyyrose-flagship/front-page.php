@@ -200,10 +200,20 @@ get_header();
 				foreach ( $hero_strip_skus as $hs_idx => $hs_sku ) :
 					$hs_img_url  = skyyrose_sot_product_image_uri( $hs_sku, 'front' );
 					$hs_priority = ( 0 === $hs_pass && $hs_idx < 2 );
+					// Strip items render at clamp(140px, 14vw, 220px) (homepage-v2.css)
+					// from 1024px sources — Photon width variants cut ~75% of the
+					// strip's image bytes. Fallback src stays direct.
+					$hs_srcset = function_exists( 'skyyrose_photon_srcset' )
+						? skyyrose_photon_srcset( $hs_img_url, array( 320, 480, 1024 ) )
+						: '';
 					?>
 					<div class="hero-strip-item">
 						<?php // fetchpriority=low: decorative strip must never outrank the hero LCP fetch. ?>
 						<img src="<?php echo esc_url( $hs_img_url ); ?>"
+							<?php if ( '' !== $hs_srcset ) : ?>
+								srcset="<?php echo esc_attr( $hs_srcset ); ?>"
+								sizes="(max-width: 1000px) 140px, 220px"
+							<?php endif; ?>
 							alt=""
 							width="1024"
 							height="1536"
