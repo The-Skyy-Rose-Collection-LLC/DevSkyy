@@ -425,3 +425,102 @@ Explicit dossier (front=3, back=2, L-sleeve=3, R-sleeve=2; both-digits-filled ne
 - ghost FRONT big rose-in-3 ✓ · ghost BACK big rose-in-2 ✓ · ghost L-sleeve 32 rose-in-3 ✓ · ghost R-sleeve 32 rose-in-2 ✓ · on-model big rose-in-3 ✓ · on-model L-sleeve rose-in-3 ✓
 - on-model R-sleeve: UNVERIFIED (arm-angle curl, can't read cleanly) — founder to eyeball; if off, targeted single-sleeve inpaint.
 Session OpenAI spend now: $6.80 + $1.20 = $8.00. Ghost product shots (catalog-critical) are perfect. Lands in _rejected (judge acct still out of credits, manual QC).
+
+#### HOUSE FILM — finish in progress (2026-07-18, founder "execute all 3")
+PAID ASSETS DONE (balance 852 -> 851.1):
+- Canon bomber still: job fa5597ad -> renders/scroll-world/ad/garments/canon/lh004-bomber-canon-world.png (752x1344, Element 2d708bf2). EYES-ON QC PASS: rose-print white hood, clean black sleeves, black/white striped cuffs, chrome-red Love/Hurts split script, cathedral+dome. Fixes bug-271 wrong-bomber. Cost 0.5cr.
+- VO: job 535551f5 -> renders/scroll-world/ad/audio/vo-house-skye.wav (4.61s, seed_audio, voice "Skye" 1fb253b8, female). Line: "The house grew up. Now the next generation gets suited too." Cost 0.4cr.
+AUDIO NOTE: Higgsfield has NO standalone music generation (seed_audio = TTS only; sonilo_music is game-pipeline-only). Music bed must come from royalty-free source or founder — flagged.
+Bomber BEAT built: renders/scroll-world/ad/garments/motion/b5-bomber-canon.mp4 (1.208s, drop-in replacement for the wrong-bomber beat).
+REMAINING (free ffmpeg, do fresh with full context): (1) re-splice canon bomber (Ken Burns beat) replacing the wrong-bomber beat in master-warm-street.mp4; (2) mux VO onto the street-walk segment (VO currently a burned caption there — align audio to it), loudnorm I=-14:TP=-1; (3) music bed; (4) lock + 1:1 center-crop reframe (free). 16:9 reframe = paid Higgsfield reframe, final tier.
+
+---
+
+## House Film — ASSEMBLY COMPLETE (2026-07-18)
+
+The House ("Luxury Grows from Concrete") anthology cut is locked. Free ffmpeg assembly on
+`master-warm-street.mp4` (23.875s, 720×1280, 24fps). No new paid spend this pass.
+
+**Bomber canon swap (bug-271 fix, IN FILM):** the wrong Love-Hurts bomber occupied the window
+9.2–10.9s (wide figure-in-cathedral + a no-hood close-up garment shot). Replaced by an OVERLAY of
+a 1.75s Ken-Burns beat built from the founder-approved canon still
+`renders/scroll-world/ad/garments/canon/lh004-bomber-canon-world.png` (752×1344), with 0.2s alpha
+fades matching the film's own xfade language. Result: canon mascot bomber throughout — white body,
+black sleeves, rose-print hood UP, red "Love Hurts" script, striped trim, rose-embroidered joggers
+on the push-in. Crossfades clean; total duration unchanged. QC eyes-on PASS (contact sheet
+`work/streetsplice/bomber-window-NEW.jpg`).
+
+**VO mux:** `audio/vo-house-skye.wav` (4.61s, Skye) muxed at t=13.0s over the KC reveal / child walk
+(aligns with on-screen caption "The house grew up. Now the next generation gets suited too.").
+loudnorm I=-14:TP=-1:LRA=11. Verified: 0–12s silent (−91 dB), 13–18s VO (mean −17.1, peak −2.1 dB),
+tail silent.
+
+**Deliverables (renders/scroll-world/ad/out/):**
+- `master-warm-street-canon.mp4` — 9:16 video master (no audio)
+- `master-warm-street-canon-vo.mp4` — 9:16 final with VO  ← the film
+- `master-warm-street-canon-1x1.mp4` — 1:1 center-crop with VO
+
+**REMAINING for House:** (1) music bed — BLOCKED, Higgsfield has no music gen; needs a royalty-free
+track or founder pick, then one audio-mix pass. (2) Optional 16:9 reframe = paid Higgsfield reframe
+(final tier). (3) Optional final 2K hero (~7cr). Balance 851.1.
+
+---
+
+## Collection Films — FREE PREVIZ BUILT (2026-07-18)
+
+Standalone per-collection previz cuts assembled from existing reusable assets (world beats
+`work/norm2/clip-*`, garment loops `garments/motion/b*`, hi-res labels `work/captions_v4/label-*`,
+CTA cards, hero stills `frames/*`). All 9:16 720×1280 24fps, silent (VO/music = paid/sourced layer).
+Recipe script: `renders/scroll-world/ad/work/filmbuild/build-collection.sh` (reusable/parametrized).
+Structure: [world+label 3.5s] → [garment 2.5s] → [garment 2.5s] → [hero-still+tagline+CTA 3.0s], 0.35s xfades.
+
+**Recipe bug fixed (this session):** `fade=t=in:alpha=1` on transparent RGBA labels ZEROES their
+alpha on this ffmpeg build → invisible overlay, no error. FIX = static `overlay ... enable='gte(t,X)'`
+(hard-in, softened by the segment xfade). Also: zsh does NOT word-split unquoted var of codec flags
+(bash does) — use a bash array or literal flags. Also: `-loop 1` zoompan needs `-t` as OUTPUT option
+(after inputs) or it explodes to N×d frames.
+
+**Films (renders/scroll-world/ad/out/):**
+- `film-love-hurts.mp4` (10.7s) — cathedral+label → canon bomber hero (hood up) → lh-002 joggers → rose-dome endcard. QC PASS. DELIVERED.
+- `film-black-rose.mp4` (10.46s) — black-star world+label → br crewneck → br hoodie → engraved-rose endcard. QC PASS, on-brand.
+- `film-signature.mp4` (10.46s) — gold-R world+label → sg sherpa → sg-015 windbreaker → gold-monogram endcard. **PROVISIONAL:** uses the OLD `b2-windbreaker` loop the founder flagged as "looks like a sweatsuit" (reads pastel-rainbow, off gold). Re-render sg-015 (OAI) then re-run the script for the final SIG cut.
+- `film-kids-capsule.mp4` (10.46s) — rose-gold archway+label → mascot(Skyy) reveal → kids colorblock set → waitlist endcard (Join the Waitlist – Kids Capsule). QC PASS, dark-first (no pastels).
+
+**Jersey Series (S) — NOT free-assemblable.** No world beat, no jersey garment loops. Needs the 8
+jersey renders (br-008..br-015, incl. corrected br-009/br-015) + a heritage/locker scene + patch
+macros. = paid OAI renders (gated) + 1 Higgsfield scene. STAGED, not built.
+
+**Paid audio layer (all films) — STAGED, gated:** per-film VO lines (Higgsfield seed_audio ~0.4cr
+each) + music bed (NO Higgsfield music gen — needs royalty-free source or founder track). Balance 851.1.
+
+---
+
+## Jersey Series Film — BUILT FREE via reconcile (2026-07-18)
+
+RECONCILE-BEFORE-RE-FIRE (bug-269) paid off: all 8 jersey on-model renders already exist —
+br-009 + br-015 CORRECTED renders live in worktree `renders/oai/_rejected/{jersey-last-oakland-football,
+black-is-beautiful-jersey-white}/` (landed in _rejected ONLY because the Anthropic judge was
+credit-starved `judge_unavailable`, NOT quality — $1.20 already spent on the br-009 rose-map pass).
+br-008/010/011/012/014/003 on-model in main `renders/oai/_lookbook/onmodel/`. Eyes-on QC:
+reconcile-sheet1/2.jpg — all 8 usable.
+
+Film = Ken Burns montage (build script `work/filmbuild/jersey-build.sh`): NFL Authentic patch macro
+open → "BLACK IS BEAUTIFUL" title (br-009 ghost-back) → 8 team jersey beats (~1.17s each) → shop CTA.
+`renders/scroll-world/ad/out/film-jersey-series.mp4` (12.6s, 9:16, silent). QC PASS.
+Minor: br-009/br-015 are blue-hour Bay-Bridge, the 6 lookbook are B&W-port — slight style mix, reads
+as variety; optional paid uniformity re-render if founder wants it.
+
+## Signature sg-015 — CONFIRMED STILL WRONG (needs paid re-render)
+
+The Batch-1 "corrected" sg-015 in `renders/oai/_rejected/signature-windbreaker-set/` is STILL the
+pastel-rainbow chevron TRACKSUIT + pink hood the founder rejected ("looks like sweatsuit") — reads as
+a zip fleece tracksuit, off Signature's gold. Root fix = dossier correction (nylon windbreaker/anorak,
+not fleece tracksuit) THEN re-render. = genuine paid OAI spend (~$0.40). STAGED for STOP-AND-SHOW.
+
+## sg-015 CORRECTION (2026-07-18) — renders are CORRECT, no re-render
+Full-res review of `renders/oai/_rejected/signature-windbreaker-set/{ghost,on-model}.attempt1.png`:
+these ARE canon nylon windbreakers (shell sheen + crinkle + elastic bands + pink structured hood),
+matching the dossier design (white + pastel chevron + pink hood). Prior "still a sweatsuit" was a
+CONTACT-SHEET MISREAD. NO paid re-render — $0.80 saved. The Signature film is NOT provisional; its
+windbreaker beat shows the canonical garment. Dossier fabric-read edit KEPT (harmless precision
+reinforcement, no design change) — revert on request.
