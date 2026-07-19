@@ -13,7 +13,7 @@
 # ── Core background removal ────────────────────────────────────────────────
 rembg==2.0.76
 pymatting==1.1.15
-numba==0.63.1
+numba==0.66.0
 llvmlite==0.47.0
 
 # ── Image processing ───────────────────────────────────────────────────────
@@ -28,4 +28,4 @@ onnxruntime==1.26.0
 watchdog==6.0.0
 
 # ── PINNED — do not upgrade until numba 0.64+ releases ────────────────────
-numpy==2.3.5
+numpy==2.5.1
