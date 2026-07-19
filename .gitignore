@@ -482,3 +482,7 @@ frontend/.claude/skills/*/screenshots/
 /live-mobile-*.jpeg
 /v8-hero-slides.jpeg
 /BlackRoseScene.png
+
+# WP commercial theme sweep working artifacts (large/regenerable)
+tasks/wp-commercial-theme/baseline/*.json
+tasks/wp-commercial-theme/shots/

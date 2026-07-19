@@ -1,5 +1,22 @@
 # Current Tasks
 
+## ACTIVE — WP Commercial Theme Sweep (/loop dynamic) — 2026-07-19
+
+Goal: skyyrose.co every page Lighthouse ≥90 (all 4 categories, mobile+desktop) + commercial-grade
+aesthetics (headers aligned, heroes visually sound). Award-grade finish.
+Team charter: `tasks/wp-commercial-theme/team.md` (Atlas/Pixel/Bolt/Access/Sentinel).
+
+- [x] Enumerate pages — 30 published + PDPs + 404; 20-URL set covers every distinct template (`pages.txt`)
+- [ ] Baseline Lighthouse sweep, mobile+desktop (bg `lh-baseline.sh` → `baseline/summary.csv`)
+- [ ] Atlas: architecture census (templates↔URLs, enqueue map, perf hazards) → `architecture-census.md`
+- [ ] Pixel: visual audit all 20 pages mobile+desktop (headers/heroes) → `visual-audit.md`
+- [ ] Triage: baseline + census + visual → ranked fix list
+- [ ] Fix wave(s): Bolt=perf, Pixel=visual, Atlas=structure, Access=a11y/SEO; source edit → rebuild .min
+- [ ] Sweep: lint:php + npm run build + php -l + scope diff clean
+- [ ] Deploy from MAIN checkout only (17 riders; standing auth post-sweep, show manifest)
+- [ ] Sentinel: independent live re-verify (fresh Lighthouse + Playwright mobile/desktop, console clean)
+- [ ] Loop until every page ≥90 all categories + visual pass; final 30-page confirmation sweep + report
+
 ## DONE — golden-fixture CI wiring for character_pipeline, spec DoD #2 (2026-07-10)
 
 Plan-mode task (2 Explore agents + 1 Plan agent dispatched first). Built

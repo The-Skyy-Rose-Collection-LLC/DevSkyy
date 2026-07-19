@@ -257,7 +257,6 @@ defined( 'ABSPATH' ) || exit;
 
 <?php get_template_part( 'template-parts/size-guide-modal' ); ?>
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
-<?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
 <?php
 // Skyy mascot — reinstated v1.9.0 with finalized character art. Gated on the
 // Customizer kill switch (live by default), checkout always excluded.
