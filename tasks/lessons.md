@@ -179,3 +179,22 @@ In a SPARSE worktree, `build_asset_manifest.py` hashes only checked-out files �
 
 ## 2026-07-18 — QC fine per-detail features on FULL-RES crops, never contact sheets
 Called br-009 back "3" as "still has rose" from a 520px-cell contact sheet; a full-res 2x zoom proved it was plain white (fix had landed). Downscaled QC sheets are fine for layout/presence checks but LOSE fine distinctions (plain digit vs rose-filled digit, small lettering weight). For any per-digit/per-region fidelity call, crop the region from the ORIGINAL render and view at ≥1x. Cost of the miss: told founder "UNACCEPTABLE", sent a deep-research tangent, for a render that was already correct.
+
+## 2026-07-18 — sg-015 "sweatsuit" was a contact-sheet misread (recurring)
+Called sg-015 "STILL the sweatsuit / needs re-render" off a 320px montage tile. Founder showed the
+full-res renders: they ARE nylon windbreakers (shell sheen, crinkle, elastic bands, structured hood).
+Same failure as the br-009 back misread (lesson b17997fa5): garment fabric/type verdicts MUST come
+from full-res single-image reads, NEVER downscaled contact sheets. Contact sheets are for LOCATING a
+shot in a timeline, not judging fabric/print/colorway. Cost of the miss: almost spent $0.80 + a
+dossier edit on a render that was already correct. Rule: before any "render is wrong → re-render"
+call, open the actual full-res PNG.
+
+## 2026-07-18 — TWO STANDING RULES LOCKED (founder-mandated)
+1. **Every paid call requires its own explicit "y".** No batch pre-approval. Each render / audio /
+   video / paid API call = its own STOP-AND-SHOW manifest + its own y, immediately before firing.
+   Menu selection or a prior y on another call is NOT approval. One manifest → one y → one call.
+2. **Full-res-only QC (blocking).** Never call a render/garment/print/colorway/fabric right or wrong
+   from a contact sheet or montage tile — open the full-res PNG. Contact sheets only locate shots in
+   a timeline. No full-res look = no verdict, and never trigger a paid re-render off a downscaled read.
+Recorded in CLAUDE.md (STOP-AND-SHOW, founder-mandated 2026-07-18 block) + memory
+(feedback_every_paid_call_needs_y, feedback_fullres_only_qc).

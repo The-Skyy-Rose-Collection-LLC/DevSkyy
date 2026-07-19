@@ -376,6 +376,21 @@ For ambiguous tasks: state your interpretation, execute against it. Don't ask fo
 
 Before taking any of the actions below, Claude MUST stop, print exactly what it is about to do, and wait for explicit "y" or "yes" from the user. No exceptions. Apologizing after is not acceptable — the damage is already done.
 
+> **FOUNDER-MANDATED 2026-07-18 — two standing rules, absolute:**
+>
+> 1. **EVERY paid call requires its own explicit "y" — NO batch pre-approval.** Each individual paid
+>    API call (each OpenAI/GPT-Image render, each Higgsfield generate/audio/video/reframe, any
+>    per-image or per-token spend) gets its OWN STOP-AND-SHOW manifest + its OWN "y" immediately
+>    before firing. Selecting a task from a menu, approving a plan, or a prior "y" on a different call
+>    is NOT approval to spend. One manifest → one y → one call. Never chain paid calls under a single
+>    approval.
+> 2. **FULL-RES-ONLY QC — never judge a render from a contact sheet.** Any verdict that a render/
+>    garment/print/colorway/fabric is right OR wrong MUST come from opening the actual full-resolution
+>    PNG (vision). Downscaled contact sheets / montage tiles are ONLY for locating a shot in a
+>    timeline — NEVER for fidelity verdicts, and NEVER as the basis for a "re-render" decision (which
+>    would trigger paid spend). This is blocking: no full-res look = no verdict. (Recurring misses:
+>    br-009 back-digit, sg-015 "sweatsuit" false alarm that nearly spent $0.80.)
+
 ### Actions that require explicit confirmation BEFORE execution:
 
 **Money / Credits**
