@@ -4384,6 +4384,44 @@
   },
   {
     "id": "bug-264",
+    "timestamp": "2026-07-17",
+    "error_message": "SIGSEGV (EXC_BAD_ACCESS) crashed on child side of fork pre-exec \u2014 companion ID to bug-263, referenced in commits b09572992 / 641955c29 (macOS fork-path SIGSEGV in test subprocesses) but never written to buglog.json.",
+    "file": "conftest.py",
+    "root_cause": "Same family as bug-263: macOS Objective-C runtime fork-unsafety in subprocess spawn paths under pytest.",
+    "fix": "posix_spawn path resolution + cwd removal in subprocess calls (landed with bug-263 layers 3+4 on main via PR #756/#760). Entry backfilled 2026-07-19 after ID-collision discovery.",
+    "tags": [
+      "macos",
+      "fork",
+      "sigsegv",
+      "pytest",
+      "backfilled"
+    ],
+    "related_bugs": [
+      "bug-263"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-17"
+  },
+  {
+    "id": "bug-265",
+    "timestamp": "2026-07-16",
+    "error_message": "scroll-world: page scroll frozen \u2014 wp_localize_script stringified scalar config values, breaking the scroll-scrub engine's numeric config (referenced in claude-mem obs 25666 but never written to buglog.json).",
+    "file": "renders/scroll-world (site scaffold, uncommitted)",
+    "root_cause": "wp_localize_script casts scalars to strings; numeric scroll config arrived as strings and the scrub math silently failed.",
+    "fix": "Passed config via wp_add_inline_script JSON (or cast client-side). Entry backfilled 2026-07-19 after ID-collision discovery; see scroll-world session for exact patch.",
+    "tags": [
+      "wordpress",
+      "wp_localize_script",
+      "scroll-world",
+      "type-coercion",
+      "backfilled"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-16"
+  },
+  {
+    "id": "bug-266",
     "timestamp": "2026-07-19",
     "error_message": "Malformed CSS rule live on skyyrose.co: style.css full-bleed-hero padding reset missing opening '{' (selector list ends with comma, then 'padding-top: 0; }'). Per CSS error recovery the bad prelude consumes through the next '{', ALSO killing the .homepage-v2 .site-header/.site-footer display:none rule.",
     "file": "wordpress-theme/skyyrose-flagship/style.css",
@@ -4402,7 +4440,7 @@
     "last_seen": "2026-07-19"
   },
   {
-    "id": "bug-265",
+    "id": "bug-267",
     "timestamp": "2026-07-19",
     "error_message": "Duplicate mobile bottom nav on every live page: footer.php included template-parts/mobile-bottom-nav twice (line 253 inside footer landmark per WS4 acceptance, and stale line 260 after #page).",
     "file": "wordpress-theme/skyyrose-flagship/footer.php",
