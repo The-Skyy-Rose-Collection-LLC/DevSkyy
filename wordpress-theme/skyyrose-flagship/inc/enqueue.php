@@ -144,6 +144,21 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
+	// Footer CRO section (template-parts/footer-cro.php) — the part is included
+	// unconditionally from footer.php, so its stylesheet belongs in the head.
+	// Its previous in-part late print painted the section unstyled first, the
+	// dominant CLS source on short pages (cart 0.49 / wishlist 0.40 — Wave 1).
+	// The part's own register+print becomes a no-op once this head enqueue runs.
+	$fcro_css_file = $use_min && file_exists( $base_dir . '/footer-cro.min.css' ) ? 'footer-cro.min.css' : 'footer-cro.css';
+	if ( file_exists( $base_dir . '/' . $fcro_css_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-footer-cro',
+			$base_uri . '/' . $fcro_css_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
 	// Mobile bottom navigation bar (hidden via CSS on desktop ≥769px).
 	$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
 	if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
@@ -176,30 +191,33 @@ function skyyrose_enqueue_global_styles() {
 	);
 
 	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/size-guide.css' ) ) {
+	$size_guide_file = $use_min && file_exists( $base_dir . '/size-guide.min.css' ) ? 'size-guide.min.css' : 'size-guide.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $size_guide_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-size-guide',
-			$base_uri . '/size-guide.css',
+			$base_uri . '/' . $size_guide_file,
 			array(),
 			SKYYROSE_VERSION
 		);
 	}
 
 	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/luxury-cursor.css' ) ) {
+	$cursor_css_file = $use_min && file_exists( $base_dir . '/luxury-cursor.min.css' ) ? 'luxury-cursor.min.css' : 'luxury-cursor.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $cursor_css_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-luxury-cursor',
-			$base_uri . '/luxury-cursor.css',
+			$base_uri . '/' . $cursor_css_file,
 			array(),
 			SKYYROSE_VERSION
 		);
 	}
 
 	// Skeleton loading states — shimmer placeholders for images and cards.
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/skeleton.css' ) ) {
+	$skeleton_file = $use_min && file_exists( $base_dir . '/skeleton.min.css' ) ? 'skeleton.min.css' : 'skeleton.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $skeleton_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-skeleton',
-			$base_uri . '/skeleton.css',
+			$base_uri . '/' . $skeleton_file,
 			array(),
 			SKYYROSE_VERSION
 		);
@@ -243,24 +261,11 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
-	// collection lockup. Loaded in <head> on content templates so this above-the-fold
-	// part never flashes unstyled. Skipped on lightweight slugs that never host it.
-	$hero_file = $use_min && file_exists( $base_dir . '/hero-cinematic.min.css' )
-		? 'hero-cinematic.min.css' : 'hero-cinematic.css';
-	$hero_skip = in_array(
-		skyyrose_get_current_template_slug(),
-		array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' ),
-		true
-	);
-	if ( ! $hero_skip && file_exists( $base_dir . '/' . $hero_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-hero-cinematic',
-			$base_uri . '/' . $hero_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// hero-cinematic.css enqueue removed (perf wave 2026-07-19): the part it
+	// styles (template-parts/hero-cinematic.php) has zero get_template_part
+	// callers — every template renders its own hero — so the sheet was a dead
+	// render-blocking request on all non-lightweight pages. If a template ever
+	// adopts the part, re-enqueue the stylesheet gated to that template's slug.
 }
 
 /**

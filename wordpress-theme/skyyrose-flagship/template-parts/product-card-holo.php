@@ -143,7 +143,7 @@ $index = (int) ( $args['index'] ?? 0 );
 			?>
 			<button type="button" class="holo__buy"
 				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
-				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to cart', 'skyyrose' ), $title ) ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name. Must start with the visible "Add to Cart" text (WCAG 2.5.3 Label in Name). */ __( 'Add to Cart: %s', 'skyyrose' ), $title ) ); ?>"
 				<?php disabled( $product_id <= 0 ); ?>>
 				<?php esc_html_e( 'Add to Cart', 'skyyrose' ); ?>
 			</button>

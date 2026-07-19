@@ -49,6 +49,9 @@ if ( woocommerce_product_loop() ) {
 	 */
 	do_action( 'woocommerce_before_shop_loop' );
 
+	// Bridge the h1 (archive header) → h3 (product-card names) heading gap for AT users.
+	echo '<h2 class="screen-reader-text">' . esc_html__( 'Products', 'skyyrose' ) . '</h2>';
+
 	woocommerce_product_loop_start();
 
 	if ( wc_get_loop_prop( 'total' ) ) {

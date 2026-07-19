@@ -51,11 +51,17 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	var returnFocus = document.activeElement || document.body;
 	if ( ! banner || ! accept || ! decline ) return;
 	banner.classList.remove( 'cookie-consent--hidden' );
+	// Clearance contract: while the banner is visible, <html> carries this
+	// class so fixed bottom widgets (mascot, recall pill) read
+	// --skyyrose-consent-clearance and lift above the banner instead of
+	// being covered by it (cookie-consent.css defines the var).
+	document.documentElement.classList.add( 'skyyrose-consent-open' );
 	// Move focus to accept button so keyboard users reach the dialog immediately.
 	setTimeout( function() { accept.focus( { preventScroll: true } ); }, 100 );
 	function dismiss( value ) {
 		localStorage.setItem( 'skyyrose_cookie_consent', value );
 		banner.classList.add( 'cookie-consent--hidden' );
+		document.documentElement.classList.remove( 'skyyrose-consent-open' );
 		// Return focus to where it was before the dialog appeared.
 		if ( returnFocus && typeof returnFocus.focus === 'function' ) {
 			returnFocus.focus();

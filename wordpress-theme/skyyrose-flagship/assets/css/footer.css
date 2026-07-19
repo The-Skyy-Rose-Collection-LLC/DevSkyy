@@ -72,7 +72,7 @@
 	min-height: 44px;
 	background: var(--skyyrose-accent, #B76E79);
 	border: none;
-	color: #fff;
+	color: #0A0A0A; /* dark ink on rose gold = 5.2:1; white was 3.8:1 — matches the gold hover treatment */
 	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.8125rem;
 	font-weight: 600;

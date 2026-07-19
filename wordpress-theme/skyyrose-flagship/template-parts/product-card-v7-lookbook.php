@@ -51,8 +51,9 @@ if ( $v7_product instanceof WC_Product ) {
 		: esc_html( '$' . number_format( (float) $v7['price'], 2 ) );
 }
 ?>
-<article class="v7card" role="listitem" data-collection="<?php echo esc_attr( $v7_collection ); ?>" data-sku="<?php echo esc_attr( $v7_sku ); ?>">
-	<a class="v7card__frame" href="<?php echo esc_url( $v7_permalink ); ?>" aria-label="<?php echo esc_attr( $v7_name ); ?>">
+<article class="v7card" data-collection="<?php echo esc_attr( $v7_collection ); ?>" data-sku="<?php echo esc_attr( $v7_sku ); ?>">
+	<?php // Badge text is the frame link's only visible text — the accessible name must contain it (WCAG 2.5.3 Label in Name). ?>
+	<a class="v7card__frame" href="<?php echo esc_url( $v7_permalink ); ?>" aria-label="<?php echo esc_attr( $v7_badge ? $v7_badge . ' — ' . $v7_name : $v7_name ); ?>">
 		<?php if ( $v7_lockup ) : ?>
 			<?php
 			// Double background-image declaration = cascade fallback: browsers

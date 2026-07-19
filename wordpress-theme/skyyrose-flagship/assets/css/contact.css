@@ -306,6 +306,7 @@
 
 .contact-form__group--order-number.is-hidden {
 	opacity: 0.4;
+	visibility: hidden; /* a dimmed-but-visible labeled input fails contrast AND stays in the AT tree */
 	pointer-events: none;
 }
 
@@ -388,7 +389,7 @@
 /* Placeholder */
 .contact-form__input::placeholder,
 .contact-form__textarea::placeholder {
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.6); /* ≥4.5:1 on the near-black input surface (0.5 measured 3.7:1) */
 }
 
 /* ==========================================================================
@@ -485,7 +486,7 @@
 	justify-content: center;
 	width: 100%;
 	padding: 1.2rem 2rem;
-	background: linear-gradient(135deg, var(--contact-dark-rose), var(--contact-rose-gold));
+	background: linear-gradient(135deg, var(--contact-dark-rose), #A4626C); /* light end darkened from #B76E79 so white ink passes 4.5:1 across the whole gradient (dark ink would fail the #9A5662 end) */
 	color: #fff;
 	border: none;
 	border-radius: 4px;

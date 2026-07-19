@@ -271,7 +271,7 @@ if ( $first_slug ) {
 		data-collection="<?php echo esc_attr( $args['collection'] ); ?>"
 		<?php endif; ?>
 	>
-		<div class="product-grid__items" role="list">
+		<div class="product-grid__items">
 			<?php
 			$index              = 0;
 			$permalink_override = ! empty( $args['permalink'] ) ? (string) $args['permalink'] : '';

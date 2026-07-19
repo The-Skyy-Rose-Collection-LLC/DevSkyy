@@ -455,6 +455,7 @@
 .lp-pane__mobile-img {
 	width: 100%;
 	max-width: 320px;
+	height: auto; /* square renders carry width=480 height=600 attrs — without this the 4:5 attr ratio distorts them */
 	border-radius: 2px;
 	display: block;
 }

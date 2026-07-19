@@ -49,16 +49,25 @@ function skyyrose_dequeue_woocommerce_styles( $enqueue_styles ) {
  */
 function skyyrose_preload_fonts() {
 	$fonts_dir = SKYYROSE_ASSETS_URI . '/fonts';
+	$slug      = function_exists( 'skyyrose_get_current_template_slug' ) ? skyyrose_get_current_template_slug() : '';
 	?>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/archivo-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/hanken-grotesk-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/anton-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<?php
+	// Inter's only canonical use is 404.css (--ff-system). As of this deploy
+	// train (2026-07-19) Pixel repoints the body-font stacks that previously
+	// fell back to Inter sitewide (undefined --font-body var + cookie-consent
+	// primary) at Hanken Grotesk, so a sitewide Inter preload would be a
+	// wasted 48KB fetch — preload it only where it still renders.
+	if ( '404' === $slug ) {
+		?>
+		<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+		<?php
+	}
 	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
 	// templates). Skip the preload elsewhere so non-BR pages don't waste
 	// bandwidth on a font they never render.
-	$slug = function_exists( 'skyyrose_get_current_template_slug' ) ? skyyrose_get_current_template_slug() : '';
 	if ( in_array( $slug, array( 'collection', 'collection-standalone', 'immersive' ), true ) ) {
 		$queried = get_queried_object();
 		$is_br   = $queried && isset( $queried->post_name )
@@ -260,6 +269,44 @@ function skyyrose_remove_jquery_migrate( $scripts ) {
 }
 
 /**
+ * Whether the current template is a theme-owned surface that never renders
+ * post content.
+ *
+ * Verified by grep (2026-07-19): only page.php, single.php, search.php and
+ * the template-elementor-*.php shells call the_content() — every other
+ * template hardcodes its markup. On those templates, block markup stored in
+ * the page's (unrendered) content must not force block/plugin stylesheets
+ * onto the page, and content-driven features (Jetpack sharing) can never
+ * appear.
+ *
+ * @since 1.11.2
+ * @return bool True when the current template never calls the_content().
+ */
+function skyyrose_template_never_renders_content() {
+	$slug = function_exists( 'skyyrose_get_current_template_slug' )
+		? skyyrose_get_current_template_slug() : '';
+
+	$never_renders = array(
+		'front-page',
+		'collection-standalone',
+		'collections-index',
+		'kc-launch',
+		'landing',
+		'immersive',
+		'preorder-gateway',
+		'experiences',
+		'about',
+		'contact',
+		'faq',
+		'shipping-returns',
+		'size-guide',
+		'404',
+	);
+
+	return in_array( $slug, $never_renders, true );
+}
+
+/**
  * Dequeue Gutenberg block library styles on pages that don't use blocks.
  *
  * The wp-block-library stylesheet (~40 KB) is loaded globally. On pages
@@ -267,6 +314,9 @@ function skyyrose_remove_jquery_migrate( $scripts ) {
  * this is wasted bandwidth.
  *
  * @since 6.6.0
+ * @since 1.11.2 has_blocks() bypass for templates that never render content —
+ *               the front page's stored block markup kept wc-blocks.css +
+ *               global-styles on a page that never calls the_content().
  * @return void
  */
 function skyyrose_dequeue_block_styles() {
@@ -274,8 +324,11 @@ function skyyrose_dequeue_block_styles() {
 		return;
 	}
 
-	// Keep block styles on pages that actually use blocks.
-	if ( function_exists( 'has_blocks' ) && has_blocks() ) {
+	// Keep block styles on pages that actually use blocks. Templates that
+	// never call the_content() can't render blocks regardless of what the
+	// stored page content contains, so they skip this check.
+	if ( ! skyyrose_template_never_renders_content()
+		&& function_exists( 'has_blocks' ) && has_blocks() ) {
 		return;
 	}
 
@@ -310,18 +363,34 @@ function skyyrose_dequeue_jetpack_non_context_styles() {
 	}
 
 	// Search chunk styles — only meaningful on search results pages.
+	// results-list + filter-wc-attribute are the handles actually observed on
+	// the live homepage (2026-07-19); the first three never matched anything.
 	if ( ! is_search() ) {
 		wp_dequeue_style( 'jetpack-search-widget' );
 		wp_dequeue_style( 'jetpack-instant-search' );
 		wp_dequeue_style( 'jetpack-search-chunk' );
+		wp_dequeue_style( 'jetpack-search-results-list-style' );
+		wp_dequeue_style( 'jetpack-search-filter-wc-attribute-style' );
 	}
 
 	// Podcast player — theme has no podcast pages; safe to remove globally.
 	wp_dequeue_style( 'jetpack-podcast-player' );
 
+	// Podcast episode block style (live handle, enqueued sitewide by wpcomsh).
+	// Fail-closed: kept on any page that actually embeds a podcast block.
+	if ( ! has_block( 'jetpack/podcast-player' ) && ! has_block( 'jetpack/podcast-episode' ) ) {
+		wp_dequeue_style( 'jetpack-block-podcast-episode' );
+	}
+
 	// Jetpack / Grunion contact forms — theme uses Elementor for contact pages.
 	wp_dequeue_style( 'grunion-front-end' );
 	wp_dequeue_style( 'jetpack-forms' );
+
+	// Forms layout css (live handle). Fail-closed: kept where a Jetpack
+	// contact-form block is actually present in the page content.
+	if ( ! has_block( 'jetpack/contact-form' ) ) {
+		wp_dequeue_style( 'jetpack-forms-layout' );
+	}
 
 	// MediaElement.js — only required for native audio/video blocks.
 	// Theme uses YouTube embeds and custom Three.js scenes; no native players.
@@ -329,6 +398,71 @@ function skyyrose_dequeue_jetpack_non_context_styles() {
 		wp_dequeue_style( 'wp-mediaelement' );
 		wp_dequeue_script( 'wp-mediaelement' );
 		wp_dequeue_script( 'mediaelement' );
+	}
+}
+
+/**
+ * Dequeue platform/plugin stylesheets that load sitewide but are only
+ * consumed on specific surfaces.
+ *
+ * Handle list verified against the live homepage (cache-busted curl,
+ * 2026-07-19 — 15 plugin sheets loaded, most unused). Every dequeue is
+ * conditional on the surface that actually consumes the stylesheet, so a
+ * page that renders the feature keeps its styles (fail-closed).
+ *
+ * Registered on wp_enqueue_scripts AND wp_footer priority 1: several of
+ * these handles (sharing, wc-blocks, Stripe) are enqueued mid-render and
+ * print in the footer, where a head-time dequeue never sees them.
+ *
+ * @since 1.11.2
+ * @return void
+ */
+function skyyrose_dequeue_platform_styles() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	// wp.com masterbar bridge CSS — toolbar chrome for logged-in wp.com users.
+	if ( ! is_user_logged_in() ) {
+		wp_dequeue_style( 'wp-calypso-bridge-masterbar' );
+	}
+
+	// Per-block styles wpcomsh enqueues globally; keep only where the block renders.
+	if ( ! has_block( 'core/code' ) ) {
+		wp_dequeue_style( 'wp-block-code' );
+	}
+	if ( ! has_block( 'jetpack/layout-grid' ) ) {
+		wp_dequeue_style( 'jetpack-layout-grid' );
+	}
+
+	// Stripe blocks-checkout styles — only cart/checkout surfaces use them.
+	$is_wc_money_page = ( function_exists( 'is_cart' ) && is_cart() )
+		|| ( function_exists( 'is_checkout' ) && is_checkout() );
+	if ( ! $is_wc_money_page ) {
+		wp_dequeue_style( 'wc-stripe-blocks-checkout-style' );
+	}
+
+	// Jetpack sharing buttons render via the_content() / WC product hooks —
+	// templates that never render post content can never show them.
+	if ( skyyrose_template_never_renders_content() ) {
+		wp_dequeue_style( 'sharedaddy' );
+		wp_dequeue_style( 'social-logos' );
+	}
+
+	// Elementor frontend + kit/post CSS — only needed when Elementor built
+	// the current page. skyyrose_builder_owns_template() asks Elementor's own
+	// document registry, so genuine Elementor pages keep their styles.
+	if ( function_exists( 'skyyrose_builder_owns_template' ) && ! skyyrose_builder_owns_template() ) {
+		wp_dequeue_style( 'elementor-frontend' );
+		global $wp_styles;
+		if ( $wp_styles instanceof WP_Styles ) {
+			$queued = (array) $wp_styles->queue;
+			foreach ( $queued as $queued_handle ) {
+				if ( 0 === strpos( $queued_handle, 'elementor-post-' ) ) {
+					wp_dequeue_style( $queued_handle );
+				}
+			}
+		}
 	}
 }
 
@@ -363,3 +497,14 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_block_styles', 100 );
 
 // Dequeue Jetpack feature styles not needed outside their context (search, podcast, forms, MediaElement).
 add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_jetpack_non_context_styles', 101 );
+
+// Dequeue surface-specific platform styles (masterbar, Elementor, Stripe, sharing, per-block).
+add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_platform_styles', 102 );
+
+// Footer pass: wc-blocks, sharing, and Stripe styles are enqueued mid-render
+// and print in the footer — re-run the dequeues before footer printing. All
+// wp_dequeue_style() calls are no-ops when already dequeued, so the double
+// registration is safe.
+add_action( 'wp_footer', 'skyyrose_dequeue_block_styles', 1 );
+add_action( 'wp_footer', 'skyyrose_dequeue_jetpack_non_context_styles', 1 );
+add_action( 'wp_footer', 'skyyrose_dequeue_platform_styles', 1 );

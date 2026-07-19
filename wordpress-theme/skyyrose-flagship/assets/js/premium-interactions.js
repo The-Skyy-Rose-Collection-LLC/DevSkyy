@@ -40,18 +40,27 @@
 	   1. SPLIT-TEXT ENGINE
 	   Wraps text into spans for per-character/word/line animation.
 	   Uses only createElement + textContent (no innerHTML).
-	   Preserves aria-label on parent, sets aria-hidden on spans.
+	   A .screen-reader-text copy carries the full text (aria-label is
+	   prohibited on role-less elements like <p>); animated spans are
+	   aria-hidden.
 	   ══════════════════════════════════════════════════════════════════ */
 
 	function clearChildren(el) {
 		while (el.firstChild) { el.removeChild(el.firstChild); }
 	}
 
+	function appendSrText(el, text) {
+		var sr = document.createElement('span');
+		sr.className = 'screen-reader-text';
+		sr.textContent = text;
+		el.appendChild(sr);
+	}
+
 	function splitChars(el) {
 		var text = el.textContent.trim();
 		if (!text) return;
-		el.setAttribute('aria-label', text);
 		clearChildren(el);
+		appendSrText(el, text);
 		var idx = 0;
 		for (var i = 0; i < text.length; i++) {
 			var ch = text[i];
@@ -69,9 +78,9 @@
 	function splitWords(el) {
 		var text = el.textContent.trim();
 		if (!text) return;
-		el.setAttribute('aria-label', text);
 		var words = text.split(/\s+/);
 		clearChildren(el);
+		appendSrText(el, text);
 		words.forEach(function (word, i) {
 			var span = document.createElement('span');
 			span.className = 'sr-word';
@@ -85,9 +94,9 @@
 	function splitLines(el) {
 		var text = el.textContent.trim();
 		if (!text) return;
-		el.setAttribute('aria-label', text);
 		var lines = text.split('\n');
 		clearChildren(el);
+		appendSrText(el, text);
 		lines.forEach(function (line, i) {
 			var trimmed = line.trim();
 			if (!trimmed) return;

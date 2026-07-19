@@ -137,13 +137,21 @@
 	--gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
 
 	/* --- §1.12  Typography — Font stacks (legacy aliases) ----------
-	   Single source of truth = --skyyrose-font-display (defined in §2).
-	   --font-heading / --font-headline / --ff-* are back-compat aliases
-	   consumed by woocommerce, footer, immersive, generic-pages, cart,
-	   checkout, search-results, homepage-v2/v7, product-grid. Do NOT
-	   add new declarations here — extend --skyyrose-font-* instead. */
+	   Single source of truth = --skyyrose-font-* (generated in §2 from
+	   data/brand/typography.json — see data/gen-design-tokens.py).
+	   --font-* / --ff-* are back-compat aliases consumed by style.css
+	   (body/base typography), woocommerce, footer, immersive,
+	   generic-pages, cart, checkout, search-results, homepage-v2/v7,
+	   product-grid, kids-capsule, skeleton. Every --font-*/--ff-* name
+	   referenced by a var() MUST be aliased here — an undefined var
+	   fails silent to its fallback (bug-271: --font-body missing put
+	   Inter body text on 19/20 pages). Do NOT add new canonical tokens
+	   here — extend --skyyrose-font-* instead. */
 	--font-heading:  var(--skyyrose-font-display);
 	--font-headline: var(--font-heading);
+	--font-body:     var(--skyyrose-font-body);
+	--font-display:  var(--skyyrose-font-display);
+	--font-ui:       var(--skyyrose-font-ui);
 	--ff-brand:     var(--skyyrose-font-display);
 	--ff-editorial: var(--skyyrose-font-display);
 	--ff-body:      var(--skyyrose-font-body);

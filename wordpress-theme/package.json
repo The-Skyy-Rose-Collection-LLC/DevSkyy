@@ -36,9 +36,10 @@
     "skyyrose-flagship"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:js",
+    "build": "npm run build:editorial && npm run build:css && npm run build:js",
     "build:css": "node skyyrose-flagship/scripts/build-css.js",
     "build:js": "node skyyrose-flagship/scripts/build-js.js",
+    "build:editorial": "node skyyrose-flagship/scripts/build-editorial-index.js",
     "clean": "find skyyrose-flagship/assets -type f \\( -name '*.min.css' -o -name '*.min.js' \\) -delete && echo 'Cleaned minified assets.'",
     "rebuild": "npm run clean && npm run build",
     "lint": "npm run lint:php && npm run lint:css",

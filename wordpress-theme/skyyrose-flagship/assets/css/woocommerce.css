@@ -159,7 +159,7 @@
 	display: block;
 	text-align: center;
 	background: var(--skyy-woo-accent);
-	color: #fff;
+	color: #0A0A0A; /* dark ink on rose gold = 5.2:1; white was 3.8:1 */
 	border: none;
 	padding: 12px;
 	font-size: 0.8rem;
@@ -279,10 +279,53 @@
 }
 
 /* ==================================================
+   SHOP ARCHIVE CONTAINER
+   The theme WC wrapper (inc/woocommerce.php skyyrose_woocommerce_wrapper_before)
+   outputs #primary.content-area with no container styles — without these the
+   products header, notices, and grid render flush at x=0 (audit D2/D8).
+   Scoped to archive surfaces only: single product, cart, and checkout own
+   their layout in their page-specific stylesheets/templates.
+   ================================================== */
+
+.woocommerce-shop #primary.content-area,
+.post-type-archive-product #primary.content-area,
+.tax-product_cat #primary.content-area,
+.tax-product_tag #primary.content-area {
+	max-width: 1600px;
+	margin-inline: auto;
+	padding: clamp(28px, 4vw, 56px) clamp(20px, 5vw, 64px) clamp(64px, 8vw, 120px);
+	box-sizing: border-box;
+}
+
+.woocommerce-products-header {
+	margin-bottom: clamp(20px, 3vw, 40px);
+}
+
+/* ==================================================
    SHOP ARCHIVE GRID — 3 columns (mirrors loop_shop_columns filter)
    WooCommerce adds columns-3 class to ul.products; these rules enforce
    the editorial 3-column density on the main shop/archive template.
    ================================================== */
+
+/* WC core woocommerce-layout.css (kept enqueued — see fix-log Wave 1) ships
+   float-era loop rules: li.product width 30.75% + clearfix ::before/::after
+   with display:table. Inside our grid the width shrinks every card to ~139px
+   of its 453px track, and the ::before becomes a phantom first grid item that
+   pushes card 1 into column 2 (audit D2). Neutralize both inside the grid. */
+.woocommerce ul.products::before,
+.woocommerce ul.products::after,
+.woocommerce-page ul.products::before,
+.woocommerce-page ul.products::after {
+	content: none;
+}
+
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
+	float: none;
+	clear: none;
+	width: auto;
+	margin: 0;
+}
 
 .woocommerce ul.products,
 .woocommerce-page ul.products {

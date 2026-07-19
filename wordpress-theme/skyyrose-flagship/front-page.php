@@ -202,11 +202,13 @@ get_header();
 					$hs_priority = ( 0 === $hs_pass && $hs_idx < 2 );
 					?>
 					<div class="hero-strip-item">
+						<?php // fetchpriority=low: decorative strip must never outrank the hero LCP fetch. ?>
 						<img src="<?php echo esc_url( $hs_img_url ); ?>"
 							alt=""
 							width="1024"
 							height="1536"
 							loading="<?php echo $hs_priority ? 'eager' : 'lazy'; ?>"
+							fetchpriority="low"
 							decoding="async">
 					</div>
 				<?php endforeach; ?>
@@ -521,7 +523,9 @@ $kc_link   = $kc_config['page_url'] ?? home_url( '/collections/kids-capsule/' );
 		<p class="kc-heir__sub"><?php esc_html_e( 'Not a fourth world. A letter to one. Hover to break the seal.', 'skyyrose' ); ?></p>
 	</div>
 
-	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0" aria-label="<?php esc_attr_e( 'You were born into the rose — open the letter, discover Kids Capsule', 'skyyrose' ); ?>">
+	<?php // No aria-label override: the visible letter text must be part of the accessible name (WCAG 2.5.3), so the name computes from content plus the sr-only destination hint below. ?>
+	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0">
+		<span class="screen-reader-text"><?php esc_html_e( 'Open the letter — discover the Kids Capsule collection.', 'skyyrose' ); ?></span>
 		<div class="kc-heir__envelope">
 			<div class="kc-heir__letter">
 				<div class="kc-heir__chapter"><?php esc_html_e( 'Chapter IV', 'skyyrose' ); ?></div>

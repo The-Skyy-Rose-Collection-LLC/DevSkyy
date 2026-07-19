@@ -13,6 +13,11 @@
 .v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
 .v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
 
+/* Text-on-dark ink: canon crimson #DC143C is 3.78:1 on #111 — small text uses the
+   design-tokens.css --skyyrose-accent-text derivative; surfaces keep --v7-accent. */
+.v7card { --v7-accent-ink: var(--v7-accent); }
+.v7card[data-collection="love-hurts"] { --v7-accent-ink: var(--skyyrose-accent-text, #FF5C7A); }
+
 .v7card {
 	position: relative;
 	background: #111;
@@ -113,14 +118,16 @@
 	padding: 4px 9px;
 	border-radius: 3px;
 }
+/* Crimson badge surface needs white ink (4.99:1) — dark ink is 3.97:1. Silver/gold badges keep dark ink (white would fail on those). */
+.v7card[data-collection="love-hurts"] .v7card__badge { color: #fff; }
 
 .v7card__meta { position: relative; z-index: 1; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
-.v7card__eyebrow { font-family: var(--v7-caps); letter-spacing: .26em; font-size: 10px; text-transform: uppercase; color: var(--v7-accent); }
+.v7card__eyebrow { font-family: var(--v7-caps); letter-spacing: .26em; font-size: 10px; text-transform: uppercase; color: var(--v7-accent-ink); }
 .v7card__name { font-family: 'Archivo', sans-serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
 .v7card__name a { color: #f5e6d3; text-decoration: none; }
 .v7card__name a:hover { color: var(--v7-accent); }
 .v7card__pricerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.v7card__price { font-family: 'Anton', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent); }
+.v7card__price { font-family: 'Anton', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent-ink); }
 .v7card__price del { opacity: .5; font-size: .85em; }
 .v7card__edition { font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .08em; color: #8a8175; }
 
@@ -157,7 +164,7 @@
 	font-size: 13px;
 	text-transform: uppercase;
 	text-align: center;
-	color: var(--v7-accent);
+	color: var(--v7-accent-ink);
 	background: transparent;
 	border: 1px solid var(--v7-accent);
 	border-radius: 8px;

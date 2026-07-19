@@ -1,7 +1,27 @@
 /* ==========================================================================
    Cookie Consent Banner
    Dark glass bar — fixed to viewport bottom, above mobile nav.
+
+   Bottom-chrome stacking/clearance contract (audit D5):
+     .mobile-nav (z 9000, 64px band, ≤768px)
+     < .skyyrose-mascot (z 9990, mascot.css)
+     < .cookie-consent (z 9998).
+   While the banner is visible, template-parts/cookie-consent.php puts
+   .skyyrose-consent-open on <html>; that class defines
+   --skyyrose-consent-clearance below, and every fixed bottom widget adds the
+   var to its bottom offset so the banner never covers it. The var collapses
+   to 0 the moment consent is resolved.
    ========================================================================== */
+
+.skyyrose-consent-open {
+	--skyyrose-consent-clearance: 76px;
+}
+
+@media (max-width: 768px) {
+	.skyyrose-consent-open {
+		--skyyrose-consent-clearance: 120px;
+	}
+}
 
 .cookie-consent {
 	position: fixed;
@@ -81,7 +101,7 @@
 
 .cookie-consent__btn--accept {
 	background: var(--color-rose-gold, #B76E79);
-	color: var(--color-text-primary, #fff);
+	color: var(--color-page-bg, #0A0A0A); /* dark ink on rose gold = 5.2:1; white was 3.8:1 — matches the hover treatment */
 	border: 1px solid var(--color-rose-gold, #B76E79);
 }
 
@@ -102,24 +122,31 @@
 	border-color: var(--color-rose-gold, #B76E79);
 }
 
-/* ---- Responsive ---- */
+/* ---- Responsive ----
+   Breakpoint matches .mobile-nav's 768px (mobile-bottom-nav.css) so the
+   banner offsets above the nav band on every viewport where the nav shows
+   (599px previously left 600-768px with the banner covering the nav).
+   Compact metrics: the banner + nav together were eating ~30% of a 390px
+   viewport (audit D5) — tighter type/padding keeps it under ~120px. */
 
-@media (max-width: 599px) {
+@media (max-width: 768px) {
 	.cookie-consent {
 		flex-direction: column;
 		align-items: stretch;
-		gap: 12px;
-		padding: 14px 16px;
+		gap: 10px;
+		padding: 12px 14px;
 		bottom: calc(64px + env(safe-area-inset-bottom));
 	}
 
-	.cookie-consent__actions {
-		justify-content: stretch;
+	.cookie-consent__message {
+		font-size: 12px;
+		line-height: 1.45;
 	}
 
 	.cookie-consent__btn {
 		flex: 1;
 		text-align: center;
+		padding: 9px 16px;
 	}
 }
 

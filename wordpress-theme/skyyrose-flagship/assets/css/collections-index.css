@@ -85,7 +85,7 @@
 	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 12px;
 	letter-spacing: 4px;
-	color: rgba(237, 230, 223, 0.4);
+	color: rgba(237, 230, 223, 0.55); /* ≥4.5:1 on #0F0F0F (0.4 measured 3.31:1) */
 	margin: 0 0 24px;
 }
 .ci-card__name { display: block; margin: 0 0 18px; }

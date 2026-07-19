@@ -444,7 +444,7 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--haze);
-	opacity: .75; /* AA contrast at rest (was .4 = 1.85:1) */
+	opacity: .88; /* AA 4.5:1 at rest — .75 × --haze(.55) computed #6C6C6C = 3.88:1 on #050505 */
 	transition: opacity .5s var(--ease-luxury), color .5s var(--ease-luxury);
 }
 .press-item:hover { opacity: 1; }

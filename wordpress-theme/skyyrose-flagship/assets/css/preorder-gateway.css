@@ -240,7 +240,7 @@
 
 .po-btn--primary {
   background: var(--po-accent);
-  color: var(--po-bg);
+  color: #0A0A0A; /* hard ink: var(--po-bg) resolves to cream in the hero context → 1.48:1 on silver; dark ink is 10.9:1 */
   padding: .9rem 2.2rem;
   border: 2px solid var(--po-accent);
 }
@@ -252,7 +252,7 @@
 
 .po-btn--primary-sm {
   background: var(--po-accent);
-  color: var(--po-bg);
+  color: #0A0A0A; /* same hard ink as .po-btn--primary */
   padding: .55rem 1.4rem;
   border: 2px solid var(--po-accent);
   font-size: .65rem;
@@ -501,7 +501,8 @@
 }
 
 .po-grid__lockup { max-width: 140px; }
-.po-grid__lockup img { width: 100%; }
+.po-grid__lockup img { width: 100%; height: auto; } /* lockup art isn't 200x60 — height:auto stops the attr ratio distorting it */
+.po-email-capture__art img { height: auto; } /* logo isn't square — same attr-ratio distortion guard */
 
 .po-grid__meta { text-align: right; }
 

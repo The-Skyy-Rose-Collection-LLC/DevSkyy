@@ -502,6 +502,27 @@ RSYNC_EXCLUDES=(
     --exclude='phpunit.xml'
     --exclude='playwright-report/'
     --exclude='screenshots/'
+    # data/ ships ONLY runtime-read files (allowlist + file:line evidence in
+    # tasks/wp-commercial-theme/architecture-census.md + fix-log.md Wave 1b):
+    # skyyrose-catalog.csv, v7-cards.json, site-guide.json, collections/*/sot.json,
+    # editorial-index.json. Everything below is internal (dossiers = Corey-authored
+    # render specs, previously world-readable — 2026-07-19) or build-time-only.
+    # Keep in sync with tar_excludes in try_rsync().
+    --exclude='data/dossiers'
+    --exclude='data/brand'
+    --exclude='data/brand-logos'
+    --exclude='data/product-references'
+    --exclude='data/*.py'
+    --exclude='data/*.bak*'
+    --exclude='data/product-embeddings.json'
+    --exclude='data/product-similarities.json'
+    --exclude='data/logo-registry.json'
+    --exclude='data/render-corrections.json'
+    --exclude='data/render-keepers.json'
+    --exclude='data/visual-manifest.json'
+    --exclude='data/collections/*/copy.md'
+    --exclude='data/collections/*/identity.json'
+    --exclude='data/collections/*/index.html'
 )
 
 # ---------------------------------------------------------------------------
@@ -563,6 +584,25 @@ try_rsync() {
         --exclude='.prettierrc*' --exclude='.editorconfig'
         --exclude='phpunit.xml' --exclude='playwright-report'
         --exclude='screenshots' --exclude='.serena'
+        # Theme-internal build tooling (mirrors RSYNC_EXCLUDES 'scripts/';
+        # the theme has exactly one scripts/ dir, at its root).
+        --exclude='scripts'
+        # Internal data/ files (dossiers = render specs, build inputs, QA
+        # artifacts) — runtime allowlist keeps only skyyrose-catalog.csv,
+        # v7-cards.json, site-guide.json, collections/*/sot.json,
+        # editorial-index.json. Keep in sync with RSYNC_EXCLUDES above.
+        --exclude='data/dossiers' --exclude='data/brand'
+        --exclude='data/brand-logos' --exclude='data/product-references'
+        --exclude='data/*.py' --exclude='data/*.bak*'
+        --exclude='data/product-embeddings.json'
+        --exclude='data/product-similarities.json'
+        --exclude='data/logo-registry.json'
+        --exclude='data/render-corrections.json'
+        --exclude='data/render-keepers.json'
+        --exclude='data/visual-manifest.json'
+        --exclude='data/collections/*/copy.md'
+        --exclude='data/collections/*/identity.json'
+        --exclude='data/collections/*/index.html'
     )
 
     # shellcheck disable=SC2086  # zstd_flag is intentionally word-split

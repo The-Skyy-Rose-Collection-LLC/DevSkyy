@@ -53,8 +53,9 @@ $back_model  = ! empty( $catalog_entry['back_model_image'] )
 	? skyyrose_product_image_uri( $catalog_entry['back_model_image'] )
 	: '';
 
-$garment_lock = $dossier['garment_type_lock'] ?? '';
-$branding     = $dossier['branding'] ?? array();
+// The dossier record is an eligibility gate ONLY. Dossier text fields
+// (garment locks, branding placement specs) are internal render-pipeline
+// instructions — never render them as consumer copy (2026-07-19 leak).
 $edition_size = (int) ( $catalog_entry['edition_size'] ?? 0 );
 $sizes_raw    = $catalog_entry['sizes'] ?? '';
 
@@ -67,8 +68,14 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 
 <article class="sr-editorial" data-collection="<?php echo esc_attr( $collection ); ?>">
 
+	<?php
+	// Chapters 1-2 are above the fold and contain the LCP element — they must
+	// never carry rv-* reveal classes: the resting state is hidden until deferred
+	// JS adds .is-visible, which stalls LCP behind the whole script queue
+	// (measured 24.9s render delay on mobile). Below-fold chapters keep reveals.
+	?>
 	<?php // ── Chapter 1: Encounter ─────────────────────────────────────── ?>
-	<section class="sr-ed__encounter rv-clip-up" role="region" aria-labelledby="sr-ed-encounter-h">
+	<section class="sr-ed__encounter" role="region" aria-labelledby="sr-ed-encounter-h">
 		<h2 id="sr-ed-encounter-h" class="screen-reader-text">
 			<?php echo esc_html( $product->get_name() ); ?>
 		</h2>
@@ -85,7 +92,7 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 	</section>
 
 	<?php // ── Chapter 2: The Piece ─────────────────────────────────────── ?>
-	<section class="sr-ed__piece rv-clip-up" role="region" aria-labelledby="sr-ed-piece-h">
+	<section class="sr-ed__piece" role="region" aria-labelledby="sr-ed-piece-h">
 		<span class="sr-ed__chapter-num"><?php esc_html_e( '02', 'skyyrose' ); ?></span>
 		<h2 id="sr-ed-piece-h" class="sr-ed__section-title">
 			<?php esc_html_e( 'The Piece', 'skyyrose' ); ?>
@@ -110,9 +117,6 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 				</span>
 			</aside>
 		<?php endif; ?>
-		<?php if ( $garment_lock ) : ?>
-			<p class="sr-ed__garment-lock"><?php echo esc_html( $garment_lock ); ?></p>
-		<?php endif; ?>
 		<?php if ( ! empty( $meta['material'] ) || ! empty( $meta['fit'] ) || $has_made_in ) : ?>
 			<div class="sr-ed__meta-row">
 				<?php if ( ! empty( $meta['material'] ) ) : ?>
@@ -133,18 +137,6 @@ $has_made_in = '' !== get_post_meta( $product->get_id(), '_skyyrose_made_in', tr
 						<span class="sr-ed__meta-value"><?php echo esc_html( strtoupper( $meta['made_in'] ) ); ?></span>
 					</div>
 				<?php endif; ?>
-			</div>
-		<?php endif; ?>
-		<?php if ( ! empty( $branding['front'] ) ) : ?>
-			<div class="sr-ed__branding-detail">
-				<h3 class="sr-ed__branding-label"><?php esc_html_e( 'Front', 'skyyrose' ); ?></h3>
-				<p><?php echo esc_html( $branding['front'] ); ?></p>
-			</div>
-		<?php endif; ?>
-		<?php if ( ! empty( $branding['back'] ) ) : ?>
-			<div class="sr-ed__branding-detail">
-				<h3 class="sr-ed__branding-label"><?php esc_html_e( 'Back', 'skyyrose' ); ?></h3>
-				<p><?php echo esc_html( $branding['back'] ); ?></p>
 			</div>
 		<?php endif; ?>
 		<?php if ( ! empty( $catalog_entry['description'] ) ) : ?>

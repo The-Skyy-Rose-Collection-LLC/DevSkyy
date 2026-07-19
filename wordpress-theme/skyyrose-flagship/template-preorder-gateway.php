@@ -181,7 +181,7 @@ get_header();
 			</p>
 		</header>
 
-		<div class="po-gateway__panels" role="list">
+		<div class="po-gateway__panels">
 			<?php
 			/* Portrait image map — from visual-manifest.json */
 			$po_portrait_map = array(
@@ -243,10 +243,10 @@ get_header();
 				$po_portrait = isset( $po_portrait_map[ $po_slug ] ) ? $po_portrait_map[ $po_slug ] : null;
 				$po_lockup   = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
 				?>
+				<?php // No list/listitem roles: aria-pressed is invalid on role="listitem", and the toggle semantics matter more than list semantics here. ?>
 				<button type="button"
 					class="po-panel po-panel--<?php echo esc_attr( $po_slug ); ?>"
 					data-collection="<?php echo esc_attr( $po_slug ); ?>"
-					role="listitem"
 					aria-label="<?php echo esc_attr( sprintf( /* translators: %s: collection label */ __( 'View %s collection', 'skyyrose' ), $po_col['label'] ) ); ?>">
 
 					<div class="po-panel__bg" aria-hidden="true">
