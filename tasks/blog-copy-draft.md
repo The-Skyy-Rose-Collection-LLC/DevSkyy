@@ -1,5 +1,117 @@
 # SkyyRose Blog Copy — Brand Story Post + Batch 1 Product Descriptions
-_Draft · 2026-06-29 · Description added 2026-07-01 · Batch 1 product copy added 2026-07-18_
+_Draft · 2026-06-29 · Description added 2026-07-01 · Batch 1 product copy added 2026-07-18 · Blog article added 2026-07-18 · Dossier corrections applied 2026-07-18 (S2695: br-009 back/sleeve spec, br-015 lettering) · Blog page description added 2026-07-18_
+
+---
+
+## BLOG PAGE DESCRIPTION
+
+**Blog page header copy** — renders above the post grid on `/blog` or `/journal`. ~60 words. No fluff.
+
+---
+
+This is where SkyyRose documents its work.
+
+Not press releases. Not trend reports. Drop announcements, design decisions, the thinking behind each piece — written by the people who built it. If you want to understand what we make and why we make it this way, start here.
+
+Oakland made us. The blog is the proof.
+
+---
+
+**Blog SEO description (≤155 chars):**
+> SkyyRose journal: drop announcements, design decisions, and the thinking behind Oakland's luxury streetwear brand. Luxury grows from concrete.
+
+*(143 chars)*
+
+---
+
+## BLOG POST ARTICLE — Batch 1 Launch
+
+**HEADLINE:** Oakland Built It. Now the Concrete Shows Its Work.
+
+**SUBHEAD:** Batch 1 is here. Four pieces. The renders are in. This is what they actually look like.
+
+**TAGS:** BlackRose · Signature · KidsCapsule · SkyyRose · OaklandMade
+
+---
+
+We don't announce releases with countdowns. We don't drip hints over six weeks to build hype for something that isn't finished. We build until it's right — and then we show you.
+
+Batch 1 is right.
+
+Four SKUs. Two from Black Rose. One from Signature. One from Kids Capsule. Every piece rendered against the actual garment spec — not a prototype, not a mood board, not a model in a studio approximating what the item will eventually look like. The garment, in light that doesn't negotiate.
+
+Here's what shipped.
+
+---
+
+### Black Rose: The Jersey Series
+
+Black Rose doesn't make clothing for looking like you belong somewhere. It makes clothing for people who already know they do.
+
+The jersey series started from a simple question: what does a jersey mean when it belongs to Oakland? Not a team. Not a season. Oakland itself — the version that doesn't have a stadium anymore, the version that kept going anyway.
+
+The answer is the BLACK is Beautiful series. Batch 1 brings two of them.
+
+**Last Oakland — #32 Jersey (Limited to 80 pieces)**
+
+The #32 in white. Front: rose fills both digits, alternating register. Back: the '2' alone carries the rose — the '3' stays plain. Sleeves: full '32' on each, both digits rose-filled. "BLACK IS BEAUTIFUL" across the back in white with a black border. Custom Football Patch, bottom-left.
+
+Before the Coliseum went quiet, Oakland had something that can't be relocated. You know what it is.
+
+The Last Oakland jersey isn't a tribute. It's a record. When they're gone, this edition is done. Black Rose does not do reprints.
+
+*$115 · S–3XL · Pre-Order · 80 pieces*
+
+**Baseball Classic — #0 (Limited to 250 pieces)**
+
+Zero is not nothing. Zero is where everything starts.
+
+The Baseball Classic in white is the foundation of the series — the one the other editions build from. Clean, black-accented, built on a silhouette that has earned its place across every era of the sport.
+
+White means you can see every decision. Every stitch is visible. That's intentional.
+
+*$100 · S–3XL · Pre-Order · 250 pieces*
+
+---
+
+### Signature: The Windbreaker Set
+
+The Bay has a climate of its own. Not cold, not warm — layered. The fog rolls in by 4pm and everyone who grew up here already knows which jacket you reach for.
+
+The Windbreaker Set is Signature's answer to that question. A premium two-piece — jacket and matching bottom — designed for movement. Not for occasions. For the person who is always somewhere between where they are and where they're going.
+
+Gold detailing. Elevated cut. West Coast logic.
+
+Signature doesn't make clothing for moments. It makes clothing for the life between them.
+
+*$85 · S–3XL · Pre-Order · 250 pieces*
+
+---
+
+### Kids Capsule: Colorblock Hoodie Set
+
+They're watching everything.
+
+The Kids Capsule exists because the kids in the neighborhood are paying attention — and they deserve the same quality their older siblings wear. Not a compromised version of it. This hoodie set carries the same embroidery weight, the same rose mark, the same construction discipline as anything else in the SkyyRose catalog.
+
+Lavender and purple V-chevron. Hoodie with embroidered Black Rose logo, left chest. Jogger with matching left-thigh mark. Right arm circular patch: *Skyy Rose · Collection* in a ring around the rose.
+
+Luxury is not a destination. It's an inheritance.
+
+*$65 · 2T–7 · Active · 150 pieces*
+
+---
+
+### How to Order
+
+Pre-order is open now on all four pieces. Batch 1 quantities are fixed — no restocks, no waitlist, no second run. When they're gone, they're gone.
+
+Shop at skyyrose.co
+
+---
+
+*SkyyRose — Oakland, CA*
+*Luxury grows from concrete.*
 
 ---
 
@@ -10,7 +122,7 @@ _Draft · 2026-06-29 · Description added 2026-07-01 · Batch 1 product copy add
 ### br-009 — BLACK is Beautiful Jersey #2: Last Oakland (Football)
 
 **Short description (WooCommerce PDP, ~50 words)**
-The Last Oakland edition of the #32 jersey. White with rose-filled alternating numbers — the '3' carries the rose, the '2' is plain. Custom Football Patch, bottom-left. 80 pieces. This one is not a jersey. It's a document.
+The Last Oakland edition of the #32 jersey. White with rose-filled numbers — both digits lit on the front and sleeves, the '2' alone carries the rose on the back. Custom Football Patch, bottom-left. 80 pieces. This one is not a jersey. It's a document.
 
 **Extended description (blog/editorial)**
 Before the Coliseum went quiet, Oakland had something that can't be relocated. You know what it is.
