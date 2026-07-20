@@ -683,3 +683,138 @@ branch so both halves degrade together. php -l clean; 480w candidate
 curl-verified 200 image/webp 46KB (vs 294KB flat AVIF). Home's biggest
 round-3 item (211KB uses-responsive) now closed — expect the largest single
 LCP improvement of the wave on home mobile.
+
+## Round 4 — post-v1.12.2 scorecard + ROOT CAUSE of the mobile ceiling (2026-07-20)
+Protocol-clean: cache gate confirmed stale=0/6 before the sweep started.
+Scores: a11y 97-100 (8 pages at 100) · BP 100 except PDP/cart 78-79 (3rd-party cookies) ·
+desktop perf 85-100 (about + wishlist = 100) · mobile perf 63-92.
+
+**Diagnosis — the mobile ceiling is ONE bug class, not many.** LCP phase breakdown (mobile):
+TTFB ~30ms cached (cart 1,982ms = uncacheable by design) and FCP ~1.6s are both healthy.
+LCP is consumed by:
+- **Render delay** (element in DOM, unpainted, waiting on deferred JS): shop 8,406ms ·
+  landing-BR 5,390 · kids 5,149 · shipping 4,417 · faq 4,289 · contact 3,539 · privacy 3,532 ·
+  wishlist 2,645 · collections 2,627 · BR 2,431. CAUSE: scroll-reveal utilities
+  (.po-rv/.rv-*/.col-reveal) set opacity:0 and wait for JS `.is-visible`
+  (preorder-gateway.css:1064 et al). Above-fold elements cannot paint until the script
+  queue drains. Same class as the PDP 24.9s bug — fixed piecemeal before, now systemic.
+- **Load delay** (LCP resource discovered late): home 3,823ms · BR 2,845 · landing-BR 2,381 ·
+  LH 2,127 · pre-order 1,642. Home is instructive: its LCP is the hero-STRIP img, not the
+  hero-bg we preload — so the preload targets a non-LCP element.
+Image bytes / TTFB / TBT are NOT the constraint. Wave 5 dispatched: Pixel3 (above-fold
+reveal gating + a CSS-only self-reveal safety net), Bolt (LCP resource discovery per template).
+
+## Wave 5 — Bolt: LCP load-delay (resource discovery) (2026-07-20)
+
+Every branch verified against round-4 `largest-contentful-paint-element` JSONs before any
+preload was added. Files: inc/enqueue.php, inc/enqueue-performance.php, front-page.php,
+template-landing-black-rose.php. php -l + PHPCS clean. All preload target URLs curl-verified
+200 on live before landing.
+
+**home (load delay 3,823ms)** — measured LCP = FIRST hero-strip img (Photon srcset), not the
+hero background. (a) enqueue.php front-page closure now ALSO preloads the first strip frame
+with byte-identical candidates (br-006 front via skyyrose_sot_product_image_uri +
+skyyrose_photon_srcset 320/480/1024, imagesizes "(max-width: 1000px) 140px, 220px" — pairing
+comments both sides); (b) front-page.php: first strip img fetchpriority low→high (Wave-1's
+blanket low now worked against the real LCP); other 11 frames stay low. Hero-bg preload kept —
+it still paints the full-viewport backdrop.
+
+**collection heroes (2,845/2,127/854ms)** — new `skyyrose_preload_template_lcp()` (wp_head:4)
+emits a responsive preload reproducing .col-hero__bg's exact srcset: same accessor as the
+template part (`skyyrose_get_collection_content`, NOT collections-config — caught during
+verification when hero_bg_base grep came back empty), same SOT-first hero_bg resolution, same
+480/768/1280/1680w webp entries, imagesizes 100vw; no-base fallback preloads the exact
+versioned src. KC (no hero bg) emits nothing — fail-closed by data.
+
+**landing-black-rose (2,381ms)** — exact-URL preload of black-roses-cloud-cluster.webp +
+fetchpriority=high added to the atmosphere img (had none). Gated to
+template-landing-black-rose.php specifically — other landings unmeasured, untouched.
+
+**pre-order (1,642ms)** — LCP element is the hero <video>; its painted image is the poster.
+Exact versioned poster URL (luxury-nighttime-1680w.jpg?v=…) preloaded on preorder-gateway.
+
+**collections index (1,439ms)** — LCP = first card's lockup (config order: black-rose).
+Preload reproduces the card's Photon srcset (br-brand-script-logotype.webp, 320/640/960,
+sizes "(max-width: 430px) 70vw, 300px").
+
+**about (1,142ms)** — the existing featured-image preload targeted the WRONG image (real LCP
+= hardcoded origin portrait, homepage-story-founder.webp). Fixed in
+skyyrose_preload_hero_image(): about now preloads the portrait URL; the wasted featured-image
+preload is gone. Collection templates also removed from that generic featured-image list —
+the new exact preloads supersede them (double-preload guard).
+
+**PDP (1,106ms)** — measured LCP = editorial encounter img (theme-asset catalog image), while
+the old branch preloaded the WC gallery attachment AND Photon-skipped, leaving no preload at
+all. Rewritten: mirrors single-product.php's own gates (skyyrose_get_product(sku) +
+dossier has_editorial_content) and preloads skyyrose_product_image_uri(entry.image); classic
+non-editorial PDPs keep the old gallery/Photon-skip behavior as fallback.
+
+**Not touched (text-LCP, Pixel3's render-delay lane):** cart, contact, faq, privacy,
+shipping-returns, shop, wishlist, kids-capsule (cookie-banner LCP).
+
+## Wave 5 — Pixel3 (above-fold reveal gating stripped sitewide + per-file CSS safety nets)
+
+**Root-cause refinement (verified against source + live markup):** the central 0.8s
+`srRevealSafety` net (animations-premium.css §12.5) already covers `rv-*`/`stagger-grid`/
+`col-reveal`/`lp-rv`/`.rv` — the 2.4-2.6s render delays (collections, black-rose, wishlist)
+are exactly "FCP + 0.8s net", i.e. the net firing, not the observer. Above-fold stripping
+removes that residual so first paint = FCP. Separately, several hidden states live in
+per-page CSS the central net does NOT cover (`po-rv`, `col-rv`, `exp-block__content`), and
+the net itself is skipped on `page/contact/404/cart/checkout/default` slugs — those got
+local, self-contained nets.
+
+**Templates stripped (above-fold only, one-line precedent comment at each site; below-fold
+reveals untouched):**
+- `search.php` — title + count + empty-state pair (search also skips premium-interactions.js entirely).
+- `template-landing-black-rose.php`, `template-landing-signature.php` — lp-hero section/lockup/subtitle/ctas.
+- `template-shipping-returns.php` — hero + first ship-section.
+- `template-faq.php` — hero; first category exempted via `$cat_idx` (later categories keep rv-clip-up).
+- `template-size-guide.php` — hero; first table exempted via `$sg_idx`.
+- `page-collections.php` — ci-hero; first ci-card exempted in collections-index.css (cards 2-4 keep stagger).
+- `template-parts/collection/page.php` — col-hero content wrapper (col-reveal), emblem/badge
+  (rv-blur-down), tagline (rv-split-word), subtitle (rv-blur). Kept `rv-scroll-bloom` on the BR
+  logo — CSS-only scroll-timeline, paints without JS (F3, deliberate).
+- `template-about.php` — hero doc/title/tag/meta.
+- `template-preorder-gateway.php` — po-hero eyebrow/lockup/body/actions (money page).
+- `woocommerce/single-product.php` — sr-gallery (rv-clip-left) + sr-info (rv-clip-right); the
+  gallery img is the PDP LCP (same 24.9s bug class Wave 1 fixed in the editorial chapters).
+
+**Safety nets added (CSS-only, mirror §12.5: snap keyframe, 0.01s, 0.8s delay, fill forwards;
+`.is-visible` cancels; reduced-motion blocks got `animation: none` where they force-visible):**
+`preorder-gateway.css` (.po-rv — was uncovered), `elementor-widgets.css` (.col-rv — uncovered),
+`experiences.css` (.exp-block__content — uncovered), `landing-scrollytell.css` + 
+`landing-pages.css` (.lp-rv), `about.css` (.abt-page .rv), `agency-tier-visuals.css` (.rv — 
+sheet loads globally incl. net-skipped slugs). Each net lives in the file that declares the
+hidden state, so no reveal can ever depend on another stylesheet being enqueued.
+**homepage-v2.css** — `#loader` now self-dismisses at 2.5s (+0.9s fade) via keyframe; it was
+dismissed only by deferred homepage-v2.js (fake-progress interval), so a slow queue held a
+full-screen overlay over the homepage LCP; `noscript` only covered JS-off. `.done` still wins
+the race and lands on the same end state.
+
+**Skipped (verified, nothing to strip):**
+- shop — LIVE markup + source verified: holo cards carry NO reveal classes (`ul.products`,
+  plain `.holo`; rv-clip-up/stagger-grid appear only in the footer). The 8.4s render delay is
+  NOT reveal gating — likely the late webfont repaint of h3.holo__name (all fonts are
+  font-display:swap; fonts load via CSS with no preload → font-arrival re-render moves text
+  LCP). Handed to team lead — font preloading is enqueue territory (Bolt's lane).
+- contact, privacy (page.php), wishlist — no reveal classes exist in these templates, and
+  their slugs don't even load animations-premium.css (classes would be inert). Their 2.6-3.5s
+  delays are consistent with the same font-swap mechanism, not reveal gating.
+- kids-capsule teaser — hero (first 100vh viewport) is already clean; col-reveal/rv-* start
+  in section 2, below the fold. Landing kids-capsule: shared hero part has no lp-rv; the
+  lp-press bar peeks ~67px into a 92vh-hero viewport — left (sliver, now netted at 0.8s).
+- front-page.php — hero is 100dvh and reveal-free; first rv hit (commercial-runway intro) is
+  below the fold. The #loader fix above is the front-page above-fold repair.
+- cart/checkout/404 rv classes — inert (animations-premium.css skipped on those slugs, no
+  local hidden-state definitions; verified woocommerce-cart.css has none).
+- immersive scene.php overlays — first-viewport but the experience is inherently JS-driven;
+  central net covers them at 0.8s on immersive/collection slugs.
+- hero-cinematic.php — dead part (zero callers; its CSS enqueue already removed this wave).
+
+**Verify:** `php -l` clean on all 11 touched templates; brace-balance clean on all 9 touched
+CSS files. `.min` rebuild deliberately NOT run (team lead builds).
+
+**Expected LCP impact:** net-covered pages (collections, black-rose, wishlist-class) drop
+~0.8-1.0s to paint at FCP; landing/preorder/PDP heroes no longer wait on JS at all; a failed
+or slow script can no longer leave ANY content invisible (worst case 0.8s, loader 3.4s).
+Shop/contact/privacy render delays need the font-preload lane, not reveal stripping.

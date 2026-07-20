@@ -229,7 +229,14 @@ get_header();
 						: '';
 					?>
 					<div class="hero-strip-item">
-						<?php // fetchpriority=low: decorative strip must never outrank the hero LCP fetch. ?>
+						<?php
+						// Round-4: the FIRST strip frame is the measured mobile LCP
+						// element — it gets fetchpriority=high and is preloaded from
+						// inc/enqueue.php (PAIRING CONTRACT: br-006 front, widths
+						// 320/480/1024, sizes below — keep in sync). All other frames
+						// stay low so decoration never outranks the LCP pair.
+						$hs_is_lcp = ( 0 === $hs_pass && 0 === $hs_idx );
+						?>
 						<img src="<?php echo esc_url( $hs_img_url ); ?>"
 							<?php if ( '' !== $hs_srcset ) : ?>
 								srcset="<?php echo esc_attr( $hs_srcset ); ?>"
@@ -239,7 +246,7 @@ get_header();
 							width="1024"
 							height="1536"
 							loading="<?php echo $hs_priority ? 'eager' : 'lazy'; ?>"
-							fetchpriority="low"
+							fetchpriority="<?php echo $hs_is_lcp ? 'high' : 'low'; ?>"
 							decoding="async">
 					</div>
 				<?php endforeach; ?>

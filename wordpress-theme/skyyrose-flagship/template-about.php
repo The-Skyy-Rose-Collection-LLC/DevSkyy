@@ -155,18 +155,24 @@ $arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns=
 	<section class="abt-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose' ); ?>">
 		<div class="abt-hero__grid">
 			<div class="abt-hero__left">
-				<p class="abt-hero__doc rv-blur-down">
+				<?php
+				// The hero is the first mobile viewport and the title is the LCP
+				// element — no reveal classes here: the hidden resting state stalls
+				// LCP behind the deferred JS queue (the PDP 24.9s bug class).
+				// Below-fold chapters keep reveals. Wave 5.
+				?>
+				<p class="abt-hero__doc">
 					<span><?php esc_html_e( 'About', 'skyyrose' ); ?></span>
 					<span class="abt-hero__doc-sep" aria-hidden="true">/</span>
 					<span><?php esc_html_e( 'SR-001', 'skyyrose' ); ?></span>
 				</p>
-				<h1 class="abt-hero__title rv-clip-up">
+				<h1 class="abt-hero__title">
 					<?php echo wp_kses( __( 'The<br>Story', 'skyyrose' ), $allowed_inline ); ?>
 				</h1>
-				<p class="abt-hero__tag rv-blur">
+				<p class="abt-hero__tag">
 					<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?>
 				</p>
-				<dl class="abt-hero__meta rv">
+				<dl class="abt-hero__meta">
 					<?php foreach ( $hero_meta as $row ) : ?>
 						<div class="abt-hero__meta-row">
 							<dt><?php echo esc_html( $row['key'] ); ?></dt>

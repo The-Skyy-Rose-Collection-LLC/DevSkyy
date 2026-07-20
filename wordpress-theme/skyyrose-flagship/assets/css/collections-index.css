@@ -55,6 +55,15 @@
 	margin: 0 auto;
 	padding: 0 28px 96px;
 }
+
+/* First card is above the fold on mobile — exempt it from the stagger-grid
+   hidden resting state so LCP never waits on the deferred JS queue (the PDP
+   24.9s bug class). Cards 2-4 keep the staggered entrance. Wave 5. */
+.ci-grid.stagger-grid > :first-child {
+	opacity: 1;
+	transform: none;
+	animation: none;
+}
 .ci-card {
 	position: relative;
 	display: block;

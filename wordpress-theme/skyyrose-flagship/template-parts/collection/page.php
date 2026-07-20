@@ -100,7 +100,14 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
 			</div>
 		<?php endif; ?>
-		<div class="col-hero__content col-reveal">
+		<?php
+		// The whole hero is the first mobile viewport (col-hero is 100dvh) — no
+		// reveal classes anywhere inside it: a hidden resting state on this
+		// wrapper stalled LCP behind the deferred JS queue (round-4 Lighthouse:
+		// 2.4s render delay = the 0.8s srRevealSafety net, not first paint).
+		// Below-fold sections keep reveals. Wave 5.
+		?>
+		<div class="col-hero__content">
 			<?php
 			if ( $has_emblem ) :
 				// Emblem renders ≤154px wide (height clamp(120px,18vh,210px) at 220:300
@@ -115,9 +122,9 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 						srcset="<?php echo esc_attr( $emblem_srcset ); ?>"
 						sizes="154px"
 					<?php endif; ?>
-					alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
+					alt="" aria-hidden="true" class="col-hero__emblem" width="220" height="300" loading="eager" decoding="async">
 				<?php endif; ?>
-				<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
+				<span class="col-hero__badge"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
 				<?php
 				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
@@ -147,8 +154,8 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			<?php else : ?>
 				<h1 class="col-hero__title"><span><?php echo esc_html( $c['hero_title'] ); ?></span></h1>
 			<?php endif; ?>
-			<p class="col-hero__tagline rv-split-word"><?php echo esc_html( $c['hero_tagline'] ); ?></p>
-			<p class="col-hero__subtitle rv-blur"><?php echo esc_html( $c['hero_subtitle'] ); ?></p>
+			<p class="col-hero__tagline"><?php echo esc_html( $c['hero_tagline'] ); ?></p>
+			<p class="col-hero__subtitle"><?php echo esc_html( $c['hero_subtitle'] ); ?></p>
 			<div class="col-hero__cta-group">
 				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>

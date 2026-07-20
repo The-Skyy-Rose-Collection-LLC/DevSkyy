@@ -246,25 +246,36 @@ function skyyrose_preload_hero_image() {
 	if ( is_front_page() ) {
 		$image_url = get_theme_mod( 'skyyrose_hero_image', '' );
 	} elseif ( function_exists( 'is_product' ) && is_product() ) {
-		// Single product: the main gallery image is the LCP element.
 		// $GLOBALS['product'] can hold non-WC_Product values when third-party
 		// callbacks fire before wp_head priority 4 — only adopt a fresh
 		// resolution when the helper returns a valid WC_Product so we never
 		// write null/false back to the global.
-		//
-		// Jetpack Photon rewrites product image URLs to its CDN on delivery.
-		// Preloading the local URL wastes a connection — the browser loads
-		// the local URL then immediately redirects to the Photon CDN URL,
-		// losing the preload benefit. Skip the preload entirely when Photon
-		// is active so the browser's own LCP heuristic takes over.
-		if ( ! function_exists( 'jetpack_photon_url' ) ) {
-			global $product;
-			if ( ! $product instanceof WC_Product ) {
-				$resolved = skyyrose_current_wc_product();
-				if ( $resolved instanceof WC_Product ) {
-					$product = $resolved;
-				}
+		global $product;
+		if ( ! $product instanceof WC_Product ) {
+			$resolved = skyyrose_current_wc_product();
+			if ( $resolved instanceof WC_Product ) {
+				$product = $resolved;
 			}
+		}
+
+		// Round-4: on the editorial PDP layout the LCP is the encounter image
+		// (product-detail-editorial.php $hero_image — a theme-asset catalog
+		// image), NOT the WC gallery attachment — and the old gallery preload
+		// was ALSO Photon-skipped, leaving the PDP with no LCP preload at all
+		// (load delay 1,106ms). Mirror single-product.php's own gates exactly:
+		// same skyyrose_get_product( $sku ) entry, same dossier editorial gate.
+		$pdp_sku      = ( $product instanceof WC_Product ) ? $product->get_sku() : '';
+		$pdp_entry    = ( '' !== $pdp_sku && function_exists( 'skyyrose_get_product' ) ) ? skyyrose_get_product( $pdp_sku ) : null;
+		$pdp_dossier  = ( '' !== $pdp_sku && function_exists( 'skyyrose_get_product_dossier' ) ) ? skyyrose_get_product_dossier( $pdp_sku ) : null;
+		$is_editorial = $pdp_dossier && ! empty( $pdp_dossier['has_editorial_content'] );
+
+		if ( $is_editorial && ! empty( $pdp_entry['image'] ) && function_exists( 'skyyrose_product_image_uri' ) ) {
+			$image_url = skyyrose_product_image_uri( $pdp_entry['image'] );
+		} elseif ( ! function_exists( 'jetpack_photon_url' ) ) {
+			// Non-editorial PDPs keep the gallery-image preload. Jetpack
+			// Photon rewrites gallery URLs to its CDN on delivery — preloading
+			// the local URL wastes a connection, so skip under Photon and let
+			// the browser's own LCP heuristic take over.
 			if ( $product instanceof WC_Product && $product->get_image_id() ) {
 				// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
 				// of wp_get_attachment_url() which returns the raw original
@@ -276,23 +287,29 @@ function skyyrose_preload_hero_image() {
 			}
 		}
 	} elseif ( is_page() ) {
-		// Collection and immersive pages: preload featured image if set.
-		// 'large' (max 1024px) instead of 'full' — full is typically 2-4MB
-		// and far exceeds what any viewport needs for a hero preload.
-		$template       = get_page_template_slug();
-		$hero_templates = array(
-			'template-collection-black-rose.php',
-			'template-collection-love-hurts.php',
-			'template-collection-signature.php',
-			'template-collection-kids-capsule.php',
-			'template-immersive-black-rose.php',
-			'template-immersive-love-hurts.php',
-			'template-immersive-signature.php',
-			'template-immersive-kids-capsule.php',
-			'template-about.php',
-		);
-		if ( $template && in_array( $template, $hero_templates, true ) && has_post_thumbnail() ) {
-			$image_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
+		$template = get_page_template_slug();
+		if ( 'template-about.php' === $template ) {
+			// Round-4: the about LCP is the hardcoded origin portrait
+			// (template-about.php $hero_img), NOT the featured image the
+			// generic branch below preloaded — that was a wasted fetch while
+			// the real LCP waited (load delay 1,142ms). Same file, same URL.
+			$image_url = get_theme_file_uri( 'assets/images/homepage-story-founder.webp' );
+		} else {
+			// Immersive pages: preload featured image if set. 'large' (max
+			// 1024px) instead of 'full' — full is typically 2-4MB and far
+			// exceeds what any viewport needs for a hero preload. Collection
+			// templates removed (Wave 5): skyyrose_preload_template_lcp()
+			// now preloads their measured LCP (.col-hero__bg srcset) exactly;
+			// a second featured-image preload here would be a wasted fetch.
+			$hero_templates = array(
+				'template-immersive-black-rose.php',
+				'template-immersive-love-hurts.php',
+				'template-immersive-signature.php',
+				'template-immersive-kids-capsule.php',
+			);
+			if ( $template && in_array( $template, $hero_templates, true ) && has_post_thumbnail() ) {
+				$image_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
+			}
 		}
 	}
 
@@ -301,6 +318,79 @@ function skyyrose_preload_hero_image() {
 			'<link rel="preload" href="%s" as="image" fetchpriority="high">' . "\n",
 			esc_url( $image_url )
 		);
+	}
+}
+
+/**
+ * Preload the measured LCP image on templates whose LCP element the preload
+ * scanner discovers late.
+ *
+ * Round-4 mobile load-delay evidence (audit: largest-contentful-paint-element):
+ * collection heroes 854-2,845ms, landing-BR atmosphere 2,381ms, preorder
+ * poster 1,642ms, collections-index lockup 1,439ms. Each branch below targets
+ * ONLY the element the round-4 JSON names for that template.
+ *
+ * PAIRING CONTRACT: every branch reproduces its template's emitted URLs
+ * exactly (same helpers, same widths, same sizes strings) — a mismatched
+ * preload double-fetches the LCP.
+ *
+ * @since 1.12.3
+ * @return void
+ */
+function skyyrose_preload_template_lcp() {
+	$slug = function_exists( 'skyyrose_get_current_template_slug' )
+		? skyyrose_get_current_template_slug() : '';
+
+	// Collection pages: .col-hero__bg img (template-parts/collection/page.php).
+	// Reproduces its srcset (hero_bg_base + 480/768/1280/1680w webp, sizes
+	// 100vw) or, without a base, its exact versioned src.
+	if ( 'collection-standalone' === $slug ) {
+		$col_key = str_replace( array( 'template-collection-', '.php' ), '', (string) get_page_template_slug() );
+		// Same accessor the template part uses (collection/page.php:19) —
+		// hero_bg_base/hero_bg live in inc/collection-content.php, NOT the
+		// collections-config array.
+		$c = function_exists( 'skyyrose_get_collection_content' ) ? skyyrose_get_collection_content( $col_key ) : null;
+		if ( is_array( $c ) ) {
+			$sot_bg      = function_exists( 'skyyrose_sot_hero' ) ? skyyrose_sot_hero( $col_key ) : '';
+			$resolved_bg = ( '' !== $sot_bg ) ? $sot_bg : ( $c['hero_bg'] ?? '' );
+			$bg_base     = isset( $c['hero_bg_base'] ) ? (string) $c['hero_bg_base'] : '';
+			if ( '' !== $bg_base ) {
+				$entries = array();
+				foreach ( array( 480, 768, 1280, 1680 ) as $w ) {
+					$entries[] = esc_url( SKYYROSE_ASSETS_URI . $bg_base . '-' . $w . 'w.webp' ) . ' ' . $w . 'w';
+				}
+				echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( implode( ', ', $entries ) ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			} elseif ( ! empty( $resolved_bg ) ) {
+				echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . $resolved_bg . '?v=' . SKYYROSE_VERSION ) . '" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+		return;
+	}
+
+	// Black Rose landing: .lp-hero__atmosphere img (the measured LCP; the img
+	// carries fetchpriority=high in template-landing-black-rose.php).
+	if ( 'landing' === $slug && 'template-landing-black-rose.php' === get_page_template_slug() ) {
+		echo '<link rel="preload" as="image" href="' . esc_url( trailingslashit( SKYYROSE_ASSETS_URI ) . 'images/logos/black-roses-cloud-cluster.webp' ) . '" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		return;
+	}
+
+	// Preorder gateway: the LCP element is the hero <video> — its painted
+	// image is the poster (template-preorder-gateway.php, versioned URL).
+	if ( 'preorder-gateway' === $slug ) {
+		echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . SKYYROSE_VERSION ) . '" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		return;
+	}
+
+	// Collections index: the first card's lockup (page-collections.php —
+	// config order puts black-rose first; same Photon widths + sizes).
+	if ( 'collections-index' === $slug && function_exists( 'skyyrose_photon_srcset' ) ) {
+		$ci_srcset = skyyrose_photon_srcset(
+			SKYYROSE_ASSETS_URI . '/images/hero-overlays/br-brand-script-logotype.webp',
+			array( 320, 640, 960 )
+		);
+		if ( '' !== $ci_srcset ) {
+			echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $ci_srcset ) . '" imagesizes="(max-width: 430px) 70vw, 300px" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 	}
 }
 
@@ -565,6 +655,9 @@ add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );
 
 // Preload hero image on front page for better LCP.
 add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );
+
+// Preload the measured LCP image on collection/landing/preorder/collections-index (Wave 5).
+add_action( 'wp_head', 'skyyrose_preload_template_lcp', 4 );
 
 // Remove jQuery Migrate on frontend (not needed since WC 9.0+ / WP 6.0+).
 add_action( 'wp_default_scripts', 'skyyrose_remove_jquery_migrate' );

@@ -754,6 +754,21 @@ function skyyrose_enqueue_template_styles() {
 				} else {
 					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
+
+				// Round-4 (Wave 5): the measured mobile LCP element is the FIRST
+				// hero-strip frame, not the hero background above (load delay
+				// 3,823ms — discovered late). PAIRING CONTRACT with front-page.php:
+				// same first SKU ($hero_strip_skus[0] = br-006), same widths
+				// 320/480/1024, same sizes string — any drift double-fetches.
+				if ( function_exists( 'skyyrose_sot_product_image_uri' ) && function_exists( 'skyyrose_photon_srcset' ) ) {
+					$strip_first_srcset = skyyrose_photon_srcset(
+						skyyrose_sot_product_image_uri( 'br-006', 'front' ),
+						array( 320, 480, 1024 )
+					);
+					if ( '' !== $strip_first_srcset ) {
+						echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $strip_first_srcset ) . '" imagesizes="(max-width: 1000px) 140px, 220px" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				}
 			},
 			2
 		);

@@ -113,7 +113,13 @@ get_header();
 		</div>
 
 		<div class="po-hero__content">
-			<p class="po-hero__eyebrow po-rv"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></p>
+			<?php
+			// The hero is the first mobile viewport and the lockup is the LCP
+			// element — no po-rv reveal classes here: the hidden resting state
+			// stalls LCP behind the deferred JS queue (the PDP 24.9s bug class).
+			// Below-fold sections keep reveals. Wave 5.
+			?>
+			<p class="po-hero__eyebrow"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></p>
 
 			<?php
 			// Hero lockup renders ≤600px (width attr; ~92vw on mobile) but shipped
@@ -124,7 +130,7 @@ get_header();
 				: '';
 			$po_h_sizes  = '(max-width: 640px) 92vw, 600px';
 			?>
-			<picture class="po-hero__lockup po-rv">
+			<picture class="po-hero__lockup">
 				<?php if ( '' !== $po_h_srcset ) : ?>
 					<source srcset="<?php echo esc_attr( $po_h_srcset ); ?>" sizes="<?php echo esc_attr( $po_h_sizes ); ?>" type="image/webp">
 				<?php else : ?>
@@ -140,11 +146,11 @@ get_header();
 					width="600" height="200" loading="eager">
 			</picture>
 
-			<p class="po-hero__body po-rv">
+			<p class="po-hero__body">
 				<?php esc_html_e( 'Secure your pieces before they drop. Luxury Grows from Concrete.', 'skyyrose' ); ?>
 			</p>
 
-			<div class="po-hero__actions po-rv">
+			<div class="po-hero__actions">
 				<a class="po-btn po-btn--primary" href="#po-gateway">
 					<?php esc_html_e( 'Browse Collections', 'skyyrose' ); ?>
 				</a>

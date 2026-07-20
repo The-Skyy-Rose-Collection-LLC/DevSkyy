@@ -49,10 +49,21 @@
 	transition:
 		opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
 		transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+	/* Safety net (mirrors srRevealSafety, animations-premium.css §12.5): .col-rv
+	   is NOT covered by the central net, so slow/failed JS left content invisible
+	   (Wave 5). Snaps the visible state at 0.8s; the .is-visible path cancels it. */
+	animation: colRvRevealSafety 0.01s linear 0.8s forwards;
+}
+@keyframes colRvRevealSafety {
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 .col-rv.is-visible {
 	opacity: 1;
 	transform: translateY(0);
+	animation: none !important;
 }
 
 /* ──────────────────────────────────────────────────────────────────
@@ -474,6 +485,7 @@
 		opacity: 1;
 		transform: none;
 		transition: none;
+		animation: none;
 	}
 	.col-card,
 	.col-card:hover,

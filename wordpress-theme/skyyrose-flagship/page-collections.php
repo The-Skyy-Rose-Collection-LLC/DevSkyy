@@ -46,7 +46,12 @@ get_header();
 
 <main id="primary" class="site-main collections-index" role="main" tabindex="-1">
 
-	<section class="ci-hero rv-clip-up">
+	<?php
+	// Above the fold — no reveal class on the hero: the hidden resting state
+	// stalls LCP behind the deferred JS queue (the PDP 24.9s bug class). The
+	// first ci-card is exempted from the stagger in collections-index.css. Wave 5.
+	?>
+	<section class="ci-hero">
 		<p class="ci-hero__eyebrow"><?php esc_html_e( 'The Collections', 'skyyrose' ); ?></p>
 		<h1 class="ci-hero__title"><?php esc_html_e( 'Four Collections. One Vision.', 'skyyrose' ); ?></h1>
 		<p class="ci-hero__subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Every piece limited, numbered, and never restocked.', 'skyyrose' ); ?></p>

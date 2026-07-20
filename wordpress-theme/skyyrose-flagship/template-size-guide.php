@@ -20,14 +20,20 @@ get_header();
 
 <main id="primary" class="site-main sg-page" role="main" tabindex="-1">
 
-	<section class="sg-page__hero rv-clip-up">
+	<?php
+	// Hero + first size table are above the fold — no reveal classes: the hidden
+	// resting state stalls LCP behind the deferred JS queue (the PDP 24.9s bug
+	// class). Later tables keep reveals. Wave 5.
+	?>
+	<section class="sg-page__hero">
 		<p class="sg-page__eyebrow"><?php esc_html_e( 'Fit Guide', 'skyyrose' ); ?></p>
 		<h1 class="sg-page__title"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></h1>
 		<p class="sg-page__subtitle"><?php esc_html_e( 'Measure once, shop every drop with confidence. All measurements in inches.', 'skyyrose' ); ?></p>
 	</section>
 
+	<?php $sg_idx = 0; ?>
 	<?php foreach ( $sg_tables as $sg_key => $sg_table ) : ?>
-		<section class="sg-page__section rv-clip-up" aria-labelledby="sg-page-<?php echo esc_attr( $sg_key ); ?>">
+		<section class="sg-page__section<?php echo 0 === $sg_idx ? '' : ' rv-clip-up'; ?>" aria-labelledby="sg-page-<?php echo esc_attr( $sg_key ); ?>">
 			<h2 id="sg-page-<?php echo esc_attr( $sg_key ); ?>" class="sg-page__heading"><?php echo esc_html( $sg_table['label'] ); ?></h2>
 			<div class="sg-page__table-wrap">
 				<table class="sg-page__table">
@@ -54,6 +60,7 @@ get_header();
 				</table>
 			</div>
 		</section>
+		<?php ++$sg_idx; ?>
 	<?php endforeach; ?>
 
 	<section class="sg-page__help rv-blur">
