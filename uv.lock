@@ -2018,7 +2018,7 @@ requires-dist = [
     { name = "langgraph", specifier = ">=0.2" },
     { name = "langgraph", marker = "extra == 'mcp'", specifier = ">=0.2" },
     { name = "langgraph-checkpoint-postgres", marker = "extra == 'mcp'", specifier = ">=2.0.0" },
-    { name = "lightrag-hku", marker = "extra == 'rag'", specifier = ">=1.4.0" },
+    { name = "lightrag-hku", marker = "extra == 'rag'", specifier = ">=1.5.4" },
     { name = "litellm", specifier = ">=1.80,<1.81" },
     { name = "llama-index", marker = "extra == 'ml'", specifier = ">=0.12.0" },
     { name = "llama-index-llms-openai", marker = "extra == 'ml'", specifier = ">=0.3.0" },
@@ -4052,7 +4052,7 @@ wheels = [
 
 [[package]]
 name = "lightrag-hku"
-version = "1.4.16"
+version = "1.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -4070,14 +4070,15 @@ dependencies = [
     { name = "pydantic", version = "2.13.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "pypinyin" },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
     { name = "setuptools" },
     { name = "tenacity" },
     { name = "tiktoken" },
     { name = "xlsxwriter" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/91/ee/a56df1e6ffcc597a82aadb5bbab40b3b99b0b6359f19ada744402adfe561/lightrag_hku-1.4.16.tar.gz", hash = "sha256:4453582e2c82f91c7c675aa3e09939b8a66816775da3370cb11eea94776aa77e", size = 3655047, upload-time = "2026-05-07T19:35:11.081Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/02/154120751550ec5ce8edb2ba6cc599c3e232dc9b9b01858fc09de2189c02/lightrag_hku-1.5.4.tar.gz", hash = "sha256:48737d21ec545e36d1d495a28b067f28f78136fe5f8b0b31d7f12632244b302c", size = 4094726, upload-time = "2026-06-24T10:25:02.446Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/6c/f340c272846010ce3152d698e597350b37d6c0b876b3adbf4906c99fb453/lightrag_hku-1.4.16-py3-none-any.whl", hash = "sha256:ce8536411f1c8b329fea1c1e86ed3357456a76d3057120b0886e60b2233f8bda", size = 3623523, upload-time = "2026-05-07T19:35:08.847Z" },
+    { url = "https://files.pythonhosted.org/packages/30/1c/98bafa29b030be57e96f5f0ebe21dc6908ad308abfc0b9e6efeea4952cf4/lightrag_hku-1.5.4-py3-none-any.whl", hash = "sha256:3bb28b2a763a91fb11b9ac87798140be852891edf71266cff59018d23afeea9d", size = 4216903, upload-time = "2026-06-24T10:25:00.12Z" },
 ]
 
 [[package]]
