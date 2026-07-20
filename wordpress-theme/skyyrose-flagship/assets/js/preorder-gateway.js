@@ -489,10 +489,18 @@ function initHeroVideo() {
       });
     }
   };
+  /* Wave 9: round-8 traces show the 3.3MB webm fetch starting AT window
+     load and still overlapping the LCP window (r2 poster load time 2.5s).
+     Push the auto-boot to load + 2.5s so the stream reliably clears the
+     LCP paint; the identical-frame poster holds until then and any
+     gesture still boots instantly. */
+  var bootAfterLoad = function () {
+    window.setTimeout(boot, 2500);
+  };
   if (document.readyState === 'complete') {
-    boot();
+    bootAfterLoad();
   } else {
-    window.addEventListener('load', boot, { once: true });
+    window.addEventListener('load', bootAfterLoad, { once: true });
   }
   ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (evt) {
     window.addEventListener(evt, boot, { once: true, passive: true });

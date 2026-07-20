@@ -1228,3 +1228,82 @@ skyyrose_product_image_uri() is fail-closed, so shipping is SAFE but the shop/BR
 landing-BR win would silently not materialize — a no-op shipped as a fix. Asked Pixel5 for
 exact paths + ls proof before deploying. Rest of wave 8 (stale pre-order preload, video
 preload=none, theme.json Inter->hanken, lockup 720 step) is verified and ready.
+
+## Round 8 — v1.12.6 FINAL (median-of-3, protocol v4 per-URL warm)
+MOBILE >=90 (9/17): shipping 96 · faq 96 · wishlist 95 · about 94 · kids 94 · contact 93 ·
+privacy 93 · PDP 92 · cart 91.
+MOBILE <90 (8/17): collections 87 · pre-order 86 · love-hurts 85 · landing-BR 83 ·
+signature 83 · black-rose 82 · shop 77 · home 76. ALL are LCP-bound (4.0-6.3s); TBT is
+8-20ms on every one of them.
+DESKTOP: 94-100 on ALL 17. Six at 100 (faq, kids, privacy, wishlist, shipping, collections
+99). Desktop target MET.
+a11y 96-100 · BP 100 except PDP/cart 78-79 (third-party cookies, founder-queued).
+
+**PDP CAVEAT — do not read 92 as a fix.** Round 7 measured 71, round 8 measured 92. The
+difference is whether the mascot's 3D boot lands inside the trace (Bolt's r2/r3
+counterfactual: 549ms vs 94ms TBT). Round 8's TBT of 93.5ms matches the no-boot case.
+Per the founder's decision the 3D auto-boots everywhere, so PDP's score is inherently
+VARIABLE between ~71 and ~92 depending on run timing. Not a regression, not a fix — a
+known accepted trade.
+
+REMAINING GAP is LCP-only and partly constrained by things outside theme PHP (logged by
+Pixel5): home hero-strip filters/mask are design-priced; landing-BR's 235KB br-006-onmodel
+is page content in the DB; TTFB ~620ms is the WP.com floor. Closing the last 8 pages likely
+needs founder design calls, not more theme optimization.
+
+## Wave 9 — Pixel6: the v7-card resolver bypass + per-page LCP phase attack (2026-07-20)
+
+Round-8 phase breakdowns read for all 8 laggards (all 3 runs each) before touching anything.
+
+### (a) FIXED — 5 files, php -l ×3 + node --check ×2 clean. BATCH: rebuild navigation.min.js + preorder-gateway.min.js + version bump.
+
+1. **THE SHOP ANSWER — template-parts/product-card-v7-lookbook.php: `$shot_src` now routes
+   through `skyyrose_product_image_uri()`** (was raw `get_theme_file_uri`). Shop's LCP did not
+   move and is NOT the problem (br-003-onmodel.webp, 108KB, High, eager — healthy). Shop didn't
+   improve because Pixel5's webp swap lives in the resolver, but shop renders v7-lookbook cards
+   for hub-verified SKUs, and that template emitted `data/v7-cards.json` URIs raw — so
+   `v7/br-015/alt.png` still shipped **795KB** (verified in live HTML srcset AND round-8 trace).
+   The same bypass was the shared cause across the family: BR + landing-BR each carried
+   br-007/front.png **814KB**, SIG carried sg-003+sg-014+sg-015 front.png **2.6MB**. One line
+   removes ~0.8MB (shop/BR/landing-BR) and ~2.4MB (SIG) from the simulated 1.6Mbps link.
+   All 12 PNG shots verified to have webp siblings on disk (150-205KB each); fail-closed.
+   **Git: all 12 siblings are ALREADY TRACKED and clean — no `git add -f` needed.**
+2. **header.php + assets/js/navigation.js — navbar rotating-lockup webm (290KB) deferred
+   sitewide.** It fetched on EVERY page (it is the only >60KB asset on collections' whole
+   trace). Video now ships `preload="none"` without `autoplay`; navigation.js (global,
+   deferred) boots it at load+1.5s or first gesture, never under reduced-motion (fetch skipped
+   entirely). Static poster (5.9KB, already cached) holds the frame. Design preserved — the
+   lockup still rotates, ~1.5s later.
+3. **assets/js/preorder-gateway.js — hero webm auto-boot load → load+2.5s.** Round-8 r2 shows
+   the 3.3MB webm starting AT window load and stretching poster load time to 2.5s. Gesture
+   fast-path unchanged; identical-frame poster holds. Autoplay canon preserved.
+4. **template-landing-black-rose.php — all lp-vp panes lazy.** CORRECTION to Wave-8: the raw
+   235KB br-006-onmodel.webp is NOT DB content — it is this template's first sticky-viewport
+   pane (eager, Medium, t=157ms), emitted via the catalog CSV path so a filename grep of PHP
+   missed it. The column is display:none on mobile → 235KB fetched for an invisible element
+   inside the LCP window. Lazy imgs in a hidden column never intersect → mobile skips the fetch.
+   Desktop LCP verified = atmosphere img (round-8 desktop r2), pane is below-fold: safe.
+
+### (b) NEEDS FOUNDER DESIGN DECISION (measured cost, DO NOT change without a call)
+- **home hero-strip filter+mask paint**: render delay is 865/1,461/865ms across r1/r2/r3 —
+  the strip's per-item filters + container mask at 0.16 opacity (+ residual script eval) price
+  ~0.9-1.5s of every mobile LCP. With TTFB ~620ms + best-case load ~0.5-0.9s, home's floor with
+  the effect kept is ~2.4-3.0s LCP — 90 is reachable only if everything else lands perfectly.
+  Trade on the table: simplify the strip treatment ≈ −1s LCP ≈ home ~76→high-80s/low-90s.
+  Same family: BR hero's grayscale+contrast filter contributes to BR's 1.3-1.7s render delay.
+- No other (b) items — nothing else left is a design surface.
+
+### (c) OUTSIDE THEME CONTROL
+- **TTFB ~605-680ms on every page, every run** — WP.com origin floor; 13-19% of each LCP.
+- **Render-blocking CSS/font contention** beyond Wave-7b's prune: load TIME on 15-42KB LCP
+  images still runs 1.0-2.0s (home strip frame, collections lockup) purely from sheets+fonts
+  sharing the lantern link. Further pruning is enqueue-lane surgery with diminishing returns —
+  no new enqueue request filed; Wave-7b already took the safe cuts.
+
+### Expected round-9 movement (verify post-deploy)
+SIG −2.4MB and BR/landing-BR −~1.1MB each off the link + webm gone → the collection family
+(82-87) should clear or graze 90. shop loses its 795KB rider + webm → 77 → mid-80s (its LCP
+still pays ~700KB of deliberate first-row eager cards; that is the Wave-7 anti-regression
+design). pre-order webm reliably out of window → 86→~89-91. collections (87) + home (76) gain
+the webm removal; home stays short of 90 without the (b) call. LCP elements must NOT flip
+(same selectors as round 8); `prioritize-lcp-image` should stay on br-003-onmodel for shop.

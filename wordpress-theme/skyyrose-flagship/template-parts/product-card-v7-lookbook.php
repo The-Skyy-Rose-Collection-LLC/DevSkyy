@@ -74,7 +74,14 @@ if ( $v7_product instanceof WC_Product ) {
 					continue;
 				}
 				$shot_face = ! empty( $shot['face'] ) ? (string) $shot['face'] : 'view';
-				$shot_src  = get_theme_file_uri( $shot_uri );
+				// Wave 9: route through the catalog resolver so .png shots serve their
+				// .webp sibling when one exists on disk (2.4-2.6MB source PNGs Photon can
+				// only recompress losslessly — 795-892KB on the wire at w=768; the webp
+				// siblings land at ~60-100KB). v7-cards.json stays canonical (SOT
+				// untouched); fail-closed: no sibling or no resolver = original path.
+				$shot_src = function_exists( 'skyyrose_product_image_uri' )
+					? skyyrose_product_image_uri( $shot_uri )
+					: get_theme_file_uri( $shot_uri );
 				// AVIF tier via the shared next-gen sibling prober (Photon-safe): serves the
 				// .avif sibling through <picture> when present; <img> is the universal fallback.
 				$shot_pic = skyyrose_picture_sources( $shot_src );

@@ -163,7 +163,18 @@ get_header();
 								class="lp-vp__img"
 								width="600"
 								height="750"
-								loading="<?php echo $is_first ? 'eager' : 'lazy'; ?>"
+								<?php
+								/*
+								 * Wave 9: ALL panes lazy — the sticky viewport column is
+								 * display:none on mobile, yet the first pane's eager 235KB
+								 * raw webp fetched at Medium priority inside the mobile LCP
+								 * window (round-8). Lazy imgs inside a hidden column never
+								 * intersect, so mobile skips the fetch entirely; on desktop
+								 * the scrollytell sits below the hero (LCP = atmosphere img,
+								 * verified round-8 desktop) and loads on scroll approach.
+								 */
+								?>
+								loading="lazy"
 							>
 						<?php endif; ?>
 						<div class="lp-vp__meta">
