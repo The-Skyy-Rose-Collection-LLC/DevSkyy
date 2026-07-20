@@ -454,3 +454,50 @@ script changes at all. `<noscript>` fallback duplicates the original render-bloc
 limit → all 8 inline-verified on main thread. Net: 7 real defects FIXED in ec76abffa (see commit),
 1 refuted (Inter-primary — only @font-face declarations), rest dups. Review verdict: ship
 unblocked. Buglog entry appended (see registry).
+
+## Wave 3 — Access (2026-07-20)
+
+**Verdict: all 5 round2 collection findings are PHANTOM — the capture audited Batcache-stale pre-deploy HTML. Zero source edits made (none needed).**
+
+**Proof the capture is stale**: `round2/collections_black-rose.mobile.json` errors-in-console cites `immersive-core.min.js?ver=1.11.1`; cache-busted curl of the same URL now serves `?ver=1.12.0` (HTTP 200, 199KB). Lighthouse doesn't cache-bust; WP.com Batcache served the pre-deploy page. Every finding matches round1's selectors/snippets byte-for-byte.
+
+Per-item independent re-verification against the CURRENT deploy (all cache-busted curls, 2026-07-20):
+1. aria-allowed-role ×10 — live HTML `role="listitem"` count = **0** (FIX-1 live). Grep also proves no second emitter exists: only template-parts/product-card-v7-lookbook.php emits v7card; no v7card/holo__buy emitters in inc/.
+2. aria-required-children — live grid renders `class="product-grid__items"` with **no role attr** (FIX-1 live).
+3. aria-prohibited-attr on col-hero__tagline — deployed `premium-interactions.min.js` contains `screen-reader-text` ×1 and `setAttribute('aria-label'` ×0 (FIX-3 live; no 4th injection site — repo-wide JS grep found only product-card-holo.js/contact.js/toast.js, all setting aria-label on buttons, which is valid).
+4. color-contrast col-newsletter — deployed `collection-pages.min.css` rule is `background:#fff;color:#000` (21:1); cookie accept is `color:var(--color-page-bg,#0a0a0a)` on rose gold (FIX-4 live). The reported white-on-#B76E79 only exists in the stale cached build.
+5. label-content-name-mismatch ×13 — live holo__buy renders `aria-label="Add to Cart: …"` which contains the visible "Add to Cart" (FIX-15 live).
+Bonus: live `Permissions-Policy` header now `accelerometer=(self), gyroscope=(self)` (FIX-13 live).
+
+**Action needed (not mine to execute)**: Sentinel must re-run Lighthouse against cache-busted URLs (`?cb=<epoch>`) or after a Batcache purge (cache purge = production action, STOP-AND-SHOW). Any audit of skyyrose.co that doesn't cache-bust re-creates these phantoms.
+
+## Wave 3 — Pixel (2026-07-19)
+
+### Wishlist desktop CLS 0.388 — root cause is the MASCOT, not the footer
+- Live layout-shift-observer probe (desktop 1440, sources captured): wishlist content NEVER
+  resizes (docH constant 2364 — no localStorage-hydration reflow), footer never moves. The
+  shift generator is `.skyyrose-mascot` (mounted INSIDE footer#colophon via footer.php —
+  hence Lighthouse attributing "footer > section.ft-cro-craft"): the idle breathe loop logged
+  a layout-shift entry every ~33-50ms (probe: 11 entries in 0.9s incl. the bubble ::after
+  oscillating ~7px). Short page = footer near viewport at load = entries accumulate all trace.
+- Mechanism: keyframes are transform-only, but Chrome only EXCLUDES transform motion from
+  CLS when composited; skyy-breathe also animates `filter` and ran main-thread.
+- Fix (`assets/css/mascot.css`, inside the reduced-motion gate): `will-change: transform` on
+  the five animation carriers (entering/exiting/idle-image/speaking/excited) + `contain: layout`
+  on the widget root. Footer/stylesheet mechanism untouched per instruction.
+
+### P3 from r1 — shared bottom-nav height var
+- `--skyyrose-mobile-nav-h: 72px` defined at :root in mobile-bottom-nav.css (nav renders
+  71px; three consumers assumed 64px → banner overlapped nav by 7px). Swapped all four
+  offset calcs (body padding, banner bottom, mascot bottom, consent-clearance variant) to
+  the var. Zero hardcoded 64px remain in the three sheets.
+
+**Verification**: brace-balance clean ×3; no PHP touched. Post-deploy check: re-run wishlist
+desktop CLS probe (expect layout-shift entries from .skyyrose-mascot → 0) + 390px banner/nav
+adjacency (banner bottom == nav top).
+
+### Measurement protocol (locked, 2026-07-20)
+Lighthouse rounds: run ≥10 min after deploy; verify one page's served asset ?ver == deployed
+version before trusting; no ?cb (measure the real cached UX); machine idle (no concurrent
+agents/builds). Round-2 violated all three — treat its mobile numbers + per-page audits as
+unreliable; round-3 = official.

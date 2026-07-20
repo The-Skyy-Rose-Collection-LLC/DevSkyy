@@ -3,7 +3,7 @@
    Dark glass bar — fixed to viewport bottom, above mobile nav.
 
    Bottom-chrome stacking/clearance contract (audit D5):
-     .mobile-nav (z 9000, 64px band, ≤768px)
+     .mobile-nav (z 9000, var(--skyyrose-mobile-nav-h) band, ≤768px)
      < .skyyrose-mascot (z 9990, mascot.css)
      < .cookie-consent (z 9998).
    While the banner is visible, template-parts/cookie-consent.php puts
@@ -144,7 +144,7 @@
 		align-items: stretch;
 		gap: 10px;
 		padding: 12px 14px;
-		bottom: calc(64px + env(safe-area-inset-bottom));
+		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom));
 	}
 
 	.cookie-consent__message {
