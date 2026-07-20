@@ -1307,3 +1307,31 @@ still pays ~700KB of deliberate first-row eager cards; that is the Wave-7 anti-r
 design). pre-order webm reliably out of window → 86→~89-91. collections (87) + home (76) gain
 the webm removal; home stays short of 90 without the (b) call. LCP elements must NOT flip
 (same selectors as round 8); `prioritize-lcp-image` should stay on br-003-onmodel for shop.
+
+## Round 9 — v1.12.7 (median-of-3, protocol v4). SWEEP CONCLUSION.
+DESKTOP: 94-100 on all 17. Four at 100 (kids, faq, wishlist, shipping). TARGET MET.
+MOBILE >=90 (8): faq 98 · wishlist 96 · shipping 96 · kids 94 · contact 93 · privacy 92 ·
+collections 90 · about 90.
+MOBILE <90 (9): PDP 86 · cart 86 · signature 84 · love-hurts 83 · pre-order 83 ·
+landing-BR 81 · black-rose 79 · shop 77 · home 76.
+
+**VARIANCE WARNING — read r8 and r9 together, not r9 alone.** Several pages moved DOWN vs
+round 8 despite v1.12.7 shipping real wins (PDP 92→86, cart 91→86, about 94→90, BR 82→79)
+while others held. Both rounds are median-of-3 on a warmed cache, so this is genuine
+run-to-run variance of roughly +/-5 points on this host, NOT a v1.12.7 regression — and it
+means any single page sitting at 86-90 is effectively "at the line", not reliably over it.
+The two rounds bracket each other: 9 pages >=90 in r8, 8 in r9.
+
+**v7 resolver fix did NOT move shop (77 in both r8 and r9, LCP ~6.0-6.3s).** Closing the
+bypass was correct and necessary (795KB PNGs were genuinely shipping) but it was not shop's
+binding constraint. Pixel6 measured shop's LCP element as healthy (br-003-onmodel, 108KB,
+High). Shop's remaining cost is the ~700KB of deliberately-eager first-row imagery we added
+in wave 7 to stop the cookie banner winning LCP — that trade-off is now the cap.
+
+**DIMINISHING RETURNS REACHED for theme-side work.** Remaining levers are all outside
+theme PHP or are brand trades:
+ (a) FOUNDER: home hero-strip filter+mask = measured 0.9-1.5s render delay; simplifying is
+     worth ~-1s (76 -> ~90). Untouched by design.
+ (b) shop: eager first-row bytes vs banner-wins-LCP — pick one, both cost.
+ (c) TTFB 605-680ms is the WP.com floor sitewide; cart additionally uncacheable by design.
+ (d) PDP variance 71-92 is the accepted 3D-mascot trade (founder decision, closed).
