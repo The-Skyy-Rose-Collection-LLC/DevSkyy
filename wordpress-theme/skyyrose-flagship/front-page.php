@@ -167,19 +167,40 @@ get_header();
 	// emitted URL are computed atomically from $hero_bg — prevents drift if
 	// $hero_bg is ever filtered (CDN swap, asset hash, etc).
 	$hero_avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $hero_bg ) : null;
+
+	// Photon width variants for the LCP hero (was a 294KB flat AVIF; ~94KB
+	// at w=768). PAIRING CONTRACT with the responsive preload in
+	// inc/enqueue.php (front-page wp_head closure): same source URL string
+	// ($hero_bg), same widths 480/768/1280/1920, and sizes MUST stay "100vw"
+	// to match the preload's imagesizes — any drift and the browser fetches a
+	// second, non-preloaded candidate. While Photon answers, the avif
+	// <source> is suppressed (Photon serves webp); '' from the helper
+	// restores the previous full-AVIF markup, which is also the preload's
+	// fallback branch — both halves degrade together.
+	$hero_srcset = function_exists( 'skyyrose_photon_srcset' )
+		? skyyrose_photon_srcset( $hero_bg, array( 480, 768, 1280, 1920 ) )
+		: '';
 	?>
 	<div class="hero-bg parallax-ken-burns" aria-hidden="true">
 		<picture>
-			<?php if ( $hero_avif && file_exists( $hero_avif['path'] ) ) : ?>
+			<?php if ( '' === $hero_srcset && $hero_avif && file_exists( $hero_avif['path'] ) ) : ?>
 				<source type="image/avif" srcset="<?php echo esc_url( $hero_avif['url'] ); ?>">
 			<?php endif; ?>
-			<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<?php if ( '' !== $hero_srcset ) : ?>
+				<source type="image/webp" srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw">
+			<?php else : ?>
+				<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<?php endif; ?>
 			<?php
 			// width=height=1920 intentional: source asset is square; CSS
 			// object-position: center 30% crops to landscape with vertical bias.
 			// If asset becomes 16:9 in future, update both attrs.
 			?>
 			<img src="<?php echo esc_url( $hero_bg ); ?>"
+				<?php if ( '' !== $hero_srcset ) : ?>
+					srcset="<?php echo esc_attr( $hero_srcset ); ?>"
+					sizes="100vw"
+				<?php endif; ?>
 				alt=""
 				width="1920"
 				height="1920"

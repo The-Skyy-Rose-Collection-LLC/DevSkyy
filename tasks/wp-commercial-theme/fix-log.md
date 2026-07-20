@@ -671,3 +671,15 @@ mascot flags gone from all 18 URLs.
 - PAIRING CONTRACT: Pixel2 ships the matching front-page.php hero `<picture>` srcset in this
   same deploy train — preload and rendered srcset must emit IDENTICAL URLs or the LCP
   double-fetches. Constraint comment in code. `php -l` clean.
+
+### Wave 4 — Pixel2 addendum: hero-bg template half SHIPPED (2026-07-20)
+Bolt's responsive preload landed (see his addendum), unblocking the front-page
+hero. front-page.php hero <picture>: Photon srcset 480/768/1280/1920 from
+$hero_bg (byte-identical input string + widths to the preload — verified by
+reading inc/enqueue.php:742), sizes="100vw" on both the webp <source> and
+<img> to match imagesizes; avif <source> suppressed while Photon answers;
+'' → previous full-AVIF markup, which pairs with the preload's own fallback
+branch so both halves degrade together. php -l clean; 480w candidate
+curl-verified 200 image/webp 46KB (vs 294KB flat AVIF). Home's biggest
+round-3 item (211KB uses-responsive) now closed — expect the largest single
+LCP improvement of the wave on home mobile.
