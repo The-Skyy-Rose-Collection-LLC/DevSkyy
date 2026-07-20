@@ -327,6 +327,18 @@
 	margin: 0;
 }
 
+/* r1 verify (2026-07-19): core ALSO ships columns-qualified width rules
+   (.woocommerce ul.products.columns-3 li.product { width:30.75% } — one
+   class more specific than the block above), which left 113px cards inside
+   368px grid tracks on the live v1.12.0 shop. Match that specificity. */
+.woocommerce ul.products[class*="columns-"] li.product,
+.woocommerce-page ul.products[class*="columns-"] li.product {
+	float: none;
+	clear: none;
+	width: auto;
+	margin: 0;
+}
+
 .woocommerce ul.products,
 .woocommerce-page ul.products {
 	display: grid !important;
