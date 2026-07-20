@@ -83,6 +83,17 @@
 	white-space: nowrap;
 }
 
+/* The dark ink above never actually applied: style.css ships a global
+   `.btn, .wp-block-button__link, button[type="submit"], input[type="submit"]
+   { color: var(--color-white,#fff) }` whose (0,1,1) specificity outranks this
+   rule's (0,1,0), so the button computed white on Rose Gold = 3.8:1 (AA needs
+   4.5). Matching specificity + later sheet order makes the dark ink win.
+   Any component that sets its own accent background must re-assert its ink at
+   >= (0,1,1) for the same reason. */
+button.footer-newsletter__submit {
+	color: #0A0A0A;
+}
+
 .footer-newsletter__submit:hover {
 	background: var(--skyyrose-secondary, #D4AF37);
 	color: #000;

@@ -818,3 +818,56 @@ CSS files. `.min` rebuild deliberately NOT run (team lead builds).
 ~0.8-1.0s to paint at FCP; landing/preorder/PDP heroes no longer wait on JS at all; a failed
 or slow script can no longer leave ANY content invisible (worst case 0.8s, loader 3.4s).
 Shop/contact/privacy render delays need the font-preload lane, not reveal stripping.
+
+## Round 5 — post-v1.12.3 (2026-07-20). Gate clean (stale=0/6).
+Wave-5 worked. Mobile perf gains: collections 77→91 · kids 78→94 · pre-order 78→90 ·
+about 88→92 · privacy 85→92 · contact 84→88 · home 69→75 · PDP 63→70 · LH 73→77.
+Desktop: 86-100 (wishlist 100, contact/about/pre-order/collections 99).
+a11y 93-100; BP 100 except PDP/cart 78-79 (3rd-party cookies, founder call).
+
+**NOISE CORRECTION (measurement discipline):** round 5 showed shop 17.1s, cart 20.3s,
+landing-BR 22.2s LCP. Independent re-measure of all three: cart **82** (LCP 3.2s),
+shop 75 (7.0s), landing-BR 75 (6.5s) — run contention, NOT regressions. Single-run
+Lighthouse on a busy machine produces 3-7x LCP outliers; treat any >2x jump as suspect
+and re-measure before acting. (Same discipline that caught the round-2 Batcache phantom.)
+
+**ONE REAL REGRESSION — wishlist 92→77**, consistent across two runs, TBT 101→~375ms.
+Attribution: bootup-time three@0.170.0/+esm 868ms + DRACOLoader 128ms; third-party-summary
+JSDelivr 1,005ms main-thread. The 3D mascot's three.js now lands INSIDE the load window
+because the page itself got fast. Wave 6 → Bolt: move the 3D bootstrap off the load path
+(timing fix, mascot stays — scope is a separate founder call).
+
+## Wave 6 — Bolt: mascot three.js off the load path (2026-07-20)
+
+**Root cause (round-5 wishlist 92→77, TBT ~375ms):** mascot-loader.js fired its
+requestIdleCallback with a 4s TIMEOUT and no load-event dependency — on throttled mobile that
+guarantees the injection lands INSIDE the load window, so skyy-3d.js's three.js import
+(cdn.jsdelivr.net three@0.170.0/+esm, 953ms main-thread + DRACOLoader 126ms per round-5
+bootup-time) executed during the trace. The page getting fast in waves 1-5 is what exposed it.
+
+**Fix — `assets/js/mascot-loader.js` (timing only, zero scope cut):**
+- The idle countdown now starts only AFTER the window `load` event (readyState-aware for
+  cache-warm loads). rIC timeout lengthened 4s→8s post-load: a timeout-forced fire is the
+  she-must-appear guarantee; the normal path is a GENUINE idle slot (≈ post-TTI), which is
+  what keeps the 950ms evaluation outside the TBT window.
+- First-interaction fast path unchanged (real users get her immediately on input; lab runs
+  have no input so it never re-enters the audit window).
+- Save-Data: honors the visitor's data-saver preference by loading mascot.min.js only —
+  she still appears via her existing 2D sprite path. Explicitly NOT the pending founder
+  decision (2D-on-mobile-PDPs) — that stays open, untouched.
+- Every existing gate preserved: skyyrose_mascot_is_enabled(), checkout exclusion, GLB-url
+  gate, 2D fallback, DRACO wiring in skyy-3d.js untouched (file not modified). Injection
+  order (mascot → skyy-3d, async=false) unchanged.
+- inc/enqueue.php loader comment updated to match the new contract. `node --check` clean,
+  `php -l` clean.
+- **REBUILD REQUIRED: mascot-loader.min.js must be rebuilt in the central batch or this fix
+  is inert in production** (theme serves .min).
+- Expected: wishlist TBT back to ~100ms / 92 territory; same relief on every page where the
+  trace previously caught the idle-timeout fire (PDP 562ms and cart ~230-290ms TBT should
+  drop by whatever share was three.js eval).
+
+**Wishlist color-contrast (1 node) — LOGGED, not fixed (brand-color decision):**
+`button.footer-newsletter__submit` — white 13px text on Rose Gold #B76E79 = 3.8:1 (needs
+4.5:1). Any fix changes brand presentation: darken the button toward ~#A05762, switch label
+to Dark #0A0A0A, or bump label to bold/larger (large-text threshold 3:1). Rose Gold is a
+locked brand token — routing to Pixel/founder. File: footer chrome CSS (footer-cro/footer).

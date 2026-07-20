@@ -403,10 +403,11 @@ function skyyrose_enqueue_global_scripts() {
 	}
 
 	// Skyy mascot JS — gated on the same kill switch as the CSS above. Loaded
-	// via a tiny idle-time bootstrap (mascot-loader.js) so the character
-	// bundle never costs LCP/CLS budget: it only fetches mascot.min.js (and
-	// skyy-3d.min.js, when a GLB is configured) after requestIdleCallback or
-	// first interaction, whichever comes first.
+	// via a tiny post-load idle bootstrap (mascot-loader.js) so the character
+	// bundle never costs LCP/CLS/TBT budget: it only fetches mascot.min.js
+	// (and skyy-3d.min.js, when a GLB is configured) after the window load
+	// event + a genuine idle slot, or first interaction — whichever comes
+	// first. Save-Data visitors get the 2D sprite path (mascot.js only).
 	$mascot_js_enabled = skyyrose_mascot_is_enabled()
 		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $mascot_js_enabled ) {
