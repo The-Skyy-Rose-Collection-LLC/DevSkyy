@@ -306,10 +306,15 @@ function skyyrose_photon_srcset( $src, $widths ) {
 		return '';
 	}
 	$entries = array();
+	// Photon caches by full URL and never revalidates against the origin —
+	// without a version param, updated theme images would serve stale from
+	// i0.wp.com forever (the direct src keeps ?v= at its call sites; the
+	// srcset variants need the same bust).
+	$ver = defined( 'SKYYROSE_VERSION' ) ? '&v=' . rawurlencode( SKYYROSE_VERSION ) : '';
 	foreach ( $widths as $w ) {
 		$w = absint( $w );
 		if ( $w > 0 ) {
-			$entries[] = 'https://i0.wp.com/' . $m[1] . $m[2] . '?w=' . $w . ' ' . $w . 'w';
+			$entries[] = 'https://i0.wp.com/' . $m[1] . $m[2] . '?w=' . $w . $ver . ' ' . $w . 'w';
 		}
 	}
 	return implode( ', ', $entries );

@@ -52,17 +52,43 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	var returnFocus = document.activeElement || document.body;
 	if ( ! banner || ! accept || ! decline ) return;
 	// The [hidden] attribute keeps the banner invisible BEFORE the (deferred)
-	// stylesheet arrives; remove it only when we actually show. Dismiss paths
-	// re-hide via the CSS class so the slide-out transition still plays.
-	banner.removeAttribute( 'hidden' );
-	banner.classList.remove( 'cookie-consent--hidden' );
-	// Clearance contract: while the banner is visible, <html> carries this
-	// class so fixed bottom widgets (mascot, recall pill) read
-	// --skyyrose-consent-clearance and lift above the banner instead of
-	// being covered by it (cookie-consent.css defines the var).
-	document.documentElement.classList.add( 'skyyrose-consent-open' );
-	// Move focus to accept button so keyboard users reach the dialog immediately.
-	setTimeout( function() { accept.focus( { preventScroll: true } ); }, 100 );
+	// stylesheet arrives. cookie-consent.css loads via the print-media swap, so
+	// on a cold first visit this script can run BEFORE the sheet applies —
+	// revealing then would paint the banner unstyled in-flow (then snap to the
+	// fixed bar). Gate the reveal on the sheet being live: .cookie-consent only
+	// computes position:fixed once cookie-consent.css has applied. Dismiss
+	// paths re-hide via the CSS class so the slide-out transition still plays.
+	function reveal() {
+		banner.removeAttribute( 'hidden' );
+		banner.classList.remove( 'cookie-consent--hidden' );
+		// Clearance contract: while the banner is visible, <html> carries this
+		// class so fixed bottom widgets (mascot, recall pill) read
+		// --skyyrose-consent-clearance and lift above the banner instead of
+		// being covered by it (cookie-consent.css defines the var).
+		document.documentElement.classList.add( 'skyyrose-consent-open' );
+		// Move focus to accept button so keyboard users reach the dialog immediately.
+		setTimeout( function() { accept.focus( { preventScroll: true } ); }, 100 );
+	}
+	function sheetLive() {
+		return 'fixed' === window.getComputedStyle( banner ).position;
+	}
+	if ( sheetLive() ) {
+		reveal();
+	} else {
+		var revealed = false;
+		var go = function() { if ( ! revealed ) { revealed = true; reveal(); } };
+		var link = document.getElementById( 'skyyrose-cookie-consent-css' );
+		if ( link ) { link.addEventListener( 'load', go ); }
+		// rAF poll with a 3s cap: worst case (sheet blocked entirely) degrades
+		// to the pre-gate behavior instead of never showing the legally
+		// required banner.
+		var t0 = Date.now();
+		( function poll() {
+			if ( revealed ) return;
+			if ( sheetLive() || Date.now() - t0 > 3000 ) { go(); return; }
+			requestAnimationFrame( poll );
+		} )();
+	}
 	function dismiss( value ) {
 		localStorage.setItem( 'skyyrose_cookie_consent', value );
 		banner.classList.add( 'cookie-consent--hidden' );

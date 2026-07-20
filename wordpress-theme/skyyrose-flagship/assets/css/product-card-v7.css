@@ -189,3 +189,12 @@
 	background: #a50f2d;
 	color: #fff;
 }
+
+/* Same contrast math as .v7card__add above: the generic quickadd:hover paints
+   dark ink on the raw accent surface, which for Love Hurts crimson computes
+   3.97:1 (below AA). Deepened surface + white ink on hover/focus. */
+.v7card[data-collection="love-hurts"] .v7card__quickadd:hover,
+.v7card[data-collection="love-hurts"] .v7card__quickadd:focus-visible {
+	background: #a50f2d;
+	color: #fff;
+}

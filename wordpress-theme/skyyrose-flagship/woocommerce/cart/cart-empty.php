@@ -30,6 +30,17 @@ defined( 'ABSPATH' ) || exit;
 
 <div class="skyy-cart" data-skyy-cart>
 
+	<?php
+	// WC core prints ALL queued notices ("'X' removed. Undo?", out-of-stock
+	// removals, checkout-error redirects) through this action at priority 5
+	// (woocommerce_output_all_notices) — swallowing it strands the notice in
+	// the session and it pops out of context on the next WC surface. Only the
+	// duplicate default empty-cart message (priority 10) is unwanted here:
+	// this template renders its own styled empty state below.
+	remove_action( 'woocommerce_cart_is_empty', 'wc_empty_cart_message', 10 );
+	do_action( 'woocommerce_cart_is_empty' );
+	?>
+
 	<div class="skyy-cart__empty">
 		<div class="skyy-cart__empty-inner">
 			<svg class="skyy-cart__empty-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true" focusable="false">
@@ -37,10 +48,15 @@ defined( 'ABSPATH' ) || exit;
 				<circle cx="37" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 				<circle cx="53" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 			</svg>
-			<h2 class="skyy-cart__empty-title rv-clip-up">
+			<?php
+			// No rv-* reveal classes here: this block IS the above-fold content
+			// (and likely LCP) of the empty-cart view — reveal classes hide it
+			// until deferred JS runs (the PDP 24.9s-LCP bug class, fix-log Wave 1).
+			?>
+			<h2 class="skyy-cart__empty-title">
 				<?php esc_html_e( 'Your Cart is Empty', 'skyyrose' ); ?>
 			</h2>
-			<p class="skyy-cart__empty-text rv-blur">
+			<p class="skyy-cart__empty-text">
 				<?php esc_html_e( 'Explore our collections and find pieces that speak to you.', 'skyyrose' ); ?>
 			</p>
 			<?php if ( wc_get_page_id( 'shop' ) > 0 ) : ?>

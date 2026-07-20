@@ -467,6 +467,28 @@ preflight() {
 }
 
 # ---------------------------------------------------------------------------
+# data/ fail-closed allowlist (bug-230 class)
+#
+# The static data/ excludes below are a belt; this is the gate. Enumerate
+# EVERY file under data/ at deploy time and exclude anything not explicitly
+# runtime-read, so a new file dropped into data/ is excluded BY DEFAULT
+# instead of shipping world-readable (the fail-open that let 36 dossiers,
+# _orphans.json, identity.schema.json and README.md reach production).
+# Allowlist + file:line evidence: architecture-census.md + fix-log Wave 1b.
+# ---------------------------------------------------------------------------
+skyyrose_data_extra_excludes() {
+    local f rel
+    [[ -d "$THEME_DIR/data" ]] || return 0
+    while IFS= read -r f; do
+        rel="${f#"$THEME_DIR"/}"
+        case "$rel" in
+            data/skyyrose-catalog.csv | data/v7-cards.json | data/site-guide.json | data/editorial-index.json | data/collections/*/sot.json) ;;
+            *) printf -- '--exclude=%s\n' "$rel" ;;
+        esac
+    done < <(find "$THEME_DIR/data" -type f | LC_ALL=C sort)
+}
+
+# ---------------------------------------------------------------------------
 # Rsync exclude list (comprehensive -- prevents dev files from reaching production)
 # ---------------------------------------------------------------------------
 RSYNC_EXCLUDES=(
@@ -524,6 +546,13 @@ RSYNC_EXCLUDES=(
     --exclude='data/collections/*/identity.json'
     --exclude='data/collections/*/index.html'
 )
+
+# Fail-closed gate: per-file excludes for everything in data/ outside the
+# runtime allowlist (see skyyrose_data_extra_excludes above).
+while IFS= read -r _skyy_exc; do
+    RSYNC_EXCLUDES+=("$_skyy_exc")
+done < <(skyyrose_data_extra_excludes)
+unset _skyy_exc
 
 # ---------------------------------------------------------------------------
 # File transfer: rsync with lftp SFTP fallback (DEPLOY-01)
@@ -604,6 +633,14 @@ try_rsync() {
         --exclude='data/collections/*/identity.json'
         --exclude='data/collections/*/index.html'
     )
+
+    # Fail-closed gate (mirrors RSYNC_EXCLUDES): per-file excludes for every
+    # data/ file outside the runtime allowlist — new data/ files never ship
+    # by default.
+    local _skyy_exc
+    while IFS= read -r _skyy_exc; do
+        tar_excludes+=("$_skyy_exc")
+    done < <(skyyrose_data_extra_excludes)
 
     # shellcheck disable=SC2086  # zstd_flag is intentionally word-split
     tar $zstd_flag -cf "$tmpzip" "${tar_excludes[@]}" \

@@ -111,10 +111,13 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 				<?php
 				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
 				// hero logo — image blurs + scales in coupled to scroll, not
-				// triggered once by IntersectionObserver. Modern browsers
-				// (Chromium 115+, Firefox 2026) honor it; others render the
-				// existing .rv-clip-up reveal. Reduced-motion respected.
-				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				// triggered once by IntersectionObserver. Reduced-motion respected.
+				// NO rv-clip-up here: this lockup IS the mobile LCP element on
+				// BR/LH (audit Wave 2) — a reveal class hides it until deferred
+				// JS runs, stalling LCP behind the whole script queue (the PDP
+				// 24.9s bug class, fix-log Wave 1). Scroll-bloom is CSS-only
+				// (scroll-timeline), so it keeps first paint intact.
+				$hero_logo_class = 'col-hero__logo' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
 				// Photon width variants for the single-res lockup (199-417KB at
 				// 1600px, the mobile LCP element — audit Wave 2). Fallback src
 				// stays direct, so no Photon = today's behavior.
