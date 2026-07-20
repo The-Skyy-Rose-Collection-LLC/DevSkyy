@@ -78,13 +78,27 @@ if ( $v7_product instanceof WC_Product ) {
 				// AVIF tier via the shared next-gen sibling prober (Photon-safe): serves the
 				// .avif sibling through <picture> when present; <img> is the universal fallback.
 				$shot_pic = skyyrose_picture_sources( $shot_src );
+				// Photon width variants: the full-size AVIF sibling (~90-130KB/shot) was
+				// the biggest image line item on shop + collection grids (round-3
+				// uses-responsive-images). While Photon answers, suppress the avif
+				// <source> — Photon serves webp, same trade skyyrose_render_picture()
+				// makes — so the srcset'd <img> wins. Photon unusable ('' return)
+				// restores the previous markup exactly. Sizes mirror the holo card
+				// (both render in the same product-grid cells).
+				$shot_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( $shot_src, array( 320, 480, 768 ) )
+					: '';
 				?>
 				<picture>
-					<?php if ( ! empty( $shot_pic['avif'] ) ) : ?>
+					<?php if ( '' === $shot_srcset && ! empty( $shot_pic['avif'] ) ) : ?>
 						<source type="image/avif" srcset="<?php echo esc_url( $shot_pic['avif'] ); ?>">
 					<?php endif; ?>
 					<img class="v7card__shot"<?php echo 0 === $i ? ' data-active="true"' : ' aria-hidden="true"'; ?>
 						src="<?php echo esc_url( $shot_src ); ?>"
+						<?php if ( '' !== $shot_srcset ) : ?>
+							srcset="<?php echo esc_attr( $shot_srcset ); ?>"
+							sizes="(max-width: 480px) 92vw, (max-width: 1024px) 46vw, 440px"
+						<?php endif; ?>
 						alt="<?php echo esc_attr( $v7_name . ' — ' . $shot_face ); ?>"
 						width="600" height="750"
 						loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">

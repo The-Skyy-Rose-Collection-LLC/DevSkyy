@@ -103,8 +103,19 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__content col-reveal">
 			<?php
 			if ( $has_emblem ) :
+				// Emblem renders ≤154px wide (height clamp(120px,18vh,210px) at 220:300
+				// ratio, collection-pages.css) but ships full-size (26-34KB, round-3
+				// uses-responsive-images). Photon width variants; '' = plain img as before.
+				$emblem_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $emblem_rel, array( 160, 320, 480 ) )
+					: '';
 				?>
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>" alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php if ( '' !== $emblem_srcset ) : ?>
+						srcset="<?php echo esc_attr( $emblem_srcset ); ?>"
+						sizes="154px"
+					<?php endif; ?>
+					alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
 				<?php endif; ?>
 				<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>

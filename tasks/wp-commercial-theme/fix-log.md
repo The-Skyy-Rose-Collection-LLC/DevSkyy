@@ -501,3 +501,173 @@ Lighthouse rounds: run ≥10 min after deploy; verify one page's served asset ?v
 version before trusting; no ?cb (measure the real cached UX); machine idle (no concurrent
 agents/builds). Round-2 violated all three — treat its mobile numbers + per-page audits as
 unreliable; round-3 = official.
+
+## Round 3 — OFFICIAL post-deploy scorecard (v1.12.0 + 2 micro-trains, 2026-07-20)
+Protocol-clean (cache-settled, ver-verified 1.12.0, idle machine). vs baseline:
+- a11y: 89-97 → **97-100 every page** (7 pages at 100)
+- CLS: cart 0.49→0.00 · wishlist desktop 0.403→0.007 · sitewide ≤0.095
+- desktop perf: 69-97 → **85-100** (11 of 18 URLs ≥90; kids-capsule + wishlist = 100)
+- mobile perf: 47-86 → **68-91**; PDP 49→68 (TBT 671→598, LCP 27.3s→3.9s), wishlist 82→91
+- best-practices: 100 nearly everywhere; PDP/cart 78-79 = third-party cookies (founder call)
+Remaining gap = mobile perf. Wave 4 dispatched: Pixel (responsive/offscreen/modern images
+7.4+6.5+4.6s, + cookie-banner-is-LCP regression on 4 text-light pages), Bolt (render-blocking
+6.8s across 14 pages, cart TTFB 2.2s, cart unused CSS).
+
+## Wave 4 — Pixel (2026-07-20)
+
+### 1. Consent-banner-as-LCP regression (faq/shipping-returns/kids, 5.0-5.7s) — FIXED FIRST
+- `template-parts/cookie-consent.php`: reveal now waits for the load event + requestIdleCallback
+  (2s timeout; setTimeout 250ms fallback) so every real content element paints before the
+  banner — then the existing sheetLive gate runs unchanged (no unstyled flash, dismiss paths
+  untouched). `assets/css/cookie-consent.css`: mobile message 11px/1.4 + max-width 46ch with a
+  comment pinning WHY it must stay small (LCP candidacy).
+- Verify post-deploy: Lighthouse LCP element on faq/shipping-returns/kids mobile should be
+  page content, not p#cookie-consent-message.
+
+### 2. uses-responsive-images: holo cards (shop 3,980ms) — SHIPPED
+- `inc/performance.php` `skyyrose_render_picture()`: new `photon_widths` option → builds
+  srcset via skyyrose_photon_srcset() into the EXISTING $srcset_attr pipe (img + webp
+  <source>); suppresses the avif <source> while active (Photon answers webp — keeps
+  type= honest); placement-contract (on-disk) srcset always wins; helper-absent/failure = no-op.
+- `template-parts/product-card-holo.php`: front + back imgs get photon_widths 320/480/768 +
+  sizes (92vw / 46vw / 440px per real grid breakpoints). Covers shop archive, search, and
+  every holo fallback card.
+
+### Remaining in-lane (NOT silent — context-bounded this dispatch)
+- v7-lookbook card imgs (product-card-v7-lookbook.php) + collection ci-card lockups + home
+  1,020ms/landing 760ms card paths: same photon_widths pattern, next dispatch.
+- offscreen-images 6,550ms sweep (footer-cro customer/instagram imgs are the repeat offender
+  across faq/privacy/collections) + modern-image-formats jpegs (po-card sr-monogram-gold.jpg):
+  audit every template-part for loading=lazy/decoding=async + Photon routing, next dispatch.
+
+**Verification**: php -l ×3 clean, inline JS node --check clean, CSS braces balanced.
+
+## Wave 4 — Bolt: render-blocking + cart TTFB/CSS (2026-07-20)
+
+Files: inc/enqueue.php, inc/enqueue-performance.php. PHP-only, `php -l` clean. Central build
+must run before deploy ONLY for pre-existing reasons — none of these edits require a rebuild
+(style.min.css already exists, 18.3K, emitted by scripts/build-css.js which already covers
+root style.css).
+
+**1. Render-blocking (round-3: 6,816ms / 14 pages) — measured per-item:**
+- style.css raw on 9 pages (177ms ea): `skyyrose-style` now serves root style.min.css with a
+  FRESHNESS GUARD (min mtime >= source mtime, else fall back) so a deploy-without-rebuild can
+  never ship stale rules — style.css took a P0 syntax fix in Wave 1.
+- social-logos on 9 pages incl. HOME (which IS gated): root cause found — Jetpack sharedaddy
+  enqueues from wp_head, AFTER wp_enqueue_scripts, so the wave-1 gates never saw it in head.
+  Added a wp_print_styles:0 pass for all three dequeue functions (fires inside wp_head right
+  before styles print). Sharing verified RENDERED on privacy ('page' slug) — the gate itself
+  correctly keeps sharing CSS there; only the never-renders-content templates shed it.
+- jquery.min.js head-printed on 15 pages (#1 item, 353ms max): new
+  `skyyrose_footer_jquery_on_content_pages()` moves jQuery to footer group on content-only
+  slugs (about/contact/faq/shipping-returns/blog/single/search/page minus wishlist), logged-out
+  only. Evidence: zero inline `jQuery(` in rendered HTML of all five checked pages; only
+  dependents are WC's footer stack. Double fail-closed: WP core ignores the group move if any
+  head script still depends on jQuery. Commerce surfaces untouched.
+- skeleton.min.css blocked collection pages: now slug-aware in the async filter — critical
+  ONLY on 'landing' (server-rendered .skeleton--* markup), async everywhere else.
+- cookie-consent: now in the async list — coordination note: Pixel's cookie-consent.php
+  rework ([hidden] attr + reveal gated on the sheet computing position:fixed + post-load LCP
+  guard) removed the unstyled-flash risk that kept it blocking in Wave 2. Pixel had already
+  added the handle to the list with the contract comment; my slug-aware skeleton logic joins it.
+- Critical-CSS inlining: SKIPPED per the work order's own bar — no deterministic source-derived
+  subset exists; a hand-maintained duplicate would drift. Logged, not attempted.
+- Kept blocking (fail-closed): block-library on privacy (99.4% measured-unused BUT the page
+  renders real block content above-fold; the ~110 used bytes are unattributable without an
+  eyes-on diff — future-wave candidate), woocommerce-layout on WC pages, agency-visuals/main/
+  tokens/info-pages/contact/homepage-v2/mobile-nav (above-fold), mascot/skyy-walk (server DOM).
+
+**2. Cart server-response-time 2,183ms — PLATFORM, not theme. Evidence + stop:**
+Fresh samples 2026-07-20: cart TTFB 1.75-2.07s ≈ cache-busted privacy 2.01-2.25s ≈
+cache-busted home 2.09s; Batcache-warm pages ~30ms (round-3 JSONs). Every uncached render on
+this host costs ~2s; cart is simply the one page Batcache can never cache (WC session cookie —
+correct, uncacheable by design). No cart-specific theme cost: integration files
+(klaviyo/fastapi/mcp-bridge) hook only signup actions/customizer/enqueue, no render-path
+wp_remote_* calls. Reduction paths are all platform/host level (WP.com PHP worker speed,
+plugin-stack bootstrap — 6 WC frontend scripts + Jetpack modules load sitewide). Out of theme
+scope; flagging to team-lead.
+
+**3. Cart unused-css 350ms — fixed.** The entire item is block-library/style.min.css: 19,213
+of 19,352 bytes unused (99.3%) because cart/checkout render WC SHORTCODE markup, not blocks —
+`has_blocks()` on stored page content kept it enqueued. `skyyrose_dequeue_block_styles()` now
+dequeues wp-block-library + wp-block-library-theme on 'cart'/'checkout' slugs specifically;
+wc-blocks-style + global-styles deliberately kept there (WC-adjacent, not flagged unused).
+This also removes cart's 345ms render-blocking block-library entry.
+
+Verification: php -l clean both files; SKYYROSE_URI constant verified (functions.php:23);
+style.min.css existence + build coverage verified; no build/commit/deploy per rules.
+
+## Wave 4 — Pixel2 (2026-07-20)
+
+Round-3 JSONs re-mined per item before editing — two dispatch premises corrected:
+the cross-page offscreen offender is NOT footer-cro customer/instagram imgs (that
+part renders zero <img>; customer photos are about-page-only) but
+**assets/images/mascot/skyy-canonical.jpeg** — triple-flagged on every page
+(118KB offscreen + 71KB modern-format + 40KB responsive). And the flagged v7/ci
+bytes are the **avif <source>** fetches, so bare img srcset would have been inert;
+every fix below suppresses the avif source while Photon answers (same trade
+skyyrose_render_picture makes).
+
+### Shipped (6 files, php -l clean; PHP-only — no .min rebuild needed)
+1. **skyy-mascot.php** — main + recall imgs → skyyrose_render_picture()
+   (avif/webp siblings tracked + live, 30KB avif vs 118KB jpeg) with
+   loading=lazy. Kills the sitewide triple flag; recall pill reuses the same
+   URL so picture negotiation hits the cached avif.
+2. **product-card-v7-lookbook.php** — per-shot Photon srcset 320/480/768 +
+   holo's sizes string (same product-grid cells); avif source suppressed while
+   active. Verified: front.webp @w=480 = 36KB vs the 90-130KB avifs that were
+   the top line items on shop/collection-BR/LH/SIG/landing-BR.
+3. **page-collections.php** — ci-card lockups (≤300px rendered, 48-88KB avifs,
+   690ms): webp source + img get Photon srcset 320/640/960, sizes
+   "(max-width:430px) 70vw, 300px". First card stays eager (page LCP — now
+   fetches ~10-40KB instead of 88KB).
+4. **front-page.php** — commercial-runway tiles ×3 (br-006 was 140KB): Photon
+   srcset 480/768/1024, sizes "(max-width:1024px) 92vw, 484px" (rail goes
+   column ≤1024 per homepage-v2.css).
+5. **template-preorder-gateway.php** — po-hero lockup (≤600px, was 93KB avif),
+   panel portraits (≤290px), panel lockups (120px), grid lockups (140px): all
+   get Photon srcset + avif-suppression with per-surface sizes.
+6. **collection/page.php** — col-hero emblem (≤154px rendered): Photon srcset
+   160/320/480.
+
+### Deliberate skips (none silent)
+- **Homepage hero-bg (211KB avif — home's biggest item): BLOCKED on
+  inc/enqueue.php** (Bolt's file): front-page preloads the full-size avif with
+  fetchpriority=high (~line 721); adding template srcset without converting that
+  preload to imagesrcset/imagesizes (or dropping it) double-fetches ~300KB on
+  the LCP element. Handoff sent to Bolt — template half is a 10-line follow-up
+  once the preload half lands.
+- **luxury-nighttime-1680w.jpg (pre-order, 119KB modern-format): PHANTOM.**
+  The round-3 trace also fetched luxury-nighttime-768w.webp — a URL absent from
+  current markup; cache-busted live HTML shows the correct webp-srcset picture.
+  Stale-Batcache capture of that block; jpg fallback is unreachable now.
+- **styleAtelierImage (front-page)** — JS swaps src on choice-click; srcset
+  would pin the browser to stale candidates. Needs a JS-side srcset swap
+  (atelier JS lane), not a template edit.
+- **sr-monogram-gold / circular-patch jpegs (pre-order)** — already inside
+  working <picture>s; trace confirms only avifs downloaded. No change needed.
+- **header tsrc-lockup-static@2x.webp (4-5KB/page)** — intentional 2x DPR asset
+  for a 60px slot; savings under Photon overhead.
+- Small fry (<35KB, single-page): scene-black-rose-gazebo.webp, about founder
+  webp 12KB, home lookbook avif 15KB.
+
+**Verification:** php -l ×6 clean; 5 emitted Photon URL patterns curl-verified
+200 image/webp at target widths (36/42/24/38/42KB); mascot avif live-verified
+200 (30.5KB); no CSS/JS touched. Post-deploy: re-run mobile Lighthouse per the
+locked protocol — expect uses-responsive-images + offscreen-images +
+modern-image-formats near-zero on shop/collections/landing-BR/pre-order and the
+mascot flags gone from all 18 URLs.
+
+### Bolt — Wave 4 addendum: responsive hero preload (paired with Pixel2)
+
+- `inc/enqueue.php` front-page wp_head closure: the flat full-size AVIF preload (294KB at
+  every viewport — home mobile's biggest image line) replaced with a responsive
+  `imagesrcset`/`imagesizes="100vw"` preload built from
+  `skyyrose_photon_srcset( homepage-hero-bg.webp, [480,768,1280,1920] )`. No `type=` attr on
+  purpose — Photon serves webp to webp-Accept clients and a jpeg transcode otherwise.
+- Verified: helper contract read from inc/performance.php (returns '' on any failure →
+  fallback branch keeps the previous full-AVIF/WebP preload untouched); live Photon URL for
+  the 768w candidate curl-verified 200 image/webp 94,142B (vs 294KB flat AVIF).
+- PAIRING CONTRACT: Pixel2 ships the matching front-page.php hero `<picture>` srcset in this
+  same deploy train — preload and rendered srcset must emit IDENTICAL URLs or the LCP
+  double-fetches. Constraint comment in code. `php -l` clean.

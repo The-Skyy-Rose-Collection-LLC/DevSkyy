@@ -147,9 +147,13 @@
 		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom));
 	}
 
+	/* Kept intentionally small: the message paragraph must never be the
+	   largest contentful element on text-light pages (Wave 4 — it became
+	   the mobile LCP on faq/shipping-returns/kids at 12px). */
 	.cookie-consent__message {
-		font-size: 12px;
-		line-height: 1.45;
+		font-size: 11px;
+		line-height: 1.4;
+		max-width: 46ch;
 	}
 
 	.cookie-consent__btn {

@@ -287,9 +287,24 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 		<h2><?php esc_html_e( 'Luxury Streetwear, Ready To Move.', 'skyyrose' ); ?></h2>
 		<p><?php esc_html_e( 'A faster path from first impression to cart: signature drops, collection worlds, fit help, and real product photography in one commercial flow.', 'skyyrose' ); ?></p>
 	</div>
+	<?php
+	// Tiles ship 1024px sources into ~484px cells (column layout ≤1024px).
+	// Photon width variants cut the runway's bytes (br-006 was 140KB in
+	// round-3 uses-responsive-images); fallback src stays direct.
+	$ct_sizes  = '(max-width: 1024px) 92vw, 484px';
+	$ct_widths = array( 480, 768, 1024 );
+	?>
 	<div class="commercial-runway__rail stagger-grid">
 		<a class="commercial-tile commercial-tile--wide magnetic" href="<?php echo esc_url( home_url( '/collections/black-rose/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'br-006', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Black Rose sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -300,7 +315,15 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 			<em><?php esc_html_e( 'Cold-weather statement pieces with Oakland weight.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collections/love-hurts/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'lh-004', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'lh-004', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Love Hurts varsity jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -311,7 +334,15 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 			<em><?php esc_html_e( 'Built for nights that need proof.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collections/signature/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'sg-009', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'sg-009', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Signature sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"

@@ -47,10 +47,20 @@ function skyyrose_enqueue_global_styles() {
 	$base_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	// Main theme stylesheet (style.css with WordPress header).
+	// Main theme stylesheet (style.css with WordPress header). Serve the built
+	// style.min.css when current (26.3K → 18.3K; round-3 flagged the raw file
+	// render-blocking on 9 pages). Freshness-guarded: a .min older than its
+	// source falls back to style.css, so a deploy-without-rebuild can never
+	// ship stale rules (style.css carried a P0 syntax fix in Wave 1).
+	$style_uri = get_stylesheet_uri();
+	$style_min = SKYYROSE_DIR . '/style.min.css';
+	if ( $use_min && file_exists( $style_min )
+		&& filemtime( $style_min ) >= filemtime( SKYYROSE_DIR . '/style.css' ) ) {
+		$style_uri = SKYYROSE_URI . '/style.min.css';
+	}
 	wp_enqueue_style(
 		'skyyrose-style',
-		get_stylesheet_uri(),
+		$style_uri,
 		array(),
 		SKYYROSE_VERSION
 	);
@@ -721,7 +731,24 @@ function skyyrose_enqueue_template_styles() {
 			'wp_head',
 			function () {
 				$webp_url = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
-				$avif     = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
+
+				// Responsive Photon preload (Wave 4, PAIRED with Pixel2's hero
+				// <picture> srcset in front-page.php — the two must emit
+				// identical URLs or the LCP double-fetches ~300KB). The flat
+				// preload fetched the full 294KB AVIF at every viewport;
+				// Photon serves width-sized webp instead (jpeg transcode for
+				// non-webp Accept clients — hence NO type= attribute, it would
+				// be dishonest on the transcode path).
+				$hero_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( $webp_url, array( 480, 768, 1280, 1920 ) )
+					: '';
+				if ( '' !== $hero_srcset ) {
+					echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $hero_srcset ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					return;
+				}
+
+				// Fallback (helper unavailable/unusable): full-size next-gen preload.
+				$avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
 				if ( $avif && file_exists( $avif['path'] ) ) {
 					echo '<link rel="preload" as="image" href="' . esc_url( $avif['url'] ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				} else {

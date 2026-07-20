@@ -624,6 +624,33 @@ function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
 
 	$sources = skyyrose_picture_sources( $src );
 
+	// --- Photon width variants (Wave 4) --------------------------------------
+	// 'photon_widths' => array of px widths builds an on-the-fly srcset via
+	// skyyrose_photon_srcset() — no on-disk siblings needed. Photon answers
+	// with webp for webp-Accept clients, so when active we (a) reuse the
+	// existing $srcset_attr pipe (img + webp <source>), and (b) suppress the
+	// avif <source>: Photon would return webp under type="image/avif".
+	// Placement-contract srcset (real on-disk variants) always wins.
+	$photon_active = false;
+	if ( isset( $attrs['photon_widths'] ) ) {
+		$photon_widths = (array) $attrs['photon_widths'];
+		unset( $attrs['photon_widths'] );
+		if ( '' === $srcset_attr && function_exists( 'skyyrose_photon_srcset' ) ) {
+			$photon_srcset = skyyrose_photon_srcset( $sources['src'], $photon_widths );
+			if ( '' !== $photon_srcset ) {
+				$srcset_attr   = $photon_srcset;
+				$photon_active = true;
+				if ( '' === $sizes_attr && isset( $attrs['sizes'] ) ) {
+					$sizes_attr = (string) $attrs['sizes'];
+					unset( $attrs['sizes'] );
+				}
+			}
+		}
+	}
+	if ( $photon_active && ! empty( $sources['avif'] ) ) {
+		$sources['avif'] = null;
+	}
+
 	// Build the HTML attribute string for the <img> tag.
 	$attr_html = '';
 	foreach ( $attrs as $key => $val ) {

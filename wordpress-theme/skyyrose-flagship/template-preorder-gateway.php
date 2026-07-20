@@ -115,10 +115,27 @@ get_header();
 		<div class="po-hero__content">
 			<p class="po-hero__eyebrow po-rv"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></p>
 
+			<?php
+			// Hero lockup renders ≤600px (width attr; ~92vw on mobile) but shipped
+			// the full-size 93KB AVIF. Photon width variants via the webp; avif
+			// <source> suppressed while Photon answers (it serves webp).
+			$po_h_srcset = function_exists( 'skyyrose_photon_srcset' )
+				? skyyrose_photon_srcset( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp', array( 360, 600, 1200 ) )
+				: '';
+			$po_h_sizes  = '(max-width: 640px) 92vw, 600px';
+			?>
 			<picture class="po-hero__lockup po-rv">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.avif?v=' . $po_ver ); ?>" type="image/avif">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp?v=' . $po_ver ); ?>" type="image/webp">
+				<?php if ( '' !== $po_h_srcset ) : ?>
+					<source srcset="<?php echo esc_attr( $po_h_srcset ); ?>" sizes="<?php echo esc_attr( $po_h_sizes ); ?>" type="image/webp">
+				<?php else : ?>
+					<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.avif?v=' . $po_ver ); ?>" type="image/avif">
+					<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp?v=' . $po_ver ); ?>" type="image/webp">
+				<?php endif; ?>
 				<img src="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.png?v=' . $po_ver ); ?>"
+					<?php if ( '' !== $po_h_srcset ) : ?>
+						srcset="<?php echo esc_attr( $po_h_srcset ); ?>"
+						sizes="<?php echo esc_attr( $po_h_sizes ); ?>"
+					<?php endif; ?>
 					alt="<?php esc_attr_e( 'Skyy Rose', 'skyyrose' ); ?>"
 					width="600" height="200" loading="eager">
 			</picture>
@@ -258,12 +275,30 @@ get_header();
 
 					<div class="po-panel__bg" aria-hidden="true">
 						<?php if ( $po_portrait ) : ?>
+							<?php
+							// Panels render ≤290px wide (minmax(220px,1fr) in a 900px grid)
+							// but shipped full-size AVIF (round-3 uses-responsive-images).
+							// Photon width variants via the webp; avif <source> suppressed
+							// while Photon answers (it serves webp — keeps type= honest).
+							$po_p_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_portrait['webp'], array( 320, 480, 640 ) )
+								: '';
+							$po_p_sizes  = '(max-width: 480px) 92vw, (max-width: 900px) 46vw, 290px';
+							?>
 							<picture>
-								<?php if ( ! empty( $po_portrait['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_p_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_p_srcset ); ?>" sizes="<?php echo esc_attr( $po_p_sizes ); ?>" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_portrait['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_portrait['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_portrait['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_portrait['jpg'] ); ?>"
+									<?php if ( '' !== $po_p_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_p_srcset ); ?>"
+										sizes="<?php echo esc_attr( $po_p_sizes ); ?>"
+									<?php endif; ?>
 									alt=""
 									width="<?php echo absint( $po_portrait['w'] ); ?>"
 									height="<?php echo absint( $po_portrait['h'] ); ?>"
@@ -279,12 +314,27 @@ get_header();
 						</span>
 
 						<?php if ( $po_lockup ) : ?>
+							<?php
+							// Lockup renders ≤120px (.po-panel__lockup) — full-size AVIF
+							// (50-93KB) was pure waste. Same Photon/avif-suppression trade.
+							$po_l_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_lockup['webp'], array( 120, 240, 360 ) )
+								: '';
+							?>
 							<picture class="po-panel__lockup">
-								<?php if ( ! empty( $po_lockup['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_l_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_l_srcset ); ?>" sizes="120px" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_lockup['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_lockup['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_lockup['png'] ); ?>"
+									<?php if ( '' !== $po_l_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_l_srcset ); ?>"
+										sizes="120px"
+									<?php endif; ?>
 									alt="<?php echo esc_attr( $po_lockup['alt'] ); ?>"
 									width="260" height="80" loading="lazy"
 									<?php if ( ! empty( $po_lockup['style'] ) ) : ?>
@@ -358,13 +408,26 @@ get_header();
 						<?php
 						$po_g_lockup = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
 						if ( $po_g_lockup ) :
+							// Renders ≤140px (.po-grid__lockup) — same Photon/avif-suppression
+							// trade as the panel lockup above.
+							$po_gl_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_g_lockup['webp'], array( 140, 280, 420 ) )
+								: '';
 							?>
 							<picture class="po-grid__lockup">
-								<?php if ( ! empty( $po_g_lockup['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_gl_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_gl_srcset ); ?>" sizes="140px" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_g_lockup['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_g_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_g_lockup['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_g_lockup['png'] ); ?>"
+									<?php if ( '' !== $po_gl_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_gl_srcset ); ?>"
+										sizes="140px"
+									<?php endif; ?>
 									alt="<?php echo esc_attr( $po_g_lockup['alt'] ); ?>"
 									width="200" height="60" loading="lazy"
 									<?php if ( ! empty( $po_g_lockup['style'] ) ) : ?>

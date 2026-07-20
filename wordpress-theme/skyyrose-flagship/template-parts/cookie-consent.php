@@ -72,9 +72,17 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	function sheetLive() {
 		return 'fixed' === window.getComputedStyle( banner ).position;
 	}
-	if ( sheetLive() ) {
-		reveal();
-	} else {
+	// LCP guard (Wave 4): on text-light pages (faq, shipping-returns, kids
+	// teaser) the banner message painted early enough — and large enough —
+	// to BECOME the Lighthouse LCP element at 5.0-5.7s. Defer the reveal
+	// until after the load event + an idle slot so every real content
+	// element has painted first; the sheetLive gate then still applies so
+	// there is never an unstyled flash.
+	function start() {
+		if ( sheetLive() ) {
+			reveal();
+			return;
+		}
 		var revealed = false;
 		var go = function() { if ( ! revealed ) { revealed = true; reveal(); } };
 		var link = document.getElementById( 'skyyrose-cookie-consent-css' );
@@ -88,6 +96,18 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 			if ( sheetLive() || Date.now() - t0 > 3000 ) { go(); return; }
 			requestAnimationFrame( poll );
 		} )();
+	}
+	function idleStart() {
+		if ( 'requestIdleCallback' in window ) {
+			requestIdleCallback( start, { timeout: 2000 } );
+		} else {
+			setTimeout( start, 250 );
+		}
+	}
+	if ( 'complete' === document.readyState ) {
+		idleStart();
+	} else {
+		window.addEventListener( 'load', idleStart );
 	}
 	function dismiss( value ) {
 		localStorage.setItem( 'skyyrose_cookie_consent', value );

@@ -84,22 +84,26 @@ $index = (int) ( $args['index'] ?? 0 );
 					$front_url,
 					$title,
 					array(
-						'class'    => 'holo__img holo__img--front',
-						'loading'  => 'lazy',
-						'decoding' => 'async',
-						'width'    => '600',
-						'height'   => '750',
+						'class'         => 'holo__img holo__img--front',
+						'loading'       => 'lazy',
+						'decoding'      => 'async',
+						'width'         => '600',
+						'height'        => '750',
+						'photon_widths' => array( 320, 480, 768 ),
+						'sizes'         => '(max-width: 480px) 92vw, (max-width: 1024px) 46vw, 440px',
 					)
 				);
 				echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
 					$back_url,
 					$title . ' — technical blueprint view',
 					array(
-						'class'    => 'holo__img holo__img--back',
-						'loading'  => 'lazy',
-						'decoding' => 'async',
-						'width'    => '600',
-						'height'   => '750',
+						'class'         => 'holo__img holo__img--back',
+						'loading'       => 'lazy',
+						'decoding'      => 'async',
+						'width'         => '600',
+						'height'        => '750',
+						'photon_widths' => array( 320, 480, 768 ),
+						'sizes'         => '(max-width: 480px) 92vw, (max-width: 1024px) 46vw, 440px',
 					)
 				);
 				?>

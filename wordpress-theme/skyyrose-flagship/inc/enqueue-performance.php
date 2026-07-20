@@ -179,6 +179,15 @@ function skyyrose_async_noncritical_styles( $html, $handle ) {
 									// defer without that contract.
 	);
 
+	// Per-template: skeleton shimmer markup is server-rendered ONLY by the
+	// landing templates (grep: template-landing-black-rose/-signature) —
+	// everywhere else .skeleton classes are JS-applied, so the sheet is safe
+	// async (round-3: it blocked paint on collection pages).
+	if ( function_exists( 'skyyrose_get_current_template_slug' )
+		&& 'landing' !== skyyrose_get_current_template_slug() ) {
+		$async_handles[] = 'skyyrose-skeleton';
+	}
+
 	if ( ! in_array( $handle, $async_handles, true ) ) {
 		return $html;
 	}
@@ -374,6 +383,19 @@ function skyyrose_dequeue_block_styles() {
 		return;
 	}
 
+	// Cart/checkout render WC shortcode markup, not blocks — round-3 measured
+	// block-library 99.3% unused on /cart/ (19,213 of 19,352 bytes) while
+	// has_blocks() on the stored page content kept it enqueued. Dequeue just
+	// the block-library pair; wc-blocks-style + global-styles stay (WC-adjacent,
+	// not flagged unused).
+	$bl_slug = function_exists( 'skyyrose_get_current_template_slug' )
+		? skyyrose_get_current_template_slug() : '';
+	if ( in_array( $bl_slug, array( 'cart', 'checkout' ), true ) ) {
+		wp_dequeue_style( 'wp-block-library' );
+		wp_dequeue_style( 'wp-block-library-theme' );
+		return;
+	}
+
 	// Keep block styles on pages that actually use blocks. Templates that
 	// never call the_content() can't render blocks regardless of what the
 	// stored page content contains, so they skip this check.
@@ -563,3 +585,52 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_platform_styles', 102 );
 add_action( 'wp_footer', 'skyyrose_dequeue_block_styles', 1 );
 add_action( 'wp_footer', 'skyyrose_dequeue_jetpack_non_context_styles', 1 );
 add_action( 'wp_footer', 'skyyrose_dequeue_platform_styles', 1 );
+
+// Print-time pass (Wave 4): Jetpack sharedaddy enqueues its styles from
+// wp_head — AFTER wp_enqueue_scripts — so social-logos survived the wave-1
+// gates in the homepage <head> (round-3: blocking on 9 pages). wp_print_styles
+// fires inside wp_head immediately before head styles print, catching those
+// late head enqueues. Idempotent like the passes above.
+add_action( 'wp_print_styles', 'skyyrose_dequeue_block_styles', 0 );
+add_action( 'wp_print_styles', 'skyyrose_dequeue_jetpack_non_context_styles', 0 );
+add_action( 'wp_print_styles', 'skyyrose_dequeue_platform_styles', 0 );
+
+/**
+ * Move jQuery to the footer on content-only templates.
+ *
+ * Round-3: jquery.min.js was the #1 render-blocker (head-printed on 15 pages,
+ * up to 353ms) yet on content templates its only dependents are WooCommerce's
+ * sitewide frontend stack (add-to-cart, order-attribution, sourcebuster) —
+ * all footer-printed. Verified 2026-07-20: rendered HTML of privacy/about/
+ * faq/contact/shipping-returns contains ZERO inline jQuery( usage, so nothing
+ * needs jQuery before the footer there. Fail-closed twice over: commerce
+ * surfaces (front-page, collections, PDP, cart/checkout, wishlist) and
+ * logged-in views are excluded here, and WordPress core ignores the group
+ * move whenever any head-printed script still depends on jQuery.
+ *
+ * @since 1.11.2
+ * @return void
+ */
+function skyyrose_footer_jquery_on_content_pages() {
+	if ( is_admin() || is_user_logged_in() ) {
+		return;
+	}
+
+	$slug  = function_exists( 'skyyrose_get_current_template_slug' )
+		? skyyrose_get_current_template_slug() : '';
+	$slugs = array( 'about', 'contact', 'faq', 'shipping-returns', 'blog', 'single', 'search', 'page' );
+	if ( ! in_array( $slug, $slugs, true ) ) {
+		return;
+	}
+
+	// Wishlist resolves to the generic 'page' slug but renders add-to-cart UI.
+	if ( 'page' === $slug && is_page( 'wishlist' ) ) {
+		return;
+	}
+
+	$scripts = wp_scripts();
+	foreach ( array( 'jquery', 'jquery-core', 'jquery-migrate' ) as $jq_handle ) {
+		$scripts->add_data( $jq_handle, 'group', 1 );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_footer_jquery_on_content_pages', 99 );

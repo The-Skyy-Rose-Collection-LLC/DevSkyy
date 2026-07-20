@@ -77,15 +77,23 @@ $recall_thumb = $skyy_img_url ?: '';
 		aria-expanded="false"
 	>
 		<?php if ( $skyy_img_url ) : ?>
-			<img
-				src="<?php echo esc_url( $skyy_img_url ); ?>"
-				alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot', 'skyyrose' ); ?>"
-				class="skyyrose-mascot__image"
-				width="220"
-				height="auto"
-				loading="eager"
-				decoding="async"
-			/>
+			<?php
+			// AVIF/WebP siblings exist on disk (30KB/39KB vs the 118KB jpeg) and
+			// the widget mounts hidden, then walks in — lazy + <picture> removes
+			// the jpeg from every page's initial payload (offscreen-images +
+			// modern-image-formats flagged sitewide, round-3 Lighthouse).
+			echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
+				$skyy_img_url,
+				__( 'Skyy, SkyyRose brand mascot', 'skyyrose' ),
+				array(
+					'class'    => 'skyyrose-mascot__image',
+					'width'    => '220',
+					'height'   => 'auto',
+					'loading'  => 'lazy',
+					'decoding' => 'async',
+				)
+			);
+			?>
 		<?php else : ?>
 			<!-- Fallback when image not yet deployed -->
 			<div class="skyyrose-mascot__image-placeholder" aria-hidden="true">
@@ -137,13 +145,22 @@ $recall_thumb = $skyy_img_url ?: '';
 	aria-label="<?php esc_attr_e( 'Bring Skyy back', 'skyyrose' ); ?>"
 >
 	<?php if ( $recall_thumb ) : ?>
-		<img
-			src="<?php echo esc_url( $recall_thumb ); ?>"
-			alt=""
-			aria-hidden="true"
-			width="32"
-			height="32"
-		/>
+		<?php
+		// Same URL as the main mascot image so <picture> negotiation resolves
+		// to the already-cached AVIF instead of a second full-size jpeg fetch
+		// (display:none does NOT prevent an <img src> download).
+		echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
+			$recall_thumb,
+			'',
+			array(
+				'aria-hidden' => 'true',
+				'width'       => '32',
+				'height'      => '32',
+				'loading'     => 'lazy',
+				'decoding'    => 'async',
+			)
+		);
+		?>
 	<?php else : ?>
 		<span aria-hidden="true" style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;">🌹</span>
 	<?php endif; ?>
