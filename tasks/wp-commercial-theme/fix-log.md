@@ -448,3 +448,9 @@ script changes at all. `<noscript>` fallback duplicates the original render-bloc
   before-CSS banner. Author-origin [hidden] rule restores the contract.
 - Unblocks: cookie-consent.css can join Bolt's deferred list (7th sheet off critical path).
 - php -l + brace-balance clean.
+
+## Ultracode pre-ship review (wf_ba262e94) — CLOSED 2026-07-19
+11 findings: 3 adversarially confirmed (0 refutes), 8 dropped when verifier fleet hit session
+limit → all 8 inline-verified on main thread. Net: 7 real defects FIXED in ec76abffa (see commit),
+1 refuted (Inter-primary — only @font-face declarations), rest dups. Review verdict: ship
+unblocked. Buglog entry appended (see registry).
