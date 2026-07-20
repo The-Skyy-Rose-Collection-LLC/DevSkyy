@@ -466,7 +466,40 @@
      MAGNETIC CTA
      rAF-throttled mousemove on .po-btn[data-magnetic]
   ────────────────────────────────────────────── */
-  function initMagneticCTA() {
+  /* ── Hero video boot ─────────────────────────────────────────────
+   The hero <video> ships without autoplay and with preload="none" so
+   its 3.5MB webm never contends with the LCP poster paint. Playback
+   starts at window load, or immediately on first interaction —
+   whichever comes first. The poster <picture> behind it shows the
+   identical frame until then. */
+function initHeroVideo() {
+  var video = document.querySelector('.po-hero__video');
+  if (!video) return;
+  var boot = function () {
+    if (video.dataset.booted) return;
+    video.dataset.booted = '1';
+    video.preload = 'auto';
+    var attempt = video.play();
+    if (attempt && attempt.catch) {
+      attempt.catch(function () {
+        // Autoplay refused (battery saver etc.): retry on first gesture.
+        document.addEventListener('pointerdown', function () {
+          video.play().catch(function () {});
+        }, { once: true });
+      });
+    }
+  };
+  if (document.readyState === 'complete') {
+    boot();
+  } else {
+    window.addEventListener('load', boot, { once: true });
+  }
+  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (evt) {
+    window.addEventListener(evt, boot, { once: true, passive: true });
+  });
+}
+
+function initMagneticCTA() {
     if (prefersReducedMotion()) { return; }
 
     var magnets = qsa('.po-btn[data-magnetic], .po-btn--reserve[data-magnetic]');
@@ -522,6 +555,7 @@
     initAccordions();
     initEmailCapture();
     initMagneticCTA();
+    initHeroVideo();
   }
 
   if (document.readyState === 'loading') {

@@ -148,7 +148,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 				// 1600px, the mobile LCP element — audit Wave 2). Fallback src
 				// stays direct, so no Photon = today's behavior.
 				$hero_logo_srcset = function_exists( 'skyyrose_photon_srcset' )
-					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $resolved_hero_logo, array( 480, 640, 960, 1280 ) )
+					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $resolved_hero_logo, array( 480, 640, 720, 960, 1280 ) )
 					: '';
 				?>
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_logo . '?v=' . SKYYROSE_VERSION ); ?>"

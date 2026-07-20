@@ -240,6 +240,21 @@ function skyyrose_product_image_uri( $image_path ) {
 	if ( empty( $image_path ) ) {
 		return get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 	}
+
+	/*
+	 * Serve a .webp sibling when one exists on disk. Several catalog entries
+	 * name 2.4-2.6MB source PNGs that Photon can only recompress LOSSLESSLY
+	 * (795-892KB on the wire at w=768 — round-7 mobile LCP contention on
+	 * shop/black-rose/signature/landing). The catalog path stays canonical
+	 * (SOT untouched); this swaps the encoding of the same pixels at the
+	 * presentation layer. No sibling on disk = original path, unchanged.
+	 */
+	if ( str_ends_with( $image_path, '.png' ) ) {
+		$webp_sibling = substr( $image_path, 0, -4 ) . '.webp';
+		if ( is_readable( get_theme_file_path( $webp_sibling ) ) ) {
+			return get_theme_file_uri( $webp_sibling );
+		}
+	}
 	return get_theme_file_uri( $image_path );
 }
 

@@ -94,9 +94,22 @@ get_header();
 		// visitors still see the brand footage, never an unrelated still.
 		?>
 		<div class="po-hero__media" aria-hidden="true" style="--po-hero-poster: url('<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.webp?v=' . $po_ver ); ?>')">
+			<?php
+			/*
+			 * No autoplay/poster attrs, preload=none: the 3.5MB webm fetched
+			 * inside the LCP window (round-7 mobile: poster load time up to
+			 * 2.8s from link contention), and the poster attr double-fetched
+			 * the frame as JPG next to the picture layer's webp. The
+			 * .po-hero__poster <picture> behind the video paints the identical
+			 * frame, and preorder-gateway.js initHeroVideo() starts playback
+			 * at window load (or first interaction, whichever comes first) —
+			 * the hero still plays the founder video, it just stops taxing
+			 * first paint. Founder canon (video plays, full outfit visible)
+			 * unchanged.
+			 */
+			?>
 			<video class="po-hero__video"
-				autoplay muted loop playsinline
-				poster="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.jpg?v=' . $po_ver ); ?>">
+				muted loop playsinline preload="none">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.webm?v=' . $po_ver ); ?>" type="video/webm">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.mp4?v=' . $po_ver ); ?>" type="video/mp4">
 			</video>
@@ -126,7 +139,7 @@ get_header();
 			// the full-size 93KB AVIF. Photon width variants via the webp; avif
 			// <source> suppressed while Photon answers (it serves webp).
 			$po_h_srcset = function_exists( 'skyyrose_photon_srcset' )
-				? skyyrose_photon_srcset( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp', array( 360, 600, 1200 ) )
+				? skyyrose_photon_srcset( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp', array( 360, 600, 960 ) )
 				: '';
 			$po_h_sizes  = '(max-width: 640px) 92vw, 600px';
 			?>

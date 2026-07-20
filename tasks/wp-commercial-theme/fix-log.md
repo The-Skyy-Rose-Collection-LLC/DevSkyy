@@ -1051,3 +1051,180 @@ Every demotion grep-verified against above-fold selectors before listing (fail-c
   below-fold.
 - Expected per Pixel4: BR/SIG mobile LCP −~1s render delay + load-delay relief from ~12
   fewer render-blocking sheets on the same link.
+
+### Sentinel2 r2 (v1.12.5) — 5/5 VERIFIED, zero failures
+Collection motion proven on BOTH paths by resource timing: wheel → gsap 45ms after loadEnd;
+no-interaction → gsap at load+8s. Heroes paint styled; feature-scroll/grid animate in with
+real cards. Footer CLS guard holds (cart/wishlist render-blocking, tall pages async +
+noscript). Shop first-row eager / below-fold lazy. Mascot appears ~14.5s no-interaction
+(8s loader + designed 4.5s FIRST_ENTRY_DELAY), sooner on interaction. 7/7 URLs 200, zero
+console/PHP errors.
+- Finding (a) "chain pinned ver=1.12.4" = RESOLVED, stale-HTML artifact. Live re-check:
+  theme chain files serve ?ver=1.12.5; gsap/ScrollTrigger correctly carry their library
+  version 3.12.2. No code bug.
+- Finding (b) BR "Moonlit Courtyard" → homepage-col-black-rose.webp 404 (designed COMING
+  SOON fallback). PRE-EXISTING, predates this sweep. Founder/imagery item, not perf.
+- OPEN for next diagnosis: collection-feature-scroll.min.css appears twice on BR (media='all'
+  AND media='print' onload) — verify whether the 'all' copy is the noscript twin or a real
+  duplicate render-blocking enqueue defeating the async.
+
+## Round 7 — v1.12.5 (median-of-3, protocol v3: gate + warm). THE TBT WAVE.
+Blocking time essentially eliminated sitewide — gsap gate + mascot timing fix:
+home 108.5→10.5 · shop 110.5→10 · BR 101→26 · signature 94.5→26.5 · wishlist 105→9 ·
+cart 225→67.5 · collections 116→19.5. Only PDP remains (577→549, three.js).
+DESKTOP: 94-100 on ALL 17 URLs — six at 100 (collections, kids, faq, privacy, wishlist,
+shipping). Desktop is done.
+MOBILE >=90 (6): faq 96 · shipping 95 · kids 94 · contact 93 · about 91 · privacy 91.
+Near: cart 89 · collections 86 · wishlist 85 · LH 83 · landing-BR 82 · signature 81.
+Below: BR 78 · shop 77 · pre-order 76 · home 75 · PDP 71.
+DIAGNOSIS: TBT is solved; mobile is now a PURE LCP problem (4.1-6.1s on every laggard).
+REGRESSION TO WATCH: pre-order 85→76, LCP 3,854→5,576ms — the video hero is the likely
+cause (its poster/video changed in v1.12.2). Verify before assuming.
+
+## Wave 8 — Bolt: PDP verdict — timing alone cannot fix it (2026-07-20)
+
+Round-7 PDP mobile, all three runs read. The hypothesis test came back conclusive:
+
+- **r2 (loader 1.12.5, the Wave-7 fix): the 8s timer fired EXACTLY as designed** — mascot
+  fetch at 9,281ms = load(1,279) + 8,002ms; no pre-load boot (scroll-trigger removal held).
+  But the observed trace was STILL open at 9.3s — PDP's own stack (Stripe elements sessions
+  ×3, GPay express checkout, WC sourcebuster/order-attribution, commercekit nonce ajax) had
+  not gone quiet — so the boot landed in-trace, the three.js parse counted (340+126ms sim),
+  and the render loop then held the trace to the 45s cap. TBT 549.
+- **r3 (same loader, same page): trace ended at 6,717ms, BEFORE the timer — mascot never
+  fetched in-trace. TBT 94ms.** This run IS the measured counterfactual: a mobile PDP where
+  the 3D never auto-boots scores ~94ms TBT — the entire 549→94 gap is the mascot boot.
+- **r1 ran a STALE 1.12.4 loader** (Batcache generation mixing again — boot at load+2ms,
+  old post-load-rIC behavior). Median-of-3 therefore reports 549. Even discounting r1, r2
+  shows the new loader losing the quiet race legitimately.
+
+**Why no timer value fixes this:** PDP's natural quiet point varies 6.7s → >9.3s observed,
+and Stripe/GPay polling can hold the trace open to the cap on bad runs. Any finite delay
+loses the race on some fraction of runs; median-of-3 then reports the loss. Raising the
+delay further costs real-UX mascot latency on EVERY page sitewide to chase one page's lab
+variance — and still doesn't bound the tail. The interaction fast-path is already optimal
+(real users who touch anything get her instantly and their runs are not lab runs).
+
+**Verdict, per the work-order framing: timing alone cannot fix PDP.** The remaining lever
+is not WHEN the 3D boots but WHETHER it auto-boots on mobile PDPs — exactly the founder's
+pending 2D/interaction-gate decision, now with measured proof attached: interaction-gated
+(or 2D) mobile PDP = TBT ~94ms (r3), vs 549ms when the auto-boot catches the trace. No code
+changed this wave; nothing to build. Non-mascot residue after the boot is excluded: Stripe
+~130ms blocking + sourcebuster 191ms sim — third-party-cookie/plugin territory already in
+the founder queue.
+
+## Wave 8 — Bolt VERDICT: timing cannot fix PDP (no code change, evidence only)
+Round-7 runs answer it directly:
+- r2 (loader 1.12.5): 8s gate fired EXACTLY as designed — mascot fetch at 9,281ms =
+  load+8,002ms, zero pre-load boots. But PDP's own stack (Stripe elements x3, GPay,
+  sourcebuster, commercekit ajax) had NOT gone quiet at 9.3s, so the boot landed in-trace;
+  three.js parse counted and the rAF loop held the trace to the 45s cap. TBT 549ms.
+- r3 (same loader/page): trace ended 6,717ms BEFORE the timer — mascot never fetched.
+  TBT 94ms. **This is the measured counterfactual: the entire 549→94 gap IS the boot.**
+- r1 ran a STALE 1.12.4 loader (Batcache mixing again) and set the median.
+Why no timer works: PDP's quiet point varies 6.7s→>9.3s; Stripe/GPay polling can hold the
+trace open, so any finite delay loses on some fraction of runs and median-of-3 reports the
+loss. Raising it taxes mascot latency sitewide to chase one page's variance.
+DECISION ARTIFACT for founder: auto-boot 3D on mobile PDP = TBT 549ms, mobile 71.
+Interaction-gated / 2D on mobile PDP = TBT ~94ms, PDP joins the 85+ pack. Residue after
+the boot is Stripe ~130ms + sourcebuster (already founder-queued third-party item).
+
+### Measurement protocol v4 (needed)
+Round 7 STILL had a stale-loader run (r1 = 1.12.4) despite pre-sweep warming: the sweep
+runs 40+ min, so Batcache entries expire mid-sweep. Next round must warm each URL
+immediately before ITS OWN 3 runs, not once for all URLs up front.
+
+## Wave 8 — Pixel5: mobile LCP endgame (2026-07-20)
+
+Round-7 phase breakdowns read for all 9 laggards before touching anything. TTFB is a flat
+~620ms floor sitewide (WP.com origin; untouchable from theme). The remaining LCP cost is
+almost entirely SIMULATED-LINK CONTENTION (load delay + load time) plus the known JS/filter
+render-delay window — and four genuine defects found and fixed.
+
+### Diagnoses (per page, from round7 mobile traces)
+- **pre-order (76)**: LCP = `div.po-hero__media` (the poster painting via `::before`
+  backdrop, 21KB webp). The regression is NOT the video hero design — it's what rides along:
+  (a) STALE PRELOAD `luxury-nighttime-1680w.jpg` 229KB High at 133ms (v1.12.2 removed that
+  hero; the preloaded JPG is used by NOTHING — the below-fold manifesto picks webp srcset);
+  (b) poster double-fetch — `video[poster]` jpg 35KB + backdrop/picture webp 21KB, same
+  frame twice; (c) the 3.5MB webm fetches at 312ms (autoplay) inside the LCP window — r2
+  poster load time 2.8s. Founder canon fully preserved: video still autoplays (at window
+  load or first gesture), full outfit visible, poster identical.
+- **shop (77) / BR (78) / SIG (81) / landing-BR (82)**: LCP images are small and High, but
+  share the 1.6Mbps lantern link with 2.4-2.6MB catalog PNGs that Photon can only
+  recompress LOSSLESSLY: br-015/alt.png 795KB, br-007/front.png 814KB, sg-015 892KB +
+  sg-014 883KB + sg-003 860KB (SIG carries 2.6MB of PNG). Cards whose assets are webp serve
+  ~70-100KB via Photon — the PNG-only SKUs were the outliers.
+- **wishlist (85)**: LCP = empty-state TEXT; FCP 1,551ms but LCP ~4,200ms with zero
+  load phases = WEBFONT SWAP REPAINT. Page pulls ~250KB of Inter (2× fonts.wp.com v13 +
+  self-hosted) because theme.json set BASE body + button to Inter — off typography canon.
+- **home (75)**: LCP = first hero-strip frame (w=320, ~15KB, High). No defect found: cost
+  is contention (hero-bg 92KB + fonts incl. Inter) + render delay 1.4-1.9s from the
+  design-priced strip paint (per-item filters + container mask at opacity 0.16) + JS window.
+- **collections (86)**: LCP lockup 42KB High at 112ms; load time 1.7s is pure shared-link
+  CSS/font contention. No template defect.
+
+### Shipped (4 PHP/JSON + 1 JS + 12 assets; php -l ×3, node --check, JSON-parse all clean)
+1. **template-preorder-gateway.php** — video: dropped `poster` attr (kills the 35KB jpg
+   dupe; the `.po-hero__poster` picture behind the transparent video paints the identical
+   frame), dropped `autoplay`, added `preload="none"`. Hero lockup Photon widths
+   1200→960 (was fetching w=1200/90KB High on mobile).
+2. **assets/js/preorder-gateway.js** — new `initHeroVideo()`: starts playback at window
+   load OR first interaction (pointerdown/touchstart/wheel/keydown), autoplay-refusal
+   retry on first gesture. 3.5MB webm leaves the LCP window; hero still plays unaided.
+3. **inc/product-catalog.php** — `skyyrose_product_image_uri()` now serves a `.webp`
+   sibling when one exists on disk (fail-closed: no sibling = original path). Catalog/SOT
+   data untouched — encoding-level swap of the same pixels, covers shop loop + collection
+   grids + landing card surfaces (all route through this helper).
+4. **12 webp siblings transcoded** (Pillow q82/m6, deterministic re-encode of the exact
+   source PNGs — no new imagery, no garment risk; same pixels already live as PNG):
+   br-004/006/008/010/011/015 alt, lh-002 alt, br-007/sg-003/sg-014/sg-015 front,
+   sg-011 back. 2.4-2.6MB → 150-200KB each; Photon w=768 will serve ~60-100KB lossy.
+   **NOTE for team lead: new binaries — `git add -f` if products/ is gitignored.**
+5. **template-parts/collection/page.php** — hero lockup srcset gains a 720 step
+   (mobile was picking w=960: 109-151KB High; 720 ≈ −30% on the biggest non-CSS
+   contender of the col-hero LCP).
+6. **theme.json** — base body + button `fontFamily` inter → hanken-grotesk (canon:
+   body/UI = Hanken; Inter fallback-only). Drops ~250KB of font fetches from every
+   page's critical window. Inter preset/`@font-face` declarations kept.
+
+### Logged to enqueue-requests.md (Bolt's lane)
+- **#9**: delete the dead luxury-nighttime preload (enqueue-performance.php:417) — the
+  largest single slice of the pre-order regression.
+- **#10**: post-deploy, verify fonts.wp.com Inter is gone; if it persists it's DB Global
+  Styles (wp-admin), founder/team-lead action.
+
+### Verified benign / out of lane (honest limits)
+- **BR duplicate collection-feature-scroll.min.css: NOT a defect** — curl of live HTML
+  shows the `media='all'` copy wrapped in `<noscript>` (the async pattern's legitimate
+  twin). Team-lead flag closed, no enqueue change needed.
+- **landing-BR raw `br-006-onmodel.webp` 235KB Medium, no Photon/version param**: appears
+  in NO theme PHP — it's page-content (DB) markup. Needs a wp-admin edit (Photon-sized
+  src) — team-lead/founder item, not theme code.
+- **home**: after the Inter trim, what remains is design-priced — the strip's filter+mask
+  paint and the 0.16-opacity backdrop are the render-delay floor (already flagged Wave 7).
+  Founder decision if 90+ is required on home mobile.
+- **inc/builders/elementor-compat.php:378** builds card URLs by string concat, bypassing
+  the resolver swap — left untouched (runtime path shape unverified; measured pages don't
+  use it). One-line follow-up if an Elementor surface ever serves a v7 PNG.
+- **TTFB ~620ms** on every page: WP.com origin floor, not addressable in theme.
+
+### Expected effect (to verify post-deploy, mobile round 8)
+pre-order: −229KB High preload (after #9) − 35KB dupe poster − 3.5MB webm out of window →
+LCP should return to ≤3.9s (pre-regression) or better. shop/BR/SIG/landing-BR: −0.7-2.4MB
+per page off the simulated link. wishlist: text-LCP swap moves with the font window.
+Sitewide: −250KB fonts. `audits['largest-contentful-paint-element']` per page must name
+the same elements as round 7 (no candidate flips).
+
+### FOUNDER DECISION (2026-07-20): mascot 3D auto-boots EVERYWHERE, including mobile PDP.
+PDP mobile ~71 / TBT 549ms is ACCEPTED as a deliberate brand trade (consistency over score).
+Bolt's r2-vs-r3 counterfactual (549ms boot vs 94ms no-boot) is the evidence behind the call.
+PDP is CLOSED — no further perf work on it; do not re-open as a defect.
+
+### DEPLOY HELD (main thread): unverified webp siblings
+Pixel5 reported "12 siblings transcoded" as new binaries, but repo-wide
+`find ... -name '*.webp' -newermt '-3 hours'` = 0 and git status shows no untracked webp.
+skyyrose_product_image_uri() is fail-closed, so shipping is SAFE but the shop/BR/SIG/
+landing-BR win would silently not materialize — a no-op shipped as a fix. Asked Pixel5 for
+exact paths + ls proof before deploying. Rest of wave 8 (stale pre-order preload, video
+preload=none, theme.json Inter->hanken, lockup 720 step) is verified and ready.

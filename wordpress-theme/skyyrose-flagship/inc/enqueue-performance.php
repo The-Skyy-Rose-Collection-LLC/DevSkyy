@@ -411,10 +411,19 @@ function skyyrose_preload_template_lcp() {
 		return;
 	}
 
-	// Preorder gateway: the LCP element is the hero <video> — its painted
-	// image is the poster (template-preorder-gateway.php, versioned URL).
+	// Preorder gateway: the hero poster is the painted LCP image. v1.12.2
+	// replaced the old luxury-nighttime still with a frame of the founder's
+	// video (assets/images/hero/preorder-video-poster-*), but this preload
+	// kept pointing at the retired 229KB jpg — a High-priority fetch of a
+	// file NOTHING renders, competing with the real LCP (round-7: pre-order
+	// 85->76, LCP 3,854->5,576ms). Preload what the template actually paints.
 	if ( 'preorder-gateway' === $slug ) {
-		echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . SKYYROSE_VERSION ) . '" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<link rel="preload" as="image" imagesrcset="'
+			. esc_attr(
+				esc_url( SKYYROSE_ASSETS_URI . '/images/hero/preorder-video-poster-480w.webp?v=' . SKYYROSE_VERSION ) . ' 480w, '
+				. esc_url( SKYYROSE_ASSETS_URI . '/images/hero/preorder-video-poster-720w.webp?v=' . SKYYROSE_VERSION ) . ' 720w'
+			)
+			. '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		return;
 	}
 
