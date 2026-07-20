@@ -484,5 +484,5 @@ frontend/.claude/skills/*/screenshots/
 /BlackRoseScene.png
 
 # WP commercial theme sweep working artifacts (large/regenerable)
-tasks/wp-commercial-theme/baseline/*.json
+tasks/wp-commercial-theme/*/*.json
 tasks/wp-commercial-theme/shots/
