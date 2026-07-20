@@ -115,6 +115,18 @@
   z-index: 0;
 }
 
+/* Blurred backdrop behind the contained video (desktop pillarboxing).
+   --po-hero-poster is set inline on .po-hero__media by the template
+   (video-frame poster). Painted below the video/poster children. */
+.po-hero__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--po-hero-poster) center / cover no-repeat;
+  filter: blur(28px) saturate(1.1) brightness(0.6);
+  transform: scale(1.15);
+}
+
 .po-hero__video {
   /* Must stack ABOVE .po-hero__poster: the poster <picture> follows the video in
      the DOM and is absolutely positioned, so without explicit z-index it paints
@@ -137,6 +149,19 @@
   object-fit: cover;
   object-position: center top;
   z-index: 1;
+}
+
+/* Founder canon (2026-07-19): the hero video is portrait 720x1280 and must
+   show the ENTIRE outfit. Any viewport wider than the video's 9/16 aspect
+   would crop it under cover — switch to contain there (the blurred
+   ::before backdrop fills the pillars). Narrow phones (<9/16, e.g. 9/19.5)
+   keep cover: the video fills the width with only minimal top/bottom trim. */
+@media (min-aspect-ratio: 9/16) {
+  .po-hero__video,
+  .po-hero__poster {
+    object-fit: contain;
+    object-position: center;
+  }
 }
 
 .po-hero__overlay {

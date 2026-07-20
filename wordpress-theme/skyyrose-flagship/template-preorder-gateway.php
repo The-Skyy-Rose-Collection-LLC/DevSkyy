@@ -84,23 +84,30 @@ get_header();
 		01 · CINEMATIC VIDEO HERO
 		══════════════════════════════════════════════════════════════════ -->
 	<section class="po-hero" aria-label="<?php esc_attr_e( 'Reserve your piece', 'skyyrose' ); ?>">
-		<div class="po-hero__media" aria-hidden="true">
+		<?php
+		// Founder canon (2026-07-19): the hero IS the uploaded video, framed to
+		// show the ENTIRE outfit (he's wearing the brand — br-006 Bomber Sherpa,
+		// rose back-embroidery). Source is portrait 720x1280, so desktop uses
+		// object-fit:contain over a blurred backdrop (preorder-gateway.css) —
+		// cover would crop the outfit. Poster = an actual video frame (40s,
+		// back-rose shot), so autoplay-blocked / low-power / reduced-motion
+		// visitors still see the brand footage, never an unrelated still.
+		?>
+		<div class="po-hero__media" aria-hidden="true" style="--po-hero-poster: url('<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.webp?v=' . $po_ver ); ?>')">
 			<video class="po-hero__video"
 				autoplay muted loop playsinline
-				poster="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . $po_ver ); ?>">
+				poster="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.jpg?v=' . $po_ver ); ?>">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.webm?v=' . $po_ver ); ?>" type="video/webm">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.mp4?v=' . $po_ver ); ?>" type="video/mp4">
 			</video>
 			<picture class="po-hero__poster" aria-hidden="true">
 				<source
-					srcset="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-480w.webp?v=' . $po_ver ); ?> 480w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-768w.webp?v=' . $po_ver ); ?> 768w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1280w.webp?v=' . $po_ver ); ?> 1280w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.webp?v=' . $po_ver ); ?> 1680w"
+					srcset="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-480w.webp?v=' . $po_ver ); ?> 480w,
+							<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.webp?v=' . $po_ver ); ?> 720w"
 					sizes="100vw"
 					type="image/webp">
-				<img src="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . $po_ver ); ?>"
-					alt="" width="1680" height="945" loading="eager" fetchpriority="high">
+				<img src="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.jpg?v=' . $po_ver ); ?>"
+					alt="" width="720" height="1280" loading="eager" fetchpriority="high">
 			</picture>
 			<div class="po-hero__overlay" aria-hidden="true"></div>
 		</div>
