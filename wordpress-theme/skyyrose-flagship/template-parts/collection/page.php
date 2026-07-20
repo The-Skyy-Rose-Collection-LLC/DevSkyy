@@ -97,7 +97,15 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 						?>
 						srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_bg_alt'] ); ?>"
-					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
+					<?php
+					// decoding=sync (Wave 7): this img is the measured mobile LCP
+					// on BR/LH/SIG. Round 6: bytes arrive High-priority at
+					// ~150ms, yet render delay ran 0.6-3.3s — under 4x CPU
+					// throttle an async decode slips behind the gsap/page-script
+					// queue to a later frame. Sync ties decode to the first
+					// paint attempt. LCP img only — everything else stays async.
+					?>
+					loading="eager" fetchpriority="high" decoding="sync" width="1680" height="720">
 			</div>
 		<?php endif; ?>
 		<?php

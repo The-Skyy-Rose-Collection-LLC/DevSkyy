@@ -23,15 +23,30 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	aria-modal="true"
 	aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose' ); ?>"
 	aria-describedby="cookie-consent-message">
+	<?php
+	/*
+	 * Wave 7 — LCP candidacy cap: each sentence is its own display:block line
+	 * (cookie-consent.css) so the banner text aggregates into TWO half-size
+	 * LCP text candidates instead of one <p>-sized one. Round 6 measured the
+	 * whole message at 9,796px² on mobile — within 7% of the smallest
+	 * real-content LCP on the site (kids-capsule wordmark, 10,516px²), and on
+	 * one shop run the banner WAS the LCP at 9.6s. Split, each line is
+	 * ≈5,000px², so this chrome can never outrank real content. Do not merge
+	 * the sentences back into one flow.
+	 */
+	?>
 	<p id="cookie-consent-message" class="cookie-consent__message">
-		<?php
-		printf(
-			/* translators: %1$s and %2$s wrap the privacy policy link */
-			esc_html__( 'Cookies keep this site fast and personal. Stay to accept, or %1$sread how we handle your data%2$s.', 'skyyrose' ),
-			'<a href="' . esc_url( $cookie_privacy_url ) . '" class="cookie-consent__link">',
-			'</a>'
-		);
-		?>
+		<span class="cookie-consent__msg-line"><?php esc_html_e( 'Cookies keep this site fast and personal.', 'skyyrose' ); ?></span>
+		<span class="cookie-consent__msg-line">
+			<?php
+			printf(
+				/* translators: %1$s and %2$s wrap the privacy policy link */
+				esc_html__( 'Stay to accept, or %1$sread how we handle your data%2$s.', 'skyyrose' ),
+				'<a href="' . esc_url( $cookie_privacy_url ) . '" class="cookie-consent__link">',
+				'</a>'
+			);
+			?>
+		</span>
 	</p>
 	<div class="cookie-consent__actions">
 		<button id="skyyrose-cookie-accept" class="cookie-consent__btn cookie-consent__btn--accept" type="button">

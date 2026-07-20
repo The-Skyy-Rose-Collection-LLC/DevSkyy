@@ -70,6 +70,18 @@ if ( empty( $permalink ) ) {
 }
 
 $index = (int) ( $args['index'] ?? 0 );
+
+/*
+ * Wave 7: first-row cards on the shop/taxonomy archive pass
+ * image_loading=eager (and image_priority on card 1) from
+ * woocommerce/content-product.php — round-6 flagged the lazy front image as
+ * shop's mobile LCP (lcp-lazy-loaded). Only the FRONT image is ever eager;
+ * the back (techflat hover) image stays lazy — it is opacity-hidden until
+ * hover and must never compete with the LCP fetch. Default stays lazy for
+ * every other caller (search, static grids).
+ */
+$image_loading  = ( isset( $args['image_loading'] ) && 'eager' === $args['image_loading'] ) ? 'eager' : 'lazy';
+$image_priority = ! empty( $args['image_priority'] );
 ?>
 <div class="holo holo--<?php echo esc_attr( $collection ); ?>" 
 	data-sku="<?php echo esc_attr( $sku ); ?>"
@@ -85,8 +97,11 @@ $index = (int) ( $args['index'] ?? 0 );
 					$title,
 					array(
 						'class'         => 'holo__img holo__img--front',
-						'loading'       => 'lazy',
-						'decoding'      => 'async',
+						'loading'       => $image_loading,
+						// fetchpriority high + sync decode on the archive's first
+						// card only — it is the measured shop mobile LCP element.
+						'fetchpriority' => $image_priority ? 'high' : null,
+						'decoding'      => $image_priority ? 'sync' : 'async',
 						'width'         => '600',
 						'height'        => '750',
 						'photon_widths' => array( 320, 480, 768 ),

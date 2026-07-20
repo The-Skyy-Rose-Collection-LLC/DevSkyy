@@ -179,13 +179,50 @@ function skyyrose_async_noncritical_styles( $html, $handle ) {
 									// defer without that contract.
 	);
 
+	$slug = function_exists( 'skyyrose_get_current_template_slug' )
+		? skyyrose_get_current_template_slug() : '';
+
 	// Per-template: skeleton shimmer markup is server-rendered ONLY by the
 	// landing templates (grep: template-landing-black-rose/-signature) —
 	// everywhere else .skeleton classes are JS-applied, so the sheet is safe
 	// async (round-3: it blocked paint on collection pages).
-	if ( function_exists( 'skyyrose_get_current_template_slug' )
-		&& 'landing' !== skyyrose_get_current_template_slug() ) {
+	if ( 'landing' !== $slug ) {
 		$async_handles[] = 'skyyrose-skeleton';
+	}
+
+	// Wave 7b (round-6: 41 render-blocking sheets on collection pages — the
+	// col-hero "load delay" is link contention, not hero bytes). On tall
+	// content templates the footer/mascot chrome renders at doc end and can
+	// never be in-viewport at first paint — the wave-2 render-blocking keep
+	// was for SHORT pages (cart/wishlist), which stay critical.
+	$tall_content_slugs = array( 'front-page', 'collection-standalone', 'landing', 'preorder-gateway', 'immersive', 'kc-launch' );
+	if ( in_array( $slug, $tall_content_slugs, true ) ) {
+		$async_handles[] = 'skyyrose-footer';
+		$async_handles[] = 'skyyrose-footer-cro';
+		$async_handles[] = 'skyyrose-mascot';
+		$async_handles[] = 'skyyrose-skyy-walk';
+	}
+
+	// Collection pages: grep-verified ZERO .col-hero selectors in these
+	// sheets — everything they style sits below the 100vh hero (the embedded
+	// scene layer renders at collection/page.php:184, after the hero). The
+	// immersive trio stays render-blocking on the 'immersive' slug, where
+	// the scene IS the above-fold surface.
+	if ( 'collection-standalone' === $slug ) {
+		$async_handles[] = 'skyyrose-pin-narrative';
+		$async_handles[] = 'skyyrose-collection-feature-scroll';
+		$async_handles[] = 'skyyrose-product-grid';
+		$async_handles[] = 'skyyrose-template-immersive';
+		$async_handles[] = 'skyyrose-immersive-scenes';
+		$async_handles[] = 'skyyrose-immersive-core';
+		$async_handles[] = 'skyyrose-product-card-holo';
+	}
+
+	// Homepage: cards + customer-enhancements (Drop Block, off by default)
+	// all render below the 100vh hero.
+	if ( 'front-page' === $slug ) {
+		$async_handles[] = 'skyyrose-product-card-holo';
+		$async_handles[] = 'skyyrose-customer-enhancements';
 	}
 
 	if ( ! in_array( $handle, $async_handles, true ) ) {

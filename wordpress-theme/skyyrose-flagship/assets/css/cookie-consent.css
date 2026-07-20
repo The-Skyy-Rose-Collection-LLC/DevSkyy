@@ -156,6 +156,18 @@
 		max-width: 46ch;
 	}
 
+	/* Wave 7 — LCP candidacy cap, second layer: each sentence becomes its own
+	   block on mobile, so LCP sees two ~5,000px² text candidates instead of
+	   one 9,796px² paragraph (round 6: that was within 7% of the smallest
+	   real-content mobile LCP, the kids-capsule wordmark at 10,516px², and on
+	   one shop run the banner WAS the LCP). Desktop keeps inline flow — every
+	   desktop LCP is real content by a wide margin, and the single-row banner
+	   layout must not grow. Pairs with the sentence markup split in
+	   template-parts/cookie-consent.php. */
+	.cookie-consent__msg-line {
+		display: block;
+	}
+
 	.cookie-consent__btn {
 		flex: 1;
 		text-align: center;

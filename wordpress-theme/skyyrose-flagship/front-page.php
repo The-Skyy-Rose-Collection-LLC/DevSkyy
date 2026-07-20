@@ -247,7 +247,14 @@ get_header();
 							height="1536"
 							loading="<?php echo $hs_priority ? 'eager' : 'lazy'; ?>"
 							fetchpriority="<?php echo $hs_is_lcp ? 'high' : 'low'; ?>"
-							decoding="async">
+							<?php
+							// decoding=sync on the LCP frame only (Wave 7):
+							// round-6 shows its bytes preloaded High by ~290ms
+							// yet 0.8-2s render delay — async decode slips
+							// behind the deferred script queue under 4x CPU
+							// throttle. Other frames stay async.
+							?>
+							decoding="<?php echo $hs_is_lcp ? 'sync' : 'async'; ?>">
 					</div>
 				<?php endforeach; ?>
 			<?php endfor; ?>

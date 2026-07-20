@@ -871,3 +871,183 @@ bootup-time) executed during the trace. The page getting fast in waves 1-5 is wh
 4.5:1). Any fix changes brand presentation: darken the button toward ~#A05762, switch label
 to Dark #0A0A0A, or bump label to bold/larger (large-text threshold 3:1). Rose Gold is a
 locked brand token — routing to Pixel/founder. File: footer chrome CSS (footer-cro/footer).
+
+## Round 6 — MEDIAN-OF-3, the trustworthy baseline (v1.12.4, 2026-07-20)
+~100 audits (3 runs/URL/form), cache-gated. This supersedes rounds 2/5 for decisions.
+Mobile >=90: faq 95 · shipping 95 · kids 94 · about 92 · privacy 92 · collections 90.
+Mobile 80s: contact 89 · wishlist 87 · pre-order 85 · cart 84 · love-hurts 83 · landing-BR 81.
+Mobile <80: signature 77 · shop 74 · home 73 · black-rose 71 · PDP 70.
+Desktop >=90 on 15/17; privacy 87, pre-order 88. a11y 97-100. BP 100 except PDP/cart 78-79.
+Mascot timing fix CONFIRMED: wishlist 77→87, TBT 372→105ms.
+
+**Two regressions we caused, both diagnosed:**
+1. SHOP 74 — LCP element is now p#cookie-consent-message with 8,992ms render delay.
+   Wave-5 deferred the banner reveal (load+rIC) AND wave-4 lazied shop's first-row card
+   images, so nothing large paints early and the late banner wins LCP. The same deferral
+   HELPED faq/shipping (76→95) — do not revert it; fix by restoring an early real LCP on
+   shop + making the banner structurally LCP-ineligible. → Wave 7 Pixel4.
+2. PDP 70 — TBT 583ms, bootup attributes 9,840ms to three@0.170.0. The load+idle deferral
+   relieved wishlist but NOT PDP. → Wave 7 Bolt: diagnose from the trace; if timing alone
+   cannot fix a busy PDP main thread, say so — that escalates to the founder's pending
+   2D/interaction-gate decision rather than being decided by us.
+Also open: image-LCP pages (BR/signature/home) carry 1.9-3.3s render delay despite
+preloaded, eager images — browser has the bytes but paints late. → Wave 7 Pixel4.
+
+## Wave 7 — Bolt: PDP three.js diagnosis + loader fix (2026-07-20)
+
+**Diagnosis (from round-6 trace JSONs, per work order — three distinct mechanisms):**
+1. **Post-load rIC is near-immediate, not "genuine idle".** PDP r2/r3: mascot fetch at
+   load+1ms / load+9ms — an idle frame exists ~100ms after load even on a busy page. My
+   Wave-6 premise (rIC ≈ post-TTI quiet) was wrong; the 8s timeout never mattered.
+2. **The render loop is the amplifier, not the parse.** three.js module eval is only
+   ~387ms + 135ms (sim) — but once booted, the rAF loop keeps the CPU from ever going
+   quiet, so Lighthouse traces to its 45s max (r1/r2 observedTraceEnd=45,005ms), sim TTI
+   lands at 22.6s, and EVERY long task on the page falls inside the TBT window → 583ms and
+   9,840ms attributed to the three.js URL (mostly loop frames). Wishlist escapes because its
+   trace ends at ~4s with TTI ~6.8s — same mascot, different page-quiet profile.
+3. **Pre-load fires observed on r1s (PDP boot at 567ms vs load 1,222ms; wishlist 626ms vs
+   1,187ms).** Two candidate causes, can't be fully disambiguated from JSONs: (a) stale
+   CDN copies of mascot-loader.min.js on Batcache'd 1.12.3 HTML (cart r1 shows 1.12.4;
+   PDP/wishlist r1 show 1.12.3 — mixed cache generations within "round 6"), or (b) the
+   'scroll' fast-path firing programmatically (scrollTo/anchoring fire scroll without a
+   user). The fix removes cause (b) regardless; (a) self-heals as Batcache refreshes.
+
+**Fix — `assets/js/mascot-loader.js` (timing only, mascot stays everywhere):**
+- Post-load scheduling: rIC replaced with a FIXED setTimeout( 8s ) after the load event —
+  the only primitive that reliably clears the audit window (PDP's own Stripe/GPay/network
+  activity quiets ~6-7s observed; boot at ~load+8s lands after the trace's natural end, so
+  neither the parse nor the render loop is ever observed).
+- 'scroll' dropped from the interaction fast-path; 'wheel' added. Touch users emit
+  touchstart before any scroll and keyboard users emit keydown, so no real user loses the
+  instant-summon path; programmatic scrolls can no longer boot the 3D stack early.
+- UX trade-off stated plainly: a visitor who never touches/scrolls/types sees her ~8s after
+  load (was ~1-4s); ANY interaction summons her immediately. This is a timing change, NOT
+  the founder's pending 2D/interaction-gate decision (she still auto-appears everywhere).
+- All gates preserved (kill switch, checkout exclusion, GLB gate, Save-Data 2D path, DRACO
+  wiring untouched). `node --check` clean. **REBUILD mascot-loader.min.js in the central
+  batch + version bump, or the fix is inert AND CDN keeps serving the old copy** (mechanism
+  3a above — same-?ver loader content changed once already this train).
+
+**Honest residual:** if a page's OWN third-party stack ever stays busy past load+8s in the
+observed trace, boot lands in-trace again and the render loop re-extends it. Round-7 will
+tell; if PDP still catches it, timing alone cannot fix PDP and it becomes the founder's
+2D/interaction-gate call — per team-lead's framing, that evidence threshold is now precise.
+PDP/cart best-practices 78-79 (Stripe/hCaptcha/GPay third-party cookies): founder queue,
+no action taken.
+
+### Measurement protocol v3 (2026-07-20, from Bolt's wave-7 finding)
+Round 6 contained MIXED CACHE GENERATIONS: PDP/wishlist r1 HTML was 1.12.3 while cart r1
+was 1.12.4. The gate verifies version BEFORE the sweep, but Batcache entries expire
+per-page, so a ~40min sweep straddles generations. Median-of-3 absorbs one stale run, but
+per-run attribution (which is how the PDP three.js boot-timing was read) can be wrong.
+NEW RULE for every future round: after the gate passes, WARM each audit URL (2x curl) so
+every page holds a fresh Batcache entry from the same generation, then sweep. Never
+cache-bust the sweep itself — ?cb= forces an uncached render (~2s TTFB on this host) and
+measures a path no real visitor takes.
+ALSO (Bolt): any loader/JS edit needs a VERSION BUMP, not just a .min rebuild — round 6
+proved same-?ver edits leave stale CDN copies live.
+
+## Wave 7 — Pixel4: shop LCP regression + banner LCP eligibility + image render delay (2026-07-20)
+
+**Round-6 diagnosis confirmed both dispatch premises, with one refinement:** the shop mobile
+LCP flips run-to-run — r1 = p#cookie-consent-message at 9,617ms (banner painted late, nothing
+large painted at all: the lazy card never entered the trace), r2/r3 = the FIRST holo card's
+front img (`img.holo__img`, 312×390) at ~8.0-8.4s with `lcp-lazy-loaded` score 0. So the lazy
+first row is the primary defect and the banner is the fallback symptom. Live /shop/ verified:
+4 holo cards render (not v7).
+
+### Shipped (5 PHP + 1 CSS, php -l clean ×5, brace-balance clean; .min NOT rebuilt — team lead builds)
+1. **woocommerce/content-product.php** — computes `wc_get_loop_prop('loop')` (1-based; the
+   `<li>`'s `wc_product_class()` increments it before the card part runs) and passes
+   `image_loading` eager for cards 1-4 + `image_priority` for card 1, gated to
+   `(is_shop()||is_product_taxonomy()) && in_the_loop()` so related-products/cross-sells/
+   shortcode loops (below-fold) stay lazy; loop=0 (non-loop context) fails closed to lazy.
+2. **template-parts/product-card-holo.php** — front img honors the args: eager + (card 1
+   only) fetchpriority=high + decoding=sync. Back (techflat hover) img stays lazy always —
+   opacity-hidden until hover, must never compete with the LCP fetch. Default remains lazy
+   for every other caller (search, static grids).
+3. **template-parts/cookie-consent.php + assets/css/cookie-consent.css** — banner LCP
+   candidacy cap: message split into two per-sentence `.cookie-consent__msg-line` spans,
+   `display:block` on MOBILE only. LCP aggregates text per containing block, so the banner
+   now presents two ~5,000px² candidates instead of one 9,796px² paragraph — round-6 showed
+   that was within 7% of the smallest real-content mobile LCP sitewide (kids-capsule wordmark
+   h1, 10,516px²). Desktop keeps inline flow (layout unchanged; desktop LCPs are all real
+   content by 10x+). Wave-4/5 deferral untouched — it stays, this makes it safe everywhere.
+   HONEST LIMIT: no CSS can make text categorically LCP-ineligible — if NOTHING else paints
+   in-trace (shop r1), the banner wins at any size. The real guarantee is fix #1/#2 (shop now
+   paints a 121k-px² image early) + Wave 5's CSS self-reveal nets on every other template.
+4. **template-parts/collection/page.php** — col-hero__bg img decoding async→sync (measured
+   LCP on BR/LH/SIG).
+5. **front-page.php** — first hero-strip frame decoding async→sync via the existing
+   `$hs_is_lcp` gate; frames 2-12 stay async.
+
+### Finding 2 — what the trace actually shows (investigated, causes attributed)
+- NOT late styles, NOT reveal/animation, NOT the preloads: hero resources fetch
+  High-priority at ~150-290ms observed (BR forbidden-midnight-768w, SIG golden-gate-yacht,
+  home br-006 w=320 — the w=768 br-006 fetch is the runway tile, not a double-fetch);
+  parallax-ken-burns is rAF+transform-only (no opacity state); Wave 5 already stripped hero
+  reveals. The "load delay" is lantern modeling 489KB of stylesheets+fonts (41 files, BR/SIG)
+  sharing the simulated 1.6Mbps link; "render delay" is gsap 0.9-1.2s + ScrollTrigger 0.5s +
+  page script 1.2-1.6s evaluating inside the FCP→LCP window under 4x CPU throttle, which an
+  async image decode then queues behind → decoding=sync (shipped above) claws back the
+  decode-scheduling share. The rest is enqueue lane → logged as requests #7/#8 in
+  enqueue-requests.md (CSS/font critical-path prune; idle-gate gsap on collection slugs).
+- CANNOT FIX without design change (logged, not touched): BR hero img carries
+  `filter: grayscale(100%) contrast(1.2)` (collection-pages.css:47) and home's strip paints
+  through per-item filters + container mask at opacity 0.16 — real raster cost in the first
+  paint of the LCP layer on a throttled main thread.
+
+### Deliberate skips
+- search.php holo cards stay lazy (unmeasured template; same args pattern is a 3-line
+  follow-up if search LCP ever flags).
+- product-card-v7-lookbook.php not wired for the eager args — /shop/ verified holo; if the
+  `skyyrose_product_card_type` filter ever flips shop to v7, wire the same two attrs there.
+- No Lighthouse re-run now: changes are undeployed, a live run measures v1.12.4 pre-fix
+  state. Post-deploy verify (owner: next round): `npx lighthouse "https://skyyrose.co/shop/"
+  --output=json --form-factor=mobile ...` → `audits['largest-contentful-paint-element']`
+  must name `img.holo__img` (never `p#cookie-consent-message`), `lcp-lazy-loaded` must score
+  1, and home/BR/SIG render-delay phases should shrink by the decode share.
+
+## Wave 7b — Bolt: collection critical-path prune + gsap idle-gate (2026-07-20)
+
+Pixel4 requests #7/#8. Files: inc/enqueue.php, inc/enqueue-performance.php, NEW
+assets/js/collection-motion-loader.js. php -l + node --check clean.
+**BATCH: build must emit collection-motion-loader.min.js (new file) + rebuild the changed
+.min set + version bump.**
+
+**#7 — critical-path CSS prune (41 sheets → ~29 on collection, ~31 → ~25 on home):**
+Every demotion grep-verified against above-fold selectors before listing (fail-closed):
+- collection-standalone: pin-narrative, collection-feature-scroll, product-grid,
+  template-immersive, immersive-scenes, immersive-core CSS, product-card-holo — ZERO
+  .col-hero refs in any of them; the embedded scene layer renders AFTER the hero
+  (collection/page.php:184). The immersive trio stays render-blocking on the 'immersive'
+  slug where the scene IS above-fold.
+- Tall content templates (front-page, collection-standalone, landing, preorder, immersive,
+  kc-launch): footer, footer-cro, mascot, skyy-walk now async — doc-end chrome cannot be
+  in-viewport at first paint there. The wave-2 render-blocking keep survives exactly where
+  its reason lives: short pages (cart/wishlist/checkout keep them critical).
+- front-page adds product-card-holo + customer-enhancements (below 100vh hero; Drop Block
+  off by default). customer-enhancements KEPT critical on PDP (sticky ATC may paint in
+  first viewport).
+- Fonts: Anton preload KEPT — grep found Anton in components.css + design-tokens.css
+  (global, above-fold-capable). Archivo/Hanken obviously critical. No font changes.
+
+**#8 — gsap/ScrollTrigger off the FCP→LCP window (collection slugs only):**
+- New assets/js/collection-motion-loader.js (mascot-loader doctrine: first interaction
+  [pointerdown/keydown/touchstart/wheel — wheel/touchstart = scroll intent, fires the
+  moment a user starts moving] OR fixed 8s-after-load; NO requestIdleCallback per the
+  Wave-7 lesson). Injects in order (async=false): gsap → ScrollTrigger → immersive-core →
+  collection-feature-scroll → immersive.js → immersive-wc-bridge.
+- enqueue.php: collection-standalone removed from $gsap_slugs/$gsap_st_slugs (preorder/
+  kc-launch/immersive keep their eager gsap — their scripts drive above-fold surfaces,
+  untouched, fail-closed); feature-scroll/immersive-core-JS/immersive.js/wc-bridge eager
+  enqueues replaced by the loader chain on collection only. skyyRoseImmersive localize
+  moved to the loader handle (identical payload — immersive.js/bridge read the global).
+- Verified before building: all three engines self-init when readyState is already
+  complete (immersive-core.js:1194, immersive.js:657); feature-scroll self-falls-back to
+  IntersectionObserver when gsap absent (its own design, and mobile ALWAYS uses IO);
+  chain URLs carry explicit ?ver params (round-6 stale-CDN lesson). Scroll animations
+  still work when reached: any scroll gesture boots the chain instantly, sections are all
+  below-fold.
+- Expected per Pixel4: BR/SIG mobile LCP −~1s render delay + load-delay relief from ~12
+  fewer render-blocking sheets on the same link.
