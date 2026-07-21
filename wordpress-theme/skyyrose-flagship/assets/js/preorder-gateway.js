@@ -466,7 +466,48 @@
      MAGNETIC CTA
      rAF-throttled mousemove on .po-btn[data-magnetic]
   ────────────────────────────────────────────── */
-  function initMagneticCTA() {
+  /* ── Hero video boot ─────────────────────────────────────────────
+   The hero <video> ships without autoplay and with preload="none" so
+   its 3.5MB webm never contends with the LCP poster paint. Playback
+   starts at window load, or immediately on first interaction —
+   whichever comes first. The poster <picture> behind it shows the
+   identical frame until then. */
+function initHeroVideo() {
+  var video = document.querySelector('.po-hero__video');
+  if (!video) return;
+  var boot = function () {
+    if (video.dataset.booted) return;
+    video.dataset.booted = '1';
+    video.preload = 'auto';
+    var attempt = video.play();
+    if (attempt && attempt.catch) {
+      attempt.catch(function () {
+        // Autoplay refused (battery saver etc.): retry on first gesture.
+        document.addEventListener('pointerdown', function () {
+          video.play().catch(function () {});
+        }, { once: true });
+      });
+    }
+  };
+  /* Wave 9: round-8 traces show the 3.3MB webm fetch starting AT window
+     load and still overlapping the LCP window (r2 poster load time 2.5s).
+     Push the auto-boot to load + 2.5s so the stream reliably clears the
+     LCP paint; the identical-frame poster holds until then and any
+     gesture still boots instantly. */
+  var bootAfterLoad = function () {
+    window.setTimeout(boot, 2500);
+  };
+  if (document.readyState === 'complete') {
+    bootAfterLoad();
+  } else {
+    window.addEventListener('load', bootAfterLoad, { once: true });
+  }
+  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (evt) {
+    window.addEventListener(evt, boot, { once: true, passive: true });
+  });
+}
+
+function initMagneticCTA() {
     if (prefersReducedMotion()) { return; }
 
     var magnets = qsa('.po-btn[data-magnetic], .po-btn--reserve[data-magnetic]');
@@ -522,6 +563,7 @@
     initAccordions();
     initEmailCapture();
     initMagneticCTA();
+    initHeroVideo();
   }
 
   if (document.readyState === 'loading') {

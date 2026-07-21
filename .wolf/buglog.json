@@ -4367,7 +4367,7 @@
     "error_message": "SIGSEGV (EXC_BAD_ACCESS) 'crashed on child side of fork pre-exec' — 12+ Python crash reports 21:20-21:26 PDT; fork children of pytest die in nw_settings_child_has_forked -> NEFlowDirectorDestroy -> _os_log_preferences_refresh; parent sees subprocess returncode -11",
     "file": "conftest.py",
     "root_cause": "macOS 26.4 + CPython 3.14.3: subprocess takes the fork()+exec path whenever close_fds=True (default) because _HAVE_POSIX_SPAWN_CLOSEFROM is False on macOS. When the multi-threaded pytest parent has initialized Apple's Network.framework (armed via _scproxy system-proxy lookup from urllib/requests/httpx), Apple's atfork child handler nw_settings_child_has_forked() calls os_log whose preferences page is invalid in the fork child -> SIGSEGV pre-exec. Apple framework bug surface, not DevSkyy code. DEEPER CHECK 2026-07-15: crash is a RACE (fork landing while another thread updates os_log preferences — 0/400 forks crashed under synthetic arming incl. live nw_path_monitor). Apple DTS (forums thread 737464): fork() after ANY higher-level framework init is unsupported; posix_spawn is the only reliable fix (syscall — atfork handlers never run). Victims identified: tests spawning python3 generators (build-collection-sot.py, gen-collection-hub.py, gen-design-tokens.py) died Signals.SIGSEGV:11.",
-    "fix": "conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (setdefault) so getproxies_environment() is non-empty and _scproxy/Network.framework is never consulted in test processes. Verified: urllib.request.getproxies() -> {'no': '*'}. Residual risk: other Network.framework arming paths; robust per-call fix is posix_spawn conditions (close_fds=False, absolute exe, no cwd/preexec_fn). LAYER 2: conftest.py darwin-only Popen.__init__ patch defaults close_fds=False for test subprocesses (safe per PEP 446 — Python fds are CLOEXEC anyway), flipping them onto the posix_spawn path; explicit close_fds/preexec_fn/pass_fds callers untouched. Verified: 2/2 patched calls route through Popen._posix_spawn; tests/collections/test_build_collection_sot.py 6/6 pass. NOTE: worktree checkouts lack the fix until this lands on their branch — post-fix crashes at 22:23-22:25 traced to unfixed worktree collections-scroll-world running the full suite.",
+    "fix": "conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (setdefault) so getproxies_environment() is non-empty and _scproxy/Network.framework is never consulted in test processes. Verified: urllib.request.getproxies() -> {'no': '*'}. Residual risk: other Network.framework arming paths; robust per-call fix is posix_spawn conditions (close_fds=False, absolute exe, no cwd/preexec_fn). LAYER 2: conftest.py darwin-only Popen.__init__ patch defaults close_fds=False for test subprocesses (safe per PEP 446 — Python fds are CLOEXEC anyway), flipping them onto the posix_spawn path; explicit close_fds/preexec_fn/pass_fds callers untouched. Verified: 2/2 patched calls route through Popen._posix_spawn; tests/collections/test_build_collection_sot.py 6/6 pass. NOTE: worktree checkouts lack the fix until this lands on their branch — post-fix crashes at 22:23-22:25 traced to unfixed worktree collections-scroll-world running the full suite. LAYER 3 (2026-07-16): recurrence from a FIXED worktree revealed cwd= kwarg forces the fork path regardless of the Popen patch (posix_spawn requires cwd=None; macOS CPython cannot chdir via posix_spawn). Removed all functional cwd= from tests/: git calls -> ['git','-C',root,...], python-script calls -> absolute path + PYTHONPATH env. 21/21 affected tests green. LAYER 4 (2026-07-16, ultracode workflow): ported bare-executable resolution into main conftest (dirname('git')=='' disqualifies posix_spawn — bug-264, found by agent-a04c28 session; shutil.which -> kwargs['executable']). Workflow forensics over all 33 .ips: 100% subprocess_fork_exec mechanism, crash rate 16.3/hr pre-fix -> 2.75/hr after layers 1+2 -> one isolated 5-min cluster after layer 3. Full 15-clause gate enumerated; patch covers dirname+close_fds only — cwd=, preexec_fn, pass_fds, explicit close_fds=True, fd<=2 redirections, bytes argv[0] still fork. 22 app-code cwd= sites (5 test-reachable). Empirical audit of ACTUALLY-executed fork calls running via subprocess._fork_exec wrap (NOTE: patching _posixsubprocess.fork_exec is a silent no-op — subprocess.py binds it at import). RECURRENCE 2026-07-16 23:36-23:37 PDT (20 .ips, parent pid 57740): layers 3+4 existed ONLY on chore/skill-font-canon-sync; concurrent session's worktrees cut from origin/main tip (1e7e6b3fb) ran tests with layers 1+2 only -> fork path -> SIGSEGV. Fix: this cherry-pick lands layers 3+4 (ac265c1dc + 5da6219f0) on main directly via focused PR.",
     "tags": [
       "macos",
       "fork",
@@ -4379,7 +4379,275 @@
       "python3.14"
     ],
     "related_bugs": [],
-    "occurrences": 2,
-    "last_seen": "2026-07-16T05:25:42Z"
+    "occurrences": 5,
+    "last_seen": "2026-07-17T06:37:44Z"
+  },
+  {
+    "id": "bug-264",
+    "timestamp": "2026-07-17",
+    "error_message": "SIGSEGV (EXC_BAD_ACCESS) crashed on child side of fork pre-exec — companion ID to bug-263, referenced in commits b09572992 / 641955c29 (macOS fork-path SIGSEGV in test subprocesses) but never written to buglog.json.",
+    "file": "conftest.py",
+    "root_cause": "Same family as bug-263: macOS Objective-C runtime fork-unsafety in subprocess spawn paths under pytest.",
+    "fix": "posix_spawn path resolution + cwd removal in subprocess calls (landed with bug-263 layers 3+4 on main via PR #756/#760). Entry backfilled 2026-07-19 after ID-collision discovery.",
+    "tags": [
+      "macos",
+      "fork",
+      "sigsegv",
+      "pytest",
+      "backfilled"
+    ],
+    "related_bugs": [
+      "bug-263"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-17"
+  },
+  {
+    "id": "bug-265",
+    "timestamp": "2026-07-16",
+    "error_message": "scroll-world: page scroll frozen — wp_localize_script stringified scalar config values, breaking the scroll-scrub engine's numeric config (referenced in claude-mem obs 25666 but never written to buglog.json).",
+    "file": "renders/scroll-world (site scaffold, uncommitted)",
+    "root_cause": "wp_localize_script casts scalars to strings; numeric scroll config arrived as strings and the scrub math silently failed.",
+    "fix": "Passed config via wp_add_inline_script JSON (or cast client-side). Entry backfilled 2026-07-19 after ID-collision discovery; see scroll-world session for exact patch.",
+    "tags": [
+      "wordpress",
+      "wp_localize_script",
+      "scroll-world",
+      "type-coercion",
+      "backfilled"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-16"
+  },
+  {
+    "id": "bug-266",
+    "timestamp": "2026-07-19",
+    "error_message": "Malformed CSS rule live on skyyrose.co: style.css full-bleed-hero padding reset missing opening '{' (selector list ends with comma, then 'padding-top: 0; }'). Per CSS error recovery the bad prelude consumes through the next '{', ALSO killing the .homepage-v2 .site-header/.site-footer display:none rule.",
+    "file": "wordpress-theme/skyyrose-flagship/style.css",
+    "root_cause": "Selector added to multi-selector list left trailing comma where ' {' belonged; no CSS syntax lint on style.css (unminified, not run through build pipeline).",
+    "fix": "style.css:520 last selector now ends ' {'. Found by Atlas census (wp-commercial-theme sweep), verified by direct read + curl byte-match on production.",
+    "tags": [
+      "css",
+      "syntax",
+      "wordpress-theme",
+      "hero",
+      "header",
+      "production"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-267",
+    "timestamp": "2026-07-19",
+    "error_message": "Duplicate mobile bottom nav on every live page: footer.php included template-parts/mobile-bottom-nav twice (line 253 inside footer landmark per WS4 acceptance, and stale line 260 after #page).",
+    "file": "wordpress-theme/skyyrose-flagship/footer.php",
+    "root_cause": "WS4 structural remediation moved the include inside the footer landmark but the original call after </div id=page> was never deleted — duplicate nav landmarks, a11y + DOM-acceptance regression.",
+    "fix": "Deleted the stale line-260 include; in-footer include (253) kept. php -l clean.",
+    "tags": [
+      "wordpress-theme",
+      "footer",
+      "a11y",
+      "duplicate-include",
+      "mobile-nav"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-268",
+    "timestamp": "2026-07-19",
+    "error_message": "Cart/wishlist CLS 0.486-0.507: footer section.ft-cro-craft re-lays-out after first paint on short pages (Lighthouse layout-shifts, cart+wishlist baselines)",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/footer-cro.php",
+    "root_cause": "Part enqueued footer-cro(.min).css DURING footer render -> WP printed the <link> in wp_footer AFTER the markup; section paints unstyled then reflows when the sheet lands. Only counted where the footer opens in-viewport (cart, wishlist).",
+    "fix": "wp_register_style + wp_print_styles('skyyrose-footer-cro') in place: in-body <link> blocks paint of subsequent content until applied. No-op once a head enqueue exists (requested in tasks/wp-commercial-theme/enqueue-requests.md #1).",
+    "tags": [
+      "wordpress-theme",
+      "cls",
+      "lighthouse",
+      "late-enqueue",
+      "footer-cro",
+      "fail-open-pattern"
+    ],
+    "related_bugs": [
+      "bug-185"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-269",
+    "timestamp": "2026-07-19",
+    "error_message": "PDP mobile LCP 27.3s: LCP element h2#sr-ed-piece-h render delay 24,952ms (FCP 1.7s) — above-fold editorial chapters hidden until deferred JS reveal",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/product-detail-editorial.php",
+    "root_cause": "Chapters 1-2 <section> carried rv-clip-up (resting clip-path:inset(100%)+opacity:0, animations-premium.css:22-32); .is-visible only added by deferred premium-interactions.js, which on throttled mobile runs after three.js/Stripe eval (~25s). Same class-on-above-fold-content pattern as bug-225/226/228.",
+    "fix": "Removed rv-clip-up from .sr-ed__encounter and .sr-ed__piece; constraint comment forbids reveal-gating above-fold LCP chapters. Below-fold chapters keep reveals.",
+    "tags": [
+      "wordpress-theme",
+      "lcp",
+      "lighthouse",
+      "reveal-classes",
+      "pdp",
+      "premium-animations"
+    ],
+    "related_bugs": [
+      "bug-225",
+      "bug-226",
+      "bug-228"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-270",
+    "timestamp": "2026-07-19",
+    "error_message": "Shop archive desktop collapsed: h1/content flush at x=0, product cards 139px wide inside 453px grid tracks, card 1 shoved into column 2 (audit D2)",
+    "file": "assets/css/woocommerce.css (wordpress-theme/skyyrose-flagship)",
+    "root_cause": "Theme WC wrapper #primary.content-area has no container styles; AND WC core woocommerce-layout.css float-era rules inside the theme's CSS grid — li.product{width:30.75%} shrinks cards, clearfix ul.products::before{display:table} becomes a phantom grid item occupying cell 1",
+    "fix": "Archive-scoped container on #primary.content-area (max-width 1600 + clamp padding) + content:none on ul.products::before/::after + float/width/margin neutralization on li.product. woocommerce-layout stays enqueued (Bolt Wave-1 decision).",
+    "tags": [
+      "wordpress-theme",
+      "woocommerce",
+      "css-grid",
+      "clearfix",
+      "shop-archive",
+      "wave-1"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-271",
+    "timestamp": "2026-07-19",
+    "error_message": "Body font computed Inter (fallback) on 19/20 live templates — Hanken Grotesk canon body face only applied on home (audit D7)",
+    "file": "assets/css/design-tokens.css (wordpress-theme/skyyrose-flagship)",
+    "root_cause": "style.css:239 body{font-family:var(--font-body, 'Inter', ...)} consumes --font-body, but the §1.12 legacy-alias block defined --font-heading/--font-headline/--ff-* and never --font-body — undefined var, fallback wins sitewide",
+    "fix": "Added --font-body: var(--skyyrose-font-body) to §1.12. Preload flip (Hanken preloaded, Inter demoted) filed to Bolt via enqueue-requests.md #6.",
+    "tags": [
+      "wordpress-theme",
+      "typography",
+      "css-custom-properties",
+      "undefined-var",
+      "brand-canon",
+      "wave-1"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-272",
+    "timestamp": "2026-07-19",
+    "error_message": "Uncaught pageerror 'Error creating WebGL context' (three@0.170) on every page in WebGL-less clients — headless audit, bots, GPU-blocklisted browsers (audit D10)",
+    "file": "assets/js/skyy-3d.js (wordpress-theme/skyyrose-flagship)",
+    "root_cause": "initScene() constructed THREE.WebGLRenderer with no capability check and no try/catch; the mascot mounts sitewide via footer.php so the throw fired on all 20 audited URLs",
+    "fix": "Throwaway-canvas webgl2||webgl pre-probe (silent bail, hide 3D canvas, keep mascot.js 2D sprite) + try/catch backstop around renderer construction.",
+    "tags": [
+      "wordpress-theme",
+      "threejs",
+      "webgl",
+      "graceful-degradation",
+      "mascot",
+      "fail-open",
+      "wave-1"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-273",
+    "timestamp": "2026-07-19",
+    "error_message": "PDP rendered internal dossier fields as consumer copy (garment_type_lock render-instruction text + branding placement specs) AND all 36 raw Corey-authored dossier .md files were world-readable at /wp-content/themes/skyyrose-flagship/data/dossiers/ (curl 200); wider data/ exposure: embeddings, logo-registry, render-corrections, catalog .bak, build .py scripts all deployed",
+    "file": "wordpress-theme/skyyrose-flagship/inc/product-catalog.php",
+    "root_cause": "skyyrose_get_product_dossier() parsed raw internal dossiers at runtime and the editorial template rendered the parsed internal fields; deploy-theme.sh tarred data/ wholesale with no runtime allowlist, so every internal artifact shipped to production world-readable.",
+    "fix": "3-layer: (1) editorial template no longer renders any dossier text; (2) runtime parser replaced by compiled data/editorial-index.json (scripts/build-editorial-index.js, predicate-parity verified 35/35, fail-closed when absent); (3) deploy-theme.sh tar+rsync exclude lists now ship only the runtime allowlist (catalog CSV, v7-cards, site-guide, collections/*/sot.json, editorial-index). Verified via real tar manifest test. Residual: catalog CSV itself still deployed (runtime dependency) with internal-ish columns.",
+    "tags": [
+      "security",
+      "data-exposure",
+      "wordpress-theme",
+      "dossier",
+      "deploy",
+      "fail-closed",
+      "pdp"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-252"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-274",
+    "timestamp": "2026-07-19",
+    "error_message": "Live /cart/ shows unstyled WC-core empty-cart markup (wc-empty-cart-message flush-left) instead of the theme's .skyy-cart__empty shell; initially misattributed to the bug-222 canvas-meta routing",
+    "file": "wordpress-theme/skyyrose-flagship/woocommerce/cart/cart-empty.php",
+    "root_cause": "WC_Shortcode_Cart::output() routes EMPTY carts to cart/cart-empty.php, never cart/cart.php — the theme only overrode cart.php, so its styled empty branch (cart.php:37-58) is dead code; sessionless audits always hit the empty path. Live curl proved the bug-222 template_include shell IS working (skr-page + woocommerce-cart body class + cart CSS all present), so no routing change was needed.",
+    "fix": "Added theme override woocommerce/cart/cart-empty.php mirroring the .skyy-cart__empty markup (classes already styled in shipped woocommerce-cart.min.css — zero CSS rebuild). h2 title (page.php shell provides h1); woocommerce_cart_is_empty deliberately not fired (would duplicate the core notice), documented in docblock like cart.php's hook exception.",
+    "tags": [
+      "wordpress-theme",
+      "woocommerce",
+      "cart",
+      "template-override",
+      "empty-state",
+      "dead-code"
+    ],
+    "related_bugs": [
+      "bug-222"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-275",
+    "timestamp": "2026-07-19",
+    "error_message": "Ultracode pre-ship review of v1.12.0 train: 7 real defects caught before deploy — cart-empty.php swallowed ALL queued WC notices (dropped woocommerce_cart_is_empty action); async-CSS races (consent banner + size-guide modal painted unstyled pre-sheet); collection hero lockup + cart-empty heading carried rv-* reveal classes (LCP-stall class); Photon srcset unversioned (stale-cache); LH quickadd:hover 3.97:1; data/ deploy seal was blocklist (fail-open, 3 files leaked).",
+    "file": "woocommerce/cart/cart-empty.php + cookie-consent.php + size-guide-modal.php + collection/page.php + inc/performance.php + product-card-v7.css + scripts/deploy-theme.sh",
+    "root_cause": "Recurring classes: (1) WC template overrides must re-fire core actions minus only the unwanted callback, never drop the action; (2) deferring a sheet requires a pre-CSS hidden state for ANY server-rendered markup it hides; (3) rv-* reveal classes must never touch above-fold/LCP elements; (4) Photon caches by URL forever — always version; (5) gates must be allowlists (bug-230).",
+    "fix": "All 7 fixed in ec76abffa; deploy gate now enumerates data/ per-file at deploy time (fail-closed, empirically tested). Review: wf_ba262e94 (3 confirmed adversarially) + inline verification of 6 findings dropped when verifiers hit session limit.",
+    "tags": [
+      "code-review",
+      "woocommerce",
+      "async-css",
+      "lcp",
+      "photon",
+      "fail-open",
+      "pre-ship"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-273",
+      "bug-274"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19"
+  },
+  {
+    "id": "bug-276",
+    "timestamp": "2026-07-20",
+    "error_message": "Round-4 Lighthouse mobile: LCP render delay 2.4-8.4s sitewide — above-fold content in DOM but unpainted, waiting on deferred JS (.is-visible scroll-reveal gating)",
+    "file": "11 theme templates + 9 CSS files (wordpress-theme/skyyrose-flagship)",
+    "root_cause": "Scroll-reveal utilities set hidden resting states (opacity:0/clip-path/blur) revealed only when deferred JS adds .is-visible. Central srRevealSafety net (animations-premium.css) exists but (a) still costs 0.8s on covered pages, (b) does not cover po-rv/col-rv/exp-block__content, (c) is skipped on page/contact/404/cart/checkout slugs, (d) homepage #loader overlay was dismissed only by deferred JS. Shop's 8.4s is NOT reveal gating (cards carry no reveal classes, verified live) — likely late webfont repaint of text LCP.",
+    "fix": "Wave 5 (Pixel3): stripped reveal classes from every above-fold element (search, landing BR/SIG, shipping, faq first-cat, size-guide first-table, collections index, collection hero, about hero, preorder hero, PDP gallery/info) with in-place precedent comments; added local self-reveal safety nets (0.01s snap @0.8s, fill forwards, .is-visible cancels, PRM-safe) to preorder-gateway/elementor-widgets/experiences/landing-scrollytell/landing-pages/about/agency-tier-visuals CSS; homepage #loader now self-dismisses at 2.5s via keyframe. Details: tasks/wp-commercial-theme/fix-log.md Wave 5.",
+    "tags": [
+      "lighthouse",
+      "lcp",
+      "render-delay",
+      "scroll-reveal",
+      "wordpress-theme",
+      "css",
+      "safety-net",
+      "performance"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-20"
   }
 ]

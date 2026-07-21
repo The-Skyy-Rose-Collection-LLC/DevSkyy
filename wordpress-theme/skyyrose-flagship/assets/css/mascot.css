@@ -298,6 +298,15 @@
 	pointer-events: none;
 }
 
+/* Consent-banner clearance (audit D5): the cookie banner (z 9998,
+   cookie-consent.css) sits above this widget (z 9990) and was clipping it.
+   While <html> carries .skyyrose-consent-open the clearance var is non-zero
+   and lifts the widget above the banner; it collapses back to 20px once
+   consent is resolved. */
+.skyyrose-consent-open .skyyrose-mascot {
+	bottom: calc(20px + var(--skyyrose-consent-clearance, 0px));
+}
+
 /* Black Rose walks in from the left; everyone else from the right. */
 .skyyrose-mascot[data-walk-side="left"] {
 	right: auto;
@@ -625,6 +634,11 @@
 	font-family: inherit;
 }
 
+/* Same consent-banner clearance contract as .skyyrose-mascot above. */
+.skyyrose-consent-open .skyyrose-mascot__recall {
+	bottom: calc(20px + var(--skyyrose-consent-clearance, 0px));
+}
+
 .skyyrose-mascot__recall img {
 	border-radius: 50%;
 	width: 32px;
@@ -658,6 +672,25 @@
    =================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
+	/* CLS fix (Wave 3, wishlist desktop 0.388): the breathe/walk keyframes
+	   are transform-only, but Chrome only EXCLUDES transform motion from
+	   layout-shift scoring when the animation is composited — skyy-breathe
+	   also animates filter and ran on the main thread, so every idle frame
+	   logged a layout-shift entry against the widget (attributed to the
+	   surrounding footer section in Lighthouse). will-change promotes the
+	   animated elements; contain isolates the widget's internal layout. */
+	.skyyrose-mascot {
+		contain: layout;
+	}
+
+	.skyyrose-mascot--entering,
+	.skyyrose-mascot--exiting,
+	.skyyrose-mascot--idle .skyyrose-mascot__image,
+	.skyy--speaking .skyyrose-mascot__image,
+	.skyy--excited .skyyrose-mascot__image {
+		will-change: transform;
+	}
+
 	.skyyrose-mascot--entering {
 		animation: skyy-walk-on 1.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 	}
@@ -692,16 +725,23 @@
    =================================================================== */
 
 @media (max-width: 768px) {
-	/* .mobile-nav (assets/css/mobile-bottom-nav.css) is a fixed 64px+safe-area
+	/* .mobile-nav (assets/css/mobile-bottom-nav.css) is a fixed var(--skyyrose-mobile-nav-h)+safe-area
 	   band pinned to the same bottom-right corner at a lower z-index (9000
 	   vs this widget's 9990) — without clearance the mascot/recall pill
 	   render on top of the nav's rightmost tap target instead of above it. */
 	.skyyrose-mascot {
-		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom) + 16px);
 		right: 16px;
 		flex-direction: column;
 		align-items: flex-end;
 		gap: 8px;
+	}
+
+	/* Consent clearance on mobile stacks on TOP of the nav clearance —
+	   the banner itself is offset above the nav band (cookie-consent.css). */
+	.skyyrose-consent-open .skyyrose-mascot,
+	.skyyrose-consent-open .skyyrose-mascot__recall {
+		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom) + 16px + var(--skyyrose-consent-clearance, 0px));
 	}
 
 	/* Side-entrance is a desktop nicety — mobile always anchors bottom-right
@@ -751,7 +791,7 @@
 	/* Recall pill shares the mascot's mobile clearance/offset so it doesn't
 	   sit on top of the mobile nav band either. */
 	.skyyrose-mascot__recall {
-		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom) + 16px);
 		right: 16px;
 	}
 
@@ -762,7 +802,7 @@
 	.skyy-3d-canvas {
 		width: 140px;
 		height: 216px;
-		bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+		bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom) + 16px);
 		right: 16px;
 	}
 

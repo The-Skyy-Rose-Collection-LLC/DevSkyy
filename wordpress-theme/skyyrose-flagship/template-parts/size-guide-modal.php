@@ -12,6 +12,14 @@ defined( 'ABSPATH' ) || exit;
 // Tables come from the single source shared with /size-guide/ (WS4).
 $sg_tables = skyyrose_get_size_guide_tables();
 ?>
+<?php
+// Pre-CSS hidden guard: size-guide.css loads via the async print-media swap
+// (Wave 2), so on a cold load this server-rendered modal would paint visible
+// in-flow before the sheet applies (inert/aria-hidden block interaction, not
+// paint). This inline rule mirrors the sheet's base-hidden state and stops
+// matching the moment JS opens the dialog (aria-hidden="false").
+?>
+<style>.sg-overlay[aria-hidden="true"]{opacity:0;visibility:hidden}</style>
 <div id="size-guide-modal" class="sg-overlay" role="dialog" aria-labelledby="sg-heading" aria-modal="true" aria-hidden="true" inert>
 <div class="sg-panel">
 	<button type="button" class="sg-close" aria-label="<?php esc_attr_e( 'Close size guide', 'skyyrose' ); ?>">

@@ -394,3 +394,12 @@ STILL STALE (out of scope, flagged): the `skyyrose/` static-app tree uses cut fo
 code + a zero-CDN-policy question, separate pass. Plugin cache is a LOCAL copy
 (`~/.claude/plugins/cache/skyyrose-suite/<plugin>/1.0.0/`) - edit source THEN mirror to cache; wordpress-copilot
 loads directly from repo (no cache).
+
+## (2026-07-19, Pixel wave-1) Key Learnings + Do-Not-Repeat additions
+- **Key Learning — theme font aliases:** style.css consumes `--font-body`/`--font-heading` LEGACY aliases; canonical vars are `--skyyrose-font-*` and the bridge lives in design-tokens.css §1.12. A missing alias fails silent (fallback font wins sitewide, no console error) — when a computed font is wrong, check the alias block before the @font-face.
+- **Key Learning — WC core layout in a grid theme:** `woocommerce-layout.css` stays enqueued (Bolt Wave-1); its float rules + clearfix `::before {display:table}` become phantom GRID ITEMS inside `display:grid` ul.products — neutralize with `content:none` + `float:none;width:auto` at equal specificity, don't dequeue.
+- **Do-Not-Repeat — audit probes:** `querySelector('a, .b, [class*=c]')` returns the first match in DOCUMENT order, not selector order — caused the false "pre-order missing footer" P1 (matched .po-card__footer). Probe for a SPECIFIC selector (#colophon.site-footer) or query each selector separately. Likewise: rect.right > viewport does NOT mean an element causes horizontal scroll — position:fixed subtrees can't extend scrollWidth; filter them before naming culprits.
+- **Do-Not-Repeat — screenshot harnesses on this theme:** the site sets `scroll-behavior:smooth`; `window.scrollTo(0,0)` animates and a fixed 1s settle captures mid-scroll on long pages. Wait on `scrollY===0`, not a timer.
+
+## Do-Not-Repeat addition (2026-07-20)
+- **Never run Lighthouse within Batcache TTL of a deploy** — round-2 (started 2 min post-deploy) audited STALE pre-deploy HTML on several pages (its console-error item cited ?ver=1.11.1 while live served 1.12.0). Wave-3 dispatched fixes for 5 phantom a11y findings that were already fixed and live. Protocol: wait >=10 min post-deploy, then spot-check one audited page's asset ?ver matches the deployed version BEFORE trusting any round; measure without ?cb (real-user cache path). [Access, wave-3]

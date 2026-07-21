@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -38,7 +39,7 @@ def test_cli_exits_zero_when_no_duplicates(tmp_path: Path) -> None:
         [sys.executable, str(SCRIPT), "--embeddings", str(embeds), "--threshold", "0.98"],
         capture_output=True,
         text=True,
-        cwd=str(REPO),
+        env={**os.environ, "PYTHONPATH": str(REPO)},
     )
     assert result.returncode == 0, result.stderr
     assert "no duplicates" in result.stdout.lower()
@@ -50,7 +51,7 @@ def test_cli_exits_one_when_duplicates_found(tmp_path: Path) -> None:
         [sys.executable, str(SCRIPT), "--embeddings", str(embeds), "--threshold", "0.98"],
         capture_output=True,
         text=True,
-        cwd=str(REPO),
+        env={**os.environ, "PYTHONPATH": str(REPO)},
     )
     assert result.returncode == 1, result.stderr
     assert "x-1" in result.stdout and "x-2" in result.stdout

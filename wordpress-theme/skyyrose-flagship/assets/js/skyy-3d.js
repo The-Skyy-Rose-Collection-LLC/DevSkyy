@@ -161,13 +161,32 @@
 	// -------------------------------------------------------------------------
 
 	function initScene( THREE ) {
+		// No-WebGL guard (audit D10): headless/bot renders, GPU-blocklisted
+		// and legacy clients have no usable context — three's constructor
+		// console.errors then THROWS, which surfaced as an uncaught pageerror
+		// on every page. Probe a throwaway canvas first (silent in most
+		// engines), keep try/catch as the backstop, and degrade to the 2D
+		// sprite mascot (mascot.js) by hiding the 3D canvas only.
+		var probeCanvas = document.createElement( 'canvas' );
+		var probeGl = probeCanvas.getContext( 'webgl2' ) || probeCanvas.getContext( 'webgl' );
+		if ( ! probeGl ) {
+			canvas.style.display = 'none';
+			return;
+		}
+
 		// Renderer — transparent background, alpha
-		renderer = new THREE.WebGLRenderer( {
-			canvas: canvas,
-			alpha: true,
-			antialias: true,
-			powerPreference: 'low-power',
-		} );
+		try {
+			renderer = new THREE.WebGLRenderer( {
+				canvas: canvas,
+				alpha: true,
+				antialias: true,
+				powerPreference: 'low-power',
+			} );
+		} catch ( e ) {
+			canvas.style.display = 'none';
+			renderer = null;
+			return;
+		}
 		renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
 		renderer.setSize( CHARACTER_W, CHARACTER_H );
 		renderer.shadowMap.enabled = false;

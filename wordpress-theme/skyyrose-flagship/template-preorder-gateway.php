@@ -84,43 +84,86 @@ get_header();
 		01 · CINEMATIC VIDEO HERO
 		══════════════════════════════════════════════════════════════════ -->
 	<section class="po-hero" aria-label="<?php esc_attr_e( 'Reserve your piece', 'skyyrose' ); ?>">
-		<div class="po-hero__media" aria-hidden="true">
+		<?php
+		// Founder canon (2026-07-19): the hero IS the uploaded video, framed to
+		// show the ENTIRE outfit (he's wearing the brand — br-006 Bomber Sherpa,
+		// rose back-embroidery). Source is portrait 720x1280, so desktop uses
+		// object-fit:contain over a blurred backdrop (preorder-gateway.css) —
+		// cover would crop the outfit. Poster = an actual video frame (40s,
+		// back-rose shot), so autoplay-blocked / low-power / reduced-motion
+		// visitors still see the brand footage, never an unrelated still.
+		?>
+		<div class="po-hero__media" aria-hidden="true" style="--po-hero-poster: url('<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.webp?v=' . $po_ver ); ?>')">
+			<?php
+			/*
+			 * No autoplay/poster attrs, preload=none: the 3.5MB webm fetched
+			 * inside the LCP window (round-7 mobile: poster load time up to
+			 * 2.8s from link contention), and the poster attr double-fetched
+			 * the frame as JPG next to the picture layer's webp. The
+			 * .po-hero__poster <picture> behind the video paints the identical
+			 * frame, and preorder-gateway.js initHeroVideo() starts playback
+			 * at window load (or first interaction, whichever comes first) —
+			 * the hero still plays the founder video, it just stops taxing
+			 * first paint. Founder canon (video plays, full outfit visible)
+			 * unchanged.
+			 */
+			?>
 			<video class="po-hero__video"
-				autoplay muted loop playsinline
-				poster="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . $po_ver ); ?>">
+				muted loop playsinline preload="none">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.webm?v=' . $po_ver ); ?>" type="video/webm">
 				<source src="<?php echo esc_url( $po_assets . '/video/preorder-hero.mp4?v=' . $po_ver ); ?>" type="video/mp4">
 			</video>
 			<picture class="po-hero__poster" aria-hidden="true">
 				<source
-					srcset="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-480w.webp?v=' . $po_ver ); ?> 480w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-768w.webp?v=' . $po_ver ); ?> 768w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1280w.webp?v=' . $po_ver ); ?> 1280w,
-							<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.webp?v=' . $po_ver ); ?> 1680w"
+					srcset="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-480w.webp?v=' . $po_ver ); ?> 480w,
+							<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.webp?v=' . $po_ver ); ?> 720w"
 					sizes="100vw"
 					type="image/webp">
-				<img src="<?php echo esc_url( $po_assets . '/branding/hero/luxury-nighttime-1680w.jpg?v=' . $po_ver ); ?>"
-					alt="" width="1680" height="945" loading="eager" fetchpriority="high">
+				<img src="<?php echo esc_url( $po_assets . '/images/hero/preorder-video-poster-720w.jpg?v=' . $po_ver ); ?>"
+					alt="" width="720" height="1280" loading="eager" fetchpriority="high">
 			</picture>
 			<div class="po-hero__overlay" aria-hidden="true"></div>
 		</div>
 
 		<div class="po-hero__content">
-			<p class="po-hero__eyebrow po-rv"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></p>
+			<?php
+			// The hero is the first mobile viewport and the lockup is the LCP
+			// element — no po-rv reveal classes here: the hidden resting state
+			// stalls LCP behind the deferred JS queue (the PDP 24.9s bug class).
+			// Below-fold sections keep reveals. Wave 5.
+			?>
+			<p class="po-hero__eyebrow"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></p>
 
-			<picture class="po-hero__lockup po-rv">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.avif?v=' . $po_ver ); ?>" type="image/avif">
-				<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp?v=' . $po_ver ); ?>" type="image/webp">
+			<?php
+			// Hero lockup renders ≤600px (width attr; ~92vw on mobile) but shipped
+			// the full-size 93KB AVIF. Photon width variants via the webp; avif
+			// <source> suppressed while Photon answers (it serves webp).
+			$po_h_srcset = function_exists( 'skyyrose_photon_srcset' )
+				? skyyrose_photon_srcset( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp', array( 360, 600, 960 ) )
+				: '';
+			$po_h_sizes  = '(max-width: 640px) 92vw, 600px';
+			?>
+			<picture class="po-hero__lockup">
+				<?php if ( '' !== $po_h_srcset ) : ?>
+					<source srcset="<?php echo esc_attr( $po_h_srcset ); ?>" sizes="<?php echo esc_attr( $po_h_sizes ); ?>" type="image/webp">
+				<?php else : ?>
+					<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.avif?v=' . $po_ver ); ?>" type="image/avif">
+					<source srcset="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp?v=' . $po_ver ); ?>" type="image/webp">
+				<?php endif; ?>
 				<img src="<?php echo esc_url( $po_assets . '/images/hero-overlays/sig-brand-skyy-rose-gold.png?v=' . $po_ver ); ?>"
+					<?php if ( '' !== $po_h_srcset ) : ?>
+						srcset="<?php echo esc_attr( $po_h_srcset ); ?>"
+						sizes="<?php echo esc_attr( $po_h_sizes ); ?>"
+					<?php endif; ?>
 					alt="<?php esc_attr_e( 'Skyy Rose', 'skyyrose' ); ?>"
 					width="600" height="200" loading="eager">
 			</picture>
 
-			<p class="po-hero__body po-rv">
+			<p class="po-hero__body">
 				<?php esc_html_e( 'Secure your pieces before they drop. Luxury Grows from Concrete.', 'skyyrose' ); ?>
 			</p>
 
-			<div class="po-hero__actions po-rv">
+			<div class="po-hero__actions">
 				<a class="po-btn po-btn--primary" href="#po-gateway">
 					<?php esc_html_e( 'Browse Collections', 'skyyrose' ); ?>
 				</a>
@@ -181,7 +224,7 @@ get_header();
 			</p>
 		</header>
 
-		<div class="po-gateway__panels" role="list">
+		<div class="po-gateway__panels">
 			<?php
 			/* Portrait image map — from visual-manifest.json */
 			$po_portrait_map = array(
@@ -243,20 +286,38 @@ get_header();
 				$po_portrait = isset( $po_portrait_map[ $po_slug ] ) ? $po_portrait_map[ $po_slug ] : null;
 				$po_lockup   = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
 				?>
+				<?php // No list/listitem roles: aria-pressed is invalid on role="listitem", and the toggle semantics matter more than list semantics here. ?>
 				<button type="button"
 					class="po-panel po-panel--<?php echo esc_attr( $po_slug ); ?>"
 					data-collection="<?php echo esc_attr( $po_slug ); ?>"
-					role="listitem"
 					aria-label="<?php echo esc_attr( sprintf( /* translators: %s: collection label */ __( 'View %s collection', 'skyyrose' ), $po_col['label'] ) ); ?>">
 
 					<div class="po-panel__bg" aria-hidden="true">
 						<?php if ( $po_portrait ) : ?>
+							<?php
+							// Panels render ≤290px wide (minmax(220px,1fr) in a 900px grid)
+							// but shipped full-size AVIF (round-3 uses-responsive-images).
+							// Photon width variants via the webp; avif <source> suppressed
+							// while Photon answers (it serves webp — keeps type= honest).
+							$po_p_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_portrait['webp'], array( 320, 480, 640 ) )
+								: '';
+							$po_p_sizes  = '(max-width: 480px) 92vw, (max-width: 900px) 46vw, 290px';
+							?>
 							<picture>
-								<?php if ( ! empty( $po_portrait['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_p_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_p_srcset ); ?>" sizes="<?php echo esc_attr( $po_p_sizes ); ?>" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_portrait['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_portrait['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_portrait['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_portrait['jpg'] ); ?>"
+									<?php if ( '' !== $po_p_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_p_srcset ); ?>"
+										sizes="<?php echo esc_attr( $po_p_sizes ); ?>"
+									<?php endif; ?>
 									alt=""
 									width="<?php echo absint( $po_portrait['w'] ); ?>"
 									height="<?php echo absint( $po_portrait['h'] ); ?>"
@@ -272,12 +333,27 @@ get_header();
 						</span>
 
 						<?php if ( $po_lockup ) : ?>
+							<?php
+							// Lockup renders ≤120px (.po-panel__lockup) — full-size AVIF
+							// (50-93KB) was pure waste. Same Photon/avif-suppression trade.
+							$po_l_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_lockup['webp'], array( 120, 240, 360 ) )
+								: '';
+							?>
 							<picture class="po-panel__lockup">
-								<?php if ( ! empty( $po_lockup['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_l_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_l_srcset ); ?>" sizes="120px" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_lockup['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_lockup['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_lockup['png'] ); ?>"
+									<?php if ( '' !== $po_l_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_l_srcset ); ?>"
+										sizes="120px"
+									<?php endif; ?>
 									alt="<?php echo esc_attr( $po_lockup['alt'] ); ?>"
 									width="260" height="80" loading="lazy"
 									<?php if ( ! empty( $po_lockup['style'] ) ) : ?>
@@ -351,13 +427,26 @@ get_header();
 						<?php
 						$po_g_lockup = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
 						if ( $po_g_lockup ) :
+							// Renders ≤140px (.po-grid__lockup) — same Photon/avif-suppression
+							// trade as the panel lockup above.
+							$po_gl_srcset = function_exists( 'skyyrose_photon_srcset' )
+								? skyyrose_photon_srcset( $po_g_lockup['webp'], array( 140, 280, 420 ) )
+								: '';
 							?>
 							<picture class="po-grid__lockup">
-								<?php if ( ! empty( $po_g_lockup['avif'] ) ) : ?>
-									<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
+								<?php if ( '' !== $po_gl_srcset ) : ?>
+									<source srcset="<?php echo esc_attr( $po_gl_srcset ); ?>" sizes="140px" type="image/webp">
+								<?php else : ?>
+									<?php if ( ! empty( $po_g_lockup['avif'] ) ) : ?>
+										<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
+									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_g_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
-								<source srcset="<?php echo esc_url( $po_g_lockup['webp'] ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( $po_g_lockup['png'] ); ?>"
+									<?php if ( '' !== $po_gl_srcset ) : ?>
+										srcset="<?php echo esc_attr( $po_gl_srcset ); ?>"
+										sizes="140px"
+									<?php endif; ?>
 									alt="<?php echo esc_attr( $po_g_lockup['alt'] ); ?>"
 									width="200" height="60" loading="lazy"
 									<?php if ( ! empty( $po_g_lockup['style'] ) ) : ?>

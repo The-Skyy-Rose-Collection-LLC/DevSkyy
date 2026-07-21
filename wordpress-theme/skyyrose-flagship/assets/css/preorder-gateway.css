@@ -115,6 +115,18 @@
   z-index: 0;
 }
 
+/* Blurred backdrop behind the contained video (desktop pillarboxing).
+   --po-hero-poster is set inline on .po-hero__media by the template
+   (video-frame poster). Painted below the video/poster children. */
+.po-hero__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--po-hero-poster) center / cover no-repeat;
+  filter: blur(28px) saturate(1.1) brightness(0.6);
+  transform: scale(1.15);
+}
+
 .po-hero__video {
   /* Must stack ABOVE .po-hero__poster: the poster <picture> follows the video in
      the DOM and is absolutely positioned, so without explicit z-index it paints
@@ -137,6 +149,19 @@
   object-fit: cover;
   object-position: center top;
   z-index: 1;
+}
+
+/* Founder canon (2026-07-19): the hero video is portrait 720x1280 and must
+   show the ENTIRE outfit. Any viewport wider than the video's 9/16 aspect
+   would crop it under cover — switch to contain there (the blurred
+   ::before backdrop fills the pillars). Narrow phones (<9/16, e.g. 9/19.5)
+   keep cover: the video fills the width with only minimal top/bottom trim. */
+@media (min-aspect-ratio: 9/16) {
+  .po-hero__video,
+  .po-hero__poster {
+    object-fit: contain;
+    object-position: center;
+  }
 }
 
 .po-hero__overlay {
@@ -240,7 +265,7 @@
 
 .po-btn--primary {
   background: var(--po-accent);
-  color: var(--po-bg);
+  color: #0A0A0A; /* hard ink: var(--po-bg) resolves to cream in the hero context → 1.48:1 on silver; dark ink is 10.9:1 */
   padding: .9rem 2.2rem;
   border: 2px solid var(--po-accent);
 }
@@ -252,7 +277,7 @@
 
 .po-btn--primary-sm {
   background: var(--po-accent);
-  color: var(--po-bg);
+  color: #0A0A0A; /* same hard ink as .po-btn--primary */
   padding: .55rem 1.4rem;
   border: 2px solid var(--po-accent);
   font-size: .65rem;
@@ -501,7 +526,8 @@
 }
 
 .po-grid__lockup { max-width: 140px; }
-.po-grid__lockup img { width: 100%; }
+.po-grid__lockup img { width: 100%; height: auto; } /* lockup art isn't 200x60 — height:auto stops the attr ratio distorting it */
+.po-email-capture__art img { height: auto; } /* logo isn't square — same attr-ratio distortion guard */
 
 .po-grid__meta { text-align: right; }
 
@@ -1039,8 +1065,22 @@
   opacity: 0;
   transform: translateY(20px);
   transition: opacity .7s var(--po-ease), transform .7s var(--po-ease);
+  /* Safety net (mirrors srRevealSafety, animations-premium.css §12.5): .po-rv is
+     NOT covered by the central net, so slow/failed JS left content invisible
+     (Wave 5). Snaps the visible state at 0.8s; the .is-visible path cancels it. */
+  animation: poRevealSafety 0.01s linear 0.8s forwards;
 }
-.po-rv.is-visible { opacity: 1; transform: none; }
+@keyframes poRevealSafety {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.po-rv.is-visible {
+  opacity: 1;
+  transform: none;
+  animation: none !important;
+}
 
 /* ─────────────────────────────────────────────────────────────
    MAGNETIC CTA helper (set by JS)
@@ -1102,6 +1142,7 @@
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
 
   .po-manifesto__bg { will-change: auto; }

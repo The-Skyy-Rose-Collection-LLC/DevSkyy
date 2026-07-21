@@ -97,34 +97,73 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 						?>
 						srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_bg_alt'] ); ?>"
-					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
+					<?php
+					// decoding=sync (Wave 7): this img is the measured mobile LCP
+					// on BR/LH/SIG. Round 6: bytes arrive High-priority at
+					// ~150ms, yet render delay ran 0.6-3.3s — under 4x CPU
+					// throttle an async decode slips behind the gsap/page-script
+					// queue to a later frame. Sync ties decode to the first
+					// paint attempt. LCP img only — everything else stays async.
+					?>
+					loading="eager" fetchpriority="high" decoding="sync" width="1680" height="720">
 			</div>
 		<?php endif; ?>
-		<div class="col-hero__content col-reveal">
+		<?php
+		// The whole hero is the first mobile viewport (col-hero is 100dvh) — no
+		// reveal classes anywhere inside it: a hidden resting state on this
+		// wrapper stalled LCP behind the deferred JS queue (round-4 Lighthouse:
+		// 2.4s render delay = the 0.8s srRevealSafety net, not first paint).
+		// Below-fold sections keep reveals. Wave 5.
+		?>
+		<div class="col-hero__content">
 			<?php
 			if ( $has_emblem ) :
+				// Emblem renders ≤154px wide (height clamp(120px,18vh,210px) at 220:300
+				// ratio, collection-pages.css) but ships full-size (26-34KB, round-3
+				// uses-responsive-images). Photon width variants; '' = plain img as before.
+				$emblem_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $emblem_rel, array( 160, 320, 480 ) )
+					: '';
 				?>
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>" alt="" aria-hidden="true" class="col-hero__emblem rv-blur-down" width="220" height="300" loading="eager" decoding="async">
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $emblem_rel . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php if ( '' !== $emblem_srcset ) : ?>
+						srcset="<?php echo esc_attr( $emblem_srcset ); ?>"
+						sizes="154px"
+					<?php endif; ?>
+					alt="" aria-hidden="true" class="col-hero__emblem" width="220" height="300" loading="eager" decoding="async">
 				<?php endif; ?>
-				<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
+				<span class="col-hero__badge"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
 				<?php
 				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
 				// hero logo — image blurs + scales in coupled to scroll, not
-				// triggered once by IntersectionObserver. Modern browsers
-				// (Chromium 115+, Firefox 2026) honor it; others render the
-				// existing .rv-clip-up reveal. Reduced-motion respected.
-				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				// triggered once by IntersectionObserver. Reduced-motion respected.
+				// NO rv-clip-up here: this lockup IS the mobile LCP element on
+				// BR/LH (audit Wave 2) — a reveal class hides it until deferred
+				// JS runs, stalling LCP behind the whole script queue (the PDP
+				// 24.9s bug class, fix-log Wave 1). Scroll-bloom is CSS-only
+				// (scroll-timeline), so it keeps first paint intact.
+				$hero_logo_class = 'col-hero__logo' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				// Photon width variants for the single-res lockup (199-417KB at
+				// 1600px, the mobile LCP element — audit Wave 2). Fallback src
+				// stays direct, so no Photon = today's behavior.
+				$hero_logo_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( SKYYROSE_ASSETS_URI . $resolved_hero_logo, array( 480, 640, 720, 960, 1280 ) )
+					: '';
 				?>
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $resolved_hero_logo . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php if ( '' !== $hero_logo_srcset ) : ?>
+						srcset="<?php echo esc_attr( $hero_logo_srcset ); ?>"
+						sizes="(max-width: 768px) 90vw, 720px"
+					<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
 					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager" fetchpriority="high" decoding="async">
 				<h1 class="screen-reader-text"><?php echo esc_html( $c['hero_logo_alt'] ); ?></h1>
 			<?php else : ?>
 				<h1 class="col-hero__title"><span><?php echo esc_html( $c['hero_title'] ); ?></span></h1>
 			<?php endif; ?>
-			<p class="col-hero__tagline rv-split-word"><?php echo esc_html( $c['hero_tagline'] ); ?></p>
-			<p class="col-hero__subtitle rv-blur"><?php echo esc_html( $c['hero_subtitle'] ); ?></p>
+			<p class="col-hero__tagline"><?php echo esc_html( $c['hero_tagline'] ); ?></p>
+			<p class="col-hero__subtitle"><?php echo esc_html( $c['hero_subtitle'] ); ?></p>
 			<div class="col-hero__cta-group">
 				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>
@@ -315,7 +354,8 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose' ); ?></h3>
 		<div class="col-crossnav__grid stagger-grid">
 			<?php foreach ( $cross_nav as $nav ) : ?>
-				<a href="<?php echo esc_url( $nav['url'] ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose' ), $nav['name'] ) ); ?>">
+				<?php // No aria-label: the accessible name computes from the visible h3 + p content (WCAG 2.5.3 — an override here dropped the visible text from the name). ?>
+				<a href="<?php echo esc_url( $nav['url'] ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>">
 					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
 					<p><?php echo esc_html( $nav['desc'] ); ?></p>
 				</a>

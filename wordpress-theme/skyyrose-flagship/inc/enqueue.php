@@ -47,10 +47,20 @@ function skyyrose_enqueue_global_styles() {
 	$base_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	// Main theme stylesheet (style.css with WordPress header).
+	// Main theme stylesheet (style.css with WordPress header). Serve the built
+	// style.min.css when current (26.3K → 18.3K; round-3 flagged the raw file
+	// render-blocking on 9 pages). Freshness-guarded: a .min older than its
+	// source falls back to style.css, so a deploy-without-rebuild can never
+	// ship stale rules (style.css carried a P0 syntax fix in Wave 1).
+	$style_uri = get_stylesheet_uri();
+	$style_min = SKYYROSE_DIR . '/style.min.css';
+	if ( $use_min && file_exists( $style_min )
+		&& filemtime( $style_min ) >= filemtime( SKYYROSE_DIR . '/style.css' ) ) {
+		$style_uri = SKYYROSE_URI . '/style.min.css';
+	}
 	wp_enqueue_style(
 		'skyyrose-style',
-		get_stylesheet_uri(),
+		$style_uri,
 		array(),
 		SKYYROSE_VERSION
 	);
@@ -144,6 +154,21 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
+	// Footer CRO section (template-parts/footer-cro.php) — the part is included
+	// unconditionally from footer.php, so its stylesheet belongs in the head.
+	// Its previous in-part late print painted the section unstyled first, the
+	// dominant CLS source on short pages (cart 0.49 / wishlist 0.40 — Wave 1).
+	// The part's own register+print becomes a no-op once this head enqueue runs.
+	$fcro_css_file = $use_min && file_exists( $base_dir . '/footer-cro.min.css' ) ? 'footer-cro.min.css' : 'footer-cro.css';
+	if ( file_exists( $base_dir . '/' . $fcro_css_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-footer-cro',
+			$base_uri . '/' . $fcro_css_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
 	// Mobile bottom navigation bar (hidden via CSS on desktop ≥769px).
 	$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
 	if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
@@ -176,30 +201,33 @@ function skyyrose_enqueue_global_styles() {
 	);
 
 	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/size-guide.css' ) ) {
+	$size_guide_file = $use_min && file_exists( $base_dir . '/size-guide.min.css' ) ? 'size-guide.min.css' : 'size-guide.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $size_guide_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-size-guide',
-			$base_uri . '/size-guide.css',
+			$base_uri . '/' . $size_guide_file,
 			array(),
 			SKYYROSE_VERSION
 		);
 	}
 
 	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/luxury-cursor.css' ) ) {
+	$cursor_css_file = $use_min && file_exists( $base_dir . '/luxury-cursor.min.css' ) ? 'luxury-cursor.min.css' : 'luxury-cursor.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $cursor_css_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-luxury-cursor',
-			$base_uri . '/luxury-cursor.css',
+			$base_uri . '/' . $cursor_css_file,
 			array(),
 			SKYYROSE_VERSION
 		);
 	}
 
 	// Skeleton loading states — shimmer placeholders for images and cards.
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/skeleton.css' ) ) {
+	$skeleton_file = $use_min && file_exists( $base_dir . '/skeleton.min.css' ) ? 'skeleton.min.css' : 'skeleton.css';
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $skeleton_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-skeleton',
-			$base_uri . '/skeleton.css',
+			$base_uri . '/' . $skeleton_file,
 			array(),
 			SKYYROSE_VERSION
 		);
@@ -243,24 +271,11 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
-	// collection lockup. Loaded in <head> on content templates so this above-the-fold
-	// part never flashes unstyled. Skipped on lightweight slugs that never host it.
-	$hero_file = $use_min && file_exists( $base_dir . '/hero-cinematic.min.css' )
-		? 'hero-cinematic.min.css' : 'hero-cinematic.css';
-	$hero_skip = in_array(
-		skyyrose_get_current_template_slug(),
-		array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' ),
-		true
-	);
-	if ( ! $hero_skip && file_exists( $base_dir . '/' . $hero_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-hero-cinematic',
-			$base_uri . '/' . $hero_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// hero-cinematic.css enqueue removed (perf wave 2026-07-19): the part it
+	// styles (template-parts/hero-cinematic.php) has zero get_template_part
+	// callers — every template renders its own hero — so the sheet was a dead
+	// render-blocking request on all non-lightweight pages. If a template ever
+	// adopts the part, re-enqueue the stylesheet gated to that template's slug.
 }
 
 /**
@@ -388,10 +403,11 @@ function skyyrose_enqueue_global_scripts() {
 	}
 
 	// Skyy mascot JS — gated on the same kill switch as the CSS above. Loaded
-	// via a tiny idle-time bootstrap (mascot-loader.js) so the character
-	// bundle never costs LCP/CLS budget: it only fetches mascot.min.js (and
-	// skyy-3d.min.js, when a GLB is configured) after requestIdleCallback or
-	// first interaction, whichever comes first.
+	// via a tiny post-load idle bootstrap (mascot-loader.js) so the character
+	// bundle never costs LCP/CLS/TBT budget: it only fetches mascot.min.js
+	// (and skyy-3d.min.js, when a GLB is configured) after the window load
+	// event + a genuine idle slot, or first interaction — whichever comes
+	// first. Save-Data visitors get the 2D sprite path (mascot.js only).
 	$mascot_js_enabled = skyyrose_mascot_is_enabled()
 		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $mascot_js_enabled ) {
@@ -716,11 +732,43 @@ function skyyrose_enqueue_template_styles() {
 			'wp_head',
 			function () {
 				$webp_url = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
-				$avif     = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
+
+				// Responsive Photon preload (Wave 4, PAIRED with Pixel2's hero
+				// <picture> srcset in front-page.php — the two must emit
+				// identical URLs or the LCP double-fetches ~300KB). The flat
+				// preload fetched the full 294KB AVIF at every viewport;
+				// Photon serves width-sized webp instead (jpeg transcode for
+				// non-webp Accept clients — hence NO type= attribute, it would
+				// be dishonest on the transcode path).
+				$hero_srcset = function_exists( 'skyyrose_photon_srcset' )
+					? skyyrose_photon_srcset( $webp_url, array( 480, 768, 1280, 1920 ) )
+					: '';
+				if ( '' !== $hero_srcset ) {
+					echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $hero_srcset ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					return;
+				}
+
+				// Fallback (helper unavailable/unusable): full-size next-gen preload.
+				$avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
 				if ( $avif && file_exists( $avif['path'] ) ) {
 					echo '<link rel="preload" as="image" href="' . esc_url( $avif['url'] ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				} else {
 					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
+
+				// Round-4 (Wave 5): the measured mobile LCP element is the FIRST
+				// hero-strip frame, not the hero background above (load delay
+				// 3,823ms — discovered late). PAIRING CONTRACT with front-page.php:
+				// same first SKU ($hero_strip_skus[0] = br-006), same widths
+				// 320/480/1024, same sizes string — any drift double-fetches.
+				if ( function_exists( 'skyyrose_sot_product_image_uri' ) && function_exists( 'skyyrose_photon_srcset' ) ) {
+					$strip_first_srcset = skyyrose_photon_srcset(
+						skyyrose_sot_product_image_uri( 'br-006', 'front' ),
+						array( 320, 480, 1024 )
+					);
+					if ( '' !== $strip_first_srcset ) {
+						echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $strip_first_srcset ) . '" imagesizes="(max-width: 1000px) 140px, 220px" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
 				}
 			},
 			2
@@ -877,7 +925,11 @@ function skyyrose_enqueue_template_scripts() {
 	// 'about' removed in 1.5.8: about.js uses prefers-reduced-motion query only,
 	// no gsap/ScrollTrigger API calls (audit: grep returns 0 hits). Was shipping
 	// 114KB of dead lib bytes to every About visitor.
-	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch', 'collection-standalone' );
+	// collection-standalone removed (Wave 7b): on collection pages gsap +
+	// ScrollTrigger + the engines are injected post-load / on-interaction by
+	// collection-motion-loader.js — their eval was the dominant col-hero
+	// render delay (round-6). Everything they power is below the 100vh hero.
+	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js', array(), '3.12.2', true );
 	}
@@ -888,29 +940,15 @@ function skyyrose_enqueue_template_scripts() {
 	// ~40KB of dead main-thread parse during the scene intro. preorder-gateway.js
 	// (5 refs), kids-capsule-launch.js (3 refs), and collection-feature-scroll.js
 	// (sticky feature section) genuinely use it.
-	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch', 'collection-standalone' );
+	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch' );
 	if ( in_array( $slug, $gsap_st_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
 	}
 
-	// Sticky-image feature scroll (collection pages) — ScrollTrigger drives the
-	// active state on desktop; the script self-falls-back to IntersectionObserver
-	// when GSAP is absent, motion is reduced, or the viewport is mobile.
-	if ( 'collection-standalone' === $slug ) {
-		$featscroll_js = $use_min && file_exists( $base_js_dir . '/collection-feature-scroll.min.js' )
-			? 'collection-feature-scroll.min.js' : 'collection-feature-scroll.js';
-		if ( file_exists( $base_js_dir . '/' . $featscroll_js ) ) {
-			$featscroll_deps = wp_script_is( 'skyyrose-gsap-st', 'enqueued' )
-				? array( 'skyyrose-gsap-st' ) : array();
-			wp_enqueue_script(
-				'skyyrose-collection-feature-scroll',
-				$base_js_uri . '/' . $featscroll_js,
-				$featscroll_deps,
-				SKYYROSE_VERSION,
-				true
-			);
-		}
-	}
+	// Sticky-image feature scroll (collection pages) — moved into the
+	// collection-motion-loader chain (Wave 7b) so its evaluation joins gsap/
+	// ScrollTrigger outside the FCP→LCP window. The section it drives is
+	// below the 100vh hero; the script self-inits on injection.
 
 	// Phase 2 — Lenis smooth-scroll lib: preorder gateway only.
 	// Immersive rooms are 100vh/overflow:hidden (nothing to scroll) — no dead bytes.
@@ -943,23 +981,29 @@ function skyyrose_enqueue_template_scripts() {
 
 		// On preorder, add lenis as a dep so WP prints it before immersive-core.
 		// On immersive rooms lenis is not enqueued — omit it from deps there.
-		$ic_js_deps = array( 'skyyrose-gsap' );
-		if ( 'preorder-gateway' === $slug && wp_script_is( 'skyyrose-lenis', 'enqueued' ) ) {
-			$ic_js_deps[] = 'skyyrose-lenis';
-		}
+		// On collection pages the JS ships via collection-motion-loader instead
+		// (Wave 7b) — the embedded scene is below the hero, so its engine may
+		// not evaluate inside the FCP→LCP window. CSS above still enqueues
+		// (async-swapped for collection by skyyrose_async_noncritical_styles).
+		if ( 'collection-standalone' !== $slug ) {
+			$ic_js_deps = array( 'skyyrose-gsap' );
+			if ( 'preorder-gateway' === $slug && wp_script_is( 'skyyrose-lenis', 'enqueued' ) ) {
+				$ic_js_deps[] = 'skyyrose-lenis';
+			}
 
-		$ic_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
-			? 'system/immersive-core.min.js' : 'system/immersive-core.js';
-		if ( file_exists( $base_js_dir . '/' . $ic_js ) ) {
-			wp_enqueue_script(
-				'skyyrose-immersive-core',
-				$base_js_uri . '/' . $ic_js,
-				// GSAP core + optional lenis dep (preorder only).
-				// immersive-core uses gsap.timeline/fromTo/set, not ScrollTrigger API.
-				$ic_js_deps,
-				SKYYROSE_VERSION,
-				true
-			);
+			$ic_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
+				? 'system/immersive-core.min.js' : 'system/immersive-core.js';
+			if ( file_exists( $base_js_dir . '/' . $ic_js ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-core',
+					$base_js_uri . '/' . $ic_js,
+					// GSAP core + optional lenis dep (preorder only).
+					// immersive-core uses gsap.timeline/fromTo/set, not ScrollTrigger API.
+					$ic_js_deps,
+					SKYYROSE_VERSION,
+					true
+				);
+			}
 		}
 	}
 
@@ -1031,20 +1075,78 @@ function skyyrose_enqueue_template_scripts() {
 		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */
 	}
 
-	// Embedded experience layer (WS3): collection pages ship the immersive
-	// engine + WC bridge alongside their own template script.
+	// Embedded experience layer (WS3): collection pages ship gsap +
+	// ScrollTrigger + immersive-core + feature-scroll + immersive engine +
+	// WC bridge via collection-motion-loader.js (Wave 7b) — injected in order
+	// on first interaction or 8s after load, so their ~2.9s evaluation
+	// (round-6 bootup-time) cannot land inside the FCP→LCP window. All chain
+	// scripts self-init when readyState is already complete.
 	if ( 'collection-standalone' === $slug ) {
-		$immersive_js = $use_min && file_exists( $base_js_dir . '/immersive.min.js' )
-			? 'immersive.min.js' : 'immersive.js';
-		if ( file_exists( $base_js_dir . '/' . $immersive_js ) ) {
+		$motion_loader = $use_min && file_exists( $base_js_dir . '/collection-motion-loader.min.js' )
+			? 'collection-motion-loader.min.js' : 'collection-motion-loader.js';
+		if ( file_exists( $base_js_dir . '/' . $motion_loader ) ) {
 			wp_enqueue_script(
-				'skyyrose-template-immersive',
-				$base_js_uri . '/' . $immersive_js,
+				'skyyrose-collection-motion-loader',
+				$base_js_uri . '/' . $motion_loader,
 				array(),
 				SKYYROSE_VERSION,
-				true
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
 			);
-			skyyrose_enqueue_immersive_runtime( 'skyyrose-template-immersive', $base_js_dir, $base_js_uri, $use_min );
+
+			// Ordered chain — gsap must precede ScrollTrigger, which must
+			// precede the engines. Explicit ?ver params: these URLs bypass
+			// wp_enqueue_script, so without them Batcache/CDN would pin
+			// stale copies across version bumps (round-6 lesson).
+			$motion_chain   = array();
+			$motion_chain[] = add_query_arg( 'ver', '3.12.2', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js' );
+			$motion_chain[] = add_query_arg( 'ver', '3.12.2', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js' );
+
+			$ic_chain_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
+				? 'system/immersive-core.min.js' : 'system/immersive-core.js';
+			if ( file_exists( $base_js_dir . '/' . $ic_chain_js ) ) {
+				$motion_chain[] = add_query_arg( 'ver', SKYYROSE_VERSION, $base_js_uri . '/' . $ic_chain_js );
+			}
+
+			$featscroll_js = $use_min && file_exists( $base_js_dir . '/collection-feature-scroll.min.js' )
+				? 'collection-feature-scroll.min.js' : 'collection-feature-scroll.js';
+			if ( file_exists( $base_js_dir . '/' . $featscroll_js ) ) {
+				$motion_chain[] = add_query_arg( 'ver', SKYYROSE_VERSION, $base_js_uri . '/' . $featscroll_js );
+			}
+
+			$immersive_js = $use_min && file_exists( $base_js_dir . '/immersive.min.js' )
+				? 'immersive.min.js' : 'immersive.js';
+			if ( file_exists( $base_js_dir . '/' . $immersive_js ) ) {
+				$motion_chain[] = add_query_arg( 'ver', SKYYROSE_VERSION, $base_js_uri . '/' . $immersive_js );
+			}
+
+			$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
+				? 'immersive-wc-bridge.min.js' : 'immersive-wc-bridge.js';
+			if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
+				$motion_chain[] = add_query_arg( 'ver', SKYYROSE_VERSION, $base_js_uri . '/' . $bridge_file );
+			}
+
+			wp_localize_script(
+				'skyyrose-collection-motion-loader',
+				'SKYY_MOTION_CONFIG',
+				array( 'scripts' => $motion_chain )
+			);
+
+			// immersive.js + the WC bridge read this global — identical
+			// payload to skyyrose_enqueue_immersive_runtime(), which attached
+			// it to their handles when they were wp_enqueued directly.
+			wp_localize_script(
+				'skyyrose-collection-motion-loader',
+				'skyyRoseImmersive',
+				array(
+					'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+					'wcActive' => class_exists( 'WooCommerce' ),
+					'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+				)
+			);
 		}
 	}
 

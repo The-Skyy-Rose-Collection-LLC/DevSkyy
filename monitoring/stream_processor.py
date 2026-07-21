@@ -184,11 +184,11 @@ class StreamProcessor:
         last_flush = time.monotonic()
 
         while self._running:
-            # Yield to event loop to allow other tasks to run
-            await asyncio.sleep(0)
-
             try:
-                msg = self._consumer.poll(self.poll_timeout)
+                # consumer.poll() is synchronous and blocks for up to poll_timeout
+                # (default 1.0s). Dispatch to a thread pool so the event loop
+                # remains responsive to other coroutines during the wait.
+                msg = await asyncio.to_thread(self._consumer.poll, self.poll_timeout)
             except Exception as exc:
                 logger.error(f"Kafka poll error: {exc}")
                 await asyncio.sleep(1.0)

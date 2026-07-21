@@ -467,6 +467,28 @@ preflight() {
 }
 
 # ---------------------------------------------------------------------------
+# data/ fail-closed allowlist (bug-230 class)
+#
+# The static data/ excludes below are a belt; this is the gate. Enumerate
+# EVERY file under data/ at deploy time and exclude anything not explicitly
+# runtime-read, so a new file dropped into data/ is excluded BY DEFAULT
+# instead of shipping world-readable (the fail-open that let 36 dossiers,
+# _orphans.json, identity.schema.json and README.md reach production).
+# Allowlist + file:line evidence: architecture-census.md + fix-log Wave 1b.
+# ---------------------------------------------------------------------------
+skyyrose_data_extra_excludes() {
+    local f rel
+    [[ -d "$THEME_DIR/data" ]] || return 0
+    while IFS= read -r f; do
+        rel="${f#"$THEME_DIR"/}"
+        case "$rel" in
+            data/skyyrose-catalog.csv | data/v7-cards.json | data/site-guide.json | data/editorial-index.json | data/collections/*/sot.json) ;;
+            *) printf -- '--exclude=%s\n' "$rel" ;;
+        esac
+    done < <(find "$THEME_DIR/data" -type f | LC_ALL=C sort)
+}
+
+# ---------------------------------------------------------------------------
 # Rsync exclude list (comprehensive -- prevents dev files from reaching production)
 # ---------------------------------------------------------------------------
 RSYNC_EXCLUDES=(
@@ -502,7 +524,35 @@ RSYNC_EXCLUDES=(
     --exclude='phpunit.xml'
     --exclude='playwright-report/'
     --exclude='screenshots/'
+    # data/ ships ONLY runtime-read files (allowlist + file:line evidence in
+    # tasks/wp-commercial-theme/architecture-census.md + fix-log.md Wave 1b):
+    # skyyrose-catalog.csv, v7-cards.json, site-guide.json, collections/*/sot.json,
+    # editorial-index.json. Everything below is internal (dossiers = Corey-authored
+    # render specs, previously world-readable — 2026-07-19) or build-time-only.
+    # Keep in sync with tar_excludes in try_rsync().
+    --exclude='data/dossiers'
+    --exclude='data/brand'
+    --exclude='data/brand-logos'
+    --exclude='data/product-references'
+    --exclude='data/*.py'
+    --exclude='data/*.bak*'
+    --exclude='data/product-embeddings.json'
+    --exclude='data/product-similarities.json'
+    --exclude='data/logo-registry.json'
+    --exclude='data/render-corrections.json'
+    --exclude='data/render-keepers.json'
+    --exclude='data/visual-manifest.json'
+    --exclude='data/collections/*/copy.md'
+    --exclude='data/collections/*/identity.json'
+    --exclude='data/collections/*/index.html'
 )
+
+# Fail-closed gate: per-file excludes for everything in data/ outside the
+# runtime allowlist (see skyyrose_data_extra_excludes above).
+while IFS= read -r _skyy_exc; do
+    RSYNC_EXCLUDES+=("$_skyy_exc")
+done < <(skyyrose_data_extra_excludes)
+unset _skyy_exc
 
 # ---------------------------------------------------------------------------
 # File transfer: rsync with lftp SFTP fallback (DEPLOY-01)
@@ -563,7 +613,34 @@ try_rsync() {
         --exclude='.prettierrc*' --exclude='.editorconfig'
         --exclude='phpunit.xml' --exclude='playwright-report'
         --exclude='screenshots' --exclude='.serena'
+        # Theme-internal build tooling (mirrors RSYNC_EXCLUDES 'scripts/';
+        # the theme has exactly one scripts/ dir, at its root).
+        --exclude='scripts'
+        # Internal data/ files (dossiers = render specs, build inputs, QA
+        # artifacts) — runtime allowlist keeps only skyyrose-catalog.csv,
+        # v7-cards.json, site-guide.json, collections/*/sot.json,
+        # editorial-index.json. Keep in sync with RSYNC_EXCLUDES above.
+        --exclude='data/dossiers' --exclude='data/brand'
+        --exclude='data/brand-logos' --exclude='data/product-references'
+        --exclude='data/*.py' --exclude='data/*.bak*'
+        --exclude='data/product-embeddings.json'
+        --exclude='data/product-similarities.json'
+        --exclude='data/logo-registry.json'
+        --exclude='data/render-corrections.json'
+        --exclude='data/render-keepers.json'
+        --exclude='data/visual-manifest.json'
+        --exclude='data/collections/*/copy.md'
+        --exclude='data/collections/*/identity.json'
+        --exclude='data/collections/*/index.html'
     )
+
+    # Fail-closed gate (mirrors RSYNC_EXCLUDES): per-file excludes for every
+    # data/ file outside the runtime allowlist — new data/ files never ship
+    # by default.
+    local _skyy_exc
+    while IFS= read -r _skyy_exc; do
+        tar_excludes+=("$_skyy_exc")
+    done < <(skyyrose_data_extra_excludes)
 
     # shellcheck disable=SC2086  # zstd_flag is intentionally word-split
     tar $zstd_flag -cf "$tmpzip" "${tar_excludes[@]}" \
