@@ -177,7 +177,14 @@ job_threejs_tests() {
     _skip "threejs-tests" "no test:collections script in root package.json"; return
   fi
   if [ "$FAST" = "1" ] && [ ! -d node_modules ]; then _skip "threejs-tests" "FAST=1 and node_modules absent"; return; fi
-  [ -d node_modules ] || _run "root npm ci" npm ci
+  # Root has no committed package-lock.json (gitignored), so `npm ci` cannot
+  # work in a clean checkout — ci.yml's threejs job uses `npm install` for the
+  # same reason. Mirror it, and fail the job if the install itself fails.
+  if [ ! -d node_modules ]; then
+    if ! _run "root npm install" npm install --no-audit --no-fund; then
+      _fail "threejs-tests: npm install"; return
+    fi
+  fi
   if npm run test:collections >/tmp/ci-threejs.log 2>&1; then _pass "threejs-tests"; else _fail "threejs-tests"; tail -n 20 /tmp/ci-threejs.log | sed 's/^/      /'; fi
 }
 
