@@ -157,7 +157,10 @@ job_security() {
     # aborts --strict before any vulns are even reported.
     local ignore="--ignore-vuln CVE-2026-45829 --ignore-vuln PYSEC-2026-139 --ignore-vuln CVE-2025-3000 --ignore-vuln PYSEC-2025-217"
     # shellcheck disable=SC2086
-    if pip-audit $ignore --skip-editable --strict >/tmp/ci-pipaudit.log 2>&1; then _pass "security: pip-audit"; else _fail "security: pip-audit (dependency vulns)"; fi
+    # No --strict: the dev venv carries local path-installed packages
+    # (devskyy, cli-anything-*) that aren't on PyPI; strict aborts on them
+    # before auditing. Non-strict still exits 1 on any real vulnerability.
+    if pip-audit $ignore --skip-editable >/tmp/ci-pipaudit.log 2>&1; then _pass "security: pip-audit"; else _fail "security: pip-audit (dependency vulns)"; fi
   else
     _skip "security: pip-audit" "not installed — pip install pip-audit"
   fi
