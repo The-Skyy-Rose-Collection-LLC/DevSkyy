@@ -116,7 +116,9 @@ function skyyrose_enqueue_global_styles() {
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
 		$prem_slug    = skyyrose_get_current_template_slug();
-		$prem_skip    = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default' );
+		// collections-world: bare-canvas template — every element is engine-built
+		// sw-* DOM, none of the premium utility classes exist there.
+		$prem_skip    = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default', 'collections-world' );
 		$skip_premium = in_array( $prem_slug, $prem_skip, true );
 		if ( ! $skip_premium ) {
 			wp_enqueue_style(
@@ -297,7 +299,7 @@ function skyyrose_enqueue_global_scripts() {
 	// v1.5.12 audit. Same skip list as global_styles.
 	$skip_premium_js = in_array(
 		skyyrose_get_current_template_slug(),
-		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default', 'collections-world' ),
 		true
 	);
 
@@ -785,10 +787,19 @@ function skyyrose_enqueue_template_styles() {
 		$sw_cfg  = skyyrose_get_collections_world_config();
 		$sw_hero = isset( $sw_cfg['sections'][0]['still'] ) ? $sw_cfg['sections'][0]['still'] : '';
 		if ( $sw_hero ) {
+			// Match the engine's <img srcset> exactly (same Photon URLs + 100vw
+			// sizes) or the preload and the element fetch different files and the
+			// LCP double-downloads. Flat webp preload only when Photon is unusable.
+			// No type= on the srcset branch — Photon may transcode for the client.
+			$sw_set = isset( $sw_cfg['sections'][0]['stillSet'] ) ? $sw_cfg['sections'][0]['stillSet'] : '';
 			add_action(
 				'wp_head',
-				function () use ( $sw_hero ) {
-					echo '<link rel="preload" as="image" href="' . esc_url( $sw_hero ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				function () use ( $sw_hero, $sw_set ) {
+					if ( '' !== $sw_set ) {
+						echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $sw_set ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					} else {
+						echo '<link rel="preload" as="image" href="' . esc_url( $sw_hero ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
 				},
 				2
 			);

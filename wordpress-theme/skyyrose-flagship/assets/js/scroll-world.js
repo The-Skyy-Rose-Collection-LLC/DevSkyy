@@ -15,7 +15,9 @@
        nav: true,         // show the top section nav
        atmosphere: true,  // subtle gradient + drifting particles behind the clips
        sections: [
-         { id, label, still, clip, clipMobile, accent,
+         { id, label, still, stillSet, stillSizes,   // stillSet = optional srcset for the
+                          // poster (assigned before src); stillSizes defaults to 100vw
+           clip, clipMobile, accent,
            scroll: 1.6,   // optional per-section override of diveScroll — more scroll
                           // distance = a slower, longer dwell in this scene
            linger: 0.5,   // optional 0..1 — remaps time so the camera settles mid-scene
@@ -62,8 +64,10 @@
 function mountScrollWorld(container, config) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Phone detection. `coarse` is captured once (input type doesn't change mid-session);
-  // the ≤860px query is read live via isMobile() so a desktop resize/DevTools toggle
-  // switches sources and seek behaviour without a reload.
+  // the ≤860px query is read live via isMobile(), which switches SEEK behaviour on a
+  // desktop resize/DevTools toggle without a reload. Clip SOURCE is chosen once per
+  // scene at first load (loadClip is one-shot) — an already-fetched clip keeps its
+  // tier for the session; only not-yet-loaded scenes pick up the new width.
   const coarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   const smallMQ = window.matchMedia('(max-width: 860px)');
   const isMobile = () => coarse || smallMQ.matches;
@@ -82,7 +86,8 @@ function mountScrollWorld(container, config) {
   // ---- build the interleaved segment chain: dive0, conn0, dive1, … diveN-1 ----
   const SEGMENTS = [];
   SECTIONS.forEach((s, i) => {
-    const dive = { kind: 'dive', si: i, clip: s.clip, clipM: s.clipMobile, still: s.still, accent: s.accent,
+    const dive = { kind: 'dive', si: i, clip: s.clip, clipM: s.clipMobile, still: s.still,
+                   stillSet: s.stillSet, stillSizes: s.stillSizes, accent: s.accent,
                    w: s.scroll || DIVE_W, linger: s.linger || 0 };
     SEGMENTS.push(dive);
     s._seg = dive;
@@ -91,7 +96,9 @@ function mountScrollWorld(container, config) {
     // connector can't be generated (e.g. a content-filter false-positive).
     if (i < N - 1 && CONNECTORS[i]) {
       SEGMENTS.push({ kind: 'conn', si: i, clip: CONNECTORS[i], clipM: CONNECTORS_M[i],
-                      still: SECTIONS[i + 1].still, accent: SECTIONS[i + 1].accent, w: CONN_W });
+                      still: SECTIONS[i + 1].still, stillSet: SECTIONS[i + 1].stillSet,
+                      stillSizes: SECTIONS[i + 1].stillSizes,
+                      accent: SECTIONS[i + 1].accent, w: CONN_W });
     }
   });
   const NSEG = SEGMENTS.length;
@@ -109,14 +116,14 @@ function mountScrollWorld(container, config) {
 
   const topbar = el('div', 'sw-topbar');
   if (config.brand) {
-    const brand = el('a', 'sw-brand'); brand.href = (config.brand.href || '#');
+    const brand = el('a', 'sw-brand'); brand.href = safeHref(config.brand.href);
     brand.appendChild(el('span', 'sw-brand__mark'));
     const nm = el('span', 'sw-brand__name'); nm.textContent = config.brand.name || ''; brand.appendChild(nm);
     topbar.appendChild(brand);
   }
   const nav = el('nav', 'sw-nav'); if (config.nav !== false) topbar.appendChild(nav);
   if (config.cta && config.cta.label) {
-    const c = el('a', 'sw-topcta'); c.href = config.cta.href || '#'; c.textContent = config.cta.label;
+    const c = el('a', 'sw-topcta'); c.href = safeHref(config.cta.href); c.textContent = config.cta.label;
     topbar.appendChild(c);
   }
 
@@ -134,12 +141,20 @@ function mountScrollWorld(container, config) {
   SEGMENTS.forEach((s, i) => {
     const scene = el('div', 'sw-scene'); scene.style.setProperty('--sw-accent', s.accent || '');
     const img = el('img', 'sw-scene__still'); img.alt = ''; img.decoding = 'async';
-    // The first scene is the LCP — load it eagerly at high priority; lazy-load the rest.
-    img.loading = i === 0 ? 'eager' : 'lazy';
-    if (i === 0) img.fetchPriority = 'high';
-    if (s.still) img.src = s.still;
+    // The first scene is the LCP — load it eagerly at high priority. The rest are
+    // NOT left to loading="lazy": every scene layer is fixed/inset:0, so they all
+    // sit "in viewport" for the browser's lazy heuristic and would fetch at t=0
+    // anyway. Their src assignment is instead deferred to read()'s proximity gate
+    // (same pattern as loadClip), so far-away scenes cost zero bytes up front.
+    if (i === 0) {
+      img.loading = 'eager'; img.fetchPriority = 'high';
+      applyStill(s, img);
+    } else {
+      img.loading = 'lazy';
+      s.stillPending = true;
+    }
     scene.appendChild(img); stage.appendChild(scene);
-    s.el = scene; s.img = img; s.video = null; s.hasClip = false;
+    s.el = scene; s.img = img; s.video = null; s.hasClip = false; s.wc = false;
     s.loading = false; s.ready = false; s.cur = 0; s.target = 0; s.visible = false;
   });
 
@@ -222,12 +237,20 @@ function mountScrollWorld(container, config) {
 
   function read() {
     const y = window.scrollY || window.pageYOffset;
-    const fade = CROSSFADE * vh;
+    // Floor the dissolve width so a configured crossfade of 0 ("instant cut")
+    // stays a hard cut instead of collapsing 1 - outside/fade into 0/0 = NaN
+    // (CSSOM rejects a NaN opacity write, leaving every scene stuck invisible).
+    const fade = Math.max(CROSSFADE * vh, 1e-4);
     let ci = 0;
     for (let i = 0; i < NSEG; i++) if (y >= SEGMENTS[i].start) ci = i;
 
     for (let i = 0; i < NSEG; i++) {
       const s = SEGMENTS[i];
+      // Stills get a wider approach window than clips — the poster must be up
+      // before the crossfade into its scene begins.
+      if (s.stillPending && y > s.start - 2.4 * vh && y < s.end + 2.4 * vh) {
+        s.stillPending = false; applyStill(s, s.img);
+      }
       if (y > s.start - 1.6 * vh && y < s.end + 1.6 * vh) loadClip(s);
       const local = clamp((y - s.start) / (s.end - s.start), 0, 1);
       s.target = s.linger ? lingerEase(local, s.linger) : local;
@@ -235,6 +258,16 @@ function mountScrollWorld(container, config) {
       if (y < s.start) outside = s.start - y; else if (y > s.end) outside = y - s.end;
       const op = smooth(1 - outside / fade);
       s.el.style.opacity = op; s.visible = op > 0.001;
+      // Promote only scenes involved in the current transition — a static
+      // will-change on every full-viewport layer keeps all the stills
+      // permanently GPU-resident, which hurts exactly the low-end phones
+      // the mobile LCP budget targets.
+      const wc = s.visible || i === ci;
+      if (wc !== s.wc) {
+        s.wc = wc;
+        s.el.style.willChange = wc ? 'opacity' : 'auto';
+        s.img.style.willChange = wc ? 'transform' : 'auto';
+      }
       s.el.style.zIndex = (i === ci) ? '120' : String(100 + Math.round(op * 10));
       if (!s.hasClip || !s.ready) {
         const sc = reduce ? 1 : 1.03 + local * 0.14;
@@ -330,6 +363,14 @@ function mountScrollWorld(container, config) {
 
   // ---- helpers ----
   function el(tag, cls) { const n = document.createElement(tag); if (cls) n.className = cls; return n; }
+  // Assign a scene still, with optional responsive candidates (section stillSet /
+  // stillSizes). srcset lands BEFORE src so the browser's first pick is already
+  // width-appropriate — src alone would commit the full-size master on phones.
+  function applyStill(s, img) {
+    if (!s.still) return;
+    if (s.stillSet) { img.srcset = s.stillSet; img.sizes = s.stillSizes || '100vw'; }
+    img.src = s.still;
+  }
   function pad(n) { return String(n).padStart(2, '0'); }
   function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
   // Config hrefs are CMS-authored, not user input — but neutralize executable
@@ -388,9 +429,9 @@ function injectCSS() {
   .sw-nav__item:hover{color:var(--sw-ink);} .sw-nav__item.is-active{color:#fff;background:var(--sw-accent);}
   .sw-topcta{text-decoration:none;font-weight:600;font-size:.9rem;color:#fff;background:var(--sw-ink);padding:10px 20px;border-radius:999px;white-space:nowrap;}
   .sw-stage{position:fixed;inset:0;z-index:10;pointer-events:none;}
-  .sw-scene{position:absolute;inset:0;opacity:0;overflow:hidden;will-change:opacity;}
+  .sw-scene{position:absolute;inset:0;opacity:0;overflow:hidden;}
   .sw-scene__video,.sw-scene__still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;}
-  .sw-scene__still{will-change:transform;} .sw-scene.has-clip .sw-scene__still{opacity:0;} .sw-scene__video{z-index:1;}
+  .sw-scene.has-clip .sw-scene__still{opacity:0;} .sw-scene__video{z-index:1;}
   .sw-copylayer{position:fixed;inset:0;z-index:20;pointer-events:none;}
   .sw-copylayer::before{content:"";position:absolute;inset:0;width:min(58vw,780px);background:linear-gradient(90deg,var(--sw-bg) 0%,color-mix(in srgb,var(--sw-bg) 82%,transparent) 34%,color-mix(in srgb,var(--sw-bg) 40%,transparent) 62%,transparent 100%);}
   .sw-copy{position:absolute;left:clamp(18px,5vw,64px);top:50%;transform:translateY(-50%);width:min(42vw,460px);opacity:0;will-change:opacity,transform;}
