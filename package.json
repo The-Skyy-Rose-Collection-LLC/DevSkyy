@@ -21,7 +21,7 @@
     "@ai-sdk/google-vertex": "^5.0.20",
     "@ai-sdk/groq": "^3.0.24",
     "@ai-sdk/huggingface": "^1.0.32",
-    "@ai-sdk/mistral": "^3.0.20",
+    "@ai-sdk/mistral": "^4.0.14",
     "@ai-sdk/openai": "^3.0.31",
     "@ai-sdk/openai-compatible": "^2.0.30",
     "@ai-sdk/xai": "^3.0.57",
