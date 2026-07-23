@@ -129,7 +129,17 @@ def main() -> int:
         "never mutate tracked files.",
     )
     args = parser.parse_args()
-    out = Path(args.out_dir) if args.out_dir else OUT
+    # Fail closed (bug-230): distinguish "flag omitted" (→ tracked OUT default,
+    # intended for production regen) from "flag passed but empty" (a caller bug,
+    # e.g. --out-dir "$UNSET_VAR"). An empty string must NOT silently fall back
+    # to the tracked tree — that reintroduces the exact write-to-tracked-files
+    # defect this isolation fix removes.
+    if args.out_dir is not None:
+        if not args.out_dir.strip():
+            parser.error("--out-dir was passed empty; refusing to fall back to the tracked tree")
+        out = Path(args.out_dir)
+    else:
+        out = OUT
 
     idents = sot_common.load_identity()
     for slug, ident in idents.items():
