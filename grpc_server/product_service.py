@@ -25,7 +25,19 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 from typing import Any
+
+# bug-263: on darwin, subprocess forks SIGSEGV in nw_settings_child_has_forked()
+# once Network.framework is armed (any httpx/requests/torch/onnxruntime import
+# does this) and close_fds=True (the default) sends Popen through fork()+exec
+# instead of posix_spawn. no_proxy="*" keeps _scproxy out of the picture. This
+# is a long-running grpc.aio server process (not a pytest run), so conftest.py's
+# layer-1 guard never applies here — set it before database.db pulls in anything
+# heavy.
+if sys.platform == "darwin":
+    os.environ.setdefault("no_proxy", "*")
+    os.environ.setdefault("NO_PROXY", "*")
 
 from database.db import DatabaseManager, Product  # noqa: E402 — module-level for patchability
 
