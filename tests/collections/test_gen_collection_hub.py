@@ -8,9 +8,22 @@ DATA = ROOT / "wordpress-theme/skyyrose-flagship/data"
 GEN = DATA / "gen-collection-hub.py"
 
 
-def test_hub_renders_all_sections_and_escapes():
-    subprocess.run([sys.executable, str(GEN)], check=True)
-    html = (DATA / "collections/black-rose/index.html").read_text()
+def _run_gen(out_dir: Path) -> None:
+    """Run the hub generator, writing ALL output into `out_dir`.
+
+    Every test gets its own pytest `tmp_path`, so the suite never mutates the tracked
+    index.html files in data/collections/ (bug-231 recurrence #5 — the generator used
+    to write straight into the tracked tree on every pytest run, dirtying the worktree).
+    """
+    subprocess.run(
+        [sys.executable, str(GEN), "--out-dir", str(out_dir)],
+        check=True,
+    )
+
+
+def test_hub_renders_all_sections_and_escapes(tmp_path):
+    _run_gen(tmp_path)
+    html = (tmp_path / "black-rose" / "index.html").read_text()
     identity = json.loads((DATA / "collections/black-rose/identity.json").read_text())
     script_font = identity["fonts"]["script"]["family"]
     assert "<!DOCTYPE html>" in html
