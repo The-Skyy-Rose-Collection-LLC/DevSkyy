@@ -120,7 +120,7 @@ dependencies = [
     "openpyxl>=3.1.0",  # Excel spreadsheet creation/analysis
 
     # 3D & Visual Generation
-    "Pillow>=10.0",
+    "Pillow>=12.3.0",  # >=12.3.0 closes open CVEs (GHSA-jjj6/-fj7v/-vjc4 et al); matches mcp/ml extras + uv.lock
     "opencv-python>=4.8",
     "fonttools>=4.55",  # scripts/font_generator: PNG-template -> TTF vectorization
 

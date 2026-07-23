@@ -53,6 +53,27 @@ updates:
       dev-dependencies:
         dependency-type: "development"
 
+  # --------------------------------------------------------------------------
+  # Python — HF Spaces (isolated deploy target; own requirements.txt, not
+  # reachable from the root "/" scan, so it needs its own entry or it drifts).
+  # --------------------------------------------------------------------------
+  - package-ecosystem: "pip"
+    directory: "/hf-spaces/virtual-tryon"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "The-Skyy-Rose-Collection-LLC"
+    labels:
+      - "dependencies"
+      - "python"
+      - "hf-spaces"
+    commit-message:
+      prefix: "deps(hf-spaces)"
+      include: "scope"
+
   # ==========================================================================
   # NPM Dependencies (TypeScript/Three.js)
   # ==========================================================================
