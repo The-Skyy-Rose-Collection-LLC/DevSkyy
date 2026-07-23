@@ -9,6 +9,6 @@
 
 google-genai>=1.14.0
 Pillow>=12.3.0
-together>=2.24.1
+together>=2.27.1
 openai>=1.30
 httpx>=0.27
