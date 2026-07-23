@@ -15,6 +15,26 @@ if sys.platform == "darwin":
     os.environ.setdefault("no_proxy", "*")
     os.environ.setdefault("NO_PROXY", "*")
 
+    # Fifth layer (bug-263 recurrence 2026-07-21): multiprocessing bypasses
+    # subprocess.Popen entirely — resource_tracker._launch() and mp child spawns
+    # go through multiprocessing.util.spawnv_passfds -> _posixsubprocess.fork_exec,
+    # so the Popen patch below never sees them. The tracker is spawned LAZILY on
+    # first SemLock registration (observed trigger: the first tqdm() bar calls
+    # create_mp_lock() -> mp.RLock()), i.e. mid-suite, after torch/onnxruntime
+    # imports have armed Network.framework — its fork child then dies in the
+    # nw_settings_child_has_forked atfork handler. Observed 2 SIGSEGVs per full
+    # suite run: the lazy first spawn, then the atexit relaunch after cleanup
+    # (util._exit_function -> SemLock._cleanup -> unregister) finds the first
+    # tracker dead. Spawning it HERE, while the pytest process is still
+    # single-threaded and unarmed, makes the one fork safe and removes any need
+    # for a later in-armed-parent relaunch.
+    from multiprocessing import resource_tracker as _resource_tracker_mod
+
+    _resource_tracker_mod.ensure_running()
+    # Captured for tests/test_bug263_fork_safety.py: if a later armed-parent fork
+    # kills the tracker (the bug-263 symptom), the live pid will differ from this.
+    _BUG263_TRACKER_PID = _resource_tracker_mod._resource_tracker._pid
+
     # Second layer (Apple-confirmed the only reliable fix — DTS, forums thread
     # 737464): fork() after ANY higher-level framework arming is unsupported;
     # posix_spawn is a syscall, so no atfork handler ever runs in the child.

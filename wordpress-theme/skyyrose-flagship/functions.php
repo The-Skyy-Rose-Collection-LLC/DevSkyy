@@ -79,6 +79,7 @@ $skyyrose_core_includes = array(
 	'/inc/collection-content.php',
 	'/inc/collection-sot-reader.php',
 	'/inc/experience-rooms.php',
+	'/inc/collections-world.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
 	'/inc/v7-cards.php',

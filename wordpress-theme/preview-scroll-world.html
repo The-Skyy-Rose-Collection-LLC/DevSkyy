@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Collections Scroll-World (preview)</title>
+<!-- Real theme fonts + tokens so the preview renders true Archivo/Hanken, not fallbacks -->
+<link rel="stylesheet" href="skyyrose-flagship/assets/css/fonts.css">
+<link rel="stylesheet" href="skyyrose-flagship/assets/css/design-tokens.css">
+<link rel="stylesheet" href="skyyrose-flagship/assets/css/scroll-world.min.css">
+</head>
+<body class="skyyrose-collections-world">
+<div id="skyyrose-collections-world"></div>
+
+<script>
+window.SKYY_SCROLL_WORLD_CONFIG = {
+  brand: { name: 'SkyyRose', href: '#' },
+  cta: { label: 'Shop', href: '/collections/' },
+  hint: 'scroll to enter',
+  nav: true,
+  atmosphere: false,          /* pure gothic-noir: dark + grain, no particles/white glow */
+  diveScroll: 1.4,
+  crossfade: 0.12,
+  sections: [
+    {
+      id: 'signature', label: 'Signature', accent: '#D4AF37',
+      still: 'skyyrose-flagship/assets/scenes/collections-world/scene-1-signature.webp',
+      clip:  'skyyrose-flagship/assets/scenes/collections-world/scene-1-signature.mp4',
+      clipMobile: 'skyyrose-flagship/assets/scenes/collections-world/scene-1-signature-m.mp4',
+      scroll: 1.6, linger: 0.4,
+      eyebrow: 'The Signature',
+      title: 'Luxury Grows from Concrete.',
+      body: 'Oakland-born luxury, cut in gold and earned on the block.',
+      tags: ['Signature', 'Gold']
+    },
+    {
+      id: 'black-rose', label: 'Black Rose', accent: '#C0C0C0',
+      still: 'skyyrose-flagship/assets/scenes/collections-world/scene-2-black-rose.webp',
+      clip:  'skyyrose-flagship/assets/scenes/collections-world/scene-2-black-rose.mp4',
+      clipMobile: 'skyyrose-flagship/assets/scenes/collections-world/scene-2-black-rose-m.mp4',
+      linger: 0.4,
+      eyebrow: 'Black Rose',
+      title: 'Worn As Armor',
+      body: 'You wear it because you already stood up.',
+      tags: ['Black Rose', 'Armor']
+    },
+    {
+      id: 'love-hurts', label: 'Love Hurts', accent: '#DC143C',
+      still: 'skyyrose-flagship/assets/scenes/collections-world/scene-3-love-hurts.webp',
+      clip:  'skyyrose-flagship/assets/scenes/collections-world/scene-3-love-hurts.mp4',
+      clipMobile: 'skyyrose-flagship/assets/scenes/collections-world/scene-3-love-hurts-m.mp4',
+      linger: 0.4,
+      eyebrow: 'Love Hurts',
+      title: 'The Bloodline That Raised Me',
+      body: 'Crimson and thorn — the love that scarred you is the love that made you.',
+      tags: ['Love Hurts', 'Crimson']
+    },
+    {
+      id: 'kids-capsule', label: 'Kids Capsule', accent: '#B76E79',
+      still: 'skyyrose-flagship/assets/scenes/collections-world/scene-4-kids-capsule.webp',
+      clip:  'skyyrose-flagship/assets/scenes/collections-world/scene-4-kids-capsule.mp4',
+      clipMobile: 'skyyrose-flagship/assets/scenes/collections-world/scene-4-kids-capsule-m.mp4',
+      linger: 0.4,
+      eyebrow: 'Kids Capsule',
+      title: 'The Next Generation, Suited',
+      body: 'The same concrete-luxe, cut for the ones coming up.',
+      tags: ['Kids Capsule', 'Rose Gold']
+    },
+    {
+      id: 'finale', label: 'The Collection', accent: '#B76E79',
+      still: 'skyyrose-flagship/assets/scenes/collections-world/scene-5-finale.webp',
+      clip:  'skyyrose-flagship/assets/scenes/collections-world/scene-5-finale.mp4',
+      clipMobile: 'skyyrose-flagship/assets/scenes/collections-world/scene-5-finale-m.mp4',
+      linger: 0.3,
+      eyebrow: 'The Skyy Rose Collection',
+      title: 'Enter The Collections',
+      body: 'Four cinematic worlds, one house built from Oakland concrete.',
+      cta: { primary: { label: 'Shop the Collections', href: '/collections/' } }
+    }
+  ]
+};
+</script>
+<script src="skyyrose-flagship/assets/js/scroll-world.min.js"></script>
+</body>
+</html>
