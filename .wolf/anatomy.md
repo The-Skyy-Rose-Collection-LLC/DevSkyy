@@ -2695,6 +2695,8 @@ WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signat
 
 ## scripts/
 
+- `ci-local.sh` — scripts/ci-local.sh -- Offline mirror of ci.yml's six gating jobs (lint/python-tests/security/frontend/threejs/wordpress-theme); CI_LOCAL_ROOT overridable (~3500 tok)
+- `ci-sim.sh` — scripts/ci-sim.sh -- Simulated CI clone: fetches a PR's merge preview (refs/pull/N/merge) or any ref into a disposable worktree and runs ci-local.sh there; PASS/FAIL verdict (~1200 tok)
 - `__init__.py` (~0 tok)
 - `3D_GENERATION_STATUS.md` — 3D Generation Status - READY (API Key Required) (~1003 tok)
 - `add_love_hurts_and_logos_to_lora.py` — luxury_post_process, upscale_with_lanczos, detect_garment_type, generate_training_caption + 2 more (~3988 tok)
