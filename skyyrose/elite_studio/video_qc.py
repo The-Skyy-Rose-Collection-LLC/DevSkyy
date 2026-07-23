@@ -25,6 +25,14 @@ only when every requested check actually ran AND passed. Verdict precedence:
 The per-check backends (OCR, CLIP scorer, face-embedder) are injectable so the
 aggregation and fail-closed logic are unit-testable without heavyweight ML deps,
 mirroring ``skyyrose/elite_studio``'s existing ``score_text_match(ocr_fn=...)``.
+
+Enabling detectors (all optional — a missing one yields ``needs_human``, never a
+silent pass):
+    * Garment (CLIP): ``open_clip_torch`` (already a project dep).
+    * Text (OCR):     ``pip install pytesseract`` + the ``tesseract`` binary.
+    * Identity:       ``pip install insightface onnxruntime`` (ONNX ArcFace,
+      TensorFlow-free — required on Python 3.14, where TF has no wheel). deepface
+      is also accepted where its TensorFlow stack is installable.
 """
 
 from __future__ import annotations
@@ -318,7 +326,45 @@ def _cosine(a: Sequence[float], b: Sequence[float]) -> float:
     return dot / (na * nb)
 
 
+_FACE_STATE: dict[str, Any] = {"loaded": False, "app": None, "error": None}
+
+
+def _load_insightface_app() -> Any | None:
+    """Lazy-load a cached CPU FaceAnalysis app (buffalo_l → ONNX ArcFace, no TF)."""
+    if _FACE_STATE["loaded"]:
+        return _FACE_STATE["app"]
+    _FACE_STATE["loaded"] = True
+    try:
+        from insightface.app import FaceAnalysis  # type: ignore[import-not-found]
+
+        app = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
+        app.prepare(ctx_id=-1, det_size=(640, 640))
+        _FACE_STATE["app"] = app
+        return app
+    except Exception as e:
+        _FACE_STATE["error"] = str(e)
+        return None
+
+
 def _default_face_embed(path: Path) -> Sequence[float] | None:
+    """ArcFace embedding of the primary detected face, or None if no face.
+
+    Prefers insightface (ONNX ArcFace, TensorFlow-free — the only viable backend on
+    Python 3.14, where TF has no wheel); falls back to deepface where it is installed.
+    """
+    if importlib.util.find_spec("insightface") is not None:
+        app = _load_insightface_app()
+        if app is not None:
+            import cv2
+
+            img = cv2.imread(str(path))
+            if img is None:
+                return None
+            faces = app.get(img)
+            if not faces:
+                return None
+            return [float(x) for x in faces[0].normed_embedding]
+
     from deepface import DeepFace  # type: ignore[import-not-found]
 
     reps = DeepFace.represent(str(path), model_name="ArcFace", enforce_detection=False)
@@ -340,11 +386,14 @@ def check_video_identity(
     face-embedding backend is present (needs_human, never a pass).
     """
     if embed_fn is None:
-        if importlib.util.find_spec("deepface") is None:
+        if (
+            importlib.util.find_spec("insightface") is None
+            and importlib.util.find_spec("deepface") is None
+        ):
             return CheckResult(
                 name="video_identity",
                 available=False,
-                reason="face-embedding backend unavailable: deepface not installed",
+                reason="face-embedding backend unavailable: neither insightface nor deepface installed",
             )
         embed_fn = _default_face_embed
 

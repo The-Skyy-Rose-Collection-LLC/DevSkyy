@@ -18,6 +18,8 @@ from skyyrose.elite_studio import video_qc as vq
 
 _HAS_OCR = importlib.util.find_spec("pytesseract") is not None
 _HAS_DEEPFACE = importlib.util.find_spec("deepface") is not None
+_HAS_INSIGHTFACE = importlib.util.find_spec("insightface") is not None
+_HAS_FACE_BACKEND = _HAS_DEEPFACE or _HAS_INSIGHTFACE
 _HAS_FFMPEG = shutil.which("ffmpeg") is not None
 
 
@@ -146,7 +148,9 @@ def test_video_identity_fail_closed_when_no_face_in_reference():
     assert res.available is False
 
 
-@pytest.mark.skipif(_HAS_DEEPFACE, reason="deepface installed — fail-closed path not exercised")
+@pytest.mark.skipif(
+    _HAS_FACE_BACKEND, reason="a face backend is installed — fail-closed path not exercised"
+)
 def test_video_identity_fail_closed_when_no_backend():
     res = vq.check_video_identity(_fake_frames(2), Path("ref.png"))
     assert res.available is False
