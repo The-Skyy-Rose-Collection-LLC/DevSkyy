@@ -116,7 +116,9 @@ function skyyrose_enqueue_global_styles() {
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
 		$prem_slug    = skyyrose_get_current_template_slug();
-		$prem_skip    = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default' );
+		// collections-world: bare-canvas template — every element is engine-built
+		// sw-* DOM, none of the premium utility classes exist there.
+		$prem_skip    = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default', 'collections-world' );
 		$skip_premium = in_array( $prem_slug, $prem_skip, true );
 		if ( ! $skip_premium ) {
 			wp_enqueue_style(
@@ -297,7 +299,7 @@ function skyyrose_enqueue_global_scripts() {
 	// v1.5.12 audit. Same skip list as global_styles.
 	$skip_premium_js = in_array(
 		skyyrose_get_current_template_slug(),
-		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default', 'collections-world' ),
 		true
 	);
 
@@ -560,6 +562,7 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
 			'template-landing-kids-capsule.php'    => 'landing',
+			'template-collections-world.php'       => 'collections-world',
 			'template-elementor-editorial.php'     => 'elementor-editorial',
 			'template-elementor-canvas.php'        => 'elementor-canvas',
 			'template-elementor-fullwidth.php'     => 'elementor-fullwidth',
@@ -617,6 +620,7 @@ function skyyrose_enqueue_template_styles() {
 		'size-guide'          => 'info-pages.css',
 		'collections-index'   => 'collections-index.css',
 		'landing'             => 'landing-scrollytell.css',
+		'collections-world'   => 'scroll-world.css',
 		'elementor-editorial' => 'landing-pages.css',
 		'single'              => 'generic-pages.css',
 		'blog'                => 'generic-pages.css',
@@ -775,6 +779,33 @@ function skyyrose_enqueue_template_styles() {
 		);
 	}
 
+	// Collections World LCP: the bare-canvas template has no server-rendered <img> —
+	// the engine injects the hero poster via JS — so preload scene 1's still at high
+	// priority, else first paint waits on script fetch->parse->exec before the image
+	// is even requested.
+	if ( 'collections-world' === $slug && function_exists( 'skyyrose_get_collections_world_config' ) ) {
+		$sw_cfg  = skyyrose_get_collections_world_config();
+		$sw_hero = isset( $sw_cfg['sections'][0]['still'] ) ? $sw_cfg['sections'][0]['still'] : '';
+		if ( $sw_hero ) {
+			// Match the engine's <img srcset> exactly (same Photon URLs + 100vw
+			// sizes) or the preload and the element fetch different files and the
+			// LCP double-downloads. Flat webp preload only when Photon is unusable.
+			// No type= on the srcset branch — Photon may transcode for the client.
+			$sw_set = isset( $sw_cfg['sections'][0]['stillSet'] ) ? $sw_cfg['sections'][0]['stillSet'] : '';
+			add_action(
+				'wp_head',
+				function () use ( $sw_hero, $sw_set ) {
+					if ( '' !== $sw_set ) {
+						echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $sw_set ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					} else {
+						echo '<link rel="preload" as="image" href="' . esc_url( $sw_hero ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				},
+				2
+			);
+		}
+	}
+
 	// Unified collection page CSS + cross-collection View Transitions choreography.
 	if ( 'collection-standalone' === $slug ) {
 		skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_min, $global_deps );
@@ -878,6 +909,39 @@ function skyyrose_enqueue_template_scripts() {
 					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
 				)
 			);
+		}
+	}
+
+	// Collections World — full-bleed scroll-scrubbed camera fly-through.
+	// Vanilla engine (no GSAP); config from skyyrose_get_collections_world_config().
+	if ( 'collections-world' === $slug ) {
+		$sw_js = $use_min && file_exists( $base_js_dir . '/scroll-world.min.js' )
+			? 'scroll-world.min.js' : 'scroll-world.js';
+		if ( file_exists( $base_js_dir . '/' . $sw_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-scroll-world',
+				$base_js_uri . '/' . $sw_js,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+			if ( function_exists( 'skyyrose_get_collections_world_config' ) ) {
+				// wp_localize_script() coerces every TOP-LEVEL scalar to a string
+				// (diveScroll 1.4 -> "1.4"), which corrupts the engine's scroll math and
+				// freezes the fly-through. wp_add_inline_script() + wp_json_encode()
+				// preserves native numeric/boolean types.
+				wp_add_inline_script(
+					'skyyrose-scroll-world',
+					'window.SKYY_SCROLL_WORLD_CONFIG = ' . wp_json_encode(
+						skyyrose_get_collections_world_config(),
+						JSON_HEX_TAG | JSON_UNESCAPED_SLASHES
+					) . ';',
+					'before'
+				);
+			}
 		}
 	}
 
