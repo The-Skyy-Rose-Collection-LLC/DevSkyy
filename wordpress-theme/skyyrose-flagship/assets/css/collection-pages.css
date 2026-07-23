@@ -801,3 +801,13 @@
 
 /* Collection hero emblem — 3D star-rose mark (Black Rose / Love Hurts). Decorative, aria-hidden. */
 .col-hero__emblem{display:block;margin:0 auto var(--space-md,1rem);width:auto;height:clamp(120px,18vh,210px);filter:drop-shadow(0 14px 22px rgba(0,0,0,.55));pointer-events:none;}
+
+/* Collection film — silent 9:16 flight loop between hero and shop grid. Poster-first; video is decorative ambience. */
+.col-film{display:flex;justify-content:center;padding:clamp(2rem,6vh,4.5rem) 1.25rem;}
+.col-film__stage{position:relative;display:inline-flex;}
+.col-film__video{height:min(78vh,760px);aspect-ratio:9/16;width:auto;max-width:92vw;object-fit:cover;border-radius:18px;background:#0A0A0A;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+.col-film__poster{display:none;height:min(78vh,760px);aspect-ratio:9/16;width:auto;max-width:92vw;object-fit:cover;border-radius:18px;background:#0A0A0A;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+.col-film__toggle{position:absolute;right:14px;bottom:14px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(10,10,10,.55);color:#fff;font-size:.9rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:background .2s ease;}
+.col-film__toggle:hover,.col-film__toggle:focus-visible{background:var(--color-rose-gold,#B76E79);}
+.col-film__toggle:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){.col-film__video{display:none;}.col-film__poster{display:block;}.col-film__toggle{display:none;}}

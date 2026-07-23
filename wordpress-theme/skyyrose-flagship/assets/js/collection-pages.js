@@ -70,4 +70,45 @@
 			}
 		});
 	}
+
+	/* ── Collection film: reduced-motion gate + pause/play toggle ────── */
+	/* Markup ships poster-first (no autoplay attribute, preload="none") so
+	 * reduced-motion users never trigger a video fetch — calling .play()
+	 * below is what actually starts the load. WCAG 2.2.2 requires a stop
+	 * mechanism for auto-playing motion lasting over 5s, so the toggle is
+	 * revealed only once motion is confirmed allowed. */
+	if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		var filmSections = document.querySelectorAll('.col-film');
+		for (var f = 0; f < filmSections.length; f++) {
+			(function (section) {
+				var video = section.querySelector('.col-film__video');
+				var toggle = section.querySelector('.col-film__toggle');
+				if (!video || !toggle) return;
+
+				var setToggleState = function (isPlaying) {
+					toggle.hidden = false;
+					toggle.setAttribute('aria-pressed', isPlaying ? 'false' : 'true');
+					toggle.setAttribute('aria-label', isPlaying ? 'Pause background video' : 'Play background video');
+					toggle.textContent = isPlaying ? '❚❚' : '▶';
+				};
+
+				var playAttempt = video.play();
+				if (playAttempt && typeof playAttempt.then === 'function') {
+					playAttempt.then(function () { setToggleState(true); }, function () { setToggleState(false); });
+				} else {
+					setToggleState(true);
+				}
+
+				toggle.addEventListener('click', function () {
+					if (video.paused) {
+						video.play();
+						setToggleState(true);
+					} else {
+						video.pause();
+						setToggleState(false);
+					}
+				});
+			})(filmSections[f]);
+		}
+	}
 })();

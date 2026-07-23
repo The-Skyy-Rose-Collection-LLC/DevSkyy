@@ -181,6 +181,51 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
+	<!-- ════ Collection Film (scroll-world flight — silent ambient loop) ════ -->
+	<?php
+	// Flight films live in the Media Library (uploads survive theme deploys —
+	// never theme assets, per the rider lesson). Silent by design: founder audio
+	// rule — muted ambient loop, poster carries the frame wherever autoplay is
+	// blocked (low-power mode, data-saver). File-existence gated like the
+	// emblem block above: a collection whose film hasn't been uploaded yet (or
+	// whose next upload lands in a different dated folder) skips the section
+	// instead of shipping a broken video + poster.
+	$film_date_path = '/uploads/2026/07/';
+	$film_base_url  = content_url( $film_date_path );
+	$film_base_path = WP_CONTENT_DIR . $film_date_path;
+	$film_map       = array(
+		'signature'    => 'signature-flight',
+		'black-rose'   => 'black-rose-flight',
+		'love-hurts'   => 'love-hurts-flight',
+		'kids-capsule' => 'kids-capsule-flight',
+	);
+	$film_slug      = $film_map[ $slug ] ?? '';
+	$has_film       = '' !== $film_slug
+		&& file_exists( $film_base_path . $film_slug . '-web.mp4' )
+		&& file_exists( $film_base_path . $film_slug . '-poster.jpg' );
+	if ( $has_film ) :
+		?>
+		<section class="col-film" aria-label="<?php esc_attr_e( 'Collection film', 'skyyrose' ); ?>">
+			<div class="col-film__stage">
+				<!--
+				No autoplay attribute + preload="none": reduced-motion users never
+				trigger a video fetch. collection-pages.js decides whether to call
+				.play() (which is what actually starts the load) and reveals the
+				pause/play toggle only once motion is confirmed allowed — WCAG
+				2.2.2 requires a stop mechanism for auto-playing motion over 5s.
+				-->
+				<video class="col-film__video" muted loop playsinline preload="none"
+					poster="<?php echo esc_url( $film_base_url . $film_slug . '-poster.jpg' ); ?>"
+					width="720" height="1280">
+					<source src="<?php echo esc_url( $film_base_url . $film_slug . '-web.mp4' ); ?>" type="video/mp4">
+				</video>
+				<img class="col-film__poster" src="<?php echo esc_url( $film_base_url . $film_slug . '-poster.jpg' ); ?>"
+					alt="" aria-hidden="true" loading="lazy" decoding="async" width="720" height="1280">
+				<button type="button" class="col-film__toggle" aria-label="<?php esc_attr_e( 'Pause background video', 'skyyrose' ); ?>" aria-pressed="false" hidden></button>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
 	<?php
 	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;
