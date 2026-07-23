@@ -195,7 +195,7 @@ function skyyrose_async_noncritical_styles( $html, $handle ) {
 	// content templates the footer/mascot chrome renders at doc end and can
 	// never be in-viewport at first paint — the wave-2 render-blocking keep
 	// was for SHORT pages (cart/wishlist), which stay critical.
-	$tall_content_slugs = array( 'front-page', 'collection-standalone', 'landing', 'preorder-gateway', 'immersive', 'kc-launch' );
+	$tall_content_slugs = array( 'front-page', 'collection-standalone', 'landing', 'preorder-gateway', 'immersive', 'kc-launch', 'collections-world' );
 	if ( in_array( $slug, $tall_content_slugs, true ) ) {
 		$async_handles[] = 'skyyrose-footer';
 		$async_handles[] = 'skyyrose-footer-cro';
