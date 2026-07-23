@@ -1800,6 +1800,109 @@
     "last_seen": "2026-06-16"
   },
   {
+    "id": "bug-131",
+    "timestamp": "2026-06-22T16:05:00-07:00",
+    "error_message": "Cleanup classifier marked all 81 untracked files as 'on main, differs' (KEEP=0) \u2014 would have recommended deleting 76 genuine local files = data loss",
+    "file": "ad-hoc bash classifier (this session)",
+    "root_cause": "Used `git rev-parse origin/main:$f` as an existence test. For a path NOT in the tree, git rev-parse ECHOES the unparseable string to stdout (errors on stderr) instead of returning empty, so every file looked present. Real blob hash never matched the echoed string -> universal false 'differs'.",
+    "fix": "Use `git cat-file -e origin/main:$f` (or `git ls-tree`) for path existence \u2014 does not echo. Re-classified: only 4 (deleted) + regen-boost (deleted) were truly on main; 76 are genuine local work, kept.",
+    "tags": [
+      "git",
+      "rev-parse",
+      "existence-test",
+      "cleanup",
+      "data-loss-averted",
+      "false-classification"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-22T16:05:00-07:00"
+  },
+  {
+    "id": "bug-132",
+    "timestamp": "2026-06-28T00:00:00-07:00",
+    "error_message": "model-viewer: web GLBs fail \u2014 'setMeshoptDecoder must be called' + basis texture CORS block",
+    "file": "glb-models.html / renders/3d/_viewer/",
+    "root_cause": "model-viewer v4 does NOT enable meshopt by default (EXT_meshopt_compression), and its gstatic basis transcoder (KHR_texture_basisu) is CORS-blocked from a localhost origin",
+    "fix": "set self.ModelViewerElement.meshoptDecoderLocation + ktx2TranscoderLocation BEFORE the module loads; VENDOR meshopt_decoder.js + basis_transcoder.js/.wasm locally (renders/3d/_viewer/) and point at same-origin paths to avoid CORS",
+    "tags": [
+      "model-viewer",
+      "glb",
+      "meshopt",
+      "ktx2",
+      "basis",
+      "wasm",
+      "cors",
+      "3d"
+    ],
+    "related_bugs": [
+      "bug-164"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-28T00:00:00-07:00"
+  },
+  {
+    "id": "bug-133",
+    "timestamp": "2026-06-28T07:40:00-07:00",
+    "error_message": "Blender Solidify batch on Meshy GLBs blew up scale (sg-002 bbox 2->2709 units)",
+    "file": "scratchpad/improve_glb.py + renders/3d/improved/ (broken output)",
+    "root_cause": "Meshy GLBs carry tiny root-node scale; use_even_offset amplified it; transforms not applied before modifier",
+    "fix": "ABANDONED - solidify is the wrong lever (slab != garment). Flat single-photo Meshy models cannot gain real depth without re-render; serve verified 2D hub photo instead. If cleanup-batch needed, run on genuinely-3D SKUs only (flatness>0.35): transform_apply first, normals+smooth+recenter, NO solidify.",
+    "tags": [
+      "blender",
+      "glb",
+      "solidify",
+      "3d",
+      "meshy",
+      "dead-end"
+    ],
+    "related_bugs": [
+      "bug-132"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-28T07:40:00-07:00"
+  },
+  {
+    "id": "bug-134",
+    "timestamp": "2026-06-28T08:20:00-07:00",
+    "error_message": "V7 card: Kids Capsule accent rendered Signature gold (#D4AF37); v7 card-type filter registered unconditionally while assets slug-gated (broken cards on WC-native surfaces)",
+    "file": "assets/css/product-card-v7.css + inc/v7-cards.php",
+    "root_cause": "KC palette copied Signature values; add_filter ran on every request but enqueue only on 6 slugs -> related-products/upsell/cart/shortcode would emit unstyled v7 markup",
+    "fix": "KC accent -> #B76E79 rose-gold (brand canon) + caps Bebas; added skyyrose_v7_is_active_surface() shared by both the enqueue AND the card-type filter; also label dedup via skyyrose_get_collections_config, PHP8 key guards, carousel aria-hidden, filter-value allowlist at call-sites",
+    "tags": [
+      "wordpress",
+      "v7",
+      "brand-color",
+      "kids-capsule",
+      "filter",
+      "enqueue",
+      "code-review"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-28T08:20:00-07:00"
+  },
+  {
+    "id": "bug-139",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "ingest_verdicts.py (Jun-25) rebuilt product manifest from verdicts each run; on a 2nd pass it would overwrite verified entries and (no is_ref gate) promote a source-photo/techflat 'use' pick into a served product-card \u2014 the fidelity-gate violation class (lh-005 fanny-pack).",
+    "file": "assets/hub/ingest_verdicts.py",
+    "root_cause": "First-ingest design (empty manifest -> rebuild from verdicts) reused for a second run against a now-authoritative LOCKED manifest; no is_ref() exclusion, no backup, no dry-run, no current-verdict gating.",
+    "fix": "Rewrote incremental + gated: start FROM manifest, dry-run default, --apply backs up manifest.json->.bak then mutates ONLY bucket-A (pending gap + exactly 1 serveable use). is_ref() excludes source-photos/source-products/techflat/references from ever becoming product-cards. Already-verified faces reported (bucket B), never overwritten. Verified-by gated on current verdict==pending.",
+    "tags": [
+      "asset-hub",
+      "ingest_verdicts",
+      "fidelity-gate",
+      "is_ref",
+      "manifest",
+      "sot",
+      "idempotency"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
     "id": "bug-140",
     "timestamp": "2026-06-18T08:10:00Z",
     "error_message": "Relayed to founder that skyyrose-lora-v3 was trained on 390 product images; live Replicate model description says 604.",
@@ -2130,25 +2233,6 @@
     "last_seen": "2026-06-22T16:10:00-07:00"
   },
   {
-    "id": "bug-131",
-    "timestamp": "2026-06-22T16:05:00-07:00",
-    "error_message": "Cleanup classifier marked all 81 untracked files as 'on main, differs' (KEEP=0) \u2014 would have recommended deleting 76 genuine local files = data loss",
-    "file": "ad-hoc bash classifier (this session)",
-    "root_cause": "Used `git rev-parse origin/main:$f` as an existence test. For a path NOT in the tree, git rev-parse ECHOES the unparseable string to stdout (errors on stderr) instead of returning empty, so every file looked present. Real blob hash never matched the echoed string -> universal false 'differs'.",
-    "fix": "Use `git cat-file -e origin/main:$f` (or `git ls-tree`) for path existence \u2014 does not echo. Re-classified: only 4 (deleted) + regen-boost (deleted) were truly on main; 76 are genuine local work, kept.",
-    "tags": [
-      "git",
-      "rev-parse",
-      "existence-test",
-      "cleanup",
-      "data-loss-averted",
-      "false-classification"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-22T16:05:00-07:00"
-  },
-  {
     "id": "bug-156",
     "timestamp": "2026-06-22T16:58:00-07:00",
     "error_message": "make sync-catalog proposed '_JERSEY_SKUS: remove [br-011]' \u2014 would drop the hooded Jersey-Series member from the render roster and break validate-catalog jersey_skus (8 vs 7)",
@@ -2312,88 +2396,6 @@
     "last_seen": "2026-06-25T04:30:00-07:00"
   },
   {
-    "id": "bug-180",
-    "timestamp": "2026-06-26T12:45:00-07:00",
-    "error_message": "V7 product cards in grid row 2+ never auto-advance (carousel stalls)",
-    "file": "prototypes/product-card-variants/v7-lookbook-card/index.html",
-    "root_cause": "IntersectionObserver threshold:0.2 on ~713px-tall cards \u2014 a partially-visible card never crosses 20% so its autoplay timer never (re)starts",
-    "fix": "threshold:0 \u2014 any pixel on screen starts autoplay; verified row-2 cards resume on scrollIntoView",
-    "tags": [
-      "intersection-observer",
-      "carousel",
-      "prototype",
-      "v7",
-      "threshold"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-26T12:45:00-07:00"
-  },
-  {
-    "id": "bug-132",
-    "timestamp": "2026-06-28T00:00:00-07:00",
-    "error_message": "model-viewer: web GLBs fail \u2014 'setMeshoptDecoder must be called' + basis texture CORS block",
-    "file": "glb-models.html / renders/3d/_viewer/",
-    "root_cause": "model-viewer v4 does NOT enable meshopt by default (EXT_meshopt_compression), and its gstatic basis transcoder (KHR_texture_basisu) is CORS-blocked from a localhost origin",
-    "fix": "set self.ModelViewerElement.meshoptDecoderLocation + ktx2TranscoderLocation BEFORE the module loads; VENDOR meshopt_decoder.js + basis_transcoder.js/.wasm locally (renders/3d/_viewer/) and point at same-origin paths to avoid CORS",
-    "tags": [
-      "model-viewer",
-      "glb",
-      "meshopt",
-      "ktx2",
-      "basis",
-      "wasm",
-      "cors",
-      "3d"
-    ],
-    "related_bugs": [
-      "bug-164"
-    ],
-    "occurrences": 1,
-    "last_seen": "2026-06-28T00:00:00-07:00"
-  },
-  {
-    "id": "bug-133",
-    "timestamp": "2026-06-28T07:40:00-07:00",
-    "error_message": "Blender Solidify batch on Meshy GLBs blew up scale (sg-002 bbox 2->2709 units)",
-    "file": "scratchpad/improve_glb.py + renders/3d/improved/ (broken output)",
-    "root_cause": "Meshy GLBs carry tiny root-node scale; use_even_offset amplified it; transforms not applied before modifier",
-    "fix": "ABANDONED - solidify is the wrong lever (slab != garment). Flat single-photo Meshy models cannot gain real depth without re-render; serve verified 2D hub photo instead. If cleanup-batch needed, run on genuinely-3D SKUs only (flatness>0.35): transform_apply first, normals+smooth+recenter, NO solidify.",
-    "tags": [
-      "blender",
-      "glb",
-      "solidify",
-      "3d",
-      "meshy",
-      "dead-end"
-    ],
-    "related_bugs": [
-      "bug-132"
-    ],
-    "occurrences": 1,
-    "last_seen": "2026-06-28T07:40:00-07:00"
-  },
-  {
-    "id": "bug-134",
-    "timestamp": "2026-06-28T08:20:00-07:00",
-    "error_message": "V7 card: Kids Capsule accent rendered Signature gold (#D4AF37); v7 card-type filter registered unconditionally while assets slug-gated (broken cards on WC-native surfaces)",
-    "file": "assets/css/product-card-v7.css + inc/v7-cards.php",
-    "root_cause": "KC palette copied Signature values; add_filter ran on every request but enqueue only on 6 slugs -> related-products/upsell/cart/shortcode would emit unstyled v7 markup",
-    "fix": "KC accent -> #B76E79 rose-gold (brand canon) + caps Bebas; added skyyrose_v7_is_active_surface() shared by both the enqueue AND the card-type filter; also label dedup via skyyrose_get_collections_config, PHP8 key guards, carousel aria-hidden, filter-value allowlist at call-sites",
-    "tags": [
-      "wordpress",
-      "v7",
-      "brand-color",
-      "kids-capsule",
-      "filter",
-      "enqueue",
-      "code-review"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-28T08:20:00-07:00"
-  },
-  {
     "id": "bug-164",
     "timestamp": "2026-06-28T12:00:00-07:00",
     "error_message": "model-viewer GLB load times out in browser; only 8/33 models render (glb-models.html)",
@@ -2480,107 +2482,6 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-06-29T14:30:00-07:00"
-  },
-  {
-    "id": "bug-139",
-    "timestamp": "2026-06-29T18:55:00-07:00",
-    "error_message": "ingest_verdicts.py (Jun-25) rebuilt product manifest from verdicts each run; on a 2nd pass it would overwrite verified entries and (no is_ref gate) promote a source-photo/techflat 'use' pick into a served product-card \u2014 the fidelity-gate violation class (lh-005 fanny-pack).",
-    "file": "assets/hub/ingest_verdicts.py",
-    "root_cause": "First-ingest design (empty manifest -> rebuild from verdicts) reused for a second run against a now-authoritative LOCKED manifest; no is_ref() exclusion, no backup, no dry-run, no current-verdict gating.",
-    "fix": "Rewrote incremental + gated: start FROM manifest, dry-run default, --apply backs up manifest.json->.bak then mutates ONLY bucket-A (pending gap + exactly 1 serveable use). is_ref() excludes source-photos/source-products/techflat/references from ever becoming product-cards. Already-verified faces reported (bucket B), never overwritten. Verified-by gated on current verdict==pending.",
-    "tags": [
-      "asset-hub",
-      "ingest_verdicts",
-      "fidelity-gate",
-      "is_ref",
-      "manifest",
-      "sot",
-      "idempotency"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-29T18:55:00-07:00"
-  },
-  {
-    "id": "bug-187",
-    "timestamp": "2026-06-29T18:55:00-07:00",
-    "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
-    "file": "wordpress-theme/skyyrose-flagship/front-page.php",
-    "root_cause": "Phantom subdirectory in the image path. front-page.php (lines 308, 485, 521) and data/render-keepers.json:12 referenced .../images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 with an extra black-rose-sherpa-jacket/ folder that does not exist in the theme asset tree (all product images are flat in products/). Verified authoritatively via curl: subdir path -> HTTP 404, flat path -> HTTP 200; Playwright predecode confirmed exactly 1 broken image of 33. Vision-verified the flat-path file is the correct garment (black Black-Rose hooded jacket with grayscale rose/wings chest crest), so the bug is the path, not the asset.",
-    "fix": "Collapsed the phantom subdir to the flat path in both files: front-page.php (3 occurrences via replace_all) and render-keepers.json (br-006 asset line) now point at /images/products/black-rose-sherpa-jacket-front-model.webp (the HTTP 200 file). Verified: 0 remaining subdir refs in wordpress-theme/, render-keepers.json re-parses as valid JSON, no other products/<slug>/<slug> double-subdir image paths in front-page.php. Source-only fix (PHP/JSON, no .min rebuild). Live still 404s until theme deploy (STOP-AND-SHOW gated).",
-    "tags": [
-      "wordpress",
-      "front-page",
-      "404",
-      "image-path",
-      "broken-image",
-      "br-006",
-      "black-rose",
-      "homepage",
-      "render-keepers"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-29T18:55:00-07:00"
-  },
-  {
-    "id": "bug-181",
-    "timestamp": "2026-06-30T12:40:00-07:00",
-    "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
-    "file": "skyyrose/core/asset_hub.py",
-    "root_cause": "served_theme_path used Path(source).suffix for the off-theme case; the staged file is always webp (theme .gitignore excludes png), so the .png path never resolved.",
-    "fix": "served_theme_path always returns assets/images/products/hub/<sku>-<face>.webp for off-theme verified renders; added regression test test_served_theme_path_offtheme_render_is_always_webp.",
-    "tags": [
-      "asset-hub",
-      "sot",
-      "build-collection-sot",
-      "served_theme_path",
-      "webp",
-      "fidelity"
-    ],
-    "related_bugs": [
-      "bug-230"
-    ],
-    "occurrences": 1,
-    "last_seen": "2026-06-30T12:40:00-07:00"
-  },
-  {
-    "id": "bug-182",
-    "timestamp": "2026-06-30T12:41:00-07:00",
-    "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
-    "file": "skyyrose/core/sot_images.py",
-    "root_cause": "PHP theme reads data/collections/<slug>/sot.json via inc/collection-sot-reader.php, NOT data/sot-images.json (zero theme readers of sot-images.json). _index() feeds sot-images.json only.",
-    "fix": "Moved the single override seam upstream to build-collection-sot.py (generates sot.json); reverted _index(). sot.json now carries hub paths \u2192 PHP theme AND sot-images.json both honor the verdict.",
-    "tags": [
-      "asset-hub",
-      "sot",
-      "architecture",
-      "php",
-      "split-brain",
-      "seam"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-30T12:41:00-07:00"
-  },
-  {
-    "id": "bug-183",
-    "timestamp": "2026-06-30T15:05:00-07:00",
-    "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
-    "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
-    "root_cause": "Storefront collection-grid cards render from the v7-cards system (build_v7_cards.py scans the products/v7/<sku>/ served tree), NOT sot.json front_model_image. The sot.json/sot-images tie reaches the holo card + dashboard, but the dominant v7 grid is a separate authority. The v7 tree was already hub-synced for 9/11 picks, so the deploy had ~0 visible card effect.",
-    "fix": "No code fix \u2014 corrected the claim. To reach the v7 grid, hub picks must be synced into products/v7/<sku>/ + v7-cards.json regenerated (build_v7_cards.py). lh-003 front + br-007 back are the 2 gaps. Deferred: PR #684 is actively refactoring v7 \u2014 coordinate, do not race.",
-    "tags": [
-      "asset-hub",
-      "sot",
-      "v7-cards",
-      "storefront",
-      "imagery-layers",
-      "overclaim"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-30T15:05:00-07:00"
   },
   {
     "id": "bug-168",
@@ -2670,76 +2571,6 @@
     "related_bugs": [],
     "occurrences": 24,
     "last_seen": "2026-06-30"
-  },
-  {
-    "id": "bug-188",
-    "timestamp": "2026-06-30T20:44:00",
-    "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
-    "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
-    "root_cause": ".venv was fully deleted from disk (untracked, not a git operation). pip install -e \".[all]\" resolves an enormous dep graph (torch/langchain/mineru/bentoml/xxhash-fallback-chain) that stalled for 6+min on source builds before I killed it; boto3 (used by integrations/cloudflare_r2_manager.py) was never declared in any pyproject.toml extra despite being required by the mcp extra import chain.",
-    "fix": "Recreated .venv, installed base package + boto3 + langgraph + scikit-image directly (piecemeal, faster than full [all] resolve) instead of waiting out the slow full extras install. Declared boto3>=1.43.0 in the mcp extra of pyproject.toml so future installs pick it up without manual patching.",
-    "tags": [
-      "venv",
-      "pip",
-      "pyproject",
-      "missing-dependency",
-      "boto3",
-      "test-infra"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-06-30T20:44:00"
-  },
-  {
-    "id": "bug-184",
-    "timestamp": "2026-07-05T21:20:00-07:00",
-    "error_message": "og:image/twitter:image emitted VideoPress .mp4 (logo_400x100.mp4) \u2014 link previews broken sitewide",
-    "file": "wordpress-theme/skyyrose-flagship/inc/seo.php",
-    "root_cause": "custom_logo theme-mod attachment used as social image without MIME validation; live logo attachment is a video",
-    "fix": "skyyrose_og_logo_url() helper gates all three emitters on image/* MIME, falls back to static brand asset",
-    "tags": [
-      "seo",
-      "og-image",
-      "wordpress",
-      "mime"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-07-05"
-  },
-  {
-    "id": "bug-185",
-    "timestamp": "2026-07-05T21:20:00-07:00",
-    "error_message": "Footer content rendered after </footer> on every page (mobile-bottom-nav; homepage also footer-cro/FAQ/size-guide)",
-    "file": "wordpress-theme/skyyrose-flagship/footer.php",
-    "root_cause": "front-page bypassed get_footer() with inline footer + manual part includes after it; footer.php included mobile-bottom-nav after </footer>",
-    "fix": "front-page uses get_footer(); mobile-bottom-nav moved inside the footer landmark (position:fixed makes placement visual no-op)",
-    "tags": [
-      "dom",
-      "landmarks",
-      "a11y",
-      "footer"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-07-05"
-  },
-  {
-    "id": "bug-186",
-    "timestamp": "2026-07-05T21:20:00-07:00",
-    "error_message": "kids-capsule.css shipped blue-dominant colors (#A8D8EA, #1A1A2E) violating no-blue brand law",
-    "file": "wordpress-theme/skyyrose-flagship/assets/css/kids-capsule.css",
-    "root_cause": "pre-canon palette survived the Kids Capsule rose-gold accent change (PR #704 changed accent but not the launch-teaser tokens)",
-    "fix": "--kc-sky \u2192 #D8A1AA, --kc-night \u2192 #171310, dawn gradient start \u2192 #D8A1AA; audit brand check now enforces",
-    "tags": [
-      "brand-law",
-      "css",
-      "kids-capsule",
-      "blue"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-07-05"
   },
   {
     "id": "bug-173",
@@ -2877,6 +2708,175 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-07T21:43:04Z"
+  },
+  {
+    "id": "bug-180",
+    "timestamp": "2026-06-26T12:45:00-07:00",
+    "error_message": "V7 product cards in grid row 2+ never auto-advance (carousel stalls)",
+    "file": "prototypes/product-card-variants/v7-lookbook-card/index.html",
+    "root_cause": "IntersectionObserver threshold:0.2 on ~713px-tall cards \u2014 a partially-visible card never crosses 20% so its autoplay timer never (re)starts",
+    "fix": "threshold:0 \u2014 any pixel on screen starts autoplay; verified row-2 cards resume on scrollIntoView",
+    "tags": [
+      "intersection-observer",
+      "carousel",
+      "prototype",
+      "v7",
+      "threshold"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-26T12:45:00-07:00"
+  },
+  {
+    "id": "bug-181",
+    "timestamp": "2026-06-30T12:40:00-07:00",
+    "error_message": "Tying hub to SOT: hub override silently fell back \u2014 sot.json kept the catalog image for the 7 synced renders. served_theme_path returned the source suffix (.png), but sync_hub_to_theme transcodes to .webp, so resolve_asset() found no file and the override was skipped.",
+    "file": "skyyrose/core/asset_hub.py",
+    "root_cause": "served_theme_path used Path(source).suffix for the off-theme case; the staged file is always webp (theme .gitignore excludes png), so the .png path never resolved.",
+    "fix": "served_theme_path always returns assets/images/products/hub/<sku>-<face>.webp for off-theme verified renders; added regression test test_served_theme_path_offtheme_render_is_always_webp.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "build-collection-sot",
+      "served_theme_path",
+      "webp",
+      "fidelity"
+    ],
+    "related_bugs": [
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:40:00-07:00"
+  },
+  {
+    "id": "bug-182",
+    "timestamp": "2026-06-30T12:41:00-07:00",
+    "error_message": "Initial hub\u2192SOT override placed in sot_images._index() reached only the dashboard; the PHP storefront still served catalog images.",
+    "file": "skyyrose/core/sot_images.py",
+    "root_cause": "PHP theme reads data/collections/<slug>/sot.json via inc/collection-sot-reader.php, NOT data/sot-images.json (zero theme readers of sot-images.json). _index() feeds sot-images.json only.",
+    "fix": "Moved the single override seam upstream to build-collection-sot.py (generates sot.json); reverted _index(). sot.json now carries hub paths \u2192 PHP theme AND sot-images.json both honor the verdict.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "architecture",
+      "php",
+      "split-brain",
+      "seam"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T12:41:00-07:00"
+  },
+  {
+    "id": "bug-183",
+    "timestamp": "2026-06-30T15:05:00-07:00",
+    "error_message": "Claimed 'tie hub to SOT' would change 11 storefront product cards; after deploy the live collection-grid cards were unchanged (e.g. lh-003 still ghost) despite deployed sot.json carrying the hub override.",
+    "file": "wordpress-theme/skyyrose-flagship/data/v7-cards.json",
+    "root_cause": "Storefront collection-grid cards render from the v7-cards system (build_v7_cards.py scans the products/v7/<sku>/ served tree), NOT sot.json front_model_image. The sot.json/sot-images tie reaches the holo card + dashboard, but the dominant v7 grid is a separate authority. The v7 tree was already hub-synced for 9/11 picks, so the deploy had ~0 visible card effect.",
+    "fix": "No code fix \u2014 corrected the claim. To reach the v7 grid, hub picks must be synced into products/v7/<sku>/ + v7-cards.json regenerated (build_v7_cards.py). lh-003 front + br-007 back are the 2 gaps. Deferred: PR #684 is actively refactoring v7 \u2014 coordinate, do not race.",
+    "tags": [
+      "asset-hub",
+      "sot",
+      "v7-cards",
+      "storefront",
+      "imagery-layers",
+      "overclaim"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T15:05:00-07:00"
+  },
+  {
+    "id": "bug-184",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "og:image/twitter:image emitted VideoPress .mp4 (logo_400x100.mp4) \u2014 link previews broken sitewide",
+    "file": "wordpress-theme/skyyrose-flagship/inc/seo.php",
+    "root_cause": "custom_logo theme-mod attachment used as social image without MIME validation; live logo attachment is a video",
+    "fix": "skyyrose_og_logo_url() helper gates all three emitters on image/* MIME, falls back to static brand asset",
+    "tags": [
+      "seo",
+      "og-image",
+      "wordpress",
+      "mime"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-185",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "Footer content rendered after </footer> on every page (mobile-bottom-nav; homepage also footer-cro/FAQ/size-guide)",
+    "file": "wordpress-theme/skyyrose-flagship/footer.php",
+    "root_cause": "front-page bypassed get_footer() with inline footer + manual part includes after it; footer.php included mobile-bottom-nav after </footer>",
+    "fix": "front-page uses get_footer(); mobile-bottom-nav moved inside the footer landmark (position:fixed makes placement visual no-op)",
+    "tags": [
+      "dom",
+      "landmarks",
+      "a11y",
+      "footer"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-186",
+    "timestamp": "2026-07-05T21:20:00-07:00",
+    "error_message": "kids-capsule.css shipped blue-dominant colors (#A8D8EA, #1A1A2E) violating no-blue brand law",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/kids-capsule.css",
+    "root_cause": "pre-canon palette survived the Kids Capsule rose-gold accent change (PR #704 changed accent but not the launch-teaser tokens)",
+    "fix": "--kc-sky \u2192 #D8A1AA, --kc-night \u2192 #171310, dawn gradient start \u2192 #D8A1AA; audit brand check now enforces",
+    "tags": [
+      "brand-law",
+      "css",
+      "kids-capsule",
+      "blue"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-05"
+  },
+  {
+    "id": "bug-187",
+    "timestamp": "2026-06-29T18:55:00-07:00",
+    "error_message": "Live skyyrose.co homepage: 404 on black-rose-sherpa-jacket-front-model.webp (br-006 Black Rose jacket). 1 of 33 homepage images broken; fires twice in console.",
+    "file": "wordpress-theme/skyyrose-flagship/front-page.php",
+    "root_cause": "Phantom subdirectory in the image path. front-page.php (lines 308, 485, 521) and data/render-keepers.json:12 referenced .../images/products/black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 with an extra black-rose-sherpa-jacket/ folder that does not exist in the theme asset tree (all product images are flat in products/). Verified authoritatively via curl: subdir path -> HTTP 404, flat path -> HTTP 200; Playwright predecode confirmed exactly 1 broken image of 33. Vision-verified the flat-path file is the correct garment (black Black-Rose hooded jacket with grayscale rose/wings chest crest), so the bug is the path, not the asset.",
+    "fix": "Collapsed the phantom subdir to the flat path in both files: front-page.php (3 occurrences via replace_all) and render-keepers.json (br-006 asset line) now point at /images/products/black-rose-sherpa-jacket-front-model.webp (the HTTP 200 file). Verified: 0 remaining subdir refs in wordpress-theme/, render-keepers.json re-parses as valid JSON, no other products/<slug>/<slug> double-subdir image paths in front-page.php. Source-only fix (PHP/JSON, no .min rebuild). Live still 404s until theme deploy (STOP-AND-SHOW gated).",
+    "tags": [
+      "wordpress",
+      "front-page",
+      "404",
+      "image-path",
+      "broken-image",
+      "br-006",
+      "black-rose",
+      "homepage",
+      "render-keepers"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-29T18:55:00-07:00"
+  },
+  {
+    "id": "bug-188",
+    "timestamp": "2026-06-30T20:44:00",
+    "error_message": ".venv/bin/python: No such file or directory (Stop hook), then No module named pytest, then boto3/langgraph/scikit-image import errors during collection",
+    "file": ".venv/ (deleted, untracked \u2014 same territory as the 135-file working-tree deletion anomaly flagged earlier this session), pyproject.toml",
+    "root_cause": ".venv was fully deleted from disk (untracked, not a git operation). pip install -e \".[all]\" resolves an enormous dep graph (torch/langchain/mineru/bentoml/xxhash-fallback-chain) that stalled for 6+min on source builds before I killed it; boto3 (used by integrations/cloudflare_r2_manager.py) was never declared in any pyproject.toml extra despite being required by the mcp extra import chain.",
+    "fix": "Recreated .venv, installed base package + boto3 + langgraph + scikit-image directly (piecemeal, faster than full [all] resolve) instead of waiting out the slow full extras install. Declared boto3>=1.43.0 in the mcp extra of pyproject.toml so future installs pick it up without manual patching.",
+    "tags": [
+      "venv",
+      "pip",
+      "pyproject",
+      "missing-dependency",
+      "boto3",
+      "test-infra"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-06-30T20:44:00"
   },
   {
     "id": "bug-189",
@@ -3085,23 +3085,6 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-09T13:15:00-07:00"
-  },
-  {
-    "id": "bug-216",
-    "timestamp": "2026-07-09T08:40:00-07:00",
-    "error_message": "[SECURITY CRITICAL] CORS allow_origin_regex matched any *.vercel.app with allow_credentials=True \u2014 credentialed cross-origin data theft (live-proven: reflected https://evil.vercel.app)",
-    "file": "main_enterprise.py",
-    "root_cause": "_resolve_cors_origin_regex default `[a-z0-9-]+\\.(vercel\\.app|devskyy\\.app)` \u2014 vercel.app is an attacker-registrable shared domain",
-    "fix": "Scoped regex to devskyy.app subdomains + `devskyy-*-skyyroseco.vercel.app`, anchored ^...$; 6 regex assertions",
-    "tags": [
-      "security",
-      "cors",
-      "critical",
-      "credentials"
-    ],
-    "related_bugs": [],
-    "occurrences": 1,
-    "last_seen": "2026-07-09T08:40:00-07:00"
   },
   {
     "id": "bug-199",
@@ -3408,6 +3391,23 @@
     "last_seen": "2026-07-09T09:55:00-07:00"
   },
   {
+    "id": "bug-216",
+    "timestamp": "2026-07-09T08:40:00-07:00",
+    "error_message": "[SECURITY CRITICAL] CORS allow_origin_regex matched any *.vercel.app with allow_credentials=True \u2014 credentialed cross-origin data theft (live-proven: reflected https://evil.vercel.app)",
+    "file": "main_enterprise.py",
+    "root_cause": "_resolve_cors_origin_regex default `[a-z0-9-]+\\.(vercel\\.app|devskyy\\.app)` \u2014 vercel.app is an attacker-registrable shared domain",
+    "fix": "Scoped regex to devskyy.app subdomains + `devskyy-*-skyyroseco.vercel.app`, anchored ^...$; 6 regex assertions",
+    "tags": [
+      "security",
+      "cors",
+      "critical",
+      "credentials"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-09T08:40:00-07:00"
+  },
+  {
     "id": "bug-217",
     "timestamp": "2026-07-10T06:00:00-07:00",
     "error_message": "docs/DEPLOYMENT_ARCHITECTURE.md asserted the MCP runs on Fly app 'devskyy-mcp' - wrong; real app is 'devskyy-api' (fly.toml -> Dockerfile.mcp -> mcp_service). Introduced in prior-turn doc banner from memory, not verified vs fly config.",
@@ -3556,29 +3556,6 @@
     "last_seen": "2026-07-11"
   },
   {
-    "id": "bug-226",
-    "timestamp": "2026-07-10",
-    "error_message": "Kids Capsule teaser wordmark (\"Kids Capsule\") renders with overlapping/illegible glyphs on live page; DOM span rects do NOT overlap (paint-layer artifact, not layout).",
-    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
-    "root_cause": "rv-split-word wraps the h1 into per-word .sr-word spans that carry filter:blur(0) even at REST (.is-visible, animations-premium.css:143). A non-none filter (incl blur(0)) forces a per-span compositing layer, so the background-clip:text gradient painted on the PARENT h1 is read through filter-isolated children -> doubled/overlapping ink on correctly-placed boxes. Structurally pre-existing; the Playfair->Archivo swap (bolder/wider) likely made the latent artifact visible.",
-    "fix": "Swapped the reveal class rv-split-word -> rv-clip-up on teaser.php:38. rv-clip-up rests with clip-path+opacity and NO filter, and acts on the h1 itself (no child spans) -> clip-mask and glyphs stay on one paint op. Consistent with siblings (.kc-teaser__badge already uses rv-clip-up, tagline uses rv-blur). rv-clip-up is already in the built .min (css+js) so no rebuild needed.",
-    "tags": [
-      "wordpress",
-      "theme",
-      "kids-capsule",
-      "background-clip-text",
-      "reveal-animation",
-      "paint-layer",
-      "typography-release",
-      "css-compositing"
-    ],
-    "related_bugs": [
-      "bug-221"
-    ],
-    "occurrences": 1,
-    "last_seen": "2026-07-10"
-  },
-  {
     "id": "bug-224",
     "timestamp": "2026-07-11",
     "error_message": "4 SDK bugs live on main ~3 months: DevSkyy.round_table() TypeError (attr shadows method); agent_sdk.worker crashes on startup (await on sync redis.from_url); task status never updated post-completion; RequestSigner HMAC non-deterministic (unsorted json.dumps)",
@@ -3620,6 +3597,29 @@
     ],
     "related_bugs": [
       "bug-226"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-10"
+  },
+  {
+    "id": "bug-226",
+    "timestamp": "2026-07-10",
+    "error_message": "Kids Capsule teaser wordmark (\"Kids Capsule\") renders with overlapping/illegible glyphs on live page; DOM span rects do NOT overlap (paint-layer artifact, not layout).",
+    "file": "wordpress-theme/skyyrose-flagship/template-parts/kids-capsule/teaser.php",
+    "root_cause": "rv-split-word wraps the h1 into per-word .sr-word spans that carry filter:blur(0) even at REST (.is-visible, animations-premium.css:143). A non-none filter (incl blur(0)) forces a per-span compositing layer, so the background-clip:text gradient painted on the PARENT h1 is read through filter-isolated children -> doubled/overlapping ink on correctly-placed boxes. Structurally pre-existing; the Playfair->Archivo swap (bolder/wider) likely made the latent artifact visible.",
+    "fix": "Swapped the reveal class rv-split-word -> rv-clip-up on teaser.php:38. rv-clip-up rests with clip-path+opacity and NO filter, and acts on the h1 itself (no child spans) -> clip-mask and glyphs stay on one paint op. Consistent with siblings (.kc-teaser__badge already uses rv-clip-up, tagline uses rv-blur). rv-clip-up is already in the built .min (css+js) so no rebuild needed.",
+    "tags": [
+      "wordpress",
+      "theme",
+      "kids-capsule",
+      "background-clip-text",
+      "reveal-animation",
+      "paint-layer",
+      "typography-release",
+      "css-compositing"
+    ],
+    "related_bugs": [
+      "bug-221"
     ],
     "occurrences": 1,
     "last_seen": "2026-07-10"
@@ -4366,8 +4366,8 @@
     "timestamp": "2026-07-16T04:40:00Z",
     "error_message": "SIGSEGV (EXC_BAD_ACCESS) 'crashed on child side of fork pre-exec' \u2014 12+ Python crash reports 21:20-21:26 PDT; fork children of pytest die in nw_settings_child_has_forked -> NEFlowDirectorDestroy -> _os_log_preferences_refresh; parent sees subprocess returncode -11",
     "file": "conftest.py",
-    "root_cause": "macOS 26.4 + CPython 3.14.3: subprocess takes the fork()+exec path whenever close_fds=True (default) because _HAVE_POSIX_SPAWN_CLOSEFROM is False on macOS. When the multi-threaded pytest parent has initialized Apple's Network.framework (armed via _scproxy system-proxy lookup from urllib/requests/httpx), Apple's atfork child handler nw_settings_child_has_forked() calls os_log whose preferences page is invalid in the fork child -> SIGSEGV pre-exec. Apple framework bug surface, not DevSkyy code. DEEPER CHECK 2026-07-15: crash is a RACE (fork landing while another thread updates os_log preferences — 0/400 forks crashed under synthetic arming incl. live nw_path_monitor). Apple DTS (forums thread 737464): fork() after ANY higher-level framework init is unsupported; posix_spawn is the only reliable fix (syscall — atfork handlers never run). Victims identified: tests spawning python3 generators (build-collection-sot.py, gen-collection-hub.py, gen-design-tokens.py) died Signals.SIGSEGV:11.",
-    "fix": "conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (setdefault) so getproxies_environment() is non-empty and _scproxy/Network.framework is never consulted in test processes. Verified: urllib.request.getproxies() -> {'no': '*'}. Residual risk: other Network.framework arming paths; robust per-call fix is posix_spawn conditions (close_fds=False, absolute exe, no cwd/preexec_fn). LAYER 2: conftest.py darwin-only Popen.__init__ patch defaults close_fds=False for test subprocesses (safe per PEP 446 — Python fds are CLOEXEC anyway), flipping them onto the posix_spawn path; explicit close_fds/preexec_fn/pass_fds callers untouched. Verified: 2/2 patched calls route through Popen._posix_spawn; tests/collections/test_build_collection_sot.py 6/6 pass. NOTE: worktree checkouts lack the fix until this lands on their branch — post-fix crashes at 22:23-22:25 traced to unfixed worktree collections-scroll-world running the full suite. LAYER 3 (2026-07-16): recurrence from a FIXED worktree revealed cwd= kwarg forces the fork path regardless of the Popen patch (posix_spawn requires cwd=None; macOS CPython cannot chdir via posix_spawn). Removed all functional cwd= from tests/: git calls -> ['git','-C',root,...], python-script calls -> absolute path + PYTHONPATH env. 21/21 affected tests green. LAYER 4 (2026-07-16, ultracode workflow): ported bare-executable resolution into main conftest (dirname('git')=='' disqualifies posix_spawn — bug-264, found by agent-a04c28 session; shutil.which -> kwargs['executable']). Workflow forensics over all 33 .ips: 100% subprocess_fork_exec mechanism, crash rate 16.3/hr pre-fix -> 2.75/hr after layers 1+2 -> one isolated 5-min cluster after layer 3. Full 15-clause gate enumerated; patch covers dirname+close_fds only — cwd=, preexec_fn, pass_fds, explicit close_fds=True, fd<=2 redirections, bytes argv[0] still fork. 22 app-code cwd= sites (5 test-reachable). Empirical audit of ACTUALLY-executed fork calls running via subprocess._fork_exec wrap (NOTE: patching _posixsubprocess.fork_exec is a silent no-op — subprocess.py binds it at import). RECURRENCE 2026-07-16 23:36-23:37 PDT (20 .ips, parent pid 57740): layers 3+4 existed ONLY on chore/skill-font-canon-sync; concurrent session's worktrees cut from origin/main tip (1e7e6b3fb) ran tests with layers 1+2 only -> fork path -> SIGSEGV. Fix: this cherry-pick lands layers 3+4 (ac265c1dc + 5da6219f0) on main directly via focused PR. LAYER 5 (2026-07-21, recurrence #6 — 6 crashes 11:18-11:25 during ci-sim pytest gates): multiprocessing bypasses subprocess.Popen entirely — resource_tracker._launch() and mp child spawns use multiprocessing.util.spawnv_passfds -> _posixsubprocess.fork_exec, so layers 2-4 never see them. Tracker spawns LAZILY on first SemLock registration (empirically: first tqdm() bar -> create_mp_lock -> mp.RLock -> SemLock.__init__ -> register -> ensure_running), i.e. mid-suite after torch/onnx arm Network.framework; observed 2 SIGSEGVs per full-suite run (lazy spawn + atexit relaunch via util._exit_function -> SemLock._cleanup -> unregister). Fix: conftest darwin block calls resource_tracker.ensure_running() at import time (single-threaded, unarmed -> fork safe) and captures _BUG263_TRACKER_PID; tests/test_bug263_fork_safety.py asserts tracker alive + pid unchanged (pid drift = mid-suite death = bug signature). Empirical method: pytest plugin wrapping subprocess._fork_exec (module binding, NOT _posixsubprocess) + mp.util.spawnv_passfds with traceback logging — RED run: exactly 2 spawnv_passfds calls, both children died (.ips parent pid match). NOTE: scripts outside pytest (uv build envs, standalone runs) remain exposed until shell-level no_proxy lands in ~/.zshrc; and mp children spawned by tests would still fork — none exist in the suite today. CENSUS 2026-07-21 (post-layer-5, AST scan all first-party .py): ZERO first-party multiprocessing/ProcessPoolExecutor/joblib sites exist — tqdm inside site-packages is the only tracker trigger. cwd= inventory corrected: 33 sites (prior '22 with 5 test-reachable' was an undercount), all with cwd= as the sole posix_spawn disqualifier; the 5 test-imported modules (security_ops_agent, trellis_agent, wordpress_theme, wp_deploy, vulnerability_scanner) all mock or short-circuit the spawn, so zero cwd= sites execute a real fork in-suite today. Dormant risk: any of those gaining an unmocked test re-arms the fork path.",
+    "root_cause": "macOS 26.4 + CPython 3.14.3: subprocess takes the fork()+exec path whenever close_fds=True (default) because _HAVE_POSIX_SPAWN_CLOSEFROM is False on macOS. When the multi-threaded pytest parent has initialized Apple's Network.framework (armed via _scproxy system-proxy lookup from urllib/requests/httpx), Apple's atfork child handler nw_settings_child_has_forked() calls os_log whose preferences page is invalid in the fork child -> SIGSEGV pre-exec. Apple framework bug surface, not DevSkyy code. DEEPER CHECK 2026-07-15: crash is a RACE (fork landing while another thread updates os_log preferences \u2014 0/400 forks crashed under synthetic arming incl. live nw_path_monitor). Apple DTS (forums thread 737464): fork() after ANY higher-level framework init is unsupported; posix_spawn is the only reliable fix (syscall \u2014 atfork handlers never run). Victims identified: tests spawning python3 generators (build-collection-sot.py, gen-collection-hub.py, gen-design-tokens.py) died Signals.SIGSEGV:11.",
+    "fix": "conftest.py + scripts/ci-local.sh: on darwin set no_proxy='*'/NO_PROXY='*' (setdefault) so getproxies_environment() is non-empty and _scproxy/Network.framework is never consulted in test processes. Verified: urllib.request.getproxies() -> {'no': '*'}. Residual risk: other Network.framework arming paths; robust per-call fix is posix_spawn conditions (close_fds=False, absolute exe, no cwd/preexec_fn). LAYER 2: conftest.py darwin-only Popen.__init__ patch defaults close_fds=False for test subprocesses (safe per PEP 446 \u2014 Python fds are CLOEXEC anyway), flipping them onto the posix_spawn path; explicit close_fds/preexec_fn/pass_fds callers untouched. Verified: 2/2 patched calls route through Popen._posix_spawn; tests/collections/test_build_collection_sot.py 6/6 pass. NOTE: worktree checkouts lack the fix until this lands on their branch \u2014 post-fix crashes at 22:23-22:25 traced to unfixed worktree collections-scroll-world running the full suite. LAYER 3 (2026-07-16): recurrence from a FIXED worktree revealed cwd= kwarg forces the fork path regardless of the Popen patch (posix_spawn requires cwd=None; macOS CPython cannot chdir via posix_spawn). Removed all functional cwd= from tests/: git calls -> ['git','-C',root,...], python-script calls -> absolute path + PYTHONPATH env. 21/21 affected tests green. LAYER 4 (2026-07-16, ultracode workflow): ported bare-executable resolution into main conftest (dirname('git')=='' disqualifies posix_spawn \u2014 bug-264, found by agent-a04c28 session; shutil.which -> kwargs['executable']). Workflow forensics over all 33 .ips: 100% subprocess_fork_exec mechanism, crash rate 16.3/hr pre-fix -> 2.75/hr after layers 1+2 -> one isolated 5-min cluster after layer 3. Full 15-clause gate enumerated; patch covers dirname+close_fds only \u2014 cwd=, preexec_fn, pass_fds, explicit close_fds=True, fd<=2 redirections, bytes argv[0] still fork. 22 app-code cwd= sites (5 test-reachable). Empirical audit of ACTUALLY-executed fork calls running via subprocess._fork_exec wrap (NOTE: patching _posixsubprocess.fork_exec is a silent no-op \u2014 subprocess.py binds it at import). RECURRENCE 2026-07-16 23:36-23:37 PDT (20 .ips, parent pid 57740): layers 3+4 existed ONLY on chore/skill-font-canon-sync; concurrent session's worktrees cut from origin/main tip (1e7e6b3fb) ran tests with layers 1+2 only -> fork path -> SIGSEGV. Fix: this cherry-pick lands layers 3+4 (ac265c1dc + 5da6219f0) on main directly via focused PR. LAYER 5 (2026-07-21, recurrence #6 \u2014 6 crashes 11:18-11:25 during ci-sim pytest gates): multiprocessing bypasses subprocess.Popen entirely \u2014 resource_tracker._launch() and mp child spawns use multiprocessing.util.spawnv_passfds -> _posixsubprocess.fork_exec, so layers 2-4 never see them. Tracker spawns LAZILY on first SemLock registration (empirically: first tqdm() bar -> create_mp_lock -> mp.RLock -> SemLock.__init__ -> register -> ensure_running), i.e. mid-suite after torch/onnx arm Network.framework; observed 2 SIGSEGVs per full-suite run (lazy spawn + atexit relaunch via util._exit_function -> SemLock._cleanup -> unregister). Fix: conftest darwin block calls resource_tracker.ensure_running() at import time (single-threaded, unarmed -> fork safe) and captures _BUG263_TRACKER_PID; tests/test_bug263_fork_safety.py asserts tracker alive + pid unchanged (pid drift = mid-suite death = bug signature). Empirical method: pytest plugin wrapping subprocess._fork_exec (module binding, NOT _posixsubprocess) + mp.util.spawnv_passfds with traceback logging \u2014 RED run: exactly 2 spawnv_passfds calls, both children died (.ips parent pid match). NOTE: scripts outside pytest (uv build envs, standalone runs) remain exposed until shell-level no_proxy lands in ~/.zshrc; and mp children spawned by tests would still fork \u2014 none exist in the suite today. CENSUS 2026-07-21 (post-layer-5, AST scan all first-party .py): ZERO first-party multiprocessing/ProcessPoolExecutor/joblib sites exist \u2014 tqdm inside site-packages is the only tracker trigger. cwd= inventory corrected: 33 sites (prior '22 with 5 test-reachable' was an undercount), all with cwd= as the sole posix_spawn disqualifier; the 5 test-imported modules (security_ops_agent, trellis_agent, wordpress_theme, wp_deploy, vulnerability_scanner) all mock or short-circuit the spawn, so zero cwd= sites execute a real fork in-suite today. Dormant risk: any of those gaining an unmocked test re-arms the fork path.",
     "tags": [
       "macos",
       "fork",
@@ -4649,6 +4649,28 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-20"
+  },
+  {
+    "id": "bug-277",
+    "timestamp": "2026-07-21",
+    "error_message": "br-014 (Giants) and br-015 (White) packshots byte-identical to br-003 black jersey (md5 cf3ddc5b) in BOTH source-photos and theme assets \u2014 shop cards show wrong garment for two SKUs",
+    "file": "wordpress-theme/skyyrose-flagship/assets/images/products/br-014-baseball-classic-giants.jpeg",
+    "root_cause": "Real Giants/White colorway photos were misfiled under br-003-jersey-giants-front.jpeg / br-003-jersey-white-front.jpeg; the br-014/br-015-named files were saved from the wrong source (br-003 black), and the theme copies inherited the wrong bytes. Filename-based QC could not catch it \u2014 filenames looked correct.",
+    "fix": "Eyes-on pixel verification (vision) of all 3 distinct images, then repointed bytes: cp br-003-jersey-giants-front.jpeg over br-014-baseball-classic-giants.jpeg and br-003-jersey-white-front.jpeg over br-015-baseball-classic-white.jpeg in both source-photos and theme assets. Zero reference changes needed (paths unchanged). Follow-up: census + rename the misfiled br-003-* files.",
+    "tags": [
+      "wrong-garment",
+      "asset-hygiene",
+      "duplicate-bytes",
+      "br-014",
+      "br-015",
+      "filename-is-not-identity"
+    ],
+    "related_bugs": [
+      "bug-268",
+      "bug-276"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-21"
   },
   {
     "id": "bug-278",
