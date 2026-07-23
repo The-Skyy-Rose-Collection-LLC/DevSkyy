@@ -164,14 +164,23 @@ job_security() {
     # then re-assert fail-closed ourselves — any package pip-audit skipped that
     # ISN'T one of the 3 known local dists fails the job, just as --strict would.
     local audit_ok=1
+    # Parse the JSON report, NOT the text log: pip-audit's "Skipping <pkg>" lines
+    # come only from the rich progress spinner, which writes nothing when stdout
+    # is redirected to a file (non-TTY) unless FORCE_COLOR is set — so grepping
+    # the log is fail-OPEN in a normal shell. The JSON marks every uncollectable
+    # dep with a non-null skip_reason regardless of TTY.
     # shellcheck disable=SC2086
-    pip-audit $ignore --skip-editable >/tmp/ci-pipaudit.log 2>&1 || audit_ok=0
-    local unexpected_skips
-    unexpected_skips=$(grep -oE 'Skipping [A-Za-z0-9._-]+' /tmp/ci-pipaudit.log 2>/dev/null \
-      | awk '{print $2}' \
-      | grep -vxE 'devskyy|cli-anything-blender|cli-anything-gimp' || true)
-    if [ -n "$unexpected_skips" ]; then
-      _fail "security: pip-audit (unaudited package(s): $(echo "$unexpected_skips" | tr '\n' ' '))"
+    pip-audit $ignore --skip-editable -f json -o /tmp/ci-pipaudit.json >/tmp/ci-pipaudit.log 2>&1 || audit_ok=0
+    local skips unexpected_skips
+    skips=$(jq -r '(.dependencies // .) | .[] | select(.skip_reason != null and .skip_reason != "") | .name' /tmp/ci-pipaudit.json 2>/dev/null | sort -u)
+    unexpected_skips=$(printf '%s\n' "$skips" | grep -vxE 'devskyy|cli-anything-blender|cli-anything-gimp' | grep -v '^$' || true)
+    if [ -z "$skips" ]; then
+      # devskyy is always installed editable → there is ALWAYS ≥1 skip. An empty
+      # set means the JSON parse failed or pip-audit changed format: fail closed,
+      # never trust an unverifiable gate (bug-230).
+      _fail "security: pip-audit (no editable skips parsed — guard cannot self-verify; see /tmp/ci-pipaudit.json)"
+    elif [ -n "$unexpected_skips" ]; then
+      _fail "security: pip-audit (unaudited package(s): $(printf '%s' "$unexpected_skips" | tr '\n' ' '))"
     elif [ "$audit_ok" = "1" ]; then
       _pass "security: pip-audit"
     else
