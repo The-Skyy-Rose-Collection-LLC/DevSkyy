@@ -9,9 +9,21 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+
+# bug-263: on darwin, subprocess forks SIGSEGV in nw_settings_child_has_forked()
+# once Network.framework is armed (any httpx/requests/torch/onnxruntime import
+# does this) and close_fds=True (the default) sends Popen through fork()+exec
+# instead of posix_spawn. no_proxy="*" keeps _scproxy out of the picture. This
+# is a long-running uvicorn server process (not a pytest run), so conftest.py's
+# layer-1 guard never applies here — set it before fastapi/structlog pull in
+# anything heavy, and before any route handler can reach agents/* subprocess calls.
+if sys.platform == "darwin":
+    os.environ.setdefault("no_proxy", "*")
+    os.environ.setdefault("NO_PROXY", "*")
 
 import structlog
 from dotenv import load_dotenv
