@@ -236,7 +236,7 @@
     "@wordpress/env": "^11.8.1",
     "@wordpress/jest-preset-default": "^12.39.0",
     "@wordpress/scripts": "^31.4.0",
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.3",
     "cssnano": "^7.1.2",
     "eslint": "^10.5.0",
     "husky": "^9.1.7",
