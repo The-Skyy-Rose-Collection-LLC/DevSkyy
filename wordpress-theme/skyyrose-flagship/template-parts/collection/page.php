@@ -183,45 +183,61 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 
 	<!-- ════ Collection Film (scroll-world flight — silent ambient loop) ════ -->
 	<?php
-	// Flight films live in the Media Library (uploads survive theme deploys —
-	// never theme assets, per the rider lesson). Silent by design: founder audio
-	// rule — muted ambient loop, poster carries the frame wherever autoplay is
-	// blocked (low-power mode, data-saver). File-existence gated like the
-	// emblem block above: a collection whose film hasn't been uploaded yet (or
-	// whose next upload lands in a different dated folder) skips the section
-	// instead of shipping a broken video + poster.
-	$film_date_path = '/uploads/2026/07/';
-	$film_base_url  = content_url( $film_date_path );
-	$film_base_path = WP_CONTENT_DIR . $film_date_path;
-	$film_map       = array(
-		'signature'    => 'signature-flight',
-		'black-rose'   => 'black-rose-flight',
-		'love-hurts'   => 'love-hurts-flight',
-		'kids-capsule' => 'kids-capsule-flight',
+	// Flight films resolve by Media Library attachment ID, not a hardcoded
+	// path: a re-upload/replace, a dated-folder move, or a relocated uploads
+	// dir can't silently serve a stale file, and wp_get_attachment_url() passes
+	// through CDN/offload filters. Fail-closed like the emblem block — a missing
+	// or deleted attachment skips the section (never a broken embed). Silent by
+	// design (founder audio rule). Map is filterable so a future replace can
+	// repoint without a template edit.
+	$film_ids   = apply_filters(
+		'skyyrose_collection_film_ids',
+		array(
+			'signature'    => array(
+				'video'  => 10329,
+				'poster' => 10328,
+			),
+			'black-rose'   => array(
+				'video'  => 10323,
+				'poster' => 10322,
+			),
+			'love-hurts'   => array(
+				'video'  => 10327,
+				'poster' => 10326,
+			),
+			'kids-capsule' => array(
+				'video'  => 10325,
+				'poster' => 10324,
+			),
+		),
+		$slug
 	);
-	$film_slug      = $film_map[ $slug ] ?? '';
-	$has_film       = '' !== $film_slug
-		&& file_exists( $film_base_path . $film_slug . '-web.mp4' )
-		&& file_exists( $film_base_path . $film_slug . '-poster.jpg' );
+	$film       = $film_ids[ $slug ] ?? null;
+	$film_url   = $film ? wp_get_attachment_url( $film['video'] ) : '';
+	$poster_url = $film ? wp_get_attachment_url( $film['poster'] ) : '';
+	$film_path  = $film ? get_attached_file( $film['video'] ) : '';
+	$has_film   = $film_url && $poster_url && $film_path && file_exists( $film_path );
 	if ( $has_film ) :
 		?>
 		<section class="col-film" aria-label="<?php esc_attr_e( 'Collection film', 'skyyrose' ); ?>">
 			<div class="col-film__stage">
-				<!--
-				No autoplay attribute + preload="none": reduced-motion users never
-				trigger a video fetch. collection-pages.js decides whether to call
-				.play() (which is what actually starts the load) and reveals the
-				pause/play toggle only once motion is confirmed allowed — WCAG
-				2.2.2 requires a stop mechanism for auto-playing motion over 5s.
-				-->
-				<video class="col-film__video" muted loop playsinline preload="none"
-					poster="<?php echo esc_url( $film_base_url . $film_slug . '-poster.jpg' ); ?>"
+				<?php
+				// No autoplay + preload="none": reduced-motion users never trigger
+				// a video fetch. collection-pages.js calls .play() (which starts the
+				// load) only when motion is allowed AND the film scrolls near view,
+				// and reveals the pause/play toggle then — WCAG 2.2.2 needs a stop
+				// mechanism for auto motion over 5s. aria-hidden on the video: it's a
+				// decorative silent loop with no accessible name; the toggle is a
+				// sibling (not a descendant), so it stays reachable.
+				?>
+				<video class="col-film__video" muted loop playsinline preload="none" aria-hidden="true"
+					poster="<?php echo esc_url( $poster_url ); ?>"
 					width="720" height="1280">
-					<source src="<?php echo esc_url( $film_base_url . $film_slug . '-web.mp4' ); ?>" type="video/mp4">
+					<source src="<?php echo esc_url( $film_url ); ?>" type="video/mp4">
 				</video>
-				<img class="col-film__poster" src="<?php echo esc_url( $film_base_url . $film_slug . '-poster.jpg' ); ?>"
+				<img class="col-film__poster" src="<?php echo esc_url( $poster_url ); ?>"
 					alt="" aria-hidden="true" loading="lazy" decoding="async" width="720" height="1280">
-				<button type="button" class="col-film__toggle" aria-label="<?php esc_attr_e( 'Pause background video', 'skyyrose' ); ?>" aria-pressed="false" hidden></button>
+				<button type="button" class="col-film__toggle" aria-label="<?php esc_attr_e( 'Pause background video', 'skyyrose' ); ?>" hidden></button>
 			</div>
 		</section>
 	<?php endif; ?>

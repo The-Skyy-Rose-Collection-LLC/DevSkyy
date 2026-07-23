@@ -73,42 +73,98 @@
 
 	/* ── Collection film: reduced-motion gate + pause/play toggle ────── */
 	/* Markup ships poster-first (no autoplay attribute, preload="none") so
-	 * reduced-motion users never trigger a video fetch — calling .play()
-	 * below is what actually starts the load. WCAG 2.2.2 requires a stop
-	 * mechanism for auto-playing motion lasting over 5s, so the toggle is
-	 * revealed only once motion is confirmed allowed. */
-	if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-		var filmSections = document.querySelectorAll('.col-film');
-		for (var f = 0; f < filmSections.length; f++) {
+	 * reduced-motion users never trigger a video fetch — calling .play() is
+	 * what starts the load. An IntersectionObserver defers that load until the
+	 * film scrolls near view and pauses it off-screen (battery/bandwidth); a
+	 * matchMedia change-listener stops playback if the user enables reduced
+	 * motion after load. WCAG 2.2.2: the pause/play toggle (APG play/pause
+	 * pattern — a swapping label, no aria-pressed) is revealed only once
+	 * motion is confirmed allowed. */
+	(function () {
+		var reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+		var sections = document.querySelectorAll('.col-film');
+		if (!sections.length) return;
+
+		var films = [];
+		for (var f = 0; f < sections.length; f++) {
 			(function (section) {
 				var video = section.querySelector('.col-film__video');
 				var toggle = section.querySelector('.col-film__toggle');
 				if (!video || !toggle) return;
 
+				var userPaused = false; // true only after an explicit toggle-pause
+
 				var setToggleState = function (isPlaying) {
 					toggle.hidden = false;
-					toggle.setAttribute('aria-pressed', isPlaying ? 'false' : 'true');
 					toggle.setAttribute('aria-label', isPlaying ? 'Pause background video' : 'Play background video');
 					toggle.textContent = isPlaying ? '❚❚' : '▶';
 				};
 
-				var playAttempt = video.play();
-				if (playAttempt && typeof playAttempt.then === 'function') {
-					playAttempt.then(function () { setToggleState(true); }, function () { setToggleState(false); });
-				} else {
-					setToggleState(true);
-				}
+				var play = function () {
+					if (reduceMq.matches || userPaused) return;
+					var p = video.play();
+					if (p && typeof p.then === 'function') {
+						p.then(function () { setToggleState(true); }, function () { setToggleState(false); });
+					} else {
+						setToggleState(true);
+					}
+				};
 
 				toggle.addEventListener('click', function () {
 					if (video.paused) {
-						video.play();
-						setToggleState(true);
+						userPaused = false;
+						play();
 					} else {
+						userPaused = true;
 						video.pause();
 						setToggleState(false);
 					}
 				});
-			})(filmSections[f]);
+
+				films.push({ section: section, video: video, play: play });
+			})(sections[f]);
 		}
-	}
+
+		if (!films.length) return;
+
+		var findFilm = function (el) {
+			for (var i = 0; i < films.length; i++) {
+				if (films[i].section === el) return films[i];
+			}
+			return null;
+		};
+
+		// Play near-view, pause off-screen. No IO support → play immediately.
+		if ('IntersectionObserver' in window) {
+			var io = new IntersectionObserver(function (entries) {
+				for (var i = 0; i < entries.length; i++) {
+					var film = findFilm(entries[i].target);
+					if (!film) continue;
+					if (entries[i].isIntersecting) {
+						film.play();
+					} else if (!film.video.paused) {
+						film.video.pause();
+					}
+				}
+			}, { rootMargin: '200px 0px' });
+			for (var k = 0; k < films.length; k++) io.observe(films[k].section);
+		} else {
+			for (var m = 0; m < films.length; m++) films[m].play();
+		}
+
+		// Stop playback if the user turns on reduced motion after load.
+		var onReduceChange = function () {
+			if (!reduceMq.matches) return;
+			for (var n = 0; n < films.length; n++) {
+				films[n].video.pause();
+				var t = films[n].section.querySelector('.col-film__toggle');
+				if (t) { t.hidden = true; }
+			}
+		};
+		if (reduceMq.addEventListener) {
+			reduceMq.addEventListener('change', onReduceChange);
+		} else if (reduceMq.addListener) {
+			reduceMq.addListener(onReduceChange);
+		}
+	})();
 })();
