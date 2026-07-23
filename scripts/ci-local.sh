@@ -152,15 +152,31 @@ job_security() {
     _skip "security: bandit" "not installed — pip install bandit"
   fi
   if _have pip-audit; then
-    # Mirror ci.yml: same documented no-fix-available ignores. Add
-    # --skip-editable: the editable devskyy package isn't on PyPI and
-    # aborts --strict before any vulns are even reported.
+    # Mirror ci.yml's documented no-fix-available ignores. Keep this list in
+    # sync with .github/workflows/ci.yml's IGNORE (single source of truth lives
+    # there; this is the offline mirror).
     local ignore="--ignore-vuln CVE-2026-45829 --ignore-vuln PYSEC-2026-139 --ignore-vuln CVE-2025-3000 --ignore-vuln PYSEC-2025-217"
+    # No --strict: the dev venv carries local path-installed packages (devskyy,
+    # cli-anything-*) not on PyPI; --strict aborts on them before auditing any
+    # real dependency. But dropping --strict alone would fail OPEN for any OTHER
+    # uncollectable package (git pin, malformed req, yanked release) — the exact
+    # fail-open pattern bug-230 forbids. So: run non-strict + --skip-editable,
+    # then re-assert fail-closed ourselves — any package pip-audit skipped that
+    # ISN'T one of the 3 known local dists fails the job, just as --strict would.
+    local audit_ok=1
     # shellcheck disable=SC2086
-    # No --strict: the dev venv carries local path-installed packages
-    # (devskyy, cli-anything-*) that aren't on PyPI; strict aborts on them
-    # before auditing. Non-strict still exits 1 on any real vulnerability.
-    if pip-audit $ignore --skip-editable >/tmp/ci-pipaudit.log 2>&1; then _pass "security: pip-audit"; else _fail "security: pip-audit (dependency vulns)"; fi
+    pip-audit $ignore --skip-editable >/tmp/ci-pipaudit.log 2>&1 || audit_ok=0
+    local unexpected_skips
+    unexpected_skips=$(grep -oE 'Skipping [A-Za-z0-9._-]+' /tmp/ci-pipaudit.log 2>/dev/null \
+      | awk '{print $2}' \
+      | grep -vxE 'devskyy|cli-anything-blender|cli-anything-gimp' || true)
+    if [ -n "$unexpected_skips" ]; then
+      _fail "security: pip-audit (unaudited package(s): $(echo "$unexpected_skips" | tr '\n' ' '))"
+    elif [ "$audit_ok" = "1" ]; then
+      _pass "security: pip-audit"
+    else
+      _fail "security: pip-audit (dependency vulns)"
+    fi
   else
     _skip "security: pip-audit" "not installed — pip install pip-audit"
   fi
