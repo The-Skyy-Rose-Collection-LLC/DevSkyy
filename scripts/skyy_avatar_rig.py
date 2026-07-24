@@ -24,8 +24,10 @@ The pipeline:
   9. Print verification (clip names, file size, bone count)
 
 This script lives outside agents/ but uses the TripoAssetAgent's tool methods
-for the main generation pipeline. _probe_key_on_region() calls TripoClient
-directly for pre-flight balance probing only, before any agent is constructed.
+for the main generation pipeline. Pre-flight multi-account/multi-region
+credential discovery is delegated to agents.tripo_credentials.resolve_tripo_credentials(),
+which calls TripoClient directly for balance probing, before any agent is
+constructed.
 """
 
 from __future__ import annotations
@@ -33,14 +35,15 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
-import os
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
+from agents.errors import ConfigurationError  # noqa: E402
 from agents.tripo_agent import TripoAssetAgent, TripoConfig  # noqa: E402
+from agents.tripo_credentials import mask_api_key, resolve_tripo_credentials  # noqa: E402
 
 DEFAULT_IMAGE = (
     REPO_ROOT
@@ -66,129 +69,6 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger("skyy-rig")
-
-
-async def _probe_key_on_region(key: str, is_global: bool) -> dict:
-    """Try a single key against a single region. Return diagnostic dict.
-
-    NOTE: the raw API key is intentionally NOT stored in the returned dict —
-    callers that need the key should track it separately (e.g. alongside the
-    index into the candidate_keys list). Keeping the key out of the dict
-    prevents CodeQL from tainting the numeric `balance` field via data-flow.
-    """
-    try:
-        from tripo3d import TripoClient
-    except ImportError as exc:
-        raise ImportError("tripo3d SDK not installed. Run: pip install 'tripo3d>=0.4.1'") from exc
-
-    region = "global (.ai)" if is_global else "china (.com)"
-    suffix = key[-4:] if len(key) >= 4 else "(short)"
-    try:
-        async with TripoClient(api_key=key, IS_GLOBAL=is_global) as client:
-            balance = await client.get_balance()
-            available = float(getattr(balance, "balance", 0))
-            frozen = float(getattr(balance, "frozen", 0))
-            return {
-                "key_suffix": suffix,
-                "region": region,
-                "is_global": is_global,
-                "auth_ok": True,
-                "balance": available,
-                "frozen": frozen,
-                "error": None,
-            }
-    except Exception as exc:
-        return {
-            "key_suffix": suffix,
-            "region": region,
-            "is_global": is_global,
-            "auth_ok": False,
-            "balance": 0.0,
-            "frozen": 0.0,
-            "error": str(exc),
-        }
-
-
-async def discover_credit_holding_account(
-    keys: list[str],
-) -> tuple[str, dict] | tuple[None, None]:
-    """Try every (key × region) combo. Return (key, result_dict) for first with non-zero balance.
-
-    Returns (None, None) when no key+region combo has credits.
-
-    Per ENFORCED PROJECT RULE: verify connectivity + account state before any
-    paid operation. The user maintains MULTIPLE Tripo accounts across the .ai
-    and .com regions; we don't assume which key holds credits.
-
-    The raw API key is tracked separately from the diagnostic dict so that
-    CodeQL cannot taint the numeric balance field via data-flow from the key.
-    """
-    log.info("=== Multi-account / multi-region Tripo discovery ===")
-    log.info("Trying %d key(s) × 2 regions = %d probes", len(keys), len(keys) * 2)
-
-    # all_results stores (key, result_dict) — key kept separate from the dict
-    all_results: list[tuple[str, dict]] = []
-    for key in keys:
-        for is_global in (True, False):
-            result = await _probe_key_on_region(key, is_global)
-            all_results.append((key, result))
-            status = "✓" if result["auth_ok"] else "✗"
-            log.info(
-                "  [%d/%d] key ***%s on %s: %s auth, balance=%.2f, frozen=%.2f%s",
-                len(all_results),
-                len(keys) * 2,
-                result["key_suffix"],
-                result["region"],
-                status,
-                result["balance"],
-                result["frozen"],
-                f", error: {result['error']}" if result["error"] else "",
-            )
-
-    # Find the winner: key+region combo with highest balance among auth_ok results.
-    # Picking highest (not first non-zero) ensures we don't abort on a low-balance
-    # account when another account has enough credits to cover --max-cost.
-    best_key: str | None = None
-    best_result: dict | None = None
-    for winning_key, r in all_results:
-        if r["auth_ok"] and r["balance"] > 0:
-            if best_result is None or r["balance"] > best_result["balance"]:
-                best_key = winning_key
-                best_result = r
-
-    if best_key is not None and best_result is not None:
-        log.info(
-            "✓ FOUND credit-holding account: key ***%s on %s (balance=%.2f)",
-            best_result["key_suffix"],
-            best_result["region"],
-            best_result["balance"],
-        )
-        return best_key, best_result
-
-    log.error("✗ NO key+region combo has credits. Tried:")
-    for _key, r in all_results:
-        log.error(
-            "  - ***%s on %s: auth=%s balance=%.2f",
-            r["key_suffix"],
-            r["region"],
-            r["auth_ok"],
-            r["balance"],
-        )
-    return None, None
-
-
-async def verify_connectivity(agent: TripoAssetAgent) -> dict | None:
-    """Single-key verify (compatibility shim). Use discover_credit_holding_account()
-    for multi-key flows."""
-    return await _probe_key_on_region(
-        agent.tripo_config.api_key, getattr(agent.tripo_config, "is_global", True)
-    )
-
-
-async def get_balance(agent: TripoAssetAgent) -> float | None:
-    """Compatibility shim — use verify_connectivity() for new code."""
-    info = await verify_connectivity(agent)
-    return info["balance"] if info and info.get("auth_ok") else None
 
 
 async def generate_cartoon_mesh(agent: TripoAssetAgent, image_path: Path) -> tuple[str, Path]:
@@ -347,43 +227,27 @@ async def main() -> int:
         log.error("Reference image not found: %s", args.image)
         return 1
 
-    # Collect all candidate keys: TRIPO_API_KEYS (csv) + TRIPO_API_KEY (single).
-    keys_csv = os.getenv("TRIPO_API_KEYS", "").strip()
-    single_key = os.getenv("TRIPO_API_KEY", "").strip() or os.getenv("TRIPO3D_API_KEY", "").strip()
-    candidate_keys = [k.strip() for k in keys_csv.split(",") if k.strip()]
-    if single_key and single_key not in candidate_keys:
-        candidate_keys.append(single_key)
-    candidate_keys = [k for k in candidate_keys if k.startswith("tsk_")]
-
-    if not candidate_keys:
-        log.error("No tsk_* keys found. Set TRIPO_API_KEYS (comma-separated) or TRIPO_API_KEY.")
+    # Resolve multi-account/multi-region Tripo credentials: try every
+    # TRIPO_API_KEYS / TRIPO_API_KEY / TRIPO3D_API_KEY candidate against both
+    # regions until one has a non-zero balance. See agents/tripo_credentials.py.
+    try:
+        credentials = await resolve_tripo_credentials()
+    except ConfigurationError as exc:
+        log.error("Aborting — %s", exc)
         return 1
 
-    winner_key, winner = await discover_credit_holding_account(candidate_keys)
-    if winner is None:
-        log.error(
-            "Aborting — no Tripo account with credits found across %d keys × 2 regions. "
-            "Add another tsk_* key from the account that holds your credits, or top up "
-            "an existing account.",
-            len(candidate_keys),
-        )
-        return 1
-
-    # Configure the agent with the winning key + region.
-    # winner_key is tracked separately from the diagnostic dict — never read back
-    # from the dict — so the key never co-mingles with numeric balance values.
+    # Configure the agent with the resolved key + region.
     config = TripoConfig.from_env()
-    config.api_key = winner_key
-    config.is_global = winner["is_global"]
-    if not config.is_global:
-        config.base_url = "https://api.tripo3d.com/v2"
+    config.api_key = credentials.api_key
+    config.is_global = credentials.is_global
+    config.base_url = credentials.base_url
 
     agent = TripoAssetAgent(config=config)
-    starting_balance = winner["balance"]
+    starting_balance = credentials.balance
     log.info(
-        "Using key ***%s on %s — balance %.2f",
-        winner["key_suffix"],
-        winner["region"],
+        "Using key %s on %s — balance %.2f",
+        mask_api_key(credentials.api_key),
+        "global (.ai)" if credentials.is_global else "china (.com)",
         starting_balance,
     )
 

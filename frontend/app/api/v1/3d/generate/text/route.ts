@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { extractBearerToken } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 import { meshyClient, toJob3D as meshyToJob3D } from '@/lib/meshy/client';
-import { tripoClient, toJob3D as tripoToJob3D } from '@/lib/tripo/client';
+import {
+  tripoClient,
+  toJob3D as tripoToJob3D,
+  productNameFromPrompt,
+} from '@/lib/tripo/client';
 import { jobStore } from '../../jobs/route';
 
 export async function POST(request: NextRequest) {
@@ -25,8 +31,15 @@ export async function POST(request: NextRequest) {
     let job;
 
     if (provider === 'tripo') {
-      const task = await tripoClient.textTo3D({ prompt });
-      job = tripoToJob3D(task, 'text', prompt);
+      const authToken = extractBearerToken(request.headers);
+      const generation = await tripoClient.textTo3D(
+        {
+          product_name: productNameFromPrompt(prompt),
+          additional_details: prompt.slice(0, 1000),
+        },
+        authToken
+      );
+      job = tripoToJob3D(generation, 'text', prompt);
     } else {
       const task = await meshyClient.textTo3D({ mode: 'preview', prompt });
       job = meshyToJob3D(task, 'text', prompt);
@@ -36,7 +49,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(job);
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Generation failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (ApiError.isApiError(err)) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    return NextResponse.json({ error: 'Generation failed' }, { status: 500 });
   }
 }

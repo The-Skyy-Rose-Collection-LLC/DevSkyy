@@ -240,7 +240,7 @@
 - `fashn_agent.py` — Pydantic: FashnTask (53 fields) (~6374 tok)
 - `marketing_agent.py` — Declares MarketingAgent (~10260 tok)
 - `meshy_agent.py` — Pydantic: MeshyTask (46 fields) (~12925 tok)
-- `models.py` — SQLAlchemy ORM models for DevSkyy. (~4704 tok)
+- `models.py` — SQLAlchemy ORM models for DevSkyy, incl. Model3DGeneration/Model3DReview (Tripo 3D generation + QA review registry, alembic/versions/004). (~5700 tok)
 - `multimodal_capabilities.py` — from: initialize, analyze_image, analyze_product_image (~4482 tok)
 - `operations_agent.py` — OperationsAgent: version (~9475 tok)
 - `SECURITY_OPS_AGENT.md` — SecurityOpsAgent - Automated Vulnerability Management (~3213 tok)
@@ -705,6 +705,7 @@
 - `001_baseline_schema.py` — baseline schema (~2899 tok)
 - `002_add_brand_assets.py` — Add brand assets tables for US-013. (~1390 tok)
 - `003_add_analytics_tables.py` — Add analytics tables for US-001: Analytics Database Schema. (~3800 tok)
+- `004_add_model3d_registry.py` — Add model3d_generations/model3d_reviews tables (Tripo 3D generation + QA review registry). (~1200 tok)
 
 ## aos/
 
@@ -2280,8 +2281,9 @@
 
 ## frontend/lib/tripo/
 
-- `client.ts` — Tripo 3D API Client (~2481 tok)
-- `config.ts` — Tripo 3D API Configuration (~473 tok)
+- `client.ts` — tripoClient: textTo3D/imageTo3D/getGenerationStatus POST/GET the real DevSkyy FastAPI backend (api/v1/media.py, JWT bearer threaded per-call since Route Handlers run server-side); dry-run mock when no authToken; toJob3D maps ThreeDGenerationResponse->Job3D (~2600 tok)
+- `config.ts` — Tripo 3D API Configuration; STALE post-migration — still gates on frontend-side TRIPO_API_KEY, only consumed by providers/status routes + pipeline/tripo GET no-task_id branch now, not by client.ts (~473 tok)
+- `__tests__/client.test.ts` — vitest: dry-run + real-fetch-mocked paths for textTo3D/imageTo3D/getGenerationStatus, toJob3D status mapping, product_name derivation helpers (~2200 tok)
 
 ## frontend/lib/vercel/
 
@@ -2778,7 +2780,10 @@ WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signat
 - `generate_2d_25d_visualizations.py` — create_drop_shadow, create_depth_effect, create_parallax_layers, create_enhanced_detail + 3 more (~3548 tok)
 - `generate_3d_color_accurate.py` — Tripo3DClient: upload_image, create_task, get_task_status, download_model + 3 more (~2875 tok)
 - `generate_3d_direct.py` — generate_exact_replica, main (~1703 tok)
+- `generate_3d_from_catalog.py` — SKU-to-3D batch orchestrator: bare TripoAssetAgent() + sot_images.resolve_image(role='packshot') + THEME_ROOT join, zero-cost validation pass (all 33 SKUs + free balance probe), STOP-AND-SHOW gate (SKYYROSE_AUTO_CONFIRM / TTY), single-SKU dispatch → Model3DGeneration DB row via db_manager. --all raises NotImplemented. (~2400 tok)
 - `generate_3d_http.py` — Tripo3DClient: upload_image, create_task, get_task_status, download_model + 2 more (~2434 tok)
+- `promote_model3d_sot.py` — Promote-to-SOT step for 3D models (sibling to build-collection-sot.py, DB dep makes folding it in unsafe): fetch_approved_model3d(session) joins model3d_reviews(status='approved')↔model3d_generations, _to_repo_relative_path strips REPO_ROOT prefix off the DB's absolute model_path, promote_model3d() (pure, immutable copy-on-write) bakes {path,format,task_id,approved_at} as 'model_3d' key into the matching SKU's sot.json product entry (last-approval-wins on dup SKU). run()/main() = CLI glue via db_manager. (~2600 tok)
+- `score_3d_fidelity.py` — Two-phase 3D fidelity scoring CLI ties imagery/model_review_scorer.py→agents.models.Model3DReview. Phase 1 (--sku / --all-pending): free analytic dims (geometry/materials/colors/proportions + texture floor), writes Model3DReview with partial fidelity_score + NULL breakdown (D4: partial 6-key dict would fail frontend Zod). Phase 2 (--sku --with-branding): STOP-AND-SHOW-gated paid VLM branding, downloads Tripo preview from R2, writes full 6-key breakdown. Reads GLB/reference from LOCAL disk fail-closed; score_analytic runs via asyncio.to_thread (it calls asyncio.run() internally — direct call from run()'s loop would raise). read→score→write = 3 separate db_manager.session() blocks so the VLM call/prompt never holds a txn. (~1400 tok)
 - `generate_3d_models_from_assets.py` — Pydantic: CollectionMetadata (31 fields) (~4137 tok)
 - `generate_3d_models_official_sdk.py` — get_image_files, generate_3d_model, batch_generate_models, main (~3392 tok)
 - `generate_3d_models.py` — upload_image, create_3d_task, wait_for_task, download_model + 2 more (~1753 tok)
@@ -3270,7 +3275,7 @@ WS7 wiring core scripts (spec C2/C3/C6). All live-hitting entrypoints are dry-ru
 - `provider_factory.py` — 3D Provider Factory with Failover Support. (~5438 tok)
 - `provider_interface.py` — 3D Provider Interface Protocol and Models. (~2548 tok)
 - `replicate_provider.py` — Replicate 3D Provider Implementation. (~4073 tok)
-- `tripo_provider.py` — Tripo3D Provider Adapter. (~3428 tok)
+- `tripo_provider.py` — Tripo3D Provider Adapter. TripoProviderConfig now has optional base_url/is_global region fields (same env vars as agents.tripo_agent.TripoConfig: TRIPO_API_BASE_URL/TRIPO_IS_GLOBAL), forwarded into TripoConfig(...) in _get_agent() only when explicitly set. health_check() does a real free GET /user/balance probe (10s timeout) instead of key/SDK-presence only. (~3428 tok)
 
 ## services/three_d/trellis/
 
@@ -3793,6 +3798,9 @@ WS7 wiring core scripts (spec C2/C3/C6). All live-hitting entrypoints are dry-ru
 - `test_flux_budget.py` — Budget-gate tests for H-01 / H-02 — flux_pipeline.render() + render_base(). (~5792 tok)
 - `test_flux_pipeline_stage_e.py` — Integration tests for flux_pipeline Stage E (Stage 1.5 AuditFilter wiring). (~2153 tok)
 - `test_gemini_rest.py` — Tests for gemini_rest — direct REST client for Gemini API. (~2312 tok)
+- `test_generate_3d_from_catalog.py` — Tests for scripts/generate_3d_from_catalog.py: resolve_sku_source_image (packshot-only role, THEME_ROOT join, missing-on-disk), build_manifest/exceeds_budget math, _confirm STOP-AND-SHOW (TTY/env), dispatch_sku (mocked agent+db_manager, file move, DB row fields), run()-level budget/blocked-SKU zero-dispatch gates. Fake tripo3d SDK injected autouse — zero real network. (~2100 tok)
+- `test_score_3d_fidelity.py` — Tests for scripts/score_3d_fidelity.py (24 cases): score-assembly helpers, _validate_args combos, _require_local fail-closed, analytic phase (creates review w/ NULL breakdown, skips when review exists, missing-GLB skip), --all-pending (only reviewless), --with-branding (full 6-key breakdown, gate-abort writes nothing, requires preview key), arg-combo exit codes, and the async-bridge regression guard (fake score_analytic that calls asyncio.run() internally, driven through run()'s loop — locks the to_thread seam). In-memory sqlite db_manager reset mirrors test_qa_router.py. (~1500 tok)
+- `test_promote_model3d_sot.py` — Tests for scripts/promote_model3d_sot.py: _to_repo_relative_path (strip/unchanged/raise-outside-repo), _sku_index, promote_model3d (add/skip-unmatched/last-write-wins/immutability/no-op), _serialize/_load_sot_documents, fetch_approved_model3d against a fake in-memory-sqlite session (mirrors test_model3d_registry.py's db_factory — approved-only filter, oldest-first ordering, absolute→repo-relative normalization), and the promote→resolve_model_3d round-trip that pins the 'model_3d' key contract both modules share. (~2100 tok)
 - `test_generator_agent_phase_b2.py` — Tests: generate_returns_generation_result, generate_fails_if_both_models_fail, winner_selection_prefers_a_on_tie (~578 tok)
 - `test_ghost_mannequin_composite.py` — Tests: collar_garment_applies_neck_in, non_collar_garment_skips_neck_in (~561 tok)
 - `test_ghost_mannequin_preflight.py` — Tests: preflight_passes_sets_preflight_result, preflight_fail_sets_error_status, preflight_skipped_for_flat_lay (~728 tok)

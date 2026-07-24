@@ -16,6 +16,7 @@ from sqlalchemy import (
     TIMESTAMP,
     Boolean,
     Column,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -24,6 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -433,3 +435,110 @@ class BrandAssetIngestionJob(Base):
 
     def __repr__(self) -> str:
         return f"<BrandAssetIngestionJob(id={self.id}, status={self.status}, {self.succeeded}/{self.total})>"
+
+
+class Model3DGeneration(Base):
+    """Tripo3D model generation attempt (3D pipeline registry).
+
+    One row per Tripo generation attempt. Captures the dispatch inputs, the
+    resulting GLB location, and the automated validation outcome (mirrors
+    `AssetValidation` / `_tool_validate_asset` in `agents/tripo_agent.py`)
+    ahead of human QA review — see `Model3DReview`.
+
+    Attributes:
+        id: Primary key UUID
+        sku: Catalog SKU this generation is for
+        task_id: Tripo3D task ID for this generation
+        provider: 3D generation provider (e.g. 'tripo3d')
+        format: Output model format (e.g. 'glb')
+        model_path: Local filesystem path where the GLB landed
+        source_image_path: Packshot image path fed to the provider
+        generation_cost_credits: Provider credits spent (unknown until pinned)
+        validation_status: Automated validation result (valid/invalid/warnings)
+        validation_details: Raw AssetValidation dict (polycount, warnings, errors)
+        model_r2_key: R2 object key for the uploaded GLB (AssetCategory.MODEL_3D)
+        rendered_preview_r2_key: R2 object key for the provider's rendered preview image
+        created_at: Generation attempt timestamp
+    """
+
+    __tablename__ = "model3d_generations"
+
+    id = Column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuid_generate_v4()"),
+    )
+    sku = Column(String(100), nullable=False, index=True)
+    task_id = Column(String(100), index=True)
+    provider = Column(String(50))
+    format = Column(String(20))
+    model_path = Column(String(1000))
+    source_image_path = Column(String(1000))
+    generation_cost_credits = Column(Float)
+    validation_status = Column(String(50), index=True)
+    validation_details = Column(JSONB(astext_type=Text()).with_variant(SQLiteJSON(), "sqlite"))
+    model_r2_key = Column(String(1000))
+    rendered_preview_r2_key = Column(String(1000))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+
+    # Relationships
+    reviews = relationship(
+        "Model3DReview", back_populates="generation", cascade="all, delete-orphan"
+    )
+
+    def __repr__(self) -> str:
+        return f"<Model3DGeneration(id={self.id}, sku={self.sku}, status={self.validation_status})>"
+
+
+class Model3DReview(Base):
+    """Human QA review of a Model3DGeneration.
+
+    One row per review pass against a generated 3D asset. The fidelity
+    dimensions mirror the frontend's QAReviewSchema exactly
+    (`frontend/lib/api/schemas.ts`).
+
+    Attributes:
+        id: Primary key UUID
+        generation_id: Foreign key to model3d_generations.id
+        fidelity_score: Overall fidelity score (0-100)
+        fidelity_breakdown: Per-dimension scores — geometry, materials,
+            colors, proportions, branding, texture_detail
+        status: Review status (pending, approved, rejected, regenerating)
+        reviewed_by: Foreign key to users table (reviewer)
+        notes: Free-text reviewer notes
+        created_at: Review creation timestamp
+        updated_at: Last update timestamp
+    """
+
+    __tablename__ = "model3d_reviews"
+
+    id = Column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuid_generate_v4()"),
+    )
+    generation_id = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("model3d_generations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    fidelity_score = Column(Float)
+    fidelity_breakdown = Column(JSONB(astext_type=Text()).with_variant(SQLiteJSON(), "sqlite"))
+    status = Column(String(50), server_default="pending", index=True)
+    reviewed_by = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+    )
+    notes = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+
+    # Relationships
+    generation = relationship("Model3DGeneration", back_populates="reviews")
+
+    def __repr__(self) -> str:
+        return (
+            f"<Model3DReview(id={self.id}, generation_id={self.generation_id}, "
+            f"status={self.status})>"
+        )

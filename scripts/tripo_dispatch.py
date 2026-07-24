@@ -120,12 +120,18 @@ def _has_tech_flat_source(row: dict[str, str]) -> bool:
     catalog `image` column is the canonical tech-flat field; `front_model_image`
     is a model-on shot that breaks the template (FLUX rebuilds the garment
     from scratch — see br-011 → cyan hoodie regression).
+
+    Checks the existence of the file `resolve_source_image()` will ACTUALLY
+    dispatch — calling the real resolver instead of re-deriving `THEME_ROOT /
+    row["image"]` independently, so this guard and the dispatch path can
+    never validate different files (see `_source_matches_declared_image`
+    for the companion check that catches a *diverging* override outright).
+    Uses `is_file()`, not `exists()`: when both `image` and
+    `render_source_override` are empty, the resolver's fallback
+    (`THEME_ROOT / ""`) resolves to THEME_ROOT itself, a directory that
+    `exists()` but is not a source image.
     """
-    image_field = row.get("image", "").strip()
-    if not image_field:
-        return False
-    candidate = THEME_ROOT / image_field
-    return candidate.exists()
+    return resolve_source_image(row).is_file()
 
 
 def _is_catalog_tech_flat(row: dict[str, str]) -> bool:
@@ -143,6 +149,34 @@ def _is_catalog_tech_flat(row: dict[str, str]) -> bool:
     return row.get("render_is_tech_flat", "").strip() == "1"
 
 
+def _source_matches_declared_image(row: dict[str, str]) -> bool:
+    """True when the file `resolve_source_image()` will ACTUALLY dispatch is
+    the same file as the catalog `image` field.
+
+    `_is_catalog_tech_flat` (the `render_is_tech_flat` flag) and
+    `_load_dossier_logo_reference` (the branding check) both vet facts
+    about the `image` field — the flag is an operator declaration that
+    *`image`* is a clean unbranded tech-flat, and the dossier lookup is
+    keyed off the SKU/dossier, not a resolved path. Neither covers
+    `render_source_override`: if it is populated and resolves to a
+    different file, those declarations don't apply to what actually gets
+    sent — the override target reaches Tripo completely unvalidated. That
+    is the exact bug-096 hallucination path, reopened by a diverging
+    override instead of a missing one. See RCA #BUG-tripo-hallu-001 and
+    the module docstring.
+
+    Comparison is done on the *resolved* path (matching basename-only
+    overrides against the `assets/images/products/` convention baked into
+    `resolve_source_image`), not raw string equality — every current
+    catalog row stores `render_source_override` as a bare basename and
+    `image` as the full relative path, so a string comparison would flag
+    all 33 rows as diverging even though they resolve to the identical
+    file.
+    """
+    declared = THEME_ROOT / row.get("image", "").strip()
+    return resolve_source_image(row) == declared
+
+
 def classify_skus(
     rows: list[dict[str, str]], allow_branded: bool = False
 ) -> tuple[list[dict[str, str]], list[tuple[dict[str, str], str]]]:
@@ -151,12 +185,19 @@ def classify_skus(
     Block conditions (in order — first match wins for the reason string):
       1. Dossier `logo_reference` is populated → BRANDED, route to ADK
          (unless ``allow_branded`` is True — escape hatch with WARNING).
-      2. Catalog `render_is_tech_flat` is not "1" → NOT A TECH-FLAT.
+      2. `render_source_override` resolves to a different file than the
+         catalog `image` field → SOURCE OVERRIDE UNVALIDATED. Checks 3 and
+         4 below (and the branding check above) only vet the `image`
+         field; a diverging override would otherwise be dispatched
+         completely unvalidated. NOT bypassed by ``allow_branded`` — this
+         is a source-integrity check, independent of branding.
+      3. Catalog `render_is_tech_flat` is not "1" → NOT A TECH-FLAT.
          The catalog is the authority on whether the source is a clean
          unbranded tech-flat; file existence alone is insufficient
          (br-011 had a PNG file but it was a branded product render,
          not a tech-flat — flag was "0").
-      3. Catalog `image` column empty or file missing → NO TECH-FLAT FILE.
+      4. Catalog `image` column empty or the file `resolve_source_image()`
+         would actually dispatch is missing → NO TECH-FLAT FILE.
 
     A SKU that passes all checks is approved for Tripo multiview.
     """
@@ -170,6 +211,20 @@ def classify_skus(
                     row,
                     f"BRANDED — dossier logo_reference={logo_ref!r}. "
                     "Route to ADK render_pipeline; Tripo multiview hallucinates branding.",
+                )
+            )
+            continue
+        if not _source_matches_declared_image(row):
+            blocked.append(
+                (
+                    row,
+                    "SOURCE OVERRIDE UNVALIDATED — render_source_override="
+                    f"{row.get('render_source_override', '')!r} resolves to a different "
+                    f"file than the catalog `image` field ({row.get('image', '')!r}). "
+                    "render_is_tech_flat and the dossier branding check only vet `image`; "
+                    "the override target has never been validated as an unbranded "
+                    "tech-flat. Point render_source_override at the same file as "
+                    "`image`, or clear it.",
                 )
             )
             continue

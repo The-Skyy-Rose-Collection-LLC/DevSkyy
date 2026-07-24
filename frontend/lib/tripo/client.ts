@@ -1,98 +1,137 @@
 /**
- * Tripo 3D API Client
+ * Tripo 3D Generation Client
  *
- * Wraps the Tripo v2 OpenAPI for text-to-3d and image-to-3d generation.
- * Falls back to dry-run mode with mock data when TRIPO_API_KEY is not set.
+ * Wraps the DevSkyy FastAPI backend's Tripo3D-backed 3D generation endpoints:
+ *   POST /api/v1/media/3d/generate/text
+ *   POST /api/v1/media/3d/generate/image
+ *   GET  /api/v1/media/3d/{generation_id}/status
+ * (api/v1/media.py). The backend owns the Tripo3D credentials and dispatches
+ * agents/tripo_agent.py::TripoAssetAgent as a background task — this client
+ * never talks to Tripo3D directly.
  *
- * API Docs: https://platform.tripo3d.ai/docs/api
- * Base URL: https://api.tripo3d.ai/v2/openapi
- * Auth: Authorization: Bearer ${TRIPO_API_KEY}
+ * Falls back to dry-run mode with mock data when no caller-supplied auth
+ * token is present (e.g. local dev without a logged-in session). The routes
+ * are JWT-gated (Depends(get_current_user)), and the callers of this client
+ * are Next.js Route Handlers, which run server-side — there is no
+ * `window`/`localStorage` there, so the token can't be read via
+ * lib/api/client.ts's getAuthToken(). Callers must extract it from the
+ * incoming request (lib/api/client.ts's extractBearerToken()) and thread it
+ * in explicitly.
  */
 
-import { getTripoApiKey, TRIPO_CONFIG } from './config';
+import { fetchWithTimeout, handleResponse } from '@/lib/api/client';
+import { API_URL } from '@/lib/api/config';
+import { ThreeDGenerationResponseSchema } from '@/lib/api/schemas';
+import type { ThreeDGenerationResponse } from '@/lib/api/types';
+import { TRIPO_CONFIG } from './config';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
+export type ThreeDOutputFormat = 'glb' | 'gltf' | 'fbx' | 'obj' | 'usdz' | 'stl';
+
 export interface TripoTextTo3DRequest {
-  prompt: string;
-  model_version?: string;
+  product_name: string;
+  collection?: string;
+  garment_type?: string;
+  additional_details?: string;
+  output_format?: ThreeDOutputFormat;
 }
 
 export interface TripoImageTo3DRequest {
-  file_token: string;
-  model_version?: string;
+  product_name: string;
+  image_url: string;
+  output_format?: ThreeDOutputFormat;
 }
 
-export type TripoTaskStatus =
-  | 'queued'
-  | 'running'
-  | 'success'
-  | 'failed'
-  | 'cancelled'
-  | 'unknown';
+export type { ThreeDGenerationResponse };
 
-export interface TripoTaskOutput {
-  model?: string;
-  rendered_image?: string;
+// ---------------------------------------------------------------------------
+// product_name derivation helpers
+//
+// ThreeDGenerationFromTextRequest/ThreeDGenerationFromImageRequest both
+// require product_name (1-200 chars, no default). Upstream callers in this
+// codebase only carry a free-text prompt or an image URL — these derive a
+// real, non-fabricated product_name from that actual input.
+// ---------------------------------------------------------------------------
+
+const MAX_PRODUCT_NAME_LENGTH = 200;
+
+/** Derive a Pydantic-valid product_name (1-200 chars) from a free-text prompt. */
+export function productNameFromPrompt(prompt: string): string {
+  const trimmed = prompt.trim();
+  return trimmed.length > MAX_PRODUCT_NAME_LENGTH
+    ? `${trimmed.slice(0, MAX_PRODUCT_NAME_LENGTH - 3)}...`
+    : trimmed;
 }
 
-export interface TripoTaskData {
-  task_id: string;
-  type: string;
-  status: TripoTaskStatus;
-  input: Record<string, unknown>;
-  output: TripoTaskOutput;
-  progress: number;
-}
-
-export interface TripoApiResponse<T = TripoTaskData> {
-  code: number;
-  data: T;
-}
-
-export interface TripoUploadData {
-  image_token: string;
+/**
+ * Derive a best-effort product_name from an image URL's filename when the
+ * caller doesn't supply one explicitly. Base64/data URIs carry no filename
+ * to derive from and fall back to a generic label — callers that can supply
+ * a real product_name (e.g. a SKU-bound upload) should always pass one.
+ */
+export function productNameFromImageUrl(imageUrl: string): string {
+  if (imageUrl.startsWith('data:')) {
+    return 'Uploaded Image';
+  }
+  try {
+    const { pathname } = new URL(imageUrl);
+    const filename = pathname.split('/').filter(Boolean).pop();
+    if (!filename) return 'Uploaded Image';
+    const base = filename
+      .replace(/\.[a-zA-Z0-9]+$/, '')
+      .replace(/[-_]+/g, ' ')
+      .trim();
+    return base ? productNameFromPrompt(base) : 'Uploaded Image';
+  } catch {
+    return 'Uploaded Image';
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Dry-run mock helpers
 // ---------------------------------------------------------------------------
 
-function mockTaskId(): string {
-  return `mock_tripo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function mockGenerationId(): string {
+  return `mock_gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function createMockTaskData(
-  input: string,
-  inputType: 'text' | 'image'
-): TripoTaskData {
+function createMockGenerationResponse(
+  productName: string,
+  outputFormat: ThreeDOutputFormat,
+  estimatedCompletionTime: string
+): ThreeDGenerationResponse {
   return {
-    task_id: mockTaskId(),
-    type: inputType === 'text' ? 'text_to_model' : 'image_to_model',
-    status: 'queued',
-    input: inputType === 'text' ? { prompt: input } : { file_token: input },
-    output: {},
-    progress: 0,
+    generation_id: mockGenerationId(),
+    status: 'processing',
+    timestamp: new Date().toISOString(),
+    product_name: productName,
+    output_format: outputFormat,
+    model_url: null,
+    preview_url: null,
+    download_url: null,
+    metadata: null,
+    estimated_completion_time: estimatedCompletionTime,
   };
 }
 
-function createMockCompletedTaskData(
-  taskId: string,
-  input: string,
-  inputType: 'text' | 'image'
-): TripoTaskData {
+function createMockCompletedGenerationResponse(
+  generationId: string
+): ThreeDGenerationResponse {
+  const modelUrl = `https://mock.devskyy.app/3d/${generationId}/model.glb`;
   return {
-    task_id: taskId,
-    type: inputType === 'text' ? 'text_to_model' : 'image_to_model',
-    status: 'success',
-    input: inputType === 'text' ? { prompt: input } : { file_token: input },
-    output: {
-      model: `https://mock.tripo3d.ai/models/${taskId}/model.glb`,
-      rendered_image: `https://mock.tripo3d.ai/models/${taskId}/rendered.png`,
-    },
-    progress: 100,
+    generation_id: generationId,
+    status: 'completed',
+    timestamp: new Date().toISOString(),
+    product_name: 'Mock Product',
+    output_format: 'glb',
+    model_url: modelUrl,
+    preview_url: `https://mock.devskyy.app/3d/${generationId}/preview.png`,
+    download_url: modelUrl,
+    metadata: null,
+    estimated_completion_time: null,
   };
 }
 
@@ -100,96 +139,25 @@ function createMockCompletedTaskData(
 // HTTP helpers
 // ---------------------------------------------------------------------------
 
-async function tripoFetch<T>(
+async function backendFetch3D(
   path: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const apiKey = getTripoApiKey();
-  if (!apiKey) {
-    throw new Error('Tripo API key not configured — use dry-run mode');
-  }
-
-  const url = `${TRIPO_CONFIG.base_url}${path}`;
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
-    TRIPO_CONFIG.default_timeout_ms
-  );
-
-  try {
-    const response = await fetch(url, {
+  options: RequestInit,
+  authToken: string
+): Promise<ThreeDGenerationResponse> {
+  const response = await fetchWithTimeout(
+    `${API_URL}${path}`,
+    {
       ...options,
-      signal: controller.signal,
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
         ...options.headers,
       },
-    });
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => '');
-      throw new Error(
-        `Tripo API error ${response.status}: ${body || response.statusText}`
-      );
-    }
-
-    return (await response.json()) as T;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-/**
- * Upload an image to Tripo and receive a file_token.
- * Uses multipart/form-data — the Content-Type header is set by the browser.
- */
-async function tripoUpload(imageUrl: string): Promise<string> {
-  const apiKey = getTripoApiKey();
-  if (!apiKey) {
-    throw new Error('Tripo API key not configured — use dry-run mode');
-  }
-
-  // Fetch the image from the provided URL
-  const imageResponse = await fetch(imageUrl);
-  if (!imageResponse.ok) {
-    throw new Error(`Failed to fetch image from ${imageUrl}`);
-  }
-  const imageBlob = await imageResponse.blob();
-
-  const formData = new FormData();
-  formData.append('file', imageBlob, 'image.png');
-
-  const url = `${TRIPO_CONFIG.base_url}/upload`;
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
+    },
     TRIPO_CONFIG.default_timeout_ms
   );
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        // Do NOT set Content-Type — fetch sets it with the boundary for FormData
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => '');
-      throw new Error(
-        `Tripo upload error ${response.status}: ${body || response.statusText}`
-      );
-    }
-
-    const result = (await response.json()) as TripoApiResponse<TripoUploadData>;
-    return result.data.image_token;
-  } finally {
-    clearTimeout(timeout);
-  }
+  return handleResponse(response, ThreeDGenerationResponseSchema);
 }
 
 // ---------------------------------------------------------------------------
@@ -198,107 +166,97 @@ async function tripoUpload(imageUrl: string): Promise<string> {
 
 export const tripoClient = {
   /**
-   * Check if client will make real API calls or return mock data.
+   * Check whether a call will hit the real DevSkyy backend or return mock
+   * data. Gated on auth-token presence — the backend owns the Tripo3D
+   * credentials, so the frontend's only decision point is whether it has a
+   * caller identity to send.
    */
-  isDryRun(): boolean {
-    return !getTripoApiKey();
+  isDryRun(authToken?: string | null): boolean {
+    return !authToken;
   },
 
   /**
-   * Submit a text-to-3D generation task.
-   * POST /task — { type: "text_to_model", prompt, model_version? }
+   * Submit a text-to-3D generation job.
+   * POST /api/v1/media/3d/generate/text
    */
-  async textTo3D(request: TripoTextTo3DRequest): Promise<TripoTaskData> {
-    if (this.isDryRun()) {
-      return createMockTaskData(request.prompt, 'text');
+  async textTo3D(
+    request: TripoTextTo3DRequest,
+    authToken?: string | null
+  ): Promise<ThreeDGenerationResponse> {
+    if (!authToken) {
+      return createMockGenerationResponse(
+        request.product_name,
+        request.output_format ?? 'glb',
+        '2-5 minutes'
+      );
     }
 
-    const body = {
-      type: 'text_to_model',
-      prompt: request.prompt,
-      ...(request.model_version && { model_version: request.model_version }),
-    };
-
-    const result = await tripoFetch<TripoApiResponse>('/task', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-
-    return result.data;
+    return backendFetch3D(
+      '/api/v1/media/3d/generate/text',
+      { method: 'POST', body: JSON.stringify(request) },
+      authToken
+    );
   },
 
   /**
-   * Submit an image-to-3D generation task.
-   * First uploads the image via POST /upload, then submits the task.
-   * POST /task — { type: "image_to_model", file: { type: "image", file_token } }
+   * Submit an image-to-3D generation job.
+   * POST /api/v1/media/3d/generate/image
    */
-  async imageTo3D(request: TripoImageTo3DRequest): Promise<TripoTaskData> {
-    if (this.isDryRun()) {
-      return createMockTaskData(request.file_token, 'image');
+  async imageTo3D(
+    request: TripoImageTo3DRequest,
+    authToken?: string | null
+  ): Promise<ThreeDGenerationResponse> {
+    if (!authToken) {
+      return createMockGenerationResponse(
+        request.product_name,
+        request.output_format ?? 'glb',
+        '3-7 minutes'
+      );
     }
 
-    const body = {
-      type: 'image_to_model',
-      file: {
-        type: 'image',
-        file_token: request.file_token,
-      },
-      ...(request.model_version && { model_version: request.model_version }),
-    };
-
-    const result = await tripoFetch<TripoApiResponse>('/task', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-
-    return result.data;
+    return backendFetch3D(
+      '/api/v1/media/3d/generate/image',
+      { method: 'POST', body: JSON.stringify(request) },
+      authToken
+    );
   },
 
   /**
-   * Upload an image and receive a file_token for use with imageTo3D.
-   * POST /upload — multipart/form-data with file field
+   * Poll the status of a generation job.
+   * GET /api/v1/media/3d/{generation_id}/status
    */
-  async uploadImage(imageUrl: string): Promise<string> {
-    if (this.isDryRun()) {
-      return `mock_token_${Date.now()}`;
+  async getGenerationStatus(
+    generationId: string,
+    authToken?: string | null
+  ): Promise<ThreeDGenerationResponse> {
+    if (!authToken) {
+      return createMockCompletedGenerationResponse(generationId);
     }
 
-    return tripoUpload(imageUrl);
-  },
-
-  /**
-   * Get the status of a task.
-   * GET /task/{task_id}
-   */
-  async getTask(taskId: string): Promise<TripoTaskData> {
-    if (this.isDryRun()) {
-      return createMockCompletedTaskData(taskId, 'mock prompt', 'text');
-    }
-
-    const result = await tripoFetch<TripoApiResponse>(`/task/${taskId}`);
-    return result.data;
+    return backendFetch3D(
+      `/api/v1/media/3d/${generationId}/status`,
+      { method: 'GET' },
+      authToken
+    );
   },
 };
 
 // ---------------------------------------------------------------------------
-// Helpers to map Tripo responses to the standard Job3D format
+// Helpers to map ThreeDGenerationResponse to the standard Job3D format
 // ---------------------------------------------------------------------------
 
-const STATUS_MAP: Record<TripoTaskStatus, 'queued' | 'processing' | 'completed' | 'failed'> = {
-  queued: 'queued',
-  running: 'processing',
-  success: 'completed',
+const STATUS_MAP: Record<string, 'queued' | 'processing' | 'completed' | 'failed'> = {
+  processing: 'processing',
+  completed: 'completed',
   failed: 'failed',
-  cancelled: 'failed',
-  unknown: 'queued',
 };
 
 /**
- * Convert a Tripo task response to the standard Job3D shape
+ * Convert a DevSkyy 3D generation response to the standard Job3D shape
  * used by the frontend pipeline.
  */
 export function toJob3D(
-  task: TripoTaskData,
+  response: ThreeDGenerationResponse,
   inputType: 'text' | 'image',
   input: string
 ): {
@@ -312,15 +270,18 @@ export function toJob3D(
   created_at: string;
   completed_at?: string;
 } {
+  const status = STATUS_MAP[response.status] ?? 'queued';
+  const finished = status === 'completed' || status === 'failed';
+
   return {
-    id: task.task_id,
-    status: STATUS_MAP[task.status] ?? 'queued',
+    id: response.generation_id,
+    status,
     provider: 'tripo',
     input_type: inputType,
     input,
-    output_url: task.output.model || undefined,
-    error: task.status === 'failed' ? 'Task failed' : undefined,
-    created_at: new Date().toISOString(),
-    completed_at: task.status === 'success' ? new Date().toISOString() : undefined,
+    output_url: response.model_url ?? undefined,
+    error: status === 'failed' ? 'Generation failed' : undefined,
+    created_at: response.timestamp,
+    completed_at: finished ? response.timestamp : undefined,
   };
 }

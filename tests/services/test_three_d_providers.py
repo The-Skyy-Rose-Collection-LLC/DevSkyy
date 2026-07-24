@@ -167,6 +167,38 @@ class TestTripoProviderConfig:
         config = TripoProviderConfig.from_env()
         assert config.api_key == "fallback-key"
 
+    def test_config_region_fields_default_unset(self, monkeypatch, temp_output_dir):
+        """base_url/is_global default to None when their env vars are absent."""
+        monkeypatch.delenv("TRIPO_API_BASE_URL", raising=False)
+        monkeypatch.delenv("TRIPO_IS_GLOBAL", raising=False)
+
+        from services.three_d.tripo_provider import TripoProviderConfig
+
+        config = TripoProviderConfig(output_dir=temp_output_dir)
+        assert config.base_url is None
+        assert config.is_global is None
+
+    def test_config_region_fields_from_env(self, monkeypatch, temp_output_dir):
+        """base_url/is_global read the SAME env vars as agents.tripo_agent.TripoConfig."""
+        monkeypatch.setenv("TRIPO_API_BASE_URL", "https://api.tripo3d.com/v2")
+        monkeypatch.setenv("TRIPO_IS_GLOBAL", "false")
+
+        from services.three_d.tripo_provider import TripoProviderConfig
+
+        config = TripoProviderConfig.from_env()
+        assert config.base_url == "https://api.tripo3d.com/v2"
+        assert config.is_global is False
+
+    def test_config_is_global_true_by_default_env_value(self, monkeypatch, temp_output_dir):
+        """is_global is True when TRIPO_IS_GLOBAL is set to anything but 'false'."""
+        monkeypatch.setenv("TRIPO_IS_GLOBAL", "true")
+        monkeypatch.delenv("TRIPO_API_BASE_URL", raising=False)
+
+        from services.three_d.tripo_provider import TripoProviderConfig
+
+        config = TripoProviderConfig(output_dir=temp_output_dir)
+        assert config.is_global is True
+
 
 class TestTripoProvider:
     """Tests for TripoProvider."""
@@ -355,6 +387,106 @@ class TestTripoProvider:
         assert exc_info.value.retryable is True
 
     @pytest.mark.asyncio
+    async def test_get_agent_forwards_explicit_region_config(self, temp_output_dir):
+        """Test _get_agent forwards base_url/is_global into TripoConfig when set."""
+        from services.three_d.tripo_provider import TripoProvider, TripoProviderConfig
+
+        config = TripoProviderConfig(
+            api_key="test-key",
+            output_dir=temp_output_dir,
+            base_url="https://api.tripo3d.com/v2",
+            is_global=False,
+        )
+        provider = TripoProvider(config)
+
+        with (
+            patch("agents.tripo_agent.TripoConfig") as mock_tripo_config_cls,
+            patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_cls,
+        ):
+            mock_tripo_config_cls.return_value = MagicMock()
+            mock_agent_cls.return_value = MagicMock()
+            await provider._get_agent()
+
+        _, kwargs = mock_tripo_config_cls.call_args
+        assert kwargs["base_url"] == "https://api.tripo3d.com/v2"
+        assert kwargs["is_global"] is False
+
+    @pytest.mark.asyncio
+    async def test_get_agent_omits_region_kwargs_when_unset(self, temp_output_dir, monkeypatch):
+        """Test _get_agent leaves TripoConfig's own defaults in place when unset."""
+        monkeypatch.delenv("TRIPO_API_BASE_URL", raising=False)
+        monkeypatch.delenv("TRIPO_IS_GLOBAL", raising=False)
+
+        from services.three_d.tripo_provider import TripoProvider, TripoProviderConfig
+
+        config = TripoProviderConfig(api_key="test-key", output_dir=temp_output_dir)
+        assert config.base_url is None
+        assert config.is_global is None
+        provider = TripoProvider(config)
+
+        with (
+            patch("agents.tripo_agent.TripoConfig") as mock_tripo_config_cls,
+            patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_cls,
+        ):
+            mock_tripo_config_cls.return_value = MagicMock()
+            mock_agent_cls.return_value = MagicMock()
+            await provider._get_agent()
+
+        _, kwargs = mock_tripo_config_cls.call_args
+        assert "base_url" not in kwargs
+        assert "is_global" not in kwargs
+
+    @pytest.mark.asyncio
+    async def test_get_agent_passes_config_none_when_caller_overrode_nothing(
+        self, temp_output_dir, monkeypatch
+    ):
+        """Test _get_agent passes config=None when the caller never explicitly set
+        api_key/base_url/is_global, restoring full multi-account credential
+        auto-resolution — TripoAssetAgent's `_needs_credential_resolution =
+        (config is None)` must stay True so agents.tripo_credentials.
+        resolve_tripo_credentials() still runs (bug-278)."""
+        for var in ("TRIPO_API_KEY", "TRIPO3D_API_KEY", "TRIPO_API_BASE_URL", "TRIPO_IS_GLOBAL"):
+            monkeypatch.delenv(var, raising=False)
+
+        from services.three_d.tripo_provider import TripoProvider, TripoProviderConfig
+
+        config = TripoProviderConfig(output_dir=temp_output_dir)
+        assert config.api_key == ""
+        assert config.base_url is None
+        assert config.is_global is None
+        provider = TripoProvider(config)
+
+        with (
+            patch("agents.tripo_agent.TripoConfig") as mock_tripo_config_cls,
+            patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_cls,
+        ):
+            mock_agent_cls.return_value = MagicMock()
+            await provider._get_agent()
+
+        mock_tripo_config_cls.assert_not_called()
+        mock_agent_cls.assert_called_once_with(config=None)
+
+    @pytest.mark.asyncio
+    async def test_get_agent_builds_explicit_config_when_api_key_overridden(self, temp_output_dir):
+        """Test _get_agent still builds and passes an explicit TripoConfig when the
+        caller DID set an explicit api_key — preserves existing explicit-config
+        behavior (does not regress non-default callers)."""
+        from services.three_d.tripo_provider import TripoProvider, TripoProviderConfig
+
+        config = TripoProviderConfig(api_key="tsk_explicit", output_dir=temp_output_dir)
+        provider = TripoProvider(config)
+
+        with (
+            patch("agents.tripo_agent.TripoConfig") as mock_tripo_config_cls,
+            patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_cls,
+        ):
+            mock_agent_cls.return_value = MagicMock()
+            await provider._get_agent()
+
+        mock_tripo_config_cls.assert_called_once()
+        mock_agent_cls.assert_called_once_with(config=mock_tripo_config_cls.return_value)
+
+    @pytest.mark.asyncio
     async def test_health_check_no_api_key(self, temp_output_dir):
         """Test health check returns unavailable when API key is missing."""
         from services.three_d.tripo_provider import (
@@ -394,6 +526,99 @@ class TestTripoProvider:
             health = await provider.health_check()
 
         assert health.status == ProviderStatus.UNAVAILABLE
+
+    @pytest.mark.asyncio
+    async def test_health_check_real_probe_success(self, mock_tripo_config):
+        """Test health check performs a real get_balance() probe, not just key/SDK presence."""
+        from services.three_d.tripo_provider import TripoProvider
+
+        provider = TripoProvider(mock_tripo_config)
+
+        mock_client = AsyncMock()
+        mock_client.get_balance = AsyncMock(return_value=MagicMock())
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        mock_tripo3d_module = MagicMock()
+        mock_tripo3d_module.TripoClient = MagicMock(return_value=mock_client)
+
+        with patch.dict("sys.modules", {"tripo3d": mock_tripo3d_module}):
+            health = await provider.health_check()
+
+        assert health.status == ProviderStatus.AVAILABLE
+        assert health.latency_ms is not None
+        mock_client.get_balance.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_health_check_passes_is_global_to_client(self, temp_output_dir):
+        """Test health check forwards config.is_global into the TripoClient probe."""
+        from services.three_d.tripo_provider import TripoProvider, TripoProviderConfig
+
+        config = TripoProviderConfig(
+            api_key="test-tripo-api-key",
+            output_dir=temp_output_dir,
+            is_global=False,
+        )
+        provider = TripoProvider(config)
+
+        mock_client = AsyncMock()
+        mock_client.get_balance = AsyncMock(return_value=MagicMock())
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        mock_tripo_client_cls = MagicMock(return_value=mock_client)
+        mock_tripo3d_module = MagicMock()
+        mock_tripo3d_module.TripoClient = mock_tripo_client_cls
+
+        with patch.dict("sys.modules", {"tripo3d": mock_tripo3d_module}):
+            await provider.health_check()
+
+        _, kwargs = mock_tripo_client_cls.call_args
+        assert kwargs["IS_GLOBAL"] is False
+
+    @pytest.mark.asyncio
+    async def test_health_check_probe_timeout(self, mock_tripo_config):
+        """Test health check reports DEGRADED when the balance probe times out."""
+        from services.three_d.tripo_provider import TripoProvider
+
+        provider = TripoProvider(mock_tripo_config)
+
+        mock_client = AsyncMock()
+        mock_client.get_balance = AsyncMock(side_effect=TimeoutError("simulated timeout"))
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        mock_tripo3d_module = MagicMock()
+        mock_tripo3d_module.TripoClient = MagicMock(return_value=mock_client)
+
+        with patch.dict("sys.modules", {"tripo3d": mock_tripo3d_module}):
+            health = await provider.health_check()
+
+        assert health.status == ProviderStatus.DEGRADED
+        assert health.error_message is not None
+        assert "timed out" in health.error_message.lower()
+
+    @pytest.mark.asyncio
+    async def test_health_check_probe_failure(self, mock_tripo_config):
+        """Test health check reports UNAVAILABLE when the balance probe raises."""
+        from services.three_d.tripo_provider import TripoProvider
+
+        provider = TripoProvider(mock_tripo_config)
+
+        mock_client = AsyncMock()
+        mock_client.get_balance = AsyncMock(side_effect=RuntimeError("401 Unauthorized"))
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        mock_tripo3d_module = MagicMock()
+        mock_tripo3d_module.TripoClient = MagicMock(return_value=mock_client)
+
+        with patch.dict("sys.modules", {"tripo3d": mock_tripo3d_module}):
+            health = await provider.health_check()
+
+        assert health.status == ProviderStatus.UNAVAILABLE
+        assert health.error_message is not None
+        assert "401" in health.error_message
 
     @pytest.mark.asyncio
     async def test_close_provider(self, mock_tripo_config):

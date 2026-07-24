@@ -106,3 +106,43 @@ def test_resolve_rejects_path_traversal(monkeypatch):
     monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
     with pytest.raises(ValueError, match="escapes the assets tree"):
         sot_images.resolve_image("xx-002", "front")
+
+
+def test_resolve_model_3d_none_for_unknown_sku():
+    assert sot_images.resolve_model_3d("zz-999") is None
+    assert sot_images.resolve_model_3d("") is None
+
+
+def test_resolve_model_3d_none_when_sku_has_no_model_3d_key():
+    # Real, known SKU that has no promoted 3D model yet -- degrades to None
+    # rather than crashing, mirroring resolve_image's missing-role fallback.
+    assert sot_images.resolve_model_3d("br-004") is None
+
+
+def test_resolve_model_3d_returns_dict_for_promoted_sku(monkeypatch):
+    synthetic = {
+        "xx-003": {
+            "model_3d": {
+                "path": "assets/3d-models-generated/xx-003/xx-003.glb",
+                "format": "glb",
+                "task_id": "task-abc",
+                "approved_at": "2026-07-22T00:00:00+00:00",
+            }
+        }
+    }
+    monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
+    assert sot_images.resolve_model_3d("xx-003") == synthetic["xx-003"]["model_3d"]
+
+
+def test_resolve_model_3d_rejects_path_traversal(monkeypatch):
+    synthetic = {"xx-004": {"model_3d": {"path": "../../etc/passwd", "format": "glb"}}}
+    monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
+    with pytest.raises(ValueError, match="escapes the assets tree"):
+        sot_images.resolve_model_3d("xx-004")
+
+
+def test_resolve_model_3d_rejects_absolute_path(monkeypatch):
+    synthetic = {"xx-005": {"model_3d": {"path": "/etc/passwd", "format": "glb"}}}
+    monkeypatch.setattr(sot_images, "_index", lambda: synthetic)
+    with pytest.raises(ValueError, match="escapes the assets tree"):
+        sot_images.resolve_model_3d("xx-005")

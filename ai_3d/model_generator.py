@@ -767,12 +767,18 @@ class AI3DModelGenerator:
         try:
             from imagery.model_fidelity import ModelFidelityValidator
 
-            validator = ModelFidelityValidator(self.reference_dir)
-            report = await validator.validate(result.model_path, result.product_sku)
+            # fidelity_threshold is a 0-1 fraction (GenerationConfig Field ge=0, le=1);
+            # ModelFidelityValidator.minimum_threshold is 0-100, matching overall_score
+            # (same scale conversion as the sibling callsite in sync/catalog_sync.py).
+            validator = ModelFidelityValidator(
+                minimum_threshold=self.config.fidelity_threshold * 100,
+                reference_image_path=source_images[0] if source_images else None,
+            )
+            report = await validator.validate(result.model_path)
 
-            result.fidelity_score = report.fidelity_score
+            result.fidelity_score = report.overall_score
             result.passed_fidelity = report.passed
-            result.validation_report = report.to_dict()
+            result.validation_report = report.model_dump()
 
         except ImportError as exc:
             # C-9 FIX: A missing validator must never silently pass fidelity.

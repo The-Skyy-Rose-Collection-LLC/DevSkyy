@@ -9,21 +9,90 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { tripoClient, toJob3D } from '@/lib/tripo/client';
+import { extractBearerToken } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
+import {
+  tripoClient,
+  toJob3D,
+  productNameFromPrompt,
+  productNameFromImageUrl,
+} from '@/lib/tripo/client';
 import { getTripoConnectionStatus } from '@/lib/tripo/config';
 
 // ---------------------------------------------------------------------------
 // POST — Submit a generation job
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function handleTextTo3D(prompt: string | undefined, authToken: string | null) {
+  if (!prompt?.trim()) {
+    return NextResponse.json({ error: 'prompt is required for text-to-3d' }, { status: 400 });
+  }
+  if (prompt.length > 5000) {
+    return NextResponse.json({ error: 'prompt too long (max 5000 chars)' }, { status: 400 });
+  }
+
+  const trimmedPrompt = prompt.trim();
+  const generation = await tripoClient.textTo3D(
+    {
+      product_name: productNameFromPrompt(trimmedPrompt),
+      additional_details: trimmedPrompt.slice(0, 1000),
+    },
+    authToken
+  );
+
+  const job = toJob3D(generation, 'text', trimmedPrompt);
+  return NextResponse.json(job, { status: 201 });
+}
+
+async function handleImageTo3D(
+  imageUrl: string | undefined,
+  productName: string | undefined,
+  authToken: string | null
+) {
+  if (!imageUrl?.trim()) {
+    return NextResponse.json({ error: 'image_url is required for image-to-3d' }, { status: 400 });
+  }
+
   try {
-    const body = await request.json();
-    const { input_type, prompt, image_url, model_version } = body as {
+    new URL(imageUrl);
+  } catch {
+    return NextResponse.json({ error: 'Invalid image_url' }, { status: 400 });
+  }
+
+  if (imageUrl.length > 2000) {
+    return NextResponse.json({ error: 'image_url too long (max 2000 chars)' }, { status: 400 });
+  }
+
+  const trimmedImageUrl = imageUrl.trim();
+  const generation = await tripoClient.imageTo3D(
+    {
+      product_name: productName?.trim() || productNameFromImageUrl(trimmedImageUrl),
+      image_url: trimmedImageUrl,
+    },
+    authToken
+  );
+
+  const job = toJob3D(generation, 'image', trimmedImageUrl);
+  return NextResponse.json(job, { status: 201 });
+}
+
+export async function POST(request: NextRequest) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  try {
+    // NOTE: model_version is no longer accepted here — the real backend
+    // (api/v1/media.py::ThreeDGenerationFromTextRequest/FromImageRequest)
+    // has no such field; Tripo model selection is owned by the backend.
+    const { input_type, prompt, image_url, product_name } = body as {
       input_type?: string;
       prompt?: string;
       image_url?: string;
-      model_version?: string;
+      product_name?: string;
     };
 
     if (!input_type || !['text', 'image'].includes(input_type)) {
@@ -33,68 +102,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (input_type === 'text') {
-      if (!prompt?.trim()) {
-        return NextResponse.json(
-          { error: 'prompt is required for text-to-3d' },
-          { status: 400 }
-        );
-      }
-      if (prompt.length > 5000) {
-        return NextResponse.json(
-          { error: 'prompt too long (max 5000 chars)' },
-          { status: 400 }
-        );
-      }
+    const authToken = extractBearerToken(request.headers);
 
-      const task = await tripoClient.textTo3D({
-        prompt: prompt.trim(),
-        model_version: model_version || undefined,
-      });
-
-      const job = toJob3D(task, 'text', prompt.trim());
-      return NextResponse.json(job, { status: 201 });
-    }
-
-    // image-to-3d
-    if (!image_url?.trim()) {
-      return NextResponse.json(
-        { error: 'image_url is required for image-to-3d' },
-        { status: 400 }
-      );
-    }
-
-    try {
-      new URL(image_url);
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid image_url' },
-        { status: 400 }
-      );
-    }
-
-    if (image_url.length > 2000) {
-      return NextResponse.json(
-        { error: 'image_url too long (max 2000 chars)' },
-        { status: 400 }
-      );
-    }
-
-    // Upload the image first to get a file_token, then submit the task
-    const fileToken = await tripoClient.uploadImage(image_url.trim());
-
-    const task = await tripoClient.imageTo3D({
-      file_token: fileToken,
-      model_version: model_version || undefined,
-    });
-
-    const job = toJob3D(task, 'image', image_url.trim());
-    return NextResponse.json(job, { status: 201 });
+    return input_type === 'text'
+      ? await handleTextTo3D(prompt, authToken)
+      : await handleImageTo3D(image_url, product_name, authToken);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Internal server error';
     console.error('Tripo POST error:', error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (ApiError.isApiError(error)) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -124,20 +142,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const task = await tripoClient.getTask(taskId);
+    const authToken = extractBearerToken(request.headers);
+    const generation = await tripoClient.getGenerationStatus(taskId, authToken);
 
-    const input =
-      typeof task.input?.prompt === 'string'
-        ? task.input.prompt
-        : '';
-    const inputType = task.type === 'image_to_model' ? 'image' : 'text';
-
-    const job = toJob3D(task, inputType as 'text' | 'image', input);
+    // ThreeDGenerationResponse doesn't echo the original request's
+    // input_type/prompt/image_url back on status polls — only product_name
+    // and output_format survive. Default input_type to 'text' and use the
+    // real product_name as the closest available "input" label; a caller
+    // that needs the original input_type must track it itself (e.g. via the
+    // in-memory jobStore populated at creation time).
+    const job = toJob3D(generation, 'text', generation.product_name);
     return NextResponse.json(job);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Internal server error';
     console.error('Tripo GET error:', error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (ApiError.isApiError(error)) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -245,7 +245,7 @@ This will execute all phases automatically:
 export WORDPRESS_URL="http://localhost:8882"
 export WORDPRESS_USERNAME="admin"
 export WORDPRESS_APP_PASSWORD="your-app-password"
-export TRIPO_API_KEY="tsk_UcZp-Gjk5ZAa8lOv8sTApdOqcvISeWdCSmj0BGk-Mvn"
+export TRIPO_API_KEY="your-tripo3d-api-key"  # SCRUBBED 2026-07-21 — was a live key committed since 2025-12-26, rotate at tripo3d.ai, see .wolf/buglog.json
 
 python3 scripts/deploy_skyyrose_site.py \
     --assets-zip "/Users/coreyfoster/Desktop/updev 4.zip" \

@@ -121,6 +121,42 @@ def resolve_image(sku: str, role: Role = "front") -> str | None:
     return _first_path(prod.get("images", {}), _ROLE_KEYS.get(role, ()), sku)
 
 
+def resolve_model_3d(sku: str) -> dict | None:
+    """Return the approved 3D model entry for a SKU, or ``None``.
+
+    Sibling to :func:`resolve_image`, reading the ``model_3d`` key that
+    ``scripts/promote_model3d_sot.py`` bakes into ``sot.json`` for SKUs with an
+    APPROVED ``Model3DReview`` — the same "hub verdict baked in upstream, resolver
+    honors it uniformly" seam this module's own index already applies to 2D
+    imagery. Returns ``None`` when the SKU is unknown or carries no ``model_3d``
+    key (nothing approved yet) — never invents a value.
+
+    Unlike :func:`resolve_image`'s theme-relative contract, the returned
+    ``path`` is REPO_ROOT-relative: generated 3D models live under
+    ``assets/3d-models-generated/`` (outside the WordPress theme tree), so
+    ``skyyrose.core.paths.REPO_ROOT`` — not ``THEME_ROOT`` — is the tree a
+    caller joins the path onto. The escape/absolute-path guard is identical
+    either way (:func:`_validated_path` only checks the raw string, it is not
+    tree-specific), so it is reused as-is.
+
+    Args:
+        sku: Canonical SKU (e.g. ``"br-011"``).
+
+    Returns:
+        ``{"path": str, "format": str, "task_id": str, "approved_at": str}``,
+        or ``None``.
+    """
+    if not sku:
+        return None
+    prod = _index().get(sku)
+    if not prod:
+        return None
+    entry = prod.get("model_3d")
+    if not isinstance(entry, dict) or not entry.get("path"):
+        return None
+    return {**entry, "path": _validated_path(entry["path"], sku)}
+
+
 def has_render(sku: str) -> bool:
     """True when the SOT has an actual on-model FRONT render (``front_model_image``).
 

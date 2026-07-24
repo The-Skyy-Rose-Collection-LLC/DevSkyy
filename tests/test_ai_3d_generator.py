@@ -14,7 +14,7 @@ Coverage:
 
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -25,6 +25,7 @@ from ai_3d.model_generator import (
     ModelFidelityError,
     ModelGenerationError,
 )
+from imagery.model_fidelity import MINIMUM_FIDELITY_SCORE
 
 # =============================================================================
 # Configuration Tests
@@ -275,7 +276,7 @@ class TestAI3DModelGenerator:
 
     @pytest.mark.asyncio
     async def test_generate_model_with_fidelity_validation(self, generator, sample_images):
-        """Should validate fidelity when enabled."""
+        """Should validate fidelity when enabled, exercising the real validator."""
         model_path = sample_images[0].parent / "SKR-001.glb"
         model_path.touch()
         thumbnail_path = sample_images[0].parent / "SKR-001_thumb.jpg"
@@ -286,28 +287,45 @@ class TestAI3DModelGenerator:
             model_path=model_path,
             texture_path=None,
             thumbnail_path=thumbnail_path,
-            fidelity_score=0.95,
+            fidelity_score=0.0,
             vertex_count=50000,
             face_count=25000,
             file_size_mb=1.5,
             source_images_used=4,
             generation_time_seconds=45.0,
             model_format="glb",
-            passed_fidelity=True,
         )
+
+        pytest.importorskip("trimesh")
+        import numpy as np
+
+        mock_mesh = Mock()
+        mock_mesh.is_watertight = True
+        mock_mesh.is_volume = True
+        mock_mesh.euler_number = 2
+        mock_mesh.volume = 400.0
+        mock_mesh.area = 300.0
+        mock_mesh.area_faces = np.ones(5000)
+        mock_mesh.vertices = np.zeros((10000, 3))
+        mock_mesh.faces = np.zeros((5000, 3))
+        mock_mesh.edges_unique = np.zeros((20000, 2))
+        mock_mesh.bounding_box = Mock()
+        mock_mesh.bounding_box.bounds = np.array([[0.0, 0.0, 0.0], [10.0, 10.0, 10.0]])
+        mock_mesh.bounding_box.volume = 800.0
+        mock_mesh.visual = Mock()
+        mock_mesh.visual.material = Mock()
+        mock_mesh.visual.material.image = Mock(width=2048, height=2048)
+        mock_mesh.visual.uv = np.array([[0.0, 0.0], [1.0, 1.0]] * 5000)
 
         with (
             patch.object(generator, "_get_hf_client", new_callable=AsyncMock) as mock_hf,
             patch.object(
                 generator, "_generate_via_huggingface", new_callable=AsyncMock
             ) as mock_pipeline,
-            patch.object(
-                generator, "_validate_model_fidelity", new_callable=AsyncMock
-            ) as mock_validate,
+            patch("trimesh.load", return_value=mock_mesh),
         ):
             mock_hf.return_value = object()
             mock_pipeline.return_value = mock_result
-            mock_validate.return_value = mock_result
 
             result = await generator.generate_model(
                 product_sku="SKR-001",
@@ -315,12 +333,66 @@ class TestAI3DModelGenerator:
                 validate_fidelity=True,
             )
 
-            mock_validate.assert_called_once()
-            assert result.fidelity_score == 0.95
+            assert result.passed_fidelity is True
+            assert result.fidelity_score >= MINIMUM_FIDELITY_SCORE
+            assert result.validation_report["overall_score"] == result.fidelity_score
 
     @pytest.mark.asyncio
-    async def test_generate_model_fidelity_failure(self, generator, sample_images):
-        """Should raise error on fidelity validation failure."""
+    async def test_configured_fidelity_threshold_reaches_validator(self, tmp_path, sample_images):
+        """Regression lock (code-review HIGH): a non-default fidelity_threshold
+        must be plumbed to ModelFidelityValidator.minimum_threshold (0-1 -> 0-100
+        scale), not silently dropped so the 95.0 class default always wins."""
+        generator = AI3DModelGenerator(
+            output_dir=tmp_path / "out",
+            config=GenerationConfig(fidelity_threshold=0.50),
+        )
+        model_path = tmp_path / "m.glb"
+        model_path.touch()
+        thumbnail_path = tmp_path / "m_thumb.jpg"
+        thumbnail_path.touch()
+        result = GeneratedModel(
+            product_sku="SKR-001",
+            model_path=model_path,
+            texture_path=None,
+            thumbnail_path=thumbnail_path,
+            fidelity_score=0.0,
+            vertex_count=1,
+            face_count=1,
+            file_size_mb=0.1,
+            source_images_used=1,
+            generation_time_seconds=1.0,
+            model_format="glb",
+        )
+
+        captured = {}
+
+        class _FakeReport:
+            overall_score = 72.0
+            passed = True
+
+            def model_dump(self):
+                return {"overall_score": 72.0}
+
+        class _FakeValidator:
+            # default 95.0 mirrors the real class default — if the callsite ever
+            # drops the kwarg again, captured['minimum_threshold'] becomes 95.0
+            # and the assertion below fails.
+            def __init__(self, *, minimum_threshold=95.0, reference_image_path=None):
+                captured["minimum_threshold"] = minimum_threshold
+
+            async def validate(self, model_path):
+                return _FakeReport()
+
+        with patch("imagery.model_fidelity.ModelFidelityValidator", _FakeValidator):
+            out = await generator._validate_model_fidelity(result, sample_images)
+
+        assert captured["minimum_threshold"] == pytest.approx(50.0)  # 0.50 * 100, not 95.0
+        assert out.passed_fidelity is True
+        assert out.fidelity_score == 72.0
+
+    @pytest.mark.asyncio
+    async def test_generate_model_fidelity_low_score_does_not_raise(self, generator, sample_images):
+        """A low-fidelity mesh should be reported, not raised, by the real validator."""
         model_path = sample_images[0].parent / "SKR-001.glb"
         model_path.touch()
         thumbnail_path = sample_images[0].parent / "SKR-001_thumb.jpg"
@@ -331,52 +403,48 @@ class TestAI3DModelGenerator:
             model_path=model_path,
             texture_path=None,
             thumbnail_path=thumbnail_path,
-            fidelity_score=0.80,
-            vertex_count=50000,
-            face_count=25000,
-            file_size_mb=1.5,
+            fidelity_score=0.0,
+            vertex_count=500,
+            face_count=100,
+            file_size_mb=0.1,
             source_images_used=4,
             generation_time_seconds=45.0,
             model_format="glb",
-            passed_fidelity=False,
         )
+
+        pytest.importorskip("trimesh")
+        mock_mesh = Mock()
+        mock_mesh.is_watertight = False
+        mock_mesh.is_volume = False
+        mock_mesh.euler_number = 0
+        mock_mesh.area = 1.0
+        mock_mesh.bounds = [[0, 0, 0], [1, 1, 1]]
+        mock_mesh.vertices = Mock()
+        mock_mesh.vertices.__len__ = Mock(return_value=10)
+        mock_mesh.faces = Mock()
+        mock_mesh.faces.__len__ = Mock(return_value=5)
+        mock_mesh.visual = None
 
         with (
             patch.object(generator, "_get_hf_client", new_callable=AsyncMock) as mock_hf_client,
             patch.object(
                 generator, "_generate_via_huggingface", new_callable=AsyncMock
             ) as mock_pipeline,
-            patch.object(
-                generator, "_validate_model_fidelity", new_callable=AsyncMock
-            ) as mock_validate,
+            patch("trimesh.load", return_value=mock_mesh),
         ):
             mock_hf_client.return_value = object()
             mock_pipeline.return_value = mock_result
-            mock_validate.side_effect = ModelFidelityError(
-                message="Fidelity score 0.80 below threshold 0.95",
-                score=0.80,
-                threshold=0.95,
+
+            result = await generator.generate_model(
+                product_sku="SKR-001",
+                source_images=sample_images,
+                validate_fidelity=True,
             )
 
-            # ModelFidelityError is wrapped in ModelGenerationError by the generator
-            raised = False
-            try:
-                await generator.generate_model(
-                    product_sku="SKR-001",
-                    source_images=sample_images,
-                    validate_fidelity=True,
-                )
-            except ModelGenerationError as e:
-                raised = True
-                # The original ModelFidelityError is the cause
-                assert e.__cause__ is not None
-                assert isinstance(e.__cause__, ModelFidelityError)
-                assert e.__cause__.score == 0.80
-                assert e.__cause__.threshold == 0.95
-
-            assert (
-                raised
-            ), "ModelGenerationError (wrapping ModelFidelityError) should have been raised"
+            # Low fidelity is reported on the result, not raised — generate_model
+            # never enforces the threshold itself.
+            assert result.passed_fidelity is False
+            assert result.fidelity_score < MINIMUM_FIDELITY_SCORE
 
     @pytest.mark.asyncio
     async def test_close(self, generator):

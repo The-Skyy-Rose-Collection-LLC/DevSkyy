@@ -11,10 +11,12 @@ Comprehensive test suite for the TripoAssetAgent including:
 """
 
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from agents.tripo_agent import AssetValidation, TripoAssetAgent, TripoConfig
+from agents.tripo_credentials import TripoCredentials
 from core.runtime.tool_registry import ToolCallContext, ToolRegistry
 
 # =============================================================================
@@ -123,6 +125,79 @@ class TestTripoAssetAgentInit:
         assert agent.registry.get_tool("tripo_generate_from_text") is not None
         assert agent.registry.get_tool("tripo_generate_from_image") is not None
         assert agent.registry.get_tool("tripo_validate_asset") is not None
+
+
+# =============================================================================
+# Credential Resolution Wiring Tests
+# =============================================================================
+
+
+@pytest.mark.asyncio
+class TestCredentialResolutionWiring:
+    """Test _ensure_credentials_resolved(): the default-vs-explicit-config gate.
+
+    Multi-account/multi-region resolution itself is covered exhaustively in
+    tests/test_tripo_credentials.py. These tests prove the *wiring* in
+    TripoAssetAgent: resolution fires exactly once for the default (no
+    explicit config) construction path, and never fires when the caller
+    supplied an explicit TripoConfig.
+    """
+
+    async def test_default_agent_resolves_credentials_once(self, monkeypatch) -> None:
+        """A bare TripoAssetAgent() (no explicit config) resolves on first use,
+        applies the result to tripo_config, and does not re-resolve afterward."""
+        from agents.tripo_credentials import TripoCredentials
+
+        fake_credentials = TripoCredentials(
+            api_key="tsk_resolvedkey0001",
+            is_global=False,
+            base_url="https://api.tripo3d.com/v2",
+            balance=12.5,
+        )
+        call_count = 0
+
+        async def fake_resolve(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            return fake_credentials
+
+        monkeypatch.setattr("agents.tripo_agent.resolve_tripo_credentials", fake_resolve)
+
+        agent = TripoAssetAgent()
+        assert agent._needs_credential_resolution is True
+
+        await agent._ensure_credentials_resolved()
+
+        assert call_count == 1
+        assert agent.tripo_config.api_key == "tsk_resolvedkey0001"
+        assert agent.tripo_config.is_global is False
+        assert agent.tripo_config.base_url == "https://api.tripo3d.com/v2"
+        assert agent._needs_credential_resolution is False
+
+        # Second call must be a no-op — resolution happens at most once per agent.
+        await agent._ensure_credentials_resolved()
+        assert call_count == 1
+
+    async def test_explicit_config_never_triggers_resolution(
+        self, monkeypatch, tripo_config: TripoConfig, tool_registry: ToolRegistry
+    ) -> None:
+        """An agent constructed with an explicit TripoConfig never calls the resolver —
+        that caller's key/region choice is authoritative."""
+
+        async def fail_if_called(*args, **kwargs):
+            raise AssertionError(
+                "resolve_tripo_credentials must not be called for an explicit config"
+            )
+
+        monkeypatch.setattr("agents.tripo_agent.resolve_tripo_credentials", fail_if_called)
+
+        agent = TripoAssetAgent(config=tripo_config, registry=tool_registry)
+        assert agent._needs_credential_resolution is False
+
+        original_api_key = agent.tripo_config.api_key
+        await agent._ensure_credentials_resolved()
+
+        assert agent.tripo_config.api_key == original_api_key
 
 
 # =============================================================================
@@ -353,6 +428,147 @@ class TestTripoAPIIntegration:
         # This would require mocking _api_request and asyncio.sleep
         # Test structure demonstrates integration point
         assert _expected_response["data"]["status"] == "success"
+
+
+# =============================================================================
+# Generation Fidelity Tests
+# =============================================================================
+
+
+@pytest.mark.asyncio
+class TestGenerateFromImageFidelity:
+    """`_tool_generate_from_image` must pass explicit max-fidelity params to
+    tripo3d's `image_to_model()` rather than relying on the SDK's own
+    defaults (regression test for a 2026-07-22 research finding: the call
+    used to pass only `image=...`, silently generating at the SDK's default
+    `model_version='v2.5-20250123'` / `texture_quality='standard'` instead of
+    the flagship model + detailed quality this project actually wants).
+    """
+
+    async def test_image_to_model_called_with_fidelity_params(
+        self, agent: TripoAssetAgent, tmp_path: Path
+    ) -> None:
+        image_path = tmp_path / "source.png"
+        image_path.write_bytes(b"fake-png-bytes")
+
+        from tripo3d import TaskStatus
+
+        fake_task = MagicMock(status=TaskStatus.SUCCESS)
+        fake_client = AsyncMock()
+        fake_client.image_to_model = AsyncMock(return_value="task-123")
+        fake_client.wait_for_task = AsyncMock(return_value=fake_task)
+        fake_client.download_task_models = AsyncMock(
+            return_value={"pbr_model": str(tmp_path / "out.glb")}
+        )
+        fake_client.__aenter__ = AsyncMock(return_value=fake_client)
+        fake_client.__aexit__ = AsyncMock(return_value=False)
+
+        with patch("agents.tripo_agent.TripoClient", return_value=fake_client):
+            await agent._tool_generate_from_image(image_path=str(image_path))
+
+        fake_client.image_to_model.assert_awaited_once()
+        _, kwargs = fake_client.image_to_model.call_args
+        assert kwargs["model_version"] == agent.tripo_config.generation_model_version
+        assert kwargs["texture"] is True
+        assert kwargs["pbr"] == agent.tripo_config.pbr_enabled
+        assert kwargs["texture_quality"] == agent.tripo_config.texture_quality
+        assert kwargs["geometry_quality"] == agent.tripo_config.geometry_quality
+        assert kwargs["texture_alignment"] == "original_image"
+        assert kwargs["face_limit"] == agent.tripo_config.face_limit
+        assert kwargs["auto_size"] is False
+        assert kwargs["enable_image_autofix"] is False
+
+    async def test_default_config_uses_valid_sdk_enum_values(self) -> None:
+        """'high' was never a valid tripo3d texture_quality value -- the
+        default must be one the SDK actually accepts."""
+        config = TripoConfig(api_key="test-key")
+        assert config.texture_quality in {"standard", "detailed"}
+        assert config.geometry_quality in {"standard", "detailed"}
+        assert config.generation_model_version
+        assert config.face_limit > 0
+
+    async def test_texture_quality_and_geometry_quality_not_swapped(
+        self, tool_registry: ToolRegistry, tmp_path: Path
+    ) -> None:
+        """`texture_quality` and `geometry_quality` share the same default
+        ('detailed'), which lets a test asserting only `kwargs[x] ==
+        config.x` pass even if the call site swapped which config field
+        feeds which kwarg. Use distinct values to catch that specifically.
+        """
+        config = TripoConfig(
+            api_key="test-key",
+            output_dir=str(tmp_path),
+            texture_quality="detailed",
+            geometry_quality="standard",
+        )
+        agent = TripoAssetAgent(config=config, registry=tool_registry)
+
+        image_path = tmp_path / "source.png"
+        image_path.write_bytes(b"fake-png-bytes")
+
+        from tripo3d import TaskStatus
+
+        fake_task = MagicMock(status=TaskStatus.SUCCESS)
+        fake_client = AsyncMock()
+        fake_client.image_to_model = AsyncMock(return_value="task-123")
+        fake_client.wait_for_task = AsyncMock(return_value=fake_task)
+        fake_client.download_task_models = AsyncMock(
+            return_value={"pbr_model": str(tmp_path / "out.glb")}
+        )
+        fake_client.__aenter__ = AsyncMock(return_value=fake_client)
+        fake_client.__aexit__ = AsyncMock(return_value=False)
+
+        with patch("agents.tripo_agent.TripoClient", return_value=fake_client):
+            await agent._tool_generate_from_image(image_path=str(image_path))
+
+        _, kwargs = fake_client.image_to_model.call_args
+        assert kwargs["texture_quality"] == "detailed"
+        assert kwargs["geometry_quality"] == "standard"
+
+    async def test_credential_resolution_called_before_dispatch(
+        self, tool_registry: ToolRegistry, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A bare TripoAssetAgent() (config=None) must resolve multi-account
+        credentials BEFORE the paid image_to_model() call -- verified through
+        the actual _tool_generate_from_image entry point, not by calling
+        _ensure_credentials_resolved() directly.
+        """
+        monkeypatch.setenv("TRIPO_OUTPUT_DIR", str(tmp_path))
+        agent = TripoAssetAgent(config=None, registry=tool_registry)
+
+        image_path = tmp_path / "source.png"
+        image_path.write_bytes(b"fake-png-bytes")
+
+        from tripo3d import TaskStatus
+
+        fake_task = MagicMock(status=TaskStatus.SUCCESS)
+        fake_client = AsyncMock()
+        fake_client.image_to_model = AsyncMock(return_value="task-123")
+        fake_client.wait_for_task = AsyncMock(return_value=fake_task)
+        fake_client.download_task_models = AsyncMock(
+            return_value={"pbr_model": str(tmp_path / "out.glb")}
+        )
+        fake_client.__aenter__ = AsyncMock(return_value=fake_client)
+        fake_client.__aexit__ = AsyncMock(return_value=False)
+
+        resolve_mock = AsyncMock(
+            return_value=TripoCredentials(
+                api_key="resolved-key",
+                is_global=True,
+                base_url="https://api.tripo3d.ai/v2",
+                balance=100.0,
+            )
+        )
+
+        with (
+            patch("agents.tripo_agent.resolve_tripo_credentials", resolve_mock),
+            patch("agents.tripo_agent.TripoClient", return_value=fake_client),
+        ):
+            await agent._tool_generate_from_image(image_path=str(image_path))
+
+        resolve_mock.assert_awaited_once()
+        fake_client.image_to_model.assert_awaited_once()
+        assert agent.tripo_config.api_key == "resolved-key"
 
 
 # =============================================================================

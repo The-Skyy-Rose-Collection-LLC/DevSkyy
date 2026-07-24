@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,17 +14,6 @@ import { Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
-
-const API_URL = (() => {
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  try {
-    new URL(url);
-    return url;
-  } catch {
-    // Invalid URL — fall back to default
-    return 'http://localhost:8000';
-  }
-})();
 
 const LOGIN_RATE_LIMIT_MS = 1000; // Minimum time between login attempts
 const MAX_LOGIN_ATTEMPTS = 5; // Max attempts before temporary lockout
@@ -48,38 +38,11 @@ const LoginFormSchema = z.object({
   rememberMe: z.boolean().optional().default(false),
 });
 
-const LoginResponseSchema = z.object({
-  access_token: z.string().min(1),
-  refresh_token: z.string().min(1),
-  token_type: z.string().default('Bearer'),
-  expires_in: z.number().optional().default(900),
-});
-
-type LoginForm = z.infer<typeof LoginFormSchema>;
-type LoginResponse = z.infer<typeof LoginResponseSchema>;
+type LoginFormData = z.infer<typeof LoginFormSchema>;
 
 // =============================================================================
-// SECURITY UTILITIES
+// RATE LIMITING (client-side; server enforces its own limits independently)
 // =============================================================================
-
-function generateNonce(): string {
-  const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function setSecureCookie(name: string, value: string, maxAge: number): void {
-  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-  const sameSite = '; SameSite=Strict';
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}${secure}${sameSite}`;
-}
-
-function clearAuthData(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('token_type');
-  document.cookie = 'access_token=; path=/; max-age=0';
-}
 
 // Rate limiting state (stored in memory, resets on page reload)
 let loginAttempts = 0;
@@ -118,12 +81,46 @@ function recordLoginAttempt(success: boolean): void {
   }
 }
 
+// Fixed, unreachable sentinel origin. safeCallbackUrl runs during render in a
+// component Next.js also SSRs (where `window` is undefined), so we resolve
+// against a constant rather than window.location.origin — origin-agnostic and
+// SSR-safe. It's an `https:` ("special") scheme so the WHATWG URL parser applies
+// the same backslash/tab/CR/LF normalization a real https origin would.
+const SAFE_REDIRECT_SENTINEL_ORIGIN = 'https://sentinel.invalid';
+
+/**
+ * Only accept same-origin relative redirect targets. An attacker-supplied
+ * off-site value — `https://evil.com`, protocol-relative `//evil.com`, or a
+ * value that only *normalizes* to one (`/\evil.com`, `/\t/evil.com` via a
+ * stripped tab/CR/LF) — must never redirect the user off-site after auth.
+ *
+ * Rather than blocklist each bypass character (which does not scale — the
+ * backslash-only guard still let control characters through), let the browser's
+ * own URL parser decide the origin: resolve `raw` against a fixed sentinel; a
+ * genuine same-origin relative path keeps the sentinel origin, anything that
+ * escapes it resolves elsewhere and is rejected. Return the parser-normalized
+ * relative path, never the raw string.
+ */
+function safeCallbackUrl(raw: string | null): string {
+  if (!raw) return '/admin';
+  try {
+    const url = new URL(raw, SAFE_REDIRECT_SENTINEL_ORIGIN);
+    if (url.origin !== SAFE_REDIRECT_SENTINEL_ORIGIN) return '/admin';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '/admin';
+  }
+}
+
 // =============================================================================
 // COMPONENT
 // =============================================================================
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -131,18 +128,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [nonce, setNonce] = useState<string>('');
 
-  // Generate CSRF nonce on mount
-  useEffect(() => {
-    setNonce(generateNonce());
-    // Clear any stale auth data
-    if (window.location.search.includes('logout=true')) {
-      clearAuthData();
-    }
-  }, []);
-
-  const validateForm = useCallback((): LoginForm | null => {
+  const validateForm = useCallback((): LoginFormData | null => {
     const result = LoginFormSchema.safeParse({ email, password, rememberMe });
 
     if (!result.success) {
@@ -181,75 +168,22 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const requestBody = new URLSearchParams();
-      requestBody.append('username', formData.email);
-      requestBody.append('password', formData.password);
-      requestBody.append('grant_type', 'password');
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-      const response = await fetch(`${API_URL}/api/v1/auth/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Request-ID': crypto.randomUUID(),
-          'X-CSRF-Token': nonce,
-        },
-        body: requestBody.toString(),
-        signal: controller.signal,
-        credentials: 'include',
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
+      if (!result || result.error) {
         recordLoginAttempt(false);
-
-        // Handle specific error codes
-        if (response.status === 401) {
-          throw new Error('Invalid email or password');
-        } else if (response.status === 429) {
-          throw new Error('Too many login attempts. Please try again later.');
-        } else if (response.status >= 500) {
-          throw new Error('Server error. Please try again later.');
-        } else {
-          // Don't expose specific error details from server
-          throw new Error('Login failed. Please check your credentials.');
-        }
+        setError('Invalid email or password');
+        return;
       }
 
-      const rawData = await response.json();
-      const parseResult = LoginResponseSchema.safeParse(rawData);
-
-      if (!parseResult.success) {
-        throw new Error('Invalid response from server');
-      }
-
-      const data = parseResult.data;
       recordLoginAttempt(true);
-
-      // Store tokens securely
-      const tokenExpiry = formData.rememberMe ? 2592000 : data.expires_in; // 30 days or session
-
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('token_type', data.token_type);
-
-      // Set secure cookie for SSR
-      setSecureCookie('access_token', data.access_token, tokenExpiry);
-
-      // Regenerate nonce after successful login
-      setNonce(generateNonce());
-
-      // Redirect to dashboard
-      router.push('/admin');
+      router.push(callbackUrl);
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        setError('Login request timed out. Please try again.');
-      } else {
-        setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
-      }
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -270,7 +204,6 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit} noValidate>
-          <input type="hidden" name="_csrf" value={nonce} />
           <CardContent className="space-y-4">
             {error && (
               <Alert variant="destructive" className="bg-red-900/50 border-red-800" data-testid="error-message">
@@ -411,5 +344,19 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <Loader2 className="h-8 w-8 animate-spin text-rose-500" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

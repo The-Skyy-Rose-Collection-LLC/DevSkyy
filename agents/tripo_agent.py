@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -54,6 +54,7 @@ from agents.core.base import (
 )
 from agents.core.validation_scoring import compute_validation_scores
 from agents.errors import ConfigurationError, ExecutionError
+from agents.tripo_credentials import resolve_tripo_credentials
 from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
@@ -123,9 +124,25 @@ class TripoConfig:
     retry_max_wait: float = 30.0  # Maximum wait between retries (seconds)
     output_dir: str = "./generated_assets/3d"
 
-    # Texture quality settings
-    texture_quality: str = "high"  # low, medium, high
-    texture_resolution: int = 2048  # 512, 1024, 2048, 4096
+    # Generation fidelity settings — max-fidelity defaults per 2026-07-22
+    # research (docs.tripo3d.ai + installed tripo3d==0.4.2 SDK signature).
+    # 'high' was never a valid tripo3d SDK value for texture_quality (only
+    # 'standard'/'detailed' are accepted) — these fields existed but were
+    # never actually passed to client.image_to_model(), so they had no
+    # effect regardless. Now wired through in _tool_generate_from_image.
+    generation_model_version: Literal[
+        "P1-20260311",
+        "Turbo-v1.0-20250506",
+        "v3.1-20260211",
+        "v3.0-20250812",
+        "v2.5-20250123",
+        "v2.0-20240919",
+        "v1.4-20240625",
+    ] = "v3.1-20260211"  # Tripo's H3.1 flagship
+    texture_quality: Literal["standard", "detailed"] = "detailed"
+    geometry_quality: Literal["standard", "detailed"] = "detailed"  # needs model >= v3.0
+    face_limit: int = 100000  # matches _tool_validate_asset's max_polycount default
+    texture_resolution: int = 2048  # 512, 1024, 2048, 4096 (not an SDK param; informational)
     pbr_enabled: bool = True  # Enable PBR materials
 
     @classmethod
@@ -295,6 +312,12 @@ class TripoAssetAgent(SuperAgent):
             logger.warning("Tripo3D SDK not installed. Install with: pip install tripo3d")
 
         self.tripo_config = config or TripoConfig.from_env()
+
+        # Multi-account/multi-region credential resolution is the DEFAULT
+        # behavior only when no explicit config was supplied — a caller that
+        # constructs TripoConfig directly (with its own api_key/is_global)
+        # is never overridden. See _ensure_credentials_resolved().
+        self._needs_credential_resolution: bool = config is None
 
         # Ensure output directory
         Path(self.tripo_config.output_dir).mkdir(parents=True, exist_ok=True)
@@ -589,6 +612,36 @@ class TripoAssetAgent(SuperAgent):
 
         return ". ".join(prompt_parts)
 
+    async def _ensure_credentials_resolved(self) -> None:
+        """Resolve multi-account/multi-region Tripo credentials, once, if needed.
+
+        No-ops when the agent was constructed with an explicit `TripoConfig`
+        (that caller's key/region choice is authoritative and is never
+        overridden). Otherwise — the default `TripoAssetAgent()` /
+        `TripoConfig.from_env()` path — resolves the (key, region) combo
+        that actually holds a usable balance via
+        `agents.tripo_credentials.resolve_tripo_credentials()` and applies
+        it to `self.tripo_config` before any paid Tripo3D call is made.
+
+        Raises:
+            ConfigurationError: Propagated from `resolve_tripo_credentials()`
+                if no configured key+region combination has credit, or the
+                tripo3d SDK is unavailable.
+        """
+        if not self._needs_credential_resolution:
+            return
+
+        credentials = await resolve_tripo_credentials()
+        self.tripo_config.api_key = credentials.api_key
+        self.tripo_config.is_global = credentials.is_global
+        self.tripo_config.base_url = credentials.base_url
+        self._needs_credential_resolution = False
+        logger.info(
+            "Resolved Tripo credentials: %s region, balance=%.2f",
+            "global (.ai)" if credentials.is_global else "china (.com)",
+            credentials.balance,
+        )
+
     async def _tool_generate_from_text(
         self,
         product_name: str,
@@ -624,12 +677,27 @@ class TripoAssetAgent(SuperAgent):
                 "See https://docs.tripo3d.ai/ for setup instructions."
             )
 
+        # Resolve multi-account/multi-region credentials (no-op if this
+        # agent was constructed with an explicit config).
+        await self._ensure_credentials_resolved()
+
         # Validate API key
         if not self.tripo_config.api_key:
             raise ValueError(
                 "TRIPO_API_KEY environment variable is required. "
                 "Get your API key from: https://www.tripo3d.ai/dashboard"
             )
+
+        # Validate output_format eagerly before any paid API work so an
+        # invalid value fails fast rather than after a costly generation
+        # completes.
+        try:
+            format_enum = ModelFormat(output_format)
+        except ValueError as e:
+            valid = [f.value for f in ModelFormat]
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. Must be one of: {valid}"
+            ) from e
 
         prompt = self._build_prompt(
             product_name, collection, garment_type, additional_details, optimized_prompt
@@ -686,8 +754,15 @@ class TripoAssetAgent(SuperAgent):
                             "The model was generated but could not be saved."
                         ) from e
 
-                    # Extract model path
-                    model_path = downloaded_files.get("model_mesh")
+                    # Extract model path. The real tripo3d SDK's
+                    # download_task_models() returns "model"/"base_model"/
+                    # "pbr_model" (never "model_mesh" -- that key never
+                    # existed in this SDK version, bug-283).
+                    model_path = (
+                        downloaded_files.get("pbr_model")
+                        or downloaded_files.get("model")
+                        or downloaded_files.get("base_model")
+                    )
                     if not model_path:
                         raise ValueError(
                             "No model file in download results. "
@@ -698,7 +773,7 @@ class TripoAssetAgent(SuperAgent):
                         task_id=task_id,
                         model_path=str(model_path),
                         model_url=str(model_path),
-                        format=ModelFormat(output_format),
+                        format=format_enum,
                         metadata={
                             "product_name": product_name,
                             "collection": collection,
@@ -774,12 +849,27 @@ class TripoAssetAgent(SuperAgent):
                 "See https://docs.tripo3d.ai/ for setup instructions."
             )
 
+        # Resolve multi-account/multi-region credentials (no-op if this
+        # agent was constructed with an explicit config).
+        await self._ensure_credentials_resolved()
+
         # Validate API key
         if not self.tripo_config.api_key:
             raise ValueError(
                 "TRIPO_API_KEY environment variable is required. "
                 "Get your API key from: https://www.tripo3d.ai/dashboard"
             )
+
+        # Validate output_format eagerly before any paid API work so an
+        # invalid value fails fast rather than after a costly generation
+        # completes.
+        try:
+            format_enum = ModelFormat(output_format)
+        except ValueError as e:
+            valid = [f.value for f in ModelFormat]
+            raise ValueError(
+                f"Invalid output_format {output_format!r}. Must be one of: {valid}"
+            ) from e
 
         # Verify image exists and is readable
         image_file = Path(image_path)
@@ -826,7 +916,18 @@ class TripoAssetAgent(SuperAgent):
                 # Generate 3D model from image
                 logger.info(f"Generating 3D model from image: {image_file.name}")
                 try:
-                    task_id = await client.image_to_model(image=str(image_path))
+                    task_id = await client.image_to_model(
+                        image=str(image_path),
+                        model_version=self.tripo_config.generation_model_version,
+                        texture=True,
+                        pbr=self.tripo_config.pbr_enabled,
+                        texture_quality=self.tripo_config.texture_quality,
+                        geometry_quality=self.tripo_config.geometry_quality,
+                        texture_alignment="original_image",
+                        face_limit=self.tripo_config.face_limit,
+                        auto_size=False,
+                        enable_image_autofix=False,
+                    )
                 except Exception as e:
                     if "authentication" in str(e).lower() or "unauthorized" in str(e).lower():
                         raise PermissionError(
@@ -875,19 +976,35 @@ class TripoAssetAgent(SuperAgent):
                             "The model was generated but could not be saved."
                         ) from e
 
-                    # Extract model path
-                    model_path = downloaded_files.get("model_mesh")
+                    # Extract model path. The real tripo3d SDK's
+                    # download_task_models() returns "model"/"base_model"/
+                    # "pbr_model" (never "model_mesh" -- that key never
+                    # existed in this SDK version, bug-283).
+                    model_path = (
+                        downloaded_files.get("pbr_model")
+                        or downloaded_files.get("model")
+                        or downloaded_files.get("base_model")
+                    )
                     if not model_path:
                         raise ValueError(
                             "No model file in download results. "
                             "The Tripo3D API may have returned an incomplete response."
                         )
 
+                    # download_task_models() also downloads Tripo's own
+                    # rendered-preview image under the "rendered_image" key
+                    # (saved as "{task_id}_rendered{ext}", see the SDK's
+                    # client.py) whenever the task produced one -- it was
+                    # previously discarded here, leaving the preview file on
+                    # disk with no path returned to the caller.
+                    rendered_image_path = downloaded_files.get("rendered_image")
+
                     result = GenerationResult(
                         task_id=task_id,
                         model_path=str(model_path),
                         model_url=str(model_path),
-                        format=ModelFormat(output_format),
+                        format=format_enum,
+                        thumbnail_path=str(rendered_image_path) if rendered_image_path else None,
                         metadata={
                             "product_name": product_name,
                             "source_image": image_path,
@@ -950,6 +1067,11 @@ class TripoAssetAgent(SuperAgent):
                 "Tripo3D SDK not available. Install with: pip install tripo3d.",
                 config_key="tripo3d",
             )
+
+        # Resolve multi-account/multi-region credentials (no-op if this
+        # agent was constructed with an explicit config).
+        await self._ensure_credentials_resolved()
+
         if not self.tripo_config.api_key:
             raise ConfigurationError(
                 "TRIPO_API_KEY environment variable is required.",
@@ -1007,6 +1129,11 @@ class TripoAssetAgent(SuperAgent):
                 "Tripo3D SDK not available. Install with: pip install tripo3d.",
                 config_key="tripo3d",
             )
+
+        # Resolve multi-account/multi-region credentials (no-op if this
+        # agent was constructed with an explicit config).
+        await self._ensure_credentials_resolved()
+
         if not self.tripo_config.api_key:
             raise ConfigurationError(
                 "TRIPO_API_KEY environment variable is required.",
@@ -1064,7 +1191,13 @@ class TripoAssetAgent(SuperAgent):
             output_dir.mkdir(parents=True, exist_ok=True)
             downloaded = await client.download_task_models(task, str(output_dir))
 
-            model_path = downloaded.get("rigged_model") or downloaded.get("model_mesh")
+            # download_task_models() returns "model"/"base_model"/"pbr_model"
+            # -- "rigged_model"/"model_mesh" never existed (bug-283).
+            model_path = (
+                downloaded.get("model")
+                or downloaded.get("pbr_model")
+                or downloaded.get("base_model")
+            )
             if not model_path:
                 raise ValueError(
                     f"No rigged model in download results. Available keys: "
@@ -1117,6 +1250,11 @@ class TripoAssetAgent(SuperAgent):
                 "Tripo3D SDK not available. Install with: pip install tripo3d.",
                 config_key="tripo3d",
             )
+
+        # Resolve multi-account/multi-region credentials (no-op if this
+        # agent was constructed with an explicit config).
+        await self._ensure_credentials_resolved()
+
         if not self.tripo_config.api_key:
             raise ConfigurationError(
                 "TRIPO_API_KEY environment variable is required.",
@@ -1177,9 +1315,13 @@ class TripoAssetAgent(SuperAgent):
             output_dir.mkdir(parents=True, exist_ok=True)
             downloaded = await client.download_task_models(task, str(output_dir))
 
+            # download_task_models() returns "model"/"base_model"/"pbr_model"
+            # -- "animated_model"/"model_mesh" never existed (bug-283); the
+            # final any-populated-value fallback is kept as defense-in-depth.
             model_path = (
-                downloaded.get("animated_model")
-                or downloaded.get("model_mesh")
+                downloaded.get("model")
+                or downloaded.get("pbr_model")
+                or downloaded.get("base_model")
                 or next((v for v in downloaded.values() if v), None)
             )
             if not model_path:

@@ -432,6 +432,10 @@ from api.v1.pipeline import router as pipeline_router
 
 app.include_router(pipeline_router, prefix="/api/v1")
 
+from api.v1.qa import router as qa_router
+
+app.include_router(qa_router, prefix="/api/v1")
+
 # Authentication
 from security.jwt_oauth2_auth import auth_router
 

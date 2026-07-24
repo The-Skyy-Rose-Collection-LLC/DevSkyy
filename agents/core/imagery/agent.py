@@ -5,6 +5,13 @@ Imagery & 3D Core Agent
 Domain: All visual asset generation — photos, VTON, 3D models.
 Sub-agents: Gemini Image Gen, Fashn VTON, Tripo 3D, Meshy 3D, HF Spaces.
 
+NOTE: every sub-agent in agents/core/imagery/sub_agents/ (including tripo_3d and
+meshy_3d) is an LLM-based *planner* — execute() routes the task through
+_llm_execute() and returns a generation plan, never a real API call or a
+downloaded asset. See agents/core/imagery/sub_agents/tripo_3d.py's module
+docstring for where real Tripo3D generation actually happens
+(api/v1/media.py -> agents.tripo_agent.TripoAssetAgent).
+
 Merges skyyrose_imagery_agent.py + skyyrose_product_agent.py into one core.
 """
 
@@ -22,15 +29,16 @@ class ImageryCoreAgent(CoreAgent):
     """
     Imagery & 3D Core Agent — all visual asset generation.
 
-    Delegates to sub-agents:
-    - gemini_image: AI image generation via Google Gemini
-    - fashn_vton: Virtual try-on (FASHN → WeShopAI → IDM-VTON failover)
-    - tripo_3d: 3D model generation via Tripo3D API
-    - meshy_3d: 3D model generation via Meshy (fallback to Tripo)
-    - hf_spaces: HuggingFace Spaces orchestration and quota management
+    Delegates to sub-agents (all LLM-planning-only — see module docstring):
+    - gemini_image: AI image generation *planning* via Google Gemini
+    - fashn_vton: Virtual try-on *planning* (FASHN → WeShopAI → IDM-VTON failover)
+    - tripo_3d: 3D model generation *planning* — does NOT call the Tripo3D API
+      (real generation: api/v1/media.py -> agents.tripo_agent.TripoAssetAgent)
+    - meshy_3d: 3D model generation *planning* (fallback to Tripo in plan text only)
+    - hf_spaces: HuggingFace Spaces orchestration *planning*
 
     Self-healing:
-    - Provider failover: if Tripo is down → route to Meshy
+    - Provider failover: if Tripo is down → route to Meshy (still plan-only output)
     - Quality gate: auto-retry with different params if output quality < threshold
     - Quota management: track API limits across all providers
     """
