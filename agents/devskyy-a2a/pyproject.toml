@@ -36,6 +36,21 @@ lint = [
     "codespell>=2.2.0,<3.0.0",
 ]
 
+[tool.uv]
+# Security floors for transitive dependencies (GitHub Dependabot alerts, 2026-07).
+# These packages are not direct dependencies; constraints keep any future
+# re-resolve from regressing below the patched versions.
+# NOTE: starlette cannot be floored to its patched 1.3.1 (CVE-2026-54283,
+# CVE-2026-48818) — every google-adk release (1.16.0-1.36.2) requires
+# starlette>=0.49.1,<1.0.0, so 1.x is unresolvable until google-adk lifts the cap.
+constraint-dependencies = [
+    "mcp>=1.28.1",
+    "tornado>=6.5.6",
+    "cryptography>=48.0.1",
+    "pyjwt>=2.13.0",
+    "python-multipart>=0.0.30",
+]
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"
