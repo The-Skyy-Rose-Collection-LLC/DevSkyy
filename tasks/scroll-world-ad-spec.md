@@ -524,3 +524,115 @@ matching the dossier design (white + pastel chevron + pink hood). Prior "still a
 CONTACT-SHEET MISREAD. NO paid re-render — $0.80 saved. The Signature film is NOT provisional; its
 windbreaker beat shows the canonical garment. Dossier fabric-read edit KEPT (harmless precision
 reinforcement, no design change) — revert on request.
+
+#### V4 FLIGHT — F0 taste test (2026-07-21)
+VERIFIED PARAM FACT: seedance_2_0 requires `mode:"fast"` for the 14cr/4s fast tier — default
+(no mode) quotes 18cr. get_cost preflight confirmed both, zero spend.
+- F0 clip 1 BR DIVE: job 07b39a02-083c-4b4a-a29d-2089f5d3d6fc · seedance_2_0 fast 4s 9:16 ·
+  start_image br-world c56f21fa (reused registry media) · 14cr · balance 811.6→797.6
+- F0 clip 2 BR SWEEP: job 27bdb9ef-6100-411e-b15d-e0234f061c52 · start=f0-br-dive-endframe
+  (media 33e1c179, new upload) · end=br001-crewneck-world (media dd5a34db, new upload) ·
+  "IN THE DARK" preset intercept declined per playbook · 14cr · balance ~797.6→783.6
+- F0 clip 3 BR RESOLVE: job 0042034c-43e8-43da-8768-c8cb1ee631a6 · start=f0-br-sweep-endframe
+  (media b2e5431f) · end=br-logo-card (media 10a8427e, v7 lockup on dark) · preset intercept
+  declined again (same id) · 14cr · balance ~783.6→769.6 · F0 taste test spend complete: 42cr
+
+## JERSEY FIX LOG — 2026-07-21 (founder-directed: "fix both jerseys first")
+- br-009 patch fix (FREE): generic NFL shield replaced with canonical card from the SKU's own folder
+  (black-is-beautiful-football-jersey-white/nfl-authentic-collection-card.jpeg — folder DOES have its
+  own card; earlier "no card" finding was wrong). PIL composite at render bbox (598,689)-(657,774),
+  brightness-matched 0.787 to dusk scene. Output: jersey/src/01-br009-patched.png. QC PASS vs card.
+- br-012 colorway fix (PAID $0.40, y 2026-07-21): gpt-image-2 images.edit via scripts/oai_render/client.py;
+  inputs 06-br012.png + br-012-last-oakland-baseball-front.jpeg. Output: jersey/src/06-br012-fixed.png.
+  QC PASS: scene/model/pose identical to original, jersey now kelly green + yellow/white piping +
+  yellow BLACK IS BEAUTIFUL (rose in first A) + cream Black Rose Collection patch, matches real photo.
+- Flight clips for these two SKUs must use the -patched/-fixed files as upload sources.
+
+## JERSEY FLIGHT MEDIA REGISTRY — uploaded+confirmed 2026-07-21 (batch 3, account-durable)
+- jersey-01-br009-patched  26233693-a11d-41fc-b81c-bc4024891566   (patch-fixed still)
+- jersey-02-br008          c50999f8-f361-4fbc-9753-90f66719552d
+- jersey-03-br010          08468b73-5694-4159-8b83-3486ab84910e
+- jersey-04-br011          831ccb52-4d9a-4d27-ae94-149f2a267702
+- jersey-05-br015          e8b3c253-24b0-48bf-93bd-11c28ab95c00
+- jersey-06-br012-fixed    397ead4e-ac25-4a62-836f-a0d59379c5b6   (colorway-fixed still)
+- jersey-07-br014          3fb16f24-ad1b-4707-889d-1c8d015518b8
+- jersey-08-br003          9ae69485-6ef0-418d-982e-d4980843a00f
+
+## JERSEY FLIGHT — COMPLETE 2026-07-21 (140/140cr, all 10 clips first-take QC PASS)
+Jobs: J-A 65acbc8c · j1 c46e102f · j2 f10160ae · j3 e8c1a4cc · j4 20ab5963 ·
+j5 9f8cd4d4 · j6 3314aaee · j7 f1b95fcd · j8 716ca939 · J-B 36073317
+Chain anchors: ja-endframe 938153e9 · j8-endframe 11767c2e (account-durable)
+Clips (silent) in hero/: ja-bay-dive, j1-br009..j8-br003, jb-bay-rise
+Film: out/film-jersey-flight.mp4 43.75s SILENT (build-jersey-flight.py; BR lockup
+bookends, butt-cut Bay seams, hard cuts between jerseys, flight grade)
+QC: in-motion vs canon per clip (mid+end full-res frames) — identity, garment,
+patch held on all 8 jerseys incl. fixed br-009 patch + br-012 green colorway.
+NOTE (founder-flagged): J-B closing aerial reads Golden Gate (orange towers) vs
+J-A opener's Bay Bridge. Re-roll available at 14cr + its own y if wanted.
+
+## Y-ALL RUN COMPLETE — 2026-07-22 (~210.5cr of ~225 approved)
+- J-B Bay Bridge re-roll: 1st attempt 193a9953 flagged nsfw (false-pos, terminated); retry e6c32543 PASS
+  (grey steel Bay Bridge aerial). film-jersey-flight.mp4 rebuilt 43.75s w/ jb-bay-rise-v2. 14cr.
+- F3 joggers corrected still: gpt_image_2 job 289d93dd, 0.5cr — heart-rose-composite thigh logo QC PASS
+  vs canon (data/product-bundles/Love Hurts Joggers/logo-heart-rose.jpg). garments/lh002-joggers-world-v2.png.
+- F1 (126cr, 9/9 first-take): SIG a0769982/d6d37aaf/e816739f · LH 02b0c232/001c4738/a2fc4c5c ·
+  KC f71c9986/413519dc/843571f1. Films: film-{signature,love-hurts,kids-capsule}-flight.mp4
+  (15.46/17.67/15.46s, LH carries joggers-v2 beat). Resolves land pixel-true on v7 lockup cards.
+- F2 (70cr, 5/5 first-take; hook = free f1-sig-dive reuse): morphs 1b274845 (SIG→BR) / f9c79ab2 (BR→LH) /
+  d4b64fdf (LH→KC) / a580e9f5 (KC→finale) + KC payoff f820bd56 (mascot identity PASS vs
+  skyy-canonical-reference across clip). film-house-flight.mp4 36.88s.
+- New durable anchors: sig/lh/kc logo cards 368eb87f/b558a96b/1df2d113 · garment-worlds sherpa 7768860b /
+  bomber-v2 b447c174 / kids-set 5c818c3d · joggers-v1 1ae6af04 · heart-rose logo 30873037 ·
+  finale 7f26c918 · kcreveal-start f7832591. All films SILENT (founder audio rule).
+
+## LH BOMBER FIX — 2026-07-22 (bug-279, FREE)
+Wrong bomber (stale lh004-bomber-world-v2) edited OUT of film-love-hurts-flight.mp4 per founder:
+sweep trimmed 2.5s, b5-bomber-canon loop (real jacket) = garment beat, resolve head-trim 2.4s.
+Rebuilt 15.04s SILENT, frames verified (canon script side-by-side + rose hood at t=8.5; lockup at t=12).
+NOTE: f1-lh-sweep/resolve raw clips still carry the wrong jacket in their cut regions — the FILM is
+clean; any future re-splice must respect the trims or re-fire vs a bomber-canon-world anchor.
+
+## LH BOMBER BEAT v2 — 2026-07-22 (0.5cr, founder y)
+Founder: chest-up b5 loop read as "just the logo" — garment beat must show the FULL bomber.
+Generated garments/lh004-bomber-canon-world.png (gpt_image_2 job 9206244e, refs = bomber-world-v2
+scene b447c174 + canon jacket ebd45cb4): full-body canon bomber in cathedral, QC PASS vs
+lh004-canon-ref.png (side-by-side script, rose hood up, b/w trim). Spliced as 2.4s Ken Burns beat
+replacing b5 loop; film-love-hurts-flight.mp4 rebuilt 15.04s SILENT, t=8.5 frame verified.
+This png is now the canonical bomber-in-world anchor for any future LH sweep/resolve re-fires.
+
+## PRODUCT BEATS IN ALL FLIGHTS — 2026-07-22 (FREE, founder-directed)
+Held 2.4s full-body Ken Burns beats of verified garment-world stills added between sweep and
+resolve (LH pattern): SIG + sherpa (windbreaker EXCLUDED per sg-015 fabric ruling) · BR + crewneck
++ hoodie (film also rebuilt SILENT — old Kitana bed dropped per audio rule) · KC + kids-set.
+Films now 17.17 / 19.21 / 17.17s. Beat frames eyes-on verified from final cuts (sherpa+monogram,
+crewneck+star, hoodie+candle, kids-set corridor). Jersey flight untouched (already all-product
+motion); house flight untouched (brand anthem, no product beats by design). build-product-beats.py.
+
+## KC THRONE PAYOFF — 2026-07-22 (founder concept, 28.5cr spent, film rebuilt)
+Founder: "slow reveal walk up into her sitting on the throne." Throne still 5da26995 (0.5cr,
+refs kc-world + skyy canonical df0363c9) QC PASS vs mascot canon → hero/kc-throne-still.png
+(upload 3488cb02, durable). Clips: walk-up 9fa527f4 (kept 0-1.4s — script drifted 'Love Heat'
+past that) · throne push-in 4dc7456d DROPPED (drift 'Love Hustle' even wide; bug-280).
+Film: open → dive → sweep → walk-up tease 1.4s → throne still beat 3s → close = 15.12s,
+silent+null-audio-track. RULE (bug-280): no seedance shots ending with script large in frame.
+
+## KC JOURNEY TO THE THRONE — 2026-07-22 (founder redesign, 44cr spent, film rebuilt)
+Founder: both KC sets in the video + Skyy walks THROUGH the other collections' scenes
+(monogram statue -> BR roof -> LH enchanted-rose hallway) with the throne at that hallway's end.
+Uploads (durable): kids-002 real photo e4c1c223-8f4a-4e9e-b5b3-2325d5b992de · skyy canonical
+RE-UPLOAD b9c1a95f-0da1-487c-be69-2d8e23704712 (df0363c9 full UUID lost to compaction — registry
+now carries full IDs). Stills (gpt_image_2 1k/low 0.5cr each, all eyes-on PASS vs canon):
+sig-walk 5874a219-1e68-4207-953d-32d00c7a4dfb · br-walk 0de638a7-4426-4530-bad8-73a95c3ba5f5 ·
+lh-walk e7f5d846-fe23-419f-a7f3-395620694fff (throne visible at hallway end) · kids002-set-world
+7dbba053-2ca6-4d22-8630-bc0915557308 (garments/kids002-set-world.png; founder-confirmed: crest
+patch belongs ON THE SLEEVE — render correct, earlier QC note wrong). Clips (seedance_2_0 fast 4s 720p 14cr each, ALL
+first-take QC PASS in-motion vs canon): sig 303e89da · br 55eee43b · lh c1b5390b (end frame =
+back view walking up aisle toward throne — lettering-safe payoff seam, bug-280 satisfied).
+Film: open -> [sig|br|lh hard-cut journey] -> xfade throne still 3s KB -> kids-001 beat 2.2s ->
+kids-002 beat 2.2s -> close = 21.79s, silent+null-audio-track (build-kc-journey.py).
+Previous corridor cut archived: out/film-kids-capsule-flight-v1-corridor.mp4.
+Open offer (not fired): kids-001 ghost-display re-still 0.5cr for presentation symmetry with
+kids-002 (current kids-001 beat = wave-A on-model back view).
+Harness note: Claude Code auto-mode classifier intermittently denied generate_image/generate_video
+mid-ladder; founder allowed mcp__higgsfield__generate_video via /permissions — spend gate remains
+STOP-AND-SHOW manifest + y, classifier was only noise on approved calls.

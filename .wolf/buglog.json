@@ -4569,5 +4569,28 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-18"
+  },
+  {
+    "id": "bug-276",
+    "timestamp": "2026-07-19T18:37:00-07:00",
+    "error_message": "Founder: 'ALL OF THOSE ARE HALLUCINATED ALMOST' \u2014 4 hero mascot clips (SIG/BR/LH/KC seedance) rejected: mascot identity drift off canonical Skye + garments not matched to real SKUs.",
+    "file": "tasks/video-finish-distribute-plan.md (render/QC chain); CLAUDE.md (rule added)",
+    "root_cause": "Lenient QC: clips verified against a DESCRIPTION of each collection ('looks like a plausible SIG/BR look'), never side-by-side against the real SKU product photos + canonical mascot reference (skyy-canonical-reference.jpeg). Plausible-looking passed. seedance_2_0_mini 480p also drifts identity across frames. Prior-session 'ALL 9 CLEAN PASS' was agent-QC, not founder eyes.",
+    "fix": "CLAUDE.md founder-mandated standing rule #3 added (2026-07-19, blocking): QC only via side-by-side vs the authoritative reference (real SKU photo / canonical mascot / canonical monogram); plausible != correct; binds stills AND animated clips; identity must hold across the clip vs canon, not just start frame. Hard-stop on 16cr already spent; no re-spend until reference chain rebuilt + founder-blessed.",
+    "tags": [
+      "hallucination",
+      "wrong-garment",
+      "mascot-identity-drift",
+      "lenient-qc",
+      "seedance",
+      "hero-clips",
+      "render-fidelity"
+    ],
+    "related_bugs": [
+      "bug-268",
+      "bug-271"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-19T18:37:00-07:00"
   }
 ]

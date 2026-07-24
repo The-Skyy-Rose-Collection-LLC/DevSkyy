@@ -376,7 +376,7 @@ For ambiguous tasks: state your interpretation, execute against it. Don't ask fo
 
 Before taking any of the actions below, Claude MUST stop, print exactly what it is about to do, and wait for explicit "y" or "yes" from the user. No exceptions. Apologizing after is not acceptable — the damage is already done.
 
-> **FOUNDER-MANDATED 2026-07-18 — two standing rules, absolute:**
+> **FOUNDER-MANDATED — three standing rules, absolute:**
 >
 > 1. **EVERY paid call requires its own explicit "y" — NO batch pre-approval.** Each individual paid
 >    API call (each OpenAI/GPT-Image render, each Higgsfield generate/audio/video/reframe, any
@@ -390,6 +390,20 @@ Before taking any of the actions below, Claude MUST stop, print exactly what it 
 >    timeline — NEVER for fidelity verdicts, and NEVER as the basis for a "re-render" decision (which
 >    would trigger paid spend). This is blocking: no full-res look = no verdict. (Recurring misses:
 >    br-009 back-digit, sg-015 "sweatsuit" false alarm that nearly spent $0.80.)
+>
+> 3. **QC AGAINST THE REAL REFERENCE, NEVER A DESCRIPTION (founder-mandated 2026-07-19, blocking).**
+>    A render/clip/still is verified ONLY by placing it *side-by-side* against the AUTHORITATIVE
+>    source and confirming a match pixel-for-detail: garment → the **real SKU product photo**
+>    (`assets/products/references/{sku}-*real*front*`, else techflat — never prose); character →
+>    the **canonical mascot reference** (`assets/branding/mascot/skyy-canonical-reference.jpeg`);
+>    monogram/lettering → its canonical asset. "Looks like a plausible SIG/BR/LH/KC look" is NOT a
+>    pass — plausible ≠ correct. Checking a render against your *memory or description* of what the
+>    collection should be is the lenient-QC defect that ships hallucinations (mascot identity drift +
+>    invented garments; 16cr of bad hero clips, 2026-07-19). This binds STILLS **and** animated
+>    clips: for any animation, identity must hold against the canonical mascot reference across the
+>    clip, not just in the start frame — seedance/video tiers drift identity, so re-confirm the
+>    in-motion frames against canon. No side-by-side vs the real reference = not verified = do not
+>    advance, assemble, upscale, or ship.
 
 ### Actions that require explicit confirmation BEFORE execution:
 

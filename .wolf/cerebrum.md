@@ -412,3 +412,11 @@ loads directly from repo (no cache).
 - **2026-07-17 — lh-004 design authority = mascot jacket** (founder ruling): rose-print white hood, clean black raglan sleeves, black/white rib cuffs, chrome-red Love/Hurts split script. SOT product photo STALE for design intent. Canon-first identity gate (bug-271): founder approves reference image BEFORE Element creation / any paid identity fire.
 
 - **Dossier input canon (verified 2026-07-17):** authoring format = _template.md (frontmatter sku/name/collection/logo_reference [+extra_logos/reference_image]; sections Branding->Front/Back/Sleeves-Collar-Hem-Other with region+dimensions+technique+color bullets from controlled vocabularies, Negative list non-empty, Scene direction Pose/Setting). Loader = skyyrose/core/dossier_loader.py, schema = dossier_schema.py (Pydantic v2, verified vs Context7). validate_dossier.py globs *.md so the dossiers/CLAUDE.local.md stub false-FAILs — exclude non-dossier files when reading its summary. CSV branding_spec is metadata, dossier is authority (sg-015 "TBD" was stale while dossier was complete).
+
+## User Preferences (2026-07-21)
+- FOUNDER AUDIO RULE: all video deliverables ship SILENT — founder uploads his own audio on
+  every video. No music beds, no VO generation in deliverables (music-candidate research +
+  CREDITS.md stay archived only). Flight grammar (continuous chained camera moves, logo
+  bookends, butt-cut seams) is the approved film style over segment+xfade editing.
+- 2026-07-22: kids-002 (and kids-001) circular crest patch placement = SLEEVE, founder-confirmed ("the sleeve is where the patch is"). QC flagged sleeve placement as drift — wrong; the garment's canon patch position is the sleeve. Do not flag sleeve-placed crest patches on Kids Capsule sets.
+- 2026-07-23 DO-NOT-REPEAT: editing theme assets/**.{css,js} without bumping SKYYROSE_VERSION. Assets enqueue as ?ver=SKYYROSE_VERSION; same version = browser/Batcache/CDN serve stale JS even after a correct deploy (bit the collection-film IO fix — film stayed paused on cached clients). Bump functions.php+style.css+readme.txt (freshness-guard syncs all 3). Origin-curl-fresh ≠ client-fresh; verify the live ?ver= on the script tag.
