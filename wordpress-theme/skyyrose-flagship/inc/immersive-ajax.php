@@ -37,7 +37,6 @@ function skyyrose_ajax_get_product_by_sku() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Check WooCommerce availability.
@@ -47,7 +46,6 @@ function skyyrose_ajax_get_product_by_sku() {
 				'message' => esc_html__( 'Product data is currently unavailable.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Sanitize SKU input.
@@ -59,7 +57,6 @@ function skyyrose_ajax_get_product_by_sku() {
 				'message' => esc_html__( 'No product identifier provided.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Look up product by SKU.
@@ -71,7 +68,6 @@ function skyyrose_ajax_get_product_by_sku() {
 				'message' => esc_html__( 'Product not found.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	$product = wc_get_product( $product_id );
@@ -82,7 +78,6 @@ function skyyrose_ajax_get_product_by_sku() {
 				'message' => esc_html__( 'Product not found.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	$data = skyyrose_build_product_data( $product );
@@ -116,7 +111,6 @@ function skyyrose_ajax_get_collection_products() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Check WooCommerce availability.
@@ -126,7 +120,6 @@ function skyyrose_ajax_get_collection_products() {
 				'message' => esc_html__( 'Product data is currently unavailable.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Sanitize collection slug.
@@ -138,7 +131,6 @@ function skyyrose_ajax_get_collection_products() {
 				'message' => esc_html__( 'No collection specified.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Validate the collection slug against known collections.
@@ -150,7 +142,6 @@ function skyyrose_ajax_get_collection_products() {
 				'message' => esc_html__( 'Invalid collection.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Query products by product category slug.
@@ -166,7 +157,6 @@ function skyyrose_ajax_get_collection_products() {
 
 	if ( empty( $products ) ) {
 		wp_send_json_success( array() );
-		return;
 	}
 
 	$result = array();
@@ -220,7 +210,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Check WooCommerce availability.
@@ -230,7 +219,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'Cart is currently unavailable.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Rate-limit: max 30 add-to-cart per IP per minute.
@@ -242,7 +230,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'Too many requests. Please wait a moment.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 	set_transient( $rate_key, $rate_hits + 1, MINUTE_IN_SECONDS );
 
@@ -267,7 +254,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'Invalid product.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Clamp quantity to a reasonable range.
@@ -287,7 +273,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'This product cannot be added to cart.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	if ( ! $product->is_in_stock() ) {
@@ -296,7 +281,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'This item is currently out of stock.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Build variation data if size is provided and product is variable.
@@ -316,7 +300,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 					'message' => esc_html__( 'Selected size is not available for this product.', 'skyyrose' ),
 				)
 			);
-			return;
 		}
 	}
 
@@ -329,7 +312,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 				'message' => esc_html__( 'Could not add item to cart. Please try again.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	// Build response with updated cart data.

@@ -80,7 +80,7 @@ foreach ( $catalog as $product ) {
 		$i = 0;
 		foreach ( $collection_data as $slug => $data ) :
 			++$i;
-			$index   = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
+			$index = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
 			// Theme-relative paths (curated lookbook defaults) resolve via
 			// get_theme_file_uri; catalog overrides arrive as full URLs.
 			$img_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );

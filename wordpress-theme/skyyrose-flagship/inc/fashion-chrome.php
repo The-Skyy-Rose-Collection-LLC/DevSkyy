@@ -51,8 +51,8 @@ if ( class_exists( 'WooCommerce' ) ) :
 		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 			return $fragments;
 		}
-		$count       = WC()->cart->get_cart_contents_count();
-		$badge_class = 'navbar__cart-badge' . ( $count > 0 ? ' navbar__cart-badge--visible' : '' );
+		$count                            = WC()->cart->get_cart_contents_count();
+		$badge_class                      = 'navbar__cart-badge' . ( $count > 0 ? ' navbar__cart-badge--visible' : '' );
 		$fragments['.navbar__cart-badge'] = '<span class="' . esc_attr( $badge_class ) . '">' . esc_html( $count ) . '</span>';
 		return $fragments;
 	}

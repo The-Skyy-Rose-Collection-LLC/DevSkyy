@@ -115,7 +115,7 @@ function skyyrose_enqueue_global_styles() {
 	$prem_anim = $use_min && file_exists( $base_dir . '/system/animations-premium.min.css' )
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
-		$prem_slug    = skyyrose_get_current_template_slug();
+		$prem_slug = skyyrose_get_current_template_slug();
 		// collections-world: bare-canvas template — every element is engine-built
 		// sw-* DOM, none of the premium utility classes exist there.
 		$prem_skip    = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default', 'collections-world' );

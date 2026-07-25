@@ -518,6 +518,12 @@ RSYNC_EXCLUDES=(
     --exclude='.gitignore'
     --exclude='generate_models.js'
     --exclude='.phpcs.xml'
+    # Static-analysis config is dev-only. phpstan/constants.php exists purely so
+    # PHPStan can discover SKYYROSE_DIR/_URI; WordPress never loads it, and a
+    # stray phpstan/ directory is a marketplace-review flag.
+    --exclude='phpstan.neon'
+    --exclude='phpstan-baseline.neon'
+    --exclude='phpstan/'
     --exclude='.eslintrc*'
     --exclude='.prettierrc*'
     --exclude='.editorconfig'
@@ -610,6 +616,7 @@ try_rsync() {
         --exclude='CLAUDE.local.md' --exclude='._*' --exclude='__pycache__'
         --exclude='IMMERSIVE-WORLDS-PLAN.md' --exclude='.deploy-archives'
         --exclude='.gitignore' --exclude='.phpcs.xml' --exclude='.eslintrc*'
+        --exclude='phpstan.neon' --exclude='phpstan-baseline.neon' --exclude='phpstan'
         --exclude='.prettierrc*' --exclude='.editorconfig'
         --exclude='phpunit.xml' --exclude='playwright-report'
         --exclude='screenshots' --exclude='.serena'

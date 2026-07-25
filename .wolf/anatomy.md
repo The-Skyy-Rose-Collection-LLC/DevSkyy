@@ -84,6 +84,7 @@
 - `deploy-and-verify.md` — Deploy & Verify Agent (~325 tok)
 - `doc-updater.md` — Documentation & Codemap Specialist (~831 tok)
 - `e2e-runner.md` — E2E Test Runner (~1022 tok)
+- `fashion-theme-architect.md` — Award-winning end-to-end marketplace fashion-theme builder; full funnel, .min build, WCAG/CWV/i18n gate, STOP-AND-SHOW on deploy/paid (~1950 tok)
 - `loop-operator.md` — Mission (~231 tok)
 - `planner.md` — Your Role (~1763 tok)
 - `python-reviewer.md` — Review Priorities (~843 tok)

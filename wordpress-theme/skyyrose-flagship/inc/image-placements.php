@@ -134,8 +134,8 @@ function skyyrose_image_srcset( string $src, array $widths ): string {
 		return '';
 	}
 
-	$theme_uri  = trailingslashit( get_template_directory_uri() );
-	$theme_dir  = trailingslashit( get_template_directory() );
+	$theme_uri = trailingslashit( get_template_directory_uri() );
+	$theme_dir = trailingslashit( get_template_directory() );
 
 	// Only handle theme assets — CDN / media-library paths are unsupported.
 	if ( 0 !== strpos( $src, $theme_uri ) ) {
@@ -153,7 +153,7 @@ function skyyrose_image_srcset( string $src, array $widths ): string {
 	$ext        = strtolower( pathinfo( $clean_url, PATHINFO_EXTENSION ) );
 	$has_ext    = in_array( $ext, $known_exts, true );
 
-	$url_stem  = $has_ext ? preg_replace( '/\.[^.]+$/', '', $clean_url ) : $clean_url;
+	$url_stem = $has_ext ? preg_replace( '/\.[^.]+$/', '', $clean_url ) : $clean_url;
 	if ( null === $url_stem ) {
 		return '';
 	}
