@@ -57,6 +57,30 @@ The diligence spine. These are the standard for every task — not aspirational,
 
 **Rule of thumb:** the verification must be able to *fail*. A check that can't return "no" isn't verification — it's a guess with a citation.
 
+> **MANDATORY — Evidence-scope tags, ALWAYS ON (founder-mandated 2026-07-24, bug-287).**
+> The matrix above says *how* to verify. This fires when you **write the sentence** — the step
+> where verification actually failed. Every load-bearing claim (anything that changes the founder's
+> decision, priority, or next action) carries its evidence scope inline:
+>
+> `[live]` probed production this session (curl / Playwright / real API call) · `[repo]` read the
+> source or working tree · `[repro]` ran it and observed the behavior · `[test]` a check that
+> executed and could have failed · `[docs]` Context7 / primary vendor docs · `[inferred]` reasoned,
+> NOT observed — the weakest tag, and the one that must never carry severity.
+>
+> **Evidence scope must cover claim scope.** These four jumps are BANNED without their own probe:
+> repo/committed state → live behavior · static-analysis finding → runtime behavior · a tool's
+> listing/output → filesystem truth · a register / todo / audit doc → current state (~25% of audit
+> claims are false positives).
+>
+> **Severity requires a probe.** "production bug", "critical", "broken", "live defect" require
+> `[live]`. No probe → state the claim at the scope actually checked, then upgrade after probing.
+> **State scope before severity** — "the committed file is stale; production unverified" is the
+> honest first sentence; "found a real production bug" is a conclusion that must be earned.
+>
+> Cost is ~6 characters and it fails closed: writing `production is stale [repo]` is visibly wrong
+> on the page. Origin of the rule + the four worked examples: `tasks/lessons.md` → 2026-07-24
+> scope-jump.
+
 > **MANDATORY — Product-image fidelity gate.** Before you **render anything, create content, or edit skyyrose.co**, every product image about to touch the site MUST be eyes-on verified as the *correct garment for that SKU* — read the actual pixels (vision), not the filename or manifest. Product renders come from **OAI-image-2 only** (see project memory). If you cannot visually confirm SKU ↔ garment match, do NOT render / publish / deploy — flag it. Wrong-garment imagery is the #1 recurring defect (lh-005 fanny-pack hallucination, never-made renders leaking onto cards).
 
 > Cross-refs: Context7-first → **Development Protocol** below · WebFetch/cache-bust → **Learnings → Audit Discipline** · Playwright-live-verify + canonical-sources → project memory.
