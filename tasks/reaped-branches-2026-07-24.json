@@ -1,0 +1,56 @@
+[
+  {
+    "branch": "fix/sg-mint-dossier-decontamination",
+    "tip": "70d10be3043456bda967cf611ec22d1bd7d7d437",
+    "worktree": "/Users/theceo/DevSkyy-ci-mirror",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "fix/api-auth-hardening",
+    "tip": "7f3cf63816811c5c774907cf7a2780fa8756f8f8",
+    "worktree": "/Users/theceo/DevSkyy-wt-secfix",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "worktree-ptc-integration-spec",
+    "tip": "390ae6badd7e3d9373089737eb46527a38e76b6c",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/ptc-integration-spec",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "async-land-clean",
+    "tip": "632d0089ee1d32f698eed91629d13dfbfb2c73a6",
+    "worktree": "/Users/theceo/DevSkyy-wt-async-land",
+    "files_vs_mergebase": 6,
+    "unique": []
+  },
+  {
+    "branch": "fix/deploy-subprocess-cleanup-land",
+    "tip": "1a4a1e9e062ca656e1ec8772af9f8f4eba3f08c9",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/agent-af6492ce853013f41",
+    "files_vs_mergebase": 2,
+    "unique": []
+  },
+  {
+    "branch": "worktree-font-ds-sync",
+    "tip": "268326bf85a23224f84f6b391ecefe638d71a9f0",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/font-ds-sync",
+    "files_vs_mergebase": 19,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  }
+]
