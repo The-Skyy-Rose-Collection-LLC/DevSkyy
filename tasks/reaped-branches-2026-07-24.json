@@ -52,5 +52,33 @@
       "conftest.py",
       "scripts/ci-local.sh"
     ]
+  },
+  {
+    "branch": "feat/catalog-hardening",
+    "tip": "a1657a27583b0c37bdb7c884d8936d244b34d54b",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-16",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "ws/drift-20260707",
+    "tip": "ddb891774e4fc2419bcfb42c847761c4c226ee87",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-15",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "fix/br014-015-wrong-packshot-bytes",
+    "tip": "ab7b1bf6779dabaf3c1ad17e82b6b1a8627c0f13",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/br014-015-fix",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "ws/br011prep-20260707",
+    "tip": "6b1cd468dbffdc7233b4029d8c6b8c153698c475",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-13",
+    "tier": 2,
+    "salvaged": []
   }
 ]
