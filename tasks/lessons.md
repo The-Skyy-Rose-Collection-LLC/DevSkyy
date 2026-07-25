@@ -185,3 +185,10 @@ if unexplained modified files exist, assume a parallel session owns them.
 - Severity words (`production bug`, `critical`, `broken`, `headline`) require evidence whose scope IS production. No probe → phrase the claim at the scope actually checked, then upgrade after probing.
 - These four inference chains are banned without their own evidence: repo/committed state → live behavior (needs curl/Playwright); static-analysis finding → runtime behavior (needs a repro); tool listing → filesystem truth (needs `find`/`stat`); register/todo/audit doc → current state (needs re-verification — project memory already puts audit false-positives near 25%).
 - State scope **before** severity. "The committed file is stale; production unverified" is the honest first sentence; "found a real production bug" is a conclusion that must be earned by a probe.
+
+### Recurrence #2, same day — estimated numbers written into an immutable artifact
+Wrote "~490 tokens" and "36.9%" into commit `b394a5528`'s message before running the measurement. Actual: ~312 tokens, 34.4%. The commit was already pushed to a shared worktree, so no amend — the wrong figures are permanent in history.
+
+**Why it slipped past the new rule:** I was applying evidence tags to *prose answers* and treating the commit message as a byproduct rather than a claim. It is a claim, and a more durable one than chat — chat can be corrected in the next message, git history cannot.
+
+**Rule extension:** any number written into a durable artifact — commit message, PR body, doc, task file, changelog — requires `[test]`-scope evidence *before* the write. Measure, then write. If a number must be written before it can be measured, state it as an estimate ("~", "approx") or leave it out.

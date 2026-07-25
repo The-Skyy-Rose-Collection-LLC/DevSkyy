@@ -4859,10 +4859,10 @@
   {
     "id": "bug-287",
     "timestamp": "2026-07-24",
-    "error_message": "Reported a stale repo-side style.min.css as 'a real production stale-serve defect' (headline) without ever probing production; live was serving correct bytes. Same session: called a PHPStan false positive 'a live functional bug' before a repro disproved it.",
+    "error_message": "Reported a stale repo-side style.min.css as 'a real production stale-serve defect' (headline) without ever probing production; live was serving correct bytes. Same session: called a PHPStan false positive 'a live functional bug' before a repro disproved it. RECURRENCE #2 (same day): put estimated token counts (~490 tok, 36.9%) into commit b394a5528's message before measuring; actual values were ~312 tok and 34.4%. Commit was already pushed to a shared worktree, so the wrong numbers are permanent in history.",
     "file": "tasks/lessons.md",
     "root_cause": "Scope-jump: evidence was real but covered a narrower system than the claim. repo != production, static analysis != runtime, tool listing != filesystem, register != current state. CLAUDE.md's verification matrix was consulted at investigation time, not at assertion time, and the claim was mis-filed as a codebase fact when it was a production fact.",
-    "fix": "Evidence-scope rule in tasks/lessons.md: tag load-bearing claims inline ([repo]/[live]/[repro]/[docs]/[inferred]); severity words require production-scope evidence; four named inference chains banned without their own probe; state scope before severity.",
+    "fix": "Evidence-scope rule in tasks/lessons.md: tag load-bearing claims inline ([repo]/[live]/[repro]/[docs]/[inferred]); severity words require production-scope evidence; four named inference chains banned without their own probe; state scope before severity. Recurrence #2 extends the rule to commit messages, PR bodies, and any durable artifact: a number written into something immutable requires [test]-scope evidence BEFORE the write, not after. Estimates get stated as estimates or omitted.",
     "tags": [
       "anti-hallucination",
       "scope-jump",
@@ -4871,7 +4871,7 @@
       "process"
     ],
     "related_bugs": [],
-    "occurrences": 1,
+    "occurrences": 2,
     "last_seen": "2026-07-24"
   }
 ]
