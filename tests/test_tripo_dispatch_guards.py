@@ -411,10 +411,13 @@ def test_dispatch_sku_does_not_pass_dead_model_version_param(
     monkeypatch.setattr(tripo_dispatch, "THEME_ROOT", tmp_path)
     (tmp_path / "img.webp").write_bytes(b"x")
 
+    # render_source_override (not the SOT) is the source-resolution path this
+    # synthetic sku exercises — "x-001" has no real SOT entry, and this test's
+    # intent is dispatch_sku's param-passing, not SOT resolution.
     row = {
         "sku": "x-001",
         "image": "img.webp",
-        "render_source_override": "",
+        "render_source_override": "img.webp",
     }
     tripo_dispatch.dispatch_sku(row)
 

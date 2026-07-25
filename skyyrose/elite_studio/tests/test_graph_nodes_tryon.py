@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from skyyrose.elite_studio.graph.nodes import tryon_node
 from skyyrose.elite_studio.models import GenerationResult, TryOnResult
+from skyyrose.integrations.fashn_client import FashnError
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -94,7 +95,7 @@ class TestTryOnNodeSuccess:
             success=True,
             output_path="/output/br-001/tryon/br-001-tryon-20260406.jpg",
             garment_sku="br-001",
-            model_image_path="/output/br-001-model.jpg",
+            model_image_path="https://cdn.example.com/br-001-model.jpg",
         )
 
         mock_agent = MagicMock()
@@ -106,6 +107,10 @@ class TestTryOnNodeSuccess:
                 return_value="/products/br-001/br-001-render-branding.webp",
             ),
             patch(
+                "skyyrose.elite_studio.graph.nodes.ensure_public_url",
+                side_effect=lambda path, sku: f"https://cdn.example.com{path}",
+            ),
+            patch(
                 "skyyrose.elite_studio.graph.nodes.TryOnAgent",
                 return_value=mock_agent,
             ),
@@ -113,8 +118,8 @@ class TestTryOnNodeSuccess:
             result = tryon_node(state)
 
         mock_agent.execute_tryon.assert_called_once_with(
-            garment_image_path="/products/br-001/br-001-render-branding.webp",
-            model_image_path="/output/br-001-model.jpg",
+            garment_image_path="https://cdn.example.com/products/br-001/br-001-render-branding.webp",
+            model_image_path="https://cdn.example.com/output/br-001-model.jpg",
             category="upper_body",
             garment_sku="br-001",
         )
@@ -136,6 +141,10 @@ class TestTryOnNodeSuccess:
                 return_value="/some/garment.jpg",
             ),
             patch(
+                "skyyrose.elite_studio.graph.nodes.ensure_public_url",
+                side_effect=lambda path, sku: f"https://cdn.example.com{path}",
+            ),
+            patch(
                 "skyyrose.elite_studio.graph.nodes.TryOnAgent",
                 return_value=mock_agent,
             ),
@@ -144,6 +153,27 @@ class TestTryOnNodeSuccess:
 
         assert result["tryon_result"].success is False
         assert result["tryon_result"].error == "API timeout"
+
+    def test_skips_without_raising_when_upload_fails(self) -> None:
+        """If ensure_public_url raises (no R2 configured, missing file, etc.), the
+        additive stage must swallow it — never crash the graph node."""
+        gen = _successful_gen()
+        state = _make_state(generation_result=gen)
+
+        with (
+            patch(
+                "skyyrose.elite_studio.graph.nodes._find_garment_image",
+                return_value="/some/garment.jpg",
+            ),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.ensure_public_url",
+                side_effect=FashnError("R2 storage is not configured"),
+            ),
+        ):
+            result = tryon_node(state)
+
+        assert result["tryon_result"] is None
+        assert "tryon" in result["stage_timings"]
 
 
 # ---------------------------------------------------------------------------
