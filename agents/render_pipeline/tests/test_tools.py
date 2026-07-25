@@ -163,6 +163,21 @@ def test_resolve_source_fn_returns_error_when_no_image_found() -> None:
     assert "source_path" not in ctx.state
 
 
+def test_resolve_builds_candidates_under_wp_products_dir(monkeypatch) -> None:
+    """Regression guard: `_resolve` must source `img_dir` from the canonical
+    `WP_PRODUCTS_DIR` constant, not a re-hardcoded path string."""
+    from agents.render_pipeline.tools import resolve_source as rs
+    from skyyrose.core.paths import WP_PRODUCTS_DIR
+
+    target = WP_PRODUCTS_DIR / "probe.png"
+    monkeypatch.setattr(Path, "exists", lambda self: str(self) == str(target))
+
+    result = rs._resolve("probe-sku", "", "probe.png")  # name="" -> bundle_dir skipped
+
+    assert result == target
+    assert result.parent == WP_PRODUCTS_DIR
+
+
 # ---------------------------------------------------------------------------
 # Tool 4 — route_engine_fn
 # ---------------------------------------------------------------------------

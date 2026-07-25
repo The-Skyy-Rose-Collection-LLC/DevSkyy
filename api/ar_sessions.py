@@ -18,6 +18,7 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import functools
 import logging
 import uuid
 from datetime import UTC, datetime
@@ -27,7 +28,30 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
+from skyyrose.core.catalog_loader import read_catalog_rows
+from skyyrose.core.sot_images import resolve_image
+
 logger = logging.getLogger(__name__)
+
+# skyyrose_product_image_uri()'s get_theme_file_uri() prefix for the flagship
+# theme in production — resolve_image() returns theme-relative paths, this is
+# the ONLY place that turns them into public URLs (mirrors inc/product-catalog.php).
+_THEME_BASE_URL = "https://skyyrose.co/wp-content/themes/skyyrose-flagship/"
+
+# CSV garment_type_lock -> AR garment_category taxonomy (matches /capabilities
+# below). Unmapped/blank values fall back to "tops".
+_GARMENT_CATEGORY_MAP: dict[str, str] = {
+    "jersey": "tops",
+    "shirt": "tops",
+    "crewneck": "tops",
+    "hoodie": "tops",
+    "bomber jacket": "outerwear",
+    "jacket": "outerwear",
+    "joggers": "bottoms",
+    "sweatpants": "bottoms",
+    "shorts": "bottoms",
+    "set": "tops",
+}
 
 ar_sessions_router = APIRouter(prefix="/ar", tags=["AR Sessions"])
 
@@ -51,6 +75,7 @@ class CollectionType(StrEnum):
     BLACK_ROSE = "black_rose"
     LOVE_HURTS = "love_hurts"
     SIGNATURE = "signature"
+    KIDS_CAPSULE = "kids_capsule"
 
 
 class SessionStatus(StrEnum):
@@ -244,59 +269,83 @@ session_store = ARSessionStore()
 
 
 # =============================================================================
-# Sample AR Products (Replace with WooCommerce data)
+# AR Products — sourced from the canonical catalog CSV via the SOT resolver
 # =============================================================================
 
-SAMPLE_AR_PRODUCTS: list[ARProduct] = [
-    ARProduct(
-        id="br-sherpa-001",
-        name="Dark Rose Sherpa Jacket",
-        collection=CollectionType.BLACK_ROSE,
-        price=189.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/br-sherpa-001.jpg",
-        garment_category="outerwear",
-    ),
-    ARProduct(
-        id="br-hoodie-002",
-        name="Midnight Rose Hoodie",
-        collection=CollectionType.BLACK_ROSE,
-        price=89.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/br-hoodie-002.jpg",
-        garment_category="tops",
-    ),
-    ARProduct(
-        id="lh-windbreaker-001",
-        name="Heartbreak Windbreaker",
-        collection=CollectionType.LOVE_HURTS,
-        price=149.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/lh-windbreaker-001.jpg",
-        garment_category="outerwear",
-    ),
-    ARProduct(
-        id="lh-joggers-002",
-        name="Love Hurts Joggers",
-        collection=CollectionType.LOVE_HURTS,
-        price=79.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/lh-joggers-002.jpg",
-        garment_category="bottoms",
-    ),
-    ARProduct(
-        id="sig-beanie-001",
-        name="Rose Gold Beanie",
-        collection=CollectionType.SIGNATURE,
-        price=39.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/sig-beanie-001.jpg",
-        garment_category="accessories",
-    ),
-    ARProduct(
-        id="sig-tee-002",
-        name="Signature Logo Tee",
-        collection=CollectionType.SIGNATURE,
-        price=49.99,
-        image_url="https://skyyrose.com/wp-content/uploads/products/sig-tee-002.jpg",
-        garment_category="tops",
-    ),
-]
+
+def _collection_type_from_slug(slug: str) -> CollectionType | None:
+    """Map the CSV's hyphenated collection slug to :class:`CollectionType`.
+
+    Returns ``None`` (never raises) for an unrecognized slug so a future
+    catalog addition degrades to a logged skip instead of a 500 on a live
+    endpoint.
+    """
+    try:
+        return CollectionType(slug.replace("-", "_"))
+    except ValueError:
+        return None
+
+
+def _garment_category_from_row(row: dict[str, str]) -> str:
+    """Map the CSV's ``garment_type_lock`` to the AR garment_category taxonomy.
+
+    Falls back to "tops" for blank or unmapped values — no new CSV column.
+    """
+    garment_type = (row.get("garment_type_lock") or "").strip().lower()
+    return _GARMENT_CATEGORY_MAP.get(garment_type, "tops")
+
+
+@functools.lru_cache(maxsize=1)
+def get_ar_products_from_catalog() -> list[ARProduct]:
+    """Build the AR product list from the canonical catalog CSV + SOT imagery.
+
+    Skips rows that are unpublished (and not pre-order) — same semantics as
+    ``skyyrose_format_price()`` in inc/product-catalog.php ("Coming Soon" =
+    excluded from the AR surface). Skips rows with no resolvable SOT image
+    rather than emitting a fabricated URL.
+
+    Cached (I/O: one CSV read + per-SKU resolve_image), matching
+    ``skyyrose.core.catalog_loader.read_catalog_rows``'s own ``@cache``.
+    """
+    products: list[ARProduct] = []
+    for row in read_catalog_rows():
+        sku = (row.get("sku") or "").strip()
+        published = bool(row.get("published")) and row.get("published") != "0"
+        is_preorder = bool(row.get("is_preorder")) and row.get("is_preorder") != "0"
+        if not published and not is_preorder:
+            logger.info("AR catalog: skipping unpublished, non-preorder SKU %s", sku)
+            continue
+
+        collection = _collection_type_from_slug((row.get("collection") or "").strip())
+        if collection is None:
+            logger.warning(
+                "AR catalog: skipping SKU %s — unrecognized collection slug %r",
+                sku,
+                row.get("collection"),
+            )
+            continue
+
+        relative_image = resolve_image(sku, "front")
+        if relative_image is None:
+            logger.warning("AR catalog: skipping SKU %s — no resolvable SOT image", sku)
+            continue
+
+        try:
+            price = float(row.get("price") or 0)
+        except ValueError:
+            price = 0.0
+
+        products.append(
+            ARProduct(
+                id=sku,
+                name=row.get("name") or sku,
+                collection=collection,
+                price=price,
+                image_url=_THEME_BASE_URL + relative_image,
+                garment_category=_garment_category_from_row(row),
+            )
+        )
+    return products
 
 
 # =============================================================================
@@ -365,7 +414,7 @@ async def get_ar_products(
 
     Returns products with AR metadata for the collection experiences.
     """
-    products = [p for p in SAMPLE_AR_PRODUCTS if p.collection == collection]
+    products = [p for p in get_ar_products_from_catalog() if p.collection == collection]
     return products[:limit]
 
 
@@ -375,7 +424,7 @@ async def get_all_ar_products(
     ar_enabled_only: bool = Query(default=True),
 ) -> list[ARProduct]:
     """Get all AR-enabled products."""
-    products = SAMPLE_AR_PRODUCTS
+    products = get_ar_products_from_catalog()
     if ar_enabled_only:
         products = [p for p in products if p.ar_enabled]
     return products[:limit]

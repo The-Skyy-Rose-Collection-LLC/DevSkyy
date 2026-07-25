@@ -3,12 +3,18 @@
 import json
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from imagery.skyyrose_lora_generator import GarmentType, SkyyRoseCollection, SkyyRoseLoRAGenerator
 from mcp_tools.security import secure_tool
 from mcp_tools.server import mcp
 from mcp_tools.types import BaseAgentInput, ResponseFormat
+from skyyrose.core.sot_images import resolve_image
+
+# Theme-relative paths returned by resolve_image() (e.g. "assets/images/products/br-001.jpg")
+# are served live by WordPress's get_theme_file_uri() — see
+# wordpress-theme/skyyrose-flagship/inc/product-catalog.php:skyyrose_product_image_uri().
+_THEME_BASE_URL = "https://skyyrose.co/wp-content/themes/skyyrose-flagship/"
 
 # ===========================
 # Input Models
@@ -164,10 +170,21 @@ class LoRABackgroundRemovalInput(BaseAgentInput):
 class ProductCaptionInput(BaseAgentInput):
     """Input for BLIP-2 auto-captioning (SEO descriptions)."""
 
-    image_url: str = Field(
-        ...,
-        description="URL to product image to caption",
+    image_url: str | None = Field(
+        default=None,
+        description="URL to product image to caption. Optional when `sku` is a "
+        "known catalog SKU — the image is then resolved through the SOT "
+        "(skyyrose.core.sot_images.resolve_image) instead of requiring a "
+        "hand-supplied URL.",
         max_length=2000,
+    )
+    sku: str | None = Field(
+        default=None,
+        description="Optional catalog SKU. When `image_url` is omitted, resolves "
+        "the front product image from the SOT (skyyrose.core.sot_images) instead "
+        "of requiring a hand-supplied URL. Ignored if `image_url` is explicitly "
+        "supplied.",
+        max_length=100,
     )
     style: Literal["seo", "social", "catalog", "technical"] = Field(
         default="seo",
@@ -183,6 +200,28 @@ class ProductCaptionInput(BaseAgentInput):
         ge=50,
         le=500,
     )
+
+    @model_validator(mode="after")
+    def _resolve_image_from_sku(self) -> "ProductCaptionInput":
+        """Resolve `image_url` from `sku` via the SOT when not explicitly supplied.
+
+        Never overrides an explicitly supplied `image_url`.
+        """
+        if self.image_url is not None:
+            return self
+
+        if not self.sku:
+            raise ValueError("Either image_url or sku must be provided for product captioning.")
+
+        relative = resolve_image(self.sku, "front")
+        if not relative:
+            raise ValueError(
+                f"Could not resolve a front product image for sku={self.sku!r} "
+                "from the SOT. Provide image_url explicitly instead."
+            )
+
+        self.image_url = _THEME_BASE_URL + relative
+        return self
 
 
 # ===========================
@@ -655,6 +694,11 @@ async def lora_clean_background(params: LoRABackgroundRemovalInput) -> str:
                 "include_brand": False,
                 "max_length": 300,
             },
+            {
+                "sku": "br-004",
+                "style": "seo",
+                "include_brand": True,
+            },
         ],
     },
 )
@@ -677,7 +721,14 @@ async def product_caption(params: ProductCaptionInput) -> str:
     - E-commerce keyword optimization
 
     Args:
-        params (ProductCaptionInput): Caption configuration
+        params (ProductCaptionInput): Caption configuration containing:
+            - image_url: URL to product image to caption. Optional when `sku`
+              is a known catalog SKU — resolved through the SOT
+              (skyyrose.core.sot_images.resolve_image) when omitted.
+            - sku: Optional catalog SKU used to resolve `image_url` from the
+              SOT when `image_url` is not supplied. Ignored if `image_url` is
+              explicitly supplied.
+            - style, include_brand, max_length: caption formatting options.
 
     Returns:
         str: AI-generated product description
@@ -687,6 +738,11 @@ async def product_caption(params: ProductCaptionInput) -> str:
         ...     "image_url": "https://skyyrose.com/products/hoodie.jpg",
         ...     "style": "seo",
         ...     "include_brand": True
+        ... })
+
+        >>> product_caption({
+        ...     "sku": "br-004",
+        ...     "style": "seo",
         ... })
     """
     # Call BLIP-2 via Replicate for image analysis

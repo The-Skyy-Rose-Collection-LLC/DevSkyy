@@ -31,6 +31,14 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# skyyrose is not pip-installed — insert repo root so this resolves regardless
+# of invocation cwd (mirrors the sys.path.insert dispatch_sku() already does
+# before its own skyyrose.elite_studio import, further down this file).
+sys.path.insert(0, str(REPO_ROOT))
+
+from skyyrose.core.sot_images import resolve_image  # noqa: E402
+
 CATALOG_CSV = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 THEME_ROOT = REPO_ROOT / "wordpress-theme/skyyrose-flagship"
 DOSSIER_DIR = THEME_ROOT / "data/dossiers"
@@ -65,7 +73,14 @@ def resolve_source_image(row: dict[str, str]) -> Path:
         return THEME_ROOT / "assets/images/products" / override
     if override:
         return THEME_ROOT / override
-    return THEME_ROOT / row.get("image", "")
+    sku = row.get("sku", "")
+    rel = resolve_image(sku, "packshot")
+    if rel is None:
+        raise SystemExit(
+            f"SKU {sku!r} has no SOT packshot image — regenerate sot.json "
+            "(data/build-collection-sot.py) or set render_source_override in the catalog CSV."
+        )
+    return THEME_ROOT / rel
 
 
 def _image_exists(row: dict[str, str], field: str) -> bool:

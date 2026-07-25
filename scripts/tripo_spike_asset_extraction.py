@@ -30,6 +30,13 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# skyyrose is not pip-installed — insert repo root so this resolves regardless
+# of invocation cwd (same pattern as scripts/tripo_dispatch.py).
+sys.path.insert(0, str(REPO_ROOT))
+
+from skyyrose.core.sot_images import resolve_image  # noqa: E402
+
 CATALOG_CSV = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 THEME_ROOT = REPO_ROOT / "wordpress-theme/skyyrose-flagship"
 OUTPUT_DIR = REPO_ROOT / "renders/output/tripo_spike"
@@ -57,7 +64,14 @@ def resolve_source_image(row: dict[str, str]) -> Path:
     elif override:
         image_rel = override
     else:
-        image_rel = row["image"]
+        sku = row.get("sku", "")
+        rel = resolve_image(sku, "packshot")
+        if rel is None:
+            raise SystemExit(
+                f"SKU {sku!r} has no SOT packshot image — regenerate sot.json "
+                "(data/build-collection-sot.py) or set render_source_override in the catalog CSV."
+            )
+        image_rel = rel
     return THEME_ROOT / image_rel
 
 

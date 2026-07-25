@@ -62,7 +62,10 @@ class SDKGarment3DAgent(SDKSubAgent):
             "quality 3D clothing models for immersive shopping experiences.\n\n"
             "Pipeline:\n"
             "1. Read product data from scripts/nano-banana-vton.py PRODUCT_CATALOG\n"
-            "2. Read existing renders from assets/images/products/{sku}-render-*.webp\n"
+            "2. Resolve existing renders via skyyrose.core.sot_images."
+            "resolve_image(sku, role) or read data/sot-images.json — never "
+            "assume a literal filename pattern, the actual render may be "
+            "named differently or be a hub-verified override.\n"
             "3. Build a brand-aware 3D prompt with collection aesthetics\n"
             "4. Call Tripo3D API via agents/tripo_agent.py patterns\n"
             "5. Export as GLB (web) + USDZ (Apple AR)\n"
@@ -93,8 +96,10 @@ class SDKGarment3DAgent(SDKSubAgent):
         if sku:
             base += (
                 f"\n\nTarget SKU: {sku}\n"
-                "Read PRODUCT_CATALOG for this SKU's details, then check "
-                "existing renders at assets/images/products/ for reference images."
+                "Read PRODUCT_CATALOG for this SKU's details, then resolve "
+                "existing renders via skyyrose.core.sot_images.resolve_image"
+                "(sku, role) or data/sot-images.json for reference images — "
+                "never assume a literal filename pattern."
             )
         if collection:
             base += f"\nCollection: {collection} — match the collection aesthetics.\n"
@@ -285,7 +290,10 @@ class SDKAvatarStylistAgent(SDKSubAgent):
             "- Output: generated_assets/tryon/\n\n"
             "Workflow for outfit change:\n"
             "1. Read product catalog for target SKU details\n"
-            "2. Get garment flat image from assets/images/products/{sku}-render-front.webp\n"
+            "2. Get garment flat image via skyyrose.core.sot_images."
+            'resolve_image(sku, role="front") or data/sot-images.json — '
+            "never assume a literal filename pattern, the actual render may "
+            "be named differently or be a hub-verified override.\n"
             "3. Use avatar reference as model image\n"
             "4. Call FASHN try-on: garment + avatar → styled avatar\n"
             "5. Generate sprite sheet (all 7 poses) in the new outfit\n"
