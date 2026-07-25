@@ -75,8 +75,13 @@ class VirtualTryOnInput(BaseAgentInput):
         """Fill ``garment_image_url`` from the SOT when the caller omits it.
 
         An explicit ``garment_image_url`` is always respected as-is and never
-        overridden — the SOT-resolution path only fires when it is absent.
+        overridden — the SOT-resolution path only fires when it is absent. A
+        blank/whitespace value counts as absent (LLM callers often send "") —
+        it falls through to SOT resolution instead of forwarding an empty URL,
+        matching ``BatchVirtualTryOnInput``'s per-item truthiness check.
         """
+        if self.garment_image_url is not None and not self.garment_image_url.strip():
+            self.garment_image_url = None
         if self.garment_image_url is not None:
             return self
         if not self.product_id:

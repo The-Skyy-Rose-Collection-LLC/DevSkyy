@@ -7,10 +7,16 @@ must come from the real catalog CSV via the SOT resolver
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from api.ar_sessions import ar_sessions_router, get_ar_products_from_catalog
+from api.ar_sessions import (
+    _ar_product_from_row,
+    ar_sessions_router,
+    get_ar_products_from_catalog,
+)
 
 app = FastAPI()
 app.include_router(ar_sessions_router, prefix="/api/v1")
@@ -58,3 +64,54 @@ def test_get_ar_products_from_catalog_matches_real_catalog_skus() -> None:
     # Every returned SKU must be a real, SOT-resolvable SKU.
     assert ids <= set(all_skus())
     assert ids, "expected the real catalog to yield at least one AR product"
+
+
+class TestRowPolicy:
+    """Direct tests of _ar_product_from_row on synthetic rows.
+
+    Guards the published/is_preorder string semantics: the catalog writes
+    "1"/"0" but sibling consumers (scripts/batch_flux_collections.py) also
+    accept "true"/"false" — a literal "false" must never count as published.
+    """
+
+    @staticmethod
+    def _row(**overrides: str) -> dict[str, str]:
+        from skyyrose.core.sot_images import all_skus, resolve_image
+
+        sku = next(s for s in all_skus() if resolve_image(s, "front"))
+        base = {
+            "sku": sku,
+            "name": "Synthetic Test Row",
+            "collection": "black-rose",
+            "published": "1",
+            "is_preorder": "0",
+            "price": "120",
+            "garment_type_lock": "hoodie",
+        }
+        return {**base, **overrides}
+
+    def test_published_false_string_is_skipped(self) -> None:
+        assert _ar_product_from_row(self._row(published="false")) is None
+
+    def test_published_zero_and_blank_are_skipped(self) -> None:
+        assert _ar_product_from_row(self._row(published="0")) is None
+        assert _ar_product_from_row(self._row(published="")) is None
+
+    def test_unknown_published_value_fails_closed(self) -> None:
+        assert _ar_product_from_row(self._row(published="banana")) is None
+
+    def test_preorder_true_string_rescues_unpublished_row(self) -> None:
+        product = _ar_product_from_row(self._row(published="false", is_preorder="true"))
+        assert product is not None
+
+    def test_published_row_is_emitted(self) -> None:
+        product = _ar_product_from_row(self._row())
+        assert product is not None
+        assert product.image_url.startswith("https://skyyrose.co/")
+
+    def test_unparsable_price_defaults_to_zero_and_logs(self, caplog) -> None:
+        with caplog.at_level(logging.WARNING, logger="api.ar_sessions"):
+            product = _ar_product_from_row(self._row(price="not-a-number"))
+        assert product is not None
+        assert product.price == 0.0
+        assert "unparsable price" in caplog.text

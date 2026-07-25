@@ -32,12 +32,14 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# skyyrose is not pip-installed — insert repo root so this resolves regardless
-# of invocation cwd (mirrors the sys.path.insert dispatch_sku() already does
-# before its own skyyrose.elite_studio import, further down this file).
-sys.path.insert(0, str(REPO_ROOT))
-
-from skyyrose.core.sot_images import resolve_image  # noqa: E402
+# skyyrose is not pip-installed. Only mutate sys.path when the import actually
+# fails (CLI run from an arbitrary cwd) so merely importing this module (tests)
+# leaves interpreter-wide import resolution untouched.
+try:
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
+except ImportError:  # pragma: no cover — CLI invocation outside the repo root
+    sys.path.insert(0, str(REPO_ROOT))
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
 
 CATALOG_CSV = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 THEME_ROOT = REPO_ROOT / "wordpress-theme/skyyrose-flagship"

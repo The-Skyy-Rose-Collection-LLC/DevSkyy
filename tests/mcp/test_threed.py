@@ -50,3 +50,16 @@ class TestSkuResolution:
         with patch.object(threed, "resolve_image", return_value=None):
             with pytest.raises(ValidationError, match="Could not resolve a front product image"):
                 ThreeDImageInput(product_name="Ghost Product", sku="totally-bogus-sku-xyz")
+
+    def test_blank_image_url_falls_through_to_sot(self) -> None:
+        with patch.object(
+            threed, "resolve_image", return_value="assets/images/products/br-004-front.webp"
+        ) as mock_resolve:
+            params = ThreeDImageInput(product_name="Black Rose Bomber", image_url="", sku="br-004")
+
+        mock_resolve.assert_called_once_with("br-004", "front")
+        assert params.image_url == _THEME_BASE_URL + "assets/images/products/br-004-front.webp"
+
+    def test_blank_image_url_without_sku_raises(self) -> None:
+        with pytest.raises(ValidationError, match="Either image_url or sku must be provided"):
+            ThreeDImageInput(product_name="Nameless Thing", image_url="   ")

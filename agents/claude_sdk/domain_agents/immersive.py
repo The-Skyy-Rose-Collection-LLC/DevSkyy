@@ -291,7 +291,7 @@ class SDKAvatarStylistAgent(SDKSubAgent):
             "Workflow for outfit change:\n"
             "1. Read product catalog for target SKU details\n"
             "2. Get garment flat image via skyyrose.core.sot_images."
-            'resolve_image(sku, role="front") or data/sot-images.json — '
+            'resolve_image(sku, role="packshot") or data/sot-images.json — '
             "never assume a literal filename pattern, the actual render may "
             "be named differently or be a hub-verified override.\n"
             "3. Use avatar reference as model image\n"

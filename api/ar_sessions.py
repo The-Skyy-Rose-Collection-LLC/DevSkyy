@@ -295,57 +295,83 @@ def _garment_category_from_row(row: dict[str, str]) -> str:
     return _GARMENT_CATEGORY_MAP.get(garment_type, "tops")
 
 
-@functools.lru_cache(maxsize=1)
-def get_ar_products_from_catalog() -> list[ARProduct]:
-    """Build the AR product list from the canonical catalog CSV + SOT imagery.
+_TRUTHY_CSV_FLAGS = frozenset({"1", "true", "yes"})
+
+
+def _csv_flag(value: str | None) -> bool:
+    """Truthiness of a catalog CSV boolean cell.
+
+    The catalog writes ``"1"``/``"0"`` today, but sibling consumers
+    (scripts/batch_flux_collections.py) also accept ``"true"``/``"false"`` —
+    handle both spellings. Anything blank or unrecognized is False, so an
+    unexpected value fails CLOSED (row treated as unpublished) rather than
+    leaking a SKU onto the public AR surface.
+    """
+    return (value or "").strip().lower() in _TRUTHY_CSV_FLAGS
+
+
+def _ar_product_from_row(row: dict[str, str]) -> ARProduct | None:
+    """Map one catalog CSV row to an :class:`ARProduct`, or ``None`` when skipped.
 
     Skips rows that are unpublished (and not pre-order) — same semantics as
     ``skyyrose_format_price()`` in inc/product-catalog.php ("Coming Soon" =
     excluded from the AR surface). Skips rows with no resolvable SOT image
     rather than emitting a fabricated URL.
+    """
+    sku = (row.get("sku") or "").strip()
+    published = _csv_flag(row.get("published"))
+    is_preorder = _csv_flag(row.get("is_preorder"))
+    if not published and not is_preorder:
+        logger.info("AR catalog: skipping unpublished, non-preorder SKU %s", sku)
+        return None
+
+    collection = _collection_type_from_slug((row.get("collection") or "").strip())
+    if collection is None:
+        logger.warning(
+            "AR catalog: skipping SKU %s — unrecognized collection slug %r",
+            sku,
+            row.get("collection"),
+        )
+        return None
+
+    relative_image = resolve_image(sku, "front")
+    if relative_image is None:
+        logger.warning("AR catalog: skipping SKU %s — no resolvable SOT image", sku)
+        return None
+
+    try:
+        price = float(row.get("price") or 0)
+    except ValueError:
+        logger.warning(
+            "AR catalog: unparsable price %r for SKU %s — defaulting to 0.0",
+            row.get("price"),
+            sku,
+        )
+        price = 0.0
+
+    return ARProduct(
+        id=sku,
+        name=row.get("name") or sku,
+        collection=collection,
+        price=price,
+        image_url=_THEME_BASE_URL + relative_image,
+        garment_category=_garment_category_from_row(row),
+    )
+
+
+@functools.lru_cache(maxsize=1)
+def get_ar_products_from_catalog() -> list[ARProduct]:
+    """Build the AR product list from the canonical catalog CSV + SOT imagery.
+
+    Row policy (publication filter, SOT image resolution, price parsing) lives
+    in :func:`_ar_product_from_row`.
 
     Cached (I/O: one CSV read + per-SKU resolve_image), matching
     ``skyyrose.core.catalog_loader.read_catalog_rows``'s own ``@cache``.
     """
-    products: list[ARProduct] = []
-    for row in read_catalog_rows():
-        sku = (row.get("sku") or "").strip()
-        published = bool(row.get("published")) and row.get("published") != "0"
-        is_preorder = bool(row.get("is_preorder")) and row.get("is_preorder") != "0"
-        if not published and not is_preorder:
-            logger.info("AR catalog: skipping unpublished, non-preorder SKU %s", sku)
-            continue
-
-        collection = _collection_type_from_slug((row.get("collection") or "").strip())
-        if collection is None:
-            logger.warning(
-                "AR catalog: skipping SKU %s — unrecognized collection slug %r",
-                sku,
-                row.get("collection"),
-            )
-            continue
-
-        relative_image = resolve_image(sku, "front")
-        if relative_image is None:
-            logger.warning("AR catalog: skipping SKU %s — no resolvable SOT image", sku)
-            continue
-
-        try:
-            price = float(row.get("price") or 0)
-        except ValueError:
-            price = 0.0
-
-        products.append(
-            ARProduct(
-                id=sku,
-                name=row.get("name") or sku,
-                collection=collection,
-                price=price,
-                image_url=_THEME_BASE_URL + relative_image,
-                garment_category=_garment_category_from_row(row),
-            )
-        )
-    return products
+    return [
+        product for row in read_catalog_rows() if (product := _ar_product_from_row(row)) is not None
+    ]
 
 
 # =============================================================================

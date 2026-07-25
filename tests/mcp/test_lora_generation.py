@@ -52,3 +52,18 @@ class TestSkuResolution:
         with patch.object(lora_generation, "resolve_image", return_value=None):
             with pytest.raises(ValidationError, match="Could not resolve a front product image"):
                 ProductCaptionInput(sku="totally-bogus-sku-xyz")
+
+    def test_blank_image_url_falls_through_to_sot(self) -> None:
+        with patch.object(
+            lora_generation,
+            "resolve_image",
+            return_value="assets/images/products/br-004-front.webp",
+        ) as mock_resolve:
+            params = ProductCaptionInput(image_url="", sku="br-004")
+
+        mock_resolve.assert_called_once_with("br-004", "front")
+        assert params.image_url == _THEME_BASE_URL + "assets/images/products/br-004-front.webp"
+
+    def test_blank_image_url_without_sku_raises(self) -> None:
+        with pytest.raises(ValidationError, match="Either image_url or sku must be provided"):
+            ProductCaptionInput(image_url="   ")

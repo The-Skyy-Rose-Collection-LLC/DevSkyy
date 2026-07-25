@@ -66,6 +66,33 @@ class TestVirtualTryOnInputSotResolution:
                 product_id="zz-999",
             )
 
+    def test_blank_garment_image_url_falls_through_to_sot(self, mocker):
+        """An empty-string garment_image_url counts as absent — SOT resolution fires."""
+        mock_resolve = mocker.patch(
+            "mcp_tools.tools.virtual_tryon.resolve_image",
+            return_value="assets/images/products/br-001.jpg",
+        )
+
+        params = VirtualTryOnInput(
+            model_image_url="https://example.com/model.jpg",
+            garment_image_url="",
+            product_id="br-001",
+        )
+
+        mock_resolve.assert_called_once_with("br-001", "front")
+        assert params.garment_image_url == (
+            "https://skyyrose.co/wp-content/themes/skyyrose-flagship/"
+            "assets/images/products/br-001.jpg"
+        )
+
+    def test_blank_garment_image_url_without_product_id_raises(self):
+        """A whitespace-only garment_image_url with no product_id must raise, not pass ''."""
+        with pytest.raises(ValidationError, match="garment_image_url is required"):
+            VirtualTryOnInput(
+                model_image_url="https://example.com/model.jpg",
+                garment_image_url="   ",
+            )
+
 
 class TestBatchVirtualTryOnInputSotResolution:
     """Tests for BatchVirtualTryOnInput.garments SOT resolution."""

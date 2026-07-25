@@ -34,6 +34,7 @@ from ..models import TryOnResult
 logger = logging.getLogger(__name__)
 
 _r2_client: R2Client | None = None
+_r2_unavailable = False
 
 # Hostnames that must never be reachable from a FASHN-side fetch. FASHN
 # fetches the URL we hand it server-side, so any private/link-local/loopback
@@ -177,21 +178,36 @@ def _find_garment_image(sku: str) -> str:
     relative = resolve_image(sku, "front")
     if not relative:
         return ""
-    candidate = THEME_ROOT / relative
+    # resolve_image() already enforces theme-relative paths (_validated_path),
+    # but this result feeds a public R2 upload — re-check containment here so
+    # this function's contract doesn't silently depend on that upstream detail
+    # (an absolute `relative` would make `THEME_ROOT / relative` ignore THEME_ROOT).
+    candidate = (THEME_ROOT / relative).resolve()
+    if not candidate.is_relative_to(THEME_ROOT.resolve()):
+        logger.warning("SOT image path escapes THEME_ROOT for %s: %r — skipping", sku, relative)
+        return ""
     return str(candidate) if candidate.is_file() else ""
 
 
 def _get_r2_client() -> R2Client | None:
-    """Lazy-init R2 client; ``None`` when R2 credentials aren't configured."""
-    global _r2_client
-    if _r2_client is None:
-        try:
-            config = R2Config.from_env()
-            config.validate()
-            _r2_client = R2Client(config)
-        except R2Error as exc:
-            logger.warning("R2 not configured — cannot upload local tryon images: %s", exc)
-            return None
+    """Lazy-init R2 client; ``None`` when R2 credentials aren't configured.
+
+    A failed init is memoized (``_r2_unavailable``) so per-SKU callers don't
+    re-parse the env and re-log the same warning on every call.
+    """
+    global _r2_client, _r2_unavailable
+    if _r2_client is not None:
+        return _r2_client
+    if _r2_unavailable:
+        return None
+    try:
+        config = R2Config.from_env()
+        config.validate()
+        _r2_client = R2Client(config)
+    except R2Error as exc:
+        logger.warning("R2 not configured — cannot upload local tryon images: %s", exc)
+        _r2_unavailable = True
+        return None
     return _r2_client
 
 
@@ -203,9 +219,11 @@ def ensure_public_url(path_or_url: str, *, sku: str) -> str:
     docstring) and the resulting public URL is returned.
 
     Raises:
-        FashnError: the local file does not exist, or R2 is not configured.
-            Never silently returns the local path — that would just move the
-            ``_validate_public_url`` rejection downstream with a worse error.
+        FashnError: the local file does not exist, R2 is not configured, or the
+            R2 upload itself fails (``R2Error`` is wrapped so callers only ever
+            handle FashnError). Never silently returns the local path — that
+            would just move the ``_validate_public_url`` rejection downstream
+            with a worse error.
     """
     parsed = urlparse(path_or_url)
     if parsed.scheme in ("http", "https"):
@@ -220,5 +238,8 @@ def ensure_public_url(path_or_url: str, *, sku: str) -> str:
         raise FashnError(
             f"cannot upload local tryon image for sku={sku!r} — R2 storage is not configured"
         )
-    result = client.upload_file(local, AssetCategory.TEMP, product_id=sku)
+    try:
+        result = client.upload_file(local, AssetCategory.TEMP, product_id=sku)
+    except R2Error as exc:
+        raise FashnError(f"failed to upload tryon image for sku={sku!r}: {exc}") from exc
     return result.cdn_url or result.url

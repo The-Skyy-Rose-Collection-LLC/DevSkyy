@@ -58,12 +58,29 @@ class TestFindGarmentImage:
         ):
             assert tryon_agent._find_garment_image("br-999") == ""
 
+    def test_rejects_path_escaping_theme_root(self, tmp_path):
+        # resolve_image() itself validates theme-relative paths, but this result
+        # feeds a public R2 upload — the consumer-side containment check must
+        # hold even if the resolver's guarantee ever changes (mocked here).
+        theme = tmp_path / "theme"
+        theme.mkdir()
+        outside = tmp_path / "outside.webp"
+        outside.write_bytes(b"fake")
+
+        with (
+            patch.object(tryon_agent, "resolve_image", return_value="../outside.webp"),
+            patch.object(tryon_agent, "THEME_ROOT", theme),
+        ):
+            assert tryon_agent._find_garment_image("br-001") == ""
+
 
 class TestEnsurePublicUrl:
     def setup_method(self) -> None:
-        # _r2_client is a lazily-populated module global — reset between tests
-        # so one test's mock client doesn't leak into the next.
+        # _r2_client/_r2_unavailable are lazily-populated module globals — reset
+        # between tests so one test's mock client / memoized failure doesn't
+        # leak into the next.
         tryon_agent._r2_client = None
+        tryon_agent._r2_unavailable = False
 
     def test_passes_through_existing_public_url(self):
         url = "https://cdn.skyyrose.co/br-001-front.jpg"
@@ -113,3 +130,35 @@ class TestEnsurePublicUrl:
             result = tryon_agent.ensure_public_url(str(local), sku="br-001")
 
         assert result == "https://r2.example.com/temp/br-001/garment.jpg"
+
+    def test_wraps_r2_upload_error_in_fashn_error(self, tmp_path):
+        # Docstring contract: callers only ever handle FashnError — an R2Error
+        # from the upload itself must not propagate unwrapped.
+        local = tmp_path / "garment.jpg"
+        local.write_bytes(b"fake")
+
+        mock_client = MagicMock()
+        mock_client.upload_file.side_effect = tryon_agent.R2Error("upload exploded")
+
+        with patch.object(tryon_agent, "_get_r2_client", return_value=mock_client):
+            with pytest.raises(FashnError, match="failed to upload tryon image"):
+                tryon_agent.ensure_public_url(str(local), sku="br-001")
+
+
+class TestGetR2ClientMemoization:
+    def setup_method(self) -> None:
+        tryon_agent._r2_client = None
+        tryon_agent._r2_unavailable = False
+
+    def teardown_method(self) -> None:
+        # Never leak the memoized-failure state into other test modules.
+        tryon_agent._r2_client = None
+        tryon_agent._r2_unavailable = False
+
+    def test_not_configured_state_is_memoized(self):
+        with patch.object(tryon_agent, "R2Config") as mock_config:
+            mock_config.from_env.side_effect = tryon_agent.R2Error("no creds")
+            assert tryon_agent._get_r2_client() is None
+            assert tryon_agent._get_r2_client() is None
+        # Second call short-circuits on the memoized failure — env parsed once.
+        mock_config.from_env.assert_called_once()

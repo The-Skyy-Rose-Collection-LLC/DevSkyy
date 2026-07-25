@@ -31,11 +31,15 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# skyyrose is not pip-installed — insert repo root so this resolves regardless
-# of invocation cwd (same pattern as scripts/tripo_dispatch.py).
-sys.path.insert(0, str(REPO_ROOT))
-
-from skyyrose.core.sot_images import resolve_image  # noqa: E402
+# skyyrose is not pip-installed. Only mutate sys.path when the import actually
+# fails (CLI run from an arbitrary cwd) so merely importing this module (tests)
+# leaves interpreter-wide import resolution untouched (same pattern as
+# scripts/tripo_dispatch.py).
+try:
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
+except ImportError:  # pragma: no cover — CLI invocation outside the repo root
+    sys.path.insert(0, str(REPO_ROOT))
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
 
 CATALOG_CSV = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 THEME_ROOT = REPO_ROOT / "wordpress-theme/skyyrose-flagship"

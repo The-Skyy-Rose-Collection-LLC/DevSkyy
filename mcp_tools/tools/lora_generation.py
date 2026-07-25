@@ -205,8 +205,12 @@ class ProductCaptionInput(BaseAgentInput):
     def _resolve_image_from_sku(self) -> "ProductCaptionInput":
         """Resolve `image_url` from `sku` via the SOT when not explicitly supplied.
 
-        Never overrides an explicitly supplied `image_url`.
+        Never overrides an explicitly supplied `image_url`. A blank/whitespace
+        `image_url` counts as "not supplied" (LLM callers often send "") — it
+        falls through to SOT resolution instead of forwarding an empty URL.
         """
+        if self.image_url is not None and not self.image_url.strip():
+            self.image_url = None
         if self.image_url is not None:
             return self
 
