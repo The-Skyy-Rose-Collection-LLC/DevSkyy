@@ -192,3 +192,17 @@ Wrote "~490 tokens" and "36.9%" into commit `b394a5528`'s message before running
 **Why it slipped past the new rule:** I was applying evidence tags to *prose answers* and treating the commit message as a byproduct rather than a claim. It is a claim, and a more durable one than chat — chat can be corrected in the next message, git history cannot.
 
 **Rule extension:** any number written into a durable artifact — commit message, PR body, doc, task file, changelog — requires `[test]`-scope evidence *before* the write. Measure, then write. If a number must be written before it can be measured, state it as an estimate ("~", "approx") or leave it out.
+
+## 2026-07-24 — Absolute paths in every Bash call; stop re-searching what you already have
+**Founder correction:** "file searching with absolute paths should be practiced within sessions. too many unnecessary file searches always go on."
+
+**What it cost this session:**
+1. A `cd /Users/theceo/DevSkyy/wordpress-theme` from an earlier verify run persisted, so a later `git add wordpress-theme/skyyrose-flagship/...` resolved to `wordpress-theme/wordpress-theme/...` → `fatal: pathspec did not match any files`. Nothing staged, full round-trip wasted, and the commit had to be re-issued.
+2. Parsed `git worktree list` three times (awk → no output, sed+while → no output, then python) before getting a census. Two wasted calls on a problem I could have gone to python for first.
+3. Located the boris skill with `find`, then `grep -A`, then `sed -n` — three calls to read two regions of one file.
+
+**Rules:**
+- **Every Bash call uses absolute paths.** cwd persists across calls in this harness, so a `cd` three calls ago is still in effect and is invisible in the command you are writing. Absolute paths make cwd irrelevant. Never write a repo-relative path in a `git add` / `git commit -- <paths>` / file operation.
+- **One parse attempt, then switch tools.** If a shell text-munge (awk/sed/while-read) does not produce output on the first try, go straight to python — do not iterate on quoting. Structured extraction from `git`/JSON output is a python job.
+- **Read a file's regions in one call, not three.** When you need multiple sections of a known file, use Read with offset/limit or a single grep with enough context — not find → grep → sed.
+- **Re-check before re-searching:** a path, file content, or command output already in this session's context is authoritative. Re-deriving it is the same waste as a redundant read.

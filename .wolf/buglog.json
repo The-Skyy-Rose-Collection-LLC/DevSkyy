@@ -4873,5 +4873,25 @@
     "related_bugs": [],
     "occurrences": 2,
     "last_seen": "2026-07-24"
+  },
+  {
+    "id": "bug-288",
+    "timestamp": "2026-07-24",
+    "error_message": "fatal: pathspec 'wordpress-theme/skyyrose-flagship/CLAUDE.md' did not match any files \u2014 git add resolved to wordpress-theme/wordpress-theme/... because an earlier `cd wordpress-theme` persisted across Bash calls",
+    "file": "tasks/lessons.md",
+    "root_cause": "Repo-relative paths in a harness where cwd persists between Bash calls. The active cwd was set three calls earlier by an unrelated verify run and is invisible in the command being written. Compounded by re-searching: git worktree list was parsed 3x (awk, sed, python) and one skill file was read via find+grep+sed.",
+    "fix": "Founder rule: every Bash call uses absolute paths \u2014 never a repo-relative path in git add / commit -- <paths> / file ops. One shell-parse attempt then switch to python. Read multiple regions of a known file in one Read with offset/limit, not find->grep->sed. Context already holds the answer = do not re-derive.",
+    "tags": [
+      "bash",
+      "cwd",
+      "absolute-paths",
+      "tool-efficiency",
+      "founder-correction"
+    ],
+    "related_bugs": [
+      "bug-287"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-24"
   }
 ]
