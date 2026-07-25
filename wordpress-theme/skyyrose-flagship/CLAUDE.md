@@ -7,10 +7,32 @@
 wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
   assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
   inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
-  template-parts/          product-card-holo.php = holo card system
+  template-parts/          product-card-holo.php = holo card system (classic PHP)
+  templates/ · parts/      FSE HTML templates + parts (hybrid block-theme scaffold)
   patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
   *.php                    collection + landing + immersive + builder templates
 ```
+
+## Hybrid FSE (partial block-theme move)
+
+**Status:** scaffolded, not production-cutover. `templates/index.html` makes
+`wp_is_block_theme()` true. Deploy only after Site Editor + frontend QA.
+
+| Surface | Source of truth | Why |
+|---------|-----------------|-----|
+| Homepage | `front-page.php` | **No** `front-page.html` — classic keeps cinematic homepage |
+| Immersive / landing / Elementor | `template-*.php` | PHP Template Name still wins when assigned |
+| Generic page / single / archive / search / 404 | `templates/*.html` | Block templates take precedence over PHP twins |
+| Collection FSE shells | `templates/template-{black-rose,love-hurts,signature,kids-capsule,preorder}.html` | Match `theme.json` `customTemplates`; PHP twins remain selectable |
+| Header / footer (block views) | `parts/header.html`, `parts/footer.html` | Site Editor editable |
+| Header / footer (PHP views) | `header.php`, `footer.php` | Full navbar, cart, newsletter, mascot mount |
+| WooCommerce | `woocommerce/*.php` | `skyyrose_override_fse_detection` forces classic WC |
+
+**Do not add** without an explicit cutover plan: `front-page.html`,
+`single-product.html`, `archive-product.html`, `cart.html`, `checkout.html`.
+
+**theme.json** already declares `templateParts` (header/footer) and the five
+`customTemplates` names — HTML files must use those exact basenames.
 
 **Key systems:**
 - `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
