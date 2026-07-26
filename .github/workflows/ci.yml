@@ -106,7 +106,11 @@ jobs:
   # ===========================================================================
   python-tests:
     name: 🐍 Python Tests
-    runs-on: [self-hosted, devskyy-local]
+    # services: (Docker container orchestration) is Linux-only in the Actions
+    # runner — "Container operations are only supported on Linux runners" —
+    # stays on hosted infra until this job's redis dependency is reworked to
+    # not need a service container on macOS. See project_self_hosted_runner_2026_07_26.md.
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     services:
@@ -588,7 +592,8 @@ jobs:
   # ===========================================================================
   api-integration:
     name: 🔌 API Integration Tests
-    runs-on: [self-hosted, devskyy-local]
+    # Same services:/redis Linux-only constraint as python-tests above.
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [python-tests]
 
