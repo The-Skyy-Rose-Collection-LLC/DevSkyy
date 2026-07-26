@@ -93,6 +93,40 @@ class ModelFormat(StrEnum):
     STL = "stl"  # 3D printing
 
 
+def _actual_model_format(model_path: str | Path, requested: ModelFormat) -> ModelFormat:
+    """Report the format of the file the SDK actually downloaded, not the request.
+
+    The tripo3d SDK's ``text_to_model``/``image_to_model`` calls accept no
+    output-format parameter — ``download_task_models()`` saves whatever the
+    task produced (GLB in practice). Reporting the *requested* format would
+    mislabel the artifact's metadata (same phantom-knob class as bug-282).
+    An unrecognized suffix falls back to the requested value with a warning
+    rather than inventing a format.
+    """
+    suffix = Path(model_path).suffix.lstrip(".").lower()
+    try:
+        actual = ModelFormat(suffix)
+    except ValueError:
+        logger.warning(
+            "Downloaded model %s has unrecognized suffix %r — reporting the "
+            "requested format %r; verify the artifact before relying on it.",
+            model_path,
+            suffix,
+            requested.value,
+        )
+        return requested
+    if actual is not requested:
+        logger.warning(
+            "Requested output_format=%r but Tripo produced %r (%s) — the SDK "
+            "generation call has no format parameter; reporting the actual "
+            "file format.",
+            requested.value,
+            actual.value,
+            model_path,
+        )
+    return actual
+
+
 class ModelStyle(StrEnum):
     """Generation style presets."""
 
@@ -773,7 +807,7 @@ class TripoAssetAgent(SuperAgent):
                         task_id=task_id,
                         model_path=str(model_path),
                         model_url=str(model_path),
-                        format=format_enum,
+                        format=_actual_model_format(model_path, format_enum),
                         metadata={
                             "product_name": product_name,
                             "collection": collection,
@@ -1003,7 +1037,7 @@ class TripoAssetAgent(SuperAgent):
                         task_id=task_id,
                         model_path=str(model_path),
                         model_url=str(model_path),
-                        format=format_enum,
+                        format=_actual_model_format(model_path, format_enum),
                         thumbnail_path=str(rendered_image_path) if rendered_image_path else None,
                         metadata={
                             "product_name": product_name,

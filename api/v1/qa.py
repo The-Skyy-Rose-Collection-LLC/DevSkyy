@@ -209,12 +209,12 @@ def _require_built_review(review: Model3DReview, generation: Model3DGeneration) 
     """
     built = _build_review(review, generation)
     if built is None:
+        # The specific cause (missing SOT reference image / R2 model URL) is
+        # already logged server-side by _build_review — keep the client-facing
+        # detail generic per the error-handling guidelines.
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                f"QA review {review.id} is missing a resolvable reference image "
-                "or generated model URL — check SOT imagery and R2 upload status"
-            ),
+            detail=f"QA review {review.id} could not be assembled",
         )
     return built
 

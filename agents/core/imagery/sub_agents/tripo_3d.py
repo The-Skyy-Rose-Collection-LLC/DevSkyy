@@ -74,7 +74,10 @@ class Tripo3dSubAgent(SubAgent):
         agents.tripo_agent.TripoAssetAgent). Callers needing an actual 3D asset
         must not treat this result as one.
         """
-        logger.warning(
+        # info, not warning: this is the expected code path on every planner
+        # request — the log exists to keep "plan" and "generated asset" from
+        # being conflated, not to flag degradation.
+        logger.info(
             "[%s] execute() returns an LLM-generated plan only — no real Tripo3D "
             "API call is made here. Real 3D generation: api/v1/media.py -> "
             "agents.tripo_agent.TripoAssetAgent.",

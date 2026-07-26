@@ -570,6 +570,36 @@ class TestGenerateFromImageFidelity:
         fake_client.image_to_model.assert_awaited_once()
         assert agent.tripo_config.api_key == "resolved-key"
 
+    async def test_result_format_reports_actual_downloaded_file_not_request(
+        self, agent: TripoAssetAgent, tmp_path: Path
+    ) -> None:
+        """The SDK generation call has no output-format parameter, so a
+        request for `fbx` still downloads a GLB — GenerationResult.format
+        must describe the artifact on disk, never echo the request
+        (phantom-knob metadata, same class as bug-282).
+        """
+        image_path = tmp_path / "source.png"
+        image_path.write_bytes(b"fake-png-bytes")
+
+        from tripo3d import TaskStatus
+
+        fake_task = MagicMock(status=TaskStatus.SUCCESS)
+        fake_client = AsyncMock()
+        fake_client.image_to_model = AsyncMock(return_value="task-123")
+        fake_client.wait_for_task = AsyncMock(return_value=fake_task)
+        fake_client.download_task_models = AsyncMock(
+            return_value={"pbr_model": str(tmp_path / "out.glb")}
+        )
+        fake_client.__aenter__ = AsyncMock(return_value=fake_client)
+        fake_client.__aexit__ = AsyncMock(return_value=False)
+
+        with patch("agents.tripo_agent.TripoClient", return_value=fake_client):
+            result = await agent._tool_generate_from_image(
+                image_path=str(image_path), output_format="fbx"
+            )
+
+        assert result["format"] == "glb"
+
 
 # =============================================================================
 # SuperAgent Workflow Tests
