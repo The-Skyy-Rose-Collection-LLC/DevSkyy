@@ -152,7 +152,40 @@ job_security() {
     _skip "security: bandit" "not installed — pip install bandit"
   fi
   if _have pip-audit; then
-    if pip-audit --strict >/tmp/ci-pipaudit.log 2>&1; then _pass "security: pip-audit"; else _fail "security: pip-audit (dependency vulns)"; fi
+    # Mirror ci.yml's documented no-fix-available ignores. Keep this list in
+    # sync with .github/workflows/ci.yml's IGNORE (single source of truth lives
+    # there; this is the offline mirror).
+    local ignore="--ignore-vuln CVE-2026-45829 --ignore-vuln PYSEC-2026-139 --ignore-vuln CVE-2025-3000 --ignore-vuln PYSEC-2025-217"
+    # No --strict: the dev venv carries local path-installed packages (devskyy,
+    # cli-anything-*) not on PyPI; --strict aborts on them before auditing any
+    # real dependency. But dropping --strict alone would fail OPEN for any OTHER
+    # uncollectable package (git pin, malformed req, yanked release) — the exact
+    # fail-open pattern bug-230 forbids. So: run non-strict + --skip-editable,
+    # then re-assert fail-closed ourselves — any package pip-audit skipped that
+    # ISN'T one of the 3 known local dists fails the job, just as --strict would.
+    local audit_ok=1
+    # Parse the JSON report, NOT the text log: pip-audit's "Skipping <pkg>" lines
+    # come only from the rich progress spinner, which writes nothing when stdout
+    # is redirected to a file (non-TTY) unless FORCE_COLOR is set — so grepping
+    # the log is fail-OPEN in a normal shell. The JSON marks every uncollectable
+    # dep with a non-null skip_reason regardless of TTY.
+    # shellcheck disable=SC2086
+    pip-audit $ignore --skip-editable -f json -o /tmp/ci-pipaudit.json >/tmp/ci-pipaudit.log 2>&1 || audit_ok=0
+    local skips unexpected_skips
+    skips=$(jq -r '(.dependencies // .) | .[] | select(.skip_reason != null and .skip_reason != "") | .name' /tmp/ci-pipaudit.json 2>/dev/null | sort -u)
+    unexpected_skips=$(printf '%s\n' "$skips" | grep -vxE 'devskyy|cli-anything-blender|cli-anything-gimp' | grep -v '^$' || true)
+    if [ -z "$skips" ]; then
+      # devskyy is always installed editable → there is ALWAYS ≥1 skip. An empty
+      # set means the JSON parse failed or pip-audit changed format: fail closed,
+      # never trust an unverifiable gate (bug-230).
+      _fail "security: pip-audit (no editable skips parsed — guard cannot self-verify; see /tmp/ci-pipaudit.json)"
+    elif [ -n "$unexpected_skips" ]; then
+      _fail "security: pip-audit (unaudited package(s): $(printf '%s' "$unexpected_skips" | tr '\n' ' '))"
+    elif [ "$audit_ok" = "1" ]; then
+      _pass "security: pip-audit"
+    else
+      _fail "security: pip-audit (dependency vulns)"
+    fi
   else
     _skip "security: pip-audit" "not installed — pip install pip-audit"
   fi
@@ -177,7 +210,14 @@ job_threejs_tests() {
     _skip "threejs-tests" "no test:collections script in root package.json"; return
   fi
   if [ "$FAST" = "1" ] && [ ! -d node_modules ]; then _skip "threejs-tests" "FAST=1 and node_modules absent"; return; fi
-  [ -d node_modules ] || _run "root npm ci" npm ci
+  # Root has no committed package-lock.json (gitignored), so `npm ci` cannot
+  # work in a clean checkout — ci.yml's threejs job uses `npm install` for the
+  # same reason. Mirror it, and fail the job if the install itself fails.
+  if [ ! -d node_modules ]; then
+    if ! _run "root npm install" npm install --no-audit --no-fund; then
+      _fail "threejs-tests: npm install"; return
+    fi
+  fi
   if npm run test:collections >/tmp/ci-threejs.log 2>&1; then _pass "threejs-tests"; else _fail "threejs-tests"; tail -n 20 /tmp/ci-threejs.log | sed 's/^/      /'; fi
 }
 

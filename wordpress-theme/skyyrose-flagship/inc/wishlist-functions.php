@@ -302,7 +302,6 @@ function skyyrose_ajax_add_to_wishlist() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	$result = skyyrose_add_to_wishlist( $product_id );
@@ -341,7 +340,6 @@ function skyyrose_ajax_remove_from_wishlist() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	$result = skyyrose_remove_from_wishlist( $product_id );
@@ -380,7 +378,6 @@ function skyyrose_ajax_move_to_cart() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 
 	$result = skyyrose_move_to_cart( $product_id );
@@ -402,19 +399,28 @@ function skyyrose_ajax_move_to_cart() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
-// Guest move-to-cart: verify nonce first, then return auth-required error so JS can redirect to login.
-add_action(
-	'wp_ajax_nopriv_skyyrose_move_to_cart',
-	function () {
-		check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
-		wp_send_json_error(
-			array(
-				'message'       => esc_html__( 'Please sign in to move items to cart.', 'skyyrose' ),
-				'require_login' => true,
-			)
-		);
-	}
-);
+/**
+ * Guest move-to-cart: verify nonce first, then return an auth-required error
+ * so the front-end JS can redirect to login.
+ *
+ * Named rather than an inline closure so the hook can be unhooked with
+ * remove_action() — and because PHPStan mis-infers an add_action() call whose
+ * closure always terminates as itself never-returning, marking every
+ * file-scope statement after it unreachable.
+ *
+ * @since 5.0.0
+ * @return void
+ */
+function skyyrose_ajax_move_to_cart_guest() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+	wp_send_json_error(
+		array(
+			'message'       => esc_html__( 'Please sign in to move items to cart.', 'skyyrose' ),
+			'require_login' => true,
+		)
+	);
+}
+add_action( 'wp_ajax_nopriv_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart_guest' );
 
 /**
  * AJAX handler: Clear wishlist.
@@ -463,7 +469,6 @@ function skyyrose_ajax_move_all_to_cart() {
 				'message' => esc_html__( 'Too many requests. Please try again shortly.', 'skyyrose' ),
 			)
 		);
-		return;
 	}
 	set_transient( $rate_key, $attempts + 1, MINUTE_IN_SECONDS );
 

@@ -1,0 +1,219 @@
+/* ==========================================================================
+   scroll-world.css — SkyyRose gothic-noir luxury skin for the scroll-world
+   camera-flight engine (assets/js/scroll-world.js).
+   --------------------------------------------------------------------------
+   The engine injects its OWN defaults inside an `@layer sw {}` cascade layer
+   (a light "pearl / SF-Pro" theme). Every rule here is UNLAYERED, so it wins
+   over the engine layer regardless of specificity or order — this is the seam
+   the engine was built for. We only re-skin; we never fork engine internals.
+
+   Grounded in the theme's established chrome:
+     - fonts  -> --skyyrose-font-display (Archivo) / --skyyrose-font-body
+                 (Hanken Grotesk), declared globally in design-tokens.css.
+                 We NEVER re-declare @font-face here (fonts.css owns that).
+     - colors -> brand hexes (#0A0A0A ground, rose-gold/gold/silver/crimson
+                 accents). Per-section accent is fed by the engine via each
+                 section's `accent`, exposed as --sw-accent.
+     - vocab  -> monument Archivo title ('wdth' 125,'wght' 900), uppercase
+                 wide-tracked micro-labels, dark-glass chrome, film grain +
+                 accent vignette (cf. immersive.css).
+   ========================================================================== */
+
+/* ---- theme tokens: map the engine's knobs onto SkyyRose canon ------------ */
+.sw-root {
+  --sw-bg:        #0A0A0A;
+  --sw-ink:       #F4EFE9;                     /* warm paper white */
+  --sw-ink-soft:  rgba(244, 239, 233, 0.60);
+  --sw-accent:    #B76E79;                     /* default; per-section overrides */
+  --sw-font-display: var(--skyyrose-font-display, 'Archivo', system-ui, sans-serif);
+  --sw-font-body:    var(--skyyrose-font-body, 'Hanken Grotesk', 'Inter', sans-serif);
+  background: var(--sw-bg);
+  color: var(--sw-ink);
+  -webkit-font-smoothing: antialiased;
+}
+html, body { background: #0A0A0A; }
+
+/* ---- cinematic frame: accent vignette + film grain over the whole world --- */
+/* Vignette frames every scene; uses the section accent as faint "world light"
+   (immersive.css pattern) so black never reads flat. */
+.sw-root::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 14; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 42%,
+      transparent 42%,
+      color-mix(in srgb, var(--sw-accent) 6%, transparent) 68%,
+      rgba(0, 0, 0, 0.62) 100%);
+  transition: background 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* 35mm grain — inline SVG feTurbulence, no network dep (immersive.css:154). */
+.sw-root::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 16; pointer-events: none;
+  opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---- top bar: dark-glass, luxury wordmark (NOT the engine's gradient blob) - */
+.sw-brand__mark { display: none; }             /* kill the childish gradient blob */
+.sw-brand__name {
+  font-family: var(--sw-font-display);
+  font-weight: 800;
+  font-size: 0.98rem;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: var(--sw-ink);
+  padding-left: 0.06em;
+}
+
+.sw-nav {
+  /* 0.72 (not 0.55): a lighter glass can't guarantee 4.5:1 for the nav text over
+     arbitrary bright scene content behind the blur. */
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sw-nav__item {
+  font-family: var(--sw-font-body);
+  color: rgba(244, 239, 233, 0.82);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.sw-nav__item:hover { color: var(--sw-ink); background: rgba(255, 255, 255, 0.05); }
+/* Lift the fill toward white so #0A0A0A text clears 4.5:1 on every accent —
+   raw crimson #DC143C is only 3.97:1; +15% white brings it to ~4.6:1. */
+.sw-nav__item.is-active { color: #0A0A0A; background: color-mix(in srgb, var(--sw-accent) 85%, #ffffff); }
+
+/* Primary/top CTA -> rose-gold→gold pill, dark ink, tracked caps (immersive). */
+.sw-topcta {
+  background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+  color: #0A0A0A;
+  font-family: var(--sw-font-body);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  box-shadow: 0 8px 26px rgba(183, 110, 121, 0.28);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+}
+.sw-topcta:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(183, 110, 121, 0.4); }
+
+/* ---- copy layer: monument title + wide-tracked editorial labels ---------- */
+/* Left scrim stays dark (engine uses --sw-bg) so copy reads over imagery. */
+.sw-copy__num {
+  font-family: var(--sw-font-body);
+  color: rgba(244, 239, 233, 0.62);
+  letter-spacing: 0.24em;
+}
+.sw-copy__eyebrow {
+  font-family: var(--sw-font-body);
+  font-weight: 700;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  /* lift the accent toward white so crimson/gold clear WCAG on #0A0A0A
+     (crimson #DC143C alone is 3.97:1; +22% white pushes it past 4.5:1). */
+  color: color-mix(in srgb, var(--sw-accent) 78%, #ffffff);
+}
+/* Widen the copy column so the monument title wraps to fewer lines (a 4-line
+   title + body overflowed the vertically-centred block at 900px height). */
+.sw-copy { width: min(46vw, 520px); }
+.sw-copy__title {
+  font-family: var(--sw-font-display);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125, 'wght' 900;   /* Archivo expanded monument */
+  font-size: clamp(2.1rem, 4.4vw, 3.7rem);
+  line-height: 1.0;
+  letter-spacing: -0.015em;
+  color: var(--sw-ink);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8), 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+/* Short-viewport guard: on a laptop-height window a long title still can't push
+   the body off-screen. */
+@media (min-width: 861px) and (max-height: 860px) {
+  .sw-copy__title { font-size: clamp(1.9rem, 3.6vw, 3.1rem); }
+  .sw-copy__body  { font-size: 1rem; }
+}
+.sw-copy__body {
+  font-family: var(--sw-font-body);
+  color: rgba(244, 239, 233, 0.82);
+  font-size: clamp(1rem, 1.25vw, 1.16rem);
+  line-height: 1.6;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.9);
+}
+
+/* Tag pills -> dark glass with accent hairline (engine default is light). */
+.sw-copy__tags li {
+  font-family: var(--sw-font-body);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--sw-accent) 42%, transparent);
+  color: color-mix(in srgb, var(--sw-accent) 72%, #ffffff);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* CTA buttons (final section). Primary = metallic pill; ghost = accent hairline. */
+.sw-copy__cta .sw-btn {
+  font-family: var(--sw-font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+.sw-btn--primary {
+  background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+  color: #0A0A0A;
+  box-shadow: 0 10px 30px rgba(183, 110, 121, 0.3);
+}
+.sw-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(183, 110, 121, 0.42); }
+.sw-btn--ghost {
+  background: transparent;
+  color: var(--sw-ink);
+  border: 1.5px solid color-mix(in srgb, var(--sw-accent) 55%, transparent);
+}
+.sw-btn--ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--sw-accent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--sw-accent) 22%, transparent);
+}
+
+/* ---- right-side route rail + labels: dark glass ------------------------- */
+.sw-route__label {
+  background: rgba(10, 10, 10, 0.72);
+  color: var(--sw-ink);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--sw-font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+/* ---- scroll hint + progress: warm-white on dark ------------------------- */
+.sw-hint {
+  color: rgba(244, 239, 233, 0.55);
+  font-family: var(--sw-font-body);
+  letter-spacing: 0.2em;
+}
+.sw-hint i { border-color: rgba(255, 255, 255, 0.24); }
+
+/* Progress bar track subtle on dark (fill stays accent, from the engine). */
+.sw-scrollbar { background: rgba(255, 255, 255, 0.06); }
+
+/* ---- mobile polish: keep the monument legible, tighten labels ----------- */
+@media (max-width: 860px) {
+  .sw-brand__name { letter-spacing: 0.22em; font-size: 0.86rem; }
+  .sw-copy__title { font-size: clamp(2rem, 8.4vw, 2.9rem); letter-spacing: -0.01em; }
+  .sw-copy__tags li { font-size: 0.7rem; }
+  /* Clear the notch / Dynamic Island — the top bar is position:fixed at top:0. */
+  .sw-topbar { padding-top: calc(clamp(14px, 2.4vw, 26px) + env(safe-area-inset-top)); }
+}

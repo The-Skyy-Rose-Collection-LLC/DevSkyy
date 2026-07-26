@@ -8,7 +8,7 @@
 #   pip install -e vendor/trellis
 
 # --- core (always required) ---
-pillow>=10.0
+pillow>=12.3.0
 pydantic>=2.5
 httpx>=0.25
 
@@ -22,7 +22,7 @@ numpy>=1.26
 
 # --- Background removal (optional but recommended) ---
 # rembg pulls onnxruntime; pin a lighter wheel for slim images.
-rembg>=2.0.76
+rembg>=2.0.77
 onnxruntime>=1.26.0
 
 # --- USDZ export (optional, iOS AR) ---

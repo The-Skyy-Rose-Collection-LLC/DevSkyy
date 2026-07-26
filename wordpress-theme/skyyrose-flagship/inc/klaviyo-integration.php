@@ -224,13 +224,11 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	if ( ! isset( $_POST['nonce'] ) ||
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
 		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose' ) ) );
-		return;
 	}
 
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error( array( 'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose' ) ) );
-		return;
 	}
 
 	// Rate limiting: 5 requests per email per 15 minutes.
@@ -238,7 +236,6 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	$attempts = (int) get_transient( $rate_key );
 	if ( $attempts >= 5 ) {
 		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ) ) );
-		return;
 	}
 	set_transient( $rate_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 
@@ -249,7 +246,6 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	$ip_attempts = (int) get_transient( $ip_key );
 	if ( $ip_attempts >= 20 ) {
 		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ) ) );
-		return;
 	}
 	set_transient( $ip_key, $ip_attempts + 1, 15 * MINUTE_IN_SECONDS );
 

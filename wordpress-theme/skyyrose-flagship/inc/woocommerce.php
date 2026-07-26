@@ -677,19 +677,24 @@ add_filter( 'woocommerce_product_filters_default_args', 'skyyrose_product_filter
  *--------------------------------------------------------------*/
 
 /**
- * Provide wp_is_block_theme() fallback for WC internals.
+ * Force WooCommerce classic template paths (hybrid FSE).
  *
- * WooCommerce 9.9 deprecated wc_current_theme_is_fse_theme() in
- * favor of the WordPress core wp_is_block_theme(). This shim
- * ensures old WC code paths get the correct answer for our
- * classic PHP theme (always false).
+ * Core `wp_is_block_theme()` is true once `templates/index.html` exists
+ * (Site Editor hybrid scaffold, 2026-07). WooCommerce 9.9+ uses
+ * `wc_is_block_theme` / `wp_is_block_theme()` to pick block vs classic
+ * product/cart/checkout templates. We intentionally keep WC on classic
+ * PHP under `woocommerce/` until a dedicated WC block-template cutover.
+ *
+ * Do NOT remove this filter without shipping WC block templates and
+ * verifying cart, checkout, PDP, and archive on production.
  *
  * @since 6.6.0
+ * @since 1.12.x Hybrid FSE: still returns false for WC only.
  *
- * @param  bool $is_fse Whether the theme is FSE.
- * @return bool Always false for this classic theme.
+ * @param  bool $is_fse Whether WC thinks the theme is a block theme.
+ * @return bool Always false — classic WC templates only.
  */
-function skyyrose_override_fse_detection( $is_fse ) {
+function skyyrose_override_fse_detection( $is_fse ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 	return false;
 }
 add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );

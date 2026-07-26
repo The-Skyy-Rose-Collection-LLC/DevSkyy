@@ -102,17 +102,30 @@ def test_has_tech_flat_source_true_when_image_resolves(
     tf = theme_root / "assets/images/products/sg-002.webp"
     tf.write_bytes(b"webp")
     monkeypatch.setattr(tripo_dispatch, "THEME_ROOT", theme_root)
+    # No override → resolve_source_image goes through the SOT packshot
+    # (canonical since the sot_images wiring); stub it to this fixture's file
+    # so the test stays hermetic against the real sot.json.
+    monkeypatch.setattr(
+        tripo_dispatch,
+        "resolve_image",
+        lambda sku, role="packshot": "assets/images/products/sg-002.webp",
+    )
 
     row = {"sku": "sg-002", "image": "assets/images/products/sg-002.webp"}
     assert tripo_dispatch._has_tech_flat_source(row) is True
 
 
 @pytest.mark.unit
-def test_has_tech_flat_source_false_when_image_field_empty() -> None:
+def test_has_tech_flat_source_false_when_image_field_empty(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts import tripo_dispatch
 
-    # br-001 in real catalog has empty `image` column — only front_model_image
-    # populated. That is exactly the regression: Tripo got fed a model-on shot.
+    # Original regression: br-001 had only a model-on shot, no tech-flat, and
+    # Tripo got fed the model-on shot. Post-SOT-wiring the no-override source
+    # is the SOT packshot; "no SOT packshot either" (resolve_image → None,
+    # resolver raises SystemExit) must fail CLOSED as False, not crash or pass.
+    monkeypatch.setattr(tripo_dispatch, "resolve_image", lambda sku, role="packshot": None)
     assert tripo_dispatch._has_tech_flat_source({"sku": "br-001", "image": ""}) is False
     assert tripo_dispatch._has_tech_flat_source({"sku": "br-001"}) is False
 
@@ -305,6 +318,13 @@ def test_classify_approves_unbranded_sku_with_tech_flat(
     (dossier_dir / "clean.md").write_text("---\n---\n", encoding="utf-8")
     tf = theme_root / "assets/images/products/clean.webp"
     tf.write_bytes(b"webp")
+    # Synthetic SKU has no real sot.json entry — stub the SOT packshot seam
+    # that the no-override dispatch path resolves through.
+    monkeypatch.setattr(
+        tripo_dispatch,
+        "resolve_image",
+        lambda sku, role="packshot": "assets/images/products/clean.webp",
+    )
 
     rows = [
         {
@@ -336,6 +356,13 @@ def test_classify_force_branded_overrides_branded_block(
     )
     tf = theme_root / "assets/images/products/branded.webp"
     tf.write_bytes(b"webp")
+    # Fixture SKU's source must resolve inside the monkeypatched THEME_ROOT —
+    # stub the SOT packshot seam the no-override dispatch path resolves through.
+    monkeypatch.setattr(
+        tripo_dispatch,
+        "resolve_image",
+        lambda sku, role="packshot": "assets/images/products/branded.webp",
+    )
 
     rows = [
         {
@@ -607,10 +634,13 @@ def test_dispatch_sku_does_not_pass_dead_model_version_param(
     monkeypatch.setattr(tripo_dispatch, "THEME_ROOT", tmp_path)
     (tmp_path / "img.webp").write_bytes(b"x")
 
+    # render_source_override (not the SOT) is the source-resolution path this
+    # synthetic sku exercises — "x-001" has no real SOT entry, and this test's
+    # intent is dispatch_sku's param-passing, not SOT resolution.
     row = {
         "sku": "x-001",
         "image": "img.webp",
-        "render_source_override": "",
+        "render_source_override": "img.webp",
     }
     tripo_dispatch.dispatch_sku(row)
 

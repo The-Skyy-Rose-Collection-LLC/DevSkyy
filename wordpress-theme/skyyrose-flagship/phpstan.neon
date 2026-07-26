@@ -45,13 +45,28 @@ parameters:
 
     excludePaths:
         - vendor/
-        - node_modules/
+        # Optional: only present when npm deps are installed inside the theme.
+        # Without (?) phpstan aborts before analysing anything.
+        - node_modules/ (?)
         - tests/
         - blueprints/
         - docs/
 
-    stubFiles:
+    # scanFiles = symbol DISCOVERY (declares classes/functions/constants PHPStan
+    # would otherwise call "not found"). stubFiles only OVERRIDES types of
+    # symbols PHPStan already knows — it never makes WooCommerce discoverable.
+    # Using stubFiles here was why WC_Product/wc_*() reported as unknown.
+    scanFiles:
         - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+        - phpstan/constants.php
+
+    # These resolve to install-specific paths/URLs at runtime, so PHPStan must
+    # not narrow them to the placeholder literals in phpstan/constants.php.
+    dynamicConstantNames:
+        - SKYYROSE_DIR
+        - SKYYROSE_URI
+        - COOKIEPATH
 
     ignoreErrors:
         # Elementor — optional integration, not present in analysis environment

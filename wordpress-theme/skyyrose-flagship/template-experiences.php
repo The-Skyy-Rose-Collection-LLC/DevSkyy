@@ -160,10 +160,12 @@ get_header();
 			id="exp-<?php echo esc_attr( $exp_col['slug'] ); ?>"
 			data-collection="<?php echo esc_attr( $exp_col['slug'] ); ?>"
 			data-block="<?php echo esc_attr( (string) $exp_i ); ?>"
-			aria-label="<?php
+			aria-label="
+			<?php
 			/* translators: %s: collection name */
 			echo esc_attr( sprintf( __( '%s — enter the world', 'skyyrose' ), $exp_col['name'] ) );
-			?>"
+			?>
+			"
 		>
 			<div class="exp-block__scene">
 				<?php
@@ -172,9 +174,9 @@ get_header();
 						$hero_url,
 						'',
 						array(
-							'placement' => 'experience-hero',
-							'loading'   => $is_first ? 'eager' : 'lazy',
-							'decoding'  => 'async',
+							'placement'   => 'experience-hero',
+							'loading'     => $is_first ? 'eager' : 'lazy',
+							'decoding'    => 'async',
 							'aria-hidden' => 'true',
 						) + ( $is_first ? array( 'fetchpriority' => 'high' ) : array() )
 					);
@@ -186,10 +188,12 @@ get_header();
 			<div class="exp-block__tint" aria-hidden="true"></div>
 
 			<div class="exp-block__content">
-				<a class="exp-name-frame" href="<?php echo esc_url( $exp_url ); ?>" aria-label="<?php
+				<a class="exp-name-frame" href="<?php echo esc_url( $exp_url ); ?>" aria-label="
+				<?php
 				/* translators: %s: collection name */
 				echo esc_attr( sprintf( __( 'Enter the %s world', 'skyyrose' ), $exp_col['name'] ) );
-				?>" style="text-decoration:none;">
+				?>
+				" style="text-decoration:none;">
 					<?php if ( $exp_col['lockup'] ) : ?>
 						<img
 							class="exp-lockup-img"

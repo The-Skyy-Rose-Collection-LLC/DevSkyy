@@ -31,6 +31,16 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# skyyrose is not pip-installed. Only mutate sys.path when the import actually
+# fails (CLI run from an arbitrary cwd) so merely importing this module (tests)
+# leaves interpreter-wide import resolution untouched.
+try:
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
+except ImportError:  # pragma: no cover — CLI invocation outside the repo root
+    sys.path.insert(0, str(REPO_ROOT))
+    from skyyrose.core.sot_images import resolve_image  # noqa: E402
+
 CATALOG_CSV = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 THEME_ROOT = REPO_ROOT / "wordpress-theme/skyyrose-flagship"
 DOSSIER_DIR = THEME_ROOT / "data/dossiers"
@@ -65,7 +75,14 @@ def resolve_source_image(row: dict[str, str]) -> Path:
         return THEME_ROOT / "assets/images/products" / override
     if override:
         return THEME_ROOT / override
-    return THEME_ROOT / row.get("image", "")
+    sku = row.get("sku", "")
+    rel = resolve_image(sku, "packshot")
+    if rel is None:
+        raise SystemExit(
+            f"SKU {sku!r} has no SOT packshot image — regenerate sot.json "
+            "(data/build-collection-sot.py) or set render_source_override in the catalog CSV."
+        )
+    return THEME_ROOT / rel
 
 
 def _image_exists(row: dict[str, str], field: str) -> bool:
@@ -126,12 +143,21 @@ def _has_tech_flat_source(row: dict[str, str]) -> bool:
     row["image"]` independently, so this guard and the dispatch path can
     never validate different files (see `_source_matches_declared_image`
     for the companion check that catches a *diverging* override outright).
-    Uses `is_file()`, not `exists()`: when both `image` and
-    `render_source_override` are empty, the resolver's fallback
-    (`THEME_ROOT / ""`) resolves to THEME_ROOT itself, a directory that
-    `exists()` but is not a source image.
+    Uses `is_file()`, not `exists()`: an override of `""` with a directory
+    fallback would otherwise pass on a path that `exists()` but is not a
+    source image.
+
+    `resolve_source_image()` raises ``SystemExit`` when the SKU has neither
+    a `render_source_override` nor a SOT packshot entry (the SOT is the
+    canonical no-override source since the sot_images wiring). Inside the
+    classify guard that means "no dispatchable source exists" — fail CLOSED
+    as a per-SKU block (reason surfaces in the manifest) rather than killing
+    the whole classify run over one unresolvable SKU.
     """
-    return resolve_source_image(row).is_file()
+    try:
+        return resolve_source_image(row).is_file()
+    except SystemExit:
+        return False
 
 
 def _is_catalog_tech_flat(row: dict[str, str]) -> bool:
@@ -172,7 +198,17 @@ def _source_matches_declared_image(row: dict[str, str]) -> bool:
     `image` as the full relative path, so a string comparison would flag
     all 33 rows as diverging even though they resolve to the identical
     file.
+
+    When `render_source_override` is EMPTY the check is trivially True:
+    dispatch then resolves through the SOT packshot
+    (`sot_images.resolve_image(sku, "packshot")`), which is the canonical
+    source by definition — it may legitimately differ from the raw catalog
+    `image` column (founder-verified hub overrides are baked into sot.json),
+    and blocking on that difference would regress the SOT wiring.
     """
+    override = row.get("render_source_override", "").strip()
+    if not override:
+        return True
     declared = THEME_ROOT / row.get("image", "").strip()
     return resolve_source_image(row) == declared
 
@@ -196,8 +232,9 @@ def classify_skus(
          unbranded tech-flat; file existence alone is insufficient
          (br-011 had a PNG file but it was a branded product render,
          not a tech-flat — flag was "0").
-      4. Catalog `image` column empty or the file `resolve_source_image()`
-         would actually dispatch is missing → NO TECH-FLAT FILE.
+      4. The file `resolve_source_image()` would actually dispatch is
+         missing — or nothing resolves at all (no `render_source_override`
+         AND no SOT packshot entry) → NO TECH-FLAT FILE.
 
     A SKU that passes all checks is approved for Tripo multiview.
     """
@@ -241,7 +278,8 @@ def classify_skus(
             blocked.append(
                 (
                     row,
-                    "NO TECH-FLAT FILE — catalog `image` column empty or file missing. "
+                    "NO TECH-FLAT FILE — dispatch source missing (no render_source_override "
+                    "and no SOT packshot, or the resolved file is absent). "
                     "Tripo multiview needs a clean tech-flat, not a model-on shot.",
                 )
             )

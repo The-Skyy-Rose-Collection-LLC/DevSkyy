@@ -48,6 +48,15 @@ def test_packshot_role_returns_flat_image():
     assert path.endswith((".jpeg", ".jpg", ".png"))
 
 
+def test_back_packshot_role_returns_exact_back_image():
+    # br-004 has a real back_image value in the SOT — back_packshot must return
+    # exactly that value, with no render-fallback (mirrors the packshot role's
+    # single-key contract, but for the back face).
+    path = sot_images.resolve_image("br-004", "back_packshot")
+    assert path is not None
+    assert path == sot_images._index()["br-004"]["images"]["back_image"]["path"]
+
+
 def test_unknown_sku_returns_none_not_a_guess():
     assert sot_images.resolve_image("zz-999", "front") is None
     assert sot_images.resolve_image("", "front") is None
@@ -77,7 +86,7 @@ def test_build_manifest_shape():
     manifest = sot_images.build_manifest()
     assert "br-004" in manifest
     entry = manifest["br-004"]
-    assert set(entry).issubset({"front", "back", "packshot"})
+    assert set(entry).issubset({"front", "back", "packshot", "back_packshot"})
     assert "front" in entry  # every published SKU has at least a front
     # Manifest paths are the same theme-relative contract as resolve_image.
     assert entry["front"] == sot_images.resolve_image("br-004", "front")

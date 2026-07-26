@@ -181,6 +181,67 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
+	<!-- ════ Collection Film (scroll-world flight — silent ambient loop) ════ -->
+	<?php
+	// Flight films resolve by Media Library attachment ID, not a hardcoded
+	// path: a re-upload/replace, a dated-folder move, or a relocated uploads
+	// dir can't silently serve a stale file, and wp_get_attachment_url() passes
+	// through CDN/offload filters. Fail-closed like the emblem block — a missing
+	// or deleted attachment skips the section (never a broken embed). Silent by
+	// design (founder audio rule). Map is filterable so a future replace can
+	// repoint without a template edit.
+	$film_ids   = apply_filters(
+		'skyyrose_collection_film_ids',
+		array(
+			'signature'    => array(
+				'video'  => 10329,
+				'poster' => 10328,
+			),
+			'black-rose'   => array(
+				'video'  => 10323,
+				'poster' => 10322,
+			),
+			'love-hurts'   => array(
+				'video'  => 10327,
+				'poster' => 10326,
+			),
+			'kids-capsule' => array(
+				'video'  => 10325,
+				'poster' => 10324,
+			),
+		),
+		$slug
+	);
+	$film       = $film_ids[ $slug ] ?? null;
+	$film_url   = $film ? wp_get_attachment_url( $film['video'] ) : '';
+	$poster_url = $film ? wp_get_attachment_url( $film['poster'] ) : '';
+	$film_path  = $film ? get_attached_file( $film['video'] ) : '';
+	$has_film   = $film_url && $poster_url && $film_path && file_exists( $film_path );
+	if ( $has_film ) :
+		?>
+		<section class="col-film" aria-label="<?php esc_attr_e( 'Collection film', 'skyyrose' ); ?>">
+			<div class="col-film__stage">
+				<?php
+				// No autoplay + preload="none": reduced-motion users never trigger
+				// a video fetch. collection-pages.js calls .play() (which starts the
+				// load) only when motion is allowed AND the film scrolls near view,
+				// and reveals the pause/play toggle then — WCAG 2.2.2 needs a stop
+				// mechanism for auto motion over 5s. aria-hidden on the video: it's a
+				// decorative silent loop with no accessible name; the toggle is a
+				// sibling (not a descendant), so it stays reachable.
+				?>
+				<video class="col-film__video" muted loop playsinline preload="none" aria-hidden="true"
+					poster="<?php echo esc_url( $poster_url ); ?>"
+					width="720" height="1280">
+					<source src="<?php echo esc_url( $film_url ); ?>" type="video/mp4">
+				</video>
+				<img class="col-film__poster" src="<?php echo esc_url( $poster_url ); ?>"
+					alt="" aria-hidden="true" loading="lazy" decoding="async" width="720" height="1280">
+				<button type="button" class="col-film__toggle" aria-label="<?php esc_attr_e( 'Pause background video', 'skyyrose' ); ?>" hidden></button>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
 	<?php
 	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;

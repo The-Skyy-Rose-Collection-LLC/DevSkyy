@@ -163,3 +163,46 @@ if unexplained modified files exist, assume a parallel session owns them.
 **Pattern:** Resumed from a compacted prior-session PR audit and treated its "open PR" list as current. Spent a full conflict-resolution pass on #672 — which was already **CLOSED** — and nearly dispatched agents for #684/#686/#689, all already **MERGED**.
 **Root cause:** (1) stale cross-session data used without re-checking; (2) `gh pr view <n> --json mergeable` returns `UNKNOWN` for merged/closed PRs *and* for uncomputed-open PRs — indistinguishable without the `state` field, which I never queried.
 **Rule:** Before acting on any multi-PR plan, `gh pr list --state open` for the authoritative open set. Never infer open/closed from `mergeable`. Any single-PR read includes `state` + `mergedAt`. `git merge-tree` showing 0 conflicts vs main can mean "already merged," not "clean to merge."
+
+## Bump SKYYROSE_VERSION on EVERY theme CSS/JS edit (2026-07-23)
+**Mistake:** Fixed collection-pages.js, rebuilt .min, deployed — but did NOT bump SKYYROSE_VERSION. The theme enqueues assets as `?ver=SKYYROSE_VERSION`, so the URL was identical to the prior deploy. Browsers + WP.com Batcache + CDN that cached the file during the earlier window kept serving STALE JS; the new IntersectionObserver play-gate never ran and the film sat paused. Cost a full extra diagnose+bump+redeploy cycle.
+**Rule:** Any commit that touches `assets/**/*.{css,js}` in the theme MUST also bump SKYYROSE_VERSION (functions.php + style.css + readme.txt — freshness-guard enforces the 3-way sync). The .min rebuild alone is NOT enough — unchanged `?ver` = inert change for every cached client. Verify live with the actual `?ver=` on the script tag, and (when a JS behavior changed) with a fresh-cache browser eval, not just an origin curl.
+**Why it fooled me:** origin curl of the `?ver=` URL showed the new bytes (origin was correct), but the browser executed its cached copy. Distinguish origin-fresh from client-fresh.
+
+## 2026-07-24 — Scope-jump: real evidence, over-scoped claim (the unifying pattern behind several prior entries)
+**Four instances in one session, all the same shape:**
+1. Found a stale `style.min.css` in the **repo** (Version 1.12.7 vs 1.12.8 source) → called it "a real production stale-serve defect" and made it the headline. Never probed production. When I finally curled, live was serving the **correct** bytes. The committed artifact was stale; production was fine.
+2. PHPStan said two `add_action()` calls were unreachable → wrote "two AJAX hooks are never registered, a live functional bug." A minimal repro then showed it was a PHPStan false positive; the hooks register fine.
+3. Compared minified output using **guessed** CleanCSS options (`level:2`) instead of the real build config → reported "CONTENT MATCH: false". Wrong config, wrong conclusion.
+4. A truncated directory listing didn't show `worker.py` → started treating `agent_sdk.worker` as a missing production module. `find` proved it exists. (Caught before asserting.)
+
+**Root cause — one pattern, not four:** the evidence was real every time and never fabricated. What failed is that **the claim named a system the evidence never touched.** repo ≠ production. static analysis ≠ runtime. a tool's listing ≠ the filesystem. a register/todo/audit ≠ current state.
+
+**Why the existing rules didn't catch it:** CLAUDE.md's verification matrix already has the right answer for each of these ("Live HTML → curl, NEVER WebFetch"; "Codebase facts → Read/Grep"). But I consulted it when choosing **how to investigate**, not when **writing the claim** — and I mis-filed the claim's category: I thought I was verifying a codebase fact ("is this file stale?") while the sentence I wrote was a production fact ("production is serving stale CSS"). `lessons.md` already carried two entries of this class (2026-07-12 stale-PR-audit, 2026-07-23 origin-fresh vs client-fresh) and it still recurred, so the gap is not knowledge — it is that nothing fires at assertion time.
+
+**Rule — evidence scope must cover claim scope, checked when writing the sentence:**
+- Tag load-bearing claims inline with their source: `[repo]` `[live]` `[repro]` `[docs]` `[inferred]`. Writing "production is stale `[repo]`" is visibly wrong on the page, and it lets the founder audit at a glance.
+- Severity words (`production bug`, `critical`, `broken`, `headline`) require evidence whose scope IS production. No probe → phrase the claim at the scope actually checked, then upgrade after probing.
+- These four inference chains are banned without their own evidence: repo/committed state → live behavior (needs curl/Playwright); static-analysis finding → runtime behavior (needs a repro); tool listing → filesystem truth (needs `find`/`stat`); register/todo/audit doc → current state (needs re-verification — project memory already puts audit false-positives near 25%).
+- State scope **before** severity. "The committed file is stale; production unverified" is the honest first sentence; "found a real production bug" is a conclusion that must be earned by a probe.
+
+### Recurrence #2, same day — estimated numbers written into an immutable artifact
+Wrote "~490 tokens" and "36.9%" into commit `b394a5528`'s message before running the measurement. Actual: ~312 tokens, 34.4%. The commit was already pushed to a shared worktree, so no amend — the wrong figures are permanent in history.
+
+**Why it slipped past the new rule:** I was applying evidence tags to *prose answers* and treating the commit message as a byproduct rather than a claim. It is a claim, and a more durable one than chat — chat can be corrected in the next message, git history cannot.
+
+**Rule extension:** any number written into a durable artifact — commit message, PR body, doc, task file, changelog — requires `[test]`-scope evidence *before* the write. Measure, then write. If a number must be written before it can be measured, state it as an estimate ("~", "approx") or leave it out.
+
+## 2026-07-24 — Absolute paths in every Bash call; stop re-searching what you already have
+**Founder correction:** "file searching with absolute paths should be practiced within sessions. too many unnecessary file searches always go on."
+
+**What it cost this session:**
+1. A `cd /Users/theceo/DevSkyy/wordpress-theme` from an earlier verify run persisted, so a later `git add wordpress-theme/skyyrose-flagship/...` resolved to `wordpress-theme/wordpress-theme/...` → `fatal: pathspec did not match any files`. Nothing staged, full round-trip wasted, and the commit had to be re-issued.
+2. Parsed `git worktree list` three times (awk → no output, sed+while → no output, then python) before getting a census. Two wasted calls on a problem I could have gone to python for first.
+3. Located the boris skill with `find`, then `grep -A`, then `sed -n` — three calls to read two regions of one file.
+
+**Rules:**
+- **Every Bash call uses absolute paths.** cwd persists across calls in this harness, so a `cd` three calls ago is still in effect and is invisible in the command you are writing. Absolute paths make cwd irrelevant. Never write a repo-relative path in a `git add` / `git commit -- <paths>` / file operation.
+- **One parse attempt, then switch tools.** If a shell text-munge (awk/sed/while-read) does not produce output on the first try, go straight to python — do not iterate on quoting. Structured extraction from `git`/JSON output is a python job.
+- **Read a file's regions in one call, not three.** When you need multiple sections of a known file, use Read with offset/limit or a single grep with enough context — not find → grep → sed.
+- **Re-check before re-searching:** a path, file content, or command output already in this session's context is authoritative. Re-deriving it is the same waste as a redundant read.

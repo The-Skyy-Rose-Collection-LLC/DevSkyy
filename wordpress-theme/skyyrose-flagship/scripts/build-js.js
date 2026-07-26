@@ -17,6 +17,11 @@ const fs = require('fs');
 const path = require('path');
 const { minify } = require('terser');
 
+// --check verifies every .min.js matches its source without writing anything.
+// Kept in this file so the check reuses the exact terser options below; a copy
+// of that config in the verify harness would drift and false-report staleness.
+const CHECK_ONLY = process.argv.includes('--check');
+
 const SRC_DIR = path.resolve(__dirname, '..', 'assets', 'js');
 // Each entry: directory absolute path, relative label for log output.
 const SCAN_DIRS = [
@@ -39,6 +44,7 @@ async function main() {
 
 	let built = 0;
 	let failed = 0;
+	const stale = [];
 	for (const { src, label } of sources) {
 		const base = path.basename(src, '.js');
 		const dest = path.join( path.dirname( src ), `${base}.min.js` );
@@ -54,6 +60,19 @@ async function main() {
 				mangle: true,
 				format: { comments: false },
 			});
+			if ( CHECK_ONLY ) {
+				// Content comparison, not mtime — a git checkout or `touch`
+				// reorders mtimes without changing bytes. terser is
+				// deterministic for a given source + options, so a byte
+				// mismatch means the .min really is out of date.
+				if ( ! fs.existsSync( dest ) ) {
+					stale.push(`${label}${base}.min.js — missing`);
+				} else if ( fs.readFileSync( dest, 'utf8' ) !== result.code ) {
+					stale.push(`${label}${base}.min.js — differs from source`);
+				}
+				built += 1;
+				continue;
+			}
 			fs.writeFileSync(dest, result.code, 'utf8');
 			built += 1;
 			console.log(`  ✓ ${label}${base}.js → ${label}${base}.min.js  (${code.length} → ${result.code.length} bytes)`);
@@ -61,6 +80,20 @@ async function main() {
 			failed += 1;
 			console.error(`  ✗ ${label}${base}.js — ${err.message}`);
 		}
+	}
+	if ( CHECK_ONLY ) {
+		if ( failed > 0 ) {
+			console.error(`[build:js --check] ${failed} file(s) failed to minify`);
+			process.exit(1);
+		}
+		if ( stale.length > 0 ) {
+			console.error(`[build:js --check] ${stale.length} stale .min.js file(s):`);
+			stale.forEach(s => console.error(`  ${s}`));
+			console.error('[build:js --check] Run: npm run build:js');
+			process.exit(1);
+		}
+		console.log(`[build:js --check] ${built} file(s) in sync with source.`);
+		process.exit(0);
 	}
 	console.log(`\nDone: ${built} built, ${failed} failed.`);
 	process.exit(failed === 0 ? 0 : 1);

@@ -33,7 +33,7 @@ from skyyrose.core.paths import REPO_ROOT, THEME_ROOT
 
 COLLECTIONS_DIR: Path = THEME_ROOT / "data" / "collections"
 
-Role = Literal["front", "back", "packshot"]
+Role = Literal["front", "back", "packshot", "back_packshot"]
 
 # role -> ordered SOT image keys. On-model render first, flat packshot last —
 # the same precedence product-card-holo.php applies. Order matters.
@@ -41,6 +41,7 @@ _ROLE_KEYS: dict[str, tuple[str, ...]] = {
     "front": ("front_model_image", "image"),
     "back": ("back_model_image", "back_image"),
     "packshot": ("image",),
+    "back_packshot": ("back_image",),
 }
 
 
