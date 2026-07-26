@@ -125,41 +125,9 @@ OpenWolf's value comes from learning across sessions. You MUST update `.wolf/cer
 - Prefer targeted Grep over full file reads when searching for specific code.
 - If appending to a file, do not read the entire file first.
 
-## Design QC
+## Design QC / Reframe
 
-When the user asks you to check, evaluate, or improve the design/UI of their app:
-
-1. Run `openwolf designqc` via Bash to capture screenshots.
-   - The command auto-detects a running dev server, or starts one from package.json if needed
-   - Use `--url <url>` only if auto-detection fails
-   - The command saves compressed JPEG screenshots to `.wolf/designqc-captures/`
-   - Full pages are captured as sectioned viewport-height images (top, section2, ..., bottom)
-2. Read the captured screenshot images from `.wolf/designqc-captures/` using the Read tool.
-3. Evaluate the design against modern standards (Shadcn UI, Tailwind, clean React patterns):
-   - Spacing and whitespace consistency
-   - Typography hierarchy and readability
-   - Color contrast and accessibility (WCAG)
-   - Visual hierarchy and focal points
-   - Component consistency
-   - Whether the design looks "dull" or "white-coded" (generic, no personality)
-4. Provide specific, actionable feedback with fix suggestions.
-5. If the user approves, implement the fixes directly in their code.
-6. After fixes, re-run `openwolf designqc` to capture new screenshots and verify improvement.
-
-**Token awareness:** Each screenshot costs ~2500 tokens. The command compresses images (JPEG quality 70, max width 1200px) to minimize cost. For large apps, use `--routes / /specific-page` to limit captures.
-
-## Reframe — UI Framework Selection
-
-When the user asks to change, pick, migrate, or "reframe" their project's UI framework:
-
-1. Read `.wolf/reframe-frameworks.md` for the full framework knowledge base.
-2. Ask the user the decision questions from the file (current stack, priority, Tailwind usage, theme preference, app type). Stop early once the choice narrows to 1-2 options.
-3. Present a recommendation with reasoning based on the comparison matrix.
-4. Once the user confirms, use the selected framework's prompt from the file — **adapted to the actual project** using `.wolf/anatomy.md` for real file paths, routes, and components.
-5. Execute the migration: install dependencies, update config, refactor components.
-6. After migration, run `openwolf designqc` to verify the new look.
-
-**Do NOT read the entire reframe-frameworks.md into context upfront.** Read the decision questions and comparison matrix first (~50 lines). Only read the specific framework's prompt section after the user chooses.
+Moved to skills — `.claude/skills/design-qc/SKILL.md` and `.claude/skills/reframe/SKILL.md` (auto-trigger on matching requests; no need to hold their workflows resident here).
 
 ## Session End
 

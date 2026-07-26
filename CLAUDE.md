@@ -189,15 +189,6 @@ One worktree = one HEAD, and multiple sessions (Ralph loop + foreground) can com
 
 ### Tool use
 
-**Before any call: do I already have this?** In context → use it. Read this session → use that.
-
-- **No redundant reads** — a file read once is available all session
-- **Batch reads** — 3 files = 1 batched call
-- **No confirmation fetches** — don't re-fetch what context settles
-- **No exploratory spam** — plan, then execute in minimum calls
-- **One targeted search** — three vague searches ≠ one good query
-- **Parallel when independent** — dispatch together in one message
-
 - **WebSearch** only when the answer depends on current state, or you need a URL/version/spec that could have changed. Never for this codebase (read the code), never "just to be sure", never twice for the same thing.
 - **Scale effort to the task.** Trivial → one shot. Hard → thorough and parallel until genuinely answered. Never a lazy pass on a hard problem, never over-engineering a simple one.
 
@@ -276,6 +267,8 @@ All targets are STOP-AND-SHOW (§1).
 ## 8. Learnings
 
 Grep before re-deriving a fix. Engineering → **`docs/engineering-learnings.md`** · behavioral → **`tasks/lessons.md`**.
+
+**Memory discipline (mandatory).** Check `~/.claude/projects/*/memory/MEMORY.md` for relevant entries at the start of every task, not just fixes — don't re-derive what a past session already established. Sync memory (write/update entries + re-index MEMORY.md) after every session, and immediately — not batched — after any change that touches production (deploy, WC write, live-data write). Keep MEMORY.md one-line-per-entry, merge/prune stale entries, `/efficient-production` discipline (terse, no padding, verifiable).
 
 <!-- wolf:recurring:start -->
 ### Recurring issues (synced from `.wolf/buglog.json` — regenerate via `python scripts/wolf_recurring_sync.py`, do not hand-edit)
