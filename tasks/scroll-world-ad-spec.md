@@ -128,6 +128,14 @@ If all three read, fire the full batch. (Mascot AI-fidelity test from v1 is down
 - **Finale start-plate = CEMENT CRACKING** — SR monogram flush in cracking Oakland concrete (unlit) → rises, rose-gold, resolving to the gold Signature monogram (full-circle). Forward-only/pinned.
 - Morphs (pixel-verified feasibility): BR→LH (the rose) = strongest; SIG→BR + LH→KC + KC→finale need cheap bridge stills first.
 
+> **AMENDMENT (founder correction, 2026-07-16, bug-268 — supersedes the scene-4 reference-lock above):**
+> character/mascot identity references resolve ONLY from `assets/branding/mascot/`
+> (`skyy-canonical-reference.jpeg` = the canonical stylized-toon Skyy). Scene-4's child is a
+> generated render and is OFF-CANON as an identity reference. Identity mismatches BLOCK
+> generation. Multi-beat character continuity = ONE generation sliced in edit, never
+> independent generations. (Matches the IDENTITY CANON block in
+> `.claude/workflows/skyyrose-ad-previz.js`.)
+
 ## PREVIZ ASSEMBLY RECIPE + COLD-CUT EDL (referenced by .claude/workflows/skyyrose-ad-previz.js assemble phase)
 
 ### Assembly (previz tier: 720x1280@24 · final tier: 1080x1920, same logic)

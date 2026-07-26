@@ -20,13 +20,16 @@ extra_references:
 > - Real product photo:            `assets/products/references/kids-001-real-photo.jpeg`
 
 ### Hoodie — Front
+
 - **front-body color-block** (entire front body): Angular geometric color-block construction — the body is divided into three colorway panels by diagonal seams. **Upper-left panel** (from top-left descending diagonally toward center): solid **black**. **Upper-right panel** (from top-right descending diagonally toward center): solid **white**. **Lower body** (from the diagonal meeting points down to the hem, including the kangaroo pocket area): solid **red**. The diagonals create an angular chevron pointing down toward the kangaroo pocket. **Technique:** stitched. **Color:** black + white + red.
 - **front-chest cluster** (ONLY mark on the hoodie front body; small, ~2in tall, on the CHEST — see the real product photo for exact position): The Black Rose three-rose-cluster, rendered in greyscale (NOT canonical multi-color). **Technique:** embroidered. **Color:** white + black + grey thread. NOTE: there is NO patch on the chest and NO logo on the stomach / lower body (above the kangaroo pocket) — the front body carries this single chest cluster and nothing else.
 
 ### Hoodie — Back
+
 - **back-body color-block**: Mirrors the front color-block construction — the back has the same angular black/white upper panels and red lower body, with the diagonals continuing from the front around to the back. **Technique:** stitched. **Color:** black + white + red.
 
 ### Hoodie — Sleeves / Hood / Hem / Other
+
 - **left-sleeve**: Solid **black** to match the front-upper-left panel. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **right-sleeve**: Solid **white** to match the front-upper-right panel. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve): A small circular rose-cluster patch — Black Rose three-rose-cluster art rendered in greyscale on a circular patch backing with a contrast border ring. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
@@ -38,10 +41,12 @@ extra_references:
 - **collar-inside / size-tag** (~1.25in × 0.5in): Branded woven size tag (universal SkyyRose product rule, scaled for kids). **Technique:** woven-label.
 
 ### Sweatpants — Front
+
 - **pants-body**: Solid **black** sweatpants. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on black. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
+
 - **waistband-drawstring**: White flat drawstring at the waistband. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-pocket / right-pocket**: Slash-style hand pockets at both sides. **Technique:** stitched.
 - **pants-cuffs**: Ribbed-knit ankle cuffs (or straight-leg open hem). **Technique:** stitched. **Color:** black. **Hex:** #000000.

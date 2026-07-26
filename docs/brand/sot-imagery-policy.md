@@ -103,7 +103,7 @@ manifest and re-render. **Canon can outrank the SOT image** — a SKU's SOT/on-m
 design (lh-004 bomber hood, br-006 name). Founder ruling + dossier + real photo are authority; if they disagree,
 flag it, don't render the stale one.
 
-## Render Fidelity Checklist — verify EVERY render, pre and post (eyes-on vs dossier)
+## Render Fidelity Checklist — verify EVERY render, pre and post (eyes-on, REFERENCE-FIRST: full-res side-by-side vs the real SKU photo `assets/products/references/{sku}-*real*front*`, else techflat; the dossier disambiguates details the photo can't show — bug-276)
 
 - **Patches present.** Jerseys carry the league AUTHENTIC patch (NFL/MLB/NBA/hockey), lower-left hip. Pipeline
   REFUSES patchless jerseys — a missing patch = a missing `assets/products/techflats/hero-overlays/br-patch-*.png`,
@@ -145,5 +145,7 @@ fill", "NO solid-black letters — white with black border"). Keep front/back/sl
 ## Gate
 
 `dry-run` first (free) → show manifest + image count + cost → wait for explicit **y** → `generate --yes`
-(prepend `STOPSHOW_ACK=1`). Eyes-on QC every output vs dossier. Promotion to the live catalog (wire into
+(prepend `STOPSHOW_ACK=1`). Eyes-on QC every output REFERENCE-FIRST — full-res side-by-side vs the real SKU
+photo (`assets/products/references/{sku}-*real*front*`, else techflat), dossier only for details absent from
+the photo (bug-276). Promotion to the live catalog (wire into
 `sot-images.json` + deploy) is a SEPARATE founder-gated production step.

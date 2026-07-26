@@ -1,6 +1,6 @@
 ---
 sku: kids-002
-name: Kids Colorblock Hoodie Set — Purple/Black
+name: Kids Colorblock Hoodie Set — Lavender/Purple
 collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
 reference_image: assets/products/references/kids-002-techflat.jpeg
@@ -8,11 +8,11 @@ extra_references:
   - assets/products/references/kids-002-real-photo.jpeg
 ---
 
-# Kids Colorblock Hoodie Set — Purple/Black
+# Kids Colorblock Hoodie Set — Lavender/Purple
 
 **Garment type lock:** Two-piece kids hoodie set — (1) pullover hoodie with kangaroo front pocket, drawstring hood, ribbed cuffs and hem, **angular geometric color-block construction** (lavender/light-pink hood + diagonal lavender-and-medium-purple upper-body panels + deep purple lower body), and (2) matching sweatpants in solid deep purple with drawstring waist. NOT a zip-up jacket. NOT a single-piece garment. NOT an adult-sized SKU. Mid-weight cotton-fleece fabric. **Two-piece sold together as one SKU.** Same construction as the Red/Black colorway (kids-001) but in a purple-monochrome palette.
 
-> **Note on catalog name:** The catalog lists this SKU as "Purple/Black," but the techflat + real-product photo confirm the **pants are deep purple, NOT black**. Render purple pants to match the actual product. The "Black" in the SKU name appears to refer to the dark-purple tones reading visually as a near-black neutral, NOT to a literal black pant.
+> **Note on catalog name:** The catalog originally listed this SKU as "Purple/Black," but the techflat + real-product photo confirm the **pants are deep purple, NOT black** — the "Black" misread the dark-purple tones as a near-black neutral. The catalog display name was corrected to **"Lavender/Purple"** (2026-07-18) to match the actual palette; the dossier slug stays `kids-colorblock-hoodie-set-purple-black` as the stable id. Render purple pants to match the actual product.
 
 ## Branding — exactly what IS on this product
 
@@ -51,7 +51,7 @@ extra_references:
 
 ## Negative — what is NOT on this product (DO NOT render)
 
-- NO BLACK pants — pants are DEEP PURPLE despite the catalog name "Purple/Black" (the techflat and real photo both confirm purple, not black).
+- NO BLACK pants — pants are DEEP PURPLE (the techflat and real photo both confirm purple, not black; the former "Purple/Black" catalog name was corrected to "Lavender/Purple").
 - NO red anywhere on this colorway — this is the all-purple sister set to kids-001 (Red/Black). NO red roses, NO red body panel, NO red kangaroo pocket.
 - NO solid-color hoodie body — body is angular color-block, NOT a solid lavender or solid purple field.
 - NO horizontal stripe blocking — color-block panels are DIAGONAL.

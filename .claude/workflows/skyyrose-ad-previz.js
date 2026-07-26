@@ -31,6 +31,16 @@ const WORKDIR = '/Users/theceo/DevSkyy/renders/scroll-world/ad' // durable worki
 // linchpin and needs NO bridge; SIG->BR, LH->KC, KC->finale use bridge stills);
 // audio = create_voice + licensed SFX/WAN-native (NOT generate_audio); captions
 // burned-in; CTA split Shop-live / Waitlist-KC; two cuts (22s warm + 9-15s cold).
+//
+// AMENDMENTS (founder rules issued after the 2026-07-16 previz run — BINDING on
+// any future reuse of this pipeline, e.g. the 'final' tier):
+// - 2026-07-18 (paid-call rule): every paid call needs its OWN manifest + its
+//   own explicit "y" — no batch pre-approval. A multi-item manifest approved
+//   once (the previz-era flow below) is no longer permitted; fire items as
+//   single-item manifests, one y each.
+// - 2026-07-21 (FOUNDER AUDIO RULE): all video deliverables ship SILENT — the
+//   founder uploads his own audio. The create_voice/SFX audio path in LOCKED v3
+//   is superseded for deliverables; audio research stays archived only.
 // ---------------------------------------------------------------------------
 
 // args can arrive JSON-encoded as a string (harness serialization); parse defensively —
@@ -149,11 +159,18 @@ For each: {id, model:"seedance_2_0", mode:"fast", aspect:"9:16", durationSec, st
     ),
   ])
   const withSig = m => m && m.items ? { ...m, signature: sig(m.items), capCr: Math.ceil(m.items.reduce((s, i) => s + i.estCrHigh, 0)) } : m
+  // The linchpin proof path must carry a REAL signature (the gate validates
+  // sig(items), not an id label) — a hand-written signature string is rejected
+  // before any generation.
+  const linchpinItems = clipManifest && clipManifest.items
+    ? clipManifest.items.filter(i => i.id === 'clip-morph-rose') : []
+  const linchpinManifest = linchpinItems.length ? withSig({ items: linchpinItems }) : null
   return {
     crops,
     bridgeManifest: withSig(bridgeManifest),
     clipManifest: withSig(clipManifest),
-    next: 'Present both manifests (run live get_cost preflights first) as STOP-AND-SHOW. On founder "y": invoke {phase:"bridges", approved:"y", manifest:<bridgeManifest verbatim>} then {phase:"previz", approved:"y", manifest:<clipManifest verbatim>}. For a linchpin-first proof, pass a single-item manifest {items:[clip-morph-rose], signature:"clip-morph-rose", capCr:<its estCrHigh>}.',
+    linchpinManifest,
+    next: 'Per the 2026-07-18 paid-call rule: fire ONE item per manifest, one STOP-AND-SHOW + one founder "y" each (run the live get_cost preflight first). For the linchpin-first proof, pass linchpinManifest VERBATIM: {phase:"previz", approved:"y", manifest:<linchpinManifest>}. For any other item, build a single-item manifest the same way (withSig semantics: signature binds the full item content) and invoke its phase with approved:"y".',
   }
 }
 

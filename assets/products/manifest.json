@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-07-26T16:08:15+00:00",
+  "generated_at": "2026-07-26T16:19:21+00:00",
   "catalog_sha": "sha256:45dc28ba3e659402f5ecc11dc409f66a0ce8cabfcf9005ea8061c232848fddd4",
   "skus": {
     "br-001": {
@@ -281,7 +281,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
-          "sha256": "sha256:30068c841c9ec61a20bb7c9d8db8df74b7e33c1c0ab07c236c2a8ce78387d7f8"
+          "sha256": "sha256:75b6e654600b613583cc991d47996d9f65020d184c0a1fb23de92bdf7f75e5ec"
         }
       ]
     },
@@ -474,7 +474,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-red-black.md",
-          "sha256": "sha256:18bff25e15087e50606f423b7a6385992972c80eb55ddec51bc38948c297fe5e"
+          "sha256": "sha256:856a7c1d9563bddb22fc21ab73a1239f7032e639f2dfd7a13650e0306c7b5e81"
         }
       ]
     },
@@ -502,7 +502,7 @@
         {
           "role": "dossier",
           "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
-          "sha256": "sha256:ab7343a938063b1480491013c906c45b3b6223d519183d30c4df218286c72cd6"
+          "sha256": "sha256:a8d8f7d477776028f1ce55221d98789d81fed55854f16b124411045104c7c900"
         }
       ]
     },

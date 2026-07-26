@@ -62,8 +62,9 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 - **back-center** (large, ~12in tall, vertically centered): The number
   **"32"** — the **"3" is a plain white digit with a black outline only (NO
   rose-cluster fill)**, and ONLY the **"2" carries the black outline + greyscale
-  rose-cluster fill**. (The FRONT and SLEEVES keep rose fill in BOTH digits; the
-  back-center is the ONLY place the "3" is plain.) **Technique:** sublimated.
+  rose-cluster fill**. (Left side = rose in the "3": front big number
+  + left sleeve. Right side = rose in the "2": back-center + right sleeve.
+  Every "32" shows both digits with exactly ONE rose-filled.) **Technique:** sublimated.
   **Color:** "3" = black outline on white ground; "2" = black outline + greyscale rose-cluster fill.
 
 ### Sleeves

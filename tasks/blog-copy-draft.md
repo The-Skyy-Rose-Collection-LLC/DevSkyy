@@ -1,4 +1,5 @@
 # SkyyRose Blog Copy — Brand Story Post + Batch 1 Product Descriptions
+
 _Draft · 2026-06-29 · Description added 2026-07-01 · Batch 1 product copy added 2026-07-18 · Blog article added 2026-07-18 · Dossier corrections applied 2026-07-18 (S2695: br-009 back/sleeve spec, br-015 lettering) · Blog page description added 2026-07-18_
 
 ---
