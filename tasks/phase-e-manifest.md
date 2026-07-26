@@ -17,10 +17,10 @@
 | Output collision guard (ADK pipeline) | **DOC (accepted)** — `renders/gated/<sku>/<sku>-<view>-render.webp` deterministic path at `agents/render_pipeline/tools/generate_image.py:264-268`. LoopAgent refine and re-dispatch both overwrite by design (decision 2026-05-12, path-b). Archive `renders/gated/<sku>/` before re-dispatch if history needed. |
 | Round-table import | clean (`python -c "from orchestration.threed_round_table import ThreeDRoundTable"`) |
 | Round-table tests | 36 / 36 passing |
-| Render-pipeline tests | 28 / 28 passing |
+| Render-pipeline tests | 29 / 29 passing |
 | TRELLIS hardening tests | 8 / 8 passing |
 | Elite Studio hardening tests | 18 / 18 passing |
-| Aggregate test baseline | **90 / 90 green** |
+| Aggregate test baseline | **91 / 91 green** |
 | TRELLIS.2 available locally | NO — conda not on PATH; TRELLIS.2 provider unavailable on this host |
 | `RunBudget` enforcement (P1) | UNVERIFIED — nodes.py missing |
 | Run summary persistence (P2) | UNVERIFIED — nodes.py missing |
