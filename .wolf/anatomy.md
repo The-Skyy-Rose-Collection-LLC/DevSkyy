@@ -84,6 +84,7 @@
 - `deploy-and-verify.md` — Deploy & Verify Agent (~325 tok)
 - `doc-updater.md` — Documentation & Codemap Specialist (~831 tok)
 - `e2e-runner.md` — E2E Test Runner (~1022 tok)
+- `fashion-theme-architect.md` — Award-winning end-to-end marketplace fashion-theme builder; full funnel, .min build, WCAG/CWV/i18n gate, STOP-AND-SHOW on deploy/paid (~1950 tok)
 - `loop-operator.md` — Mission (~231 tok)
 - `planner.md` — Your Role (~1763 tok)
 - `python-reviewer.md` — Review Priorities (~843 tok)
@@ -2695,6 +2696,8 @@ WS7 wiring core — typed WordPress↔dashboard client. `auth-policy.ts`/`signat
 
 ## scripts/
 
+- `ci-local.sh` — scripts/ci-local.sh -- Offline mirror of ci.yml's six gating jobs (lint/python-tests/security/frontend/threejs/wordpress-theme); CI_LOCAL_ROOT overridable (~3500 tok)
+- `ci-sim.sh` — scripts/ci-sim.sh -- Simulated CI clone: fetches a PR's merge preview (refs/pull/N/merge) or any ref into a disposable worktree and runs ci-local.sh there; PASS/FAIL verdict (~1200 tok)
 - `__init__.py` (~0 tok)
 - `3D_GENERATION_STATUS.md` — 3D Generation Status - READY (API Key Required) (~1003 tok)
 - `add_love_hurts_and_logos_to_lora.py` — luxury_post_process, upscale_with_lanczos, detect_garment_type, generate_training_caption + 2 more (~3988 tok)

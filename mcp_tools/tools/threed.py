@@ -2,12 +2,15 @@
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from mcp_tools.api_client import _format_response, _make_api_request
 from mcp_tools.security import secure_tool
 from mcp_tools.server import PTC_CALLER, mcp
 from mcp_tools.types import BaseAgentInput
+from skyyrose.core.sot_images import resolve_image
+
+_THEME_BASE_URL = "https://skyyrose.co/wp-content/themes/skyyrose-flagship/"
 
 
 class ThreeDGenerationInput(BaseAgentInput):
@@ -49,15 +52,49 @@ class ThreeDImageInput(BaseAgentInput):
         min_length=1,
         max_length=200,
     )
-    image_url: str = Field(
-        ...,
-        description="URL or base64-encoded image for 3D generation",
+    image_url: str | None = Field(
+        default=None,
+        description="URL or base64-encoded image for 3D generation. If omitted, "
+        "provide `sku` to resolve the front product image from the SOT.",
         max_length=10000,
+    )
+    sku: str | None = Field(
+        default=None,
+        description="Optional catalog SKU. When `image_url` is omitted, resolves "
+        "the front product image from the SOT (skyyrose.core.sot_images) instead "
+        "of requiring a hand-supplied URL.",
+        max_length=100,
     )
     output_format: Literal["glb", "gltf", "fbx", "obj", "usdz", "stl"] = Field(
         default="glb",
         description="Output 3D model format. GLB recommended for web.",
     )
+
+    @model_validator(mode="after")
+    def _resolve_image_from_sku(self) -> "ThreeDImageInput":
+        """Resolve `image_url` from `sku` via the SOT when not explicitly supplied.
+
+        Never overrides an explicitly supplied `image_url`. A blank/whitespace
+        `image_url` counts as "not supplied" (LLM callers often send "") — it
+        falls through to SOT resolution instead of forwarding an empty URL.
+        """
+        if self.image_url is not None and not self.image_url.strip():
+            self.image_url = None
+        if self.image_url is not None:
+            return self
+
+        if not self.sku:
+            raise ValueError("Either image_url or sku must be provided for image-to-3D generation.")
+
+        relative = resolve_image(self.sku, "front")
+        if not relative:
+            raise ValueError(
+                f"Could not resolve a front product image for sku={self.sku!r} "
+                "from the SOT. Provide image_url explicitly instead."
+            )
+
+        self.image_url = _THEME_BASE_URL + relative
+        return self
 
 
 @mcp.tool(
@@ -181,6 +218,11 @@ async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
                 "image_url": "https://cdn.skyyrose.co/sketches/jacket-v1.png",
                 "output_format": "gltf",
             },
+            {
+                "product_name": "Black Rose Bomber",
+                "sku": "br-004",
+                "output_format": "glb",
+            },
         ],
     },
 )
@@ -192,7 +234,11 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
     Parameters:
         params (ThreeDImageInput): Input containing:
             - product_name: Human-readable name for the generated model.
-            - image_url: Reference image URL or base64-encoded image data.
+            - image_url: Reference image URL or base64-encoded image data. Optional
+              when `sku` is supplied — resolved from the SOT front product image.
+            - sku: Optional catalog SKU used to resolve `image_url` from the SOT
+              (skyyrose.core.sot_images) when `image_url` is omitted. Ignored if
+              `image_url` is explicitly supplied.
             - output_format: Desired 3D file format (e.g., "glb", "gltf", "fbx", "obj", "usdz", "stl").
             - response_format: Desired response presentation (markdown or json).
 

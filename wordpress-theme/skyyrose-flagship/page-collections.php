@@ -46,7 +46,12 @@ get_header();
 
 <main id="primary" class="site-main collections-index" role="main" tabindex="-1">
 
-	<section class="ci-hero rv-clip-up">
+	<?php
+	// Above the fold — no reveal class on the hero: the hidden resting state
+	// stalls LCP behind the deferred JS queue (the PDP 24.9s bug class). The
+	// first ci-card is exempted from the stagger in collections-index.css. Wave 5.
+	?>
+	<section class="ci-hero">
 		<p class="ci-hero__eyebrow"><?php esc_html_e( 'The Collections', 'skyyrose' ); ?></p>
 		<h1 class="ci-hero__title"><?php esc_html_e( 'Four Collections. One Vision.', 'skyyrose' ); ?></h1>
 		<p class="ci-hero__subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Every piece limited, numbered, and never restocked.', 'skyyrose' ); ?></p>
@@ -63,11 +68,31 @@ get_header();
 				<div class="ci-card__body">
 					<p class="ci-card__num"><?php echo esc_html( sprintf( '%02d', $ci_index + 1 ) ); ?></p>
 					<?php if ( $ci_lockup ) : ?>
-						<?php $ci_lk_uri = SKYYROSE_ASSETS_URI . '/images/' . $ci_lockup['base']; ?>
+						<?php
+						$ci_lk_uri = SKYYROSE_ASSETS_URI . '/images/' . $ci_lockup['base'];
+						// Lockups render at ≤300px (min(300px, 70%) in collections-index.css)
+						// but shipped as full-size AVIF sources (48-88KB each — round-3
+						// uses-responsive-images, 690ms). Photon width variants via the
+						// .webp sibling; the avif <source> is suppressed while Photon
+						// answers (Photon serves webp — keeps type= honest, same trade
+						// as skyyrose_render_picture()). '' return = previous markup.
+						$ci_srcset = function_exists( 'skyyrose_photon_srcset' )
+							? skyyrose_photon_srcset( $ci_lk_uri . '.webp', array( 320, 640, 960 ) )
+							: '';
+						$ci_sizes  = '(max-width: 430px) 70vw, 300px';
+						?>
 						<picture class="ci-card__name">
-							<source srcset="<?php echo esc_url( $ci_lk_uri . '.avif' ); ?>" type="image/avif">
-							<source srcset="<?php echo esc_url( $ci_lk_uri . '.webp' ); ?>" type="image/webp">
+							<?php if ( '' !== $ci_srcset ) : ?>
+								<source srcset="<?php echo esc_attr( $ci_srcset ); ?>" sizes="<?php echo esc_attr( $ci_sizes ); ?>" type="image/webp">
+							<?php else : ?>
+								<source srcset="<?php echo esc_url( $ci_lk_uri . '.avif' ); ?>" type="image/avif">
+								<source srcset="<?php echo esc_url( $ci_lk_uri . '.webp' ); ?>" type="image/webp">
+							<?php endif; ?>
 							<img src="<?php echo esc_url( $ci_lk_uri . '.' . $ci_lockup['ext'] ); ?>"
+								<?php if ( '' !== $ci_srcset ) : ?>
+									srcset="<?php echo esc_attr( $ci_srcset ); ?>"
+									sizes="<?php echo esc_attr( $ci_sizes ); ?>"
+								<?php endif; ?>
 								alt=""
 								loading="<?php echo 0 === $ci_index ? 'eager' : 'lazy'; ?>"
 								decoding="async"

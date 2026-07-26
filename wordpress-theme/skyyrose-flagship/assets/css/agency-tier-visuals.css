@@ -156,11 +156,24 @@
     transition:
         opacity 0.8s var(--ease-vanguard),
         transform 0.8s var(--ease-vanguard);
+    /* Safety net (mirrors srRevealSafety, animations-premium.css §12.5) — this
+       sheet loads globally, including slugs where animations-premium (and its
+       central net) is skipped, so the hidden state needs a local fallback
+       (Wave 5). The .is-visible path cancels it. */
+    animation: agencyRvRevealSafety 0.01s linear 0.8s forwards;
+}
+
+@keyframes agencyRvRevealSafety {
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 .rv.is-visible {
     opacity: 1;
     transform: translateY(0);
+    animation: none !important;
 }
 
 /* Staggered mask reveal for navigation */

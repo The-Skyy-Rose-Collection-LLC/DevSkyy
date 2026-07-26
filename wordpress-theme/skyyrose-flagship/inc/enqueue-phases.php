@@ -31,12 +31,15 @@ function skyyrose_enqueue_phase2_performance_guardian(): void {
 		return;
 	}
 	$base_js_dir = SKYYROSE_DIR . '/assets/js';
-	if ( ! file_exists( $base_js_dir . '/performance-guardian.js' ) ) {
+	$use_min     = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$pg_file     = $use_min && file_exists( $base_js_dir . '/performance-guardian.min.js' )
+		? 'performance-guardian.min.js' : 'performance-guardian.js';
+	if ( ! file_exists( $base_js_dir . '/' . $pg_file ) ) {
 		return;
 	}
 	wp_enqueue_script(
 		'skyyrose-performance-guardian',
-		SKYYROSE_ASSETS_URI . '/js/performance-guardian.js',
+		SKYYROSE_ASSETS_URI . '/js/' . $pg_file,
 		array(),
 		SKYYROSE_VERSION,
 		array(
@@ -62,21 +65,26 @@ function skyyrose_enqueue_phase2_brand_atmosphere(): void {
 	}
 	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	if ( file_exists( $base_css_dir . '/brand-atmosphere.css' ) ) {
+	$ba_css = $use_min && file_exists( $base_css_dir . '/brand-atmosphere.min.css' )
+		? 'brand-atmosphere.min.css' : 'brand-atmosphere.css';
+	if ( file_exists( $base_css_dir . '/' . $ba_css ) ) {
 		wp_enqueue_style(
 			'skyyrose-brand-atmosphere',
-			SKYYROSE_ASSETS_URI . '/css/brand-atmosphere.css',
+			SKYYROSE_ASSETS_URI . '/css/' . $ba_css,
 			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
 	}
-	if ( ! file_exists( $base_js_dir . '/brand-atmosphere.js' ) ) {
+	$ba_js = $use_min && file_exists( $base_js_dir . '/brand-atmosphere.min.js' )
+		? 'brand-atmosphere.min.js' : 'brand-atmosphere.js';
+	if ( ! file_exists( $base_js_dir . '/' . $ba_js ) ) {
 		return;
 	}
 	wp_enqueue_script(
 		'skyyrose-brand-atmosphere',
-		SKYYROSE_ASSETS_URI . '/js/brand-atmosphere.js',
+		SKYYROSE_ASSETS_URI . '/js/' . $ba_js,
 		array( 'skyyrose-performance-guardian' ),
 		SKYYROSE_VERSION,
 		array(
@@ -178,10 +186,12 @@ function skyyrose_enqueue_phase3_smart_showcase(): void {
 	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	if ( file_exists( $base_css_dir . '/smart-showcase.css' ) ) {
+	$ss_css = $use_min && file_exists( $base_css_dir . '/smart-showcase.min.css' )
+		? 'smart-showcase.min.css' : 'smart-showcase.css';
+	if ( file_exists( $base_css_dir . '/' . $ss_css ) ) {
 		wp_enqueue_style(
 			'skyyrose-smart-showcase',
-			$css_uri . '/smart-showcase.css',
+			$css_uri . '/' . $ss_css,
 			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
@@ -277,20 +287,25 @@ function skyyrose_enqueue_phase4_assets(): void {
 	}
 	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
-	if ( file_exists( $base_css_dir . '/personalization.css' ) ) {
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$pers_css     = $use_min && file_exists( $base_css_dir . '/personalization.min.css' )
+		? 'personalization.min.css' : 'personalization.css';
+	if ( file_exists( $base_css_dir . '/' . $pers_css ) ) {
 		wp_enqueue_style(
 			'skyyrose-personalization',
-			SKYYROSE_ASSETS_URI . '/css/personalization.css',
+			SKYYROSE_ASSETS_URI . '/css/' . $pers_css,
 			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
 	}
-	if ( ! file_exists( $base_js_dir . '/personalization.js' ) ) {
+	$pers_js = $use_min && file_exists( $base_js_dir . '/personalization.min.js' )
+		? 'personalization.min.js' : 'personalization.js';
+	if ( ! file_exists( $base_js_dir . '/' . $pers_js ) ) {
 		return;
 	}
 	wp_enqueue_script(
 		'skyyrose-personalization',
-		SKYYROSE_ASSETS_URI . '/js/personalization.js',
+		SKYYROSE_ASSETS_URI . '/js/' . $pers_js,
 		array(),
 		SKYYROSE_VERSION,
 		array(

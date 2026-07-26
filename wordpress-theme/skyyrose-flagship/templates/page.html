@@ -1,0 +1,19 @@
+<!--
+  Generic page template (block). Used when no custom page template is assigned.
+  Classic page.php is bypassed for this type once the theme is a block theme.
+  Complex storefront pages should keep using PHP Template Name: page templates
+  (immersive, collection PHP templates, Elementor, preorder PHP, etc.).
+-->
+<!-- wp:template-part {"slug":"header","tagName":"header","area":"header"} /-->
+
+<!-- wp:group {"tagName":"main","metadata":{"name":"Main"},"align":"full","className":"site-main skyyrose-fse-main","style":{"spacing":{"padding":{"top":"var:preset|spacing|2xl","bottom":"var:preset|spacing|2xl","left":"var:preset|spacing|md","right":"var:preset|spacing|md"}},"color":{"background":"#0A0A0A"}},"layout":{"type":"constrained","contentSize":"1200px"}} -->
+<main class="wp-block-group alignfull site-main skyyrose-fse-main has-background" style="background-color:#0A0A0A;padding-top:var(--wp--preset--spacing--2xl);padding-right:var(--wp--preset--spacing--md);padding-bottom:var(--wp--preset--spacing--2xl);padding-left:var(--wp--preset--spacing--md)">
+
+	<!-- wp:post-title {"level":1,"style":{"typography":{"fontStyle":"normal","fontWeight":"700","letterSpacing":"-0.02em"},"spacing":{"margin":{"bottom":"var:preset|spacing|lg"}}},"textColor":"white","fontFamily":"archivo"} /-->
+
+	<!-- wp:post-content {"layout":{"type":"constrained","contentSize":"1200px"},"style":{"typography":{"lineHeight":"1.7"}},"textColor":"text-secondary","fontFamily":"hanken-grotesk"} /-->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer","area":"footer"} /-->

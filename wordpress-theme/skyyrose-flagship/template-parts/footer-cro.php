@@ -12,10 +12,14 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Late-enqueue the Footer CRO stylesheet. Because this template part is
- * conditionally included (skipped on lightweight templates), enqueuing
- * here guarantees the CSS only ships on pages that render the section.
- * WordPress flushes queued styles via wp_print_footer_scripts.
+ * Print the Footer CRO stylesheet IN PLACE, before this part's markup.
+ * A footer-timed wp_enqueue_style() defers the <link> to wp_footer — after
+ * the markup — so the section first paints unstyled and re-lays-out when
+ * the sheet lands (~0.49 CLS on short pages where the footer opens inside
+ * the viewport: cart, wishlist). An in-body <link> blocks paint of the
+ * content that follows it until applied, so the section renders styled on
+ * first paint. wp_print_styles() is a no-op if the handle was already
+ * printed (safe to combine with a future head enqueue).
  */
 $skyyrose_fcro_dir  = trailingslashit( get_stylesheet_directory() ) . 'assets/css';
 $skyyrose_fcro_uri  = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/css';
@@ -24,12 +28,13 @@ $skyyrose_fcro_file = $skyyrose_fcro_min && file_exists( $skyyrose_fcro_dir . '/
 	? 'footer-cro.min.css'
 	: 'footer-cro.css';
 if ( file_exists( $skyyrose_fcro_dir . '/' . $skyyrose_fcro_file ) ) {
-	wp_enqueue_style(
+	wp_register_style(
 		'skyyrose-footer-cro',
 		$skyyrose_fcro_uri . '/' . $skyyrose_fcro_file,
 		array( 'skyyrose-design-tokens' ),
 		defined( 'SKYYROSE_VERSION' ) ? SKYYROSE_VERSION : false
 	);
+	wp_print_styles( 'skyyrose-footer-cro' );
 }
 ?>
 

@@ -81,7 +81,7 @@ defined( 'ABSPATH' ) || exit;
 							width="60"
 							height="44"
 							poster="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-static@2x.webp' ); ?>"
-							autoplay
+							preload="none"
 							muted
 							loop
 							playsinline
@@ -89,9 +89,18 @@ defined( 'ABSPATH' ) || exit;
 							fetchpriority="low"
 							aria-hidden="true">
 							<source src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-rotating@2x.webm' ); ?>" type="video/webm">
-							<?php // Fallback content only paints if no <source> is playable (e.g. Safari versions without WebM support) — same nav-logo weight class as the primary video, so it must not outrank real above-fold content either. ?>
+							<?php
+							// Fallback constraint: the HTML preload scanner fetches any <img> inside
+							// <video> on EVERY page, even though it only renders in browsers without
+							// the <video> element itself (can't-play-source browsers get the poster,
+							// which persists when no source is playable). So this src must stay a
+							// small file the page already fetches — the 5.9KB static webp (same URL
+							// as the poster + .navbar__logo-static img → one cached fetch, zero
+							// extra bytes). Never point it back at tsrc-lockup-rotating@2x.webp
+							// (636KB animated).
+							?>
 							<img
-								src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-rotating@2x.webp' ); ?>"
+								src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/tsrc-lockup-static@2x.webp' ); ?>"
 								alt=""
 								class="navbar__logo-img"
 								width="60"

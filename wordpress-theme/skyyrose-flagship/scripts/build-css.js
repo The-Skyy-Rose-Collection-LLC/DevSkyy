@@ -8,7 +8,13 @@
  * - assets/css/**\/*.css (recursive, catches system/animations.css)
  * - Root style.css (preserves WordPress theme header comment)
  *
- * Usage: node scripts/build-css.js
+ * Usage: node scripts/build-css.js            (write .min.css + .map)
+ *        node scripts/build-css.js --check    (verify only, write nothing)
+ *
+ * --check exits 1 if any .min.css differs from what a build would produce, or
+ * is missing. It lives here rather than in the verify harness so the staleness
+ * check uses this file's exact CleanCSS options and style.css header handling
+ * -- a second copy of that config would drift and report false staleness.
  */
 
 'use strict';
@@ -19,6 +25,7 @@ const path = require('path');
 const glob = require('glob');
 
 const rootDir = path.resolve(__dirname, '..');
+const CHECK_ONLY = process.argv.includes('--check');
 
 // Discover all CSS source files (exclude already-minified)
 const assetFiles = glob.sync('assets/css/**/*.css', {
@@ -32,6 +39,7 @@ const cssFiles = [...assetFiles, 'style.css'];
 let processed = 0;
 let failed = 0;
 const results = [];
+const stale = [];
 
 cssFiles.forEach(relPath => {
   const srcPath = path.resolve(rootDir, relPath);
@@ -68,8 +76,22 @@ cssFiles.forEach(relPath => {
       return;
     }
 
-    // Write minified CSS (prepend header for root style.css)
+    // Minified CSS (prepend header for root style.css)
     const minContent = headerComment + output.styles;
+
+    if (CHECK_ONLY) {
+      // Compare against what is on disk. Content, not mtime: git checkouts and
+      // `touch` reorder mtimes without changing bytes, which made an
+      // mtime-based staleness check report false positives.
+      if (!fs.existsSync(minPath)) {
+        stale.push(`${relPath} -- .min.css missing`);
+      } else if (fs.readFileSync(minPath, 'utf8') !== minContent) {
+        stale.push(`${relPath} -- .min.css differs from source`);
+      }
+      processed++;
+      return;
+    }
+
     fs.writeFileSync(minPath, minContent);
 
     // Write source map
@@ -87,6 +109,21 @@ cssFiles.forEach(relPath => {
     failed++;
   }
 });
+
+if (CHECK_ONLY) {
+  if (failed > 0) {
+    console.error(`[build:css --check] ${failed} file(s) failed to minify`);
+    process.exit(1);
+  }
+  if (stale.length > 0) {
+    console.error(`[build:css --check] ${stale.length} stale .min.css file(s):`);
+    stale.forEach(s => console.error(`  ${s}`));
+    console.error('[build:css --check] Run: npm run build:css');
+    process.exit(1);
+  }
+  console.log(`[build:css --check] ${processed} file(s) in sync with source.`);
+  process.exit(0);
+}
 
 // Print summary
 console.log(`[build:css] Minified ${processed} files:`);

@@ -71,8 +71,20 @@
 	align-items: center;
 	justify-content: center;
 	transition: opacity 1.5s var(--ease-luxury), visibility 1.5s;
+	/* Safety net (Wave 5): the loader is dismissed by deferred JS (homepage-v2.js
+	   adds .done), so on a slow/failed script queue it covered the page — and the
+	   LCP element behind it — indefinitely (noscript only handles JS-off). This
+	   self-dismisses the overlay at 2.5s regardless of JS; .done still wins the
+	   race when JS is fast, landing on the same hidden end state. */
+	animation: hpLoaderSafety 0.9s var(--ease-luxury) 2.5s forwards;
 }
-#loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes hpLoaderSafety {
+	to {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+#loader.done { opacity: 0; visibility: hidden; pointer-events: none; animation: none !important; }
 .ld-brand {
 	font-family: var(--ff-brand);
 	font-size: 24px;
@@ -444,7 +456,7 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--haze);
-	opacity: .75; /* AA contrast at rest (was .4 = 1.85:1) */
+	opacity: .88; /* AA 4.5:1 at rest — .75 × --haze(.55) computed #6C6C6C = 3.88:1 on #050505 */
 	transition: opacity .5s var(--ease-luxury), color .5s var(--ease-luxury);
 }
 .press-item:hover { opacity: 1; }

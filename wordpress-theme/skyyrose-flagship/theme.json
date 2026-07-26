@@ -458,7 +458,7 @@
 			"text": "#FFFFFF"
 		},
 		"typography": {
-			"fontFamily": "var(--wp--preset--font-family--inter)",
+			"fontFamily": "var(--wp--preset--font-family--hanken-grotesk)",
 			"fontSize": "var(--wp--preset--font-size--medium)",
 			"lineHeight": "1.6"
 		},
@@ -559,7 +559,7 @@
 					"text": "var(--wp--preset--color--white)"
 				},
 				"typography": {
-					"fontFamily": "var(--wp--preset--font-family--inter)",
+					"fontFamily": "var(--wp--preset--font-family--hanken-grotesk)",
 					"fontWeight": "600",
 					"letterSpacing": "0.05em",
 					"textTransform": "uppercase"

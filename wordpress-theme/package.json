@@ -36,9 +36,10 @@
     "skyyrose-flagship"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:js",
+    "build": "npm run build:editorial && npm run build:css && npm run build:js",
     "build:css": "node skyyrose-flagship/scripts/build-css.js",
     "build:js": "node skyyrose-flagship/scripts/build-js.js",
+    "build:editorial": "node skyyrose-flagship/scripts/build-editorial-index.js",
     "clean": "find skyyrose-flagship/assets -type f \\( -name '*.min.css' -o -name '*.min.js' \\) -delete && echo 'Cleaned minified assets.'",
     "rebuild": "npm run clean && npm run build",
     "lint": "npm run lint:php && npm run lint:css",
@@ -51,6 +52,10 @@
     "format:check": "npx prettier --check 'skyyrose-flagship/**/*.{css,js,json}'",
     "verify": "npm run lint:php 2>&1 | grep -v 'No syntax errors' | head -20; echo '--- PHP check done.'",
     "verify:full": "npm run lint && npm run build && echo '--- Verify pipeline passed.'",
+    "verify:theme": "bash skyyrose-flagship/scripts/verify-theme.sh",
+    "verify:aspect": "bash skyyrose-flagship/scripts/verify-theme.sh --only",
+    "verify:list": "bash skyyrose-flagship/scripts/verify-theme.sh --list",
+    "verify:json": "bash skyyrose-flagship/scripts/verify-theme.sh --json",
     "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
     "watch:build": "npx chokidar 'skyyrose-flagship/assets/{css,js}/**/*' -c 'npm run build'",
     "deploy": "bash ../scripts/deploy-theme.sh",

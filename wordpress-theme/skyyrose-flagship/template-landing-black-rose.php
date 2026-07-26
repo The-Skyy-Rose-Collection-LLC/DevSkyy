@@ -60,12 +60,17 @@ get_header();
 	class="lp-main"
 	data-collection="black-rose"
 >
-	<?php // ── Hero ─────────────────────────────────────────────────────────── ?>
-	<section class="lp-hero lp-rv" aria-label="<?php esc_attr_e( 'Black Rose collection', 'skyyrose' ); ?>">
+	<?php
+	// ── Hero ───────────────────────────────────────────────────────────
+	// Above the fold — no lp-rv reveal classes here: the lockup is the mobile
+	// LCP element, and a hidden resting state stalls LCP behind the deferred
+	// JS queue (the PDP 24.9s bug class). Below-fold sections keep reveals. Wave 5.
+	?>
+	<section class="lp-hero" aria-label="<?php esc_attr_e( 'Black Rose collection', 'skyyrose' ); ?>">
 		<div class="lp-hero__inner">
 
 			<?php // Lockup image IS the collection name — never type-rendered. ?>
-			<div class="lp-hero__lockup lp-rv">
+			<div class="lp-hero__lockup">
 				<picture>
 					<source
 						srcset="<?php echo esc_url( $assets . 'images/hero-overlays/br-brand-script-logotype.avif' ); ?>"
@@ -87,11 +92,11 @@ get_header();
 				</picture>
 			</div>
 
-			<p class="lp-hero__subtitle lp-rv">
+			<p class="lp-hero__subtitle">
 				<?php esc_html_e( 'Built from what was broken. Worn as proof.', 'skyyrose' ); ?>
 			</p>
 
-			<div class="lp-hero__ctas lp-rv">
+			<div class="lp-hero__ctas">
 				<a
 					href="#lp-split"
 					class="lp-btn lp-btn--primary btn-sweep"
@@ -110,6 +115,11 @@ get_header();
 
 		<?php // Atmospheric image (visual-manifest.json: black-rose → atmosphere). ?>
 		<div class="lp-hero__atmosphere" aria-hidden="true">
+			<?php
+			// Round-4: this img is the page's measured mobile LCP element —
+			// fetchpriority=high pairs with the exact-URL preload emitted by
+			// skyyrose_preload_template_lcp() (inc/enqueue-performance.php).
+			?>
 			<img
 				src="<?php echo esc_url( $assets . 'images/logos/black-roses-cloud-cluster.webp' ); ?>"
 				alt=""
@@ -117,6 +127,7 @@ get_header();
 				width="1200"
 				height="700"
 				loading="eager"
+				fetchpriority="high"
 			>
 		</div>
 	</section>
@@ -152,7 +163,18 @@ get_header();
 								class="lp-vp__img"
 								width="600"
 								height="750"
-								loading="<?php echo $is_first ? 'eager' : 'lazy'; ?>"
+								<?php
+								/*
+								 * Wave 9: ALL panes lazy — the sticky viewport column is
+								 * display:none on mobile, yet the first pane's eager 235KB
+								 * raw webp fetched at Medium priority inside the mobile LCP
+								 * window (round-8). Lazy imgs inside a hidden column never
+								 * intersect, so mobile skips the fetch entirely; on desktop
+								 * the scrollytell sits below the hero (LCP = atmosphere img,
+								 * verified round-8 desktop) and loads on scroll approach.
+								 */
+								?>
+								loading="lazy"
 							>
 						<?php endif; ?>
 						<div class="lp-vp__meta">

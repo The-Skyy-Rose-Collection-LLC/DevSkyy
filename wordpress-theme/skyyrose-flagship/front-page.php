@@ -167,19 +167,40 @@ get_header();
 	// emitted URL are computed atomically from $hero_bg — prevents drift if
 	// $hero_bg is ever filtered (CDN swap, asset hash, etc).
 	$hero_avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $hero_bg ) : null;
+
+	// Photon width variants for the LCP hero (was a 294KB flat AVIF; ~94KB
+	// at w=768). PAIRING CONTRACT with the responsive preload in
+	// inc/enqueue.php (front-page wp_head closure): same source URL string
+	// ($hero_bg), same widths 480/768/1280/1920, and sizes MUST stay "100vw"
+	// to match the preload's imagesizes — any drift and the browser fetches a
+	// second, non-preloaded candidate. While Photon answers, the avif
+	// <source> is suppressed (Photon serves webp); '' from the helper
+	// restores the previous full-AVIF markup, which is also the preload's
+	// fallback branch — both halves degrade together.
+	$hero_srcset = function_exists( 'skyyrose_photon_srcset' )
+		? skyyrose_photon_srcset( $hero_bg, array( 480, 768, 1280, 1920 ) )
+		: '';
 	?>
 	<div class="hero-bg parallax-ken-burns" aria-hidden="true">
 		<picture>
-			<?php if ( $hero_avif && file_exists( $hero_avif['path'] ) ) : ?>
+			<?php if ( '' === $hero_srcset && $hero_avif && file_exists( $hero_avif['path'] ) ) : ?>
 				<source type="image/avif" srcset="<?php echo esc_url( $hero_avif['url'] ); ?>">
 			<?php endif; ?>
-			<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<?php if ( '' !== $hero_srcset ) : ?>
+				<source type="image/webp" srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw">
+			<?php else : ?>
+				<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<?php endif; ?>
 			<?php
 			// width=height=1920 intentional: source asset is square; CSS
 			// object-position: center 30% crops to landscape with vertical bias.
 			// If asset becomes 16:9 in future, update both attrs.
 			?>
 			<img src="<?php echo esc_url( $hero_bg ); ?>"
+				<?php if ( '' !== $hero_srcset ) : ?>
+					srcset="<?php echo esc_attr( $hero_srcset ); ?>"
+					sizes="100vw"
+				<?php endif; ?>
 				alt=""
 				width="1920"
 				height="1920"
@@ -200,14 +221,40 @@ get_header();
 				foreach ( $hero_strip_skus as $hs_idx => $hs_sku ) :
 					$hs_img_url  = skyyrose_sot_product_image_uri( $hs_sku, 'front' );
 					$hs_priority = ( 0 === $hs_pass && $hs_idx < 2 );
+					// Strip items render at clamp(140px, 14vw, 220px) (homepage-v2.css)
+					// from 1024px sources — Photon width variants cut ~75% of the
+					// strip's image bytes. Fallback src stays direct.
+					$hs_srcset = function_exists( 'skyyrose_photon_srcset' )
+						? skyyrose_photon_srcset( $hs_img_url, array( 320, 480, 1024 ) )
+						: '';
 					?>
 					<div class="hero-strip-item">
+						<?php
+						// Round-4: the FIRST strip frame is the measured mobile LCP
+						// element — it gets fetchpriority=high and is preloaded from
+						// inc/enqueue.php (PAIRING CONTRACT: br-006 front, widths
+						// 320/480/1024, sizes below — keep in sync). All other frames
+						// stay low so decoration never outranks the LCP pair.
+						$hs_is_lcp = ( 0 === $hs_pass && 0 === $hs_idx );
+						?>
 						<img src="<?php echo esc_url( $hs_img_url ); ?>"
+							<?php if ( '' !== $hs_srcset ) : ?>
+								srcset="<?php echo esc_attr( $hs_srcset ); ?>"
+								sizes="(max-width: 1000px) 140px, 220px"
+							<?php endif; ?>
 							alt=""
 							width="1024"
 							height="1536"
 							loading="<?php echo $hs_priority ? 'eager' : 'lazy'; ?>"
-							decoding="async">
+							fetchpriority="<?php echo $hs_is_lcp ? 'high' : 'low'; ?>"
+							<?php
+							// decoding=sync on the LCP frame only (Wave 7):
+							// round-6 shows its bytes preloaded High by ~290ms
+							// yet 0.8-2s render delay — async decode slips
+							// behind the deferred script queue under 4x CPU
+							// throttle. Other frames stay async.
+							?>
+							decoding="<?php echo $hs_is_lcp ? 'sync' : 'async'; ?>">
 					</div>
 				<?php endforeach; ?>
 			<?php endfor; ?>
@@ -275,9 +322,24 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 		<h2><?php esc_html_e( 'Luxury Streetwear, Ready To Move.', 'skyyrose' ); ?></h2>
 		<p><?php esc_html_e( 'A faster path from first impression to cart: signature drops, collection worlds, fit help, and real product photography in one commercial flow.', 'skyyrose' ); ?></p>
 	</div>
+	<?php
+	// Tiles ship 1024px sources into ~484px cells (column layout ≤1024px).
+	// Photon width variants cut the runway's bytes (br-006 was 140KB in
+	// round-3 uses-responsive-images); fallback src stays direct.
+	$ct_sizes  = '(max-width: 1024px) 92vw, 484px';
+	$ct_widths = array( 480, 768, 1024 );
+	?>
 	<div class="commercial-runway__rail stagger-grid">
 		<a class="commercial-tile commercial-tile--wide magnetic" href="<?php echo esc_url( home_url( '/collections/black-rose/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'br-006', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'br-006', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Black Rose sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -288,7 +350,15 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 			<em><?php esc_html_e( 'Cold-weather statement pieces with Oakland weight.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collections/love-hurts/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'lh-004', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'lh-004', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Love Hurts varsity jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -299,7 +369,15 @@ if ( function_exists( 'skyyrose_render_drop_block' ) ) {
 			<em><?php esc_html_e( 'Built for nights that need proof.', 'skyyrose' ); ?></em>
 		</a>
 		<a class="commercial-tile magnetic" href="<?php echo esc_url( home_url( '/collections/signature/' ) ); ?>">
-			<img src="<?php echo esc_url( skyyrose_sot_product_image_uri( 'sg-009', 'front' ) ); ?>"
+			<?php
+			$ct_src    = skyyrose_sot_product_image_uri( 'sg-009', 'front' );
+			$ct_srcset = function_exists( 'skyyrose_photon_srcset' ) ? skyyrose_photon_srcset( $ct_src, $ct_widths ) : '';
+			?>
+			<img src="<?php echo esc_url( $ct_src ); ?>"
+				<?php if ( '' !== $ct_srcset ) : ?>
+					srcset="<?php echo esc_attr( $ct_srcset ); ?>"
+					sizes="<?php echo esc_attr( $ct_sizes ); ?>"
+				<?php endif; ?>
 				alt="<?php esc_attr_e( 'Signature sherpa jacket on model', 'skyyrose' ); ?>"
 				loading="lazy"
 				decoding="async"
@@ -521,7 +599,9 @@ $kc_link   = $kc_config['page_url'] ?? home_url( '/collections/kids-capsule/' );
 		<p class="kc-heir__sub"><?php esc_html_e( 'Not a fourth world. A letter to one. Hover to break the seal.', 'skyyrose' ); ?></p>
 	</div>
 
-	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0" aria-label="<?php esc_attr_e( 'You were born into the rose — open the letter, discover Kids Capsule', 'skyyrose' ); ?>">
+	<?php // No aria-label override: the visible letter text must be part of the accessible name (WCAG 2.5.3), so the name computes from content plus the sr-only destination hint below. ?>
+	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0">
+		<span class="screen-reader-text"><?php esc_html_e( 'Open the letter — discover the Kids Capsule collection.', 'skyyrose' ); ?></span>
 		<div class="kc-heir__envelope">
 			<div class="kc-heir__letter">
 				<div class="kc-heir__chapter"><?php esc_html_e( 'Chapter IV', 'skyyrose' ); ?></div>

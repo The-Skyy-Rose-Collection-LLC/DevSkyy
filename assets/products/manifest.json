@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-07-18T20:13:48+00:00",
-  "catalog_sha": "sha256:5bbd3d3b49e33a331dda78e55f3c0a0fca90b0f1426ca7282bb4ec4efe6e0e2b",
+  "generated_at": "2026-07-26T16:08:15+00:00",
+  "catalog_sha": "sha256:45dc28ba3e659402f5ecc11dc409f66a0ce8cabfcf9005ea8061c232848fddd4",
   "skus": {
     "br-001": {
       "sku": "br-001",
@@ -160,7 +160,7 @@
     },
     "br-006": {
       "sku": "br-006",
-      "name": "The Black Rose Bomber Sherpa",
+      "name": "The Bomber Sherpa",
       "collection": "black-rose",
       "garment_type": "jacket",
       "assets": [
@@ -186,8 +186,8 @@
         },
         {
           "role": "dossier",
-          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-bomber-sherpa.md",
-          "sha256": "sha256:d8555d0ddca0d91aca71a1f9db069fc48781404704982d64a90a132ddb7ab199"
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-sherpa-jacket.md",
+          "sha256": "sha256:83c6d2d6fb778d0f44a247a622be45c2dd7e4cd5092e30106c1c8e4f932f66fa"
         }
       ]
     },

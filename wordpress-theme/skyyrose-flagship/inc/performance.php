@@ -276,6 +276,51 @@ function skyyrose_picture_sources( $src ) {
 }
 
 /**
+ * Build a Jetpack Photon srcset for a single-resolution image URL.
+ *
+ * Photon (i0.wp.com) resizes on the fly via ?w=N — width variants need no
+ * files on disk. Verified live 2026-07-19 against theme-dir assets:
+ * a 204KB 1600px lockup .webp returns 200 image/webp 55KB at ?w=640 when
+ * the client Accepts webp (all srcset-capable browsers do). Clients without
+ * webp Accept receive a Photon jpeg/png transcode — still the requested
+ * WIDTH, so the resolution win holds even in the transcode path (see the
+ * 2026-05-21 note in skyyrose_picture_sources(): that transcode is why
+ * next-gen <source> tags must NOT route through Photon — a srcset on a
+ * plain <img> is the safe surface, because the fallback src stays direct).
+ *
+ * @since 1.11.2
+ * @param string $src    Absolute https URL of the image (query string ignored).
+ * @param int[]  $widths Ascending pixel widths to offer.
+ * @return string        srcset value, or '' when the URL is unusable.
+ */
+function skyyrose_photon_srcset( $src, $widths ) {
+	if ( empty( $src ) || empty( $widths ) ) {
+		return '';
+	}
+	$bare = strtok( (string) $src, '?' );
+	if ( false === $bare || ! preg_match( '#^https://([^/]+)(/.+)$#', $bare, $m ) ) {
+		return '';
+	}
+	// Already-Photon URLs and non-raster sources pass through unusable.
+	if ( preg_match( '#^i[0-2]\.wp\.com$#', $m[1] ) || ! preg_match( '/\.(jpe?g|png|webp|gif)$/i', $m[2] ) ) {
+		return '';
+	}
+	$entries = array();
+	// Photon caches by full URL and never revalidates against the origin —
+	// without a version param, updated theme images would serve stale from
+	// i0.wp.com forever (the direct src keeps ?v= at its call sites; the
+	// srcset variants need the same bust).
+	$ver = defined( 'SKYYROSE_VERSION' ) ? '&v=' . rawurlencode( SKYYROSE_VERSION ) : '';
+	foreach ( $widths as $w ) {
+		$w = absint( $w );
+		if ( $w > 0 ) {
+			$entries[] = 'https://i0.wp.com/' . $m[1] . $m[2] . '?w=' . $w . $ver . ' ' . $w . 'w';
+		}
+	}
+	return implode( ', ', $entries );
+}
+
+/**
  * Map an image URL to its absolute filesystem path.
  *
  * Supports theme assets + WP Media Library uploads. Returns null
@@ -560,8 +605,8 @@ function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
 			&& ! empty( $placement_contract['aspect'] ) ) {
 			$parts = array_map( 'trim', explode( '/', (string) $placement_contract['aspect'] ) );
 			if ( 2 === count( $parts ) && is_numeric( $parts[0] ) && is_numeric( $parts[1] ) && (float) $parts[1] > 0 ) {
-				$ratio         = (float) $parts[0] / (float) $parts[1];
-				$baseline_h    = 900;
+				$ratio           = (float) $parts[0] / (float) $parts[1];
+				$baseline_h      = 900;
 				$attrs['width']  = (int) round( $baseline_h * $ratio );
 				$attrs['height'] = $baseline_h;
 			}
@@ -578,6 +623,33 @@ function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
 	// --- end placement -------------------------------------------------------
 
 	$sources = skyyrose_picture_sources( $src );
+
+	// --- Photon width variants (Wave 4) --------------------------------------
+	// 'photon_widths' => array of px widths builds an on-the-fly srcset via
+	// skyyrose_photon_srcset() — no on-disk siblings needed. Photon answers
+	// with webp for webp-Accept clients, so when active we (a) reuse the
+	// existing $srcset_attr pipe (img + webp <source>), and (b) suppress the
+	// avif <source>: Photon would return webp under type="image/avif".
+	// Placement-contract srcset (real on-disk variants) always wins.
+	$photon_active = false;
+	if ( isset( $attrs['photon_widths'] ) ) {
+		$photon_widths = (array) $attrs['photon_widths'];
+		unset( $attrs['photon_widths'] );
+		if ( '' === $srcset_attr && function_exists( 'skyyrose_photon_srcset' ) ) {
+			$photon_srcset = skyyrose_photon_srcset( $sources['src'], $photon_widths );
+			if ( '' !== $photon_srcset ) {
+				$srcset_attr   = $photon_srcset;
+				$photon_active = true;
+				if ( '' === $sizes_attr && isset( $attrs['sizes'] ) ) {
+					$sizes_attr = (string) $attrs['sizes'];
+					unset( $attrs['sizes'] );
+				}
+			}
+		}
+	}
+	if ( $photon_active && ! empty( $sources['avif'] ) ) {
+		$sources['avif'] = null;
+	}
 
 	// Build the HTML attribute string for the <img> tag.
 	$attr_html = '';

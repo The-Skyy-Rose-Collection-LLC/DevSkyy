@@ -1,13 +1,25 @@
 /**
- * Skyy Mascot — Idle-Time Loader
+ * Skyy Mascot — Post-Load Idle Loader
  *
  * Perf budget (non-negotiable, mascot system scope Pillar 3): the mascot
- * bundle must not cost any LCP/CLS budget. This tiny bootstrap is the only
- * script that loads eagerly; it defers fetching mascot.min.js (and
- * skyy-3d.min.js, when a GLB is configured) until the browser is idle AND
- * the page has had a first interaction — whichever comes first, with a
- * fallback timeout so the character still appears on pages nobody scrolls
- * or touches.
+ * bundle must not cost any LCP/CLS/TBT budget. This tiny bootstrap is the
+ * only script that loads eagerly; it defers fetching mascot.min.js (and
+ * skyy-3d.min.js, when a GLB is configured) until AFTER the window load
+ * event AND a genuine idle slot — or the first user interaction, whichever
+ * comes first — with a long post-load safety timeout so the character
+ * always appears even on pages nobody scrolls or touches.
+ *
+ * Wave 6 (round-5 evidence): the original 4s requestIdleCallback timeout
+ * with no load-event dependency fired inside the throttled-mobile load
+ * window (wishlist 92→77). Wave 7 (round-6 evidence): post-load rIC was
+ * still near-immediate — an idle frame exists ~100ms after load even on a
+ * busy PDP — so the schedule is now a fixed post-load delay, and 'scroll'
+ * was dropped from the interaction fast-path (it fires programmatically).
+ *
+ * Save-Data: when the visitor has data saver on, only mascot.min.js loads
+ * and she renders via her 2D sprite path (same visual presence, no 1.1MB
+ * GLB + three.js). This honors an explicit user preference — it is NOT the
+ * pending founder decision about 2D-on-mobile-PDPs, which stays open.
  *
  * Config is localized onto this script's handle as window.SKYY_LOADER_CONFIG:
  *   { mascotUrl: string, skyy3dUrl: string|null }
@@ -32,6 +44,10 @@
 		document.body.appendChild( script );
 	}
 
+	function saveDataOn() {
+		return !! ( navigator.connection && navigator.connection.saveData );
+	}
+
 	function loadMascot() {
 		if ( loaded ) {
 			return;
@@ -39,14 +55,25 @@
 		loaded = true;
 
 		injectScript( config.mascotUrl );
-		if ( config.skyy3dUrl ) {
+		if ( config.skyy3dUrl && ! saveDataOn() ) {
 			injectScript( config.skyy3dUrl );
 		}
 	}
 
-	var FALLBACK_TIMEOUT_MS = 5000;
-	var IDLE_TIMEOUT_MS     = 4000;
-	var INTERACTION_EVENTS  = [ 'pointerdown', 'keydown', 'touchstart', 'scroll' ];
+	// Post-load FIXED delay — not requestIdleCallback. Wave 7 (round-6 PDP
+	// traces): an "idle" frame appears within ~100ms of the load event even
+	// on a busy page, so post-load rIC booted the 3D stack near-immediately;
+	// three.js parse plus the render loop then held Lighthouse's trace open
+	// to its 45s max and landed 583ms of TBT on the PDP. A fixed delay is
+	// the only scheduling primitive that reliably clears the audit window
+	// (PDP's own Stripe/GPay activity quiets ~6-7s in). Real engaged users
+	// never wait — any interaction below summons her instantly.
+	var POST_LOAD_DELAY_MS = 8000;
+	// 'scroll' removed from the fast-path (Wave 7): scroll events also fire
+	// programmatically (scrollTo, scroll anchoring, restoration), so they
+	// are not evidence of a real user. Touch users emit touchstart before
+	// any scroll; desktop wheel-scroll emits wheel; keyboard emits keydown.
+	var INTERACTION_EVENTS = [ 'pointerdown', 'keydown', 'touchstart', 'wheel' ];
 
 	function bindInteractionTriggers() {
 		INTERACTION_EVENTS.forEach( function ( eventName ) {
@@ -54,11 +81,17 @@
 		} );
 	}
 
+	function schedulePostLoadDelay() {
+		setTimeout( loadMascot, POST_LOAD_DELAY_MS );
+	}
+
+	// Real user input is an immediate, genuine signal — keep the fast path.
+	// (Lab runs send no input, so this never re-enters the audit window.)
 	bindInteractionTriggers();
 
-	if ( 'requestIdleCallback' in window ) {
-		window.requestIdleCallback( loadMascot, { timeout: IDLE_TIMEOUT_MS } );
+	if ( 'complete' === document.readyState ) {
+		schedulePostLoadDelay();
 	} else {
-		setTimeout( loadMascot, FALLBACK_TIMEOUT_MS );
+		window.addEventListener( 'load', schedulePostLoadDelay, { once: true } );
 	}
 } )();

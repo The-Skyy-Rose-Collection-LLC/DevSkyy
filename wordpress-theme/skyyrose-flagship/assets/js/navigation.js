@@ -163,15 +163,40 @@
 	if (logoVideo) {
 		var logoMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+		/* Wave 9: the webm ships preload="none" without autoplay (header.php) —
+		   its 290KB fetch used to land inside every page's mobile LCP window.
+		   The static poster (already cached) holds the frame until boot:
+		   window load + 1.5s, or first interaction, whichever comes first.
+		   Under reduced motion the video never boots at all (CSS shows the
+		   static lockup), so the webm is never fetched for those users. */
+		var logoBooted = false;
+
 		function syncLogoVideoPlayback() {
 			if (logoMotionQuery.matches || document.hidden) {
 				logoVideo.pause();
-			} else if (logoVideo.paused) {
+			} else if (logoBooted && logoVideo.paused) {
 				logoVideo.play().catch(function () {});
 			}
 		}
 
-		syncLogoVideoPlayback();
+		function bootLogoVideo() {
+			if (logoBooted || logoMotionQuery.matches) return;
+			logoBooted = true;
+			logoVideo.preload = 'auto';
+			syncLogoVideoPlayback();
+		}
+
+		var logoBootAfterLoad = function () {
+			window.setTimeout(bootLogoVideo, 1500);
+		};
+		if (document.readyState === 'complete') {
+			logoBootAfterLoad();
+		} else {
+			window.addEventListener('load', logoBootAfterLoad, { once: true });
+		}
+		['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (evt) {
+			window.addEventListener(evt, bootLogoVideo, { once: true, passive: true });
+		});
 		document.addEventListener('visibilitychange', syncLogoVideoPlayback);
 		if (typeof logoMotionQuery.addEventListener === 'function') {
 			logoMotionQuery.addEventListener('change', syncLogoVideoPlayback);

@@ -71,13 +71,24 @@
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.6s var(--skyyrose-ease), transform 0.6s var(--skyyrose-ease);
+  /* Safety net (mirrors srRevealSafety, animations-premium.css §12.5) — kept
+     local so this hidden state never depends on another stylesheet being
+     enqueued (Wave 5). The .is-visible path cancels it. */
+  animation: lpRevealSafety 0.01s linear 0.8s forwards;
+}
+@keyframes lpRevealSafety {
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .lp-rv.is-visible {
   opacity: 1;
   transform: translateY(0);
+  animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .lp-rv { opacity: 1; transform: none; transition: none; }
+  .lp-rv { opacity: 1; transform: none; transition: none; animation: none; }
 }
 
 /* Stagger delays for children */

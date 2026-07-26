@@ -57,6 +57,17 @@
 	margin-bottom: 0;
 }
 
+/* Long-form tables: legal pages ship raw <table> markup wider than the
+   mobile column, which widened the whole document (audit D6 — privacy
+   policy scrollWidth 424px on a 390px viewport). Tables scroll inside
+   their own box instead of dragging the page sideways. */
+.skr-page__content.entry-content table {
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
 .skr-page__content.entry-content h2,
 .skr-page__content.entry-content h3,
 .skr-page__content.entry-content h4 {

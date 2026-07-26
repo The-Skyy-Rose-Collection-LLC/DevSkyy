@@ -3,6 +3,14 @@
  * Technical glassmorphism, rose gold accents, exact padding.
  */
 
+/* Single source for the rendered nav band height. r1 verify measured the
+   nav at 71px while three offset calcs (banner, mascot, body padding)
+   assumed 64px — the banner overlapped the nav's top by 7px. Every
+   bottom-chrome offset MUST use this var, never a hardcoded 64px. */
+:root {
+	--skyyrose-mobile-nav-h: 72px;
+}
+
 .mobile-nav {
 	display: none; /* Hidden on desktop */
 	position: fixed;
@@ -23,7 +31,7 @@
 @media (max-width: 768px) {
 	.mobile-nav { display: flex; }
 	/* Add padding to body to prevent content hiding behind nav */
-	body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+	body { padding-bottom: calc(var(--skyyrose-mobile-nav-h, 72px) + env(safe-area-inset-bottom)); }
 }
 
 .mobile-nav__item {

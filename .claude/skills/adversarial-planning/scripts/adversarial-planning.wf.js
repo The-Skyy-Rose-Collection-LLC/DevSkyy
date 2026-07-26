@@ -104,23 +104,24 @@ const REVIEW_SCHEMA = {
 // Prompt is written to a file and piped over stdin (never interpolated into the
 // shell command) so plan JSON with quotes can't break the call.
 function codexTurn(round, phase, sandbox, instruction, planObj, schema) {
-  const promptFile = `/tmp/codex-ap-${phase}-r${round}.txt`;
-  const outFile = `/tmp/codex-ap-${phase}-r${round}.json`;
-  // On the execution turn, capture the REAL diff (ground truth) — the skill's whole
-  // point is the planner reviews what actually changed, not Codex's self-report.
+  // Prompt + output live in a per-run mktemp dir (created by the relay subagent),
+  // piped over stdin so plan JSON with quotes can't break the shell command, and
+  // uniquely named so concurrent runs of this workflow never collide on /tmp.
   const diffStep =
     sandbox === "workspace-write"
-      ? `3b. Then run \`git diff --stat\` and append its output to codex_verbatim under a "--- git diff --stat ---" header, so the reviewer sees the real diff.\n`
+      ? `   Also run \`git diff --stat\` afterward and append its output to codex_verbatim under a "--- git diff --stat ---" header, so the reviewer sees the real diff.\n`
       : "";
   const relay =
     `You are a relay to a DIFFERENT model (Codex). Do exactly this, do not add your own judgment:\n` +
-    `1. Write this exact text to ${promptFile} (heredoc, no edits):\n` +
-    `<<<CODEX_PROMPT\n${instruction}\n\nPLAN (JSON):\n${JSON.stringify(planObj, null, 2)}\nCODEX_PROMPT\n` +
-    `2. Run: codex exec -m ${CODEX_MODEL} -s ${sandbox} --json -o ${outFile} < ${promptFile}\n` +
-    `3. Read ${outFile} (the -o file holds Codex's final message).\n` +
+    `1. Run the following as ONE Bash command so the same temp dir ("$d") is used throughout — a fresh dir per run, never a fixed /tmp path:\n` +
+    `   d="$(mktemp -d)"\n` +
+    `   cat > "$d/prompt.txt" <<'CODEX_PROMPT'\n${instruction}\n\nPLAN (JSON):\n${JSON.stringify(planObj, null, 2)}\nCODEX_PROMPT\n` +
+    `   codex exec -m ${CODEX_MODEL} -s ${sandbox} --json -o "$d/out.json" < "$d/prompt.txt"\n` +
+    `   cat "$d/out.json"\n` +
+    `2. The printed "$d/out.json" content is Codex's final message.\n` +
     diffStep +
-    `4. Return the structured fields, putting Codex's raw final message verbatim in codex_verbatim ` +
-    `and reading satisfied / specific_challenge from what CODEX actually said — not your opinion.\n` +
+    `3. Return the structured fields: put Codex's raw final message verbatim in codex_verbatim ` +
+    `and read satisfied / specific_challenge from what CODEX actually said — not your opinion.\n` +
     `If codex errors on the model string or reachability, put the exact error in codex_verbatim, ` +
     `set satisfied=false, and put the error in specific_challenge.`;
   return agent(relay, {

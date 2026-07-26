@@ -1,0 +1,84 @@
+[
+  {
+    "branch": "fix/sg-mint-dossier-decontamination",
+    "tip": "70d10be3043456bda967cf611ec22d1bd7d7d437",
+    "worktree": "/Users/theceo/DevSkyy-ci-mirror",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "fix/api-auth-hardening",
+    "tip": "7f3cf63816811c5c774907cf7a2780fa8756f8f8",
+    "worktree": "/Users/theceo/DevSkyy-wt-secfix",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "worktree-ptc-integration-spec",
+    "tip": "390ae6badd7e3d9373089737eb46527a38e76b6c",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/ptc-integration-spec",
+    "files_vs_mergebase": 2,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "async-land-clean",
+    "tip": "632d0089ee1d32f698eed91629d13dfbfb2c73a6",
+    "worktree": "/Users/theceo/DevSkyy-wt-async-land",
+    "files_vs_mergebase": 6,
+    "unique": []
+  },
+  {
+    "branch": "fix/deploy-subprocess-cleanup-land",
+    "tip": "1a4a1e9e062ca656e1ec8772af9f8f4eba3f08c9",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/agent-af6492ce853013f41",
+    "files_vs_mergebase": 2,
+    "unique": []
+  },
+  {
+    "branch": "worktree-font-ds-sync",
+    "tip": "268326bf85a23224f84f6b391ecefe638d71a9f0",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/font-ds-sync",
+    "files_vs_mergebase": 19,
+    "unique": [
+      "conftest.py",
+      "scripts/ci-local.sh"
+    ]
+  },
+  {
+    "branch": "feat/catalog-hardening",
+    "tip": "a1657a27583b0c37bdb7c884d8936d244b34d54b",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-16",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "ws/drift-20260707",
+    "tip": "ddb891774e4fc2419bcfb42c847761c4c226ee87",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-15",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "fix/br014-015-wrong-packshot-bytes",
+    "tip": "ab7b1bf6779dabaf3c1ad17e82b6b1a8627c0f13",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/br014-015-fix",
+    "tier": 2,
+    "salvaged": []
+  },
+  {
+    "branch": "ws/br011prep-20260707",
+    "tip": "6b1cd468dbffdc7233b4029d8c6b8c153698c475",
+    "worktree": "/Users/theceo/DevSkyy/.claude/worktrees/wf_8ce2338e-722-13",
+    "tier": 2,
+    "salvaged": []
+  }
+]

@@ -17,15 +17,20 @@ get_header();
 <main id="primary" class="info-page info-page--shipping" role="main">
 	<div class="info-page__container">
 
+		<?php
+		// Hero + first section are above the fold — no reveal classes: the hidden
+		// resting state stalls LCP behind the deferred JS queue (the PDP 24.9s bug
+		// class). Below-fold sections keep reveals. Wave 5.
+		?>
 		<!-- Hero -->
-		<header class="info-page__hero rv-clip-up">
+		<header class="info-page__hero">
 			<span class="info-page__badge"><?php esc_html_e( 'Policies', 'skyyrose' ); ?></span>
 			<h1 class="info-page__title"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></h1>
 			<p class="info-page__subtitle"><?php esc_html_e( 'We want you to love what you wear. Here\'s how we make that happen.', 'skyyrose' ); ?></p>
 		</header>
 
 		<!-- Shipping Section -->
-		<section class="ship-section rv-clip-up" aria-labelledby="shipping-heading">
+		<section class="ship-section" aria-labelledby="shipping-heading">
 			<h2 class="ship-section__title" id="shipping-heading">
 				<span class="ship-section__icon" aria-hidden="true">&#x2726;</span>
 				<?php esc_html_e( 'Shipping', 'skyyrose' ); ?>

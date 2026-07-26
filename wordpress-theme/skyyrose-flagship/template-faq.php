@@ -122,8 +122,13 @@ get_header();
 <main id="primary" class="info-page info-page--faq" role="main">
 	<div class="info-page__container">
 
+		<?php
+		// Hero + first category are above the fold — no reveal classes: the hidden
+		// resting state stalls LCP behind the deferred JS queue (the PDP 24.9s bug
+		// class). Below-fold categories keep reveals. Wave 5.
+		?>
 		<!-- Hero -->
-		<header class="info-page__hero rv-clip-up">
+		<header class="info-page__hero">
 			<span class="info-page__badge"><?php esc_html_e( 'Support', 'skyyrose' ); ?></span>
 			<h1 class="info-page__title"><?php esc_html_e( 'Frequently Asked Questions', 'skyyrose' ); ?></h1>
 			<p class="info-page__subtitle"><?php esc_html_e( 'Everything you need to know about shopping with SkyyRose.', 'skyyrose' ); ?></p>
@@ -132,7 +137,7 @@ get_header();
 		<!-- FAQ Categories -->
 		<div class="faq-categories">
 			<?php foreach ( $faq_categories as $cat_idx => $category ) : ?>
-				<section class="faq-category rv-clip-up" aria-labelledby="faq-cat-<?php echo esc_attr( $cat_idx ); ?>">
+				<section class="faq-category<?php echo 0 === $cat_idx ? '' : ' rv-clip-up'; ?>" aria-labelledby="faq-cat-<?php echo esc_attr( $cat_idx ); ?>">
 					<h2 class="faq-category__title" id="faq-cat-<?php echo esc_attr( $cat_idx ); ?>">
 						<span class="faq-category__icon" aria-hidden="true"><?php echo wp_kses( $category['icon'], array() ); ?></span>
 						<?php echo esc_html( $category['title'] ); ?>

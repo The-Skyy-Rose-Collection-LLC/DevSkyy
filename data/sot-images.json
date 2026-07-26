@@ -10,32 +10,38 @@
     "br-002": {
       "front": "assets/images/products/ghost/br-002-ghost-front.webp",
       "back": "assets/images/products/black-rose-joggers-back-model.webp",
-      "packshot": "assets/images/products/br-002-joggers.png"
+      "packshot": "assets/images/products/br-002-joggers.png",
+      "back_packshot": "assets/images/products/black-rose-joggers-back-model.webp"
     },
     "br-003": {
       "front": "assets/images/products/br-003-onmodel.webp",
       "back": "assets/images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp",
-      "packshot": "assets/images/products/br-003-baseball-classic.jpeg"
+      "packshot": "assets/images/products/br-003-baseball-classic.jpeg",
+      "back_packshot": "assets/images/products/black-is-beautiful-jersey/black-is-beautiful-jersey-back-model.webp"
     },
     "br-004": {
       "front": "assets/images/products/br-004-onmodel.webp",
       "back": "assets/images/products/black-rose-hoodie-back-model.webp",
-      "packshot": "assets/images/products/br-004-black-rose-hoodie.jpeg"
+      "packshot": "assets/images/products/br-004-black-rose-hoodie.jpeg",
+      "back_packshot": "assets/images/products/black-rose-hoodie-back-model.webp"
     },
     "br-005": {
       "front": "assets/images/products/ghost/br-005-ghost-front.webp",
       "back": "assets/images/products/black-rose-hoodie-signature-back-model.webp",
-      "packshot": "assets/images/products/br-005-signature-hoodie.jpeg"
+      "packshot": "assets/images/products/br-005-signature-hoodie.jpeg",
+      "back_packshot": "assets/images/products/black-rose-hoodie-signature-edition-back-model.webp"
     },
     "br-006": {
       "front": "assets/images/products/br-006-onmodel.webp",
       "back": "assets/images/products/black-rose-sherpa-jacket-back.jpg",
-      "packshot": "assets/images/products/br-006-sherpa-jacket.jpeg"
+      "packshot": "assets/images/products/br-006-sherpa-jacket.jpeg",
+      "back_packshot": "assets/images/products/black-rose-sherpa-jacket-back.jpg"
     },
     "br-007": {
-      "front": "assets/images/products/ghost/br-007-ghost-front.webp",
-      "back": "assets/images/products/black-rose-love-hurts-basketball-shorts-back-model.webp",
-      "packshot": "assets/images/products/br-007.jpg"
+      "front": "assets/images/products/hub/br-007-front.webp",
+      "back": "assets/images/products/hub/br-007-back.webp",
+      "packshot": "assets/images/products/br-007.jpg",
+      "back_packshot": "assets/images/products/br-007-real-back.jpg"
     },
     "br-008": {
       "front": "assets/images/products/br-008-onmodel.webp",
@@ -54,13 +60,15 @@
     },
     "br-011": {
       "front": "assets/images/products/br-011-onmodel.webp",
-      "back": "assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp",
-      "packshot": "assets/images/products/br-011-the-rose-hockey.png"
+      "back": "assets/images/products/br-011-the-rose-hockey-back.webp",
+      "packshot": "assets/images/products/br-011-the-rose-hockey.png",
+      "back_packshot": "assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp"
     },
     "br-012": {
       "front": "assets/images/products/jersey-last-oakland-baseball-front-model.webp",
       "back": "assets/images/products/br-012-last-oakland-baseball-back.webp",
-      "packshot": "assets/images/products/br-012-last-oakland-baseball-front.jpeg"
+      "packshot": "assets/images/products/br-012-last-oakland-baseball-front.jpeg",
+      "back_packshot": "assets/images/products/br-012-last-oakland-baseball-back.jpeg"
     },
     "br-014": {
       "front": "assets/images/products/br-014-onmodel.webp",
@@ -85,17 +93,20 @@
     "lh-002": {
       "front": "assets/images/products/lh-002-onmodel.webp",
       "back": "assets/images/products/love-hurts-joggers-back-model.webp",
-      "packshot": "assets/images/products/lh-002-joggers.jpeg"
+      "packshot": "assets/images/products/lh-002-joggers.jpeg",
+      "back_packshot": "assets/images/products/love-hurts-joggers-back-model.webp"
     },
     "lh-003": {
-      "front": "assets/images/products/ghost/lh-003-ghost-front.webp",
+      "front": "assets/images/products/hub/lh-003-front.webp",
       "back": "assets/images/products/love-hurts-basketball-shorts-back-model.webp",
-      "packshot": "assets/images/products/lh-003-shorts.jpeg"
+      "packshot": "assets/images/products/lh-003-shorts.jpeg",
+      "back_packshot": "assets/images/products/lh-003-real-back.jpg"
     },
     "lh-004": {
       "front": "assets/images/products/lh-004-onmodel.webp",
       "back": "assets/images/products/love-hurts-bomber-back-model.webp",
-      "packshot": "assets/images/products/lh-004-bomber.png"
+      "packshot": "assets/images/products/lh-004-bomber.png",
+      "back_packshot": "assets/images/products/lh-004-bomber-back.png"
     },
     "lh-005": {
       "front": "assets/images/products/lh-005-onmodel.webp",
@@ -105,12 +116,14 @@
     "lh-006": {
       "front": "assets/images/products/lh-006-onmodel.webp",
       "back": "assets/images/products/love-hurts-joggers-white-back-model.webp",
-      "packshot": "assets/images/products/lh-006-joggers-white.jpeg"
+      "packshot": "assets/images/products/lh-006-joggers-white.jpeg",
+      "back_packshot": "assets/images/products/love-hurts-joggers-white-back-model.webp"
     },
     "sg-001": {
-      "front": "assets/images/products/bridge-bay-bridge-shorts-front-model.webp",
+      "front": "assets/images/products/sg-001-bay-bridge-shorts.webp",
       "back": "assets/images/products/bridge-bay-bridge-shorts-back-model.webp",
-      "packshot": "assets/images/products/sg-001-bay-bridge-shorts.jpeg"
+      "packshot": "assets/images/products/sg-001-bay-bridge-shorts.jpeg",
+      "back_packshot": "assets/images/products/the-bay-set-back-model.webp"
     },
     "sg-002": {
       "front": "assets/images/products/sg-002-stay-golden-shirt.webp",
@@ -118,7 +131,7 @@
       "packshot": "assets/images/products/sg-002-stay-golden-shirt.jpeg"
     },
     "sg-003": {
-      "front": "assets/images/products/bridge-stay-golden-shorts-front-model.webp",
+      "front": "assets/images/products/hub/sg-003-front.webp",
       "back": "assets/images/products/bridge-stay-golden-shorts-back-model.webp",
       "packshot": "assets/images/products/sg-003-stay-golden-shorts.jpeg"
     },
@@ -130,27 +143,31 @@
     "sg-006": {
       "front": "assets/images/products/sg-006-onmodel.webp",
       "back": "assets/images/products/mint-lavender-hoodie-back-model.webp",
-      "packshot": "assets/images/products/sg-006-mint-lavender-hoodie.png"
+      "packshot": "assets/images/products/sg-006-mint-lavender-hoodie.png",
+      "back_packshot": "assets/images/products/mint-lavender-hoodie-back-model.webp"
     },
     "sg-007": {
-      "front": "assets/images/products/sg-007-onmodel.webp",
+      "front": "assets/images/products/sg-007-signature-beanie.webp",
       "back": "assets/images/products/signature-beanie-back-model.webp",
       "packshot": "assets/images/products/sg-007-signature-beanie.png"
     },
     "sg-009": {
       "front": "assets/images/products/sg-009-onmodel.webp",
       "back": "assets/images/products/signature-sherpa-jacket-back-model.webp",
-      "packshot": "assets/images/products/sg-009-sherpa-jacket.jpeg"
+      "packshot": "assets/images/products/sg-009-sherpa-jacket.jpeg",
+      "back_packshot": "assets/images/products/the-sherpa-jacket-back-model.webp"
     },
     "sg-011": {
       "front": "assets/images/products/sg-011-onmodel.webp",
-      "back": "assets/images/products/original-label-tee-white-back-model.webp",
-      "packshot": "assets/images/products/sg-011-original-label-tee-white.jpeg"
+      "back": "assets/images/products/hub/sg-011-back.webp",
+      "packshot": "assets/images/products/sg-011-original-label-tee-white.jpeg",
+      "back_packshot": "assets/images/products/original-label-tee-white-back-model.webp"
     },
     "sg-012": {
       "front": "assets/images/products/sg-012-onmodel.webp",
       "back": "assets/images/products/original-label-tee-orchid-back-model.webp",
-      "packshot": "assets/images/products/sg-012-original-label-tee-orchid.jpeg"
+      "packshot": "assets/images/products/sg-012-original-label-tee-orchid.jpeg",
+      "back_packshot": "assets/images/products/original-label-tee-orchid-back-model.webp"
     },
     "sg-013": {
       "front": "assets/images/products/sg-013-onmodel.webp",
@@ -158,12 +175,12 @@
       "packshot": "assets/images/products/sg-013-mint-lavender-crewneck.jpeg"
     },
     "sg-014": {
-      "front": "assets/images/products/ghost/sg-014-ghost-front.webp",
+      "front": "assets/images/products/hub/sg-014-front.webp",
       "back": "assets/images/products/mint-lavender-sweatpants-back-model.webp",
       "packshot": "assets/images/products/sg-014-mint-lavender-sweatpants.jpeg"
     },
     "sg-015": {
-      "front": "assets/images/products/sg-015-onmodel.webp",
+      "front": "assets/images/products/hub/sg-015-front.webp",
       "back": "assets/images/products/signature-windbreaker-set-back-model.webp",
       "packshot": "assets/images/products/sg-015-windbreaker-set.jpg"
     }

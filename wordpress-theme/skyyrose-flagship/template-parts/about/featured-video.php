@@ -35,7 +35,7 @@ if ( empty( $youtube_embed_id ) ) {
 		</div>
 		<div class="abt-press__video-frame">
 			<iframe
-				src="<?php echo esc_url( 'https://www.youtube.com/embed/' . $youtube_embed_id . '?rel=0&modestbranding=1' ); ?>"
+				src="<?php echo esc_url( 'https://www.youtube-nocookie.com/embed/' . $youtube_embed_id . '?rel=0&modestbranding=1' ); ?>"
 				title="<?php esc_attr_e( 'SkyyRose Collection — The Blox Interview', 'skyyrose' ); ?>"
 				frameborder="0"
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

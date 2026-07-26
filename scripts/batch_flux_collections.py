@@ -42,6 +42,7 @@ for _f in [".env", ".env.hf", ".env.secrets"]:
         load_dotenv(_f, override=False)
 
 from skyyrose.core.dossier_loader import DOSSIERS_DIR, get_product_with_dossier
+from skyyrose.core.sot_images import resolve_image
 from skyyrose.elite_studio.synthesis.flux_pipeline import render
 from skyyrose.elite_studio.synthesis.state.telemetry import CostTracker
 
@@ -68,12 +69,17 @@ def _load_manifest(collections: set[str], skus: set[str]) -> list[dict]:
                 continue
             if skus and row["sku"] not in skus:
                 continue
-            front_path = ASSETS_ROOT / row["image"].strip()
-            back_raw = row.get("back_image", "").strip()
-            back_path = (ASSETS_ROOT / back_raw) if back_raw else None
+            sku = row["sku"]
+            front_rel = resolve_image(sku, "packshot")
+            if front_rel is None:
+                logger.warning("skipping %s — SOT has no packshot image", sku)
+                continue
+            front_path = ASSETS_ROOT / front_rel
+            back_rel = resolve_image(sku, "back_packshot")
+            back_path = (ASSETS_ROOT / back_rel) if back_rel else None
             manifest.append(
                 {
-                    "sku": row["sku"],
+                    "sku": sku,
                     "name": row["name"],
                     "collection": row["collection"],
                     "dossier_slug": row.get("dossier_slug", ""),

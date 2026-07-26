@@ -455,6 +455,7 @@
 .lp-pane__mobile-img {
 	width: 100%;
 	max-width: 320px;
+	height: auto; /* square renders carry width=480 height=600 attrs — without this the 4:5 attr ratio distorts them */
 	border-radius: 2px;
 	display: block;
 }
@@ -666,11 +667,23 @@
 	opacity: 0;
 	transform: translateY( 1.25rem );
 	transition: opacity 0.55s ease, transform 0.55s ease;
+	/* Safety net (mirrors srRevealSafety, animations-premium.css §12.5) — kept
+	   local so this hidden state never depends on another stylesheet being
+	   enqueued (Wave 5). The .is-visible path cancels it. */
+	animation: lpScrollRevealSafety 0.01s linear 0.8s forwards;
+}
+
+@keyframes lpScrollRevealSafety {
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .lp-rv.is-visible {
 	opacity: 1;
 	transform: none;
+	animation: none !important;
 }
 
 /* ==========================================================================

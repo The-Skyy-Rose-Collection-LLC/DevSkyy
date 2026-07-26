@@ -54,7 +54,12 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 		Header + Re-Search Form
 		============================ -->
 	<header class="search-results__header">
-		<h1 class="search-results__title rv-clip-up">
+		<?php
+		// Above the fold — no reveal classes: the hidden resting state stalls LCP
+		// behind the deferred JS queue (and search skips premium-interactions.js
+		// entirely, so .is-visible never arrives here). Wave 5.
+		?>
+		<h1 class="search-results__title">
 			<?php if ( ! empty( $skyyrose_search_query ) ) : ?>
 				<?php esc_html_e( 'Results for', 'skyyrose' ); ?>
 				<span class="search-results__query"><?php echo esc_html( $skyyrose_search_query ); ?></span>
@@ -64,7 +69,7 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 		</h1>
 
 		<?php if ( ! empty( $skyyrose_search_query ) ) : ?>
-			<p class="search-results__count rv-blur">
+			<p class="search-results__count">
 				<?php
 				$skyyrose_total = $skyyrose_product_count + $skyyrose_content_count;
 				printf(
@@ -214,11 +219,12 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 				</svg>
 			</div>
 
-			<h2 class="search-results__empty-title rv-clip-up">
+			<?php // Above the fold on the no-results state — no reveal classes (Wave 5, see header note). ?>
+			<h2 class="search-results__empty-title">
 				<?php esc_html_e( 'No Results Found', 'skyyrose' ); ?>
 			</h2>
 
-			<p class="search-results__empty-subtitle rv-blur">
+			<p class="search-results__empty-subtitle">
 				<?php
 				if ( ! empty( $skyyrose_search_query ) ) {
 					printf(

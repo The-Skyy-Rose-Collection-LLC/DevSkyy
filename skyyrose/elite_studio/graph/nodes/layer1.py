@@ -15,6 +15,7 @@ from ...agents.generator_agent import GeneratorAgent as GeneratorAgent  # re-exp
 from ...agents.quality_agent import QualityAgent as QualityAgent  # re-exported
 from ...agents.tryon_agent import TryOnAgent as TryOnAgent  # re-exported
 from ...agents.tryon_agent import _find_garment_image as _find_garment_image  # re-exported
+from ...agents.tryon_agent import ensure_public_url as ensure_public_url  # re-exported
 from ...agents.vision_agent import VisionAgent as VisionAgent  # re-exported
 from ...quality.human_review import HumanReviewGate as HumanReviewGate  # re-exported
 from ...quality.ml_classifier import QualityClassifier as QualityClassifier  # re-exported
@@ -487,14 +488,22 @@ def tryon_node(state: EliteStudioState) -> dict:
 
     category = state.get("tryon_category", "upper_body")
     agent = _shim().TryOnAgent()
-    result = run_sync(
-        agent.execute_tryon(
-            garment_image_path=garment_path,
-            model_image_path=gen.output_path,
-            category=category,
-            garment_sku=sku,
+    try:
+        garment_url = _shim().ensure_public_url(garment_path, sku=sku)
+        model_url = _shim().ensure_public_url(gen.output_path, sku=sku)
+        result = run_sync(
+            agent.execute_tryon(
+                garment_image_path=garment_url,
+                model_image_path=model_url,
+                category=category,
+                garment_sku=sku,
+            )
         )
-    )
+    except Exception as exc:
+        # Additive stage — never let an upload or FASHN failure crash the job.
+        logger.warning("tryon_node: skipping for %s — %s", sku, exc)
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
 
     if budget is not None and hasattr(budget, "spend") and getattr(result, "success", False):
         budget.spend(_TRYON_EST_COST_USD, stage="tryon")

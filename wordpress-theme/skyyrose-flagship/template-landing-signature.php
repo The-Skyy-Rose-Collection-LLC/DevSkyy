@@ -56,12 +56,17 @@ get_header();
 	class="lp-main"
 	data-collection="signature"
 >
-	<?php // ── Hero ─────────────────────────────────────────────────────────── ?>
-	<section class="lp-hero lp-rv" aria-label="<?php esc_attr_e( 'Signature collection', 'skyyrose' ); ?>">
+	<?php
+	// ── Hero ───────────────────────────────────────────────────────────
+	// Above the fold — no lp-rv reveal classes here: the lockup is the mobile
+	// LCP element, and a hidden resting state stalls LCP behind the deferred
+	// JS queue (the PDP 24.9s bug class). Below-fold sections keep reveals. Wave 5.
+	?>
+	<section class="lp-hero" aria-label="<?php esc_attr_e( 'Signature collection', 'skyyrose' ); ?>">
 		<div class="lp-hero__inner">
 
 			<?php // Lockup image IS the collection name — never type-rendered. ?>
-			<div class="lp-hero__lockup lp-rv">
+			<div class="lp-hero__lockup">
 				<picture>
 					<source
 						srcset="<?php echo esc_url( $assets . 'images/hero-overlays/sig-brand-skyy-rose-gold.avif' ); ?>"
@@ -83,11 +88,11 @@ get_header();
 				</picture>
 			</div>
 
-			<p class="lp-hero__subtitle lp-rv">
+			<p class="lp-hero__subtitle">
 				<?php esc_html_e( 'Not basics. Blueprints.', 'skyyrose' ); ?>
 			</p>
 
-			<div class="lp-hero__ctas lp-rv">
+			<div class="lp-hero__ctas">
 				<a
 					href="#lp-split"
 					class="lp-btn lp-btn--primary btn-sweep"

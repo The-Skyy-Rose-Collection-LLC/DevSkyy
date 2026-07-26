@@ -159,11 +159,23 @@ html {
 	opacity: 0;
 	transform: translateY(28px);
 	transition: opacity 1.1s var(--exp-ease), transform 1.1s var(--exp-ease);
+	/* Safety net (mirrors srRevealSafety, animations-premium.css §12.5): this
+	   hidden state is NOT covered by the central net, so slow/failed JS left
+	   content invisible (Wave 5). The .is-visible path cancels it. */
+	animation: expRevealSafety 0.01s linear 0.8s forwards;
+}
+
+@keyframes expRevealSafety {
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .exp-block__content.is-visible {
 	opacity: 1;
 	transform: translateY(0);
+	animation: none !important;
 }
 
 /* ─── Faded-border treatment: hairline rules above + below the name ──── */
@@ -323,7 +335,7 @@ html {
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-snap-type: none; }
 	.exp-block__scene img { animation: none; transform: scale(1.04); }
-	.exp-block__content { opacity: 1; transform: none; transition: none; }
+	.exp-block__content { opacity: 1; transform: none; transition: none; animation: none; }
 	.exp-name { letter-spacing: 0.02em !important; transition: none; }
 	.exp-name-frame::before,
 	.exp-name-frame::after { opacity: 0.85; animation: none; transition: none; }

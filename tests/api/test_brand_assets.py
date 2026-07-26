@@ -170,6 +170,7 @@ class TestBulkIngestion:
         assert data["total"] == 3
 
     @pytest.mark.asyncio
+    @pytest.mark.timeout(30)  # 100-asset ingest sits at ~10s; flakes at the global 10s cap
     async def test_bulk_ingest_max_100_assets(self, client: AsyncClient) -> None:
         """Should accept up to 100 assets."""
         assets = [

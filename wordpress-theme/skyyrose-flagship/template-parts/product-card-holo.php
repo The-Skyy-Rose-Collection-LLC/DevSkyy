@@ -70,6 +70,18 @@ if ( empty( $permalink ) ) {
 }
 
 $index = (int) ( $args['index'] ?? 0 );
+
+/*
+ * Wave 7: first-row cards on the shop/taxonomy archive pass
+ * image_loading=eager (and image_priority on card 1) from
+ * woocommerce/content-product.php — round-6 flagged the lazy front image as
+ * shop's mobile LCP (lcp-lazy-loaded). Only the FRONT image is ever eager;
+ * the back (techflat hover) image stays lazy — it is opacity-hidden until
+ * hover and must never compete with the LCP fetch. Default stays lazy for
+ * every other caller (search, static grids).
+ */
+$image_loading  = ( isset( $args['image_loading'] ) && 'eager' === $args['image_loading'] ) ? 'eager' : 'lazy';
+$image_priority = ! empty( $args['image_priority'] );
 ?>
 <div class="holo holo--<?php echo esc_attr( $collection ); ?>" 
 	data-sku="<?php echo esc_attr( $sku ); ?>"
@@ -84,22 +96,29 @@ $index = (int) ( $args['index'] ?? 0 );
 					$front_url,
 					$title,
 					array(
-						'class'    => 'holo__img holo__img--front',
-						'loading'  => 'lazy',
-						'decoding' => 'async',
-						'width'    => '600',
-						'height'   => '750',
+						'class'         => 'holo__img holo__img--front',
+						'loading'       => $image_loading,
+						// fetchpriority high + sync decode on the archive's first
+						// card only — it is the measured shop mobile LCP element.
+						'fetchpriority' => $image_priority ? 'high' : null,
+						'decoding'      => $image_priority ? 'sync' : 'async',
+						'width'         => '600',
+						'height'        => '750',
+						'photon_widths' => array( 320, 480, 768 ),
+						'sizes'         => '(max-width: 480px) 92vw, (max-width: 1024px) 46vw, 440px',
 					)
 				);
 				echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
 					$back_url,
 					$title . ' — technical blueprint view',
 					array(
-						'class'    => 'holo__img holo__img--back',
-						'loading'  => 'lazy',
-						'decoding' => 'async',
-						'width'    => '600',
-						'height'   => '750',
+						'class'         => 'holo__img holo__img--back',
+						'loading'       => 'lazy',
+						'decoding'      => 'async',
+						'width'         => '600',
+						'height'        => '750',
+						'photon_widths' => array( 320, 480, 768 ),
+						'sizes'         => '(max-width: 480px) 92vw, (max-width: 1024px) 46vw, 440px',
 					)
 				);
 				?>
@@ -143,7 +162,7 @@ $index = (int) ( $args['index'] ?? 0 );
 			?>
 			<button type="button" class="holo__buy"
 				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
-				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to cart', 'skyyrose' ), $title ) ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name. Must start with the visible "Add to Cart" text (WCAG 2.5.3 Label in Name). */ __( 'Add to Cart: %s', 'skyyrose' ), $title ) ); ?>"
 				<?php disabled( $product_id <= 0 ); ?>>
 				<?php esc_html_e( 'Add to Cart', 'skyyrose' ); ?>
 			</button>

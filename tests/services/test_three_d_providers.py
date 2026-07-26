@@ -1459,3 +1459,85 @@ class TestErrorClasses:
 
         assert error.timeout_seconds == 300.0
         assert error.retryable is True  # Timeouts are always retryable
+
+
+# =============================================================================
+# Regression Tests: #18a — Sync I/O in Async HuggingFace Methods
+# =============================================================================
+
+
+class TestHuggingFaceAsyncIO:
+    """
+    Regression tests for P1 finding #18a.
+
+    All three Gradio predict calls (_run_trellis, _run_triposr, _run_shap_e)
+    must be dispatched via asyncio.to_thread — not called synchronously in the
+    async method body, which would block the event loop for the full generation
+    duration (often 30-120 seconds).
+    """
+
+    @pytest.fixture
+    def provider(self, mock_huggingface_config):
+        from services.three_d.huggingface_provider import HuggingFaceProvider
+
+        return HuggingFaceProvider(mock_huggingface_config)
+
+    @pytest.mark.asyncio
+    async def test_run_trellis_dispatches_predict_via_to_thread(self, provider, tmp_path):
+        """_run_trellis must use asyncio.to_thread for client.predict()."""
+        import asyncio
+
+        fake_glb = tmp_path / "model.glb"
+        fake_glb.write_bytes(b"glb")
+
+        mock_client = MagicMock()
+        mock_client.predict.return_value = (
+            {"video": "info"},
+            str(fake_glb),
+            str(fake_glb),
+        )
+
+        with (
+            patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_to_thread,
+            patch("gradio_client.Client", return_value=mock_client),
+            patch("gradio_client.handle_file", return_value="handle"),
+        ):
+            await provider._run_trellis(str(fake_glb), "corr-001")
+            mock_to_thread.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_run_triposr_dispatches_predict_via_to_thread(self, provider, tmp_path):
+        """_run_triposr must use asyncio.to_thread for client.predict()."""
+        import asyncio
+
+        fake_mesh = tmp_path / "model.obj"
+        fake_mesh.write_bytes(b"obj")
+
+        mock_client = MagicMock()
+        mock_client.predict.return_value = (str(fake_mesh),)
+
+        with (
+            patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_to_thread,
+            patch("gradio_client.Client", return_value=mock_client),
+            patch("gradio_client.handle_file", return_value="handle"),
+        ):
+            await provider._run_triposr(str(fake_mesh), "corr-002")
+            mock_to_thread.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_run_shap_e_dispatches_predict_via_to_thread(self, provider, tmp_path):
+        """_run_shap_e must use asyncio.to_thread for client.predict()."""
+        import asyncio
+
+        fake_mesh = tmp_path / "model.obj"
+        fake_mesh.write_bytes(b"obj")
+
+        mock_client = MagicMock()
+        mock_client.predict.return_value = (str(fake_mesh),)
+
+        with (
+            patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_to_thread,
+            patch("gradio_client.Client", return_value=mock_client),
+        ):
+            await provider._run_shap_e("a 3D hooded sweatshirt", "corr-003")
+            mock_to_thread.assert_called_once()

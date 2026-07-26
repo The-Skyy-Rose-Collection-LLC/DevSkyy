@@ -438,7 +438,10 @@ function skyyrose_render_drop_block() {
 	?>
 	<section
 		class="sr-drop-block rv"
-		<?php if ( $collection ) : ?>data-collection="<?php echo esc_attr( $collection ); ?>"<?php endif; ?>
+		<?php
+		if ( $collection ) :
+			?>
+			data-collection="<?php echo esc_attr( $collection ); ?>"<?php endif; ?>
 		aria-label="<?php echo esc_attr( $aria_label ); ?>"
 	>
 		<?php if ( $image_url ) : ?>
@@ -535,8 +538,8 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 	</aside>
 	<script>
 	/* Editorial sticky ATC — IntersectionObserver visibility + size select mirror.
-	   Inline because this controller is tightly coupled to the editorial template's
-	   DOM structure and is not shared with any other template. No innerHTML used. */
+		Inline because this controller is tightly coupled to the editorial template's
+		DOM structure and is not shared with any other template. No innerHTML used. */
 	(function () {
 		'use strict';
 
@@ -545,12 +548,12 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 		if (!bar || !trigger) { return; }
 
 		/* Show bar once Chapter 1 (.sr-ed__encounter) is no longer in view.
-		   IntersectionObserver is threshold:0 so any pixel leaving viewport fires. */
+			IntersectionObserver is threshold:0 so any pixel leaving viewport fires. */
 		var obs = new IntersectionObserver(function (entries) {
 			var gone = !entries[0].isIntersecting;
 			bar.classList.toggle('is-visible', gone);
 			/* Flip aria-hidden so the bar is reachable by keyboard/screen reader
-			   only when it is visually present. */
+				only when it is visually present. */
 			bar.setAttribute('aria-hidden', gone ? 'false' : 'true');
 		}, { threshold: 0 });
 		obs.observe(trigger);
@@ -560,7 +563,7 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 
 		function getMainSel() {
 			/* WooCommerce renders the attribute select with attribute_pa_size for
-			   taxonomy attributes and attribute_size for custom attributes. */
+				taxonomy attributes and attribute_size for custom attributes. */
 			return document.querySelector('.variations_form select[name="attribute_pa_size"]')
 				|| document.querySelector('.variations_form select[name="attribute_size"]');
 		}
@@ -570,7 +573,7 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 			if (!mainSel || !stickySel) { return; }
 
 			/* Only populate once — the WC form's options are static HTML
-			   rendered server-side and present in the DOM when this script runs. */
+				rendered server-side and present in the DOM when this script runs. */
 			if (stickySel.options.length > 1) { return; }
 
 			/* Build using createElement + textContent — no innerHTML. */
@@ -589,11 +592,11 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 		}
 
 		/* Run immediately — WC variation form is in the DOM at this point
-		   because woocommerce_template_single_add_to_cart() was called above. */
+			because woocommerce_template_single_add_to_cart() was called above. */
 		populateStickySelect();
 
 		/* Push sticky select choice back to WC form and trigger variation
-		   resolution so WC updates stock, price, and button state. */
+			resolution so WC updates stock, price, and button state. */
 		if (stickySel) {
 			stickySel.addEventListener('change', function () {
 				var mainSel = getMainSel();
@@ -616,15 +619,15 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 		}
 
 		/* "Add to Bag" — scroll to real ATC then submit the cart form.
-		   Slight delay (350ms) lets smooth-scroll animation settle before
-		   WC form focus shift, avoiding a jarring layout jump. */
+			Slight delay (350ms) lets smooth-scroll animation settle before
+			WC form focus shift, avoiding a jarring layout jump. */
 		var addBtn = bar.querySelector('.sr-sticky-atc__btn');
 		if (addBtn) {
 			addBtn.addEventListener('click', function (e) {
 				e.preventDefault();
 				/* Guard: a double-tap during the 350ms scroll window would queue a
-				   second programmatic submit — WC does not dedupe, so the cart
-				   would silently gain duplicate line items. */
+					second programmatic submit — WC does not dedupe, so the cart
+					would silently gain duplicate line items. */
 				if (addBtn.dataset.submitting) { return; }
 				addBtn.dataset.submitting = '1';
 				var atcWrap  = document.querySelector('.sr-ed__atc-wrap');
@@ -635,7 +638,7 @@ function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
 				setTimeout(function () {
 					if (cartForm) {
 						/* requestSubmit() triggers native form validation;
-						   .submit() bypasses it — prefer requestSubmit when available. */
+							.submit() bypasses it — prefer requestSubmit when available. */
 						if (typeof cartForm.requestSubmit === 'function') {
 							cartForm.requestSubmit();
 						} else {

@@ -73,8 +73,14 @@ while ( have_posts() ) :
 			<section class="sr-hero">
 				<div class="sr-container sr-hero-grid">
 
+					<?php
+					// Gallery + info columns are the first mobile viewport and the
+					// gallery image is the LCP element — no reveal classes here:
+					// the hidden resting state stalls LCP behind the deferred JS
+					// queue (the 24.9s render-delay bug, fix-log Wave 1). Wave 5.
+					?>
 					<!-- Gallery Column -->
-					<div class="sr-gallery rv-clip-left">
+					<div class="sr-gallery">
 						<div class="sr-gallery-main">
 							<?php
 							$hero_img = $techflat_url ? $techflat_url : $main_image;
@@ -108,7 +114,7 @@ while ( have_posts() ) :
 					</div>
 
 					<!-- Info Column -->
-					<div class="sr-info rv-clip-right">
+					<div class="sr-info">
 						<div class="sr-info-inner">
 							<p class="sr-info-collection"><?php echo esc_html( $config['label'] ); ?> COLLECTION</p>
 							<h1 class="sr-info-name"><?php the_title(); ?></h1>

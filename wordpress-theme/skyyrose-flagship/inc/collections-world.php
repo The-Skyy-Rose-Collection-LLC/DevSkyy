@@ -50,11 +50,23 @@ function skyyrose_get_collections_world_config() {
 	 * @return array{still:string,clip:string,clipMobile:string}
 	 */
 	$assets = static function ( $base ) use ( $scenes_uri ) {
-		return array(
-			'still'      => esc_url( $scenes_uri . '/' . $base . '.webp' ),
+		$still = esc_url( $scenes_uri . '/' . $base . '.webp' );
+		$out   = array(
+			'still'      => $still,
 			'clip'       => esc_url( $scenes_uri . '/' . $base . '.mp4' ),
 			'clipMobile' => esc_url( $scenes_uri . '/' . $base . '-m.mp4' ),
 		);
+		// Photon width variants: the engine assigns srcset before src, so phones
+		// pull a viewport-sized still instead of the 1920px master (mobile LCP
+		// budget). Empty when Photon can't serve the URL (e.g. local dev).
+		$set = function_exists( 'skyyrose_photon_srcset' )
+			? skyyrose_photon_srcset( $still, array( 480, 768, 1280, 1920 ) )
+			: '';
+		if ( '' !== $set ) {
+			$out['stillSet']   = $set;
+			$out['stillSizes'] = '100vw';
+		}
+		return $out;
 	};
 
 	$config = array(

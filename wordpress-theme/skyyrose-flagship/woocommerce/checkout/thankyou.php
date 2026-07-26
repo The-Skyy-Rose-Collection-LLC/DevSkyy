@@ -22,7 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $order ) : ?>
 
 		<?php
-		/* Fire WC's standard pre-content hook INSIDE the wrapper (matching WC
+		/*
+		Fire WC's standard pre-content hook INSIDE the wrapper (matching WC
 		 * core's structural placement) so analytics / conversion-pixel plugins
 		 * that emit HTML (e.g. noscript pixels) land inside the section, not
 		 * above it. */
@@ -91,7 +92,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</dl>
 
 			<?php
-			/* Render itemized order line items — the garment IS the proof of
+			/*
+			Render itemized order line items — the garment IS the proof of
 			 * purchase on this page. WC's standard order/order-details.php
 			 * template handles permissions (download links, etc.). */
 			wc_get_template(
