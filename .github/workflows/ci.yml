@@ -49,7 +49,7 @@ jobs:
   # ===========================================================================
   lint:
     name: 🔍 Lint & Static Analysis
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
@@ -196,7 +196,7 @@ jobs:
   # ===========================================================================
   security:
     name: 🔐 Security Scan
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
@@ -344,7 +344,7 @@ jobs:
   # ===========================================================================
   frontend-tests:
     name: ⚛️ Frontend Tests
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
 
     defaults:
@@ -389,7 +389,7 @@ jobs:
   # ===========================================================================
   threejs-tests:
     name: 🎮 Three.js Tests
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
@@ -422,7 +422,7 @@ jobs:
   # ===========================================================================
   wordpress-theme:
     name: "🏗️ WordPress Theme"
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
@@ -479,7 +479,7 @@ jobs:
   # ===========================================================================
   e2e-tests:
     name: 🎭 Playwright E2E Tests
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     # Non-gating: E2E suite is nascent / not yet CI-stable. Still runs for visibility,
     # but does not block merges until the suite is hardened (see settings-page.spec follow-up).
@@ -645,7 +645,7 @@ jobs:
   # ===========================================================================
   docker-build:
     name: 🐳 Docker Build
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     # The .[all] backend image pulls the full ML stack (torch+CUDA, transformers,
     # mineru, chromadb, faiss, sentence-transformers) — a multi-GB image whose
     # build + GHCR push legitimately exceeds 20 min cold. Deps now resolve (aiofiles
@@ -743,7 +743,7 @@ jobs:
   # touches pyproject.toml, failing fast instead. (Added 2026-07-07, P4.)
   deps-resolve-canary:
     name: 🧪 Deps Canary ([all] resolves)
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
 
@@ -903,7 +903,7 @@ jobs:
   # ===========================================================================
   summary:
     name: 📊 Pipeline Summary
-    runs-on: [self-hosted, devskyy-local]
+    runs-on: ubuntu-latest
     needs: [lint, python-tests, security, frontend-tests, threejs-tests, wordpress-theme]
     if: always()
 
