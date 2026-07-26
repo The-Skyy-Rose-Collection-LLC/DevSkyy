@@ -397,18 +397,19 @@ class CatalogSyncEngine:
             # Validate fidelity if enabled
             if self.config.validate_3d_fidelity:
                 try:
-                    from imagery.model_fidelity import validate_model_fidelity
+                    from imagery.model_fidelity import ModelFidelityValidator
 
-                    fidelity_report = await validate_model_fidelity(
-                        str(model_path),
-                        product_sku,
-                        reference_dir=str(self.images_dir),
-                        threshold=self.config.fidelity_threshold,
+                    # fidelity_threshold is a 0-1 fraction (Pydantic Field ge=0, le=1);
+                    # ModelFidelityValidator.minimum_threshold is 0-100, matching overall_score.
+                    validator = ModelFidelityValidator(
+                        minimum_threshold=self.config.fidelity_threshold * 100,
+                        reference_image_path=source_images[0] if source_images else None,
                     )
+                    fidelity_report = await validator.validate(model_path)
 
                     if not fidelity_report.passed:
                         result.warnings.append(
-                            f"3D model fidelity {fidelity_report.fidelity_score:.2%} "
+                            f"3D model fidelity {fidelity_report.overall_score:.2f}% "
                             f"below threshold {self.config.fidelity_threshold:.2%}"
                         )
                         # Regenerate if configured

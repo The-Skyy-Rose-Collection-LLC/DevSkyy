@@ -9,12 +9,14 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 from services.three_d.provider_interface import (
     OutputFormat,
@@ -47,6 +49,19 @@ class TripoProviderConfig:
         default_factory=lambda: os.getenv("THREE_D_OUTPUT_DIR", "./assets/3d-models-generated")
     )
     timeout_seconds: float = 300.0
+    # Region control — mirrors agents.tripo_agent.TripoConfig's own env-driven
+    # defaults (same env var names) so a caller who only touches
+    # TripoProviderConfig still gets consistent region selection. `None` means
+    # "not explicitly set" — _get_agent() then lets the wrapped TripoConfig
+    # apply its own default instead of forcing a value.
+    base_url: str | None = field(default_factory=lambda: os.getenv("TRIPO_API_BASE_URL") or None)
+    is_global: bool | None = field(
+        default_factory=lambda: (
+            os.getenv("TRIPO_IS_GLOBAL", "").lower() != "false"
+            if "TRIPO_IS_GLOBAL" in os.environ
+            else None
+        )
+    )
 
     @classmethod
     def from_env(cls) -> TripoProviderConfig:
@@ -100,14 +115,49 @@ class TripoProvider:
             # Lazy import to avoid circular dependencies
             from agents.tripo_agent import TripoAssetAgent, TripoConfig
 
-            tripo_config = TripoConfig(
-                api_key=self.config.api_key,
-                output_dir=self.config.output_dir,
-                timeout=self.config.timeout_seconds,
+            # When the caller hasn't overridden anything, pass config=None so
+            # TripoAssetAgent.__init__ sets _needs_credential_resolution=True
+            # and runs the multi-account/multi-region resolver (bug-278) —
+            # building ANY explicit TripoConfig here, even one built purely
+            # from env-var defaults, permanently disables that resolver.
+            caller_overrode_nothing = (
+                not self.config.api_key
+                and self.config.base_url is None
+                and self.config.is_global is None
             )
+            if caller_overrode_nothing:
+                self._agent = TripoAssetAgent(config=None)
+                return self._agent
+
+            # dict[str, Any]: values are individually correctly typed per key
+            # (verified by the None-guarded assignments below), but the dict's
+            # own value type must stay heterogeneous for the **kwargs unpack —
+            # a narrower union (e.g. str | float | bool) makes Pyright unable
+            # to verify each TripoConfig parameter individually.
+            tripo_config_kwargs: dict[str, Any] = {
+                "api_key": self.config.api_key,
+                "output_dir": self.config.output_dir,
+                "timeout": self.config.timeout_seconds,
+            }
+            # Only override region fields when explicitly set — otherwise
+            # TripoConfig's own default_factory (same env vars) applies.
+            if self.config.base_url is not None:
+                tripo_config_kwargs["base_url"] = self.config.base_url
+            if self.config.is_global is not None:
+                tripo_config_kwargs["is_global"] = self.config.is_global
+
+            tripo_config = TripoConfig(**tripo_config_kwargs)
             self._agent = TripoAssetAgent(config=tripo_config)
 
         return self._agent
+
+    def _resolve_is_global(self) -> bool:
+        """Resolve the effective IS_GLOBAL flag for direct TripoClient use.
+
+        Mirrors TripoClient's own default (True → .ai region) when the
+        provider config leaves is_global unset.
+        """
+        return self.config.is_global if self.config.is_global is not None else True
 
     def _generate_correlation_id(self) -> str:
         """Generate correlation ID."""
@@ -305,35 +355,40 @@ class TripoProvider:
             ) from e
 
     async def health_check(self) -> ProviderHealth:
-        """Check provider health and availability."""
+        """Check provider health and availability.
+
+        Performs a real, free connectivity probe — GET /user/balance via the
+        Tripo3D SDK — rather than only checking key-presence and SDK
+        importability. get_balance() is a read-only account endpoint, not a
+        generation call, so this costs nothing and never queues a paid job.
+        """
         start_time = time.time()
 
+        if not self.config.api_key:
+            return ProviderHealth(
+                provider=self.name,
+                status=ProviderStatus.UNAVAILABLE,
+                capabilities=self.capabilities,
+                last_check=datetime.now(UTC),
+                error_message="TRIPO_API_KEY not configured",
+            )
+
         try:
-            if not self.config.api_key:
-                return ProviderHealth(
-                    provider=self.name,
-                    status=ProviderStatus.UNAVAILABLE,
-                    capabilities=self.capabilities,
-                    last_check=datetime.now(UTC),
-                    error_message="TRIPO_API_KEY not configured",
-                )
+            from tripo3d import TripoClient
+        except ImportError:
+            return ProviderHealth(
+                provider=self.name,
+                status=ProviderStatus.UNAVAILABLE,
+                capabilities=self.capabilities,
+                last_check=datetime.now(UTC),
+                error_message="tripo3d SDK not installed",
+            )
 
-            # Check if Tripo SDK is available
-            try:
-                from tripo3d import TripoClient  # noqa: F401
-
-                TRIPO_SDK_AVAILABLE = True
-            except ImportError:
-                TRIPO_SDK_AVAILABLE = False
-
-            if not TRIPO_SDK_AVAILABLE:
-                return ProviderHealth(
-                    provider=self.name,
-                    status=ProviderStatus.UNAVAILABLE,
-                    capabilities=self.capabilities,
-                    last_check=datetime.now(UTC),
-                    error_message="tripo3d SDK not installed",
-                )
+        try:
+            async with TripoClient(
+                api_key=self.config.api_key, IS_GLOBAL=self._resolve_is_global()
+            ) as client:
+                await asyncio.wait_for(client.get_balance(), timeout=10.0)
 
             latency = (time.time() - start_time) * 1000
 
@@ -343,6 +398,15 @@ class TripoProvider:
                 capabilities=self.capabilities,
                 latency_ms=latency,
                 last_check=datetime.now(UTC),
+            )
+
+        except TimeoutError:
+            return ProviderHealth(
+                provider=self.name,
+                status=ProviderStatus.DEGRADED,
+                capabilities=self.capabilities,
+                last_check=datetime.now(UTC),
+                error_message="Tripo3D balance check timed out after 10s",
             )
 
         except Exception as e:

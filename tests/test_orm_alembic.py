@@ -47,6 +47,8 @@ def test_base_metadata():
         "rag_documents",
         "brand_assets",
         "brand_asset_ingestion_jobs",
+        "model3d_generations",
+        "model3d_reviews",
     }
 
     actual_tables = set(tables.keys())

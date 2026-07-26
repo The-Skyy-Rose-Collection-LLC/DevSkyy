@@ -92,6 +92,31 @@ export const Job3DSchema = z.object({
     completed_at: z.string().optional(),
 });
 
+// 3D Generation Schemas — mirrors api/v1/media.py exactly (ThreeDAssetMetadata,
+// ThreeDGenerationResponse). Field names/nullability must match the Pydantic
+// models field-for-field; a mismatch here fails validation at runtime.
+export const ThreeDAssetMetadataSchema = z.object({
+    polycount: z.number(),
+    file_size_mb: z.number(),
+    texture_resolution: z.string(),
+    includes_materials: z.boolean(),
+    includes_textures: z.boolean(),
+    animation_ready: z.boolean(),
+});
+
+export const ThreeDGenerationResponseSchema = z.object({
+    generation_id: z.string(),
+    status: z.string(),
+    timestamp: z.string(),
+    product_name: z.string(),
+    output_format: z.string(),
+    model_url: z.string().nullable().optional(),
+    preview_url: z.string().nullable().optional(),
+    download_url: z.string().nullable().optional(),
+    metadata: ThreeDAssetMetadataSchema.nullable().optional(),
+    estimated_completion_time: z.string().nullable().optional(),
+});
+
 // Health Schema
 export const HealthResponseSchema = z.object({
     status: z.string(),

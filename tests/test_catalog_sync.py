@@ -306,6 +306,82 @@ class TestCatalogSyncEngine:
         assert "has_3d_model" in status
         assert "has_processed_images" in status
 
+    @pytest.mark.asyncio
+    async def test_ensure_3d_model_validates_existing_model(self, engine, sample_images):
+        """A high-fidelity mesh should pass validation via the real ModelFidelityValidator API."""
+        pytest.importorskip("trimesh")
+        from unittest.mock import Mock
+
+        import numpy as np
+
+        model_path = engine.models_dir / "models" / "SKR-001.glb"
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        model_path.touch()
+
+        mock_mesh = Mock()
+        mock_mesh.is_watertight = True
+        mock_mesh.is_volume = True
+        mock_mesh.euler_number = 2
+        mock_mesh.volume = 400.0
+        mock_mesh.area = 300.0
+        mock_mesh.area_faces = np.ones(5000)
+        mock_mesh.vertices = np.zeros((10000, 3))
+        mock_mesh.faces = np.zeros((5000, 3))
+        mock_mesh.edges_unique = np.zeros((20000, 2))
+        mock_mesh.bounding_box = Mock()
+        mock_mesh.bounding_box.bounds = np.array([[0.0, 0.0, 0.0], [10.0, 10.0, 10.0]])
+        mock_mesh.bounding_box.volume = 800.0
+        mock_mesh.visual = Mock()
+        mock_mesh.visual.material = Mock()
+        mock_mesh.visual.material.image = Mock(width=2048, height=2048)
+        mock_mesh.visual.uv = np.array([[0.0, 0.0], [1.0, 1.0]] * 5000)
+
+        result = SyncResult(product_sku="SKR-001", success=True)
+
+        with patch("trimesh.load", return_value=mock_mesh):
+            returned_path = await engine._ensure_3d_model("SKR-001", sample_images, result)
+
+        assert returned_path == model_path
+        assert not any("Fidelity validation failed" in w for w in result.warnings)
+        assert not any("below threshold" in w for w in result.warnings)
+
+    @pytest.mark.asyncio
+    async def test_ensure_3d_model_warns_below_fidelity_threshold(self, tmp_path, sample_images):
+        """A low-fidelity mesh should trigger the threshold-comparison warning path."""
+        pytest.importorskip("trimesh")
+        from unittest.mock import Mock
+
+        config = CatalogSyncConfig(generate_3d_if_missing=False)
+        engine = CatalogSyncEngine(
+            config=config,
+            output_dir=tmp_path / "output",
+            models_dir=tmp_path / "models",
+            images_dir=tmp_path / "images",
+        )
+
+        model_path = engine.models_dir / "models" / "SKR-001.glb"
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        model_path.touch()
+
+        mock_mesh = Mock()
+        mock_mesh.is_watertight = False
+        mock_mesh.euler_number = 0
+        mock_mesh.area = 1.0
+        mock_mesh.bounds = [[0, 0, 0], [1, 1, 1]]
+        mock_mesh.vertices = Mock()
+        mock_mesh.vertices.__len__ = Mock(return_value=10)
+        mock_mesh.faces = Mock()
+        mock_mesh.faces.__len__ = Mock(return_value=5)
+        mock_mesh.visual = None
+
+        result = SyncResult(product_sku="SKR-001", success=True)
+
+        with patch("trimesh.load", return_value=mock_mesh):
+            returned_path = await engine._ensure_3d_model("SKR-001", sample_images, result)
+
+        assert returned_path == model_path
+        assert any("below threshold" in w for w in result.warnings)
+
 
 # =============================================================================
 # Bulk Sync Tests

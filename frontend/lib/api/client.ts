@@ -8,6 +8,20 @@ export function getAuthToken(): string | null {
     return localStorage.getItem('access_token');
 }
 
+/**
+ * Server-context counterpart to getAuthToken(): extracts the bearer token
+ * from an incoming request's Authorization header. Route Handlers run
+ * server-side (no `window`/`localStorage`), so a client that needs to
+ * forward the caller's JWT to a downstream API must thread it in explicitly
+ * via this helper rather than via getAuthToken().
+ */
+export function extractBearerToken(headers: Headers): string | null {
+    const header = headers.get('authorization');
+    if (!header) return null;
+    const match = /^Bearer\s+(.+)$/i.exec(header);
+    return match ? match[1] : header;
+}
+
 export async function getAuthHeaders(): Promise<HeadersInit> {
     const token = getAuthToken();
     const headers: HeadersInit = {
