@@ -24,6 +24,7 @@ from .layer1 import (
     VisionAgent,
     _find_garment_image,
     compositor_node,
+    ensure_public_url,
     finalize_node,
     generator_node,
     human_review_node,
@@ -67,6 +68,7 @@ __all__ = [
     "_is_collar_garment",
     "_COLLAR_KEYWORDS",
     "_find_garment_image",
+    "ensure_public_url",
     # Agent classes (re-exported so test patches resolve)
     "VisionAgent",
     "GeneratorAgent",

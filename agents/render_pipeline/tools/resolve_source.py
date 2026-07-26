@@ -25,6 +25,8 @@ ensure_repo_paths()
 
 from google.adk.tools.tool_context import ToolContext
 
+from skyyrose.core.paths import WP_PRODUCTS_DIR
+
 
 def _resolve(sku: str, name: str, src_override: str) -> Path | None:
     """Verified resolver — copied verbatim from _validate_pipeline_multi_sku.
@@ -33,7 +35,7 @@ def _resolve(sku: str, name: str, src_override: str) -> Path | None:
     (which is marked NOT FOR CI; the agent is the production path going
     forward). Resolution order matches the validator's tested behavior.
     """
-    img_dir = REPO_ROOT / "wordpress-theme/skyyrose-flagship/assets/images/products"
+    img_dir = WP_PRODUCTS_DIR
     bundle_dir = REPO_ROOT / "data/product-bundles" / name if name else None
 
     candidates: list[Path] = []

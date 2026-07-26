@@ -20,16 +20,21 @@ import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
+from services.storage.r2_client import AssetCategory, R2Client, R2Config, R2Error
+
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
 from llm.model_ids import GEMINI_FLASH_2_MODEL
+from skyyrose.core.paths import THEME_ROOT
+from skyyrose.core.sot_images import resolve_image
 from skyyrose.integrations.fashn_client import FashnClient, FashnError
 
 from ..models import TryOnResult
 
 logger = logging.getLogger(__name__)
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+_r2_client: R2Client | None = None
+_r2_unavailable = False
 
 # Hostnames that must never be reachable from a FASHN-side fetch. FASHN
 # fetches the URL we hand it server-side, so any private/link-local/loopback
@@ -162,12 +167,79 @@ TryonAgent = TryOnAgent
 
 
 def _find_garment_image(sku: str) -> str:
-    """Return the path to the garment (flat-lay) image for ``sku``, or empty string.
+    """Return the path to the garment (on-model front render) image for ``sku``, or empty string.
 
-    Resolves against the project root rather than the process CWD so the answer
-    is stable regardless of how the pipeline is invoked. Returns empty string
-    when the file does not exist so the caller can skip FASHN dispatch rather
+    Resolves through the SOT (:func:`skyyrose.core.sot_images.resolve_image`) rather
+    than a hardcoded output path, so this always agrees with whatever the theme and
+    dashboard show for the SKU. Returns empty string when the SOT has no image or the
+    resolved file does not exist on disk, so the caller can skip FASHN dispatch rather
     than sending a phantom path to the provider.
     """
-    candidate = _PROJECT_ROOT / "renders" / "output" / sku / f"{sku}-model-front-gemini.jpg"
+    relative = resolve_image(sku, "front")
+    if not relative:
+        return ""
+    # resolve_image() already enforces theme-relative paths (_validated_path),
+    # but this result feeds a public R2 upload — re-check containment here so
+    # this function's contract doesn't silently depend on that upstream detail
+    # (an absolute `relative` would make `THEME_ROOT / relative` ignore THEME_ROOT).
+    candidate = (THEME_ROOT / relative).resolve()
+    if not candidate.is_relative_to(THEME_ROOT.resolve()):
+        logger.warning("SOT image path escapes THEME_ROOT for %s: %r — skipping", sku, relative)
+        return ""
     return str(candidate) if candidate.is_file() else ""
+
+
+def _get_r2_client() -> R2Client | None:
+    """Lazy-init R2 client; ``None`` when R2 credentials aren't configured.
+
+    A failed init is memoized (``_r2_unavailable``) so per-SKU callers don't
+    re-parse the env and re-log the same warning on every call.
+    """
+    global _r2_client, _r2_unavailable
+    if _r2_client is not None:
+        return _r2_client
+    if _r2_unavailable:
+        return None
+    try:
+        config = R2Config.from_env()
+        config.validate()
+        _r2_client = R2Client(config)
+    except R2Error as exc:
+        logger.warning("R2 not configured — cannot upload local tryon images: %s", exc)
+        _r2_unavailable = True
+        return None
+    return _r2_client
+
+
+def ensure_public_url(path_or_url: str, *, sku: str) -> str:
+    """Return a public ``https://`` URL FASHN can fetch for ``path_or_url``.
+
+    A ``http(s)://`` input passes through unchanged. A local file path is
+    uploaded to Cloudflare R2 (per this module's own contract — see the module
+    docstring) and the resulting public URL is returned.
+
+    Raises:
+        FashnError: the local file does not exist, R2 is not configured, or the
+            R2 upload itself fails (``R2Error`` is wrapped so callers only ever
+            handle FashnError). Never silently returns the local path — that
+            would just move the ``_validate_public_url`` rejection downstream
+            with a worse error.
+    """
+    parsed = urlparse(path_or_url)
+    if parsed.scheme in ("http", "https"):
+        return path_or_url
+
+    local = Path(path_or_url)
+    if not local.is_file():
+        raise FashnError(f"tryon image not found for sku={sku!r}: {path_or_url!r}")
+
+    client = _get_r2_client()
+    if client is None:
+        raise FashnError(
+            f"cannot upload local tryon image for sku={sku!r} — R2 storage is not configured"
+        )
+    try:
+        result = client.upload_file(local, AssetCategory.TEMP, product_id=sku)
+    except R2Error as exc:
+        raise FashnError(f"failed to upload tryon image for sku={sku!r}: {exc}") from exc
+    return result.cdn_url or result.url
