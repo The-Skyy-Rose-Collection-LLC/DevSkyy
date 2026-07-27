@@ -1,6 +1,62 @@
 # Current Tasks
 
-## ACTIVE — WP Commercial Theme Sweep (/loop dynamic) — 2026-07-19
+## ACTIVE — Commercial-Grade Theme Build, fashion-theme-architect owns it — 2026-07-27
+
+Supersedes the 2026-07-19 sweep below (same goal, folded in — live has since moved 1.12.0→1.12.8,
+so that entry's blocking/status lines are stale; its Sentinel/Lighthouse loop-until-90 mandate
+carries forward into Phase 2 here rather than running standalone).
+
+Goal: skyyrose.co storefront pushed to full commercial/production quality — real catalog, real
+content (not genericized/resold), zero placeholders, full WCAG/security/performance bar, plus a
+deliberate visual upgrade sourced from a screened 176-pattern shortlist. Owner agent:
+**fashion-theme-architect** (`.claude/agents/fashion-theme-architect.md`, upgraded 2026-07-27 with
+§2b shortlist boot + §5.2 Motion QA gate). Dedicated worktree: `.claude/worktrees/theme-commercial-build`.
+
+Visual source: `docs/design/visual-pattern-shortlist.md` — 176/202 patterns screened against real
+brand tokens/fonts/references. 24 extend existing code (`luxury-cursor.js`, `product-card-holo.js`,
+`toast.js`, `footer-cro.js`, try-on backend, Immersive Worlds) — build those first, cheapest wins.
+Known landmine: "Dark Luxury Hero"/"Dark Luxury Newsletter" spec a cut font (Cormorant Garamond) —
+retoken before building either.
+
+### Phase 0 — Audit (read-only, in the new worktree, before any code changes)
+- [ ] `devskyy` MCP: `serena_full_project_audit`, `serena_check_code_style`, `serena_validate_security`, `serena_find_issues`
+- [ ] `wp-security` agent pass (CSP/nonce/escaping/auth/upload/SQL)
+- [ ] Accessibility baseline — verify the WCAG 2.2 AA claim in `style.css`'s header is actually true
+- [ ] `npm run verify:theme` baseline (record starting aspect states before touching anything)
+- [ ] `wp-code-simplifier` — dead-code/file-bloat baseline
+
+### Phase 1a — Visual direction (informs Phase 1, doesn't block it — cheap wins can start immediately)
+- [ ] Retoken the two font-landmine patterns (Dark Luxury Hero, Dark Luxury Newsletter) to Cinzel/Pinyon Script + real `#D4AF37`
+- [ ] Build the 16 priority-tier patterns first (table at top of `visual-pattern-shortlist.md`) — they extend code that already exists
+- [ ] Each pattern built passes Motion QA (`fashion-theme-architect.md` §5.2) before being marked done
+
+### Phase 1 — Funnel build (fashion-theme-architect owns; wp-theme-dev/wp-woocommerce/wp-catalog-sync as needed)
+- [ ] Home → collection → PDP → cart → checkout → account, all templates resolve, zero white-screens
+- [ ] WooCommerce wiring: add-to-cart (simple+variable), AJAX cart, mini-cart, cross-sell/upsell, real catalog data
+- [ ] Real content everywhere — no lorem, no "coming soon" as final state (Kids Capsule's 0-card launch mode is documented by-design, not a gap)
+- [ ] Customizer options wired so non-code reskinning is possible
+- [ ] Demo import + `screenshot.png` + complete `style.css` header + README
+
+### Phase 2 — Cross-cutting gates (dispatch in parallel once Phase 1 lands)
+- [ ] `wp-security` + `security-reviewer` — two independent OWASP/CSP passes
+- [ ] Accessibility Auditor — re-verify WCAG holds post-build
+- [ ] `chrome-devtools` MCP `lighthouse_audit` + `performance_start_trace`/`performance_analyze_insight` — carries forward the old sweep's "every page ≥90 all categories, mobile+desktop" mandate
+- [ ] `e2e-runner` (Playwright) — add-to-cart, checkout, account critical flows
+- [ ] `wp-code-simplifier` — final pass after the full batch of edits
+
+### Phase 3 — Adversarial verify (never trust the builder's own "done")
+- [ ] `theme-heal-doctor` + `theme-heal-verifier` pair on anything flagged live-broken
+- [ ] Independent re-run: `npm run verify:theme` fresh (not fashion-theme-architect's cached claim), `npm run lint:php`, `git diff --stat` scope check
+- [ ] Reality Checker pass — default NEEDS WORK, require overwhelming proof before calling this "commercial-grade"
+
+### Phase 4 — Docs + ship (STOP-AND-SHOW gated, not autonomous)
+- [ ] `doc-updater` — codemap refresh
+- [ ] `npm run deploy:dry` preview, then `npm run deploy` — exact manifest shown, wait for `y`
+- [ ] `devskyy` MCP `wp_verify_live` post-deploy
+
+---
+
+## FOLDED IN ABOVE — WP Commercial Theme Sweep (/loop dynamic) — 2026-07-19
 
 Goal: skyyrose.co every page Lighthouse ≥90 (all 4 categories, mobile+desktop) + commercial-grade
 aesthetics (headers aligned, heroes visually sound). Award-grade finish.
