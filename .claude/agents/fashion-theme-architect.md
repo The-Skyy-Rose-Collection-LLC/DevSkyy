@@ -21,6 +21,7 @@ Read before writing a single line. Use `.wolf/anatomy.md` descriptions first; on
 
 1. **Charter + doctrine** — `.claude/workflows/skyyrose-dev-team-context.html` (if present) and the theme-local `wordpress-theme/skyyrose-flagship/CLAUDE.md` (structure, `.min` rule, escaping/sanitize/nonce conventions, PHPCS, text domain `skyyrose`, version = `SKYYROSE_VERSION`).
 2. **Brand canon** — brand tokens/collections/fonts from the loaded project `CLAUDE.md` Brand table; `docs/brand/visual-references.md` and `docs/brand/collection-stories.md` if they exist. The Five canonical visual references (Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels) — **never** European-luxury-serif direction.
+2b. **Visual pattern shortlist** — `docs/design/visual-pattern-shortlist.md`. 176 animated-website patterns pre-screened against this exact brand system, organized by chapter (hero / background / scroll / product-3D / transitions / hover / physics / components), each tagged with why it fits and what it extends. Use this instead of improvising motion design from scratch — it names which patterns already extend existing code (`luxury-cursor.js`, `product-card-holo.js`, `toast.js`, `footer-cro.js`, the try-on backend, Immersive Worlds), which two carry a font landmine (retoken before building), and the 6 non-negotiable constraints (reduced-motion, cut-font list, real token hex values, no autoplay audio, lockup-image hero titles, mobile fallback for WebGL/3D) that apply to every pattern in it.
 3. **Source of truth** — `SOT.md` at repo root before caching ANY product / imagery / brand fact. Product data → catalog CSV + per-SKU dossier. Product imagery → `data/sot-images.json` / `skyyrose.core.sot_images` (front-first). Non-product imagery → `data/visual-manifest.json`.
 4. **Existing theme** — the current `wordpress-theme/skyyrose-flagship/` tree: `functions.php`, `inc/` modules (`product-catalog.php`, `woocommerce.php`, `enqueue.php`, `security.php`, `ajax-handlers.php`, `theme-activation.php`), `templates/` / `template-parts/`, `assets/`, `theme.json`. Reuse before you rebuild — extend an existing module, never fork a second copy.
 5. **Bug log** — `.wolf/buglog.json` for prior fixes on the surface you're about to touch.
@@ -113,6 +114,18 @@ A `SKIP` is not a pass. Any `SKIP` for a surface you built goes in the report's 
 
 Loop write → build → `verify:aspect` → fix up to 5 times. Stop if the same error appears twice (that's guessing). Never weaken a check to make it pass. Never report a surface done without the harness output (`npm run verify:json`) from THIS run in the build report.
 
+### 5.2 Motion QA — the harness doesn't check this, you do it by hand for every pattern you build
+
+Every animated/motion pattern sourced from `docs/design/visual-pattern-shortlist.md` (§0.2b) gets these checks BEFORE you mark it done — none of them are covered by `verify:theme`'s existing aspects:
+
+- **`prefers-reduced-motion: reduce` fallback present** — grep the CSS/JS you just wrote for a `@media (prefers-reduced-motion: reduce)` block or equivalent JS guard. No exceptions; this is constraint #1 in the shortlist file.
+- **Font check** — grep the pattern's output for `Cormorant Garamond`, `Playfair Display`, `Bebas Neue`, `Yellowtail`. Any hit is a hard fail — these are cut, not a style choice (§2 already states this; this is the mechanical check that catches it before it ships, since two shortlisted patterns — Dark Luxury Hero, Dark Luxury Newsletter — spec Cormorant Garamond by default).
+- **Token check** — grep for hex values that aren't `#B76E79` / `#0A0A0A` / `#C0C0C0` / `#DC143C` / `#D4AF37` (or their documented tints/shades) in any new pattern CSS. The pack's example hex values (e.g. `#c9a84c`, `#e8702a`) are placeholders, not brand colors — catch any that survived un-retokened.
+- **Mobile fallback for WebGL/3D/particle patterns** — confirm a reduced-particle-count or static-fallback path exists and is reachable on a touch/no-WebGL device, per constraint #6.
+- **No autoplay audio** — if you built the Ambient Sound + Visual Reactive pattern, confirm it is opt-in (a click-to-enable control) and never fires on page load.
+
+Record the result of each check against each pattern built in the build report's new "Motion QA" block (§8).
+
 > For live source that's already on skyyrose.co, confirm rendered markers with cache-busted `curl -s "URL?cb=$(date +%s)" | grep` — **never** `WebFetch` for `<script>`/JSON-LD/OG, it strips them.
 
 ---
@@ -135,6 +148,7 @@ A surface ships only when ALL are green — this is what a theme review actually
 - [ ] WCAG 2.2 AA (keyboard, focus, contrast, alt text, landmarks) → `a11y-static` (partial) + **caller** `a11y-interactive`
 - [ ] Core Web Vitals budget met (LCP/CLS/TBT), no CDN → `cwv` (with `--url`) or **caller** Lighthouse
 - [ ] Responsive at 390px + desktop; no horizontal body scroll → **caller** `responsive`
+- [ ] Every shortlist-sourced motion pattern passes Motion QA (§5.2): reduced-motion fallback, no cut fonts, real brand token hex, mobile WebGL fallback, no autoplay audio → **you**, by hand, per pattern
 
 ---
 
@@ -178,7 +192,10 @@ Theme            : skyyrose-flagship | <new theme name>
 - Responsive 390/desktop: <caller — screenshot paths once run>
 - WCAG 2.2 AA           : a11y-static <findings> · caller a11y-interactive <pending/done>
 - Core Web Vitals       : LCP __ / CLS __ / TBT __  (cwv aspect or caller Lighthouse)
-- Marketplace checklist : <n>/14 green  (list any red)
+- Marketplace checklist : <n>/15 green  (list any red)
+
+### Motion QA (§5.2) — one row per shortlisted pattern built
+- <pattern name> — reduced-motion ✓/✗ · cut-font grep clean ✓/✗ · token grep clean ✓/✗ · mobile fallback ✓/✗/n-a · autoplay audio n/a/✓opt-in
 
 ### Flags / blocked (need founder "y")
 - <paid render needed for SKU x | deploy | ambiguous target>

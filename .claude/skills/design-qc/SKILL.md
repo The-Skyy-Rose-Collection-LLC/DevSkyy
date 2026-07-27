@@ -23,3 +23,13 @@ When the user asks you to check, evaluate, or improve the design/UI of their app
 6. After fixes, re-run `openwolf designqc` to capture new screenshots and verify improvement.
 
 **Token awareness:** Each screenshot costs ~2500 tokens. The command compresses images (JPEG quality 70, max width 1200px) to minimize cost. For large apps, use `--routes / /specific-page` to limit captures.
+
+## When QA'ing the SkyyRose WordPress theme specifically
+
+Standard step 3 (Shadcn/Tailwind/generic-React) does NOT apply — this is a brand-locked luxury-streetwear storefront, not a dashboard. Replace step 3 with:
+
+- Cross-check every animated/motion element against `docs/design/visual-pattern-shortlist.md` — is it one of the 176 screened patterns, or an unscreened improvisation? Flag anything that reads generic-SaaS (glassmorphism dashboards, gradient-blob-on-white heroes, Inter/Space-Grotesk-as-safe-default) — that shortlist exists specifically to keep this theme out of that territory.
+- Grep any new CSS/JS for `Cormorant Garamond`, `Playfair Display`, `Bebas Neue`, `Yellowtail` — cut fonts, hard fail regardless of how the design looks.
+- Confirm every motion/animation has a `prefers-reduced-motion: reduce` fallback — not optional here.
+- Confirm hex values trace to real tokens (`#B76E79` / `#0A0A0A` / `#C0C0C0` / `#DC143C` / `#D4AF37`), not placeholder colors left over from a sourced pattern spec.
+- "Dull or white-coded" becomes: does it read as Kith / Oaklandish / Culture Kings / Fear of God / Palm Angels, or does it drift toward European-luxury-serif or generic streetwear-template territory?
