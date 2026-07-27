@@ -1,0 +1,498 @@
+/**
+ * WooCommerce My Account — Dark Luxury Surface
+ *
+ * Styles WooCommerce core my-account markup (navigation, dashboard, orders,
+ * downloads, addresses, account details, login/register, lost password) on the
+ * SkyyRose dark ground. Loaded ON TOP of the base woocommerce.css via the
+ * 'account' slug in inc/enqueue.php ($woo_page_styles).
+ *
+ * Mobile-first. Logical properties for RTL. Tokens from design-tokens.css.
+ *
+ * @package SkyyRose
+ */
+
+/* ==================================================
+   PAGE FRAME
+   ================================================== */
+
+.woocommerce-account .site-main .woocommerce {
+	max-width: var(--container-content, 1200px);
+	margin-inline: auto;
+	padding: clamp(24px, 5vw, 64px) 20px 96px;
+	color: rgba(255, 255, 255, 0.85);
+	font-family: var(--skyyrose-font-body, 'Hanken Grotesk', sans-serif);
+}
+
+.woocommerce-account .entry-title,
+.woocommerce-account .page-title {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: #fff;
+	text-align: center;
+	margin-block: clamp(24px, 5vw, 48px) 0;
+}
+
+/* Logged-in shell: nav + content */
+@media (min-width: 880px) {
+	.woocommerce-account.logged-in .site-main .woocommerce {
+		display: grid;
+		grid-template-columns: 240px minmax(0, 1fr);
+		gap: 48px;
+		align-items: start;
+	}
+
+	.woocommerce-account.logged-in .site-main .woocommerce > .woocommerce-notices-wrapper {
+		grid-column: 1 / -1;
+	}
+}
+
+/* ==================================================
+   ACCOUNT NAVIGATION
+   ================================================== */
+
+.woocommerce-MyAccount-navigation {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+	padding: 8px 0;
+	margin-block-end: 32px;
+}
+
+.woocommerce-MyAccount-navigation ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.woocommerce-MyAccount-navigation-link a {
+	display: block;
+	padding: 12px 20px;
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 11px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.6);
+	text-decoration: none;
+	border-inline-start: 2px solid transparent;
+	transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.woocommerce-MyAccount-navigation-link a:hover,
+.woocommerce-MyAccount-navigation-link a:focus-visible {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.woocommerce-MyAccount-navigation-link.is-active a {
+	color: var(--color-rose-gold, #B76E79);
+	border-inline-start-color: var(--color-rose-gold, #B76E79);
+	background: rgba(183, 110, 121, 0.08);
+}
+
+.woocommerce-MyAccount-navigation-link--customer-logout a {
+	/* Was rgba(255,255,255,0.4) = 3.77:1 on #0A0A0A, which fails WCAG AA (4.5:1) at this
+	   size. The muted token is 9.44:1 and still reads as de-emphasised. */
+	color: var(--color-text-muted, #B3B3B3);
+}
+
+/* Horizontal scroll strip on small screens */
+@media (max-width: 879px) {
+	.woocommerce-MyAccount-navigation ul {
+		display: flex;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+
+	.woocommerce-MyAccount-navigation ul::-webkit-scrollbar {
+		display: none;
+	}
+
+	.woocommerce-MyAccount-navigation-link a {
+		white-space: nowrap;
+		border-inline-start: 0;
+		border-block-end: 2px solid transparent;
+	}
+
+	.woocommerce-MyAccount-navigation-link.is-active a {
+		border-block-end-color: var(--color-rose-gold, #B76E79);
+	}
+}
+
+/* ==================================================
+   CONTENT PANE
+   ================================================== */
+
+.woocommerce-MyAccount-content {
+	min-width: 0;
+	font-size: 0.95rem;
+	line-height: 1.7;
+}
+
+.woocommerce-MyAccount-content > h2,
+.woocommerce-MyAccount-content > h3 {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	letter-spacing: 2px;
+	color: #fff;
+}
+
+.woocommerce-MyAccount-content a:not(.button, .woocommerce-button) {
+	color: var(--color-rose-gold, #B76E79);
+	text-decoration: none;
+	border-block-end: 1px solid rgba(183, 110, 121, 0.35);
+	transition: border-color 0.2s ease;
+}
+
+.woocommerce-MyAccount-content a:not(.button, .woocommerce-button):hover {
+	border-block-end-color: var(--color-rose-gold, #B76E79);
+}
+
+/* ==================================================
+   TABLES — orders, downloads, order detail
+   ================================================== */
+
+.woocommerce-account table.shop_table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+	font-size: 0.85rem;
+}
+
+.woocommerce-account table.shop_table th {
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 10px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.5);
+	text-align: start;
+	padding: 14px 16px;
+	border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.woocommerce-account table.shop_table td {
+	padding: 14px 16px;
+	border-block-end: 1px solid rgba(255, 255, 255, 0.05);
+	color: rgba(255, 255, 255, 0.8);
+	vertical-align: middle;
+}
+
+.woocommerce-account table.shop_table tbody tr:last-child td {
+	border-block-end: 0;
+}
+
+.woocommerce-account table.shop_table tfoot th,
+.woocommerce-account table.shop_table tfoot td {
+	color: #fff;
+	border-block-start: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.woocommerce-account table.shop_table .woocommerce-Price-amount {
+	color: var(--color-rose-gold, #B76E79);
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+}
+
+/* Stacked rows on small screens (WC adds data-title attributes) */
+@media (max-width: 640px) {
+	.woocommerce-account table.woocommerce-orders-table thead {
+		display: none;
+	}
+
+	.woocommerce-account table.woocommerce-orders-table tr {
+		display: block;
+		padding: 8px 0;
+		border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.woocommerce-account table.woocommerce-orders-table td {
+		display: flex;
+		justify-content: space-between;
+		gap: 16px;
+		border: 0;
+		padding: 6px 16px;
+	}
+
+	.woocommerce-account table.woocommerce-orders-table td::before {
+		content: attr(data-title);
+		font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+		font-size: 10px;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.woocommerce-account table.woocommerce-orders-table td.woocommerce-orders-table__cell-order-actions::before {
+		content: none;
+	}
+}
+
+/* ==================================================
+   BUTTONS
+   ================================================== */
+
+.woocommerce-account .woocommerce .button,
+.woocommerce-account .woocommerce-button,
+.woocommerce-account button.woocommerce-Button {
+	display: inline-block;
+	font-family: var(--skyyrose-font-ui, 'Anton', sans-serif);
+	font-size: 12px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	background: transparent;
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	padding: 12px 24px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.woocommerce-account .woocommerce .button:hover,
+.woocommerce-account .woocommerce-button:hover,
+.woocommerce-account button.woocommerce-Button:hover {
+	background: var(--color-rose-gold, #B76E79);
+	border-color: var(--color-rose-gold, #B76E79);
+	color: #fff;
+}
+
+.woocommerce-account .woocommerce .button:focus-visible,
+.woocommerce-account .woocommerce-button:focus-visible,
+.woocommerce-account button.woocommerce-Button:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+.woocommerce-account button[type="submit"].woocommerce-Button,
+.woocommerce-account button.woocommerce-form-login__submit,
+.woocommerce-account button.woocommerce-form-register__submit {
+	background: var(--color-rose-gold, #B76E79);
+	border-color: var(--color-rose-gold, #B76E79);
+}
+
+.woocommerce-account button[type="submit"].woocommerce-Button:hover,
+.woocommerce-account button.woocommerce-form-login__submit:hover,
+.woocommerce-account button.woocommerce-form-register__submit:hover {
+	background: transparent;
+	color: var(--color-rose-gold, #B76E79);
+}
+
+/* ==================================================
+   FORMS — login, register, edit account, addresses
+   ================================================== */
+
+.woocommerce-account .woocommerce-form-row label {
+	display: block;
+	font-family: var(--skyyrose-font-mono, ui-monospace, monospace);
+	font-size: 10px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.6);
+	margin-block-end: 8px;
+}
+
+.woocommerce-account .woocommerce-form-row {
+	margin-block-end: 20px;
+}
+
+.woocommerce-account .woocommerce-Input,
+.woocommerce-account .woocommerce-form-row .input-text,
+.woocommerce-account .woocommerce-form-row select {
+	width: 100%;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	color: #fff;
+	padding: 12px 16px;
+	font-family: inherit;
+	font-size: 0.95rem;
+	border-radius: 0;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.woocommerce-account .woocommerce-Input:focus,
+.woocommerce-account .woocommerce-form-row .input-text:focus,
+.woocommerce-account .woocommerce-form-row select:focus {
+	outline: none;
+	border-color: var(--color-rose-gold, #B76E79);
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.2);
+}
+
+.woocommerce-account .woocommerce-form-row span em {
+	font-size: 0.8rem;
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.woocommerce-account fieldset {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	padding: 24px;
+	margin-block: 32px;
+}
+
+.woocommerce-account fieldset legend {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	letter-spacing: 2px;
+	color: #fff;
+	padding-inline: 12px;
+}
+
+.woocommerce-account .woocommerce-form-login__rememberme {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-block-end: 16px;
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.woocommerce-account .woocommerce-LostPassword a,
+.woocommerce-account .lost_password a {
+	color: rgba(255, 255, 255, 0.55);
+	font-size: 0.85rem;
+}
+
+.woocommerce-account .woocommerce-privacy-policy-text {
+	font-size: 0.8rem;
+	color: rgba(255, 255, 255, 0.45);
+}
+
+/* Password visibility toggle (WC core adds .show-password-input) */
+.woocommerce-account .password-input {
+	position: relative;
+	display: block;
+}
+
+.woocommerce-account .show-password-input {
+	position: absolute;
+	inset-inline-end: 12px;
+	inset-block-start: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+}
+
+.woocommerce-account .show-password-input::after {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==================================================
+   LOGIN / REGISTER SPLIT
+   ================================================== */
+
+/* #customer_login is WooCommerce core markup (templates/myaccount/form-login.php);
+   the ID is not ours to rename, so the kebab-case selector rule is waived here only. */
+/* stylelint-disable-next-line selector-id-pattern */
+.woocommerce-account #customer_login h2 {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: #fff;
+	font-size: 1.2rem;
+	margin-block-end: 24px;
+}
+
+/* stylelint-disable-next-line selector-id-pattern */
+.woocommerce-account #customer_login .woocommerce-form {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+	padding: clamp(24px, 4vw, 40px);
+}
+
+@media (min-width: 880px) {
+	.woocommerce-account .u-columns.col2-set {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 48px;
+	}
+}
+
+/* ==================================================
+   ADDRESSES
+   ================================================== */
+
+.woocommerce-account .woocommerce-Addresses .woocommerce-Address {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+	padding: 24px;
+	margin-block-end: 24px;
+}
+
+.woocommerce-account .woocommerce-Address-title {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin-block-end: 16px;
+}
+
+.woocommerce-account .woocommerce-Address-title h2,
+.woocommerce-account .woocommerce-Address-title h3 {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	font-size: 1rem;
+	letter-spacing: 2px;
+	color: #fff;
+	margin: 0;
+}
+
+.woocommerce-account .woocommerce-Address address {
+	font-style: normal;
+	color: rgba(255, 255, 255, 0.7);
+	line-height: 1.8;
+}
+
+@media (min-width: 880px) {
+	.woocommerce-account .woocommerce-Addresses.col2-set {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px;
+	}
+}
+
+/* ==================================================
+   ORDER DETAIL + CUSTOMER DETAILS
+   ================================================== */
+
+.woocommerce-account .woocommerce-order-details,
+.woocommerce-account .woocommerce-customer-details {
+	margin-block-start: 32px;
+}
+
+.woocommerce-account .woocommerce-order-details__title,
+.woocommerce-account .woocommerce-column__title {
+	font-family: var(--skyyrose-font-caps, 'Cinzel', serif);
+	letter-spacing: 2px;
+	color: #fff;
+	font-size: 1.1rem;
+}
+
+.woocommerce-account .woocommerce-customer-details address {
+	font-style: normal;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	padding: 24px;
+	color: rgba(255, 255, 255, 0.7);
+	line-height: 1.8;
+}
+
+/* ==================================================
+   PAGINATION
+   ================================================== */
+
+.woocommerce-account .woocommerce-pagination,
+.woocommerce-account .woocommerce-Pagination {
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	margin-block-start: 32px;
+}
+
+/* ==================================================
+   REDUCED MOTION
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.woocommerce-account .woocommerce-MyAccount-navigation-link a,
+	.woocommerce-account .woocommerce .button,
+	.woocommerce-account .woocommerce-button,
+	.woocommerce-account button.woocommerce-Button,
+	.woocommerce-account .woocommerce-Input,
+	.woocommerce-account .woocommerce-form-row .input-text,
+	.woocommerce-account .woocommerce-MyAccount-content a:not(.button, .woocommerce-button) {
+		transition: none;
+	}
+}

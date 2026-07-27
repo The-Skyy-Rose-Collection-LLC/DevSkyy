@@ -36,6 +36,30 @@ function skyyrose_enqueue_local_fonts() {
 }
 
 /**
+ * Whether a template slug skips the optional asset bundles (size guide, luxury
+ * cursor, skeleton).
+ *
+ * Single source of truth for BOTH the style and script enqueues. These bundles are
+ * CSS+JS pairs: shipping the JS without its stylesheet renders unstyled artifacts
+ * (the luxury cursor's label span rendered as stray body text on every slug listed
+ * here), so the two must be gated identically. Keeping the list in one function is
+ * what prevents them drifting apart again.
+ *
+ * @since 1.12.9
+ * @param string $slug Template slug from skyyrose_get_current_template_slug().
+ * @return bool True when the slug should skip optional assets.
+ */
+function skyyrose_slug_skips_optional_assets( $slug ) {
+	// Cart / checkout / 404 / search / blog / single never trigger these features,
+	// so shipping their assets is dead bytes. v1.5.12 audit.
+	return in_array(
+		$slug,
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		true
+	);
+}
+
+/**
  * Enqueue global styles that load on every page.
  *
  * @since 3.0.0
@@ -196,11 +220,7 @@ function skyyrose_enqueue_global_styles() {
 	// Lightweight slugs skip optional CSS bundles (size guide, luxury cursor,
 	// skeleton). Cart / checkout / 404 / search / blog / single never trigger
 	// these features, so shipping their CSS is dead bytes. v1.5.12 audit.
-	$skip_optional_css = in_array(
-		skyyrose_get_current_template_slug(),
-		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
-		true
-	);
+	$skip_optional_css = skyyrose_slug_skips_optional_assets( skyyrose_get_current_template_slug() );
 
 	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
 	$size_guide_file = $use_min && file_exists( $base_dir . '/size-guide.min.css' ) ? 'size-guide.min.css' : 'size-guide.css';
@@ -333,7 +353,7 @@ function skyyrose_enqueue_global_scripts() {
 		);
 	}
 
-	// Footer CRO — FAQ accordion (extracted from inline <script> in v1.5.3).
+	// Footer CRO — FAQ accordion + animated newsletter capture.
 	$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
 	if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
 		wp_enqueue_script(
@@ -344,6 +364,16 @@ function skyyrose_enqueue_global_scripts() {
 			array(
 				'strategy'  => 'defer',
 				'in_footer' => true,
+			)
+		);
+
+		// The only client-originated newsletter string; server responses
+		// arrive already localized from skyyrose_ajax_newsletter_subscribe().
+		wp_localize_script(
+			'skyyrose-footer-cro',
+			'skyyRoseFooterCro',
+			array(
+				'networkError' => __( 'Connection problem — please try again.', 'skyyrose' ),
 			)
 		);
 	}
@@ -540,6 +570,8 @@ function skyyrose_get_current_template_slug() {
 		$slug = 'cart';
 	} elseif ( function_exists( 'is_checkout' ) && is_checkout() ) {
 		$slug = 'checkout';
+	} elseif ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		$slug = 'account';
 	} elseif ( function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() ) ) {
 		$slug = 'shop-archive';
 	} elseif ( ! empty( $page_template ) ) {
@@ -609,6 +641,7 @@ function skyyrose_enqueue_template_styles() {
 		'single-product'      => 'single-product.css',
 		'cart'                => 'woocommerce.css',
 		'checkout'            => 'woocommerce.css',
+		'account'             => 'woocommerce.css',
 		'shop-archive'        => 'woocommerce.css',
 		'about'               => 'about.css',
 		'contact'             => 'contact.css',
@@ -833,6 +866,7 @@ function skyyrose_enqueue_template_styles() {
 		// single-product.css is the primary stylesheet (replaces woocommerce-single.css).
 		'cart'     => 'woocommerce-cart.css',
 		'checkout' => 'woocommerce-checkout.css',
+		'account'  => 'woocommerce-account.css',
 	);
 
 	if ( isset( $woo_page_styles[ $slug ] ) ) {
@@ -876,7 +910,9 @@ function skyyrose_enqueue_template_scripts() {
 	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
 	// CURS-03: Immersive templates intentionally hide cursor to keep focus on the 3D scene.
 	// Skip enqueue entirely on immersive slugs so the JS isn't downloaded for hidden UI.
-	if ( 'immersive' !== $slug ) {
+	// Also skip wherever luxury-cursor.css is skipped: the script builds a .cursor-label
+	// span, which without its stylesheet renders as stray visible text in the page flow.
+	if ( 'immersive' !== $slug && ! skyyrose_slug_skips_optional_assets( $slug ) ) {
 		$cursor_file = $use_min && file_exists( $base_js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
 		if ( file_exists( $base_js_dir . '/' . $cursor_file ) ) {
 			wp_enqueue_script(

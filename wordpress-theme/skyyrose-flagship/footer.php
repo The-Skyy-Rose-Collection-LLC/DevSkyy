@@ -53,6 +53,7 @@ defined( 'ABSPATH' ) || exit;
 							</svg>
 						</button>
 					</div>
+					<p class="footer-newsletter__status" role="status" aria-live="polite"></p>
 				</form>
 			</div>
 		</div>

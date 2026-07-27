@@ -723,15 +723,24 @@ function skyyrose_rest_clear_wishlist( $request ) {
  * @since 1.0.0
  */
 function skyyrose_enqueue_wishlist_assets() {
-	// Enqueue wishlist CSS (with file_exists guard to prevent 404s on partial deploys).
-	$css_path = SKYYROSE_DIR . '/assets/css/wishlist.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-wishlist',
-			SKYYROSE_ASSETS_URI . '/css/wishlist.css',
-			array(),
-			SKYYROSE_VERSION
-		);
+	// Wishlist CSS is page-scoped — every selector in it targets page-wishlist.php markup
+	// (.wishlist-page/-grid/-item/-empty/-actions), so loading it site-wide would ship dead
+	// bytes on every request. The JS below stays global: wishlist buttons render on product
+	// cards throughout the site.
+	// (file_exists guard prevents 404s on partial deploys; .min preferred in production,
+	// matching skyyrose_enqueue_template_styles().)
+	if ( is_page_template( 'page-wishlist.php' ) || is_page( 'wishlist' ) ) {
+		$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+		$css_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/wishlist.min.css' )
+			? 'wishlist.min.css' : 'wishlist.css';
+		if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-wishlist',
+				SKYYROSE_ASSETS_URI . '/css/' . $css_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Enqueue wishlist JS.
