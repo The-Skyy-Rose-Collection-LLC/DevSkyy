@@ -30,6 +30,16 @@ retoken before building either.
 - [ ] Build the 16 priority-tier patterns first (table at top of `visual-pattern-shortlist.md`) — they extend code that already exists
 - [ ] Each pattern built passes Motion QA (`fashion-theme-architect.md` §5.2) before being marked done
 
+### Phase 1b — Immersive Worlds enhancement (wp-immersive owns; NOT fashion-theme-architect — top-of-funnel storytelling, not shopping)
+4 live templates: `template-immersive-black-rose.php`, `-love-hurts.php`, `-signature.php`, `-kids-capsule.php` — real, actively maintained (`assets/js/immersive.js` last touched 2026-07-23), not stale. Shortlist patterns tagged ★ "matches Immersive Worlds build" apply directly here:
+- [ ] Black Rose (gothic cathedral) — Smoke/Fog Drift Background, 3D Scroll Depth Scene, Full Page 3D Scene Hero
+- [ ] Love Hurts (romantic castle) — Bioluminescent Wave / Interactive Ink Drop Background, Fluid Simulation Section, Ink Bleed Text Reveal (graffiti-identity match), Retro VHS Scanline (mood-specific)
+- [ ] Signature (city tour) — Sunrise/Sunset Sky Gradient Animator, Liquid Metal/Chrome Material Effect (gold token), Constellation Star Field
+- [ ] Kids Capsule — Physics-Based Bouncing Logo Elements (playful register fit)
+- [ ] Cross-collection: Multi-Layer Parallax Scene, Scroll-Triggered Hero w/ Sequence Frames, Scroll-Driven SVG Map Animation (Bay Area/Oakland founder-story tie-in) — any page it fits
+- [ ] Each pattern still passes fashion-theme-architect.md §5.2 Motion QA (reduced-motion, cut-font grep, token grep, mobile WebGL fallback) even though wp-immersive is the builder — the gate isn't agent-specific
+- [ ] `immersive-wc-bridge.js` stays untouched by this phase unless a hotspot needs a real product link — that's the one legitimate funnel crossover point, per wp-immersive's own charter
+
 ### Phase 1 — Funnel build (fashion-theme-architect owns; wp-theme-dev/wp-woocommerce/wp-catalog-sync as needed)
 - [ ] Home → collection → PDP → cart → checkout → account, all templates resolve, zero white-screens
 - [ ] WooCommerce wiring: add-to-cart (simple+variable), AJAX cart, mini-cart, cross-sell/upsell, real catalog data
