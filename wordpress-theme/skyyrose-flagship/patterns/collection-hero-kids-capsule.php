@@ -4,7 +4,7 @@
  * Slug: skyyrose/collection-hero-kids-capsule
  * Categories: skyyrose-collections
  * Description: Full-width hero section for the Kids Capsule collection with pink accent.
- * Keywords: hero, kids capsule, collection, playful
+ * Keywords: hero, kids capsule, collection
  * Block Types: core/group
  *
  * @package SkyyRose
@@ -13,7 +13,7 @@
 
 $collection = function_exists( 'skyyrose_get_collection' ) ? skyyrose_get_collection( 'kids-capsule' ) : null;
 $label      = $collection ? $collection['label'] : esc_html__( 'Kids Capsule', 'skyyrose' );
-$tagline    = $collection ? $collection['tagline'] : esc_html__( 'Joyful luxury, playful sophistication', 'skyyrose' );
+$tagline    = $collection ? $collection['tagline'] : esc_html__( 'Luxury runs in the family.', 'skyyrose' );
 $desc       = $collection ? $collection['description'] : '';
 ?>
 <!-- wp:group {"align":"full","style":{"color":{"background":"#0A0A0A"},"spacing":{"padding":{"top":"var:preset|spacing|2xl","bottom":"var:preset|spacing|2xl","left":"var:preset|spacing|lg","right":"var:preset|spacing|lg"}}},"layout":{"type":"constrained","contentSize":"1200px"}} -->

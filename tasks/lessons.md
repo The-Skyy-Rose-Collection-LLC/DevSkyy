@@ -206,3 +206,9 @@ Wrote "~490 tokens" and "36.9%" into commit `b394a5528`'s message before running
 - **One parse attempt, then switch tools.** If a shell text-munge (awk/sed/while-read) does not produce output on the first try, go straight to python — do not iterate on quoting. Structured extraction from `git`/JSON output is a python job.
 - **Read a file's regions in one call, not three.** When you need multiple sections of a known file, use Read with offset/limit or a single grep with enough context — not find → grep → sed.
 - **Re-check before re-searching:** a path, file content, or command output already in this session's context is authoritative. Re-deriving it is the same waste as a redundant read.
+
+
+## 2026-07-27 — Multi-agent Campaign Orchestration
+- **Pattern:** Using specialized agents (MarketingAgent, Whimsy-Injector, code-reviewer) in parallel to drive a multi-dimensional campaign.
+- **Rule:** When creating high-fidelity marketing content, ensure the **MarketingAgent** handles strategy and copy, **Whimsy-Injector** adds "moments of delight," and the **Senior theme developer (implied)** handles the technical implementation in the WordPress theme.
+- **Verification:** Always verify campaign copy against the authoritative `docs/brand/collection-stories.md` and `docs/brand/visual-references.md` to ensure no "European-luxury-house" tropes leak in and the collection-specific voice is preserved.
