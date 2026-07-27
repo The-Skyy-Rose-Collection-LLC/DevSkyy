@@ -56,7 +56,16 @@ function skyyrose_rest_get_matching_set( $request ) {
 	$kids_id = $request->get_param( 'id' );
 	$kids    = wc_get_product( $kids_id );
 
-	if ( ! $kids ) {
+	// Public endpoint: only expose published products. An ID walk against an
+	// unguarded lookup could reveal draft/private pre-launch pricing and
+	// preorder edition/claimed counts. Treat anything not published as not found.
+	//
+	// Variations are rejected outright rather than status-checked: a product_variation
+	// post carries its OWN post_status (published by default) and does NOT inherit the
+	// parent's, so a variation of a draft pre-launch product would otherwise report
+	// 'publish' and walk straight past this guard. A variation is never a valid input
+	// here anyway — _kc_matching_adult_id lives on the parent product.
+	if ( ! $kids || $kids->is_type( 'variation' ) || 'publish' !== $kids->get_status() ) {
 		return new WP_Error(
 			'product_not_found',
 			esc_html__( 'Kids product not found.', 'skyyrose' ),
@@ -66,6 +75,9 @@ function skyyrose_rest_get_matching_set( $request ) {
 
 	$adult_id = (int) get_post_meta( $kids_id, '_kc_matching_adult_id', true );
 	$adult    = $adult_id ? wc_get_product( $adult_id ) : null;
+	if ( $adult && ( $adult->is_type( 'variation' ) || 'publish' !== $adult->get_status() ) ) {
+		$adult = null;
+	}
 
 	$kids_data = function_exists( 'skyyrose_build_product_data' )
 		? skyyrose_build_product_data( $kids )
