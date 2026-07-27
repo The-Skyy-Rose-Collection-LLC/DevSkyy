@@ -106,11 +106,10 @@ jobs:
   # ===========================================================================
   python-tests:
     name: 🐍 Python Tests
-    # services: (Docker container orchestration) is Linux-only in the Actions
-    # runner — "Container operations are only supported on Linux runners" —
-    # stays on hosted infra until this job's redis dependency is reworked to
-    # not need a service container on macOS. See project_self_hosted_runner_2026_07_26.md.
-    runs-on: ubuntu-latest
+    # Routed to the Docker-containerized self-hosted runner (genuine Linux, not
+    # macOS) so services: (Docker container orchestration) works natively.
+    # See project_self_hosted_runner_2026_07_26.md for the macOS-runner history.
+    runs-on: [self-hosted, docker-arm64]
     timeout-minutes: 20
 
     services:
