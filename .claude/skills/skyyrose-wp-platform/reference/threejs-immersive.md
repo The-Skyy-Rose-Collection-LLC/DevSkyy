@@ -37,7 +37,15 @@ true of the other — check which one you're actually touching before generalizi
 - `assets/js/immersive.js`, `assets/css/immersive.css`, `assets/scenes/`
 - These are top-of-funnel storytelling pages (Black Rose gothic cathedral, Love Hurts romantic
   castle, Signature city tour, Kids Capsule) — not shopping pages. Don't route product-grid
-  or catalog work into these templates.
+  or catalog work into these templates. The one sanctioned crossover is
+  `immersive-wc-bridge.js` (hotspot → real product link).
+- `wp-immersive` is the agent that owns this surface (`.claude/agents/wp-immersive.md`,
+  user-scope). New/modified scene patterns should draw from the pre-screened set in
+  `docs/design/visual-pattern-shortlist.md` (Priority tier + Chapter 1-3/7 entries tagged
+  "Immersive Worlds scene work") and must still pass `fashion-theme-architect.md`'s §5.2
+  Motion QA (reduced-motion fallback, cut-font grep, brand-token hex grep, mobile WebGL
+  fallback, no autoplay audio) even though wp-immersive is the builder — that gate isn't
+  agent-specific.
 
 ## Mascot-specific spec (current production baseline)
 
