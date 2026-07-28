@@ -5099,5 +5099,51 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-299",
+    "timestamp": "2026-07-27T18:08:00-07:00",
+    "error_message": "Production deploy reported '=== Deploy complete (verified live) ===' with 13/13 structural assertions PASS, but shipped stale code: live style.css reports 1.12.8 and /my-account/ still serves the placeholder. None of bug-295/296/297 reached production.",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "THEME_DIR defaults to $PROJECT_ROOT/wordpress-theme/skyyrose-flagship, where PROJECT_ROOT is derived from the SCRIPT's own location (scripts/deploy-theme.sh:25-27). Invoking the script by absolute path from a git worktree therefore deploys the MAIN checkout's tree, not the caller's. Main was on branch 'main' at 83f85b53a without the 6 fix commits. Every post-deploy gate passed because each compares live against the source it actually shipped -- the version-stamp check confirmed 1.12.8==1.12.8. No gate compares the deploy source to the caller's working tree, so 'wrong tree' is invisible by construction.",
+    "fix": "PENDING founder action: merge worktree-glimmering-crafting-shannon into main (0 conflicts, 0 overlap with the dirty frontend/ work), then re-run deploy from the main checkout. Do NOT use THEME_DIR_OVERRIDE to point at the worktree -- see bug-300.",
+    "tags": [
+      "deploy",
+      "worktree",
+      "stale-deploy",
+      "fail-open",
+      "gate-gap",
+      "verification"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-252",
+      "bug-287"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27T18:08:00-07:00"
+  },
+  {
+    "id": "bug-300",
+    "timestamp": "2026-07-27T18:20:00-07:00",
+    "error_message": "preflight_completeness() reported 'Tracked-file completeness: 1803/1803 on disk' and passed clean, while the source tree it validated was missing 979 files that exist on production.",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "preflight_completeness() (scripts/deploy-theme.sh:346-370) enumerates via `git ls-files` and only asserts each TRACKED file exists on disk. All 979 files that a sparse worktree lacks are UNTRACKED (gitignored brand binaries: assets/branding/hero/*.webp|avif, collection logos, etc). Deploy is an atomic rsync hot-swap, so production loses any file the source lacks -- the gate is structurally blind to exactly the class of file that goes missing. Same fail-open shape as bug-230: absent input reads as 'nothing wrong'.",
+    "fix": "Census method recorded in this session: compare `find . -type f` between the deploy source and the main checkout, then split the delta by `git ls-files` membership. Deploying this worktree via THEME_DIR_OVERRIDE would have silently deleted 979 live brand assets while every gate reported PASS. Durable fix (not yet written): preflight must diff the source tree against a manifest of what is currently live, not against git's tracked set.",
+    "tags": [
+      "deploy",
+      "fail-open",
+      "gate-gap",
+      "untracked",
+      "sparse-worktree",
+      "riders"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-252",
+      "bug-299"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27T18:20:00-07:00"
   }
 ]
