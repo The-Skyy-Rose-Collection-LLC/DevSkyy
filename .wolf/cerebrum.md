@@ -85,6 +85,19 @@
 - **Key Learning:** `bmesh.ops.subdivide_edges(edges=patch_edges, cuts=2, use_grid_fill=True)` on a real (non-uniform-grid) character-mesh patch multiplies local face count ~9x (cuts=2 → 3x3 subdivision), not a small linear increase — a 0.15m-radius patch on a ~49k-face body mesh went from ~2.8k faces per armpit to ~25k, i.e. +44,552 faces mesh-wide for two armpits. This is expected/correct for "2 new edge loops," not a bug — confirmed by an independent radius-bucketed face count showing 0 new faces outside a 0.40m buffer around either `*Arm` bone head (fully localized, no whole-body side effect).
 - **Key Learning:** `Mesh1.0` (Phase-1 glTF import) has 2 pre-existing, out-of-scope defects present in BOTH the pre-gusset backup and the current file, unchanged by the gusset edit: (1) 89 non-manifold edges scattered at collar/hip-pocket/hair-back/jacket seams (single dropped-triangle fragments, not large seams), and (2) the mesh is 2 connected components, not 1 (48972→93524-face main body + a static 373-face accessory island). Neither is "watertight" in the strict sense; both are pre-existing and explicitly out of scope for the armpit-only surgical edit — do not conflate "gusset introduced 0 new non-manifold edges / preserved island count" (true, verified) with "whole mesh is watertight" (false, pre-existing).
 
+### 2026-07-27 — bug-289/290: child-character retopo + auto-rig (scratchpad, not yet committed)
+- **Key Learning:** `bpy.ops.object.quadriflow_remesh()` returned `{'CANCELLED'}` on a real character mesh across 5 distinct cleanup attempts (largest-island-keep, degenerate-face delete, degenerate-face dissolve, custom-split-normals clear) despite a sphere control succeeding (`{'FINISHED'}`) in the same Blender build (5.1.2) — root cause never diagnosed. `Mesh.normals_split_custom_set([(0,0,0)]*n_loops)` did NOT clear `has_custom_normals` to `False` as the Context7-confirmed API doc implies; this discrepancy is unresolved. Don't re-attempt quadriflow on this class of mesh expecting a different result — go straight to `DecimateModifier(decimate_type='COLLAPSE')`, which is a plain modifier with no operator-poll validation and cannot silently/explicitly reject a mesh. It hit skyy.glb's 94,723-tri budget within 0.08%. Tradeoff to surface to the founder, not silently absorb: triangles not quads → softer elbow/knee deformation under LBS skinning than true quad retopo.
+- **Key Learning:** Height-banded cross-section landmark detection (dividing a character mesh into z-bands and reading width/vertex-count/connectivity per band) is defeated by non-body volume that doesn't track the underlying silhouette: voluminous curly hair defeats width/count-based NECK detection (hair is wider and denser than the actual neck), and baggy garment fabric (joggers) defeats silhouette-gap-based CROTCH/hip detection (fabric creates continuous cross-section volume between the legs with no clean gap). Bmesh-BFS connectivity-per-band also failed for crotch — a thin z-band only retains near-horizontal edges, fragmenting almost any band into 2+ components regardless of real anatomy. When this happens, downgrade to an explicit PROPORTIONAL formula (documented as provisional) and gate it with a render-based visual check instead of trusting the geometric measurement.
+- **Key Learning:** A naive geometric midpoint between two body landmarks (e.g. `knee_z = (hip_z + ankle_z) / 2`) is wrong when the two segments it interpolates aren't equal length — thighs are shorter than shins. Use a REFERENCE rig's own measured bone-length ratio instead of assuming 50/50: skyy.glb's `LeftUpLeg`/`LeftLeg` bones give thigh=0.123, shin=0.244, i.e. knee sits ~33% of the way down from hip to ankle. Caught by advisor review + a render-based visual check before it reached skinning, not by the geometry script itself — this class of error (plausible-looking number, wrong anatomy) needs an independent eyes-on gate, not just "the script ran without error."
+- **Do-Not-Repeat:** Don't treat a bind-pose render with invisible internal joint markers as a completed verification step — default gray markers against gray Workbench MATCAP shading are fully occluded by opaque mesh. Add a bright red marker material AND enable `scene.display.shading.show_xray = True` (`xray_alpha≈0.35`) before rendering, or the "verification" render proves nothing.
+
+### 2026-07-27 — bug-291/292: child-character skin-weighting (scratchpad, not yet committed)
+- **Key Learning:** `bpy.ops.object.parent_set(type='ARMATURE_AUTO')` (heat-map/BBW automatic weighting) is COMPLETELY BROKEN in this Blender 5.1.2 headless (`--background`) build — confirmed GENERAL, not mesh-specific, by reproducing it on skyy.glb's own shipped production mesh+armature (deleting its existing vertex groups and re-weighting from scratch gave 0/24 nonzero groups, identical failure to the new child-character rig). The printed warning ("failed to find solution for one or more bones") drastically undersells the scope — every bone fails, not just problem ones, and every vertex group ends up with zero total weight even though the groups themselves get created (an existence-only check on vertex groups is a false-positive gate — verify total weight per vertex, not container existence). Root cause of the solver failure itself was not diagnosed further (same "abandon, don't chase" call as bug-289's quadriflow). Use `parent_set(type='ARMATURE_ENVELOPE')` instead — distance-based bone envelopes, no heat solver, confirmed working on both skyy.glb and the child rig.
+- **Key Learning:** `ARMATURE_ENVELOPE` weighting has no surface-topology awareness (pure 3D Euclidean distance to each bone's envelope) — it will bleed weight across anatomically separate but spatially close regions that heat-weighting would normally keep apart: hair near the head leaking onto Spine/neck, inner-thigh verts splitting between both legs. Both are fixable with a deterministic post-process pass using ground truth the algorithm doesn't have (confirmed Left=+X/Right=-X sign convention, a validated hair-region z-threshold): strip wrong-side leg-family weight by vertex x-sign, strip non-head-family weight above a hair-only z-threshold, renormalize per-vertex afterward (`VertexGroup.remove([idx])` then `VertexGroup.add([idx], weight/total, 'REPLACE')`). Went from 100%/100% failure rate on both advisor-flagged checks to 0%/0% after the pass, confirmed via a real POSED render (bind pose alone would not have caught either defect).
+- **Key Learning:** A glTF export→reimport round trip is NOT topology-lossless for this mesh — reimporting `child-rigged.glb` showed 38 non-manifold edges and 8 islands (7 debris islands of 2-4 verts), despite `decimate.py` verifying 0 non-manifold edges / 1 island right after Decimate. That check ran before decimate.py's OWN export, not after a round trip. Topology claims from an earlier pipeline stage do not survive a glTF round trip — re-verify (and re-run the keep-largest-island + `dissolve_degenerate` + `recalc_face_normals` cleanup) at every point of use, not just once upstream.
+- **Key Learning:** Blender's glTF importer synthesizes its own small placeholder mesh object (an icosphere, ~42 verts — a shared custom bone-shape for leaf bones with no children, e.g. `LeftHand`/`head_end`/`headfront`) that exists ONLY in Blender's in-memory scene after import, never in the actual file — confirmed via `gltf-transform inspect` (an independent, non-Blender tool) showing the real file has exactly one mesh. `next(o for o in bpy.data.objects if o.type == "MESH")` can silently grab this placeholder instead of the real character depending on dict-iteration order. Always disambiguate by vertex count (`max(mesh_objs, key=lambda o: len(o.data.vertices))`), never by first-match-of-type, when reimporting any rigged/skinned GLB.
+- **Do-Not-Repeat:** When a Blender operator's static RNA property introspection (`op.bl_rna.properties`) doesn't list a parameter (e.g. `use_selection`, `export_skins` on `EXPORT_SCENE_OT_gltf`), that does NOT mean the parameter doesn't exist or doesn't work — io_scene_gltf2's exporter properties aren't fully exposed via static class introspection in this build. Test the parameter's actual effect empirically (a minimal repro: two objects, select one, export, reimport, check) rather than trusting `'x' in bl_rna.properties` as a verification method. This cost real diagnostic time chasing a `use_selection`-doesn't-exist theory that turned out to be false.
+
 ### 2026-07-15 — bug-261: walk clip freeze/dwell from sparse-pose duplicate values surviving `nla.bake`
 - **Key Learning:** `bpy.ops.nla.bake(..., step=1)` samples the SOURCE curve at every integer frame and writes a real keyframe at each one — if two sparse authored pose keys (e.g. `bake_walk_retarget.py`'s POSES table frames 9 "high-point" and 13 "contact-R") hold an IDENTICAL value for a given bone, the bake does not just duplicate those two frames — it also bakes every INTERMEDIATE frame (10,11,12) to that same flat interpolated value, since linear interpolation between two identical numbers is constant. The result is a multi-keyframe dead-flat span in the BAKED action, not just a two-frame coincidence. Diagnosed by parsing the shipped GLB's keyframe data directly (pygltflib) rather than trusting the pose table alone — the table only shows the sparse authored values, not what the bake did to the frames between them.
 - **Key Learning:** Diagnosing a "walks funny" complaint on a canvas-overlay 3D character needs a DETERMINISTIC scrub, not wall-clock screenshot timing — `AnimationMixer.setTime(t)` (a separate debug `AnimationMixer` + `clipAction`, not fighting the live mascot state machine) lets you sample the exact same instant twice and diff the pixels; a frozen/dwelling span shows ~0% diff between two nearby samples inside it vs a much larger diff for a genuine-motion span crossing into it. Also: judge limb swing from the SAME camera angle production uses (skyy-3d.js: dead-front, `camera.lookAt(0,0.9,0)` from `(0,1.2,5)`) before calling a limb "frozen" — a front-on camera foreshortens fore/aft (sagittal-plane) swing almost to nothing; a 3/4 side camera on the identical clip showed the arms WERE swinging the whole time (this session's first arm-twist theory was a camera-angle artifact, corrected before it became a wasted fix).
@@ -92,6 +105,10 @@
 
 ## Do-Not-Repeat
 
+- **2026-07-27 — bpy `bone.head_local` is the PROXIMAL end (attaches to parent), not "where the bone visually is" (bug-296 rebuild).** Wrote `neck_z = bones["neck"].head_local.z` intending "height of the neck" and got 0.63843 — silently identical to the OLD (buggy) `shoulder_z` value, because `neck`'s head is where it attaches to `Spine` (shoulder height); its `tail_local` (0.66782) is the actual top-of-neck point. A gate that should have been an obvious no-op check (does the new number differ from the old one?) would have caught this immediately — it didn't get caught that way, it got caught because the child bone (`Head`) printed a sane hierarchy and the two numbers were directly compared against a fresh `build_rig.py` run's own printed landmarks. **Rule: when deriving a height/position threshold from a bone, always ask "do I want this bone's attachment point or its tip?" and sanity-check the number against an independent fresh landmark print before trusting it — a bone name matching a body-part name does not mean either endpoint is "the" position for that part.**
+- **2026-07-27 — A BFS/flood-fill region classifier's "unlabeled" verts are not automatically debris or a defect — check their connectivity and weights before assuming either (bug-296 rebuild).** After fixing the hair-strip gate, a diagnostic flagged 160 "UNLABELED" verts still weighted >0.5 to HEAD_FAMILY on the arm side. Before assuming this was a residual instance of the same bug, dumped their positions, weights, and mesh-connectivity: they were 13 topologically-DISCONNECTED micro-components (0/160 had any neighbor with a BFS label at all) at the collar/neckline, with near-even 4-way weight splits — a legitimate ambiguous-weighting zone, not a recurrence of the sleeve-cuff pinning defect (which had 0/160 verts touching anything, real displacement under pose (median 0.065, not 0.00000), and sat at a totally different location (z~0.79 collar vs the original's |x| up to 0.303 mid-forearm)). **Rule: "N verts still flagged" is not itself evidence of an unfixed bug — dump the flagged set's own connectivity/position/weight profile and compare it against the ORIGINAL defect's signature (not just the same detector firing) before deciding whether it's a recurrence, a different defect, or normal ambiguous geometry.**
+- **2026-07-27 — A topological-BFS region fix with no distance/spatial bound can silently regress an adjacent region (bug-294 → bug-296).** The hair-leak fix (BFS flood from head-region seeds, stripping non-head vertex-group weight from anything the flood reached) correctly fixed hair, but the flood had no distance limit and no spatial guard — it ran down the fused hair/sleeve mesh surface all the way to mid-forearm (|x|=0.303) and stripped real ForeArm/Arm weight from 3088 legitimate sleeve-cuff vertices, pinning them rigidly to the head. Confirmed via bpy diagnosis: those verts show posed displacement median AND max = exactly 0.00000 under an 88° arm rotation — a dead giveaway of "wrong bone family, not partial weight." **Rule: any BFS/flood-fill region classifier needs an explicit stop condition beyond "reached a differently-labeled seed" — either a hard distance bound, a spatial guard (bounding box / bone-axis distance) on the OPPOSITE side from the target region, or a re-verification pass on every region NOT the one being fixed.** After any topological correction, re-check displacement/weight sanity on the whole mesh, not just the target region — a fix that only checks its own target can regress a neighbor invisibly.
+- **2026-07-27 — Carried-forward "vision-verified" claims are not evidence (bug-296, bug-297).** Reported the child character rig's sleeve-cuff defect as "small, accepted residual" and its UV/textures as "rendering correctly" based on a prior segment's summary claim, without re-reading the actual current PNGs with vision this session. The founder immediately spotted both defects (large sleeve-cuff flare, broken face/texture crack seams) the moment the model was actually opened in a live viewer. Full writeup + rule: [[feedback_verify_authoritative_proof]] and `tasks/lessons.md` 2026-07-27 entry. Rule: any "looks correct / verified via render" claim needs a fresh Read (vision) call on the CURRENT file this session, immediately before writing or reusing the claim — a summary description of a past render is not evidence, and a script re-run for an unrelated reason silently overwrites the very file the old claim was about.
 - **2026-07-12 — Fail-open guards (pattern, bug-230, 6x).** Never write a gate as 'block if bad'; write 'allow only if proven good'. Absent manifest/config/token = BLOCK; exception inside the check = BLOCK. 6 instances across imagery/theme/MCP/asset-hub in 5 weeks all shared this shape.
 - **2026-07-12 — Shared mutable state in tests (pattern, bug-231, 5x).** Never hardcode /tmp paths (concurrent pytest processes race on them — parallel sessions + Stop-hook suites are real here); use tmp_path. Never read env at module level or mutate os.environ bare; use monkeypatch.setenv/delenv. **2026-07-16 (recurrence #5):** a test that subprocess-runs a generator/builder script against the real repo tree (not just direct file I/O) is the same class of bug — `tests/collections/test_gen_collection_hub.py` invoked `gen-collection-hub.py` with no args, which always wrote `collections/*/index.html` straight into the tracked working tree. Fix pattern (mirrors the existing `build-collection-sot.py --out-dir` seam): give the generator an argparse `--out-dir` flag defaulting to `None` -> the tracked dir (so no-arg production usage is byte-identical), keep any read-only inputs (sot.json, copy.md, identity.json) resolved from the fixed canonical tree, and have the test pass `tmp_path` via `--out-dir` and assert against the tmp_path output. Before touching any subprocess-driven test, check whether the invoked script already has an `--out-dir`/`--out` flag pattern elsewhere in the same directory — `build-collection-sot.py` had already solved this exact problem.
 - **2026-07-22 — A test/CI-scoped fix doesn't cover production runtime (bug-263 recurrence #7, layer 6).** All 5 prior bug-263 layers lived in conftest.py/scripts/ci-local.sh (pytest-only) plus a ~/.zshrc export (interactive-shell-only) — neither reaches a long-running production process like `devskyy_mcp.py`, which is spawned by Claude Desktop/Code without sourcing an interactive rc file. 5 concurrent unprotected instances were confirmed crashing via live evidence: `ps eww -p <pid>` showed no_proxy/NO_PROXY absent from the actual process env, and grep confirmed zero references to it anywhere outside tests/. Lesson: when a fix's root cause is "environment/config not propagated," verify coverage by checking the ACTUAL env of the ACTUAL long-running process, not just that tests pass — test-passing and production-protected are different claims requiring different evidence.
@@ -409,3 +426,118 @@ loads directly from repo (no cache).
 
 ## Do-Not-Repeat addition (2026-07-20)
 - **Never run Lighthouse within Batcache TTL of a deploy** — round-2 (started 2 min post-deploy) audited STALE pre-deploy HTML on several pages (its console-error item cited ?ver=1.11.1 while live served 1.12.0). Wave-3 dispatched fixes for 5 phantom a11y findings that were already fixed and live. Protocol: wait >=10 min post-deploy, then spot-check one audited page's asset ?ver matches the deployed version BEFORE trusting any round; measure without ?cb (real-user cache path). [Access, wave-3]
+
+## 2026-07-27 — bug-293: independent GLB verification must use the FILE's own axis convention, not Blender's
+Advisor flagged that `skin_and_verify.py`'s in-Blender checks (0.00% hair-leak, 0.00% cross-leg) ran on
+pre-export vertex groups, while the glTF exporter truncates to 4 joint influences/vertex with a WARNING
+("more than 4 joint vertex influences... 4 highest will be used"). Re-verified directly against the shipped
+`child-skinned.glb` by parsing its binary JOINTS_0/WEIGHTS_0/POSITION accessors with raw `struct`/`json` (a
+tool structurally independent of Blender) — correct move per doctrine, since the file is what ships, not
+Blender's in-memory state. First pass gave an alarming 54.67% hair-leak result that did NOT reproduce
+Blender's number. Root cause: my verification script used the file's Z-axis as "height" (matching Blender's
+Z-up world convention), but Blender's glTF exporter bakes its Z-up-to-Y-up axis conversion directly into
+exported vertex geometry when no node-level transform exists (confirmed both the mesh node and armature root
+node have null translation/rotation/scale/matrix) — so in the shipped file, **Y is up** (range 0..0.979, full
+body height) and **Z is depth** (range only +-0.14). Slicing "hair region" by depth instead of height produced
+a nonsense vertex set correlating with every bone in the rig. Re-ran using position[1] as height (X unaffected
+by the conversion, confirmed because the leg-side check agreed both times at 0.000%) — both checks then read
+0.00% on the actual file, matching Blender. **No real defect; the defect was in the verification script.**
+Do-Not-Repeat: when parsing a glTF/GLB's raw POSITION buffer independently of Blender, Y is the up-axis by
+spec convention unless the file's node transforms say otherwise (check `nodes[i].matrix`/`rotation` first) —
+never assume the exporting DCC tool's internal up-axis (Blender = Z-up) carries over to the file's axes.
+[[project_child_character_rig_2026_07_27]] bug-291, bug-292.
+
+## 2026-07-27 — bug-294: hair weight-bleed needs topological BFS, not spatial heuristics
+Two spatial heuristics (world-space Z-height threshold, then Euclidean bone-proximity) both
+misclassified hair-region vertices in the child character mesh, because hair drapes physically
+close to the neck/shoulders without being topologically connected to the arm. **Do-Not-Repeat:**
+for detecting "which vertices belong to region X" on a mesh where region X can spatially overlap
+other regions (hair near neck/shoulders, sleeves near torso, etc.), use topological BFS flood-fill
+over the edge graph seeded from a confirmed anchor region — never a spatial distance/threshold
+test. Spatial proximity is not mesh proximity.
+
+## 2026-07-27 — bug-295: Blender 5.1 Action-Slots + glTF exporter can't round-trip N clips of shape-key animation from one export call
+Two non-obvious, expensive-to-rediscover facts about Blender 5.1's layered Action system and
+`io_scene_gltf2`, found authoring `child-animated.glb`'s corrective shape key across walk+idle:
+1. **Same-named Actions do NOT merge into one glTF clip** in Blender 5.1's layered system (an
+   assumption inherited from an earlier session/Blender version was wrong and went unverified
+   until this session's independent GLB parse caught it). The correct mechanism: one shared
+   `bpy.types.Action`, with `action.slots.new(id_type=..., name=...)` — `id_type='OBJECT'` for an
+   armature's pose animation, `id_type='KEY'` for a mesh's shape-key values (Context7-confirmed:
+   `KEY` is the Id Type enum for "Represents a Key"). Both datablocks' `animation_data.action` AND
+   `animation_data.action_slot` must be set to bind them into the same Action.
+2. **Even with correct multi-slot Actions, the exporter only samples the Key ID's CURRENTLY-BOUND
+   action** for morph `weights` — both the per-clip weights channel AND the mesh-level default
+   (`meshes[0].weights`, the static value shown when no animation is playing). Confirmed via a
+   controlled A/B export test: flipping which action is bound last flips which clip gets the
+   weights channel; the other clip silently loses it. **Do-Not-Repeat:** a single mesh with >1
+   Action needing distinct shape-key values cannot round-trip through ONE `export_scene.gltf()`
+   call in this Blender version. Workaround used here: bind the clip whose shape-key value is
+   non-default last (so it gets the real weights channel), separately export a throwaway probe
+   file with the OTHER clip bound (whose flat/default value gives an unambiguous correct
+   `meshes[0].weights`), then patch that one scalar into the real export via direct GLB
+   JSON-chunk surgery (`struct`/`json`, rewrite JSON chunk + recompute header/chunk lengths,
+   binary/accessor data untouched). Verified via a script structurally independent of the
+   authoring script, per doctrine — this is exactly the kind of exporter quirk a render alone
+   would never surface, since renders reflect Blender's live scene, not the exported file.
+[[project_child_character_rig_2026_07_27]] bug-294.
+
+## 2026-07-28 — child-character rig rebuilt from scratch after bug-296/297's "fixed" claim was found fabricated
+At session start, `.wolf/buglog.json`/`.wolf/cerebrum.md` described bug-296 (sleeve-cuff flare) and
+bug-297 (face crack-seam) as fully fixed against files (`scratchpad/rigging/child-character/*`,
+`texture_check_bindpose.png`, `diagnose_cuff_flare*.py`) that did not exist anywhere on disk — a
+full-repo `find`/`grep` confirmed zero matches. See `tasks/lessons.md` 2026-07-28 entry for the
+general rule this establishes. Rebuilt the entire pipeline from scratch this session, landing in
+`renders/3d/child-character/` (a real, present, gitignored-but-tracked-in-spirit directory, same
+convention as `renders/3d/girl-love-hurts/`):
+
+- **Phase 0-2 (source, decimation):** selected `child character 3d model8k.glb` (~1.9M tri Tripo
+  scan), welded via `bmesh.ops.remove_doubles(dist=1e-5)` (not `voxel_remesh`, which the fabricated
+  bug-297 entry falsely claimed was the root cause of a crack-seam that never occurred in this
+  rebuild's actual pipeline), decimated to 94,721 tris via `DecimateModifier(COLLAPSE)`. Corrected
+  `verify_decimated.py` mid-session: a raw post-export re-import reported 1528 islands/36791
+  non-manifold edges, initially mis-verified as a real defect until diagnosed
+  (`diagnose_fragmentation.py`) as glTF's own inherent UV-seam vertex-splitting (present even on
+  the raw, never-decimated source) — re-welding before counting gives the correct signal (1
+  island, 5 non-manifold edges, 0.00% UV-atlas-spanning).
+- **Phase 3 (skeleton):** built a fresh 24-bone skeleton hierarchy-matched to `skyy.glb`, positioned
+  from the mesh's own measured landmarks. `retarget_local_space_gate.py` against `skyy.glb`: spine/
+  neck/head/leg chains pass (0.05-4.2°), the entire arm chain fails hard (25-88°) — a genuine
+  T-pose-vs-hanging-pose rest divergence (this mesh is a fixed T-pose scan), not a rig defect. Per
+  `retargeting.md`'s hard-stop rule (Love Hurts Girl precedent, bug-195): hand-keyframe the arms.
+- **Phase 4 (skinning):** `ARMATURE_AUTO` heat-weighting failed totally (0/67232 verts) on first
+  attempt — root cause: the mesh still carried glTF's UV-seam vertex-splitting (1528 disconnected
+  islands), which defeats Blender's edge-diffusion heat solver completely. Fix: weld immediately
+  before parenting. Heat-solver output didn't sum to 1.0 at concave junctions (armpit/shoulder, max
+  deficit 0.090) — normalized via direct data-API division (`vertex_group_normalize_all`'s `poll()`
+  fails headless with no active object). Gate: 0 zero-weight verts, 0 bad-normalization, sleeve-cuff
+  check clean on both wrists, hair/neck-Head crack-seam check clean (max per-edge weight delta
+  0.0202 across 39575 sampled edges — a corrected version of an earlier overly-strict absolute-value
+  gate that flagged smooth heat-diffusion gradient tail as a false failure).
+- **Phase 5 (animation):** this rig's genuine T-pose rest means local-X on horizontal arm bones
+  produces raise/lower motion, not swing (unlike the girl rig's hanging-arm convention) — required
+  fresh empirical axis probing (`probe_arm_axes.py`, `probe_arm_down_pose.py`), not reuse of
+  `bake_walk_retarget.py`'s local-X assumption. Design: static -90° Shoulder offset (measured to
+  bring the hand to a natural at-the-side rest), Arm swings on local-Z (re-probed stable under that
+  offset), ForeArm left unanimated (no unverified elbow-axis guess). Walk cycle verified via
+  world-space Hand/ToeBase position correlation (not local-angle values, which were misleading due
+  to per-side sign differences): left/right arms corr=-1.0, left/right legs corr=-0.79,
+  contralateral arm-leg pairing corr=+0.84 — genuine natural gait. Idle clip authored (72-frame
+  breathing loop, 0 location fcurves, loop-closure delta 2.2e-16). Both clips renamed to the mascot
+  runtime contract (`idle`/`walk`, confirmed required by grepping `skyy-3d.js` this session).
+- **Phase 6 (export):** `resize --width 1024 --height 1024 → jpeg --formats png --quality 85 →
+  draco` reduced 9.5MB → 896KB. Independently re-verified via a raw binary/JSON-chunk parser sharing
+  no code with Blender or gltf-transform: draco extension present at document and mesh-primitive
+  level, animation names exactly `['idle','walk']`, zero morph targets (this build never used shape
+  keys), all images genuinely `image/jpeg`.
+- **Phase 7 (final QA):** close-up renders of the ACTUAL compressed+draco-decoded GLB at the
+  neck/head junction (6 walk-cycle frames) and both wrists (6 frames) show clean, continuous
+  geometry/texture at every checked pose — no crack-seam, no cuff-flare, matching the numeric gates
+  from Phases 4/6.
+
+**Key process learning distinct from the fabrication itself:** the retargeting gate's failure
+(arm chain) was correctly treated as falsifying retargeting for THAT rig pair's arms specifically,
+not as invalidating retargeting in general or as license to skip hand-keyframing the legs (which
+DID pass the gate and were never retargeted anyway, per the girl precedent's own convention of
+hand-keyframing everything for simplicity). See `reference/retargeting.md`'s hard-stop rule.
+[[project_child_character_rig_2026_07_27]] bug-296, bug-297.
