@@ -7,7 +7,9 @@ The gotchas below are the ones a fresh session gets wrong.
 
 - **Admin (`/admin/*`): NextAuth v4.** `lib/auth.ts` + `SessionProvider` (`app/admin/layout.tsx`). Server-side: `getServerSession(authOptions)`. Client-side: `useSession()`. JWT, 15-min expiry.
 - **Storefront/legacy:** `contexts/AuthContext.tsx` → `useAuth()`, `localStorage` key `access_token`. NOT used by any admin page. `lib/api/client.ts` also reads this key directly for backend calls. Calling `useAuth()` in an admin page gets undefined context.
-- **Edge gate = `proxy.ts`, NOT `middleware.ts`.** Next.js 16 **deprecated `middleware.ts` in favor of `proxy.ts`** (both still resolve — a lone `middleware.ts` only warns, both-present is a hard error; named export `middleware` → `proxy`). `frontend/proxy.ts` exports `async function proxy()` + `export const config.matcher` — this IS the registered gate and it DOES run. Add gated paths via `config.matcher` (`proxy.ts:42`). Caveat: `proxy` runs the **nodejs** runtime — edge is not supported in `proxy`; keep a `middleware.ts` only if you need edge. Per-route `getServerSession()` stays as defense-in-depth.
+- **API gate = `withAuth()` per route handler** (`lib/api-auth.ts`). Every handler under `app/api/` is exported as `export const GET = withAuth(getHandler);`. Unauthenticated → **401 JSON, never a redirect**: these are all `fetch` calls from `/admin` pages, and a 302 to `/login` gets followed transparently, handing the caller an HTML login page with status 200 — which parses as success. Exemptions live in `lib/api-public-routes.ts` (`auth/[...nextauth]`, `checkout`, `webhooks/woocommerce`) and are **exact** route matches, so a future `checkout-status/` cannot inherit `checkout/`'s pass.
+- **Adding an API route? It is gated or the build fails.** `tests/api-auth-coverage.test.ts` walks `app/api/**/route.ts` on disk and rejects any exported handler that is neither wrapped nor explicitly exempted. Per-handler auth is fail-OPEN by nature (a new route is unprotected until someone remembers) — that test is what restores the fail-closed property the old matcher had for free. Do not add a route to `PUBLIC_API_ROUTES` without writing the reason next to it.
+- **Edge gate = `proxy.ts`, NOT `middleware.ts`.** Next.js 16 **deprecated `middleware.ts` in favor of `proxy.ts`** (both still resolve — a lone `middleware.ts` only warns, both-present is a hard error; named export `middleware` → `proxy`). `frontend/proxy.ts` exports `async function proxy()` + `export const config.matcher`. Caveat: `proxy` runs the **nodejs** runtime — edge is not supported in `proxy`; keep a `middleware.ts` only if you need edge. **This file is slated for removal** (founder decision, 2026-07-28) — `withAuth()` above is its replacement for `/api/*`, so treat `config.matcher` as legacy and gate new API routes with the wrapper, not the matcher.
 
 ## Catalog data is SERVER-ONLY
 
@@ -30,7 +32,9 @@ shadcn/ui **"new-york"** style, `rsc: true` (`components.json`). Install primiti
 
 ## E2E tests — canonical dir is `tests/e2e/`
 
-`playwright.config.ts:4` sets `testDir: './tests/e2e'`. The legacy `frontend/e2e/` dir is NOT executed — new specs go to `tests/e2e/`. No Jest/unit runner is wired (`npm test` has no script) despite `@testing-library/react` being installed. Launch/smoke the app with the `run-devskyy-dashboard` skill.
+`playwright.config.ts:4` sets `testDir: './tests/e2e'`. The legacy `frontend/e2e/` dir is NOT executed — new specs go to `tests/e2e/`. Launch/smoke the app with the `run-devskyy-dashboard` skill.
+
+**Unit runner is vitest** — `npm test` → `vitest run`. `vitest.config.ts` uses an explicit `include` (`lib/wp/**`, `tests/**`), NOT a default glob, because most of the dashboard cannot be imported under vitest: `lib/wp/client.ts` sits behind a `server-only` boundary the resolver can't satisfy, and anything reaching `next-auth`/`next/server` drags the framework in. Keep new suites framework-free, or they get skipped — and a skipped security test is indistinguishable from a passing one. `tests/e2e/**` is excluded here; it belongs to Playwright.
 
 ## next.config.ts — leave the Vercel guard alone
 

@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { withAuth } from '@/lib/api-auth';
 import { getProduct } from '@/lib/catalog';
 import { updateProductRow } from '@/lib/catalog-write';
 import { collapseNewlines, type CatalogPatch } from '@/lib/catalog-csv';
@@ -45,7 +46,7 @@ function toCsvPatch(input: PatchInput): CatalogPatch {
   return patch;
 }
 
-export async function PUT(
+async function putHandler(
   request: NextRequest,
   { params }: { params: Promise<{ sku: string }> }
 ) {
@@ -103,3 +104,5 @@ export async function PUT(
     return NextResponse.json({ success: false, error: 'Catalog write failed' }, { status: 500 });
   }
 }
+
+export const PUT = withAuth(putHandler);

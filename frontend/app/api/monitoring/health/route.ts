@@ -4,9 +4,11 @@
 
 import { NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
+
 const startTime = Date.now();
 
-export async function GET() {
+async function getHandler() {
   try {
     const uptimeSeconds = (Date.now() - startTime) / 1000;
     const memoryUsage = process.memoryUsage();
@@ -39,3 +41,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

@@ -11,10 +11,11 @@
 import { NextResponse } from 'next/server';
 import { connection } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
 import { getCatalog, getCollectionSlugs } from '@/lib/catalog';
 import { getSotImagesForSku } from '@/lib/sot-images';
 
-export async function GET() {
+async function getHandler() {
   // `await connection()` opts this route out of static prerendering under
   // `cacheComponents`, so it always reads the catalog fresh from disk and never
   // serves a build-time snapshot after a write.
@@ -40,3 +41,5 @@ export async function GET() {
     return NextResponse.json({ success: false, error: 'Catalog unavailable' }, { status: 500 });
   }
 }
+
+export const GET = withAuth(getHandler);

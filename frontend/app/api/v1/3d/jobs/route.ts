@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 
 // In-memory job store (replaced by database in production)
 const jobStore: Array<{
@@ -15,9 +16,11 @@ const jobStore: Array<{
 
 export { jobStore };
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const limit = Math.min(Math.max(1, Number(searchParams.get('limit')) || 20), 100);
 
   return NextResponse.json(jobStore.slice(0, limit));
 }
+
+export const GET = withAuth(getHandler);

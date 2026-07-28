@@ -5145,5 +5145,66 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-27T18:20:00-07:00"
+  },
+  {
+    "id": "bug-301",
+    "timestamp": "2026-07-28T10:20:00-07:00",
+    "error_message": "Backend uptime monitor reports the Vercel dashboard as DOWN. api/v1/monitoring.py:57 registers {'name': 'Vercel API', 'url': 'https://devskyy.app/api/health'}; that URL returns 401 {'success':false,'error':'Unauthorized'} on production [live, probed 2026-07-28].",
+    "file": "api/v1/monitoring.py",
+    "root_cause": "The monitor targets /api/health, which is inside proxy.ts's gated matcher and requires a NextAuth session -- an unauthenticated prober can never get 200. /api/health is also the WRONG endpoint for uptime: it probes WordPress/WooCommerce credential state and returns whether WP_APP_PASSWORD is provisioned plus raw WP error strings in wp_reason, so it must STAY gated. The endpoint intended for uptime is /api/monitoring/health (status, uptime, commit SHA, region, heap) -- but that is gated too, which also breaks the post-deploy check at frontend/scripts/deploy.ts:247 and the unauthenticated probe in frontend/tests/e2e/smoke.spec.ts:44.",
+    "fix": "NOT YET APPLIED -- founder decision, deliberately out of scope for the withAuth gating change (which preserves current behavior exactly, zero regression). Recommended: repoint api/v1/monitoring.py:57 and deploy.ts:247 to /api/monitoring/health, then add ONLY 'monitoring/health' to frontend/lib/api-public-routes.ts. Do NOT exempt /api/health -- it discloses credential-provisioning state.",
+    "tags": [
+      "monitoring",
+      "auth",
+      "false-alarm",
+      "uptime",
+      "dashboard",
+      "pre-existing"
+    ],
+    "related_bugs": [
+      "bug-162"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:20:00-07:00"
+  },
+  {
+    "id": "bug-302",
+    "timestamp": "2026-07-28T10:45:00-07:00",
+    "error_message": "POST https://www.devskyy.app/api/conversion returns 401 {'success':false,'error':'Unauthorized'} [live, probed 2026-07-28]. The WordPress->dashboard conversion analytics bridge has been silently dead: skyyrose.co client engines (CIE, Aurora, Pulse, Magnetic Obsidian, Cross-Sell, Journey Gamification, APE) POST batched events to it and every batch is rejected.",
+    "file": "frontend/app/api/conversion/route.ts",
+    "root_cause": "Same shape as bug-301: an endpoint designed for UNAUTHENTICATED EXTERNAL callers sits inside proxy.ts's blanket /api/* matcher, whose only exemptions are auth, checkout and webhooks. The storefront has no NextAuth session, so it can never satisfy the gate. Nothing alerts, because the sender fire-and-forgets analytics beacons and the dashboard simply shows zero events -- indistinguishable from 'no traffic'.",
+    "fix": "NOT APPLIED -- preserved as-is by the withAuth migration (exact parity, zero regression). Correct fix is a decision, not a patch: either (a) add 'conversion' to frontend/lib/api-public-routes.ts AND unwrap GET/POST/OPTIONS in the same change -- withAuth does NOT consult the exemption list at runtime, the list only drives the coverage test -- with the ingest authenticated by a shared secret or HMAC like webhooks/woocommerce does; or (b) accept that this bridge is retired and delete the WP-side senders. Note GET on this route returns aggregated dashboard metrics and must STAY gated even if POST opens.",
+    "tags": [
+      "analytics",
+      "auth",
+      "wordpress-bridge",
+      "silent-failure",
+      "pre-existing",
+      "fail-open-inverse"
+    ],
+    "related_bugs": [
+      "bug-301"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:45:00-07:00"
+  },
+  {
+    "id": "bug-303",
+    "timestamp": "2026-07-28T10:50:00-07:00",
+    "error_message": "GET /api/settings returns WooCommerce consumerKey/consumerSecret to the browser in plaintext with no redaction, and masking them is not safely possible without changing POST first.",
+    "file": "frontend/app/api/settings/route.ts",
+    "root_cause": "getHandler returns the settings object verbatim. app/admin/settings/page.tsx binds those fields into CONTROLLED inputs (page.tsx:243,269) and postHandler writes req.json() straight to data/settings.json. So the response is not a view -- it is the next write's payload. Returning a masked value (cs_****1234) would persist the mask OVER the real credential on the very next save.",
+    "fix": "NOT APPLIED -- out of scope for the auth-gating change, and a naive mask here DESTROYS credentials. Correct sequence: (1) make postHandler merge instead of overwrite, ignoring any secret field whose submitted value equals the mask sentinel; (2) only then redact in getHandler. Mitigation today: the route is double-gated (withAuth wrapper + inline isAuthenticated), so exposure is limited to an authenticated admin session. The env-seeded defaults added 2026-07-28 do not widen this -- they follow the same path settings.json values already take.",
+    "tags": [
+      "secrets",
+      "dashboard",
+      "settings",
+      "redaction",
+      "controlled-input",
+      "pre-existing"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:50:00-07:00"
   }
 ]

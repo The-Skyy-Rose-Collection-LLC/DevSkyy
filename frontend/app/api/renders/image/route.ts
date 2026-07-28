@@ -13,13 +13,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connection } from 'next/server';
 import fs from 'node:fs';
 
+import { withAuth } from '@/lib/api-auth';
 import { resolveRenderImage } from '@/lib/renders';
 
 // Cap in-memory reads so a huge (or symlink-redirected) file can't exhaust
 // memory / block the event loop.
 const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   await connection();
 
   const { searchParams } = request.nextUrl;
@@ -47,3 +48,5 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Not found', { status: 404 });
   }
 }
+
+export const GET = withAuth(getHandler);

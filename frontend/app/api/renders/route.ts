@@ -7,9 +7,10 @@
 import { NextResponse } from 'next/server';
 import { connection } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
 import { getRenderQueue } from '@/lib/renders';
 
-export async function GET() {
+async function getHandler() {
   // Dynamic under `cacheComponents`: always reflect the current disk state.
   await connection();
   try {
@@ -21,3 +22,5 @@ export async function GET() {
     return NextResponse.json({ success: false, error: 'Renders unavailable' }, { status: 500 });
   }
 }
+
+export const GET = withAuth(getHandler);

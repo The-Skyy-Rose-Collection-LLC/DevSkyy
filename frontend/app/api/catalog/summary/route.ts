@@ -11,10 +11,11 @@
 import { NextResponse } from 'next/server';
 import { connection } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
 import { getCatalog, getCollectionSlugs } from '@/lib/catalog';
 import { wpRequestRaw, type WcStoreProduct } from '@/lib/wp/client';
 
-export async function GET() {
+async function getHandler() {
   await connection();
 
   const response = await wpRequestRaw('/wc/store/v1/products?per_page=100');
@@ -51,3 +52,5 @@ export async function GET() {
 
   return NextResponse.json({ success: true, live: liveCounts, csv: csvCounts, drift, uncategorized });
 }
+
+export const GET = withAuth(getHandler);

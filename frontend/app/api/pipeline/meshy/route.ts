@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { meshyClient, toJob3D } from '@/lib/meshy/client';
 import { getMeshyConnectionStatus } from '@/lib/meshy/config';
 
@@ -16,7 +17,7 @@ import { getMeshyConnectionStatus } from '@/lib/meshy/config';
 // POST — Submit a generation job
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { input_type, prompt, image_url, art_style, mode } = body as {
@@ -96,11 +97,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export const POST = withAuth(postHandler);
+
 // ---------------------------------------------------------------------------
 // GET — Check job status or get connection info
 // ---------------------------------------------------------------------------
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const taskId = searchParams.get('task_id');
@@ -139,6 +142,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export const GET = withAuth(getHandler);
 
 // ---------------------------------------------------------------------------
 // Helper type (keeps the import out of the function body)

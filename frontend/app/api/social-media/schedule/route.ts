@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 
 // ---------------------------------------------------------------------------
 // In-memory schedule store (replace with Redis/DB in production)
@@ -40,7 +41,7 @@ function addScheduledEntry(entry: ScheduledEntry): void {
 // POST handler
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = (await request.json()) as { post_id?: string; scheduled_at?: string };
 
@@ -107,11 +108,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export const POST = withAuth(postHandler);
+
 // ---------------------------------------------------------------------------
 // GET handler - Retrieve scheduled posts
 // ---------------------------------------------------------------------------
 
-export async function GET() {
+async function getHandler() {
   try {
     const entries = Array.from(scheduledPosts.values()).sort(
       (a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
@@ -129,3 +132,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withAuth(getHandler);
