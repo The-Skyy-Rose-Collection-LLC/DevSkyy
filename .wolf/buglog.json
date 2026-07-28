@@ -5057,5 +5057,47 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-297",
+    "timestamp": "2026-07-27",
+    "error_message": "PRODUCTION: /my-account/ renders NO account UI at all. Logged out or in, visitors get no login form, no orders, no addresses, no downloads \u2014 only a placeholder paragraph. Conversion-blocking: customers cannot access their account.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/woocommerce.php",
+    "root_cause": "Live page 9710 (/my-account/) has post_content of only 'This page uses the SkyyRose Flagship theme template. Content is rendered by the theme.' \u2014 no [woocommerce_my_account] shortcode and no block equivalent [live, WP REST probe 2026-07-27]. Its template field is '' (default), and the theme ships NO woocommerce/myaccount/ override. So page.php calls the_content(), which renders the placeholder and nothing else. The content explicitly delegates rendering to the theme; the theme never implemented it. Discovered indirectly: a new 492-line woocommerce-account.css was found to have 26 of its 28 targeted woocommerce-* classes absent from the live page \u2014 the markup never renders.",
+    "fix": "skyyrose_account_content_fallback() on the_content at priority 9 (BEFORE core's do_shortcode at 11, so the returned shortcode is expanded by the normal filter chain). Guarded on is_account_page() + in_the_loop() + is_main_query() so excerpts/widgets/secondary loops are untouched. Idempotent: yields if the content ever gains the shortcode or the woocommerce/customer-account block, so a later content fix cannot double-render. ZERO production DB writes \u2014 matches the template_include remedies in inc/redirects.php used for the stale-meta Collections/Cart/Checkout pages.",
+    "tags": [
+      "woocommerce",
+      "my-account",
+      "production",
+      "conversion-blocking",
+      "missing-shortcode",
+      "live-verified"
+    ],
+    "related_bugs": [
+      "bug-222"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-298",
+    "timestamp": "2026-07-27",
+    "error_message": "verify-theme.sh a11y-static reported a fixed '72 <img> without alt' forever. All 72 were FALSE POSITIVES; the check also MISSED 31 real tags. Broken in both directions, so it could neither be trusted nor acted on \u2014 and it undermined the theme's advertised WCAG 2.2 AA / accessibility-ready claim for no reason.",
+    "file": "wordpress-theme/skyyrose-flagship/scripts/verify-theme.sh",
+    "root_cause": "Line-based grep `<img[^>]*>` piped to `grep -civE alt=`. Three failure modes: (1) counted <img> appearing inside PHP docblocks/comments and inside the theme's own alt-injection regex strings; (2) for `<img src=\"<?php echo esc_url($u); ?>\" alt=\"x\">` the FIRST '>' belongs to `?>`, truncating the tag before its alt \u2014 so correct multi-line tags were flagged; (3) tags whose opening line contained no '>' at all were never matched, hiding 31 real tags.",
+    "fix": "Replaced with a python3 parse that strips, IN ORDER, html comments -> php block comments -> php line comments -> php <?php ?> blocks, then matches `<img\\b[^>]*>` ([^>] spans newlines) and checks for \\balt\\s*=. Falls back to the old grep if python3 is absent. Order matters: php blocks must go before tag matching or the `?>` truncation recurs. Proven non-vacuous with a synthetic fixture: flags a genuinely alt-less tag, does NOT flag a tag whose alt is on the next line, and ignores an <img> inside an HTML comment. That fixture caught a real bug in the first version of the fix \u2014 html comments were not being stripped. Theme result 72 -> 2; the remaining 2 are inc/accessibility-fix.php's own regex/replacement string literals. Deliberately NOT chasing those: stripping PHP string literals would risk false negatives on markup echoed from PHP strings, a real pattern in this codebase.",
+    "tags": [
+      "a11y",
+      "verify-theme",
+      "false-positive",
+      "gate-quality",
+      "wcag",
+      "mutation-testing"
+    ],
+    "related_bugs": [
+      "bug-292"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
   }
 ]
