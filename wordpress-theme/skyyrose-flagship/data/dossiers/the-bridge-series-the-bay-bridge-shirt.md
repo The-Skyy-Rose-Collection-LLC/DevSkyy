@@ -46,10 +46,10 @@ reference_image: assets/products/references/sg-005-bay-bridge-shirt-techflat.jpe
 - **back-neck** (small, ~1.5in wide, top-center just below the collar): The SR monogram embroidered onto the jersey in **dark grey / black thread** (NOT canonical gold). **Technique:** embroidered. **Color:** dark grey / black thread on white.
 
 ### Sleeves / Collar / Hem / Other
-- **collar** (~0.5in wide ribbed crew neck): Standard ribbed crew-neck collar. **Technique:** stitched. **Color:** white.
-- **left-sleeve** (short sleeve, plain hem): Short set-in sleeve. **Technique:** stitched. **Color:** white.
-- **right-sleeve** (short sleeve, plain hem): Mirror of left. **Technique:** stitched. **Color:** white.
-- **hem** (straight even bottom hem): Plain stitched bottom hem. **Technique:** stitched. **Color:** white.
+- **collar** (~0.5in wide ribbed crew neck): Standard ribbed crew-neck collar. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **left-sleeve** (short sleeve, plain hem): Short set-in sleeve. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **right-sleeve** (short sleeve, plain hem): Mirror of left. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **hem** (straight even bottom hem): Plain stitched bottom hem. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **collar-inside** (~1.5in × 0.5in interior tag): Branded woven size tag. **Technique:** woven-label. **Color:** brand-label palette.
 
 ## Negative — what is NOT on this product (DO NOT render)

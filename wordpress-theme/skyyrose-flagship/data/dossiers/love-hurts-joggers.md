@@ -20,21 +20,21 @@ reference_image: assets/products/references/lh-002-techflat-front.jpeg
 > - Product techflat: `assets/products/references/lh-002-techflat-front.jpeg`
 
 ### Front
-- **front-body** (entire front body — solid black field): Solid black, cotton-fleece. **Technique:** stitched. **Color:** black.
-- **front-left-pocket** (vertical slash pocket at the left side of the upper hip): Slash-style hand pocket at the front left side, with vertical welt opening. **Technique:** stitched (sewn-on welt edges). **Color:** body-matching black.
-- **front-right-pocket** (vertical slash pocket at the right side of the upper hip): Slash-style hand pocket at the front right side, with vertical welt opening. **Technique:** stitched (sewn-on welt edges). **Color:** body-matching black.
+- **front-body** (entire front body — solid black field): Solid black, cotton-fleece. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **front-left-pocket** (vertical slash pocket at the left side of the upper hip): Slash-style hand pocket at the front left side, with vertical welt opening. **Technique:** stitched (sewn-on welt edges). **Color:** body-matching black. **Hex:** #000000.
+- **front-right-pocket** (vertical slash pocket at the right side of the upper hip): Slash-style hand pocket at the front right side, with vertical welt opening. **Technique:** stitched (sewn-on welt edges). **Color:** body-matching black. **Hex:** #000000.
 - **left-thigh** (centered on the wearer's left thigh, just below the hip): **Heart-rose-composite logo** — the Love Hurts heart-and-thorns lockup with roses emerging from the top, rendered embroidered on the black body fabric. **Technique:** embroidered. **Color:** red roses + green thorns + crimson heart, on black body.
 
 ### Back
 - (No back-body decoration. The back is a clean panel with no embroidered logo or graphic — the contrast side-panel wraps cleanly from front to back through the side seam.)
 
 ### Sleeves / Collar / Hem / Other
-- **left-side-panel** (vertical contrast strip running from waistband to ankle on the left side seam): A WHITE contrast-fabric panel inserted along the left side seam. The panel is approximately 1.5in–2in wide and runs continuously from the waistband down to the ankle hem. **Technique:** stitched (contrast fabric panel sewn into the side seam). **Color:** white.
-- **right-side-panel** (vertical contrast strip running from waistband to ankle on the right side seam): A WHITE contrast-fabric panel inserted along the right side seam. The panel is approximately 1.5in–2in wide and runs continuously from the waistband down to the ankle hem. **Technique:** stitched. **Color:** white.
+- **left-side-panel** (vertical contrast strip running from waistband to ankle on the left side seam): A WHITE contrast-fabric panel inserted along the left side seam. The panel is approximately 1.5in–2in wide and runs continuously from the waistband down to the ankle hem. **Technique:** stitched (contrast fabric panel sewn into the side seam). **Color:** white. **Hex:** #FFFFFF.
+- **right-side-panel** (vertical contrast strip running from waistband to ankle on the right side seam): A WHITE contrast-fabric panel inserted along the right side seam. The panel is approximately 1.5in–2in wide and runs continuously from the waistband down to the ankle hem. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **waistband**: Black elasticated waistband with **white flat drawstring**. **Technique:** stitched. **Color:** black waistband + white drawstring.
-- **drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white.
-- **left-ankle-cuff** (ribbed-knit band at the left ankle hem): Ribbed-knit cuff at the left ankle in black (some variants may use a banded-elastic cuff instead of rib-knit). **Technique:** stitched. **Color:** black.
-- **right-ankle-cuff** (ribbed-knit band at the right ankle hem): Ribbed-knit cuff at the right ankle in black (some variants may use a banded-elastic cuff instead of rib-knit). **Technique:** stitched. **Color:** black.
+- **drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **left-ankle-cuff** (ribbed-knit band at the left ankle hem): Ribbed-knit cuff at the left ankle in black (some variants may use a banded-elastic cuff instead of rib-knit). **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **right-ankle-cuff** (ribbed-knit band at the right ankle hem): Ribbed-knit cuff at the right ankle in black (some variants may use a banded-elastic cuff instead of rib-knit). **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **inside-waistband** (~1.25in × 0.5in, sewn into the inside front waistband): Branded woven size tag (universal SkyyRose product rule). **Technique:** woven-label. **Color:** white label, black lettering.
 
 ## Negative — what is NOT on this product (DO NOT render)

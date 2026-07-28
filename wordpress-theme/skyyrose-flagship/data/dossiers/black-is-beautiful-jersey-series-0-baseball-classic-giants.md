@@ -48,7 +48,7 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
   onto the jersey in **white thread on the black fabric** (same treatment as
   the Classic black colorway — single-color white-thread silhouette
   preserving the canonical art's shapes). **Technique:** embroidered.
-  **Color:** white thread.
+  **Color:** white thread. **Hex:** #FFFFFF.
 
 ### Sleeves / Collar / Hem / Other
 - **collar / V-neck binding**: Bright orange contrast piping/binding around

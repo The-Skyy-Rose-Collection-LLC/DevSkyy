@@ -38,28 +38,28 @@ reference_image: assets/products/references/sg-015-windbreaker-set-techflat.jpeg
 > would be a sibling dossier with a `colorway` frontmatter override.
 
 ### Front
-- **front-body-jacket** (entire white jacket field, between the hood seam and the bottom hem): Solid **white** nylon windbreaker shell fabric. **Technique:** stitched. **Color:** white.
+- **front-body-jacket** (entire white jacket field, between the hood seam and the bottom hem): Solid **white** nylon windbreaker shell fabric. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **front-chevron-jacket** (large V-shape, ~10in wide, fanning from the upper chest outward toward both shoulders and up to the hood opening): Multi-color **rainbow chevron stripe color-block panel** — alternating pink + green + lavender + yellow stripes (~5–8 stripes, each ~0.5–1in wide) arranged in a V/chevron formation that meets at the center-front upper-chest and fans up-and-out toward each shoulder. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow on white ground.
 - **front-center-chest-jacket** (small, ~2in tall, just below the V-chevron meeting point on the white body): Small **pink rose-cluster** decoration — canonical rose-cluster art recolored to a pink-on-white tonal palette (pink / coral petals + grey-pink outlines + white cloud) matching the small chest rose on the sg-006 hoodie. **Technique:** embroidered. **Color:** pink + coral + grey-pink thread on white.
 - **front-zipper-jacket** (vertical center-front, full body length from hood opening to waistband hem): Standard center-front zipper running the full length of the jacket body. **Technique:** patch. **Color:** body-tone hardware (white or near-white teeth).
 - **front-left-pocket-jacket** (vertical slash hand pocket at the lower-left jacket body, with **pink contrast piping** along the welt edge): Slash hand pocket. **Technique:** stitched. **Color:** white body with pink piping accent.
 - **front-right-pocket-jacket** (vertical slash hand pocket at the lower-right jacket body, mirror of left): Slash hand pocket with pink contrast piping. **Technique:** stitched. **Color:** white body with pink piping.
-- **front-body-pants** (entire white pants field, between the waistband and ankle cuffs): Solid **white** nylon windbreaker fabric. **Technique:** stitched. **Color:** white.
+- **front-body-pants** (entire white pants field, between the waistband and ankle cuffs): Solid **white** nylon windbreaker fabric. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **front-thigh-chevron-pants** (V-shape, ~6–7in wide, on each upper-thigh / hip area, mirroring across the center-front): Multi-color V-shape **rainbow chevron stripe color-block panel** on each upper thigh — alternating pink + green + lavender + yellow stripes arranged in V/chevron pattern. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow on white ground.
 - **front-left-pocket-pants** (vertical slash hand pocket on wearer's left thigh, with **pink contrast piping** along the welt edge): Slash hand pocket. **Technique:** stitched. **Color:** white body with pink piping.
 - **front-right-pocket-pants** (vertical slash hand pocket on wearer's right thigh, mirror of left): Slash hand pocket with pink contrast piping. **Technique:** stitched. **Color:** white body with pink piping.
-- **drawstring-pants** (~24in long, threaded through the pants waistband): White flat drawstring. **Technique:** stitched. **Color:** white.
+- **drawstring-pants** (~24in long, threaded through the pants waistband): White flat drawstring. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 
 ### Back
 - **back-yoke-jacket** (~5–6in tall, ~3–4in wide, centered on the upper back below the hood seam): Large **SR monogram** in cursive script — prominent back-yoke logo placement (significantly larger and more visible than the small back-neck SR on the sg-006 fleece hoodie). **Technique:** embroidered. **Color:** dark-grey / black / metallic thread on white ground.
-- **back-body-jacket** (entire white back field, below the SR monogram and above the waistband): Solid **white**, no other decoration. **Technique:** stitched. **Color:** white.
-- **back-body-pants** (entire white pants back field, between waistband and ankle cuffs): Solid **white**, no decoration. **Technique:** stitched. **Color:** white.
+- **back-body-jacket** (entire white back field, below the SR monogram and above the waistband): Solid **white**, no other decoration. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **back-body-pants** (entire white pants back field, between waistband and ankle cuffs): Solid **white**, no decoration. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 
 ### Sleeves / Hood / Hem / Other
 - **hood-jacket** (full hood with drawstring, ~10in tall when laid flat): Solid **pink / light pink** contrast hood. **Technique:** stitched. **Color:** pink / light pink.
-- **hood-drawstring-jacket** (white flat drawstring threaded through the hood opening): White drawstring. **Technique:** stitched. **Color:** white.
-- **left-sleeve-jacket** (long nylon sleeve): Solid white nylon body with a small V-shape rainbow chevron stripe panel at the upper-cuff / forearm area mirroring the front-chevron color story. **Technique:** sublimated. **Color:** white body with chevron accent.
-- **right-sleeve-jacket** (mirror of left-sleeve): Solid white with chevron accent at the upper-cuff. **Technique:** sublimated. **Color:** white body with chevron accent.
+- **hood-drawstring-jacket** (white flat drawstring threaded through the hood opening): White drawstring. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
+- **left-sleeve-jacket** (long nylon sleeve): Solid white nylon body with a small V-shape rainbow chevron stripe panel at the upper-cuff / forearm area mirroring the front-chevron color story. **Technique:** sublimated. **Color:** white body with chevron accent. **Hex:** #FFFFFF.
+- **right-sleeve-jacket** (mirror of left-sleeve): Solid white with chevron accent at the upper-cuff. **Technique:** sublimated. **Color:** white body with chevron accent. **Hex:** #FFFFFF.
 - **left-cuff-jacket** (~1.5in tall ribbed cuff at wrist): Multi-color rainbow stripe band (alternating pink + green + lavender + yellow stripes wrapping the cuff). **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.
 - **right-cuff-jacket** (mirror of left-cuff-jacket): Multi-color rainbow stripe band. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.
 - **waistband-jacket** (~2in tall ribbed band at the jacket bottom hem): Multi-color rainbow stripe band wrapping the jacket front-and-back at the hem. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.

@@ -1,6 +1,6 @@
 ---
 sku: kids-002
-name: Kids Colorblock Hoodie Set — Purple/Black
+name: Kids Colorblock Hoodie Set — Lavender/Purple
 collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
 reference_image: assets/products/references/kids-002-techflat.jpeg
@@ -8,11 +8,11 @@ extra_references:
   - assets/products/references/kids-002-real-photo.jpeg
 ---
 
-# Kids Colorblock Hoodie Set — Purple/Black
+# Kids Colorblock Hoodie Set — Lavender/Purple
 
 **Garment type lock:** Two-piece kids hoodie set — (1) pullover hoodie with kangaroo front pocket, drawstring hood, ribbed cuffs and hem, **angular geometric color-block construction** (lavender/light-pink hood + diagonal lavender-and-medium-purple upper-body panels + deep purple lower body), and (2) matching sweatpants in solid deep purple with drawstring waist. NOT a zip-up jacket. NOT a single-piece garment. NOT an adult-sized SKU. Mid-weight cotton-fleece fabric. **Two-piece sold together as one SKU.** Same construction as the Red/Black colorway (kids-001) but in a purple-monochrome palette.
 
-> **Note on catalog name:** The catalog lists this SKU as "Purple/Black," but the techflat + real-product photo confirm the **pants are deep purple, NOT black**. Render purple pants to match the actual product. The "Black" in the SKU name appears to refer to the dark-purple tones reading visually as a near-black neutral, NOT to a literal black pant.
+> **Note on catalog name:** The catalog originally listed this SKU as "Purple/Black," but the techflat + real-product photo confirm the **pants are deep purple, NOT black** — the "Black" misread the dark-purple tones as a near-black neutral. The catalog display name was corrected to **"Lavender/Purple"** (2026-07-18) to match the actual palette; the dossier slug stays `kids-colorblock-hoodie-set-purple-black` as the stable id. Render purple pants to match the actual product.
 
 ## Branding — exactly what IS on this product
 
@@ -33,7 +33,7 @@ extra_references:
 - **right-sleeve**: Solid **medium purple** to match the front-upper-right panel. **Technique:** stitched. **Color:** medium purple.
 - **sleeve patch** (ONE only, ~2in diameter, on the upper sleeve / shoulder — see the real product photo for which sleeve and its exact artwork): A small round embroidered patch. **Technique:** embroidered-patch. Only ONE sleeve carries a patch; the other sleeve is plain.
 - **hood**: Solid **lavender / light pink-purple** (matching the upper-left panel). **Technique:** stitched. **Color:** lavender.
-- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white.
+- **hood-drawstring**: White flat drawstring threaded through the hood. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **kangaroo-pocket**: Deep purple front kangaroo pocket integrated into the lower-body panel.
 - **left-cuff / right-cuff**: Ribbed-knit cuffs, color-matching their sleeves. **Technique:** stitched.
 - **hem / waistband**: Ribbed-knit waistband, deep purple to match the lower-body panel. **Technique:** stitched. **Color:** deep purple.
@@ -44,14 +44,14 @@ extra_references:
 - **pants cluster** (ONE only, small, ~2in tall, on the pants — see the real product photo for exact position): A small Black Rose three-rose-cluster (greyscale). **Technique:** embroidered. **Color:** white + black + grey thread on deep purple. Only ONE cluster on the pants.
 
 ### Sweatpants — Other
-- **waistband-drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white.
+- **waistband-drawstring**: White flat drawstring. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-pocket / right-pocket**: Slash-style hand pockets. **Technique:** stitched.
 - **pants-cuffs**: Ribbed-knit ankle cuffs (or straight-leg open hem). **Technique:** stitched. **Color:** deep purple.
 - **pants-inside / waistband-tag**: Branded woven size tag. **Technique:** woven-label.
 
 ## Negative — what is NOT on this product (DO NOT render)
 
-- NO BLACK pants — pants are DEEP PURPLE despite the catalog name "Purple/Black" (the techflat and real photo both confirm purple, not black).
+- NO BLACK pants — pants are DEEP PURPLE (the techflat and real photo both confirm purple, not black; the former "Purple/Black" catalog name was corrected to "Lavender/Purple").
 - NO red anywhere on this colorway — this is the all-purple sister set to kids-001 (Red/Black). NO red roses, NO red body panel, NO red kangaroo pocket.
 - NO solid-color hoodie body — body is angular color-block, NOT a solid lavender or solid purple field.
 - NO horizontal stripe blocking — color-block panels are DIAGONAL.

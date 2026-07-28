@@ -69,11 +69,11 @@ extra_logos:
 
 ### Sleeves / Collar / Hem / Other
 - **collar-outside / neckband**: White ribbed-knit neckband contrasting against
-  the black body. **Technique:** stitched. **Color:** white.
+  the black body. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-cuff / right-cuff**: White ribbed-knit sleeve cuffs contrasting
-  against the black body. **Technique:** stitched. **Color:** white.
+  against the black body. **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **hem**: White ribbed-knit waist hem contrasting against the black body.
-  **Technique:** stitched. **Color:** white.
+  **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **collar-inside** (~1.75in × 0.75in): Small woven brand label sewn into the
   inside back of the collar. **Technique:** woven-label. **Color:**
   brand-label colors (typically black with brand-color accents).

@@ -98,9 +98,9 @@ extra_references:
 
 ### Sleeves / Collar / Hem / Other
 - **waistband-rib**: White elasticated waistband at the top.
-  **Technique:** stitched. **Color:** white.
+  **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **drawstring**: White flat drawstring threaded through the waistband.
-  **Technique:** stitched. **Color:** white.
+  **Technique:** stitched. **Color:** white. **Hex:** #FFFFFF.
 - **left-side-pocket / right-side-pocket** (front-side hand pockets):
   Vertical hand pockets at both sides, **with zipper closures**.
   **Technique:** patch (sewn-on zipper hardware). **Color:** black

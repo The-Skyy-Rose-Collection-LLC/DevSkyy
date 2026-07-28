@@ -41,30 +41,30 @@ extra_references:
   running the entire length of the center-front from the V-opening at
   the collar down to the bottom of the ribbed waistband. The primary
   closure. **Technique:** patch (sewn-on hardware — zipper teeth).
-  **Color:** black zipper teeth.
+  **Color:** black zipper teeth. **Hex:** #000000.
 - **front-placket-storm-flap** (covering the zipper line): A black
   satin storm flap overlaps the zipper line, secured with **buttons /
   snaps** down the placket. The buttoned overlap creates a clean
   uninterrupted satin front when fully closed (the zipper is hidden
   underneath the flap). **Technique:** patch (sewn-on snap/button
-  hardware). **Color:** black snaps/buttons on black satin.
+  hardware). **Color:** black snaps/buttons on black satin. **Hex:** #000000.
 - **front-placket-drawstring**: A flat black drawstring threaded down
   the inside of the placket area, hanging visibly from inside the hood
-  toward the chest. **Technique:** stitched. **Color:** black.
+  toward the chest. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **side-hand-pockets** (left and right, lower-side): Slash-style hand
   pockets with **zipper closures** at the openings. **Technique:**
-  patch (sewn-on hardware — zipper teeth). **Color:** black zipper teeth.
+  patch (sewn-on hardware — zipper teeth). **Color:** black zipper teeth. **Hex:** #000000.
 - **left-cuff / right-cuff**: Black ribbed-knit cuffs at the wrists
   (tonal black, contrasting with the satin sleeves). **Technique:**
-  stitched. **Color:** black.
+  stitched. **Color:** black. **Hex:** #000000.
 - **hem / waistband**: Black ribbed-knit bomber-style waistband at the
-  bottom of the jacket. **Technique:** stitched. **Color:** black.
+  bottom of the jacket. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **hood-inside / inner-hood-lining**: Black sherpa lining inside the
   hood (plush textured fabric, distinct from the satin exterior).
-  **Technique:** stitched. **Color:** black sherpa.
+  **Technique:** stitched. **Color:** black sherpa. **Hex:** #000000.
 - **body-inside / inner-body-lining**: Black sherpa lining inside the
   body of the jacket (visible when the front placket is open).
-  **Technique:** stitched. **Color:** black sherpa.
+  **Technique:** stitched. **Color:** black sherpa. **Hex:** #000000.
 - **collar-inside / interior-back-collar** (small woven label): Branded
   woven size tag (universal SkyyRose product rule). Visible as a small
   white-and-brand-color tag in the reference photos. **Technique:**

@@ -20,17 +20,17 @@ extra_references:
 > - Product mockup:                     `assets/products/references/lh-005-fannie-mockup.jpeg`
 
 ### Front
-- **front-body** (the front face of the bag, ~6–8in wide): Solid **black pebbled faux-leather** fabric. **Technique:** stitched. **Color:** black.
-- **front-pocket-zipper** (horizontal, across the front face below the bag's top edge): A black metal/plastic zipper running horizontally across the front face providing access to the front pocket. **Technique:** patch (sewn-on zipper hardware). **Color:** black zipper teeth and pull.
+- **front-body** (the front face of the bag, ~6–8in wide): Solid **black pebbled faux-leather** fabric. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **front-pocket-zipper** (horizontal, across the front face below the bag's top edge): A black metal/plastic zipper running horizontally across the front face providing access to the front pocket. **Technique:** patch (sewn-on zipper hardware). **Color:** black zipper teeth and pull. **Hex:** #000000.
 - **front-center-bottom** (~3–4in wide, centered on the lower front face below the zipper): The wordmark **"FANNIE"** in stylized white cursive script lettering, with a small **canonical Love Hurts red rose graphic** decoration to the immediate right of the wordmark (a single small red rose accent — similar in style to the small standalone rose accent used on lh-002 joggers). **Technique:** embroidered (wordmark in white thread + small red rose embroidered detail). **Color:** white "FANNIE" + small red rose accent.
 
 ### Back
-- **back-body** (the panel against the wearer's body): Solid **black pebbled faux-leather**, no decoration. **Technique:** stitched. **Color:** black.
-- **strap-attachment-points** (D-rings or stitched belt-loops at the upper-left and upper-right corners of the bag): Two D-rings or stitched belt-loops where the nylon strap attaches. **Technique:** patch (sewn-on hardware). **Color:** black.
+- **back-body** (the panel against the wearer's body): Solid **black pebbled faux-leather**, no decoration. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **strap-attachment-points** (D-rings or stitched belt-loops at the upper-left and upper-right corners of the bag): Two D-rings or stitched belt-loops where the nylon strap attaches. **Technique:** patch (sewn-on hardware). **Color:** black. **Hex:** #000000.
 
 ### Strap / Hardware / Other
-- **adjustable-strap**: Black nylon webbing strap, adjustable length via slider, with a **plastic quick-release side-release buckle** at one point so the strap can clip on and off. **Technique:** patch (sewn-on plastic buckle hardware) + stitched (webbing). **Color:** black webbing + black plastic buckle.
-- **strap-buckle**: Plastic side-release clip buckle. **Technique:** patch (sewn-on plastic hardware). **Color:** black.
+- **adjustable-strap**: Black nylon webbing strap, adjustable length via slider, with a **plastic quick-release side-release buckle** at one point so the strap can clip on and off. **Technique:** patch (sewn-on plastic buckle hardware) + stitched (webbing). **Color:** black webbing + black plastic buckle. **Hex:** #000000.
+- **strap-buckle**: Plastic side-release clip buckle. **Technique:** patch (sewn-on plastic hardware). **Color:** black. **Hex:** #000000.
 - **interior-tag** (~1in × 0.5in, sewn into the interior of the front pocket): Branded woven size tag (universal SkyyRose product rule, scaled for accessory). **Technique:** woven-label. **Color:** white label, black lettering.
 
 ## Negative — what is NOT on this product (DO NOT render)

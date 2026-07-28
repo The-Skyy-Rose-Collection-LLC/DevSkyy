@@ -164,6 +164,41 @@ if unexplained modified files exist, assume a parallel session owns them.
 **Root cause:** (1) stale cross-session data used without re-checking; (2) `gh pr view <n> --json mergeable` returns `UNKNOWN` for merged/closed PRs *and* for uncomputed-open PRs — indistinguishable without the `state` field, which I never queried.
 **Rule:** Before acting on any multi-PR plan, `gh pr list --state open` for the authoritative open set. Never infer open/closed from `mergeable`. Any single-PR read includes `state` + `mergedAt`. `git merge-tree` showing 0 conflicts vs main can mean "already merged," not "clean to merge."
 
+## 2026-07-16 — Persist paid-platform knowledge immediately (founder correction)
+**Wrong:** re-derived Higgsfield facts (costs, param schemas, capabilities) and re-uploaded already-uploaded media across the session — tokens and credits are money, and discovery calls repeated what was already known.
+**Rule:** the moment a paid-platform fact is verified (cost, param, media_id, capability), write it to CLAUDE.md (rules) or the governing spec's registry (artifacts) IN THE SAME TURN — and check those BEFORE any discovery call or upload. A fact that lives only in a transcript is a fact you will pay for twice.
+
+## 2026-07-17 — Subagent briefs MUST carry the governing spec path
+**What happened:** Creative-director agent was dispatched with brand canon + EDL + chat directives but NOT `tasks/scroll-world-ad-spec.md`. It substituted a tagline end card for the founder-LOCKED end card copy and missed the second (cold-cut) deliverable entirely — reasoned correctly from general rules, wrong because a specific locked directive existed unread.
+**Lesson:** Every build/creative subagent brief includes the governing spec doc path as REQUIRED reading before execution, and states which sections are LOCKED. General brand rules never substitute for specific locked copy. Orchestrator owns this — the agent can't read what it wasn't pointed at.
+
+## 2026-07-18 — Regenerate ALL derived artifacts after catalog/dossier edits
+Catalog CSV or dossier edits require regenerating THREE derived files, not just sot.json:
+`build-collection-sot.py` (collection sot.json) · `skyyrose.core.sot_images` (sot-images.json) · **`build_asset_manifest.py` (assets/products/manifest.json)** — the last one hashes dossier files + catalog names and has a Stop-gate test. Missing it = stale-manifest Stop-gate block.
+In a SPARSE worktree, `build_asset_manifest.py` hashes only checked-out files — regenerating without the full `assets/products` tree DROPS entries and corrupts the manifest. Always `git sparse-checkout add assets/products` first. (bug-273, class of bug-252.)
+
+## 2026-07-18 — QC fine per-detail features on FULL-RES crops, never contact sheets
+Called br-009 back "3" as "still has rose" from a 520px-cell contact sheet; a full-res 2x zoom proved it was plain white (fix had landed). Downscaled QC sheets are fine for layout/presence checks but LOSE fine distinctions (plain digit vs rose-filled digit, small lettering weight). For any per-digit/per-region fidelity call, crop the region from the ORIGINAL render and view at ≥1x. Cost of the miss: told founder "UNACCEPTABLE", sent a deep-research tangent, for a render that was already correct.
+
+## 2026-07-18 — sg-015 "sweatsuit" was a contact-sheet misread (recurring)
+Called sg-015 "STILL the sweatsuit / needs re-render" off a 320px montage tile. Founder showed the
+full-res renders: they ARE nylon windbreakers (shell sheen, crinkle, elastic bands, structured hood).
+Same failure as the br-009 back misread (lesson b17997fa5): garment fabric/type verdicts MUST come
+from full-res single-image reads, NEVER downscaled contact sheets. Contact sheets are for LOCATING a
+shot in a timeline, not judging fabric/print/colorway. Cost of the miss: almost spent $0.80 + a
+dossier edit on a render that was already correct. Rule: before any "render is wrong → re-render"
+call, open the actual full-res PNG.
+
+## 2026-07-18 — TWO STANDING RULES LOCKED (founder-mandated)
+1. **Every paid call requires its own explicit "y".** No batch pre-approval. Each render / audio /
+   video / paid API call = its own STOP-AND-SHOW manifest + its own y, immediately before firing.
+   Menu selection or a prior y on another call is NOT approval. One manifest → one y → one call.
+2. **Full-res-only QC (blocking).** Never call a render/garment/print/colorway/fabric right or wrong
+   from a contact sheet or montage tile — open the full-res PNG. Contact sheets only locate shots in
+   a timeline. No full-res look = no verdict, and never trigger a paid re-render off a downscaled read.
+Recorded in CLAUDE.md (STOP-AND-SHOW, founder-mandated 2026-07-18 block) + memory
+(feedback_every_paid_call_needs_y, feedback_fullres_only_qc).
+
 ## Bump SKYYROSE_VERSION on EVERY theme CSS/JS edit (2026-07-23)
 **Mistake:** Fixed collection-pages.js, rebuilt .min, deployed — but did NOT bump SKYYROSE_VERSION. The theme enqueues assets as `?ver=SKYYROSE_VERSION`, so the URL was identical to the prior deploy. Browsers + WP.com Batcache + CDN that cached the file during the earlier window kept serving STALE JS; the new IntersectionObserver play-gate never ran and the film sat paused. Cost a full extra diagnose+bump+redeploy cycle.
 **Rule:** Any commit that touches `assets/**/*.{css,js}` in the theme MUST also bump SKYYROSE_VERSION (functions.php + style.css + readme.txt — freshness-guard enforces the 3-way sync). The .min rebuild alone is NOT enough — unchanged `?ver` = inert change for every cached client. Verify live with the actual `?ver=` on the script tag, and (when a JS behavior changed) with a fresh-cache browser eval, not just an origin curl.

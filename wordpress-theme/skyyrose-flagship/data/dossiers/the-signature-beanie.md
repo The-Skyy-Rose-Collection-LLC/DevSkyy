@@ -51,8 +51,8 @@ reference_image: assets/products/references/sg-007-techflat.jpeg
 - (Clean back — no decoration on the rear-cuff face or rear-crown.)
 
 ### Sleeves / Hood / Hem / Other
-- **cuff** (~2.5–3in tall folded): Standard ribbed-knit cuff, folded up once. **Technique:** stitched. **Color:** black.
-- **crown**: Rounded knit crown, no decoration. **Technique:** stitched. **Color:** black.
+- **cuff** (~2.5–3in tall folded): Standard ribbed-knit cuff, folded up once. **Technique:** stitched. **Color:** black. **Hex:** #000000.
+- **crown**: Rounded knit crown, no decoration. **Technique:** stitched. **Color:** black. **Hex:** #000000.
 - **inside-cuff** (~1in × 0.5in interior tag): Branded woven size tag (universal SkyyRose product rule, scaled for accessory). **Technique:** woven-label. **Color:** brand-label palette.
 
 ## Negative — what is NOT on this product (DO NOT render)
