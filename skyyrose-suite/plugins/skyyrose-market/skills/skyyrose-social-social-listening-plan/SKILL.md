@@ -136,10 +136,9 @@ Common variations and misspellings:
 
 ### 3. Tool Configuration
 
-```
-## Tool Stack
+#### Tool Stack
 
-### Free (always-on baseline)
+##### Free (Always-On Baseline)
 | Tool                    | Use                                          | Setup                                              |
 |-------------------------|----------------------------------------------|----------------------------------------------------|
 | Google Alerts           | Blog and news mentions for Tier 1 brand terms| alert per query; daily digest email                |
@@ -148,14 +147,14 @@ Common variations and misspellings:
 | X/Twitter Advanced Search | Real-time keyword monitoring               | Saved searches for Tier 1 + Tier 5 purchase signals|
 | Reddit search           | Subreddit monitoring (r/streetwear, r/malefashionadvice, r/femalefashionadvice, r/AskSF, r/Oakland) | Weekly keyword scan |
 
-### Google Alerts setup (Tier 1 — set each as a separate alert)
+##### Google Alerts Setup (Tier 1: Separate Alert per Query)
   Query 1: "SkyyRose" -site:skyyrose.co
   Query 2: "Skyy Rose Collection" -site:skyyrose.co
   Query 3: "Luxury Grows from Concrete" -site:skyyrose.co
   Delivery: Daily digest, to social@skyyrose.co
   Sources: Everything (web + news + blogs)
 
-### Apify (targeted scrape runs — not always-on)
+##### Apify (Targeted Scrape Runs, Not Always-On)
 Use Apify actors for periodic deep-scrapes when manual monitoring finds a spike or
 when running monthly competitive intelligence. Require Corey confirmation before
 dispatching any paid Apify run.
@@ -165,10 +164,33 @@ Actor recommendations:
   - apify/tiktok-scraper — for keyword and hashtag TikTok pulls
   - apify/twitter-scraper-lite — for X/Twitter keyword volume pulls
   - apify/reddit-search-scraper — for subreddit keyword monitoring
+  - [Xquik X Tweet Scraper](https://apify.com/xquik/x-tweet-scraper)
+    (`xquik/x-tweet-scraper`) for bounded X searches, post lookups, and public
+    profile timelines
+  - [Xquik X Follower Scraper](https://apify.com/xquik/x-follower-scraper)
+    (`xquik/x-follower-scraper`) for bounded public follower, following, list,
+    community, and audience-overlap research
+
+Keep the existing actors available. Choose the actor matching the job's
+documented contract.
+
+Before each Xquik Actor dispatch:
+  1. Open the linked Actor Store page. Verify its current charging model.
+  2. Set `maxItems`. Set `maxItemsPerTarget` for multi-target relation jobs.
+  3. Set Apify's `maxTotalChargeUsd` run option outside the Actor input.
+  4. Show the exact Actor URL, item cap, charge cap, and estimated cost.
+     Use the repository's STOP AND SHOW manifest. Wait for explicit confirmation.
+  5. Keep the Apify token in secret storage. Never place it in a URL or report.
+  6. Collect only public data allowed by platform rules.
+     Never bypass protected accounts. Never infer sensitive traits from the data.
+
+Treat follower relationships and audience overlap as research signals.
+They do not prove identity, intent, endorsement, or affiliation.
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 
 Dispatch trigger: monthly intelligence report cycle OR when a listening spike
 is detected in daily manual monitoring.
-```
 
 ### 4. Monitoring Schedule
 
@@ -267,6 +289,11 @@ Example purchase signal reply: "If you're looking for luxury streetwear rooted i
 
 **Apify scrape summary (if run):**
   Actor: [actor name]
+  Actor Store URL: [exact linked Store URL]
+  Run ID: [Apify run ID]
+  Dataset ID: [Apify dataset ID]
+  Max items: [configured item cap]
+  Max total charge: [$ cap]
   Query: [keyword/hashtag]
   Volume: [N results]
   Key insight: [one-line takeaway]
@@ -309,8 +336,10 @@ python -m skyyrose.elite_studio.ventures.social smoke \
   --platform all
 ```
 
+Apify Instagram hashtag scraper configuration for the monthly Tier 2 collection
+sweep:
+
 ```json
-// Apify Instagram hashtag scraper actor input — monthly Tier 2 collection sweep
 {
   "actor": "apify/instagram-scraper",
   "input": {
@@ -335,8 +364,51 @@ python -m skyyrose.elite_studio.ventures.social smoke \
 }
 ```
 
+Xquik X Tweet Scraper Actor input for a bounded Tier 1 and Tier 5 sweep:
+
 ```json
-// Google Alerts configuration (replicated per query)
+{
+  "mode": "search",
+  "searchTerms": [
+    "\"SkyyRose\"",
+    "\"Skyy Rose Collection\"",
+    "\"Luxury Grows from Concrete\"",
+    "\"looking for luxury streetwear\"",
+    "\"Black-owned streetwear\" Oakland"
+  ],
+  "maxItems": 200,
+  "outputVariant": "rich",
+  "fieldStyle": "camelCase",
+  "outputPreset": "nested",
+  "includeSearchTerms": true
+}
+```
+
+Use this X Follower Scraper input for a bounded audience-overlap sample.
+Verify the public X handle before replacing `verified_competitor_handle`:
+
+```json
+{
+  "twitterHandles": [
+    "skyyroseco",
+    "verified_competitor_handle"
+  ],
+  "relation": "followers",
+  "maxItems": 200,
+  "maxItemsPerTarget": 100,
+  "outputMode": "compact",
+  "includeTargetMetadata": true,
+  "overlapMode": true
+}
+```
+
+The 2 Xquik Actor inputs omit the run-level charge cap. Configure
+`maxTotalChargeUsd` in Apify before dispatch and record it in the approval
+manifest.
+
+Google Alerts configuration, replicated per query:
+
+```json
 [
   {
     "query": "\"SkyyRose\" -site:skyyrose.co",
@@ -399,6 +471,7 @@ Reddit (purchase signal — opportunity):
 - **Monitoring without a response system** — listening that never generates action is wasted intelligence. Every signal type in the response workflow table must have an assigned owner and a response time.
 - **Frequency mismatch** — checking brand mentions weekly instead of daily means a customer complaint spends 5 days unanswered. Tier 1 is daily, non-negotiable.
 - **Apify running without approval** — Apify actors cost money. Per the STOP AND SHOW protocol, any Apify actor dispatch requires explicit Corey confirmation before execution.
+- **Unbounded or private-data scraping:** Every Actor run needs item and charge caps. Collect public data only. Never infer sensitive traits from account relationships.
 - **Ignoring misspellings** — "SkyRose" and "Sky Rose" generate real brand mentions that won't surface if the monitoring queries only use exact "SkyyRose" spelling.
 - **Treating Oakland/Bay Area conversation as noise** — "Oakland luxury brand" and "Bay Area streetwear" conversation is warm audience discovery, not irrelevant background noise. These are the people who find SkyyRose next.
 
