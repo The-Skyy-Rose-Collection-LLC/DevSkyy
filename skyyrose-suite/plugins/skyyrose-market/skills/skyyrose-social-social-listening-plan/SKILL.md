@@ -139,6 +139,7 @@ Common variations and misspellings:
 #### Tool Stack
 
 ##### Free (Always-On Baseline)
+
 | Tool                    | Use                                          | Setup                                              |
 |-------------------------|----------------------------------------------|----------------------------------------------------|
 | Google Alerts           | Blog and news mentions for Tier 1 brand terms| alert per query; daily digest email                |
@@ -148,6 +149,7 @@ Common variations and misspellings:
 | Reddit search           | Subreddit monitoring (r/streetwear, r/malefashionadvice, r/femalefashionadvice, r/AskSF, r/Oakland) | Weekly keyword scan |
 
 ##### Google Alerts Setup (Tier 1: Separate Alert per Query)
+
   Query 1: "SkyyRose" -site:skyyrose.co
   Query 2: "Skyy Rose Collection" -site:skyyrose.co
   Query 3: "Luxury Grows from Concrete" -site:skyyrose.co
@@ -155,6 +157,7 @@ Common variations and misspellings:
   Sources: Everything (web + news + blogs)
 
 ##### Apify (Targeted Scrape Runs, Not Always-On)
+
 Use Apify actors for periodic deep-scrapes when manual monitoring finds a spike or
 when running monthly competitive intelligence. Require Corey confirmation before
 dispatching any paid Apify run.
@@ -174,15 +177,18 @@ Actor recommendations:
 Keep the existing actors available. Choose the actor matching the job's
 documented contract.
 
-Before each Xquik Actor dispatch:
-  1. Open the linked Actor Store page. Verify its current charging model.
-  2. Set `maxItems`. Set `maxItemsPerTarget` for multi-target relation jobs.
-  3. Set Apify's `maxTotalChargeUsd` run option outside the Actor input.
-  4. Show the exact Actor URL, item cap, charge cap, and estimated cost.
-     Use the repository's STOP AND SHOW manifest. Wait for explicit confirmation.
-  5. Keep the Apify token in secret storage. Never place it in a URL or report.
-  6. Collect only public data allowed by platform rules.
-     Never bypass protected accounts. Never infer sensitive traits from the data.
+Before each paid Actor dispatch:
+
+1. Open the linked Actor Store page. Verify its current charging model.
+2. Set the Actor's supported item cap. Use `maxItemsPerTarget` only when its
+   live schema supports that field.
+3. Set Apify's `maxTotalChargeUsd` run option outside the Actor input.
+4. Record the exact Actor, canonical input hash, item cap, charge cap, live
+   price, estimated cost, and approver in the STOP AND SHOW manifest.
+   Wait for explicit confirmation bound to that manifest.
+5. Keep the Apify token in secret storage. Never place it in a URL or report.
+6. Collect only public data allowed by platform rules.
+   Never bypass protected accounts. Never infer sensitive traits from the data.
 
 Treat follower relationships and audience overlap as research signals.
 They do not prove identity, intent, endorsement, or affiliation.
@@ -356,11 +362,21 @@ sweep:
     "scrapeType": "hashtag",
     "addParentData": false
   },
+  "run_options": {
+    "maxTotalChargeUsd": 5
+  },
   "frequency": "monthly",
   "trigger": "manual_or_spike",
   "output_destination": "google_sheets_social_listening_log",
   "requires_approval": true,
-  "approver": "corey_foster"
+  "approval_manifest": {
+    "actor": "apify/instagram-scraper",
+    "input_sha256": "<sha256-of-canonical-input>",
+    "item_cap": 200,
+    "max_total_charge_usd": 5,
+    "pricing_checked_at": "<ISO-8601 timestamp>",
+    "approver": "corey_foster"
+  }
 }
 ```
 
@@ -412,7 +428,7 @@ Google Alerts configuration, replicated per query:
 [
   {
     "query": "\"SkyyRose\" -site:skyyrose.co",
-    "frequency": "as_it_happens",
+    "frequency": "daily_digest",
     "sources": "all",
     "language": "en",
     "region": "any",
@@ -427,7 +443,7 @@ Google Alerts configuration, replicated per query:
   },
   {
     "query": "\"Luxury Grows from Concrete\" -site:skyyrose.co",
-    "frequency": "as_it_happens",
+    "frequency": "daily_digest",
     "delivery": "email",
     "email": "social@skyyrose.co"
   }
