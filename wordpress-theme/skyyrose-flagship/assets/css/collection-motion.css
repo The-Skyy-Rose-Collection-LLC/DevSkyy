@@ -1,0 +1,597 @@
+/**
+ * Collection Motion Identity — per-collection atmosphere + cross-collection
+ * micro-motion for the unified collection page (template-parts/collection/page.php).
+ *
+ * Pattern sources: docs/design/visual-pattern-shortlist.md (screened against
+ * brand canon). Per-collection packages:
+ *   Black Rose    — Smoke/Fog Drift (hero + story), Noise Texture Overlay
+ *                   (concrete), Tilt & Glare on lookbook figures (JS-driven).
+ *   Love Hurts    — Ink Bleed Text Reveal (section headings), Interactive
+ *                   Ink Drop (hero, JS-driven), Retro VHS Scanline (col-film).
+ *   Signature     — Flowing Aurora (hero), Liquid Metal/Chrome CTAs,
+ *                   Constellation Star Field (story).
+ *   Kids Capsule  — spring-physics card hover, bouncing accent field (JS),
+ *                   confetti on add-to-cart (JS).
+ * Cross-collection: Smooth Underline (cross-nav), Morphing Section Dividers.
+ *
+ * Hero constraint (load-bearing): every hero-layer effect here is CSS-only —
+ * pseudo-elements over/under the existing z-stack (bg z1 / scrim z2 /
+ * content z3). Nothing hides the lockup or bg before first paint; the LCP
+ * decode path in page.php is untouched. JS-driven pieces (tilt, ink drop,
+ * bounce, confetti) inject their own DOM after load via collection-motion.js.
+ *
+ * All color literals below are brand-token values (design-tokens.css /
+ * identity.json): 183,110,121 = Rose Gold #B76E79 · #F5E6D3 = Signature
+ * text tint · #050505/#0A0A0A = dark ground. Accents flow from the
+ * per-collection --skyyrose-accent(-rgb) cascade.
+ *
+ * @package SkyyRose
+ * @since   1.13.0
+ */
+
+/* ==========================================================================
+   SHARED SCAFFOLDING — ambient-layer stacking
+   Ambient pseudo-layers need a deterministic stacking context so they sit
+   above the section background but below its content (a negative-z pseudo
+   without isolation would slip beneath .col-story's opaque #050505 and
+   vanish).
+   ========================================================================== */
+.col-page[data-collection="black-rose"] .col-story,
+.col-page[data-collection="signature"] .col-story,
+.col-page[data-collection="signature"] .col-cta {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.col-page[data-collection="black-rose"] .col-story__grid,
+.col-page[data-collection="signature"] .col-story__grid {
+	position: relative;
+	z-index: 1;
+}
+
+.col-page[data-collection="signature"] .col-cta > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* ==========================================================================
+   CROSS-COLLECTION — Smooth Underline Animation (cross-nav links)
+   Accent hairline draws left-to-right on hover/focus, retracts to the right
+   on leave. Inline-block shrinks the h3 to text width so the line matches
+   the wordmark, not the card.
+   ========================================================================== */
+.col-page .col-crossnav__link h3 {
+	position: relative;
+	display: inline-block;
+}
+
+.col-page .col-crossnav__link h3::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -6px;
+	height: 1px;
+	background: var(--skyyrose-accent);
+	transform: scaleX(0);
+	transform-origin: right center;
+	transition: transform 0.45s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.col-page .col-crossnav__link:hover h3::after,
+.col-page .col-crossnav__link:focus-visible h3::after {
+	transform: scaleX(1);
+	transform-origin: left center;
+}
+
+/* ==========================================================================
+   CROSS-COLLECTION — Morphing Section Dividers
+   A breathing accent hairline at the top of major section boundaries
+   (products → story, CTA → cross-nav). Clip-path ellipse morph + scale keeps
+   it organic without a second DOM element; accent color cascades per
+   collection for free.
+   ========================================================================== */
+.col-page .col-story::before,
+.col-page .col-crossnav::before {
+	content: '';
+	display: block;
+	width: min(560px, 70%);
+	height: 3px;
+	margin: 0 auto clamp(48px, 6vw, 80px);
+	border-radius: 999px;
+	background: linear-gradient(90deg, transparent, rgba(var(--skyyrose-accent-rgb), 0.7), transparent);
+	box-shadow: 0 0 24px rgba(var(--skyyrose-accent-rgb), 0.35);
+	animation: colDividerMorph 9s ease-in-out infinite alternate;
+}
+
+/* Story divider joins the ambient stacking fix above. */
+.col-page[data-collection="black-rose"] .col-story::before,
+.col-page[data-collection="signature"] .col-story::before {
+	position: relative;
+	z-index: 1;
+}
+
+@keyframes colDividerMorph {
+	0%   { clip-path: ellipse(50% 100% at 50% 50%); transform: scaleX(0.72); }
+	50%  { clip-path: ellipse(38% 100% at 42% 50%); transform: scaleX(1); }
+	100% { clip-path: ellipse(46% 100% at 60% 50%); transform: scaleX(0.85); }
+}
+
+/* ==========================================================================
+   BLACK ROSE — Smoke/Fog Drift
+   Silver-tinged fog banks drifting over the hero backdrop and story block.
+   Lives inside .col-hero__bg (z1) so the scrim (z2) and content (z3) stay
+   above it — the lockup never waits on this layer.
+   ========================================================================== */
+.col-page[data-collection="black-rose"] .col-hero__bg::after {
+	content: '';
+	position: absolute;
+	inset: -20%;
+	pointer-events: none;
+	background:
+		radial-gradient(42% 34% at 22% 68%, rgba(var(--skyyrose-accent-rgb), 0.12), transparent 70%),
+		radial-gradient(50% 40% at 78% 30%, rgba(var(--skyyrose-accent-rgb), 0.09), transparent 70%),
+		radial-gradient(36% 30% at 55% 82%, rgba(255, 255, 255, 0.06), transparent 70%);
+	filter: blur(28px);
+	animation: brFogDrift 26s ease-in-out infinite alternate;
+}
+
+.col-page[data-collection="black-rose"] .col-story::after {
+	content: '';
+	position: absolute;
+	inset: -15%;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(45% 38% at 18% 30%, rgba(var(--skyyrose-accent-rgb), 0.07), transparent 70%),
+		radial-gradient(40% 34% at 82% 72%, rgba(var(--skyyrose-accent-rgb), 0.05), transparent 70%);
+	filter: blur(30px);
+	animation: brFogDrift 34s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes brFogDrift {
+	from { transform: translate3d(-4%, -2%, 0) scale(1.04); }
+	to   { transform: translate3d(4%, 2.5%, 0) scale(1.14); }
+}
+
+/* ==========================================================================
+   BLACK ROSE — Noise Texture Overlay (concrete)
+   Static concrete grain over the whole page — the "luxury grows from
+   concrete" surface, not TV static (deliberately unanimated). Fixed layer
+   composites once; pointer-events off keeps it inert. z-index stays under
+   header/nav/modal strata.
+   ========================================================================== */
+.col-page[data-collection="black-rose"]::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	pointer-events: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	mix-blend-mode: overlay;
+	opacity: 0.05;
+}
+
+/* ==========================================================================
+   BLACK ROSE — Tilt & Glare (lookbook figures)
+   collection-motion.js sets --tilt-rx/--tilt-ry (deg) and --glare-x/--glare-y
+   (%) on pointer move, and injects .col-tilt-glare inside each figure.
+   Desktop fine-pointer only (JS gate); corner ticks ride the same transform.
+   ========================================================================== */
+.col-page[data-collection="black-rose"] .col-lookbook__figure {
+	transform: perspective(900px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+	transition: transform 0.5s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1));
+	will-change: transform;
+}
+
+.col-page[data-collection="black-rose"] .col-lookbook__figure.is-tilting {
+	transition: transform 0.12s ease-out;
+}
+
+.col-page .col-tilt-glare {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	background: radial-gradient(60% 45% at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, 0.14), transparent 65%);
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.col-page .col-lookbook__figure.is-tilting .col-tilt-glare {
+	opacity: 1;
+}
+
+/* ==========================================================================
+   LOVE HURTS — Ink Bleed Text Reveal (section headings)
+   Rides the existing reveal system: premium-interactions.js adds .is-visible
+   to the ancestor section; the heading then soaks in — crimson bloom
+   sharpening to white, like ink drying. Hero excluded (lockup image + LCP).
+   Fail-open: no .is-visible (JS never ran) = heading renders normally under
+   the srRevealSafety net.
+   ========================================================================== */
+.col-page[data-collection="love-hurts"] .is-visible .col-story__title,
+.col-page[data-collection="love-hurts"] .is-visible .col-cta__title,
+.col-page[data-collection="love-hurts"] .is-visible .col-newsletter__title,
+.col-page[data-collection="love-hurts"] .is-visible .col-featscroll__heading,
+.col-page[data-collection="love-hurts"] .is-visible .product-grid-section__heading,
+.col-page[data-collection="love-hurts"] .is-visible .col-crossnav__heading {
+	animation: lhInkBleed 0.95s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)) 0.12s both;
+}
+
+@keyframes lhInkBleed {
+	0% {
+		opacity: 0;
+		filter: blur(9px);
+		text-shadow:
+			0 0 18px rgba(var(--skyyrose-accent-rgb), 0.9),
+			0 0 42px rgba(var(--skyyrose-accent-rgb), 0.5);
+	}
+	60% {
+		opacity: 1;
+		filter: blur(1.5px);
+		text-shadow:
+			0 0 10px rgba(var(--skyyrose-accent-rgb), 0.4),
+			0 0 24px rgba(var(--skyyrose-accent-rgb), 0.18);
+	}
+	100% {
+		opacity: 1;
+		filter: blur(0);
+		text-shadow: 0 0 0 rgba(var(--skyyrose-accent-rgb), 0);
+	}
+}
+
+/* ==========================================================================
+   LOVE HURTS — Interactive Ink Drop (hero)
+   collection-motion.js appends .lh-ink-layer (z2: above scrim, below
+   content) and spawns a blot per tap/click. Blot spreads and dries; removed
+   on animationend. Cap enforced in JS.
+   ========================================================================== */
+.col-page .lh-ink-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.col-page .lh-ink-drop {
+	position: absolute;
+	border-radius: 46% 54% 58% 42% / 52% 44% 56% 48%;
+	background: radial-gradient(circle at 42% 38%, rgba(var(--skyyrose-accent-rgb), 0.55), rgba(var(--skyyrose-accent-rgb), 0.25) 55%, transparent 75%);
+	filter: blur(2px);
+	transform: scale(0.2);
+	opacity: 0;
+	animation: lhInkSpread 1.4s ease-out forwards;
+}
+
+@keyframes lhInkSpread {
+	0%   { transform: scale(0.2) rotate(0deg);  opacity: 0.65; }
+	60%  { transform: scale(0.9) rotate(8deg);  opacity: 0.4; }
+	100% { transform: scale(1.15) rotate(12deg); opacity: 0; }
+}
+
+/* ==========================================================================
+   LOVE HURTS — Retro VHS Scanline (col-film only)
+   Static scanlines (cheap paint) + a slow composited roll bar over the
+   flight-film stage. Toggle lifts above the treatment so pause/play stays
+   clickable.
+   ========================================================================== */
+.col-page[data-collection="love-hurts"] .col-film__stage::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	border-radius: 18px;
+	background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+	opacity: 0.55;
+}
+
+.col-page[data-collection="love-hurts"] .col-film__stage::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 14%;
+	z-index: 1;
+	pointer-events: none;
+	border-radius: 18px;
+	background: linear-gradient(180deg, transparent, rgba(var(--skyyrose-accent-rgb), 0.07), transparent);
+	animation: lhVhsRoll 8s linear infinite;
+}
+
+.col-page[data-collection="love-hurts"] .col-film__toggle {
+	z-index: 2;
+}
+
+@keyframes lhVhsRoll {
+	from { transform: translateY(-120%); }
+	to   { transform: translateY(820%); }
+}
+
+/* ==========================================================================
+   SIGNATURE — Flowing Aurora (hero + CTA)
+   Gold aurora banks drifting behind the scrim. Second bank carries the
+   Rose Gold secondary (183,110,121 = #B76E79, identity.json palette).
+   ========================================================================== */
+.col-page[data-collection="signature"] .col-hero__bg::after {
+	content: '';
+	position: absolute;
+	inset: -30% -10%;
+	pointer-events: none;
+	background:
+		radial-gradient(55% 42% at 30% 20%, rgba(var(--skyyrose-accent-rgb), 0.16), transparent 65%),
+		radial-gradient(48% 40% at 72% 75%, rgba(183, 110, 121, 0.10), transparent 70%),
+		radial-gradient(40% 32% at 60% 35%, rgba(var(--skyyrose-accent-rgb), 0.08), transparent 70%);
+	filter: blur(34px);
+	animation: sigAurora 24s ease-in-out infinite alternate;
+}
+
+.col-page[data-collection="signature"] .col-cta::after {
+	content: '';
+	position: absolute;
+	inset: -20%;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(50% 40% at 25% 40%, rgba(var(--skyyrose-accent-rgb), 0.10), transparent 70%),
+		radial-gradient(45% 36% at 78% 60%, rgba(183, 110, 121, 0.07), transparent 70%);
+	filter: blur(30px);
+	animation: sigAurora 30s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes sigAurora {
+	from { transform: translate3d(-5%, -3%, 0) rotate(-2deg) scale(1.05); }
+	to   { transform: translate3d(5%, 3%, 0) rotate(2deg) scale(1.16); }
+}
+
+/* ==========================================================================
+   SIGNATURE — Liquid Metal/Chrome CTAs
+   Gold chrome material on the primary CTAs; the sheen pours across on
+   hover/focus via background-position. Replaces the generic white fill and
+   the btn-sweep overlay in Signature scope only. Dark text on gold clears
+   WCAG AA (#050505 on #D4AF37 ≈ 9.9:1).
+   ========================================================================== */
+.col-page[data-collection="signature"] .col-hero__cta--primary,
+.col-page[data-collection="signature"] .col-cta__btn {
+	background: linear-gradient(
+		115deg,
+		var(--skyyrose-accent-dark) 0%,
+		var(--skyyrose-accent) 30%,
+		#F5E6D3 50%,
+		var(--skyyrose-accent) 70%,
+		var(--skyyrose-accent-dark) 100%
+	);
+	background-size: 220% 100%;
+	background-position: 0% 50%;
+	color: #050505;
+	border-color: transparent;
+	transition: background-position 0.8s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow 0.4s ease;
+}
+
+.col-page[data-collection="signature"] .col-hero__cta--primary:hover,
+.col-page[data-collection="signature"] .col-hero__cta--primary:focus-visible,
+.col-page[data-collection="signature"] .col-cta__btn:hover,
+.col-page[data-collection="signature"] .col-cta__btn:focus-visible {
+	background-position: 100% 50%;
+	color: #050505;
+	box-shadow: 0 8px 28px rgba(var(--skyyrose-accent-rgb), 0.35);
+}
+
+/* Chrome owns the surface — the generic diagonal sweep would smear it. */
+.col-page[data-collection="signature"] .col-hero__cta--primary.btn-sweep::before {
+	display: none;
+}
+
+/* ==========================================================================
+   SIGNATURE — Constellation Star Field (story section)
+   Gold points over the origin story, twinkling as a layer. Static
+   positions; opacity oscillation only (composited).
+   ========================================================================== */
+.col-page[data-collection="signature"] .col-story::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background-image:
+		radial-gradient(1.5px 1.5px at 12% 22%, rgba(var(--skyyrose-accent-rgb), 0.9), transparent 55%),
+		radial-gradient(1px 1px at 28% 68%, rgba(var(--skyyrose-accent-rgb), 0.7), transparent 55%),
+		radial-gradient(2px 2px at 44% 14%, rgba(245, 230, 211, 0.8), transparent 55%),
+		radial-gradient(1px 1px at 58% 45%, rgba(var(--skyyrose-accent-rgb), 0.6), transparent 55%),
+		radial-gradient(1.5px 1.5px at 70% 78%, rgba(var(--skyyrose-accent-rgb), 0.8), transparent 55%),
+		radial-gradient(1px 1px at 82% 30%, rgba(245, 230, 211, 0.6), transparent 55%),
+		radial-gradient(2px 2px at 91% 60%, rgba(var(--skyyrose-accent-rgb), 0.75), transparent 55%),
+		radial-gradient(1px 1px at 18% 88%, rgba(var(--skyyrose-accent-rgb), 0.55), transparent 55%),
+		radial-gradient(1.5px 1.5px at 63% 90%, rgba(245, 230, 211, 0.5), transparent 55%),
+		radial-gradient(1px 1px at 36% 38%, rgba(var(--skyyrose-accent-rgb), 0.65), transparent 55%);
+	animation: sigTwinkle 6s ease-in-out infinite alternate;
+}
+
+@keyframes sigTwinkle {
+	from { opacity: 0.5; }
+	to   { opacity: 1; }
+}
+
+/* ==========================================================================
+   KIDS CAPSULE — Spring-physics card hover (product grid only)
+   Overshoot easing + a touch more lift and tilt than the base holo hover.
+   Scoped to the kids page so the adult collections keep the restrained
+   0.4s ease.
+   ========================================================================== */
+.col-page[data-collection="kids-capsule"] .holo {
+	transition:
+		border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.55s cubic-bezier(0.3, 1.6, 0.45, 1),
+		box-shadow 0.55s cubic-bezier(0.3, 1.6, 0.45, 1);
+}
+
+.col-page[data-collection="kids-capsule"] .holo:hover {
+	transform: translateY(-10px) scale(1.02) rotate(-0.4deg);
+	box-shadow: 0 18px 40px rgba(var(--skyyrose-accent-rgb), 0.22);
+}
+
+/* ==========================================================================
+   KIDS CAPSULE — Bouncing accent field (hero)
+   collection-motion.js appends .kc-bounce-field into the hero and drives
+   gravity/bounce via transform. Rose-gold + gold orbs, mascot-adjacent
+   register — soft, dark-first, no pastels.
+   ========================================================================== */
+.col-page .kc-bounce-field {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.col-page .kc-bounce {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 50%;
+	opacity: 0.45;
+	background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.85), rgba(var(--skyyrose-accent-rgb), 0.9) 55%, rgba(var(--skyyrose-accent-rgb), 0.4));
+	box-shadow: 0 4px 14px rgba(var(--skyyrose-accent-rgb), 0.35);
+	will-change: transform;
+}
+
+.col-page .kc-bounce--gold {
+	background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.85), rgba(var(--color-gold-rgb, 212, 175, 55), 0.85) 55%, rgba(var(--color-gold-rgb, 212, 175, 55), 0.35));
+	box-shadow: 0 4px 14px rgba(var(--color-gold-rgb, 212, 175, 55), 0.3);
+}
+
+/* ==========================================================================
+   KIDS CAPSULE — Confetti on add-to-cart
+   collection-motion.js spawns pieces into a fixed layer on the WooCommerce
+   added_to_cart event, seeds per-piece travel via custom props, and removes
+   each on animationend.
+   ========================================================================== */
+.kc-confetti-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 9500;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.kc-confetti {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 8px;
+	height: 12px;
+	border-radius: 2px;
+	opacity: 0;
+	background: var(--skyyrose-accent);
+	animation: kcConfettiFall var(--kc-dur, 1.6s) cubic-bezier(0.25, 0.6, 0.35, 1) var(--kc-delay, 0s) forwards;
+}
+
+.kc-confetti--gold  { background: var(--color-gold, #D4AF37); }
+.kc-confetti--white { background: #FFFFFF; }
+
+@keyframes kcConfettiFall {
+	0% {
+		opacity: 1;
+		transform: translate3d(var(--kc-x0, 50vw), var(--kc-y0, 30vh), 0) rotate(0turn);
+	}
+	100% {
+		opacity: 0;
+		transform: translate3d(calc(var(--kc-x0, 50vw) + var(--kc-dx, 0px)), calc(var(--kc-y0, 30vh) + var(--kc-dy, 320px)), 0) rotate(var(--kc-rot, 2turn));
+	}
+}
+
+/* ==========================================================================
+   MOBILE TUNE-DOWN — cheaper ambient paint on small screens
+   Full-viewport blurred layers are the one paint-heavy piece here; halve
+   the blur and slow the drift below 768px.
+   ========================================================================== */
+@media (max-width: 768px) {
+	.col-page[data-collection="black-rose"] .col-hero__bg::after,
+	.col-page[data-collection="black-rose"] .col-story::after,
+	.col-page[data-collection="signature"] .col-hero__bg::after,
+	.col-page[data-collection="signature"] .col-cta::after {
+		filter: blur(16px);
+		animation-duration: 40s;
+	}
+}
+
+/* ==========================================================================
+   REDUCED MOTION — static/reduced fallback for every pattern above
+   Atmosphere freezes in place (first-frame gradients stay as set dressing);
+   everything interactive or animated stops. JS pieces double-gate on the
+   same media query before spawning DOM.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+	/* Dividers: static hairline. */
+	.col-page .col-story::before,
+	.col-page .col-crossnav::before {
+		animation: none;
+		clip-path: none;
+		transform: none;
+	}
+
+	/* Underline: appears without sliding. */
+	.col-page .col-crossnav__link h3::after {
+		transition: none;
+	}
+
+	/* Fog / aurora / stars: frozen ambient stills. */
+	.col-page[data-collection="black-rose"] .col-hero__bg::after,
+	.col-page[data-collection="black-rose"] .col-story::after,
+	.col-page[data-collection="signature"] .col-hero__bg::after,
+	.col-page[data-collection="signature"] .col-cta::after,
+	.col-page[data-collection="signature"] .col-story::after {
+		animation: none;
+	}
+
+	/* Tilt & glare: flat, no glare sweep. */
+	.col-page[data-collection="black-rose"] .col-lookbook__figure {
+		transform: none;
+		transition: none;
+	}
+	.col-page .col-tilt-glare {
+		display: none;
+	}
+
+	/* Ink: headings render instantly; drops never spawn (JS gate) and never
+	   show if one is mid-flight when the preference flips. */
+	.col-page[data-collection="love-hurts"] .is-visible .col-story__title,
+	.col-page[data-collection="love-hurts"] .is-visible .col-cta__title,
+	.col-page[data-collection="love-hurts"] .is-visible .col-newsletter__title,
+	.col-page[data-collection="love-hurts"] .is-visible .col-featscroll__heading,
+	.col-page[data-collection="love-hurts"] .is-visible .product-grid-section__heading,
+	.col-page[data-collection="love-hurts"] .is-visible .col-crossnav__heading {
+		animation: none;
+	}
+	.col-page .lh-ink-layer {
+		display: none;
+	}
+
+	/* VHS: static scanlines stay (texture, not motion); roll bar stops. */
+	.col-page[data-collection="love-hurts"] .col-film__stage::before {
+		display: none;
+	}
+
+	/* Chrome CTA: material stays, sheen pour stops. */
+	.col-page[data-collection="signature"] .col-hero__cta--primary,
+	.col-page[data-collection="signature"] .col-cta__btn {
+		transition: none;
+	}
+
+	/* Kids: physics field and confetti are motion-only — remove entirely
+	   (toast still confirms add-to-cart); card hover loses the spring. */
+	.col-page .kc-bounce-field,
+	.kc-confetti-layer {
+		display: none;
+	}
+	.col-page[data-collection="kids-capsule"] .holo {
+		transition: none;
+	}
+	.col-page[data-collection="kids-capsule"] .holo:hover {
+		transform: none;
+	}
+}

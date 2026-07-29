@@ -111,6 +111,8 @@ Lottie Web:       https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie
 - NEVER block the WordPress render thread — all 3D init must be `async`/deferred
 - Provide both: (a) the shortcode PHP snippet, (b) the full HTML/JS embed file
 
+**For the SkyyRose flagship theme specifically, the CDN/importmap pattern above does NOT apply.** That theme's real loading contract — three.js from jsdelivr via `/+esm` with NO importmap (a late importmap is rejected once the page has run a module script), self-hosted Draco decoder only, `window.THREE` gated behind a `three-ready` event — is documented and load-bearing in `.claude/skills/skyyrose-wp-platform/reference/threejs-immersive.md`. Read that file before writing any three.js code targeting this theme; it overrides this section. The `wp-immersive` agent owns the four `template-immersive-*.php` pages (Black Rose, Love Hurts, Signature, Kids Capsule) — route work there rather than duplicating scene logic here.
+
 ### Any Other Language / Stack
 - Identify the runtime, then output the canonical pattern for that environment
 - Python (Flask/Django): Jinja2 templates + static JS bundles
@@ -301,16 +303,20 @@ When building for SkyyRose, always:
 
 **Load**: `skyyrose-market:skyyrose-brand-dna` SKILL.md alongside this skill for full brand context.
 
-**CDN loading**: this project self-hosts all JS libs (zero-CDN policy) — swap CDN script tags for `SKYYROSE_ASSETS_URI` paths when outputting WordPress code.
+**Pre-screened patterns**: `docs/design/visual-pattern-shortlist.md` has 176 animation/visual patterns already cross-checked against this brand system, including a dedicated set tagged "Immersive Worlds scene work." Check there before improvising a pattern from scratch.
 
-**Spatial Brand Palette**:
+**CDN loading**: this is theme-dependent, not a blanket zero-CDN policy — the flagship WordPress theme actually loads three.js from jsdelivr (see the WordPress/WooCommerce section above and `threejs-immersive.md`); only the Draco decoder is self-hosted there. For other output targets, self-host under `SKYYROSE_ASSETS_URI` where the platform supports it. Don't assume either policy — check the target.
+
+**Spatial Brand Palette** (canonical tokens — locked, do not invent alternates):
 ```css
 :root {
-  --sr-void: #0A0A0A;          /* scene background */
+  --sr-void: #0A0A0A;          /* scene background / Dark */
   --sr-charcoal: #1C1C1C;      /* surfaces */
   --sr-smoke: #2D2D2D;         /* secondary surfaces */
-  --sr-rose-gold: #B76E79;     /* accent lights, UI highlights */
-  --sr-blood: #8B0000;         /* LOVE HURTS collection energy */
+  --sr-rose-gold: #B76E79;     /* accent lights, UI highlights — global + Kids Capsule */
+  --sr-silver: #C0C0C0;        /* BLACK ROSE collection accent */
+  --sr-crimson: #DC143C;       /* LOVE HURTS collection energy */
+  --sr-gold: #D4AF37;          /* SIGNATURE collection accent */
   --sr-white: #F5F5F0;         /* typography, clean surfaces */
 }
 ```
@@ -318,9 +324,10 @@ When building for SkyyRose, always:
 **Per-Collection 3D Environments**:
 | Collection | Environment | Light Color | Fog | Particle Effect |
 |---|---|---|---|---|
-| BLACK ROSE | Dark marble vault | #B76E79 rose gold key, white rim | Dense black fog | Gold dust particles |
-| LOVE HURTS | Fractured red glass space | Deep red fill, white backlight | Red mist | Ember/ash particles |
-| SIGNATURE | Editorial white studio | Neutral 3-point, soft shadows | None | None |
+| BLACK ROSE | Dark marble vault | #B76E79 rose gold key, #C0C0C0 silver rim | Dense black fog | Gold dust particles |
+| LOVE HURTS | Fractured red glass space | #DC143C crimson fill, white backlight | Red mist | Ember/ash particles |
+| SIGNATURE | Editorial white studio | #D4AF37 gold key, neutral 3-point | None | None |
+| KIDS CAPSULE | Playful, launch-mode | #B76E79 rose gold (shared global accent) | None | Physics-based bouncing elements, not ambient particles |
 
 **Product Interaction Sound Design** (optional but impactful):
 - Use Web Audio API for subtle UI sounds (no autoplay — always user-triggered)

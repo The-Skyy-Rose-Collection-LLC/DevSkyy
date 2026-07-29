@@ -32,7 +32,6 @@ module.exports = {
 			'assets/css/system/animations.css',
 			'assets/css/header.css',
 			'assets/css/mobile-bottom-nav.css',
-			'assets/css/agency-tier-visuals.css',
 		],
 		// Unconditional pair, async-swapped together on tall-content slugs.
 		// Handle: skyyrose-footer (keeps the async-handle entry matching).

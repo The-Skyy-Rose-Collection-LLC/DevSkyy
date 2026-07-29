@@ -165,7 +165,8 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			<p class="col-hero__tagline"><?php echo esc_html( $c['hero_tagline'] ); ?></p>
 			<p class="col-hero__subtitle"><?php echo esc_html( $c['hero_subtitle'] ); ?></p>
 			<div class="col-hero__cta-group">
-				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
+				<?php // .magnetic: cursor-reactive displacement via premium-interactions.js (--mag-x/--mag-y); reduced-motion neutralized in animations-premium.css. ?>
+			<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press magnetic"><?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?></a>
 				<?php if ( $has_3d ) : ?>
 					<?php
 					// Experience merged into this page (WS3): anchor URLs ('#experience')
@@ -181,68 +182,93 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
-	<!-- ════ Collection Film (scroll-world flight — silent ambient loop) ════ -->
+	<!-- ════ Film Spine (scroll-scrubbed shoppable stage — Variant C, founder pick 2026-07-29) ════ -->
 	<?php
-	// Flight films resolve by Media Library attachment ID, not a hardcoded
-	// path: a re-upload/replace, a dated-folder move, or a relocated uploads
-	// dir can't silently serve a stale file, and wp_get_attachment_url() passes
-	// through CDN/offload filters. Fail-closed like the emblem block — a missing
-	// or deleted attachment skips the section (never a broken embed). Silent by
-	// design (founder audio rule). Map is filterable so a future replace can
-	// repoint without a template edit.
-	$film_ids   = apply_filters(
-		'skyyrose_collection_film_ids',
+	// Attachment-ID resolution, fail-closed gating, and the WCAG pause
+	// toggle all live inside the part (moved verbatim). Beats = this
+	// collection's pin_beats canon; hotspots = the first 1-3 entries of the
+	// same $products list the grids below render.
+	get_template_part(
+		'template-parts/collection/film-spine',
+		null,
 		array(
-			'signature'    => array(
-				'video'  => 10329,
-				'poster' => 10328,
-			),
-			'black-rose'   => array(
-				'video'  => 10323,
-				'poster' => 10322,
-			),
-			'love-hurts'   => array(
-				'video'  => 10327,
-				'poster' => 10326,
-			),
-			'kids-capsule' => array(
-				'video'  => 10325,
-				'poster' => 10324,
-			),
-		),
-		$slug
+			'slug'      => $slug,
+			'content'   => $c,
+			'products'  => $products,
+			'permalink' => $is_kids ? $preorder_url : '',
+		)
 	);
-	$film       = $film_ids[ $slug ] ?? null;
-	$film_url   = $film ? wp_get_attachment_url( $film['video'] ) : '';
-	$poster_url = $film ? wp_get_attachment_url( $film['poster'] ) : '';
-	$film_path  = $film ? get_attached_file( $film['video'] ) : '';
-	$has_film   = $film_url && $poster_url && $film_path && file_exists( $film_path );
-	if ( $has_film ) :
-		?>
-		<section class="col-film" aria-label="<?php esc_attr_e( 'Collection film', 'skyyrose' ); ?>">
-			<div class="col-film__stage">
-				<?php
-				// No autoplay + preload="none": reduced-motion users never trigger
-				// a video fetch. collection-pages.js calls .play() (which starts the
-				// load) only when motion is allowed AND the film scrolls near view,
-				// and reveals the pause/play toggle then — WCAG 2.2.2 needs a stop
-				// mechanism for auto motion over 5s. aria-hidden on the video: it's a
-				// decorative silent loop with no accessible name; the toggle is a
-				// sibling (not a descendant), so it stays reachable.
-				?>
-				<video class="col-film__video" muted loop playsinline preload="none" aria-hidden="true"
-					poster="<?php echo esc_url( $poster_url ); ?>"
-					width="720" height="1280">
-					<source src="<?php echo esc_url( $film_url ); ?>" type="video/mp4">
-				</video>
-				<img class="col-film__poster" src="<?php echo esc_url( $poster_url ); ?>"
-					alt="" aria-hidden="true" loading="lazy" decoding="async" width="720" height="1280">
-				<button type="button" class="col-film__toggle" aria-label="<?php esc_attr_e( 'Pause background video', 'skyyrose' ); ?>" hidden></button>
-			</div>
-		</section>
-	<?php endif; ?>
+	?>
 
-	<!-- ════ Experience Layer (merged immersive world — WS3) ════ -->
+	<!-- ════ Interleaved Product Grid (Variant C: band → half, band → rest) ════ -->
+	<?php
+	// Pin-narrative include retired here (WS-C): its pin_beats copy now
+	// renders inside the film spine above — keeping both would double-render
+	// the same canon lines. The spine's shoppable hotspots carry the
+	// story-to-product job its closing feature beat used to do.
+
+	// Build subheading: kids-capsule uses a dynamic piece count (FULL
+	// collection count, shown once on the first grid), others use the
+	// static copy from skyyrose_get_collection_content().
+	if ( $is_kids ) {
+		$products_subheading = sprintf(
+			/* translators: %d: product count */
+			_n( '%d Piece', '%d Pieces', $product_count, 'skyyrose' ),
+			$product_count
+		) . ' · ' . __( 'Limited Run', 'skyyrose' );
+	} else {
+		$products_subheading = $c['products_subheading'] ?? '';
+	}
+
+	/*
+	 * Variant C interleave: the grid renders in two halves, a narrative
+	 * band (each grid's own header) fronting each. Split only when the
+	 * collection is deep enough for two bands (4+ pieces) — Kids Capsule's
+	 * tight 2-piece capsule stays one grid. Band copy comes from existing
+	 * config only: band 1 keeps the canonical grid header (+ the #shop
+	 * anchor), band 2 lifts the collection's marquee lines — founder copy
+	 * that is otherwise unrendered on this template.
+	 */
+	$grid_count = count( $products );
+	$grid_split = ( $grid_count >= 4 ) ? (int) ceil( $grid_count / 2 ) : $grid_count;
+	$grid_first = array_slice( $products, 0, $grid_split );
+	$grid_rest  = array_slice( $products, $grid_split );
+
+	get_template_part(
+		'template-parts/product-grid',
+		null,
+		array(
+			'products'      => $grid_first,
+			'collection'    => $slug,
+			'heading'       => __( 'The Collection', 'skyyrose' ),
+			'subheading'    => $products_subheading,
+			'section_id'    => 'shop',
+			'section_class' => 'col-products',
+			'reveal_class'  => 'rv-clip-up',
+			'permalink'     => $is_kids ? $preorder_url : '',
+		)
+	);
+
+	if ( ! empty( $grid_rest ) ) {
+		$band = isset( $c['marquee'] ) && is_array( $c['marquee'] ) ? $c['marquee'] : array();
+		get_template_part(
+			'template-parts/product-grid',
+			null,
+			array(
+				'products'      => $grid_rest,
+				'collection'    => $slug,
+				'heading'       => isset( $band[0] ) ? $band[0] : '',
+				'subheading'    => isset( $band[1] ) ? $band[1] : '',
+				'section_id'    => 'shop-continued',
+				'section_class' => 'col-products col-products--continued',
+				'reveal_class'  => 'rv-clip-up',
+				'permalink'     => $is_kids ? $preorder_url : '',
+			)
+		);
+	}
+	?>
+
+	<!-- ════ Experience Layer (merged immersive world — WS3, now post-grid deep-dive) ════ -->
 	<?php
 	$experience = function_exists( 'skyyrose_get_experience_config' ) ? skyyrose_get_experience_config( $slug ) : null;
 	if ( $experience && ! empty( $experience['rooms'] ) ) :
@@ -266,22 +292,6 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			?>
 		</section>
 	<?php endif; ?>
-
-	<?php
-	get_template_part(
-		'template-parts/pin-narrative',
-		null,
-		array(
-			'slug'     => $slug,
-			'beats'    => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
-			// Reuses the same $products list the grid below renders — no
-			// second catalog/WC query — so the narrative's closing beat can
-			// spotlight the collection's flagship piece instead of ending
-			// on empty stage space (founder: "it's just wasted space").
-			'products' => $products,
-		)
-	);
-	?>
 
 	<!-- ════ Lookbook (editorial imagery, narrative → shop bridge) ════ -->
 	<?php
@@ -340,36 +350,6 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		array(
 			'slug'    => $slug,
 			'content' => $c,
-		)
-	);
-	?>
-
-	<!-- ════ Product Grid (immediately after hero) ════ -->
-	<?php
-	// Build subheading: kids-capsule uses a dynamic piece count, others
-	// use the static copy from skyyrose_get_collection_content().
-	if ( $is_kids ) {
-		$products_subheading = sprintf(
-			/* translators: %d: product count */
-			_n( '%d Piece', '%d Pieces', $product_count, 'skyyrose' ),
-			$product_count
-		) . ' · ' . __( 'Limited Run', 'skyyrose' );
-	} else {
-		$products_subheading = $c['products_subheading'] ?? '';
-	}
-
-	get_template_part(
-		'template-parts/product-grid',
-		null,
-		array(
-			'products'      => $products,
-			'collection'    => $slug,
-			'heading'       => __( 'The Collection', 'skyyrose' ),
-			'subheading'    => $products_subheading,
-			'section_id'    => 'shop',
-			'section_class' => 'col-products',
-			'reveal_class'  => 'rv-clip-up',
-			'permalink'     => $is_kids ? $preorder_url : '',
 		)
 	);
 	?>

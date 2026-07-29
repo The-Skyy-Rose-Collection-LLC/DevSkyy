@@ -424,6 +424,60 @@
 }
 
 /* ==========================================================================
+   CTA (Terminal Conversion Block)
+   Last full-width push before Cross Nav/Newsletter — every collection got
+   only per-collection motion overlays (collection-motion.css) with zero
+   base layout/typography/button styling underneath, so BR/LH/KC rendered
+   an unstyled <a> here. Base styling lives here; motion overlays still
+   layer on top unchanged.
+   ========================================================================== */
+.col-cta {
+	padding: clamp(100px, 13vw, 200px) 48px;
+	background: #0A0A0A;
+	border-top: 1px solid rgba(255,255,255,0.04);
+	text-align: center;
+}
+
+.col-cta__title {
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(32px, 4vw, 56px);
+	font-weight: 400;
+	letter-spacing: 8px;
+	text-transform: uppercase;
+	color: #fff;
+	margin-bottom: 20px;
+}
+
+.col-cta__text {
+	font-family: var(--skyyrose-font-body);
+	font-size: 1.2rem;
+	color: rgba(255,255,255,0.6);
+	max-width: 600px;
+	margin: 0 auto 48px;
+}
+
+.col-cta__btn {
+	display: inline-block;
+	font-family: var(--skyyrose-font-ui);
+	font-size: 14px;
+	letter-spacing: 6px;
+	text-transform: uppercase;
+	padding: 20px 56px;
+	background: #fff;
+	color: #050505;
+	border: 1px solid transparent;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.col-cta__btn:hover,
+.col-cta__btn:focus-visible {
+	background: var(--skyyrose-accent);
+	color: #fff;
+	transform: translateY(-2px);
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
    CROSS NAV
    ========================================================================== */
 .col-crossnav {

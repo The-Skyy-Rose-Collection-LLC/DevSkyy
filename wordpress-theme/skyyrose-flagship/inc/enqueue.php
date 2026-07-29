@@ -90,10 +90,10 @@ function skyyrose_enqueue_global_styles() {
 	);
 
 	/*
-	 * Build-time bundles (production): bundles/core.min.css is the seven
+	 * Build-time bundles (production): bundles/core.min.css is the six
 	 * always-render-blocking globals concatenated in this exact enqueue order
 	 * (main, design-tokens, components, system/animations, header,
-	 * mobile-bottom-nav, agency-tier-visuals — see scripts/bundles.config.js).
+	 * mobile-bottom-nav — see scripts/bundles.config.js).
 	 * NOT WordPress runtime concat — CONCATENATE_SCRIPTS stays false (WP.com
 	 * MIME constraint); these are static files emitted by build-css.js.
 	 *
@@ -124,7 +124,6 @@ function skyyrose_enqueue_global_styles() {
 			'skyyrose-animations',
 			'skyyrose-header',
 			'skyyrose-mobile-nav',
-			'skyyrose-agency-visuals',
 		);
 		foreach ( $core_aliases as $core_alias ) {
 			wp_register_style( $core_alias, false, array( 'skyyrose-main' ), SKYYROSE_VERSION );
@@ -375,22 +374,14 @@ function skyyrose_enqueue_global_styles() {
 		}
 	}
 
-	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
-	// (In the core bundle when $css_bundled.)
-	if ( ! $css_bundled ) {
-		$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
-		if ( file_exists( $base_dir . '/' . $agency_file ) ) {
-			wp_enqueue_style(
-				'skyyrose-agency-visuals',
-				$base_uri . '/' . $agency_file,
-				array( 'skyyrose-design-tokens', 'skyyrose-components' ),
-				SKYYROSE_VERSION
-			);
-		}
-	}
+	// Agency-Tier Visuals enqueue removed (census-deleted 2026-07-29, zero
+	// consumers, agency-tier-visuals.css + .min twin no longer exist) — this
+	// block previously relied on file_exists() to silently no-op rather than
+	// being removed outright (same dead-enqueue class as bug-312).
 
-	// hero-cinematic.css enqueue removed (perf wave 2026-07-19): the part it
-	// styles (template-parts/hero-cinematic.php) has zero get_template_part
+	// hero-cinematic.css enqueue removed (perf wave 2026-07-19); the orphaned
+	// files (css + template-parts/hero-cinematic.php) were census-deleted
+	// 2026-07-29. The part had zero get_template_part
 	// callers — every template renders its own hero — so the sheet was a dead
 	// render-blocking request on all non-lightweight pages. If a template ever
 	// adopts the part, re-enqueue the stylesheet gated to that template's slug.
@@ -1165,6 +1156,25 @@ function skyyrose_enqueue_template_scripts() {
 				array(
 					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
+				)
+			);
+		}
+
+		// Collection motion identity JS — Black Rose tilt/glare, Love Hurts
+		// ink drops, Kids Capsule bounce field + add-to-cart confetti.
+		// Vanilla and self-gating (reduced-motion / touch); deferred so its
+		// evaluation stays out of the FCP→LCP window (Wave 7b doctrine).
+		$motion_js = $use_min && file_exists( $base_js_dir . '/collection-motion.min.js' )
+			? 'collection-motion.min.js' : 'collection-motion.js';
+		if ( file_exists( $base_js_dir . '/' . $motion_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-collection-motion',
+				$base_js_uri . '/' . $motion_js,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
 				)
 			);
 		}

@@ -376,4 +376,24 @@ function skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_
 	if ( file_exists( $base_css_dir . '/' . $vt_css ) ) {
 		wp_enqueue_style( 'skyyrose-view-transitions', $base_css_uri . '/' . $vt_css, array( 'skyyrose-collection-pages' ), SKYYROSE_VERSION );
 	}
+
+	// Per-collection motion identity (visual-pattern-shortlist packages):
+	// Black Rose fog/noise/tilt, Love Hurts ink/VHS, Signature aurora/chrome/
+	// stars, Kids Capsule spring/bounce/confetti, cross-collection underline
+	// + dividers. Depends on collection-pages so its overrides win cascade order.
+	$motion_css = $use_min && file_exists( $base_css_dir . '/collection-motion.min.css' )
+		? 'collection-motion.min.css' : 'collection-motion.css';
+	if ( file_exists( $base_css_dir . '/' . $motion_css ) ) {
+		wp_enqueue_style( 'skyyrose-collection-motion', $base_css_uri . '/' . $motion_css, array( 'skyyrose-collection-pages' ), SKYYROSE_VERSION );
+	}
+
+	// Film spine (Variant C, founder pick 2026-07-29): sticky scroll-scrub
+	// stage + beats + shoppable hotspots for collection/film-spine.php.
+	// Split from collection-motion.css (800-line gate); same dep so its
+	// .col-film--spine overrides load after the legacy ambient rules.
+	$spine_css = $use_min && file_exists( $base_css_dir . '/collection-film-spine.min.css' )
+		? 'collection-film-spine.min.css' : 'collection-film-spine.css';
+	if ( file_exists( $base_css_dir . '/' . $spine_css ) ) {
+		wp_enqueue_style( 'skyyrose-collection-film-spine', $base_css_uri . '/' . $spine_css, array( 'skyyrose-collection-pages' ), SKYYROSE_VERSION );
+	}
 }
