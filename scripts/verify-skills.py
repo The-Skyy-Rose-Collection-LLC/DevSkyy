@@ -100,6 +100,21 @@ def strip_code_blocks(body: str) -> str:
     return re.sub(r"```.*?```", "", body, flags=re.S)
 
 
+def mask_code_blocks(body: str) -> str:
+    """Like strip_code_blocks, but length-preserving: fence interiors become 'x' per non-newline
+    char instead of being removed. A shell comment (`# ...`) inside a fenced command block starts
+    with 1-3 '#' + whitespace, identical to a markdown heading — real instance: ai-regression-testing
+    put `# this is a bash comment` above its build command, which truncated the Verification section
+    at that line and made a valid command block/pass-condition invisible to the checks below. Masking
+    keeps offsets valid (for slicing the ORIGINAL body) while making fence interiors heading-proof.
+    """
+
+    def _mask(m: re.Match) -> str:
+        return re.sub(r"[^\n]", "x", m.group(0))
+
+    return re.sub(r"```.*?```", _mask, body, flags=re.S)
+
+
 def check_skill(d: Path) -> Result:
     r = Result(name=d.name, path=str(d))
     f = d / "SKILL.md"
@@ -144,8 +159,17 @@ def check_skill(d: Path) -> Result:
     m = re.search(REQUIRED_SECTIONS["verification"], body, re.I | re.M)
     if m:
         start = m.start()
-        nxt = re.search(r"^#{1,3}\s", body[start + 1 :], re.M)
-        section = body[start : start + 1 + nxt.start()] if nxt else body[start:]
+        # Scan for the NEXT heading from the line after this one. Slicing from start+1 matched
+        # this very heading again (`## Verification` minus one `#` still starts with `#{1,3}\s`),
+        # so every section collapsed to a single character and no skill could ever satisfy the
+        # command/pass-condition checks — the gate was red for reasons unrelated to its input.
+        line_end = body.find("\n", start)
+        after = body[line_end + 1 :] if line_end != -1 else ""
+        # Search the MASKED text (fence interiors blanked, length preserved) so a shell comment
+        # inside the verification command block can't be mistaken for the next markdown heading.
+        # nxt.start() is an offset into `after`, valid for both the masked and original strings.
+        nxt = re.search(r"^#{1,3}\s", mask_code_blocks(after), re.M)
+        section = body[start : line_end + 1 + nxt.start()] if nxt else body[start:]
         if not COMMAND_RE.search(section):
             r.failures.append("verification section has no runnable command block")
         if not PASS_COND_RE.search(section):
