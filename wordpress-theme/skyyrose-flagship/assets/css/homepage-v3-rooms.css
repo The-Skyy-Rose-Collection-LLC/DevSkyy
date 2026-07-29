@@ -1,0 +1,389 @@
+/**
+ * Homepage v3 — Act III, the collection rooms.
+ *
+ * The single collection chooser on the page. A corridor, not a list: one room
+ * fills the viewport at a time and floods it with its own accent. The movement
+ * mechanism is CSS scroll-snap; JS only mirrors the current room into the
+ * counter and the dots.
+ *
+ * Consumes the token block declared in homepage-v3.css, so it must load after
+ * it. Split out only to keep every source file under the 800-line ceiling.
+ *
+ * @package SkyyRose
+ * @since   1.13.0
+ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ACT III — THE ROOMS. A corridor, not a list: one collection fills the
+   viewport at a time and floods it with its own accent; you swipe, drag,
+   shift-wheel or arrow between worlds. True CSS scroll-snap — the rail owns
+   the mechanism, JS only mirrors which room is current into the chrome.
+   ══════════════════════════════════════════════════════════════════════════ */
+.hp-rooms {
+	padding-block: var(--space-20) var(--space-16);
+	background: linear-gradient(180deg, var(--black), var(--charcoal) 40%, var(--black));
+}
+
+.hp-rooms__top {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	max-width: var(--container-wide);
+	margin: 0 auto var(--space-8);
+	padding: 0 var(--space-6);
+}
+
+.hp-rooms__eyebrow {
+	font-family: var(--font-accent);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-widest);
+	text-transform: uppercase;
+	color: var(--fg3);
+}
+
+.hp-rooms__top h2 {
+	font-family: var(--font-display);
+	font-variation-settings: 'wdth' 125;
+	font-weight: 800;
+	font-size: var(--text-3xl);
+	letter-spacing: var(--tracking-tight);
+	line-height: var(--leading-tight);
+	margin-top: var(--space-2);
+	color: var(--fg1);
+}
+
+.hp-rooms__counter {
+	font-family: var(--font-accent);
+	font-size: var(--text-xl);
+	letter-spacing: var(--tracking-wider);
+	color: var(--fg3);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	margin: 0;
+}
+
+.hp-rooms__counter b {
+	color: var(--fg1);
+	font-weight: 400;
+}
+
+.hp-rooms__rail {
+	display: flex;
+	gap: 0;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.hp-rooms__rail::-webkit-scrollbar {
+	display: none;
+}
+
+.hp-rooms__rail:focus-visible {
+	outline: 2px solid var(--rose-gold);
+	outline-offset: -4px;
+}
+
+/* One room = one viewport. flex-basis 100% of the rail, snap centre. */
+.hp-room {
+	position: relative;
+	flex: 0 0 100%;
+	min-width: 0;
+	min-height: 74svh;
+	scroll-snap-align: center;
+	scroll-snap-stop: always;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	gap: var(--space-3);
+	padding: var(--space-12) var(--space-6) var(--space-12);
+	border-top: 1px solid rgba(var(--acc-rgb), .28);
+	border-bottom: 1px solid rgba(var(--acc-rgb), .28);
+	overflow: hidden;
+	isolation: isolate;
+}
+
+@media (min-width: 900px) {
+
+	.hp-room {
+		min-height: 68svh;
+		padding: var(--space-16) clamp(48px, 8vw, 140px) var(--space-16);
+	}
+}
+
+/* Room ground — the collections-world scene still for this collection,
+   scrimmed so type stays measured against it. */
+.hp-room__bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.hp-room__bg img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	filter: grayscale(.22) contrast(1.04);
+	opacity: .5;
+}
+
+.hp-room__bg::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(120% 80% at 50% 0%, rgba(var(--acc-rgb), .20), transparent 62%),
+		linear-gradient(180deg, rgba(10, 10, 10, .55), rgba(10, 10, 10, .88) 62%, var(--black));
+}
+
+/* The garment, held to the right half so it never crowds the copy column.
+   Desktop only — at phone widths the room is already tight and the scene
+   ground carries the mood by itself. */
+.hp-room__figure {
+	display: none;
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 0;
+	z-index: 0;
+	width: 46%;
+	max-width: 620px;
+	pointer-events: none;
+}
+
+@media (min-width: 900px) {
+
+	.hp-room__figure {
+		display: block;
+	}
+}
+
+.hp-room__figure img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: 50% 18%;
+	-webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 1) 38%);
+	mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 1) 38%);
+}
+
+/* Vertical seat as a sibling overlay rather than a second mask layer:
+   compositing two mask-images needs mask-composite: intersect, which Safari
+   still spells differently — this needs no compositing mode at all. */
+.hp-room__figure::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg,
+			rgba(10, 10, 10, .45) 0%,
+			transparent 24%,
+			transparent 56%,
+			var(--black) 96%);
+}
+
+.hp-room > *:not(.hp-room__bg, .hp-room__figure) {
+	position: relative;
+	z-index: 1;
+	max-width: 46ch;
+}
+
+.hp-room__num {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	font-family: var(--font-accent);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-widest);
+	text-transform: uppercase;
+	color: var(--fg2);
+	margin: 0;
+}
+
+.hp-room__num::before {
+	content: '';
+	width: 20px;
+	height: 3px;
+	background: var(--acc);
+	flex: 0 0 auto;
+}
+
+/* Collection names are LOCKUP IMAGES, never type-rendered (brand canon).
+   Kids Capsule has no lockup asset yet — it falls back to type in its own
+   script and is flagged as an imagery-pipeline gap. */
+.hp-room__name {
+	display: block;
+	margin: var(--space-4) 0 var(--space-2);
+}
+
+.hp-room__lockup {
+	display: block;
+	width: auto;
+	height: clamp(64px, 13vw, 132px);
+	max-width: min(100%, 520px);
+	object-fit: contain;
+	object-position: left center;
+	filter: drop-shadow(0 0 34px rgba(var(--acc-rgb), .38));
+}
+
+.hp-room__name-type {
+	font-family: var(--script-kc);
+	font-size: clamp(3rem, 12vw, 5.5rem);
+	font-weight: 400;
+	line-height: .95;
+	color: var(--fg1);
+	text-shadow: 0 0 34px rgba(var(--acc-rgb), .38);
+	margin: 0;
+}
+
+.hp-room__poetic {
+	font-family: var(--font-caps);
+	font-size: var(--text-lg);
+	line-height: var(--leading-snug);
+	color: var(--fg2);
+	max-width: 24ch;
+	margin: 0;
+}
+
+.hp-room__desc {
+	color: var(--fg3);
+	font-size: var(--text-sm);
+	line-height: var(--leading-normal);
+	max-width: 40ch;
+	margin: 0;
+}
+
+.hp-room__facts {
+	display: flex;
+	gap: var(--space-8);
+	margin: var(--space-4) 0 var(--space-2);
+	padding-top: var(--space-4);
+	border-top: 1px solid rgba(var(--acc-rgb), .3);
+}
+
+.hp-room__facts dt {
+	font-family: var(--font-ui);
+	font-weight: 600;
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	color: var(--fg3);
+}
+
+.hp-room__facts dd {
+	font-family: var(--font-accent);
+	font-size: var(--text-2xl);
+	color: var(--fg1);
+	line-height: 1.1;
+	margin: 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.hp-room__cta {
+	align-self: flex-start;
+	margin-top: var(--space-4);
+	padding: var(--space-4) var(--space-8);
+	background: var(--acc);
+	color: var(--on-acc);
+	font-family: var(--font-ui);
+	font-weight: 700;
+	font-size: var(--text-sm);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	text-decoration: none;
+	border-radius: var(--radius-pill);
+	transition:
+		transform var(--dur-base) var(--ease-magnetic),
+		box-shadow var(--dur-base) var(--ease);
+}
+
+.hp-room__cta:hover,
+.hp-room__cta:focus-visible {
+	transform: translateY(-2px);
+	box-shadow: 0 0 28px rgba(var(--acc-rgb), .45);
+}
+
+.hp-room__cta:focus-visible {
+	outline: 2px solid var(--fg1);
+	outline-offset: 3px;
+}
+
+.hp-rooms__dots {
+	display: flex;
+	justify-content: center;
+	gap: var(--space-3);
+	margin-top: var(--space-6);
+}
+
+.hp-rooms__dot {
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+}
+
+.hp-rooms__dot::after {
+	content: '';
+	width: 26px;
+	height: 2px;
+	background: var(--border);
+	transition:
+		background var(--dur-base) var(--ease),
+		width var(--dur-base) var(--ease);
+}
+
+.hp-rooms__dot[aria-current="true"]::after {
+	background: var(--acc);
+	width: 40px;
+}
+
+.hp-rooms__dot:focus-visible {
+	outline: 2px solid var(--fg1);
+	outline-offset: -6px;
+}
+
+.hp-rooms__hint {
+	text-align: center;
+	color: var(--fg3);
+	font-family: var(--font-ui);
+	font-weight: 600;
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	margin-top: var(--space-4);
+}
+
+@media (max-width: 480px) {
+
+	.hp-rooms__top {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-2);
+		padding: 0 var(--space-4);
+	}
+
+	.hp-room {
+		padding: var(--space-8) var(--space-5);
+	}
+
+	.hp-room__facts {
+		gap: var(--space-6);
+	}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION — the corridor stays operable, it just stops snapping.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+	.hp-rooms__rail {
+		scroll-snap-type: none;
+	}
+}
