@@ -89,46 +89,91 @@ function skyyrose_enqueue_global_styles() {
 		SKYYROSE_VERSION
 	);
 
-	// Elite Web Builder global styles: font vars, grain overlay, sr-container.
-	$main_file = $use_min && file_exists( $base_dir . '/main.min.css' ) ? 'main.min.css' : 'main.css';
-	if ( file_exists( $base_dir . '/' . $main_file ) ) {
+	/*
+	 * Build-time bundles (production): bundles/core.min.css is the seven
+	 * always-render-blocking globals concatenated in this exact enqueue order
+	 * (main, design-tokens, components, system/animations, header,
+	 * mobile-bottom-nav, agency-tier-visuals — see scripts/bundles.config.js).
+	 * NOT WordPress runtime concat — CONCATENATE_SCRIPTS stays false (WP.com
+	 * MIME constraint); these are static files emitted by build-css.js.
+	 *
+	 * The bundle keeps the 'skyyrose-main' handle so the fetchpriority=high
+	 * critical-handle filter in enqueue-performance.php matches unchanged.
+	 * Absorbed handles are re-registered as enqueued src-false aliases so
+	 * every dependency ($global_deps on design-tokens, premium-animations on
+	 * animations) and every wp_add_inline_style target (customizer +
+	 * performance-guardian attach to design-tokens) keeps printing. Alias
+	 * inline CSS prints after the whole bundle instead of mid-cascade; proven
+	 * safe 2026-07-29 — the emitted custom properties/selectors are disjoint
+	 * from everything that moved (see bundles.config.js header).
+	 *
+	 * SCRIPT_DEBUG or a missing bundle falls through to the individual
+	 * per-file enqueues below — the debuggable dev path is unchanged.
+	 */
+	$css_bundled = $use_min && file_exists( $base_dir . '/bundles/core.min.css' );
+	if ( $css_bundled ) {
 		wp_enqueue_style(
 			'skyyrose-main',
-			$base_uri . '/' . $main_file,
+			$base_uri . '/bundles/core.min.css',
 			array( 'skyyrose-style', 'skyyrose-fonts' ),
 			SKYYROSE_VERSION
 		);
-	}
-
-	// Design tokens: CSS custom properties for colors, spacing, typography.
-	$tokens_file = $use_min && file_exists( $base_dir . '/design-tokens.min.css' ) ? 'design-tokens.min.css' : 'design-tokens.css';
-	wp_enqueue_style(
-		'skyyrose-design-tokens',
-		$base_uri . '/' . $tokens_file,
-		array( 'skyyrose-style' ),
-		SKYYROSE_VERSION
-	);
-
-	// Components: reusable component styles (buttons, cards, forms, etc.).
-	$comp_file = $use_min && file_exists( $base_dir . '/components.min.css' ) ? 'components.min.css' : 'components.css';
-	if ( file_exists( $base_dir . '/' . $comp_file ) ) {
-		wp_enqueue_style(
+		$core_aliases = array(
+			'skyyrose-design-tokens',
 			'skyyrose-components',
-			$base_uri . '/' . $comp_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
+			'skyyrose-animations',
+			'skyyrose-header',
+			'skyyrose-mobile-nav',
+			'skyyrose-agency-visuals',
 		);
+		foreach ( $core_aliases as $core_alias ) {
+			wp_register_style( $core_alias, false, array( 'skyyrose-main' ), SKYYROSE_VERSION );
+			wp_enqueue_style( $core_alias );
+		}
 	}
 
-	// Animations: unified scroll-reveal system (.rv, .rv-left, .rv-right, .rv-scale).
-	$anim_file = $use_min && file_exists( $base_dir . '/system/animations.min.css' ) ? 'system/animations.min.css' : 'system/animations.css';
-	if ( file_exists( $base_dir . '/' . $anim_file ) ) {
+	if ( ! $css_bundled ) {
+		// Elite Web Builder global styles: font vars, grain overlay, sr-container.
+		$main_file = $use_min && file_exists( $base_dir . '/main.min.css' ) ? 'main.min.css' : 'main.css';
+		if ( file_exists( $base_dir . '/' . $main_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-main',
+				$base_uri . '/' . $main_file,
+				array( 'skyyrose-style', 'skyyrose-fonts' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		// Design tokens: CSS custom properties for colors, spacing, typography.
+		$tokens_file = $use_min && file_exists( $base_dir . '/design-tokens.min.css' ) ? 'design-tokens.min.css' : 'design-tokens.css';
 		wp_enqueue_style(
-			'skyyrose-animations',
-			$base_uri . '/' . $anim_file,
-			array( 'skyyrose-design-tokens' ),
+			'skyyrose-design-tokens',
+			$base_uri . '/' . $tokens_file,
+			array( 'skyyrose-style' ),
 			SKYYROSE_VERSION
 		);
+
+		// Components: reusable component styles (buttons, cards, forms, etc.).
+		$comp_file = $use_min && file_exists( $base_dir . '/components.min.css' ) ? 'components.min.css' : 'components.css';
+		if ( file_exists( $base_dir . '/' . $comp_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-components',
+				$base_uri . '/' . $comp_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		// Animations: unified scroll-reveal system (.rv, .rv-left, .rv-right, .rv-scale).
+		$anim_file = $use_min && file_exists( $base_dir . '/system/animations.min.css' ) ? 'system/animations.min.css' : 'system/animations.css';
+		if ( file_exists( $base_dir . '/' . $anim_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-animations',
+				$base_uri . '/' . $anim_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Premium animations: clip-path reveals, split-text, stagger, magnetic, parallax.
@@ -159,51 +204,71 @@ function skyyrose_enqueue_global_styles() {
 	// all template-specific stylesheets (priority 20).
 
 	// Header: navbar, search overlay, mobile menu, dropdowns.
-	$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
-	if ( file_exists( $base_dir . '/' . $header_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-header',
-			$base_uri . '/' . $header_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
+	// (In the core bundle when $css_bundled.)
+	if ( ! $css_bundled ) {
+		$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
+		if ( file_exists( $base_dir . '/' . $header_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-header',
+				$base_uri . '/' . $header_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
-	// Footer: newsletter bar, grid columns, copyright bar, brand column.
-	$footer_file = $use_min && file_exists( $base_dir . '/footer.min.css' ) ? 'footer.min.css' : 'footer.css';
-	if ( file_exists( $base_dir . '/' . $footer_file ) ) {
+	// Footer + Footer CRO: both unconditional, async-swapped together on tall
+	// slugs (enqueue-performance.php) — bundled as bundles/footer.min.css
+	// under the existing 'skyyrose-footer' handle so the async-handle entry
+	// matches unchanged. The footer-cro alias keeps the in-part
+	// wp_print_styles fallback (template-parts/footer-cro.php) a no-op.
+	// The head enqueue itself is the Wave-1 CLS fix: the part is included
+	// unconditionally from footer.php, so its styles belong in the head.
+	$footer_bundle = $base_dir . '/bundles/footer.min.css';
+	if ( $use_min && file_exists( $footer_bundle ) ) {
 		wp_enqueue_style(
 			'skyyrose-footer',
-			$base_uri . '/' . $footer_file,
+			$base_uri . '/bundles/footer.min.css',
 			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
-	}
+		wp_register_style( 'skyyrose-footer-cro', false, array( 'skyyrose-footer' ), SKYYROSE_VERSION );
+		wp_enqueue_style( 'skyyrose-footer-cro' );
+	} else {
+		// Footer: newsletter bar, grid columns, copyright bar, brand column.
+		$footer_file = $use_min && file_exists( $base_dir . '/footer.min.css' ) ? 'footer.min.css' : 'footer.css';
+		if ( file_exists( $base_dir . '/' . $footer_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-footer',
+				$base_uri . '/' . $footer_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 
-	// Footer CRO section (template-parts/footer-cro.php) — the part is included
-	// unconditionally from footer.php, so its stylesheet belongs in the head.
-	// Its previous in-part late print painted the section unstyled first, the
-	// dominant CLS source on short pages (cart 0.49 / wishlist 0.40 — Wave 1).
-	// The part's own register+print becomes a no-op once this head enqueue runs.
-	$fcro_css_file = $use_min && file_exists( $base_dir . '/footer-cro.min.css' ) ? 'footer-cro.min.css' : 'footer-cro.css';
-	if ( file_exists( $base_dir . '/' . $fcro_css_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-footer-cro',
-			$base_uri . '/' . $fcro_css_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
+		$fcro_css_file = $use_min && file_exists( $base_dir . '/footer-cro.min.css' ) ? 'footer-cro.min.css' : 'footer-cro.css';
+		if ( file_exists( $base_dir . '/' . $fcro_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-footer-cro',
+				$base_uri . '/' . $fcro_css_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Mobile bottom navigation bar (hidden via CSS on desktop ≥769px).
-	$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
-	if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-mobile-nav',
-			$base_uri . '/' . $mobnav_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
+	// (In the core bundle when $css_bundled.)
+	if ( ! $css_bundled ) {
+		$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
+		if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-mobile-nav',
+				$base_uri . '/' . $mobnav_file,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Cookie consent banner (GDPR).
@@ -222,26 +287,39 @@ function skyyrose_enqueue_global_styles() {
 	// these features, so shipping their CSS is dead bytes. v1.5.12 audit.
 	$skip_optional_css = skyyrose_slug_skips_optional_assets( skyyrose_get_current_template_slug() );
 
-	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
-	$size_guide_file = $use_min && file_exists( $base_dir . '/size-guide.min.css' ) ? 'size-guide.min.css' : 'size-guide.css';
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $size_guide_file ) ) {
+	// Size guide modal + luxury cursor: same skip-slug gate, both always
+	// async-swapped — bundled as bundles/optional-ui.min.css under the
+	// existing 'skyyrose-size-guide' handle so the async-handle entry matches.
+	$optional_bundle = $base_dir . '/bundles/optional-ui.min.css';
+	if ( ! $skip_optional_css && $use_min && file_exists( $optional_bundle ) ) {
 		wp_enqueue_style(
 			'skyyrose-size-guide',
-			$base_uri . '/' . $size_guide_file,
+			$base_uri . '/bundles/optional-ui.min.css',
 			array(),
 			SKYYROSE_VERSION
 		);
-	}
+	} elseif ( ! $skip_optional_css ) {
+		// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
+		$size_guide_file = $use_min && file_exists( $base_dir . '/size-guide.min.css' ) ? 'size-guide.min.css' : 'size-guide.css';
+		if ( file_exists( $base_dir . '/' . $size_guide_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-size-guide',
+				$base_uri . '/' . $size_guide_file,
+				array(),
+				SKYYROSE_VERSION
+			);
+		}
 
-	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
-	$cursor_css_file = $use_min && file_exists( $base_dir . '/luxury-cursor.min.css' ) ? 'luxury-cursor.min.css' : 'luxury-cursor.css';
-	if ( ! $skip_optional_css && file_exists( $base_dir . '/' . $cursor_css_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-luxury-cursor',
-			$base_uri . '/' . $cursor_css_file,
-			array(),
-			SKYYROSE_VERSION
-		);
+		// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
+		$cursor_css_file = $use_min && file_exists( $base_dir . '/luxury-cursor.min.css' ) ? 'luxury-cursor.min.css' : 'luxury-cursor.css';
+		if ( file_exists( $base_dir . '/' . $cursor_css_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-luxury-cursor',
+				$base_uri . '/' . $cursor_css_file,
+				array(),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Skeleton loading states — shimmer placeholders for images and cards.
@@ -261,36 +339,54 @@ function skyyrose_enqueue_global_styles() {
 	$mascot_enabled = skyyrose_mascot_is_enabled()
 		&& ! ( function_exists( 'is_checkout' ) && is_checkout() );
 	if ( $mascot_enabled ) {
-		$mascot_css_file = $use_min && file_exists( $base_dir . '/mascot.min.css' ) ? 'mascot.min.css' : 'mascot.css';
-		if ( file_exists( $base_dir . '/' . $mascot_css_file ) ) {
+		// Same kill-switch gate, skyy-walk depends on mascot — bundled as
+		// bundles/mascot.min.css under the existing 'skyyrose-mascot' handle
+		// (async-handle entry on tall slugs matches unchanged).
+		$mascot_bundle = $base_dir . '/bundles/mascot.min.css';
+		if ( $use_min && file_exists( $mascot_bundle ) ) {
 			wp_enqueue_style(
 				'skyyrose-mascot',
-				$base_uri . '/' . $mascot_css_file,
+				$base_uri . '/bundles/mascot.min.css',
 				array( 'skyyrose-design-tokens' ),
 				SKYYROSE_VERSION
 			);
-		}
+			wp_register_style( 'skyyrose-skyy-walk', false, array( 'skyyrose-mascot' ), SKYYROSE_VERSION );
+			wp_enqueue_style( 'skyyrose-skyy-walk' );
+		} else {
+			$mascot_css_file = $use_min && file_exists( $base_dir . '/mascot.min.css' ) ? 'mascot.min.css' : 'mascot.css';
+			if ( file_exists( $base_dir . '/' . $mascot_css_file ) ) {
+				wp_enqueue_style(
+					'skyyrose-mascot',
+					$base_uri . '/' . $mascot_css_file,
+					array( 'skyyrose-design-tokens' ),
+					SKYYROSE_VERSION
+				);
+			}
 
-		$skyy_walk_css_file = $use_min && file_exists( $base_dir . '/skyy-walk.min.css' ) ? 'skyy-walk.min.css' : 'skyy-walk.css';
-		if ( file_exists( $base_dir . '/' . $skyy_walk_css_file ) ) {
-			wp_enqueue_style(
-				'skyyrose-skyy-walk',
-				$base_uri . '/' . $skyy_walk_css_file,
-				array( 'skyyrose-mascot' ),
-				SKYYROSE_VERSION
-			);
+			$skyy_walk_css_file = $use_min && file_exists( $base_dir . '/skyy-walk.min.css' ) ? 'skyy-walk.min.css' : 'skyy-walk.css';
+			if ( file_exists( $base_dir . '/' . $skyy_walk_css_file ) ) {
+				wp_enqueue_style(
+					'skyyrose-skyy-walk',
+					$base_uri . '/' . $skyy_walk_css_file,
+					array( 'skyyrose-mascot' ),
+					SKYYROSE_VERSION
+				);
+			}
 		}
 	}
 
 	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
-	$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
-	if ( file_exists( $base_dir . '/' . $agency_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-agency-visuals',
-			$base_uri . '/' . $agency_file,
-			array( 'skyyrose-design-tokens', 'skyyrose-components' ),
-			SKYYROSE_VERSION
-		);
+	// (In the core bundle when $css_bundled.)
+	if ( ! $css_bundled ) {
+		$agency_file = $use_min && file_exists( $base_dir . '/agency-tier-visuals.min.css' ) ? 'agency-tier-visuals.min.css' : 'agency-tier-visuals.css';
+		if ( file_exists( $base_dir . '/' . $agency_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-agency-visuals',
+				$base_uri . '/' . $agency_file,
+				array( 'skyyrose-design-tokens', 'skyyrose-components' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// hero-cinematic.css enqueue removed (perf wave 2026-07-19): the part it
@@ -323,42 +419,23 @@ function skyyrose_enqueue_global_scripts() {
 		true
 	);
 
-	// Navigation script (hamburger toggle, keyboard nav, dropdowns).
-	$nav_file = $use_min && file_exists( $js_dir . '/navigation.min.js' ) ? 'navigation.min.js' : 'navigation.js';
-	if ( file_exists( $js_dir . '/' . $nav_file ) ) {
+	/*
+	 * Build-time JS core bundle: navigation + toast + footer-cro +
+	 * page-transitions — all unconditional, all defer + in_footer,
+	 * independent IIFEs concatenated in enqueue order
+	 * (scripts/bundles.config.js). Enqueued under the existing
+	 * 'skyyrose-navigation' handle so skyyrose_localize_scripts() keeps
+	 * attaching skyyRoseData to it unchanged. The footer-cro alias
+	 * (src-false, enqueued) carries its skyyRoseFooterCro localization —
+	 * inline config always executes before deferred scripts, so the bundle
+	 * reads it exactly as the standalone file did.
+	 * SCRIPT_DEBUG / missing bundle falls through to per-file enqueues.
+	 */
+	$js_bundled = $use_min && file_exists( $js_dir . '/bundles/core.min.js' );
+	if ( $js_bundled ) {
 		wp_enqueue_script(
 			'skyyrose-navigation',
-			$js_uri . '/' . $nav_file,
-			array(),
-			SKYYROSE_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
-	}
-
-	// Toast notification utility (global, used by wishlist, add-to-cart, newsletter).
-	$toast_file = $use_min && file_exists( $js_dir . '/toast.min.js' ) ? 'toast.min.js' : 'toast.js';
-	if ( file_exists( $js_dir . '/' . $toast_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-toast',
-			$js_uri . '/' . $toast_file,
-			array(),
-			SKYYROSE_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
-	}
-
-	// Footer CRO — FAQ accordion + animated newsletter capture.
-	$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
-	if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-footer-cro',
-			$js_uri . '/' . $fcro_file,
+			$js_uri . '/bundles/core.min.js',
 			array(),
 			SKYYROSE_VERSION,
 			array(
@@ -367,8 +444,8 @@ function skyyrose_enqueue_global_scripts() {
 			)
 		);
 
-		// The only client-originated newsletter string; server responses
-		// arrive already localized from skyyrose_ajax_newsletter_subscribe().
+		wp_register_script( 'skyyrose-footer-cro', false, array( 'skyyrose-navigation' ), SKYYROSE_VERSION, true );
+		wp_enqueue_script( 'skyyrose-footer-cro' );
 		wp_localize_script(
 			'skyyrose-footer-cro',
 			'skyyRoseFooterCro',
@@ -376,6 +453,63 @@ function skyyrose_enqueue_global_scripts() {
 				'networkError' => __( 'Connection problem — please try again.', 'skyyrose' ),
 			)
 		);
+	}
+
+	if ( ! $js_bundled ) {
+		// Navigation script (hamburger toggle, keyboard nav, dropdowns).
+		$nav_file = $use_min && file_exists( $js_dir . '/navigation.min.js' ) ? 'navigation.min.js' : 'navigation.js';
+		if ( file_exists( $js_dir . '/' . $nav_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-navigation',
+				$js_uri . '/' . $nav_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+		}
+
+		// Toast notification utility (global, used by wishlist, add-to-cart, newsletter).
+		$toast_file = $use_min && file_exists( $js_dir . '/toast.min.js' ) ? 'toast.min.js' : 'toast.js';
+		if ( file_exists( $js_dir . '/' . $toast_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-toast',
+				$js_uri . '/' . $toast_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+		}
+
+		// Footer CRO — FAQ accordion + animated newsletter capture.
+		$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
+		if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-footer-cro',
+				$js_uri . '/' . $fcro_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+
+			// The only client-originated newsletter string; server responses
+			// arrive already localized from skyyrose_ajax_newsletter_subscribe().
+			wp_localize_script(
+				'skyyrose-footer-cro',
+				'skyyRoseFooterCro',
+				array(
+					'networkError' => __( 'Connection problem — please try again.', 'skyyrose' ),
+				)
+			);
+		}
 	}
 
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
@@ -414,19 +548,22 @@ function skyyrose_enqueue_global_scripts() {
 	}
 
 	// Page transitions + skeleton screens + scarcity bars.
-	$pt_file = $use_min && file_exists( $js_dir . '/page-transitions.min.js' )
-		? 'page-transitions.min.js' : 'page-transitions.js';
-	if ( file_exists( $js_dir . '/' . $pt_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-page-transitions',
-			$js_uri . '/' . $pt_file,
-			array(),
-			SKYYROSE_VERSION,
-			array(
-				'strategy'  => 'defer',
-				'in_footer' => true,
-			)
-		);
+	// (In the JS core bundle when $js_bundled.)
+	if ( ! $js_bundled ) {
+		$pt_file = $use_min && file_exists( $js_dir . '/page-transitions.min.js' )
+			? 'page-transitions.min.js' : 'page-transitions.js';
+		if ( file_exists( $js_dir . '/' . $pt_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-page-transitions',
+				$js_uri . '/' . $pt_file,
+				array(),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+		}
 	}
 
 	// Comment reply script (WordPress built-in).
@@ -636,7 +773,7 @@ function skyyrose_enqueue_template_styles() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
-		'front-page'          => 'homepage-v2.css',
+		'front-page'          => 'homepage-v3.css',
 		'immersive'           => 'immersive.css',
 		'single-product'      => 'single-product.css',
 		'cart'                => 'woocommerce.css',
@@ -662,7 +799,32 @@ function skyyrose_enqueue_template_styles() {
 		'experiences'         => 'experiences.css',
 	);
 
-	if ( isset( $template_styles[ $slug ] ) ) {
+	/*
+	 * WooCommerce bundles: cart/checkout/account each load base
+	 * woocommerce.css + one page-specific sheet, always together — bundled
+	 * per slug (base first, same order the dependency chain produces) under
+	 * the existing 'skyyrose-template-woocommerce' handle, so the script-side
+	 * wp_script_is/localize in inc/woocommerce.php matches unchanged.
+	 * shop-archive keeps the plain base sheet via the map below.
+	 */
+	$wc_bundles     = array(
+		'cart'     => 'wc-cart',
+		'checkout' => 'wc-checkout',
+		'account'  => 'wc-account',
+	);
+	$wc_bundle_used = false;
+	if ( isset( $wc_bundles[ $slug ] ) && $use_min
+		&& file_exists( $base_css_dir . '/bundles/' . $wc_bundles[ $slug ] . '.min.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-template-woocommerce',
+			$base_css_uri . '/bundles/' . $wc_bundles[ $slug ] . '.min.css',
+			$global_deps,
+			SKYYROSE_VERSION
+		);
+		$wc_bundle_used = true;
+	}
+
+	if ( ! $wc_bundle_used && isset( $template_styles[ $slug ] ) ) {
 		$css_file = $template_styles[ $slug ];
 		$handle   = 'skyyrose-template-' . sanitize_title( pathinfo( $css_file, PATHINFO_FILENAME ) );
 		$min_file = str_replace( '.css', '.min.css', $css_file );
@@ -677,6 +839,26 @@ function skyyrose_enqueue_template_styles() {
 				$handle,
 				$base_css_uri . '/' . $css_file,
 				$global_deps,
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
+	// Homepage v3 act stylesheets. One act group per file (many-small-files
+	// rule); each consumes the token block that homepage-v3.css declares, so
+	// every one of them depends on that handle and loads after it.
+	if ( 'front-page' === $slug ) {
+		$hp_sheets = array( 'homepage-v3-rooms', 'homepage-v3-editorial', 'homepage-v3-close' );
+		foreach ( $hp_sheets as $hp_sheet ) {
+			$hp_file = $use_min && file_exists( $base_css_dir . '/' . $hp_sheet . '.min.css' )
+				? $hp_sheet . '.min.css' : $hp_sheet . '.css';
+			if ( ! file_exists( $base_css_dir . '/' . $hp_file ) ) {
+				continue;
+			}
+			wp_enqueue_style(
+				'skyyrose-' . $hp_sheet,
+				$base_css_uri . '/' . $hp_file,
+				array( 'skyyrose-template-homepage-v3' ),
 				SKYYROSE_VERSION
 			);
 		}
@@ -757,56 +939,25 @@ function skyyrose_enqueue_template_styles() {
 	}
 
 	if ( 'front-page' === $slug ) {
-		// LCP: preload hero image so the browser prioritises it in the
-		// high-priority fetch queue alongside critical CSS, improving LCP score.
-		//
-		// v1.5.17: preload AVIF (broadest 2026 browser coverage, smaller payload).
-		// v1.5.19: derive path + URL atomically via skyyrose_avif_sibling_pair()
-		// so existence probe + emitted preload URL cannot drift apart.
-		// Non-AVIF browsers fall through to WebP via the <picture> element's
-		// normal source negotiation (not preloaded, but still high-priority).
+		/*
+		 * LCP: the homepage-v3 hero is a portrait <video> whose poster frame is
+		 * the paint. A poster attribute is NOT preload-scanner discoverable, so
+		 * without this the browser only requests it after CSS + layout.
+		 *
+		 * PAIRING CONTRACT with template-parts/home/hero.php: the same file,
+		 * assets/images/hero/home-hero-poster-720w.webp, byte-for-byte the same
+		 * URL string, and no imagesizes (the poster is a single fixed asset, not
+		 * a srcset) — any drift and the browser fetches a second candidate.
+		 *
+		 * The v2 preloads that used to live here (homepage-hero-bg + the br-006
+		 * hero-strip frame) are retired with the elements they paired with;
+		 * neither asset appears on the v3 page.
+		 */
 		add_action(
 			'wp_head',
 			function () {
-				$webp_url = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
-
-				// Responsive Photon preload (Wave 4, PAIRED with Pixel2's hero
-				// <picture> srcset in front-page.php — the two must emit
-				// identical URLs or the LCP double-fetches ~300KB). The flat
-				// preload fetched the full 294KB AVIF at every viewport;
-				// Photon serves width-sized webp instead (jpeg transcode for
-				// non-webp Accept clients — hence NO type= attribute, it would
-				// be dishonest on the transcode path).
-				$hero_srcset = function_exists( 'skyyrose_photon_srcset' )
-					? skyyrose_photon_srcset( $webp_url, array( 480, 768, 1280, 1920 ) )
-					: '';
-				if ( '' !== $hero_srcset ) {
-					echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $hero_srcset ) . '" imagesizes="100vw" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					return;
-				}
-
-				// Fallback (helper unavailable/unusable): full-size next-gen preload.
-				$avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
-				if ( $avif && file_exists( $avif['path'] ) ) {
-					echo '<link rel="preload" as="image" href="' . esc_url( $avif['url'] ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				} else {
-					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				}
-
-				// Round-4 (Wave 5): the measured mobile LCP element is the FIRST
-				// hero-strip frame, not the hero background above (load delay
-				// 3,823ms — discovered late). PAIRING CONTRACT with front-page.php:
-				// same first SKU ($hero_strip_skus[0] = br-006), same widths
-				// 320/480/1024, same sizes string — any drift double-fetches.
-				if ( function_exists( 'skyyrose_sot_product_image_uri' ) && function_exists( 'skyyrose_photon_srcset' ) ) {
-					$strip_first_srcset = skyyrose_photon_srcset(
-						skyyrose_sot_product_image_uri( 'br-006', 'front' ),
-						array( 320, 480, 1024 )
-					);
-					if ( '' !== $strip_first_srcset ) {
-						echo '<link rel="preload" as="image" imagesrcset="' . esc_attr( $strip_first_srcset ) . '" imagesizes="(max-width: 1000px) 140px, 220px" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
-				}
+				$poster = SKYYROSE_ASSETS_URI . '/images/hero/home-hero-poster-720w.webp';
+				echo '<link rel="preload" as="image" href="' . esc_url( $poster ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			},
 			2
 		);
@@ -869,7 +1020,7 @@ function skyyrose_enqueue_template_styles() {
 		'account'  => 'woocommerce-account.css',
 	);
 
-	if ( isset( $woo_page_styles[ $slug ] ) ) {
+	if ( ! $wc_bundle_used && isset( $woo_page_styles[ $slug ] ) ) {
 		$woo_file   = $woo_page_styles[ $slug ];
 		$woo_handle = 'skyyrose-' . sanitize_title( pathinfo( $woo_file, PATHINFO_FILENAME ) );
 		$woo_min    = str_replace( '.css', '.min.css', $woo_file );
@@ -1107,8 +1258,14 @@ function skyyrose_enqueue_template_scripts() {
 		}
 	}
 
+	/*
+	 * No 'front-page' entry: front-page.php inlines homepage-v3(.min).js and
+	 * kc-mascot(.min).js itself, because the host's page-optimize plugin strips
+	 * separately enqueued homepage scripts. The v2 map still listed
+	 * homepage-v2.js here alongside that inline block, so the homepage shipped
+	 * the same file twice — fixed with the v3 cutover.
+	 */
 	$template_scripts = array(
-		'front-page'       => 'homepage-v2.js',
 		'immersive'        => 'immersive.js',
 		'single-product'   => 'single-product.js',
 		'cart'             => 'woocommerce.js',

@@ -295,32 +295,27 @@ function skyyrose_preload_hero_image() {
 			}
 		}
 
-		// Round-4: on the editorial PDP layout the LCP is the encounter image
-		// (product-detail-editorial.php $hero_image — a theme-asset catalog
-		// image), NOT the WC gallery attachment — and the old gallery preload
-		// was ALSO Photon-skipped, leaving the PDP with no LCP preload at all
-		// (load delay 1,106ms). Mirror single-product.php's own gates exactly:
-		// same skyyrose_get_product( $sku ) entry, same dossier editorial gate.
-		$pdp_sku      = ( $product instanceof WC_Product ) ? $product->get_sku() : '';
-		$pdp_entry    = ( '' !== $pdp_sku && function_exists( 'skyyrose_get_product' ) ) ? skyyrose_get_product( $pdp_sku ) : null;
-		$pdp_dossier  = ( '' !== $pdp_sku && function_exists( 'skyyrose_get_product_dossier' ) ) ? skyyrose_get_product_dossier( $pdp_sku ) : null;
-		$is_editorial = $pdp_dossier && ! empty( $pdp_dossier['has_editorial_content'] );
-
-		if ( $is_editorial && ! empty( $pdp_entry['image'] ) && function_exists( 'skyyrose_product_image_uri' ) ) {
-			$image_url = skyyrose_product_image_uri( $pdp_entry['image'] );
-		} elseif ( ! function_exists( 'jetpack_photon_url' ) ) {
-			// Non-editorial PDPs keep the gallery-image preload. Jetpack
-			// Photon rewrites gallery URLs to its CDN on delivery — preloading
-			// the local URL wastes a connection, so skip under Photon and let
-			// the browser's own LCP heuristic take over.
-			if ( $product instanceof WC_Product && $product->get_image_id() ) {
-				// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
-				// of wp_get_attachment_url() which returns the raw original
-				// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
-				$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
-				if ( ! $image_url ) {
-					$image_url = wp_get_attachment_url( $product->get_image_id() );
-				}
+		/*
+		 * 2026-07-29 Lighthouse (mobile, live br-001): the measured LCP element
+		 * is the WC gallery image (.wp-post-image, i0.wp.com ?resize=800,1024,
+		 * NO srcset) with a 5,714ms load delay — while the round-4 encounter
+		 * preload fetched a DIFFERENT theme asset at high priority. Both prior
+		 * assumptions are disproven by live markup:
+		 *   - the editorial encounter image is not the mobile LCP element;
+		 *   - the Photon "wastes a connection" skip is wrong — Photon filters
+		 *     image_downsize server-side, so wp_get_attachment_image_url()
+		 *     returns the SAME i0.wp.com URL the rendered <img> carries. The
+		 *     preload is byte-identical to the element fetch, no extra host.
+		 * So: every PDP preloads the gallery featured image, exactly as the
+		 * template will render it. Post-deploy check: the emitted preload href
+		 * must equal the .wp-post-image src (see task verify commands).
+		 * 'woocommerce_single' variant, not the raw original — the original is
+		 * often 2-3MB (audit 2026-05-23).
+		 */
+		if ( $product instanceof WC_Product && $product->get_image_id() ) {
+			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+			if ( ! $image_url ) {
+				$image_url = wp_get_attachment_url( $product->get_image_id() );
 			}
 		}
 	} elseif ( is_page() ) {

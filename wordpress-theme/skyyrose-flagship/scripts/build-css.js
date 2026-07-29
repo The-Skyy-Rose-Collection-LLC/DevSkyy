@@ -40,6 +40,9 @@ let processed = 0;
 let failed = 0;
 const results = [];
 const stale = [];
+// relPath -> minified content, for the bundle phase below. Bundles are built
+// from these in-memory results so --check verifies them without writing.
+const minByRel = {};
 
 cssFiles.forEach(relPath => {
   const srcPath = path.resolve(rootDir, relPath);
@@ -78,6 +81,7 @@ cssFiles.forEach(relPath => {
 
     // Minified CSS (prepend header for root style.css)
     const minContent = headerComment + output.styles;
+    minByRel[relPath] = minContent;
 
     if (CHECK_ONLY) {
       // Compare against what is on disk. Content, not mtime: git checkouts and
@@ -108,6 +112,41 @@ cssFiles.forEach(relPath => {
     console.error(`  FAIL: ${relPath} -- ${err.message}`);
     failed++;
   }
+});
+
+// Bundle phase: concatenate the minified outputs listed in bundles.config.js,
+// in order. A bundle is exactly its parts' .min contents joined with '\n', so
+// cascade order inside a bundle is the config's list order. Fails closed: a
+// part missing from the build (renamed/deleted source) is a hard error, never
+// a silently smaller bundle.
+const bundles = require('./bundles.config.js').css;
+Object.entries(bundles).forEach(([bundleRel, parts]) => {
+  const missing = parts.filter(p => !(p in minByRel));
+  if (missing.length > 0) {
+    console.error(`  FAIL: ${bundleRel} -- missing part(s): ${missing.join(', ')}`);
+    failed++;
+    return;
+  }
+  const content = parts.map(p => minByRel[p]).join('\n');
+  const bundlePath = path.resolve(rootDir, bundleRel);
+
+  if (CHECK_ONLY) {
+    if (!fs.existsSync(bundlePath)) {
+      stale.push(`${bundleRel} -- bundle missing`);
+    } else if (fs.readFileSync(bundlePath, 'utf8') !== content) {
+      stale.push(`${bundleRel} -- bundle differs from fresh concat`);
+    }
+    return;
+  }
+
+  fs.mkdirSync(path.dirname(bundlePath), { recursive: true });
+  fs.writeFileSync(bundlePath, content);
+  results.push({
+    file: bundleRel,
+    srcSize: content.length,
+    minSize: content.length,
+    savings: 0,
+  });
 });
 
 if (CHECK_ONLY) {
