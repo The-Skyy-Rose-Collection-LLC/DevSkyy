@@ -1,0 +1,272 @@
+/**
+ * Collection Film Spine — Variant C scroll-scrubbed shoppable stage.
+ *
+ * Founder-picked base layout 2026-07-29 ("Shop the Film / scroll-world
+ * spine"). Styles template-parts/collection/film-spine.php: tall track +
+ * sticky 100vh stage; collection-motion.js drives the progress bar
+ * (scaleX), media drift (transform only — currentTime is never seeked)
+ * and beat cross-fade. Legacy .col-film ambient rules
+ * (collection-pages.css) still size the video/poster; the --spine
+ * modifier only re-frames the section. Beats and hotspots overlay the
+ * stage on desktop; below 768px and under reduced motion they reflow
+ * into the column as static content.
+ *
+ * Split from collection-motion.css (800-line file gate); loads after
+ * collection-pages.css via the enqueue dependency chain.
+ *
+ * @package SkyyRose
+ * @since   1.13.0
+ */
+
+.col-film--spine {
+	display: block;
+	padding: 0;
+}
+
+.col-film__scrolltrack {
+	position: relative;
+	height: 280vh;
+}
+
+.col-film--spine .col-film__stage {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	overflow: hidden;
+	padding: 0 16px;
+}
+
+.col-film__media {
+	position: relative;
+	display: inline-flex;
+	transform-origin: center;
+	will-change: transform;
+}
+
+.col-film__progress {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: var(--skyyrose-accent);
+	transform: scaleX(0);
+	transform-origin: left center;
+	z-index: 4;
+}
+
+/* Narrative beats — pin_beats canon, cross-faded by scroll progress. */
+.col-film__beats {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 8vh;
+	min-height: 120px;
+	text-align: center;
+	padding: 0 24px;
+	z-index: 3;
+	pointer-events: none;
+}
+
+.col-film__beat {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity 0.5s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)), transform 0.5s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.col-film__beat.is-on {
+	opacity: 1;
+	transform: none;
+}
+
+.col-film__beat-label {
+	display: block;
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.65rem;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	margin-bottom: 10px;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.col-film__beat-title {
+	font-family: var(--skyyrose-font-display);
+	font-size: clamp(1.2rem, 2.6vw, 1.9rem);
+	font-weight: 400;
+	line-height: 1.3;
+	letter-spacing: 0.06em;
+	color: #fff;
+	margin: 0 auto;
+	max-width: 640px;
+	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.col-film__beat-accent {
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	font-style: italic;
+}
+
+.col-film__beat-sub {
+	display: block;
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.6rem;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.6);
+	margin-top: 10px;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+/* Shoppable hotspots — real focusable product links over the stage. */
+.col-film__hotspots {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	pointer-events: none;
+}
+
+.col-film__hotspot {
+	pointer-events: auto;
+	position: absolute;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: rgba(10, 10, 10, 0.78);
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.75);
+	padding: 0.5rem 0.85rem;
+	font-family: var(--skyyrose-font-mono);
+	font-size: 0.68rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #fff;
+	text-decoration: none;
+	transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover/focus inverts to white-with-dark-text — AA-safe on every collection
+   accent (a dark-text-on-accent invert fails contrast on Crimson). */
+.col-film__hotspot:hover,
+.col-film__hotspot:focus-visible {
+	background: #fff;
+	color: #050505;
+	border-color: transparent;
+}
+
+.col-film__hotspot:hover .col-film__hotspot-price,
+.col-film__hotspot:focus-visible .col-film__hotspot-price {
+	color: #050505;
+}
+
+.col-film__hotspot:focus-visible {
+	outline: 2px solid var(--skyyrose-accent);
+	outline-offset: 2px;
+}
+
+.col-film__hotspot-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--skyyrose-accent);
+	flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.col-film__hotspot-dot {
+		animation: colHotspotPulse 2s infinite;
+	}
+}
+
+@keyframes colHotspotPulse {
+	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--skyyrose-accent-rgb), 0.6); }
+	55%      { box-shadow: 0 0 0 8px rgba(var(--skyyrose-accent-rgb), 0); }
+}
+
+.col-film__hotspot-price {
+	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+}
+
+.col-film__hotspot-price .woocommerce-Price-amount {
+	color: inherit;
+}
+
+/* Deterministic positions (desktop, motion-capable) — clear of the pause
+   toggle's bottom-right corner and the centered beat captions. */
+.col-film__hotspot--1 { top: 24%; left: 6%; }
+.col-film__hotspot--2 { top: 44%; right: 6%; }
+.col-film__hotspot--3 { bottom: 30%; left: 10%; }
+
+/* Below 768px: shorter track, smaller plate, beats + hotspots leave the
+   overlay and join the column flow (no absolute-position collisions on
+   small screens). Scrub itself stays on — it's transform + class toggles
+   on a passive rAF-throttled listener, cheap enough for touch. */
+@media (max-width: 767px) {
+	.col-film__scrolltrack { height: 220vh; }
+	.col-film--spine .col-film__video,
+	.col-film--spine .col-film__poster { height: min(52vh, 480px); }
+	.col-film__beats {
+		position: relative;
+		bottom: auto;
+		min-height: 96px;
+		width: 100%;
+	}
+	.col-film__hotspots {
+		position: relative;
+		inset: auto;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+		padding: 0 8px;
+	}
+	.col-film__hotspot { position: static; }
+}
+
+/* ==========================================================================
+   REDUCED MOTION — collapse to the previous non-sticky ambient section:
+   no scrub track, no progress bar, no media drift. Beats render as a
+   static stacked column (content preserved, no cross-fade); hotspots
+   become a static row under the film. collection-pages.css already swaps
+   video → poster and hides the toggle under reduced motion.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+	.col-film__scrolltrack { height: auto; }
+	.col-film--spine .col-film__stage {
+		position: static;
+		height: auto;
+		padding: clamp(2rem, 6vh, 4.5rem) 1.25rem;
+	}
+	.col-film__progress { display: none; }
+	.col-film__media { transform: none !important; }
+	.col-film__beats {
+		position: relative;
+		bottom: auto;
+		min-height: 0;
+		width: 100%;
+	}
+	.col-film__beat {
+		position: static;
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+	.col-film__beat + .col-film__beat { margin-top: 20px; }
+	.col-film__hotspots {
+		position: relative;
+		inset: auto;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+	}
+	.col-film__hotspot { position: static; }
+}

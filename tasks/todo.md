@@ -31,6 +31,29 @@ brand tokens/fonts/references. 24 extend existing code (`luxury-cursor.js`, `pro
 Known landmine: "Dark Luxury Hero"/"Dark Luxury Newsletter" spec a cut font (Cormorant Garamond) —
 retoken before building either.
 
+### 2026-07-29 session — collection template revamp + base-layout prototype (this worktree)
+- [x] Base-layout prototype SHIPPED: `docs/brand/design-mockups/prototype-collection-base-layout.html`
+      (4 variants A–D, `?variant=`, Signature skin, real catalog/SOT data; verdict placeholder in
+      `prototype-collection-base-layout.NOTES.md`). Playwright/Chrome-verified: 4 distinct trees,
+      8 cards each, lockup images intact, mobile collapse OK.
+- [x] Founder picked VARIANT C (scroll-world spine) 2026-07-29 → folded in + independently verified:
+      NEW `template-parts/collection/film-spine.php` (sticky scroll-scrub film, 3 SOT-product hotspots,
+      pin_beats captions), grid split in two with marquee-copy band, experience/lookbook/feature-scroll
+      after grids, pin-narrative include dropped (kids LANDING template still consumes the part — not
+      orphaned). All UNCOMMITTED.
+- [ ] Delete prototype pair + OPEN-VARIANT-* launchers after founder confirms fold-in on live (or on request)
+- [x] `collection-revamp` agent DONE + independently re-verified 2026-07-29: 15 patterns / 4 collections
+      in NEW `assets/css/collection-motion.css` (597) + `assets/js/collection-motion.js` (303) + enqueue
+      wiring + `magnetic` class on hero CTA. My re-run: php -l clean, lint:php clean, cut-fonts 0,
+      reduced-motion in all 4 new files, verify:theme 2 FAILs both PRE-EXISTING (min-sync terser drift,
+      file-size). Section order unchanged; heroes/film/experience intact. UNCOMMITTED.
+- [ ] Browser motion QA at deploy time (standing Playwright rule): 390px+desktop all 4 collections,
+      reduced-motion emulation (fog/aurora frozen, no orbs/confetti), kids quick-add confetti
+- [ ] Follow-ups flagged by builder (pre-existing, NOT this session's): `.col-cta` has zero styles
+      theme-wide; min-sync terser drift needs lockfile or one-time full-min rebuild commit; KC
+      launch-mode ON bypasses collection-standalone assets (kids motion invisible until off); 5 inc/
+      files over 800-line gate
+
 ### Phase 0 — Audit (read-only, in the new worktree, before any code changes)
 - [ ] `devskyy` MCP: `serena_full_project_audit`, `serena_check_code_style`, `serena_validate_security`, `serena_find_issues` — SKIPPED today (time-boxed); wp-security + wp-code-simplifier baselines cover the same ground for this pass
 - [x] `wp-security` agent pass (CSP/nonce/escaping/auth/upload/SQL) — 1 MEDIUM found+fixed (bug-289), zero CRITICAL/HIGH
