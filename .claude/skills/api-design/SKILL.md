@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs.
+description: REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs. Use when designing or reviewing HTTP API endpoints, contracts, pagination, error formats, versioning, or rate limits. Do NOT use for GraphQL schema design (api/graphql/), MCP tool schemas (devskyy_mcp.py), or internal function signatures — this covers the HTTP/REST surface only.
 origin: ECC
 ---
 
@@ -8,7 +8,7 @@ origin: ECC
 
 Conventions and best practices for designing consistent, developer-friendly REST APIs.
 
-## When to Activate
+## When to use
 
 - Designing new API endpoints
 - Reviewing existing API contracts
@@ -16,6 +16,32 @@ Conventions and best practices for designing consistent, developer-friendly REST
 - Implementing error handling for APIs
 - Planning API versioning strategy
 - Building public or partner-facing APIs
+
+**When NOT to use:**
+
+- GraphQL schema/resolver design (`api/graphql/`) — type and resolver rules differ from REST resource rules
+- MCP tool definitions (`devskyy_mcp.py`) — tool schemas, not HTTP resources
+- WordPress REST conventions on skyyrose.co — that surface follows WordPress core patterns, owned by the `wp-rest-api` skill
+
+## Inputs
+
+Required before starting. **Absent input = stop** — never proceed by inventing a convention.
+
+- **The existing API surface being extended.** In this repo: FastAPI routers under `api/v1/` and `api/v2/`, mounted by `main_enterprise.py`. Read the sibling router closest to the new resource first.
+- **The conventions already in force** — envelope shape, naming case, auth dependency, error format — taken from that sibling router, not from this document's defaults. A second convention that is internally consistent is still a defect.
+- **The boundary-validation library**: Pydantic for the Python backend, Zod for Next.js routes (`frontend/`).
+- **The consumer contract**, when one exists (OpenAPI spec, frontend caller, partner doc). If the consumer's field names cannot be located, stop and ask — do not guess them.
+
+## Procedure
+
+1. Read the nearest existing router (`api/v1/<domain>.py`) and record its envelope, naming case, auth dependency, and error shape.
+2. Design the URL per **Resource Design** below — plural noun, kebab-case; verbs only for non-CRUD actions.
+3. Pick method and status codes from the tables below: 201 + `Location` for creates, 204 for deletes, 4xx for client errors — never 200-for-everything.
+4. Define request/response schemas with validation at the boundary (Pydantic/Zod), field-level details per the **Error Response** format.
+5. For list endpoints, choose pagination from the cursor-vs-offset table; add filtering/sorting only where a consumer needs it.
+6. Wire authentication and a rate-limit tier from the tables below; an intentionally public endpoint says so explicitly.
+7. Walk the **API Design Checklist**; every unchecked box is either fixed or named as a known gap in the deliverable.
+8. Run every command in **Verification** and report the observed output with evidence-scope tags.
 
 ## Resource Design
 
@@ -521,3 +547,57 @@ Before shipping a new endpoint:
 - [ ] Response does not leak internal details (stack traces, SQL errors)
 - [ ] Consistent naming with existing endpoints (camelCase vs snake_case)
 - [ ] Documented (OpenAPI/Swagger spec updated)
+
+## Verification
+
+Run from the repo root. All three commands confirmed runnable in this repo on 2026-07-29.
+
+1. The OpenAPI schema still builds with the change mounted:
+
+```bash
+python3 -c "from main_enterprise import app; spec = app.openapi(); print('openapi', spec['openapi'], '| paths:', len(spec['paths']))"
+```
+
+**PASS:** exits 0 and prints spec version + path count (baseline 2026-07-29: `openapi 3.1.0 | paths: 288`). A traceback is a FAIL. `[repro]`
+
+2. No duplicate operation IDs — duplicates silently corrupt OpenAPI-driven client generators:
+
+```bash
+python3 -W error::UserWarning -c "from main_enterprise import app; app.openapi(); print('operation ids unique')"
+```
+
+**PASS:** prints `operation ids unique` and exits 0. Baseline is currently RED (observed 2026-07-29, exit 1): 3 pre-existing duplicates — `list_tools` and `test_tool` in `api/tools.py`, `list_agents` in `api/v1/monitoring.py`. Per rule 4 of `docs/skill-authoring-standard.md`, diff the warning *list*, not the exit code: the change passes when it adds zero NEW duplicates. `[repro]`
+
+3. API contract tests stay green:
+
+```bash
+rtk proxy pytest tests/api -q
+```
+
+**PASS:** exits 0, all collected tests pass. Use `rtk proxy`, never bare pytest — bare `python3 -m pytest tests/api -q --co` falsely reported "No tests collected" in this session while `rtk proxy` collected 37 tests across 4 files. `[test]`
+
+## Worked example
+
+Invoked 2026-07-29 in this worktree, auditing the mounted surface before endpoint work. Real commands, real observed output:
+
+```text
+$ python3 -c "from main_enterprise import app; spec = app.openapi(); print('openapi', spec['openapi'], '| paths:', len(spec['paths']))"
+openapi 3.1.0 | paths: 288
+
+$ python3 -W error::UserWarning -c "from main_enterprise import app; app.openapi(); print('operation ids unique')"
+UserWarning: Duplicate Operation ID list_tools_api_v1_tools_get for function list_tools at .../api/tools.py
+(exit 1)
+
+$ rtk proxy pytest tests/api/test_ml_predict.py -q
+.....                                                                    [100%]
+```
+
+Finding from check 2: the generated spec contains colliding `operationId`s for `list_tools`/`test_tool` (`api/tools.py`) and `list_agents` (`api/v1/monitoring.py`), so a generated client would overwrite one method with the other. Scope: `[repro]` — schema-build observation only; live behavior of api.devskyy.app was not probed this session.
+
+## Failure modes
+
+- **200-for-everything** — error state hidden in the body; monitors and clients cannot distinguish outcomes. See *Common Mistakes* above.
+- **Duplicate operation IDs** from copy-pasted handlers or double-mounted routers. Symptom: `UserWarning` at schema build (real instance observed 2026-07-29, Verification check 2). Consequence: OpenAPI client generators key on `operationId` and drop one of the two operations.
+- **Second-convention drift** — a new endpoint that invents its own envelope/naming instead of matching its sibling router. Passes its own tests, fails integration review.
+- **Breaking change shipped as an addition** — field rename or type change without a version bump. The *Versioning Strategy* section defines what counts as breaking.
+- No `bug-NNN` id is cited above; when one of these bites in production, log it to `.wolf/buglog.json` and reference the id here.

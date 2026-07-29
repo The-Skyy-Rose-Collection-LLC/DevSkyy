@@ -1,6 +1,6 @@
 ---
 name: backend-patterns
-description: "Node.js / TypeScript backend patterns: REST API design, repository pattern, middleware, caching, and error handling for Express and Next.js API routes. (Python/FastAPI service layers live in the fastapi-patterns skill.)"
+description: "Node.js / TypeScript backend patterns: REST API design, repository pattern, middleware, caching, and error handling for Express and Next.js API routes. Use when designing or implementing Node/TS server-side code — API endpoints, service/repository layers, auth middleware, caching, rate limiting, or background jobs. Do NOT use for Python/FastAPI service layers (fastapi-patterns skill) or React/frontend component work (frontend-design)."
 origin: ECC
 ---
 
@@ -10,7 +10,7 @@ origin: ECC
 
 Backend architecture patterns and best practices for scalable server-side applications.
 
-## When to Activate
+## When to use
 
 - Designing REST or GraphQL API endpoints
 - Implementing repository, service, or controller layers
@@ -19,6 +19,46 @@ Backend architecture patterns and best practices for scalable server-side applic
 - Setting up background jobs or async processing
 - Structuring error handling and validation for APIs
 - Building middleware (auth, logging, rate limiting)
+
+**When NOT to use:**
+
+- Python/FastAPI service layers → `fastapi-patterns` skill
+- React components, hooks, or client-side state → `frontend-design` / frontend skills
+- WordPress/PHP backend (`wordpress-theme/`) → `skyyrose-wp-platform` skill
+- Database schema design and SQL tuning beyond query-shape fixes → `postgres-patterns` skill
+
+## Inputs
+
+Required before applying any pattern below. **Absent input = stop — never proceed on a guess.**
+
+1. **The target runtime, identified from the tree.** In this repo, Node/TS backend code lives in
+   `frontend/app/api/**/route.ts` (Next.js App Router route handlers on Vercel), not a standalone
+   Express app. If you cannot locate where the handler belongs, stop and find it before writing code.
+2. **Every imported library declared.** Before writing code that imports a package (`zod`, `redis`,
+   `jsonwebtoken`, …), verify it exists in `frontend/package.json` (`npm ls <pkg>` from `frontend/`).
+   Undeclared import = stop and resolve the dependency first — never assume it is installed.
+3. **Current docs for every non-stdlib API touched** — Context7 `resolve-library-id` → `query-docs`
+   before writing against Next.js, Supabase, Redis client, etc. Training data is stale.
+4. **The auth decision for any new API route.** In this repo every handler under `frontend/app/api/`
+   is either wrapped (`export const GET = withAuth(getHandler)` via `frontend/lib/api-auth.ts`) or
+   explicitly exempted in `frontend/lib/api-public-routes.ts` with a written reason. If you don't
+   know which applies, stop and ask — an unwrapped route is unprotected (fail-open, bug-230 pattern).
+
+## Procedure
+
+1. Read the nearest existing handler before writing a new one (e.g.
+   `frontend/app/api/products/route.ts`) and match its response envelope
+   `{ success, data | error }` and its gating style. New code follows existing patterns, not memory.
+2. Fetch Context7 docs for each external library the change touches (Inputs #3).
+3. Pick the **minimal** pattern from the library below that solves the problem — repository +
+   service layers for real data-access complexity, a plain handler for a simple read. No
+   speculative abstraction.
+4. Implement with the non-negotiables: validate input at the boundary (Zod), narrow `unknown`
+   errors (`error instanceof Error`), generic message to the client + detailed log server-side,
+   immutable updates, no hardcoded secrets (env only).
+5. Wire the auth gate: wrap the exported handler with `withAuth(...)`, or add an exact-match
+   exemption to `frontend/lib/api-public-routes.ts` with the reason written next to it.
+6. Run the Verification block below. A red check means fix the cause — never weaken the check.
 
 ## API Design Patterns
 
@@ -596,5 +636,100 @@ export async function GET(request: Request) {
   }
 }
 ```
+
+## Verification
+
+Run from the frontend workspace after any backend TS change. Each check can return "no" — that is
+the point. A check that errors or times out is an artifact, not a pass (bug-230): re-run it, don't
+report its silence as green.
+
+1. Type safety across the whole workspace:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend && npm run type-check
+```
+
+   **PASS:** exits 0 with no `error TS` lines. `[repro]` — observed exiting 0 on this tree 2026-07-29.
+
+2. Lint (flags `console.log` in production code, unsafe patterns):
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend && npm run lint
+```
+
+   **PASS:** exits 0.
+
+3. Unit suite — includes the auth-coverage gate:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend && npm test
+```
+
+   **PASS:** exits 0. `[test]` `frontend/tests/api-auth-coverage.test.ts` walks
+   `app/api/**/route.ts` on disk and fails on any exported handler that is neither
+   `withAuth`-wrapped nor exempted in `lib/api-public-routes.ts` — this is what makes per-handler
+   auth fail CLOSED. A new route that skips step 5 of the Procedure turns this red.
+
+4. Envelope + gate spot-check on the touched route (replace the path with yours):
+
+```bash
+grep -n "withAuth\|success" /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend/app/api/products/route.ts
+```
+
+   **PASS:** output shows both `import { withAuth }` and `export const GET = withAuth(...)` (or the
+   route's documented exemption), and every `NextResponse.json` body carries `success:`. `[repo]`
+
+## Worked example
+
+Applying Procedure step 1 + Verification step 4 to the real catalog route, 2026-07-29:
+
+```bash
+$ grep -n "withAuth\|success" frontend/app/api/products/route.ts
+14:import { withAuth } from '@/lib/api-auth';
+89:          { success: false, error: 'Product not found' },
+93:      return NextResponse.json({ success: true, data: shape(product) });
+101:      success: true,
+111:      { success: false, error: message },
+117:export const GET = withAuth(getHandler);
+```
+
+Reading the full file shows the reference shape a new handler should match: a plain `getHandler`
+function, boundary handling of `sku`/`collection` query params, 404 as `{ success: false, error }`,
+errors narrowed with `error instanceof Error` before the message reaches the client (line 109), and
+the auth gate applied only at the export (line 117) so the handler stays testable. Verification
+step 1 on the same tree:
+
+```bash
+$ cd frontend && npm run type-check
+> tsc --noEmit
+$ echo $?
+0
+```
+
+Both observed this session. `[repro]`
+
+## Failure modes
+
+- **Unwrapped route ships unprotected (fail-open auth).** Per-handler auth is fail-open by nature —
+  a new route is public until someone remembers the wrapper. `tests/api-auth-coverage.test.ts` is
+  the fail-closed backstop; never add to `PUBLIC_API_ROUTES` without a written reason. (bug-230
+  pattern, ×6 in this repo.)
+- **Redirect-to-login from an API route.** A 302 to `/login` gets followed transparently by `fetch`,
+  handing the caller an HTML page with status 200 that parses as success. API handlers must return
+  **401 JSON**, never a redirect.
+- **Gating new routes via the edge matcher.** `frontend/proxy.ts` (`config.matcher`) is legacy and
+  slated for removal — gate with `withAuth()` per handler, not by extending the matcher. (bug-162
+  history: the admin-renders gate lived there.)
+- **In-memory state on serverless.** The `RateLimiter` and `JobQueue` patterns above hold state in a
+  per-process `Map` — on Vercel each instance has its own, reset on every cold start. Single
+  long-lived Node process only; serverless needs Redis or a real queue.
+- **Cache write path without invalidation.** Cache-aside reads plus a write path that never calls
+  `invalidateCache()` serves stale data until TTL. Every mutation of a cached entity invalidates its
+  key in the same change.
+- **Retry wrapping a non-idempotent call.** `fetchWithRetry` around a POST that creates a record
+  duplicates the record on transient failure. Retry GETs and idempotent PUTs only, or add an
+  idempotency key.
+- **Next.js dynamic APIs inside cached scopes.** Admin catalog editor broke under `cacheComponents`
+  until the handler awaited `connection()` before dynamic work (bug-161).
 
 **Remember**: Backend patterns enable scalable, maintainable server-side applications. Choose patterns that fit your complexity level.

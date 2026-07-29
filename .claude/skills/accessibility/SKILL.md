@@ -1,7 +1,11 @@
 ---
 name: accessibility
 description: Design, implement, and audit inclusive digital products using WCAG 2.2 Level AA
-  standards. Use this skill to generate semantic ARIA for Web and accessibility traits for Web and Native platforms (iOS/Android).
+  standards. Use when auditing a page, template, or component for accessibility barriers or WCAG
+  compliance, generating semantic ARIA for Web or accessibility traits for Native (iOS/Android),
+  or fixing a11y gate findings (missing alt text, lang attr, skip-link, focus traps, contrast).
+  Do NOT use for performance/CWV audits, SEO, or visual design taste — those have their own
+  skills; this one covers accessibility barriers only.
 origin: ECC
 ---
 
@@ -16,6 +20,24 @@ This skill ensures that digital interfaces are Perceivable, Operable, Understand
 - Implementing new WCAG 2.2 standards like Target Size (Minimum) and Focus Appearance.
 - Mapping high-level design requirements to technical attributes (ARIA roles, traits, hints).
 
+**When NOT to use:** performance/Core Web Vitals work (`optimize` skill), SEO/structured data,
+or visual design judgment — accessibility barriers only.
+
+## Inputs
+
+Required before starting — if any is absent, **stop and ask; never proceed on a guess**:
+
+- **The surface under audit** — concrete file paths (e.g. `wordpress-theme/skyyrose-flagship/header.php`,
+  a component under `frontend/`) or a reachable URL. No named target = nothing to audit; never
+  audit from memory of the code.
+- **Target platform(s)** — Web (HTML/ARIA), iOS (SwiftUI traits), or Android (Compose semantics).
+  The remediation vocabulary differs per platform (see Cross-Platform Mapping below).
+- **Conformance target** — default is WCAG 2.2 Level AA. Note any stricter house rules: in this
+  repo, contrast is also a brand constraint — crimson `#DC143C` on `#0A0A0A` is 3.63:1, below AA
+  for body text, so it is fills/borders/glows only (`CLAUDE.md` §6).
+- **For theme work** — a checkout containing `wordpress-theme/skyyrose-flagship/` so the
+  `a11y-static` gate in Verification below can run.
+
 ## Core Concepts
 
 - **POUR Principles**: The foundation of WCAG (Perceivable, Operable, Understandable, Robust).
@@ -24,7 +46,7 @@ This skill ensures that digital interfaces are Perceivable, Operable, Understand
 - **Focus Management**: Controlling the order and visibility of the keyboard/screen reader cursor.
 - **Labeling & Hints**: Providing context through `aria-label`, `accessibilityLabel`, and `contentDescription`.
 
-## How It Works
+## Procedure
 
 ### Step 1: Identify the Component Role
 
@@ -48,10 +70,45 @@ Determine the functional purpose (e.g., Is this a button, a link, or a tab?). Us
 - Provide descriptive error messages and suggestions for correction (SC 3.3.3).
 - Implement "Redundant Entry" (SC 3.3.7) to prevent asking for the same data twice.
 
-### Step 5: Verify Robust Compatibility
+### Step 5: Robust Compatibility
 
 - Use correct `Name, Role, Value` patterns.
 - Implement `aria-live` or live regions for dynamic status updates.
+
+### Step 6: Run the gate
+
+Every audit or fix ends by re-running the gate below and reporting the row status with an
+evidence tag — an edit whose gate output was never observed is an unverified claim.
+
+## Verification
+
+Run the repo's static accessibility gate. It parses every delivered theme `.php` template for
+`<img>` tags without `alt`, a missing `lang` attribute in `header.php`, and a missing skip-link:
+
+```bash
+bash wordpress-theme/skyyrose-flagship/scripts/verify-theme.sh --only a11y-static
+```
+
+**PASS:** the row reads `[PASS] a11y-static  img alt / lang attr / skip-link present`. `[test]`
+**Not a pass:** a `[WARN]` row — it carries concrete findings (e.g. `2 <img> without alt`,
+observed on this tree 2026-07-29) that must be fixed and the gate re-run. The script exits 0 on
+WARN by design, so the pass condition is the row status, never the exit code alone. `[repro]`
+
+The interactive half (keyboard reachability, focus order, contrast measurement, axe-core run) is
+deliberately a SKIP in the same gate:
+
+```bash
+bash wordpress-theme/skyyrose-flagship/scripts/verify-theme.sh --only a11y-interactive
+```
+
+**Expected:** `[SKIP] a11y-interactive  needs-browser — caller: axe-core + keyboard/focus/contrast pass`.
+A SKIP is not a PASS — the browser pass must be executed against the rendered page with a real
+browser (Playwright MCP / Chrome DevTools), on mobile AND desktop, and reported with its own
+evidence tag: `[repro]` against a local render, `[live]` against skyyrose.co. For component-level
+work outside the theme, the jest-axe / `@axe-core/playwright` patterns under Automated
+Accessibility Testing below apply — but neither package is installed in this repo today
+(`frontend/package.json` carries vitest + Playwright only), so install them first; a check that
+cannot run must be reported as not-run, never as passed.
 
 ## Accessibility Architecture Diagram
 

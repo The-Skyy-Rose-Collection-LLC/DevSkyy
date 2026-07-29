@@ -1,6 +1,6 @@
 ---
 name: agent-eval
-description: Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics
+description: Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom YAML-defined tasks with pass rate, cost, time, and consistency metrics. Use when choosing between coding agents for a codebase, benchmarking an agent after a model or tooling update, or producing data-backed agent-selection decisions for a team. Do NOT use for grading a single fix or claim (that is adversarial-verification) or for eval-driven development of Claude Code sessions and prompts themselves (that is eval-harness).
 origin: ECC
 tools: Read, Write, Edit, Bash, Grep, Glob
 ---
@@ -9,16 +9,27 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 
 A lightweight CLI tool for comparing coding agents head-to-head on reproducible tasks. Every "which coding agent is best?" comparison runs on vibes — this tool systematizes it.
 
-## When to Activate
+## When to use
 
 - Comparing coding agents (Claude Code, Aider, Codex, etc.) on your own codebase
 - Measuring agent performance before adopting a new tool or model
 - Running regression checks when an agent updates its model or tooling
 - Producing data-backed agent selection decisions for a team
 
-## Installation
+**When NOT to use:**
 
-> **Note:** Install agent-eval from its repository after reviewing the source.
+- Grading whether a single fix, claim, or result actually holds — that is the `adversarial-verification` skill.
+- Eval-driven development of Claude Code sessions, prompts, or skills (pass@k on your own workflows rather than head-to-head agent comparison) — that is the sibling `eval-harness` skill at `.claude/skills/eval-harness/SKILL.md`.
+- Product imagery or render QC — that is the QC-judge pipeline, not a coding-agent benchmark.
+
+## Inputs
+
+All of these must exist before starting. Any one absent → **stop and report the missing input** — never substitute a hand-rolled comparison loop and label it an agent-eval result.
+
+1. **The `agent-eval` CLI on PATH.** Observed absent on this machine 2026-07-29 (`command -v agent-eval` → exit 1) `[repro]`. Install from the repository in [Links](#links) only after reviewing its source.
+2. **A target git repository** with a pinned commit SHA, so every worktree starts from identical state.
+3. **≥1 task YAML** (template below) containing **≥1 deterministic judge** (pytest, build command). A task whose only judge is an LLM is not a valid task definition.
+4. **Every agent under test installed and authenticated** — its own CLI on PATH, API keys loaded from env, never hardcoded.
 
 ## Core Concepts
 
@@ -130,6 +141,52 @@ judge:
       Does this implementation correctly handle exponential backoff?
       Check for: max retries, increasing delays, jitter.
 ```
+
+## Verification
+
+The report table is the tool's self-assessment, not evidence. After a comparison completes, run each of these — every one can return "no":
+
+```bash
+command -v agent-eval
+git -C "$TARGET_REPO" worktree list
+git -C "$TARGET_REPO" status --porcelain
+pytest tests/test_http_client.py -v
+```
+
+1. `command -v agent-eval` — **PASS:** prints a path and exits 0. `[repro]` If it exits 1, no tool ran, so any "results" you are holding came from somewhere else — discard them (fail-open pattern, bug-230).
+2. `git -C "$TARGET_REPO" worktree list` — **PASS:** one worktree per agent-run, each rooted at the pinned commit. `[repro]`
+3. `git -C "$TARGET_REPO" status --porcelain` on the **base** repo — **PASS:** empty output; agents wrote only inside their own worktrees. `[repro]`
+4. Re-run the winning row's deterministic judge yourself inside that agent's worktree, substituting the task's own judge command (for the template task: `pytest tests/test_http_client.py -v`) — **PASS:** your independently observed verdict matches the report row. `[test]` At least one re-derivation per report; a table you never spot-checked is `[inferred]`.
+
+Judge falsifiability (rule 3 of `docs/skill-authoring-standard.md`): before trusting any task, run its judge in a fresh worktree at the pinned commit **before** any agent touches it. **PASS:** the judge is RED there — the task is genuinely unsolved at base. A judge already green on the unmodified repo can never fail, so every agent "solves" it.
+
+## Worked example
+
+A real invocation on this machine (2026-07-29), exercising the Inputs gate:
+
+```bash
+$ command -v agent-eval; echo "exit=$?"
+exit=1
+```
+
+Observed output: `exit=1` — the CLI is not installed here `[repro]`. The correct response was to stop at Inputs and report the blocker, which is what this section records: no comparison was run and none is claimed. Once installed, a run against the template task is invoked as:
+
+```bash
+agent-eval run --task tasks/add-retry-logic.yaml --agent claude-code --agent aider --runs 3
+agent-eval report --format table
+```
+
+Command shape is from the upstream README in [Links](#links) `[docs]` — re-verify flags against `agent-eval --help` after installing, before citing any of them.
+
+## Failure modes
+
+- **Fail-open preflight (bug-230, ×6 in this repo).** The tool is missing or the run crashed, and an empty/zero-row report gets read as "no differences between agents". An errored gate's output is an artifact — re-run and demand exit 0 before reading any table.
+- **Vacuous judge.** A grep judge matches the prompt text an agent echoed into a comment, or the judge is already green at the pinned commit. Guard: prove RED-at-base before the eval (Verification, last step).
+- **Single-run comparison.** Agents are non-deterministic; one run per agent makes the consistency column meaningless. Minimum 3 runs.
+- **Unpinned commit.** The base repo drifts between runs, so results across days are not comparable. Pin `commit:` in every task YAML.
+- **Worktree pollution (bug-231 pattern: shared-state contamination).** An agent writes outside its worktree, corrupting the base repo or a sibling run's results. Guard: Verification step 3; also never use a shared stash stack across eval worktrees.
+- **Cost apples-to-oranges.** Some agent CLIs report no spend; comparing a measured cost against "n/a" is `[inferred]`, not measured. Annotate missing columns — never fill them in.
+- **LLM-judge drift.** Model-based judges change verdicts across model versions. Keep at least one deterministic judge per task and treat LLM judgments as advisory.
 
 ## Best Practices
 

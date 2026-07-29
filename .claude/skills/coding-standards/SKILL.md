@@ -1,6 +1,6 @@
 ---
 name: coding-standards
-description: Universal coding standards, best practices, and patterns for TypeScript, JavaScript, React, and Node.js development.
+description: Universal coding standards, best practices, and patterns for TypeScript, JavaScript, React, and Node.js development. Use when writing or reviewing TS/JS/React/Node code, setting up ESLint/Prettier/tsc tooling, or enforcing naming, immutability, error-handling, and structural conventions. Do NOT use for Python (python-patterns), Go (golang-patterns), or WordPress theme PHP (skyyrose-wp-platform owns phpcs and the .min build).
 origin: ECC
 ---
 
@@ -8,7 +8,7 @@ origin: ECC
 
 Universal coding standards applicable across all projects.
 
-## When to Activate
+## When to use
 
 - Starting a new project or module
 - Reviewing code for quality and maintainability
@@ -16,6 +16,82 @@ Universal coding standards applicable across all projects.
 - Enforcing naming, formatting, or structural consistency
 - Setting up linting, formatting, or type-checking rules
 - Onboarding new contributors to coding conventions
+
+**When NOT to use:**
+
+- Python code — `python-patterns` owns PEP 8, type hints, and Pythonic idioms
+- Go code — `golang-patterns` owns Go conventions
+- WordPress theme PHP — `skyyrose-wp-platform` owns phpcs, escaping/nonce rules, and the `.min` build
+- Repo-wide policy (STOP-AND-SHOW, deploy gates, git discipline) — that lives in `CLAUDE.md`, not here
+
+## Inputs
+
+Required before applying any standard:
+
+- **The target files, read this session.** Never grade or refactor code you have not opened — apply standards to what the file actually contains, not what you assume it contains.
+- **The owning workspace's lint/type config.** This repo has two separate TS workspaces:
+  - `frontend/` — Next.js dashboard: `npm run lint` (`eslint .`), `npm run type-check` (`tsc --noEmit`)
+  - repo root — `npm run lint` (`eslint src/**/*.{ts,tsx,js,jsx}`), `npm run type-check` (`tsc --project config/typescript/tsconfig.json --noEmit`)
+- **Installed dependencies for that workspace.** If `node_modules/.bin/eslint` is absent there, the gate cannot execute — stop and install first. Do not proceed on an unrunnable gate and report it clean (fail-open, bug-230).
+
+If any input is absent: stop and name what's missing. Never proceed with a guessed config or an unread file.
+
+## Procedure
+
+1. Read the code you are about to write against or review (`Read`/`Grep`) — quote `file:line` for every finding.
+2. Identify the owning workspace (`frontend/` vs root `src/`) so the right ESLint/tsc config judges the code. Never mix `frontend/node_modules` with root.
+3. Apply the standards in this file in order: naming → immutability → error handling → type safety → structure → tests.
+4. Grep the diff for banned patterns before running tools: `: any`, direct mutation of shared state (`obj.key =`, `.push(`), empty `catch` blocks, magic numbers.
+5. Run the owning workspace's lint and type-check (see Verification). Fix the cause of each finding — never silence it with `eslint-disable` or `@ts-ignore` to get green.
+6. Report findings with `file:line` and severity. Violations in code you did not touch are flagged, not fixed unasked (surgical-changes rule).
+
+## Verification
+
+Run the owning workspace's own gates — these are the real scripts in this repo's `package.json` files `[repo]`:
+
+```bash
+cd frontend && npm run lint          # frontend workspace: eslint .
+cd frontend && npm run type-check    # frontend workspace: tsc --noEmit
+npm run lint                         # root workspace: eslint src/**/*.{ts,tsx,js,jsx}
+npm run type-check                   # root workspace: tsc --project config/typescript/tsconfig.json --noEmit
+grep -n ": any" <changed .ts/.tsx files>   # diff-scoped hard gate, blocking even when eslint exits 0
+```
+
+- **PASS (lint):** exits 0. Observed 2026-07-29: `cd frontend && npm run lint` exits 0 in this worktree — existing `no-explicit-any` / `no-unused-vars` findings are warning-severity, so exit 0 does NOT mean zero violations. `[repro]`
+- **PASS (type-check):** exits 0 with no diagnostics. `[test]`
+- **PASS (diff grep):** zero matches on lines you added. `[repo]`
+- A gate that dies (missing binary, config error, OOM) is an artifact, not a pass — fix the environment and re-run; never read an errored run as clean (bug-230).
+
+## Worked example
+
+Real invocation in this repo, 2026-07-29 — grepping a workspace lib against the Type Safety standard:
+
+```bash
+grep -rn ": any" frontend/lib/vercel --include="*.ts" | head -5
+```
+
+Observed output:
+
+```
+frontend/lib/vercel/deployment-manager.ts:26:  aliasError?: any
+frontend/lib/vercel/deployment-manager.ts:34:    info?: any
+frontend/lib/vercel/deployment-manager.ts:93:    const body: any = {
+frontend/lib/vercel/deployment-manager.ts:177:    const body: any = {
+frontend/lib/vercel/deployment-manager.ts:208:    const params: any = { ...options }
+```
+
+Five violations of the Type Safety standard (`any` in API payload shapes) `[repro]`. The same day, `cd frontend && npm run lint` exited 0 while reporting `@typescript-eslint/no-explicit-any` across 41+ files — the rule is warning-severity in this config, which is exactly why the diff-scoped grep is the blocking check for new code. The correct fix is a typed interface for the Vercel deployment payloads, not an `eslint-disable`.
+
+## Failure modes
+
+| Failure | What it looks like | Rule |
+|---|---|---|
+| Silencing instead of fixing | `eslint-disable-next-line`, `@ts-ignore`, `as any` added to get green | Same defect as weakening a test to pass it — fix the cause |
+| Warning-severity lulling | lint exits 0, so "zero violations" gets claimed | Exit 0 ≠ clean (observed above) — grep the diff for banned patterns |
+| Gate dies, read as pass | eslint crashes on a missing binary/config and the empty output is treated as clean | Fail-open (bug-230, ×6) — a gate that dies is not a gate that passed |
+| Wrong workspace | root ESLint config judging `frontend/` code, or mixed `node_modules` trees | Two separate workspaces — never mix (`CLAUDE.md` §5) |
+| Standards applied to unread code | findings without `file:line`, refactors of assumed content | If you haven't read it, you don't know it |
+| Cross-language leakage | these TS/React rules applied to Python or theme PHP | Route to `python-patterns` / `skyyrose-wp-platform` instead |
 
 ## Code Quality Principles
 

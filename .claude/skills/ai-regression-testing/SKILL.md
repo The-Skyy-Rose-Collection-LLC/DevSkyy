@@ -1,6 +1,6 @@
 ---
 name: ai-regression-testing
-description: Regression testing strategies for AI-assisted development. Sandbox-mode API testing without database dependencies, automated bug-check workflows, and patterns to catch AI blind spots where the same model writes and reviews code.
+description: Regression testing strategies for AI-assisted development — sandbox-mode API testing without database dependencies, automated bug-check workflows, and patterns to catch AI blind spots where the same model writes and reviews code. Use when an AI agent has modified API routes or backend logic, when a just-fixed bug needs a test that locks out re-introduction, or when running a bug-check pass over AI-written changes. Do NOT use for authoring tests on never-broken code (that is test-driven-development) or for browser-level user flows (that is e2e-testing).
 origin: ECC
 ---
 
@@ -8,13 +8,30 @@ origin: ECC
 
 Testing patterns specifically designed for AI-assisted development, where the same model writes code and reviews it — creating systematic blind spots that only automated tests can catch.
 
-## When to Activate
+## When to use
 
 - AI agent (Claude Code, Cursor, Codex) has modified API routes or backend logic
 - A bug was found and fixed — need to prevent re-introduction
 - Project has a sandbox/mock mode that can be leveraged for DB-free testing
 - Running `/bug-check` or similar review commands after code changes
 - Multiple code paths exist (sandbox vs production, feature flags, etc.)
+
+**When NOT to use:**
+
+- Writing tests for a brand-new feature with no defect history — that is `test-driven-development` (RED → GREEN → IMPROVE), not regression lockdown
+- Browser-level user-flow coverage (login, checkout, navigation) — that is `e2e-testing` / Playwright territory
+- Grading a model's *output quality* (render fidelity, copy tone) — that is an eval/QC-judge concern, not code regression
+
+## Inputs
+
+Everything below must exist before starting. **Absent input = stop — never proceed on a default** (fail-open is bug-230, ×6 in this repo).
+
+| Input | Where it lives here | If absent |
+|---|---|---|
+| A named defect or AI-modified surface | bug id (`.wolf/buglog.json`), a failing behavior, or the diff of the touched routes | Stop — there is nothing to regression-lock; "test everything" is not a task |
+| A runnable test command for the touched workspace | frontend: `cd frontend && npm run test` (Vitest, config at `frontend/vitest.config.ts`) · Python: `rtk proxy pytest tests/ -v --tb=short` (or `make test`) | Stop — a regression test that cannot be executed is documentation, not a gate |
+| Sandbox/mock mode toggle (only for DB-free API testing) | env-driven, forced in the test setup file | Do NOT fabricate one mid-task; test against the real path or flag the gap |
+| The expected response contract | the frontend consumer's field list, or the API's typed response | Derive it from the consumer code first — a contract guessed from the handler under test is circular |
 
 ## The Core Problem
 
@@ -357,6 +374,69 @@ No bug in /api/user/notifications  → Don't write test (yet)
 2. Bugs cluster in complex areas (auth, multi-path logic, state management)
 3. Once tested, that exact regression **cannot happen again**
 4. Test count grows organically with bug fixes — no wasted effort
+
+## Verification
+
+Every claim of "regression locked out" must trace to one of these runs, in this session, with the
+output read — not to a review verdict.
+
+1. Run the suite for the touched workspace — frontend (Vitest) first, or targeted on the one
+   regression test while iterating; the Python suite goes through `rtk proxy` because bare pytest
+   can falsely report "no tests collected" in this repo:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend && npm run test
+npx vitest run lib/wp/__tests__/signature.test.ts
+rtk proxy pytest tests/ -v --tb=short
+```
+
+   **PASS:** exits 0 with `FAIL (0)` (Vitest) / a non-zero collected count and 0 failures (pytest).
+   A run that reports zero tests collected is a FAIL signal, not a quiet pass. `[repro]`
+
+2. Type-check the frontend when the regression touched response shapes:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend && npm run type-check
+```
+
+   **PASS:** `tsc --noEmit` exits 0. `[test]`
+
+3. **Prove the new regression test can fail.** Temporarily re-introduce the bug (revert the fix
+   hunk), run only that test — **PASS for this step: the test goes RED** — then restore the fix and
+   watch it go GREEN. A regression test never observed failing is a guess with a citation. `[repro]`
+
+Scope note: a green suite with sandbox mode forced ON is `[test]` evidence for the sandbox path
+only. Claims about live/production behavior need their own probe (`[live]`); never jump from
+suite-green to "production is fixed".
+
+## Worked example
+
+Real invocation against this repo's frontend workspace, 2026-07-29:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon/frontend \
+  && npx vitest run lib/wp/__tests__/signature.test.ts
+```
+
+Observed output: `PASS (5)  FAIL (0)` — exit 0. `[repro]`
+
+That file is a live instance of this skill's core pattern: `frontend/lib/wp/__tests__/` holds
+regression tests for the WordPress-bridge surface (`signature.test.ts`, `throttle.test.ts`,
+`path-safety.test.ts`, `auth-policy.test.ts`), each pinning behavior where a defect class was
+found — signature verification, throttling, path traversal, auth policy — rather than chasing a
+coverage percentage. `frontend/tests/api-auth-coverage.test.ts` does the same at the route level.
+
+## Failure modes
+
+| Failure mode | What it looks like | Guard |
+|---|---|---|
+| Fail-open gate (bug-230, ×6) | Runner errors/times out, prints nothing, and the silence is read as green | A gate that dies is not a gate that passed — re-run and read the counts |
+| Phantom empty suite | Bare `pytest` reports "no tests collected" in this repo and exits happily | Use `rtk proxy pytest`; treat 0-collected as red |
+| Shared-state flake (bug-231, ×5) | Regression test passes alone, fails in full-suite (hardcoded `/tmp`, leaked env) | Per-test `tmp_path` + `monkeypatch`; never mutate tracked files in-place |
+| Weakened assertion | Test edited until it passes the broken code | Fix the implementation, never the test — a loosened contract un-locks the regression |
+| Sandbox-only green | Suite forces sandbox mode, so the production branch never executes | Parity test on response shape + type-check; live behavior claims need `[live]` |
+| Self-review substitution | "AI reviewed the fix, looks correct" treated as verification | That is `[inferred]`, never `[test]` — the same blind spot wrote both; only an executed check counts |
+| Untested new test | Regression test committed without ever being seen red | Verification step 3: break the input once, watch it fail, restore |
 
 ## Quick Reference
 
