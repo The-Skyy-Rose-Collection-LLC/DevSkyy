@@ -328,7 +328,10 @@ button.footer-newsletter__submit {
 		flex-direction: column;
 		text-align: center;
 	}
-	.footer-newsletter__input { width: 100%; min-width: 200px; }
+	.footer-newsletter__input {
+		width: 100%;
+		min-width: 200px;
+	}
 }
 
 @media (max-width: 480px) {

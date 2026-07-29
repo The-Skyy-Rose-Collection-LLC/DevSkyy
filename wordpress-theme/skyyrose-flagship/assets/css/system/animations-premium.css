@@ -271,9 +271,9 @@
 
 .gradient-shift {
 	background-size: 200% auto;
-	animation: gradientShift 4s linear infinite;
+	animation: sr-gradient-shift 4s linear infinite;
 }
-@keyframes gradientShift {
+@keyframes sr-gradient-shift {
 	0% { background-position: 0% center; }
 	100% { background-position: 200% center; }
 }
@@ -340,21 +340,21 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 .page-enter {
-	animation: pageEnter 0.5s var(--ease-cinematic) forwards;
+	animation: page-enter 0.5s var(--ease-cinematic) forwards;
 }
 /* Opacity-only by design: these run on <body>, and a transform keyframe held
    by fill-mode:forwards makes body a containing block forever — every
    position:fixed descendant (Skyy mascot, modals) anchors to the page
    instead of the viewport. Never reintroduce transforms here. */
-@keyframes pageEnter {
+@keyframes page-enter {
 	from { opacity: 0; }
 	to { opacity: 1; }
 }
 
 .page-exit {
-	animation: pageExit 0.3s var(--ease-whip) forwards;
+	animation: page-exit 0.3s var(--ease-whip) forwards;
 }
-@keyframes pageExit {
+@keyframes page-exit {
 	from { opacity: 1; }
 	to { opacity: 0; }
 }
@@ -364,24 +364,18 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 @keyframes breathe {
-	0%, 100% { opacity: 0.4; transform: scale(1); }
-	50% { opacity: 0.7; transform: scale(1.02); }
+	0%, 100% {
+		opacity: 0.4;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.7;
+		transform: scale(1.02);
+	}
 }
 
-@keyframes floatGentle {
-	0%, 100% { transform: translateY(0); }
-	50% { transform: translateY(-8px); }
-}
 
-@keyframes pulseGlow {
-	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--skyyrose-accent-rgb), 0.4); }
-	50% { box-shadow: 0 0 20px 5px rgba(var(--skyyrose-accent-rgb), 0.12); }
-}
 
-@keyframes lineReveal {
-	from { width: 0; }
-	to { width: 100%; }
-}
 
 /* ═══════════════════════════════════════════════════════════════════
    12.5 SAFETY NET — Force-show reveal elements after 0.8s
@@ -394,7 +388,7 @@
    Was 2.5s — reduced 2026-05-24 (S650) to close the stutter window
    for reduced-motion users, in-app browsers, and slow JS engines.
    ═══════════════════════════════════════════════════════════════════ */
-@keyframes srRevealSafety {
+@keyframes sr-reveal-safety {
 	to {
 		opacity: 1;
 		filter: none;
@@ -406,12 +400,12 @@
 .rv-blur, .rv-blur-down,
 .stagger-grid > *,
 .col-reveal, .lp-rv, .rv {
-	animation: srRevealSafety 0.01s linear 0.8s forwards;
+	animation: sr-reveal-safety 0.01s linear 0.8s forwards;
 }
 .rv-split-char .sr-char,
 .rv-split-word .sr-word,
 .rv-split-line .sr-line {
-	animation: srRevealSafety 0.01s linear 0.8s forwards;
+	animation: sr-reveal-safety 0.01s linear 0.8s forwards;
 }
 /* Cancel safety net once IO confirms visibility — prevents 2.5s stutter
    when observer fires near the safety timeout (animation snap vs.
@@ -454,9 +448,21 @@
 	.btn-border-draw::before, .btn-border-draw::after { display: none; }
 	.gradient-shift { animation: none; }
 	.parallax-slow, .parallax-medium, .parallax-fast, .parallax-ken-burns { transform: none !important; }
-	[data-scroll-fade] > * { transform: none !important; opacity: 1 !important; }
-	.page-enter, .page-exit { animation: none; opacity: 1; transform: none; }
-	.rv-scroll-bloom { animation: none !important; opacity: 1; transform: none; filter: none; }
+	[data-scroll-fade] > * {
+		transform: none !important;
+		opacity: 1 !important;
+	}
+	.page-enter, .page-exit {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+	.rv-scroll-bloom {
+		animation: none !important;
+		opacity: 1;
+		transform: none;
+		filter: none;
+	}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -466,13 +472,21 @@
    support, the @supports gate hides the rule and the element renders
    normally (opacity:1, no transform). Reduced-motion handled above.
    ═══════════════════════════════════════════════════════════════════ */
-@keyframes srScrollBloom {
-	from { opacity: 0; filter: blur(12px); transform: scale(0.96); }
-	to   { opacity: 1; filter: blur(0);    transform: scale(1);    }
+@keyframes sr-scroll-bloom {
+	from {
+		opacity: 0;
+		filter: blur(12px);
+		transform: scale(0.96);
+	}
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: scale(1);
+	}
 }
 @supports (animation-timeline: view()) {
 	.rv-scroll-bloom {
-		animation: srScrollBloom auto linear;
+		animation: sr-scroll-bloom auto linear;
 		animation-timeline: view();
 		animation-range: entry 0% cover 35%;
 	}

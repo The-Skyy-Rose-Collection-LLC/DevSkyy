@@ -45,6 +45,8 @@ async function main() {
 	let built = 0;
 	let failed = 0;
 	const stale = [];
+	// theme-root-relative source path -> minified code, for the bundle phase.
+	const minByRel = {};
 	for (const { src, label } of sources) {
 		const base = path.basename(src, '.js');
 		const dest = path.join( path.dirname( src ), `${base}.min.js` );
@@ -60,6 +62,7 @@ async function main() {
 				mangle: true,
 				format: { comments: false },
 			});
+			minByRel[`assets/js/${label}${base}.js`] = result.code;
 			if ( CHECK_ONLY ) {
 				// Content comparison, not mtime — a git checkout or `touch`
 				// reorders mtimes without changing bytes. terser is
@@ -81,6 +84,33 @@ async function main() {
 			console.error(`  ✗ ${label}${base}.js — ${err.message}`);
 		}
 	}
+	// Bundle phase: concatenate minified outputs per bundles.config.js, in
+	// order, joined with '\n;' (the leading empty statement makes each part
+	// concat-safe regardless of how the previous one ends). Fails closed on
+	// any missing part.
+	const bundles = require('./bundles.config.js').js;
+	for ( const [ bundleRel, parts ] of Object.entries( bundles ) ) {
+		const missing = parts.filter( ( p ) => ! ( p in minByRel ) );
+		if ( missing.length > 0 ) {
+			failed += 1;
+			console.error(`  ✗ ${bundleRel} — missing part(s): ${missing.join(', ')}`);
+			continue;
+		}
+		const content = parts.map( ( p ) => minByRel[ p ] ).join( '\n;' );
+		const bundlePath = path.resolve( SRC_DIR, '..', '..', bundleRel );
+		if ( CHECK_ONLY ) {
+			if ( ! fs.existsSync( bundlePath ) ) {
+				stale.push(`${bundleRel} — bundle missing`);
+			} else if ( fs.readFileSync( bundlePath, 'utf8' ) !== content ) {
+				stale.push(`${bundleRel} — bundle differs from fresh concat`);
+			}
+			continue;
+		}
+		fs.mkdirSync( path.dirname( bundlePath ), { recursive: true } );
+		fs.writeFileSync( bundlePath, content, 'utf8' );
+		console.log(`  ✓ bundle ${bundleRel}  (${parts.length} parts, ${content.length} bytes)`);
+	}
+
 	if ( CHECK_ONLY ) {
 		if ( failed > 0 ) {
 			console.error(`[build:js --check] ${failed} file(s) failed to minify`);

@@ -42,20 +42,46 @@
    KEYFRAMES
    ───────────────────────────────────────────────────────────── */
 @keyframes po-clip-rise {
-  from { clip-path: inset(0 0 100% 0); transform: translateY(16px); opacity: 0; }
-  to   { clip-path: inset(0 0 0% 0);   transform: translateY(0);    opacity: 1; }
+  from {
+  	clip-path: inset(0 0 100% 0);
+  	transform: translateY(16px);
+  	opacity: 0;
+  }
+  to {
+  	clip-path: inset(0 0 0% 0);
+  	transform: translateY(0);
+  	opacity: 1;
+  }
 }
 @keyframes po-word-rise {
-  from { transform: translateY(110%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+  	transform: translateY(110%);
+  	opacity: 0;
+  }
+  to {
+  	transform: translateY(0);
+  	opacity: 1;
+  }
 }
 @keyframes po-letter-reveal {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+  	opacity: 0;
+  	transform: translateY(8px);
+  }
+  to {
+  	opacity: 1;
+  	transform: translateY(0);
+  }
 }
 @keyframes po-card-rise {
-  from { opacity: 0; transform: translateY(32px) scale(.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+  from {
+  	opacity: 0;
+  	transform: translateY(32px) scale(.97);
+  }
+  to {
+  	opacity: 1;
+  	transform: translateY(0)    scale(1);
+  }
 }
 @keyframes po-skeleton-pulse {
   0%, 100% { opacity: .18; }
@@ -66,8 +92,14 @@
   to   { transform: translateX(-50%); }
 }
 @keyframes po-scroll-pulse {
-  0%, 100% { transform: scaleY(1);   opacity: .7; }
-  50%       { transform: scaleY(.5); opacity: .35; }
+  0%, 100% {
+  	transform: scaleY(1);
+  	opacity: .7;
+  }
+  50% {
+  	transform: scaleY(.5);
+  	opacity: .35;
+  }
 }
 @keyframes po-seal-rotate {
   from { transform: rotate(0deg); }
@@ -86,9 +118,15 @@
 .po-page *::after { box-sizing: border-box; }
 
 .po-page img,
-.po-page video { display: block; max-width: 100%; }
+.po-page video {
+	display: block;
+	max-width: 100%;
+}
 
-.po-page a { color: inherit; text-decoration: none; }
+.po-page a {
+	color: inherit;
+	text-decoration: none;
+}
 
 .po-page button {
   cursor: pointer;
@@ -526,7 +564,10 @@
 }
 
 .po-grid__lockup { max-width: 140px; }
-.po-grid__lockup img { width: 100%; height: auto; } /* lockup art isn't 200x60 — height:auto stops the attr ratio distorting it */
+.po-grid__lockup img {
+	width: 100%;
+	height: auto;
+} /* lockup art isn't 200x60 — height:auto stops the attr ratio distorting it */
 .po-email-capture__art img { height: auto; } /* logo isn't square — same attr-ratio distortion guard */
 
 .po-grid__meta { text-align: right; }
@@ -668,7 +709,10 @@
   transform: translateY(20px);
   transition: opacity .7s var(--po-ease), transform .7s var(--po-ease);
 }
-.po-journey__header.is-visible { opacity: 1; transform: none; }
+.po-journey__header.is-visible {
+	opacity: 1;
+	transform: none;
+}
 
 .po-journey__eyebrow {
   font-family: var(--po-font-ui);
@@ -697,7 +741,10 @@
   transform: translateY(24px);
   transition: opacity .7s var(--po-ease), transform .7s var(--po-ease);
 }
-.po-journey__step.is-visible { opacity: 1; transform: none; }
+.po-journey__step.is-visible {
+	opacity: 1;
+	transform: none;
+}
 
 .po-journey__step-num {
   font-family: var(--po-font-d);
@@ -771,7 +818,10 @@
   transform: translateY(20px);
   transition: opacity .65s var(--po-ease), transform .65s var(--po-ease);
 }
-.po-lookbook__figure.is-visible { opacity: 1; transform: none; }
+.po-lookbook__figure.is-visible {
+	opacity: 1;
+	transform: none;
+}
 .po-lookbook__figure img {
   width: 100%;
   height: 100%;
@@ -1004,7 +1054,6 @@
   align-items: center;
 }
 
-.po-email-capture__copy { }
 
 .po-email-capture__title {
   font-family: var(--po-font-d);
@@ -1022,7 +1071,6 @@
 
 .po-email-capture__art { text-align: center; }
 
-.po-email-form { }
 
 .po-email-form__row {
   display: flex;
@@ -1065,12 +1113,12 @@
   opacity: 0;
   transform: translateY(20px);
   transition: opacity .7s var(--po-ease), transform .7s var(--po-ease);
-  /* Safety net (mirrors srRevealSafety, animations-premium.css §12.5): .po-rv is
+  /* Safety net (mirrors sr-reveal-safety, animations-premium.css §12.5): .po-rv is
      NOT covered by the central net, so slow/failed JS left content invisible
      (Wave 5). Snaps the visible state at 0.8s; the .is-visible path cancels it. */
-  animation: poRevealSafety 0.01s linear 0.8s forwards;
+  animation: po-reveal-safety 0.01s linear 0.8s forwards;
 }
-@keyframes poRevealSafety {
+@keyframes po-reveal-safety {
   to {
     opacity: 1;
     transform: none;

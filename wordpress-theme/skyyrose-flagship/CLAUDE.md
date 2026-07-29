@@ -3,15 +3,8 @@
 **Commercial marketplace theme. Production at skyyrose.co**
 **Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
 
-```
-wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/anatomy.md
-  assets/{css,js,fonts}    self-hosted fonts, zero Google Fonts CDN
-  inc/ + inc/builders/     enqueue, security, WC, ajax, SEO; builder detection
-  template-parts/          product-card-holo.php = holo card system (classic PHP)
-  templates/ · parts/      FSE HTML templates + parts (hybrid block-theme scaffold)
-  patterns/ · woocommerce/ · blueprints/ · docs/ (ThemeForest)
-  *.php                    collection + landing + immersive + builder templates
-```
+Per-file map + token sizes: `.wolf/anatomy.md`. Directory layout is derivable via `ls`/`find` —
+not duplicated here.
 
 ## Hybrid FSE (partial block-theme move)
 
@@ -33,15 +26,6 @@ wordpress-theme/skyyrose-flagship/   — per-file map + token sizes in .wolf/ana
 
 **theme.json** already declares `templateParts` (header/footer) and the five
 `customTemplates` names — HTML files must use those exact basenames.
-
-**Key systems:**
-- `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
-- `inc/enqueue.php` — All CSS/JS loading, template slug detection
-- `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
-- `inc/patterns.php` — Block pattern registration for all collections
-- `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
-- `functions.php` — Theme constants (`SKYYROSE_VERSION`), includes array
 
 **PHPCS compliance:**
 - `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix

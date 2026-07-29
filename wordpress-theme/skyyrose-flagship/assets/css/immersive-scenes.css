@@ -79,10 +79,10 @@
    ================================================== */
 
 .hotspot-beacon {
-	animation: beaconPulse 2.5s ease-in-out infinite;
+	animation: beacon-pulse 2.5s ease-in-out infinite;
 }
 
-@keyframes beaconPulse {
+@keyframes beacon-pulse {
 	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-r, 183), var(--accent-g, 110), var(--accent-b, 121), 0.4); }
 	50%      { box-shadow: 0 0 0 8px rgba(var(--accent-r, 183), var(--accent-g, 110), var(--accent-b, 121), 0); }
 }
@@ -205,7 +205,7 @@
 		radial-gradient(1px 1px at 45% 20%, rgba(212, 175, 55, 0.35) 0%, transparent 100%),
 		radial-gradient(1.5px 1.5px at 70% 45%, rgba(212, 175, 55, 0.4) 0%, transparent 100%),
 		radial-gradient(1px 1px at 85% 25%, rgba(212, 175, 55, 0.3) 0%, transparent 100%);
-	animation: particleDrift 14s ease-in-out infinite alternate;
+	animation: particle-drift 14s ease-in-out infinite alternate;
 }
 
 .immersive-black-rose .scene-viewport::after {
@@ -218,7 +218,7 @@
 		radial-gradient(1px 1px at 25% 40%, rgba(192, 192, 192, 0.4) 0%, transparent 100%),
 		radial-gradient(1.5px 1.5px at 55% 30%, rgba(192, 192, 192, 0.3) 0%, transparent 100%),
 		radial-gradient(1px 1px at 80% 55%, rgba(192, 192, 192, 0.35) 0%, transparent 100%);
-	animation: particleDrift 18s ease-in-out infinite alternate;
+	animation: particle-drift 18s ease-in-out infinite alternate;
 }
 
 .immersive-love-hurts .scene-viewport::after {
@@ -231,7 +231,7 @@
 		radial-gradient(1px 1px at 20% 15%, rgba(192, 192, 192, 0.35) 0%, transparent 100%),
 		radial-gradient(1px 1px at 50% 10%, rgba(192, 192, 192, 0.25) 0%, transparent 100%),
 		radial-gradient(1px 1px at 75% 20%, rgba(220, 20, 60, 0.3) 0%, transparent 100%);
-	animation: particleDrift 16s ease-in-out infinite alternate;
+	animation: particle-drift 16s ease-in-out infinite alternate;
 }
 
 .immersive-kids-capsule .scene-viewport::after {
@@ -244,13 +244,19 @@
 		radial-gradient(2px 2px at 20% 30%, rgba(183, 110, 121, 0.35) 0%, transparent 100%),
 		radial-gradient(1.5px 1.5px at 55% 50%, rgba(183, 110, 121, 0.25) 0%, transparent 100%),
 		radial-gradient(2px 2px at 80% 35%, rgba(183, 110, 121, 0.3) 0%, transparent 100%);
-	animation: particleDrift 15s ease-in-out infinite alternate;
+	animation: particle-drift 15s ease-in-out infinite alternate;
 }
 
-@keyframes particleDrift {
-	0%   { transform: translateY(0) translateX(0); opacity: 0.7; }
+@keyframes particle-drift {
+	0% {
+		transform: translateY(0) translateX(0);
+		opacity: 0.7;
+	}
 	50%  { opacity: 1; }
-	100% { transform: translateY(-6px) translateX(3px); opacity: 0.7; }
+	100% {
+		transform: translateY(-6px) translateX(3px);
+		opacity: 0.7;
+	}
 }
 
 

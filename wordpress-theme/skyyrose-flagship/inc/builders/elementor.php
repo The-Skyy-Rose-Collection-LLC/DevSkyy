@@ -100,21 +100,6 @@ function skyyrose_add_elementor_widget_categories( $elements_manager ) {
 add_action( 'elementor/elements/categories_registered', 'skyyrose_add_elementor_widget_categories' );
 
 /**
- * Enqueue Elementor editor styles.
- *
- * @since 1.0.0
- */
-function skyyrose_elementor_editor_styles() {
-	wp_enqueue_style(
-		'skyyrose-elementor-editor',
-		SKYYROSE_ASSETS_URI . '/css/elementor-editor.css',
-		array(),
-		SKYYROSE_VERSION
-	);
-}
-add_action( 'elementor/editor/after_enqueue_styles', 'skyyrose_elementor_editor_styles' );
-
-/**
  * Enqueue Elementor frontend scripts.
  *
  * Design-tokens.css is enqueued globally by inc/enqueue.php; only the

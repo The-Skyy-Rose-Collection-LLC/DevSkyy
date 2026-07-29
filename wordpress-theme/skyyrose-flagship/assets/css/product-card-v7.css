@@ -7,11 +7,31 @@
  */
 
 /* ── collection palette (self-contained; mirrors brand tokens) ── */
-.v7card[data-collection="black-rose"]   { --v7-accent:#C0C0C0; --v7-accent-rgb:192,192,192; --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="love-hurts"]   { --v7-accent:#DC143C; --v7-accent-rgb:220,20,60;  --v7-caps:'Anton',sans-serif; }
-.v7card[data-collection="signature"]    { --v7-accent:#D4AF37; --v7-accent-rgb:212,175,55;  --v7-caps:'Cinzel',serif; }
-.v7card[data-collection="kids-capsule"] { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
-.v7card { --v7-accent:#B76E79; --v7-accent-rgb:183,110,121; --v7-caps:'Anton',sans-serif; }
+.v7card[data-collection="black-rose"] {
+	--v7-accent:#C0C0C0;
+	--v7-accent-rgb:192,192,192;
+	--v7-caps:'Cinzel',serif;
+}
+.v7card[data-collection="love-hurts"] {
+	--v7-accent:#DC143C;
+	--v7-accent-rgb:220,20,60;
+	--v7-caps:'Anton',sans-serif;
+}
+.v7card[data-collection="signature"] {
+	--v7-accent:#D4AF37;
+	--v7-accent-rgb:212,175,55;
+	--v7-caps:'Cinzel',serif;
+}
+.v7card[data-collection="kids-capsule"] {
+	--v7-accent:#B76E79;
+	--v7-accent-rgb:183,110,121;
+	--v7-caps:'Anton',sans-serif;
+}
+.v7card {
+	--v7-accent:#B76E79;
+	--v7-accent-rgb:183,110,121;
+	--v7-caps:'Anton',sans-serif;
+}
 
 /* Text-on-dark ink: canon crimson #DC143C is 3.78:1 on #111 — small text uses the
    design-tokens.css --skyyrose-accent-text derivative; surfaces keep --v7-accent. */
@@ -39,7 +59,10 @@
 	background: #0d0d0d;
 	outline: none;
 }
-.v7card__frame:focus-visible { outline: 2px solid var(--v7-accent); outline-offset: 3px; }
+.v7card__frame:focus-visible {
+	outline: 2px solid var(--v7-accent);
+	outline-offset: 3px;
+}
 
 /* collection-logo backdrop (placeholder until founder logos land) */
 .v7card__logo {
@@ -54,7 +77,10 @@
 	pointer-events: none;
 	z-index: 0;
 }
-.v7card:hover .v7card__logo { opacity: .26; transform: scale(1.04); }
+.v7card:hover .v7card__logo {
+	opacity: .26;
+	transform: scale(1.04);
+}
 
 /* Star-plaque backdrops (dark full-scene art needs more presence than the
    light logo marks to read against the void-black card). */
@@ -69,7 +95,11 @@
 	opacity: .34;
 }
 
-.v7card__carousel { position: absolute; inset: 0; z-index: 1; }
+.v7card__carousel {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+}
 .v7card__shot {
 	position: absolute;
 	inset: 0;
@@ -101,15 +131,24 @@
 	gap: 7px;
 	z-index: 3;
 }
-.v7card__dot { width: 26px; height: 3px; border-radius: 2px; background: rgba(245,230,211,.28); transition: background .25s, transform .25s; }
-.v7card__dot.is-on { background: var(--v7-accent); transform: scaleY(1.6); }
+.v7card__dot {
+	width: 26px;
+	height: 3px;
+	border-radius: 2px;
+	background: rgba(245,230,211,.28);
+	transition: background .25s, transform .25s;
+}
+.v7card__dot.is-on {
+	background: var(--v7-accent);
+	transform: scaleY(1.6);
+}
 
 .v7card__badge {
 	position: absolute;
 	top: 12px;
 	left: 12px;
 	z-index: 3;
-	font-family: 'Anton', sans-serif;
+	font-family: Anton, sans-serif;
 	letter-spacing: .18em;
 	font-size: 10px;
 	text-transform: uppercase;
@@ -121,20 +160,60 @@
 /* Crimson badge surface needs white ink (4.99:1) — dark ink is 3.97:1. Silver/gold badges keep dark ink (white would fail on those). */
 .v7card[data-collection="love-hurts"] .v7card__badge { color: #fff; }
 
-.v7card__meta { position: relative; z-index: 1; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
-.v7card__eyebrow { font-family: var(--v7-caps); letter-spacing: .26em; font-size: 10px; text-transform: uppercase; color: var(--v7-accent-ink); }
-.v7card__name { font-family: 'Archivo', sans-serif; font-weight: 500; font-size: clamp(1rem,1.4vw,1.14rem); line-height: 1.25; margin: 0; }
-.v7card__name a { color: #f5e6d3; text-decoration: none; }
+.v7card__meta {
+	position: relative;
+	z-index: 1;
+	padding: 16px 18px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.v7card__eyebrow {
+	font-family: var(--v7-caps);
+	letter-spacing: .26em;
+	font-size: 10px;
+	text-transform: uppercase;
+	color: var(--v7-accent-ink);
+}
+.v7card__name {
+	font-family: Archivo, sans-serif;
+	font-weight: 500;
+	font-size: clamp(1rem,1.4vw,1.14rem);
+	line-height: 1.25;
+	margin: 0;
+}
+.v7card__name a {
+	color: #f5e6d3;
+	text-decoration: none;
+}
 .v7card__name a:hover { color: var(--v7-accent); }
-.v7card__pricerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.v7card__price { font-family: 'Anton', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--v7-accent-ink); }
-.v7card__price del { opacity: .5; font-size: .85em; }
-.v7card__edition { font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .08em; color: #8a8175; }
+.v7card__pricerow {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+.v7card__price {
+	font-family: Anton, sans-serif;
+	font-size: 1.25rem;
+	letter-spacing: .05em;
+	color: var(--v7-accent-ink);
+}
+.v7card__price del {
+	opacity: .5;
+	font-size: .85em;
+}
+.v7card__edition {
+	font-family: ui-monospace, Menlo, monospace;
+	font-size: 9px;
+	letter-spacing: .08em;
+	color: #8a8175;
+}
 
 .v7card__add {
 	display: inline-block;
 	margin-top: 6px;
-	font-family: 'Anton', sans-serif;
+	font-family: Anton, sans-serif;
 	letter-spacing: .16em;
 	font-size: 13px;
 	text-transform: uppercase;
@@ -151,7 +230,10 @@
 }
 .v7card__add:hover { filter: brightness(1.08); }
 .v7card__add:active { transform: scale(.97); }
-.v7card__add.loading { opacity: .6; pointer-events: none; }
+.v7card__add.loading {
+	opacity: .6;
+	pointer-events: none;
+}
 .v7card__add.added::after { content: " ✓"; }
 
 /* Secondary AJAX quick-add (WS5) — ghost variant beside the primary View Piece. */
@@ -159,7 +241,7 @@
 	display: inline-block;
 	margin-top: 6px;
 	margin-left: 8px;
-	font-family: 'Anton', sans-serif;
+	font-family: Anton, sans-serif;
 	letter-spacing: .16em;
 	font-size: 13px;
 	text-transform: uppercase;
@@ -173,9 +255,15 @@
 	text-decoration: none;
 	transition: background .25s, color .25s, transform .15s;
 }
-.v7card__quickadd:hover { background: var(--v7-accent); color: #0a0a0a; }
+.v7card__quickadd:hover {
+	background: var(--v7-accent);
+	color: #0a0a0a;
+}
 .v7card__quickadd:active { transform: scale(.97); }
-.v7card__quickadd.loading { opacity: .6; pointer-events: none; }
+.v7card__quickadd.loading {
+	opacity: .6;
+	pointer-events: none;
+}
 .v7card__quickadd.added::after { content: " ✓"; }
 
 @media (prefers-reduced-motion: reduce) {

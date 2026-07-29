@@ -71,12 +71,12 @@
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.6s var(--skyyrose-ease), transform 0.6s var(--skyyrose-ease);
-  /* Safety net (mirrors srRevealSafety, animations-premium.css §12.5) — kept
+  /* Safety net (mirrors sr-reveal-safety, animations-premium.css §12.5) — kept
      local so this hidden state never depends on another stylesheet being
      enqueued (Wave 5). The .is-visible path cancels it. */
-  animation: lpRevealSafety 0.01s linear 0.8s forwards;
+  animation: lp-reveal-safety 0.01s linear 0.8s forwards;
 }
-@keyframes lpRevealSafety {
+@keyframes lp-reveal-safety {
   to {
     opacity: 1;
     transform: none;
@@ -88,7 +88,12 @@
   animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .lp-rv { opacity: 1; transform: none; transition: none; animation: none; }
+  .lp-rv {
+  	opacity: 1;
+  	transform: none;
+  	transition: none;
+  	animation: none;
+  }
 }
 
 /* Stagger delays for children */
@@ -159,7 +164,7 @@
   text-transform: uppercase;
   backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.3);
-  animation: lpFadeDown 0.8s var(--skyyrose-ease) both;
+  animation: lp-fade-down 0.8s var(--skyyrose-ease) both;
 }
 
 /* Brand logo image — primary hero visual (NOT CSS text) */
@@ -168,7 +173,7 @@
   max-height: 40vh;
   height: auto;
   filter: drop-shadow(0 4px 32px rgba(0, 0, 0, 0.6));
-  animation: lpScaleIn 1s var(--skyyrose-ease) 0.2s both;
+  animation: lp-scale-in 1s var(--skyyrose-ease) 0.2s both;
 }
 
 /* Countdown sits below logo */
@@ -185,7 +190,7 @@
   max-width: 560px;
   line-height: 1.6;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  animation: lpFadeUp 0.8s var(--skyyrose-ease) 0.4s both;
+  animation: lp-fade-up 0.8s var(--skyyrose-ease) 0.4s both;
 }
 
 /* CTA buttons */
@@ -195,7 +200,7 @@
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 1rem;
-  animation: lpFadeUp 0.8s var(--skyyrose-ease) 0.6s both;
+  animation: lp-fade-up 0.8s var(--skyyrose-ease) 0.6s both;
 }
 
 /* Scroll indicator */
@@ -214,7 +219,7 @@
   font-size: 0.65rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  animation: lpBounce 2s ease-in-out infinite 1.5s;
+  animation: lp-bounce 2s ease-in-out infinite 1.5s;
 }
 .lp-hero__scroll svg {
   width: 18px;
@@ -224,19 +229,37 @@
 }
 
 /* Hero entrance animations */
-@keyframes lpFadeDown {
-  from { opacity: 0; transform: translateY(-16px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes lp-fade-down {
+  from {
+  	opacity: 0;
+  	transform: translateY(-16px);
+  }
+  to {
+  	opacity: 1;
+  	transform: translateY(0);
+  }
 }
-@keyframes lpFadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes lp-fade-up {
+  from {
+  	opacity: 0;
+  	transform: translateY(16px);
+  }
+  to {
+  	opacity: 1;
+  	transform: translateY(0);
+  }
 }
-@keyframes lpScaleIn {
-  from { opacity: 0; transform: scale(0.94); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes lp-scale-in {
+  from {
+  	opacity: 0;
+  	transform: scale(0.94);
+  }
+  to {
+  	opacity: 1;
+  	transform: scale(1);
+  }
 }
-@keyframes lpBounce {
+@keyframes lp-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(8px); }
 }
@@ -476,7 +499,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-parallax img { position: relative; inset: auto; height: 100%; }
+  .lp-parallax img {
+  	position: relative;
+  	inset: auto;
+  	height: 100%;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

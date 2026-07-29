@@ -405,7 +405,7 @@
 	margin: 0 0 18px;
 }
 .sg-page__title {
-	font-family: 'Archivo', sans-serif;
+	font-family: Archivo, sans-serif;
 	font-size: clamp(32px, 5vw, 52px);
 	font-weight: 500;
 	color: #fff;
@@ -424,7 +424,7 @@
 	padding: 24px 28px;
 }
 .sg-page__heading {
-	font-family: 'Archivo', sans-serif;
+	font-family: Archivo, sans-serif;
 	font-size: 24px;
 	font-weight: 500;
 	color: var(--color-rose-gold, #B76E79);

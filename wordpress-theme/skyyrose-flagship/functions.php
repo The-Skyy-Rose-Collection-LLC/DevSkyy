@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.13.1' );
+define( 'SKYYROSE_VERSION', '1.13.2' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -81,6 +81,9 @@ $skyyrose_core_includes = array(
 	'/inc/experience-rooms.php',
 	'/inc/collections-world.php',
 	'/inc/product-catalog.php',
+	// Homepage v3 act data — depends on collections-config, collections-world
+	// and product-catalog above, so it loads after all three.
+	'/inc/homepage-data.php',
 	'/inc/product-catalog-display.php',
 	'/inc/v7-cards.php',
 	'/inc/immersive-product-adapter.php',

@@ -8,7 +8,10 @@
 	opacity: 0; visibility: hidden;
 	transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-.sg-overlay[aria-hidden="false"] { opacity: 1; visibility: visible; }
+.sg-overlay[aria-hidden="false"] {
+	opacity: 1;
+	visibility: visible;
+}
 
 /* Panel */
 .sg-panel {
@@ -33,7 +36,10 @@
 	transition: color 0.2s ease, background 0.2s ease;
 }
 .sg-close:hover,
-.sg-close:focus-visible { color: #b76e79; background: rgba(255, 255, 255, 0.06); }
+.sg-close:focus-visible {
+	color: #b76e79;
+	background: rgba(255, 255, 255, 0.06);
+}
 
 /* Typography */
 .sg-heading {
@@ -58,10 +64,16 @@
 	transition: color 0.2s ease, border-color 0.2s ease;
 }
 .sg-tab:hover { color: rgba(255, 255, 255, 0.7); }
-.sg-tab--active { color: #b76e79; border-bottom-color: #b76e79; }
+.sg-tab--active {
+	color: #b76e79;
+	border-bottom-color: #b76e79;
+}
 
 /* Table */
-.sg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sg-table-wrap {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
 .sg-table {
 	width: 100%; border-collapse: collapse;
 	font-family: var(--ff-system); font-size: 13px;
@@ -78,7 +90,10 @@
 	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 .sg-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
-.sg-table td:first-child { font-weight: 600; color: #fff; }
+.sg-table td:first-child {
+	font-weight: 600;
+	color: #fff;
+}
 
 /* How to Measure */
 .sg-measure {
@@ -90,8 +105,15 @@
 	font-size: 13px; font-weight: 600; text-transform: uppercase;
 	letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.7);
 }
-.sg-measure__content { display: flex; gap: 16px; align-items: flex-start; }
-.sg-measure__icon { flex-shrink: 0; color: rgba(183, 110, 121, 0.5); }
+.sg-measure__content {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+}
+.sg-measure__icon {
+	flex-shrink: 0;
+	color: rgba(183, 110, 121, 0.5);
+}
 .sg-measure__list {
 	margin: 0; padding: 0; list-style: none;
 	font-family: var(--ff-system); font-size: 12px;
@@ -101,9 +123,16 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-	.sg-panel { padding: 28px 18px 24px; max-height: 90vh; }
+	.sg-panel {
+		padding: 28px 18px 24px;
+		max-height: 90vh;
+	}
 	.sg-heading { font-size: 18px; }
-	.sg-measure__content { flex-direction: column; align-items: center; text-align: center; }
+	.sg-measure__content {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
 }
 
 /* Reduced Motion */

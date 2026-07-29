@@ -1,6 +1,6 @@
 ---
 name: deep-research
-description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
+description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations. Do NOT use for questions about this codebase (read the code), single-fact lookups one search answers, or library/API docs (Context7 first).
 origin: ECC
 ---
 
@@ -8,7 +8,7 @@ origin: ECC
 
 Produce thorough, cited research reports from multiple web sources using firecrawl and exa MCP tools.
 
-## When to Activate
+## When to use
 
 - User asks to research any topic in depth
 - Competitive analysis, technology evaluation, or market sizing
@@ -16,13 +16,29 @@ Produce thorough, cited research reports from multiple web sources using firecra
 - Any question requiring synthesis from multiple sources
 - User says "research", "deep dive", "investigate", or "what's the current state of"
 
-## MCP Requirements
+**When NOT to use:**
 
-At least one of:
-- **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
-- **exa** — `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
+- Questions about this codebase — read the code (Read/Grep/Glob), never web-search it
+- Single-fact lookups a lone search answers — one query, no report scaffolding
+- Library/framework/API documentation — Context7 first (`resolve-library-id` → `query-docs`)
+- Anything answerable from files the user already provided in the conversation
 
-Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
+## Inputs
+
+Required before starting:
+
+1. **A research topic** from the user, plus goal/angle from Step 1 (or an explicit "just research it").
+2. **At least one search MCP loaded in this session:**
+   - **firecrawl** — `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`
+   - **exa** — `web_search_exa`, `web_search_advanced_exa`, `crawling_exa`
+
+   Both together give the best coverage. Configure in `~/.claude.json` or `~/.codex/config.toml`.
+
+**If neither MCP is available: STOP.** Report which tools are missing and how to configure them.
+Never fall back to writing a "researched" report from training data — that produces confident
+citations for sources never fetched, which is worse than no report (fail-open pattern, bug-230).
+Tool availability is a fact of the session's tool listing, not a guess: a tool absent from the
+listing is absent.
 
 ## Workflow
 
@@ -143,6 +159,52 @@ Each agent searches, reads sources, and returns findings. The main session synth
 4. **Acknowledge gaps.** If you couldn't find good info on a sub-question, say so.
 5. **No hallucination.** If you don't know, say "insufficient data found."
 6. **Separate fact from inference.** Label estimates, projections, and opinions clearly.
+
+## Verification
+
+There is no executable test for whether research *conclusions* are true — that limit is stated
+plainly rather than papered over. What CAN fail is the report's citation structure. Run these
+against the report file written in Step 6 (substitute its real path for `REPORT`):
+
+```bash
+REPORT="<path the report was saved to in Step 6>"
+grep -oE 'https?://[^/ )]+' "$REPORT" | sort -u | wc -l   # unique cited hosts
+grep -cE '\]\(https?://' "$REPORT"                         # inline markdown-link citations
+awk '/^## Sources/,0' "$REPORT" | grep -cE '^[0-9]+\.'     # numbered Sources entries
+```
+
+- **PASS (line 1):** ≥ 5 unique hosts. 1–2 hosts is single-source syndrome, not deep research. `[repro]`
+- **PASS (line 2):** ≥ 10 inline citations — claims carry their sources in the body, not only in
+  the Sources list. `[repro]`
+- **PASS (line 3):** ≥ 5 numbered entries under `## Sources`. `[repro]`
+
+Two further checks that can each return "no" but have no grep:
+
+- **Citation provenance:** every URL in the report appeared in a tool result THIS session (a
+  search hit or a scrape). A URL with no matching tool result is a hallucinated citation —
+  delete the claim it supports, not just the link. `[repro]`
+- **Cross-reference floor:** each load-bearing claim traces to ≥ 2 independent sources, or is
+  explicitly flagged "single-source, unverified" in the report. Claims labeled as inference
+  under Quality Rule 6 are `[inferred]` and never justify a `Confidence: High` header.
+
+## Failure modes
+
+- **Proceeding with no MCP** — neither firecrawl nor exa is loaded and the "report" gets
+  synthesized from training data anyway. Fail-open (bug-230): absent input stops the skill,
+  never silently degrades it. Symptom: a cited report in a session with zero search tool calls.
+- **Hallucinated citations** — a URL in the report that no tool result returned this session.
+  The most damaging failure: it looks maximally rigorous while being fabricated. Caught by the
+  provenance step in Verification.
+- **Snippet-only synthesis** — Step 4 skipped; the report is written from search-result snippets
+  alone. Symptoms: no direct quotes, no concrete figures, every section reads like an abstract.
+- **Single-source syndrome** — one article's framing repeated as consensus. Quality Rule 2
+  requires flagging any claim only one source supports; Verification line 1 catches the extreme
+  case.
+- **A search that dies is not a search that found nothing** — an MCP error, timeout, or rate
+  limit yields zero results as an *artifact*, not a finding. Re-run or switch tools before
+  writing "no information found" (same fail-open family as bug-230).
+- **Stale answer to a "current state" question** — every cited source predates the last 12
+  months. The `startPublishedDate` filter in Step 3 exists for exactly this.
 
 ## Examples
 
