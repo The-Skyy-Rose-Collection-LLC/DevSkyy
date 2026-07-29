@@ -12,9 +12,10 @@
 import { NextResponse } from 'next/server';
 import { connection } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
 import { wpRequestRaw } from '@/lib/wp/client';
 
-export async function GET() {
+async function getHandler() {
   // `await connection()` opts this route out of static prerendering under
   // `cacheComponents`, so every probe is live — never a build-time snapshot
   // (same pattern as /api/catalog, bug-161).
@@ -53,3 +54,5 @@ export async function GET() {
     latency_ms: Date.now() - start,
   });
 }
+
+export const GET = withAuth(getHandler);

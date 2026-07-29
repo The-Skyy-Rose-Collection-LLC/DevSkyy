@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import {
   getCatalog,
   getCollectionSlugs,
@@ -75,7 +76,7 @@ function shape(p: CatalogProduct): Product {
   };
 }
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const collection = searchParams.get('collection');
   const sku = searchParams.get('sku');
@@ -112,3 +113,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

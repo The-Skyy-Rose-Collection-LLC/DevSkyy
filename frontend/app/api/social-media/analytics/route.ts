@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { getPlatformConnection, getPlatformToken, type PlatformId } from '@/lib/social-media/config';
 
 // ---------------------------------------------------------------------------
@@ -343,7 +344,7 @@ async function fetchFacebookAnalytics(): Promise<PlatformAnalytics & { simulated
 // Route handler
 // ---------------------------------------------------------------------------
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const dryRun = searchParams.get('dry_run') === 'true';
@@ -393,3 +394,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

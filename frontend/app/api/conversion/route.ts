@@ -14,6 +14,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -306,11 +308,13 @@ function corsHeaders(request?: NextRequest): HeadersInit {
 // Route handlers
 // ---------------------------------------------------------------------------
 
-export async function OPTIONS(request: NextRequest) {
+async function optionsHandler(request: NextRequest) {
   return new NextResponse(null, { status: 204, headers: corsHeaders(request) });
 }
 
-export async function POST(request: NextRequest) {
+export const OPTIONS = withAuth(optionsHandler);
+
+async function postHandler(request: NextRequest) {
   try {
     const body = (await request.json()) as { events?: unknown[] };
 
@@ -367,7 +371,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export const POST = withAuth(postHandler);
+
+async function getHandler(request: NextRequest) {
   try {
     const metrics = aggregateMetrics();
     return NextResponse.json(
@@ -381,3 +387,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

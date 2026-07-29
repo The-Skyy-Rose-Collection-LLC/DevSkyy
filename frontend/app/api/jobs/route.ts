@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import type { JobType, JobData } from '@/lib/queue/queues';
 
-export async function POST(request: Request) {
+async function postHandler(request: Request) {
   try {
     const { type, data, options } = (await request.json()) as {
       type: JobType;
@@ -43,7 +44,9 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export const POST = withAuth(postHandler);
+
+async function getHandler() {
   try {
     const { getAllQueueStats } = await import('@/lib/queue/queues');
     const stats = await getAllQueueStats();
@@ -55,3 +58,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

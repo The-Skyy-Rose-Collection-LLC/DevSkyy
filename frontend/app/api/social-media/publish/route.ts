@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { getPlatformConnection, getPlatformToken, type PlatformId } from '@/lib/social-media/config';
 
 // ---------------------------------------------------------------------------
@@ -400,7 +401,7 @@ const PUBLISHERS: Record<PlatformId, (postId: string, caption?: string, mediaUrl
 // Route handler
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = (await request.json()) as PublishRequest;
 
@@ -445,3 +446,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(postHandler);

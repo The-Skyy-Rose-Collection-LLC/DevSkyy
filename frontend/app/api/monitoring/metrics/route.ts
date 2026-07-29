@@ -4,6 +4,8 @@
 
 import { NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
+
 const metrics = [
   {
     name: 'mcp_tool_calls_total',
@@ -49,7 +51,7 @@ function formatPrometheusMetrics() {
   return output;
 }
 
-export async function GET() {
+async function getHandler() {
   try {
     const prometheusOutput = formatPrometheusMetrics();
 
@@ -70,3 +72,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

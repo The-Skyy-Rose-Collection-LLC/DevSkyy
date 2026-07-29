@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { withAuth } from '@/lib/api-auth';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 
@@ -63,7 +64,7 @@ async function withClient<T>(run: (client: Client) => Promise<T>): Promise<T> {
   }
 }
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+async function postHandler(req: NextRequest): Promise<NextResponse> {
   // Gate: only authenticated dashboard users may reach the relay. The proxy holds
   // MCP_SERVICE_TOKEN server-side, so an open route would expose the full tool set
   // (count is computed at runtime — see /health's tool_count, mcp_tools/http_mount.py).
@@ -102,3 +103,5 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: `MCP request failed: ${message}` }, { status: 502 });
   }
 }
+
+export const POST = withAuth(postHandler);

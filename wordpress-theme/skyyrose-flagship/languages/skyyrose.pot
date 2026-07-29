@@ -1,66 +1,233 @@
-# Copyright (C) 2026 SkyyRose Team
+# Copyright (C) 2026 The Skyy Rose Collection LLC
 # This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SkyyRose 4.0.0\n"
-"Report-Msgid-Bugs-To: support@skyyrose.com\n"
+"Project-Id-Version: SkyyRose 1.12.8\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/skyyrose-flagship\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-08T21:00:21+00:00\n"
+"POT-Creation-Date: 2026-07-27T19:12:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: skyyrose\n"
 
 #. Theme Name of the theme
-#: style.css
+#: style.css:2
+#: footer.php:70
+#: front-page.php:152
+#: front-page.php:265
+#: header.php:118
+#: inc/patterns.php:31
+#: inc/skyyrose-product-meta.php:304
 msgid "SkyyRose"
 msgstr ""
 
 #. Theme URI of the theme
 #. Author URI of the theme
-#: style.css
-msgid "https://skyyrose.com"
+#: style.css:3
+#: style.css:5
+msgid "https://skyyrose.co"
 msgstr ""
 
 #. Description of the theme
-#: style.css
-msgid "Premium WordPress theme for SkyyRose featuring Three.js 3D integration, WooCommerce support, and Elementor Pro compatibility. Built with modern web standards and optimized for performance."
+#: style.css:6
+msgid "SkyyRose — Oakland-born luxury streetwear. Built by Corey Foster."
 msgstr ""
 
 #. Author of the theme
-#: style.css
-msgid "SkyyRose Team"
+#: style.css:4
+msgid "The Skyy Rose Collection LLC"
 msgstr ""
 
-#: 404.php:16
-msgid "Oops! That page can&rsquo;t be found."
+#: 404.php:21
+msgid "Shop All"
 msgstr ""
 
-#: 404.php:20
-msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
+#: 404.php:26
+msgid "New Arrivals"
 msgstr ""
 
-#: 404.php:29
-msgid "Most Used Categories"
+#: 404.php:31
+msgid "Best Sellers"
 msgstr ""
 
-#. translators: %1$s: smiley
-#: 404.php:47
+#: 404.php:36
+#: footer.php:183
+#: template-faq.php:169
+msgid "Reach Out"
+msgstr ""
+
+#: 404.php:41
+#: front-page.php:404
+#: template-parts/about/chapter-origin.php:41
+msgid "The Origin"
+msgstr ""
+
+#. Template Name of the theme
+#: 404.php:46
+#: footer.php:184
+#: inc/menu-setup.php:223
+#: template-faq.php:3
+msgid "FAQ"
+msgstr ""
+
+#: 404.php:142
+msgid "Error 404"
+msgstr ""
+
+#: 404.php:150
+msgid "Not Here."
+msgstr ""
+
+#: 404.php:154
+msgid "That page doesn't exist. Oakland taught us to keep moving."
+msgstr ""
+
+#: 404.php:158
+msgid "The concrete's still here. So are the collections."
+msgstr ""
+
+#: 404.php:164
+#: search.php:84
+msgid "Search the site"
+msgstr ""
+
+#: 404.php:167
+#: inc/woocommerce.php:476
+#: search.php:87
+msgid "Search for:"
+msgstr ""
+
+#: 404.php:174
+#: search.php:94
+msgid "Search products, collections, pages..."
+msgstr ""
+
+#: 404.php:178
+#: header.php:55
+#: search.php:67
+#: search.php:98
+#: template-parts/mobile-bottom-nav.php:81
+msgid "Search"
+msgstr ""
+
+#: 404.php:208
+msgid "Skyy, SkyyRose brand mascot."
+msgstr ""
+
+#: 404.php:221
+msgid "Nothing here. The shop still has you covered."
+msgstr ""
+
+#: 404.php:228
+#: search.php:267
+#: template-parts/content/content-none.php:60
+#: template-preorder-gateway.php:168
+msgid "Browse Collections"
+msgstr ""
+
+#: 404.php:230
+msgid "Explore Our World"
+msgstr ""
+
+#. translators: %d: number of products
+#: 404.php:246
+#: search.php:284
 #, php-format
-msgid "Try looking in the monthly archives. %1$s"
+msgid "%d product"
+msgid_plural "%d products"
+msgstr[0] ""
+msgstr[1] ""
+
+#: 404.php:255
+#: inc/collection-content.php:125
+#: inc/collection-content.php:305
+#: search.php:292
+msgid "Explore"
+msgstr ""
+
+#: 404.php:280
+msgid "Trending Products"
+msgstr ""
+
+#: 404.php:282
+msgid "Trending Right Now"
+msgstr ""
+
+#: 404.php:330
+msgid "Quick Navigation"
+msgstr ""
+
+#: 404.php:332
+msgid "Quick Links"
+msgstr ""
+
+#: 404.php:355
+#: elementor/widgets/newsletter.php:24
+msgid "Newsletter Signup"
+msgstr ""
+
+#: 404.php:357
+msgid "While you're here, join the family"
+msgstr ""
+
+#: 404.php:360
+msgid "Be the first to know about drops, new arrivals, and events."
+msgstr ""
+
+#: 404.php:362
+#: footer.php:32
+#: template-coming-soon.php:406
+#: template-parts/collection/page.php:431
+msgid "Newsletter signup"
+msgstr ""
+
+#: 404.php:366
+#: footer.php:37
+#: front-page.php:704
+#: template-coming-soon.php:410
+#: template-landing-love-hurts.php:364
+#: template-parts/collection/page.php:432
+#: template-parts/kids-capsule/teaser.php:143
+#: template-preorder-gateway.php:863
+msgid "Email address"
+msgstr ""
+
+#: 404.php:373
+#: footer.php:44
+#: template-parts/collection/page.php:433
+msgid "Enter your email"
+msgstr ""
+
+#: 404.php:378
+#: front-page.php:705
+#: template-parts/collection/page.php:434
+msgid "Join"
+msgstr ""
+
+#: 404.php:388
+#: page-wishlist.php:19
+#: search.php:320
+#: template-parts/content/content-none.php:72
+msgid "Return Home"
+msgstr ""
+
+#: 404.php:391
+#: woocommerce/cart/cart.php:383
+msgid "Continue Shopping"
 msgstr ""
 
 #. translators: 1: title.
-#: comments.php:31
+#: comments.php:30
 #, php-format
 msgid "One thought on &ldquo;%1$s&rdquo;"
 msgstr ""
 
 #. translators: 1: comment count number, 2: title.
-#: comments.php:37
+#: comments.php:36
 #, php-format
 msgctxt "comments title"
 msgid "%1$s thought on &ldquo;%2$s&rdquo;"
@@ -68,16 +235,471 @@ msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
 msgstr[0] ""
 msgstr[1] ""
 
-#: comments.php:64
+#: comments.php:63
 msgid "Comments are closed."
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:23
+msgid "Collection Hero"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:74
+msgid "Hero"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:82
+#: inc/customer-enhancements.php:330
+#: inc/skyyrose-product-meta.php:77
+msgid "Collection"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:85
+#: front-page.php:478
+#: front-page.php:534
+#: front-page.php:580
+#: inc/admin-experience-dashboard.php:206
+#: inc/collections-config.php:39
+#: inc/collections-world.php:105
+#: inc/collections-world.php:108
+#: inc/collections-world.php:111
+#: inc/menu-setup.php:178
+#: inc/product-taxonomy.php:122
+#: inc/seo.php:339
+#: inc/skyyrose-product-meta.php:57
+#: inc/template-functions.php:915
+#: patterns/collection-hero-black-rose.php:15
+#: search.php:251
+#: template-experiences.php:109
+#: template-landing-black-rose.php:85
+#: template-parts/hero-cinematic.php:59
+#: template-parts/immersive/scene.php:215
+#: template-parts/immersive/tab-bar.php:31
+#: template-preorder-gateway.php:23
+#: template-preorder-gateway.php:266
+msgid "Black Rose"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:86
+#: front-page.php:482
+#: front-page.php:560
+#: inc/admin-experience-dashboard.php:207
+#: inc/collection-content.php:117
+#: inc/collections-config.php:63
+#: inc/collections-world.php:118
+#: inc/collections-world.php:121
+#: inc/collections-world.php:124
+#: inc/menu-setup.php:182
+#: inc/product-taxonomy.php:126
+#: inc/seo.php:340
+#: inc/skyyrose-product-meta.php:58
+#: inc/template-functions.php:919
+#: patterns/collection-hero-love-hurts.php:15
+#: search.php:252
+#: template-experiences.php:114
+#: template-parts/hero-cinematic.php:63
+#: template-parts/immersive/scene.php:222
+#: template-parts/immersive/tab-bar.php:37
+#: template-preorder-gateway.php:29
+#: template-preorder-gateway.php:273
+msgid "Love Hurts"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:87
+#: front-page.php:486
+#: front-page.php:547
+#: inc/admin-experience-dashboard.php:208
+#: inc/collections-config.php:87
+#: inc/collections-world.php:91
+#: inc/collections-world.php:98
+#: inc/menu-setup.php:186
+#: inc/product-taxonomy.php:130
+#: inc/seo.php:341
+#: inc/skyyrose-product-meta.php:56
+#: inc/template-functions.php:923
+#: patterns/collection-hero-signature.php:15
+#: search.php:253
+#: template-experiences.php:104
+#: template-landing-signature.php:81
+#: template-parts/hero-cinematic.php:67
+#: template-parts/immersive/scene.php:229
+#: template-parts/immersive/tab-bar.php:25
+#: template-preorder-gateway.php:35
+#: template-preorder-gateway.php:280
+msgid "Signature"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:96
+msgid "Heading Override"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:98
+#: elementor/widgets/collection-hero.php:108
+msgid "Auto-loaded from collection"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:99
+msgid "Leave empty to use collection name."
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:106
+msgid "Tagline Override"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:115
+msgid "Hero Image"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:117
+msgid "Leave empty to use default collection scene."
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:124
+msgid "Primary CTA Text"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:126
+#: front-page.php:513
+#: page-collections.php:111
+msgid "Explore Collection"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:133
+msgid "Primary CTA URL"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:141
+msgid "Secondary CTA Text"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:143
+#: footer.php:172
+#: inc/menu-setup.php:198
+#: inc/product-catalog.php:226
+#: inc/product-taxonomy.php:183
+#: inc/template-functions.php:933
+#: inc/theme-activation-setup.php:63
+#: inc/woocommerce-preorder.php:186
+#: inc/woocommerce-preorder.php:257
+#: inc/woocommerce-preorder.php:265
+#: template-landing-black-rose.php:190
+#: template-landing-black-rose.php:270
+#: template-landing-love-hurts.php:283
+#: template-landing-signature.php:172
+#: template-landing-signature.php:254
+#: template-parts/components/card-product.php:57
+#: template-parts/product-card-v7-lookbook.php:158
+#: template-parts/product-detail-editorial.php:226
+#: woocommerce/single-product.php:169
+msgid "Pre-Order"
+msgstr ""
+
+#: elementor/widgets/collection-hero.php:150
+msgid "Secondary CTA URL"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:23
+msgid "Featured Product"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:45
+#: elementor/widgets/product-card.php:47
+msgid "Product"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:50
+#: elementor/widgets/product-card.php:53
+msgid "— Select Product —"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:62
+#: elementor/widgets/product-card.php:65
+msgid "Product SKU"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:72
+msgid "Layout"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:75
+msgid "Image Left"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:76
+msgid "Image Right"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:85
+#: elementor/widgets/product-card.php:85
+msgid "Show Sizes"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:95
+#: elementor/widgets/preorder-cta.php:78
+#: elementor/widgets/product-card.php:105
+#: inc/customer-enhancements.php:381
+msgid "CTA Text"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:97
+#: inc/woocommerce-preorder.php:219
+#: template-parts/immersive/scene.php:319
+msgid "Pre-Order Now"
+msgstr ""
+
+#: elementor/widgets/featured-product.php:109
+#: elementor/widgets/product-card.php:141
+msgid "Select a product SKU."
+msgstr ""
+
+#: elementor/widgets/featured-product.php:115
+#: elementor/widgets/product-card.php:147
+#: inc/immersive-ajax.php:68
+#: inc/immersive-ajax.php:78
+msgid "Product not found."
+msgstr ""
+
+#: elementor/widgets/featured-product.php:162
+msgid "Featured"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:23
+msgid "Lookbook Gallery"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:43
+msgid "Gallery"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:51
+msgid "Images"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:60
+msgid "Columns"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:74
+msgid "Aspect Ratio"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:77
+msgid "Square"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:78
+msgid "3:4 Portrait"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:79
+msgid "4:3 Landscape"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:80
+msgid "Auto"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:89
+msgid "Overlay Text"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:91
+msgid "e.g. @skyyrose"
+msgstr ""
+
+#: elementor/widgets/lookbook.php:106
+msgid "Add images to the gallery."
+msgstr ""
+
+#: elementor/widgets/newsletter.php:44
+#: elementor/widgets/preorder-cta.php:43
+#: elementor/widgets/three-viewer.php:69
+msgid "Content"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:52
+msgid "Heading"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:54
+#: footer.php:26
+#: template-parts/collection/page.php:429
+msgid "Join the Inner Circle"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:61
+#: inc/admin-experience-dashboard.php:188
+msgid "Description"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:63
+msgid "Early access to drops, member-only alerts, and behind-the-scenes from the studio."
+msgstr ""
+
+#: elementor/widgets/newsletter.php:70
+msgid "Button Text"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:72
+#: footer.php:49
+#: template-landing-love-hurts.php:376
+msgid "Subscribe"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:79
+msgid "Success Message"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:81
+msgid "You're in."
+msgstr ""
+
+#: elementor/widgets/newsletter.php:88
+#: elementor/widgets/preorder-cta.php:96
+#: elementor/widgets/product-card.php:126
+msgid "Accent Color"
+msgstr ""
+
+#: elementor/widgets/newsletter.php:121
+#: front-page.php:704
+#: template-landing-black-rose.php:328
+#: template-landing-signature.php:312
+msgid "Your email address"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:23
+msgid "Pre-Order CTA"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:51
+msgid "Headline"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:53
+msgid "Limited Edition — Pre-Order Now"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:60
+msgid "Subtext"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:62
+msgid "Only 250 pieces per style. Once they are gone, they are gone."
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:69
+msgid "Countdown Deadline"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:71
+msgid "Leave empty to hide countdown."
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:80
+msgid "Secure Your Piece"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:87
+#: inc/customer-enhancements.php:399
+msgid "CTA URL"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:133
+#: inc/builders/elementor-compat.php:204
+#: template-parts/kids-capsule/teaser.php:80
+msgid "Days"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:134
+#: inc/builders/elementor-compat.php:209
+#: template-parts/kids-capsule/teaser.php:85
+msgid "Hours"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:135
+msgid "Mins"
+msgstr ""
+
+#: elementor/widgets/preorder-cta.php:136
+msgid "Secs"
+msgstr ""
+
+#: elementor/widgets/product-card.php:25
+msgid "Product Card"
+msgstr ""
+
+#: elementor/widgets/product-card.php:75
+msgid "Show Price"
+msgstr ""
+
+#: elementor/widgets/product-card.php:95
+msgid "Badge Override"
+msgstr ""
+
+#: elementor/widgets/product-card.php:97
+msgid "e.g. NEW, SOLD OUT"
+msgstr ""
+
+#: elementor/widgets/product-card.php:98
+msgid "Leave empty to use catalog badge."
+msgstr ""
+
+#: elementor/widgets/product-card.php:107
+#: template-parts/product-card-v7-lookbook.php:146
+msgid "View Piece"
+msgstr ""
+
+#: elementor/widgets/product-card.php:118
+msgid "Card Style"
+msgstr ""
+
+#: elementor/widgets/product-card.php:129
+msgid "Leave empty to auto-detect from collection."
+msgstr ""
+
+#: elementor/widgets/testimonials.php:23
+#: elementor/widgets/testimonials.php:43
+#: elementor/widgets/testimonials.php:90
+msgid "Testimonials"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:53
+msgid "Name"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:55
+msgid "Customer Name"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:62
+msgid "Quote"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:64
+msgid "This is the most beautiful piece I own."
+msgstr ""
+
+#: elementor/widgets/testimonials.php:71
+msgid "Rating (1-5)"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:82
+msgid "Avatar"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:112
+msgid "Auto-Play"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:122
+msgid "Transition Speed (ms)"
+msgstr ""
+
+#: elementor/widgets/testimonials.php:142
+msgid "Add testimonials."
 msgstr ""
 
 #: elementor/widgets/three-viewer.php:36
 msgid "3D Model Viewer"
-msgstr ""
-
-#: elementor/widgets/three-viewer.php:69
-msgid "Content"
 msgstr ""
 
 #: elementor/widgets/three-viewer.php:77
@@ -120,236 +742,1050 @@ msgstr ""
 msgid "Please add a model URL."
 msgstr ""
 
-#. translators: %s: Site name
-#: footer.php:65
-#, php-format
-msgid "&copy; %1$s %2$s. All rights reserved."
+#: footer.php:29
+msgid "Exclusive drops, early access, and luxury delivered to your inbox."
 msgstr ""
 
-#. translators: %s: Theme name
-#: footer.php:70
-#, php-format
-msgid "Powered by %s"
+#: footer.php:76
+msgid "SKYY ROSE"
 msgstr ""
 
-#: front-page.php:40
-#: template-parts/content/content-page.php:28
-#: template-parts/content/content.php:60
-msgid "Pages:"
+#: footer.php:79
+#: front-page.php:153
+#: inc/collections-world.php:96
+#: inc/experience-rooms.php:51
+#: template-about.php:173
+#: template-coming-soon.php:30
+#: template-experiences.php:148
+#: template-parts/kids-capsule/teaser.php:174
+#: template-preorder-gateway.php:755
+msgid "Luxury Grows from Concrete."
 msgstr ""
 
-#. translators: %s: Name of current post. Only visible to screen readers
-#: front-page.php:54
-#: inc/template-functions.php:263
-#: template-parts/content/content-page.php:42
-#, php-format
-msgid "Edit <span class=\"screen-reader-text\">%s</span>"
+#: footer.php:82
+msgid "Oakland luxury streetwear. Gender-neutral, limited edition pieces — built by a father, named after a daughter."
 msgstr ""
 
-#: functions.php:62
-msgid "Primary Menu"
+#: footer.php:84
+msgid "Social Media Links"
 msgstr ""
 
-#: functions.php:63
-msgid "Footer Menu"
-msgstr ""
-
-#: functions.php:64
-msgid "Mobile Menu"
-msgstr ""
-
-#: functions.php:65
-msgid "Top Bar Menu"
-msgstr ""
-
-#: functions.php:186
-msgid "Primary Sidebar"
-msgstr ""
-
-#: functions.php:188
-msgid "Add widgets here to appear in your sidebar."
-msgstr ""
-
-#: functions.php:198
-msgid "Footer Area 1"
-msgstr ""
-
-#: functions.php:200
-#: functions.php:212
-#: functions.php:224
-#: functions.php:236
-msgid "Add widgets here to appear in your footer."
-msgstr ""
-
-#: functions.php:210
-msgid "Footer Area 2"
-msgstr ""
-
-#: functions.php:222
-msgid "Footer Area 3"
-msgstr ""
-
-#: functions.php:234
-msgid "Footer Area 4"
-msgstr ""
-
-#: functions.php:248
-msgid "Shop Sidebar"
-msgstr ""
-
-#: functions.php:250
-msgid "Add widgets here to appear in your shop pages."
-msgstr ""
-
-#: functions.php:507
-msgid "Wishlists"
-msgstr ""
-
-#. Template Name of the theme
-#: functions.php:508
-msgid "Wishlist"
-msgstr ""
-
-#: header.php:22
-msgid "Skip to content"
-msgstr ""
-
-#: header.php:48
-msgid "Menu"
-msgstr ""
-
-#: inc/accessibility-seo.php:48
-msgid "Primary Navigation"
-msgstr ""
-
-#: inc/accessibility-seo.php:50
-msgid "Footer Navigation"
-msgstr ""
-
-#: inc/accessibility-seo.php:52
-msgid "Mobile Navigation"
-msgstr ""
-
-#: inc/accessibility-seo.php:322
-#: inc/template-functions.php:72
-msgid "Home"
-msgstr ""
-
-#: inc/accessibility-seo.php:329
-#: inc/accessibility-seo.php:348
-#: inc/accessibility-seo.php:353
+#: footer.php:149
+#: inc/collections-world.php:78
+#: inc/product-taxonomy.php:104
+#: inc/seo.php:373
+#: inc/seo.php:392
+#: inc/seo.php:397
+#: inc/template-functions.php:236
+#: inc/template-functions.php:256
+#: inc/theme-activation-setup.php:306
+#: template-landing-love-hurts.php:283
 msgid "Shop"
 msgstr ""
 
-#. translators: %s: search query.
-#: inc/accessibility-seo.php:388
-#: search.php:20
-#, php-format
-msgid "Search Results for: %s"
+#: footer.php:174
+msgid "All Products"
 msgstr ""
 
-#: inc/accessibility-seo.php:412
-msgid "Breadcrumb"
+#: footer.php:181
+msgid "Help"
 msgstr ""
 
-#: inc/accessibility-seo.php:597
-#, php-format
-msgid "Page %s"
+#. Template Name of the theme
+#: footer.php:185
+#: template-shipping-returns.php:3
+#: template-shipping-returns.php:28
+msgid "Shipping & Returns"
 msgstr ""
 
-#: inc/accessibility-seo.php:689
+#: footer.php:186
+#: inc/redirects.php:316
+#: template-parts/product-detail-editorial.php:201
+#: template-parts/size-guide-modal.php:28
+#: template-size-guide.php:30
+#: woocommerce/single-product.php:157
+msgid "Size Guide"
+msgstr ""
+
+#: footer.php:187
+#: inc/wc-product-functions.php:207
+#: template-parts/product-detail-editorial.php:253
+msgid "Care Instructions"
+msgstr ""
+
+#: footer.php:193
+msgid "Legal"
+msgstr ""
+
+#: footer.php:195
+#: inc/menu-setup.php:227
+msgid "Privacy Policy"
+msgstr ""
+
+#: footer.php:196
+#: inc/menu-setup.php:231
+msgid "Terms of Service"
+msgstr ""
+
+#: footer.php:197
+msgid "Refund Policy"
+msgstr ""
+
+#: footer.php:198
+msgid "Accessibility"
+msgstr ""
+
+#: footer.php:199
+msgid "Cookie Policy"
+msgstr ""
+
+#: footer.php:205
+msgid "Connect"
+msgstr ""
+
+#: footer.php:228
+msgid "The Skyy Rose Collection LLC. All rights reserved."
+msgstr ""
+
+#: footer.php:232
+msgid "Footer Legal Navigation"
+msgstr ""
+
+#: footer.php:280
+msgid "Back to top"
+msgstr ""
+
+#: front-page.php:50
+msgid "Maxim"
+msgstr ""
+
+#: front-page.php:54
+msgid "CEO Weekly"
+msgstr ""
+
+#: front-page.php:58
+msgid "San Francisco Post"
+msgstr ""
+
+#: front-page.php:62
+msgid "Best of Best Review"
+msgstr ""
+
+#: front-page.php:66
+#: template-parts/about/featured-video.php:34
+#: template-parts/about/press-section.php:65
+msgid "The Blox"
+msgstr ""
+
+#: front-page.php:87
+msgid "Uncompromising Construction"
+msgstr ""
+
+#: front-page.php:88
+msgid "280-400gsm cotton. Italian wool blends. Full-grain leather. No shortcuts."
+msgstr ""
+
+#: front-page.php:92
+msgid "Oakland Made Mentality"
+msgstr ""
+
+#: front-page.php:93
+msgid "Born from the struggle of East Oakland. Designed for the world. Built to last generations."
+msgstr ""
+
+#: front-page.php:97
+msgid "Gender Neutral"
+msgstr ""
+
+#: front-page.php:98
+msgid "Pioneer in Oakland gender-neutral fashion. Designed for anyone, regardless of gender or age."
+msgstr ""
+
+#: front-page.php:102
+msgid "Limited Editions"
+msgstr ""
+
+#: front-page.php:103
+msgid "Small batch production. Individually numbered. When it's gone, it's gone."
+msgstr ""
+
+#: front-page.php:151
+msgid "Loading"
+msgstr ""
+
+#: front-page.php:160
+msgid "SkyyRose Hero"
+msgstr ""
+
+#: front-page.php:264
+#: template-parts/about/community.php:32
+#: template-parts/about/community.php:39
+msgid "Oakland"
+msgstr ""
+
+#: front-page.php:266
+msgid "Est. 2020"
+msgstr ""
+
+#: front-page.php:268
+msgid "Luxury Grows from Concrete. Four collections, one name — built by a father, named after a daughter."
+msgstr ""
+
+#: front-page.php:270
+#: woocommerce/cart/cart-empty.php:65
+#: woocommerce/cart/cart.php:55
+msgid "Explore Collections"
+msgstr ""
+
+#: front-page.php:271
+#: front-page.php:400
+#: inc/menu-setup.php:202
+#: inc/menu-setup.php:215
+msgid "Our Story"
+msgstr ""
+
+#: front-page.php:275
+#: template-about.php:197
+#: template-experiences.php:223
+#: template-landing-love-hurts.php:99
+#: template-parts/kids-capsule/teaser.php:42
+#: template-preorder-gateway.php:178
+msgid "Scroll"
+msgstr ""
+
+#: front-page.php:287
+msgid "As Featured In"
+msgstr ""
+
+#: front-page.php:319
+msgid "Shop SkyyRose"
+msgstr ""
+
+#: front-page.php:321
+msgid "The Storefront"
+msgstr ""
+
+#: front-page.php:322
+msgid "Luxury Streetwear, Ready To Move."
+msgstr ""
+
+#: front-page.php:323
+msgid "A faster path from first impression to cart: signature drops, collection worlds, fit help, and real product photography in one commercial flow."
+msgstr ""
+
+#: front-page.php:343
+msgid "Black Rose sherpa jacket on model"
+msgstr ""
+
+#: front-page.php:348
+msgid "Drop Focus"
+msgstr ""
+
+#: front-page.php:349
+msgid "Black Rose Outerwear"
+msgstr ""
+
+#: front-page.php:350
+msgid "Cold-weather statement pieces with Oakland weight."
+msgstr ""
+
+#: front-page.php:362
+msgid "Love Hurts varsity jacket on model"
+msgstr ""
+
+#: front-page.php:367
+msgid "Now Styling"
+msgstr ""
+
+#: front-page.php:368
+msgid "Varsity Heat"
+msgstr ""
+
+#: front-page.php:369
+msgid "Built for nights that need proof."
+msgstr ""
+
+#: front-page.php:381
+msgid "Signature sherpa jacket on model"
+msgstr ""
+
+#: front-page.php:386
+msgid "Core Luxury"
+msgstr ""
+
+#: front-page.php:387
+msgid "Signature Layering"
+msgstr ""
+
+#: front-page.php:388
+msgid "Gold-standard essentials for daily rotation."
+msgstr ""
+
+#: front-page.php:392
+msgid "Limited runs"
+msgstr ""
+
+#: front-page.php:393
+msgid "Gender neutral fit"
+msgstr ""
+
+#: front-page.php:394
+msgid "Oakland story"
+msgstr ""
+
+#: front-page.php:395
+msgid "Wishlist ready"
+msgstr ""
+
+#. translators: line break for visual layout
+#: front-page.php:408
+msgid "Born In<br>The Town"
+msgstr ""
+
+#: front-page.php:410
+msgid "A father's promise. A daughter's name."
+msgstr ""
+
+#: front-page.php:413
+msgid "In a neighborhood where opportunities are as scarce as support, <strong>Corey Foster</strong> refused to become another statistic. He'd lost everything — broke, no drive left, a baby on the way."
+msgstr ""
+
+#: front-page.php:414
+msgid "Through failed websites, scammer manufacturers, and single parenthood with no support — he built something real. Named after his daughter <strong>Skyy Rose</strong>. Designed for anyone, regardless of gender or age."
+msgstr ""
+
+#: front-page.php:415
+msgid "SkyyRose isn't just clothing. It's proof that your circumstances don't define your destination."
+msgstr ""
+
+#: front-page.php:421
+msgid "Corey Foster, SkyyRose founder"
+msgstr ""
+
+#: front-page.php:425
+msgid "Recognition"
+msgstr ""
+
+#: front-page.php:426
+msgid "Best Oakland<br>Clothing Line 2024"
+msgstr ""
+
+#: front-page.php:433
+msgid "Founder Quote"
+msgstr ""
+
+#: front-page.php:436
+msgid "&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it <em>by any means necessary</em>.&rdquo;"
+msgstr ""
+
+#: front-page.php:438
+msgid "Corey Foster, Founder & CEO"
+msgstr ""
+
+#: front-page.php:442
+msgid "Our Collections"
+msgstr ""
+
+#: front-page.php:444
+#: page-collections.php:55
+#: template-parts/about/collections-grid.php:62
+msgid "The Collections"
+msgstr ""
+
+#: front-page.php:445
+#: page-collections.php:56
+msgid "Four Collections. One Vision."
+msgstr ""
+
+#: front-page.php:510
+#: page-collections.php:108
+msgid "Pieces"
+msgstr ""
+
+#: front-page.php:521
+msgid "Style Atelier"
+msgstr ""
+
+#: front-page.php:523
+msgid "Customer Driven"
+msgstr ""
+
+#: front-page.php:524
+msgid "Find Your SkyyRose Lane."
+msgstr ""
+
+#: front-page.php:525
+msgid "Choose how you want to show up. The atelier responds with a collection direction and first piece to explore."
+msgstr ""
+
+#: front-page.php:528
+msgid "Choose a styling profile"
+msgstr ""
+
+#: front-page.php:533
+#: front-page.php:581
+msgid "Statement Layer"
+msgstr ""
+
+#: front-page.php:535
+#: front-page.php:583
+msgid "Structured outerwear, dark palette, heavyweight presence. Start with the sherpa and build the rest quiet."
+msgstr ""
+
+#: front-page.php:537
+#: front-page.php:573
+msgid "Black Rose sherpa jacket style recommendation"
+msgstr ""
+
+#: front-page.php:539
+msgid "Statement"
+msgstr ""
+
+#: front-page.php:540
+msgid "Outerwear first"
+msgstr ""
+
+#: front-page.php:546
+msgid "Clean Daily Rotation"
+msgstr ""
+
+#: front-page.php:548
+msgid "Soft luxury staples with mint, gold, and easy proportions. Built for repeat wear without losing identity."
+msgstr ""
+
+#: front-page.php:550
+msgid "Mint lavender hoodie style recommendation"
+msgstr ""
+
+#: front-page.php:552
+msgid "Daily"
+msgstr ""
+
+#: front-page.php:553
+msgid "Soft luxury"
+msgstr ""
+
+#: front-page.php:559
+msgid "Night Signal"
+msgstr ""
+
+#: front-page.php:561
+msgid "Varsity energy, crimson edge, and pieces that read from across the room. Designed for entrance moments."
+msgstr ""
+
+#: front-page.php:563
+msgid "Love Hurts varsity jacket style recommendation"
+msgstr ""
+
+#: front-page.php:565
+msgid "Night"
+msgstr ""
+
+#: front-page.php:566
+msgid "Entrance energy"
+msgstr ""
+
+#: front-page.php:584
+msgid "Shop This Direction"
+msgstr ""
+
+#: front-page.php:595
+msgid "Kids Capsule — Heir Apparent"
+msgstr ""
+
+#: front-page.php:597
+msgid "Capsule · IV · Heir Apparent"
+msgstr ""
+
+#: front-page.php:598
+msgid "The Kids Capsule"
+msgstr ""
+
+#: front-page.php:599
+msgid "Not a fourth world. A letter to one. Hover to break the seal."
+msgstr ""
+
+#: front-page.php:604
+msgid "Open the letter — discover the Kids Capsule collection."
+msgstr ""
+
+#: front-page.php:607
+msgid "Chapter IV"
+msgstr ""
+
+#: front-page.php:608
+msgid "Dear future,"
+msgstr ""
+
+#: front-page.php:609
+msgid "You were born into the rose. Wear it lightly."
+msgstr ""
+
+#: front-page.php:639
+msgid "↗ break the seal"
+msgstr ""
+
+#: front-page.php:643
+msgid "Heir to the rose."
+msgstr ""
+
+#: front-page.php:644
+msgid "Capsule · IV · Kids · Born Into It"
+msgstr ""
+
+#: front-page.php:649
+msgid "SkyyRose Service Promise"
+msgstr ""
+
+#: front-page.php:651
+msgid "Commercial Standard"
+msgstr ""
+
+#: front-page.php:652
+msgid "The House Service Layer."
+msgstr ""
+
+#: front-page.php:656
+#: template-preorder-gateway.php:24
+msgid "01"
+msgstr ""
+
+#: front-page.php:657
+msgid "Clear Shipping"
+msgstr ""
+
+#: front-page.php:658
+msgid "Delivery and return expectations before checkout."
+msgstr ""
+
+#: front-page.php:661
+#: template-parts/product-detail-editorial.php:96
+#: template-preorder-gateway.php:30
+msgid "02"
+msgstr ""
+
+#: front-page.php:662
+#: template-size-guide.php:29
+msgid "Fit Guide"
+msgstr ""
+
+#: front-page.php:663
+msgid "Measure once, shop every drop with more confidence."
+msgstr ""
+
+#: front-page.php:666
+#: template-parts/product-detail-editorial.php:150
+#: template-preorder-gateway.php:36
+msgid "03"
+msgstr ""
+
+#: front-page.php:667
+msgid "Wishlist Flow"
+msgstr ""
+
+#: front-page.php:668
+msgid "Save looks before small runs disappear."
+msgstr ""
+
+#: front-page.php:671
+#: template-parts/product-detail-editorial.php:169
+msgid "04"
+msgstr ""
+
+#: front-page.php:672
+msgid "Concierge Contact"
+msgstr ""
+
+#: front-page.php:673
+msgid "Questions, press, styling, and collaboration routes."
+msgstr ""
+
+#: front-page.php:679
+msgid "Our Craft"
+msgstr ""
+
+#: front-page.php:682
+msgid "The Craft"
+msgstr ""
+
+#: front-page.php:683
+msgid "Every stitch, every fabric, every detail — intentional."
+msgstr ""
+
+#: front-page.php:698
+msgid "Newsletter"
+msgstr ""
+
+#: front-page.php:700
+msgid "Join the Movement"
+msgstr ""
+
+#: front-page.php:701
+msgid "For The Real Ones"
+msgstr ""
+
+#: front-page.php:702
+msgid "Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance."
+msgstr ""
+
+#: front-page.php:707
+msgid "Free to join · Unsubscribe anytime · Oakland love only"
+msgstr ""
+
+#: header.php:20
+#: template-elementor-canvas.php:30
+msgid "Skip to the story"
+msgstr ""
+
+#: header.php:34
+msgid "Site announcement"
+msgstr ""
+
+#: header.php:41
+msgid "Dismiss announcement"
+msgstr ""
+
+#: header.php:47
+#: inc/accessibility-seo.php:62
+msgid "Primary Navigation"
+msgstr ""
+
+#: header.php:61
+#: template-parts/mobile-bottom-nav.php:93
+msgid "Account"
+msgstr ""
+
+#: header.php:70
+msgid "Bag"
+msgstr ""
+
+#: header.php:78
+msgid "SkyyRose — Home"
+msgstr ""
+
+#: header.php:154
+msgid "Open navigation menu"
+msgstr ""
+
+#: header.php:169
+msgid "Close navigation menu"
+msgstr ""
+
+#: header.php:190
+#: header.php:192
+msgid "Search the collection"
+msgstr ""
+
+#: header.php:195
+msgid "Close search"
+msgstr ""
+
+#: inc/accessibility-seo.php:64
+msgid "Footer Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:66
+msgid "Mobile Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:147
 #, php-format
 msgid "Add %s to your cart"
 msgstr ""
 
-#: inc/accessibility-seo.php:694
-msgid "Product quantity"
-msgstr ""
-
-#: inc/accessibility-seo.php:702
+#. translators: %s: product name
+#: inc/accessibility-seo.php:165
+#: woocommerce/cart/cart.php:310
 #, php-format
 msgid "Remove %s from cart"
 msgstr ""
 
-#: inc/accessibility-seo.php:784
-msgid "Products"
-msgstr ""
-
-#: inc/accessibility-seo.php:806
-#: inc/accessibility-seo.php:823
+#: inc/accessibility-seo.php:215
+#: inc/accessibility-seo.php:235
 msgid "Accessibility & SEO Tools"
 msgstr ""
 
-#: inc/accessibility-seo.php:807
+#: inc/accessibility-seo.php:216
 msgid "A11y & SEO"
 msgstr ""
 
-#: inc/accessibility-seo.php:826
+#: inc/accessibility-seo.php:231
+#: inc/mcp-bridge.php:371
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: inc/accessibility-seo.php:238
 msgid "WCAG 2.1 AA Compliance Checklist"
 msgstr ""
 
-#: inc/accessibility-seo.php:845
+#: inc/accessibility-seo.php:257
 msgid "SEO Features Checklist"
 msgstr ""
 
-#: inc/accessibility-seo.php:864
-msgid "Recommended Testing Tools"
-msgstr ""
-
-#: inc/accessibility-seo.php:865
-msgid "Accessibility Testing"
-msgstr ""
-
-#: inc/accessibility-seo.php:875
-msgid "SEO Testing"
-msgstr ""
-
-#: inc/accessibility-seo.php:888
-msgid "Manual Testing Checklist"
-msgstr ""
-
-#: inc/accessibility-seo.php:889
-msgid "Keyboard Navigation"
-msgstr ""
-
-#: inc/accessibility-seo.php:899
-msgid "Screen Reader Testing"
-msgstr ""
-
-#: inc/accessibility-seo.php:909
-msgid "SEO Validation"
-msgstr ""
-
-#: inc/accessibility-seo.php:922
+#: inc/accessibility-seo.php:276
 msgid "Quick Tests"
 msgstr ""
 
-#: inc/accessibility-seo.php:923
+#: inc/accessibility-seo.php:277
 msgid "Test Page URL:"
 msgstr ""
 
-#: inc/accessibility-seo.php:928
+#: inc/accessibility-seo.php:282
 msgid "Test with WAVE"
 msgstr ""
 
-#: inc/accessibility-seo.php:931
+#: inc/accessibility-seo.php:285
 msgid "Test Rich Results"
 msgstr ""
 
-#: inc/accessibility-seo.php:934
+#: inc/accessibility-seo.php:288
 msgid "Test PageSpeed"
 msgstr ""
 
-#: inc/accessibility-seo.php:940
+#: inc/accessibility-seo.php:310
 msgid "Customizer Settings"
 msgstr ""
 
-#: inc/accessibility-seo.php:941
+#: inc/accessibility-seo.php:311
 msgid "Configure social media profiles and contact information for enhanced SEO:"
 msgstr ""
 
-#: inc/accessibility-seo.php:953
+#: inc/accessibility-seo.php:323
 msgid "Open Customizer"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:43
+#: inc/experience-engine.php:297
+#: inc/experience-engine.php:298
+msgid "Experience Engine"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:48
+msgid "Real-time UX orchestration for SkyyRose digital properties."
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:55
+msgid "Analytics"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:57
+#, php-format
+msgid "Last %d days"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:64
+msgid "Total Events"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:68
+msgid "Unique Visitors"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:75
+msgid "Top Collection"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:104
+msgid "Modules"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:107
+msgid "Toggle modules without a code deploy. Changes take effect immediately."
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:123
+#, php-format
+msgid "Priority %d"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:135
+#, php-format
+msgid "Disable %s"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:136
+#, php-format
+msgid "Enable %s"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:156
+msgid "Design Narratives"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:159
+msgid "Active directives shape the Experience Engine's UX decisions."
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:172
+msgid "Priority"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:179
+msgid "No active directives."
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:184
+#: inc/admin-experience-dashboard.php:225
+msgid "Add Directive"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:195
+msgid "e.g. Emphasise scarcity on Black Rose pre-orders"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:202
+msgid "Target"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:205
+msgid "Global"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:209
+#: inc/collection-content.php:317
+#: inc/collections-config.php:111
+#: inc/collections-world.php:131
+#: inc/collections-world.php:134
+#: inc/collections-world.php:137
+#: inc/menu-setup.php:190
+#: inc/product-taxonomy.php:134
+#: inc/seo.php:342
+#: inc/skyyrose-product-meta.php:59
+#: inc/template-functions.php:927
+#: inc/theme-activation-setup.php:85
+#: patterns/collection-hero-kids-capsule.php:15
+#: template-experiences.php:119
+#: template-parts/immersive/scene.php:236
+#: template-parts/immersive/tab-bar.php:43
+#: template-parts/kids-capsule/teaser.php:38
+msgid "Kids Capsule"
+msgstr ""
+
+#: inc/admin-experience-dashboard.php:214
+msgid "Priority (1–10)"
+msgstr ""
+
+#: inc/ajax-handlers.php:39
+msgid "The drop"
+msgstr ""
+
+#: inc/ajax-handlers.php:40
+msgid "Word of mouth"
+msgstr ""
+
+#: inc/ajax-handlers.php:41
+msgid "Social media"
+msgstr ""
+
+#: inc/ajax-handlers.php:42
+msgid "Just found it"
+msgstr ""
+
+#: inc/ajax-handlers.php:66
+#: inc/ajax-handlers.php:199
+#: inc/ajax-handlers.php:269
+#: inc/ajax-handlers.php:343
+msgid "Security check failed. Please refresh the page and try again."
+msgstr ""
+
+#: inc/ajax-handlers.php:75
+#: inc/ajax-handlers.php:165
+msgid "Thank you for your message. We will be in touch soon."
+msgstr ""
+
+#: inc/ajax-handlers.php:105
+#: template-contact.php:75
+msgid "General Inquiry"
+msgstr ""
+
+#: inc/ajax-handlers.php:106
+#: template-contact.php:76
+msgid "Order Status"
+msgstr ""
+
+#: inc/ajax-handlers.php:107
+#: template-contact.php:77
+#: template-faq.php:38
+msgid "Returns & Exchanges"
+msgstr ""
+
+#: inc/ajax-handlers.php:108
+#: template-contact.php:78
+msgid "Wholesale Inquiry"
+msgstr ""
+
+#: inc/ajax-handlers.php:109
+#: template-contact.php:79
+#: template-parts/about/press-section.php:33
+msgid "Press & Media"
+msgstr ""
+
+#: inc/ajax-handlers.php:110
+#: inc/product-taxonomy.php:184
+#: template-contact.php:80
+msgid "Collaboration"
+msgstr ""
+
+#: inc/ajax-handlers.php:111
+#: template-contact.php:81
+msgid "Custom Orders"
+msgstr ""
+
+#: inc/ajax-handlers.php:112
+#: template-parts/about/press-section.php:38
+msgid "Press"
+msgstr ""
+
+#: inc/ajax-handlers.php:113
+#: template-contact.php:82
+msgid "Other"
+msgstr ""
+
+#: inc/ajax-handlers.php:121
+msgid "Please fill in all required fields."
+msgstr ""
+
+#: inc/ajax-handlers.php:129
+#: inc/ajax-handlers.php:211
+#: inc/ajax-handlers.php:281
+#: inc/klaviyo-integration.php:231
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: inc/ajax-handlers.php:138
+msgid "[SkyyRose Contact] New Message"
+msgstr ""
+
+#: inc/ajax-handlers.php:171
+msgid "Unable to send your message. Please try again later."
+msgstr ""
+
+#: inc/ajax-handlers.php:223
+#: inc/ajax-handlers.php:293
+#: inc/klaviyo-integration.php:238
+#: inc/klaviyo-integration.php:248
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: inc/ajax-handlers.php:242
+msgid "You're in. Your 15% code is on the way."
+msgstr ""
+
+#: inc/ajax-handlers.php:316
+msgid "You are in! Check your inbox for your 25% discount code and early access details."
+msgstr ""
+
+#: inc/ajax-handlers.php:356
+#: inc/ajax-handlers.php:395
+msgid "Invalid email or password. Please try again."
+msgstr ""
+
+#: inc/ajax-handlers.php:364
+msgid "Please enter both email and password."
+msgstr ""
+
+#: inc/ajax-handlers.php:383
+msgid "Too many login attempts. Please try again in 15 minutes."
+msgstr ""
+
+#: inc/ajax-handlers.php:414
+msgid "Sign in successful. Redirecting..."
+msgstr ""
+
+#: inc/ajax-handlers.php:436
+msgid "You are already signed in."
+msgstr ""
+
+#: inc/ajax-handlers.php:470
+#: inc/ajax-handlers.php:544
+#: inc/klaviyo-integration.php:226
+msgid "Security check failed."
+msgstr ""
+
+#: inc/ajax-handlers.php:481
+msgid "Invalid referral code."
+msgstr ""
+
+#: inc/ajax-handlers.php:492
+msgid "Referral code not found."
+msgstr ""
+
+#: inc/ajax-handlers.php:551
+msgid "Too many requests. Slow down!"
+msgstr ""
+
+#: inc/ajax-handlers.php:576
+msgid "I don’t have that one memorized — try Contact, or ask me about sizing, shipping, or a collection. 🌹"
+msgstr ""
+
+#: inc/builders/beaver-builder.php:40
+msgid "Header"
+msgstr ""
+
+#: inc/builders/beaver-builder.php:44
+msgid "Footer"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:32
+msgid "SkyyRose Editorial"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:89
+msgid "SkyyRose Collection Palette"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:111
+msgid "Signature (Gold)"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:112
+msgid "Black Rose (Silver)"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:113
+msgid "Love Hurts (Crimson)"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:118
+msgid "Select the collection palette for this page:"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:129
+msgid "Controls CSS custom properties (accent colors, glow) on the editorial template."
+msgstr ""
+
+#: inc/builders/elementor-compat.php:214
+#: template-parts/kids-capsule/teaser.php:90
+msgid "Min"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:219
+#: template-parts/kids-capsule/teaser.php:95
+msgid "Sec"
+msgstr ""
+
+#. translators: %d: percentage of stock sold
+#: inc/builders/elementor-compat.php:276
+#, php-format
+msgid "%d%% sold"
+msgstr ""
+
+#. translators: %d: number of items remaining
+#: inc/builders/elementor-compat.php:290
+#, php-format
+msgid "Only %d left"
+msgstr ""
+
+#: inc/builders/elementor-compat.php:323
+msgid "Featured in"
+msgstr ""
+
+#: inc/builders/elementor.php:87
+msgid "SkyyRose Widgets"
+msgstr ""
+
+#: inc/builders/elementor.php:95
+msgid "SkyyRose 3D"
 msgstr ""
 
 #: inc/class-wishlist-widget.php:25
@@ -362,7 +1798,7 @@ msgstr ""
 
 #: inc/class-wishlist-widget.php:39
 #: inc/class-wishlist-widget.php:107
-#: page-wishlist.php:16
+#: page-wishlist.php:35
 msgid "My Wishlist"
 msgstr ""
 
@@ -386,227 +1822,2675 @@ msgstr ""
 msgid "Show \"View All\" button"
 msgstr ""
 
-#: inc/elementor.php:68
-msgid "SkyyRose Widgets"
+#: inc/collection-content.php:26
+msgid "The Original Collection"
 msgstr ""
 
-#: inc/elementor.php:76
-msgid "SkyyRose 3D"
+#: inc/collection-content.php:28
+msgid "The Black Rose Collection"
 msgstr ""
 
-#: inc/template-functions.php:89
-msgid "Search Results"
+#: inc/collection-content.php:33
+msgid "Black Rose Collection — rose from concrete"
 msgstr ""
 
-#: inc/template-functions.php:95
-msgid "404 Not Found"
+#: inc/collection-content.php:34
+msgid "The beauty of the color black through the rose and high-end fashion design."
 msgstr ""
 
-#. translators: %s: Reading time in minutes
-#: inc/template-functions.php:171
+#: inc/collection-content.php:35
+msgid "Monochrome sophistication. Dark-on-dark texture. Elegance distilled into every fiber. You don't wear it to stand out. You wear it because you already stood up."
+msgstr ""
+
+#: inc/collection-content.php:36
+#: inc/collection-content.php:214
+msgid "Discover"
+msgstr ""
+
+#: inc/collection-content.php:37
+#: inc/collection-content.php:215
+msgid "View 3D Experience"
+msgstr ""
+
+#: inc/collection-content.php:40
+#: inc/collection-content.php:50
+#: inc/collections-config.php:40
+msgid "Dark Elegance"
+msgstr ""
+
+#: inc/collection-content.php:41
+msgid "Quiet Authority"
+msgstr ""
+
+#: inc/collection-content.php:44
+msgid "From the Concrete"
+msgstr ""
+
+#: inc/collection-content.php:45
+msgid "Born from a Single Question"
+msgstr ""
+
+#: inc/collection-content.php:46
+msgid "Someone asked who Black Rose was for. The answer came before the question finished: a black rose is a posture. Not a flower — a conviction. In Oakland, where concrete is the only soil that matters, beauty doesn't ask for permission. It forces its way through the cracks."
+msgstr ""
+
+#: inc/collection-content.php:47
+msgid "\"They said luxury can't come from the Town. We said watch. Every piece in Black Rose is the concrete answering back.\""
+msgstr ""
+
+#: inc/collection-content.php:48
+msgid "Black Rose is what happens when you stop apologizing for where you're from. Monochrome because silence speaks louder. Dark-on-dark because depth is earned, not given. These aren't clothes that announce themselves — they command presence the way Oakland taught us. Quiet. Unshakable."
+msgstr ""
+
+#: inc/collection-content.php:49
+msgid "BLACK ROSE"
+msgstr ""
+
+#: inc/collection-content.php:52
+msgid "\"Where I'm from, black isn't a color — it's armor. Every kid on my block knew that. Black Rose is that truth made into fabric. You don't wear it to stand out. You wear it because you already stood up.\""
+msgstr ""
+
+#: inc/collection-content.php:53
+#: inc/collection-content.php:231
+msgid "Corey Foster, Oakland"
+msgstr ""
+
+#: inc/collection-content.php:54
+msgid "The Philosophy"
+msgstr ""
+
+#: inc/collection-content.php:55
+msgid "Every stitch, every detail is designed to empower you to move through the world on your own terms."
+msgstr ""
+
+#: inc/collection-content.php:59
+msgid "Monochrome Mastery"
+msgstr ""
+
+#: inc/collection-content.php:60
+msgid "The depth of black carries what other colors cannot — layered textures, tonal contrasts, silhouettes that command presence without raising their voice."
+msgstr ""
+
+#: inc/collection-content.php:62
+msgid "Black Rose hockey jersey — layered black-on-black texture"
+msgstr ""
+
+#: inc/collection-content.php:68
+msgid "The Thorn Motif"
+msgstr ""
+
+#: inc/collection-content.php:69
+msgid "Resilience encoded in every stitch. The thorn represents protective beauty — guarding what is precious while standing its ground."
+msgstr ""
+
+#: inc/collection-content.php:71
+msgid "Moonlit courtyard rose garden — the Black Rose world"
+msgstr ""
+
+#: inc/collection-content.php:77
+msgid "Dark-on-Dark Texture"
+msgstr ""
+
+#: inc/collection-content.php:78
+msgid "This is not loud fashion. This is the quiet authority of someone who knows exactly who they are. Elegance distilled into every fiber."
+msgstr ""
+
+#: inc/collection-content.php:80
+msgid "Night gazebo scene — dark-on-dark depth"
+msgstr ""
+
+#: inc/collection-content.php:85
+msgid "Dark elegance — holographic preview"
+msgstr ""
+
+#: inc/collection-content.php:86
+msgid "Wear the Darkness"
+msgstr ""
+
+#: inc/collection-content.php:87
+msgid "The thorn protects what the world tries to take. Every piece in Black Rose carries that Oakland lesson: be beautiful, be sharp, never be soft where it counts."
+msgstr ""
+
+#: inc/collection-content.php:88
+#: patterns/collection-hero-black-rose.php:39
+msgid "Shop Black Rose"
+msgstr ""
+
+#: inc/collection-content.php:89
+msgid "First access to new drops, behind-the-scenes stories, and the darkness behind each piece."
+msgstr ""
+
+#: inc/collection-content.php:93
+msgid "01 — THE POSTURE"
+msgstr ""
+
+#: inc/collection-content.php:94
+msgid "Not a flower —"
+msgstr ""
+
+#: inc/collection-content.php:95
+msgid "a conviction."
+msgstr ""
+
+#: inc/collection-content.php:96
+msgid "Black Rose / Oakland"
+msgstr ""
+
+#: inc/collection-content.php:99
+msgid "02 — THE ANSWER"
+msgstr ""
+
+#: inc/collection-content.php:100
+msgid "Every piece in Black Rose is"
+msgstr ""
+
+#: inc/collection-content.php:101
+msgid "the concrete answering back."
+msgstr ""
+
+#: inc/collection-content.php:102
+msgid "Black Rose / The Town"
+msgstr ""
+
+#: inc/collection-content.php:105
+msgid "03 — THE STAND"
+msgstr ""
+
+#: inc/collection-content.php:106
+msgid "You wear it because"
+msgstr ""
+
+#: inc/collection-content.php:107
+msgid "you already stood up."
+msgstr ""
+
+#: inc/collection-content.php:108
+msgid "Black Rose / Collection I"
+msgstr ""
+
+#: inc/collection-content.php:115
+#: inc/collection-content.php:129
+#: inc/collection-content.php:134
+#: inc/collection-content.php:139
+msgid "The Hurts Bloodline"
+msgstr ""
+
+#: inc/collection-content.php:122
+msgid "Love Hurts Collection — enchanted rose under glass"
+msgstr ""
+
+#: inc/collection-content.php:123
+msgid "They called me Beast. They were right."
+msgstr ""
+
+#: inc/collection-content.php:124
+msgid "But even the Beast kept a rose under glass — protecting the most fragile thing he ever loved. This collection carries the weight of three generations of Hurts."
+msgstr ""
+
+#: inc/collection-content.php:126
+msgid "Enter the 3D Experience"
+msgstr ""
+
+#: inc/collection-content.php:130
+msgid "Love Is Worth the Pain"
+msgstr ""
+
+#: inc/collection-content.php:133
+msgid "The Bloodline"
+msgstr ""
+
+#: inc/collection-content.php:135
+msgid "My grandmother used to say it plain: \"Love hurts, baby. That's how you know it's real.\" She wasn't being poetic. She was teaching survival. Three generations of Hurts women and men poured everything into the people they loved — and the world poured pain right back. But they never stopped loving. Not once."
+msgstr ""
+
+#: inc/collection-content.php:136
+msgid "\"The Beast didn't hide because he was ugly. He hid because he loved something so beautiful it terrified him. The rose under glass — that's every Hurts who ever kept loving when love didn't love them back.\""
+msgstr ""
+
+#: inc/collection-content.php:137
+msgid "This collection carries grandmother's name. Not as a brand, but as a bloodline truth. Every stitch holds the weight of family dinners where we laughed through grief, of front porches where grandmama told stories while pressing creases into Sunday shirts."
+msgstr ""
+
+#: inc/collection-content.php:138
+msgid "LOVE HURTS"
+msgstr ""
+
+#: inc/collection-content.php:141
+msgid "\"Every petal that falls is a lesson. Every thorn is a boundary. The enchanted rose doesn't die — it transforms. Just like us.\""
+msgstr ""
+
+#: inc/collection-content.php:142
+msgid "From Grit to Grace"
+msgstr ""
+
+#: inc/collection-content.php:143
+msgid "The Emotional Architecture"
+msgstr ""
+
+#: inc/collection-content.php:144
+msgid "Crimson for the blood we share. Deep purple for the bruises that became wisdom. Burgundy for the wine grandmama poured when she said, \"Baby, you survived another one.\""
+msgstr ""
+
+#: inc/collection-content.php:148
+msgid "Beast's Vulnerability"
+msgstr ""
+
+#: inc/collection-content.php:149
+msgid "Strength isn't the roar. It's the silence after — when you choose to stay open instead of closing off. These pieces honor the courage it takes to be soft in a world that rewards hardness."
+msgstr ""
+
+#: inc/collection-content.php:151
+msgid "The Beast and the rose — Love Hurts hero artwork"
+msgstr ""
+
+#: inc/collection-content.php:157
+msgid "The Enchanted Rose"
+msgstr ""
+
+#: inc/collection-content.php:158
+msgid "Protected under glass, glowing in a dark room, losing petals one by one. The rose is every love worth fighting for — fragile and fierce at the same time."
+msgstr ""
+
+#: inc/collection-content.php:160
+msgid "Cathedral rose chamber — the enchanted rose under glass"
+msgstr ""
+
+#: inc/collection-content.php:166
+msgid "The Transformation"
+msgstr ""
+
+#: inc/collection-content.php:167
+msgid "From concrete to runway. From grief to grace. The Hurts bloodline doesn't break — it metamorphoses. The Beast becoming the prince he always was."
+msgstr ""
+
+#: inc/collection-content.php:169
+msgid "Love Hurts varsity jacket — crimson on black"
+msgstr ""
+
+#: inc/collection-content.php:174
+msgid "Pieces forged in the Hurts bloodline"
+msgstr ""
+
+#: inc/collection-content.php:175
+msgid "Wear the Bloodline"
+msgstr ""
+
+#: inc/collection-content.php:176
+msgid "Every piece carries grandmother's truth: love is worth the pain. The Beast kept the rose under glass not out of fear, but out of reverence. This collection is that reverence, made wearable."
+msgstr ""
+
+#: inc/collection-content.php:177
+#: patterns/collection-hero-love-hurts.php:39
+msgid "Shop Love Hurts"
+msgstr ""
+
+#: inc/collection-content.php:178
+msgid "First access to new drops and the stories behind every petal."
+msgstr ""
+
+#: inc/collection-content.php:182
+msgid "01 — THE BEAST"
+msgstr ""
+
+#: inc/collection-content.php:183
+msgid "They called me Beast."
+msgstr ""
+
+#: inc/collection-content.php:184
+msgid "They were right."
+msgstr ""
+
+#: inc/collection-content.php:185
+msgid "Love Hurts / Collection II"
+msgstr ""
+
+#: inc/collection-content.php:188
+msgid "02 — THE GLASS"
+msgstr ""
+
+#: inc/collection-content.php:189
+msgid "even the Beast kept a rose under glass —"
+msgstr ""
+
+#: inc/collection-content.php:190
+msgid "protecting the most fragile thing he ever loved."
+msgstr ""
+
+#: inc/collection-content.php:191
+msgid "Love Hurts / The Rose"
+msgstr ""
+
+#: inc/collection-content.php:194
+msgid "03 — THE TURN"
+msgstr ""
+
+#: inc/collection-content.php:195
+msgid "From concrete to runway."
+msgstr ""
+
+#: inc/collection-content.php:196
+msgid "From grief to grace."
+msgstr ""
+
+#: inc/collection-content.php:197
+msgid "Love Hurts / The Bloodline"
+msgstr ""
+
+#: inc/collection-content.php:204
+msgid "Where It All Began"
+msgstr ""
+
+#: inc/collection-content.php:206
+msgid "The SkyyRose Signature Collection"
+msgstr ""
+
+#: inc/collection-content.php:211
+msgid "Signature Collection — SkyyRose yacht at the pier, Golden Gate Bridge at night"
+msgstr ""
+
+#: inc/collection-content.php:212
+msgid "The origin. The main event. The birth of it all."
+msgstr ""
+
+#: inc/collection-content.php:213
+msgid "This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation."
+msgstr ""
+
+#: inc/collection-content.php:218
+#: inc/collections-config.php:88
+#: template-landing-love-hurts.php:143
+msgid "The Foundation"
+msgstr ""
+
+#: inc/collection-content.php:219
+msgid "Est. Oakland"
+msgstr ""
+
+#: inc/collection-content.php:222
+msgid "Chapter One"
+msgstr ""
+
+#: inc/collection-content.php:223
+msgid "The First Rose"
+msgstr ""
+
+#: inc/collection-content.php:224
+msgid "I drew the first rose on a night I couldn't afford dinner. Broke, a baby on the way, every manufacturer I'd worked with had scammed me. But I sat there sketching that script logo until 4 AM because something in me knew — if I could get this right, everything changes. Signature is that night made permanent."
+msgstr ""
+
+#: inc/collection-content.php:225
+msgid "\"They told me luxury doesn't come from Oakland. I said luxury grows from concrete — and I meant that literally. This collection is the concrete. Everything else grew from here.\""
+msgstr ""
+
+#: inc/collection-content.php:226
+msgid "Before Black Rose. Before Love Hurts. Before the press wrote us up or anybody knew the name. There was just a father in Oakland with a daughter's name and a refusal to quit. Every piece in Signature carries that original DNA — the gold rose, the hand-drawn script, the silhouettes I sketched when I had nothing but the idea."
+msgstr ""
+
+#: inc/collection-content.php:227
+msgid "SIGNATURE"
+msgstr ""
+
+#: inc/collection-content.php:228
+msgid "Est. Oakland, CA"
+msgstr ""
+
+#: inc/collection-content.php:230
+msgid "\"Four years ago I never would have thought I'd be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary. Signature is the proof that your circumstances don't define your destination.\""
+msgstr ""
+
+#: inc/collection-content.php:232
+msgid "Built from Nothing"
+msgstr ""
+
+#: inc/collection-content.php:233
+msgid "Every Signature piece carries the same stubbornness that built the brand — failed websites, scammer manufacturers, single parenthood with zero support. We refused to cut corners then. We refuse now."
+msgstr ""
+
+#: inc/collection-content.php:237
+msgid "Sourced Without Compromise"
+msgstr ""
+
+#: inc/collection-content.php:238
+msgid "Italian leathers, Japanese denim, Egyptian cotton — sourced from the finest mills worldwide."
+msgstr ""
+
+#: inc/collection-content.php:240
+msgid "Signature rose hoodie and beanie — gold-accented essentials"
+msgstr ""
+
+#: inc/collection-content.php:246
+msgid "Expert Construction"
+msgstr ""
+
+#: inc/collection-content.php:247
+msgid "Hand-finished details by master tailors who share our obsession with perfection."
+msgstr ""
+
+#: inc/collection-content.php:249
+msgid "Bay Bridge at dusk — the Signature world"
+msgstr ""
+
+#: inc/collection-content.php:255
+msgid "Timeless Design"
+msgstr ""
+
+#: inc/collection-content.php:256
+msgid "Classic silhouettes that never date. Investment pieces, not trend pieces."
+msgstr ""
+
+#: inc/collection-content.php:258
+msgid "Golden showroom scene — timeless Signature staging"
+msgstr ""
+
+#: inc/collection-content.php:263
+msgid "The original blueprint. Every piece carries the DNA of day one."
+msgstr ""
+
+#: inc/collection-content.php:264
+msgid "Wear the Foundation"
+msgstr ""
+
+#: inc/collection-content.php:265
+msgid "This is where it all started. A father in Oakland with a daughter's name and a dream that wouldn't die. When you wear Signature, you wear the origin story — and you help write the next chapter."
+msgstr ""
+
+#: inc/collection-content.php:266
+#: patterns/collection-hero-signature.php:39
+msgid "Shop Signature"
+msgstr ""
+
+#: inc/collection-content.php:267
+msgid "Early access to new drops, behind-the-scenes stories, and first dibs on each piece."
+msgstr ""
+
+#: inc/collection-content.php:271
+msgid "01 — THE ORIGIN"
+msgstr ""
+
+#: inc/collection-content.php:272
+msgid "The origin. The main event."
+msgstr ""
+
+#: inc/collection-content.php:273
+msgid "The birth of it all."
+msgstr ""
+
+#: inc/collection-content.php:274
+msgid "Signature / Collection I"
+msgstr ""
+
+#: inc/collection-content.php:277
+msgid "02 — PERMANENT"
+msgstr ""
+
+#: inc/collection-content.php:278
+msgid "Signature is that night"
+msgstr ""
+
+#: inc/collection-content.php:279
+msgid "made permanent."
+msgstr ""
+
+#: inc/collection-content.php:280
+msgid "Signature / Oakland"
+msgstr ""
+
+#: inc/collection-content.php:283
+msgid "03 — THE CONCRETE"
+msgstr ""
+
+#: inc/collection-content.php:284
+msgid "luxury grows from concrete —"
+msgstr ""
+
+#: inc/collection-content.php:285
+msgid "and I meant that literally."
+msgstr ""
+
+#: inc/collection-content.php:286
+msgid "Signature / The Founder"
+msgstr ""
+
+#: inc/collection-content.php:293
+msgid "New Collection"
+msgstr ""
+
+#: inc/collection-content.php:300
+msgid "SkyyRose Kids Capsule"
+msgstr ""
+
+#: inc/collection-content.php:303
+#: inc/collections-config.php:125
+#: inc/experience-rooms.php:297
+#: patterns/collection-hero-kids-capsule.php:16
+#: template-parts/kids-capsule/teaser.php:39
+msgid "Luxury runs in the family."
+msgstr ""
+
+#: inc/collection-content.php:304
+msgid "Premium streetwear for the next generation — powerful, elevated, and born into legacy. Because legacy is not inherited. It is worn."
+msgstr ""
+
+#: inc/collection-content.php:307
+msgid "Born Into Luxury"
+msgstr ""
+
+#: inc/collection-content.php:308
+#: inc/collections-config.php:112
+msgid "Next Generation"
+msgstr ""
+
+#: inc/collection-content.php:311
+msgid "Her Name"
+msgstr ""
+
+#: inc/collection-content.php:312
+msgid "Named After My Daughter"
+msgstr ""
+
+#: inc/collection-content.php:313
+msgid "The whole brand is named after her — Skyy Rose. My daughter. She was on the way when I had nothing. No drive, no money, no support. But that baby coming changed everything. I needed to build something she'd be proud to carry. Kids Capsule is the promise made real — pieces I designed thinking about my daughter walking into a room and knowing she belongs there."
+msgstr ""
+
+#: inc/collection-content.php:314
+msgid "\"No pastels. No cartoons. Skyy Rose doesn't wear that. She wears what her father built — premium, dark, elegant. Scaled down but never dumbed down.\""
+msgstr ""
+
+#: inc/collection-content.php:315
+msgid "Every kid deserves to feel like they belong at the table. Not the kids' table — THE table. Kids Capsule is that seat."
+msgstr ""
+
+#: inc/collection-content.php:316
+msgid "KC"
+msgstr ""
+
+#: inc/collection-content.php:319
+msgid "\"I built SkyyRose so my daughter would never have to wonder if she was enough. Every piece in Kids Capsule carries that — a father's promise that she can be anything, wear anything, own any room she walks into.\""
+msgstr ""
+
+#: inc/collection-content.php:320
+msgid "Corey Foster, Father & Founder"
+msgstr ""
+
+#: inc/collection-content.php:321
+msgid "Built Different"
+msgstr ""
+
+#: inc/collection-content.php:322
+msgid "The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, built different."
+msgstr ""
+
+#: inc/collection-content.php:326
+msgid "Uncompromising Fabrics"
+msgstr ""
+
+#: inc/collection-content.php:327
+msgid "Same uncompromising fabrics as the adult lines — heavyweight cotton, reinforced stitching, luxury hand-feel."
+msgstr ""
+
+#: inc/collection-content.php:329
+msgid "Kids Capsule Black Rose hoodie — premium heavyweight cotton"
+msgstr ""
+
+#: inc/collection-content.php:335
+msgid "Built to Last"
+msgstr ""
+
+#: inc/collection-content.php:336
+msgid "Engineered for the energy of youth. Double-stitched seams, pre-shrunk fits, colorfast dyes that survive everything."
+msgstr ""
+
+#: inc/collection-content.php:338
+msgid "Kids Capsule playroom scene"
+msgstr ""
+
+#: inc/collection-content.php:344
+msgid "Dark Luxury DNA"
+msgstr ""
+
+#: inc/collection-content.php:345
+msgid "No pastels. No cartoons. Real streetwear scaled down, not dumbed down. The same aesthetic the brand was built on."
+msgstr ""
+
+#: inc/collection-content.php:347
+msgid "Kids Capsule runway scene"
+msgstr ""
+
+#: inc/collection-content.php:352
+msgid "Their Turn Now"
+msgstr ""
+
+#: inc/collection-content.php:353
+msgid "We built this for Skyy Rose. For every kid who deserves to feel the same luxury their parents wear. Legacy isn't inherited — it's earned. But we can give them a head start."
+msgstr ""
+
+#: inc/collection-content.php:354
+#: patterns/collection-hero-kids-capsule.php:39
+msgid "Shop Kids Capsule"
+msgstr ""
+
+#: inc/collection-content.php:355
+msgid "Be first to know about new Kids Capsule drops and family previews."
+msgstr ""
+
+#: inc/collection-content.php:359
+msgid "01 — THE LEGACY"
+msgstr ""
+
+#: inc/collection-content.php:360
+msgid "legacy is not inherited."
+msgstr ""
+
+#: inc/collection-content.php:361
+msgid "It is worn."
+msgstr ""
+
+#: inc/collection-content.php:362
+msgid "Kids Capsule / Family"
+msgstr ""
+
+#: inc/collection-content.php:365
+msgid "02 — NO PASTELS"
+msgstr ""
+
+#: inc/collection-content.php:366
+msgid "No pastels."
+msgstr ""
+
+#: inc/collection-content.php:367
+msgid "No cartoons."
+msgstr ""
+
+#: inc/collection-content.php:368
+msgid "Kids Capsule / Skyy Rose"
+msgstr ""
+
+#: inc/collections-config.php:43
+#: patterns/collection-hero-black-rose.php:16
+msgid "Gothic elegance, dark romance"
+msgstr ""
+
+#: inc/collections-config.php:44
+msgid "Monochromatic pieces that channel mystery and silver-toned refinement."
+msgstr ""
+
+#: inc/collections-config.php:53
+#: inc/collections-world.php:110
+msgid "You wear it because you already stood up."
+msgstr ""
+
+#: inc/collections-config.php:54
+msgid "Limited"
+msgstr ""
+
+#: inc/collections-config.php:55
+msgid "Collection 01"
+msgstr ""
+
+#: inc/collections-config.php:64
+msgid "Crimson Rebellion"
+msgstr ""
+
+#: inc/collections-config.php:67
+#: patterns/collection-hero-love-hurts.php:16
+msgid "Dramatic, passionate, fearless"
+msgstr ""
+
+#: inc/collections-config.php:68
+msgid "Bold crimson statements for those who wear their heart on their sleeve."
+msgstr ""
+
+#: inc/collections-config.php:77
+msgid "Wear Your Heart. Own Your Scars."
+msgstr ""
+
+#: inc/collections-config.php:78
+msgid "Family Legacy"
+msgstr ""
+
+#: inc/collections-config.php:79
+msgid "Collection 02"
+msgstr ""
+
+#: inc/collections-config.php:91
+#: patterns/collection-hero-signature.php:16
+msgid "Elevated, confident, refined"
+msgstr ""
+
+#: inc/collections-config.php:92
+msgid "Gold luxe essentials for building the foundation wardrobe."
+msgstr ""
+
+#: inc/collections-config.php:101
+#: template-landing-signature.php:92
+msgid "Not basics. Blueprints."
+msgstr ""
+
+#: inc/collections-config.php:102
+msgid "Everyday Luxury"
+msgstr ""
+
+#: inc/collections-config.php:103
+msgid "Collection 03"
+msgstr ""
+
+#: inc/collections-config.php:115
+msgid "Joyful luxury, playful sophistication"
+msgstr ""
+
+#: inc/collections-config.php:116
+msgid "Mini versions of our signature pieces for the youngest trendsetters."
+msgstr ""
+
+#: inc/collections-config.php:126
+#: inc/template-functions.php:875
+#: search.php:254
+msgid "Kids"
+msgstr ""
+
+#: inc/collections-config.php:127
+msgid "Collection 04"
+msgstr ""
+
+#: inc/collections-world.php:81
+msgid "scroll to enter"
+msgstr ""
+
+#: inc/collections-world.php:95
+msgid "The Signature"
+msgstr ""
+
+#: inc/collections-world.php:97
+msgid "Oakland-born luxury, cut in gold and earned on the block."
+msgstr ""
+
+#: inc/collections-world.php:98
+msgid "Gold"
+msgstr ""
+
+#: inc/collections-world.php:109
+msgid "Worn As Armor"
+msgstr ""
+
+#: inc/collections-world.php:111
+msgid "Armor"
+msgstr ""
+
+#: inc/collections-world.php:122
+msgid "The Bloodline That Raised Me"
+msgstr ""
+
+#: inc/collections-world.php:123
+msgid "Crimson and thorn — the love that scarred you is the love that made you."
+msgstr ""
+
+#: inc/collections-world.php:124
+msgid "Crimson"
+msgstr ""
+
+#: inc/collections-world.php:135
+msgid "The Next Generation, Suited"
+msgstr ""
+
+#: inc/collections-world.php:136
+msgid "The same concrete-luxe, cut for the ones coming up."
+msgstr ""
+
+#: inc/collections-world.php:137
+msgid "Rose Gold"
+msgstr ""
+
+#: inc/collections-world.php:144
+#: template-parts/collection/page.php:367
+#: template-parts/landing/product-grid.php:53
+msgid "The Collection"
+msgstr ""
+
+#: inc/collections-world.php:147
+msgid "The Skyy Rose Collection"
+msgstr ""
+
+#: inc/collections-world.php:148
+msgid "Enter The Collections"
+msgstr ""
+
+#: inc/collections-world.php:149
+msgid "Four cinematic worlds, one house built from Oakland concrete."
+msgstr ""
+
+#: inc/collections-world.php:152
+#: template-collections-world.php:46
+msgid "Shop the Collections"
+msgstr ""
+
+#: inc/customer-enhancements.php:45
+msgid "Fit & Experience"
+msgstr ""
+
+#: inc/customer-enhancements.php:74
+msgid "Fit guidance and model reference shown on the product page. All fields optional — leave blank to hide the block entirely."
+msgstr ""
+
+#: inc/customer-enhancements.php:80
+msgid "Fit Note"
+msgstr ""
+
+#: inc/customer-enhancements.php:89
+msgid "e.g. Runs oversized — size down for a tailored fit"
+msgstr ""
+
+#: inc/customer-enhancements.php:91
+msgid "Fit guidance text displayed under the ATC button."
+msgstr ""
+
+#: inc/customer-enhancements.php:96
+msgid "Model Height"
+msgstr ""
+
+#: inc/customer-enhancements.php:105
+msgid "e.g. 6'2\""
+msgstr ""
+
+#: inc/customer-enhancements.php:107
+msgid "Height of the model in the product imagery."
+msgstr ""
+
+#: inc/customer-enhancements.php:112
+msgid "Model Size"
+msgstr ""
+
+#: inc/customer-enhancements.php:121
+msgid "e.g. Large"
+msgstr ""
+
+#: inc/customer-enhancements.php:123
+msgid "Size the model is wearing. Appears beside height in the Model Reference spec."
+msgstr ""
+
+#: inc/customer-enhancements.php:208
+msgid "Fit Information"
+msgstr ""
+
+#: inc/customer-enhancements.php:209
+#: inc/wc-product-functions.php:193
+#: template-parts/product-detail-editorial.php:130
+msgid "Fit"
+msgstr ""
+
+#: inc/customer-enhancements.php:217
+msgid "Model Reference"
+msgstr ""
+
+#. translators: %s: model height, e.g. 6'2"
+#: inc/customer-enhancements.php:227
+#, php-format
+msgid "%s tall"
+msgstr ""
+
+#. translators: %s: size worn by the model, e.g. Large
+#: inc/customer-enhancements.php:231
+#, php-format
+msgid "wearing a %s"
+msgstr ""
+
+#: inc/customer-enhancements.php:266
+msgid "Drop Block"
+msgstr ""
+
+#: inc/customer-enhancements.php:267
+msgid "Full-bleed editorial section between the hero and press strip on the homepage. Disabled by default — enable to show."
+msgstr ""
+
+#: inc/customer-enhancements.php:285
+msgid "Enable Drop Block"
+msgstr ""
+
+#: inc/customer-enhancements.php:303
+msgid "Drop Title"
+msgstr ""
+
+#: inc/customer-enhancements.php:322
+msgid "— none —"
+msgstr ""
+
+#: inc/customer-enhancements.php:341
+msgid "Collection Slug"
+msgstr ""
+
+#: inc/customer-enhancements.php:342
+msgid "e.g. signature, black-rose, love-hurts, kids-capsule"
+msgstr ""
+
+#: inc/customer-enhancements.php:362
+msgid "Drop Image"
+msgstr ""
+
+#: inc/customer-enhancements.php:437
+msgid "Drop"
+msgstr ""
+
+#: inc/customer-enhancements.php:477
+#: template-landing-black-rose.php:192
+#: template-landing-black-rose.php:272
+#: template-landing-signature.php:174
+#: template-landing-signature.php:256
+#: template-parts/components/card-product.php:57
+msgid "Shop Now"
+msgstr ""
+
+#: inc/customer-enhancements.php:520
+msgid "Quick add to bag"
+msgstr ""
+
+#: inc/customer-enhancements.php:530
+#: template-parts/product-card-holo.php:139
+msgid "Select size"
+msgstr ""
+
+#: inc/customer-enhancements.php:533
+msgid "Size"
+msgstr ""
+
+#: inc/customer-enhancements.php:536
+msgid "Add to Bag"
+msgstr ""
+
+#: inc/customizer.php:59
+msgid "Brand Identity"
+msgstr ""
+
+#: inc/customizer.php:60
+msgid "Customize brand colors, logo, and social media links."
+msgstr ""
+
+#: inc/customizer.php:83
+msgid "Primary Brand Color"
+msgstr ""
+
+#: inc/customizer.php:84
+msgid "Rose gold accent used for headings, links, and highlights."
+msgstr ""
+
+#: inc/customizer.php:109
+msgid "Gold Accent Color"
+msgstr ""
+
+#: inc/customizer.php:110
+msgid "Used for buttons, CTA accents, and luxury highlights."
+msgstr ""
+
+#: inc/customizer.php:135
+msgid "Dark Background"
+msgstr ""
+
+#: inc/customizer.php:136
+msgid "Primary dark background for header, footer, and immersive sections."
+msgstr ""
+
+#: inc/customizer.php:161
+msgid "Brand Logo (SVG or PNG)"
+msgstr ""
+
+#: inc/customizer.php:162
+msgid "Upload a transparent-background logo for the footer and email templates. Use Custom Logo (above) for the header."
+msgstr ""
+
+#: inc/customizer.php:176
+msgid "Social Media"
+msgstr ""
+
+#: inc/customizer.php:177
+msgid "Add your social media profile URLs for the footer and Open Graph."
+msgstr ""
+
+#: inc/customizer.php:184
+msgid "Instagram URL"
+msgstr ""
+
+#: inc/customizer.php:188
+msgid "TikTok URL"
+msgstr ""
+
+#: inc/customizer.php:192
+msgid "Facebook URL"
+msgstr ""
+
+#: inc/customizer.php:196
+msgid "X (Twitter) URL"
+msgstr ""
+
+#: inc/customizer.php:200
+msgid "Pinterest URL"
+msgstr ""
+
+#: inc/customizer.php:204
+msgid "YouTube URL"
+msgstr ""
+
+#: inc/customizer.php:208
+msgid "LinkedIn URL"
+msgstr ""
+
+#: inc/customizer.php:251
+msgid "Twitter/X Handle"
+msgstr ""
+
+#: inc/customizer.php:252
+msgid "Without the @ symbol (e.g., \"SkyyRose\")."
+msgstr ""
+
+#: inc/customizer.php:274
+msgid "Contact Email"
+msgstr ""
+
+#: inc/customizer.php:296
+msgid "Contact Phone"
+msgstr ""
+
+#: inc/customizer.php:309
+msgid "Kids Capsule Launch"
+msgstr ""
+
+#: inc/customizer.php:310
+msgid "Toggle between launch mode (teaser + waitlist) and live mode (full catalog)."
+msgstr ""
+
+#: inc/customizer.php:328
+msgid "Collection Status"
+msgstr ""
+
+#: inc/customizer.php:332
+msgid "Launch Mode — Teaser + Waitlist"
+msgstr ""
+
+#: inc/customizer.php:333
+msgid "Live Mode — Full Catalog"
+msgstr ""
+
+#: inc/customizer.php:351
+msgid "Launch Date"
+msgstr ""
+
+#: inc/customizer.php:352
+msgid "ISO 8601 date for the countdown timer, e.g. 2026-06-01T09:00:00-07:00"
+msgstr ""
+
+#: inc/customizer.php:365
+msgid "Announcement Bar"
+msgstr ""
+
+#: inc/customizer.php:366
+msgid "Sitewide announcement strip shown at the very top of the page."
+msgstr ""
+
+#: inc/customizer.php:382
+msgid "Enable Announcement Bar"
+msgstr ""
+
+#: inc/customizer.php:399
+msgid "Announcement Text"
+msgstr ""
+
+#: inc/customizer.php:416
+msgid "Announcement Link (optional)"
+msgstr ""
+
+#: inc/enqueue.php:356
+msgid "Connection problem — please try again."
+msgstr ""
+
+#: inc/enqueue.php:1137
+msgid "item"
+msgstr ""
+
+#: inc/enqueue.php:1138
+msgid "items"
+msgstr ""
+
+#: inc/experience-engine.php:87
+msgid "Performance Guardian"
+msgstr ""
+
+#: inc/experience-engine.php:92
+msgid "Experience Analyzer"
+msgstr ""
+
+#: inc/experience-engine.php:97
+msgid "Brand Atmosphere"
+msgstr ""
+
+#: inc/experience-engine.php:102
+msgid "Smart Showcase"
+msgstr ""
+
+#: inc/experience-engine.php:107
+msgid "Micro-Interactions"
+msgstr ""
+
+#: inc/experience-engine.php:112
+msgid "Personalization"
+msgstr ""
+
+#: inc/experience-rooms.php:49
+#: inc/theme-activation-setup.php:70
+msgid "Black Rose Collection"
+msgstr ""
+
+#: inc/experience-rooms.php:50
+#: inc/experience-rooms.php:248
+msgid "The Bay Bridge"
+msgstr ""
+
+#: inc/experience-rooms.php:56
+msgid "Moonlit Courtyard"
+msgstr ""
+
+#: inc/experience-rooms.php:65
+msgid "Draped over marble garden statue"
+msgstr ""
+
+#: inc/experience-rooms.php:74
+msgid "Folded on fountain edge"
+msgstr ""
+
+#: inc/experience-rooms.php:83
+msgid "Folded at base of rose topiary"
+msgstr ""
+
+#: inc/experience-rooms.php:92
+msgid "Draped over statue pedestal"
+msgstr ""
+
+#: inc/experience-rooms.php:98
+msgid "Iron Gazebo"
+msgstr ""
+
+#: inc/experience-rooms.php:107
+msgid "Displayed inside iron gazebo"
+msgstr ""
+
+#: inc/experience-rooms.php:116
+msgid "Hanging from rose hedge archway"
+msgstr ""
+
+#: inc/experience-rooms.php:125
+msgid "Draped over cobblestone garden bench"
+msgstr ""
+
+#: inc/experience-rooms.php:136
+#: inc/theme-activation-setup.php:75
+#: template-landing-love-hurts.php:74
+#: template-landing-love-hurts.php:330
+msgid "Love Hurts Collection"
+msgstr ""
+
+#: inc/experience-rooms.php:137
+#: inc/experience-rooms.php:143
+msgid "The Cathedral"
+msgstr ""
+
+#: inc/experience-rooms.php:138
+msgid "Every petal tells a story."
+msgstr ""
+
+#: inc/experience-rooms.php:152
+msgid "On the mannequin stand"
+msgstr ""
+
+#: inc/experience-rooms.php:161
+msgid "Suspended above the pews"
+msgstr ""
+
+#: inc/experience-rooms.php:170
+msgid "Draped across the pew"
+msgstr ""
+
+#: inc/experience-rooms.php:179
+msgid "Hanging from the candelabra"
+msgstr ""
+
+#: inc/experience-rooms.php:190
+#: inc/theme-activation-setup.php:80
+msgid "Signature Collection"
+msgstr ""
+
+#: inc/experience-rooms.php:191
+msgid "The Golden Gate Runway"
+msgstr ""
+
+#: inc/experience-rooms.php:192
+msgid "The Origin. The Crown."
+msgstr ""
+
+#: inc/experience-rooms.php:197
+msgid "The Golden Gate"
+msgstr ""
+
+#: inc/experience-rooms.php:206
+msgid "Inside glass orb display case"
+msgstr ""
+
+#: inc/experience-rooms.php:215
+#: inc/experience-rooms.php:224
+#: inc/experience-rooms.php:233
+msgid "Hanging in gold-lit LED display frame"
+msgstr ""
+
+#: inc/experience-rooms.php:242
+msgid "Featured on stepped marble pedestal"
+msgstr ""
+
+#: inc/experience-rooms.php:257
+msgid "Hanging on left wall clothing rack"
+msgstr ""
+
+#: inc/experience-rooms.php:266
+msgid "Featured on center marble display table"
+msgstr ""
+
+#: inc/experience-rooms.php:275
+msgid "On left marble pedestal"
+msgstr ""
+
+#: inc/experience-rooms.php:284
+msgid "Hanging on right wall clothing rack"
+msgstr ""
+
+#: inc/experience-rooms.php:295
+msgid "Kids Capsule Collection"
+msgstr ""
+
+#: inc/experience-rooms.php:296
+#: inc/experience-rooms.php:302
+msgid "The Playroom"
+msgstr ""
+
+#: inc/experience-rooms.php:311
+msgid "Featured on center playroom display"
+msgstr ""
+
+#: inc/experience-rooms.php:317
+msgid "The Runway"
+msgstr ""
+
+#: inc/experience-rooms.php:326
+msgid "Featured on center runway display"
+msgstr ""
+
+#: inc/immersive-ajax.php:37
+#: inc/immersive-ajax.php:111
+#: inc/immersive-ajax.php:210
+msgid "Security check failed. Please refresh the page."
+msgstr ""
+
+#: inc/immersive-ajax.php:46
+#: inc/immersive-ajax.php:120
+msgid "Product data is currently unavailable."
+msgstr ""
+
+#: inc/immersive-ajax.php:57
+msgid "No product identifier provided."
+msgstr ""
+
+#: inc/immersive-ajax.php:131
+msgid "No collection specified."
+msgstr ""
+
+#: inc/immersive-ajax.php:142
+msgid "Invalid collection."
+msgstr ""
+
+#: inc/immersive-ajax.php:219
+msgid "Cart is currently unavailable."
+msgstr ""
+
+#: inc/immersive-ajax.php:230
+msgid "Too many requests. Please wait a moment."
+msgstr ""
+
+#: inc/immersive-ajax.php:254
+msgid "Invalid product."
+msgstr ""
+
+#: inc/immersive-ajax.php:273
+msgid "This product cannot be added to cart."
+msgstr ""
+
+#: inc/immersive-ajax.php:281
+msgid "This item is currently out of stock."
+msgstr ""
+
+#: inc/immersive-ajax.php:300
+msgid "Selected size is not available for this product."
+msgstr ""
+
+#: inc/immersive-ajax.php:312
+msgid "Could not add item to cart. Please try again."
+msgstr ""
+
+#: inc/immersive-ajax.php:336
+msgid "Added to cart!"
+msgstr ""
+
+#: inc/klaviyo-integration.php:280
+msgid "You're in. Watch your inbox for early access."
+msgstr ""
+
+#: inc/klaviyo-integration.php:518
+msgid "Klaviyo Integration"
+msgstr ""
+
+#: inc/klaviyo-integration.php:536
+msgid "Private API Key (sk_live_...)"
+msgstr ""
+
+#: inc/klaviyo-integration.php:539
+msgid "Found in Klaviyo → Account → API Keys"
+msgstr ""
+
+#: inc/klaviyo-integration.php:556
+msgid "Public Site ID (6-char)"
+msgstr ""
+
+#: inc/klaviyo-integration.php:564
+msgid "General Newsletter List ID"
+msgstr ""
+
+#: inc/klaviyo-integration.php:565
+msgid "Black Rose Drop List ID"
+msgstr ""
+
+#: inc/klaviyo-integration.php:566
+msgid "Love Hurts Drop List ID"
+msgstr ""
+
+#: inc/klaviyo-integration.php:567
+msgid "Signature Drop List ID"
+msgstr ""
+
+#: inc/klaviyo-integration.php:568
+msgid "Jersey Series VIP List ID"
+msgstr ""
+
+#: inc/klaviyo-integration.php:569
+msgid "Kids Capsule Waitlist List ID"
+msgstr ""
+
+#: inc/maintenance.php:108
+msgid "The Skyy Rose Collection is preparing the next chapter. Please return shortly."
+msgstr ""
+
+#: inc/maintenance.php:109
+msgid "Coming soon — The Skyy Rose Collection"
+msgstr ""
+
+#: inc/mascot-config.php:263
+msgid "You can reach the SkyyRose team directly through our contact page. 🌹"
+msgstr ""
+
+#: inc/mascot-config.php:268
+msgid "SkyyRose was built by Corey Foster from the ground up — Oakland roots, real luxury. Our story page has the full journey."
+msgstr ""
+
+#: inc/mascot-config.php:273
+msgid "Prices vary by piece — every product page shows the exact price and any pre-order details."
+msgstr ""
+
+#: inc/mascot-config.php:278
+msgid "You can review your bag and apply any code at checkout."
+msgstr ""
+
+#: inc/mascot-config.php:283
+msgid "Manage orders, addresses, and details from your account page."
+msgstr ""
+
+#: inc/mascot-config.php:288
+msgid "Hey! I’m Skyy 👋 — ask me about sizing, shipping, pre-orders, or a collection."
+msgstr ""
+
+#: inc/mascot-config.php:363
+msgid "Skyy Mascot"
+msgstr ""
+
+#: inc/mascot-config.php:364
+msgid "Living character widget — live sitewide by default (checkout excluded). Uncheck to take Skyy down."
+msgstr ""
+
+#: inc/mascot-config.php:381
+msgid "Enable Skyy"
+msgstr ""
+
+#: inc/mascot-config.php:382
+msgid "Shows the mascot widget sitewide (checkout always excluded)."
+msgstr ""
+
+#: inc/mascot-config.php:402
+msgid "Character GLB URL"
+msgstr ""
+
+#: inc/mascot-config.php:403
+msgid "Rigged 3D model. Defaults to the theme-shipped model when present; leave empty to force the 2D sprite walk-on."
+msgstr ""
+
+#: inc/mascot-config.php:423
+msgid "Enable Expanded Fallback Answers (Tier 2)"
+msgstr ""
+
+#: inc/mascot-config.php:424
+msgid "Answers questions the scripted guide misses (contact, about, pricing, account) via deterministic server-side matching. No external API call, no per-use cost."
+msgstr ""
+
+#: inc/mascot-config.php:432
+msgid "Homepage Tip"
+msgstr ""
+
+#: inc/mascot-config.php:433
+msgid "Pre-Order Page Tip"
+msgstr ""
+
+#: inc/mascot-config.php:434
+msgid "Black Rose Collection Tip"
+msgstr ""
+
+#: inc/mascot-config.php:435
+msgid "Love Hurts Collection Tip"
+msgstr ""
+
+#: inc/mascot-config.php:436
+msgid "Signature Collection Tip"
+msgstr ""
+
+#: inc/mascot-config.php:437
+msgid "Kids Capsule Collection Tip"
+msgstr ""
+
+#: inc/mascot-config.php:438
+msgid "FAQ Page Tip"
+msgstr ""
+
+#: inc/mascot-config.php:439
+msgid "Shipping & Returns Page Tip"
+msgstr ""
+
+#: inc/mascot-config.php:440
+msgid "Account Page Tip"
+msgstr ""
+
+#: inc/mascot-config.php:458
+msgid "1–2 lines. Empty = Skyy uses her default line here."
+msgstr ""
+
+#: inc/mcp-bridge.php:93
+msgid "MCP endpoint URL failed the safety check."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: inc/mcp-bridge.php:222
+#, php-format
+msgid "MCP initialize failed (HTTP %d)."
+msgstr ""
+
+#: inc/mcp-bridge.php:230
+msgid "MCP server did not return a session id."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: inc/mcp-bridge.php:264
+#, php-format
+msgid "MCP request failed (HTTP %d)."
+msgstr ""
+
+#: inc/mcp-bridge.php:267
+msgid "MCP returned an unparseable response."
+msgstr ""
+
+#: inc/mcp-bridge.php:270
+msgid "MCP tool error."
+msgstr ""
+
+#: inc/mcp-bridge.php:317
+#: inc/mcp-bridge.php:378
+msgid "DevSkyy MCP Console"
+msgstr ""
+
+#: inc/mcp-bridge.php:318
+msgid "DevSkyy MCP"
+msgstr ""
+
+#: inc/mcp-bridge.php:353
+msgid "Working…"
+msgstr ""
+
+#: inc/mcp-bridge.php:354
+msgid "Arguments must be valid JSON."
+msgstr ""
+
+#: inc/mcp-bridge.php:355
+msgid "No tools returned."
+msgstr ""
+
+#: inc/mcp-bridge.php:356
+msgid "Select a tool first."
+msgstr ""
+
+#. translators: %d: number of tools.
+#: inc/mcp-bridge.php:358
+#, php-format
+msgid "%d tools loaded."
+msgstr ""
+
+#: inc/mcp-bridge.php:380
+msgid "Endpoint:"
+msgstr ""
+
+#: inc/mcp-bridge.php:384
+msgid "service token configured"
+msgstr ""
+
+#: inc/mcp-bridge.php:385
+msgid "no service token — define SKYYROSE_MCP_TOKEN in wp-config.php"
+msgstr ""
+
+#: inc/mcp-bridge.php:390
+msgid "Load tools"
+msgstr ""
+
+#: inc/mcp-bridge.php:395
+msgid "Tool"
+msgstr ""
+
+#: inc/mcp-bridge.php:399
+msgid "Arguments (JSON)"
+msgstr ""
+
+#: inc/mcp-bridge.php:405
+msgid "Invoke tool"
+msgstr ""
+
+#: inc/mcp-bridge.php:409
+msgid "Result"
+msgstr ""
+
+#: inc/mcp-bridge.php:550
+msgid "This tool is blocked from the admin bridge (paid generation or production mutation)."
+msgstr ""
+
+#: inc/mcp-bridge.php:559
+msgid "This tool is not on the read-only allowlist. Add it via the skyyrose_mcp_allowed_write_tools filter if it is safe to expose."
+msgstr ""
+
+#: inc/mcp-bridge.php:570
+msgid "Insufficient permissions."
+msgstr ""
+
+#: inc/mcp-bridge.php:581
+msgid "Tool name required."
+msgstr ""
+
+#: inc/mcp-bridge.php:601
+msgid "Arguments must be a JSON object."
+msgstr ""
+
+#: inc/mcp-bridge.php:606
+msgid "Unknown action."
+msgstr ""
+
+#: inc/menu-setup.php:167
+#: inc/theme-setup.php:64
+msgid "Primary Menu"
+msgstr ""
+
+#: inc/menu-setup.php:170
+#: inc/seo.php:332
+#: inc/template-functions.php:229
+#: inc/template-functions.php:906
+#: inc/theme-activation-setup.php:48
+#: template-parts/mobile-bottom-nav.php:69
+msgid "Home"
+msgstr ""
+
+#: inc/menu-setup.php:174
+#: inc/seo.php:357
+#: inc/seo.php:362
+#: inc/template-functions.php:911
+#: template-parts/mobile-bottom-nav.php:75
+msgid "Collections"
+msgstr ""
+
+#. Template Name of the theme
+#: inc/menu-setup.php:206
+#: inc/menu-setup.php:219
+#: inc/template-functions.php:943
+#: inc/theme-activation-setup.php:58
+#: template-contact.php:3
+#: woocommerce/checkout/form-checkout.php:424
+msgid "Contact"
+msgstr ""
+
+#: inc/menu-setup.php:212
+#: inc/theme-setup.php:65
+msgid "Footer Menu"
+msgstr ""
+
+#: inc/patterns.php:32
+msgid "Luxury fashion brand patterns"
+msgstr ""
+
+#: inc/patterns.php:35
+msgid "SkyyRose Collections"
+msgstr ""
+
+#: inc/patterns.php:36
+msgid "Collection-specific hero sections and grids"
+msgstr ""
+
+#: inc/patterns.php:39
+msgid "SkyyRose Commerce"
+msgstr ""
+
+#: inc/patterns.php:40
+msgid "Product display and shopping patterns"
+msgstr ""
+
+#: inc/product-catalog.php:220
+#: template-parts/kids-capsule/teaser.php:37
+msgid "Coming Soon"
+msgstr ""
+
+#: inc/product-taxonomy.php:43
+msgctxt "taxonomy general name"
+msgid "Product Tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:44
+msgctxt "taxonomy singular name"
+msgid "Product Tag"
+msgstr ""
+
+#: inc/product-taxonomy.php:45
+msgid "Search Product Tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:46
+msgid "Popular Product Tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:47
+msgid "All Product Tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:48
+msgid "Edit Product Tag"
+msgstr ""
+
+#: inc/product-taxonomy.php:49
+msgid "Update Product Tag"
+msgstr ""
+
+#: inc/product-taxonomy.php:50
+msgid "Add New Product Tag"
+msgstr ""
+
+#: inc/product-taxonomy.php:51
+msgid "New Product Tag Name"
+msgstr ""
+
+#: inc/product-taxonomy.php:52
+msgid "Separate product tags with commas"
+msgstr ""
+
+#: inc/product-taxonomy.php:53
+msgid "Add or remove product tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:54
+msgid "Choose from the most used product tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:55
+msgid "No product tags found."
+msgstr ""
+
+#: inc/product-taxonomy.php:56
+msgid "Product Tags"
+msgstr ""
+
+#: inc/product-taxonomy.php:108
+msgid "All SkyyRose products."
+msgstr ""
+
+#: inc/product-taxonomy.php:123
+msgid "Dark elegance meets luxury streetwear. Cathedral-inspired pieces for the bold."
+msgstr ""
+
+#: inc/product-taxonomy.php:127
+msgid "Where passion meets pain. Castle-themed pieces that tell a story of love and resilience."
+msgstr ""
+
+#: inc/product-taxonomy.php:131
+msgid "The quintessential SkyyRose experience. City-inspired luxury for every day."
+msgstr ""
+
+#: inc/product-taxonomy.php:135
+msgid "Luxury fashion for the next generation. Where love meets comfort."
+msgstr ""
+
+#: inc/product-taxonomy.php:180
+#: inc/woocommerce-preorder.php:189
+#: template-preorder-gateway.php:191
+msgid "Limited Edition"
+msgstr ""
+
+#: inc/product-taxonomy.php:181
+msgid "Bestseller"
+msgstr ""
+
+#: inc/product-taxonomy.php:182
+msgid "New Arrival"
+msgstr ""
+
+#: inc/product-taxonomy.php:185
+msgid "Collab"
+msgstr ""
+
+#: inc/product-taxonomy.php:186
+msgid "Hoodie"
+msgstr ""
+
+#: inc/product-taxonomy.php:187
+msgid "Jogger"
+msgstr ""
+
+#: inc/product-taxonomy.php:188
+msgid "Crewneck"
+msgstr ""
+
+#: inc/product-taxonomy.php:189
+msgid "Jacket"
+msgstr ""
+
+#: inc/product-taxonomy.php:190
+msgid "Dress"
+msgstr ""
+
+#: inc/product-taxonomy.php:191
+msgid "Shorts"
+msgstr ""
+
+#: inc/product-taxonomy.php:192
+msgid "Beanie"
+msgstr ""
+
+#: inc/product-taxonomy.php:193
+msgid "Jersey"
+msgstr ""
+
+#: inc/product-taxonomy.php:194
+msgid "Set"
+msgstr ""
+
+#: inc/product-taxonomy.php:195
+msgid "Tee"
+msgstr ""
+
+#: inc/product-taxonomy.php:196
+msgid "Sherpa"
+msgstr ""
+
+#: inc/rest-api-experience.php:55
+msgid "Invalid analytics key."
+msgstr ""
+
+#: inc/rest-kids-capsule.php:65
+msgid "Kids product not found."
+msgstr ""
+
+#: inc/security.php:346
+msgid "Access denied."
+msgstr ""
+
+#: inc/seo.php:173
+msgid "Luxury Grows from Concrete. Premium streetwear and luxury fashion brand."
+msgstr ""
+
+#: inc/seo.php:434
+#, php-format
+msgid "Search Results for: %s"
+msgstr ""
+
+#: inc/seo.php:458
+#: inc/template-functions.php:312
+msgid "Breadcrumb"
+msgstr ""
+
+#: inc/seo.php:996
+#: woocommerce/archive-product.php:53
+msgid "Products"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:63
+msgid "— default —"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:64
+msgid "Gemini Pro"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:65
+msgid "FASHN"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:66
+msgid "Tripo"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:67
+msgid "Meshy"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:68
+msgid "TRELLIS"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:69
+msgid "Nano Banana"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:78
+msgid "Brand collection slug."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:82
+#: inc/skyyrose-product-meta.php:91
+#: inc/skyyrose-product-meta.php:100
+msgid "Identity"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:87
+msgid "Badge"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:88
+msgid "Optional merchandising badge (e.g. NEW, LIMITED)."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:96
+#: inc/wc-product-functions.php:228
+#: inc/woocommerce-preorder.php:70
+msgid "Edition Size"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:97
+msgid "Total units in the edition. 0 = open edition."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:107
+msgid "Front Model Image"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:108
+msgid "Path relative to theme (e.g. assets/images/products/x-front-model.webp)."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:111
+#: inc/skyyrose-product-meta.php:120
+#: inc/skyyrose-product-meta.php:129
+msgid "Imagery"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:116
+msgid "Back Image"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:117
+msgid "Path to back-side product image."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:125
+msgid "Back Model Image"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:126
+msgid "Path to back-side model image."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:136
+msgid "Dossier Slug"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:137
+msgid "Filename slug in data/dossiers/ (without .md extension)."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:140
+#: inc/skyyrose-product-meta.php:150
+#: inc/skyyrose-product-meta.php:159
+#: inc/skyyrose-product-meta.php:168
+#: inc/skyyrose-product-meta.php:177
+#: inc/skyyrose-product-meta.php:186
+#: inc/skyyrose-product-meta.php:195
+#: inc/skyyrose-product-meta.php:204
+#: inc/skyyrose-product-meta.php:213
+msgid "Render Pipeline"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:145
+msgid "Engine Override"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:146
+msgid "Force a specific render engine. Empty = pipeline default."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:155
+msgid "Branding Spec"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:156
+msgid "Free-text branding placement instructions for the render pipeline."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:164
+msgid "Render Output Slug"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:165
+msgid "Filename slug for rendered output (matches renders/output/<slug>)."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:173
+msgid "Render Source Override (front)"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:174
+msgid "Override the front source image used by the render pipeline."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:182
+msgid "Render Source Override (back)"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:183
+msgid "Override the back source image used by the render pipeline."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:191
+msgid "Is Tech Flat"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:192
+msgid "Source asset is a technical flat (not a 3/4 photo)."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:200
+msgid "Is Accessory"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:201
+msgid "Product is an accessory (cap, beanie, bag) not garment."
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:209
+msgid "Garment Type Lock"
+msgstr ""
+
+#: inc/skyyrose-product-meta.php:210
+msgid "Force garment type classification (e.g. crewneck, hoodie, joggers)."
+msgstr ""
+
+#. translators: %s: search query
+#: inc/template-functions.php:297
+#, php-format
+msgid "Search: %s"
+msgstr ""
+
+#: inc/template-functions.php:302
+msgid "Page Not Found"
+msgstr ""
+
+#. translators: %s: number of minutes
+#: inc/template-functions.php:482
 #, php-format
 msgid "%s min read"
 msgstr ""
 
-#. translators: %s: post date.
-#: inc/template-functions.php:195
-#, php-format
+#: inc/template-functions.php:515
 msgctxt "post date"
-msgid "Posted on %s"
+msgid "Posted on"
 msgstr ""
 
-#. translators: %s: post author.
-#: inc/template-functions.php:210
-#, php-format
+#: inc/template-functions.php:529
 msgctxt "post author"
-msgid "by %s"
+msgid "by"
 msgstr ""
 
 #. translators: used between list items, there is a space after the comma
-#: inc/template-functions.php:226
+#: inc/template-functions.php:545
 msgid ", "
 msgstr ""
 
 #. translators: 1: list of categories.
-#: inc/template-functions.php:229
+#: inc/template-functions.php:548
 #, php-format
 msgid "Posted in %1$s"
 msgstr ""
 
 #. translators: used between list items, there is a space after the comma
-#: inc/template-functions.php:233
+#: inc/template-functions.php:552
 msgctxt "list item separator"
 msgid ", "
 msgstr ""
 
 #. translators: 1: list of tags.
-#: inc/template-functions.php:236
+#: inc/template-functions.php:555
 #, php-format
 msgid "Tagged %1$s"
 msgstr ""
 
 #. translators: %s: post title
-#: inc/template-functions.php:246
+#: inc/template-functions.php:565
 #, php-format
 msgid "Leave a Comment<span class=\"screen-reader-text\"> on %s</span>"
 msgstr ""
 
-#: inc/wishlist-functions.php:236
-#: inc/wishlist-functions.php:274
-#: inc/wishlist-functions.php:312
+#. translators: %s: post title, only visible to screen readers
+#: inc/template-functions.php:578
+#, php-format
+msgid "Edit <span class=\"screen-reader-text\">%s</span>"
+msgstr ""
+
+#: inc/template-functions.php:805
+#: template-coming-soon.php:451
+msgid "Instagram"
+msgstr ""
+
+#: inc/template-functions.php:809
+msgid "TikTok"
+msgstr ""
+
+#: inc/template-functions.php:813
+msgid "X (Twitter)"
+msgstr ""
+
+#: inc/template-functions.php:817
+msgid "Facebook"
+msgstr ""
+
+#: inc/template-functions.php:851
+msgid "Tops"
+msgstr ""
+
+#: inc/template-functions.php:863
+msgid "Bottoms"
+msgstr ""
+
+#. Template Name of the theme
+#: inc/template-functions.php:938
+#: inc/theme-activation-setup.php:53
+#: template-about.php:3
+#: template-about.php:165
+msgid "About"
+msgstr ""
+
+#: inc/theme-activation-setup.php:92
+msgid "Black Rose Experience"
+msgstr ""
+
+#: inc/theme-activation-setup.php:97
+msgid "Love Hurts Experience"
+msgstr ""
+
+#: inc/theme-activation-setup.php:102
+msgid "Signature Experience"
+msgstr ""
+
+#: inc/theme-activation-setup.php:107
+msgid "Kids Capsule Experience"
+msgstr ""
+
+#: inc/theme-activation-setup.php:114
+msgid "Immersive Worlds"
+msgstr ""
+
+#: inc/theme-activation-setup.php:121
+msgid "Black Rose — Drop"
+msgstr ""
+
+#: inc/theme-activation-setup.php:126
+msgid "Love Hurts — Drop"
+msgstr ""
+
+#: inc/theme-activation-setup.php:131
+msgid "Signature — Drop"
+msgstr ""
+
+#: inc/theme-activation-setup.php:136
+msgid "Kids Capsule — Drop"
+msgstr ""
+
+#. Template Name of the theme
+#: inc/theme-activation-setup.php:143
+#: inc/theme-setup.php:229
+#: page-wishlist.php:3
+msgid "Wishlist"
+msgstr ""
+
+#: inc/theme-activation-setup.php:259
+msgid "Luxury Grows from Concrete. Premium streetwear from Oakland, CA."
+msgstr ""
+
+#: inc/theme-activation-setup.php:310
+#: template-parts/mobile-bottom-nav.php:87
+#: woocommerce/checkout/form-checkout.php:49
+msgid "Cart"
+msgstr ""
+
+#: inc/theme-activation-setup.php:314
+#: template-preorder-gateway.php:593
+#: woocommerce/checkout/form-checkout.php:78
+msgid "Checkout"
+msgstr ""
+
+#: inc/theme-activation-setup.php:318
+#: woocommerce/checkout/thankyou.php:44
+msgid "My Account"
+msgstr ""
+
+#: inc/theme-setup.php:173
+msgid "Primary Sidebar"
+msgstr ""
+
+#: inc/theme-setup.php:175
+msgid "Add widgets here to appear in your sidebar."
+msgstr ""
+
+#: inc/theme-setup.php:178
+msgid "Footer Area 1"
+msgstr ""
+
+#: inc/theme-setup.php:180
+msgid "First footer widget area."
+msgstr ""
+
+#: inc/theme-setup.php:183
+msgid "Footer Area 2"
+msgstr ""
+
+#: inc/theme-setup.php:185
+msgid "Second footer widget area."
+msgstr ""
+
+#: inc/theme-setup.php:188
+msgid "Footer Area 3"
+msgstr ""
+
+#: inc/theme-setup.php:190
+msgid "Third footer widget area."
+msgstr ""
+
+#: inc/theme-setup.php:193
+msgid "Footer Area 4"
+msgstr ""
+
+#: inc/theme-setup.php:195
+msgid "Fourth footer widget area."
+msgstr ""
+
+#: inc/theme-setup.php:209
+msgid "Shop Sidebar"
+msgstr ""
+
+#: inc/theme-setup.php:211
+msgid "Widgets for WooCommerce shop pages."
+msgstr ""
+
+#: inc/theme-setup.php:228
+msgid "Wishlists"
+msgstr ""
+
+#: inc/wc-product-functions.php:179
+msgid "SkyyRose Product Details"
+msgstr ""
+
+#: inc/wc-product-functions.php:184
+#: template-parts/product-detail-editorial.php:124
+msgid "Material"
+msgstr ""
+
+#: inc/wc-product-functions.php:187
+msgid "Primary material composition"
+msgstr ""
+
+#: inc/wc-product-functions.php:200
+msgid "Signature Detail"
+msgstr ""
+
+#: inc/wc-product-functions.php:214
+#: template-parts/product-detail-editorial.php:136
+msgid "Made In"
+msgstr ""
+
+#: inc/wc-product-functions.php:221
+msgid "Limited Edition?"
+msgstr ""
+
+#: inc/wishlist-functions.php:302
+#: inc/wishlist-functions.php:340
+#: inc/wishlist-functions.php:378
 msgid "Invalid product ID."
 msgstr ""
 
-#: inc/wishlist-functions.php:246
-#: inc/wishlist-functions.php:511
+#: inc/wishlist-functions.php:312
+#: inc/wishlist-functions.php:643
 msgid "Product added to wishlist."
 msgstr ""
 
-#: inc/wishlist-functions.php:253
-#: inc/wishlist-functions.php:521
+#: inc/wishlist-functions.php:319
+#: inc/wishlist-functions.php:653
 msgid "Product already in wishlist."
 msgstr ""
 
-#: inc/wishlist-functions.php:284
-#: inc/wishlist-functions.php:542
+#: inc/wishlist-functions.php:350
+#: inc/wishlist-functions.php:674
 msgid "Product removed from wishlist."
 msgstr ""
 
-#: inc/wishlist-functions.php:291
-#: inc/wishlist-functions.php:552
+#: inc/wishlist-functions.php:357
+#: inc/wishlist-functions.php:684
 msgid "Product not in wishlist."
 msgstr ""
 
-#: inc/wishlist-functions.php:322
+#: inc/wishlist-functions.php:388
 msgid "Product moved to cart."
 msgstr ""
 
-#: inc/wishlist-functions.php:330
+#: inc/wishlist-functions.php:396
 msgid "Failed to add product to cart."
 msgstr ""
 
-#: inc/wishlist-functions.php:351
-#: inc/wishlist-functions.php:572
+#: inc/wishlist-functions.php:418
+msgid "Please sign in to move items to cart."
+msgstr ""
+
+#: inc/wishlist-functions.php:438
+#: inc/wishlist-functions.php:704
 msgid "Wishlist cleared."
 msgstr ""
 
-#: inc/wishlist-functions.php:358
-#: inc/wishlist-functions.php:582
+#: inc/wishlist-functions.php:445
+#: inc/wishlist-functions.php:714
 msgid "Failed to clear wishlist."
 msgstr ""
 
+#: inc/wishlist-functions.php:469
+msgid "Too many requests. Please try again shortly."
+msgstr ""
+
 #. translators: %d: Number of products moved
-#: inc/wishlist-functions.php:381
+#: inc/wishlist-functions.php:482
 #, php-format
 msgid "%d products moved to cart."
 msgstr ""
 
-#: inc/wishlist-functions.php:391
+#: inc/wishlist-functions.php:492
 msgid "Failed to move products to cart."
 msgstr ""
 
-#: inc/wishlist-functions.php:621
+#: inc/wishlist-functions.php:514
+msgid "Wishlist requires authentication."
+msgstr ""
+
+#: inc/wishlist-functions.php:763
 msgid "Added to wishlist"
 msgstr ""
 
-#: inc/wishlist-functions.php:622
+#: inc/wishlist-functions.php:764
 msgid "Removed from wishlist"
 msgstr ""
 
-#: inc/wishlist-functions.php:623
+#: inc/wishlist-functions.php:765
 msgid "Moved to cart"
 msgstr ""
 
-#: inc/wishlist-functions.php:624
+#: inc/wishlist-functions.php:766
 msgid "An error occurred"
 msgstr ""
 
-#: inc/woocommerce.php:64
+#: inc/woocommerce-kids-capsule.php:26
+msgid "Kids Capsule Settings"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:49
+msgid "Assign this product to the \"Kids Capsule\" category to enable these fields."
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:60
+msgid "Select age range"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:70
+msgid "Age Range"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:80
+msgid "Matching Adult Product ID"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:83
+msgid "WC product ID of matching adult piece"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:86
+msgid "Drop #"
+msgstr ""
+
+#: inc/woocommerce-kids-capsule.php:89
+msgid "e.g. 1"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:36
+msgid "Pre-Order Settings"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:66
+msgid "This is a pre-order product"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:74
+msgid "Available Remaining"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:78
+msgid "Expected Ship Date"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:82
+msgid "Pre-Order Price ($)"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:189
+msgid "pieces"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:191
+msgid "remaining"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:197
+msgid "Early Access Price:"
+msgstr ""
+
+#: inc/woocommerce-preorder.php:201
+msgid "Expected Ship Date:"
+msgstr ""
+
+#: inc/woocommerce.php:316
 msgid "Added to cart"
 msgstr ""
 
-#: inc/woocommerce.php:203
+#: inc/woocommerce.php:340
+#: single.php:77
+msgid "Previous"
+msgstr ""
+
+#: inc/woocommerce.php:341
+#: single.php:78
+msgid "Next"
+msgstr ""
+
+#: inc/woocommerce.php:369
 msgid "View in 3D"
 msgstr ""
 
-#: inc/woocommerce.php:218
+#: inc/woocommerce.php:383
 msgid "3D Model"
 msgstr ""
 
-#: inc/woocommerce.php:241
+#: inc/woocommerce.php:408
 msgid "3D Model File URL (GLB/GLTF)"
 msgstr ""
 
-#: inc/woocommerce.php:252
+#: inc/woocommerce.php:419
 msgid "Enter the URL of the 3D model file (GLB or GLTF format)."
 msgstr ""
 
-#: inc/woocommerce.php:303
-msgid "Search for:"
-msgstr ""
-
-#: inc/woocommerce.php:309
+#: inc/woocommerce.php:482
 msgid "Search products&hellip;"
 msgstr ""
 
-#: inc/woocommerce.php:313
-#: inc/woocommerce.php:314
+#: inc/woocommerce.php:486
+#: inc/woocommerce.php:487
 #: searchform.php:23
 msgctxt "submit button"
 msgid "Search"
 msgstr ""
 
-#: inc/woocommerce.php:331
-msgid "Previous"
+#: index.php:21
+msgid "Journal"
 msgstr ""
 
-#: inc/woocommerce.php:332
-msgid "Next"
+#: index.php:23
+msgid "Stories, drops, and behind-the-scenes from SkyyRose."
 msgstr ""
 
-#: page-wishlist.php:27
+#: index.php:55
+msgid "Read More"
+msgstr ""
+
+#: index.php:63
+msgid "Blog pagination"
+msgstr ""
+
+#: index.php:67
+msgid "Older Posts"
+msgstr ""
+
+#: index.php:68
+msgid "Newer Posts"
+msgstr ""
+
+#: index.php:76
+msgid "No posts yet. Check back soon."
+msgstr ""
+
+#: page-collections.php:57
+msgid "Luxury Grows from Concrete. Every piece limited, numbered, and never restocked."
+msgstr ""
+
+#: page-collections.php:60
+msgid "All collections"
+msgstr ""
+
+#: page-collections.php:121
+msgid "Reserve Before the Drop"
+msgstr ""
+
+#: page-collections.php:122
+msgid "Pre-order pieces are numbered in the order they are claimed."
+msgstr ""
+
+#: page-collections.php:123
+msgid "Enter Pre-Order"
+msgstr ""
+
+#: page-wishlist.php:16
+msgid "Wishlist Unavailable"
+msgstr ""
+
+#: page-wishlist.php:17
+msgid "The wishlist feature requires WooCommerce to be active."
+msgstr ""
+
+#: page-wishlist.php:47
 msgid "Move All to Cart"
 msgstr ""
 
-#: page-wishlist.php:30
+#: page-wishlist.php:50
 msgid "Clear Wishlist"
 msgstr ""
 
-#: page-wishlist.php:36
+#: page-wishlist.php:56
 msgid "Share Wishlist"
 msgstr ""
 
-#: page-wishlist.php:55
-#: template-parts/wishlist-button.php:23
-msgid "Remove from wishlist"
+#. translators: %s: product name
+#: page-wishlist.php:73
+#: template-parts/product-card-holo.php:93
+#: template-preorder-gateway.php:553
+#, php-format
+msgid "View %s"
 msgstr ""
 
-#: page-wishlist.php:81
+#: page-wishlist.php:76
+#, php-format
+msgid "Remove %s from wishlist"
+msgstr ""
+
+#: page-wishlist.php:102
 msgid "In Stock"
 msgstr ""
 
-#: page-wishlist.php:83
+#: page-wishlist.php:104
 msgid "Out of Stock"
 msgstr ""
 
-#: page-wishlist.php:90
+#: page-wishlist.php:111
 msgid "Move to Cart"
 msgstr ""
 
-#: page-wishlist.php:94
+#: page-wishlist.php:115
 msgid "View Product"
 msgstr ""
 
-#: page-wishlist.php:115
+#: page-wishlist.php:136
 msgid "Your Wishlist is Empty"
 msgstr ""
 
-#: page-wishlist.php:117
+#: page-wishlist.php:138
 msgid "Save your favorite items here to purchase later or keep track of items you love."
 msgstr ""
 
-#: page-wishlist.php:121
+#: page-wishlist.php:142
 msgid "Start Shopping"
+msgstr ""
+
+#: page.php:33
+#: single.php:65
+msgid "Page navigation"
+msgstr ""
+
+#: patterns/collection-hero-black-rose.php:3
+msgctxt "Pattern title"
+msgid "Black Rose Collection Hero"
+msgstr ""
+
+#: patterns/collection-hero-black-rose.php:6
+msgctxt "Pattern description"
+msgid "Full-width hero section for the Black Rose collection with silver accent."
+msgstr ""
+
+#: patterns/collection-hero-kids-capsule.php:3
+msgctxt "Pattern title"
+msgid "Kids Capsule Collection Hero"
+msgstr ""
+
+#: patterns/collection-hero-kids-capsule.php:6
+msgctxt "Pattern description"
+msgid "Full-width hero section for the Kids Capsule collection with pink accent."
+msgstr ""
+
+#: patterns/collection-hero-love-hurts.php:3
+msgctxt "Pattern title"
+msgid "Love Hurts Collection Hero"
+msgstr ""
+
+#: patterns/collection-hero-love-hurts.php:6
+msgctxt "Pattern description"
+msgid "Full-width hero section for the Love Hurts collection with crimson accent."
+msgstr ""
+
+#: patterns/collection-hero-signature.php:3
+msgctxt "Pattern title"
+msgid "Signature Collection Hero"
+msgstr ""
+
+#: patterns/collection-hero-signature.php:6
+msgctxt "Pattern description"
+msgid "Full-width hero section for the Signature collection with gold accent."
+msgstr ""
+
+#: search.php:64
+msgid "Results for"
+msgstr ""
+
+#. translators: %d: total result count
+#: search.php:77
+#, php-format
+msgid "%d result found"
+msgid_plural "%d results found"
+msgstr[0] ""
+msgstr[1] ""
+
+#: search.php:116
+msgid "Product Results"
+msgstr ""
+
+#. translators: %d: product count
+#: search.php:121
+#, php-format
+msgid "%d Product"
+msgid_plural "%d Products"
+msgstr[0] ""
+msgstr[1] ""
+
+#: search.php:160
+msgid "Content Results"
+msgstr ""
+
+#: search.php:162
+msgid "Pages & Posts"
+msgstr ""
+
+#: search.php:197
+msgid "Older Results"
+msgstr ""
+
+#: search.php:198
+msgid "Newer Results"
+msgstr ""
+
+#: search.php:224
+msgid "No Results Found"
+msgstr ""
+
+#. translators: %s: search query
+#: search.php:232
+#, php-format
+msgid "We couldn't find anything matching \"%s\""
+msgstr ""
+
+#: search.php:236
+msgid "Enter a search term to explore our collections"
+msgstr ""
+
+#: search.php:244
+msgid "Try Searching For"
+msgstr ""
+
+#: search.php:249
+msgid "Hoodies"
+msgstr ""
+
+#: search.php:250
+msgid "T-Shirts"
+msgstr ""
+
+#: search.php:269
+msgid "Explore Our Collections"
+msgstr ""
+
+#: search.php:317
+msgid "Browse All Products"
 msgstr ""
 
 #: searchform.php:13
@@ -619,48 +4503,2498 @@ msgctxt "placeholder"
 msgid "Search &hellip;"
 msgstr ""
 
-#: single.php:22
-msgid "Previous:"
+#: single.php:73
+msgid "Post navigation"
 msgstr ""
 
-#: single.php:23
-msgid "Next:"
+#: template-about.php:155
+#: template-faq.php:100
+msgid "About SkyyRose"
+msgstr ""
+
+#: template-about.php:167
+msgid "SR-001"
+msgstr ""
+
+#: template-about.php:170
+msgid "The<br>Story"
+msgstr ""
+
+#: template-about.php:187
+msgid "SkyyRose origin portrait"
+msgstr ""
+
+#: template-about.php:191
+msgid "Skyy Rose &mdash; The Heir"
 msgstr ""
 
 #. Template Name of the theme
-msgid "Love Hurts Collection - Enchanted Ballroom"
+#: template-collection-black-rose.php:3
+msgid "Collection - Black Rose"
 msgstr ""
 
-#: template-parts/content/content-none.php:13
-msgid "Nothing Found"
+#. Template Name of the theme
+#: template-collection-kids-capsule.php:3
+msgid "Collection - Kids Capsule"
+msgstr ""
+
+#. Template Name of the theme
+#: template-collection-love-hurts.php:3
+msgid "Collection - Love Hurts"
+msgstr ""
+
+#. Template Name of the theme
+#: template-collection-signature.php:3
+msgid "Collection - Signature"
+msgstr ""
+
+#. Template Name of the theme
+#: template-collections-world.php:3
+msgid "Collections World (Scroll Fly-Through)"
+msgstr ""
+
+#: template-collections-world.php:37
+msgid "Skip to the collections"
+msgstr ""
+
+#: template-collections-world.php:45
+msgid "This scroll experience needs JavaScript."
+msgstr ""
+
+#. Template Name of the theme
+#: template-coming-soon.php:3
+msgid "Coming Soon (Veil)"
+msgstr ""
+
+#: template-coming-soon.php:28
+msgid "The next collection is coming."
+msgstr ""
+
+#: template-coming-soon.php:29
+msgid "Skyy Rose — Studio Notice"
+msgstr ""
+
+#: template-coming-soon.php:31
+msgid "We are reworking the floor. The story stays the same — what you wear should say something. New collection, new chapters, same Oakland blood."
+msgstr ""
+
+#: template-coming-soon.php:32
+msgid "Be the first to know when we open the doors."
+msgstr ""
+
+#: template-coming-soon.php:373
+msgid "Skip to main content"
+msgstr ""
+
+#: template-coming-soon.php:378
+msgid "Studio masthead"
+msgstr ""
+
+#: template-coming-soon.php:387
+msgid "Studio active"
+msgstr ""
+
+#: template-coming-soon.php:395
+msgid "The next"
+msgstr ""
+
+#: template-coming-soon.php:396
+msgid "chapter is"
+msgstr ""
+
+#: template-coming-soon.php:397
+msgid "on the loom."
+msgstr ""
+
+#: template-coming-soon.php:407
+msgid "On the list"
+msgstr ""
+
+#: template-coming-soon.php:418
+#: template-landing-black-rose.php:334
+#: template-landing-love-hurts.php:372
+#: template-landing-signature.php:318
+#: template-parts/kids-capsule/teaser.php:149
+#: template-preorder-gateway.php:869
+#: woocommerce/checkout/form-checkout.php:108
+msgid "your@email.com"
+msgstr ""
+
+#: template-coming-soon.php:425
+msgid "Submit"
+msgstr ""
+
+#. translators: 1: current year 2: site name
+#: template-coming-soon.php:439
+#, php-format
+msgid "© %1$s %2$s"
+msgstr ""
+
+#: template-coming-soon.php:447
+msgid "Oakland, California — Est. 2020"
+msgstr ""
+
+#: template-contact.php:30
+msgid "Email Us"
+msgstr ""
+
+#: template-contact.php:31
+msgid "Drop us a line anytime. We read every message personally."
+msgstr ""
+
+#: template-contact.php:37
+msgid "Visit Our Showroom"
+msgstr ""
+
+#: template-contact.php:38
+msgid "Experience the collections in person by appointment."
+msgstr ""
+
+#: template-contact.php:44
+msgid "Business Hours"
+msgstr ""
+
+#: template-contact.php:45
+msgid "Our team is available during the following hours (PST)."
+msgstr ""
+
+#: template-contact.php:46
+msgid "Mon-Fri: 9:00 AM - 6:00 PM"
+msgstr ""
+
+#: template-contact.php:47
+msgid "Sat: 10:00 AM - 4:00 PM | Sun: Closed"
+msgstr ""
+
+#: template-contact.php:74
+msgid "Select a topic"
+msgstr ""
+
+#: template-contact.php:88
+msgid "Pick one"
+msgstr ""
+
+#: template-contact.php:94
+#: template-faq.php:20
+msgid "How long does shipping take?"
+msgstr ""
+
+#: template-contact.php:95
+msgid "Domestic orders ship within 1-2 business days. Standard shipping (5-7 business days) is $17, Express (2-3 days) is $22, and shipping is free on orders over $200. International orders typically take 7-14 business days depending on your location and customs processing times."
+msgstr ""
+
+#: template-contact.php:98
+msgid "What's your return policy?"
+msgstr ""
+
+#: template-contact.php:99
+msgid "We offer a 30-day return policy from the date of delivery. Items must be unworn, unwashed, and in their original condition with all tags attached. Simply initiate a return through your order confirmation email or contact us directly. Exchanges are always free. Refunds are processed within 5-7 business days after we receive your return. Pre-order and final sale items may have different policies."
+msgstr ""
+
+#: template-contact.php:102
+msgid "Do you offer custom orders?"
+msgstr ""
+
+#: template-contact.php:103
+msgid "Yes! We love bringing unique visions to life. Our custom order process starts with a consultation where we discuss your ideas, preferred materials, and timeline. Custom pieces typically take 4-6 weeks to produce. Reach out through the contact form with \"Custom Orders\" selected as the subject, and include details about your vision. Pricing varies based on complexity and materials."
+msgstr ""
+
+#: template-contact.php:106
+msgid "Is wholesale available?"
+msgstr ""
+
+#: template-contact.php:107
+msgid "We selectively partner with boutiques and retailers that align with our brand vision. Our minimum wholesale order is 12 units per style. For wholesale inquiries, select \"Wholesale Inquiry\" in the contact form and include your business name, location, and the collections you are interested in. Our wholesale team will follow up within 48 hours with pricing and terms."
+msgstr ""
+
+#: template-contact.php:110
+#: template-faq.php:24
+msgid "Do you ship internationally?"
+msgstr ""
+
+#: template-contact.php:111
+msgid "Yes, we ship to over 50 countries worldwide! International shipping rates are calculated at checkout based on your location and order weight. All duties, taxes, and customs fees are the responsibility of the customer. Tracking is provided for all international orders. Please note that delivery times may vary due to customs processing in your country."
+msgstr ""
+
+#: template-contact.php:114
+msgid "How do I track my order?"
+msgstr ""
+
+#: template-contact.php:115
+msgid "Once your order ships, you will receive a confirmation email with your tracking number and a direct link to track your package. You can also check your order status anytime by visiting our Order Tracking page or by contacting us with your order number. We ship with major carriers including USPS, UPS, and FedEx."
+msgstr ""
+
+#: template-contact.php:118
+msgid "What sizes do you carry?"
+msgstr ""
+
+#: template-contact.php:119
+msgid "Most of our pieces are available in sizes XS through XXL. Each product page includes a detailed size guide with measurements for chest, waist, hips, and length. We recommend measuring yourself and comparing to our size charts for the best fit. If you are between sizes, we suggest sizing up for a relaxed fit or down for a more tailored look. Need help? Our styling team is always happy to assist."
+msgstr ""
+
+#: template-contact.php:122
+msgid "Are your products sustainable?"
+msgstr ""
+
+#: template-contact.php:123
+msgid "Sustainability is at the heart of what we do. We use ethically sourced materials including organic cotton, recycled polyester, and responsibly produced hardware. Our limited production runs minimize waste, and we partner with manufacturers who uphold fair labor practices. We are continuously working to reduce our environmental footprint through eco-friendly packaging and carbon-offset shipping options."
+msgstr ""
+
+#: template-contact.php:126
+msgid "Do you do collaborations?"
+msgstr ""
+
+#: template-contact.php:127
+msgid "Absolutely! We love partnering with artists, designers, influencers, and brands that share our vision. Whether you're interested in a co-designed capsule, a content collaboration, or a brand partnership, we want to hear from you. Select \"Collaboration\" in the contact form and share your portfolio or social links along with your idea. Our creative team reviews every submission."
+msgstr ""
+
+#: template-contact.php:130
+msgid "How can I join the SkyyRose community?"
+msgstr ""
+
+#: template-contact.php:131
+msgid "There are many ways to be part of the SkyyRose family! Follow us on Instagram, TikTok, and Twitter @skyyrose for the latest drops, behind-the-scenes content, and styling inspiration. Sign up for our newsletter to get early access to new collections and member-only drop alerts. We also host pop-up events in Oakland and other cities throughout the year, so stay tuned for invitations."
+msgstr ""
+
+#: template-contact.php:152
+msgid "We'd Love to Hear From You"
+msgstr ""
+
+#: template-contact.php:155
+msgid "Whether you have a question about our collections, need styling advice, want to explore a collaboration, or just want to say hello, the SkyyRose community is here for you. Every message matters to us."
+msgstr ""
+
+#: template-contact.php:161
+msgid "Contact Information and Form"
+msgstr ""
+
+#: template-contact.php:167
+#: woocommerce/checkout/form-checkout.php:92
+msgid "Contact Information"
+msgstr ""
+
+#: template-contact.php:194
+msgid "Follow Us"
+msgstr ""
+
+#: template-contact.php:197
+msgid "Stay connected with the SkyyRose community for drops, styling tips, and behind-the-scenes content."
+msgstr ""
+
+#: template-contact.php:206
+#, php-format
+msgid "Follow SkyyRose on %s"
+msgstr ""
+
+#: template-contact.php:236
+msgid "Our Response Promise"
+msgstr ""
+
+#: template-contact.php:245
+msgid "We Typically Respond Within 24 Hours"
+msgstr ""
+
+#: template-contact.php:248
+msgid "Our team reads every message personally. You will hear back from a real person, not a bot."
+msgstr ""
+
+#: template-contact.php:256
+#: template-parts/contact/form.php:185
+#: woocommerce/checkout/thankyou.php:78
+msgid "Email"
+msgstr ""
+
+#: template-contact.php:264
+msgid "Instagram DM"
+msgstr ""
+
+#: template-contact.php:272
+msgid "Live Chat"
+msgstr ""
+
+#: template-contact.php:291
+msgid "Our Location"
+msgstr ""
+
+#: template-contact.php:313
+msgid "SkyyRose Showroom"
+msgstr ""
+
+#: template-contact.php:320
+msgid "Mon-Fri 9AM-6PM PST | Sat 10AM-4PM"
+msgstr ""
+
+#: template-contact.php:332
+msgid "Get Directions"
+msgstr ""
+
+#. Template Name of the theme
+#: template-elementor-canvas.php:3
+msgid "Elementor Canvas (SkyyRose)"
+msgstr ""
+
+#. Template Name of the theme
+#: template-elementor-editorial.php:3
+msgid "Elementor Editorial"
+msgstr ""
+
+#. Template Name of the theme
+#: template-elementor-fullwidth.php:3
+msgid "Full Width (SkyyRose)"
+msgstr ""
+
+#. Template Name of the theme
+#: template-experiences.php:3
+msgid "Experiences Hub"
+msgstr ""
+
+#: template-experiences.php:137
+msgid "Collection navigation"
+msgstr ""
+
+#. translators: %s: collection name
+#: template-experiences.php:166
+#, php-format
+msgid "%s — enter the world"
+msgstr ""
+
+#. translators: %s: collection name
+#: template-experiences.php:194
+#, php-format
+msgid "Enter the %s world"
+msgstr ""
+
+#: template-experiences.php:216
+#: template-parts/about/collections-grid.php:116
+msgid "Enter"
+msgstr ""
+
+#: template-faq.php:16
+msgid "Orders & Shipping"
+msgstr ""
+
+#: template-faq.php:21
+msgid "Standard shipping within the US takes 5–7 business days. Express shipping delivers in 2–3 business days. International orders typically arrive within 10–14 business days depending on your location and customs processing."
+msgstr ""
+
+#: template-faq.php:25
+msgid "Yes. We ship to over 40 countries worldwide. International shipping rates are calculated at checkout based on your destination. Duties and taxes are the responsibility of the recipient."
+msgstr ""
+
+#: template-faq.php:28
+msgid "How can I track my order?"
+msgstr ""
+
+#: template-faq.php:29
+msgid "Once your order ships, you'll receive an email with a tracking number and link. You can also check your order status anytime by logging into your account on our website."
+msgstr ""
+
+#: template-faq.php:32
+msgid "Can I change or cancel my order?"
+msgstr ""
+
+#: template-faq.php:33
+msgid "We process orders quickly. If you need to make changes, contact us within 2 hours of placing your order at support@skyyrose.co. After that window, we cannot guarantee modifications as your order may already be in production."
+msgstr ""
+
+#: template-faq.php:42
+#: template-parts/footer-cro.php:106
+msgid "What is your return policy?"
+msgstr ""
+
+#: template-faq.php:43
+msgid "We accept returns within 30 days of delivery for unworn, unwashed items with original tags attached. Items must be in their original packaging. Refunds are processed within 5–7 business days after we receive and inspect the return."
+msgstr ""
+
+#: template-faq.php:46
+msgid "How do I start a return?"
+msgstr ""
+
+#: template-faq.php:47
+msgid "Email support@skyyrose.co with your order number and reason for return. We'll send you a prepaid return label (US orders) or return instructions (international orders) within 24 hours."
+msgstr ""
+
+#: template-faq.php:50
+msgid "Can I exchange for a different size?"
+msgstr ""
+
+#: template-faq.php:51
+msgid "Yes. Exchanges are free for US orders. Request an exchange through support@skyyrose.co and we'll ship your new size as soon as we receive the original item. If the size you need is available, we can ship it immediately and provide a return label for the original."
+msgstr ""
+
+#: template-faq.php:54
+msgid "Are sale items final sale?"
+msgstr ""
+
+#: template-faq.php:55
+msgid "Items marked \"Final Sale\" cannot be returned or exchanged. All other sale items follow our standard 30-day return policy."
+msgstr ""
+
+#: template-faq.php:60
+msgid "Products & Sizing"
+msgstr ""
+
+#: template-faq.php:64
+msgid "How do your pieces fit?"
+msgstr ""
+
+#: template-faq.php:65
+msgid "Most pieces run true to size with a relaxed, gender-neutral fit. Each product page includes a detailed size chart with measurements. When in doubt, check our Size Guide or reach out — we'll point you right."
+msgstr ""
+
+#: template-faq.php:68
+msgid "Are your products unisex?"
+msgstr ""
+
+#: template-faq.php:69
+msgid "Every SkyyRose piece is designed gender-neutral. Our sizing accounts for all body types with relaxed silhouettes that drape naturally regardless of how you identify."
+msgstr ""
+
+#: template-faq.php:72
+msgid "How should I care for my SkyyRose pieces?"
+msgstr ""
+
+#: template-faq.php:73
+msgid "Machine wash cold, inside out, on a gentle cycle. Hang dry or tumble dry low. Do not bleach. Iron on low heat if needed, avoiding printed or embroidered areas. Detailed care instructions are included on every garment label."
+msgstr ""
+
+#: template-faq.php:76
+msgid "What materials do you use?"
+msgstr ""
+
+#: template-faq.php:77
+msgid "We source heavyweight cotton (280–320 GSM), reinforced stitching, and colorfast dyes. Our materials are chosen for longevity — these are investment pieces, not fast fashion. Specific material details are listed on each product page."
+msgstr ""
+
+#: template-faq.php:82
+msgid "Pre-Orders & Limited Editions"
+msgstr ""
+
+#: template-faq.php:86
+msgid "How do pre-orders work?"
+msgstr ""
+
+#: template-faq.php:87
+msgid "Pre-orders secure your piece before the official drop. Your card is charged at the time of pre-order. Estimated ship dates are listed on each product page. Pre-order items ship separately from in-stock items."
+msgstr ""
+
+#: template-faq.php:90
+msgid "What does \"Limited Edition\" mean?"
+msgstr ""
+
+#: template-faq.php:91
+msgid "Limited Edition pieces are produced in a fixed quantity — once they sell out, they're gone forever. The edition size is displayed on the product card. We never reprint or restock limited runs."
+msgstr ""
+
+#: template-faq.php:94
+msgid "Can I cancel a pre-order?"
+msgstr ""
+
+#: template-faq.php:95
+msgid "Pre-orders can be cancelled for a full refund up to 48 hours before the estimated ship date. After that, standard return policy applies once the item is delivered."
+msgstr ""
+
+#: template-faq.php:104
+msgid "Who is behind SkyyRose?"
+msgstr ""
+
+#: template-faq.php:105
+msgid "SkyyRose was founded by Corey Foster in Oakland, California. The brand is named after his daughter, Skyy Rose. What started as a father's promise became a luxury streetwear label built on authenticity, uncompromising craft, and the belief that luxury grows from concrete."
+msgstr ""
+
+#: template-faq.php:108
+msgid "Where are your pieces made?"
+msgstr ""
+
+#: template-faq.php:109
+msgid "Our pieces are designed in Oakland and manufactured by vetted production partners who share our commitment to quality. Every manufacturer is personally approved and regularly audited."
+msgstr ""
+
+#: template-faq.php:112
+msgid "How can I collaborate or partner with SkyyRose?"
+msgstr ""
+
+#: template-faq.php:113
+msgid "For wholesale inquiries, press features, collaboration proposals, or influencer partnerships, email partnerships@skyyrose.co with your proposal and we'll review it within 5 business days."
+msgstr ""
+
+#: template-faq.php:132
+msgid "Support"
+msgstr ""
+
+#: template-faq.php:133
+#: template-parts/contact/faq-list.php:23
+#: template-parts/contact/faq-list.php:26
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: template-faq.php:134
+msgid "Everything you need to know about shopping with SkyyRose."
+msgstr ""
+
+#: template-faq.php:167
+msgid "Still have questions?"
+msgstr ""
+
+#: template-faq.php:168
+msgid "Questions live here. For everything else — reach out."
+msgstr ""
+
+#. Template Name of the theme
+#: template-immersive-black-rose.php:3
+msgid "Immersive - Black Rose"
+msgstr ""
+
+#. Template Name of the theme
+#: template-immersive-kids-capsule.php:3
+msgid "Immersive - Kids Capsule"
+msgstr ""
+
+#. Template Name of the theme
+#: template-immersive-love-hurts.php:3
+msgid "Immersive - Love Hurts"
+msgstr ""
+
+#. Template Name of the theme
+#: template-immersive-signature.php:3
+msgid "Immersive - Signature"
+msgstr ""
+
+#. Template Name of the theme
+#: template-landing-black-rose.php:3
+msgid "Landing — Black Rose"
+msgstr ""
+
+#: template-landing-black-rose.php:69
+msgid "Black Rose collection"
+msgstr ""
+
+#: template-landing-black-rose.php:96
+msgid "Built from what was broken. Worn as proof."
+msgstr ""
+
+#: template-landing-black-rose.php:103
+#: template-landing-signature.php:99
+msgid "Explore the Collection"
+msgstr ""
+
+#: template-landing-black-rose.php:111
+msgid "Shop All Black Rose"
+msgstr ""
+
+#: template-landing-black-rose.php:139
+msgid "Black Rose product stories"
+msgstr ""
+
+#: template-landing-black-rose.php:210
+#: template-landing-signature.php:192
+msgid "Product navigation"
+msgstr ""
+
+#: template-landing-black-rose.php:310
+msgid "Join the Black Rose list"
+msgstr ""
+
+#: template-landing-black-rose.php:314
+msgid "Stay in the Dark."
+msgstr ""
+
+#: template-landing-black-rose.php:317
+msgid "Drop alerts and early access — Black Rose inner circle only."
+msgstr ""
+
+#: template-landing-black-rose.php:341
+#: template-landing-signature.php:325
+msgid "Get Access"
+msgstr ""
+
+#. Template Name of the theme
+#: template-landing-kids-capsule.php:3
+msgid "Landing — Kids Capsule"
+msgstr ""
+
+#: template-landing-kids-capsule.php:22
+msgid "Kids Capsule Collection — luxury runs in the family"
+msgstr ""
+
+#: template-landing-kids-capsule.php:89
+msgid "Kids Capsule purple set, model shot"
+msgstr ""
+
+#: template-landing-kids-capsule.php:137
+msgid "Kids Capsule red set, model shot"
+msgstr ""
+
+#: template-landing-kids-capsule.php:138
+msgid "Kids Capsule purple set, back view"
+msgstr ""
+
+#: template-landing-kids-capsule.php:139
+msgid "Kids Capsule red set, back view"
+msgstr ""
+
+#. Template Name of the theme
+#: template-landing-love-hurts.php:3
+msgid "Landing — Love Hurts"
+msgstr ""
+
+#: template-landing-love-hurts.php:35
+msgid "Skip to products"
+msgstr ""
+
+#: template-landing-love-hurts.php:39
+msgid "Love Hurts Collection — SkyyRose"
+msgstr ""
+
+#: template-landing-love-hurts.php:44
+msgid "Love Hurts collection hero"
+msgstr ""
+
+#: template-landing-love-hurts.php:84
+#: template-landing-love-hurts.php:331
+msgid "For the love that survived everything."
+msgstr ""
+
+#: template-landing-love-hurts.php:89
+#: template-parts/about/mission.php:33
+#: template-parts/collection/page.php:168
+msgid "Shop the Collection"
+msgstr ""
+
+#: template-landing-love-hurts.php:92
+msgid "Explore the Story"
+msgstr ""
+
+#: template-landing-love-hurts.php:106
+msgid "Collection narrative"
+msgstr ""
+
+#: template-landing-love-hurts.php:109
+msgid "Navigate to pane"
+msgstr ""
+
+#: template-landing-love-hurts.php:114
+#, php-format
+msgid "Pane %d"
+msgstr ""
+
+#: template-landing-love-hurts.php:130
+msgid "The Statement Piece"
+msgstr ""
+
+#: template-landing-love-hurts.php:131
+msgid "Wear every chapter."
+msgstr ""
+
+#: template-landing-love-hurts.php:132
+msgid "Some love stories don't have clean endings. The Love Hurts Bomber Jacket carries that weight — embroidered devotion on the back, silence on the chest. Structured. Unforgettable."
+msgstr ""
+
+#: template-landing-love-hurts.php:133
+msgid "\"You don't dress for the memories. You dress through them.\""
+msgstr ""
+
+#: template-landing-love-hurts.php:135
+msgid "Heavyweight satin shell"
+msgstr ""
+
+#: template-landing-love-hurts.php:136
+msgid "Embroidered back panel"
+msgstr ""
+
+#: template-landing-love-hurts.php:139
+msgid "View Jacket"
+msgstr ""
+
+#: template-landing-love-hurts.php:144
+msgid "Soft outside. Carrying everything inside."
+msgstr ""
+
+#: template-landing-love-hurts.php:145
+msgid "Cotton-fleece joggers built for the long stretch — after the conversation, before the next decision. The Love Hurts wordmark embroidered at the left ankle. Crimson, black, and gold on dark."
+msgstr ""
+
+#: template-landing-love-hurts.php:147
+msgid "Mid-weight cotton-fleece"
+msgstr ""
+
+#: template-landing-love-hurts.php:148
+msgid "Ribbed ankle cuffs"
+msgstr ""
+
+#: template-landing-love-hurts.php:149
+msgid "Athletic fit"
+msgstr ""
+
+#: template-landing-love-hurts.php:151
+msgid "Shop Joggers"
+msgstr ""
+
+#: template-landing-love-hurts.php:155
+msgid "The Move"
+msgstr ""
+
+#: template-landing-love-hurts.php:156
+msgid "Built for what you carry off the court."
+msgstr ""
+
+#: template-landing-love-hurts.php:157
+msgid "Basketball shorts that live past the game. The heart emblem at the inseam. Moisture-wicking shell. Every rep, every comeback, every day you showed up anyway."
+msgstr ""
+
+#: template-landing-love-hurts.php:159
+msgid "Moisture-wicking shell"
+msgstr ""
+
+#: template-landing-love-hurts.php:160
+msgid "Side-slit hem"
+msgstr ""
+
+#: template-landing-love-hurts.php:162
+msgid "Shop Shorts"
+msgstr ""
+
+#: template-landing-love-hurts.php:166
+msgid "The Mirror"
+msgstr ""
+
+#: template-landing-love-hurts.php:167
+msgid "The same devotion. Different light."
+msgstr ""
+
+#: template-landing-love-hurts.php:168
+msgid "The white colorway of the Love Hurts Joggers. Crimson, black, and gold on white — the same emblem reading differently when you step into the room. A mirror of the black pair."
+msgstr ""
+
+#: template-landing-love-hurts.php:170
+msgid "Cotton-fleece, white colorway"
+msgstr ""
+
+#: template-landing-love-hurts.php:171
+msgid "Mirror of Love Hurts Joggers (Black)"
+msgstr ""
+
+#: template-landing-love-hurts.php:173
+msgid "Shop White Joggers"
+msgstr ""
+
+#: template-landing-love-hurts.php:177
+msgid "The Detail"
+msgstr ""
+
+#: template-landing-love-hurts.php:178
+msgid "Even the small things carry it."
+msgstr ""
+
+#: template-landing-love-hurts.php:179
+msgid "The Fannie wears the Love Hurts logo at the front pocket. Worn across the body or around the waist, it's the accessory that finishes the set — quietly, without announcement."
+msgstr ""
+
+#: template-landing-love-hurts.php:181
+msgid "Love Hurts logo embroidery"
+msgstr ""
+
+#: template-landing-love-hurts.php:182
+msgid "Adjustable strap"
+msgstr ""
+
+#: template-landing-love-hurts.php:184
+msgid "Shop The Fannie"
+msgstr ""
+
+#: template-landing-love-hurts.php:217
+#, php-format
+msgid "From $%s"
+msgstr ""
+
+#: template-landing-love-hurts.php:219
+#, php-format
+msgid "$%s"
+msgstr ""
+
+#: template-landing-love-hurts.php:308
+msgid "Love Hurts — Full Collection"
+msgstr ""
+
+#: template-landing-love-hurts.php:311
+msgid "The Full Collection"
+msgstr ""
+
+#: template-landing-love-hurts.php:351
+msgid "Stay connected"
+msgstr ""
+
+#: template-landing-love-hurts.php:354
+msgid "Stay Connected"
+msgstr ""
+
+#: template-landing-love-hurts.php:356
+msgid "Love never left. Neither should you."
+msgstr ""
+
+#: template-landing-love-hurts.php:359
+msgid "New drops, restocks, and stories — straight to your inbox."
+msgstr ""
+
+#. Template Name of the theme
+#: template-landing-signature.php:3
+msgid "Landing — Signature"
+msgstr ""
+
+#: template-landing-signature.php:65
+msgid "Signature collection"
+msgstr ""
+
+#: template-landing-signature.php:108
+msgid "Shop All Signature"
+msgstr ""
+
+#: template-landing-signature.php:130
+msgid "Signature product stories"
+msgstr ""
+
+#: template-landing-signature.php:294
+msgid "Join the Signature list"
+msgstr ""
+
+#: template-landing-signature.php:298
+msgid "Build Your Blueprint."
+msgstr ""
+
+#: template-landing-signature.php:301
+msgid "Early access and new drops — Signature subscribers first."
+msgstr ""
+
+#: template-parts/about/chapter-origin.php:36
+msgid "The Rebrand Story"
+msgstr ""
+
+#: template-parts/about/chapter-origin.php:39
+msgid "CH. 01"
+msgstr ""
+
+#: template-parts/about/chapter-origin.php:44
+msgid "The Birth<br>of the Rebrand"
+msgstr ""
+
+#: template-parts/about/chapter-origin.php:57
+msgid "Pull quote"
+msgstr ""
+
+#: template-parts/about/collections-grid.php:60
+msgid "CH. 02"
+msgstr ""
+
+#: template-parts/about/collections-grid.php:67
+msgid "Four Worlds.<br>One Bloodline."
+msgstr ""
+
+#: template-parts/about/community.php:35
+msgid "The Town"
+msgstr ""
+
+#: template-parts/about/community.php:43
+msgid "Oakland places"
+msgstr ""
+
+#: template-parts/about/community.php:75
+msgid "The SkyyRose Family"
+msgstr ""
+
+#: template-parts/about/featured-video.php:29
+msgid "Featured video"
+msgstr ""
+
+#: template-parts/about/featured-video.php:32
+#: template-parts/about/press-section.php:63
+msgid "Featured Video"
+msgstr ""
+
+#: template-parts/about/featured-video.php:39
+#: template-parts/about/press-section.php:70
+msgid "SkyyRose Collection — The Blox Interview"
+msgstr ""
+
+#: template-parts/about/mission.php:21
+msgid "Our Mission"
+msgstr ""
+
+#: template-parts/about/mission.php:24
+msgid "The Mission"
+msgstr ""
+
+#: template-parts/about/mission.php:27
+msgid "Luxury Grows<br>from Concrete."
+msgstr ""
+
+#: template-parts/about/mission.php:30
+msgid "Four Collections, A Bloodline, and the Heir to the Throne."
+msgstr ""
+
+#: template-parts/about/press-section.php:36
+msgid "CH. 04"
+msgstr ""
+
+#: template-parts/about/press-section.php:41
+msgid "As Seen In"
+msgstr ""
+
+#: template-parts/about/press-section.php:53
+msgid "Corey Foster interviewed on The Blox"
+msgstr ""
+
+#: template-parts/about/press-section.php:56
+msgid "Corey Foster on The Blox"
+msgstr ""
+
+#: template-parts/about/press-section.php:101
+msgid "Read"
+msgstr ""
+
+#: template-parts/about/timeline.php:27
+msgid "Our Journey"
+msgstr ""
+
+#: template-parts/about/timeline.php:30
+msgid "CH. 03"
+msgstr ""
+
+#: template-parts/about/timeline.php:32
+msgid "The Journey"
+msgstr ""
+
+#: template-parts/about/timeline.php:35
+msgid "Drop Calendar"
+msgstr ""
+
+#: template-parts/collection/founder-pullquote.php:28
+msgid "If you asked me four years ago, I never would have thought I'd be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary."
+msgstr ""
+
+#: template-parts/collection/founder-pullquote.php:31
+#: template-parts/collection/page.php:387
+msgid "Corey Foster"
+msgstr ""
+
+#: template-parts/collection/founder-pullquote.php:34
+msgid "Founder · Oakland"
+msgstr ""
+
+#: template-parts/collection/founder-pullquote.php:36
+msgid "Founder note from Corey Foster"
+msgstr ""
+
+#: template-parts/collection/page.php:222
+msgid "Collection film"
+msgstr ""
+
+#: template-parts/collection/page.php:240
+msgid "Pause background video"
+msgstr ""
+
+#: template-parts/collection/page.php:292
+msgid "Rose hoodie and beanie, worn — Signature editorial"
+msgstr ""
+
+#: template-parts/collection/page.php:298
+msgid "Black Rose football jersey, worn — editorial"
+msgstr ""
+
+#: template-parts/collection/page.php:302
+msgid "Black Rose hockey jersey, worn — editorial"
+msgstr ""
+
+#: template-parts/collection/page.php:308
+msgid "Love Hurts varsity jacket, worn — editorial"
+msgstr ""
+
+#: template-parts/collection/page.php:314
+msgid "Child wearing a Black Rose piece — Kids Capsule editorial"
+msgstr ""
+
+#: template-parts/collection/page.php:322
+#: template-preorder-gateway.php:656
+#: template-preorder-gateway.php:659
+msgid "Lookbook"
+msgstr ""
+
+#. translators: %d: product count
+#: template-parts/collection/page.php:354
+#, php-format
+msgid "%d Piece"
+msgid_plural "%d Pieces"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template-parts/collection/page.php:356
+msgid "Limited Run"
+msgstr ""
+
+#: template-parts/collection/page.php:388
+msgid "Founder · The origin"
+msgstr ""
+
+#: template-parts/collection/page.php:414
+msgid "Other collections"
+msgstr ""
+
+#: template-parts/collection/page.php:415
+msgid "Explore More Collections"
+msgstr ""
+
+#: template-parts/components/drawer.php:42
+#: template-parts/components/modal.php:39
+msgid "Close"
+msgstr ""
+
+#: template-parts/components/drawer.php:113
+msgid "Panel"
+msgstr ""
+
+#: template-parts/components/modal.php:96
+msgid "Dialog"
+msgstr ""
+
+#: template-parts/contact/faq-list.php:29
+msgid "Can't find what you're looking for? Send us a message above and we'll get back to you."
+msgstr ""
+
+#: template-parts/contact/form.php:24
+msgid "Send Us a Message"
+msgstr ""
+
+#: template-parts/contact/form.php:40
+msgid "Website"
+msgstr ""
+
+#: template-parts/contact/form.php:55
+#: woocommerce/checkout/form-checkout.php:162
+msgid "First Name"
+msgstr ""
+
+#: template-parts/contact/form.php:66
+msgid "Your first name"
+msgstr ""
+
+#: template-parts/contact/form.php:72
+#: woocommerce/checkout/form-checkout.php:175
+msgid "Last Name"
+msgstr ""
+
+#: template-parts/contact/form.php:83
+msgid "Your last name"
+msgstr ""
+
+#: template-parts/contact/form.php:92
+#: woocommerce/checkout/form-checkout.php:104
+msgid "Email Address"
+msgstr ""
+
+#: template-parts/contact/form.php:103
+msgid "you@example.com"
+msgstr ""
+
+#: template-parts/contact/form.php:109
+msgid "Phone (Optional)"
+msgstr ""
+
+#: template-parts/contact/form.php:118
+msgid "(555) 123-4567"
+msgstr ""
+
+#: template-parts/contact/form.php:127
+msgid "Subject"
+msgstr ""
+
+#: template-parts/contact/form.php:154
+msgid "Order Number (Optional)"
+msgstr ""
+
+#: template-parts/contact/form.php:161
+msgid "e.g. SR-2025-123456"
+msgstr ""
+
+#: template-parts/contact/form.php:172
+msgid "Preferred Contact Method"
+msgstr ""
+
+#: template-parts/contact/form.php:197
+#: woocommerce/checkout/form-checkout.php:277
+msgid "Phone"
+msgstr ""
+
+#: template-parts/contact/form.php:209
+msgid "Either"
+msgstr ""
+
+#: template-parts/contact/form.php:218
+msgid "Your Message"
+msgstr ""
+
+#: template-parts/contact/form.php:227
+msgid "Tell us what's on your mind. We're all ears..."
+msgstr ""
+
+#: template-parts/contact/form.php:234
+msgid "What brought you to SkyyRose?"
+msgstr ""
+
+#: template-parts/contact/form.php:258
+msgid "Send Message"
+msgstr ""
+
+#: template-parts/contact/form.php:264
+msgid "Sending..."
+msgstr ""
+
+#: template-parts/content/content-none.php:19
+msgid "The Vault Is Quiet."
 msgstr ""
 
 #. translators: 1: link to WP admin new post page.
-#: template-parts/content/content-none.php:23
+#: template-parts/content/content-none.php:29
 #, php-format
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
 msgstr ""
 
-#: template-parts/content/content-none.php:36
-msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+#: template-parts/content/content-none.php:42
+msgid "Those pieces don't live here. Try another name, another collection."
 msgstr ""
 
-#: template-parts/content/content-none.php:43
-msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+#: template-parts/content/content-none.php:49
+msgid "Nothing in this drawer yet. The drop you're looking for might be in another collection."
 msgstr ""
 
-#. translators: %s: Name of current post. Only visible to screen readers
-#: template-parts/content/content.php:47
+#: template-parts/cookie-consent.php:24
+msgid "Cookie consent"
+msgstr ""
+
+#: template-parts/cookie-consent.php:39
+msgid "Cookies keep this site fast and personal."
+msgstr ""
+
+#. translators: %1$s and %2$s wrap the privacy policy link
+#: template-parts/cookie-consent.php:44
 #, php-format
-msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgid "Stay to accept, or %1$sread how we handle your data%2$s."
 msgstr ""
 
-#: template-parts/content/content.php:68
-msgid "Read More"
+#: template-parts/cookie-consent.php:53
+msgid "Accept"
 msgstr ""
 
-#: template-parts/wishlist-button.php:23
-msgid "Add to wishlist"
+#: template-parts/cookie-consent.php:56
+msgid "Decline"
+msgstr ""
+
+#: template-parts/footer-cro.php:43
+msgid "Limited Edition. Individually Numbered. Never Restocked."
+msgstr ""
+
+#: template-parts/footer-cro.php:47
+#: template-parts/footer-cro.php:49
+msgid "Why SkyyRose"
+msgstr ""
+
+#: template-parts/footer-cro.php:50
+msgid "Every dollar goes into the product. No influencer budgets. No middlemen. Just quality you can feel."
+msgstr ""
+
+#: template-parts/footer-cro.php:61
+msgid "5 out of 5 stars"
+msgstr ""
+
+#: template-parts/footer-cro.php:92
+#: template-preorder-gateway.php:772
+msgid "Frequently asked questions"
+msgstr ""
+
+#: template-parts/footer-cro.php:94
+msgid "Frequently Asked"
+msgstr ""
+
+#: template-parts/footer-cro.php:104
+msgid "How does the sizing run?"
+msgstr ""
+
+#: template-parts/footer-cro.php:104
+msgid "True to size, S through 3XL. Check the size guide on any product page for exact measurements."
+msgstr ""
+
+#: template-parts/footer-cro.php:105
+msgid "Is this really limited edition?"
+msgstr ""
+
+#: template-parts/footer-cro.php:105
+msgid "Yes. Every style is produced in a numbered run of 80-250 pieces. Once sold out, never restocked or reprinted."
+msgstr ""
+
+#: template-parts/footer-cro.php:106
+msgid "30-day return and exchange on unworn items. Contact us and we will make it right."
+msgstr ""
+
+#: template-parts/footer-cro.php:127
+msgid "View all questions on the FAQ page"
+msgstr ""
+
+#: template-parts/hero-cinematic.php:71
+msgid "SkyyRose Kids"
+msgstr ""
+
+#. translators: %s: collection name
+#: template-parts/hero-cinematic.php:101
+#, php-format
+msgid "%s collection hero"
+msgstr ""
+
+#: template-parts/immersive/cinematic-toggle.php:13
+msgid "Toggle cinematic mode"
+msgstr ""
+
+#: template-parts/immersive/scene.php:111
+msgid "Coming soon."
+msgstr ""
+
+#: template-parts/immersive/scene.php:124
+msgid "Previous room"
+msgstr ""
+
+#: template-parts/immersive/scene.php:129
+msgid "Next room"
+msgstr ""
+
+#: template-parts/immersive/scene.php:135
+msgid "Room selector"
+msgstr ""
+
+#. translators: 1: room number, 2: total rooms, 3: room name
+#: template-parts/immersive/scene.php:146
+#, php-format
+msgid "Room %1$d of %2$d: %3$s"
+msgstr ""
+
+#: template-parts/immersive/scene.php:288
+msgid "Explore the Full Collection"
+msgstr ""
+
+#: template-parts/immersive/scene.php:302
+msgid "Close product details"
+msgstr ""
+
+#: template-parts/immersive/scene.php:306
+msgid "Product preview"
+msgstr ""
+
+#: template-parts/immersive/scene.php:314
+msgid "Product Details"
+msgstr ""
+
+#: template-parts/immersive/scene.php:317
+msgid "Available sizes"
+msgstr ""
+
+#: template-parts/immersive/scene.php:320
+msgid "View Details"
+msgstr ""
+
+#: template-parts/immersive/scene.php:324
+msgid "View Full Collection"
+msgstr ""
+
+#: template-parts/immersive/tab-bar.php:50
+msgid "Explore other collections"
+msgstr ""
+
+#: template-parts/kids-capsule/matching-set.php:26
+#: template-parts/kids-capsule/matching-set.php:27
+msgid "Shop the Matching Set"
+msgstr ""
+
+#: template-parts/kids-capsule/matching-set.php:29
+msgid "This piece was designed to pair with its adult counterpart. Twin with your little one."
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:34
+msgid "Kids Capsule Coming Soon"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:55
+msgid "Collection Story"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:59
+msgid "Named after a daughter. Made for yours."
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:63
+msgid "Mini versions of our signature pieces, designed for the youngest trendsetters who inherit their style from the best."
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:75
+msgid "Launch Countdown"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:76
+msgid "Launching In"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:107
+msgid "Collection Preview"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:109
+msgid "Match With Your Mini"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:111
+msgid "Every Kids Capsule piece is designed to complement an adult style from our core collections. Dress alike without the cringe — luxury twinning, elevated."
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:116
+msgid "Parent"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:120
+msgid "Mini"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:132
+#: template-parts/kids-capsule/teaser.php:152
+msgid "Join the Waitlist"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:134
+msgid "Be the First to Know"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:136
+msgid "Join the Kids Capsule waitlist for early access, first-look previews, and first dibs on every drop."
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:166
+msgid "Brand Story"
+msgstr ""
+
+#: template-parts/kids-capsule/teaser.php:170
+msgid "Corey built this brand for Skyy Rose. This collection is hers."
+msgstr ""
+
+#: template-parts/mobile-bottom-nav.php:122
+msgid "Mobile navigation"
+msgstr ""
+
+#: template-parts/mobile-bottom-nav.php:135
+#, php-format
+msgid "%d items in cart"
+msgstr ""
+
+#: template-parts/pin-narrative.php:66
+msgid "04 — THE PROOF"
+msgstr ""
+
+#: template-parts/pin-narrative.php:67
+msgid "The concrete had a shape."
+msgstr ""
+
+#: template-parts/pin-narrative.php:68
+msgid "This is it."
+msgstr ""
+
+#: template-parts/pin-narrative.php:69
+msgid "Signature / Worn"
+msgstr ""
+
+#: template-parts/pin-narrative.php:72
+msgid "04 — THE ARMOR"
+msgstr ""
+
+#: template-parts/pin-narrative.php:73
+msgid "The stand isn't finished."
+msgstr ""
+
+#: template-parts/pin-narrative.php:74
+msgid "Put it on."
+msgstr ""
+
+#: template-parts/pin-narrative.php:75
+msgid "Black Rose / Worn"
+msgstr ""
+
+#: template-parts/pin-narrative.php:78
+msgid "04 — THE VOW"
+msgstr ""
+
+#: template-parts/pin-narrative.php:79
+msgid "The bloodline doesn't end in a story."
+msgstr ""
+
+#: template-parts/pin-narrative.php:80
+msgid "It ends on your back."
+msgstr ""
+
+#: template-parts/pin-narrative.php:81
+msgid "Love Hurts / Worn"
+msgstr ""
+
+#: template-parts/pin-narrative.php:84
+msgid "03 — HERS TO WEAR"
+msgstr ""
+
+#: template-parts/pin-narrative.php:85
+msgid "Legacy isn't a story you tell her."
+msgstr ""
+
+#: template-parts/pin-narrative.php:86
+msgid "It's a piece she puts on."
+msgstr ""
+
+#: template-parts/pin-narrative.php:87
+msgid "Kids Capsule / Worn"
+msgstr ""
+
+#: template-parts/pin-narrative.php:91
+msgid "THE REVEAL"
+msgstr ""
+
+#: template-parts/pin-narrative.php:92
+msgid "The story becomes"
+msgstr ""
+
+#: template-parts/pin-narrative.php:93
+msgid "something you wear."
+msgstr ""
+
+#: template-parts/pin-narrative.php:94
+msgid "Worn"
+msgstr ""
+
+#: template-parts/pin-narrative.php:100
+msgid "Brand story"
+msgstr ""
+
+#: template-parts/pin-narrative.php:151
+msgid "Shop This Piece"
+msgstr ""
+
+#. translators: %s: product name
+#: template-parts/product-card-holo.php:93
+#: template-parts/product-card-v7-lookbook.php:158
+#: template-preorder-gateway.php:554
+msgid "View"
+msgstr ""
+
+#. translators: %s: product name. Must start with the visible "Add to Cart" text (WCAG 2.5.3 Label in Name).
+#: template-parts/product-card-holo.php:165
+#, php-format
+msgid "Add to Cart: %s"
+msgstr ""
+
+#: template-parts/product-card-holo.php:167
+msgid "Add to Cart"
+msgstr ""
+
+#. translators: %s: product name
+#: template-parts/product-card-holo.php:173
+#, php-format
+msgid "Add %s to wishlist"
+msgstr ""
+
+#: template-parts/product-card-v7-lookbook.php:152
+msgid "Quick Add"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:98
+msgid "The Piece"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:107
+msgid "Numbered authentication"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:108
+msgid "Numbered Authentication"
+msgstr ""
+
+#. translators: %d is the total edition run size, e.g. "One of 80".
+#: template-parts/product-detail-editorial.php:112
+#, php-format
+msgid "One of %d"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:116
+msgid "Hand-numbered at fulfillment. Never restocked."
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:152
+msgid "The Story"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:171
+msgid "The Fit"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:190
+msgid "05"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:192
+msgid "Make It Yours"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:199
+msgid "Select Size"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:225
+#: woocommerce/single-product.php:168
+msgid "In Stock — Ready to Ship"
+msgstr ""
+
+#. translators: %d: edition size
+#: template-parts/product-detail-editorial.php:235
+#, php-format
+msgid "Limited Edition — %d Pieces"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:247
+msgid "07"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:249
+msgid "Care + Craft"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:254
+msgid "Machine wash cold, inside out. Tumble dry low. Do not bleach. Iron on low heat if needed — avoid direct contact with prints and embroidery."
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:257
+msgid "Construction"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:258
+msgid "Every piece is constructed with reinforced stitching at stress points, pre-shrunk heavyweight fabric, and solid-brass hardware. Built to last through real life."
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:261
+msgid "Sustainability"
+msgstr ""
+
+#: template-parts/product-detail-editorial.php:262
+msgid "We produce in limited runs to minimize waste. Every unsold unit is donated — nothing goes to landfill. Packaging is recycled and recyclable."
+msgstr ""
+
+#: template-parts/product-grid.php:251
+msgid "Product grid"
+msgstr ""
+
+#: template-parts/size-guide-modal.php:25
+msgid "Close size guide"
+msgstr ""
+
+#: template-parts/size-guide-modal.php:29
+msgid "All measurements in inches"
+msgstr ""
+
+#: template-parts/size-guide-modal.php:31
+msgid "Size categories"
+msgstr ""
+
+#: template-parts/size-guide-modal.php:65
+msgid "How to Measure"
+msgstr ""
+
+#: template-parts/size-guide-modal.php:69
+msgid "Chest: Measure around the fullest part, keeping the tape level."
+msgstr ""
+
+#: template-parts/size-guide-modal.php:70
+msgid "Waist: Measure around your natural waistline, just above the navel."
+msgstr ""
+
+#: template-parts/size-guide-modal.php:71
+msgid "Hip: Measure around the widest part of your hips."
+msgstr ""
+
+#: template-parts/size-guide-modal.php:72
+msgid "Inseam: Measure from the crotch seam to the ankle bone."
+msgstr ""
+
+#: template-parts/skyy-mascot.php:57
+msgid "Skyy, your SkyyRose style guide"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:65
+msgid "Quick replies"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:67
+msgid "Ask a question"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:76
+msgid "Chat with Skyy"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:87
+msgid "Skyy, SkyyRose brand mascot"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:112
+msgid "Minimize Skyy"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:122
+msgid "Ask Skyy"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:123
+msgid "Where to find something, sizing, shipping…"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:129
+msgid "Sizing, shipping, a collection…"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:132
+msgid "Cancel"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:133
+msgid "Ask"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:145
+msgid "Bring Skyy back"
+msgstr ""
+
+#: template-parts/skyy-mascot.php:167
+msgid "Skyy"
+msgstr ""
+
+#. Template Name of the theme
+#: template-preorder-gateway.php:3
+msgid "Pre-Order Gateway"
+msgstr ""
+
+#: template-preorder-gateway.php:25
+msgid "Armor for the concrete world."
+msgstr ""
+
+#: template-preorder-gateway.php:26
+msgid "Black"
+msgstr ""
+
+#: template-preorder-gateway.php:31
+msgid "Bloodline you carry forward."
+msgstr ""
+
+#: template-preorder-gateway.php:32
+msgid "Love"
+msgstr ""
+
+#: template-preorder-gateway.php:37
+msgid "The origin. The crown."
+msgstr ""
+
+#: template-preorder-gateway.php:38
+msgid "Origin"
+msgstr ""
+
+#: template-preorder-gateway.php:86
+msgid "Reserve your piece"
+msgstr ""
+
+#: template-preorder-gateway.php:135
+msgid "Exclusive Access"
+msgstr ""
+
+#: template-preorder-gateway.php:158
+#: template-preorder-gateway.php:193
+msgid "Skyy Rose"
+msgstr ""
+
+#: template-preorder-gateway.php:163
+msgid "Secure your pieces before they drop. Luxury Grows from Concrete."
+msgstr ""
+
+#: template-preorder-gateway.php:171
+msgid "View All Pieces"
+msgstr ""
+
+#: template-preorder-gateway.php:190
+msgid "Luxury Grows from Concrete"
+msgstr ""
+
+#: template-preorder-gateway.php:192
+#: template-preorder-gateway.php:370
+msgid "Reserve Now"
+msgstr ""
+
+#: template-preorder-gateway.php:194
+msgid "Concrete Culture"
+msgstr ""
+
+#: template-preorder-gateway.php:195
+msgid "Pre-Order Open"
+msgstr ""
+
+#: template-preorder-gateway.php:216
+msgid "Choose a collection"
+msgstr ""
+
+#: template-preorder-gateway.php:220
+msgid "Choose Your Collection"
+msgstr ""
+
+#: template-preorder-gateway.php:223
+msgid "Three collections. One story."
+msgstr ""
+
+#. translators: %s: collection label
+#: template-preorder-gateway.php:293
+#, php-format
+msgid "View %s collection"
+msgstr ""
+
+#: template-preorder-gateway.php:386
+msgid "Pre-order products"
+msgstr ""
+
+#: template-preorder-gateway.php:389
+msgid "Filter by collection"
+msgstr ""
+
+#. translators: %s: product name
+#: template-preorder-gateway.php:489
+#, php-format
+msgid "%s — back view"
+msgstr ""
+
+#. translators: %d: edition size number
+#: template-preorder-gateway.php:507
+#, php-format
+msgid "Edition of %d"
+msgstr ""
+
+#: template-preorder-gateway.php:525
+msgid "Reservation availability"
+msgstr ""
+
+#. translators: %s: product name
+#: template-preorder-gateway.php:547
+#, php-format
+msgid "Reserve %s"
+msgstr ""
+
+#. translators: %s: product name
+#: template-preorder-gateway.php:548
+#: template-preorder-gateway.php:614
+msgid "Reserve"
+msgstr ""
+
+#: template-preorder-gateway.php:563
+msgid "Pieces coming soon."
+msgstr ""
+
+#: template-preorder-gateway.php:576
+msgid "Cart summary"
+msgstr ""
+
+#: template-preorder-gateway.php:580
+msgid "Items in cart"
+msgstr ""
+
+#: template-preorder-gateway.php:581
+msgid "0 items"
+msgstr ""
+
+#: template-preorder-gateway.php:590
+msgid "View Cart"
+msgstr ""
+
+#: template-preorder-gateway.php:603
+msgid "How your piece is made"
+msgstr ""
+
+#: template-preorder-gateway.php:606
+msgid "The Process"
+msgstr ""
+
+#: template-preorder-gateway.php:607
+msgid "Built from the concrete up."
+msgstr ""
+
+#: template-preorder-gateway.php:615
+msgid "You claim your piece. Limited quantities, no restocks."
+msgstr ""
+
+#: template-preorder-gateway.php:619
+msgid "Production"
+msgstr ""
+
+#: template-preorder-gateway.php:620
+msgid "Every garment cut and sewn in the precise run size. No overstock, no waste."
+msgstr ""
+
+#: template-preorder-gateway.php:624
+msgid "Quality Gate"
+msgstr ""
+
+#: template-preorder-gateway.php:625
+msgid "Each piece passes a hands-on review before it leaves the floor."
+msgstr ""
+
+#: template-preorder-gateway.php:629
+msgid "Ship"
+msgstr ""
+
+#: template-preorder-gateway.php:630
+msgid "Delivered to your door. Tracked. Protected."
+msgstr ""
+
+#: template-preorder-gateway.php:634
+msgid "Yours"
+msgstr ""
+
+#: template-preorder-gateway.php:635
+msgid "One of a defined number. Carry it knowing exactly what it is."
+msgstr ""
+
+#: template-preorder-gateway.php:660
+msgid "Worn."
+msgstr ""
+
+#: template-preorder-gateway.php:671
+msgid "Black Rose football jersey"
+msgstr ""
+
+#: template-preorder-gateway.php:679
+msgid "Black Rose hockey jersey"
+msgstr ""
+
+#: template-preorder-gateway.php:687
+msgid "Love Hurts varsity jacket"
+msgstr ""
+
+#: template-preorder-gateway.php:695
+msgid "Rose hoodie and beanie"
+msgstr ""
+
+#: template-preorder-gateway.php:721
+msgid "Brand manifesto"
+msgstr ""
+
+#: template-preorder-gateway.php:759
+msgid "Every piece in every collection is a limited number. Defined. Finite. When the run closes it stays closed. This is not a drop. This is a record."
+msgstr ""
+
+#: template-preorder-gateway.php:763
+msgid "Reserve Your Piece"
+msgstr ""
+
+#: template-preorder-gateway.php:775
+msgid "Questions"
+msgstr ""
+
+#: template-preorder-gateway.php:781
+msgid "What is a pre-order?"
+msgstr ""
+
+#: template-preorder-gateway.php:782
+msgid "You reserve your piece before production closes. Your order locks your place in the run. Once the edition sells out, it does not reopen."
+msgstr ""
+
+#: template-preorder-gateway.php:785
+msgid "When will my order ship?"
+msgstr ""
+
+#: template-preorder-gateway.php:786
+msgid "Pre-orders ship after production completes for your collection run. You will receive a tracking number the moment your piece leaves the floor."
+msgstr ""
+
+#: template-preorder-gateway.php:789
+msgid "Can I cancel or exchange my pre-order?"
+msgstr ""
+
+#: template-preorder-gateway.php:790
+msgid "Pre-orders are final once placed. If there is a defect or fulfillment error, reach out to us directly — we will make it right."
+msgstr ""
+
+#: template-preorder-gateway.php:793
+msgid "What sizes are available?"
+msgstr ""
+
+#: template-preorder-gateway.php:794
+msgid "Size availability varies by piece. Check the product page for current options. If your size is gone, the run is closed."
+msgstr ""
+
+#: template-preorder-gateway.php:797
+msgid "How are edition sizes determined?"
+msgstr ""
+
+#: template-preorder-gateway.php:798
+msgid "Each piece has a defined number set before production opens. That number does not change — no reprints, no restocks."
+msgstr ""
+
+#: template-preorder-gateway.php:837
+msgid "Stay informed about new drops"
+msgstr ""
+
+#: template-preorder-gateway.php:849
+msgid "First access. Always."
+msgstr ""
+
+#: template-preorder-gateway.php:852
+msgid "Drop alerts before they open. No noise."
+msgstr ""
+
+#: template-preorder-gateway.php:857
+msgid "Subscribe for drop alerts"
+msgstr ""
+
+#: template-preorder-gateway.php:874
+msgid "Notify Me"
+msgstr ""
+
+#: template-shipping-returns.php:27
+msgid "Policies"
+msgstr ""
+
+#: template-shipping-returns.php:29
+msgid "We want you to love what you wear. Here's how we make that happen."
+msgstr ""
+
+#: template-shipping-returns.php:36
+#: woocommerce/cart/cart.php:435
+#: woocommerce/cart/cart.php:444
+#: woocommerce/checkout/form-checkout.php:616
+msgid "Shipping"
+msgstr ""
+
+#: template-shipping-returns.php:41
+msgid "Processing Time"
+msgstr ""
+
+#: template-shipping-returns.php:42
+msgid "Orders are processed within 1–3 business days. During new collection drops or holiday periods, processing may take up to 5 business days. You'll receive a confirmation email with tracking once your order ships."
+msgstr ""
+
+#: template-shipping-returns.php:46
+msgid "Domestic Shipping (US)"
+msgstr ""
+
+#: template-shipping-returns.php:47
+msgid "US shipping rates"
+msgstr ""
+
+#: template-shipping-returns.php:50
+msgid "Method"
+msgstr ""
+
+#: template-shipping-returns.php:51
+msgid "Time"
+msgstr ""
+
+#: template-shipping-returns.php:52
+msgid "Cost"
+msgstr ""
+
+#: template-shipping-returns.php:57
+msgid "Standard"
+msgstr ""
+
+#: template-shipping-returns.php:58
+#: template-shipping-returns.php:68
+msgid "5–7 business days"
+msgstr ""
+
+#: template-shipping-returns.php:59
+msgid "$17"
+msgstr ""
+
+#: template-shipping-returns.php:62
+msgid "Express"
+msgstr ""
+
+#: template-shipping-returns.php:63
+msgid "2–3 business days"
+msgstr ""
+
+#: template-shipping-returns.php:64
+msgid "$22"
+msgstr ""
+
+#: template-shipping-returns.php:67
+msgid "Free Shipping"
+msgstr ""
+
+#: template-shipping-returns.php:73
+#, php-format
+msgid "Orders $%d+"
+msgstr ""
+
+#: template-shipping-returns.php:84
+msgid "International Shipping"
+msgstr ""
+
+#: template-shipping-returns.php:85
+msgid "We ship to 40+ countries. International rates are calculated at checkout based on destination and package weight. Delivery typically takes 10–14 business days. Customs duties and import taxes are the responsibility of the recipient and are not included in the shipping cost."
+msgstr ""
+
+#: template-shipping-returns.php:94
+msgid "Returns"
+msgstr ""
+
+#: template-shipping-returns.php:99
+msgid "30-Day Return Window"
+msgstr ""
+
+#: template-shipping-returns.php:100
+msgid "Not feeling it? Return any unworn item within 30 days of delivery for a full refund. Items must be in original condition with tags attached and in original packaging."
+msgstr ""
+
+#: template-shipping-returns.php:104
+msgid "How to Return"
+msgstr ""
+
+#: template-shipping-returns.php:106
+msgid "Email support@skyyrose.co with your order number"
+msgstr ""
+
+#: template-shipping-returns.php:107
+msgid "Receive your prepaid return label within 24 hours"
+msgstr ""
+
+#: template-shipping-returns.php:108
+msgid "Pack the item in its original packaging"
+msgstr ""
+
+#: template-shipping-returns.php:109
+msgid "Drop off at any USPS location"
+msgstr ""
+
+#: template-shipping-returns.php:110
+msgid "Refund processed within 5–7 business days of receipt"
+msgstr ""
+
+#: template-shipping-returns.php:115
+msgid "Non-Returnable Items"
+msgstr ""
+
+#: template-shipping-returns.php:117
+msgid "Items marked \"Final Sale\""
+msgstr ""
+
+#: template-shipping-returns.php:118
+msgid "Worn, washed, or altered items"
+msgstr ""
+
+#: template-shipping-returns.php:119
+msgid "Items without original tags"
+msgstr ""
+
+#: template-shipping-returns.php:120
+msgid "Gift cards"
+msgstr ""
+
+#: template-shipping-returns.php:130
+msgid "Exchanges"
+msgstr ""
+
+#: template-shipping-returns.php:135
+msgid "Free Exchanges (US)"
+msgstr ""
+
+#: template-shipping-returns.php:136
+msgid "Need a different size? Exchanges are free for US orders. Email support@skyyrose.co and we'll ship your new size immediately — just return the original within 14 days using our prepaid label."
+msgstr ""
+
+#: template-shipping-returns.php:140
+msgid "International Exchanges"
+msgstr ""
+
+#: template-shipping-returns.php:141
+msgid "International customers are responsible for return shipping costs on exchanges. Once we receive and verify the returned item, we'll ship the new size at no additional charge."
+msgstr ""
+
+#: template-shipping-returns.php:150
+msgid "Pre-Orders"
+msgstr ""
+
+#: template-shipping-returns.php:155
+msgid "How Pre-Orders Work"
+msgstr ""
+
+#: template-shipping-returns.php:156
+msgid "Pre-orders secure your piece before the official drop. Your card is charged at the time of pre-order. Estimated ship dates are displayed on each product page. Pre-order items ship separately from in-stock items."
+msgstr ""
+
+#: template-shipping-returns.php:159
+msgid "Pre-Order Cancellations"
+msgstr ""
+
+#: template-shipping-returns.php:160
+msgid "Pre-orders can be cancelled for a full refund up to 48 hours before the estimated ship date. After that, standard return policy applies once delivered."
+msgstr ""
+
+#: template-shipping-returns.php:167
+msgid "Need Help?"
+msgstr ""
+
+#: template-shipping-returns.php:168
+msgid "Our support team responds within 24 hours. Reach out anytime."
+msgstr ""
+
+#: template-shipping-returns.php:169
+msgid "Email Support"
+msgstr ""
+
+#: template-size-guide.php:31
+msgid "Measure once, shop every drop with confidence. All measurements in inches."
+msgstr ""
+
+#: template-size-guide.php:67
+msgid "Between sizes? Size up — every piece is cut for a relaxed, gender-neutral fit."
+msgstr ""
+
+#: template-size-guide.php:68
+msgid "Still unsure? Reach out"
+msgstr ""
+
+#: woocommerce/cart/cart-empty.php:57
+#: woocommerce/cart/cart.php:48
+msgid "Your Cart is Empty"
+msgstr ""
+
+#: woocommerce/cart/cart-empty.php:60
+#: woocommerce/cart/cart.php:51
+msgid "Explore our collections and find pieces that speak to you."
+msgstr ""
+
+#: woocommerce/cart/cart.php:64
+msgid "Shopping Cart"
+msgstr ""
+
+#. translators: %d: number of items
+#: woocommerce/cart/cart.php:70
+#, php-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: woocommerce/cart/cart.php:88
+msgid "Free shipping progress"
+msgstr ""
+
+#: woocommerce/cart/cart.php:94
+msgid "You qualify for free shipping!"
+msgstr ""
+
+#. translators: %s: dollar amount remaining
+#: woocommerce/cart/cart.php:99
+#, php-format
+msgid "Add $%s more for free shipping"
+msgstr ""
+
+#: woocommerce/cart/cart.php:232
+msgid "Available on backorder"
+msgstr ""
+
+#: woocommerce/cart/cart.php:283
+msgid "Decrease quantity"
+msgstr ""
+
+#: woocommerce/cart/cart.php:287
+msgid "Item quantity"
+msgstr ""
+
+#: woocommerce/cart/cart.php:288
+msgid "Increase quantity"
+msgstr ""
+
+#: woocommerce/cart/cart.php:338
+#: woocommerce/cart/cart.php:345
+msgid "Coupon code"
+msgstr ""
+
+#: woocommerce/cart/cart.php:349
+#: woocommerce/cart/cart.php:350
+msgid "Apply"
+msgstr ""
+
+#: woocommerce/cart/cart.php:359
+msgid "Update cart"
+msgstr ""
+
+#: woocommerce/cart/cart.php:360
+msgid "Update Cart"
+msgstr ""
+
+#: woocommerce/cart/cart.php:394
+#: woocommerce/checkout/form-checkout.php:538
+msgid "Order Summary"
+msgstr ""
+
+#: woocommerce/cart/cart.php:409
+#: woocommerce/checkout/form-checkout.php:598
+msgid "Subtotal"
+msgstr ""
+
+#. translators: %s: coupon code
+#: woocommerce/cart/cart.php:422
+#: woocommerce/checkout/form-checkout.php:607
+#, php-format
+msgid "Coupon: %s"
+msgstr ""
+
+#: woocommerce/cart/cart.php:447
+msgid "Calculated at checkout"
+msgstr ""
+
+#: woocommerce/cart/cart.php:483
+#: woocommerce/checkout/form-checkout.php:639
+#: woocommerce/checkout/thankyou.php:83
+msgid "Total"
+msgstr ""
+
+#: woocommerce/cart/cart.php:515
+msgid "or"
+msgstr ""
+
+#: woocommerce/cart/cart.php:524
+msgid "Proceed to Checkout"
+msgstr ""
+
+#: woocommerce/cart/cart.php:534
+msgid "Secure Checkout"
+msgstr ""
+
+#. translators: %d: free shipping order minimum in dollars
+#: woocommerce/cart/cart.php:543
+#, php-format
+msgid "Free Shipping $%d+"
+msgstr ""
+
+#: woocommerce/cart/cart.php:551
+msgid "30-Day Returns"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:37
+msgid "You must be logged in to checkout."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:45
+msgid "Checkout progress"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:53
+msgid "Information"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:57
+#: woocommerce/checkout/form-checkout.php:336
+#: woocommerce/checkout/form-checkout.php:454
+msgid "Payment"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:61
+msgid "Confirmation"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:95
+msgid "We'll use this email for order updates and tracking."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:120
+msgid "Phone (optional)"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:124
+#: woocommerce/checkout/form-checkout.php:281
+msgid "+1 (555) 000-0000"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:137
+msgid "Back to Cart"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:142
+msgid "Continue to Shipping"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:152
+msgid "Shipping Address"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:191
+msgid "Street Address"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:195
+msgid "123 Main Street"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:204
+msgid "Apartment, Suite, etc. (optional)"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:220
+msgid "City"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:233
+msgid "State / Province"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:249
+msgid "ZIP / Postal Code"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:262
+msgid "Country"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:301
+msgid "Shipping Method"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:314
+#: woocommerce/checkout/form-checkout.php:402
+#: woocommerce/checkout/form-checkout.php:499
+msgid "Back"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:319
+msgid "Continue to Payment"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:339
+msgid "All transactions are secure and encrypted."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:388
+msgid "Payment options unavailable right now. Reach us at support@skyyrose.co and we will sort it."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:407
+msgid "Review Order"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:417
+msgid "Review & Confirm"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:429
+#: woocommerce/checkout/form-checkout.php:444
+#: woocommerce/checkout/form-checkout.php:459
+msgid "Edit"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:439
+msgid "Ship to"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:472
+msgid "Order Notes (optional)"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:475
+msgid "Notes about your order, e.g. special notes for delivery."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:510
+#: woocommerce/checkout/form-checkout.php:511
+#: woocommerce/checkout/form-checkout.php:512
+msgid "Place Order"
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:36
+msgid "Payment didn't go through. Nothing was charged. Try the checkout again, or send us a note and we'll sort it."
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:41
+msgid "Try Again"
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:50
+#: woocommerce/checkout/thankyou.php:115
+msgid "Order Received"
+msgstr ""
+
+#. translators: %s: customer first name
+#: woocommerce/checkout/thankyou.php:56
+#, php-format
+msgid "Thank you, %s."
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:58
+#: woocommerce/checkout/thankyou.php:116
+msgid "Thank you."
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:64
+msgid "Your pieces are being prepared. Each one is checked by hand before it leaves us. You'll get a shipping confirmation by email once they're on their way."
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:69
+msgid "Order"
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:73
+msgid "Date"
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:88
+msgid "Payment Method"
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:118
+msgid "Your order has been received and is being prepared. A confirmation has been sent to your email."
+msgstr ""
+
+#: woocommerce/single-product.php:105
+msgid "Technical Blueprint"
+msgstr ""
+
+#: woocommerce/single-product.php:110
+msgid "Model View"
+msgstr ""
+
+#: woocommerce/single-product.php:129
+msgid "GARMENT TYPE"
+msgstr ""
+
+#: woocommerce/single-product.php:133
+msgid "SKU"
+msgstr ""
+
+#: woocommerce/single-product.php:138
+msgid "MATERIAL"
+msgstr ""
+
+#: woocommerce/single-product.php:144
+msgid "FIT"
+msgstr ""
+
+#: woocommerce/single-product.php:150
+msgid "MADE IN"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Page Background"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Card Background"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Surface"
 msgstr ""
 
 #: theme.json
@@ -675,17 +7009,22 @@ msgstr ""
 
 #: theme.json
 msgctxt "Color name"
+msgid "Rose Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
 msgid "Gold"
 msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Rose"
+msgid "Metallic Silver"
 msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Deep Purple"
+msgid "Red"
 msgstr ""
 
 #: theme.json
@@ -695,27 +7034,62 @@ msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Light Gray"
+msgid "Pink"
 msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Dark Gray"
+msgid "Lavender"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Text Secondary"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Text Muted"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Border"
 msgstr ""
 
 #: theme.json
 msgctxt "Gradient name"
-msgid "Black to Gold"
+msgid "Rose Gold"
 msgstr ""
 
 #: theme.json
 msgctxt "Gradient name"
-msgid "Purple to Rose"
+msgid "Signature"
 msgstr ""
 
 #: theme.json
 msgctxt "Gradient name"
-msgid "Crimson to Gold"
+msgid "Love Hurts"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Black Rose"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Kids Capsule"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Dark Overlay"
+msgstr ""
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and Rose Gold"
 msgstr ""
 
 #: theme.json
@@ -725,7 +7099,17 @@ msgstr ""
 
 #: theme.json
 msgctxt "Duotone name"
-msgid "Purple and Rose"
+msgid "Crimson and Rose Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Pink and Lavender"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Extra Small"
 msgstr ""
 
 #: theme.json
@@ -750,22 +7134,42 @@ msgstr ""
 
 #: theme.json
 msgctxt "Font size name"
+msgid "2X Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
 msgid "Huge"
 msgstr ""
 
 #: theme.json
-msgctxt "Font family name"
-msgid "System Font"
+msgctxt "Font size name"
+msgid "Gigantic"
 msgstr ""
 
 #: theme.json
 msgctxt "Font family name"
-msgid "Serif"
+msgid "Inter"
 msgstr ""
 
 #: theme.json
 msgctxt "Font family name"
-msgid "Monospace"
+msgid "Archivo"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Cinzel"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Hanken Grotesk"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Anton"
 msgstr ""
 
 #: theme.json
@@ -796,16 +7200,6 @@ msgstr ""
 #: theme.json
 msgctxt "Space size name"
 msgid "2X Large"
-msgstr ""
-
-#: theme.json
-msgctxt "Color name"
-msgid "Primary Button"
-msgstr ""
-
-#: theme.json
-msgctxt "Color name"
-msgid "Secondary Button"
 msgstr ""
 
 #: theme.json
@@ -866,4 +7260,9 @@ msgstr ""
 #: theme.json
 msgctxt "Custom template name"
 msgid "Preorder Gateway - Portal Entrance"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Kids Capsule Collection"
 msgstr ""

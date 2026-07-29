@@ -13,6 +13,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -227,7 +229,7 @@ async function performSpaceAction(
 // GET Handler
 // ---------------------------------------------------------------------------
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     const token = getToken();
     const { searchParams } = request.nextUrl;
@@ -304,11 +306,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export const GET = withAuth(getHandler);
+
 // ---------------------------------------------------------------------------
 // POST Handler — Space actions
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = (await request.json()) as Partial<HFActionRequestBody>;
     const { action, spaceId } = body;
@@ -384,3 +388,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(postHandler);

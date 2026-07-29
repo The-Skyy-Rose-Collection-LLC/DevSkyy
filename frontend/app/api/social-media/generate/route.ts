@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { hasLlmKey } from '@/lib/social-media/config';
 import { getProduct as getCatalogProduct } from '@/lib/catalog';
 
@@ -187,7 +188,7 @@ Return JSON only: { "caption": "...", "hashtags": ["#...", ...] }`;
 // Route handler
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = (await request.json()) as GenerateRequest;
 
@@ -278,6 +279,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(postHandler);
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -14,6 +14,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -164,7 +166,7 @@ SIMULATED_JOBS.forEach((j) => jobs.push(j));
 // Route Handlers
 // ---------------------------------------------------------------------------
 
-export async function GET(): Promise<NextResponse> {
+async function getHandler(): Promise<NextResponse> {
   const stats = {
     totalGenerated: jobs.filter((j) => j.status === 'completed').length,
     processing: jobs.filter((j) => j.status === 'processing').length,
@@ -188,7 +190,9 @@ export async function GET(): Promise<NextResponse> {
   });
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export const GET = withAuth(getHandler);
+
+async function postHandler(request: NextRequest): Promise<NextResponse> {
   try {
     const body = (await request.json()) as MascotGenerateRequest;
 
@@ -259,3 +263,5 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 }
+
+export const POST = withAuth(postHandler);

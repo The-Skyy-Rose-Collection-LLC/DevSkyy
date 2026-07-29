@@ -99,6 +99,78 @@ button.footer-newsletter__submit {
 	color: #000;
 }
 
+/* ── Animated email capture states (footer-cro.js) ──────────────────────── */
+
+.footer-newsletter__input-group:focus-within {
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.18), 0 0 24px rgba(183, 110, 121, 0.12);
+}
+
+.footer-newsletter__form.is-submitting .footer-newsletter__submit {
+	opacity: 0.6;
+	cursor: wait;
+}
+
+.footer-newsletter__form.is-error .footer-newsletter__input-group {
+	border-color: var(--color-crimson, #DC143C);
+	animation: ft-nl-shake 0.45s ease;
+}
+
+.footer-newsletter__form.is-success .footer-newsletter__input-group {
+	display: none;
+}
+
+.footer-newsletter__status {
+	margin: 0.75rem 0 0;
+	font-size: var(--text-sm);
+	min-height: 0;
+}
+
+.footer-newsletter__status--success {
+	color: var(--color-gold, #D4AF37);
+	font-family: var(--font-heading, 'Archivo', sans-serif);
+	font-size: 1rem;
+	animation: ft-nl-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.footer-newsletter__status--error {
+	/* Brand crimson #DC143C is only 3.63:1 on the dark ground — below WCAG AA (4.5:1) for
+	   body text, and a form error is exactly the text that must be readable. This is the
+	   Love Hurts crimson lightened for on-dark text (6.66:1); the brand token is unchanged
+	   and still used for fills, borders and glows where contrast rules don't apply. */
+	color: #FF5C7A;
+}
+
+@keyframes ft-nl-shake {
+	0%, 100% { transform: translateX(0); }
+	20%      { transform: translateX(-6px); }
+	40%      { transform: translateX(6px); }
+	60%      { transform: translateX(-4px); }
+	80%      { transform: translateX(4px); }
+}
+
+@keyframes ft-nl-rise {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.footer-newsletter__input-group,
+	.footer-newsletter__submit {
+		transition: none;
+	}
+
+	.footer-newsletter__form.is-error .footer-newsletter__input-group,
+	.footer-newsletter__status--success {
+		animation: none;
+	}
+}
+
 .footer-grid { padding: 4rem 0 2rem; }
 
 .footer-grid__container {
@@ -237,16 +309,9 @@ button.footer-newsletter__submit {
 
 .footer-copyright__menu a:hover { color: var(--skyyrose-accent, #B76E79); }
 
-.toast-container {
-	position: fixed;
-	bottom: 1.5rem;
-	right: 1.5rem;
-	z-index: 3000;
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-	pointer-events: none;
-}
+/* .toast-container lives in components.css alongside the rest of the toast system.
+   A duplicate definition here used to win purely on enqueue order (footer.css loads
+   after components.css), which silently defeated the mobile full-width rule. */
 
 @media (max-width: 1024px) {
 	.footer-grid__container {
@@ -316,8 +381,7 @@ button.footer-newsletter__submit {
 /* ── Print: clean footer ── */
 @media print {
 	.footer-newsletter,
-	.footer-brand__social,
-	.toast-container {
+	.footer-brand__social {
 		display: none !important;
 	}
 

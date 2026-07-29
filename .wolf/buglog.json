@@ -4893,5 +4893,318 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-07-24"
+  },
+  {
+    "id": "bug-289",
+    "timestamp": "2026-07-27",
+    "error_message": "wp-security baseline audit (Phase 0 of commercial funnel build): GET /skyyrose/v1/kids-capsule/matching-set/{id} used permission_callback __return_true and called wc_get_product() with no publish-status check \u2014 an ID walk could disclose draft/private pre-launch product name/price/preorder-edition data.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-kids-capsule.php",
+    "root_cause": "New public REST route copied wc_get_product() lookup pattern without also copying the publish-status guard that the sibling klaviyo-integration.php stock-check route already had (klaviyo-integration.php:356).",
+    "fix": "Added 'publish' !== $product->get_status() guard to both the kids product lookup (returns 404 product_not_found) and the matched adult product lookup (nulls out $adult instead of leaking it), mirroring the existing klaviyo-integration.php pattern exactly.",
+    "tags": [
+      "security",
+      "rest-api",
+      "woocommerce",
+      "kids-capsule",
+      "disclosure"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-290",
+    "timestamp": "2026-07-27",
+    "error_message": "Two JS-driven visual systems shipped with their CSS half dead: (1) luxury-cursor.js writes an inline transform on .cursor-dot/.cursor-ring every frame, so the .cursor-hover/.cursor-down stylesheet transform:scale() rules NEVER applied (inline style wins) \u2014 hover/press cursor states silently inert since 5.3.0; (2) product-card-holo.js computes --tilt-x/--tilt-y/--holo-x/--holo-y/--holo-angle per frame but product-card-holo.css never consumed them \u2014 the advertised magnetic tilt + holographic shimmer rendered nothing.",
+    "file": "assets/js/luxury-cursor.js, assets/css/luxury-cursor.css, assets/css/product-card-holo.css",
+    "root_cause": "Class-based stylesheet transforms lose to per-frame inline style writes; and a CSS-variable contract between JS and CSS has no failure signal when the consuming side is deleted/rewritten (the 'Impeccable Luxury Refinement' CSS rewrite dropped the var consumers while the JS kept computing them).",
+    "fix": "Inline transforms now reference scale(var(--cursor-dot-scale/1)) / scale(var(--cursor-ring-scale,1)) so state classes set the custom property instead of a doomed transform; product-card-holo.css gained a consumption layer (rotateX/Y tilt on .holo__body + .holo__gallery::after sheen from the --holo-* vars) gated behind @media (hover:hover) and (prefers-reduced-motion: no-preference).",
+    "tags": [
+      "css-custom-properties",
+      "inline-style-specificity",
+      "dead-code",
+      "js-css-contract",
+      "luxury-cursor",
+      "product-card-holo"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-291",
+    "timestamp": "2026-07-27",
+    "error_message": "8 new stylelint errors introduced by the commercial funnel build and initially invisible: repo-wide `npm run lint:css` was already red with 460 pre-existing errors, so 8 new ones did not change the gate's pass/fail state and would have shipped unnoticed.",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/{components,footer,woocommerce-account}.css",
+    "root_cause": "An already-failing gate cannot detect new regressions by pass/fail alone. Counting total errors is also insufficient when the baseline is large. Attribution requires comparing the gate's output against the SAME gate run on the pristine pre-change tree.",
+    "fix": "Diffed stylelint output between pristine HEAD (extracted via `git archive HEAD | tar -x`, vendor/ symlinked) and the working tree, isolating exactly 8 new errors: 3 camelCase keyframes (toastProgress, ftNlShake, ftNlRise) + 3 legacy :not() chains + 2 #customer_login id-pattern. Renamed keyframes to kebab-case updating BOTH @keyframes and every animation: caller, modernized :not(a):not(b) -> :not(a, b), and waived selector-id-pattern on #customer_login ONLY via stylelint-disable-next-line with a comment noting it is WooCommerce core markup (templates/myaccount/form-login.php) and not ours to rename. Rebuilt .min, verified zero stale keyframe references in source or minified output. Repo-wide 460 -> 452.",
+    "tags": [
+      "stylelint",
+      "css",
+      "attribution",
+      "regression-detection",
+      "already-failing-gate",
+      "verification"
+    ],
+    "related_bugs": [
+      "bug-287"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-292",
+    "timestamp": "2026-07-27",
+    "error_message": "languages/skyyrose.pot covered only 187 of 1651 translatable msgids (~11%), while style.css Tags advertise `translation-ready`. Header still read 'SkyyRose 4.0.0' (theme is 1.12.8) with POT-Creation-Date 2026-02-08 \u2014 ~5.5 months stale. Translators could not translate 93% of the theme.",
+    "file": "wordpress-theme/skyyrose-flagship/languages/skyyrose.pot",
+    "root_cause": "The .pot was hand-appended per-change (each session adding only its own new msgid) instead of being regenerated from source, so it drifted continuously from the code. Nothing in verify-theme.sh detects this: its `pot` aspect only asserts the FILE EXISTS, never that its contents match the source \u2014 a presence check masquerading as a coverage check.",
+    "fix": "Regenerated with `WP_CLI_PHP_ARGS=\"-d memory_limit=2G\" vendor/bin/wp i18n make-pot . --exclude=vendor,node_modules,tests,docs,blueprints,assets/js/lib`. NOTE: the default 128M limit OOMs in the Peast JS parser on this theme's large minified JS \u2014 raising it is what makes the command work; it is not a PHP 8.5 incompatibility. Verified before replacing: languages/ held NO .po/.mo files (zero translations to lose, so no msgmerge needed) and .pot has no runtime effect; msgfmt --check valid; all 50 msgids present in old-but-not-new confirmed DEAD (retired customizer color names, old admin labels, and 'Add to wishlist' which now survives only in docblock comments, correctly not extracted); the newsletter string added earlier the same day survives with its correct source ref. 187 -> 1651 msgids.",
+    "tags": [
+      "i18n",
+      "pot",
+      "translation-ready",
+      "marketplace-claim",
+      "stale-artifact",
+      "presence-check-not-coverage-check",
+      "wp-cli"
+    ],
+    "related_bugs": [
+      "bug-291"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-293",
+    "timestamp": "2026-07-27",
+    "error_message": "luxury-cursor JS and CSS were gated on DIFFERENT conditions: CSS on `! $skip_optional_css` (skipped for cart/checkout/blog/single/404/search/default), JS only on `'immersive' !== $slug`. So on 7 slug types the script loaded with no stylesheet. Latent for years; became VISIBLE when a `.cursor-label` span carrying real text ('View') was added \u2014 unstyled, it rendered as stray body text on search results.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+    "root_cause": "The skip-list lived as an inline array inside skyyrose_enqueue_global_styles() and the script enqueue in skyyrose_enqueue_template_scripts() never consulted it. Two halves of one CSS+JS feature pair gated independently, so they drifted. Invisible while the JS produced only empty positioned divs.",
+    "fix": "Extracted `skyyrose_slug_skips_optional_assets( $slug )` as the single source of truth and called it from BOTH the style and script enqueues, so the pair cannot drift again. Also removed the now-dead JS from 7 slug types (bytes saved). Verified: phpcs 0 violations, phpstan still exactly 144 (no new errors), file-size list unchanged.",
+    "tags": [
+      "enqueue",
+      "css-js-pairing",
+      "drift",
+      "luxury-cursor",
+      "dead-asset",
+      "root-cause-fix"
+    ],
+    "related_bugs": [
+      "bug-290"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-294",
+    "timestamp": "2026-07-27",
+    "error_message": "Three WCAG AA contrast failures shipped in today's new/changed CSS, on a theme whose style.css Description advertises 'WCAG 2.2 AA': footer newsletter error text (brand crimson #DC143C = 3.63:1), account logout nav link and wishlist out-of-stock label (both rgba(255,255,255,0.4) = 3.77:1 on #0A0A0A). AA requires 4.5:1 for body text.",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/{footer,woocommerce-account,wishlist}.css",
+    "root_cause": "Low-alpha white was used as a 'de-emphasised' styling shorthand without measuring it, and the existing --color-text-muted token (#B3B3B3, 9.44:1) was overlooked. The brand crimson was used for error TEXT, where it is a fill/accent colour that has never met body-text contrast on the dark ground.",
+    "fix": "Replaced both rgba(255,255,255,0.4) uses with var(--color-text-muted, #B3B3B3) \u2014 fixes contrast AND removes hardcoded rgba in favour of the existing token. Error text uses a lightened Love Hurts crimson #FF5C7A (6.66:1); the brand token itself is UNCHANGED and still used for fills/borders/glows where contrast rules don't apply. Each carries an inline comment with the measured ratio so the next editor doesn't silently revert it.",
+    "tags": [
+      "a11y",
+      "wcag",
+      "contrast",
+      "design-tokens",
+      "marketplace-claim"
+    ],
+    "related_bugs": [
+      "bug-292"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-295",
+    "timestamp": "2026-07-27",
+    "error_message": "CRITICAL: footer newsletter AJAX was 100% non-functional. footer-cro.js did `fetch( form.action, ... )`, but the form contains `<input type=\"hidden\" name=\"action\" value=\"skyyrose_newsletter_subscribe\">` (required by admin-ajax). A named form control SHADOWS the form's `action` IDL property, so form.action returned the HTMLInputElement, not the URL.",
+    "file": "wordpress-theme/skyyrose-flagship/assets/js/footer-cro.js",
+    "root_cause": "DOM clobbering. Per the HTML spec, form controls are exposed as named properties of their form element, overriding same-named IDL attributes. `action` is the classic collision because admin-ajax REQUIRES a field named 'action'. The bug is invisible to every static gate: valid JS, valid PHP, phpcs/eslint/php -l all clean, and the code reads correctly.",
+    "fix": "Use `form.getAttribute( 'action' )`, which reads the content attribute and is immune to named-control shadowing. PROVEN in a real browser via Playwright against a copy of the actual footer.php markup: `form.action instanceof HTMLInputElement === true`; it stringifies to '[object HTMLInputElement]' and resolves to a bogus same-origin path (`/[object%20HTMLInputElement]`), so every submission 404s, res.json() rejects, and the .catch branch fires 'Connection problem \u2014 please try again.' every time. getAttribute('action') returns the correct admin-ajax URL. NOTE: it does NOT throw a parse error (an earlier report claimed that) \u2014 it silently resolves to garbage, which is why it could ship unnoticed. Rebuilt .min and verified the minified bundle contains getAttribute(\"action\") and no form.action.",
+    "tags": [
+      "dom-clobbering",
+      "javascript",
+      "ajax",
+      "newsletter",
+      "html-spec",
+      "critical",
+      "invisible-to-static-analysis"
+    ],
+    "related_bugs": [
+      "bug-290"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-296",
+    "timestamp": "2026-07-27",
+    "error_message": "The bug-289 publish-status guard on /skyyrose/v1/kids-capsule/matching-set/{id} was incomplete: bypassable via product VARIATION ids. wc_get_product() returns a WC_Product_Variation for a variation id, and a product_variation post carries its OWN post_status.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/rest-kids-capsule.php",
+    "root_cause": "Setting a variable product to draft does NOT cascade to its product_variation children \u2014 they stay 'publish'. WC_Product_Variation extends WC_Product_Simple and does not override get_status(), so it reports its own status, not the parent's. An unauthenticated id-walk over variation ids therefore returned name/price/price_html/permalink for unreleased pre-launch products, defeating the guard added earlier the same day.",
+    "fix": "Reject variations outright in the same condition rather than status-checking them \u2014 a variation is never valid input here, since _kc_matching_adult_id lives on the parent: `if ( ! $kids || $kids->is_type( 'variation' ) || 'publish' !== $kids->get_status() )`. Applied symmetrically to the matched adult lookup. Returns the identical 404 WP_Error so no existence signal is introduced. Verified is_type() exists on WC_Product in the bundled stubs and that phpstan stayed at exactly 144 (no new errors).",
+    "tags": [
+      "security",
+      "rest-api",
+      "woocommerce",
+      "variations",
+      "information-disclosure",
+      "incomplete-fix"
+    ],
+    "related_bugs": [
+      "bug-289"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-297",
+    "timestamp": "2026-07-27",
+    "error_message": "PRODUCTION: /my-account/ renders NO account UI at all. Logged out or in, visitors get no login form, no orders, no addresses, no downloads \u2014 only a placeholder paragraph. Conversion-blocking: customers cannot access their account.",
+    "file": "wordpress-theme/skyyrose-flagship/inc/woocommerce.php",
+    "root_cause": "Live page 9710 (/my-account/) has post_content of only 'This page uses the SkyyRose Flagship theme template. Content is rendered by the theme.' \u2014 no [woocommerce_my_account] shortcode and no block equivalent [live, WP REST probe 2026-07-27]. Its template field is '' (default), and the theme ships NO woocommerce/myaccount/ override. So page.php calls the_content(), which renders the placeholder and nothing else. The content explicitly delegates rendering to the theme; the theme never implemented it. Discovered indirectly: a new 492-line woocommerce-account.css was found to have 26 of its 28 targeted woocommerce-* classes absent from the live page \u2014 the markup never renders.",
+    "fix": "skyyrose_account_content_fallback() on the_content at priority 9 (BEFORE core's do_shortcode at 11, so the returned shortcode is expanded by the normal filter chain). Guarded on is_account_page() + in_the_loop() + is_main_query() so excerpts/widgets/secondary loops are untouched. Idempotent: yields if the content ever gains the shortcode or the woocommerce/customer-account block, so a later content fix cannot double-render. ZERO production DB writes \u2014 matches the template_include remedies in inc/redirects.php used for the stale-meta Collections/Cart/Checkout pages.",
+    "tags": [
+      "woocommerce",
+      "my-account",
+      "production",
+      "conversion-blocking",
+      "missing-shortcode",
+      "live-verified"
+    ],
+    "related_bugs": [
+      "bug-222"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-298",
+    "timestamp": "2026-07-27",
+    "error_message": "verify-theme.sh a11y-static reported a fixed '72 <img> without alt' forever. All 72 were FALSE POSITIVES; the check also MISSED 31 real tags. Broken in both directions, so it could neither be trusted nor acted on \u2014 and it undermined the theme's advertised WCAG 2.2 AA / accessibility-ready claim for no reason.",
+    "file": "wordpress-theme/skyyrose-flagship/scripts/verify-theme.sh",
+    "root_cause": "Line-based grep `<img[^>]*>` piped to `grep -civE alt=`. Three failure modes: (1) counted <img> appearing inside PHP docblocks/comments and inside the theme's own alt-injection regex strings; (2) for `<img src=\"<?php echo esc_url($u); ?>\" alt=\"x\">` the FIRST '>' belongs to `?>`, truncating the tag before its alt \u2014 so correct multi-line tags were flagged; (3) tags whose opening line contained no '>' at all were never matched, hiding 31 real tags.",
+    "fix": "Replaced with a python3 parse that strips, IN ORDER, html comments -> php block comments -> php line comments -> php <?php ?> blocks, then matches `<img\\b[^>]*>` ([^>] spans newlines) and checks for \\balt\\s*=. Falls back to the old grep if python3 is absent. Order matters: php blocks must go before tag matching or the `?>` truncation recurs. Proven non-vacuous with a synthetic fixture: flags a genuinely alt-less tag, does NOT flag a tag whose alt is on the next line, and ignores an <img> inside an HTML comment. That fixture caught a real bug in the first version of the fix \u2014 html comments were not being stripped. Theme result 72 -> 2; the remaining 2 are inc/accessibility-fix.php's own regex/replacement string literals. Deliberately NOT chasing those: stripping PHP string literals would risk false negatives on markup echoed from PHP strings, a real pattern in this codebase.",
+    "tags": [
+      "a11y",
+      "verify-theme",
+      "false-positive",
+      "gate-quality",
+      "wcag",
+      "mutation-testing"
+    ],
+    "related_bugs": [
+      "bug-292"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27"
+  },
+  {
+    "id": "bug-299",
+    "timestamp": "2026-07-27T18:08:00-07:00",
+    "error_message": "Production deploy reported '=== Deploy complete (verified live) ===' with 13/13 structural assertions PASS, but shipped stale code: live style.css reports 1.12.8 and /my-account/ still serves the placeholder. None of bug-295/296/297 reached production.",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "THEME_DIR defaults to $PROJECT_ROOT/wordpress-theme/skyyrose-flagship, where PROJECT_ROOT is derived from the SCRIPT's own location (scripts/deploy-theme.sh:25-27). Invoking the script by absolute path from a git worktree therefore deploys the MAIN checkout's tree, not the caller's. Main was on branch 'main' at 83f85b53a without the 6 fix commits. Every post-deploy gate passed because each compares live against the source it actually shipped -- the version-stamp check confirmed 1.12.8==1.12.8. No gate compares the deploy source to the caller's working tree, so 'wrong tree' is invisible by construction.",
+    "fix": "PENDING founder action: merge worktree-glimmering-crafting-shannon into main (0 conflicts, 0 overlap with the dirty frontend/ work), then re-run deploy from the main checkout. Do NOT use THEME_DIR_OVERRIDE to point at the worktree -- see bug-300.",
+    "tags": [
+      "deploy",
+      "worktree",
+      "stale-deploy",
+      "fail-open",
+      "gate-gap",
+      "verification"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-252",
+      "bug-287"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27T18:08:00-07:00"
+  },
+  {
+    "id": "bug-300",
+    "timestamp": "2026-07-27T18:20:00-07:00",
+    "error_message": "preflight_completeness() reported 'Tracked-file completeness: 1803/1803 on disk' and passed clean, while the source tree it validated was missing 979 files that exist on production.",
+    "file": "scripts/deploy-theme.sh",
+    "root_cause": "preflight_completeness() (scripts/deploy-theme.sh:346-370) enumerates via `git ls-files` and only asserts each TRACKED file exists on disk. All 979 files that a sparse worktree lacks are UNTRACKED (gitignored brand binaries: assets/branding/hero/*.webp|avif, collection logos, etc). Deploy is an atomic rsync hot-swap, so production loses any file the source lacks -- the gate is structurally blind to exactly the class of file that goes missing. Same fail-open shape as bug-230: absent input reads as 'nothing wrong'.",
+    "fix": "Census method recorded in this session: compare `find . -type f` between the deploy source and the main checkout, then split the delta by `git ls-files` membership. Deploying this worktree via THEME_DIR_OVERRIDE would have silently deleted 979 live brand assets while every gate reported PASS. Durable fix (not yet written): preflight must diff the source tree against a manifest of what is currently live, not against git's tracked set.",
+    "tags": [
+      "deploy",
+      "fail-open",
+      "gate-gap",
+      "untracked",
+      "sparse-worktree",
+      "riders"
+    ],
+    "related_bugs": [
+      "bug-230",
+      "bug-252",
+      "bug-299"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-27T18:20:00-07:00"
+  },
+  {
+    "id": "bug-301",
+    "timestamp": "2026-07-28T10:20:00-07:00",
+    "error_message": "Backend uptime monitor reports the Vercel dashboard as DOWN. api/v1/monitoring.py:57 registers {'name': 'Vercel API', 'url': 'https://devskyy.app/api/health'}; that URL returns 401 {'success':false,'error':'Unauthorized'} on production [live, probed 2026-07-28].",
+    "file": "api/v1/monitoring.py",
+    "root_cause": "The monitor targets /api/health, which is inside proxy.ts's gated matcher and requires a NextAuth session -- an unauthenticated prober can never get 200. /api/health is also the WRONG endpoint for uptime: it probes WordPress/WooCommerce credential state and returns whether WP_APP_PASSWORD is provisioned plus raw WP error strings in wp_reason, so it must STAY gated. The endpoint intended for uptime is /api/monitoring/health (status, uptime, commit SHA, region, heap) -- but that is gated too, which also breaks the post-deploy check at frontend/scripts/deploy.ts:247 and the unauthenticated probe in frontend/tests/e2e/smoke.spec.ts:44.",
+    "fix": "NOT YET APPLIED -- founder decision, deliberately out of scope for the withAuth gating change (which preserves current behavior exactly, zero regression). Recommended: repoint api/v1/monitoring.py:57 and deploy.ts:247 to /api/monitoring/health, then add ONLY 'monitoring/health' to frontend/lib/api-public-routes.ts. Do NOT exempt /api/health -- it discloses credential-provisioning state.",
+    "tags": [
+      "monitoring",
+      "auth",
+      "false-alarm",
+      "uptime",
+      "dashboard",
+      "pre-existing"
+    ],
+    "related_bugs": [
+      "bug-162"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:20:00-07:00"
+  },
+  {
+    "id": "bug-302",
+    "timestamp": "2026-07-28T10:45:00-07:00",
+    "error_message": "POST https://www.devskyy.app/api/conversion returns 401 {'success':false,'error':'Unauthorized'} [live, probed 2026-07-28]. The WordPress->dashboard conversion analytics bridge has been silently dead: skyyrose.co client engines (CIE, Aurora, Pulse, Magnetic Obsidian, Cross-Sell, Journey Gamification, APE) POST batched events to it and every batch is rejected.",
+    "file": "frontend/app/api/conversion/route.ts",
+    "root_cause": "Same shape as bug-301: an endpoint designed for UNAUTHENTICATED EXTERNAL callers sits inside proxy.ts's blanket /api/* matcher, whose only exemptions are auth, checkout and webhooks. The storefront has no NextAuth session, so it can never satisfy the gate. Nothing alerts, because the sender fire-and-forgets analytics beacons and the dashboard simply shows zero events -- indistinguishable from 'no traffic'.",
+    "fix": "NOT APPLIED -- preserved as-is by the withAuth migration (exact parity, zero regression). Correct fix is a decision, not a patch: either (a) add 'conversion' to frontend/lib/api-public-routes.ts AND unwrap GET/POST/OPTIONS in the same change -- withAuth does NOT consult the exemption list at runtime, the list only drives the coverage test -- with the ingest authenticated by a shared secret or HMAC like webhooks/woocommerce does; or (b) accept that this bridge is retired and delete the WP-side senders. Note GET on this route returns aggregated dashboard metrics and must STAY gated even if POST opens.",
+    "tags": [
+      "analytics",
+      "auth",
+      "wordpress-bridge",
+      "silent-failure",
+      "pre-existing",
+      "fail-open-inverse"
+    ],
+    "related_bugs": [
+      "bug-301"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:45:00-07:00"
+  },
+  {
+    "id": "bug-303",
+    "timestamp": "2026-07-28T10:50:00-07:00",
+    "error_message": "GET /api/settings returns WooCommerce consumerKey/consumerSecret to the browser in plaintext with no redaction, and masking them is not safely possible without changing POST first.",
+    "file": "frontend/app/api/settings/route.ts",
+    "root_cause": "getHandler returns the settings object verbatim. app/admin/settings/page.tsx binds those fields into CONTROLLED inputs (page.tsx:243,269) and postHandler writes req.json() straight to data/settings.json. So the response is not a view -- it is the next write's payload. Returning a masked value (cs_****1234) would persist the mask OVER the real credential on the very next save.",
+    "fix": "NOT APPLIED -- out of scope for the auth-gating change, and a naive mask here DESTROYS credentials. Correct sequence: (1) make postHandler merge instead of overwrite, ignoring any secret field whose submitted value equals the mask sentinel; (2) only then redact in getHandler. Mitigation today: the route is double-gated (withAuth wrapper + inline isAuthenticated), so exposure is limited to an authenticated admin session. The env-seeded defaults added 2026-07-28 do not widen this -- they follow the same path settings.json values already take.",
+    "tags": [
+      "secrets",
+      "dashboard",
+      "settings",
+      "redaction",
+      "controlled-input",
+      "pre-existing"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-28T10:50:00-07:00"
   }
 ]

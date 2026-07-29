@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { tripoClient, toJob3D } from '@/lib/tripo/client';
 import { getTripoConnectionStatus } from '@/lib/tripo/config';
 
@@ -16,7 +17,7 @@ import { getTripoConnectionStatus } from '@/lib/tripo/config';
 // POST — Submit a generation job
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { input_type, prompt, image_url, model_version } = body as {
@@ -98,11 +99,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export const POST = withAuth(postHandler);
+
 // ---------------------------------------------------------------------------
 // GET — Check job status or get connection info
 // ---------------------------------------------------------------------------
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const taskId = searchParams.get('task_id');
@@ -141,3 +144,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export const GET = withAuth(getHandler);

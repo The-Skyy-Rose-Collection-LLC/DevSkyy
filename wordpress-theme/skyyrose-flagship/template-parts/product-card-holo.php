@@ -90,7 +90,7 @@ $image_priority = ! empty( $args['image_priority'] );
 
 	<div class="holo__body">
 		<div class="holo__gallery">
-			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'View %s', 'skyyrose' ), $title ) ); ?>">
+			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link" data-cursor-label="<?php esc_attr_e( 'View', 'skyyrose' ); ?>" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'View %s', 'skyyrose' ), $title ) ); ?>">
 				<?php
 				echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
 					$front_url,

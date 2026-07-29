@@ -10,13 +10,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import {
   getAllPipelineStatuses,
   getAllPipelineStatusesDryRun,
   getPipelineStatus,
 } from '@/lib/pipeline-config';
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const dryRun = searchParams.get('dry_run') === 'true';
@@ -58,3 +59,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getHandler);

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { isMeshyConnected, MESHY_CONFIG } from '@/lib/meshy/config';
 import { isTripoConnected, TRIPO_CONFIG } from '@/lib/tripo/config';
 
-export async function GET() {
+async function getHandler() {
   const providers = [
     {
       id: MESHY_CONFIG.provider_id,
@@ -24,3 +25,5 @@ export async function GET() {
 
   return NextResponse.json(providers);
 }
+
+export const GET = withAuth(getHandler);

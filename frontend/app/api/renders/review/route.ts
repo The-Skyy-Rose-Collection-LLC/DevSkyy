@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { withAuth } from '@/lib/api-auth';
 import {
   isSafeSegment,
   loadReviewState,
@@ -26,7 +27,7 @@ const bodySchema = z
   })
   .strict();
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -78,3 +79,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to save review' }, { status: 500 });
   }
 }
+
+export const POST = withAuth(postHandler);

@@ -12,6 +12,7 @@
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { withAuth } from '@/lib/api-auth';
 import { authOptions } from '@/lib/auth';
 
 const WORDPRESS_URL = process.env.WORDPRESS_URL;
@@ -21,7 +22,7 @@ const WP_CONSUMER_SECRET = process.env.WOOCOMMERCE_SECRET;
 /** WordPress REST API namespace prefixes that are safe to proxy. */
 const ALLOWED_PREFIXES = ['/wp/', '/wc/'];
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   // Defense in depth: this route injects WooCommerce write credentials, so it
   // authenticates itself rather than trusting proxy.ts's matcher alone. If that
   // edge gate ever regresses, this check still fails an unauthenticated caller
@@ -105,3 +106,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(postHandler);

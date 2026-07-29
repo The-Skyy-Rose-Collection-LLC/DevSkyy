@@ -10,7 +10,20 @@ Goal: skyyrose.co storefront pushed to full commercial/production quality — re
 content (not genericized/resold), zero placeholders, full WCAG/security/performance bar, plus a
 deliberate visual upgrade sourced from a screened 176-pattern shortlist. Owner agent:
 **fashion-theme-architect** (`.claude/agents/fashion-theme-architect.md`, upgraded 2026-07-27 with
-§2b shortlist boot + §5.2 Motion QA gate). Dedicated worktree: `.claude/worktrees/theme-commercial-build`.
+§2b shortlist boot + §5.2 Motion QA gate). Actual worktree: `.claude/worktrees/glimmering-crafting-shannon`
+(the planned `theme-commercial-build` worktree was never created — this session executed in-place;
+clean, un-diverged from origin/main on the theme path at kickoff).
+
+**2026-07-27 execution session (today, founder deadline):** Phase 0 run — verify:theme baseline
+captured, min-sync FAIL fixed (`clean-css` module was missing from `node_modules`; `npm install` +
+full `npm run build` resolved it, confirmed benign single-line minifier-version drift, not content
+change). wp-security baseline: 1 MEDIUM (bug-289, kids-capsule REST publish-status leak) found+fixed.
+wp-code-simplifier baseline captured (dead-refs, duplicate-selector count, size-growth — see
+`.wolf/memory.md` 2026-07-27 entries for detail). Phase 1 dispatched to fashion-theme-architect
+(background agent `funnel-architect`), scope-cut for today: full Phase 1 funnel-to-commercial-grade
++ ONLY 4 code-extending Phase 1a patterns (luxury-cursor/product-card-holo/toast/footer-cro) + 2 font
+retokens. Remaining 12 Phase 1a patterns and ALL of Phase 1b (Immersive Worlds) explicitly deferred
+past today — not dropped, just sequenced after the funnel ships.
 
 Visual source: `docs/design/visual-pattern-shortlist.md` — 176/202 patterns screened against real
 brand tokens/fonts/references. 24 extend existing code (`luxury-cursor.js`, `product-card-holo.js`,
@@ -19,11 +32,11 @@ Known landmine: "Dark Luxury Hero"/"Dark Luxury Newsletter" spec a cut font (Cor
 retoken before building either.
 
 ### Phase 0 — Audit (read-only, in the new worktree, before any code changes)
-- [ ] `devskyy` MCP: `serena_full_project_audit`, `serena_check_code_style`, `serena_validate_security`, `serena_find_issues`
-- [ ] `wp-security` agent pass (CSP/nonce/escaping/auth/upload/SQL)
-- [ ] Accessibility baseline — verify the WCAG 2.2 AA claim in `style.css`'s header is actually true
-- [ ] `npm run verify:theme` baseline (record starting aspect states before touching anything)
-- [ ] `wp-code-simplifier` — dead-code/file-bloat baseline
+- [ ] `devskyy` MCP: `serena_full_project_audit`, `serena_check_code_style`, `serena_validate_security`, `serena_find_issues` — SKIPPED today (time-boxed); wp-security + wp-code-simplifier baselines cover the same ground for this pass
+- [x] `wp-security` agent pass (CSP/nonce/escaping/auth/upload/SQL) — 1 MEDIUM found+fixed (bug-289), zero CRITICAL/HIGH
+- [ ] Accessibility baseline — deferred to Phase 2 Accessibility Auditor (needs-browser checks anyway, verify:theme only does static `<img alt>` count: 72 without alt, WARN not FAIL)
+- [x] `npm run verify:theme` baseline — captured; min-sync FAIL fixed (npm install, npm run build); 1 pre-existing FAIL remains (file-size, 5 PHP files, out of scope today), 2 WARN (escaping, a11y)
+- [x] `wp-code-simplifier` — dead-code/file-bloat baseline captured (4 dead-refs, 43 dup selectors, homepage-v2.css 1339→1993 lines)
 
 ### Phase 1a — Visual direction (informs Phase 1, doesn't block it — cheap wins can start immediately)
 - [ ] Retoken the two font-landmine patterns (Dark Luxury Hero, Dark Luxury Newsletter) to Cinzel/Pinyon Script + real `#D4AF37`

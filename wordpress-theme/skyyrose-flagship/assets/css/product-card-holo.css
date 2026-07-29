@@ -23,6 +23,57 @@
 	height: 100%;
 }
 
+/* ── Holographic tilt + sheen (desktop pointer, motion-ok only) ──────────
+   Consumes the --tilt-x/--tilt-y/--holo-x/--holo-y/--holo-angle custom
+   properties product-card-holo.js writes per frame. The JS skips touch and
+   reduced-motion, and this media gate mirrors that so the resting values
+   never render a stale effect there. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+	.holo {
+		perspective: 900px;
+	}
+
+	.holo__body {
+		transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	/* Track the pointer live while hovered; the transition above only plays
+	   the spring-back to neutral after mouseleave resets the vars. */
+	.holo:hover .holo__body {
+		transition: transform 0s;
+	}
+
+	.holo__gallery::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 5; /* above imagery, below badge (10) and drawer (20) */
+		pointer-events: none;
+		opacity: 0;
+		background:
+			radial-gradient(
+				380px circle at var(--holo-x, 50%) var(--holo-y, 50%),
+				rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.22),
+				transparent 55%
+			),
+			linear-gradient(
+				var(--holo-angle, 135deg),
+				transparent 30%,
+				rgba(255, 255, 255, 0.07) 45%,
+				rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.1) 50%,
+				rgba(255, 255, 255, 0.07) 55%,
+				transparent 70%
+			);
+		mix-blend-mode: screen;
+		transition: opacity 0.4s ease;
+	}
+
+	.holo:hover .holo__gallery::after {
+		opacity: 1;
+	}
+}
+
 /* Gallery & Images */
 .holo__gallery {
 	position: relative;

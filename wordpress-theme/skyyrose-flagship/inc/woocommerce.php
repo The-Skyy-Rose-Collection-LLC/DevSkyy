@@ -699,6 +699,48 @@ function skyyrose_override_fse_detection( $is_fse ) { // phpcs:ignore Generic.Co
 }
 add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );
 
+/**
+ * Render the My Account UI when the page content does not.
+ *
+ * Live page 9710 (/my-account/) holds only the placeholder paragraph "This page
+ * uses the SkyyRose Flagship theme template. Content is rendered by the theme."
+ * — no [woocommerce_my_account] shortcode, no block equivalent, and the theme
+ * ships no woocommerce/myaccount/ override. Verified against production 2026-07-27:
+ * logged out OR in, visitors got no login form, no orders, no addresses. The page
+ * content explicitly delegates rendering to the theme, so the theme must render it.
+ *
+ * Runs at priority 9 — BEFORE core's do_shortcode() at 11 — so the returned
+ * shortcode is expanded normally by the existing filter chain. Idempotent: if the
+ * content ever gains the shortcode (or a block equivalent) this yields to it, so
+ * a later content fix does not double-render.
+ *
+ * Zero production DB writes, matching the template_include remedies in
+ * inc/redirects.php used for the stale-meta Collections/Cart/Checkout pages.
+ *
+ * @since 1.12.9
+ * @param string $content Post content.
+ * @return string
+ */
+function skyyrose_account_content_fallback( $content ) {
+	if ( ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
+		return $content;
+	}
+
+	// Only the main page body — never excerpts, widgets, or secondary loops.
+	if ( ! in_the_loop() || ! is_main_query() ) {
+		return $content;
+	}
+
+	// Already renders the account UI (shortcode or WC block) — leave it alone.
+	if ( has_shortcode( $content, 'woocommerce_my_account' )
+		|| has_block( 'woocommerce/customer-account', $content ) ) {
+		return $content;
+	}
+
+	return '[woocommerce_my_account]';
+}
+add_filter( 'the_content', 'skyyrose_account_content_fallback', 9 );
+
 /*
 --------------------------------------------------------------
  * Cart "Wears With" Cross-Sell Helper

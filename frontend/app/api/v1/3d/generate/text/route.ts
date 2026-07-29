@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/api-auth';
 import { meshyClient, toJob3D as meshyToJob3D } from '@/lib/meshy/client';
 import { tripoClient, toJob3D as tripoToJob3D } from '@/lib/tripo/client';
 import { jobStore } from '../../jobs/route';
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   let body: { prompt?: string; provider?: string };
   try {
     body = await request.json();
@@ -40,3 +41,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export const POST = withAuth(postHandler);

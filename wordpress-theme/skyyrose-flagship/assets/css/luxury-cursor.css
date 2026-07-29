@@ -29,28 +29,69 @@ html.cursor-active * {
 	height: 36px;
 	border: 1.5px solid rgba(183, 110, 121, 0.4);
 	background: transparent;
+	display: grid;
+	place-items: center;
+	transition:
+		transform 0.15s ease,
+		opacity 0.15s ease,
+		width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+		height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+		background 0.25s ease,
+		border-color 0.25s ease;
 }
 
+/* State classes set scale via custom properties — the JS inline transform
+   references them (scale(var(--cursor-*-scale, 1))), so stylesheet
+   transforms here would silently lose to the per-frame inline writes. */
 .cursor-hover .cursor-ring {
-	transform: translate(-50%, -50%) scale(1.5);
+	--cursor-ring-scale: 1.5;
 	border-color: rgba(183, 110, 121, 0.7);
 }
 
 .cursor-hover .cursor-dot {
-	transform: translate(-50%, -50%) scale(0.5);
+	--cursor-dot-scale: 0.5;
 }
 
 .cursor-down .cursor-ring {
-	transform: translate(-50%, -50%) scale(0.9);
+	--cursor-ring-scale: 0.9;
 }
 
 .cursor-down .cursor-dot {
-	transform: translate(-50%, -50%) scale(0.8);
+	--cursor-dot-scale: 0.8;
+}
+
+/* Labeled lens state — element under cursor carries data-cursor-label.
+   Expands by width/height (not scale) so the label text renders sharp. */
+.cursor-label {
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+	font-size: 10px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	color: #fff;
+	opacity: 0;
+	transition: opacity 0.2s ease 0.05s;
+}
+
+.cursor-labeled .cursor-ring {
+	--cursor-ring-scale: 1;
+	width: 88px;
+	height: 88px;
+	background: rgba(10, 10, 10, 0.82);
+	border-color: rgba(183, 110, 121, 0.8);
+}
+
+.cursor-labeled .cursor-ring .cursor-label {
+	opacity: 1;
+}
+
+.cursor-labeled .cursor-dot {
+	--cursor-dot-scale: 0;
 }
 
 @media (hover: none), (max-width: 768px) {
 	.cursor-dot,
-	.cursor-ring {
+	.cursor-ring,
+	.cursor-label {
 		display: none !important;
 	}
 	html.cursor-active,
@@ -61,7 +102,8 @@ html.cursor-active * {
 
 @media (prefers-reduced-motion: reduce) {
 	.cursor-dot,
-	.cursor-ring {
+	.cursor-ring,
+	.cursor-label {
 		display: none !important;
 	}
 	html.cursor-active,
