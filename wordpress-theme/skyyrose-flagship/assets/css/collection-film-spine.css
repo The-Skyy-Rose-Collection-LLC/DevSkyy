@@ -191,8 +191,15 @@
 	55%      { box-shadow: 0 0 0 8px rgba(var(--skyyrose-accent-rgb), 0); }
 }
 
+/* White, not the per-collection accent-text token: adversarial audit
+   2026-07-29 computed real WCAG ratios for the rest-state plate composited
+   over a worst-case bright video frame — LH accent-text (#FF5C7A) drops to
+   3.49:1 and KC (#B76E79) to 2.73:1, both below AA 4.5:1. White holds
+   10.37:1 in the same worst case (matches the name span, which was already
+   white). Accent identity stays on the border/dot/focus-outline, none of
+   which carry WCAG 1.4.3 text-contrast risk. */
 .col-film__hotspot-price {
-	color: var(--skyyrose-accent-text, var(--skyyrose-accent));
+	color: #fff;
 }
 
 .col-film__hotspot-price .woocommerce-Price-amount {

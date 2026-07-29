@@ -47,8 +47,35 @@ retoken before building either.
       wiring + `magnetic` class on hero CTA. My re-run: php -l clean, lint:php clean, cut-fonts 0,
       reduced-motion in all 4 new files, verify:theme 2 FAILs both PRE-EXISTING (min-sync terser drift,
       file-size). Section order unchanged; heroes/film/experience intact. UNCOMMITTED.
-- [ ] Browser motion QA at deploy time (standing Playwright rule): 390px+desktop all 4 collections,
-      reduced-motion emulation (fog/aurora frozen, no orbs/confetti), kids quick-add confetti
+- [x] DEPLOYED v1.13.0 to skyyrose.co 2026-07-29 (preflight 1805/1805, homepage 13/13 Scrapling PASS)
+- [x] Post-deploy QA on BR/LH/SIG [live]: spine+beats+hotspots render correct real product/price/voice
+      per collection, video playing, 0 console errors, hotspots real focusable links. Verified via
+      Playwright computed-style+text (NOT screenshots — headless CLI --screenshot and Playwright's
+      screenshot tool both failed to paint this page's video/JS layer; a tooling gap, not a site defect)
+- [x] GAP CLOSED — reduced-motion live-verified via page.emulateMedia() (browser_run_code_unsafe):
+      all 3 collections confirm stage collapses to static, track shrinks 2520px->~1300px, beats
+      render as static stack, hotspots stay present. Matches spec.
+- [x] Kids Capsule 0 spine/motion markers — CONFIRMED via 5-lens adversarial audit (workflow
+      wf_2912d330-ecb): skyyrose_kc_is_launch_mode() + kc-launch routing predates cd2899fe7 by
+      3.5mo (c4d00b98a, 2026-04-12); zero refs to it in cd2899fe7's diff. Pre-existing, not a
+      regression, confirmed by git blame + git show, not just inferred.
+- [x] Adversarial audit (5 independent lenses, ultracode workflow) on shipped v1.13.0 source —
+      2 CLEAN (reduced-motion completeness: 24 effects all guarded, zero gaps beyond what was
+      already checked; toggle-move claim: functionally sound, structurally rewritten not
+      byte-identical as claimed, no a11y regression), 2 REAL FINDINGS fixed below, 1 confirmed above.
+- [x] FIX — hotspot price text WCAG AA failure: LH accent-text (#FF5C7A) computed 3.49:1, KC
+      (#B76E79) 2.73:1 against the rest-state plate composited over a bright video frame (both
+      below 4.5:1 AA). Changed `.col-film__hotspot-price` to `#fff` (matches the name span, proven
+      10.37:1 worst-case). Accent identity kept on border/dot/focus-outline (non-text, no WCAG
+      1.4.3 risk). File: assets/css/collection-film-spine.css.
+- [x] FIX — LCP-doctrine violation: initFilmSpine()'s initial update() ran synchronously at
+      DOMContentLoaded (forced layout + style writes), inside the FCP->LCP window Wave 7b exists
+      to protect; not part of the interaction/8s-gated loader chain. Deferred to `load` event,
+      matching the existing Kids-bounce pattern. File: assets/js/collection-motion.js.
+- [x] v1.13.1 committed (functions.php/style.css/readme.txt triple bump) — both fixes verified:
+      php -l clean, correct min output confirmed by content (not just presence), verify:theme same
+      2 pre-existing FAILs only (min-sync terser drift, file-size — neither touches these 2 files).
+      UNCOMMITTED->committed, awaiting deploy y.
 - [ ] Follow-ups flagged by builder (pre-existing, NOT this session's): `.col-cta` has zero styles
       theme-wide; min-sync terser drift needs lockfile or one-time full-min rebuild commit; KC
       launch-mode ON bypasses collection-standalone assets (kids motion invisible until off); 5 inc/

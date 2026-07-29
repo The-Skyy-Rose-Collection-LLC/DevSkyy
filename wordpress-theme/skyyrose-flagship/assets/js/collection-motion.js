@@ -324,7 +324,18 @@
 			requestAnimationFrame(update);
 		}, { passive: true });
 
-		if (!reduceMq.matches) update();
+		// Deferred, not synchronous: adversarial audit 2026-07-29 found this
+		// call forcing a layout read (getBoundingClientRect) + style writes
+		// during boot() at DOMContentLoaded — inside the FCP->LCP window the
+		// Wave 7b loader doctrine exists to protect (enqueue.php:988). Same
+		// load-gate pattern already used for Kids' bounce field below.
+		if (!reduceMq.matches) {
+			if ('complete' === document.readyState) {
+				update();
+			} else {
+				window.addEventListener('load', update, { once: true });
+			}
+		}
 
 		// Live flip to reduced motion: clear the inline drift so the CSS
 		// static fallback isn't fighting a stale transform.
