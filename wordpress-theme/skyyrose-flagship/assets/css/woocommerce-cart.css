@@ -142,7 +142,7 @@
 	height: 150px;
 	border-radius: var(--skyy-woo-radius-sm);
 	overflow: hidden;
-	background: var(--color-card-bg, #111111);
+	background: var(--color-card-bg, #111);
 }
 
 @media (max-width: 640px) {

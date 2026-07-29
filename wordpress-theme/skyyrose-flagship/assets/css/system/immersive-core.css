@@ -212,7 +212,7 @@
    @media (hover:hover) prevents the attribute from applying on touch. */
 @media (hover: hover) {
 	[data-warp][data-warp-active] {
-		filter: url(#ic-warp-filter);
+		filter: url("#ic-warp-filter");
 	}
 }
 

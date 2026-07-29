@@ -18,7 +18,7 @@
 
 /* latin-ext */
 @font-face {
-	font-family: 'Inter';
+	font-family: Inter;
 	font-style: normal;
 	font-weight: 300 700;
 	font-display: swap;
@@ -31,7 +31,7 @@
 
 /* latin */
 @font-face {
-	font-family: 'Inter';
+	font-family: Inter;
 	font-style: normal;
 	font-weight: 300 700;
 	font-display: swap;
@@ -46,7 +46,7 @@
 
 /* latin */
 @font-face {
-	font-family: 'Archivo';
+	font-family: Archivo;
 	font-style: normal;
 	font-weight: 100 900;
 	font-stretch: 62% 125%;
@@ -61,7 +61,7 @@
 
 /* latin */
 @font-face {
-	font-family: 'Cinzel';
+	font-family: Cinzel;
 	font-style: normal;
 	font-weight: 400 900;
 	font-display: swap;
@@ -89,7 +89,7 @@
 
 /* latin */
 @font-face {
-	font-family: 'Anton';
+	font-family: Anton;
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
@@ -113,7 +113,7 @@
 
 /* ─── Pacifico (Black Rose script accent) ─────────────────────────── */
 @font-face {
-	font-family: 'Pacifico';
+	font-family: Pacifico;
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;

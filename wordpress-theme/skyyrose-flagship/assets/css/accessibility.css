@@ -261,9 +261,9 @@ td a,
 @media (prefers-contrast: more) {
 	:root {
 		--color-text-secondary: #E0E0E0;
-		--color-text-muted: #BBBBBB;
-		--color-text-dim: #AAAAAA;
-		--color-border: #444444;
+		--color-text-muted: #BBB;
+		--color-text-dim: #AAA;
+		--color-border: #444;
 		--color-border-hover: rgba(183, 110, 121, 0.6);
 	}
 

@@ -142,7 +142,7 @@
 	   --font-* / --ff-* are back-compat aliases consumed by style.css
 	   (body/base typography), woocommerce, footer, immersive,
 	   generic-pages, cart, checkout, search-results, homepage-v2/v7,
-	   product-grid, kids-capsule, skeleton. Every --font-*/--ff-* name
+	   product-grid, kids-capsule, skeleton. Every --font-* / --ff-* name
 	   referenced by a var() MUST be aliased here — an undefined var
 	   fails silent to its fallback (bug-271: --font-body missing put
 	   Inter body text on 19/20 pages). Do NOT add new canonical tokens
@@ -279,8 +279,8 @@ html {
 [data-collection="black-rose"] {
 	--skyyrose-accent:       #C0C0C0;
 	--skyyrose-accent-rgb:   192, 192, 192;
-	--skyyrose-accent-dark:  #999999;
-	--skyyrose-secondary:    #FFFFFF;
+	--skyyrose-accent-dark:  #999;
+	--skyyrose-secondary:    #FFF;
 	--skyyrose-font-script:  'SkyyRose Black Rose Script', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);
@@ -300,7 +300,7 @@ html {
 	--skyyrose-accent:       #DC143C;
 	--skyyrose-accent-rgb:   220, 20, 60;
 	--skyyrose-accent-dark:  #9B0F2E;
-	--skyyrose-secondary:    #FFFFFF;
+	--skyyrose-secondary:    #FFF;
 	--skyyrose-font-script:  'SkyyRose Love Hurts Graffiti', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);

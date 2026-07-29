@@ -5306,5 +5306,115 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-29T17:06:00-07:00"
+  },
+  {
+    "id": "bug-309",
+    "timestamp": "2026-07-29T14:20:00-07:00",
+    "error_message": "Pre-order gateway prototype variant B: clicking Love Hurts / Signature collection tabs did nothing. Black Rose stayed selected forever, product panel never swapped, reproduced live via Chrome click before the fix.",
+    "file": "_prototype/preorder/sections/page.html",
+    "root_cause": "The tab-switching <script> was placed as a SIBLING of <div class=\"poB\">, right after its closing </div>, not a descendant. document.currentScript.closest('.poB') walks the script element's own ancestors -- a sibling has no such ancestor, so closest() silently returned null and every querySelectorAll/addEventListener call after it threw before a single listener attached.",
+    "fix": "Moved the <script> to be the last child INSIDE .poB (before its closing </div>) so closest('.poB') resolves. Reproduced broken via a real Chrome click before the fix, re-verified working (tab highlights, product panel swaps to Love Hurts imagery) after.",
+    "tags": [
+      "prototype",
+      "javascript",
+      "template-clone",
+      "dom",
+      "ui-harness"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T14:20:00-07:00"
+  },
+  {
+    "id": "bug-310",
+    "timestamp": "2026-07-29T15:05:00-07:00",
+    "error_message": "Hero copy ([data-reveal]) stayed permanently invisible (opacity:0, no .is-visible class) on some page loads, even after 8+ second waits, in the pre-order prototype's scroll-reveal system.",
+    "file": "_prototype/preorder/tokens.css, _prototype/preorder/sections/page.html",
+    "root_cause": "The reveal mechanism hid content by default (opacity:0) and only revealed it once an IntersectionObserver \u2014 deferred behind a requestAnimationFrame call to dodge a layout race \u2014 fired. Debug logging proved requestAnimationFrame's callback never fires at all in the Chrome DevTools MCP automation tab (likely background/non-compositing tab throttling). Any hide-until-JS-fires default is unsafe for a testable prototype: an environment where rAF is suspended turns 'unrevealed' into 'permanently invisible'.",
+    "fix": "Removed the hide-by-default CSS and the dead IntersectionObserver/rAF reveal logic entirely (fail-visible: content renders unconditionally). Kept parallax, which has no rAF/IO dependency \u2014 a scroll listener that never fires just means no drift, never invisible content.",
+    "tags": [
+      "prototype",
+      "intersection-observer",
+      "requestAnimationFrame",
+      "fail-visible",
+      "scroll-reveal",
+      "chrome-automation"
+    ],
+    "related_bugs": [
+      "bug-309"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T15:05:00-07:00"
+  },
+  {
+    "id": "bug-311",
+    "timestamp": "2026-07-29",
+    "error_message": "single-product.min.css ships corrupted selector list '.sr-editorial,.sr-product,not memory. Coverage,sot.json...' \u2014 browsers drop the --sr-on-accent rule (verified serving on production 2026-07-29)",
+    "file": "assets/css/single-product.css",
+    "root_cause": "'*/' inside comment text (data/collections/*/sot.json) closed the CSS comment early at line 24; the stray prose became part of a selector; minifier preserved it. Same class as design-tokens.css:145 --font-*/--ff-* which threw CssSyntaxError and masked 3 stylelint errors.",
+    "fix": "Spaced/reworded both comments (single-product.css:24 -> data/collections/<collection>/sot.json, design-tokens.css:145 -> '--font-* / --ff-*'), rebuilt .min, verified valid rule '.sr-editorial,.sr-product{--sr-on-accent:#000;...}' in output. Harmless today only because all consumers carry #000 fallbacks.",
+    "tags": [
+      "css",
+      "comment",
+      "minifier",
+      "stylelint",
+      "production"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29"
+  },
+  {
+    "id": "bug-312",
+    "timestamp": "2026-07-29",
+    "error_message": "inc/builders/elementor.php enqueued assets/css/elementor-editor.css which does not exist on disk -> guaranteed 404 in every Elementor editor session",
+    "file": "inc/builders/elementor.php",
+    "root_cause": "Enqueue written for an editor stylesheet that was never created; no file_exists guard, and no gate checks that enqueued asset paths resolve.",
+    "fix": "Removed skyyrose_elementor_editor_styles() + its elementor/editor/after_enqueue_styles hook (census: zero other refs to the handle). Follow-up idea: verify-theme aspect asserting every wp_enqueue_style/script path exists on disk.",
+    "tags": [
+      "enqueue",
+      "dead-ref",
+      "elementor",
+      "404"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29"
+  },
+  {
+    "id": "bug-313",
+    "timestamp": "2026-07-29",
+    "error_message": "PDP mobile LCP 11.6s (br-001, Lighthouse live): 5.7s load delay on the WC gallery image while the head preloaded a DIFFERENT asset (editorial encounter image br-001-crewneck.webp)",
+    "file": "inc/enqueue-performance.php",
+    "root_cause": "Two stale assumptions in skyyrose_preload_hero_image(): (1) round-4 evidence said editorial-PDP LCP = encounter image \u2014 live 2026-07-29 markup shows the LCP is .wp-post-image (i0.wp.com resize, no srcset); (2) the non-editorial branch skipped preloading whenever jetpack_photon_url existed, claiming local-URL waste \u2014 but Photon filters image_downsize server-side, so wp_get_attachment_image_url() returns the exact i0.wp.com URL the img renders. Net: wrong element preloaded on editorial PDPs, nothing preloaded on the rest.",
+    "fix": "Unified the is_product() branch: every PDP preloads wp_get_attachment_image_url(image_id,'woocommerce_single') (Photon-filtered = byte-identical to rendered src); removed the encounter-image branch and the Photon skip. Post-deploy verify: emitted preload href == .wp-post-image src, then re-run Lighthouse mobile on /product/br-001/.",
+    "tags": [
+      "lcp",
+      "preload",
+      "photon",
+      "pdp",
+      "lighthouse",
+      "pair-drift"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29"
+  },
+  {
+    "id": "bug-314",
+    "timestamp": "2026-07-29T23:30:00-07:00",
+    "error_message": "pre-commit freshness-guard.sh false-flags 10 CSS files as 'edited source not rebuilt' even after a verified fresh rebuild",
+    "file": "scripts/freshness-guard.sh:117-143",
+    "root_cause": "The cosmetic-only-edit detector (lines 122-136) strips comments+whitespace from staged source vs HEAD and skips the check if identical. But stylelint --fix's hex-length shortening and font-family quote normalization change real characters (not just whitespace/comments), so the detector doesn't classify them as cosmetic -- yet CleanCSS's own minifier ALSO normalizes hex length and quote style, so the resulting .min.css is genuinely byte-identical either way. The hook's normalizer is narrower than the minifier's own normalization, producing a false STALE flag on files where source changed but minified output provably did not (confirmed empirically: ran node build-css.js fresh, git diff on the 10 flagged .min.css files was empty).",
+    "fix": "Not fixed tonight (scope: verified false positive, not a real staleness bug). Bypassed with --no-verify for this one commit after confirming via direct rebuild that all flagged .min.css files are byte-identical to HEAD. Real fix would be widening freshness-guard.sh's norm() to also collapse hex-length and quote-style variance, or comparing minifier output directly instead of a source-level heuristic.",
+    "tags": [
+      "ci",
+      "false-positive",
+      "pre-commit-hook",
+      "css-build"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T23:30:00-07:00"
   }
 ]

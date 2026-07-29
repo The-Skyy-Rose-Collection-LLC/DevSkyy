@@ -21,7 +21,7 @@
 
    --sr-on-accent-dark is the same idea for --skyyrose-accent-dark (the
    darker hover/pressed shade used by the sticky ATC button). Values come
-   from the collection SOT masters (data/collections/*/sot.json via
+   from the collection SOT masters (data/collections/<collection>/sot.json via
    gen-design-tokens.py) — verify contrast against THOSE, not memory.
 
    Coverage, all four collections (accent-dark per current SOT):
@@ -33,14 +33,14 @@
    ========================================================================== */
 .sr-product,
 .sr-editorial {
-	--sr-on-accent: #000000;
-	--sr-on-accent-dark: #000000;
+	--sr-on-accent: #000;
+	--sr-on-accent-dark: #000;
 }
 
 .sr-product[data-collection="love-hurts"],
 .sr-editorial[data-collection="love-hurts"] {
-	--sr-on-accent: #ffffff;
-	--sr-on-accent-dark: #ffffff;
+	--sr-on-accent: #fff;
+	--sr-on-accent-dark: #fff;
 }
 
 .sr-container {
@@ -304,7 +304,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-	.sr-hero-grid { grid-template-columns: 1fr; gap: 48px; }
+	.sr-hero-grid {
+		grid-template-columns: 1fr;
+		gap: 48px;
+	}
 	.sr-container { padding: 0 24px; }
 }
 
@@ -614,7 +617,10 @@
 @media (max-width: 900px) {
 	.sr-editorial section { padding: 56px 20px; }
 	.sr-ed__fit-images { grid-template-columns: 1fr; }
-	.sr-ed__care-items { grid-template-columns: 1fr; gap: 28px; }
+	.sr-ed__care-items {
+		grid-template-columns: 1fr;
+		gap: 28px;
+	}
 }
 
 /* ==========================================================================
@@ -633,7 +639,7 @@
 	max-width: 28rem;
 }
 .sr-ed__edition-badge-label {
-	font-family: 'Anton', sans-serif;
+	font-family: Anton, sans-serif;
 	font-size: 11px;
 	letter-spacing: 0.3em;
 	text-transform: uppercase;
@@ -645,7 +651,7 @@
 	font-style: italic;
 	font-weight: 500;
 	font-size: clamp(22px, 3vw, 30px);
-	color: var(--skyyrose-text, #FFFFFF);
+	color: var(--skyyrose-text, #FFF);
 	line-height: 1.1;
 	letter-spacing: 0.02em;
 }
@@ -659,5 +665,8 @@
 }
 
 @media (max-width: 768px) {
-	.sr-ed__edition-badge { width: 100%; max-width: 100%; }
+	.sr-ed__edition-badge {
+		width: 100%;
+		max-width: 100%;
+	}
 }

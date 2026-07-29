@@ -83,10 +83,16 @@ html, body { background: #0A0A0A; }
   font-size: 0.72rem;
   font-weight: 600;
 }
-.sw-nav__item:hover { color: var(--sw-ink); background: rgba(255, 255, 255, 0.05); }
+.sw-nav__item:hover {
+	color: var(--sw-ink);
+	background: rgba(255, 255, 255, 0.05);
+}
 /* Lift the fill toward white so #0A0A0A text clears 4.5:1 on every accent —
    raw crimson #DC143C is only 3.97:1; +15% white brings it to ~4.6:1. */
-.sw-nav__item.is-active { color: #0A0A0A; background: color-mix(in srgb, var(--sw-accent) 85%, #ffffff); }
+.sw-nav__item.is-active {
+	color: #0A0A0A;
+	background: color-mix(in srgb, var(--sw-accent) 85%, #fff);
+}
 
 /* Primary/top CTA -> rose-gold→gold pill, dark ink, tracked caps (immersive). */
 .sw-topcta {
@@ -100,7 +106,10 @@ html, body { background: #0A0A0A; }
   box-shadow: 0 8px 26px rgba(183, 110, 121, 0.28);
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
 }
-.sw-topcta:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(183, 110, 121, 0.4); }
+.sw-topcta:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 34px rgba(183, 110, 121, 0.4);
+}
 
 /* ---- copy layer: monument title + wide-tracked editorial labels ---------- */
 /* Left scrim stays dark (engine uses --sw-bg) so copy reads over imagery. */
@@ -117,7 +126,7 @@ html, body { background: #0A0A0A; }
   font-size: 0.72rem;
   /* lift the accent toward white so crimson/gold clear WCAG on #0A0A0A
      (crimson #DC143C alone is 3.97:1; +22% white pushes it past 4.5:1). */
-  color: color-mix(in srgb, var(--sw-accent) 78%, #ffffff);
+  color: color-mix(in srgb, var(--sw-accent) 78%, #fff);
 }
 /* Widen the copy column so the monument title wraps to fewer lines (a 4-line
    title + body overflowed the vertically-centred block at 900px height). */
@@ -151,7 +160,7 @@ html, body { background: #0A0A0A; }
   font-family: var(--sw-font-body);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid color-mix(in srgb, var(--sw-accent) 42%, transparent);
-  color: color-mix(in srgb, var(--sw-accent) 72%, #ffffff);
+  color: color-mix(in srgb, var(--sw-accent) 72%, #fff);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-size: 0.7rem;
@@ -173,7 +182,10 @@ html, body { background: #0A0A0A; }
   color: #0A0A0A;
   box-shadow: 0 10px 30px rgba(183, 110, 121, 0.3);
 }
-.sw-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(183, 110, 121, 0.42); }
+.sw-btn--primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 14px 40px rgba(183, 110, 121, 0.42);
+}
 .sw-btn--ghost {
   background: transparent;
   color: var(--sw-ink);
@@ -211,8 +223,14 @@ html, body { background: #0A0A0A; }
 
 /* ---- mobile polish: keep the monument legible, tighten labels ----------- */
 @media (max-width: 860px) {
-  .sw-brand__name { letter-spacing: 0.22em; font-size: 0.86rem; }
-  .sw-copy__title { font-size: clamp(2rem, 8.4vw, 2.9rem); letter-spacing: -0.01em; }
+  .sw-brand__name {
+  	letter-spacing: 0.22em;
+  	font-size: 0.86rem;
+  }
+  .sw-copy__title {
+  	font-size: clamp(2rem, 8.4vw, 2.9rem);
+  	letter-spacing: -0.01em;
+  }
   .sw-copy__tags li { font-size: 0.7rem; }
   /* Clear the notch / Dynamic Island — the top bar is position:fixed at top:0. */
   .sw-topbar { padding-top: calc(clamp(14px, 2.4vw, 26px) + env(safe-area-inset-top)); }

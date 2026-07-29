@@ -244,8 +244,14 @@
 }
 
 @keyframes lp-scroll-pulse {
-	0%, 100% { opacity: 1; transform: translateX( -50% ) translateY( 0 ); }
-	50%       { opacity: 0.3; transform: translateX( -50% ) translateY( 5px ); }
+	0%, 100% {
+		opacity: 1;
+		transform: translateX( -50% ) translateY( 0 );
+	}
+	50% {
+		opacity: 0.3;
+		transform: translateX( -50% ) translateY( 5px );
+	}
 }
 
 /* ==========================================================================
@@ -667,13 +673,13 @@
 	opacity: 0;
 	transform: translateY( 1.25rem );
 	transition: opacity 0.55s ease, transform 0.55s ease;
-	/* Safety net (mirrors srRevealSafety, animations-premium.css §12.5) — kept
+	/* Safety net (mirrors sr-reveal-safety, animations-premium.css §12.5) — kept
 	   local so this hidden state never depends on another stylesheet being
 	   enqueued (Wave 5). The .is-visible path cancels it. */
-	animation: lpScrollRevealSafety 0.01s linear 0.8s forwards;
+	animation: lp-scroll-reveal-safety 0.01s linear 0.8s forwards;
 }
 
-@keyframes lpScrollRevealSafety {
+@keyframes lp-scroll-reveal-safety {
 	to {
 		opacity: 1;
 		transform: none;

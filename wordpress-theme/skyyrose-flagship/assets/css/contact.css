@@ -19,7 +19,7 @@
 	--contact-rose-gold: var(--color-rose-gold, #B76E79);
 	--contact-gold: var(--color-gold, #D4AF37);
 	--contact-dark-rose: var(--skyyrose-accent-dark, #9A5662);
-	--contact-text-primary: #FFFFFF;
+	--contact-text-primary: #FFF;
 	--contact-text-secondary: rgba(255, 255, 255, 0.7);
 	--contact-text-muted: rgba(255, 255, 255, 0.5);
 	--contact-border: rgba(255, 255, 255, 0.08);
@@ -346,7 +346,7 @@
 }
 
 .contact-form__select option {
-	background: var(--color-card-bg, #111111);
+	background: var(--color-card-bg, #111);
 	color: #fff;
 }
 

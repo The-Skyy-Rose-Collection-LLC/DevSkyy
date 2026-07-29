@@ -40,10 +40,30 @@
 	pointer-events: none;
 	z-index: 3;
 }
-.pin-corner--tl { top: 1.5rem; left: 1.5rem; border-top-width: 1px; border-left-width: 1px; }
-.pin-corner--tr { top: 1.5rem; right: 1.5rem; border-top-width: 1px; border-right-width: 1px; }
-.pin-corner--bl { bottom: 1.5rem; left: 1.5rem; border-bottom-width: 1px; border-left-width: 1px; }
-.pin-corner--br { bottom: 1.5rem; right: 1.5rem; border-bottom-width: 1px; border-right-width: 1px; }
+.pin-corner--tl {
+	top: 1.5rem;
+	left: 1.5rem;
+	border-top-width: 1px;
+	border-left-width: 1px;
+}
+.pin-corner--tr {
+	top: 1.5rem;
+	right: 1.5rem;
+	border-top-width: 1px;
+	border-right-width: 1px;
+}
+.pin-corner--bl {
+	bottom: 1.5rem;
+	left: 1.5rem;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+}
+.pin-corner--br {
+	bottom: 1.5rem;
+	right: 1.5rem;
+	border-bottom-width: 1px;
+	border-right-width: 1px;
+}
 
 /* beats stacked in one grid cell, cross-fade on scroll */
 .pin-beats {
@@ -82,7 +102,10 @@
 	color: var(--skyyrose-text-muted);
 }
 .pin-beat__label { font-size: 0.6875rem; }
-.pin-beat__sub { font-size: 0.625rem; letter-spacing: 0.32em; }
+.pin-beat__sub {
+	font-size: 0.625rem;
+	letter-spacing: 0.32em;
+}
 
 .pin-beat__chrome {
 	width: 3rem;
@@ -98,7 +121,10 @@
 	color: var(--skyyrose-text);
 	max-width: 18ch;
 }
-.pin-beat__accent { color: var(--skyyrose-accent); font-style: italic; }
+.pin-beat__accent {
+	color: var(--skyyrose-accent);
+	font-style: italic;
+}
 
 /* closing feature beat — real product, so the pinned stage never ends on
    empty space (founder feedback: put a product in this section). Shares
@@ -189,7 +215,10 @@
 	background: transparent;
 	transition: background 0.25s var(--skyyrose-ease, ease), border-color 0.25s var(--skyyrose-ease, ease);
 }
-.pin-pip.is-active { background: var(--skyyrose-accent); border-color: var(--skyyrose-accent); }
+.pin-pip.is-active {
+	background: var(--skyyrose-accent);
+	border-color: var(--skyyrose-accent);
+}
 
 .pin-counter {
 	position: absolute;
@@ -213,9 +242,21 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.pin-track { height: auto; }
-	.pin-stage { position: static; height: auto; padding: 6rem 2rem; }
-	.pin-beats { display: flex; flex-direction: column; gap: 4rem; }
-	.pin-beat { opacity: 1; transform: none; pointer-events: auto; }
+	.pin-stage {
+		position: static;
+		height: auto;
+		padding: 6rem 2rem;
+	}
+	.pin-beats {
+		display: flex;
+		flex-direction: column;
+		gap: 4rem;
+	}
+	.pin-beat {
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
+	}
 	.pin-corner,
 	.pin-progress,
 	.pin-counter { display: none; }

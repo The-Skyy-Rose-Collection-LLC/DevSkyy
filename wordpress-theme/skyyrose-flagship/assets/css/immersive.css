@@ -64,7 +64,7 @@
 	letter-spacing: 0.3em;
 	color: var(--rose-gold, #B76E79);
 	margin-bottom: 1.5rem;
-	animation: loadPulse 1.8s ease-in-out infinite;
+	animation: load-pulse 1.8s ease-in-out infinite;
 }
 
 .scene-loading-text {
@@ -76,7 +76,7 @@
 	color: rgba(255, 255, 255, 0.5);
 }
 
-@keyframes loadPulse {
+@keyframes load-pulse {
 	0%, 100% { opacity: 0.4; }
 	50%      { opacity: 1; }
 }
@@ -159,10 +159,10 @@
 	opacity: 0.04;
 	mix-blend-mode: overlay;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-	animation: grainShift 0.5s steps(4) infinite;
+	animation: grain-shift 0.5s steps(4) infinite;
 }
 
-@keyframes grainShift {
+@keyframes grain-shift {
 	0%   { transform: translate(0, 0); }
 	25%  { transform: translate(-2px, 2px); }
 	50%  { transform: translate(2px, -2px); }
@@ -201,7 +201,7 @@
 	border-radius: 50%;
 	background: var(--rose-gold, #B76E79);
 	box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5);
-	animation: beaconPulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	animation: beacon-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	transition: transform 0.25s ease;
 }
 
@@ -223,18 +223,24 @@
 	inset: -6px;
 	border-radius: 50%;
 	border: 1.5px solid rgba(183, 110, 121, 0.4);
-	animation: beaconRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	animation: beacon-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes beaconPulse {
+@keyframes beacon-pulse {
 	0%   { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5); }
 	70%  { box-shadow: 0 0 0 14px rgba(183, 110, 121, 0); }
 	100% { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0); }
 }
 
-@keyframes beaconRing {
-	0%   { transform: scale(1); opacity: 1; }
-	100% { transform: scale(2.2); opacity: 0; }
+@keyframes beacon-ring {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(2.2);
+		opacity: 0;
+	}
 }
 
 /* Hotspot label — appears on hover */
@@ -799,14 +805,14 @@
 	border-color: rgba(192, 192, 192, 0.4);
 }
 
-@keyframes beaconPulseBlackRose {
+@keyframes beacon-pulse-black-rose {
 	0%   { box-shadow: 0 0 0 0 rgba(192, 192, 192, 0.5); }
 	70%  { box-shadow: 0 0 0 14px rgba(192, 192, 192, 0); }
 	100% { box-shadow: 0 0 0 0 rgba(192, 192, 192, 0); }
 }
 
 .immersive-black-rose .hotspot-beacon {
-	animation-name: beaconPulseBlackRose;
+	animation-name: beacon-pulse-black-rose;
 }
 
 /* Love Hurts — Crimson beacons */
@@ -819,14 +825,14 @@
 	border-color: rgba(220, 20, 60, 0.4);
 }
 
-@keyframes beaconPulseLoveHurts {
+@keyframes beacon-pulse-love-hurts {
 	0%   { box-shadow: 0 0 0 0 rgba(220, 20, 60, 0.5); }
 	70%  { box-shadow: 0 0 0 14px rgba(220, 20, 60, 0); }
 	100% { box-shadow: 0 0 0 0 rgba(220, 20, 60, 0); }
 }
 
 .immersive-love-hurts .hotspot-beacon {
-	animation-name: beaconPulseLoveHurts;
+	animation-name: beacon-pulse-love-hurts;
 }
 
 /* Signature — Rose Gold beacons (default) */
@@ -841,14 +847,14 @@
 	border-color: rgba(183, 110, 121, 0.4);
 }
 
-@keyframes beaconPulseKidsCapsule {
+@keyframes beacon-pulse-kids-capsule {
 	0%   { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5); }
 	70%  { box-shadow: 0 0 0 14px rgba(183, 110, 121, 0); }
 	100% { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0); }
 }
 
 .immersive-kids-capsule .hotspot-beacon {
-	animation-name: beaconPulseKidsCapsule;
+	animation-name: beacon-pulse-kids-capsule;
 }
 
 /* ==================================================
@@ -1051,10 +1057,10 @@
 		rgba(255, 153, 51, 0.04) 0%,
 		transparent 70%
 	);
-	animation: candleFlicker 3s ease-in-out infinite alternate;
+	animation: candle-flicker 3s ease-in-out infinite alternate;
 }
 
-@keyframes candleFlicker {
+@keyframes candle-flicker {
 	0%   { opacity: 0.6; }
 	20%  { opacity: 0.9; }
 	40%  { opacity: 0.5; }
@@ -1076,13 +1082,22 @@
 		rgba(212, 175, 55, 0.03) 50%,
 		transparent 70%
 	);
-	animation: lightShimmer 6s ease-in-out infinite;
+	animation: light-shimmer 6s ease-in-out infinite;
 }
 
-@keyframes lightShimmer {
-	0%   { transform: translateX(-20%) translateY(-10%); opacity: 0; }
-	50%  { transform: translateX(20%) translateY(10%); opacity: 1; }
-	100% { transform: translateX(-20%) translateY(-10%); opacity: 0; }
+@keyframes light-shimmer {
+	0% {
+		transform: translateX(-20%) translateY(-10%);
+		opacity: 0;
+	}
+	50% {
+		transform: translateX(20%) translateY(10%);
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(-20%) translateY(-10%);
+		opacity: 0;
+	}
 }
 
 /* Mist drift for Black Rose scenes */
@@ -1098,12 +1113,18 @@
 		rgba(192, 192, 192, 0.02) 30%,
 		transparent 60%
 	);
-	animation: mistDrift 8s ease-in-out infinite alternate;
+	animation: mist-drift 8s ease-in-out infinite alternate;
 }
 
-@keyframes mistDrift {
-	0%   { transform: translateX(-3%) translateY(2%); opacity: 0.7; }
-	100% { transform: translateX(3%) translateY(-1%); opacity: 1; }
+@keyframes mist-drift {
+	0% {
+		transform: translateX(-3%) translateY(2%);
+		opacity: 0.7;
+	}
+	100% {
+		transform: translateX(3%) translateY(-1%);
+		opacity: 1;
+	}
 }
 
 /* Rose-gold glow for Kids Capsule scenes */
@@ -1118,10 +1139,10 @@
 		rgba(183, 110, 121, 0.04) 0%,
 		transparent 70%
 	);
-	animation: kidsGlow 8s ease-in-out infinite alternate;
+	animation: kids-glow 8s ease-in-out infinite alternate;
 }
 
-@keyframes kidsGlow {
+@keyframes kids-glow {
 	0%   { opacity: 0.6; }
 	100% { opacity: 1; }
 }

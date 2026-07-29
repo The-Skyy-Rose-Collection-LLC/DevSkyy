@@ -16,6 +16,18 @@
     "rule-empty-line-before": null,
     "declaration-empty-line-before": null,
     "at-rule-empty-line-before": null,
+    "property-no-vendor-prefix": [
+      true,
+      {
+        "ignoreProperties": [
+          "backdrop-filter",
+          "background-clip",
+          "appearance",
+          "mask-image",
+          "line-clamp"
+        ]
+      }
+    ],
     "selector-pseudo-element-no-unknown": [
       true,
       {

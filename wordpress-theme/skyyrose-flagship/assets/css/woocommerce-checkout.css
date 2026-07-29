@@ -126,10 +126,10 @@
 .skyy-checkout__step--active,
 .skyy-checkout__step[data-skyy-active] {
 	display: block;
-	animation: skyyFadeIn 0.4s ease;
+	animation: skyy-fade-in 0.4s ease;
 }
 
-@keyframes skyyFadeIn {
+@keyframes skyy-fade-in {
 	from {
 		opacity: 0;
 		transform: translateY(12px);
