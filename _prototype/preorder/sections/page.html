@@ -1,0 +1,504 @@
+<!-- PROTOTYPE — 3 whole-page layout variants for the pre-order gateway. Throwaway. -->
+
+<!-- ============================== VARIANT A — Single-scroll spine ============================== -->
+<!-- Linear stack, closest to today's production order (hero → gateway → products → journey →
+     lookbook → manifesto → faq → email), rebuilt clean. Control baseline. -->
+<template data-variant="A" data-name="Single-scroll spine">
+<style>
+.poA { font-family: var(--font-body); background: var(--black); }
+.poA .wrap { max-width: var(--container); margin: 0 auto; padding: 0 var(--space-6); }
+
+.poA .hero { position: relative; height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--black); }
+.poA .hero .vid-layer { position: absolute; inset: -8% 0; }
+.poA .hero video { width: 100%; height: 100%; object-fit: contain; opacity: .6; }
+.poA .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,.2), rgba(10,10,10,.85)); }
+.poA .hero-copy { position: relative; z-index: 1; text-align: center; }
+.poA .hero-copy .eyebrow { font-family: var(--font-ui); font-size: var(--text-xs); letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg3); }
+.poA .hero-copy h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--text-5xl); letter-spacing: var(--tracking-tight); margin: var(--space-4) 0; }
+.poA .hero-copy p { font-family: var(--font-ui); color: var(--fg3); max-width: 42ch; margin: 0 auto var(--space-8); }
+.poA .cta { display: inline-block; font-family: var(--font-ui); font-weight: 700; letter-spacing: var(--tracking-wide); text-transform: uppercase; font-size: var(--text-sm); padding: 16px 32px; border-radius: var(--radius-pill); background: var(--fg1); color: var(--black); text-decoration: none; }
+.poA .cta.ghost { background: transparent; color: var(--fg1); border: 1px solid var(--border); }
+
+.poA .band { display: grid; grid-template-columns: 1fr; gap: var(--space-8); padding: var(--space-24) 0; border-top: 1px solid var(--border); }
+@media (min-width: 860px) { .poA .band { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--space-16); } }
+.poA .band.rev .art { order: 2; }
+@media (min-width: 860px) { .poA .band.rev .art { order: -1; } }
+.poA .band .art img { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--depth-3); }
+.poA .band .logo { height: 56px; width: auto; margin-bottom: var(--space-6); }
+.poA .band .logo.wordmark { display: block; height: auto; font-family: 'Grand Hotel', cursive; font-size: var(--text-4xl); color: var(--accent-kids); }
+.poA .band p.line { font-family: var(--font-ui); color: var(--fg2); max-width: 46ch; margin-bottom: var(--space-8); }
+.poA .band[data-c="black-rose"] .cta { background: var(--silver); color: var(--black); }
+.poA .band[data-c="love-hurts"] .cta { background: var(--crimson); color: var(--fg1); }
+.poA .band[data-c="signature"] .cta { background: var(--gold); color: var(--black); }
+.poA .band[data-c="kids-capsule"] .cta { background: var(--accent-kids); color: var(--black); }
+
+.poA .recap { padding: var(--space-16) 0; border-top: 1px solid var(--border); }
+.poA .recap h2 { font-family: var(--font-caps); font-size: var(--text-2xl); text-align: center; margin-bottom: var(--space-12); }
+.poA .recap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+@media (min-width: 640px) { .poA .recap-grid { grid-template-columns: repeat(4, 1fr); } }
+.poA .recap-grid img { width: 100%; border-radius: var(--radius-sm); }
+.poA .recap-grid .cap { font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3); margin-top: var(--space-2); text-align: center; }
+
+.poA .journey { padding: var(--space-16) 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.poA .journey .step { flex: 1; min-width: 140px; text-align: center; font-family: var(--font-ui); }
+.poA .journey .step .n { font-family: var(--font-accent); font-size: var(--text-3xl); color: var(--rose-gold); display: block; }
+.poA .journey .step .t { color: var(--fg3); font-size: var(--text-sm); margin-top: var(--space-2); }
+
+.poA .lookbook { padding: var(--space-16) 0; border-top: 1px solid var(--border); }
+.poA .lookbook-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+@media (min-width: 640px) { .poA .lookbook-grid { grid-template-columns: repeat(4, 1fr); } }
+.poA .lookbook-grid img { width: 100%; border-radius: var(--radius-sm); }
+
+.poA .manifesto { padding: var(--space-24) 0; border-top: 1px solid var(--border); text-align: center; }
+.poA .manifesto p { font-family: var(--font-caps); font-size: var(--text-3xl); max-width: 22ch; margin: 0 auto; line-height: var(--leading-snug); }
+.poA .manifesto span { color: var(--rose-gold); }
+
+.poA .faq { padding: var(--space-16) 0; border-top: 1px solid var(--border); max-width: var(--container-narrow); margin: 0 auto; }
+.poA .faq details { border-bottom: 1px solid var(--border); padding: var(--space-4) 0; }
+.poA .faq summary { font-family: var(--font-ui); font-weight: 600; cursor: pointer; }
+.poA .faq p { font-family: var(--font-ui); color: var(--fg3); margin-top: var(--space-3); }
+
+.poA .close { padding: var(--space-24) 0; border-top: 1px solid var(--border); text-align: center; }
+.poA .close h2 { font-family: var(--font-display); font-size: var(--text-3xl); margin-bottom: var(--space-6); }
+.poA .close form { display: flex; gap: var(--space-2); justify-content: center; max-width: 420px; margin: 0 auto; }
+.poA .close input { flex: 1; font-family: var(--font-ui); padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--fg1); }
+</style>
+<div class="poA">
+  <section class="hero">
+    <div class="vid-layer" data-parallax>
+      <video autoplay muted loop playsinline>
+        <source src="assets/preorder-hero.webm" type="video/webm">
+        <source src="assets/preorder-hero.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-copy">
+      <div class="eyebrow">Pre-Order — Fall Run</div>
+      <h1>Reserve the drop<br>before it exists.</h1>
+      <p>Three collections. One production run. Luxury grows from concrete — Oakland to your closet.</p>
+      <a class="cta" href="#gateway">See What's Coming</a>
+    </div>
+  </section>
+
+  <nav class="logo-rail" aria-label="Jump to a collection">
+    <a class="logo-rail-card" href="#gateway"><img src="assets/branding/black-rose-logo.webp" alt="Black Rose"><span>Enter Black Rose</span></a>
+    <a class="logo-rail-card" href="#love-hurts"><img src="assets/branding/love-hurts-logo.webp" alt="Love Hurts"><span>Enter Love Hurts</span></a>
+    <a class="logo-rail-card" href="#signature"><img src="assets/branding/signature-logo.webp" alt="Signature"><span>Enter Signature</span></a>
+    <a class="logo-rail-card" href="#kids-capsule"><span class="wordmark">Kids Capsule</span><span>Enter Kids Capsule</span></a>
+  </nav>
+
+  <div class="wrap">
+    <section class="band" id="gateway" data-c="black-rose">
+      <div class="copy">
+        <img class="logo" src="assets/branding/black-rose-logo.webp" alt="Black Rose">
+        <p class="line">Armor for the ones who don't flinch. Silver hardware, matte-black shell, cut sharp.</p>
+        <a class="cta" href="#">Reserve Black Rose</a>
+      </div>
+      <div class="art"><img src="assets/products/br-006-onmodel.webp" alt="Black Rose on-model"></div>
+    </section>
+    <section class="band rev" id="love-hurts" data-c="love-hurts">
+      <div class="copy">
+        <img class="logo" src="assets/branding/love-hurts-logo.webp" alt="Love Hurts">
+        <p class="line">The bloodline collection. Graffiti-script heat on crimson and black, built for scars worth keeping.</p>
+        <a class="cta" href="#">Reserve Love Hurts</a>
+      </div>
+      <div class="art"><img src="assets/products/lh-004-onmodel.webp" alt="Love Hurts on-model"></div>
+    </section>
+    <section class="band" id="signature" data-c="signature">
+      <div class="copy">
+        <img class="logo" src="assets/branding/signature-logo.webp" alt="Signature">
+        <p class="line">Where it started. Gold hardware, Pinyon script, the house line that never goes out.</p>
+        <a class="cta" href="#">Reserve Signature</a>
+      </div>
+      <div class="art"><img src="assets/products/sg-009-onmodel.webp" alt="Signature on-model"></div>
+    </section>
+    <section class="band" id="kids-capsule" data-c="kids-capsule">
+      <div class="copy">
+        <span class="logo wordmark">Kids Capsule</span>
+        <p class="line">Luxury runs in the family. Colorblock armor, sized for the next generation.</p>
+        <a class="cta" href="#">Reserve Kids Capsule</a>
+      </div>
+      <div class="art"><img src="assets/products/kids-001-onmodel.webp" alt="Kids Capsule on-model"></div>
+    </section>
+
+    <section class="recap">
+      <h2>All Four, Side By Side</h2>
+      <div class="recap-grid">
+        <div><img src="assets/products/br-006-onmodel.webp" alt=""><div class="cap">Black Rose</div></div>
+        <div><img src="assets/products/lh-004-onmodel.webp" alt=""><div class="cap">Love Hurts</div></div>
+        <div><img src="assets/products/sg-009-onmodel.webp" alt=""><div class="cap">Signature</div></div>
+        <div><img src="assets/products/kids-001-onmodel.webp" alt=""><div class="cap">Kids Capsule</div></div>
+      </div>
+    </section>
+
+    <section class="journey">
+      <div class="step"><span class="n">01</span><span class="t">Reserve your size</span></div>
+      <div class="step"><span class="n">02</span><span class="t">We confirm by email</span></div>
+      <div class="step"><span class="n">03</span><span class="t">Run gets cut</span></div>
+      <div class="step"><span class="n">04</span><span class="t">Shipped to your door</span></div>
+    </section>
+
+    <section class="lookbook">
+      <div class="lookbook-grid">
+        <img src="assets/products/br-006-onmodel.webp" alt="">
+        <img src="assets/products/lh-004-onmodel.webp" alt="">
+        <img src="assets/products/sg-009-onmodel.webp" alt="">
+        <img src="assets/products/kids-001-onmodel.webp" alt="">
+      </div>
+    </section>
+
+    <section class="manifesto">
+      <p>Nothing here restocks. <span>Reserve it or watch it go.</span></p>
+    </section>
+
+    <section class="faq">
+      <details><summary>When does the run ship?</summary><p>This Fall, once the pre-order window closes and the run is cut to order.</p></details>
+      <details><summary>Can I change my size after reserving?</summary><p>Yes — email us any time before the run is cut.</p></details>
+      <details><summary>Is this a subscription?</summary><p>No. One reservation, one shipment, no recurring charge.</p></details>
+    </section>
+
+    <section class="close">
+      <h2>Get the drop email</h2>
+      <form onsubmit="event.preventDefault()">
+        <input type="email" placeholder="you@email.com">
+        <button class="cta" type="submit">Notify Me</button>
+      </form>
+    </section>
+  </div>
+  <script>
+  (function () {
+    // Must live INSIDE .poA — see bug-309 (closest() on a sibling script returns null).
+    const root = document.currentScript.closest('.poA');
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion) {
+      const layers = root.querySelectorAll('[data-parallax]');
+      const onScroll = () => layers.forEach(el => { el.style.transform = `translateY(${el.getBoundingClientRect().top * 0.12}px)`; });
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  })();
+  </script>
+</div>
+</template>
+
+<!-- ============================== VARIANT B — Collection-first sticky rail ============================== -->
+<!-- Compressed hero → a tab rail that STICKS and fuses collection-choice with the product grid in one
+     persistent interactive unit (no re-scroll to switch collections). Trust content compressed into
+     one strip under the grid. Highest structural CRO bet: minimize distance from "see it" to "reserve it". -->
+<template data-variant="B" data-name="Collection-first sticky rail">
+<style>
+.poB { font-family: var(--font-body); background: var(--black); }
+.poB .wrap { max-width: var(--container); margin: 0 auto; padding: 0 var(--space-6); }
+
+.poB .hero { position: relative; height: 62svh; display: flex; align-items: flex-end; overflow: hidden; background: var(--black); }
+.poB .hero .vid-layer { position: absolute; inset: -8% 0; }
+.poB .hero video { width: 100%; height: 100%; object-fit: contain; opacity: .55; }
+.poB .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,.1), rgba(10,10,10,.95)); }
+.poB .hero-copy { position: relative; z-index: 1; padding: 0 var(--space-6) var(--space-8); }
+.poB .hero-copy .eyebrow { font-family: var(--font-ui); font-size: var(--text-xs); letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg3); }
+.poB .hero-copy h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--text-4xl); margin-top: var(--space-2); }
+
+.poB .rail { position: sticky; top: 0; z-index: 50; background: var(--charcoal); border-bottom: 1px solid var(--border); }
+.poB .rail-inner { display: flex; gap: var(--space-2); padding: var(--space-4) var(--space-6); max-width: var(--container); margin: 0 auto; overflow-x: auto; }
+.poB .tab { font-family: var(--font-ui); font-weight: 700; font-size: var(--text-sm); letter-spacing: var(--tracking-wide); text-transform: uppercase; padding: 10px 20px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: transparent; color: var(--fg2); cursor: pointer; white-space: nowrap; }
+.poB .tab[aria-selected="true"] { background: var(--fg1); color: var(--black); border-color: var(--fg1); }
+
+.poB .stage { padding: var(--space-16) 0; }
+.poB .product-view { display: none; grid-template-columns: 1fr; gap: var(--space-8); }
+.poB .product-view.active { display: grid; }
+@media (min-width: 860px) { .poB .product-view { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--space-16); } }
+.poB .product-view img { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--depth-3); }
+.poB .product-view .logo { height: 48px; margin-bottom: var(--space-4); }
+.poB .product-view p.line { font-family: var(--font-ui); color: var(--fg2); max-width: 46ch; margin-bottom: var(--space-8); }
+.poB .product-view[data-c="black-rose"] .cta { background: var(--silver); color: var(--black); }
+.poB .product-view[data-c="love-hurts"] .cta { background: var(--crimson); color: var(--fg1); }
+.poB .product-view[data-c="signature"] .cta { background: var(--gold); color: var(--black); }
+.poB .product-view[data-c="kids-capsule"] .cta { background: var(--accent-kids); color: var(--black); }
+.poB .product-view .logo.wordmark { display: block; height: auto; font-family: 'Grand Hotel', cursive; font-size: var(--text-3xl); color: var(--accent-kids); }
+.poB .cta { display: inline-block; font-family: var(--font-ui); font-weight: 700; letter-spacing: var(--tracking-wide); text-transform: uppercase; font-size: var(--text-sm); padding: 16px 32px; border-radius: var(--radius-pill); text-decoration: none; }
+
+.poB .trust { display: flex; gap: var(--space-8); justify-content: center; flex-wrap: wrap; padding: var(--space-8) 0; border-top: 1px solid var(--border); font-family: var(--font-ui); font-size: var(--text-sm); color: var(--fg3); }
+
+.poB .lookbook-carousel { display: flex; gap: var(--space-4); overflow-x: auto; padding: var(--space-16) var(--space-6); scroll-snap-type: x mandatory; }
+.poB .lookbook-carousel img { flex: 0 0 70%; scroll-snap-align: start; border-radius: var(--radius-sm); }
+@media (min-width: 860px) { .poB .lookbook-carousel img { flex-basis: 32%; } }
+
+.poB .closer { padding: var(--space-24) 0; border-top: 1px solid var(--border); }
+.poB .closer-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+@media (min-width: 860px) { .poB .closer-grid { grid-template-columns: 1fr 1fr; } }
+.poB .faq details { border-bottom: 1px solid var(--border); padding: var(--space-4) 0; }
+.poB .faq summary { font-family: var(--font-ui); font-weight: 600; cursor: pointer; }
+.poB .faq p { font-family: var(--font-ui); color: var(--fg3); margin-top: var(--space-3); }
+.poB .capture h2 { font-family: var(--font-display); font-size: var(--text-2xl); margin-bottom: var(--space-4); }
+.poB .capture form { display: flex; gap: var(--space-2); }
+.poB .capture input { flex: 1; font-family: var(--font-ui); padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--fg1); }
+</style>
+<div class="poB">
+  <section class="hero">
+    <div class="vid-layer" data-parallax>
+      <video autoplay muted loop playsinline>
+        <source src="assets/preorder-hero.webm" type="video/webm">
+        <source src="assets/preorder-hero.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-copy">
+      <div class="eyebrow">Pre-Order — Fall Run</div>
+      <h1>Pick a collection. Reserve in one tap.</h1>
+    </div>
+  </section>
+
+  <nav class="logo-rail" aria-label="Jump to a collection">
+    <a class="logo-rail-card" href="#" data-jump="black-rose"><img src="assets/branding/black-rose-logo.webp" alt="Black Rose"><span>Enter Black Rose</span></a>
+    <a class="logo-rail-card" href="#" data-jump="love-hurts"><img src="assets/branding/love-hurts-logo.webp" alt="Love Hurts"><span>Enter Love Hurts</span></a>
+    <a class="logo-rail-card" href="#" data-jump="signature"><img src="assets/branding/signature-logo.webp" alt="Signature"><span>Enter Signature</span></a>
+    <a class="logo-rail-card" href="#" data-jump="kids-capsule"><span class="wordmark">Kids Capsule</span><span>Enter Kids Capsule</span></a>
+  </nav>
+
+  <nav class="rail">
+    <div class="rail-inner" role="tablist">
+      <button class="tab" data-target="black-rose" aria-selected="true">Black Rose</button>
+      <button class="tab" data-target="love-hurts" aria-selected="false">Love Hurts</button>
+      <button class="tab" data-target="signature" aria-selected="false">Signature</button>
+      <button class="tab" data-target="kids-capsule" aria-selected="false">Kids Capsule</button>
+    </div>
+  </nav>
+
+  <div class="wrap stage">
+    <div class="product-view active" data-c="black-rose">
+      <div class="copy">
+        <img class="logo" src="assets/branding/black-rose-logo.webp" alt="Black Rose">
+        <p class="line">Armor for the ones who don't flinch. Silver hardware, matte-black shell, cut sharp.</p>
+        <a class="cta" href="#">Reserve Black Rose</a>
+      </div>
+      <div class="art"><img src="assets/products/br-006-onmodel.webp" alt="Black Rose on-model"></div>
+    </div>
+    <div class="product-view" data-c="love-hurts">
+      <div class="copy">
+        <img class="logo" src="assets/branding/love-hurts-logo.webp" alt="Love Hurts">
+        <p class="line">The bloodline collection. Graffiti-script heat on crimson and black, built for scars worth keeping.</p>
+        <a class="cta" href="#">Reserve Love Hurts</a>
+      </div>
+      <div class="art"><img src="assets/products/lh-004-onmodel.webp" alt="Love Hurts on-model"></div>
+    </div>
+    <div class="product-view" data-c="signature">
+      <div class="copy">
+        <img class="logo" src="assets/branding/signature-logo.webp" alt="Signature">
+        <p class="line">Where it started. Gold hardware, Pinyon script, the house line that never goes out.</p>
+        <a class="cta" href="#">Reserve Signature</a>
+      </div>
+      <div class="art"><img src="assets/products/sg-009-onmodel.webp" alt="Signature on-model"></div>
+    </div>
+    <div class="product-view" data-c="kids-capsule">
+      <div class="copy">
+        <span class="logo wordmark">Kids Capsule</span>
+        <p class="line">Luxury runs in the family. Colorblock armor, sized for the next generation.</p>
+        <a class="cta" href="#">Reserve Kids Capsule</a>
+      </div>
+      <div class="art"><img src="assets/products/kids-001-onmodel.webp" alt="Kids Capsule on-model"></div>
+    </div>
+
+    <div class="trust">
+      <span>Ships this Fall</span><span>·</span><span>Limited to one production run</span><span>·</span><span>Free returns</span>
+    </div>
+  </div>
+
+  <section class="lookbook-carousel">
+    <img src="assets/products/br-006-onmodel.webp" alt="">
+    <img src="assets/products/lh-004-onmodel.webp" alt="">
+    <img src="assets/products/sg-009-onmodel.webp" alt="">
+    <img src="assets/products/kids-001-onmodel.webp" alt="">
+  </section>
+
+  <section class="closer wrap">
+    <div class="closer-grid">
+      <div class="faq">
+        <details><summary>When does the run ship?</summary><p>This Fall, once the pre-order window closes and the run is cut to order.</p></details>
+        <details><summary>Can I change my size after reserving?</summary><p>Yes — email us any time before the run is cut.</p></details>
+      </div>
+      <div class="capture">
+        <h2>Get the drop email</h2>
+        <form onsubmit="event.preventDefault()">
+          <input type="email" placeholder="you@email.com">
+          <button class="cta" style="background:var(--fg1);color:var(--black)" type="submit">Notify Me</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <script>
+  (function () {
+    // Must live INSIDE .poB — document.currentScript.closest() walks the script's own
+    // ancestors, and a <script> placed as a SIBLING after </div> is not a descendant of
+    // it, so closest('.poB') silently returns null and every listener below is skipped.
+    const root = document.currentScript.closest('.poB');
+    function selectCollection(target) {
+      root.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.target === target)));
+      root.querySelectorAll('.product-view').forEach(v => v.classList.toggle('active', v.dataset.c === target));
+    }
+    root.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => selectCollection(btn.dataset.target)));
+    root.querySelectorAll('.logo-rail-card').forEach(card => card.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectCollection(card.dataset.jump);
+      root.querySelector('.stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion) {
+      const layers = root.querySelectorAll('[data-parallax]');
+      const onScroll = () => layers.forEach(el => { el.style.transform = `translateY(${el.getBoundingClientRect().top * 0.12}px)`; });
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  })();
+  </script>
+</div>
+</template>
+
+<!-- ============================== VARIANT C — Product-led editorial spread ============================== -->
+<!-- Hero splits immediately into video + first product (no scroll to see product). Trust signals
+     shown ONCE near the top instead of repeated. Each collection is a woven editorial spread
+     (image + product + manifesto line together) rather than separate stacked sections. -->
+<template data-variant="C" data-name="Product-led editorial spread">
+<style>
+.poC { font-family: var(--font-body); background: var(--black); }
+.poC .wrap { max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--space-6); }
+
+.poC .hero-split { display: grid; grid-template-columns: 1fr; height: auto; }
+@media (min-width: 860px) { .poC .hero-split { grid-template-columns: 1.1fr 1fr; height: 92svh; } }
+.poC .hero-split .vid { position: relative; overflow: hidden; min-height: 50svh; background: var(--black); }
+.poC .hero-split .vid .vid-layer { position: absolute; inset: -8% 0; }
+.poC .hero-split .vid video { width: 100%; height: 100%; object-fit: contain; }
+.poC .hero-split .vid::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(10,10,10,.85), rgba(10,10,10,.15) 55%); }
+.poC .hero-split .vid .copy { position: absolute; left: var(--space-8); bottom: var(--space-8); z-index: 1; }
+.poC .hero-split .vid .copy .eyebrow { font-family: var(--font-ui); font-size: var(--text-xs); letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg2); }
+.poC .hero-split .vid .copy h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--text-4xl); color: var(--fg1); margin-top: var(--space-2); }
+.poC .hero-split .first-product { position: relative; background: var(--charcoal); display: flex; flex-direction: column; justify-content: center; padding: var(--space-12); }
+.poC .hero-split .first-product img { width: 100%; border-radius: var(--radius-sm); margin-bottom: var(--space-6); box-shadow: var(--depth-3); }
+.poC .hero-split .first-product .logo { height: 40px; margin-bottom: var(--space-3); }
+.poC .hero-split .first-product .cta { display: inline-block; align-self: flex-start; font-family: var(--font-ui); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-wide); font-size: var(--text-sm); padding: 14px 28px; border-radius: var(--radius-pill); background: var(--silver); color: var(--black); text-decoration: none; }
+
+.poC .trust-row { display: flex; justify-content: center; gap: var(--space-8); padding: var(--space-6) 0; border-bottom: 1px solid var(--border); font-family: var(--font-ui); font-size: var(--text-sm); color: var(--fg3); flex-wrap: wrap; }
+
+.poC .spread { display: grid; grid-template-columns: 1fr; gap: var(--space-8); padding: var(--space-20) 0; border-top: 1px solid var(--border); }
+@media (min-width: 860px) { .poC .spread { grid-template-columns: 1.3fr .7fr; align-items: end; } }
+.poC .spread .editorial img { width: 100%; border-radius: var(--radius-sm); }
+.poC .spread .sell { display: flex; flex-direction: column; gap: var(--space-4); }
+.poC .spread .sell .logo { height: 44px; }
+.poC .spread .sell img.product { width: 100%; border-radius: var(--radius-sm); }
+.poC .spread .sell p.manifesto-line { font-family: var(--font-caps); font-size: var(--text-lg); color: var(--fg2); }
+.poC .spread[data-c="black-rose"] .cta { background: var(--silver); color: var(--black); }
+.poC .spread[data-c="love-hurts"] .cta { background: var(--crimson); color: var(--fg1); }
+.poC .spread[data-c="signature"] .cta { background: var(--gold); color: var(--black); }
+.poC .spread[data-c="kids-capsule"] .cta { background: var(--accent-kids); color: var(--black); }
+.poC .spread .sell .logo.wordmark { display: block; height: auto; font-family: 'Grand Hotel', cursive; font-size: var(--text-3xl); color: var(--accent-kids); }
+.poC .cta { display: inline-block; align-self: flex-start; font-family: var(--font-ui); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-wide); font-size: var(--text-sm); padding: 14px 28px; border-radius: var(--radius-pill); text-decoration: none; }
+
+.poC .closer { padding: var(--space-20) 0; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr; gap: var(--space-10); }
+@media (min-width: 860px) { .poC .closer { grid-template-columns: 1fr 1fr; } }
+.poC .faq details { border-bottom: 1px solid var(--border); padding: var(--space-4) 0; }
+.poC .faq summary { font-family: var(--font-ui); font-weight: 600; cursor: pointer; }
+.poC .faq p { font-family: var(--font-ui); color: var(--fg3); margin-top: var(--space-3); }
+.poC .capture h2 { font-family: var(--font-display); font-size: var(--text-2xl); margin-bottom: var(--space-4); }
+.poC .capture form { display: flex; gap: var(--space-2); }
+.poC .capture input { flex: 1; font-family: var(--font-ui); padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--fg1); }
+</style>
+<div class="poC">
+  <section class="hero-split">
+    <div class="vid">
+      <div class="vid-layer" data-parallax>
+        <video autoplay muted loop playsinline>
+          <source src="assets/preorder-hero.webm" type="video/webm">
+          <source src="assets/preorder-hero.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="copy">
+        <div class="eyebrow">Pre-Order — Fall Run</div>
+        <h1>The next run,<br>reserved today.</h1>
+      </div>
+    </div>
+    <div class="first-product">
+      <img class="logo" src="assets/branding/black-rose-logo.webp" alt="Black Rose">
+      <img src="assets/products/br-006-onmodel.webp" alt="Black Rose on-model">
+      <a class="cta" href="#black-rose">Reserve Black Rose</a>
+    </div>
+  </section>
+
+  <div class="trust-row">
+    <span>Ships this Fall</span><span>·</span><span>Limited to one production run</span><span>·</span><span>Free returns</span>
+  </div>
+
+  <nav class="logo-rail" aria-label="Jump to a collection">
+    <a class="logo-rail-card" href="#black-rose"><img src="assets/branding/black-rose-logo.webp" alt="Black Rose"><span>Enter Black Rose</span></a>
+    <a class="logo-rail-card" href="#love-hurts"><img src="assets/branding/love-hurts-logo.webp" alt="Love Hurts"><span>Enter Love Hurts</span></a>
+    <a class="logo-rail-card" href="#signature"><img src="assets/branding/signature-logo.webp" alt="Signature"><span>Enter Signature</span></a>
+    <a class="logo-rail-card" href="#kids-capsule"><span class="wordmark">Kids Capsule</span><span>Enter Kids Capsule</span></a>
+  </nav>
+
+  <div class="wrap">
+    <section class="spread" id="black-rose" data-c="black-rose">
+      <div class="editorial"><img src="assets/products/br-006-onmodel.webp" alt="Black Rose editorial"></div>
+      <div class="sell">
+        <img class="logo" src="assets/branding/black-rose-logo.webp" alt="Black Rose">
+        <img class="product" src="assets/products/br-006-onmodel.webp" alt="Black Rose product">
+        <p class="manifesto-line">Armor for the ones who don't flinch.</p>
+        <a class="cta" href="#">Reserve Black Rose</a>
+      </div>
+    </section>
+
+    <section class="spread" id="love-hurts" data-c="love-hurts">
+      <div class="editorial"><img src="assets/products/lh-004-onmodel.webp" alt="Love Hurts editorial"></div>
+      <div class="sell">
+        <img class="logo" src="assets/branding/love-hurts-logo.webp" alt="Love Hurts">
+        <img class="product" src="assets/products/lh-004-onmodel.webp" alt="Love Hurts product">
+        <p class="manifesto-line">The bloodline collection — scars worth keeping.</p>
+        <a class="cta" href="#">Reserve Love Hurts</a>
+      </div>
+    </section>
+
+    <section class="spread" id="signature" data-c="signature">
+      <div class="editorial"><img src="assets/products/sg-009-onmodel.webp" alt="Signature editorial"></div>
+      <div class="sell">
+        <img class="logo" src="assets/branding/signature-logo.webp" alt="Signature">
+        <img class="product" src="assets/products/sg-009-onmodel.webp" alt="Signature product">
+        <p class="manifesto-line">The house line that never goes out.</p>
+        <a class="cta" href="#">Reserve Signature</a>
+      </div>
+    </section>
+
+    <section class="spread" id="kids-capsule" data-c="kids-capsule">
+      <div class="editorial"><img src="assets/products/kids-001-onmodel.webp" alt="Kids Capsule editorial"></div>
+      <div class="sell">
+        <span class="logo wordmark">Kids Capsule</span>
+        <img class="product" src="assets/products/kids-001-onmodel.webp" alt="Kids Capsule product">
+        <p class="manifesto-line">Luxury runs in the family.</p>
+        <a class="cta" href="#">Reserve Kids Capsule</a>
+      </div>
+    </section>
+
+    <section class="closer">
+      <div class="faq">
+        <details><summary>When does the run ship?</summary><p>This Fall, once the pre-order window closes and the run is cut to order.</p></details>
+        <details><summary>Can I change my size after reserving?</summary><p>Yes — email us any time before the run is cut.</p></details>
+        <details><summary>Is this a subscription?</summary><p>No. One reservation, one shipment, no recurring charge.</p></details>
+      </div>
+      <div class="capture">
+        <h2>Get the drop email</h2>
+        <form onsubmit="event.preventDefault()">
+          <input type="email" placeholder="you@email.com">
+          <button class="cta" style="background:var(--fg1);color:var(--black)" type="submit">Notify Me</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <script>
+  (function () {
+    // Must be a descendant of .poC, not a sibling — see bug-309.
+    const root = document.currentScript.closest('.poC');
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion) {
+      const layers = root.querySelectorAll('[data-parallax]');
+      const onScroll = () => layers.forEach(el => { el.style.transform = `translateY(${el.getBoundingClientRect().top * 0.12}px)`; });
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  })();
+  </script>
+</div>
+</template>

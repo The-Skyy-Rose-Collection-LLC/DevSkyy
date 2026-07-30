@@ -1,0 +1,123 @@
+/* PROTOTYPE — throwaway. Canon token system for homepage section variants.
+   Structure/motion/spacing scale adapted from the founder's "Award-winning collections
+   showcase" artifact; TYPEFACES remapped to SkyyRose canon (the artifact shipped Playfair,
+   Cormorant, Bebas, Great Vibes, Alex Brush and Bungee Shade — all cut fonts).
+   Fonts are the real self-hosted woff2 copied from the theme, so variants are judged in
+   actual brand typography rather than a fallback stack. */
+
+@font-face { font-family: 'Archivo';   src: url('assets/fonts/archivo-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Hanken Grotesk'; src: url('assets/fonts/hanken-grotesk-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Anton';     src: url('assets/fonts/anton-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Cinzel';    src: url('assets/fonts/cinzel-latin.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Inter';     src: url('assets/fonts/inter-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Pinyon Script'; src: url('assets/fonts/pinyon-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Grand Hotel';   src: url('assets/fonts/grand-hotel-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'SkyyRose Black Rose Script'; src: url('assets/fonts/skyyrose-black-rose-script-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'SkyyRose Love Hurts Graffiti'; src: url('assets/fonts/skyyrose-love-hurts-graffiti-latin.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+
+:root {
+  /* Brand tokens — LOCKED */
+  --rose-gold: #B76E79;  --rose-gold-rgb: 183,110,121;
+  --gold:      #D4AF37;  --gold-rgb: 212,175,55;
+  --silver:    #C0C0C0;  --silver-rgb: 192,192,192;
+  --crimson:   #DC143C;  --crimson-rgb: 220,20,60;   /* fills/borders/glows ONLY — 3.63:1 on black */
+
+  /* ONE black. The artifact's #08080A and homepage-v2's #050505 are both dead. */
+  --black: #0A0A0A;  --charcoal: #0E0E12;  --smoke: #141418;  --ash: #1A1A20;
+  --card: #111111;   --card-hover: #161616;  --border: #2A2A2A;
+
+  /* Text — measured, never low-alpha white as a "muted" shorthand */
+  --fg1: #FFFFFF;  --fg2: #E0E0E0;  --fg3: #B3B3B3;  /* 9.44:1 — the muted token */
+
+  /* Type — canon families only */
+  --font-display: 'Archivo', system-ui, sans-serif;      /* was Playfair */
+  --font-body:    'Hanken Grotesk', system-ui, sans-serif; /* was Cormorant */
+  --font-accent:  'Anton', Impact, sans-serif;            /* was Bebas/Oswald */
+  --font-caps:    'Cinzel', Georgia, serif;
+  --font-ui:      'Inter', system-ui, sans-serif;
+  --script-sig:   'Pinyon Script', cursive;               /* was Great Vibes */
+  --script-br:    'SkyyRose Black Rose Script', cursive;  /* was Alex Brush */
+  --script-lh:    'SkyyRose Love Hurts Graffiti', sans-serif; /* was Bungee Shade */
+  --script-kc:    'Grand Hotel', cursive;
+
+  --text-xs: .8125rem; --text-sm: .9375rem; --text-base: 1.0625rem; --text-lg: 1.1875rem;
+  --text-xl: 1.375rem; --text-2xl: 1.625rem;
+  --text-3xl: clamp(1.875rem, 2.8vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 3.8vw, 2.875rem);
+  --text-5xl: clamp(2.75rem, 5.5vw, 4rem);
+  --text-dec-md: clamp(3rem, 6vw, 6rem);
+  --text-dec-lg: clamp(5rem, 14vw, 12.5rem);
+
+  --leading-tight: 1.15; --leading-snug: 1.30; --leading-normal: 1.60;
+  --tracking-tight: -.025em; --tracking-wide: .05em; --tracking-wider: .10em; --tracking-widest: .20em;
+
+  /* Motion — the artifact's easings, kept verbatim; they are good and canon-neutral */
+  --ease:           cubic-bezier(.16, 1, .3, 1);
+  --ease-cinematic: cubic-bezier(.22, 1, .36, 1);
+  --ease-magnetic:  cubic-bezier(.03, .98, .52, .99);
+  --ease-whip:      cubic-bezier(.75, 0, .25, 1);
+  --dur-fast: 200ms; --dur-base: 300ms; --dur-slow: 600ms; --dur-reveal: 800ms; --dur-cinem: 1200ms;
+
+  --depth-1: 0 2px 8px rgba(0,0,0,.4);
+  --depth-2: 0 8px 24px rgba(0,0,0,.5);
+  --depth-3: 0 16px 48px rgba(0,0,0,.6);
+  --depth-4: 0 24px 64px rgba(0,0,0,.7), 0 0 120px rgba(0,0,0,.3);
+  --glow-rose: 0 0 20px rgba(var(--rose-gold-rgb), .30);
+  --glow-gold: 0 0 20px rgba(var(--gold-rgb), .30);
+  --glow-silver: 0 0 20px rgba(var(--silver-rgb), .30);
+  --glow-crimson: 0 0 20px rgba(var(--crimson-rgb), .30);
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;  --space-6: 24px;
+  --space-8: 32px; --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+  --space-32: 128px;
+  --radius-sharp: 2px; --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px; --radius-pill: 9999px;
+  --container: 1200px; --container-wide: 1400px; --container-narrow: 800px;
+
+  /* Per-collection accents — each collection is its own room */
+  --accent-black-rose: var(--silver);
+  --accent-love-hurts: var(--crimson);
+  --accent-signature:  var(--gold);
+  --accent-kids:       var(--rose-gold);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--black);
+  color: var(--fg1);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+img, video { max-width: 100%; display: block; }
+a { color: inherit; }
+
+/* Scroll-world-esque cinematic feel: [data-parallax] hero-video layers drift via JS scroll
+   offset (see each variant's own inline script — kept as a LAST CHILD inside its root div,
+   never a sibling, or document.currentScript.closest() silently returns null; see bug-309).
+   An earlier IntersectionObserver-driven fade/rise-in-on-scroll pass was removed (bug-310):
+   its setup depended on requestAnimationFrame, which does not reliably fire in every
+   environment, and a hide-until-revealed default made content vanish permanently when it
+   didn't. Parallax has no such dependency — a scroll listener that never fires just means
+   no drift, never invisible content. */
+
+.logo-rail { display: flex; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--space-6) var(--space-6); scrollbar-width: thin; }
+.logo-rail-card { flex: 0 0 78%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4); padding: var(--space-10) var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--charcoal); text-decoration: none; }
+@media (min-width: 640px) { .logo-rail-card { flex-basis: 46%; } }
+@media (min-width: 960px) { .logo-rail-card { flex-basis: 31%; } }
+.logo-rail-card img { height: 44px; width: auto; }
+.logo-rail-card span { font-family: var(--font-ui); font-weight: 700; font-size: var(--text-xs); letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg2); }
+/* Kids Capsule has no bespoke image lockup like the other 3 (brand canon: its accent script is
+   the Grand Hotel webfont, not custom artwork) — its rail card renders a real text wordmark
+   instead of an <img>, sized to read at a glance next to the other cards' logo marks. */
+.logo-rail-card .wordmark { font-family: 'Grand Hotel', cursive; font-size: var(--text-3xl); color: var(--accent-kids); line-height: 1; }
+
+/* Every variant must honour this. A prototype that ignores reduced-motion teaches the
+   production code to ignore it too. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}

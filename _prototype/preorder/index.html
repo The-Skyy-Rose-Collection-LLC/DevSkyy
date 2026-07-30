@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose pre-order gateway — layout prototype</title>
+<!--
+  PROTOTYPE — THROWAWAY. Not production. Not deployable (lives outside the theme dir).
+
+  QUESTION: What should the WHOLE pre-order gateway page look like — 3 structurally
+  different information-architecture variants for the same page, not per-section swaps.
+
+  Founder-locked constraints honoured in all 3 variants (verified via memory + live file
+  before building, see NOTES.md): video hero present; exactly 3 gateway collections
+  (Black Rose / Love Hurts / Signature — Kids Capsule excluded from the gateway); no fake
+  reserve-count or countdown (skyyrose_preorder_meters_enabled defaults false — this
+  prototype never fabricates a number).
+
+  Switch with the bar at the bottom, or ?variant=<A|B|C>. Arrow keys ←/→ cycle variants.
+  Judged in real brand typography (self-hosted woff2) and real, already-shipped product
+  photography (br-006 / lh-004 / sg-009 on-model shots) — a layout judged in placeholder
+  gray boxes has not been judged.
+
+  When a winner is picked: record it in NOTES.md, fold it into
+  template-preorder-gateway.php properly (rewritten, not pasted), delete this dir.
+-->
+<link rel="stylesheet" href="tokens.css">
+<style>
+  #proto-stage { min-height: 100vh; padding-bottom: var(--proto-bar-clearance); }
+  #proto-bar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px; z-index: 99999;
+    background: #fff; color: #111; border-radius: 9999px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.18);
+    padding: 6px 8px; font: 500 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    max-width: min(94vw, 920px); flex-wrap: wrap; justify-content: center;
+  }
+  :root { --proto-bar-clearance: 130px; }
+  @media (min-width: 760px) { :root { --proto-bar-clearance: 90px; } }
+  #proto-bar button {
+    font: inherit; border: 0; background: #f1f1f1; color: #111;
+    padding: 7px 11px; border-radius: 9999px; cursor: pointer;
+  }
+  #proto-bar button:hover { background: #e2e2e2; }
+  #proto-bar button[aria-pressed="true"] { background: #111; color: #fff; }
+  #proto-label { padding: 0 10px; white-space: nowrap; font-weight: 700; }
+  #proto-err { padding: 80px 24px; color: var(--fg3); font-family: var(--font-ui); text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="proto-stage"><div id="proto-err">loading…</div></div>
+<div id="proto-bar" role="group" aria-label="Prototype switcher"></div>
+
+<script>
+// Single page, 3 whole-page variants — see NOTES.md for what each represents.
+const VARIANTS = ['A', 'B', 'C'];
+let cachedDoc = null;
+
+const qs = () => new URLSearchParams(location.search);
+const curVariant = () => { const v = (qs().get('variant') || 'A').toUpperCase(); return VARIANTS.includes(v) ? v : 'A'; };
+
+function setState(variant, push = true) {
+  const p = new URLSearchParams({ variant });
+  history[push ? 'pushState' : 'replaceState'](null, '', '?' + p);
+  render();
+}
+
+async function loadPage() {
+  if (cachedDoc) return cachedDoc;
+  const res = await fetch(`sections/page.html`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`sections/page.html → HTTP ${res.status}`);
+  cachedDoc = new DOMParser().parseFromString(await res.text(), 'text/html');
+  return cachedDoc;
+}
+
+async function render() {
+  const variant = curVariant();
+  const stage = document.getElementById('proto-stage');
+  let doc;
+  try {
+    doc = await loadPage();
+  } catch (e) {
+    stage.innerHTML = `<div id="proto-err">${e.message}</div>`;
+    paintBar(variant, null);
+    return;
+  }
+  const tpl = doc.querySelector(`template[data-variant="${variant}"]`);
+  if (!tpl) {
+    stage.innerHTML = `<div id="proto-err">sections/page.html has no variant ${variant}.</div>`;
+    paintBar(variant, null);
+    return;
+  }
+  stage.innerHTML = '';
+  doc.querySelectorAll('style').forEach(s => stage.appendChild(s.cloneNode(true)));
+  // A <template>'s inline <script> DOES execute on clone-insert (template content lives in
+  // an inert document). Do not also re-create the script after insertion — that double-runs
+  // it and double-binds listeners (this bug was found and fixed in the homepage prototype).
+  stage.appendChild(tpl.content.cloneNode(true));
+  paintBar(variant, tpl.dataset.name || null);
+  window.scrollTo(0, 0);
+}
+
+function paintBar(variant, variantName) {
+  const bar = document.getElementById('proto-bar');
+  bar.innerHTML = '';
+  const mk = (label, onClick, pressed) => {
+    const b = document.createElement('button');
+    b.textContent = label; b.onclick = onClick;
+    if (pressed !== undefined) b.setAttribute('aria-pressed', String(pressed));
+    return b;
+  };
+  const idx = VARIANTS.indexOf(variant);
+  bar.appendChild(mk('←', () => setState(VARIANTS[(idx - 1 + VARIANTS.length) % VARIANTS.length])));
+  VARIANTS.forEach(v => bar.appendChild(mk(v, () => setState(v), v === variant)));
+  bar.appendChild(mk('→', () => setState(VARIANTS[(idx + 1) % VARIANTS.length])));
+  const lab = document.createElement('span');
+  lab.id = 'proto-label';
+  lab.textContent = variantName || '';
+  bar.appendChild(lab);
+}
+
+addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.matches('input, textarea, select') || t.isContentEditable)) return;
+  const v = curVariant();
+  const vi = VARIANTS.indexOf(v);
+  if (e.key === 'ArrowRight') setState(VARIANTS[(vi + 1) % VARIANTS.length]);
+  else if (e.key === 'ArrowLeft') setState(VARIANTS[(vi - 1 + VARIANTS.length) % VARIANTS.length]);
+  else return;
+  e.preventDefault();
+});
+
+addEventListener('popstate', render);
+render();
+</script>
+</body>
+</html>

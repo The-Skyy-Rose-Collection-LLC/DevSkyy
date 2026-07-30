@@ -1,0 +1,655 @@
+<!--
+  RECEIPTS — proof band. THROWAWAY PROTOTYPE.
+
+  REAL COPY SOURCES (all verified this session):
+    wordpress-theme/skyyrose-flagship/front-page.php
+      :48-69  $press — Maxim / CEO Weekly / San Francisco Post / Best of Best Review / The Blox (+ real URLs)
+      :287    "As Featured In"
+      :266    "Est. 2020"        :264 "Oakland"
+      :268    "Luxury Grows from Concrete. Four collections, one name — built by a father, named after a daughter."
+      :444    "Four Collections. One Vision."
+      :510    "<n> Pieces"  (col-card-meta)
+      :92-93  "Oakland Made Mentality" / "Born from the struggle of East Oakland…"
+      :102-103 "Limited Editions" / "Small batch production. Individually numbered…"
+    wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+      33 rows total — black-rose 14, signature 12, love-hurts 5, kids-capsule 2. That is the "33".
+
+  GAPS / DERIVED STRINGS (front-page.php stores outlet NAMES only, never headlines or years):
+    - Article headlines in variants B and C are reconstructed from the real article URL slugs
+      already in $press. They are not invented, but they are also not strings the theme renders.
+      If the founder picks B or C, confirm each headline against the live article before shipping.
+    - The award title "Best Bay Area Clothing Line · 2024" is read out of the real Best of Best
+      Review award URL slug. The theme only renders the outlet name "Best of Best Review".
+    - The Blox has an empty url in $press → renders as a non-link everywhere here, same as prod.
+    - Years shown only where the real URL carries one (Maxim 2023, Best of Best Review 2024).
+      CEO Weekly / San Francisco Post / The Blox show an em dash rather than a guessed year.
+
+  ASSETS USED (ls-confirmed): assets/branding/skyyrose-monogram.webp,
+    assets/branding/skyyrose-rose-icon.webp, assets/branding/tsrc-lockup-static@2x.webp
+-->
+<style>
+/* ═════════════ shared primitives (three variants, three skeletons) ═════════════ */
+.rcp { position: relative; color: var(--fg1); }
+.rcp a { text-decoration: none; color: inherit; }
+.rcp-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings: 'wdth' 125;
+  line-height: .82;
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+.rcp-lab {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.rcp-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--fg3);
+  line-height: var(--leading-snug);
+}
+.rcp :focus-visible { outline: 2px solid var(--rose-gold); outline-offset: 4px; }
+
+/* Brand marks on black. VERIFIED with PIL this session: skyyrose-monogram.webp,
+   skyyrose-rose-icon.webp and tsrc-lockup-static@2x.webp are all mode=RGB with an
+   OPAQUE WHITE background (minA=255) — dropped in raw they render as white boxes.
+   invert(1) hue-rotate(180deg) is an exact hue-preserving luminance flip: the CSS
+   hue-rotate matrix at 180° maps the inverted rose gold (72,145,134) back to
+   (185,112,124) — within 2/255 of the source (183,110,121) — while white → pure
+   black. mix-blend-mode:screen then drops that black plate into --black entirely.
+   The leading contrast(1.08) is there because these plates are 253,253,253 rather
+   than pure white; without it the inverted plate lands 2/255 off --black and
+   ghosts a faint rectangle. contrast pins it to 255 → invert → pure black.
+   PRODUCTION NOTE: ship real alpha-channel PNG/WebP instead of this filter. */
+.rcp-mark { filter: contrast(1.08) invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+
+
+/* ═══════════════════ A — ASYMMETRIC PROOF MOSAIC ═══════════════════
+   One hairline grid. Stats and press are PEER CELLS in the same mosaic — the
+   press outlets are not a separate strip, they are a tile of the ledger. The
+   33 is a 3×2 monument that anchors the whole block. Scan target: the numeral. */
+.rcp-a { padding: var(--space-24) var(--space-6); }
+.rcp-a__inner { max-width: var(--container); margin: 0 auto; }
+
+.rcp-a__top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-6);
+}
+.rcp-a__tag {
+  font-family: var(--font-caps); font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wider); color: var(--rose-gold);
+}
+
+.rcp-a__grid {
+  display: grid; gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-areas:
+    "n1 n1 n1 n2 n2 mk"
+    "n1 n1 n1 n3 n3 mk"
+    "aw aw aw pr pr pr";
+}
+.rcp-a__cell {
+  background: var(--black);
+  padding: var(--space-8);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-3);
+  transition: background var(--dur-base) var(--ease);
+}
+/* The reveal rides the cell's CONTENTS, never the cell. Fading the cell itself fades its
+   background too, and the grid's hairline backing (--border) then floods the whole
+   un-revealed tile: MEASURED at 390px, 18.9% of the frame painted flat --border instead of
+   black until the observer fired — a grey slab, not a hairline. Keeping the tile opaque and
+   moving opacity/translate onto its children holds the mosaic black at every scroll position. */
+.rcp-a__cell > * {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--dur-reveal) var(--ease-cinematic),
+              transform var(--dur-reveal) var(--ease-cinematic);
+}
+.rcp-a__cell.is-in > * { opacity: 1; transform: none; }
+.rcp-a__cell:nth-child(2) > * { transition-delay: 80ms; }
+.rcp-a__cell:nth-child(3) > * { transition-delay: 140ms; }
+.rcp-a__cell:nth-child(4) > * { transition-delay: 200ms; }
+.rcp-a__cell:nth-child(5) > * { transition-delay: 260ms; }
+.rcp-a__cell:nth-child(6) > * { transition-delay: 320ms; }
+
+.rcp-a__n1 { grid-area: n1; justify-content: center; }
+.rcp-a__n1 .rcp-num {
+  font-size: var(--text-dec-lg);
+  background: linear-gradient(170deg, var(--fg1) 30%, rgba(var(--rose-gold-rgb), .85));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.rcp-a__n2 { grid-area: n2; }
+.rcp-a__n3 { grid-area: n3; }
+.rcp-a__n2 .rcp-num, .rcp-a__n3 .rcp-num { font-size: var(--text-dec-md); }
+.rcp-a__n2 .rcp-num { color: var(--gold); }
+.rcp-a__n3 .rcp-num { color: var(--silver); }
+
+.rcp-a__mk {
+  grid-area: mk; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 45%, rgba(var(--rose-gold-rgb), .14), transparent 62%), var(--black);
+}
+.rcp-a__mk img { width: 100%; max-width: 96px; opacity: .85; }
+
+.rcp-a__aw {
+  grid-area: aw; justify-content: center;
+  border-left: 2px solid var(--gold);
+  background: linear-gradient(100deg, rgba(var(--gold-rgb), .10), transparent 58%), var(--black);
+}
+.rcp-a__aw strong {
+  font-family: var(--font-display); font-weight: 800; font-variation-settings: 'wdth' 125;
+  font-size: var(--text-2xl); line-height: var(--leading-tight); color: var(--fg1);
+  display: block;
+}
+.rcp-a__aw .rcp-a__awmeta {
+  font-family: var(--font-ui); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--gold);
+}
+
+.rcp-a__pr { grid-area: pr; justify-content: flex-start; gap: 0; }
+.rcp-a__prlist { display: flex; flex-direction: column; margin-top: var(--space-4); }
+.rcp-a__pritem {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  padding: var(--space-3) 0; border-top: 1px solid var(--border);
+  font-family: var(--font-display); font-weight: 700; font-variation-settings: 'wdth' 125;
+  font-size: var(--text-lg); letter-spacing: var(--tracking-tight);
+  transition: color var(--dur-fast) var(--ease), padding-left var(--dur-base) var(--ease-magnetic);
+}
+.rcp-a__pritem:first-child { border-top: 0; }
+a.rcp-a__pritem:hover { color: var(--rose-gold); padding-left: var(--space-3); }
+.rcp-a__pritem span[aria-hidden] { color: var(--fg3); font-family: var(--font-ui); font-size: var(--text-sm); }
+a.rcp-a__pritem:hover span[aria-hidden] { color: var(--rose-gold); }
+.rcp-a__pritem--flat { color: var(--fg3); }
+
+@media (max-width: 820px) {
+  .rcp-a { padding: var(--space-16) var(--space-4); }
+  .rcp-a__grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "n1 n1"
+      "n2 n3"
+      "aw aw"
+      "pr pr";
+  }
+  .rcp-a__mk { display: none; }
+  .rcp-a__cell { padding: var(--space-6); }
+  .rcp-a__n1 { padding-block: var(--space-8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rcp-a__cell > * { opacity: 1; transform: none; }
+}
+
+
+/* ═══════════════════ B — LOGO WALL + STRUCK AWARD SEAL ═══════════════════
+   A short full-bleed band, not a block. The press outlets ARE the object: a
+   marquee wall of names at display scale. The award is a struck seal at the
+   centre; the stats demote to a single caption rail. Scan target: the wall. */
+.rcp-b {
+  padding: var(--space-16) 0 var(--space-12);
+  border-top: 1px solid rgba(var(--gold-rgb), .22);
+  border-bottom: 1px solid rgba(var(--gold-rgb), .22);
+  background:
+    radial-gradient(ellipse 60% 100% at 50% 0%, rgba(var(--gold-rgb), .07), transparent 70%),
+    linear-gradient(180deg, var(--black), var(--charcoal) 55%, var(--black));
+  overflow: hidden;
+}
+.rcp-b__label { text-align: center; margin-bottom: var(--space-8); }
+
+/* The glow lives on the <svg>, NOT on this wrapper. A `filter` on the wrapper
+   isolates its subtree's blending group, which strands the centre mark's
+   mix-blend-mode:screen and paints its inverted plate as a visible black box. */
+.rcp-b__seal { width: clamp(150px, 23vw, 212px); aspect-ratio: 1; position: relative; margin: 0 auto; }
+.rcp-b__seal svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  animation: rcpSpin 46s linear infinite;
+  filter: drop-shadow(0 0 26px rgba(var(--gold-rgb), .22));
+}
+/* Arc radius 76 in a 200 viewBox → 477 user units of path. At 12.5px Cinzel caps
+   (~7.7u advance) + 4u tracking ≈ 11.7u/char, so the ring text must stay ≤ 40
+   characters or it laps itself. The first draft ran 58 chars and overlapped. */
+.rcp-b__seal svg text { font-family: var(--font-caps); font-size: 12.5px; letter-spacing: 4px; fill: var(--gold); }
+.rcp-b__seal img { position: absolute; inset: 27%; width: 46%; height: 46%; object-fit: contain; }
+.rcp-b__ring { fill: none; stroke: rgba(var(--gold-rgb), .35); stroke-width: 1; }
+@keyframes rcpSpin { to { transform: rotate(360deg); } }
+
+.rcp-b__awtext { text-align: center; margin-top: var(--space-6); }
+.rcp-b__awtext strong {
+  display: block; font-family: var(--font-display); font-weight: 900;
+  font-variation-settings: 'wdth' 125; font-size: var(--text-3xl);
+  letter-spacing: var(--tracking-tight); line-height: var(--leading-tight);
+}
+.rcp-b__awtext a { color: var(--gold); border-bottom: 1px solid rgba(var(--gold-rgb), .4); }
+
+.rcp-b__wall {
+  margin-top: var(--space-16);
+  -webkit-mask-image: linear-gradient(90deg, transparent, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, transparent);
+}
+.rcp-b__track {
+  display: flex; align-items: center; width: max-content;
+  animation: rcpWall 34s linear infinite;
+}
+.rcp-b__wall:hover .rcp-b__track { animation-play-state: paused; }
+@keyframes rcpWall { to { transform: translateX(-50%); } }
+
+.rcp-b__name {
+  font-family: var(--font-display); font-weight: 900; font-variation-settings: 'wdth' 125;
+  font-size: clamp(1.75rem, 5.4vw, 3.5rem); letter-spacing: var(--tracking-tight);
+  text-transform: uppercase; color: var(--fg2); white-space: nowrap;
+  padding: 0 var(--space-8);
+  transition: color var(--dur-fast) var(--ease);
+}
+a.rcp-b__name:hover { color: var(--rose-gold); }
+.rcp-b__name--flat { color: var(--fg3); }
+.rcp-b__dot { width: 8px; height: 8px; flex: none; background: var(--crimson); transform: rotate(45deg); }
+
+.rcp-b__rail {
+  margin: var(--space-16) auto 0; max-width: var(--container-narrow);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: var(--space-3) var(--space-6); padding: 0 var(--space-4);
+}
+.rcp-b__stat { display: flex; align-items: baseline; gap: var(--space-2); }
+.rcp-b__stat b { font-family: var(--font-display); font-weight: 900; font-variation-settings: 'wdth' 125; font-size: var(--text-2xl); color: var(--fg1); }
+.rcp-b__stat span {
+  font-family: var(--font-accent); font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg3);
+}
+.rcp-b__railsep { width: 5px; height: 5px; border-radius: 50%; background: var(--rose-gold); }
+/* Own line — it is a qualifier for the three numerals above it, not a fourth stat. */
+.rcp-b__stat--wide { flex-basis: 100%; justify-content: center; margin-top: var(--space-2); }
+
+@media (max-width: 640px) {
+  .rcp-b__name { padding: 0 var(--space-6); }
+  .rcp-b__rail { gap: var(--space-2) var(--space-4); }
+  .rcp-b__railsep { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rcp-b__seal svg { animation: none; }
+  .rcp-b__wall { -webkit-mask-image: none; mask-image: none; }
+  .rcp-b__track {
+    animation: none; width: 100%; flex-wrap: wrap; justify-content: center;
+    gap: var(--space-2) 0;
+  }
+  .rcp-b__track [data-dup] { display: none; }
+  /* The names carry `white-space: nowrap` at display scale. The marquee copes by
+     scrolling them past; this static reflow cannot. MEASURED at 390px before this
+     rule: "San Francisco Post" and "Best of Best Review" both laid out 453px wide in
+     a 390px viewport (left -32 → right 422) and .rcp-b's overflow:hidden cut both
+     edges, with document scrollWidth pinned at 390 so nothing could recover them —
+     two of five outlets permanently unreadable, the exact failure this block exists
+     to prevent. Wrapping keeps every name whole; max-width pins them inside the band. */
+  .rcp-b__track .rcp-b__name { white-space: normal; max-width: 100%; text-align: center; }
+}
+
+
+/* ═══════════════════ C — EDITORIAL DISPATCH INDEX ═══════════════════
+   A magazine spread. Left: a sticky rail of pull-stats stacked vertically under
+   hairlines. Right: the press as a dated dispatch index — outlet, headline, year
+   — ruled rows you read, not logos you glance at. Scan target: the ruled list. */
+.rcp-c { padding: var(--space-24) var(--space-6); }
+.rcp-c__inner { max-width: var(--container); margin: 0 auto; }
+
+.rcp-c__head { border-bottom: 1px solid var(--border); padding-bottom: var(--space-6); margin-bottom: var(--space-12); }
+.rcp-c__head h2 {
+  font-family: var(--font-display); font-weight: 900; font-variation-settings: 'wdth' 125;
+  font-size: var(--text-4xl); letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight); margin-top: var(--space-3);
+}
+.rcp-c__head em { font-style: normal; color: var(--rose-gold); }
+
+.rcp-c__wrap { display: grid; grid-template-columns: minmax(210px, 290px) 1fr; gap: var(--space-16); }
+
+.rcp-c__rail { position: sticky; top: var(--space-8); align-self: start; }
+.rcp-c__stat { padding: var(--space-6) 0; border-top: 1px solid var(--border); }
+.rcp-c__stat:first-child { border-top: 2px solid var(--rose-gold); }
+.rcp-c__stat .rcp-num { font-size: var(--text-dec-md); margin-bottom: var(--space-2); }
+.rcp-c__stat:nth-child(2) .rcp-num { color: var(--gold); }
+.rcp-c__stat:nth-child(3) .rcp-num { color: var(--silver); }
+.rcp-c__stat--award .rcp-c__awline {
+  font-family: var(--font-display); font-weight: 800; font-variation-settings: 'wdth' 125;
+  font-size: var(--text-xl); line-height: var(--leading-tight); display: block; margin-bottom: var(--space-2);
+}
+/* NO raster mark in this rail — deliberately. Measured: inside the sticky rail the
+   lockup's blend group stays isolated (plate renders 0,0,0 against a 10,10,10 field,
+   a visible rectangle) no matter what backdrop the rail carries. A and B keep their
+   marks because their parents do not isolate. The award closes this rail instead. */
+
+.rcp-c__idxlab { margin-bottom: var(--space-4); }
+.rcp-c__row {
+  display: grid; grid-template-columns: 46px 1fr auto; gap: var(--space-6);
+  align-items: baseline; padding: var(--space-6) 0 var(--space-6) 0;
+  border-top: 1px solid var(--border); position: relative;
+  opacity: 0; transform: translateY(14px);
+  transition: opacity var(--dur-reveal) var(--ease-cinematic),
+              transform var(--dur-reveal) var(--ease-cinematic);
+}
+.rcp-c__row.is-in { opacity: 1; transform: none; }
+.rcp-c__row::before {
+  content: ""; position: absolute; left: 0; top: -1px; height: 1px; width: 0;
+  background: var(--rose-gold);
+  transition: width var(--dur-slow) var(--ease-magnetic);
+}
+a.rcp-c__row:hover::before { width: 100%; }
+.rcp-c__row:last-child { border-bottom: 1px solid var(--border); }
+
+.rcp-c__no { font-family: var(--font-ui); font-size: var(--text-xs); letter-spacing: var(--tracking-wider); color: var(--fg3); }
+.rcp-c__outlet {
+  font-family: var(--font-display); font-weight: 800; font-variation-settings: 'wdth' 125;
+  font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); line-height: var(--leading-tight);
+  display: block; transition: color var(--dur-fast) var(--ease);
+}
+a.rcp-c__row:hover .rcp-c__outlet { color: var(--rose-gold); }
+.rcp-c__headline { display: block; margin-top: var(--space-2); max-width: 52ch; }
+.rcp-c__meta {
+  display: flex; align-items: center; gap: var(--space-3); white-space: nowrap;
+  font-family: var(--font-ui); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider); color: var(--fg3);
+}
+.rcp-c__arrow { transition: transform var(--dur-base) var(--ease-magnetic); }
+a.rcp-c__row:hover .rcp-c__arrow { transform: translate(4px, -4px); }
+.rcp-c__row--flat .rcp-c__outlet { color: var(--fg3); }
+
+@media (max-width: 880px) {
+  .rcp-c { padding: var(--space-16) var(--space-4); }
+  .rcp-c__wrap { grid-template-columns: 1fr; gap: var(--space-12); }
+  .rcp-c__rail { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--space-6); }
+  .rcp-c__stat:nth-child(2) { border-top: 2px solid var(--rose-gold); }
+  .rcp-c__stat--award { grid-column: 1 / -1; }
+  .rcp-c__row { grid-template-columns: 34px 1fr; row-gap: var(--space-2); }
+  .rcp-c__meta { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rcp-c__row { opacity: 1; transform: none; }
+}
+</style>
+
+
+<template data-variant="A" data-name="Asymmetric proof mosaic">
+<section class="rcp rcp-a" aria-labelledby="rcp-a-h">
+  <div class="rcp-a__inner">
+    <div class="rcp-a__top">
+      <p class="rcp-lab" id="rcp-a-h">The Receipts</p>
+      <p class="rcp-a__tag">Luxury Grows from Concrete.</p>
+    </div>
+
+    <div class="rcp-a__grid">
+
+      <div class="rcp-a__cell rcp-a__n1">
+        <span class="rcp-num" data-count="33" data-pad="2">33</span>
+        <p class="rcp-lab">Pieces</p>
+        <p class="rcp-sub">Small batch production. Individually numbered. When it&rsquo;s gone, it&rsquo;s gone.</p>
+      </div>
+
+      <div class="rcp-a__cell rcp-a__n2">
+        <span class="rcp-num" data-count="4" data-pad="2">04</span>
+        <p class="rcp-lab">Collections</p>
+        <p class="rcp-sub">Black Rose · Love Hurts · Signature · Kids Capsule</p>
+      </div>
+
+      <div class="rcp-a__cell rcp-a__n3">
+        <span class="rcp-num">2020</span>
+        <p class="rcp-lab">Est. — Oakland</p>
+        <p class="rcp-sub">Born from the struggle of East Oakland. Designed for the world.</p>
+      </div>
+
+      <div class="rcp-a__cell rcp-a__mk">
+        <img class="rcp-mark" src="assets/branding/skyyrose-monogram.webp" alt="" width="96" height="96" loading="lazy" decoding="async">
+      </div>
+
+      <div class="rcp-a__cell rcp-a__aw">
+        <p class="rcp-a__awmeta">Award · 2024</p>
+        <strong>Best Bay Area<br>Clothing Line</strong>
+        <p class="rcp-sub">
+          <a href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024"
+             target="_blank" rel="noopener noreferrer">Best of Best Review &nearr;</a>
+        </p>
+      </div>
+
+      <div class="rcp-a__cell rcp-a__pr">
+        <p class="rcp-lab">As Featured In</p>
+        <div class="rcp-a__prlist">
+          <a class="rcp-a__pritem" href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" target="_blank" rel="noopener noreferrer">Maxim <span aria-hidden="true">&nearr;</span></a>
+          <a class="rcp-a__pritem" href="https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/" target="_blank" rel="noopener noreferrer">CEO Weekly <span aria-hidden="true">&nearr;</span></a>
+          <a class="rcp-a__pritem" href="https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/" target="_blank" rel="noopener noreferrer">San Francisco Post <span aria-hidden="true">&nearr;</span></a>
+          <a class="rcp-a__pritem" href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024" target="_blank" rel="noopener noreferrer">Best of Best Review <span aria-hidden="true">&nearr;</span></a>
+          <!-- The Blox has an empty url in $press — renders as a non-link, same as production. -->
+          <span class="rcp-a__pritem rcp-a__pritem--flat">The Blox</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var root = document.querySelector('.rcp-a');
+    if (!root) return;
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var cells = root.querySelectorAll('.rcp-a__cell');
+    var nums  = root.querySelectorAll('[data-count]');
+
+    var pad = function (v, n) { var s = String(v); while (s.length < n) s = '0' + s; return s; };
+
+    function countUp(el) {
+      var target = parseInt(el.dataset.count, 10);
+      var width  = parseInt(el.dataset.pad || '0', 10);
+      if (reduce) { el.textContent = pad(target, width); return; }
+      var t0 = performance.now();
+      (function tick(now) {
+        var p = Math.min(1, (now - t0) / 900);
+        var e = 1 - Math.pow(1 - p, 3);
+        el.textContent = pad(Math.round(target * e), width);
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    }
+
+    if (!reduce) nums.forEach(function (n) { n.textContent = pad(0, parseInt(n.dataset.pad || '0', 10)); });
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-in');
+        var n = en.target.querySelector('[data-count]');
+        if (n) countUp(n);
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.25 });
+
+    cells.forEach(function (c) { io.observe(c); });
+  })();
+  </script>
+</section>
+</template>
+
+
+<template data-variant="B" data-name="Logo wall + struck award seal">
+<section class="rcp rcp-b" aria-labelledby="rcp-b-h">
+
+  <p class="rcp-lab rcp-b__label" id="rcp-b-h">As Featured In</p>
+
+  <div class="rcp-b__seal">
+    <svg viewBox="0 0 200 200" role="img" aria-label="Best Bay Area Clothing Line Award 2024, Best of Best Review">
+      <defs>
+        <path id="rcpSealArc" d="M 100,100 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0"></path>
+      </defs>
+      <circle class="rcp-b__ring" cx="100" cy="100" r="88"></circle>
+      <circle class="rcp-b__ring" cx="100" cy="100" r="62"></circle>
+      <text><textPath href="#rcpSealArc" startOffset="0">BEST BAY AREA CLOTHING LINE · 2024 ·</textPath></text>
+    </svg>
+    <img class="rcp-mark" src="assets/branding/skyyrose-rose-icon.webp" alt="" width="96" height="96" loading="lazy" decoding="async">
+  </div>
+
+  <div class="rcp-b__awtext">
+    <strong>Best Bay Area Clothing Line</strong>
+    <p class="rcp-sub">
+      <a href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024"
+         target="_blank" rel="noopener noreferrer">Best of Best Review, 2024 &nearr;</a>
+    </p>
+  </div>
+
+  <div class="rcp-b__wall">
+    <div class="rcp-b__track">
+      <!-- set 1: real links -->
+      <a class="rcp-b__name" href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" target="_blank" rel="noopener noreferrer">Maxim</a>
+      <span class="rcp-b__dot" aria-hidden="true"></span>
+      <a class="rcp-b__name" href="https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/" target="_blank" rel="noopener noreferrer">CEO Weekly</a>
+      <span class="rcp-b__dot" aria-hidden="true"></span>
+      <a class="rcp-b__name" href="https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/" target="_blank" rel="noopener noreferrer">San Francisco Post</a>
+      <span class="rcp-b__dot" aria-hidden="true"></span>
+      <a class="rcp-b__name" href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024" target="_blank" rel="noopener noreferrer">Best of Best Review</a>
+      <span class="rcp-b__dot" aria-hidden="true"></span>
+      <span class="rcp-b__name rcp-b__name--flat">The Blox</span>
+      <span class="rcp-b__dot" aria-hidden="true"></span>
+      <!-- set 2: visual duplicate only, so the marquee loops seamlessly -->
+      <span class="rcp-b__name" data-dup aria-hidden="true">Maxim</span>
+      <span class="rcp-b__dot" data-dup aria-hidden="true"></span>
+      <span class="rcp-b__name" data-dup aria-hidden="true">CEO Weekly</span>
+      <span class="rcp-b__dot" data-dup aria-hidden="true"></span>
+      <span class="rcp-b__name" data-dup aria-hidden="true">San Francisco Post</span>
+      <span class="rcp-b__dot" data-dup aria-hidden="true"></span>
+      <span class="rcp-b__name" data-dup aria-hidden="true">Best of Best Review</span>
+      <span class="rcp-b__dot" data-dup aria-hidden="true"></span>
+      <span class="rcp-b__name rcp-b__name--flat" data-dup aria-hidden="true">The Blox</span>
+      <span class="rcp-b__dot" data-dup aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="rcp-b__rail">
+    <span class="rcp-b__stat"><b>33</b><span>Pieces</span></span>
+    <span class="rcp-b__railsep" aria-hidden="true"></span>
+    <span class="rcp-b__stat"><b>04</b><span>Collections</span></span>
+    <span class="rcp-b__railsep" aria-hidden="true"></span>
+    <span class="rcp-b__stat"><b>2020</b><span>Established</span></span>
+    <span class="rcp-b__stat rcp-b__stat--wide"><span>Oakland &middot; Gender Neutral &middot; Limited Edition</span></span>
+  </div>
+
+  <script>
+  (function () {
+    // Marquee is pure CSS. This only pauses it while the tab is hidden and
+    // while a wall link has keyboard focus, so a focused link never scrolls away.
+    var track = document.querySelector('.rcp-b__track');
+    if (!track) return;
+    var pause = function (on) { track.style.animationPlayState = on ? 'paused' : 'running'; };
+    document.addEventListener('visibilitychange', function () { pause(document.hidden); });
+    track.addEventListener('focusin', function () { pause(true); });
+    track.addEventListener('focusout', function () { pause(false); });
+  })();
+  </script>
+</section>
+</template>
+
+
+<template data-variant="C" data-name="Editorial dispatch index">
+<section class="rcp rcp-c" aria-labelledby="rcp-c-h">
+  <div class="rcp-c__inner">
+
+    <div class="rcp-c__head">
+      <p class="rcp-lab">The Record</p>
+      <h2 id="rcp-c-h">Four Collections. One Vision.<br><em>Luxury Grows from Concrete.</em></h2>
+    </div>
+
+    <div class="rcp-c__wrap">
+
+      <aside class="rcp-c__rail" aria-label="SkyyRose by the numbers">
+        <div class="rcp-c__stat">
+          <span class="rcp-num">33</span>
+          <p class="rcp-lab">Pieces</p>
+          <p class="rcp-sub">Across four collections</p>
+        </div>
+        <div class="rcp-c__stat">
+          <span class="rcp-num">04</span>
+          <p class="rcp-lab">Collections</p>
+          <p class="rcp-sub">Black Rose · Love Hurts · Signature · Kids Capsule</p>
+        </div>
+        <div class="rcp-c__stat">
+          <span class="rcp-num">2020</span>
+          <p class="rcp-lab">Est. — Oakland</p>
+          <p class="rcp-sub">Built by a father, named after a daughter.</p>
+        </div>
+        <div class="rcp-c__stat rcp-c__stat--award">
+          <span class="rcp-c__awline">Best Bay Area Clothing Line</span>
+          <p class="rcp-lab">Award · 2024</p>
+          <p class="rcp-sub">
+            <a href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024"
+               target="_blank" rel="noopener noreferrer">Best of Best Review &nearr;</a>
+          </p>
+        </div>
+      </aside>
+
+      <div>
+        <p class="rcp-lab rcp-c__idxlab">As Featured In</p>
+
+        <a class="rcp-c__row" href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" target="_blank" rel="noopener noreferrer">
+          <span class="rcp-c__no">01</span>
+          <span>
+            <span class="rcp-c__outlet">Maxim</span>
+            <span class="rcp-sub rcp-c__headline">14 Game-Changing Entrepreneurs to Watch in 2023</span>
+          </span>
+          <span class="rcp-c__meta">2023 <span class="rcp-c__arrow" aria-hidden="true">&nearr;</span></span>
+        </a>
+
+        <a class="rcp-c__row" href="https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/" target="_blank" rel="noopener noreferrer">
+          <span class="rcp-c__no">02</span>
+          <span>
+            <span class="rcp-c__outlet">CEO Weekly</span>
+            <span class="rcp-sub rcp-c__headline">The Unyielding Journey of a Single Father and Entrepreneur</span>
+          </span>
+          <!-- no year in the real URL — em dash rather than a guessed date -->
+          <span class="rcp-c__meta">&mdash; <span class="rcp-c__arrow" aria-hidden="true">&nearr;</span></span>
+        </a>
+
+        <a class="rcp-c__row" href="https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/" target="_blank" rel="noopener noreferrer">
+          <span class="rcp-c__no">03</span>
+          <span>
+            <span class="rcp-c__outlet">San Francisco Post</span>
+            <span class="rcp-sub rcp-c__headline">The Skyy Rose Collection: From Oakland&rsquo;s Streets to Fashion Heights</span>
+          </span>
+          <span class="rcp-c__meta">&mdash; <span class="rcp-c__arrow" aria-hidden="true">&nearr;</span></span>
+        </a>
+
+        <a class="rcp-c__row" href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024" target="_blank" rel="noopener noreferrer">
+          <span class="rcp-c__no">04</span>
+          <span>
+            <span class="rcp-c__outlet">Best of Best Review</span>
+            <span class="rcp-sub rcp-c__headline">Best Bay Area Clothing Line Award</span>
+          </span>
+          <span class="rcp-c__meta">2024 <span class="rcp-c__arrow" aria-hidden="true">&nearr;</span></span>
+        </a>
+
+        <!-- The Blox: empty url in $press, and no headline exists — non-link row. -->
+        <div class="rcp-c__row rcp-c__row--flat">
+          <span class="rcp-c__no">05</span>
+          <span>
+            <span class="rcp-c__outlet">The Blox</span>
+            <span class="rcp-sub rcp-c__headline">Feature</span>
+          </span>
+          <span class="rcp-c__meta">&mdash;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var rows = document.querySelectorAll('.rcp-c__row');
+    if (!rows.length) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en, i) {
+        if (!en.isIntersecting) return;
+        en.target.style.transitionDelay = (i * 70) + 'ms';
+        en.target.classList.add('is-in');
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.2 });
+    rows.forEach(function (r) { io.observe(r); });
+  })();
+  </script>
+</section>
+</template>

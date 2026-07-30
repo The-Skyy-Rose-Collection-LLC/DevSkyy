@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose homepage — section prototype</title>
+<!--
+  PROTOTYPE — THROWAWAY. Not production. Not deployable (lives outside the theme dir).
+
+  QUESTION: What should each section of the SkyyRose homepage look like?
+
+  3 structurally-different variants per section, 8 sections. Switch with the bar at the
+  bottom, or ?section=<key>&variant=<A|B|C>. Arrow keys work: ←/→ variant, ↑/↓ section.
+
+  Judged in real brand typography (the theme's own self-hosted woff2) and real brand logos,
+  because a variant that only looks good in a fallback stack has not been judged at all.
+
+  When a winner is picked: record it in NOTES.md, fold it into front-page.php properly
+  (rewritten, not pasted — this was written under prototype constraints), delete this dir.
+-->
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* Switcher chrome only — deliberately NOT brand-styled so it can never be mistaken
+     for part of the design under evaluation. */
+  /* The bar is fixed and opaque, so anything a variant docks at its own bottom edge sits
+     UNDER it — and in a 100svh section there is nothing to scroll, so those controls are
+     unreachable, not merely covered. Observed: hero A's two CTAs and all four of hero C's
+     nav links (C's entire primary affordance) at both 390px and 1440px.
+     The clearance goes HERE, on the stage, not inside any variant: padding on .hA/.hB/.hC
+     would come out of their own 100svh layouts and silently re-price the composition being
+     judged. This leaves every variant's internal geometry byte-identical and just gives the
+     document 190px of scroll so its bottom edge clears the bar. */
+  #proto-stage { min-height: 100vh; padding-bottom: var(--proto-bar-clearance); }
+  #proto-bar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px; z-index: 99999;
+    background: #fff; color: #111; border-radius: 9999px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.18);
+    padding: 6px 8px; font: 500 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    max-width: min(94vw, 920px); flex-wrap: wrap; justify-content: center;
+  }
+  /* At 390px the section buttons wrap to 3 rows (~157px tall), so the bar's top edge sits
+     ~175px off the viewport floor and swallows any variant's own bottom-docked chrome.
+     Variants read this var instead of hardcoding a clearance.
+     Measured footprint (bar height + its 18px floor offset): 175px at 390px wide, 90px at
+     1440px. The clearance must EXCEED that, not approximate it — the old desktop value of
+     80px was 10px short, which left hero C's bottom-flush nav row clipped even after
+     scrolling to the end. Values below carry ~15px of margin over the measurement. */
+  :root { --proto-bar-clearance: 190px; }
+  @media (min-width: 760px) { :root { --proto-bar-clearance: 106px; } }
+  #proto-bar button {
+    font: inherit; border: 0; background: #f1f1f1; color: #111;
+    padding: 7px 11px; border-radius: 9999px; cursor: pointer;
+  }
+  #proto-bar button:hover { background: #e2e2e2; }
+  #proto-bar button[aria-pressed="true"] { background: #111; color: #fff; }
+  #proto-label { padding: 0 10px; white-space: nowrap; font-weight: 700; }
+  #proto-sep { width: 1px; align-self: stretch; background: #ddd; margin: 2px 4px; }
+  #proto-err { padding: 80px 24px; color: var(--fg3); font-family: var(--font-ui); text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="proto-stage"><div id="proto-err">loading…</div></div>
+<div id="proto-bar" role="group" aria-label="Prototype switcher"></div>
+
+<script>
+// Section keys map 1:1 to sections/<key>.html. Each of those files contains three
+// <template data-variant="A|B|C"> blocks and its own <style>.
+const SECTIONS = [
+  ['hero',     'Hero — video + logo marquee'],
+  ['ticker',   'Ticker — brand mantra'],
+  ['chooser',  'Collection chooser'],
+  ['drop',     'Drop / pre-order band'],
+  ['receipts', 'Receipts — proof'],
+  ['origin',   'Origin — founder'],
+  ['letter',   'Letter — Kids Capsule'],
+  ['close',    'Close — service + capture'],
+];
+const VARIANTS = ['A', 'B', 'C'];
+const cache = new Map();
+
+const qs = () => new URLSearchParams(location.search);
+const curSection = () => { const s = qs().get('section'); return SECTIONS.some(x => x[0] === s) ? s : SECTIONS[0][0]; };
+const curVariant = () => { const v = (qs().get('variant') || 'A').toUpperCase(); return VARIANTS.includes(v) ? v : 'A'; };
+
+function setState(section, variant, push = true) {
+  const p = new URLSearchParams({ section, variant });
+  // replaceState keeps the URL shareable and reload-stable without flooding history.
+  history[push ? 'pushState' : 'replaceState'](null, '', '?' + p);
+  render();
+}
+
+async function loadSection(key) {
+  if (cache.has(key)) return cache.get(key);
+  const res = await fetch(`sections/${key}.html`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`sections/${key}.html → HTTP ${res.status}`);
+  const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+  cache.set(key, doc);
+  return doc;
+}
+
+async function render() {
+  const section = curSection(), variant = curVariant();
+  const stage = document.getElementById('proto-stage');
+  let doc;
+  try {
+    doc = await loadSection(section);
+  } catch (e) {
+    stage.innerHTML = `<div id="proto-err">${e.message}<br><br>This section has not been written yet.</div>`;
+    paintBar(section, variant, null);
+    return;
+  }
+  const tpl = doc.querySelector(`template[data-variant="${variant}"]`);
+  if (!tpl) {
+    stage.innerHTML = `<div id="proto-err">sections/${section}.html has no variant ${variant}.</div>`;
+    paintBar(section, variant, null);
+    return;
+  }
+  stage.innerHTML = '';
+  // Section-scoped <style> blocks ride along with the section file; re-adopt them each
+  // switch so variants can disagree about layout entirely rather than sharing one.
+  doc.querySelectorAll('style').forEach(s => stage.appendChild(s.cloneNode(true)));
+  // Inline <script> inside a <template> DOES execute on clone-insert: template content lives
+  // in an inert document, so its scripts are never flagged "already started", and the clone is
+  // a fresh element. An earlier version of this harness ALSO re-created each script after
+  // insertion (copied from a DOMParser bundler, where scripts genuinely are inert) — which ran
+  // every variant's script TWICE and double-bound every listener. Symptom found in close.html:
+  // one submit event, handler ran twice; pass 1 cleared the field, pass 2 saw it empty and
+  // painted an error. Do NOT reintroduce a re-creation step here.
+  stage.appendChild(tpl.content.cloneNode(true));
+  paintBar(section, variant, tpl.dataset.name || null);
+  window.scrollTo(0, 0);
+}
+
+function paintBar(section, variant, variantName) {
+  const bar = document.getElementById('proto-bar');
+  bar.innerHTML = '';
+  const mk = (label, onClick, pressed, title) => {
+    const b = document.createElement('button');
+    b.textContent = label; b.onclick = onClick;
+    if (pressed !== undefined) b.setAttribute('aria-pressed', String(pressed));
+    if (title) b.title = title;
+    return b;
+  };
+  SECTIONS.forEach(([key, name]) => bar.appendChild(
+    mk(key, () => setState(key, 'A'), key === section, name)
+  ));
+  const sep = document.createElement('div'); sep.id = 'proto-sep'; bar.appendChild(sep);
+  const idx = VARIANTS.indexOf(variant);
+  bar.appendChild(mk('←', () => setState(section, VARIANTS[(idx - 1 + VARIANTS.length) % VARIANTS.length])));
+  const lab = document.createElement('span');
+  lab.id = 'proto-label';
+  lab.textContent = variantName ? `${variant} — ${variantName}` : variant;
+  bar.appendChild(lab);
+  bar.appendChild(mk('→', () => setState(section, VARIANTS[(idx + 1) % VARIANTS.length])));
+}
+
+addEventListener('keydown', e => {
+  // Never hijack arrows while the user is typing in a variant's own form.
+  const t = e.target;
+  if (t && (t.matches('input, textarea, select') || t.isContentEditable)) return;
+  const s = curSection(), v = curVariant();
+  const si = SECTIONS.findIndex(x => x[0] === s), vi = VARIANTS.indexOf(v);
+  if (e.key === 'ArrowRight') setState(s, VARIANTS[(vi + 1) % VARIANTS.length]);
+  else if (e.key === 'ArrowLeft') setState(s, VARIANTS[(vi - 1 + VARIANTS.length) % VARIANTS.length]);
+  else if (e.key === 'ArrowDown') setState(SECTIONS[(si + 1) % SECTIONS.length][0], 'A');
+  else if (e.key === 'ArrowUp') setState(SECTIONS[(si - 1 + SECTIONS.length) % SECTIONS.length][0], 'A');
+  else return;
+  e.preventDefault();
+});
+
+addEventListener('popstate', render);
+render();
+</script>
+</body>
+</html>

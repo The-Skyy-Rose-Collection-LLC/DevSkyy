@@ -1,0 +1,666 @@
+<!--
+  HERO — three variants. PROTOTYPE, throwaway. Not production, not deployable.
+
+  FIXED ACROSS ALL THREE (founder direction): the 720x1280 PORTRAIT video is centred and
+  fully visible. Sizing is width-first — `width: min(<vw cap>, calc(<vh cap> * 9/16))` with
+  `aspect-ratio: 9/16` — so the frame can never be cover-cropped at either end. Height-first
+  sizing (height:100vh; width:auto) overflows horizontally on phones; it is not used here.
+
+  WHAT VARIES: the relationship between video, marquee, type and CTA.
+    A  logo field passes BEHIND the video, through the pillarbox gutters. Button-led.
+    B  marquee becomes two discrete BANDS clamping the video; empty pillarbox; type is an
+       editorial caption column below. Reading-led (text links).
+    C  monumental type sits BEHIND and overlaps the video edges; the marquee crosses at
+       mid-height between them AND is the navigation. No conventional CTA.
+
+  ── ASSET FACTS, verified this session with `magick identify` + corner-pixel sampling, then
+     eyes-on against a screen-composited simulation. Do not re-derive:
+       WHITE background, dark artwork (no alpha) → skyyrose-monogram, skyyrose-rose-icon,
+         love-hurts-logo, black-rose-collection-text, tsrc-lockup-static@2x
+       BLACK background, light artwork (no alpha) → black-rose-logo  (it is a 3D crystal
+         trophy object, NOT a wordmark — used only in B's recognition beat, never the wall)
+       REAL ALPHA, gold → signature-logo   (the only ALPHA asset)
+       WHITE background, FULL-COLOUR CHARACTER (no alpha) → skyy-mascot  (see below)
+     Treatment: white-bg marks get `invert(1) grayscale(1)`; the whole marquee wrapper then
+     carries `mix-blend-mode: screen` so the inverted #000 field lands exactly on --black and
+     disappears. Result is a silver monochrome logo wall with the gold Signature lockup and the
+     plated mascot as its two colour accents — a deliberate call, not a limitation.
+     tsrc-lockup-static@2x.webp is only 198x144 → capped at 34px tall or it turns to mush.
+
+  ── KIDS CAPSULE — the gap is now FILLED by the mascot (founder direction). The other three
+     collections appear as wordmarks; Kids Capsule appears as its CHARACTER mark, `.hx-kc`.
+       skyy-mascot.webp  1024x1035, opaque 255-white field, NO alpha, 36,841 colours.
+     It must NEVER take .hx-inv. Simulated and looked at: inverting a photographic character
+     turns her skin and hair into a photographic negative — a horror mask, not a silver mark.
+     So it is plated, exactly as chooser.html plates the love-hurts enamel pin and for exactly
+     the same reason. Here the image's OWN white field is the plate (clipped to a soft rect
+     with a rose-gold hairline), so there is no tinted-plate seam to fight.
+     A character carries no name, so it locks up WITH "Kids Capsule" in --script-kc rather than
+     replacing it: mark + name = the Kids Capsule mark, not a sticker.
+     Sized ~65-70% of the mean wordmark height in each track — a dense near-square reads far
+     heavier than sparse wide lettering at the same box height.
+
+  ── COPY: every string below is lifted from wordpress-theme/skyyrose-flagship/front-page.php.
+     No invented brand voice.
+-->
+<style>
+/* ════════ SHARED — logo-mark treatment only. Everything else is namespaced per variant,
+   because index.html clones EVERY <style> in this file into the stage, so all three
+   variants' CSS is live at once and any shared class name would have them fight. ════════ */
+
+.hx-lg {
+  height: var(--lg-h, 60px);
+  width: auto;
+  flex: 0 0 auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* White-bg marks: invert flips the field to black and the artwork to light; grayscale kills
+   the hue flip that invert introduces. The wrapper's screen blend erases the black field. */
+.hx-inv { filter: invert(1) grayscale(1) contrast(1.06); }
+/* black-rose-collection-text.webp is a 3072² square with a small script floating in the
+   middle — contained it renders ~15px tall. Cover-crop the middle band so the script fills. */
+.hx-lg--wide {
+  width: calc(var(--lg-h, 60px) * 2.4);
+  object-fit: cover;
+  object-position: center;
+}
+/* The screen blend does the real work, but a transformed track creates its own stacking
+   context on some engines and can isolate the group — leaving a faint near-black rectangle.
+   Low wrapper opacity makes that residual delta (#000 vs #0A0A0A ≈ 4%) imperceptible either
+   way. Belt and braces, verified by eye rather than by reasoning about the spec. */
+
+/* ── THE KIDS CAPSULE MARK ────────────────────────────────────────────────────────────────
+   Deliberately NOT .hx-lg + .hx-inv. Its own class so the inversion that is correct for every
+   wordmark is structurally impossible to apply to the character (see the header note).
+   ONE flex child, not two: the tracks are flex with `gap`, so a loose plate and a loose name
+   would be spaced as two separate marks and could land either side of the -50% loop seam. */
+.hx-kc {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 0 0 auto;
+  user-select: none;
+}
+.hx-kc img {
+  height: var(--kc-h, 44px);
+  width: auto;
+  flex: 0 0 auto;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  /* The plate IS the artwork's own field — a ring, never a backing colour, so nothing can
+     seam against the source's pure (255,255,255). */
+  box-shadow: 0 0 0 1px rgba(var(--rose-gold-rgb), .55);
+  -webkit-user-drag: none;
+}
+.hx-kc .hx-kc-name {
+  font-family: var(--script-kc);
+  font-size: calc(var(--kc-h, 44px) * .56);
+  line-height: 1;
+  color: var(--rose-gold);
+  white-space: nowrap;
+}
+
+@keyframes hx-marq { to { transform: translate3d(-50%, 0, 0); } }
+
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   VARIANT A — LOGO FIELD BEHIND THE MONOLITH
+   Video is a lit object floating over a moving field of brand marks. Two counter-scrolling
+   rows pass behind it and read through the pillarbox gutters. Type is deliberately thin.
+   One primary button carries the whole section.
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.hA {
+  --vw-cap: 68vw;
+  --vh-cap: 44vh;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--black);
+  padding: var(--space-12) var(--space-4);
+}
+@media (min-width: 860px) {
+  .hA { --vw-cap: 34vw; --vh-cap: 58vh; padding: var(--space-16) var(--space-8); }
+}
+
+.hA-field { position: absolute; inset: 0; z-index: 0; mix-blend-mode: screen; pointer-events: none; }
+.hA-row { position: absolute; left: 0; right: 0; display: flex; overflow: hidden; }
+.hA-row--far  { top: 30%; opacity: .40; }
+.hA-row--near { top: 62%; opacity: .58; }
+.hA-track {
+  display: flex; align-items: center; gap: var(--space-16);
+  width: max-content; padding-right: var(--space-16);
+  animation: hx-marq 72s linear infinite;
+  will-change: transform;
+}
+.hA-track--rev { animation-duration: 52s; animation-direction: reverse; }
+
+/* Dims the field immediately around the video so the frame never fights the marks. */
+.hA-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 46% 62% at 50% 48%,
+              var(--black) 0%,
+              color-mix(in srgb, var(--black) 86%, transparent) 42%,
+              color-mix(in srgb, var(--black) 0%, transparent) 78%);
+}
+
+.hA-stack {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-6); text-align: center; max-width: 46rem;
+}
+.hA-eyebrow {
+  font-family: var(--font-caps); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+  color: var(--fg3); margin: 0;
+}
+.hA-eyebrow span { color: var(--rose-gold); margin: 0 .5em; }
+
+.hA-screen {
+  position: relative;
+  padding: 5px;
+  border: 1px solid rgba(var(--rose-gold-rgb), .34);
+  border-radius: var(--radius-sharp);
+  box-shadow: var(--depth-4), var(--glow-rose);
+  background: var(--black);
+}
+.hA-video {
+  display: block;
+  aspect-ratio: 9 / 16;
+  width: min(var(--vw-cap), calc(var(--vh-cap) * 9 / 16));
+  height: auto;
+  object-fit: contain;          /* never cover — cropping cuts off the outfit */
+  background: var(--black);
+}
+
+.hA-tag {
+  font-family: var(--font-display); font-variation-settings: 'wdth' 125;
+  font-weight: 800; font-size: var(--text-4xl); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight); color: var(--fg1); margin: 0;
+}
+.hA-sub {
+  font-family: var(--font-body); font-size: var(--text-sm);
+  line-height: var(--leading-snug); color: var(--fg3);
+  max-width: 34rem; margin: 0;
+}
+.hA-ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
+.hA-cta {
+  font-family: var(--font-ui); font-size: var(--text-xs); font-weight: 700;
+  letter-spacing: var(--tracking-wider); text-transform: uppercase; text-decoration: none;
+  padding: var(--space-4) var(--space-8); border-radius: var(--radius-pill);
+  border: 1px solid var(--border); color: var(--fg2);
+  transition: transform var(--dur-base) var(--ease-magnetic),
+              border-color var(--dur-base) var(--ease),
+              color var(--dur-base) var(--ease);
+}
+.hA-cta:hover { transform: translateY(-2px); border-color: var(--fg3); color: var(--fg1); }
+.hA-cta--primary {
+  background: var(--rose-gold); border-color: var(--rose-gold); color: var(--black);
+  box-shadow: var(--glow-rose);
+}
+.hA-cta--primary:hover { border-color: var(--rose-gold); color: var(--black); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hA-track { animation: none !important; transform: none !important; }
+  .hA-cta { transition: none !important; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   VARIANT B — TICKER-CLAMPED SPECIMEN
+   The marquee stops being a background and becomes architecture: two full-bleed rails with
+   hairline rules clamp the video top and bottom. The pillarbox is left empty and black — the
+   video reads as a specimen in a case. All the reading weight moves to an editorial caption
+   column underneath, where the affordance is text links, not a button.
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.hB {
+  --vw-cap: 84vw;
+  --vh-cap: 52vh;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  padding-block: var(--space-8) var(--space-20);
+}
+@media (min-width: 860px) { .hB { --vw-cap: 30vw; --vh-cap: 60vh; } }
+
+/* The background and the blend must NOT sit on the same element. If they do, the inverted
+   #000 field composites source-over onto that background INSIDE the blend group, and only the
+   finished group screens out — leaving a visible dark rectangle around every mark (observed,
+   fixed). Background goes on the rail (unblended, so the band reads as a real surface); the
+   blend goes on the track, whose backdrop is then that surface. The rail must not create a
+   stacking context or it would isolate the track — hence position:relative with no z-index. */
+.hB-rail {
+  position: relative;
+  overflow: hidden;
+  background: var(--smoke);
+  border-block: 1px solid var(--border);
+  padding-block: var(--space-3);
+  flex: 0 0 auto;
+}
+.hB-rail--bot { border-top: 0; }
+.hB-track {
+  display: flex; align-items: center; gap: var(--space-12);
+  width: max-content; padding-right: var(--space-12);
+  animation: hx-marq 46s linear infinite;
+  will-change: transform; opacity: .82;
+  mix-blend-mode: screen;
+}
+.hB-track--rev { animation-duration: 58s; animation-direction: reverse; }
+
+.hB-plate {
+  flex: 1 1 auto;
+  display: grid; place-items: center;
+  padding-block: var(--space-8);
+  background: var(--black);   /* deliberately empty pillarbox — no marks, no gradient */
+}
+.hB-video {
+  display: block;
+  aspect-ratio: 9 / 16;
+  width: min(var(--vw-cap), calc(var(--vh-cap) * 9 / 16));
+  height: auto;
+  object-fit: contain;
+  background: var(--black);
+  box-shadow: var(--depth-3);
+}
+
+.hB-caption {
+  width: min(100% - var(--space-8) * 2, 62rem);
+  margin: var(--space-16) auto 0;
+  display: grid; gap: var(--space-6);
+}
+@media (min-width: 900px) {
+  .hB-caption { grid-template-columns: 1.15fr .85fr; gap: var(--space-16); align-items: start; }
+}
+.hB-eyebrow {
+  font-family: var(--font-caps); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg3);
+  margin: 0 0 var(--space-4);
+}
+.hB-title {
+  font-family: var(--font-display); font-variation-settings: 'wdth' 125;
+  font-weight: 800; font-size: var(--text-3xl); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight); color: var(--fg1);
+  margin: 0 0 var(--space-4);
+}
+.hB-body {
+  font-family: var(--font-body); font-size: var(--text-base);
+  line-height: var(--leading-normal); color: var(--fg2); max-width: 46ch; margin: 0;
+}
+.hB-links { list-style: none; display: grid; gap: var(--space-2); margin: var(--space-6) 0 0; padding: 0; }
+.hB-links a {
+  display: inline-flex; align-items: baseline; gap: var(--space-3);
+  font-family: var(--font-accent); font-size: var(--text-xl);
+  letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  color: var(--fg1); text-decoration: none;
+  border-bottom: 1px solid transparent; width: max-content;
+  transition: border-color var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
+}
+.hB-links a:hover { border-bottom-color: var(--rose-gold); }
+.hB-links i {
+  font-style: normal; font-family: var(--font-ui); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); color: var(--fg3);
+}
+.hB-side { display: grid; gap: var(--space-6); align-content: start; }
+.hB-press-label,
+.hB-award-label {
+  font-family: var(--font-caps); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg3);
+  margin: 0 0 var(--space-3);
+}
+.hB-press { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; list-style: none; }
+.hB-press li a, .hB-press li span {
+  font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg3); text-decoration: none;
+}
+.hB-press li a:hover { color: var(--fg1); }
+/* Recognition beat — the one place black-rose-logo.webp belongs. It is a 3D crystal-star
+   trophy on a dark field, so it needs no invert; the rail's screen blend is not in play
+   here, so it sits on black as-shot. */
+.hB-award { display: flex; align-items: center; gap: var(--space-4); }
+.hB-award img { width: 76px; height: 76px; object-fit: contain; flex: 0 0 auto; }
+.hB-award strong {
+  display: block; font-family: var(--font-display); font-variation-settings: 'wdth' 125;
+  font-weight: 700; font-size: var(--text-lg); line-height: var(--leading-tight); color: var(--fg1);
+}
+.hB-award em { display: block; font-style: normal; font-family: var(--font-body); font-size: var(--text-xs); color: var(--fg3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hB-track { animation: none !important; transform: none !important; }
+  .hB-links a { transition: none !important; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   VARIANT C — MASTHEAD POSTER, MARQUEE IS THE NAV
+   Three layers instead of a stack: monumental Anton type at the back, overlapped and half
+   occluded by the video; the logo marquee crossing at mid-height between them; the video in
+   front. There is no CTA button — the marks in the marquee ARE the collection links, with a
+   static, touch-usable row of the four collection names underneath so the idea stays
+   judgeable (and usable) when the track is moving or paused.
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.hC {
+  --vw-cap: 66vw;
+  --vh-cap: 50vh;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--black);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  overflow: hidden;
+}
+@media (min-width: 860px) { .hC { --vw-cap: 26vw; --vh-cap: 62vh; } }
+
+.hC-poster { position: relative; display: grid; place-items: center; }
+
+/* LAYER 1 — the word, behind everything. */
+.hC-word {
+  position: absolute; inset-inline: 0; top: 50%; z-index: 0;
+  transform: translateY(-50%);
+  text-align: center; white-space: nowrap; pointer-events: none;
+  font-family: var(--font-accent); font-size: var(--text-dec-lg);
+  line-height: .8; letter-spacing: var(--tracking-tight); text-transform: uppercase;
+  color: var(--fg1); opacity: .13;
+  margin: 0;
+}
+.hC-word b { font-weight: inherit; color: var(--rose-gold); opacity: .9; }
+
+/* LAYER 2 — the marquee, crossing between word and video. Blend + opacity as elsewhere. */
+.hC-marquee {
+  position: absolute; inset-inline: 0; top: 52%; z-index: 1;
+  transform: translateY(-50%);
+  overflow: hidden; mix-blend-mode: screen;
+}
+.hC-track {
+  display: flex; align-items: center; gap: var(--space-12);
+  width: max-content; padding-right: var(--space-12);
+  animation: hx-marq 64s linear infinite;
+  will-change: transform; opacity: .82;
+}
+/* Continuously moving link targets are close to unusable on touch — pause on any hover or
+   keyboard focus inside the rail. The static row below is the real affordance. */
+.hC-marquee:hover .hC-track,
+.hC-marquee:focus-within .hC-track { animation-play-state: paused; }
+.hC-track a { display: block; border-radius: var(--radius-sm); }
+.hC-track a:focus-visible { outline: 2px solid var(--rose-gold); outline-offset: 6px; }
+
+/* LAYER 3 — the video, in front, unframed, so the word runs under its edges. */
+.hC-video {
+  position: relative; z-index: 2;
+  display: block;
+  aspect-ratio: 9 / 16;
+  width: min(var(--vw-cap), calc(var(--vh-cap) * 9 / 16));
+  height: auto;
+  object-fit: contain;
+  background: var(--black);
+  box-shadow: 0 0 90px 30px var(--black), var(--depth-4);
+}
+
+.hC-tag {
+  position: absolute; left: 50%; bottom: var(--space-6); z-index: 3;
+  transform: translateX(-50%);
+  font-family: var(--font-caps); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+  color: var(--fg3); white-space: nowrap; margin: 0;
+}
+
+.hC-nav {
+  position: relative; z-index: 3;
+  border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  background: var(--black);
+}
+@media (min-width: 720px) { .hC-nav { grid-template-columns: repeat(4, 1fr); } }
+.hC-nav a {
+  display: grid; place-items: center; gap: var(--space-1);
+  padding: var(--space-6) var(--space-3);
+  text-decoration: none; text-align: center;
+  border-inline-end: 1px solid var(--border);
+  transition: background var(--dur-base) var(--ease);
+}
+.hC-nav a:nth-child(2n) { border-inline-end: 0; }
+@media (min-width: 720px) {
+  .hC-nav a:nth-child(2n) { border-inline-end: 1px solid var(--border); }
+  .hC-nav a:last-child { border-inline-end: 0; }
+}
+.hC-nav a:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+@media (min-width: 720px) { .hC-nav a:nth-child(-n+2) { border-bottom: 0; } }
+.hC-nav a:hover { background: var(--card-hover); }
+.hC-nav b { font-weight: 400; font-size: var(--text-2xl); line-height: 1.1; color: var(--fg1); }
+.hC-nav .n-sig { font-family: var(--script-sig); }
+.hC-nav .n-br  { font-family: var(--script-br);  color: var(--silver); }
+.hC-nav .n-lh  { font-family: var(--script-lh);  color: var(--fg1); }
+/* Kids Capsule's mark is the mascot, and it is in the marquee above with the other three.
+   This row stays TYPE for all four: the other three appear here as their own scripts, not as
+   marks, so hanging an image on the KC cell alone would be the opposite of consistent. */
+.hC-nav .n-kc  { font-family: var(--script-kc);  color: var(--rose-gold); }
+.hC-nav i {
+  font-style: normal; font-family: var(--font-ui); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hC-track { animation: none !important; transform: none !important; }
+  .hC-nav a { transition: none !important; }
+}
+</style>
+
+
+<template data-variant="A" data-name="Logo field behind the monolith">
+<section class="hA" aria-label="SkyyRose Hero">
+
+  <!-- Decorative: the marks are atmosphere here, not navigation. -->
+  <div class="hA-field" aria-hidden="true">
+    <div class="hA-row hA-row--far">
+      <div class="hA-track">
+        <img class="hx-lg hx-inv"                src="assets/branding/skyyrose-monogram.webp"       style="--lg-h:82px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv hx-lg--wide"    src="assets/branding/black-rose-collection-text.webp" style="--lg-h:96px" alt="" decoding="async">
+        <img class="hx-lg"                       src="assets/branding/signature-logo.webp"          style="--lg-h:46px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv"                src="assets/branding/love-hurts-logo.webp"         style="--lg-h:86px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv"                src="assets/branding/skyyrose-rose-icon.webp"      style="--lg-h:78px"  alt="" decoding="async">
+        <span class="hx-kc" style="--kc-h:52px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+        <img class="hx-lg hx-inv"                src="assets/branding/skyyrose-monogram.webp"       style="--lg-h:82px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv hx-lg--wide"    src="assets/branding/black-rose-collection-text.webp" style="--lg-h:96px" alt="" decoding="async">
+        <img class="hx-lg"                       src="assets/branding/signature-logo.webp"          style="--lg-h:46px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv"                src="assets/branding/love-hurts-logo.webp"         style="--lg-h:86px"  alt="" decoding="async">
+        <img class="hx-lg hx-inv"                src="assets/branding/skyyrose-rose-icon.webp"      style="--lg-h:78px"  alt="" decoding="async">
+        <span class="hx-kc" style="--kc-h:52px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+      </div>
+    </div>
+    <div class="hA-row hA-row--near">
+      <div class="hA-track hA-track--rev">
+        <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"   style="--lg-h:46px" alt="" decoding="async">
+        <img class="hx-lg"                    src="assets/branding/signature-logo.webp"       style="--lg-h:28px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"      style="--lg-h:54px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp" style="--lg-h:30px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"    style="--lg-h:50px" alt="" decoding="async">
+        <span class="hx-kc" style="--kc-h:30px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+        <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"   style="--lg-h:46px" alt="" decoding="async">
+        <img class="hx-lg"                    src="assets/branding/signature-logo.webp"       style="--lg-h:28px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"      style="--lg-h:54px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp" style="--lg-h:30px" alt="" decoding="async">
+        <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"    style="--lg-h:50px" alt="" decoding="async">
+        <span class="hx-kc" style="--kc-h:30px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hA-scrim" aria-hidden="true"></div>
+
+  <div class="hA-stack">
+    <p class="hA-eyebrow">Oakland<span>&bull;</span>Est. 2020</p>
+
+    <div class="hA-screen">
+      <video class="hA-video"
+             src="assets/home-hero.webm"
+             poster="assets/home-hero-poster-720w.webp"
+             width="720" height="1280"
+             muted loop playsinline autoplay preload="auto"
+             aria-label="SkyyRose hero film"></video>
+    </div>
+
+    <h1 class="hA-tag">Luxury Grows<br>from Concrete.</h1>
+    <p class="hA-sub">Four collections, one name &mdash; built by a father, named after a daughter.</p>
+
+    <div class="hA-ctas">
+      <a class="hA-cta hA-cta--primary" href="#collections">Explore Collections</a>
+      <a class="hA-cta" href="#story">Our Story</a>
+    </div>
+  </div>
+</section>
+</template>
+
+
+<template data-variant="B" data-name="Ticker-clamped specimen">
+<section class="hB" aria-label="SkyyRose Hero">
+
+  <div class="hB-rail hB-rail--top" aria-hidden="true">
+    <div class="hB-track">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"        style="--lg-h:44px" alt="" decoding="async">
+      <img class="hx-lg"                    src="assets/branding/signature-logo.webp"           style="--lg-h:26px" alt="" decoding="async">
+      <img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:52px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"          style="--lg-h:48px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"       style="--lg-h:42px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp"    style="--lg-h:34px" alt="" decoding="async">
+      <span class="hx-kc" style="--kc-h:30px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"        style="--lg-h:44px" alt="" decoding="async">
+      <img class="hx-lg"                    src="assets/branding/signature-logo.webp"           style="--lg-h:26px" alt="" decoding="async">
+      <img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:52px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"          style="--lg-h:48px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"       style="--lg-h:42px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp"    style="--lg-h:34px" alt="" decoding="async">
+      <span class="hx-kc" style="--kc-h:30px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+    </div>
+  </div>
+
+  <div class="hB-plate">
+    <video class="hB-video"
+           src="assets/home-hero.webm"
+           poster="assets/home-hero-poster-720w.webp"
+           width="720" height="1280"
+           muted loop playsinline autoplay preload="auto"
+           aria-label="SkyyRose hero film"></video>
+  </div>
+
+  <div class="hB-rail hB-rail--bot" aria-hidden="true">
+    <div class="hB-track hB-track--rev">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"       style="--lg-h:40px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"          style="--lg-h:46px" alt="" decoding="async">
+      <img class="hx-lg"                    src="assets/branding/signature-logo.webp"           style="--lg-h:24px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"        style="--lg-h:42px" alt="" decoding="async">
+      <img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:48px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp"    style="--lg-h:32px" alt="" decoding="async">
+      <span class="hx-kc" style="--kc-h:28px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-rose-icon.webp"       style="--lg-h:40px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/love-hurts-logo.webp"          style="--lg-h:46px" alt="" decoding="async">
+      <img class="hx-lg"                    src="assets/branding/signature-logo.webp"           style="--lg-h:24px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/skyyrose-monogram.webp"        style="--lg-h:42px" alt="" decoding="async">
+      <img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:48px" alt="" decoding="async">
+      <img class="hx-lg hx-inv"             src="assets/branding/tsrc-lockup-static@2x.webp"    style="--lg-h:32px" alt="" decoding="async">
+      <span class="hx-kc" style="--kc-h:28px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span>
+    </div>
+  </div>
+
+  <div class="hB-caption">
+    <div>
+      <p class="hB-eyebrow">Oakland &mdash; Est. 2020</p>
+      <h1 class="hB-title">Luxury Grows from Concrete.</h1>
+      <p class="hB-body">Four collections, one name &mdash; built by a father, named after a daughter.
+        Small batch production. Individually numbered. When it&rsquo;s gone, it&rsquo;s gone.</p>
+
+      <ul class="hB-links">
+        <li><a href="#signature">Signature <i>Core Luxury</i></a></li>
+        <li><a href="#black-rose">Black Rose <i>Drop Focus</i></a></li>
+        <li><a href="#love-hurts">Love Hurts <i>Now Styling</i></a></li>
+        <li><a href="#kids-capsule">Kids Capsule <i>Born Into It</i></a></li>
+      </ul>
+    </div>
+
+    <div class="hB-side">
+      <div>
+        <p class="hB-press-label">As Featured In</p>
+        <ul class="hB-press">
+          <li><a href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" target="_blank" rel="noopener noreferrer">Maxim</a></li>
+          <li><a href="https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/" target="_blank" rel="noopener noreferrer">CEO Weekly</a></li>
+          <li><a href="https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/" target="_blank" rel="noopener noreferrer">San Francisco Post</a></li>
+          <li><a href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024" target="_blank" rel="noopener noreferrer">Best of Best Review</a></li>
+          <li><span>The Blox</span></li>
+        </ul>
+      </div>
+      <div>
+        <p class="hB-award-label">Recognition</p>
+        <div class="hB-award">
+          <img src="assets/branding/black-rose-logo.webp" alt="" decoding="async" loading="lazy">
+          <span>
+            <strong>Best Oakland Clothing Line 2024</strong>
+            <em>Best of Best Review</em>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</template>
+
+
+<template data-variant="C" data-name="Masthead poster — marquee is the nav">
+<section class="hC" aria-label="SkyyRose Hero">
+
+  <div class="hC-poster">
+    <!-- LAYER 1 — the word runs under the video's edges. -->
+    <p class="hC-word" aria-hidden="true">SKYY<b>ROSE</b></p>
+
+    <!-- LAYER 2 — these marks are the navigation, not decoration, so they are not
+         aria-hidden. The second pass exists only to make the loop seamless and is hidden
+         from AT and from the tab order. -->
+    <nav class="hC-marquee" aria-label="Collections">
+      <div class="hC-track">
+        <a href="#signature"  aria-label="Signature"><img class="hx-lg" src="assets/branding/signature-logo.webp" style="--lg-h:40px" alt="" decoding="async"></a>
+        <a href="#black-rose" aria-label="Black Rose"><img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:64px" alt="" decoding="async"></a>
+        <a href="#love-hurts" aria-label="Love Hurts"><img class="hx-lg hx-inv" src="assets/branding/love-hurts-logo.webp" style="--lg-h:64px" alt="" decoding="async"></a>
+        <!-- No aria-label here on purpose: the other three marks carry no text, so they need
+             one. This link's visible "Kids Capsule" IS its accessible name, which is the
+             better of the two — so the mascot is decorative and takes alt="". -->
+        <a href="#kids-capsule"><span class="hx-kc" style="--kc-h:40px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span></a>
+        <a href="#collections" aria-label="All collections"><img class="hx-lg hx-inv" src="assets/branding/skyyrose-monogram.webp" style="--lg-h:60px" alt="" decoding="async"></a>
+        <a href="#story" aria-label="Our story"><img class="hx-lg hx-inv" src="assets/branding/skyyrose-rose-icon.webp" style="--lg-h:56px" alt="" decoding="async"></a>
+
+        <span aria-hidden="true"><img class="hx-lg" src="assets/branding/signature-logo.webp" style="--lg-h:40px" alt="" decoding="async"></span>
+        <span aria-hidden="true"><img class="hx-lg hx-inv hx-lg--wide" src="assets/branding/black-rose-collection-text.webp" style="--lg-h:64px" alt="" decoding="async"></span>
+        <span aria-hidden="true"><img class="hx-lg hx-inv" src="assets/branding/love-hurts-logo.webp" style="--lg-h:64px" alt="" decoding="async"></span>
+        <span aria-hidden="true"><span class="hx-kc" style="--kc-h:40px"><img src="assets/branding/skyy-mascot.webp" alt="" decoding="async"><span class="hx-kc-name">Kids Capsule</span></span></span>
+        <span aria-hidden="true"><img class="hx-lg hx-inv" src="assets/branding/skyyrose-monogram.webp" style="--lg-h:60px" alt="" decoding="async"></span>
+        <span aria-hidden="true"><img class="hx-lg hx-inv" src="assets/branding/skyyrose-rose-icon.webp" style="--lg-h:56px" alt="" decoding="async"></span>
+      </div>
+    </nav>
+
+    <!-- LAYER 3 — video in front, unframed. -->
+    <video class="hC-video"
+           src="assets/home-hero.webm"
+           poster="assets/home-hero-poster-720w.webp"
+           width="720" height="1280"
+           muted loop playsinline autoplay preload="auto"
+           aria-label="SkyyRose hero film"></video>
+
+    <p class="hC-tag">Luxury Grows from Concrete.</p>
+  </div>
+
+  <!-- The static, touch-usable form of the same navigation. All four are set in their own
+       script here — the marks live in the marquee above, this row is the type version of it,
+       so Kids Capsule stays in Grand Hotel (--script-kc) alongside the other three. -->
+  <div class="hC-nav">
+    <a href="#signature"><b class="n-sig">Signature</b><i>Core Luxury</i></a>
+    <a href="#black-rose"><b class="n-br">Black Rose</b><i>Drop Focus</i></a>
+    <a href="#love-hurts"><b class="n-lh">Love Hurts</b><i>Now Styling</i></a>
+    <a href="#kids-capsule"><b class="n-kc">Kids Capsule</b><i>Born Into It</i></a>
+  </div>
+</section>
+</template>
