@@ -5416,5 +5416,22 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-29T23:30:00-07:00"
+  },
+  {
+    "id": "bug-315",
+    "timestamp": "2026-07-29T18:09:00-07:00",
+    "error_message": "Post-deploy structural verification FAILed homepage 10/13 (main#primary.homepage-v2, section#hero, div#loader all missing) on a clean v1.13.3 deploy",
+    "file": "scripts/verify_live_structure.py:290-306",
+    "root_cause": "HOMEPAGE_ASSERTIONS still targeted the pre-rebuild v2 template markup (homepage-v2 class, #hero id, #loader id). The homepage was rebuilt to v3 earlier this session (front-page.php, 8-act template-parts/home/*) which renders main.homepage-v3 and section.hp-hero, and intentionally cut the simulated loader entirely (see front-page.php:17 comment) -- the check script was never updated to match.",
+    "fix": "Updated HOMEPAGE_ASSERTIONS in verify_live_structure.py: homepage-v2 -> homepage-v3, section#hero -> section.hp-hero, removed the div#loader assertion (no v3 replacement, cut by design). Re-ran against production: 12/12 assertions PASS.",
+    "tags": [
+      "deploy-verification",
+      "stale-assertion",
+      "homepage-v3",
+      "false-positive"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T18:09:00-07:00"
   }
 ]

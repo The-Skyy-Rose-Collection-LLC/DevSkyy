@@ -289,10 +289,9 @@ def immersive_assertions(name: str) -> tuple[Assertion, ...]:
 
 HOMEPAGE_ASSERTIONS: tuple[Assertion, ...] = (
     Assertion("body.home", 1, "<body class='home'> (WP routed to front page)"),
-    _main_assertion("homepage-v2", "front-page.php template ran"),
+    _main_assertion("homepage-v3", "front-page.php template ran"),
     Assertion("header#masthead", 1, "<header id='masthead'> (standard site header rendered)"),
-    Assertion("section#hero", 1, "<section id='hero'> (hero section emitted)"),
-    Assertion("div#loader", 1, "<div id='loader'> (front-page.php loader element)"),
+    Assertion("section.hp-hero", 1, "<section class='hp-hero'> (hero section emitted)"),
     THEME_CSS_ASSERTION,
     Assertion("meta[name='generator']", 1, "<meta name='generator'> (WordPress emitted)"),
     # CURS-01/CURS-03: luxury cursor JS must be present on front-page (global enqueue confirmed).
