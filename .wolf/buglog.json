@@ -5475,6 +5475,6 @@
     "related_bugs": [],
     "occurrences": 1,
     "last_seen": "2026-07-29T18:45:00-07:00",
-    "note": "Version triple bumped to 1.13.4 (functions.php/style.css/readme.txt) so this ships cache-visible. Live re-verification (deploy + re-run Lighthouse) still pending founder go-ahead -- expect it to confirm zero real-user LCP impact (already shown via live PerformanceObserver) and possibly zero change to the Lighthouse number itself, since this commit does not address the poster-registration root cause."
+    "note": "CONFIRMED via live re-verification post-deploy (v1.13.4): performance 63->64, LCP 21.6s->21.3s -- both noise-level, unchanged. Same LCP element (mascot img), same 0x0 bounding rect at report time. The aspect-ratio fix is confirmed hardening only, exactly as predicted -- it did NOT move the Lighthouse number, because the recorded symptom is a poster-registration timing issue under headless Chrome, not an image-size issue. Real users remain confirmed unaffected (live PerformanceObserver, 2 separate runs, correct ~2.5s LCP on the hero poster). Root cause of the headless poster-registration failure is STILL OPEN -- would require Lighthouse/headless-Chrome video-decode-specific investigation to pursue further. Not chased without explicit direction, since it has zero real-user impact."
   }
 ]
