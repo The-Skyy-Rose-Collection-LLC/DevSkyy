@@ -1,6 +1,6 @@
 ---
 name: redis-patterns
-description: Redis data structure patterns, caching strategies, distributed locks, rate limiting, pub/sub, and connection management for production applications.
+description: Redis data structure patterns, caching strategies, distributed locks, rate limiting, pub/sub, and connection management for production applications. Use when adding or debugging caching, a distributed lock, a rate limiter, session/token storage, or a Streams/Pub-Sub flow against the devskyy Redis. Do NOT use for durable relational data or transactional integrity (postgres-patterns — Redis is not a system of record), for schema/versioned state (database-migrations), or for the container's health/networking (docker-patterns).
 origin: ECC
 ---
 
@@ -14,7 +14,7 @@ Redis is an in-memory data structure store that supports strings, hashes, lists,
 
 All primary examples use `redis.asyncio` — the async-native client bundled with redis-py ≥ 4.2. Use it for any FastAPI / asyncio application. A short sync note is included at the end of Connection Management for scripts and CLI utilities.
 
-## When to Activate
+## When to use
 
 - Adding caching to an application
 - Implementing rate limiting or throttling
@@ -22,6 +22,136 @@ All primary examples use `redis.asyncio` — the async-native client bundled wit
 - Setting up session or token storage
 - Using Pub/Sub or Redis Streams for messaging
 - Configuring Redis in production (pooling, eviction, clustering)
+
+**When NOT to use:**
+
+- Data that must survive a flush or a node loss → Postgres. Redis here runs `maxmemory-policy
+  noeviction` with `maxmemory 0` (verified below): unbounded, and nothing evicts to make room.
+- Schema/versioned state → `database-migrations`. Relational modelling and indexes →
+  `postgres-patterns`.
+- "Redis container won't start / can't connect from the app" → `docker-patterns` first; this skill
+  assumes a reachable, authenticated client.
+- Any `FLUSHALL`/`FLUSHDB` against a shared instance — irreversible, STOP-AND-SHOW.
+
+## Inputs
+
+**Absent input = STOP. A cache key written to the wrong instance is invisible until it corrupts something.**
+
+1. **A reachable, authenticated client.** This instance requires auth: a bare `redis-cli ping`
+   returns `NOAUTH Authentication required.` (observed 2026-07-28 `[repro]`). Use
+   `REDISCLI_AUTH="$REDIS_PASSWORD"` (env, not argv). No password → stop; do not disable auth.
+2. **The target instance and DB index.** Cache, queue, and rate-limit state should not share a
+   logical DB by accident. Confirm with `INFO server` / `dbsize` before writing.
+3. **A TTL decision for every key you create.** There is no eviction fallback here (see the
+   `maxmemory-policy` check) — a key without a TTL is a permanent memory leak. If the TTL is
+   genuinely unbounded, that key belongs in Postgres.
+4. **For any lock: an owner token and a TTL that exceeds the worst-case job duration.** A lock
+   released by a different holder is a correctness bug, which is why release must be the
+   compare-and-delete Lua script, never a bare `DEL`.
+
+## Procedure
+
+1. Confirm connectivity and identity (Verification check 1) before writing any code.
+2. Pick the structure from the cheat sheet by access pattern, then design the key name
+   (`namespace:resource:id`) and its TTL together — never the key alone.
+3. Implement with `redis.asyncio` (the sync client blocks the FastAPI event loop) and a module-level
+   pool created once at startup; wire teardown through the lifespan handler.
+4. Make every multi-step sequence atomic: pipeline with `transaction=True` for grouped writes, or a
+   Lua script when a read must gate a write (sliding-window limiter, lock release).
+5. Set the TTL in the same call that writes the value (`setex`, or `hset` + `expire` inside one
+   pipeline) — a crash between write and expire is exactly how untracked keys are born.
+6. Verify TTL coverage and lock semantics against the real instance (Verification checks 2-3).
+7. On failure paths, confirm the app degrades to the source of truth rather than serving stale or
+   erroring: a cache outage must not be an application outage.
+
+## Verification
+
+Each check names its command and pass condition. A command that returns an auth error or connects
+to the wrong instance is a dead gate, not a pass (bug-230). Results below are `[repro]` against the
+local dev container — they are not claims about any production Redis.
+
+```bash
+docker exec devskyy-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ping; \
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli dbsize; \
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli info memory | grep -E "used_memory_human|maxmemory_human"'
+```
+**PASS:** `PONG`, plus a `dbsize` and memory figure you can compare against later. Observed
+2026-07-28: `PONG`, `dbsize 0`, `used_memory_human:1.23M`, `maxmemory_human:0B` `[repro]`.
+`maxmemory 0` = no cap, so TTLs are the *only* thing bounding memory on this instance.
+
+```bash
+docker exec devskyy-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli config get maxmemory-policy'
+```
+**PASS:** you have read the value and your key design matches it. Observed 2026-07-28:
+`noeviction` `[repro]` — under a memory cap this instance would **error on writes** rather than
+evict, so "the cache will just evict old keys" is false here. Any pattern in this skill that
+assumes `allkeys-lru` must be adjusted or the policy changed deliberately.
+
+```bash
+docker exec devskyy-redis sh -c '
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli set lock:demo tok-1 PX 5000 NX
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli set lock:demo tok-2 PX 5000 NX
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli pttl lock:demo
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli del lock:demo'
+```
+**PASS:** first `SET` returns `OK`, the second returns **empty** (nil — contended, correctly
+refused), `pttl` is a positive number ≤ 5000, and `del` returns `1`. Observed 2026-07-28:
+`OK`, ``(empty)``, `4985`, `1` `[repro]`. If the second `SET` also returns `OK`, `NX` is not being
+applied and your lock grants concurrent holders.
+
+```bash
+docker exec devskyy-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --scan --count 1000 \
+  | while read -r k; do t=$(REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ttl "$k"); \
+    [ "$t" = "-1" ] && echo "NO-TTL $k"; done'
+```
+**PASS:** no `NO-TTL` lines. Every key that is not a deliberate, documented long-lived structure must
+carry a TTL — with `noeviction` and no `maxmemory`, a TTL-less key never leaves. `[repro]`
+
+Prove the lock check can fail (rule 3): drop the `NX` flag from the second `SET` and re-run — it
+must return `OK`, showing the check distinguishes "lock held" from "lock free" — then restore it.
+
+Attribute before claiming a leak is yours (rule 4): snapshot `dbsize` and the TTL-less key list
+before and after your change, and compare against the pristine tree's code via
+`git archive HEAD core/ | tar -x -C <scratch>`. Never `git stash` — the stack is shared across
+worktrees.
+
+## Worked example
+
+Real session against the dev container, 2026-07-28:
+
+```bash
+docker exec devskyy-redis redis-cli ping
+docker exec devskyy-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ping'
+docker exec devskyy-redis sh -c '
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli set lock:skill-demo:wp-ops tok-1 PX 5000 NX
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli set lock:skill-demo:wp-ops tok-2 PX 5000 NX
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli pttl lock:skill-demo:wp-ops
+  REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli del lock:skill-demo:wp-ops'
+```
+
+Observed `[repro]`:
+
+```
+NOAUTH Authentication required.
+PONG
+OK
+
+4985
+1
+```
+
+Three facts fall out. The first line is auth *working* — an agent that reads `NOAUTH` as "Redis is
+down" will go fix a container that is healthy. The blank line after `OK` is the second `SET NX`
+returning nil: the lock was already held, so acquisition was correctly refused — that empty line is
+the entire safety property, and a harness that only checks "did the command run" would miss it.
+`pttl 4985` confirms the 5000ms expiry is armed, which is what stops a crashed holder from wedging
+the resource forever.
+
+Paired with `maxmemory-policy noeviction` and `maxmemory 0B` on this instance, the operative rule
+for any new key here is the TTL: nothing evicts, nothing is capped, so
+`core/redis_cache.py:191`'s `await self._client.setex(key, ttl, json.dumps(response))` — TTL passed
+in the same call as the value, defaulting from `LLM_CACHE_TTL` at `core/redis_cache.py:60` `[repo]`
+— is the pattern to copy, not a bare `set` followed by a hopeful `expire`.
 
 ## Data Structure Cheat Sheet
 

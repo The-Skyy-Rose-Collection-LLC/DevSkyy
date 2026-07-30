@@ -1,6 +1,6 @@
 ---
 name: database-migrations
-description: Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments across PostgreSQL, MySQL, and common ORMs (Prisma, Drizzle, Kysely, Django, TypeORM, golang-migrate).
+description: Safe schema and data migrations — expand/contract, concurrent indexes, batched backfills, rollback strategy — across PostgreSQL/MySQL and Alembic (this repo's canonical tool), Prisma, Drizzle, Kysely, Django, golang-migrate. Use when a model/table/column/index changes, a backfill is needed, or migration tooling is being set up or repaired. Do NOT use for query tuning and index *selection* on an unchanged schema (that is postgres-patterns), for Redis key/TTL design (redis-patterns), or for bringing the DB container up (docker-patterns).
 origin: ECC
 ---
 
@@ -8,13 +8,169 @@ origin: ECC
 
 Safe, reversible database schema changes for production systems.
 
-## When to Activate
+## When to use
 
 - Creating or altering database tables
 - Adding/removing columns or indexes
 - Running data migrations (backfill, transform)
 - Planning zero-downtime schema changes
 - Setting up migration tooling for a new project
+
+**When NOT to use:**
+
+- The schema is fine and a query is slow → `postgres-patterns` (EXPLAIN, index choice, RLS).
+- Cache/session/rate-limit storage → `redis-patterns`; Redis has no migrations, only key contracts.
+- The database will not start / compose won't parse → `docker-patterns` first; you cannot migrate
+  a DB you cannot reach.
+- WooCommerce/WordPress product data on skyyrose.co — that lives in the WP MySQL DB behind the WC
+  REST API and is **not** managed by this repo's Alembic tree. Never point an Alembic revision at it.
+
+## Inputs
+
+**Absent input = STOP. A migration authored against an unknown current schema is a guess that runs
+DDL on real data.**
+
+1. **`DATABASE_URL`** for the target environment. `alembic/env.py:22` overrides `sqlalchemy.url`
+   from this env var (loaded via `dotenv`) `[repo]`; `alembic.ini` ships it blank so secrets never
+   enter version control. Unset → Alembic falls back to the empty ini value and fails; do not
+   hardcode a URL to get moving.
+2. **The current head, read from the database, not from memory** — `alembic current` (online) or
+   `alembic heads` (tree only). If the two disagree, the environment is behind or diverged; resolve
+   before authoring.
+3. **A models import that reaches ALL models** — autogenerate diffs `Base.metadata` against the DB.
+   A lazily-imported model is invisible, and autogenerate will happily emit a DROP for a table it
+   simply did not see.
+4. **Row-count expectations for any backfill.** "Works on 100 rows" is not evidence for 10M; a
+   backfill without a batch size is an outage waiting for its turn.
+5. **Explicit approval before running against production.** Applying a migration to a real database
+   is irreversible-data territory — STOP-AND-SHOW with the exact revision id and target host.
+
+## Procedure
+
+Project rule for this repo: **model change + Alembic revision ship in the SAME commit.** Never
+alter a production database by hand; never edit a revision that has already been applied anywhere.
+
+1. Read the current state: `alembic current` (needs DB) and `alembic heads` (offline, tree only).
+2. Change the SQLAlchemy model.
+3. Generate: `alembic revision --autogenerate -m "<what changed>"`.
+4. **Read the generated file before applying.** Autogenerate misses `CONCURRENTLY`, triggers,
+   views, check constraints, and all data migrations — see "Autogenerate — What It Catches".
+5. Split DDL from DML: schema change in one revision, backfill in the next, batched.
+6. Dry-run the SQL without touching any database: `alembic upgrade head --sql` (Verification
+   check 1).
+7. Apply to dev: `alembic upgrade head`; confirm `alembic current` advanced (check 2).
+8. Prove reversibility: `alembic downgrade -1` then `alembic upgrade head` (check 3). A revision
+   whose `downgrade()` was never executed is an untested rollback plan.
+9. For production: expand → migrate → contract, one deploy per phase (see Zero-Downtime section).
+
+## Verification
+
+Static reading of a revision file proves nothing about what it will do — these checks execute it.
+An `alembic` command that aborted mid-run leaves the DB in a partially-migrated state: its error
+output is an artifact, not a verdict (bug-230). Re-read `alembic current` before concluding
+anything. Nothing here should ever run against production without explicit approval.
+
+```bash
+DATABASE_URL="postgresql://offline:offline@localhost/offline" alembic upgrade head --sql | head -20
+```
+**PASS:** exits 0 and emits the DDL you expect, wrapped in `BEGIN;`. This never connects, so it is
+safe anywhere — and it catches "the revision doesn't even compile" before any real database sees
+it. Observed 2026-07-28 from the repo root `[repro]`:
+`INFO [alembic.runtime.migration] Generating static SQL` … `BEGIN;` … `CREATE TABLE alembic_version (…)`.
+
+```bash
+alembic heads && alembic current
+```
+**PASS:** exactly ONE head (multiple heads = a diverged tree, resolve with `alembic merge heads`
+before doing anything else), and after an upgrade `alembic current` equals that head. Observed
+2026-07-28: `003 (head)` with history `<base> -> 001 -> 002 -> 003` `[repro]`.
+
+```bash
+alembic upgrade head && alembic downgrade -1 && alembic upgrade head && alembic current
+```
+**PASS:** all four steps exit 0 and `current` returns to the head. This is the only evidence that
+`downgrade()` actually works — an unexecuted downgrade is a comment, not a rollback plan. Run it in
+dev, never in production. `[repro]`
+
+```bash
+docker exec devskyy-postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc \
+  "SELECT count(*) FROM information_schema.columns WHERE table_name='"'"'<table>'"'"' AND column_name='"'"'<new_col>'"'"';"'
+```
+**PASS:** returns `1` for a column you added (`0` for one you dropped). Asserting the *database*
+changed, not that a file exists, is the difference between `[repo]` and `[repro]` evidence.
+
+Prove the checks can fail (rule 3): once, point check 4 at a column name that does not exist and
+confirm it returns `0`. A schema assertion that returns success for a column you never added is
+checking nothing.
+
+Attribute before claiming (rule 4): to tell your migration's effect from pre-existing drift, run
+the same assertions against a pristine tree extracted with
+`git archive HEAD alembic | tar -x -C <scratch>` — **never `git stash`**, the stack is shared
+across worktrees.
+
+## Worked example
+
+Real invocation in this repo, 2026-07-28:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon
+/Users/theceo/DevSkyy/.venv/bin/alembic heads
+/Users/theceo/DevSkyy/.venv/bin/alembic history | head -3
+DATABASE_URL="postgresql://offline:offline@localhost/offline" \
+  /Users/theceo/DevSkyy/.venv/bin/alembic upgrade head --sql | head -8
+```
+
+Observed `[repro]`:
+
+```
+003 (head)
+
+002 -> 003 (head), Add analytics tables for US-001: Analytics Database Schema.
+001 -> 002, Add brand assets tables for US-013.
+<base> -> 001, baseline schema
+
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Generating static SQL
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+BEGIN;
+
+CREATE TABLE alembic_version (
+    version_num VARCHAR(32) NOT NULL,
+    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+```
+
+Three things this proves, and one it deliberately does not. It proves the tree is linear with a
+single head (`003`), that all three revisions in `alembic/versions/` compile and render, and that
+the offline `--sql` path works without a database — so the whole check runs safely in CI. What it
+does **not** prove is that production is at `003`: `--sql` and `heads` are both `[repo]`-scope
+evidence about files. Claiming "prod is migrated" requires `alembic current` against the real
+`DATABASE_URL` (`[repro]`/`[live]`). Reporting file state as deployment state is exactly the scope
+jump bug-287 exists to prevent.
+
+Checking the database separately is what makes that concrete. Same session:
+
+```bash
+docker exec devskyy-postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT version_num FROM alembic_version;"'
+docker exec devskyy-postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='"'"'public'"'"';"'
+```
+
+Observed `[repro]`:
+
+```
+ERROR:  relation "alembic_version" does not exist
+7
+```
+
+That is a real drift finding, invisible to every file-side check: the running dev database holds 7
+public tables but has **no `alembic_version` table**, so it was provisioned by something other than
+Alembic (`create_all` or a seed script) and Alembic has no record of it. Consequences to respect
+before writing anything: `alembic current` returns nothing to compare against `003`,
+`alembic upgrade head` would attempt to create tables that already exist and fail, and
+`--autogenerate` run against this database would diff `Base.metadata` against an unmanaged schema
+and bake the drift into a revision file. Reconcile deliberately — verify the live schema matches
+`001` and `alembic stamp` it, or rebuild the dev DB from migrations — rather than generating a
+revision on top of an unknown base. (Also note the interpreter: this worktree has no `.venv`; the
+Python environment lives at `/Users/theceo/DevSkyy/.venv`.)
 
 ## Core Principles
 

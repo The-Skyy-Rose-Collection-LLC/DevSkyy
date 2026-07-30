@@ -3,9 +3,11 @@ name: frontend-design
 description: >
   Build production-grade frontends grounded in the user's existing codebase, framework, and design system.
   Read first, design second. Defaults: accessible (WCAG 2.2 AA), performant (Core Web Vitals budgeted),
-  responsive (mobile-first). Picks aesthetic register from product context (calm-editorial /
-  dense-utility / expressive-brand) rather than impulse. Includes the Claude calm-editorial design
-  vocabulary as one register among many, not as the default. Replaces the upstream frontend-design
+  responsive (mobile-first). Use when building or restyling a page, view, component, or layout in a real
+  codebase and the aesthetic register still has to be chosen — picks calm-editorial / dense-utility /
+  expressive-brand from product context rather than impulse. Do NOT use for SkyyRose brand-canon taste
+  calls (use luxury-design-taste — its tokens and fonts are locked and override every default here),
+  and do NOT use for native iOS surfaces (use liquid-glass-design). Replaces the upstream frontend-design
   skill with codebase-aware behavior, production triad defaults, and an anti-fingerprint protocol.
 version: 2.0.0
 upstream: claude-plugins-official/frontend-design @ 5c392562 (May 2026)
@@ -28,6 +30,27 @@ This v2 inverts the priority:
 5. **Claude design vocabulary is one register among many.** Use it when the product context calls for calm-editorial — never as a global default.
 
 ---
+
+## When to use
+
+- A page, view, component, or layout is being built or restyled inside a real codebase.
+- Existing UI works but reads flat, generic, or mismatched to its audience, and the aesthetic register needs deciding.
+- A frontend PR needs grading against the production triad (accessibility, Core Web Vitals, responsive).
+- Another skill produced markup/CSS and it must be grounded in the project's actual tokens and framework before shipping.
+
+**When NOT to use:** SkyyRose brand-canon judgments — `luxury-design-taste` owns those and its locked tokens/fonts override Section 2 entirely. Native iOS/SwiftUI → `liquid-glass-design`. Pure design-direction interviewing before any code → `frontend-design-direction`. Token-system generation or a drift audit → `design-system`. 3D/immersive scene architecture → `immersive-interactive-architect`.
+
+## Inputs
+
+Gather these before the first aesthetic decision. **Any absent input is a stop, not a default.**
+
+| Input | Where | If absent |
+|---|---|---|
+| Design tokens | `theme.json`, `tokens.css`, `design-tokens.css`, `tailwind.config.*` | Run the token census (Verification #1). Empty result → say "no tokens at <paths checked>, designing fresh" **in writing**; never assume greenfield silently |
+| Framework + version | `package.json`, `next.config.*`, `vite.config.*` | Stop — reading version decides which APIs are legal; guessing ships code that will not build |
+| Project overrides | `CLAUDE.md`, `.impeccable.md`, `BRAND.md`, `STYLEGUIDE.md`, `wordpress-theme/skyyrose-flagship/CLAUDE.md` | Stop and read. Section 6 makes these outrank this skill; proceeding without them is how a parallel design system gets shipped |
+| Target contrast + CWV budget | project docs, else WCAG 2.2 AA and the Section 1 budgets | Default and state that you defaulted |
+| A representative existing page in the same product area | the repo | Stop — voice, density, and motion style are read from a real page, not inferred |
 
 ## 0. The hard rule — read before you design
 
@@ -335,6 +358,99 @@ Before declaring frontend work done:
 - [ ] No console errors or warnings in browser devtools.
 
 ---
+
+## Procedure
+
+1. Run the token census (Verification #1) and read the framework versions. Write both down before choosing anything.
+2. Read the project overrides listed in Section 6. If one exists, its rules replace the corresponding defaults here — say which ones, explicitly.
+3. Pick one aesthetic register from Section 2 and justify it from product context in one line. Mixed registers read as incoherence.
+4. Run the anti-fingerprint protocol (Section 3) in full — name the default, reject it, source the alternative, justify in one line.
+5. Implement against the existing tokens and component vocabulary. Every new token added gets a written justification.
+6. Walk the Section 7 pre-ship checklist item by item; each unchecked box is a blocker, not a nit.
+7. Run every Verification check below and report the outputs, not the intent. On WordPress theme CSS/JS, `npm run build` is mandatory before any claim about what production serves.
+
+## Verification
+
+Each check names the command, the pass condition, and its evidence scope. Design taste is not gradeable by command — the production triad is, and that is what these checks bind.
+
+1. **Token census** — decides extend-vs-greenfield, and makes "no tokens exist" falsifiable:
+
+```bash
+ls frontend/tailwind.config.ts frontend/app/globals.css \
+   wordpress-theme/skyyrose-flagship/theme.json 2>/dev/null
+```
+
+   **PASS (extend mode):** at least one path listed → read it and extend; a parallel system is a defect.
+   **PASS (greenfield):** prints nothing, and you state the checked paths in writing. `[repo]`
+
+2. **Contrast floor**, computed for every text/background pair you introduce:
+
+```bash
+python3 -c "
+def lum(h):
+    r,g,b=[int(h[i:i+2],16)/255 for i in (0,2,4)]
+    f=lambda c: c/12.92 if c<=0.03928 else ((c+0.055)/1.055)**2.4
+    r,g,b=f(r),f(g),f(b); return 0.2126*r+0.7152*g+0.0722*b
+for fg,bg in [('B76E79','0A0A0A')]:
+    l1,l2=sorted((lum(fg),lum(bg)),reverse=True)
+    print(fg,bg,f'{(l1+0.05)/(l2+0.05):.2f}:1')
+"
+```
+
+   **PASS:** normal text ≥ 4.5:1, large text and UI components ≥ 3:1. `[repro]`
+   (Observed 2026-07-28: `#B76E79` on `#0A0A0A` → `5.20:1` — clears AA for body text.)
+
+3. **Section 4 anti-pattern grep** — the aged-into-slop list has exact CSS signatures, so read them with a command, not with your eyes:
+
+```bash
+grep -rnE 'background-clip:\s*text|backdrop-filter:\s*blur|feTurbulence|cursor:\s*url\(' \
+  wordpress-theme/skyyrose-flagship/assets/css/*.css frontend/app/globals.css 2>/dev/null \
+  | grep -v '.min.css' | head
+```
+
+   **PASS:** zero hits, or each hit justified in writing at its `file:line`. `[repo]`
+
+4. **Build + type-check** — the project's own gate, whichever applies:
+
+```bash
+cd wordpress-theme && npm run build          # theme CSS/JS: production serves .min
+cd frontend && npm run build                 # dashboard
+```
+
+   **PASS:** exits 0. For the theme, follow with `bash skyyrose-flagship/scripts/verify-theme.sh --only min-sync` — **PASS:** every `.min` byte-identical to a fresh build. `[test]`
+
+5. **Rendered proof at 390px and desktop, plus an axe pass** — these are BROWSER aspects (`verify-theme.sh --list` labels `responsive`, `a11y-interactive`, and `cwv` as BROWSER). This skill cannot execute them headlessly. **A SKIP is not a PASS:** name the caller or the browser-capable session that closes them, and never assert a live severity without that `[live]` probe.
+
+Inherited: a check that errors or times out yields an artifact, not a pass — re-run by hand (bug-230). Before attributing a grep or build failure to your change, run the same gate against a pristine tree — `git archive HEAD <path> | tar -x -C <scratch>` — and diff the *contents*, because a new violation hides as one more line inside an already-red check. **Never `git stash`**: the stash stack is shared across worktrees.
+
+## Worked example
+
+Real invocation in this repo, 2026-07-28 — deciding extend-vs-greenfield for the DevSkyy dashboard:
+
+```bash
+$ ls frontend/tailwind.config.ts frontend/app/globals.css
+frontend/app/globals.css
+frontend/tailwind.config.ts
+
+$ grep -nE "colors|#[0-9a-fA-F]{6}|fontFamily" frontend/tailwind.config.ts | head -6
+12:  		fontFamily: {
+17:  		colors: {
+19:  				'rose-gold': '#B76E79',
+20:  				'rose-dark': '#8B5465',
+21:  				'rose-light': '#D4A5B0',
+22:  				charcoal: '#1A1A1A',
+```
+
+Outcome: **extend mode** — a Tailwind token layer already carries the brand rose-gold ramp, so Section 5's decision tree routes to "extend `tailwind.config`; never ship the default slate palette" `[repo]`. Framework read from `frontend/package.json`: `next ^16`, `react ^19.2.3` `[repo]` — App Router and RSC are available, so static sections are server components by default. The contrast probe returned `#B76E79` on `#0A0A0A` → `5.20:1` `[repro]`, clearing AA for body text on the dark surface.
+
+## Failure modes
+
+- **Shipping a parallel design system.** The failure this skill exists to prevent: tokens existed, nobody looked, two systems now fight. Verification #1 makes it falsifiable — run it first.
+- **Silent greenfield.** Concluding "no design system" without naming the paths checked. That is a fail-open default (bug-230, ×6): absent input must stop you, or at minimum be stated out loud.
+- **Register mixing.** Calm-editorial hero over a dense-utility table. Pick one register per product and commit.
+- **Anti-fingerprint theatre.** Naming the default then picking its nearest neighbour (Inter → Space Grotesk). Section 4 lists that specific dodge as slop; source from Step 3's non-default places.
+- **Claiming production behavior from repo state.** A committed CSS change is `[repo]`; what skyyrose.co serves is `[live]` and requires `curl -s "URL?cb=$(date +%s)"` — **never WebFetch**, which strips `<script>`, and never an uncached curl, because Batcache serves stale (bug-287).
+- **Editing theme CSS without rebuilding `.min`.** Production serves the minified bundle; a source-only edit ships nothing while every local check stays green.
 
 ## Notes on this skill
 

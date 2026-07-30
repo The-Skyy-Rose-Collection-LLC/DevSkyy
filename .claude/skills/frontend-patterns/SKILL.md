@@ -1,6 +1,6 @@
 ---
 name: frontend-patterns
-description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
+description: React/Next.js structural patterns — component composition, custom hooks, state layering, data fetching, memoization, virtualization, forms, and error boundaries — as practised in the devskyy dashboard at frontend/. Use when building or reviewing a component, hook, API route, or state container under frontend/ (Next.js 16 + React 19). Do NOT use for the WordPress theme (no React — that is skyyrose-wp-platform / css-cascade-discipline), and do NOT use for animation specifics (motion-ui) or accessibility semantics (frontend-a11y).
 origin: ECC
 ---
 
@@ -8,15 +8,44 @@ origin: ECC
 
 Modern frontend patterns for React, Next.js, and performant user interfaces.
 
-## When to Activate
+## When to use
 
-- Building React components (composition, props, rendering)
-- Managing state (useState, useReducer, Zustand, Context)
-- Implementing data fetching (SWR, React Query, server components)
-- Optimizing performance (memoization, virtualization, code splitting)
-- Working with forms (validation, controlled inputs, Zod schemas)
-- Handling client-side routing and navigation
-- Building accessible, responsive UI patterns
+**Observable events:**
+
+- You are adding or editing a component, hook, or context under `frontend/app/`, `frontend/components/`, or `frontend/lib/`.
+- You are adding an API route under `frontend/app/api/**/route.ts` — the auth-coverage gate will reject it unwrapped (see Verification check 3).
+- A dashboard list renders hundreds of rows and scrolling stutters (virtualization).
+- A component re-renders on every parent update (memoization).
+- You are choosing where a piece of state lives — server cache, persistent store, or session.
+
+**When NOT to use:**
+
+- **`wordpress-theme/skyyrose-flagship/`** — PHP templates and vanilla JS. There is no React, no hooks, no bundler-scoped CSS. Use `skyyrose-wp-platform` for the theme and `css-cascade-discipline` for its styles.
+- **Animation behaviour** — `AnimatePresence`, tokens, reduced motion: `motion-ui`.
+- **Accessibility semantics** — labels, ARIA, focus order: `frontend-a11y`.
+- **Trivial single-line edits** where the pattern is already established in the file. Match the file, do not restructure it.
+
+## Inputs
+
+| Required before starting | How to confirm | If absent |
+|---|---|---|
+| `frontend/node_modules` installed | `ls -d frontend/node_modules` | **STOP.** Run `npm install` — **npm, never pnpm** (`ERR_INVALID_THIS` on Node 22+ breaks Vercel deploys). No checks below can run without it. |
+| Which state layer owns this data | read `frontend/CLAUDE.md` → "State management — three layers" | **STOP.** Guessing produces a fourth parallel store. Server/API data → TanStack Query; persistent cart → Zustand `persist`; admin auth → NextAuth `useSession()`. `jotai` is installed but unused — do not introduce atoms without confirming the domain is not already one of the three. |
+| Whether the module is server-only | grep the file for `node:fs`, `server-only`, `next-auth` | **STOP.** `lib/catalog.ts` uses `node:fs` (`catalog.ts:13`); importing it from a `'use client'` component **crashes the build**. Client code must call `/api/catalog`. |
+| For a new API route: its auth decision | read `frontend/lib/api-auth.ts` and `lib/api-public-routes.ts` | **STOP.** Do not add to `PUBLIC_API_ROUTES` without writing the reason beside it. Per-handler auth is fail-OPEN by nature; the coverage test is what restores fail-closed. |
+| For new tests: the runner's `include` list | read `frontend/vitest.config.ts` | **STOP.** The config uses an explicit `include` (`lib/wp/**`, `tests/**`), not a glob, because most of the dashboard cannot be imported under vitest. A suite written outside those paths is silently **skipped** — and a skipped security test is indistinguishable from a passing one. |
+
+## Procedure
+
+1. **Read the target file and its neighbours first.** Match the existing pattern; do not introduce a second way of doing what the file already does.
+2. **Place the state in the right layer** (table above). Server data does not belong in `useState`.
+3. **Import through the barrel** — always `@/lib/api`, never `@/lib/api/endpoints/*` directly. To add an endpoint: file in `lib/api/endpoints/`, Zod schema in `lib/api/schemas.ts`, register in `lib/api/index.ts`.
+4. **Keep the server/client boundary intact.** Anything touching `node:fs`, `next-auth`, or `next/server` stays server-side; client components call the REST route instead.
+5. **Wrap every new API handler**: `export const GET = withAuth(getHandler);`. Unauthenticated must return **401 JSON, never a redirect** — a 302 to `/login` is followed transparently and hands the caller an HTML page with status 200, which parses as success.
+6. **Reach for memoization only against a measured re-render**, not preemptively. `useMemo`/`useCallback` on cheap values costs more than it saves.
+7. **Virtualize lists past a few hundred rows** (`@tanstack/react-virtual`), rather than paginating a UI that should scroll.
+8. **Validate at the boundary with Zod**, and derive the TypeScript type from the schema rather than declaring it twice.
+9. **Run the Verification checks below** and paste real output.
 
 ## Component Patterns
 
@@ -640,3 +669,98 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 ```
 
 **Remember**: Modern frontend patterns enable maintainable, performant user interfaces. Choose patterns that fit your project complexity.
+
+---
+
+## Verification
+
+Run from `frontend/`. Three independent checks, each able to return "no".
+
+1. **Types compile.** Catches the boundary violations this codebase actually hits — a server-only import pulled into a client component, a prop shape drifting from its Zod schema, a hook returning the wrong tuple.
+
+```bash
+cd frontend && npx tsc --noEmit
+```
+**PASS:** exits 0 and prints `TypeScript: No errors found`.
+**Observed 2026-07-28: `TypeScript: No errors found`** `[repro]`.
+
+2. **Unit suites still green.**
+
+```bash
+cd frontend && npx vitest run lib/wp/__tests__/throttle.test.ts
+```
+**PASS:** `PASS (3) FAIL (0)`.
+**Observed 2026-07-28: `PASS (3) FAIL (0)`** `[test]`.
+
+3. **Every API route is gated — the fail-closed gate (rule 2 in code form).** This suite walks `app/api/**/route.ts` on disk and rejects any exported handler that is neither `withAuth`-wrapped nor explicitly exempted. It is the reason a forgotten route cannot ship unprotected.
+
+```bash
+cd frontend && npx vitest run tests/api-auth-coverage.test.ts
+```
+**PASS:** `PASS (37) FAIL (0)` — and the count *rises* when you add a route. A new route that does not raise it was not detected.
+**Observed 2026-07-28: `PASS (37) FAIL (0)`** `[test]`.
+
+**Prove the check can fail (rule 3).** Check 3 is the one worth breaking once: add a throwaway
+`app/api/__proof/route.ts` exporting a bare `export async function GET() {}`, re-run the suite, confirm
+it goes **red** naming that route, then delete the file and confirm green again. A gate never observed
+failing is a guess with a citation.
+
+**A gate that dies is not a gate that passed (rule 1).** `vitest` exits non-zero for a *config* error
+(bad `include`, unresolvable import) exactly as it does for a failing assertion, and it exits **zero**
+when its `include` matches nothing. `No test files found` is therefore an artifact, not a pass — read
+the counts, not just the exit code. (bug-230, ×6.)
+
+**A SKIP is not a PASS (rule 2).** `vitest.config.ts` deliberately excludes `tests/e2e/**` (Playwright
+owns it) and cannot import anything behind `server-only` or `next-auth`. So request-path behaviour —
+does the admin page actually render, does the 401 actually return JSON — is **unverified by the above**.
+Closer: `npm run test:e2e` (Playwright, `tests/e2e/`) or the `run-devskyy-dashboard` skill for a booted
+smoke. Do not report a route as working on type-check evidence alone.
+
+**Attribution (rule 4).** These three are green in the pristine tree, so any red is presumptively yours —
+but confirm rather than assume when the failure looks unrelated:
+
+```bash
+mkdir -p /tmp/fe-attr && git archive HEAD frontend/lib frontend/tests | tar -x -C /tmp/fe-attr
+```
+Compare against that copy. **Never `git stash`** — the stack is shared across worktrees.
+
+## Worked example
+
+**Task (2026-07-28):** confirm the dashboard's structural gates are green before adding a hook.
+
+```bash
+$ cd frontend && npx tsc --noEmit
+TypeScript: No errors found
+
+$ npx vitest run lib/wp/__tests__/throttle.test.ts
+PASS (3) FAIL (0)
+
+$ npx vitest run tests/api-auth-coverage.test.ts
+PASS (37) FAIL (0)
+```
+
+All three green `[test]`. The 37-case count is the load-bearing number: it is one assertion per
+route handler discovered **on disk**, so it tracks the filesystem rather than a hand-maintained list.
+That is what makes it fail closed — adding `app/api/foo/route.ts` without `withAuth` turns it red
+without anyone remembering to update a test.
+
+**Honest scope:** this proves the committed tree type-checks and its unit gates pass `[test]`. It does
+**not** prove the dashboard renders, that auth works against a live session, or that anything is correct
+on `devskyy.app` — those need Playwright and a deployment probe respectively. Reporting "the dashboard
+is working" from this output would be the `[repo]`/`[test]` → `[live]` jump the evidence rules ban
+(bug-287).
+
+## Failure modes
+
+| Symptom | Root cause | Fix |
+|---|---|---|
+| Build crashes importing catalog data into a component | `lib/catalog.ts` uses `node:fs` (`catalog.ts:13`); pulled into a `'use client'` tree | Call `/api/catalog` from the client instead |
+| A `fetch` from an admin page returns HTML with status 200 | Unauthenticated API redirected 302 → `/login`, transparently followed | Handlers must return **401 JSON**; wrap with `withAuth()` |
+| New API route ships unprotected | Per-handler auth is fail-open by construction | `tests/api-auth-coverage.test.ts` — never bypass it by adding to `PUBLIC_API_ROUTES` without a written reason |
+| A new test suite "passes" but never ran | `vitest.config.ts` uses an explicit `include`; the file is outside it | Put suites in `lib/wp/**` or `tests/**`, keep them framework-free, and check the count rose |
+| `useAuth()` returns undefined in an admin page | Two auth systems: admin is NextAuth (`useSession()`), storefront is `AuthContext` | Use `useSession()` under `/admin/*` |
+| Vercel build crashes on a doubled path | `outputFileTracingRoot` / `turbopack.root` set unconditionally | Leave the `!process.env.VERCEL` guard in `next.config.ts:13` alone |
+| Deploy fails with `ERR_INVALID_THIS` | pnpm on Node 22+ | Use npm |
+| Direct import from `@/lib/api/endpoints/*` compiles but the page 404s the call | Barrel bypassed; endpoint never registered in `lib/api/index.ts` | Import from `@/lib/api`; register the endpoint |
+| Memoization added, nothing got faster | `useMemo`/`useCallback` on cheap values | Measure first; remove speculative memoization |
+| A killed `vitest` run reported as clean | Gate died — output is an artifact | Re-run; read counts not exit code (bug-230) |

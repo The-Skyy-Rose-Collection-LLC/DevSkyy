@@ -1,6 +1,6 @@
 ---
 name: docker-patterns
-description: Docker and Docker Compose patterns for local development, container security, networking, volume strategies, and multi-service orchestration.
+description: Docker and Docker Compose patterns for local development, container security, networking, volume strategies, and multi-service orchestration. Use when authoring or debugging a Dockerfile / compose file, bringing the local DevSkyy stack up, or diagnosing container networking, healthcheck, or volume failures. Do NOT use for production orchestration on Fly/Vercel/Kubernetes, for WordPress theme deploys (that is wp-deploy — skyyrose.co is WP.com Atomic, not containerized), or for schema changes inside the DB container (that is database-migrations).
 origin: ECC
 ---
 
@@ -8,13 +8,97 @@ origin: ECC
 
 Docker and Docker Compose best practices for containerized development.
 
-## When to Activate
+## When to use
 
 - Setting up Docker Compose for local development
 - Designing multi-container architectures
-- Troubleshooting container networking or volume issues
+- Troubleshooting container networking, healthchecks, or volume issues
 - Reviewing Dockerfiles for security and size
 - Migrating from local dev to containerized workflow
+
+**When NOT to use:**
+
+- skyyrose.co — WP.com Atomic hosting, no containers involved. Theme changes go through `wp-deploy`.
+- Production orchestration (Fly.io for `api.devskyy.app`, Vercel for `devskyy.app`) — Compose is a
+  local-dev tool here; `docker-compose.prod.yml` patterns below are reference, not this repo's
+  production path.
+- Schema/data changes inside `devskyy-postgres` → `database-migrations` (Alembic is canonical).
+- Cache key design or eviction inside `devskyy-redis` → `redis-patterns`.
+
+## Inputs
+
+**Absent input = STOP. A compose stack started with guessed secrets is worse than one that
+refuses to start — it silently gets a different DB than every other developer.**
+
+1. **`.env.docker` with real values.** `docker-compose.yml` interpolates `POSTGRES_PASSWORD`,
+   `REDIS_PASSWORD`, and friends into the shared `x-app-env` anchor. Absent → `docker compose`
+   refuses to even parse the file (see Worked example — this is the correct fail-closed behavior).
+   Generate it with `make docker-secrets`, then paste API keys in. Never invent a password to get
+   past the error.
+2. **A running Docker daemon.** `docker info` must succeed. A dead daemon makes every subsequent
+   command fail in ways that look like config bugs.
+3. **The repo root as the compose working directory** — `docker-compose.yml`, `Dockerfile`, and
+   `.env.docker` all resolve relative to it. Never use repo-relative paths from a random cwd
+   (bug-288: cwd persists silently between calls; use absolute paths).
+4. **Free host ports** for anything you publish (`APP_PORT` defaults to 8000). A port already bound
+   by another stack surfaces as a container that starts then dies.
+
+## Procedure
+
+1. `make docker-secrets` if `.env.docker` does not exist; fill in API keys.
+2. Validate the compose file *before* starting anything: `docker compose config --services`
+   (Verification check 1). A parse/interpolation error here is a stop, not a warning.
+3. `make docker-up` (build + start the core stack: app, postgres, redis, workers).
+4. Wait for healthchecks, then confirm every service reports `(healthy)` — not merely `Up`
+   (Verification check 2). `depends_on: condition: service_healthy` means an unhealthy postgres
+   silently holds the app in "Created".
+5. Probe the app's own health endpoint through the published port (Verification check 3).
+6. On failure, read logs for the specific service (`docker compose logs --tail=50 <svc>`) before
+   changing config — most "networking" bugs are a service that never became healthy.
+7. Tear down with `docker compose down`. **`docker compose down -v` destroys the named volumes
+   (`postgres_data`, `redis_data`) — that is irreversible data loss and a STOP-AND-SHOW action.**
+
+## Verification
+
+Every check below can return "no". A command that errored or timed out is an artifact, not a pass —
+re-run it (bug-230). `docker compose ps` showing `Up` is **not** the same as `(healthy)`; treating
+"started" as "working" is the fail-open shape this stack is most prone to.
+
+```bash
+cd /Users/theceo/DevSkyy && docker compose config --services
+```
+**PASS:** exits 0 and lists the expected services. Any interpolation error means a required secret
+is missing — fix `.env.docker`, never hand-edit the compose file to dodge it. `[repro]`
+
+```bash
+docker compose ps --format '{{.Name}} {{.Status}}'
+```
+**PASS:** every core service line contains `(healthy)`. Observed 2026-07-28: `devskyy-app`,
+`devskyy-postgres`, `devskyy-redis`, `devskyy-worker`, `devskyy-elite-worker` all
+`Up 35 hours (healthy)` `[repro]`. A service stuck at `Up (health: starting)` past its
+`start_period` (40s for app) is failing, not booting.
+
+```bash
+docker exec devskyy-postgres sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"' && \
+docker exec devskyy-redis  sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ping'
+```
+**PASS:** `accepting connections` and `PONG`. Observed 2026-07-28: `PONG` `[repro]`. These mirror
+the healthchecks at `docker-compose.yml:73` (`pg_isready -U devskyy -d devskyy`) and `:94`
+(`redis-cli -a "$$REDIS_PASSWORD" ping | grep -q PONG`), but pass credentials via env
+(`REDISCLI_AUTH`) instead of argv; running them by hand is how you distinguish "healthcheck is
+wrong" from "service is down". A bare `redis-cli ping` returning `NOAUTH Authentication required.`
+is the password being enforced, not an outage. `[repro]`
+
+```bash
+curl -fsS "http://localhost:${APP_PORT:-8000}/health"
+```
+**PASS:** exits 0 with a JSON health body — the same probe as the app healthcheck
+(`docker-compose.yml:127`), but from the host, which additionally proves the port publish works.
+`[repro]`
+
+Prove the checks can fail (rule 3): `docker compose stop redis`, re-run check 2 — the app must go
+unhealthy — then `docker compose start redis`. A health gate never observed going red is a guess
+with a citation.
 
 ## Docker Compose for Local Development
 
@@ -340,6 +424,56 @@ docker compose exec app wget -qO- http://api:3000/health
 docker network ls
 docker network inspect <project>_default
 ```
+
+## Worked example
+
+Real invocation in this repo, 2026-07-28 — the fail-closed path first:
+
+```bash
+cd /Users/theceo/DevSkyy/.claude/worktrees/glimmering-crafting-shannon
+docker compose config --services; echo "exit=$?"
+docker info >/dev/null 2>&1 && echo "daemon=UP" || echo "daemon=DOWN"
+```
+
+Observed `[repro]`:
+
+```
+error while interpolating x-app-env.DATABASE_URL: required variable POSTGRES_PASSWORD is missing a value: set POSTGRES_PASSWORD in .env.docker
+exit=1
+daemon=UP
+```
+
+That is the gate working exactly as it should: the daemon is fine, but `.env.docker` is absent in
+this worktree, so Compose refuses to produce a config at all rather than interpolating an empty
+password into `DATABASE_URL` and quietly connecting to a different database. The fix is
+`make docker-secrets` — never "just export POSTGRES_PASSWORD=postgres to get past it".
+
+The already-running stack (started from the main checkout, which has `.env.docker`):
+
+```bash
+docker ps --format '{{.Names}} {{.Status}}'
+docker exec devskyy-postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT current_database(), version();"'
+docker exec devskyy-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli ping'
+```
+
+Observed `[repro]`:
+
+```
+devskyy-elite-worker Up 35 hours (healthy)
+devskyy-worker       Up 35 hours (healthy)
+devskyy-app          Up 35 hours (healthy)
+devskyy-postgres     Up 35 hours (healthy)
+devskyy-redis        Up 35 hours (healthy)
+devskyy|PostgreSQL 15.18 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+PONG
+```
+
+Two lessons in that output. First, `redis-cli ping` **without** the password returns
+`NOAUTH Authentication required.` — observed in the same session; the healthcheck at
+`docker-compose.yml:94` passes `-a "$$REDIS_PASSWORD"` precisely because of this, and a hand-run
+probe that omits it looks like an outage that is not there. Second, the service names in exec
+commands are container names (`devskyy-postgres`), while in-network DNS uses the *service* name
+(`postgres`) — mixing them up is the most common "networking is broken" false alarm.
 
 ## Anti-Patterns
 

@@ -1,12 +1,17 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence. 67 styles, 96 palettes, 57 font pairings, 25 charts, 13 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: shadcn/ui MCP for component search and examples."
+description: "UI/UX design intelligence. 67 styles, 96 palettes, 57 font pairings, 25 charts, 13 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: shadcn/ui MCP for component search and examples. Use when you need a searchable
+  starting point — a style, palette, font pairing, chart type, landing structure, or stack-specific
+  UX rule — for a UI you are about to build or review. Do NOT use as a source of truth for SkyyRose
+  surfaces: its recommendations are generic and have been observed to propose CUT fonts (Cormorant)
+  and banned materials (Liquid Glass) for luxury queries — filter every output through
+  `luxury-design-taste`, which outranks this skill's tables."
 ---
 # UI/UX Pro Max - Design Intelligence
 
 Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
 
-## When to Apply
+## When to use
 
 Reference these guidelines when:
 - Designing new UI components or pages
@@ -14,6 +19,14 @@ Reference these guidelines when:
 - Reviewing code for UX issues
 - Building landing pages or dashboards
 - Implementing accessibility requirements
+
+**When NOT to use:** as the authority on any SkyyRose surface. This is a generic recommendation
+database; skyyrose.co's palette, fonts, and materials are locked canon and this skill does not know
+them. Observed 2026-07-28 — a `luxury streetwear e-commerce dark` query returned style
+**Liquid Glass** and heading font **Cormorant**; Cormorant is on the project's CUT list and
+glassmorphism is banned outside `product-card-holo`. Use it for structure, charts, and stack rules;
+route every aesthetic recommendation through `luxury-design-taste` before it touches a file. Also not
+for native iOS (`liquid-glass-design`) or token-system generation (`design-system`).
 
 ## Rule Categories by Priority
 
@@ -375,3 +388,106 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+---
+
+## Verification
+
+The recommendation database itself is checkable — its scripts must run, and its output must be
+filtered before use. The checklist above is not a gate until each item is bound to a command.
+
+1. **The search tool actually runs** (a broken script silently degrades this skill to guesswork):
+
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "accessibility" --domain ux -n 3
+```
+
+   **PASS:** exits 0 and the header reads `**Found:** 3 results` (observed 2026-07-28 `[repro]`).
+   A traceback means the data files or Python version moved. **`Found: 0 results` is also a failure
+   of this check** — observed with the query `dashboard analytics`, which matches nothing in
+   `ux-guidelines.csv`. Zero rows means the database did not answer you; it does not mean "no rules
+   apply". Re-query or stop — never fill the gap from memory.
+
+2. **Brand-canon filter on every recommendation, before it reaches a file.** Run the
+   `--design-system` output through the CUT-font and banned-material check:
+
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "luxury streetwear e-commerce dark" \
+  --design-system -f markdown \
+  | grep -iE 'playfair|cormorant|bebas|yellowtail|glassmorphism|liquid glass'
+```
+
+   **PASS for direct use:** exits 1, prints nothing.
+   **Observed 2026-07-28:** it printed `**Name:** Liquid Glass` and `**Heading:** Cormorant` — i.e.
+   this check FAILED, which is exactly why it exists. On a hit, discard the aesthetic half of the
+   output and take only the structural half (pattern, sections, CTA placement, chart type). `[repro]`
+
+3. **Contrast claims are computed, never read off a table.** The database prints palettes; it does
+   not measure them against your background:
+
+```bash
+python3 -c "
+def lum(h):
+    r,g,b=[int(h[i:i+2],16)/255 for i in (0,2,4)]
+    f=lambda c: c/12.92 if c<=0.03928 else ((c+0.055)/1.055)**2.4
+    r,g,b=f(r),f(g),f(b); return 0.2126*r+0.7152*g+0.0722*b
+for fg,bg in [('CA8A04','FAFAF9')]:
+    l1,l2=sorted((lum(fg),lum(bg)),reverse=True)
+    print(fg,'on',bg,f'{(l1+0.05)/(l2+0.05):.2f}:1')
+"
+```
+
+   **PASS:** ≥ 4.5:1 for normal text, ≥ 3:1 for large text and UI components.
+   **Observed 2026-07-28:** the CTA/background pair this skill recommended for a luxury query,
+   `#CA8A04` on `#FAFAF9`, measures **2.81:1** — below AA for normal text *and* below the 3:1 UI
+   floor. A recommended colour that fails this is rejected, whatever the table says. `[repro]`
+
+4. **The Pre-Delivery Checklist's render items** — 375/768/1024/1440 responsiveness, focus
+   visibility, light/dark contrast in situ — are BROWSER checks this skill cannot execute. **A SKIP
+   is not a PASS.** Name the browser-capable session or caller that closes them; on skyyrose.co that
+   is `verify-theme.sh` aspects `responsive` and `a11y-interactive`, both labelled BROWSER. Any
+   severity claim about the live site needs its own `[live]` probe.
+
+Inherited: a gate that dies is not a gate that passed — if a command above errors or times out, its
+empty output is an artifact; re-run by hand (bug-230). Before blaming a failing check on your change,
+run it against a pristine tree with `git archive HEAD <path> | tar -x -C <scratch>`; **never
+`git stash`**, the stack is shared across worktrees.
+
+## Worked example
+
+Real run, this repo, 2026-07-28:
+
+```bash
+$ python3 .claude/skills/ui-ux-pro-max/scripts/search.py \
+    "luxury streetwear e-commerce dark" --design-system -p "SkyyRose" -f markdown
+### Style
+- **Name:** Liquid Glass
+- **Performance:** ⚠ Moderate-Poor | **Accessibility:** ⚠ Text contrast
+### Colors
+| Primary | #1C1917 |  | CTA | #CA8A04 |  | Background | #FAFAF9 |
+### Typography
+- **Heading:** Cormorant
+- **Body:** Montserrat
+```
+
+Verification #2 hit on both `Liquid Glass` and `Cormorant` `[repro]`. Disposition: **aesthetic half
+discarded** — Cormorant is on the project CUT list (`CLAUDE.md` §6) and glassmorphism is banned
+outside `product-card-holo`; the recommended `#FAFAF9` light background inverts the locked
+`#0A0A0A` dark surface. **Structural half kept**: the returned pattern (Horizontal Scroll Journey —
+intro, horizontal track, detail reveal, vertical footer; floating sticky CTA) is brand-neutral and
+usable. This is the intended use of the skill: structure from the database, aesthetics from canon.
+
+## Failure modes
+
+- **Taking the aesthetic output verbatim on a SkyyRose surface.** Demonstrated above — it proposes a
+  CUT font and a banned material for exactly the query a SkyyRose task would use. This is the #1
+  failure mode of this skill and the reason Verification #2 exists.
+- **Trusting the `Accessibility: ⚠ Text contrast` warning to be specific.** It is a category flag,
+  not a measurement. Compute the ratio (Verification #3).
+- **Defaulting to `html-tailwind`** because Step 4 says so. The SkyyRose theme is classic PHP with
+  vanilla CSS and no Tailwind — the default stack flag produces advice that cannot be applied there.
+  Pass the real stack, or take none.
+- **Treating the Pre-Delivery Checklist as passed because it was read.** A checkbox with no command
+  behind it is decoration; bind each to a check or hand it to a browser-capable caller by name.
+- **A silent traceback from `search.py`** leaving you to fill the gap from memory — that is the
+  fail-open pattern. Absent tool output = stop, not improvise (bug-230, ×6).
