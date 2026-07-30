@@ -360,14 +360,17 @@
 }
 
 /* --- Character Image — full body, never cropped ---
-   max-height caps the fallback 2D image (shown only when the 3D canvas
+   aspect-ratio locks the fallback 2D image (shown only when the 3D canvas
    isn't available/ready — headless Chrome, WebGL-disabled, slow GLB fetch)
-   so its rendered area can never exceed the hero poster's and hijack LCP
-   on that degraded path (bug-317). */
+   to its real source proportions (skyy-canonical.jpeg is 1024x1035) at
+   whatever width the current breakpoint sets — so a future asset swap with
+   a different aspect ratio gets letterboxed inside this same footprint via
+   object-fit:contain, never rendering taller than the ratio allows, at
+   every breakpoint, with no separate mobile override needed (bug-317). */
 
 .skyyrose-mascot__image {
 	width: 220px;
-	max-height: 260px;
+	aspect-ratio: 1024 / 1035;
 	height: auto;
 	object-fit: contain;
 	display: block;
