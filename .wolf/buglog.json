@@ -5456,5 +5456,25 @@
     "occurrences": 1,
     "last_seen": "2026-07-29T17:24:58-07:00",
     "note": "Fixed in commit ce5b2231b, whose message mislabeled this as \"bug-315\" -- that ID was never written to buglog.json at the time, so bug-315 was later reassigned by wolf_bug_id.py to an unrelated fix (stale homepage-v2 structural assertions). This entry backfills the missing log under the correct next-free ID; ce5b2231bs commit message stays as-is (shared worktree, no history rewrite)."
+  },
+  {
+    "id": "bug-317",
+    "timestamp": "2026-07-29T18:45:00-07:00",
+    "error_message": "Lighthouse mobile audit on live homepage v1.13.3: performance=63, LCP=21.6s, LCP element = mascot fallback <img> (display:none, loading=lazy, 0x0 rect at report time)",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/mascot.css:364",
+    "root_cause": "Investigated with a real PerformanceObserver({type:\"largest-contentful-paint\",buffered:true}) injected live on skyyrose.co, not just trusting the Lighthouse report: on a real GPU-accelerated Chrome tab (2 separate runs, 20s+ each), LCP is correctly the hero video poster at ~2.5-2.7s (69,048px2), and the mascot fallback <img> never even loads (imgLoaded:false, 0x0 rect) because the 3D GLB canvas succeeds and the 2D image fallback path is never taken. The mascot image is only shown when the 3D canvas fails/is unavailable (headless Chrome without working WebGL, GLB fetch timeout, WebGL-disabled browsers) -- exactly the conditions Lighthouse headless runs under. At its natural 1024x1035 aspect ratio scaled to width:220px (~48,840px2), the fallback image is smaller than the hero poster by area, so it should not be able to win LCP by size -- meaning the video poster itself likely failed to register as an LCP candidate at all in the headless run (known class of headless video-decode quirk), leaving the mascot fallback as the only candidate that ever painted, winning by default rather than by size. Real users are not affected; this is a lab-tool/headless-Chrome artifact, but it is a real, reproducible Lighthouse/CI score defect and the fallback image had zero size ceiling regardless.",
+    "fix": "Added max-height:260px to .skyyrose-mascot__image (previously only width:220px + height:auto, unbounded). This is defensive regardless of the LCP question -- guarantees the fallback image can never render larger than the hero content on the one degraded path where it activates. Rebuilt .min + bundle, verified byte-identical propagation, verify:theme min-sync PASS, stylelint 0. Root cause of WHY the video poster fails to register as an LCP candidate under headless Lighthouse specifically is NOT fixed by this change and remains open -- flagged, not chased, since 2 real-browser tests confirm zero real-user impact.",
+    "tags": [
+      "performance",
+      "lcp",
+      "lighthouse",
+      "headless-chrome-artifact",
+      "mascot",
+      "defensive-css"
+    ],
+    "related_bugs": [],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T18:45:00-07:00",
+    "note": "Live production re-verification (deploy + re-run Lighthouse against skyyrose.co) still needed to confirm whether the max-height cap actually changes the headless LCP winner -- STOP-AND-SHOW, awaiting founder go-ahead."
   }
 ]
