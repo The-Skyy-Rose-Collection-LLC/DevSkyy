@@ -182,11 +182,11 @@
 
 @media (prefers-reduced-motion: no-preference) {
 	.col-film__hotspot-dot {
-		animation: colHotspotPulse 2s infinite;
+		animation: col-hotspot-pulse 2s infinite;
 	}
 }
 
-@keyframes colHotspotPulse {
+@keyframes col-hotspot-pulse {
 	0%, 100% { box-shadow: 0 0 0 0 rgba(var(--skyyrose-accent-rgb), 0.6); }
 	55%      { box-shadow: 0 0 0 8px rgba(var(--skyyrose-accent-rgb), 0); }
 }
@@ -208,9 +208,18 @@
 
 /* Deterministic positions (desktop, motion-capable) — clear of the pause
    toggle's bottom-right corner and the centered beat captions. */
-.col-film__hotspot--1 { top: 24%; left: 6%; }
-.col-film__hotspot--2 { top: 44%; right: 6%; }
-.col-film__hotspot--3 { bottom: 30%; left: 10%; }
+.col-film__hotspot--1 {
+	top: 24%;
+	left: 6%;
+}
+.col-film__hotspot--2 {
+	top: 44%;
+	right: 6%;
+}
+.col-film__hotspot--3 {
+	bottom: 30%;
+	left: 10%;
+}
 
 /* Below 768px: shorter track, smaller plate, beats + hotspots leave the
    overlay and join the column flow (no absolute-position collisions on
