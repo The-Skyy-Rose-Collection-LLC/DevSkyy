@@ -5430,8 +5430,31 @@
       "homepage-v3",
       "false-positive"
     ],
-    "related_bugs": [],
+    "related_bugs": [
+      "bug-316"
+    ],
     "occurrences": 1,
-    "last_seen": "2026-07-29T18:09:00-07:00"
+    "last_seen": "2026-07-29T18:09:00-07:00",
+    "note": "ce5b2231b commit message also says \"bug-315\" for an unrelated a11y fix -- that ID was never logged at the time, so wolf_bug_id.py handed it to this entry instead. The a11y fix is backfilled as bug-316."
+  },
+  {
+    "id": "bug-316",
+    "timestamp": "2026-07-29T17:24:58-07:00",
+    "error_message": ".col-newsletter__input had outline:none with no :focus-visible replacement anywhere in collection-pages.css -- WCAG 2.4.7 gap, keyboard users had no visible focus indicator on the newsletter input",
+    "file": "wordpress-theme/skyyrose-flagship/assets/css/collection-pages.css",
+    "root_cause": "outline:none was set on .col-newsletter__input to remove the default browser ring on a borderless input, but no :focus-visible replacement was ever added, so keyboard-only users tabbing to the field got no focus indicator at all.",
+    "fix": "Added .col-newsletter__input:focus-visible { outline: 2px solid var(--skyyrose-accent); outline-offset: 2px; } directly below the outline:none rule, with an inline comment explaining why.",
+    "tags": [
+      "accessibility",
+      "wcag-2.4.7",
+      "focus-indicator",
+      "css-audit"
+    ],
+    "related_bugs": [
+      "bug-315"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-07-29T17:24:58-07:00",
+    "note": "Fixed in commit ce5b2231b, whose message mislabeled this as \"bug-315\" -- that ID was never written to buglog.json at the time, so bug-315 was later reassigned by wolf_bug_id.py to an unrelated fix (stale homepage-v2 structural assertions). This entry backfills the missing log under the correct next-free ID; ce5b2231bs commit message stays as-is (shared worktree, no history rewrite)."
   }
 ]
