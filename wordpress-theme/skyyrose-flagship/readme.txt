@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.13.3
+Stable tag: 1.13.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,9 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 1.13.4 =
+* Fix: mascot fallback 2D character image (`.skyyrose-mascot__image`, shown only when the 3D canvas is unavailable) had no aspect-ratio constraint; now locked to its real source proportions (1024x1035) at every breakpoint via `aspect-ratio`, correctly proportional on both desktop and mobile with no separate mobile override needed (bug-317)
 
 = 1.11.0 =
 * Feat: new mascot body — the site host is now the in-house-built Love Hurts Girl character (full rig, hand-authored walk + breathing idle, draco GLB 1.1MB), live on every page via the existing mascot system; chat, greetings, and reduced-motion behavior unchanged
