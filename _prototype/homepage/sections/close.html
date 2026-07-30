@@ -1,0 +1,896 @@
+<!--
+  PROTOTYPE — THROWAWAY. sections/close.html
+  The closing band: service promise · email capture · brand outro.
+
+  ASSET REALITY (verified with `identify` + corner-pixel sample, 2026-07-29):
+    skyyrose-monogram.webp   2048x2048  alpha=Undefined  corner rgb(254,254,254)
+    tsrc-lockup-static@2x.webp 198x144  alpha=Undefined  corner rgb(253,253,253)
+    skyyrose-rose-icon.webp  3000x3000  alpha=Undefined  corner rgb(255,255,255)
+  All three are OPAQUE white-background files. Dropping one onto --black renders a white
+  box, so every variant here deliberately mounts the mark on a light "tag plate" — read it
+  as a woven label / numbered hang-tag, which is on-brand (Kith care-label, FoG tagging).
+  PRODUCTION GAP: to float the monogram directly on --black we need alpha-channel cutouts.
+  Do not "fix" this in the prototype by inverting — invert() destroys the rose-gold.
+
+  COPY: every string below is lifted from the live theme —
+    front-page.php  (service promise 01-04, "Commercial Standard", "The House Service
+                     Layer.", "Join the Movement", "For The Real Ones", the nl-desc,
+                     "Free to join · Unsubscribe anytime · Oakland love only")
+    footer.php      ("Join the Inner Circle", "Exclusive drops, early access, and luxury
+                     delivered to your inbox.", "Subscribe", "Enter your email",
+                     "Luxury Grows from Concrete.", the brand description, copyright)
+    template-parts/footer-cro.php ("Limited Edition. Individually Numbered. Never Restocked.")
+    front-page.php Kids band ("A father's promise. A daughter's name.")
+
+  HONESTY CONTRACT (the live-site bug this section exists to kill):
+    - the status element ships EMPTY, with no success class, in all three variants
+    - submit is preventDefault()'d; an empty or invalid address gets an ERROR state, never
+      a success state
+    - the success treatment renders ONLY after a genuinely valid submit, and says out loud
+      that nothing was sent, because in a prototype nothing was
+    - none of these is an interstitial: A and B are in-flow, C only docks after the visitor
+      has actually reached the close band (IntersectionObserver sentinel, dismissible)
+-->
+
+<style>
+/* ============================================================================
+   SHARED — capture status only. Deliberately the ONLY shared skeleton: all three
+   variants must obey the same honesty contract, so they share its plumbing and
+   nothing else. Layout, hierarchy and primary affordance are variant-owned.
+   ========================================================================== */
+.cx-status {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  min-height: 1.2em;          /* reserve the row so a submit never shifts layout */
+  color: var(--fg3);
+}
+.cx-status:empty { min-height: 1.2em; }
+.cx-status.is-err { color: var(--fg2); }
+.cx-status.is-err::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px;
+  border-radius: 50%; background: var(--crimson); box-shadow: var(--glow-crimson);
+  vertical-align: middle;
+}
+.cx-status.is-ok { color: var(--fg1); }
+.cx-status.is-ok::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px;
+  border-radius: 50%; background: var(--rose-gold); box-shadow: var(--glow-rose);
+  vertical-align: middle;
+}
+.cx-proto {
+  display: block; margin-top: 4px; color: var(--fg3);
+  font-size: .75rem; letter-spacing: var(--tracking-wide);
+}
+/* The tag plate — the one honest way to mount an alpha-less brand webp on black. */
+.cx-plate {
+  background: #F4F1EE;                       /* bone card stock; not a brand token by
+                                                design — it is paper, not brand colour */
+  border: 1px solid rgba(var(--rose-gold-rgb), .55);
+  box-shadow: var(--depth-2), 0 0 0 1px rgba(0,0,0,.5);
+  display: grid; place-items: center; overflow: hidden;
+}
+.cx-plate img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ============================================================================
+   VARIANT A — NUMBERED UTILITY LEDGER
+   Organising idea: the close band as a spec sheet. Service is the primary
+   affordance; every promise is a ruled ledger row you can hit. Capture lives in
+   a narrow right rail as one more line item, not a moment.
+   ========================================================================== */
+.cA { background: var(--black); padding: var(--space-24) var(--space-6) var(--space-16); }
+.cA__inner { max-width: var(--container-wide); margin: 0 auto; }
+
+.cA__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--space-6); flex-wrap: wrap;
+  padding-bottom: var(--space-6); border-bottom: 1px solid var(--border);
+}
+.cA__eyebrow {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+}
+.cA__title {
+  font-family: var(--font-display); font-size: var(--text-4xl); font-weight: 700;
+  font-variation-settings: 'wdth' 125; letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+.cA__meta {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+}
+
+.cA__body { display: grid; grid-template-columns: 1fr; gap: 0; }
+@media (min-width: 900px) {
+  .cA__body { grid-template-columns: minmax(0, 1.6fr) minmax(320px, .85fr); gap: var(--space-16); }
+}
+
+/* --- the ledger rows: primary affordance --- */
+.cA__rows { display: block; }
+.cA-row {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: start;
+  gap: var(--space-4) var(--space-6);
+  width: 100%; text-align: left; text-decoration: none;
+  background: none; border: 0; border-bottom: 1px solid var(--border);
+  padding: var(--space-6) var(--space-2);
+  color: var(--fg1); font: inherit; cursor: pointer;
+  transition: background var(--dur-base) var(--ease), padding-left var(--dur-base) var(--ease);
+}
+.cA-row:hover, .cA-row:focus-visible {
+  background: linear-gradient(90deg, rgba(var(--rose-gold-rgb), .10), transparent 70%);
+  padding-left: var(--space-6);
+  outline: none;
+}
+.cA-row:focus-visible { box-shadow: inset 3px 0 0 var(--rose-gold); }
+.cA-row__n {
+  font-family: var(--font-accent); font-size: var(--text-2xl); line-height: 1;
+  color: var(--rose-gold); letter-spacing: var(--tracking-wide);
+  min-width: 2.2ch;
+}
+.cA-row__label {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl);
+  font-variation-settings: 'wdth' 125; letter-spacing: var(--tracking-tight);
+  display: block;
+}
+.cA-row__desc {
+  font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg3);
+  margin-top: 4px; max-width: 46ch;
+}
+.cA-row__affordance {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase; white-space: nowrap;
+  align-self: center;
+}
+.cA-row:hover .cA-row__affordance, .cA-row:focus-visible .cA-row__affordance { color: var(--rose-gold); }
+
+/* --- the rail: capture as a line item --- */
+.cA__rail {
+  border: 1px solid var(--border); border-radius: var(--radius-sharp);
+  padding: var(--space-8) var(--space-6);
+  margin-top: var(--space-12);
+  background: var(--card);
+}
+@media (min-width: 900px) { .cA__rail { margin-top: var(--space-6); align-self: start; position: sticky; top: var(--space-8); } }
+.cA__rail-eyebrow {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--rose-gold);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+}
+.cA__rail-title {
+  font-family: var(--font-display); font-weight: 800; font-size: var(--text-2xl);
+  font-variation-settings: 'wdth' 125; letter-spacing: var(--tracking-tight);
+  margin: var(--space-2) 0 var(--space-3);
+}
+.cA__rail-desc { font-size: var(--text-sm); color: var(--fg3); line-height: var(--leading-normal); }
+.cA__form { margin-top: var(--space-6); display: grid; gap: var(--space-3); }
+.cA__field { display: flex; gap: var(--space-2); }
+.cA__input {
+  flex: 1 1 auto; min-width: 0;
+  background: var(--black); border: 1px solid var(--border); color: var(--fg1);
+  font-family: var(--font-ui); font-size: var(--text-sm);
+  padding: 12px var(--space-4); border-radius: var(--radius-sharp);
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+.cA__input::placeholder { color: var(--fg3); }
+.cA__input:focus { outline: none; border-color: var(--rose-gold); box-shadow: var(--glow-rose); }
+.cA__submit {
+  flex: 0 0 auto; cursor: pointer;
+  background: var(--rose-gold); color: var(--black); border: 0;
+  font-family: var(--font-ui); font-weight: 700; font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+  padding: 12px var(--space-6); border-radius: var(--radius-sharp);
+  transition: transform var(--dur-fast) var(--ease-magnetic), box-shadow var(--dur-base) var(--ease);
+}
+.cA__submit:hover { box-shadow: var(--glow-rose); transform: translateY(-1px); }
+.cA__submit:active { transform: translateY(0); }
+.cA__note {
+  font-family: var(--font-ui); font-size: .75rem; color: var(--fg3);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* --- outro strip --- */
+.cA__outro {
+  margin-top: var(--space-16); padding-top: var(--space-8);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap;
+}
+.cA__plate { width: 76px; height: 76px; border-radius: var(--radius-sm); flex: 0 0 auto; padding: 8px; }
+.cA__outro-copy { flex: 1 1 260px; }
+.cA__tagline {
+  font-family: var(--font-caps); font-size: var(--text-lg);
+  letter-spacing: var(--tracking-wide); color: var(--fg1);
+}
+.cA__outro-desc { font-size: var(--text-sm); color: var(--fg3); margin-top: 4px; max-width: 60ch; }
+.cA__scarcity {
+  font-family: var(--font-accent); font-size: var(--text-xs); color: var(--fg2);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+  border: 1px solid rgba(var(--crimson-rgb), .5); border-radius: var(--radius-pill);
+  padding: 8px var(--space-4);
+  /* must wrap at 390px — nowrap on this string blew the page out to 504px wide */
+  text-align: center; line-height: var(--leading-snug);
+}
+@media (min-width: 700px) { .cA__scarcity { white-space: nowrap; } }
+.cA__copyright { font-family: var(--font-ui); font-size: .75rem; color: var(--fg3); margin-top: var(--space-8); }
+
+/* ============================================================================
+   VARIANT B — CLOSING STATEMENT, CAPTURE INSIDE THE LINE
+   Organising idea: one centred voice. No grid, no cards. The hang-tag is the
+   object, one sentence is the argument, and the email field is set INSIDE that
+   sentence as an underlined blank you fill in. Service is demoted to a hairline
+   footnote row. Capture is unambiguously the primary affordance.
+   ========================================================================== */
+.cB {
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(var(--rose-gold-rgb), .10), transparent 62%),
+    var(--black);
+  padding: var(--space-32) var(--space-6) var(--space-16);
+  text-align: center;
+}
+.cB__inner { max-width: 760px; margin: 0 auto; }
+
+.cB__plate {
+  width: clamp(140px, 34vw, 208px); aspect-ratio: 1; margin: 0 auto var(--space-8);
+  border-radius: var(--radius-sm); padding: clamp(10px, 3vw, 18px);
+  animation: cB-plate-in var(--dur-cinem) var(--ease-cinematic) both;
+}
+@keyframes cB-plate-in {
+  from { opacity: 0; transform: translateY(18px) scale(.965); }
+  to   { opacity: 1; transform: none; }
+}
+.cB__eyebrow {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+.cB__statement {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: var(--text-5xl); font-variation-settings: 'wdth' 125;
+  letter-spacing: var(--tracking-tight); line-height: var(--leading-tight);
+}
+.cB__script {
+  display: block; font-family: var(--script-sig); font-weight: 400;
+  font-size: clamp(2rem, 6vw, 3.25rem); color: var(--rose-gold);
+  letter-spacing: 0; margin-top: var(--space-2); line-height: 1.3;
+}
+.cB__desc {
+  font-size: var(--text-lg); color: var(--fg3); line-height: var(--leading-normal);
+  max-width: 52ch; margin: var(--space-6) auto 0;
+}
+
+/* --- the sentence that IS the form --- */
+.cB__form { margin-top: var(--space-12); }
+.cB__line {
+  display: flex; align-items: baseline; justify-content: center;
+  flex-wrap: wrap; gap: var(--space-2) var(--space-3);
+  font-family: var(--font-display); font-weight: 500;
+  font-size: clamp(1.25rem, 3.4vw, 1.75rem);
+  font-variation-settings: 'wdth' 125;
+  color: var(--fg2);
+}
+.cB__input {
+  flex: 1 1 min(320px, 100%); min-width: 0; max-width: 380px;
+  background: transparent; border: 0; border-bottom: 2px solid var(--rose-gold);
+  color: var(--fg1); font-family: inherit; font-size: inherit; font-weight: 500;
+  text-align: center; padding: 4px var(--space-2) 8px;
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+.cB__input::placeholder { color: var(--fg3); font-style: italic; }
+.cB__input:focus {
+  outline: none; border-bottom-color: var(--gold);
+  box-shadow: 0 8px 18px -14px rgba(var(--gold-rgb), .9);
+}
+.cB__go {
+  flex: 0 0 auto; cursor: pointer;
+  background: transparent; color: var(--rose-gold);
+  border: 1px solid var(--rose-gold); border-radius: var(--radius-pill);
+  width: 46px; height: 46px; font-size: 1.1rem; line-height: 1;
+  display: grid; place-items: center; align-self: center;
+  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease),
+              transform var(--dur-fast) var(--ease-magnetic), box-shadow var(--dur-base) var(--ease);
+}
+.cB__go:hover { background: var(--rose-gold); color: var(--black); box-shadow: var(--glow-rose); transform: translateX(3px); }
+.cB__status { margin-top: var(--space-4); }
+.cB__note {
+  font-family: var(--font-ui); font-size: .75rem; color: var(--fg3);
+  letter-spacing: var(--tracking-wide); margin-top: var(--space-3);
+}
+
+/* --- service demoted to a footnote rail --- */
+.cB__services {
+  margin-top: var(--space-20); padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: center; align-items: stretch;
+  flex-wrap: wrap; gap: 0;
+}
+.cB-svc {
+  background: none; border: 0; cursor: pointer; color: var(--fg2);
+  font-family: var(--font-ui); font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+  text-decoration: none; padding: var(--space-3) var(--space-6);
+  position: relative;
+  transition: color var(--dur-base) var(--ease);
+}
+.cB-svc + .cB-svc::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 14px; background: var(--border);
+}
+.cB-svc:hover, .cB-svc:focus-visible { color: var(--rose-gold); outline: none; }
+.cB-svc small {
+  display: block; text-transform: none; letter-spacing: 0;
+  font-size: .75rem; color: var(--fg3); margin-top: 4px; max-width: 22ch;
+}
+.cB__scarcity {
+  font-family: var(--font-accent); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+  margin-top: var(--space-12);
+}
+.cB__copyright { font-family: var(--font-ui); font-size: .75rem; color: var(--fg3); margin-top: var(--space-4); }
+
+/* ============================================================================
+   VARIANT C — SCROLLING OUTRO, DOCKED CONCIERGE BAR
+   Organising idea: the brand outro plays as an editorial scroll; service is a
+   thumb-swipeable rail; capture is a persistent dock that arrives ONLY once the
+   visitor has actually reached the close band — never on entry — and can be
+   dismissed. Primary affordance is the dock, but it earns its place.
+   ========================================================================== */
+.cC { background: var(--black); position: relative; }
+.cC__stage { max-width: var(--container); margin: 0 auto; padding: var(--space-24) var(--space-6) var(--space-32); }
+
+.cC__eyebrow {
+  font-family: var(--font-ui); font-size: var(--text-xs); color: var(--fg3);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase;
+}
+.cC__lines { margin-top: var(--space-8); }
+.cC-line {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(2.25rem, 9vw, 6rem); font-variation-settings: 'wdth' 125;
+  letter-spacing: var(--tracking-tight); line-height: .98;
+  display: block;
+  opacity: 0; transform: translateY(28px);
+  transition: opacity var(--dur-reveal) var(--ease-cinematic),
+              transform var(--dur-reveal) var(--ease-cinematic);
+}
+.cC-line.is-in { opacity: 1; transform: none; }
+.cC-line--muted { color: var(--fg3); }
+.cC-line--accent { color: var(--rose-gold); }
+
+.cC__body {
+  margin-top: var(--space-12); max-width: 54ch;
+  font-size: var(--text-lg); color: var(--fg3); line-height: var(--leading-normal);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity var(--dur-reveal) var(--ease) 120ms, transform var(--dur-reveal) var(--ease) 120ms;
+}
+.cC__body.is-in { opacity: 1; transform: none; }
+.cC__script {
+  display: block; margin-top: var(--space-6);
+  font-family: var(--script-kc); font-size: clamp(1.75rem, 5vw, 2.75rem);
+  color: var(--fg1); line-height: 1.3;
+}
+
+/* --- service as a thumb rail --- */
+.cC__rail-head {
+  margin-top: var(--space-24); display: flex; align-items: baseline;
+  justify-content: space-between; gap: var(--space-4);
+  border-bottom: 1px solid var(--border); padding-bottom: var(--space-3);
+}
+.cC__rail-title {
+  font-family: var(--font-accent); font-size: var(--text-lg);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+}
+.cC__rail-hint { font-family: var(--font-ui); font-size: .75rem; color: var(--fg3); letter-spacing: var(--tracking-wide); }
+.cC__rail {
+  display: flex; gap: var(--space-4); margin-top: var(--space-6);
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-4);
+  scrollbar-width: thin;
+  /* full-bleed the rail on mobile so cards run off the edge — swipe affordance */
+  margin-inline: calc(var(--space-6) * -1); padding-inline: var(--space-6);
+}
+.cC-card {
+  scroll-snap-align: start; flex: 0 0 clamp(220px, 68vw, 280px);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sharp); padding: var(--space-6);
+  display: flex; flex-direction: column; gap: var(--space-2);
+  text-align: left; text-decoration: none; color: var(--fg1);
+  font: inherit; cursor: pointer;
+  transition: border-color var(--dur-base) var(--ease), background var(--dur-base) var(--ease),
+              transform var(--dur-base) var(--ease-magnetic);
+}
+.cC-card:hover, .cC-card:focus-visible {
+  border-color: var(--rose-gold); background: var(--card-hover);
+  transform: translateY(-4px); outline: none;
+}
+.cC-card__n { font-family: var(--font-accent); font-size: var(--text-2xl); color: var(--rose-gold); line-height: 1; }
+.cC-card__label {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg);
+  font-variation-settings: 'wdth' 125; letter-spacing: var(--tracking-tight);
+}
+.cC-card__desc { font-size: var(--text-sm); color: var(--fg3); }
+.cC-card__go {
+  margin-top: auto; padding-top: var(--space-4);
+  font-family: var(--font-ui); font-size: .75rem; color: var(--fg3);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+}
+
+/* --- the outro object --- */
+.cC__sign {
+  margin-top: var(--space-24); padding-top: var(--space-8);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap;
+}
+.cC__plate { width: 132px; height: 96px; border-radius: var(--radius-sm); padding: 10px; flex: 0 0 auto; }
+.cC__sign-copy { flex: 1 1 240px; }
+.cC__tagline { font-family: var(--font-caps); font-size: var(--text-lg); letter-spacing: var(--tracking-wide); }
+.cC__copyright { font-family: var(--font-ui); font-size: .75rem; color: var(--fg3); margin-top: var(--space-2); }
+.cC__sentinel { height: 1px; }
+
+/* --- the dock --- */
+.cC__dock {
+  position: fixed; left: var(--space-4); right: var(--space-4);
+  /* PROTOTYPE NOTE: in production this docks FLUSH to the viewport bottom. It is inset
+     here so the white prototype-switcher pill (fixed, bottom:18px, centred, and it WRAPS
+     to ~3 rows / ~128px tall at 390px) does not sit on top of the thing being judged.
+     Measured, not guessed — the pill is 157px tall at 390px, so its top edge sits 175px
+     off the viewport floor. 96px and 152px both still got eaten. */
+  bottom: 190px;
+  z-index: 40;
+  background: rgba(14,14,18,.94);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(var(--rose-gold-rgb), .45);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--depth-4), var(--glow-rose);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4);
+  display: grid; gap: var(--space-3);
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  opacity: 0; transform: translateY(24px); pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-cinematic), transform var(--dur-slow) var(--ease-cinematic);
+}
+.cC__dock.is-up { opacity: 1; transform: none; pointer-events: auto; }
+.cC__dock.is-gone { opacity: 0; transform: translateY(24px); pointer-events: none; }
+@media (min-width: 860px) {
+  .cC__dock {
+    left: 50%; right: auto; transform: translate(-50%, 24px);
+    width: min(880px, calc(100vw - var(--space-12)));
+    bottom: 92px;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+  }
+  .cC__dock.is-up { transform: translate(-50%, 0); }
+  .cC__dock.is-gone { transform: translate(-50%, 24px); }
+}
+.cC__dock-mark { display: none; }
+@media (min-width: 860px) {
+  .cC__dock-mark { display: block; width: 74px; height: 54px; border-radius: var(--radius-sm); padding: 6px; }
+}
+.cC__dock-copy { grid-column: 1 / -1; }
+@media (min-width: 860px) { .cC__dock-copy { grid-column: auto; } }
+.cC__dock-title {
+  font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg);
+  font-variation-settings: 'wdth' 125; letter-spacing: var(--tracking-tight);
+}
+.cC__dock-desc { font-size: var(--text-xs); color: var(--fg3); margin-top: 2px; }
+.cC__dock-form { grid-column: 1 / -1; display: grid; gap: var(--space-2); }
+@media (min-width: 860px) { .cC__dock-form { grid-column: auto; min-width: 340px; } }
+.cC__dock-field { display: flex; gap: var(--space-2); }
+.cC__dock-input {
+  flex: 1 1 auto; min-width: 0;
+  background: var(--black); border: 1px solid var(--border); color: var(--fg1);
+  font-family: var(--font-ui); font-size: var(--text-sm);
+  padding: 11px var(--space-4); border-radius: var(--radius-sharp);
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+}
+.cC__dock-input::placeholder { color: var(--fg3); }
+.cC__dock-input:focus { outline: none; border-color: var(--rose-gold); box-shadow: var(--glow-rose); }
+.cC__dock-submit {
+  flex: 0 0 auto; cursor: pointer; border: 0; border-radius: var(--radius-sharp);
+  background: var(--rose-gold); color: var(--black);
+  font-family: var(--font-ui); font-weight: 700; font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider); text-transform: uppercase;
+  padding: 11px var(--space-6);
+  transition: box-shadow var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease-magnetic);
+}
+.cC__dock-submit:hover { box-shadow: var(--glow-rose); transform: translateY(-1px); }
+.cC__dock-close {
+  position: absolute; top: -12px; right: -6px;
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  background: var(--smoke); color: var(--fg2); border: 1px solid var(--border);
+  font-family: var(--font-ui); font-size: 15px; line-height: 1;
+  display: grid; place-items: center;
+  transition: color var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+}
+.cC__dock-close:hover { color: var(--fg1); border-color: var(--rose-gold); }
+@media (min-width: 860px) { .cC__dock-close { position: static; } }
+.cC__dock-note {
+  font-family: var(--font-ui); font-size: .7rem; color: var(--fg3);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ============================================================================
+   REDUCED MOTION — tokens.css already flattens durations globally. These rules
+   additionally guarantee that nothing scripted stays stuck at opacity:0, and
+   that the dock arrives without travel.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .cB__plate { animation: none; }
+  .cC-line, .cC__body { opacity: 1 !important; transform: none !important; }
+  .cC__dock { transform: none !important; }
+  .cC__dock.is-up { transform: none !important; }
+  .cC__dock.is-gone { transform: none !important; }
+  @media (min-width: 860px) {
+    .cC__dock, .cC__dock.is-up, .cC__dock.is-gone { transform: translateX(-50%) !important; }
+  }
+  .cA-row:hover, .cA-row:focus-visible { padding-left: var(--space-2); }
+  .cC-card:hover, .cC-card:focus-visible { transform: none; }
+  .cB__go:hover { transform: none; }
+}
+</style>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     A — Numbered utility ledger
+     ═════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="A" data-name="Numbered utility ledger">
+<section class="cA" aria-label="SkyyRose Service Promise">
+  <div class="cA__inner">
+
+    <header class="cA__head">
+      <div>
+        <p class="cA__eyebrow">Commercial Standard</p>
+        <h2 class="cA__title">The House Service Layer.</h2>
+      </div>
+      <p class="cA__meta">Oakland, CA · Est. 2019</p>
+    </header>
+
+    <div class="cA__body">
+
+      <div class="cA__rows">
+        <a class="cA-row" href="#shipping-returns">
+          <span class="cA-row__n">01</span>
+          <span>
+            <span class="cA-row__label">Clear Shipping</span>
+            <span class="cA-row__desc">Delivery and return expectations before checkout.</span>
+          </span>
+          <span class="cA-row__affordance">Read &rarr;</span>
+        </a>
+
+        <!-- Fit Guide stays a <button> exactly as the theme has it: it opens the size-guide
+             modal, it does not navigate. The affordance label states the difference. -->
+        <button type="button" class="cA-row" data-open-size-guide>
+          <span class="cA-row__n">02</span>
+          <span>
+            <span class="cA-row__label">Fit Guide</span>
+            <span class="cA-row__desc">Measure once, shop every drop with more confidence.</span>
+          </span>
+          <span class="cA-row__affordance">Open &#8599;</span>
+        </button>
+
+        <a class="cA-row" href="#wishlist">
+          <span class="cA-row__n">03</span>
+          <span>
+            <span class="cA-row__label">Wishlist Flow</span>
+            <span class="cA-row__desc">Save looks before small runs disappear.</span>
+          </span>
+          <span class="cA-row__affordance">Save &rarr;</span>
+        </a>
+
+        <a class="cA-row" href="#contact">
+          <span class="cA-row__n">04</span>
+          <span>
+            <span class="cA-row__label">Concierge Contact</span>
+            <span class="cA-row__desc">Questions, press, styling, and collaboration routes.</span>
+          </span>
+          <span class="cA-row__affordance">Reach out &rarr;</span>
+        </a>
+      </div>
+
+      <aside class="cA__rail" aria-label="Newsletter">
+        <p class="cA__rail-eyebrow">Join the Movement</p>
+        <h3 class="cA__rail-title">For The Real Ones</h3>
+        <p class="cA__rail-desc">Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance.</p>
+
+        <form class="cA__form" data-capture novalidate>
+          <div class="cA__field">
+            <label class="cx-sr" for="cA-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Email address</label>
+            <input class="cA__input" id="cA-email" type="email" name="email" autocomplete="email" placeholder="Your email address" required>
+            <button class="cA__submit" type="submit">Join</button>
+          </div>
+          <!-- ships EMPTY. no class. no pre-rendered success. -->
+          <p class="cx-status" role="status" aria-live="polite" data-status></p>
+          <p class="cA__note">Free to join &middot; Unsubscribe anytime &middot; Oakland love only</p>
+        </form>
+      </aside>
+
+    </div>
+
+    <div class="cA__outro">
+      <div class="cx-plate cA__plate">
+        <img src="assets/branding/skyyrose-monogram.webp" alt="SkyyRose monogram" width="2048" height="2048" loading="lazy" decoding="async">
+      </div>
+      <div class="cA__outro-copy">
+        <p class="cA__tagline">Luxury Grows from Concrete.</p>
+        <p class="cA__outro-desc">Oakland luxury streetwear. Gender-neutral, limited edition pieces &mdash; built by a father, named after a daughter.</p>
+      </div>
+      <p class="cA__scarcity">Limited Edition &middot; Individually Numbered &middot; Never Restocked</p>
+    </div>
+
+    <p class="cA__copyright">&copy; 2026 The Skyy Rose Collection LLC. All rights reserved.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.currentScript.parentNode;
+  var form = root.querySelector('form[data-capture]');
+  if (!form) return;
+  /* HARNESS GOTCHA: index.html's comment says a template's inline <script> is inert after
+     cloning. It is not — the clone executes, and then the harness re-creates the node and
+     it executes AGAIN. Without this guard the submit handler binds twice: pass 1 succeeds
+     and clears the field, pass 2 then sees an empty field and paints the error state. */
+  if (form.dataset.wired) return;
+  form.dataset.wired = '1';
+  var input = form.querySelector('input[type="email"]');
+  var status = form.querySelector('[data-status]');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    status.classList.remove('is-ok', 'is-err');
+    var v = input.value.trim();
+    if (!v) { status.classList.add('is-err'); status.textContent = 'Enter an email address to join.'; input.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { status.classList.add('is-err'); status.textContent = 'That address does not look right.'; input.focus(); return; }
+    status.classList.add('is-ok');
+    status.innerHTML = "You're on the list.<span class=\"cx-proto\">Prototype — nothing was sent. Production posts to admin-ajax.php.</span>";
+    input.value = '';
+  });
+})();
+</script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     B — Closing statement, capture in the line
+     ═════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="B" data-name="Closing statement, capture in the line">
+<section class="cB" aria-label="Join the Movement">
+  <div class="cB__inner">
+
+    <div class="cx-plate cB__plate">
+      <img src="assets/branding/skyyrose-monogram.webp" alt="SkyyRose monogram" width="2048" height="2048" loading="lazy" decoding="async">
+    </div>
+
+    <p class="cB__eyebrow">Join the Movement</p>
+    <h2 class="cB__statement">
+      For The Real Ones
+      <span class="cB__script">Luxury grows from concrete.</span>
+    </h2>
+    <p class="cB__desc">Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance.</p>
+
+    <form class="cB__form" data-capture novalidate aria-label="Newsletter signup">
+      <div class="cB__line">
+        <span>Send it to</span>
+        <label for="cB-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Email address</label>
+        <input class="cB__input" id="cB-email" type="email" name="email" autocomplete="email" placeholder="your email address" required>
+        <button class="cB__go" type="submit" aria-label="Join">&rarr;</button>
+      </div>
+      <!-- ships EMPTY. no class. no pre-rendered success. -->
+      <p class="cx-status cB__status" role="status" aria-live="polite" data-status></p>
+      <p class="cB__note">Free to join &middot; Unsubscribe anytime &middot; Oakland love only</p>
+    </form>
+
+    <!-- Service promise, demoted to a hairline footnote rail. Fit Guide stays a <button>
+         (opens the size-guide modal); the other three navigate. -->
+    <nav class="cB__services" aria-label="SkyyRose Service Promise">
+      <a class="cB-svc" href="#shipping-returns">Clear Shipping<small>Delivery and return expectations before checkout.</small></a>
+      <button class="cB-svc" type="button" data-open-size-guide>Fit Guide<small>Measure once, shop every drop with more confidence.</small></button>
+      <a class="cB-svc" href="#wishlist">Wishlist Flow<small>Save looks before small runs disappear.</small></a>
+      <a class="cB-svc" href="#contact">Concierge Contact<small>Questions, press, styling, and collaboration routes.</small></a>
+    </nav>
+
+    <p class="cB__scarcity">Limited Edition. Individually Numbered. Never Restocked.</p>
+    <p class="cB__copyright">&copy; 2026 The Skyy Rose Collection LLC. All rights reserved.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.currentScript.parentNode;
+  var form = root.querySelector('form[data-capture]');
+  if (!form) return;
+  /* HARNESS GOTCHA: index.html's comment says a template's inline <script> is inert after
+     cloning. It is not — the clone executes, and then the harness re-creates the node and
+     it executes AGAIN. Without this guard the submit handler binds twice: pass 1 succeeds
+     and clears the field, pass 2 then sees an empty field and paints the error state. */
+  if (form.dataset.wired) return;
+  form.dataset.wired = '1';
+  var input = form.querySelector('input[type="email"]');
+  var status = form.querySelector('[data-status]');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    status.classList.remove('is-ok', 'is-err');
+    var v = input.value.trim();
+    if (!v) { status.classList.add('is-err'); status.textContent = 'Enter an email address to join.'; input.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { status.classList.add('is-err'); status.textContent = 'That address does not look right.'; input.focus(); return; }
+    status.classList.add('is-ok');
+    status.innerHTML = "You're on the list.<span class=\"cx-proto\">Prototype — nothing was sent. Production posts to admin-ajax.php.</span>";
+    input.value = '';
+  });
+})();
+</script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     C — Scrolling outro, docked concierge bar
+     ═════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="C" data-name="Scrolling outro, docked concierge bar">
+<section class="cC" aria-label="SkyyRose">
+  <div class="cC__stage">
+
+    <p class="cC__eyebrow">The Skyy Rose Collection &middot; Oakland, CA</p>
+
+    <div class="cC__lines">
+      <span class="cC-line" data-reveal>Luxury</span>
+      <span class="cC-line cC-line--muted" data-reveal>Grows from</span>
+      <span class="cC-line cC-line--accent" data-reveal>Concrete.</span>
+    </div>
+
+    <p class="cC__body" data-reveal>
+      Oakland luxury streetwear. Gender-neutral, limited edition pieces &mdash; built by a
+      father, named after a daughter.
+      <span class="cC__script">A father&rsquo;s promise. A daughter&rsquo;s name.</span>
+    </p>
+
+    <div class="cC__rail-head">
+      <h2 class="cC__rail-title">The House Service Layer</h2>
+      <p class="cC__rail-hint">Swipe &rarr;</p>
+    </div>
+    <div class="cC__rail" role="group" aria-label="SkyyRose Service Promise">
+      <a class="cC-card" href="#shipping-returns">
+        <span class="cC-card__n">01</span>
+        <span class="cC-card__label">Clear Shipping</span>
+        <span class="cC-card__desc">Delivery and return expectations before checkout.</span>
+        <span class="cC-card__go">Read &rarr;</span>
+      </a>
+      <button class="cC-card" type="button" data-open-size-guide>
+        <span class="cC-card__n">02</span>
+        <span class="cC-card__label">Fit Guide</span>
+        <span class="cC-card__desc">Measure once, shop every drop with more confidence.</span>
+        <span class="cC-card__go">Open &#8599;</span>
+      </button>
+      <a class="cC-card" href="#wishlist">
+        <span class="cC-card__n">03</span>
+        <span class="cC-card__label">Wishlist Flow</span>
+        <span class="cC-card__desc">Save looks before small runs disappear.</span>
+        <span class="cC-card__go">Save &rarr;</span>
+      </a>
+      <a class="cC-card" href="#contact">
+        <span class="cC-card__n">04</span>
+        <span class="cC-card__label">Concierge Contact</span>
+        <span class="cC-card__desc">Questions, press, styling, and collaboration routes.</span>
+        <span class="cC-card__go">Reach out &rarr;</span>
+      </a>
+    </div>
+
+    <div class="cC__sign">
+      <div class="cx-plate cC__plate">
+        <img src="assets/branding/tsrc-lockup-static@2x.webp" alt="The Skyy Rose Collection" width="198" height="144" loading="lazy" decoding="async">
+      </div>
+      <div class="cC__sign-copy">
+        <p class="cC__tagline">Limited Edition. Individually Numbered. Never Restocked.</p>
+        <p class="cC__copyright">&copy; 2026 The Skyy Rose Collection LLC. All rights reserved.</p>
+      </div>
+    </div>
+
+    <!-- The dock is allowed to arrive only once this sentinel has been seen. That is the
+         markup expression of "never an entry interstitial". -->
+    <div class="cC__sentinel" data-dock-sentinel aria-hidden="true"></div>
+  </div>
+
+  <aside class="cC__dock" data-dock aria-label="Join the Inner Circle">
+    <div class="cx-plate cC__dock-mark">
+      <img src="assets/branding/tsrc-lockup-static@2x.webp" alt="" width="198" height="144" loading="lazy" decoding="async">
+    </div>
+    <div class="cC__dock-copy">
+      <p class="cC__dock-title">Join the Inner Circle</p>
+      <p class="cC__dock-desc">Exclusive drops, early access, and luxury delivered to your inbox.</p>
+    </div>
+    <form class="cC__dock-form" data-capture novalidate>
+      <div class="cC__dock-field">
+        <label for="cC-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Email address</label>
+        <input class="cC__dock-input" id="cC-email" type="email" name="email" autocomplete="email" placeholder="Enter your email" required>
+        <button class="cC__dock-submit" type="submit">Subscribe</button>
+      </div>
+      <!-- ships EMPTY. no class. no pre-rendered success. -->
+      <p class="cx-status" role="status" aria-live="polite" data-status></p>
+      <p class="cC__dock-note">Free to join &middot; Unsubscribe anytime &middot; Oakland love only</p>
+    </form>
+    <button class="cC__dock-close" type="button" data-dock-close aria-label="Dismiss">&times;</button>
+  </aside>
+</section>
+
+<script>
+(function () {
+  var root = document.currentScript.parentNode;
+  /* HARNESS GOTCHA — see A/B: this inline script executes twice (clone, then the harness's
+     re-created node). Everything below binds listeners and observers, so guard once at the
+     section level or the capture double-binds and the dock gets two observers. */
+  var sec = root.querySelector('.cC');
+  if (!sec || sec.dataset.wired) return;
+  sec.dataset.wired = '1';
+
+  /* --- capture: identical honesty contract to A and B --- */
+  var form = root.querySelector('form[data-capture]');
+  if (form) {
+    var input = form.querySelector('input[type="email"]');
+    var status = form.querySelector('[data-status]');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      status.classList.remove('is-ok', 'is-err');
+      var v = input.value.trim();
+      if (!v) { status.classList.add('is-err'); status.textContent = 'Enter an email address to join.'; input.focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { status.classList.add('is-err'); status.textContent = 'That address does not look right.'; input.focus(); return; }
+      status.classList.add('is-ok');
+      status.innerHTML = "You're on the list.<span class=\"cx-proto\">Prototype — nothing was sent.</span>";
+      input.value = '';
+    });
+  }
+
+  /* --- dock: arrives on arrival-at-close, never on arrival-at-page --- */
+  var dock = root.querySelector('[data-dock]');
+  var sentinel = root.querySelector('[data-dock-sentinel]');
+  var closeBtn = root.querySelector('[data-dock-close]');
+  if (!dock) return;
+  var dismissed = false;   // per-render, deliberately NOT persisted — a dismissal that
+                           // survives the session would hide the variant being judged
+
+  function raise() {
+    if (dismissed) return;
+    dock.classList.remove('is-gone');
+    dock.classList.add('is-up');
+  }
+
+  if (sentinel && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { raise(); io.disconnect(); } });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    io.observe(sentinel);
+  }
+  /* Backstop, deliberately gated on scrollY > 0. An UNGATED timer would raise the dock on
+     a visitor who never moved — which is precisely the entry-interstitial behaviour this
+     variant exists to argue against, and the founder would be judging the wrong rule. So
+     this only rescues someone who has actually scrolled and somehow missed the sentinel
+     (short section, no IntersectionObserver, restored scroll position). Production drops
+     it and keeps the observer alone. */
+  (function backstop() {
+    setTimeout(function () {
+      if (dismissed) return;
+      if (window.scrollY > 0) { raise(); return; }
+      backstop();
+    }, 2600);
+  })();
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      dismissed = true;
+      dock.classList.remove('is-up');
+      dock.classList.add('is-gone');
+    });
+  }
+
+  /* --- editorial reveal --- */
+  var reveals = root.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    var ro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en, i) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        setTimeout(function () { el.classList.add('is-in'); }, i * 90);
+        ro.unobserve(el);
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(function (el) { ro.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add('is-in'); });
+  }
+})();
+</script>
+</template>

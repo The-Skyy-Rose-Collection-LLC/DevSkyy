@@ -1,410 +1,180 @@
 ---
 name: tdd-workflow
-description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
+description: Drives RED → GREEN → IMPROVE in this repo's actual runners — pytest via `rtk proxy`, vitest in frontend/, Playwright for flows — and requires the RED state to be observed, not assumed. Use when writing a new feature, fixing a bug, or refactoring anything under the Python API, frontend/, or the theme's JS. Do NOT use for retrofitting tests onto code that already shipped green (that is a coverage-gap task), and do NOT use it to decide whether an existing suite's result is trustworthy — that is verification-loop.
 origin: ECC
 ---
 
-# Test-Driven Development Workflow
+# Test-Driven Development
 
-This skill ensures all code development follows TDD principles with comprehensive test coverage.
+TDD's value is not the test file. It is the **observed RED**: the one moment you have
+evidence the test can fail. Skip it and you have written an assertion nobody has ever
+seen return "no" — decoration with a green checkmark.
 
-## When to Activate
+This repo has paid for that. A fraud scorer shipped with a fully green suite; adversarial
+review then found **16 real defects** (bug-150). The tests proved each rule fires. Nobody
+had ever watched them fail for the right reason.
 
-- Writing new features or functionality
-- Fixing bugs or issues
-- Refactoring existing code
-- Adding API endpoints
-- Creating new components
+## When to use
 
-## Core Principles
+Use it when:
 
-### 1. Tests BEFORE Code
-ALWAYS write tests first, then implement code to make tests pass.
+- adding a feature or endpoint under `agents/`, `api/`, `services/`, `skyyrose/`
+- fixing a bug — the regression test is written first and must reproduce the bug
+- refactoring: the suite is the safety net, so it must be green *before* you touch code
+- changing a gate, guard, or validator — those need an explicit fail-closed test
 
-### 2. Coverage Requirements
-- Minimum 80% coverage (unit + integration + E2E)
-- All edge cases covered
-- Error scenarios tested
-- Boundary conditions verified
+Do **not** use it:
 
-### 3. Test Types
+- to backfill tests onto already-shipped code. That is a coverage-gap task with a
+  different shape (read the code, find the untested branch); there is no RED to observe.
+- to judge whether someone else's green suite means anything — that is
+  [`verification-loop`](../verification-loop/SKILL.md) plus
+  [`adversarial-verification`](../adversarial-verification/SKILL.md).
+- for pure config/docs edits with no behaviour.
 
-#### Unit Tests
-- Individual functions and utilities
-- Component logic
-- Pure functions
-- Helpers and utilities
+## Inputs
 
-#### Integration Tests
-- API endpoints
-- Database operations
-- Service interactions
-- External API calls
+| Required | How to get it | If absent |
+|---|---|---|
+| A green baseline before you start | `rtk proxy pytest tests/ -q` → 6546 passed, 0 failed | **Stop.** On a red baseline you cannot tell your break from the existing one. Fix or quarantine first, and name who owns the pre-existing failure. |
+| The right runner for the surface | Python → `rtk proxy pytest` · `frontend/` → `npm test` (vitest) · flows → `npx playwright test` | **Stop.** A bare `pytest` in this repo can print "no tests collected" and read as success. |
+| A stated behaviour, not a stated function | "invalid SKU raises `ValueError`", not "test `resolve_image`" | **Stop and restate.** A test named after a function tests whatever the function does, including the bug. |
+| A writable per-test temp dir (`tmp_path`) | pytest fixture | **Never write to tracked files.** bug-153: a test injected tokens into the real shared `design-tokens.css` and failed only under the full suite. |
+| For `frontend/`: the suite must be importable under vitest | `vitest.config.ts` uses an explicit `include` (`lib/wp/**`, `tests/**`) | **Stop.** A suite outside `include` is silently never run — and a skipped security test is indistinguishable from a passing one. |
 
-#### E2E Tests (Playwright)
-- Critical user flows
-- Complete workflows
-- Browser automation
-- UI interactions
+## Procedure
 
-## TDD Workflow Steps
+1. **Record the baseline.** Run the suite for the surface you are about to touch and note
+   the exact counts. You will diff against these, not against "green".
+2. **Write the test first**, naming the behaviour and the failure it forbids. One
+   behaviour per test; arrange-act-assert.
+3. **Run it and read the failure text.** RED must be the *right* red — an assertion
+   about your behaviour, not `ImportError`, not a fixture typo. A test that errors before
+   reaching its assertion has not demonstrated anything.
+4. **Write the minimum implementation** to turn it green. No speculative branches, no
+   abstraction for a single call site.
+5. **Re-run the single test, then the surface's full suite.** A test that passes alone
+   and fails in the suite is shared-state pollution (bug-231, ×5), not flake.
+6. **Prove the test can still fail** — extract the pre-change file with
+   `git archive HEAD <path> | tar -x -C <scratch>` and run your new test against that
+   pristine tree. It **must** fail there. Never `git stash`: the stash stack is shared
+   across worktrees.
+7. **Check coverage for the module you touched**, not repo-wide — the repo number moves
+   too slowly to show your delta.
+8. **Refactor with the suite green**, re-running after each step.
+9. **Never weaken a test to make it pass.** Loosening an assertion, adding `xfail`, or
+   widening a tolerance to reach green converts a real failure into a silent one.
 
-### Step 1: Write User Journeys
-```
-As a [role], I want to [action], so that [benefit]
+**A SKIP is not a PASS.** This worktree is sparse, so asset-dependent tests skip by
+design (bug-257). Report them as "not executed here; closed by CI / the full checkout" —
+never inside a passing count.
 
-Example:
-As a user, I want to search for markets semantically,
-so that I can find relevant markets even without exact keywords.
-```
+## Verification
 
-### Step 2: Generate Test Cases
-For each user journey, create comprehensive test cases:
+**1 — The new test is green in isolation and in the suite.**
 
-```typescript
-describe('Semantic Search', () => {
-  it('returns relevant markets for query', async () => {
-    // Test implementation
-  })
-
-  it('handles empty query gracefully', async () => {
-    // Test edge case
-  })
-
-  it('falls back to substring search when Redis unavailable', async () => {
-    // Test fallback behavior
-  })
-
-  it('sorts results by similarity score', async () => {
-    // Test sorting logic
-  })
-})
-```
-
-### Step 3: Run Tests (They Should Fail)
 ```bash
-npm test
-# Tests should fail - we haven't implemented yet
+rtk proxy pytest tests/mcp/test_http_mount.py -q && rtk proxy pytest tests/ -q
 ```
 
-### Step 4: Implement Code
-Write minimal code to make tests pass:
+**PASS:** the single file passes, and the full run reports `N passed` with `0 failed`
+and `N >= 6546` (the baseline). A drop in total count means you deleted or de-collected
+tests. `[test]`
 
-```typescript
-// Implementation guided by tests
-export async function searchMarkets(query: string) {
-  // Implementation here
-}
-```
+**2 — RED was real: the test fails against the pristine tree.** This is the
+prove-it-can-fail rule and the attribution rule in one move.
 
-### Step 5: Run Tests Again
 ```bash
-npm test
-# Tests should now pass
+mkdir -p /tmp/tdd-pristine && git archive HEAD mcp_tools/ | tar -x -C /tmp/tdd-pristine
+rtk proxy pytest tests/mcp/test_http_mount.py -q --rootdir=/tmp/tdd-pristine
 ```
 
-### Step 6: Refactor
-Improve code quality while keeping tests green:
-- Remove duplication
-- Improve naming
-- Optimize performance
-- Enhance readability
+**PASS-OF-THE-PROOF:** this run **fails**. If your new test passes against code that
+predates your change, it is not testing your change. `[test]`
 
-### Step 7: Verify Coverage
+**3 — Coverage on the module you touched.**
+
 ```bash
-npm run test:coverage
-# Verify 80%+ coverage achieved
+rtk proxy pytest tests/mcp/ -q --cov=mcp_tools --cov-report=term-missing
 ```
 
-## Testing Patterns
+**PASS:** the touched module reports ≥ 85% and the `Missing` column contains no line
+from your new code. `[repro]`
 
-### Unit Test Pattern (Jest/Vitest)
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from './Button'
+**4 — Frontend suites are actually collected.** vitest's explicit `include` makes silent
+non-collection the default failure here.
 
-describe('Button Component', () => {
-  it('renders with correct text', () => {
-    render(<Button>Click me</Button>)
-    expect(screen.getByText('Click me')).toBeInTheDocument()
-  })
-
-  it('calls onClick when clicked', () => {
-    const handleClick = jest.fn()
-    render(<Button onClick={handleClick}>Click</Button>)
-
-    fireEvent.click(screen.getByRole('button'))
-
-    expect(handleClick).toHaveBeenCalledTimes(1)
-  })
-
-  it('is disabled when disabled prop is true', () => {
-    render(<Button disabled>Click</Button>)
-    expect(screen.getByRole('button')).toBeDisabled()
-  })
-})
-```
-
-### API Integration Test Pattern
-```typescript
-import { NextRequest } from 'next/server'
-import { GET } from './route'
-
-describe('GET /api/markets', () => {
-  it('returns markets successfully', async () => {
-    const request = new NextRequest('http://localhost/api/markets')
-    const response = await GET(request)
-    const data = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(data.success).toBe(true)
-    expect(Array.isArray(data.data)).toBe(true)
-  })
-
-  it('validates query parameters', async () => {
-    const request = new NextRequest('http://localhost/api/markets?limit=invalid')
-    const response = await GET(request)
-
-    expect(response.status).toBe(400)
-  })
-
-  it('handles database errors gracefully', async () => {
-    // Mock database failure
-    const request = new NextRequest('http://localhost/api/markets')
-    // Test error handling
-  })
-})
-```
-
-### E2E Test Pattern (Playwright)
-```typescript
-import { test, expect } from '@playwright/test'
-
-test('user can search and filter markets', async ({ page }) => {
-  // Navigate to markets page
-  await page.goto('/')
-  await page.click('a[href="/markets"]')
-
-  // Verify page loaded
-  await expect(page.locator('h1')).toContainText('Markets')
-
-  // Search for markets
-  await page.fill('input[placeholder="Search markets"]', 'election')
-
-  // Wait for debounce and results
-  await page.waitForTimeout(600)
-
-  // Verify search results displayed
-  const results = page.locator('[data-testid="market-card"]')
-  await expect(results).toHaveCount(5, { timeout: 5000 })
-
-  // Verify results contain search term
-  const firstResult = results.first()
-  await expect(firstResult).toContainText('election', { ignoreCase: true })
-
-  // Filter by status
-  await page.click('button:has-text("Active")')
-
-  // Verify filtered results
-  await expect(results).toHaveCount(3)
-})
-
-test('user can create a new market', async ({ page }) => {
-  // Login first
-  await page.goto('/creator-dashboard')
-
-  // Fill market creation form
-  await page.fill('input[name="name"]', 'Test Market')
-  await page.fill('textarea[name="description"]', 'Test description')
-  await page.fill('input[name="endDate"]', '2025-12-31')
-
-  // Submit form
-  await page.click('button[type="submit"]')
-
-  // Verify success message
-  await expect(page.locator('text=Market created successfully')).toBeVisible()
-
-  // Verify redirect to market page
-  await expect(page).toHaveURL(/\/markets\/test-market/)
-})
-```
-
-## Test File Organization
-
-```
-src/
-├── components/
-│   ├── Button/
-│   │   ├── Button.tsx
-│   │   ├── Button.test.tsx          # Unit tests
-│   │   └── Button.stories.tsx       # Storybook
-│   └── MarketCard/
-│       ├── MarketCard.tsx
-│       └── MarketCard.test.tsx
-├── app/
-│   └── api/
-│       └── markets/
-│           ├── route.ts
-│           └── route.test.ts         # Integration tests
-└── e2e/
-    ├── markets.spec.ts               # E2E tests
-    ├── trading.spec.ts
-    └── auth.spec.ts
-```
-
-## Mocking External Services
-
-### Supabase Mock
-```typescript
-jest.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => Promise.resolve({
-          data: [{ id: 1, name: 'Test Market' }],
-          error: null
-        }))
-      }))
-    }))
-  }
-}))
-```
-
-### Redis Mock
-```typescript
-jest.mock('@/lib/redis', () => ({
-  searchMarketsByVector: jest.fn(() => Promise.resolve([
-    { slug: 'test-market', similarity_score: 0.95 }
-  ])),
-  checkRedisHealth: jest.fn(() => Promise.resolve({ connected: true }))
-}))
-```
-
-### OpenAI Mock
-```typescript
-jest.mock('@/lib/openai', () => ({
-  generateEmbedding: jest.fn(() => Promise.resolve(
-    new Array(1536).fill(0.1) // Mock 1536-dim embedding
-  ))
-}))
-```
-
-## Test Coverage Verification
-
-### Run Coverage Report
 ```bash
-npm run test:coverage
+cd frontend && npm test 2>&1 | tail -5
 ```
 
-### Coverage Thresholds
-```json
-{
-  "jest": {
-    "coverageThresholds": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
-  }
-}
-```
+**PASS:** the summary names your spec file. If your file is absent from the output, it
+was never run — fix `vitest.config.ts` `include` or move the suite. `[repro]`
 
-## Common Testing Mistakes to Avoid
+**5 — Flows: the Playwright spec is registered.**
 
-### ❌ WRONG: Testing Implementation Details
-```typescript
-// Don't test internal state
-expect(component.state.count).toBe(5)
-```
-
-### ✅ CORRECT: Test User-Visible Behavior
-```typescript
-// Test what users see
-expect(screen.getByText('Count: 5')).toBeInTheDocument()
-```
-
-### ❌ WRONG: Brittle Selectors
-```typescript
-// Breaks easily
-await page.click('.css-class-xyz')
-```
-
-### ✅ CORRECT: Semantic Selectors
-```typescript
-// Resilient to changes
-await page.click('button:has-text("Submit")')
-await page.click('[data-testid="submit-button"]')
-```
-
-### ❌ WRONG: No Test Isolation
-```typescript
-// Tests depend on each other
-test('creates user', () => { /* ... */ })
-test('updates same user', () => { /* depends on previous test */ })
-```
-
-### ✅ CORRECT: Independent Tests
-```typescript
-// Each test sets up its own data
-test('creates user', () => {
-  const user = createTestUser()
-  // Test logic
-})
-
-test('updates user', () => {
-  const user = createTestUser()
-  // Update logic
-})
-```
-
-## Continuous Testing
-
-### Watch Mode During Development
 ```bash
-npm test -- --watch
-# Tests run automatically on file changes
+cd frontend && ./node_modules/.bin/playwright test --list | tail -1
 ```
 
-### Pre-Commit Hook
+**PASS:** the total count went **up** by your test count. `testDir` is `./tests/e2e`;
+a spec written into the legacy `frontend/e2e/` is never executed and shows here as an
+unchanged total. `[repro]`
+
+**A run that errored, timed out, or hit a session limit is not a pass.** Its empty
+failure list is an artifact — re-run it by hand (bug-230).
+
+## Worked example
+
+Regression test for bug-211 (MCP bearer token compared with `!=`; fail-open when
+`MCP_SERVICE_TOKEN` is unset). Real commands in this worktree, 2026-07-29.
+
+Baseline for the surface:
+
 ```bash
-# Runs before every commit
-npm test && npm run lint
+$ rtk proxy pytest tests/mcp/test_http_mount.py -q
+......                                                                   [100%]
 ```
 
-### CI/CD Integration
-```yaml
-# GitHub Actions
-- name: Run Tests
-  run: npm test -- --coverage
-- name: Upload Coverage
-  uses: codecov/codecov-action@v3
+`[repro]` — 6 passed. That is the number the next run is diffed against.
+
+The behaviour under test, stated before the code: *"an Authorization header that shares a
+prefix with the real token is rejected, and the comparison is constant-time"* — which is
+why the implementation reads:
+
+```bash
+$ grep -n "compare_digest" mcp_tools/http_mount.py
+88:        if not hmac.compare_digest(provided, f"Bearer {token}")
 ```
 
-## Best Practices
+`[repo]`. The RED proof is the interesting half: run the same test file against the
+pre-fix tree via `git archive`, and it must fail on the `!=` comparison. Running it only
+against the fixed tree — where it passes — would have demonstrated nothing about the
+test.
 
-1. **Write Tests First** - Always TDD
-2. **One Assert Per Test** - Focus on single behavior
-3. **Descriptive Test Names** - Explain what's tested
-4. **Arrange-Act-Assert** - Clear test structure
-5. **Mock External Dependencies** - Isolate unit tests
-6. **Test Edge Cases** - Null, undefined, empty, large
-7. **Test Error Paths** - Not just happy paths
-8. **Keep Tests Fast** - Unit tests < 50ms each
-9. **Clean Up After Tests** - No side effects
-10. **Review Coverage Reports** - Identify gaps
+The contrast case, same session, same runner:
 
-## Success Metrics
+```bash
+$ rtk proxy pytest tests/test_asset_manifest.py -q
+SKIPPED [1] tests/test_asset_manifest.py:42: sparse worktree deliberately excludes
+  assets/products; this gate runs in full checkouts and CI
+SKIPPED [1] tests/test_asset_manifest.py:51: ... (×4 total)
+```
 
-- 80%+ code coverage achieved
-- All tests passing (green)
-- No skipped or disabled tests
-- Fast test execution (< 30s for unit tests)
-- E2E tests cover critical user flows
-- Tests catch bugs before production
+`[repro]` — 4 skipped, **0 passed**. Reported as "asset-manifest integrity did not run in
+this worktree". Rolling those four into a "tests pass" line is the exact bug-257 defect.
 
----
+## Failure modes
 
-**Remember**: Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.
+| Symptom | What is really happening | Bug |
+|---|---|---|
+| Suite fully green, adversarial review finds many real defects | Tests proved each rule fires; none exercised calibration, boundaries, or the never-raises guard. Green ≠ correct. | bug-150 |
+| Test passes alone, fails in the full suite | Shared state — module globals, a real tracked file written in place, ordering under `asyncio_mode=auto`. Use `tmp_path` / `monkeypatch`. | bug-231 (×5), bug-153 |
+| Test skipped everywhere, counted as passing | A SKIP is not a PASS. Name who closes it (CI / full checkout). | bug-257 |
+| `pytest` says "no tests collected", read as success | Bare pytest misreports in this repo. Always `rtk proxy pytest`. | — |
+| New frontend spec never appears in output | Outside `vitest.config.ts`'s explicit `include`, or written into the legacy `frontend/e2e/` that Playwright's `testDir` excludes. | — |
+| Test made to pass by loosening its assertion | The failure was real and is now silent. Fix the cause, never the assertion. | — |
+| RED never observed; test written after the code | No evidence the assertion can fail. Re-derive via `git archive` against the pristine tree. | — |
+| `git stash` used to get a clean tree for the RED check | The stash stack is shared across worktrees; you can pop another session's work. | — |
+| Multiprocess/fork test SIGSEGVs on macOS | Darwin fork safety — `no_proxy='*'` must be pre-set and the resource tracker pre-spawned. | bug-263 (×7) |
+| Coverage measured repo-wide, shows "no change" | Your delta is invisible in a 6546-test total. Measure `--cov=<touched module>`. | — |

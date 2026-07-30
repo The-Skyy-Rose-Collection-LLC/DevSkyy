@@ -1,0 +1,844 @@
+<style>
+/* ══════════════════════════════════════════════════════════════════════════════
+   PROTOTYPE — THROWAWAY. Section: origin (the founder story).
+   Three variants, three different skeletons. Not production, not deployable.
+
+   COPY IS REAL. Every string is lifted from
+   wordpress-theme/skyyrose-flagship/front-page.php — story block (404-427),
+   quote block (434-438), craft cards (92-104), hero marks (264-268),
+   press array (48-69). Compression is done by DROPPING paragraphs and
+   re-punctuating real fragments into beats, never by paraphrasing into new
+   brand voice.
+
+   GAP — one invented string in the whole file: variant C's beat label
+   "The Name". front-page.php has no label for the naming beat; every other
+   label ("Est. 2020", "Oakland Made Mentality", "Gender Neutral",
+   "Recognition") is a real string. Marked inline where it appears.
+
+   GAP — media. front-page.php's founder portrait ($founder_img =
+   homepage-story-founder.webp) is NOT in the prototype asset tree. The
+   720x1280 PORTRAIT founder video (assets/home-hero.webm + its poster) stands
+   in for it. Both confirmed present with `ls`.
+
+   COLOUR — tokens only. rgba(0,0,0,…) and rgba(10,10,10,…) appear as scrims;
+   10,10,10 IS --black in rgb, and tokens.css ships no --black-rgb.
+   Crimson is used as a border and a radial glow only, never as text.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─── shared: the reveal gate ─────────────────────────────────────────────────
+   The hidden state is gated on [data-anim="on"], which each variant's script
+   sets ONLY when reduced-motion is off. tokens.css's global reduced-motion
+   block zeroes durations but does not reveal anything — so an ungated
+   opacity:0 would leave the whole section blank and unjudgeable. No JS or
+   reduced motion => content is simply visible. */
+[data-anim="on"] .og-rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-reveal) var(--ease-cinematic) var(--d, 0ms),
+              transform var(--dur-reveal) var(--ease-cinematic) var(--d, 0ms);
+}
+[data-anim="on"] .og-rv.is-in { opacity: 1; transform: none; }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   A — SPLIT PORTRAIT + CUT-IN
+   Organising idea: the founder is a BOUNDED OBJECT on the page. The video sits
+   in a hairline-framed, fixed-aspect box in normal flow; a pull-quote card is
+   hung off it and visibly crosses its bottom edge — at every width, 390px
+   included. The intrusion is the idea, so it never gets dropped on mobile.
+   Hierarchy: name the section, then the man, then the quote biting into him,
+   then the compressed prose. Affordance: one link out — "Our Story".
+   ══════════════════════════════════════════════════════════════════════════ */
+.ogA {
+  position: relative;
+  background: var(--black);
+  overflow-x: clip;
+  padding: clamp(56px, 9vw, 120px) var(--space-6) clamp(72px, 10vw, 140px);
+}
+.ogA__rail { display: none; }
+@media (min-width: 1180px) {
+  .ogA__rail {
+    display: block;
+    position: absolute;
+    left: clamp(14px, 2vw, 34px);
+    top: 50%;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-family: var(--font-caps);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--fg3);
+  }
+}
+
+.ogA__grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+  grid-template-areas: "head" "media" "body";
+}
+@media (min-width: 900px) {
+  .ogA__grid {
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr);
+    /* auto/1fr, not the implicit 1fr/1fr: the media spans both rows and is the
+       tallest item, so even rows would split its height and strand the body
+       halfway down the column with a dead gap under the heading. */
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "media head" "media body";
+    column-gap: clamp(44px, 5vw, 84px);
+    row-gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.ogA__head { grid-area: head; }
+.ogA__eyebrow {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--rose-gold);           /* 5.16:1 on --black — safe for text */
+}
+.ogA__h {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 125;
+  font-weight: 800;
+  font-size: var(--text-5xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin-top: var(--space-4);
+}
+.ogA__sub {
+  display: block;
+  margin-top: var(--space-4);
+  font-family: var(--font-caps);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--text-lg);
+  letter-spacing: 0;
+  line-height: var(--leading-snug);
+  color: var(--fg3);
+}
+
+/* the bounded object */
+.ogA__media { grid-area: media; position: relative; }
+.ogA__frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sharp);
+  box-shadow: var(--depth-3);
+  background: var(--smoke);
+}
+/* The source is 9:16; a centred 4:5 crop lands on the subject's lap and cuts the
+   head off entirely. Bias the crop upward so the face is in frame. */
+.ogA__frame video,
+.ogA__frame img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; }
+.ogA__frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,.62), transparent 46%);
+}
+.ogA__badge {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-4);
+  left: var(--space-4);
+  max-width: 62%;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(10,10,10,.84);          /* 10,10,10 === --black */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--rose-gold-rgb), .45);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--depth-2);
+}
+.ogA__badgeLbl {
+  display: block;
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+}
+.ogA__badgeVal {
+  display: block;
+  margin-top: var(--space-1);
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 112;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+
+/* the intrusion — crosses the frame's bottom edge at EVERY width */
+.ogA__cut {
+  position: relative;
+  z-index: 3;
+  margin-top: -26px;
+  margin-left: var(--space-8);
+  margin-right: calc(var(--space-4) * -1);
+  padding: var(--space-6);
+  background: var(--smoke);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--crimson);    /* crimson as a fill/border only */
+  box-shadow: var(--depth-4);
+}
+@media (min-width: 900px) {
+  .ogA__cut {
+    position: absolute;
+    margin: 0;
+    width: min(370px, 44vw);
+    /* Hangs BELOW the frame's bottom edge rather than reaching deep into the
+       text column — reaching further collided with the "Our Story" CTA and the
+       intrusion swallowed the section's only affordance. */
+    right: clamp(-80px, -5vw, -32px);
+    bottom: clamp(-40px, -3vw, -20px);
+  }
+}
+.ogA__cutQ {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 115;
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+.ogA__cutQ em { font-style: italic; color: var(--gold); }   /* 9.27:1 on --black */
+.ogA__cutA {
+  margin-top: var(--space-4);
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+.ogA__body { grid-area: body; max-width: 48ch; }
+.ogA__body p {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--fg2);
+}
+.ogA__body p + p { margin-top: var(--space-4); }
+.ogA__body strong { color: var(--rose-gold); font-weight: 700; }
+.ogA__cta {
+  display: inline-block;
+  margin-top: var(--space-8);
+  padding: var(--space-3) var(--space-8);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fg1);
+  border: 1px solid rgba(var(--rose-gold-rgb), .55);
+  border-radius: var(--radius-pill);
+  transition: border-color var(--dur-base) var(--ease),
+              box-shadow var(--dur-base) var(--ease);
+}
+.ogA__cta:hover,
+.ogA__cta:focus-visible { border-color: var(--rose-gold); box-shadow: var(--glow-rose); }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   B — FULL-BLEED TESTIMONY
+   Organising idea: the founder speaks first and the page is his voice. The
+   video is not an object — it is a LAYER, edge to edge, unframed, scrimmed,
+   with type sitting on top of it. Every prose paragraph is dropped; the quote
+   IS the section. Hierarchy: words, then the man, then the marks.
+   Affordance: a transport control — play or pause the film behind the words.
+   ══════════════════════════════════════════════════════════════════════════ */
+.ogB {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--black);
+  padding: clamp(72px, 12vh, 140px) var(--space-6);
+}
+.ogB__layer { position: absolute; inset: 0; z-index: 0; }
+.ogB__layer video,
+.ogB__layer img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  filter: grayscale(.3) contrast(1.06);
+  opacity: .62;
+}
+/* Scrim is deliberately lighter than instinct wants: at .34 opacity behind a
+   .70-.88 scrim the film read as a flat gradient, which collapses B into "a
+   quote on black" — the one thing that distinguishes it from A. */
+.ogB__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(62% 54% at 50% 40%, rgba(var(--crimson-rgb), .17), transparent 70%),
+    linear-gradient(to bottom, rgba(10,10,10,.52), rgba(10,10,10,.78) 62%, var(--black));
+}
+.ogB__inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--container-narrow);
+  margin: 0 auto;
+  text-align: center;
+}
+.ogB__mark {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+}
+.ogB__q {
+  margin-top: var(--space-8);
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 118;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 4.2vw, 3.25rem);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg1);
+  max-width: 24ch;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+.ogB__q em { font-style: italic; color: var(--gold); }
+/* Phrase-level stagger. These are inline, so transform is useless — the reveal
+   rides opacity + blur instead. Rules sit AFTER .og-rv so they win. */
+[data-anim="on"] .ogB__ph { transform: none; filter: blur(10px); }
+[data-anim="on"] .ogB__ph.is-in {
+  transform: none;
+  filter: blur(0);
+  transition-property: opacity, filter;
+  transition-duration: var(--dur-cinem);
+  transition-timing-function: var(--ease-cinematic);
+  transition-delay: var(--d, 0ms);
+}
+.ogB__attr {
+  margin-top: var(--space-8);
+  font-family: var(--font-caps);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg2);
+}
+/* Reused verbatim from front-page.php's hero subtitle (line 268) — the only
+   string in the file that carries the whole premise in one clause. */
+.ogB__line {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--fg3);
+}
+.ogB__ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-12);
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  color: var(--fg1);
+  border: 1px solid rgba(var(--rose-gold-rgb), .5);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  transition: border-color var(--dur-base) var(--ease),
+              box-shadow var(--dur-base) var(--ease);
+}
+.ogB__ctrl:hover,
+.ogB__ctrl:focus-visible { border-color: var(--rose-gold); box-shadow: var(--glow-rose); }
+.ogB__ctrl svg { display: block; }
+.ogB__ctrl [hidden] { display: none; }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   C — LEDGER LETTER, TAP-OPEN
+   Organising idea: not a spread, a DOCUMENT. No portrait at all — a ruled
+   ledger of dated beats down a rose-gold rail, signed at the bottom. The
+   over-writing the brief complains about is solved by progressive disclosure:
+   every beat shows one compressed line, and the full front-page.php prose is
+   folded behind it. Hierarchy: chronology. Affordance: self-paced expansion
+   (native <details>, so it works keyboard-first and with JS off).
+   ══════════════════════════════════════════════════════════════════════════ */
+.ogC {
+  background: linear-gradient(180deg, var(--black), var(--charcoal) 45%, var(--black));
+  padding: clamp(64px, 9vw, 120px) var(--space-6);
+}
+.ogC__sheet { max-width: 760px; margin: 0 auto; }
+.ogC__head { padding-bottom: var(--space-8); border-bottom: 1px solid var(--border); }
+.ogC__eyebrow {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+}
+.ogC__h {
+  margin-top: var(--space-3);
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 125;
+  font-weight: 800;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+.ogC__sub {
+  margin-top: var(--space-3);
+  font-family: var(--font-caps);
+  font-style: italic;
+  font-size: var(--text-lg);
+  color: var(--fg3);
+}
+
+.ogC__ledger {
+  --rail: clamp(22px, 5vw, 40px);
+  position: relative;
+  margin-top: var(--space-8);
+  padding-left: var(--rail);
+  border-left: 1px solid rgba(var(--rose-gold-rgb), .22);
+}
+.ogC__fill {
+  position: absolute;
+  left: -1px; top: 0;
+  width: 1px; height: 0;
+  background: var(--rose-gold);
+  box-shadow: var(--glow-rose);
+}
+.ogC__beat { position: relative; padding: var(--space-6) 0; border-bottom: 1px solid var(--border); }
+.ogC__beat::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--rail) * -1 - 4px);
+  top: calc(var(--space-6) + 9px);
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--rose-gold);
+  box-shadow: var(--glow-rose);
+}
+.ogC__beat > summary {
+  display: block;
+  list-style: none;
+  cursor: pointer;
+  padding-right: var(--space-8);
+  position: relative;
+}
+.ogC__beat > summary::-webkit-details-marker { display: none; }
+.ogC__beat > summary::after {
+  content: '+';
+  position: absolute;
+  right: 0; top: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-xl);
+  line-height: 1;
+  color: var(--fg3);
+}
+.ogC__beat[open] > summary::after { content: '\2212'; color: var(--rose-gold); }
+.ogC__beat > summary:focus-visible { outline: 1px solid var(--rose-gold); outline-offset: 6px; }
+.ogC__lbl {
+  display: block;
+  font-family: var(--font-accent);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+}
+.ogC__line {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 112;
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+.ogC__more {
+  margin-top: var(--space-4);
+  max-width: 58ch;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--fg3);
+}
+.ogC__press { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin-top: var(--space-4); }
+.ogC__press a,
+.ogC__press span {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--fg3);
+  text-decoration: none;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(var(--rose-gold-rgb), .45);
+}
+.ogC__press span { border-bottom-color: var(--border); }   /* The Blox — no URL in front-page.php */
+.ogC__press a:hover,
+.ogC__press a:focus-visible { color: var(--rose-gold); border-bottom-color: var(--rose-gold); }
+
+.ogC__sign { margin-top: var(--space-12); }
+.ogC__proof {
+  max-width: 26ch;
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 118;
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+.ogC__name {
+  margin-top: var(--space-8);
+  font-family: var(--script-sig);
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  line-height: 1;
+  color: var(--gold);
+}
+.ogC__role {
+  margin-top: var(--space-3);
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.ogC__tag {
+  margin-top: var(--space-12);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+
+/* ─── reduced motion — second belt ────────────────────────────────────────────
+   tokens.css already zeroes durations. This guarantees nothing is left in a
+   hidden start state, because an invisible variant cannot be judged at all. */
+@media (prefers-reduced-motion: reduce) {
+  .og-rv,
+  .og-rv.is-in,
+  .ogB__ph,
+  .ogB__ph.is-in {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .ogC__fill { height: 100% !important; }
+}
+</style>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="A" data-name="Split portrait + cut-in">
+<section class="ogA" id="ogA" aria-labelledby="ogA-h">
+  <p class="ogA__rail" aria-hidden="true">Luxury Grows from Concrete.</p>
+
+  <div class="ogA__grid">
+
+    <header class="ogA__head">
+      <p class="ogA__eyebrow og-rv">The Origin</p>
+      <h2 class="ogA__h og-rv" id="ogA-h" style="--d:80ms">
+        Born In<br>The Town
+        <em class="ogA__sub">A father&rsquo;s promise. A daughter&rsquo;s name.</em>
+      </h2>
+    </header>
+
+    <div class="ogA__media og-rv" style="--d:160ms">
+      <div class="ogA__frame">
+        <!-- front-page.php's real alt for the founder portrait is "Corey Foster,
+             SkyyRose founder" — but that belongs to homepage-story-founder.webp,
+             a different file. This is home-hero.webm standing in, and reading the
+             poster's pixels does not let me confirm the subject IS Corey. Label
+             left neutral rather than asserting an identity from a filename. -->
+        <video
+          poster="assets/home-hero-poster-720w.webp"
+          muted playsinline loop preload="metadata"
+          width="720" height="1280"
+          aria-label="SkyyRose founder film"></video>
+        <div class="ogA__badge">
+          <span class="ogA__badgeLbl">Recognition</span>
+          <span class="ogA__badgeVal">Best Oakland<br>Clothing Line 2024</span>
+        </div>
+      </div>
+
+      <!-- the intrusion: hangs off the frame's bottom edge at every width -->
+      <figure class="ogA__cut">
+        <blockquote class="ogA__cutQ">
+          But we knew we had to get it <em>by any means necessary</em>.
+        </blockquote>
+        <figcaption class="ogA__cutA">&mdash; Corey Foster, Founder &amp; CEO</figcaption>
+      </figure>
+    </div>
+
+    <!-- compressed: front-page.php ships three paragraphs here; this keeps the
+         first and the last verbatim and drops the middle. -->
+    <div class="ogA__body og-rv" style="--d:240ms">
+      <p>In a neighborhood where opportunities are as scarce as support,
+         <strong>Corey Foster</strong> refused to become another statistic.
+         He&rsquo;d lost everything &mdash; broke, no drive left, a baby on the way.</p>
+      <p>SkyyRose isn&rsquo;t just clothing. It&rsquo;s proof that your circumstances
+         don&rsquo;t define your destination.</p>
+      <a class="ogA__cta" href="#">Our Story</a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.getElementById('ogA');
+  if (!root) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var vid = root.querySelector('video');
+  if (vid) {
+    // No autoplay attribute in the markup — reduced-motion users get the poster
+    // and zero frames of motion.
+    if (!vid.querySelector('source')) {
+      var s = document.createElement('source');
+      s.src = 'assets/home-hero.webm'; s.type = 'video/webm';
+      vid.appendChild(s);
+    }
+    if (!reduce) vid.play().catch(function () {});
+  }
+
+  if (reduce) return;
+  root.setAttribute('data-anim', 'on');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-in');
+      io.unobserve(e.target);
+    });
+  }, { threshold: .12 });
+  root.querySelectorAll('.og-rv').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="B" data-name="Full-bleed testimony">
+<section class="ogB" id="ogB" aria-labelledby="ogB-q">
+
+  <div class="ogB__layer" aria-hidden="true">
+    <video
+      poster="assets/home-hero-poster-720w.webp"
+      muted playsinline loop preload="metadata"
+      width="720" height="1280"></video>
+  </div>
+  <div class="ogB__scrim" aria-hidden="true"></div>
+
+  <div class="ogB__inner">
+    <p class="ogB__mark og-rv">Oakland &middot; Est. 2020</p>
+
+    <blockquote class="ogB__q" id="ogB-q">
+      <span class="ogB__ph og-rv" style="--d:0ms">&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here.</span>
+      <span class="ogB__ph og-rv" style="--d:200ms">I had no drive, lost it all, a baby on the way, and was broke.</span>
+      <span class="ogB__ph og-rv" style="--d:400ms">But we knew we had to get it <em>by any means necessary</em>.&rdquo;</span>
+    </blockquote>
+
+    <p class="ogB__attr og-rv" style="--d:640ms">&mdash; Corey Foster, Founder &amp; CEO</p>
+    <p class="ogB__line og-rv" style="--d:720ms">Built by a father, named after a daughter.</p>
+
+    <button type="button" class="ogB__ctrl og-rv" data-play style="--d:800ms">
+      <svg data-icon="play" width="13" height="15" viewBox="0 0 13 15" fill="currentColor" aria-hidden="true"><path d="M0 0l13 7.5L0 15z"/></svg>
+      <svg data-icon="pause" width="13" height="15" viewBox="0 0 13 15" fill="currentColor" aria-hidden="true" hidden><path d="M0 0h4.5v15H0zM8.5 0H13v15H8.5z"/></svg>
+      <span data-play-label>Play the film</span>
+    </button>
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.getElementById('ogB');
+  if (!root) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var vid = root.querySelector('video');
+  var btn = root.querySelector('[data-play]');
+  var iPlay = root.querySelector('[data-icon="play"]');
+  var iPause = root.querySelector('[data-icon="pause"]');
+  var label = root.querySelector('[data-play-label]');
+
+  if (vid && !vid.querySelector('source')) {
+    var s = document.createElement('source');
+    s.src = 'assets/home-hero.webm'; s.type = 'video/webm';
+    vid.appendChild(s);
+  }
+
+  function sync() {
+    var playing = !!vid && !vid.paused && !vid.ended;
+    // These are SVGElements. `.hidden` is an HTMLElement IDL property, so
+    // `iPlay.hidden = true` silently sets a plain JS prop and never reaches the
+    // content attribute — the icon stayed on "play" while the label said
+    // "Pause the film". Set the attribute directly.
+    function show(el, on) { if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', ''); }
+    show(iPlay, !playing);
+    show(iPause, playing);
+    label.textContent = playing ? 'Pause the film' : 'Play the film';
+    btn.setAttribute('aria-pressed', String(playing));
+  }
+  if (btn && vid) {
+    btn.addEventListener('click', function () {
+      if (vid.paused) vid.play().catch(function () {}); else vid.pause();
+    });
+    vid.addEventListener('play', sync);
+    vid.addEventListener('pause', sync);
+  }
+  // Reduced motion: poster only, and the control still works if asked for.
+  if (vid && !reduce) vid.play().catch(function () {});
+  sync();
+
+  if (reduce) return;
+  root.setAttribute('data-anim', 'on');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-in');
+      io.unobserve(e.target);
+    });
+  }, { threshold: .1 });
+  root.querySelectorAll('.og-rv').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="C" data-name="Ledger letter, tap-open">
+<section class="ogC" id="ogC" aria-labelledby="ogC-h">
+  <div class="ogC__sheet">
+
+    <header class="ogC__head">
+      <!-- No mark here on purpose. skyyrose-monogram.webp / skyyrose-rose-icon.webp /
+           tsrc-lockup-static@2x.webp are all RGB with an opaque WHITE background
+           (only signature-logo.webp carries real alpha), so any of them renders as a
+           white chip on this black sheet. And C's whole idea is a document with no
+           imagery — a typographic letterhead is the stronger read anyway. -->
+      <p class="ogC__eyebrow og-rv">The Origin</p>
+      <h2 class="ogC__h og-rv" id="ogC-h" style="--d:120ms">Born In The Town</h2>
+      <p class="ogC__sub og-rv" style="--d:180ms">A father&rsquo;s promise. A daughter&rsquo;s name.</p>
+    </header>
+
+    <!-- Each beat: one compressed line up top, the full front-page.php prose
+         folded behind it. Labels are real strings except "The Name" (see the
+         GAP note at the top of this file). -->
+    <div class="ogC__ledger" id="ogC-ledger">
+      <div class="ogC__fill" id="ogC-fill" aria-hidden="true"></div>
+
+      <details class="ogC__beat og-rv">
+        <summary>
+          <span class="ogC__lbl">Est. 2020</span>
+          <span class="ogC__line">Broke. No drive left. A baby on the way.</span>
+        </summary>
+        <p class="ogC__more">In a neighborhood where opportunities are as scarce as support,
+           Corey Foster refused to become another statistic.</p>
+      </details>
+
+      <details class="ogC__beat og-rv" style="--d:60ms">
+        <summary>
+          <!-- INVENTED LABEL — the one string in this file with no source in
+               front-page.php. Everything under it is real. -->
+          <span class="ogC__lbl">The Name</span>
+          <span class="ogC__line">Named after his daughter, Skyy Rose.</span>
+        </summary>
+        <p class="ogC__more">Four collections, one name &mdash; built by a father,
+           named after a daughter.</p>
+      </details>
+
+      <details class="ogC__beat og-rv" style="--d:120ms">
+        <summary>
+          <span class="ogC__lbl">Oakland Made Mentality</span>
+          <span class="ogC__line">Failed websites. Scammer manufacturers. Single parenthood with no support.</span>
+        </summary>
+        <p class="ogC__more">Born from the struggle of East Oakland. Designed for the world.
+           Built to last generations.</p>
+      </details>
+
+      <details class="ogC__beat og-rv" style="--d:180ms">
+        <summary>
+          <span class="ogC__lbl">Gender Neutral</span>
+          <span class="ogC__line">Designed for anyone, regardless of gender or age.</span>
+        </summary>
+        <p class="ogC__more">Pioneer in Oakland gender-neutral fashion.</p>
+      </details>
+
+      <details class="ogC__beat og-rv" style="--d:240ms">
+        <summary>
+          <span class="ogC__lbl">Recognition</span>
+          <span class="ogC__line">Best Oakland Clothing Line 2024.</span>
+        </summary>
+        <div class="ogC__press">
+          <a href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" rel="noopener" target="_blank">Maxim</a>
+          <a href="https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/" rel="noopener" target="_blank">CEO Weekly</a>
+          <a href="https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/" rel="noopener" target="_blank">San Francisco Post</a>
+          <a href="https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024" rel="noopener" target="_blank">Best of Best Review</a>
+          <span>The Blox</span>
+        </div>
+      </details>
+    </div>
+
+    <div class="ogC__sign og-rv">
+      <p class="ogC__proof">SkyyRose isn&rsquo;t just clothing. It&rsquo;s proof that your
+         circumstances don&rsquo;t define your destination.</p>
+      <p class="ogC__name">Corey Foster</p>
+      <p class="ogC__role">Founder &amp; CEO</p>
+      <p class="ogC__tag">Luxury Grows from Concrete.</p>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.getElementById('ogC');
+  if (!root) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ledger = document.getElementById('ogC-ledger');
+  var fill = document.getElementById('ogC-fill');
+
+  if (reduce) { if (fill) fill.style.height = '100%'; return; }
+
+  root.setAttribute('data-anim', 'on');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('is-in');
+      io.unobserve(e.target);
+    });
+  }, { threshold: .12 });
+  root.querySelectorAll('.og-rv').forEach(function (el) { io.observe(el); });
+
+  // Rail fills as the ledger scrolls past. Self-detaching: the harness remounts
+  // the section on every switch, so an orphaned listener unhooks itself.
+  function tick() {
+    if (!document.body.contains(ledger)) {
+      removeEventListener('scroll', tick);
+      removeEventListener('resize', tick);
+      return;
+    }
+    var r = ledger.getBoundingClientRect();
+    var p = (innerHeight * 0.72 - r.top) / (r.height || 1);
+    fill.style.height = (Math.max(0, Math.min(1, p)) * 100) + '%';
+  }
+  addEventListener('scroll', tick, { passive: true });
+  addEventListener('resize', tick);
+  tick();
+})();
+</script>
+</template>

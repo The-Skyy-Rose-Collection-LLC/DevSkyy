@@ -1,0 +1,445 @@
+<!--
+  PROTOTYPE — THROWAWAY. sections/ticker.html
+  The brand-mantra ticker: a rhythm break between two heavy sections. Decorative, so the
+  moving strip is aria-hidden in every variant and carries no link, no control, no
+  screen-reader duty.
+
+  COPY: every string is real, from wordpress-theme/skyyrose-flagship/front-page.php —
+    tagline          front-page.php:153  "Luxury Grows from Concrete."
+    $marquee items   front-page.php:70-79 "Black Rose" "Love Hurts" "Signature"
+                                          "Oakland Made" "Gender Neutral"
+                                          "Limited Edition" "Luxury Streetwear"
+                                          "Built Different"
+    neighbour stubs  front-page.php:287 "As Featured In", :424 quote, :443 "The Collections"
+                                        / "Four Collections. One Vision."
+  GAP: the theme's live $marquee array has NO "Kids Capsule" entry — it predates the
+  capsule. All four collections are canon, so Kids Capsule is added here deliberately.
+  If a variant wins, add it to $marquee too rather than special-casing the template.
+
+  NO IMAGES, on purpose. `identify` says 6 of the 7 branding webps report alpha=Undefined
+  (only signature-logo.webp is alpha=Blend), so a logo used as an inline separator glyph
+  would render as an opaque tile, not a mark. A broken-looking asset makes the variant
+  unjudgeable, so this section is type-only — which is what a ticker should be anyway.
+
+  Each variant is wrapped in stub neighbours above and below, because the one question
+  this section has to answer is "does it shout louder than what it sits between?" —
+  which is unanswerable in isolation.
+-->
+<style>
+/* ─────────────────────────── neighbour stubs (judging aid, not design) ─────────────── */
+.tk-nb {
+  padding: clamp(64px, 12vw, 120px) var(--space-6);
+  text-align: center;
+  border: 0;
+}
+.tk-nb__eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: var(--space-4);
+}
+.tk-nb__title {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 125;
+  font-weight: 800;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg1);
+  max-width: 18ch;
+  margin: 0 auto;
+}
+.tk-nb__quote {
+  font-family: var(--font-body);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg2);
+  max-width: 34ch;
+  margin: 0 auto;
+}
+.tk-nb--above { background: linear-gradient(180deg, var(--smoke), var(--black)); }
+.tk-nb--below { background: linear-gradient(180deg, var(--black), var(--charcoal)); }
+
+
+/* ═══════════════════════════ A — Hairline seam ════════════════════════════════════════
+   The ticker as a RULE that happens to carry words. Rule-weight ink, one row, one
+   continuous reading line. The Pinyon mantra is the only colour in the strip; everything
+   else sits at --fg3. Lowest possible visual mass — it can never out-shout a neighbour
+   because it barely has a body.                                                        */
+.tk-a {
+  position: relative;
+  overflow: hidden;
+  background: var(--black);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-4) 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
+          mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
+}
+.tk-a__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tk-a-run 46s linear infinite;
+}
+.tk-a__item {
+  display: inline-flex;
+  align-items: center;
+  /* Separator is TRAILING and belongs to the item, so both halves of the track are
+     byte-identical and the -50% wrap is invisible. */
+}
+.tk-a__item::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  margin: 0 clamp(20px, 3.4vw, 40px);
+  background: var(--rose-gold);
+  opacity: .45;
+  transform: rotate(45deg);
+  flex: none;
+}
+.tk-a__name {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.tk-a__mantra {
+  font-family: var(--script-sig);
+  font-size: clamp(1.0625rem, 2.2vw, 1.375rem);
+  line-height: 1;
+  color: var(--rose-gold);
+  /* Pinyon sits high in its em box; nudge it onto the same optical baseline as Cinzel. */
+  transform: translateY(-.06em);
+}
+@keyframes tk-a-run { to { transform: translateX(-50%); } }
+
+
+/* ═══════════════════════════ B — Counter-scrolling shear band ═════════════════════════
+   Two tiers moving against each other, split by a hairline. Top tier is dominant in SIZE
+   but not in INK — outline-only Cinzel with a 7%-alpha fill, so it has scale without
+   weight. Bottom tier is the subordinate register: the mantra plus the real $marquee
+   attribute strings. The opposed motion is the whole idea — friction between two faces
+   of one slab.                                                                          */
+.tk-b {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--charcoal), var(--black));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: clamp(14px, 2.4vw, 22px) 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+          mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+.tk-b__row { overflow: hidden; }
+.tk-b__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+}
+.tk-b__track--left  { animation: tk-b-left  38s linear infinite; }
+.tk-b__track--right { animation: tk-b-right 27s linear infinite; }
+
+.tk-b__name {
+  font-family: var(--font-caps);
+  /* Capped deliberately. At 4rem this band became the loudest thing on the page, which
+     is the one thing the brief says it must not be. */
+  font-size: clamp(1.5rem, 5.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding-right: clamp(28px, 5vw, 64px);
+  color: rgba(var(--rose-gold-rgb), .07);
+  -webkit-text-stroke: 1px rgba(var(--rose-gold-rgb), .55);
+}
+.tk-b__rule {
+  height: 1px;
+  margin: clamp(10px, 1.6vw, 16px) 0;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(var(--rose-gold-rgb), .55) 22%,
+    rgba(var(--rose-gold-rgb), .55) 78%,
+    transparent);
+  box-shadow: var(--glow-rose);
+}
+.tk-b__sub {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--fg3);
+  padding-right: clamp(24px, 4vw, 52px);
+}
+.tk-b__mantra {
+  font-family: var(--script-sig);
+  font-size: clamp(1.125rem, 2.6vw, 1.5rem);
+  line-height: 1;
+  color: var(--rose-gold);
+  padding-right: clamp(24px, 4vw, 52px);
+  transform: translateY(-.06em);
+}
+@keyframes tk-b-left  { to   { transform: translateX(-50%); } }
+@keyframes tk-b-right { from { transform: translateX(-50%); } }
+
+
+/* ═══════════════════════════ C — Vertical slat assembly ═══════════════════════════════
+   No horizontal motion at all. The band is cut into four slats by formwork joints, and a
+   single shared word sequence rises through them — each slat one step ahead of the last.
+   The consequence: the sequence marches diagonally, and twice per cycle the four slats
+   line up on a complete phrase.
+
+     step 0 → Luxury / Grows / from / Concrete.        (the mantra, assembled)
+     step 4 → Signature / Black Rose / Love Hurts / Kids Capsule   (the four collections)
+
+   Between those it shears apart into fragments. Assemble → disassemble → reassemble.
+
+   STEP MATH — three invariants, break one and the effect dies:
+     · 8 tokens, duplicated to 16, in a flex column with NO growth. Track height is
+       auto = 16 × --slat-h. translateY(-6.25%) therefore = exactly one token.
+     · Every token box is exactly --slat-h. A padded or auto-height token drifts the
+       steps off the token boundary permanently.
+     · Slat count is 4 at EVERY viewport. Both payoff frames are four-token phrases;
+       dropping to 3 on mobile destroys them. Two-word collection names wrap inside
+       their fixed box instead — consistent wrapping reads as a look, not a bug.        */
+.tk-c {
+  --slat-h: clamp(58px, 13vw, 88px);
+  --tk-c-cycle: 17.6s;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--black);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.tk-c__slat {
+  height: var(--slat-h);
+  overflow: hidden;
+  border-left: 1px solid rgba(var(--rose-gold-rgb), .16);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 14%, black 86%, transparent);
+          mask-image: linear-gradient(180deg, transparent, black 14%, black 86%, transparent);
+}
+.tk-c__slat:first-child { border-left: 0; }
+.tk-c__stack {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  animation: tk-c-rise var(--tk-c-cycle) var(--ease-cinematic) infinite;
+  /* Negative delay of exactly one step per slat → slat i opens on token i.
+     At t=0 the band reads the full mantra. */
+  animation-delay: calc(var(--i) * (var(--tk-c-cycle) / -8));
+}
+.tk-c__tok {
+  flex: 0 0 var(--slat-h);
+  height: var(--slat-h);
+  /* align-content centres the row vertically; justify-items stays at its `stretch`
+     default ON PURPOSE. `place-items: center` sizes the anonymous item to max-content,
+     which made "BLACK ROSE" overflow the 97px mobile slat and get clipped by the slat's
+     own overflow:hidden instead of wrapping. */
+  display: grid;
+  align-content: center;
+  padding: 0 6px;
+  text-align: center;
+}
+.tk-c__tok--script {
+  font-family: var(--script-sig);
+  font-size: clamp(1.125rem, 5vw, 2.5rem);
+  line-height: 1;
+  color: var(--rose-gold);
+  white-space: nowrap;
+}
+.tk-c__tok--name {
+  font-family: var(--font-caps);
+  /* Ceiling raised from .875rem. At 1440 the slat is 360x88px, and 14px caps against
+     40px script left the collections frame — the frame that sells the mechanic — sparse
+     and mismatched (2.9:1 script:caps at desktop vs 1.8:1 at 390px). 20px lands it at
+     2:1. The .6875rem floor now governs below 687px, so the mobile frame is unchanged. */
+  font-size: clamp(.6875rem, 1.6vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+@keyframes tk-c-rise {
+  0%,     9%    { transform: translateY(0); }
+  12.5%,  21.5% { transform: translateY(-6.25%); }
+  25%,    34%   { transform: translateY(-12.5%); }
+  37.5%,  46.5% { transform: translateY(-18.75%); }
+  50%,    59%   { transform: translateY(-25%); }
+  62.5%,  71.5% { transform: translateY(-31.25%); }
+  75%,    84%   { transform: translateY(-37.5%); }
+  87.5%,  96.5% { transform: translateY(-43.75%); }
+  100%          { transform: translateY(-50%); }
+}
+
+
+/* ─────────────────────────── reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tk-a__track,
+  .tk-b__track--left,
+  .tk-b__track--right { animation: none; }
+  /* C must NOT simply stop — every slat would land on token 0 and the band would read
+     "Luxury Luxury Luxury Luxury". Freeze it on the assembled-mantra frame instead. */
+  .tk-c__stack {
+    animation: none;
+    transform: translateY(calc(var(--i) * -6.25%));
+  }
+}
+</style>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="A" data-name="Hairline seam — one continuous line">
+  <section class="tk-nb tk-nb--above">
+    <p class="tk-nb__eyebrow">As Featured In</p>
+    <p class="tk-nb__quote">&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here.&rdquo;</p>
+  </section>
+
+  <div class="tk-a" aria-hidden="true">
+    <div class="tk-a__track" id="tkATrack">
+      <span class="tk-a__item" data-tk-group><span class="tk-a__name">Signature</span></span>
+      <span class="tk-a__item"><span class="tk-a__mantra">Luxury Grows from Concrete.</span></span>
+      <span class="tk-a__item"><span class="tk-a__name">Black Rose</span></span>
+      <span class="tk-a__item"><span class="tk-a__mantra">Luxury Grows from Concrete.</span></span>
+      <span class="tk-a__item"><span class="tk-a__name">Love Hurts</span></span>
+      <span class="tk-a__item"><span class="tk-a__mantra">Luxury Grows from Concrete.</span></span>
+      <span class="tk-a__item"><span class="tk-a__name">Kids Capsule</span></span>
+      <span class="tk-a__item"><span class="tk-a__mantra">Luxury Grows from Concrete.</span></span>
+    </div>
+  </div>
+
+  <section class="tk-nb tk-nb--below">
+    <p class="tk-nb__eyebrow">The Collections</p>
+    <h2 class="tk-nb__title">Four Collections. One Vision.</h2>
+  </section>
+
+  <script>
+  // Repeat the authored group so each half of the track is wider than any viewport —
+  // otherwise the -50% wrap leaves a visible gap on a wide screen. 4 groups total,
+  // 2 per half, identical by construction.
+  (function () {
+    var track = document.getElementById('tkATrack');
+    if (!track) return;
+    var group = Array.prototype.slice.call(track.children);
+    for (var i = 0; i < 3; i++) {
+      group.forEach(function (n) { track.appendChild(n.cloneNode(true)); });
+    }
+  })();
+  </script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="B" data-name="Counter-scrolling shear band — two opposed tiers">
+  <section class="tk-nb tk-nb--above">
+    <p class="tk-nb__eyebrow">As Featured In</p>
+    <p class="tk-nb__quote">&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here.&rdquo;</p>
+  </section>
+
+  <div class="tk-b" aria-hidden="true">
+    <div class="tk-b__row">
+      <div class="tk-b__track tk-b__track--left" id="tkBTop">
+        <span class="tk-b__name">Signature</span>
+        <span class="tk-b__name">Black Rose</span>
+        <span class="tk-b__name">Love Hurts</span>
+        <span class="tk-b__name">Kids Capsule</span>
+      </div>
+    </div>
+
+    <div class="tk-b__rule"></div>
+
+    <div class="tk-b__row">
+      <div class="tk-b__track tk-b__track--right" id="tkBBot">
+        <span class="tk-b__mantra">Luxury Grows from Concrete.</span>
+        <span class="tk-b__sub">Oakland Made</span>
+        <span class="tk-b__sub">Gender Neutral</span>
+        <span class="tk-b__mantra">Luxury Grows from Concrete.</span>
+        <span class="tk-b__sub">Limited Edition</span>
+        <span class="tk-b__sub">Luxury Streetwear</span>
+        <span class="tk-b__mantra">Luxury Grows from Concrete.</span>
+        <span class="tk-b__sub">Built Different</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="tk-nb tk-nb--below">
+    <p class="tk-nb__eyebrow">The Collections</p>
+    <h2 class="tk-nb__title">Four Collections. One Vision.</h2>
+  </section>
+
+  <script>
+  // Same widen-then-halve trick as A. Top row needs more copies — 4 large words is
+  // narrower than a desktop viewport on its own.
+  (function () {
+    [['tkBTop', 5], ['tkBBot', 3]].forEach(function (pair) {
+      var track = document.getElementById(pair[0]);
+      if (!track) return;
+      var group = Array.prototype.slice.call(track.children);
+      for (var i = 0; i < pair[1]; i++) {
+        group.forEach(function (n) { track.appendChild(n.cloneNode(true)); });
+      }
+    });
+  })();
+  </script>
+</template>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════════════ -->
+<template data-variant="C" data-name="Vertical slat assembly — mantra builds across four cuts">
+  <section class="tk-nb tk-nb--above">
+    <p class="tk-nb__eyebrow">As Featured In</p>
+    <p class="tk-nb__quote">&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here.&rdquo;</p>
+  </section>
+
+  <div class="tk-c" id="tkCBand" aria-hidden="true">
+    <div class="tk-c__slat" style="--i:0"><div class="tk-c__stack" data-tk-stack></div></div>
+    <div class="tk-c__slat" style="--i:1"><div class="tk-c__stack" data-tk-stack></div></div>
+    <div class="tk-c__slat" style="--i:2"><div class="tk-c__stack" data-tk-stack></div></div>
+    <div class="tk-c__slat" style="--i:3"><div class="tk-c__stack" data-tk-stack></div></div>
+  </div>
+
+  <section class="tk-nb tk-nb--below">
+    <p class="tk-nb__eyebrow">The Collections</p>
+    <h2 class="tk-nb__title">Four Collections. One Vision.</h2>
+  </section>
+
+  <script>
+  // One shared sequence. Every slat gets the identical 8 tokens, duplicated to 16 so the
+  // -50% wrap is seamless; the per-slat animation-delay is what offsets them by one step
+  // each. Order is load-bearing: indexes 0-3 are the mantra, 4-7 the four collections.
+  (function () {
+    var TOKENS = [
+      ['script', 'Luxury'],
+      ['script', 'Grows'],
+      ['script', 'from'],
+      ['script', 'Concrete.'],
+      ['name',   'Signature'],
+      ['name',   'Black Rose'],
+      ['name',   'Love Hurts'],
+      ['name',   'Kids Capsule']
+    ];
+    var band = document.getElementById('tkCBand');
+    if (!band) return;
+    band.querySelectorAll('[data-tk-stack]').forEach(function (stack) {
+      stack.innerHTML = '';
+      for (var pass = 0; pass < 2; pass++) {
+        TOKENS.forEach(function (t) {
+          var el = document.createElement('span');
+          el.className = 'tk-c__tok tk-c__tok--' + t[0];
+          el.textContent = t[1];
+          stack.appendChild(el);
+        });
+      }
+    });
+  })();
+  </script>
+</template>

@@ -1,0 +1,656 @@
+<!--
+  SECTION: drop — the pre-order band, shown ONLY while a drop is live.
+
+  The live-gate is real and already exists: skyyrose_render_drop_block()
+  (inc/customer-enhancements.php:419) returns early unless the
+  `skyyrose_drop_block_enabled` theme_mod is on AND there is at least a title
+  or an image. Its docblock says it outright: "No countdown timers — campaign
+  urgency is not SkyyRose canon." So none of these three variants has a clock,
+  a bar, or an "N left" count.
+
+  REAL URGENCY ONLY. Every urgency line below is a verbatim theme string —
+  the five production-journey beats and the craft card, which describe how the
+  run actually works rather than pretending time is running out:
+    · "You claim your piece. Limited quantities, no restocks."
+    · "Every garment cut and sewn in the precise run size. No overstock, no waste."
+    · "Small batch production. Individually numbered. When it's gone, it's gone."
+  Sources: template-preorder-gateway.php (hero, marquee, journey, CTAs) and
+  front-page.php (craft cards, runway bar).
+
+  DELIBERATELY ABSENT: reserve meters / "31 of 80" counters. Gated off in
+  production at template-preorder-gateway.php:518-521 — "NEVER enable until
+  real WC stock data is wired." A prototype that shows one teaches the wrong
+  thing.
+
+  GAP NOTED: production renders a real per-SKU "Edition of %d" from the
+  catalog's edition_size. There is no catalog here, so the variants use the
+  qualitative real string ("Individually numbered") and never invent a number.
+
+  ASSET NOTES (all seven branding files were opened and looked at, because
+  filename ≠ contents):
+    signature-logo.webp          gold script on BLACK, 2577x882 — the only
+                                 asset that drops straight onto a dark ground.
+                                 Used as A's display lockup.
+    black-rose-logo.webp         crystal star + black rose on a near-black
+                                 ground, 2048². A dark-native object — used as
+                                 C's protagonist.
+    black-rose-collection-text   BLACK lettering on WHITE, 3072². Needs the
+                                 theme's documented treatment — invert(1)
+                                 grayscale(1) brightness(1.05) — plus a crop,
+                                 since the type occupies only the middle band.
+    love-hurts-logo.webp         enamel pin on WHITE. Unusable on a dark ground
+                                 without a light plate. NOT referenced here.
+    skyyrose-monogram.webp       rose-gold on WHITE. Same problem. NOT used.
+    skyyrose-rose-icon.webp      rose-gold on WHITE. Same problem. NOT used.
+    tsrc-lockup-static@2x.webp    198x144 — never opened, so never referenced.
+  home-hero.webm / -poster-720w.webp is a 720x1280 PORTRAIT night clip and
+  carries a videographer watermark in the lower-left. A's scrims are built
+  heavy at top and bottom partly for composition and partly to bury it.
+-->
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   Everything is prefixed .dropA / .dropB / .dropC. The harness re-adopts this
+   whole <style> on every variant switch, so the three must never share a
+   selector — that is what lets them disagree about layout completely.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   A — FULL-BLEED PROCLAMATION
+   Owns the viewport. Ambient founder footage, the Signature lockup as the
+   title, three fact plates, and then ONE slab. Read → act, no branches.
+   ────────────────────────────────────────────────────────────────────────── */
+.dropA {
+  position: relative;
+  /* isolation makes .dropA the blend root, so the lockup's screen blend
+     composites against the video + scrims and nothing leaks to the page. */
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--black);
+  /* Mobile rhythm is deliberately tight: >70% of traffic is phones, and a
+     proclamation whose only CTA sits below the fold has proclaimed nothing.
+     Measured to fit 390x844 with the slab fully visible. */
+  padding: var(--space-12) var(--space-6) 104px;
+}
+/* Absolutely positioned, z-index:auto — deliberately NOT a stacking context,
+   or the lockup below would have nothing to blend against. */
+.dropA__media { position: absolute; inset: 0; }
+.dropA__video,
+.dropA__poster {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 34%;
+}
+.dropA__video { animation: dropA-drift 28s var(--ease-cinematic) infinite alternate; }
+@keyframes dropA-drift { from { transform: scale(1.06); } to { transform: scale(1.16); } }
+.dropA__scrim { position: absolute; inset: 0; }
+/* Three stacked scrims: a centre well that gets the lockup area to near-pure
+   black (so the screen blend has clean input), then top and bottom ramps that
+   seat the type and bury the footage watermark. */
+.dropA__scrim::before,
+.dropA__scrim::after { content: ''; position: absolute; inset: 0; }
+.dropA__scrim::before {
+  background:
+    radial-gradient(75% 55% at 50% 42%, rgba(10,10,10,.97) 0%, rgba(10,10,10,.86) 45%, rgba(10,10,10,.55) 100%);
+}
+.dropA__scrim::after {
+  background:
+    linear-gradient(to bottom, var(--black) 0%, rgba(10,10,10,.35) 22%, rgba(10,10,10,.45) 62%, var(--black) 96%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.014) 0 2px, transparent 2px 5px);
+}
+
+.dropA__inner {
+  /* position:relative + z-index:auto — paints above the media without opening
+     a stacking context that would kill the blend. */
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  text-align: center;
+}
+.dropA__eyebrow {
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  font-family: var(--font-accent);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  margin-bottom: var(--space-6);
+}
+.dropA__live {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--crimson);
+  box-shadow: var(--glow-crimson);
+  animation: dropA-pulse 2.4s var(--ease) infinite;
+}
+@keyframes dropA-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+.dropA__lockup {
+  width: min(100%, 620px);
+  /* height:auto is load-bearing — the width/height attrs are presentational
+     hints, and without this the lockup renders 882px tall and stretched. */
+  height: auto;
+  margin: 0 auto var(--space-6);
+  /* Asset is gold-on-black; screen melts its black ground into the section. */
+  mix-blend-mode: screen;
+}
+.dropA__body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);
+  color: var(--fg2);
+  max-width: 34ch;
+  margin: 0 auto var(--space-8);
+}
+
+.dropA__facts {
+  list-style: none;
+  display: grid; gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-8);
+  text-align: left;
+}
+.dropA__facts li { background: var(--black); padding: var(--space-3) var(--space-4); }
+.dropA__facts b {
+  display: block;
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--gold);
+  margin-bottom: var(--space-2);
+}
+.dropA__facts span {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--fg3);
+}
+
+.dropA__cta {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-4);
+  position: relative; overflow: hidden;
+  width: 100%;
+  min-height: clamp(72px, 11vw, 104px);
+  text-decoration: none;
+  font-family: var(--font-accent);
+  font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg1);
+  background: transparent;
+  border: 1px solid var(--rose-gold);
+  transition: color var(--dur-base) var(--ease);
+}
+.dropA__cta::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--rose-gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-magnetic);
+}
+.dropA__cta > * { position: relative; }
+.dropA__cta i { font-style: normal; transition: transform var(--dur-base) var(--ease); }
+.dropA__cta:hover, .dropA__cta:focus-visible { color: var(--black); }
+.dropA__cta:hover::before, .dropA__cta:focus-visible::before { transform: scaleX(1); }
+.dropA__cta:hover i, .dropA__cta:focus-visible i { transform: translateX(8px); }
+.dropA__cta:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+.dropA__note {
+  margin-top: var(--space-6);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg3);
+}
+@media (min-width: 760px) {
+  .dropA { padding: var(--space-24) var(--space-8) 120px; }
+  .dropA__facts { grid-template-columns: repeat(3, 1fr); }
+  .dropA__facts li { padding: var(--space-6); }
+  .dropA__facts b { font-size: var(--text-sm); }
+  .dropA__body { font-size: var(--text-lg); margin-bottom: var(--space-12); }
+  .dropA__lockup { margin-bottom: var(--space-8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropA__video { animation: none; transform: none; }
+  .dropA__live { animation: none; }
+  .dropA__cta::before { display: none; }
+  .dropA__cta:hover, .dropA__cta:focus-visible { color: var(--black); background: var(--rose-gold); }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   B — INLINE MANIFEST RAIL
+   The opposite bet: the drop does NOT own the viewport. One low band that
+   sits between two other sections like a status line. No media at all, and
+   the affordance is the entire rail — one link, one target, no decisions.
+   Height is capped so it can never grow into a card.
+   ────────────────────────────────────────────────────────────────────────── */
+.dropB {
+  background: var(--black);
+  padding: var(--space-16) var(--space-4);
+  display: grid; place-items: center;
+  min-height: 100svh; /* prototype staging only — the band itself is the design */
+}
+.dropB__rail {
+  display: grid;
+  width: 100%;
+  max-width: var(--container);
+  text-decoration: none;
+  color: inherit;
+  background:
+    linear-gradient(180deg, var(--smoke) 0%, var(--charcoal) 100%);
+  border-top: 1px solid var(--rose-gold);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: border-color var(--dur-base) var(--ease), background var(--dur-base) var(--ease);
+}
+/* Workwear hatch — texture, not a progress bar. Nothing here encodes time. */
+.dropB__rail::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(115deg, rgba(var(--rose-gold-rgb),.035) 0 5px, transparent 5px 22px);
+  pointer-events: none;
+}
+.dropB__rail:hover { border-bottom-color: var(--rose-gold); background: linear-gradient(180deg, var(--ash) 0%, var(--smoke) 100%); }
+.dropB__rail:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.dropB__cell {
+  display: flex; flex-direction: column; justify-content: center; gap: var(--space-2);
+  padding: var(--space-6);
+  position: relative;
+  min-width: 0;
+}
+.dropB__cell + .dropB__cell { border-top: 1px solid var(--border); }
+.dropB__cell b {
+  font-family: var(--font-accent);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg1);
+  font-weight: 400;
+}
+.dropB__cell em {
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--fg3);
+}
+.dropB__status { flex-direction: row; align-items: center; justify-content: flex-start; gap: var(--space-3); }
+.dropB__dot {
+  flex: none;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--crimson);
+  box-shadow: var(--glow-crimson);
+  animation: dropB-breathe 2.2s var(--ease) infinite;
+}
+@keyframes dropB-breathe { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
+
+/* Collection name is set in the collection's own bespoke script rather than a
+   lockup image: the rail is 96px tall and the BR lockup's usable band is a
+   narrow strip of a 3072² file, so cropping it this small makes it illegible.
+   --script-br IS the brand asset here (SkyyRose Black Rose Script, self-hosted). */
+.dropB__name {
+  font-family: var(--script-br);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  line-height: 1;
+  color: var(--silver);
+}
+.dropB__go {
+  flex-direction: row; align-items: center; justify-content: space-between;
+  gap: var(--space-4);
+  background: rgba(var(--rose-gold-rgb), .07);
+  font-family: var(--font-accent);
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg1);
+}
+.dropB__go i { font-style: normal; color: var(--rose-gold); transition: transform var(--dur-base) var(--ease-magnetic); }
+.dropB__rail:hover .dropB__go i { transform: translateX(10px); }
+
+@media (min-width: 860px) {
+  .dropB__rail {
+    grid-template-columns: minmax(0,auto) minmax(0,1fr) minmax(0,1.1fr) minmax(0,auto);
+    align-items: stretch;
+    max-height: 116px; /* the whole point of the variant — it cannot become a card */
+  }
+  .dropB__cell + .dropB__cell { border-top: 0; border-left: 1px solid var(--border); }
+  .dropB__go { min-width: 220px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropB__dot { animation: none; }
+  .dropB__rail:hover .dropB__go i { transform: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   C — SPLIT CARD, OBJECT + SPEC SHEET
+   The piece is the protagonist: it takes the larger half and is the only
+   thing above the fold on mobile. The right half is a spec sheet — the five
+   real production beats as a definition list — and the affordance is a
+   two-button action row at the END of a scannable table, not a hero CTA.
+   ────────────────────────────────────────────────────────────────────────── */
+.dropC {
+  background: var(--black);
+  padding: var(--space-20) var(--space-4) 120px;
+  display: grid; place-items: center;
+  min-height: 100svh;
+}
+.dropC__card {
+  width: 100%;
+  max-width: var(--container);
+  display: grid;
+  border: 1px solid var(--border);
+  box-shadow: var(--depth-3);
+  background: var(--charcoal);
+  overflow: hidden;
+}
+
+/* ── media half ── */
+.dropC__media {
+  position: relative;
+  isolation: isolate;
+  min-height: 420px;
+  display: grid; place-items: center;
+  /* Heavy bottom pad reserves the plate zone so the object never lands on the
+     lockup — the object is centred in what's left, not in the whole panel.
+     220px = lockup (147) + gap (12) + tagline (20) + bottom offset (24) + air. */
+  padding: var(--space-8) var(--space-8) 220px;
+  background:
+    radial-gradient(70% 60% at 50% 42%, rgba(var(--silver-rgb), .10) 0%, transparent 70%),
+    linear-gradient(160deg, var(--ash) 0%, var(--black) 70%);
+}
+.dropC__object {
+  width: min(100%, 380px);
+  height: auto;
+  /* Asset is a crystal object on a near-black ground — screen melts the ground
+     and keeps the specular highlights. That ground is a few levels above pure
+     black, so screen leaves a faint rectangle; the radial mask feathers it away. */
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(closest-side, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%);
+  mask-image: radial-gradient(closest-side, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%);
+  transition: transform var(--dur-cinem) var(--ease-cinematic);
+}
+.dropC__card:hover .dropC__object { transform: scale(1.04) translateY(-6px); }
+.dropC__chapter {
+  position: absolute; top: var(--space-6); left: var(--space-6);
+  font-family: var(--font-accent);
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-wide);
+  color: var(--silver);
+  opacity: .55;
+}
+.dropC__plate {
+  position: absolute; left: var(--space-6); right: var(--space-6); bottom: var(--space-6);
+  display: grid; gap: var(--space-3); justify-items: start;
+}
+/* The BR lockup is black-on-white with the type occupying only a middle band,
+   so it is cropped via background-size/position and inverted per the theme's
+   documented rule for this asset. Percentages are scale-invariant, so this
+   holds at every render size. */
+.dropC__lockup {
+  width: min(78%, 300px);
+  aspect-ratio: 1.9;
+  background-image: url('assets/branding/black-rose-collection-text.webp');
+  background-repeat: no-repeat;
+  background-size: 151.5% auto;
+  background-position: 41% 60%;
+  /* The theme's documented treatment for this asset is
+     invert(1) grayscale(1) brightness(1.05) — correct when it sits on a solid
+     ground. Here it is screen-blended, so the brightness lift leaves the
+     inverted paper a few levels above zero and the crop box shows as a faint
+     rectangle. contrast(1.35) crushes that floor to true black instead:
+     paper 250 -> 5 -> clamps to 0, lettering 15 -> 240 -> clamps to 255. */
+  filter: invert(1) grayscale(1) contrast(1.35);
+  mix-blend-mode: screen;
+}
+.dropC__tagline {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg3);
+}
+
+/* ── spec half ── */
+.dropC__spec {
+  padding: var(--space-8) var(--space-6) var(--space-8);
+  display: flex; flex-direction: column;
+  border-top: 1px solid var(--border);
+  background: var(--black);
+}
+.dropC__eyebrow {
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  font-family: var(--font-accent);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  margin-bottom: var(--space-4);
+}
+.dropC__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--crimson); box-shadow: var(--glow-crimson);
+  /* Own keyframes, not B's. The three variants share one adopted <style>, so
+     borrowing dropB-breathe worked — right up until someone edits or deletes B. */
+  animation: dropC-breathe 2.2s var(--ease) infinite;
+}
+@keyframes dropC-breathe { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
+.dropC__title {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 125;
+  font-weight: 700;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg1);
+  margin-bottom: var(--space-3);
+}
+.dropC__lede {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);
+  color: var(--fg2);
+  margin-bottom: var(--space-8);
+  max-width: 42ch;
+}
+.dropC__specHead {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--gold);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.dropC__dl { margin: 0 0 var(--space-8); }
+.dropC__row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border);
+}
+.dropC__row dt {
+  font-family: var(--font-caps);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--silver);
+}
+.dropC__row dd {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--fg3);
+}
+.dropC__actions { margin-top: auto; display: grid; gap: var(--space-3); }
+.dropC__btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-3);
+  min-height: 56px;
+  padding: 0 var(--space-8);
+  text-decoration: none;
+  font-family: var(--font-accent);
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+}
+.dropC__btn--primary { background: var(--rose-gold); color: var(--black); border: 1px solid var(--rose-gold); }
+.dropC__btn--primary:hover, .dropC__btn--primary:focus-visible { background: var(--gold); border-color: var(--gold); }
+.dropC__btn--ghost { background: transparent; color: var(--fg2); border: 1px solid var(--border); }
+.dropC__btn--ghost:hover, .dropC__btn--ghost:focus-visible { border-color: var(--silver); color: var(--fg1); }
+.dropC__btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+@media (min-width: 900px) {
+  .dropC__card { grid-template-columns: 52fr 48fr; }
+  /* Same clearance rule at desktop. Without the explicit bottom pad the panel
+     only clears because the spec column happens to be tall — that is luck, not
+     layout, and it breaks the moment a row is removed. */
+  .dropC__media { min-height: 620px; padding: var(--space-12) var(--space-12) 250px; }
+  .dropC__spec { border-top: 0; border-left: 1px solid var(--border); padding: var(--space-16) var(--space-12); }
+  .dropC__actions { grid-template-columns: 1fr auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropC__dot { animation: none; }
+  .dropC__card:hover .dropC__object { transform: none; }
+}
+</style>
+
+
+<template data-variant="A" data-name="Full-bleed proclamation">
+  <section class="dropA" aria-label="Pre-order open">
+
+    <div class="dropA__media" aria-hidden="true">
+      <!-- No autoplay attribute in markup on purpose: the script below starts it
+           only when reduced-motion is NOT requested, so the poster stands in.
+           The attribute WAS present here and contradicted this comment; it made
+           the reduced-motion gate a race — autoplay starts the clip, pause()
+           stops it, and "no visible motion" depended on the script winning.
+           Now the clip cannot start unless the script decides to start it.
+           Safe to rely on: template content is cloned by the harness, and
+           template scripts DO execute on clone-insert (verified in-browser).
+           Note when reading currentTime here: a loaded-but-never-played copy of
+           this webm reports t=0.042 (first-frame decode), not playback. -->
+      <video class="dropA__video" id="dropA-video"
+             poster="assets/home-hero-poster-720w.webp"
+             muted loop playsinline preload="auto">
+        <source src="assets/home-hero.webm" type="video/webm">
+      </video>
+      <div class="dropA__scrim"></div>
+    </div>
+
+    <div class="dropA__inner">
+      <p class="dropA__eyebrow"><span class="dropA__live" aria-hidden="true"></span>Pre-Order Open</p>
+
+      <img class="dropA__lockup"
+           src="assets/branding/signature-logo.webp"
+           alt="The Skyy Rose Collection"
+           width="2577" height="882" decoding="async">
+
+      <p class="dropA__body">Secure your pieces before they drop. Luxury Grows from Concrete.</p>
+
+      <!-- Three plates, three verbatim facts. Each pairs a real substring as the
+           label with the rest of its own sentence as the body — nothing invented,
+           and nothing that implies a deadline. -->
+      <ul class="dropA__facts">
+        <li><b>Limited quantities</b><span>No restocks.</span></li>
+        <li><b>Cut and sewn in the precise run size</b><span>No overstock, no waste.</span></li>
+        <li><b>Individually numbered</b><span>When it&rsquo;s gone, it&rsquo;s gone.</span></li>
+      </ul>
+
+      <a class="dropA__cta" href="/pre-order/"><span>Reserve Now</span><i aria-hidden="true">&rarr;</i></a>
+
+      <p class="dropA__note">Limited runs &middot; Gender neutral fit &middot; Oakland story</p>
+    </div>
+
+  </section>
+
+  <script>
+  (function () {
+    var v = document.getElementById('dropA-video');
+    if (!v) return;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    function sync() {
+      if (still.matches) { v.pause(); return; }
+      // play() rejects under autoplay policy even when muted — swallow it or the
+      // console noise shows up while the founder is judging the variant.
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+    sync();
+    still.addEventListener('change', sync);
+  })();
+  </script>
+</template>
+
+
+<template data-variant="B" data-name="Inline manifest rail">
+  <section class="dropB" aria-label="Pre-order open">
+    <!-- The whole rail is one link: no competing affordances, nothing to choose.
+         It is sized to sit BETWEEN sections, not to interrupt them. -->
+    <a class="dropB__rail" href="/pre-order/">
+
+      <span class="dropB__cell dropB__status">
+        <i class="dropB__dot" aria-hidden="true"></i>
+        <b>Pre-Order Open</b>
+      </span>
+
+      <span class="dropB__cell">
+        <span class="dropB__name">Black Rose</span>
+        <em>Armor for the concrete world.</em>
+      </span>
+
+      <span class="dropB__cell">
+        <b>Limited quantities, no restocks</b>
+        <em>Small batch production. Individually numbered. When it&rsquo;s gone, it&rsquo;s gone.</em>
+      </span>
+
+      <span class="dropB__cell dropB__go">Reserve <i aria-hidden="true">&rarr;</i></span>
+
+    </a>
+  </section>
+</template>
+
+
+<template data-variant="C" data-name="Split card, object + spec sheet">
+  <section class="dropC" aria-label="Pre-order open">
+    <article class="dropC__card">
+
+      <div class="dropC__media">
+        <span class="dropC__chapter" aria-hidden="true">01</span>
+        <img class="dropC__object"
+             src="assets/branding/black-rose-logo.webp"
+             alt="Black Rose crystal star"
+             width="2048" height="2048" fetchpriority="high" decoding="async">
+        <div class="dropC__plate">
+          <div class="dropC__lockup" role="img" aria-label="The Black Rose Collection"></div>
+          <p class="dropC__tagline">Armor for the concrete world.</p>
+        </div>
+      </div>
+
+      <div class="dropC__spec">
+        <p class="dropC__eyebrow"><span class="dropC__dot" aria-hidden="true"></span>Pre-Order Open</p>
+        <h2 class="dropC__title">Reserve your piece.</h2>
+        <p class="dropC__lede">Secure your pieces before they drop. Luxury Grows from Concrete.</p>
+
+        <p class="dropC__specHead">The Process</p>
+        <!-- Every dt AND every dd is a verbatim theme string (the five
+             production-journey beats, template-preorder-gateway.php:611-637).
+             This is the whole argument of the variant: the urgency is the
+             manufacturing record, not a clock. -->
+        <dl class="dropC__dl">
+          <div class="dropC__row"><dt>Reserve</dt><dd>You claim your piece. Limited quantities, no restocks.</dd></div>
+          <div class="dropC__row"><dt>Production</dt><dd>Every garment cut and sewn in the precise run size. No overstock, no waste.</dd></div>
+          <div class="dropC__row"><dt>Quality Gate</dt><dd>Each piece passes a hands-on review before it leaves the floor.</dd></div>
+          <div class="dropC__row"><dt>Ship</dt><dd>Delivered to your door. Tracked. Protected.</dd></div>
+          <div class="dropC__row"><dt>Yours</dt><dd>One of a defined number. Carry it knowing exactly what it is.</dd></div>
+        </dl>
+
+        <div class="dropC__actions">
+          <a class="dropC__btn dropC__btn--primary" href="/pre-order/">Reserve</a>
+          <a class="dropC__btn dropC__btn--ghost" href="/pre-order/">View All Pieces</a>
+        </div>
+      </div>
+
+    </article>
+  </section>
+</template>
