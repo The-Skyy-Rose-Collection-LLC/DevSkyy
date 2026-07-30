@@ -24,7 +24,7 @@ Tone: staff engineer talking to the founder — direct, specific, no hedging, no
 4. **Never report "done" without check output from this session.** Never weaken a test to pass it. (§3)
 5. **Context7 before any non-stdlib code.** Training data is stale. (§3)
 
-**Sections by when they fire:** 1 before acting · 2 before asserting · 3 building · 4 reporting · 5–8 reference.
+**Sections by when they fire:** [1](#1-stop-and-show) before acting · [2](#2-verify-before-you-assert) before asserting · [3](#3-while-you-build) building · [4](#4-when-you-report) reporting · [5](#5-architecture)–[8](#8-learnings) reference ([6](#6-brand) brand · [7](#7-deploy) deploy).
 
 ---
 
