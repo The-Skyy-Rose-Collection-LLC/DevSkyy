@@ -102,7 +102,7 @@
 	border-radius: 999px;
 	background: linear-gradient(90deg, transparent, rgba(var(--skyyrose-accent-rgb), 0.7), transparent);
 	box-shadow: 0 0 24px rgba(var(--skyyrose-accent-rgb), 0.35);
-	animation: colDividerMorph 9s ease-in-out infinite alternate;
+	animation: col-divider-morph 9s ease-in-out infinite alternate;
 }
 
 /* Story divider joins the ambient stacking fix above. */
@@ -112,10 +112,19 @@
 	z-index: 1;
 }
 
-@keyframes colDividerMorph {
-	0%   { clip-path: ellipse(50% 100% at 50% 50%); transform: scaleX(0.72); }
-	50%  { clip-path: ellipse(38% 100% at 42% 50%); transform: scaleX(1); }
-	100% { clip-path: ellipse(46% 100% at 60% 50%); transform: scaleX(0.85); }
+@keyframes col-divider-morph {
+	0% {
+		clip-path: ellipse(50% 100% at 50% 50%);
+		transform: scaleX(0.72);
+	}
+	50% {
+		clip-path: ellipse(38% 100% at 42% 50%);
+		transform: scaleX(1);
+	}
+	100% {
+		clip-path: ellipse(46% 100% at 60% 50%);
+		transform: scaleX(0.85);
+	}
 }
 
 /* ==========================================================================
@@ -134,7 +143,7 @@
 		radial-gradient(50% 40% at 78% 30%, rgba(var(--skyyrose-accent-rgb), 0.09), transparent 70%),
 		radial-gradient(36% 30% at 55% 82%, rgba(255, 255, 255, 0.06), transparent 70%);
 	filter: blur(28px);
-	animation: brFogDrift 26s ease-in-out infinite alternate;
+	animation: br-fog-drift 26s ease-in-out infinite alternate;
 }
 
 .col-page[data-collection="black-rose"] .col-story::after {
@@ -147,10 +156,10 @@
 		radial-gradient(45% 38% at 18% 30%, rgba(var(--skyyrose-accent-rgb), 0.07), transparent 70%),
 		radial-gradient(40% 34% at 82% 72%, rgba(var(--skyyrose-accent-rgb), 0.05), transparent 70%);
 	filter: blur(30px);
-	animation: brFogDrift 34s ease-in-out infinite alternate-reverse;
+	animation: br-fog-drift 34s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes brFogDrift {
+@keyframes br-fog-drift {
 	from { transform: translate3d(-4%, -2%, 0) scale(1.04); }
 	to   { transform: translate3d(4%, 2.5%, 0) scale(1.14); }
 }
@@ -211,16 +220,18 @@
    Fail-open: no .is-visible (JS never ran) = heading renders normally under
    the srRevealSafety net.
    ========================================================================== */
-.col-page[data-collection="love-hurts"] .is-visible .col-story__title,
-.col-page[data-collection="love-hurts"] .is-visible .col-cta__title,
-.col-page[data-collection="love-hurts"] .is-visible .col-newsletter__title,
-.col-page[data-collection="love-hurts"] .is-visible .col-featscroll__heading,
-.col-page[data-collection="love-hurts"] .is-visible .product-grid-section__heading,
-.col-page[data-collection="love-hurts"] .is-visible .col-crossnav__heading {
-	animation: lhInkBleed 0.95s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)) 0.12s both;
+.col-page[data-collection="love-hurts"] .is-visible :where(
+	.col-story__title,
+	.col-cta__title,
+	.col-newsletter__title,
+	.col-featscroll__heading,
+	.product-grid-section__heading,
+	.col-crossnav__heading
+) {
+	animation: lh-ink-bleed 0.95s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)) 0.12s both;
 }
 
-@keyframes lhInkBleed {
+@keyframes lh-ink-bleed {
 	0% {
 		opacity: 0;
 		filter: blur(9px);
@@ -263,13 +274,22 @@
 	filter: blur(2px);
 	transform: scale(0.2);
 	opacity: 0;
-	animation: lhInkSpread 1.4s ease-out forwards;
+	animation: lh-ink-spread 1.4s ease-out forwards;
 }
 
-@keyframes lhInkSpread {
-	0%   { transform: scale(0.2) rotate(0deg);  opacity: 0.65; }
-	60%  { transform: scale(0.9) rotate(8deg);  opacity: 0.4; }
-	100% { transform: scale(1.15) rotate(12deg); opacity: 0; }
+@keyframes lh-ink-spread {
+	0% {
+		transform: scale(0.2) rotate(0deg);
+		opacity: 0.65;
+	}
+	60% {
+		transform: scale(0.9) rotate(8deg);
+		opacity: 0.4;
+	}
+	100% {
+		transform: scale(1.15) rotate(12deg);
+		opacity: 0;
+	}
 }
 
 /* ==========================================================================
@@ -300,14 +320,14 @@
 	pointer-events: none;
 	border-radius: 18px;
 	background: linear-gradient(180deg, transparent, rgba(var(--skyyrose-accent-rgb), 0.07), transparent);
-	animation: lhVhsRoll 8s linear infinite;
+	animation: lh-vhs-roll 8s linear infinite;
 }
 
 .col-page[data-collection="love-hurts"] .col-film__toggle {
 	z-index: 2;
 }
 
-@keyframes lhVhsRoll {
+@keyframes lh-vhs-roll {
 	from { transform: translateY(-120%); }
 	to   { transform: translateY(820%); }
 }
@@ -327,7 +347,7 @@
 		radial-gradient(48% 40% at 72% 75%, rgba(183, 110, 121, 0.10), transparent 70%),
 		radial-gradient(40% 32% at 60% 35%, rgba(var(--skyyrose-accent-rgb), 0.08), transparent 70%);
 	filter: blur(34px);
-	animation: sigAurora 24s ease-in-out infinite alternate;
+	animation: sig-aurora 24s ease-in-out infinite alternate;
 }
 
 .col-page[data-collection="signature"] .col-cta::after {
@@ -340,10 +360,10 @@
 		radial-gradient(50% 40% at 25% 40%, rgba(var(--skyyrose-accent-rgb), 0.10), transparent 70%),
 		radial-gradient(45% 36% at 78% 60%, rgba(183, 110, 121, 0.07), transparent 70%);
 	filter: blur(30px);
-	animation: sigAurora 30s ease-in-out infinite alternate-reverse;
+	animation: sig-aurora 30s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes sigAurora {
+@keyframes sig-aurora {
 	from { transform: translate3d(-5%, -3%, 0) rotate(-2deg) scale(1.05); }
 	to   { transform: translate3d(5%, 3%, 0) rotate(2deg) scale(1.16); }
 }
@@ -408,10 +428,10 @@
 		radial-gradient(1px 1px at 18% 88%, rgba(var(--skyyrose-accent-rgb), 0.55), transparent 55%),
 		radial-gradient(1.5px 1.5px at 63% 90%, rgba(245, 230, 211, 0.5), transparent 55%),
 		radial-gradient(1px 1px at 36% 38%, rgba(var(--skyyrose-accent-rgb), 0.65), transparent 55%);
-	animation: sigTwinkle 6s ease-in-out infinite alternate;
+	animation: sig-twinkle 6s ease-in-out infinite alternate;
 }
 
-@keyframes sigTwinkle {
+@keyframes sig-twinkle {
 	from { opacity: 0.5; }
 	to   { opacity: 1; }
 }
@@ -487,13 +507,13 @@
 	border-radius: 2px;
 	opacity: 0;
 	background: var(--skyyrose-accent);
-	animation: kcConfettiFall var(--kc-dur, 1.6s) cubic-bezier(0.25, 0.6, 0.35, 1) var(--kc-delay, 0s) forwards;
+	animation: kc-confetti-fall var(--kc-dur, 1.6s) cubic-bezier(0.25, 0.6, 0.35, 1) var(--kc-delay, 0s) forwards;
 }
 
 .kc-confetti--gold  { background: var(--color-gold, #D4AF37); }
-.kc-confetti--white { background: #FFFFFF; }
+.kc-confetti--white { background: #FFF; }
 
-@keyframes kcConfettiFall {
+@keyframes kc-confetti-fall {
 	0% {
 		opacity: 1;
 		transform: translate3d(var(--kc-x0, 50vw), var(--kc-y0, 30vh), 0) rotate(0turn);
