@@ -83,11 +83,11 @@ do_action( 'woocommerce_before_cart' );
 		$skyy_qualified  = $skyy_remaining <= 0;
 		?>
 		<div class="skyy-cart__shipping-bar rv-blur" role="progressbar"
-			aria-valuenow="<?php echo esc_attr( round( $skyy_progress ) ); ?>"
+			aria-valuenow="<?php echo esc_attr( (string) round( $skyy_progress ) ); ?>"
 			aria-valuemin="0" aria-valuemax="100"
 			aria-label="<?php esc_attr_e( 'Free shipping progress', 'skyyrose' ); ?>">
 			<div class="skyy-cart__shipping-track">
-				<div class="skyy-cart__shipping-fill" style="width: <?php echo esc_attr( round( $skyy_progress ) ); ?>%"></div>
+				<div class="skyy-cart__shipping-fill" style="width: <?php echo esc_attr( (string) round( $skyy_progress ) ); ?>%"></div>
 			</div>
 			<p class="skyy-cart__shipping-msg">
 				<?php if ( $skyy_qualified ) : ?>
@@ -281,9 +281,9 @@ do_action( 'woocommerce_before_cart' );
 											</div>',
 											esc_attr( $cart_item_key ),
 											esc_attr__( 'Decrease quantity', 'skyyrose' ),
-											esc_attr( $cart_item['quantity'] ),
-											esc_attr( $min_quantity ),
-											esc_attr( $max_quantity > 0 ? $max_quantity : 99 ),
+										esc_attr( (string) $cart_item['quantity'] ),
+										esc_attr( (string) $min_quantity ),
+										esc_attr( (string) ( $max_quantity > 0 ? $max_quantity : 99 ) ),
 											esc_attr__( 'Item quantity', 'skyyrose' ),
 											esc_attr__( 'Increase quantity', 'skyyrose' )
 										);

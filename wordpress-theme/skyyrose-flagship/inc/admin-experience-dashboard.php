@@ -89,7 +89,7 @@ $period          = intval( $summary['period'] ?? 30 );
 					<?php echo esc_html( strtoupper( str_replace( '-', ' ', $slug ) ) ); ?>
 				</span>
 				<div class="see-dashboard__bar-track">
-					<div class="see-dashboard__bar-fill" style="width:<?php echo esc_attr( $pct ); ?>%"></div>
+					<div class="see-dashboard__bar-fill" style="width:<?php echo esc_attr( (string) $pct ); ?>%"></div>
 				</div>
 				<span class="see-dashboard__bar-count"><?php echo esc_html( number_format_i18n( (int) $count ) ); ?></span>
 			</div>
@@ -112,15 +112,15 @@ $period          = intval( $summary['period'] ?? 30 );
 			foreach ( $modules as $slug => $config ) :
 				$is_active = function_exists( 'skyyrose_see_is_module_active' )
 					? skyyrose_see_is_module_active( $slug )
-					: (bool) ( $config['default'] ?? false );
+					: $config['default'];
 				?>
 			<div class="see-dashboard__module" data-module="<?php echo esc_attr( $slug ); ?>">
 				<div class="see-dashboard__module-info">
 					<span class="see-dashboard__module-name">
-						<?php echo esc_html( $config['label'] ?? $slug ); ?>
+						<?php echo esc_html( $config['label'] ); ?>
 					</span>
 					<span class="see-dashboard__module-priority">
-						<?php printf( esc_html__( 'Priority %d', 'skyyrose' ), (int) ( $config['priority'] ?? 0 ) ); ?>
+						<?php printf( esc_html__( 'Priority %s', 'skyyrose' ), esc_html( (string) $config['priority'] ) ); ?>
 					</span>
 				</div>
 				<button
@@ -134,7 +134,7 @@ $period          = intval( $summary['period'] ?? 30 );
 							$is_active
 							? __( 'Disable %s', 'skyyrose' )
 							: __( 'Enable %s', 'skyyrose' ),
-							$config['label'] ?? $slug
+							$config['label']
 						)
 					);
 					?>

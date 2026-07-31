@@ -157,7 +157,7 @@ function skyyrose_woocommerce_accessibility() {
 	add_filter(
 		'woocommerce_cart_item_remove_link',
 		function ( $link, $cart_item_key ) {
-			$cart         = WC()->cart ? WC()->cart->get_cart() : array();
+				$cart         = WC()->cart->get_cart();
 			$cart_item    = isset( $cart[ $cart_item_key ] ) ? $cart[ $cart_item_key ] : null;
 			$product_name = $cart_item && isset( $cart_item['data'] ) ? $cart_item['data']->get_name() : '';
 			return str_replace(

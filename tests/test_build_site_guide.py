@@ -212,7 +212,7 @@ def test_build_pages_merges_all_sources() -> None:
         collections=["black-rose"],
     )
     assert set(pages) == {"home", "faq", "shipping-returns", "collection-black-rose"}
-    assert pages["collection-black-rose"]["url"] == "/collection-black-rose/"
+    assert pages["collection-black-rose"]["url"] == "/collections/black-rose/"
     assert pages["faq"]["tips"] == []
 
 
@@ -379,7 +379,7 @@ def test_generate_against_real_theme_source() -> None:
     for collection_slug in ("black-rose", "love-hurts", "signature", "kids-capsule"):
         page_slug = "collection-" + collection_slug
         assert page_slug in data["pages"]
-        assert data["pages"][page_slug]["url"] == f"/{page_slug}/"
+        assert data["pages"][page_slug]["url"] == f"/collections/{collection_slug}/"
 
     # Every intent link must resolve to a real page's url — no dangling guesses.
     urls = {p["url"] for p in data["pages"].values()}

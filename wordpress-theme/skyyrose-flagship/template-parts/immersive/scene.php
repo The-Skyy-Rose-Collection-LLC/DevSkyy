@@ -179,7 +179,7 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 					<?php
 					if ( $p_wc > 0 ) :
 						?>
-						data-product-wc-id="<?php echo esc_attr( $p_wc ); ?>"<?php endif; ?>
+						data-product-wc-id="<?php echo esc_attr( (string) $p_wc ); ?>"<?php endif; ?>
 					data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
 					data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
 					data-product-image="<?php echo esc_url( $product['image'] ); ?>"
@@ -252,11 +252,11 @@ $scene_h_tag = $embedded ? 'h2' : 'h1';
 				?>
 				<?php if ( $lockup_info['has_png'] ) : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.png' ); ?>"
-						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( $lockup_info['height'] ); ?>"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( (string) $lockup_info['height'] ); ?>"
 						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php else : ?>
 					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>"
-						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( $lockup_info['height'] ); ?>"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480" height="<?php echo esc_attr( (string) $lockup_info['height'] ); ?>"
 						<?php echo $lockup_loading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- literal attribute pair. ?> class="scene-lockup__img">
 				<?php endif; ?>
 			</picture>

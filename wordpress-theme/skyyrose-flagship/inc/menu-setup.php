@@ -82,10 +82,8 @@ function skyyrose_setup_menus() {
  * Rebuild menu items for all registered locations.
  *
  * Deletes existing items and recreates them from the current definitions.
- * Gated on a version option so it fires exactly once per version bump —
- * mirrors the theme-activation-setup pattern.
- *
- * To re-run: change SKYYROSE_MENU_BUILD_VERSION to a new string value.
+ * Manual migration helper only. Never run during a normal request: deleting
+ * merchant-managed menu items during a theme update is not marketplace-safe.
  *
  * @since 7.0.0
  * @return void
@@ -139,23 +137,6 @@ function skyyrose_rebuild_menu_items() {
 	}
 }
 
-// One-time rebuild trigger on init — bump SKYYROSE_MENU_BUILD_VERSION to re-run.
-// Fires after skyyrose_setup_menus() (priority 20 vs 10) so menu objects exist.
-define( 'SKYYROSE_MENU_BUILD_VERSION', 'v702' );
-
-add_action(
-	'init',
-	function () {
-		$flag = 'skyyrose_menu_rebuild_' . SKYYROSE_MENU_BUILD_VERSION;
-		if ( get_option( $flag ) ) {
-			return;
-		}
-		skyyrose_rebuild_menu_items();
-		update_option( $flag, true );
-	},
-	20
-);
-
 /**
  * Menu definitions: location => name + items.
  *
@@ -165,48 +146,7 @@ function skyyrose_get_menu_definitions() {
 	return array(
 		'primary' => array(
 			'name'  => __( 'Primary Menu', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'Home', 'skyyrose' ),
-					'url'   => '/',
-				),
-				array(
-					'title'    => __( 'Collections', 'skyyrose' ),
-					'url'      => '/collections/',
-					'children' => array(
-						array(
-							'title' => __( 'Black Rose', 'skyyrose' ),
-							'url'   => '/collections/black-rose/',
-						),
-						array(
-							'title' => __( 'Love Hurts', 'skyyrose' ),
-							'url'   => '/collections/love-hurts/',
-						),
-						array(
-							'title' => __( 'Signature', 'skyyrose' ),
-							'url'   => '/collections/signature/',
-						),
-						array(
-							'title' => __( 'Kids Capsule', 'skyyrose' ),
-							'url'   => '/collections/kids-capsule/',
-						),
-					),
-				),
-				// Experiences tree removed (structural remediation WS3) — each
-				// experience is now the opening layer of its collection page.
-				array(
-					'title' => __( 'Pre-Order', 'skyyrose' ),
-					'url'   => '/pre-order/',
-				),
-				array(
-					'title' => __( 'Our Story', 'skyyrose' ),
-					'url'   => '/about/',
-				),
-				array(
-					'title' => __( 'Contact', 'skyyrose' ),
-					'url'   => '/contact/',
-				),
-			),
+			'items' => skyyrose_get_primary_navigation_items(),
 		),
 		'footer'  => array(
 			'name'  => __( 'Footer Menu', 'skyyrose' ),
@@ -242,9 +182,7 @@ function skyyrose_get_menu_definitions() {
 		// waste. If mobile and desktop menus ever need to diverge, register 'mobile'
 		// in theme-setup.php and re-add it here.
 
-		// 'collection' and 'experiences' locations removed (audit 2026-06-28).
-		// These were never called by any template; removed from register_nav_menus()
-		// in theme-setup.php in the same change. No live consumers confirmed.
+		// Retired menu locations stay omitted until a template renders them.
 	);
 }
 

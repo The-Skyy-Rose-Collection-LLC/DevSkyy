@@ -420,7 +420,7 @@ function skyyrose_get_display_product_fields( $item ) {
 		$image_url = (string) ( $item['image_url'] ?? '' );
 	}
 	if ( '' === $image_url && $wc_product ) {
-		$image_url = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) ?: '';
+		$image_url = wp_get_attachment_image_url( absint( $wc_product->get_image_id() ), 'large' ) ?: '';
 	}
 	if ( '' === $image_url ) {
 		$image_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );

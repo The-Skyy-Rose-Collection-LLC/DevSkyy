@@ -195,7 +195,7 @@ function skyyrose_woocommerce_cart_fragments( $fragments ) {
 
 	ob_start();
 	?>
-	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo wp_kses_data( $count ); ?></span>
+	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo wp_kses_data( (string) $count ); ?></span>
 	<?php
 	$fragments['.cart-count'] = ob_get_clean();
 
@@ -560,7 +560,7 @@ function skyyrose_wc_inject_product_attrs(): void {
 
 	printf(
 		'<div class="skyy-product-meta" hidden data-product-id="%s" data-collection="%s" data-name="%s"></div>',
-		esc_attr( $product_id ),
+		esc_attr( (string) $product_id ),
 		esc_attr( $collection ),
 		esc_attr( $name )
 	);
@@ -670,34 +670,6 @@ function skyyrose_product_filter_defaults( $args ) {
 	return $args;
 }
 add_filter( 'woocommerce_product_filters_default_args', 'skyyrose_product_filter_defaults' );
-
-/*
---------------------------------------------------------------
- * Deprecated Function Replacement (WC 9.9)
- *--------------------------------------------------------------*/
-
-/**
- * Force WooCommerce classic template paths (hybrid FSE).
- *
- * Core `wp_is_block_theme()` is true once `templates/index.html` exists
- * (Site Editor hybrid scaffold, 2026-07). WooCommerce 9.9+ uses
- * `wc_is_block_theme` / `wp_is_block_theme()` to pick block vs classic
- * product/cart/checkout templates. We intentionally keep WC on classic
- * PHP under `woocommerce/` until a dedicated WC block-template cutover.
- *
- * Do NOT remove this filter without shipping WC block templates and
- * verifying cart, checkout, PDP, and archive on production.
- *
- * @since 6.6.0
- * @since 1.12.x Hybrid FSE: still returns false for WC only.
- *
- * @param  bool $is_fse Whether WC thinks the theme is a block theme.
- * @return bool Always false — classic WC templates only.
- */
-function skyyrose_override_fse_detection( $is_fse ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
-	return false;
-}
-add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );
 
 /**
  * Render the My Account UI when the page content does not.

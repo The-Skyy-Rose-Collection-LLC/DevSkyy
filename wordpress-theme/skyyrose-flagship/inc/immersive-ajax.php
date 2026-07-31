@@ -213,14 +213,6 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	}
 
 	// Check WooCommerce availability.
-	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
-		wp_send_json_error(
-			array(
-				'message' => esc_html__( 'Cart is currently unavailable.', 'skyyrose' ),
-			)
-		);
-	}
-
 	// Rate-limit: max 30 add-to-cart per IP per minute.
 	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
 	$rate_hits = (int) get_transient( $rate_key );
@@ -287,11 +279,11 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	$variation_id = 0;
 	$variation    = array();
 
-	if ( ! empty( $size ) && $product->is_type( 'variable' ) ) {
+	if ( ! empty( $size ) && $product instanceof WC_Product_Variable ) {
 		$variation = array( 'attribute_pa_size' => $size );
 
 		// Find the matching variation ID.
-		$data_store   = WC_Data_Store::load( 'product' );
+		$data_store   = new WC_Product_Data_Store_CPT();
 		$variation_id = $data_store->find_matching_product_variation( $product, $variation );
 
 		if ( ! $variation_id ) {
@@ -321,7 +313,7 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	ob_start();
 	$count = $cart_count;
 	?>
-	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo esc_html( absint( $count ) ); ?></span>
+	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo esc_html( (string) absint( $count ) ); ?></span>
 	<?php
 	$cart_count_fragment = ob_get_clean();
 
@@ -377,7 +369,7 @@ function skyyrose_build_product_data( $product ) {
 
 	// Product image.
 	$image_id  = $product->get_image_id();
-	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'woocommerce_single' ) : '';
+	$image_url = $image_id ? wp_get_attachment_image_url( absint( $image_id ), 'woocommerce_single' ) : '';
 
 	// Pre-order metadata.
 	$is_preorder  = skyyrose_immersive_is_preorder( $product_id );
@@ -440,7 +432,7 @@ function skyyrose_immersive_is_preorder( $product_id ) {
  */
 function skyyrose_immersive_get_product_sizes( $product ) {
 
-	if ( ! $product->is_type( 'variable' ) ) {
+	if ( ! $product instanceof WC_Product_Variable ) {
 		return array();
 	}
 
@@ -454,7 +446,7 @@ function skyyrose_immersive_get_product_sizes( $product ) {
 
 	foreach ( $attributes['pa_size'] as $slug ) {
 		$term = get_term_by( 'slug', $slug, 'pa_size' );
-		if ( $term && ! is_wp_error( $term ) ) {
+		if ( $term ) {
 			$sizes[] = $term->name;
 		} else {
 			$sizes[] = ucfirst( sanitize_text_field( $slug ) );
@@ -477,7 +469,7 @@ function skyyrose_immersive_get_product_sizes( $product ) {
  */
 function skyyrose_immersive_get_product_colors( $product ) {
 
-	if ( ! $product->is_type( 'variable' ) ) {
+	if ( ! $product instanceof WC_Product_Variable ) {
 		return array();
 	}
 
@@ -491,7 +483,7 @@ function skyyrose_immersive_get_product_colors( $product ) {
 
 	foreach ( $attributes['pa_color'] as $slug ) {
 		$term = get_term_by( 'slug', $slug, 'pa_color' );
-		if ( $term && ! is_wp_error( $term ) ) {
+		if ( $term ) {
 			$colors[] = $term->name;
 		} else {
 			$colors[] = ucfirst( sanitize_text_field( $slug ) );

@@ -580,3 +580,117 @@ function skyyrose_ajax_mascot_chat() {
 }
 add_action( 'wp_ajax_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );
 add_action( 'wp_ajax_nopriv_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );
+
+/*
+--------------------------------------------------------------
+ * Premium Product Search
+ *--------------------------------------------------------------*/
+
+/**
+ * Search canonical catalog without querying unpublished WordPress products.
+ *
+ * Results stay deliberately small for fast typeahead rendering. Catalog loader
+ * uses persistent object cache when available, so repeated searches do not
+ * reparse CSV on every request.
+ *
+ * @since 2.0.0
+ * @return void
+ */
+function skyyrose_ajax_product_search() {
+	if ( ! isset( $_POST['nonce'] )
+		|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose' ) ), 403 );
+	}
+
+	$query = isset( $_POST['query'] )
+		? mb_substr( sanitize_text_field( wp_unslash( $_POST['query'] ) ), 0, 80 )
+		: '';
+	$query = trim( $query );
+
+	if ( mb_strlen( $query ) < 2 || ! function_exists( 'skyyrose_get_product_catalog' ) ) {
+		wp_send_json_success( array( 'results' => array() ) );
+	}
+
+	$matches = array();
+
+	foreach ( skyyrose_get_product_catalog() as $product ) {
+		if ( empty( $product['published'] ) ) {
+			continue;
+		}
+
+		$name        = (string) ( $product['name'] ?? '' );
+		$sku         = (string) ( $product['sku'] ?? '' );
+		$collection  = (string) ( $product['collection'] ?? '' );
+		$color       = (string) ( $product['color'] ?? '' );
+		$type        = (string) ( $product['garment_type_lock'] ?? '' );
+		$description = (string) ( $product['description'] ?? '' );
+		$score       = 0;
+
+		if ( 0 === mb_stripos( $name, $query ) ) {
+			$score += 100;
+		} elseif ( false !== mb_stripos( $name, $query ) ) {
+			$score += 70;
+		}
+		if ( false !== mb_stripos( $sku, $query ) ) {
+			$score += 60;
+		}
+		if ( false !== mb_stripos( $collection, $query ) ) {
+			$score += 45;
+		}
+		if ( false !== mb_stripos( $color . ' ' . $type, $query ) ) {
+			$score += 30;
+		}
+		if ( false !== mb_stripos( $description, $query ) ) {
+			$score += 10;
+		}
+
+		if ( 0 === $score ) {
+			continue;
+		}
+
+		$config      = function_exists( 'skyyrose_get_collection' ) ? skyyrose_get_collection( $collection ) : array();
+		$image_path  = function_exists( 'skyyrose_get_product_display_image' )
+			? skyyrose_get_product_display_image( $product )
+			: '';
+		$price       = isset( $product['price'] ) ? (float) $product['price'] : 0.0;
+		$price_label = function_exists( 'wc_price' )
+			? wp_specialchars_decode( wp_strip_all_tags( wc_price( $price ) ), ENT_QUOTES )
+			: '$' . number_format_i18n( $price, 2 );
+
+		$matches[] = array(
+			'score'      => $score,
+			'name'       => $name,
+			'sku'        => $sku,
+			'collection' => isset( $config['label'] ) ? $config['label'] : ucwords( str_replace( '-', ' ', $collection ) ),
+			'price'      => $price_label,
+			'image'      => $image_path && function_exists( 'skyyrose_product_image_uri' )
+				? skyyrose_product_image_uri( $image_path )
+				: '',
+			'url'        => function_exists( 'skyyrose_product_url' )
+				? skyyrose_product_url( $sku )
+				: home_url( '/shop/' ),
+		);
+	}
+
+	usort(
+		$matches,
+		static function ( $left, $right ) {
+			if ( $left['score'] === $right['score'] ) {
+				return strcasecmp( $left['name'], $right['name'] );
+			}
+			return $right['score'] <=> $left['score'];
+		}
+	);
+
+	$results = array_map(
+		static function ( $result_item ) {
+			unset( $result_item['score'] );
+			return $result_item;
+		},
+		array_slice( $matches, 0, 6 )
+	);
+
+	wp_send_json_success( array( 'results' => $results ) );
+}
+add_action( 'wp_ajax_skyyrose_product_search', 'skyyrose_ajax_product_search' );
+add_action( 'wp_ajax_nopriv_skyyrose_product_search', 'skyyrose_ajax_product_search' );

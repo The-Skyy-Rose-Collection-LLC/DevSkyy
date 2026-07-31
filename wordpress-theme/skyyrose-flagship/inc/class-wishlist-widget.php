@@ -132,7 +132,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 				type="number"
 				step="1"
 				min="1"
-				value="<?php echo esc_attr( $limit ); ?>"
+				value="<?php echo esc_attr( (string) $limit ); ?>"
 				size="3"
 			>
 		</p>

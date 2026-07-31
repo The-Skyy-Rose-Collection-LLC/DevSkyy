@@ -649,54 +649,5 @@
 				}
 			}
 		}
-	},
-	"templateParts": [
-		{
-			"name": "header",
-			"title": "Header",
-			"area": "header"
-		},
-		{
-			"name": "footer",
-			"title": "Footer",
-			"area": "footer"
-		}
-	],
-	"customTemplates": [
-		{
-			"name": "template-love-hurts",
-			"title": "Love Hurts Collection - Enchanted Ballroom",
-			"postTypes": [
-				"page"
-			]
-		},
-		{
-			"name": "template-signature",
-			"title": "Signature Collection - Luxury Runway",
-			"postTypes": [
-				"page"
-			]
-		},
-		{
-			"name": "template-black-rose",
-			"title": "Black Rose Collection - Gothic Garden",
-			"postTypes": [
-				"page"
-			]
-		},
-		{
-			"name": "template-preorder",
-			"title": "Preorder Gateway - Portal Entrance",
-			"postTypes": [
-				"page"
-			]
-		},
-		{
-			"name": "template-kids-capsule",
-			"title": "Kids Capsule Collection",
-			"postTypes": [
-				"page"
-			]
-		}
-	]
+	}
 }

@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bump this constant when adding new pages or changing setup logic.
  * The `init` runner uses this to determine if setup has already run.
  */
-define( 'SKYYROSE_SETUP_VERSION', '4.3.0' );
+define( 'SKYYROSE_SETUP_VERSION', '4.5.0' );
 
 /*
 --------------------------------------------------------------
@@ -42,6 +42,8 @@ define( 'SKYYROSE_SETUP_VERSION', '4.3.0' );
  * @return array Associative array of slug => page data.
  */
 function skyyrose_get_required_pages() {
+	$policy_content = skyyrose_get_policy_starter_content();
+
 	return array(
 		// --- Core pages ---
 		'home'                    => array(
@@ -64,6 +66,16 @@ function skyyrose_get_required_pages() {
 			'template' => 'template-preorder-gateway.php',
 			'content'  => '',
 		),
+		'collections'             => array(
+			'title'    => __( 'Collections', 'skyyrose' ),
+			'template' => 'page-collections.php',
+			'content'  => '',
+		),
+		'collections-world'       => array(
+			'title'    => __( 'Collections World', 'skyyrose' ),
+			'template' => 'template-collections-world.php',
+			'content'  => '',
+		),
 
 		// --- Collection pages ---
 		'collection-black-rose'   => array(
@@ -84,35 +96,6 @@ function skyyrose_get_required_pages() {
 		'collection-kids-capsule' => array(
 			'title'    => __( 'Kids Capsule', 'skyyrose' ),
 			'template' => 'template-collection-kids-capsule.php',
-			'content'  => '',
-		),
-
-		// --- Immersive experience pages (3D storytelling) ---
-		'experience-black-rose'   => array(
-			'title'    => __( 'Black Rose Experience', 'skyyrose' ),
-			'template' => 'template-immersive-black-rose.php',
-			'content'  => '',
-		),
-		'experience-love-hurts'   => array(
-			'title'    => __( 'Love Hurts Experience', 'skyyrose' ),
-			'template' => 'template-immersive-love-hurts.php',
-			'content'  => '',
-		),
-		'experience-signature'    => array(
-			'title'    => __( 'Signature Experience', 'skyyrose' ),
-			'template' => 'template-immersive-signature.php',
-			'content'  => '',
-		),
-		'experience-kids-capsule' => array(
-			'title'    => __( 'Kids Capsule Experience', 'skyyrose' ),
-			'template' => 'template-immersive-kids-capsule.php',
-			'content'  => '',
-		),
-
-		// --- Experiences hub (links to all four immersive worlds) ---
-		'experiences'             => array(
-			'title'    => __( 'Immersive Worlds', 'skyyrose' ),
-			'template' => 'template-experiences.php',
 			'content'  => '',
 		),
 
@@ -144,7 +127,99 @@ function skyyrose_get_required_pages() {
 			'template' => 'page-wishlist.php',
 			'content'  => '',
 		),
+		'faq'                     => array(
+			'title'    => __( 'Frequently Asked Questions', 'skyyrose' ),
+			'template' => 'template-faq.php',
+			'content'  => '',
+		),
+		'shipping-returns'        => array(
+			'title'    => __( 'Shipping & Returns', 'skyyrose' ),
+			'template' => 'template-shipping-returns.php',
+			'content'  => '',
+		),
+		'privacy-policy'          => array(
+			'title'    => __( 'Privacy Policy', 'skyyrose' ),
+			'template' => 'template-policy.php',
+			'content'  => $policy_content['privacy-policy'],
+		),
+		'terms-of-service'        => array(
+			'title'    => __( 'Terms of Service', 'skyyrose' ),
+			'template' => 'template-policy.php',
+			'content'  => $policy_content['terms-of-service'],
+		),
+		'refund-policy'           => array(
+			'title'    => __( 'Refund Policy', 'skyyrose' ),
+			'template' => 'template-policy.php',
+			'content'  => $policy_content['refund-policy'],
+		),
+		'cookie-policy'           => array(
+			'title'    => __( 'Cookie Policy', 'skyyrose' ),
+			'template' => 'template-policy.php',
+			'content'  => $policy_content['cookie-policy'],
+		),
+		'accessibility'           => array(
+			'title'    => __( 'Accessibility Statement', 'skyyrose' ),
+			'template' => 'template-policy.php',
+			'content'  => $policy_content['accessibility'],
+		),
+		'track-order'             => array(
+			'title'    => __( 'Track Your Order', 'skyyrose' ),
+			'template' => 'default',
+			'content'  => '<!-- wp:shortcode -->[woocommerce_order_tracking]<!-- /wp:shortcode -->',
+		),
 	);
+}
+
+/**
+ * Editable starter copy for policy pages linked by the storefront.
+ *
+ * Existing page content is never overwritten. Merchants remain responsible
+ * for reviewing these operational defaults against their legal requirements.
+ *
+ * @since 4.5.0
+ * @return array<string,string>
+ */
+function skyyrose_get_policy_starter_content() {
+	$pages = array(
+		'privacy-policy'   => array(
+			array( __( 'Information We Collect', 'skyyrose' ), __( 'We collect information you provide when you place an order, create an account, join our mailing list, contact support, or interact with the storefront. This may include contact, billing, shipping, order, and device information.', 'skyyrose' ) ),
+			array( __( 'How We Use Information', 'skyyrose' ), __( 'We use information to process orders, provide customer support, prevent fraud, improve the storefront, and send marketing only where you have requested it or applicable law permits it.', 'skyyrose' ) ),
+			array( __( 'Service Providers', 'skyyrose' ), __( 'We share only the information needed by payment, shipping, analytics, hosting, and customer-service providers to perform services for the store. We do not sell personal information.', 'skyyrose' ) ),
+			array( __( 'Your Choices', 'skyyrose' ), __( 'You may request access, correction, or deletion of personal information, or unsubscribe from marketing at any time by contacting support@skyyrose.co.', 'skyyrose' ) ),
+		),
+		'terms-of-service' => array(
+			array( __( 'Store Terms', 'skyyrose' ), __( 'By using this storefront or placing an order, you agree to these terms and to provide current, accurate account and payment information.', 'skyyrose' ) ),
+			array( __( 'Orders and Pricing', 'skyyrose' ), __( 'Orders are subject to acceptance and product availability. We may correct pricing or description errors, limit quantities, or cancel and refund an order when necessary.', 'skyyrose' ) ),
+			array( __( 'Intellectual Property', 'skyyrose' ), __( 'SkyyRose names, artwork, photography, product designs, and site content remain the property of The Skyy Rose Collection LLC or their respective licensors.', 'skyyrose' ) ),
+			array( __( 'Responsible Use', 'skyyrose' ), __( 'Do not misuse the storefront, interfere with its security, submit fraudulent orders, scrape protected content, or use our work without permission.', 'skyyrose' ) ),
+		),
+		'refund-policy'    => array(
+			array( __( 'Return Window', 'skyyrose' ), __( 'Eligible unworn items may be returned within 30 days of delivery in original condition, with tags attached and original packaging.', 'skyyrose' ) ),
+			array( __( 'Exceptions', 'skyyrose' ), __( 'Final-sale items, gift cards, and worn, washed, altered, or tagless pieces are not eligible for return. Product-specific exceptions are shown before purchase.', 'skyyrose' ) ),
+			array( __( 'Refund Timing', 'skyyrose' ), __( 'Approved refunds are sent to the original payment method after inspection. Bank processing times vary. Contact support@skyyrose.co with your order number to begin.', 'skyyrose' ) ),
+		),
+		'cookie-policy'    => array(
+			array( __( 'Essential Cookies', 'skyyrose' ), __( 'Essential cookies keep the cart, checkout, account security, preferences, and fraud protection working. The storefront cannot operate correctly without them.', 'skyyrose' ) ),
+			array( __( 'Analytics and Marketing', 'skyyrose' ), __( 'With consent where required, analytics and marketing technologies help us understand storefront use and measure campaigns. These tools may be provided by third parties.', 'skyyrose' ) ),
+			array( __( 'Managing Cookies', 'skyyrose' ), __( 'Use the cookie controls shown on the storefront or your browser settings to change non-essential cookie choices. Blocking essential cookies may prevent checkout or account features from working.', 'skyyrose' ) ),
+		),
+		'accessibility'    => array(
+			array( __( 'Our Commitment', 'skyyrose' ), __( 'SkyyRose works to provide an inclusive storefront aligned with WCAG 2.2 Level AA, including keyboard access, readable contrast, meaningful structure, and reduced-motion support.', 'skyyrose' ) ),
+			array( __( 'Ongoing Work', 'skyyrose' ), __( 'We test core shopping journeys, improve content and components as standards evolve, and review third-party commerce integrations for accessibility barriers.', 'skyyrose' ) ),
+			array( __( 'Accessibility Feedback', 'skyyrose' ), __( 'If you encounter a barrier, email support@skyyrose.co with the page, task, device, and assistive technology involved. We will work to provide an accessible alternative.', 'skyyrose' ) ),
+		),
+	);
+
+	$content = array();
+	foreach ( $pages as $slug => $sections ) {
+		$content[ $slug ] = '';
+		foreach ( $sections as $section ) {
+			$content[ $slug ] .= '<!-- wp:heading --><h2 class="wp-block-heading">' . esc_html( $section[0] ) . '</h2><!-- /wp:heading -->';
+			$content[ $slug ] .= '<!-- wp:paragraph --><p>' . esc_html( $section[1] ) . '</p><!-- /wp:paragraph -->';
+		}
+	}
+
+	return $content;
 }
 
 /*

@@ -36,11 +36,13 @@
 	}
 
 	var loaded = false;
+	var threeLoaded = false;
+	var delayTimer = null;
 
 	function injectScript( src ) {
 		var script = document.createElement( 'script' );
 		script.src = src;
-		script.async = false; // preserve mascot.js -> skyy-3d.js execution order.
+		script.async = true;
 		document.body.appendChild( script );
 	}
 
@@ -48,16 +50,41 @@
 		return !! ( navigator.connection && navigator.connection.saveData );
 	}
 
+	function shouldLoadThree() {
+		return !! config.skyy3dUrl && ! saveDataOn();
+	}
+
+	function loadThree() {
+		if ( threeLoaded || ! shouldLoadThree() ) {
+			return;
+		}
+		threeLoaded = true;
+		window.SKYY_3D_CONFIG = window.SKYY_3D_CONFIG || {};
+		window.SKYY_3D_CONFIG.startVisible = true;
+		injectScript( config.skyy3dUrl );
+	}
+
+	function unbindInteractionTriggers() {
+		INTERACTION_EVENTS.forEach( function ( eventName ) {
+			window.removeEventListener( eventName, loadMascot );
+		} );
+	}
+
 	function loadMascot() {
 		if ( loaded ) {
 			return;
 		}
 		loaded = true;
+		window.clearTimeout( delayTimer );
+		unbindInteractionTriggers();
 
-		injectScript( config.mascotUrl );
-		if ( config.skyy3dUrl && ! saveDataOn() ) {
-			injectScript( config.skyy3dUrl );
+		// Keep the 1.1MB model + Three.js out of the page until Skyy actually
+		// begins entering. The lightweight 2D character remains the fallback
+		// only when Save-Data explicitly requests the lightweight path.
+		if ( shouldLoadThree() ) {
+			document.addEventListener( 'skyy:walking-in', loadThree, { once: true } );
 		}
+		injectScript( config.mascotUrl );
 	}
 
 	// Post-load FIXED delay — not requestIdleCallback. Wave 7 (round-6 PDP
@@ -82,7 +109,7 @@
 	}
 
 	function schedulePostLoadDelay() {
-		setTimeout( loadMascot, POST_LOAD_DELAY_MS );
+		delayTimer = window.setTimeout( loadMascot, POST_LOAD_DELAY_MS );
 	}
 
 	// Real user input is an immediate, genuine signal — keep the fast path.

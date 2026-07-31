@@ -48,12 +48,9 @@ if ( class_exists( 'WooCommerce' ) ) :
 	 * @return array
 	 */
 	function skyyrose_cart_badge_fragment( $fragments ) {
-		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
-			return $fragments;
-		}
 		$count                            = WC()->cart->get_cart_contents_count();
 		$badge_class                      = 'navbar__cart-badge' . ( $count > 0 ? ' navbar__cart-badge--visible' : '' );
-		$fragments['.navbar__cart-badge'] = '<span class="' . esc_attr( $badge_class ) . '">' . esc_html( $count ) . '</span>';
+		$fragments['.navbar__cart-badge'] = '<span class="' . esc_attr( $badge_class ) . '">' . esc_html( (string) $count ) . '</span>';
 		return $fragments;
 	}
 	add_filter( 'woocommerce_add_to_cart_fragments', 'skyyrose_cart_badge_fragment' );

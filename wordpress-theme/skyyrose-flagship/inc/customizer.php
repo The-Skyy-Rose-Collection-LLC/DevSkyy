@@ -32,7 +32,7 @@ function skyyrose_customize_register( $wp_customize ) {
 	$wp_customize->get_setting( 'blogdescription' )->transport  = 'postMessage';
 	$wp_customize->get_setting( 'header_textcolor' )->transport = 'postMessage';
 
-	if ( isset( $wp_customize->selective_refresh ) ) {
+	if ( $wp_customize->selective_refresh ) {
 		$wp_customize->selective_refresh->add_partial(
 			'blogname',
 			array(
@@ -83,7 +83,7 @@ function skyyrose_customize_register( $wp_customize ) {
 				'label'       => esc_html__( 'Primary Brand Color', 'skyyrose' ),
 				'description' => esc_html__( 'Rose gold accent used for headings, links, and highlights.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
-				'settings'    => 'skyyrose_primary_color',
+				'setting'     => 'skyyrose_primary_color',
 			)
 		)
 	);
@@ -109,7 +109,7 @@ function skyyrose_customize_register( $wp_customize ) {
 				'label'       => esc_html__( 'Gold Accent Color', 'skyyrose' ),
 				'description' => esc_html__( 'Used for buttons, CTA accents, and luxury highlights.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
-				'settings'    => 'skyyrose_gold_accent',
+				'setting'     => 'skyyrose_gold_accent',
 			)
 		)
 	);
@@ -135,7 +135,7 @@ function skyyrose_customize_register( $wp_customize ) {
 				'label'       => esc_html__( 'Dark Background', 'skyyrose' ),
 				'description' => esc_html__( 'Primary dark background for header, footer, and immersive sections.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
-				'settings'    => 'skyyrose_dark_bg',
+				'setting'     => 'skyyrose_dark_bg',
 			)
 		)
 	);
@@ -161,7 +161,7 @@ function skyyrose_customize_register( $wp_customize ) {
 				'label'       => esc_html__( 'Brand Logo (SVG or PNG)', 'skyyrose' ),
 				'description' => esc_html__( 'Upload a transparent-background logo for the footer and email templates. Use Custom Logo (above) for the header.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
-				'settings'    => 'skyyrose_brand_logo',
+				'setting'     => 'skyyrose_brand_logo',
 			)
 		)
 	);
@@ -371,7 +371,7 @@ function skyyrose_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'skyyrose_announcement_enabled',
 		array(
-			'default'           => false,
+			'default'           => '0',
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'absint',
 		)

@@ -280,7 +280,7 @@ function skyyrose_ee_scarcity_shortcode( $atts ) {
 			</span>
 		</div>
 		<div class="lp-scarcity__bar" aria-hidden="true">
-			<div class="lp-scarcity__fill" data-percent="<?php echo esc_attr( $sold_pct ); ?>" style="width:0%"></div>
+			<div class="lp-scarcity__fill" data-percent="<?php echo esc_attr( (string) $sold_pct ); ?>" style="width:0%"></div>
 		</div>
 		<?php if ( $is_low ) : ?>
 			<p class="lp-scarcity__warning">

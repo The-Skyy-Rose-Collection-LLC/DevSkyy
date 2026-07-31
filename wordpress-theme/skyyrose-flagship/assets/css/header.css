@@ -101,8 +101,7 @@
 	object-fit: contain;
 	transition: filter 0.4s ease;
 }
-/* .navbar scope beats the page-level .homepage-v2 img reset (0,1,1) that
-   otherwise re-shows this at (0,1,0) — the #719/#721 cascade-trap class. */
+/* Navbar scope keeps the static fallback hidden until its media query enables it. */
 .navbar .navbar__logo-static {
 	display: none;
 }
@@ -279,6 +278,9 @@
 	pointer-events: auto;
 	visibility: visible;
 }
+body.mobile-nav-open {
+	overflow: hidden;
+}
 .mobile-menu__overlay {
 	position: absolute;
 	inset: 0;
@@ -410,6 +412,7 @@
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity 0.5s;
+	overflow-y: auto;
 }
 .search-overlay.open {
 	opacity: 1;
@@ -421,6 +424,10 @@
 	max-width: 800px;
 	padding-bottom: 16px;
 }
+.search-overlay__container {
+	width: min(80vw, 800px);
+	padding-bottom: var(--space-10);
+}
 .search-overlay__input {
 	width: 100%;
 	background: transparent;
@@ -430,6 +437,122 @@
 	font-size: 24px;
 	outline: none;
 	text-align: center;
+}
+.search-live {
+	width: 100%;
+	padding-top: var(--space-6);
+}
+.search-live__hint {
+	margin: 0 0 var(--space-4);
+	color: var(--color-text-muted);
+	font-family: var(--font-ui);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+}
+.search-live__results {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+.search-live__result {
+	display: flex;
+	align-items: center;
+	gap: var(--space-4);
+	padding: var(--space-3);
+	border: 1px solid var(--color-border);
+	background: var(--color-card-bg);
+	color: var(--color-text-primary);
+	text-decoration: none;
+	opacity: 0;
+	transform: translateY(var(--space-2));
+	animation: search-result-in var(--reveal-fast) var(--ease-cinematic) forwards;
+	animation-delay: calc(var(--search-index) * var(--stagger-base));
+}
+.search-live__result:hover,
+.search-live__result:focus-visible,
+.search-live__result[aria-selected="true"] {
+	border-color: var(--skyyrose-accent);
+	background: var(--color-card-bg-hover);
+}
+.search-live__image {
+	flex: 0 0 auto;
+	width: 3.375rem;
+	height: 4.5rem;
+	object-fit: cover;
+	background: var(--color-card-bg-hover);
+}
+.search-live__copy {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: var(--space-1);
+	min-width: 0;
+}
+.search-live__collection {
+	color: var(--skyyrose-accent);
+	font-family: var(--font-ui);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+}
+.search-live__name {
+	overflow: hidden;
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.search-live__price {
+	flex: 0 0 auto;
+	color: var(--color-text-secondary);
+	font-family: var(--font-ui);
+}
+.search-live__all {
+	display: inline-block;
+	margin-top: var(--space-5);
+	color: var(--color-text-primary);
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	text-underline-offset: var(--space-2);
+}
+
+@keyframes search-result-in {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Editorial reading progress. Hidden unless page tells a long-form story. */
+.house-progress {
+	display: none;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 2px;
+	overflow: hidden;
+	background: var(--color-border);
+}
+.page-template-template-collection-black-rose .house-progress,
+.page-template-template-collection-love-hurts .house-progress,
+.page-template-template-collection-signature .house-progress,
+.page-template-template-collection-kids-capsule .house-progress,
+.page-template-template-about .house-progress,
+.single-product .house-progress {
+	display: block;
+}
+.house-progress__bar {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--skyyrose-accent);
+	transform: scaleX(var(--story-progress, 0));
+	transform-origin: left center;
+	will-change: transform;
 }
 .search-overlay__input:focus-visible {
 	outline: 2px solid var(--color-rose-gold, #B76E79);
@@ -540,6 +663,11 @@ a.announcement-bar__content:hover {
 	.navbar__menu .sub-menu,
 	.search-overlay {
 		transition: none;
+	}
+	.search-live__result {
+		opacity: 1;
+		transform: none;
+		animation: none;
 	}
 	/* Rotating TSRC lockup is a continuous animation — swap it for the
 	   static poster frame instead of the autoplaying <video>. */

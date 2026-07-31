@@ -75,11 +75,11 @@
 	// layer too. Without this, a GLB that finishes loading before the
 	// visitor's idle-entrance timer fires would reveal the canvas in idle
 	// pose ahead of any walk-on decision. skyy:walking-in flips this true.
-	var visible     = false;
+	var visible     = !! ( window.SKYY_3D_CONFIG && window.SKYY_3D_CONFIG.startVisible );
 	var loopRunning = false;
 	var modelReady  = false;
 	var bootStarted = false;
-	var pendingClip = null; // clip requested before the GLB finished loading
+	var pendingClip = visible ? CLIP_WALK : null; // clip requested before the GLB finished loading
 
 	function dismissedThisSession() {
 		try {

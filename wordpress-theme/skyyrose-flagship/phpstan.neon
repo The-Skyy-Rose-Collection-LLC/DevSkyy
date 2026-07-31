@@ -19,10 +19,9 @@ parameters:
         - template-landing-signature.php
         - template-preorder-gateway.php
         - template-about.php
-        - template-immersive-signature.php
-        - template-immersive-black-rose.php
-        - template-immersive-love-hurts.php
-        - template-immersive-kids-capsule.php
+        - template-collections-world.php
+        - template-coming-soon.php
+        - template-size-guide.php
         - template-elementor-canvas.php
         - template-elementor-fullwidth.php
         - template-elementor-editorial.php
@@ -31,6 +30,7 @@ parameters:
         - template-contact.php
         - template-landing-kids-capsule.php
         - page-wishlist.php
+        - page-collections.php
         - comments.php
         - archive.php
         - index.php
@@ -67,6 +67,7 @@ parameters:
         - SKYYROSE_DIR
         - SKYYROSE_URI
         - COOKIEPATH
+		- SKYYROSE_COMING_SOON_MODE
 
     ignoreErrors:
         # Elementor — optional integration, not present in analysis environment

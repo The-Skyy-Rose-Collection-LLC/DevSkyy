@@ -4,7 +4,7 @@
  *
  * Single source of truth for every collection's immersive-experience layer:
  * world name, tagline, accent, and the room/hotspot data previously inlined
- * in the four template-immersive-*.php files. Consumed by both the legacy
+ * in four standalone immersive templates. Consumed by the canonical
  * immersive templates (now 301-redirected) and the embedded experience layer
  * on each /collections/{slug}/ page (structural remediation WS3).
  *

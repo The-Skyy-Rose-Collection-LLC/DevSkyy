@@ -437,6 +437,9 @@ function skyyrose_klaviyo_on_order_created( $order_id, $order ) {
 	// Build item list for the event.
 	$items = array();
 	foreach ( $order->get_items() as $item ) {
+		if ( ! $item instanceof WC_Order_Item_Product ) {
+			continue;
+		}
 		$product = $item->get_product();
 		$items[] = array(
 			'ProductID'   => $item->get_product_id(),

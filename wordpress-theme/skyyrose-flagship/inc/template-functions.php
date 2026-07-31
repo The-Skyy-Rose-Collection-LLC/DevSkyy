@@ -325,7 +325,7 @@ function skyyrose_breadcrumbs() {
 			$output .= '</a>';
 		}
 
-		$output .= '<meta itemprop="position" content="' . esc_attr( $index + 1 ) . '" />';
+		$output .= '<meta itemprop="position" content="' . esc_attr( (string) ( $index + 1 ) ) . '" />';
 		$output .= '</li>';
 	}
 
@@ -381,9 +381,9 @@ function skyyrose_custom_body_classes( $classes ) {
 		$classes[] = 'has-header-image';
 	}
 
-	// Homepage V2 body class for CSS scoping.
+	// Editorial homepage body class for shell and layout scoping.
 	if ( is_front_page() ) {
-		$classes[] = 'homepage-v2';
+		$classes[] = 'homepage-editorial';
 	}
 
 	// Mobile bottom nav body spacer (CSS handles visibility).
@@ -527,7 +527,7 @@ function skyyrose_posted_by() {
 	printf(
 		'<span class="byline">%s <span class="author vcard"><a class="url fn n" href="%s">%s</a></span></span>',
 		esc_html_x( 'by', 'post author', 'skyyrose' ),
-		esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+		esc_url( get_author_posts_url( absint( get_the_author_meta( 'ID' ) ) ) ),
 		esc_html( get_the_author() )
 	);
 }
@@ -752,7 +752,7 @@ function skyyrose_svg_kses_allowed() {
  * @return string HTML attribute string (leading space included when non-empty).
  */
 function skyyrose_build_attr_string( $attrs ) {
-	if ( empty( $attrs ) || ! is_array( $attrs ) ) {
+	if ( empty( $attrs ) ) {
 		return '';
 	}
 	$parts = array();
@@ -774,197 +774,10 @@ function skyyrose_build_attr_string( $attrs ) {
  * @return string Sanitized space-separated class string (empty when input is empty).
  */
 function skyyrose_sanitize_class_list( $classes ) {
-	if ( empty( $classes ) || ! is_string( $classes ) ) {
+	if ( empty( $classes ) ) {
 		return '';
 	}
 	$tokens = preg_split( '/\s+/', trim( $classes ) );
 	$clean  = array_filter( array_map( 'sanitize_html_class', $tokens ) );
 	return implode( ' ', $clean );
-}
-
-/*
---------------------------------------------------------------
- * Social Media Links (Single Source of Truth)
- *--------------------------------------------------------------*/
-
-/**
- * Get the centralized social media links array.
- *
- * All templates (footer, contact, etc.) should call this function
- * instead of hardcoding social URLs. Returns a new array each call.
- *
- * @since 3.2.2
- * @return array Associative array of social links keyed by platform.
- */
-function skyyrose_get_social_links() {
-	// Canonical brand profiles (brand DNA). Overridable per network via the
-	// skyyrose_social_{network} theme mods registered in inc/customizer.php.
-	$defaults = array(
-		'instagram' => array(
-			'url'   => 'https://instagram.com/skyyrose.co',
-			'label' => __( 'Instagram', 'skyyrose' ),
-		),
-		'tiktok'    => array(
-			'url'   => 'https://tiktok.com/@skyyroseco',
-			'label' => __( 'TikTok', 'skyyrose' ),
-		),
-		'twitter'   => array(
-			'url'   => 'https://x.com/skyyroseco',
-			'label' => __( 'X (Twitter)', 'skyyrose' ),
-		),
-		'facebook'  => array(
-			'url'   => 'https://facebook.com/TheSkyyRoseCollection',
-			'label' => __( 'Facebook', 'skyyrose' ),
-		),
-	);
-
-	$links = array();
-	foreach ( $defaults as $network => $data ) {
-		$override = get_theme_mod( 'skyyrose_social_' . $network, '' );
-		if ( ! empty( $override ) ) {
-			$data['url'] = esc_url_raw( $override );
-		}
-		$links[ $network ] = $data;
-	}
-
-	return $links;
-}
-
-/*
---------------------------------------------------------------
- * Size Guide (Single Source of Truth)
- *--------------------------------------------------------------*/
-
-/**
- * Get the size-guide measurement tables.
- *
- * Consumed by both the site-wide modal (template-parts/size-guide-modal.php)
- * and the canonical /size-guide/ page (template-size-guide.php) so the two
- * surfaces can never drift (structural remediation WS4).
- *
- * @since 1.8.0
- * @return array Tables keyed by category: label, headers, rows.
- */
-function skyyrose_get_size_guide_tables() {
-	return array(
-		'tops'    => array(
-			'label'   => __( 'Tops', 'skyyrose' ),
-			'headers' => array( 'Size', 'Chest', 'Waist', 'Length', 'Sleeve' ),
-			'rows'    => array(
-				array( 'XS', '34', '28', '27', '32' ),
-				array( 'S', '36', '30', '28', '33' ),
-				array( 'M', '38', '32', '29', '34' ),
-				array( 'L', '40', '34', '30', '35' ),
-				array( 'XL', '42', '36', '31', '35.5' ),
-				array( '2XL', '44', '38', '32', '36' ),
-			),
-		),
-		'bottoms' => array(
-			'label'   => __( 'Bottoms', 'skyyrose' ),
-			'headers' => array( 'Size', 'Waist', 'Hip', 'Inseam', 'Length' ),
-			'rows'    => array(
-				array( 'XS', '28', '34', '30', '38' ),
-				array( 'S', '30', '36', '31', '39' ),
-				array( 'M', '32', '38', '32', '40' ),
-				array( 'L', '34', '40', '32', '41' ),
-				array( 'XL', '36', '42', '33', '42' ),
-				array( '2XL', '38', '44', '33', '43' ),
-			),
-		),
-		'kids'    => array(
-			'label'   => __( 'Kids', 'skyyrose' ),
-			'headers' => array( 'Size', 'Age', 'Chest', 'Waist', 'Height' ),
-			'rows'    => array(
-				array( '2T', '2', '21', '20', '33-36' ),
-				array( '3T', '3', '22', '20.5', '36-39' ),
-				array( '4T', '4', '23', '21', '39-42' ),
-				array( '5', '5-6', '24', '21.5', '42-45' ),
-				array( '6', '6-7', '25', '22', '45-48' ),
-			),
-		),
-	);
-}
-
-/*
---------------------------------------------------------------
- * Navigation Fallback
- *--------------------------------------------------------------*/
-
-/**
- * Fallback navigation menu when no custom menu is assigned.
- *
- * Renders a hardcoded list of essential pages matching the luxury
- * brand navigation structure: Collections, About, Contact.
- *
- * @since 3.0.0
- * @return void
- */
-function skyyrose_nav_fallback() {
-
-	$items = array(
-		array(
-			'title'    => __( 'Home', 'skyyrose' ),
-			'url'      => home_url( '/' ),
-			'children' => array(),
-		),
-		array(
-			'title'    => __( 'Collections', 'skyyrose' ),
-			'url'      => home_url( '/collections/' ),
-			'children' => array(
-				array(
-					'title' => __( 'Black Rose', 'skyyrose' ),
-					'url'   => home_url( '/collections/black-rose/' ),
-				),
-				array(
-					'title' => __( 'Love Hurts', 'skyyrose' ),
-					'url'   => home_url( '/collections/love-hurts/' ),
-				),
-				array(
-					'title' => __( 'Signature', 'skyyrose' ),
-					'url'   => home_url( '/collections/signature/' ),
-				),
-				array(
-					'title' => __( 'Kids Capsule', 'skyyrose' ),
-					'url'   => home_url( '/collections/kids-capsule/' ),
-				),
-			),
-		),
-		array(
-			'title'    => __( 'Pre-Order', 'skyyrose' ),
-			'url'      => home_url( '/pre-order/' ),
-			'children' => array(),
-		),
-		array(
-			'title'    => __( 'About', 'skyyrose' ),
-			'url'      => home_url( '/about/' ),
-			'children' => array(),
-		),
-		array(
-			'title'    => __( 'Contact', 'skyyrose' ),
-			'url'      => home_url( '/contact/' ),
-			'children' => array(),
-		),
-	);
-
-	echo '<ul class="navbar__menu">';
-
-	foreach ( $items as $item ) {
-		$has_children = ! empty( $item['children'] );
-		$li_class     = $has_children ? ' class="menu-item menu-item-has-children"' : ' class="menu-item"';
-
-		echo '<li' . $li_class . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $li_class is a hardcoded class string built 2 lines above.
-		echo '<a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['title'] ) . '</a>';
-
-		if ( $has_children ) {
-			echo '<ul class="sub-menu">';
-			foreach ( $item['children'] as $child ) {
-				echo '<li class="menu-item"><a href="' . esc_url( $child['url'] ) . '">' . esc_html( $child['title'] ) . '</a></li>';
-			}
-			echo '</ul>';
-		}
-
-		echo '</li>';
-	}
-
-	echo '</ul>';
 }

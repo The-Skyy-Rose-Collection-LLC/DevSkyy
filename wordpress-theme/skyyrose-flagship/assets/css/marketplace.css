@@ -1,0 +1,189 @@
+/**
+ * SkyyRose commercial marketplace layer.
+ *
+ * Provider-neutral presentation for Dokan, WCFM Marketplace, and WC Vendors.
+ * Plugin behavior stays plugin-owned; theme only controls visual language.
+ *
+ * @package SkyyRose
+ * @since   2.0.0
+ */
+
+.skyyrose-marketplace {
+	--market-surface: var(--color-gallery-cream);
+	--market-card: var(--color-paper);
+	--market-ink: var(--color-gallery-ink);
+	--market-accent: var(--color-oxblood);
+	--market-line: var(--color-concrete);
+}
+
+.skyyrose-marketplace-surface .site-content {
+	background: var(--market-surface);
+	color: var(--market-ink);
+}
+
+.marketplace-seller {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--space-2) var(--space-4);
+	margin-block: var(--space-5);
+	padding: var(--space-4) 0;
+	border-block: 1px solid var(--market-line);
+	color: var(--color-text-primary);
+}
+
+.marketplace-seller__eyebrow,
+.marketplace-seller__provider {
+	font-family: var(--font-ui);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+}
+
+.marketplace-seller__name {
+	color: var(--skyyrose-accent);
+	font-family: var(--font-heading);
+	font-size: var(--text-lg);
+}
+
+.marketplace-seller__provider {
+	flex-basis: 100%;
+	color: var(--color-text-muted);
+}
+
+.skyyrose-marketplace-surface :where(
+	.dokan-dashboard-wrap,
+	.dokan-store-wrap,
+	.wcfm-membership-wrapper,
+	.wcfm-dashboard-page,
+	.wcfmmp-store-page,
+	.wcv-dashboard-navigation,
+	.wcvendors-pro-dashboard-wrapper
+) {
+	width: min(var(--container-wide), calc(100% - (2 * var(--space-6))));
+	margin-inline: auto;
+	padding-block: var(--space-10);
+	font-family: var(--font-body);
+}
+
+.skyyrose-marketplace-surface :where(
+	.dokan-dashboard-content,
+	.dokan-store-products-filter-area,
+	.wcfm-content,
+	.wcfm-collapse-content,
+	.wcv-grid,
+	.wcvendors-pro-dashboard-wrapper
+) {
+	background: var(--market-card);
+	border: 1px solid var(--market-line);
+	border-radius: var(--radius-sm);
+	color: var(--market-ink);
+}
+
+.skyyrose-marketplace-surface :where(
+	.dokan-dashboard-menu,
+	.wcfm_menu,
+	.wcv-dashboard-navigation
+) {
+	background: var(--market-ink);
+	border-radius: var(--radius-sm);
+	color: var(--color-white);
+}
+
+.skyyrose-marketplace-surface :where(
+	.dokan-btn,
+	.dokan-btn-theme,
+	.wcfm_submit_button,
+	.wcv-button,
+	.wcvendors-pro-dashboard-wrapper .button
+) {
+	min-height: 2.75rem;
+	padding: var(--space-3) var(--space-5);
+	background: var(--market-ink);
+	border: 1px solid var(--market-ink);
+	border-radius: var(--radius-sm);
+	color: var(--color-white);
+	font-family: var(--font-ui);
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+	transition:
+		background-color var(--motion-duration) var(--ease-smooth-out),
+		border-color var(--motion-duration) var(--ease-smooth-out),
+		color var(--motion-duration) var(--ease-smooth-out);
+}
+
+.skyyrose-marketplace-surface :where(
+	.dokan-btn,
+	.dokan-btn-theme,
+	.wcfm_submit_button,
+	.wcv-button,
+	.wcvendors-pro-dashboard-wrapper .button
+):hover {
+	background: var(--market-accent);
+	border-color: var(--market-accent);
+	color: var(--color-white);
+}
+
+.skyyrose-marketplace-surface :where(input, select, textarea) {
+	background: var(--color-white);
+	border: 1px solid var(--market-line);
+	border-radius: var(--radius-sm);
+	color: var(--market-ink);
+}
+
+.skyyrose-marketplace-surface :where(table, .dokan-table, .wcfm-table) {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--market-card);
+	color: var(--market-ink);
+}
+
+.skyyrose-marketplace-surface :where(th, td) {
+	padding: var(--space-3) var(--space-4);
+	border-bottom: 1px solid var(--market-line);
+	text-align: left;
+}
+
+.skyyrose-marketplace-surface :where(th) {
+	font-family: var(--font-ui);
+	font-size: var(--text-xs);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+}
+
+.skyyrose-marketplace-surface .skyyrose-mascot,
+.skyyrose-marketplace-surface .luxury-cursor,
+.skyyrose-marketplace-surface .grain-overlay {
+	display: none;
+}
+
+@media (max-width: 48rem) {
+	.skyyrose-marketplace-surface :where(
+		.dokan-dashboard-wrap,
+		.dokan-store-wrap,
+		.wcfm-membership-wrapper,
+		.wcfm-dashboard-page,
+		.wcfmmp-store-page,
+		.wcv-dashboard-navigation,
+		.wcvendors-pro-dashboard-wrapper
+	) {
+		width: calc(100% - (2 * var(--space-4)));
+		padding-block: var(--space-6);
+	}
+
+	.skyyrose-marketplace-surface :where(table, .dokan-table, .wcfm-table) {
+		display: block;
+		overflow-x: auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skyyrose-marketplace-surface *,
+	.skyyrose-marketplace-surface *::before,
+	.skyyrose-marketplace-surface *::after {
+		scroll-behavior: auto;
+		transition-duration: 0.01ms;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+	}
+}

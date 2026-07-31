@@ -137,8 +137,8 @@ get_header();
 		<!-- FAQ Categories -->
 		<div class="faq-categories">
 			<?php foreach ( $faq_categories as $cat_idx => $category ) : ?>
-				<section class="faq-category<?php echo 0 === $cat_idx ? '' : ' rv-clip-up'; ?>" aria-labelledby="faq-cat-<?php echo esc_attr( $cat_idx ); ?>">
-					<h2 class="faq-category__title" id="faq-cat-<?php echo esc_attr( $cat_idx ); ?>">
+				<section class="faq-category<?php echo 0 === $cat_idx ? '' : ' rv-clip-up'; ?>" aria-labelledby="faq-cat-<?php echo esc_attr( (string) $cat_idx ); ?>">
+					<h2 class="faq-category__title" id="faq-cat-<?php echo esc_attr( (string) $cat_idx ); ?>">
 						<span class="faq-category__icon" aria-hidden="true"><?php echo wp_kses( $category['icon'], array() ); ?></span>
 						<?php echo esc_html( $category['title'] ); ?>
 					</h2>

@@ -7,7 +7,7 @@
  * homepage-v3-close.css (Acts VII–VIII) — one act group per file, none over
  * the 800-line ceiling.
  *
- * Everything is scoped to .homepage-v3 — homepage-v2.css leaked a rogue black
+ * Everything is scoped to .homepage-v3 — the retired homepage stylesheet leaked a rogue black
  * onto :root, which is the drift this file exists to end. Nothing here touches
  * global state.
  *
@@ -19,7 +19,7 @@
    TOKENS — the artifact/prototype system resolved onto SkyyRose canon.
    ══════════════════════════════════════════════════════════════════════════ */
 .homepage-v3 {
-	/* ONE black on this site. The two rogue near-blacks that homepage-v2.css
+	/* ONE black on this site. The two rogue near-blacks that the retired stylesheet
 	   and the source artifact each introduced are both retired here. */
 	--black: #0A0A0A;
 	--charcoal: #0E0E12;
@@ -377,6 +377,71 @@
 	color: var(--fg3);
 	white-space: nowrap;
 	margin: 0;
+}
+
+.hp-hero__world {
+	position: absolute;
+	right: clamp(var(--space-4), 4vw, var(--space-10));
+	bottom: var(--space-4);
+	z-index: 4;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: 11px 15px;
+	border: 1px solid color-mix(in srgb, var(--rose-gold) 54%, transparent);
+	border-radius: var(--radius-full);
+	background: color-mix(in srgb, var(--black) 82%, transparent);
+	color: var(--fg1);
+	font-family: var(--font-ui);
+	font-size: var(--text-xs);
+	font-weight: 700;
+	letter-spacing: var(--tracking-widest);
+	text-decoration: none;
+	text-transform: uppercase;
+	backdrop-filter: blur(12px);
+	transition:
+		background var(--dur-base) var(--ease),
+		border-color var(--dur-base) var(--ease),
+		transform var(--dur-base) var(--ease);
+}
+
+.hp-hero__world i {
+	color: var(--rose-gold);
+	font-family: var(--font-body);
+	font-size: 1rem;
+	font-style: normal;
+	transition: transform var(--dur-base) var(--ease);
+}
+
+.hp-hero__world:hover,
+.hp-hero__world:focus-visible {
+	border-color: var(--rose-gold);
+	background: var(--card-hover);
+	transform: translateY(-2px);
+}
+
+.hp-hero__world:hover i,
+.hp-hero__world:focus-visible i {
+	transform: translateX(3px);
+}
+
+@media (max-width: 719px) {
+
+	.hp-hero__tag {
+		bottom: var(--space-14);
+	}
+
+	.hp-hero__world {
+		right: 50%;
+		bottom: var(--space-3);
+		transform: translateX(50%);
+		white-space: nowrap;
+	}
+
+	.hp-hero__world:hover,
+	.hp-hero__world:focus-visible {
+		transform: translateX(50%);
+	}
 }
 
 /* The static, touch-usable form of the same navigation. */

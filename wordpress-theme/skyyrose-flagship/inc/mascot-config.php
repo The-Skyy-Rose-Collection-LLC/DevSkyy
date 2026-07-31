@@ -370,7 +370,7 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'skyyrose_mascot_enabled',
 		array(
-			'default'           => true,
+			'default'           => '1',
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'skyyrose_sanitize_mascot_checkbox',
 		)
@@ -412,7 +412,7 @@ function skyyrose_mascot_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'skyyrose_mascot_llm_enabled',
 		array(
-			'default'           => true,
+			'default'           => '1',
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'skyyrose_sanitize_mascot_checkbox',
 		)

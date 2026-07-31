@@ -60,7 +60,7 @@ while ( have_posts() ) :
 		);
 	else :
 		$techflat_url = $catalog_entry ? skyyrose_product_image_uri( $catalog_entry['image'] ?? '' ) : '';
-		$main_image   = wp_get_attachment_url( $product->get_image_id() );
+		$main_image   = wp_get_attachment_url( absint( $product->get_image_id() ) );
 		$price_html   = $product->get_price_html();
 		$stock_status = $product->get_stock_status();
 		$description  = ! empty( $catalog_entry['description'] )

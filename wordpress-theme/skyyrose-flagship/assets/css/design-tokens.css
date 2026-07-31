@@ -107,6 +107,11 @@
 	--color-text-muted:     #B3B3B3;
 	--color-text-dim:       #A0A0A0;
 	--skyyrose-surface-warm: #F5F1EB;
+	--color-concrete:       #C8C0B2;
+	--color-paper:          #F7F3E9;
+	--color-gallery-cream:  #EEE9DE;
+	--color-gallery-ink:    #1B1B1A;
+	--color-oxblood:        #6F1821;
 
 	/* --- §1.7  Color — Semantic state (mapped to brand palette) ---- */
 	--color-success:      var(--color-gold, #D4AF37);
@@ -141,7 +146,7 @@
 	   data/brand/typography.json — see data/gen-design-tokens.py).
 	   --font-* / --ff-* are back-compat aliases consumed by style.css
 	   (body/base typography), woocommerce, footer, immersive,
-	   generic-pages, cart, checkout, search-results, homepage-v2/v7,
+	   generic-pages, cart, checkout, search-results, homepage,
 	   product-grid, kids-capsule, skeleton. Every --font-* / --ff-* name
 	   referenced by a var() MUST be aliased here — an undefined var
 	   fails silent to its fallback (bug-271: --font-body missing put
@@ -231,6 +236,17 @@
 	--hover-lift:    translateY(-2px);
 	--active-press:  scale(0.97);
 
+	/* --- §1.24.1  Commercial spacing ------------------------------ */
+	--space-1:  0.25rem;
+	--space-2:  0.5rem;
+	--space-3:  0.75rem;
+	--space-4:  1rem;
+	--space-5:  1.25rem;
+	--space-6:  1.5rem;
+	--space-8:  2rem;
+	--space-10: 2.5rem;
+	--space-12: 3rem;
+
 	/* --- §1.25  Content visibility / containment ------------------- */
 	--cv-auto:        auto;
 	--contain-paint:  paint;
@@ -279,8 +295,8 @@ html {
 [data-collection="black-rose"] {
 	--skyyrose-accent:       #C0C0C0;
 	--skyyrose-accent-rgb:   192, 192, 192;
-	--skyyrose-accent-dark:  #999;
-	--skyyrose-secondary:    #FFF;
+	--skyyrose-accent-dark:  #999999;
+	--skyyrose-secondary:    #FFFFFF;
 	--skyyrose-font-script:  'SkyyRose Black Rose Script', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);
@@ -300,7 +316,7 @@ html {
 	--skyyrose-accent:       #DC143C;
 	--skyyrose-accent-rgb:   220, 20, 60;
 	--skyyrose-accent-dark:  #9B0F2E;
-	--skyyrose-secondary:    #FFF;
+	--skyyrose-secondary:    #FFFFFF;
 	--skyyrose-font-script:  'SkyyRose Love Hurts Graffiti', cursive;
 	--skyyrose-font-caps:    'Cinzel', serif;
 	--skyyrose-font-display: var(--skyyrose-font-caps);

@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.13.4
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,10 +12,14 @@ SkyyRose — Oakland-born luxury streetwear. Built by Corey Foster. Four cinemat
 
 == Description ==
 
-SkyyRose is a premium dark luxury WooCommerce theme built for fashion, streetwear, and lifestyle brands. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, holographic product cards, and configurable collection palettes. Compatible with Elementor, Gutenberg, and all major page builders.
+SkyyRose is a premium dark luxury WooCommerce theme built for fashion, streetwear, and lifestyle brands. The theme delivers immersive product storytelling, holographic product cards, configurable collection palettes, and marketplace-vendor UI compatibility. It supports the block editor, Elementor, Divi, Beaver Builder, and Bricks.
 
 = Features =
 
+* **Commercial Marketplace Layer** — Dokan, WCFM Marketplace, and WC Vendors presentation compatibility with seller identity, vendor dashboards, store pages, product tables, and account surfaces
+* **Premium Live Product Search** — Keyboard-accessible, debounced catalog search with real product imagery, collection context, pricing, and direct product links
+* **SkyyRose House System** — Concrete Gallery structure, Oakland Noir editorial typography, and Rose Signal drop accents unified without flattening the four collection worlds
+* **Conflict-Aware Motion** — Story progress rail and staggered search reveals stay disabled on checkout, vendor dashboards, reduced-motion sessions, and dedicated 3D/scroll-world canvases
 * **Dark Luxury Design System** — #0A0A0A page background with #111111 card surfaces for a rich, cinematic feel
 * **4 Collection Pages** — Black Rose, Love Hurts, Signature, and Kids Capsule, each with unique color schemes and particle animations
 * **3 Immersive Scene Experiences** — Hotspot-based product discovery within cinematic environments
@@ -104,11 +108,11 @@ The luxury cursor (rose gold ring with sparkle trail) is desktop-only. It is aut
 
 = How does conditional asset loading work? =
 
-Each page template only loads the CSS and JavaScript it needs. Collection pages load particle animation scripts, immersive pages load scene scripts, and WooCommerce pages load cart/checkout scripts. This reduces page weight across the site.
+Each page template only loads the CSS and JavaScript it needs. Collection pages load their embedded scene engine, Collections World keeps its own canvas bundle, and WooCommerce pages load cart/checkout scripts. This reduces page weight across the site.
 
 = Is a skyyrose-template-kit.zip included for Elementor? =
 
-No. The current release does not include a pre-built Elementor Template Kit zip. The docs/installation.html reference to skyyrose-template-kit.zip describes a planned deliverable that has not shipped yet. The recommended import path is the WC Blueprints JSON file at blueprints/skyyrose-demo-setup.json, which automates WooCommerce setup and site options. Full page and collection templates are assigned via Page Attributes in the WordPress editor — no Elementor kit is required to use the theme.
+No. The current release does not include a pre-built Elementor Template Kit zip. Theme activation creates and assigns the required storefront pages. Elementor templates and widgets are available directly from the theme; no separate kit is required.
 
 = What can I configure in the Customizer? =
 
@@ -134,6 +138,28 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 2.2.1 =
+* Feature: page-aware conversion, confidence, and discovery upgrades across public storefront views
+* Architecture: storefront data and performance CLI responsibilities moved into focused modules
+* Quality: static accessibility scan now tokenizes PHP and no longer counts code literals as rendered images
+* Quality: reduced static-analysis findings and oversized legacy PHP files without changing public theme interfaces
+
+= 2.2.0 =
+* Feature: high-end Collections World chapter reveals, persistent commerce CTAs, keyboard paging, accessible progress, and shared storefront navigation
+* Feature: homepage entry point into Collections World
+* Performance: missing scroll-world clips no longer trigger failed requests
+* Performance: 3D Skyy mascot loads its model only when entering; guide data loads only when a visitor asks a question
+* Accessibility: mobile menu focus containment, Escape close, focus restoration, state labels, and scroll locking
+* Marketplace: default navigation now shares one canonical definition and no longer overwrites merchant-managed menus during normal requests
+
+= 2.0.0 =
+* Major: commercial marketplace foundation for Dokan, WCFM Marketplace, and WC Vendors
+* Major: premium live product search inspired by Prompt 197 from the Animated Website Prompt Pack
+* Feature: scroll-linked story progress rail inspired by Prompt 065, limited to editorial story surfaces
+* Feature: WooCommerce HPOS, Cart/Checkout Blocks, and Product Block Editor compatibility declarations
+* Design: Concrete Gallery structure blended with Oakland Noir and Rose Signal while preserving all four collection identities
+* Performance: marketplace dashboards, checkout, Collections World, and immersive 3D pages opt out of decorative motion
 
 = 1.13.4 =
 * Fix: mascot fallback 2D character image (`.skyyrose-mascot__image`, shown only when the 3D canvas is unavailable) had no aspect-ratio constraint; now locked to its real source proportions (1024x1035) at every breakpoint via `aspect-ratio`, correctly proportional on both desktop and mobile with no separate mobile override needed (bug-317)

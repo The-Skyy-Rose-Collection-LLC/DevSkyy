@@ -64,7 +64,7 @@ get_header();
 			$ci_count  = count( skyyrose_get_collection_products( $ci_slug ) );
 			$ci_lockup = $ci_lockups[ $ci_slug ] ?? null;
 			?>
-			<a href="<?php echo esc_url( $ci_col['page_url'] ); ?>" class="ci-card ci-card--<?php echo esc_attr( $ci_col['class_abbr'] ?? $ci_slug ); ?> magnetic" data-collection="<?php echo esc_attr( $ci_slug ); ?>" data-piece-count="<?php echo esc_attr( $ci_count ); ?>">
+			<a href="<?php echo esc_url( $ci_col['page_url'] ); ?>" class="ci-card ci-card--<?php echo esc_attr( $ci_col['class_abbr'] ?? $ci_slug ); ?> magnetic" data-collection="<?php echo esc_attr( $ci_slug ); ?>" data-piece-count="<?php echo esc_attr( (string) $ci_count ); ?>">
 				<div class="ci-card__body">
 					<p class="ci-card__num"><?php echo esc_html( sprintf( '%02d', $ci_index + 1 ) ); ?></p>
 					<?php if ( $ci_lockup ) : ?>

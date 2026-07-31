@@ -62,13 +62,14 @@ defined( 'ABSPATH' ) || exit;
 					</a>
 
 					<?php
-					if ( class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC() && WC()->cart ) :
-						$cart_count = WC()->cart->get_cart_contents_count();
+					// Runtime cart can be null during REST, CLI, and early/custom renders despite WooCommerce stubs declaring it non-null.
+					if ( function_exists( 'WC' ) && WC()->cart ) : // @phpstan-ignore booleanAnd.rightAlwaysTrue
+						$cart_count = (int) WC()->cart->get_cart_contents_count();
 						?>
 						<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="navbar__action-btn navbar__cart-btn">
 							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
 							<span><?php esc_html_e( 'Bag', 'skyyrose' ); ?></span>
-							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>"><?php echo esc_html( $cart_count ); ?></span>
+							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>"><?php echo esc_html( (string) $cart_count ); ?></span>
 						</a>
 					<?php endif; ?>
 				</div>
@@ -126,8 +127,9 @@ defined( 'ABSPATH' ) || exit;
 						array(
 							'theme_location' => 'primary',
 							'menu_class'     => 'navbar__menu',
-							'container'      => false,
+							'container'      => '',
 							'depth'          => 2,
+							'fallback_cb'    => 'skyyrose_nav_fallback',
 						)
 					);
 					?>
@@ -159,6 +161,9 @@ defined( 'ABSPATH' ) || exit;
 
 			</div>
 		</nav>
+		<div class="house-progress" data-story-progress aria-hidden="true">
+			<span class="house-progress__bar"></span>
+		</div>
 
 		<!-- Mobile Menu Slide-In -->
 		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
@@ -190,8 +195,15 @@ defined( 'ABSPATH' ) || exit;
 				<span id="search-overlay-label" class="screen-reader-text"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></span>
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></label>
-					<input id="search-overlay-input" type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">
+					<input id="search-overlay-input" type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off"
+						role="combobox" aria-autocomplete="list" aria-controls="search-live-results" aria-expanded="false">
+					<input type="hidden" name="post_type" value="product">
 				</form>
+				<div class="search-live" id="search-live-results" aria-live="polite">
+					<p class="search-live__hint"><?php esc_html_e( 'Search by piece, collection, color, or SKU.', 'skyyrose' ); ?></p>
+					<div class="search-live__results" role="listbox"></div>
+					<a class="search-live__all" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>"><?php esc_html_e( 'Explore full storefront', 'skyyrose' ); ?></a>
+				</div>
 				<button class="search-overlay__close" id="search-close" type="button" aria-label="<?php esc_attr_e( 'Close search', 'skyyrose' ); ?>">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 				</button>

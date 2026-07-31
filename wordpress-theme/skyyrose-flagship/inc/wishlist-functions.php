@@ -610,7 +610,7 @@ function skyyrose_rest_get_wishlist( $request ) {
 				'id'    => $product_id,
 				'name'  => $product->get_name(),
 				'price' => $product->get_price_html(),
-				'image' => wp_get_attachment_image_url( $product->get_image_id(), 'thumbnail' ),
+				'image' => wp_get_attachment_image_url( absint( $product->get_image_id() ), 'thumbnail' ),
 				'url'   => $product->get_permalink(),
 			);
 		}

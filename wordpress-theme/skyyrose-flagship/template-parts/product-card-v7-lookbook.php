@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$args       = isset( $args ) && is_array( $args ) ? $args : array();
 $v7_product = isset( $args['product'] ) ? $args['product'] : null;
 $v7_sku     = '';
 if ( $v7_product instanceof WC_Product ) {

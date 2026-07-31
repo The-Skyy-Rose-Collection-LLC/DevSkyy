@@ -485,3 +485,38 @@
 .sg-page__contact:focus-visible {
 	text-decoration: underline;
 }
+/* Shared policy shell — editor-managed copy inside the established info frame. */
+.policy-page__content {
+	max-width: 760px;
+	margin-inline: auto;
+	padding-block: clamp(12px, 3vw, 36px) clamp(64px, 9vw, 112px);
+	color: var(--color-text-secondary);
+	font-family: var(--font-body);
+	font-size: clamp(1rem, 1.2vw, 1.125rem);
+	line-height: 1.8;
+}
+
+.policy-page__content h2 {
+	margin-block: clamp(42px, 7vw, 72px) 14px;
+	color: var(--color-text-primary);
+	font-family: var(--font-caps);
+	font-size: clamp(1.35rem, 2.6vw, 2rem);
+	font-weight: 500;
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+}
+
+.policy-page__content h2:first-child {
+	margin-block-start: 0;
+}
+
+.policy-page__content p,
+.policy-page__content ul,
+.policy-page__content ol {
+	margin-block: 0 1.25em;
+}
+
+.policy-page__content a {
+	color: var(--color-rose-gold);
+	text-underline-offset: 0.2em;
+}

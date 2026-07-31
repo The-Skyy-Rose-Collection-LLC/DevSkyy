@@ -52,7 +52,6 @@ function skyyrose_setup() {
 	 *
 	 * primary     - Main header navigation (also used by mobile slide-in panel)
 	 * collection  - Collection-specific navigation (per-collection pages)
-	 * experiences - Immersive experience pages navigation (3D storytelling)
 	 * footer      - Footer copyright bar menu (rendered in footer.php)
 	 *
 	 * Removed: footer-legal — was never called in any template (orphaned location).
@@ -63,8 +62,7 @@ function skyyrose_setup() {
 		array(
 			'primary' => esc_html__( 'Primary Menu', 'skyyrose' ),
 			'footer'  => esc_html__( 'Footer Menu', 'skyyrose' ),
-			// 'collection' and 'experiences' removed (audit 2026-06-28) — never
-			// called in any template; dead locations waste DB + Customizer UI space.
+			// Retired menu locations are omitted; only rendered locations belong here.
 		)
 	);
 
@@ -123,23 +121,31 @@ function skyyrose_setup() {
 add_action( 'after_setup_theme', 'skyyrose_setup' );
 
 /**
- * Declare WooCommerce HPOS (High-Performance Order Storage) compatibility.
+ * Declare compatibility with WooCommerce storage and block-era commerce features.
  *
  * Ensures compatibility with WooCommerce 8.5+ Custom Order Tables feature.
  *
  * @since 1.0.0
  * @return void
  */
-function skyyrose_declare_woocommerce_hpos_compatibility() {
+function skyyrose_declare_woocommerce_feature_compatibility() {
 	if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+		$features = array(
 			'custom_order_tables',
-			SKYYROSE_DIR . '/functions.php',
-			true
+			'cart_checkout_blocks',
+			'product_block_editor',
 		);
+
+		foreach ( $features as $feature ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+				$feature,
+				SKYYROSE_DIR . '/functions.php',
+				true
+			);
+		}
 	}
 }
-add_action( 'before_woocommerce_init', 'skyyrose_declare_woocommerce_hpos_compatibility' );
+add_action( 'before_woocommerce_init', 'skyyrose_declare_woocommerce_feature_compatibility' );
 
 /**
  * Set the content width in pixels, based on the theme's design.

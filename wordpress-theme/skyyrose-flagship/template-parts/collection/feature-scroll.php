@@ -70,14 +70,14 @@ $subheading = isset( $c['features_subheading'] ) ? $c['features_subheading'] : '
 						height="<?php echo esc_attr( $feature['image_h'] ); ?>"
 						loading="lazy" decoding="async"
 						class="col-featscroll__img<?php echo 0 === $i ? ' is-active' : ''; ?>"
-						data-feat-img="<?php echo esc_attr( $i ); ?>">
+						data-feat-img="<?php echo esc_attr( (string) $i ); ?>">
 				<?php endforeach; ?>
 			</div>
 		</div>
 
 		<ol class="col-featscroll__items">
 			<?php foreach ( $render_features as $i => $feature ) : ?>
-				<li class="col-featscroll__item<?php echo 0 === $i ? ' is-active' : ''; ?>" data-feat-item="<?php echo esc_attr( $i ); ?>">
+				<li class="col-featscroll__item<?php echo 0 === $i ? ' is-active' : ''; ?>" data-feat-item="<?php echo esc_attr( (string) $i ); ?>">
 					<figure class="col-featscroll__item-figure">
 						<img
 							src="<?php echo esc_url( $feature['image_url'] ); ?>"

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace Setup - SkyyRose Documentation</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0A0A0A;color:#F5F5F0;font-family:'Inter',system-ui,sans-serif;line-height:1.7;padding:2rem;max-width:860px;margin:0 auto}
+    h1,h2,h3{font-family:'Archivo',system-ui,sans-serif;color:#B76E79;margin:1.5rem 0 .75rem}
+    h1{font-size:2rem;border-bottom:1px solid #B76E79;padding-bottom:.5rem}
+    a{color:#B76E79;text-decoration:none}a:hover{text-decoration:underline}
+    .doc-nav{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem 0;border-bottom:1px solid #222}
+    .doc-nav a{padding:.25rem .6rem;border:1px solid #333;border-radius:4px;font-size:.85rem}
+    code{background:#151515;border-radius:4px;font-family:monospace;font-size:.85rem;padding:.15rem .35rem}
+    table{width:100%;border-collapse:collapse;margin:1rem 0}
+    th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid #222;vertical-align:top}
+    th{color:#B76E79;font-weight:600}
+    p{margin:.75rem 0}
+    ul,ol{margin:.5rem 0 .5rem 1.5rem}
+    .callout{border-left:3px solid #B76E79;background:#151515;padding:1rem;margin:1rem 0}
+  </style>
+</head>
+<body>
+<nav class="doc-nav">
+  <a href="index.html">Overview</a>
+  <a href="installation.html">Installation</a>
+  <a href="woocommerce.html">WooCommerce</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="customization.html">Customization</a>
+  <a href="credits.html">Credits</a>
+</nav>
+
+<h1>Commercial Marketplace Setup</h1>
+<p>SkyyRose 2.0 adds provider-neutral presentation compatibility for Dokan, WCFM Marketplace, and WC Vendors. Vendor plugins own commissions, payouts, onboarding, permissions, and order data. SkyyRose owns storefront presentation.</p>
+
+<div class="callout"><strong>Choose one vendor plugin.</strong> Never activate multiple marketplace providers together. Their routes, capabilities, dashboards, and product ownership hooks overlap.</div>
+
+<h2>Supported Providers</h2>
+<table>
+  <tr><th>Provider</th><th>Theme coverage</th><th>Plugin-owned behavior</th></tr>
+  <tr><td>Dokan</td><td>Store pages, dashboard chrome, forms, tables, seller identity</td><td>Registration, commissions, withdrawals, shipping</td></tr>
+  <tr><td>WCFM Marketplace</td><td>Store pages, dashboard chrome, forms, tables, seller identity</td><td>Memberships, commissions, payouts, vendor capabilities</td></tr>
+  <tr><td>WC Vendors</td><td>Vendor navigation, dashboard, forms, tables, seller identity</td><td>Applications, commissions, payouts, orders</td></tr>
+</table>
+
+<h2>Install Order</h2>
+<ol>
+  <li>Install WordPress, WooCommerce, and SkyyRose.</li>
+  <li>Complete WooCommerce setup, payment, tax, shipping, privacy, and transactional email configuration.</li>
+  <li>Install exactly one supported marketplace provider.</li>
+  <li>Run provider onboarding and assign its dashboard/store pages.</li>
+  <li>Test shopper, seller, and administrator accounts separately.</li>
+  <li>Place test orders for physical, variable, sale, out-of-stock, refunded, and vendor-split scenarios.</li>
+</ol>
+
+<h2>Conflict Policy</h2>
+<ul>
+  <li>Vendor dashboards disable decorative cursor, grain, mascot, and cinematic motion.</li>
+  <li>Checkout stays motion-light and uses WooCommerce-owned page content.</li>
+  <li>Collections World keeps an isolated asset bundle; collection storytelling loads only on collection pages.</li>
+  <li>Marketplace stylesheet targets provider public APIs and top-level classes; plugin business logic is never overridden.</li>
+  <li>Reduced-motion preference removes result stagger and marketplace transitions.</li>
+</ul>
+
+<h2>Release Checklist</h2>
+<ul>
+  <li>PHP 8.2, current WordPress, and current WooCommerce smoke test</li>
+  <li>Cart and Checkout Blocks, HPOS, and Product Block Editor test</li>
+  <li>Keyboard navigation and 200% zoom test</li>
+  <li>Seller dashboard test at 375px, 768px, and desktop widths</li>
+  <li>Zero console errors on shop, product, cart, checkout, account, vendor store, and vendor dashboard</li>
+  <li>Package with <code>npm run package:theme</code> from <code>wordpress-theme/</code></li>
+</ul>
+
+<p>Production deployment remains separate from packaging. Always deploy through approved SkyyRose release workflow after backup and staging verification.</p>
+</body>
+</html>

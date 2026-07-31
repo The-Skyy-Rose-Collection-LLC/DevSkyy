@@ -101,6 +101,11 @@ $hp_lockups = skyyrose_home_marquee_marks();
 			<span class="hp-sr"><?php esc_html_e( 'SkyyRose —', 'skyyrose' ); ?></span>
 			<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?>
 		</h1>
+
+		<a class="hp-hero__world" href="<?php echo esc_url( home_url( '/collections-world/' ) ); ?>">
+			<span><?php esc_html_e( 'Enter Scroll World', 'skyyrose' ); ?></span>
+			<i aria-hidden="true">&rarr;</i>
+		</a>
 	</div>
 
 	<?php

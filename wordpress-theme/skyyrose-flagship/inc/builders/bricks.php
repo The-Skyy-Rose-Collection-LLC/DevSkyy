@@ -24,9 +24,6 @@ if ( ! defined( 'ABSPATH' ) || ! defined( 'BRICKS_VERSION' ) ) {
  * @return array Defaults with brand colors prepended.
  */
 function skyyrose_bricks_default_globals_callback( array $colors, $defaults = array() ) {
-	if ( ! is_array( $defaults ) ) {
-		$defaults = array();
-	}
 	if ( ! isset( $defaults['colors'] ) || ! is_array( $defaults['colors'] ) ) {
 		$defaults['colors'] = array();
 	}

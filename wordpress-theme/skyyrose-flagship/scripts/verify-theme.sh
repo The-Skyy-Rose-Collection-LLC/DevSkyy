@@ -328,27 +328,41 @@ if want a11y-static; then
   # Parsing, not line-matching. Order matters: PHP blocks are stripped FIRST, because
   # `<img src="<?php echo esc_url( $u ); ?>" alt="x">` has its first '>' inside `?>`,
   # which is what truncated the tag and hid the alt.
-  if command -v python3 >/dev/null 2>&1; then
-    noalt=$(python3 - <<'PYEOF'
-import re, pathlib
-skip = {'vendor', 'node_modules'}
-count = 0
-for p in pathlib.Path('.').rglob('*.php'):
-    if any(s in p.parts for s in skip):
-        continue
-    try:
-        src = p.read_text(errors='ignore')
-    except OSError:
-        continue
-    src = re.sub(r'<!--.*?-->', ' ', src, flags=re.S)     # html comments
-    src = re.sub(r'/\*.*?\*/', ' ', src, flags=re.S)      # php block comments
-    src = re.sub(r'^[ \t]*(?://|#).*$', ' ', src, flags=re.M)  # php line comments
-    src = re.sub(r'<\?(?:php|=)?.*?\?>', ' ', src, flags=re.S)  # php blocks
-    for tag in re.findall(r'<img\b[^>]*>', src):           # [^>] spans newlines
-        if not re.search(r'\balt\s*=', tag):
-            count += 1
-print(count)
-PYEOF
+  if command -v php >/dev/null 2>&1; then
+    # token_get_all() distinguishes real inline HTML from PHP string/regex
+    # literals. Regex-stripping PHP cannot do that reliably when a PHP string
+    # itself contains tag-like text or `?>`.
+    noalt=$(php <<'PHPEOF'
+<?php
+$iterator = new RecursiveIteratorIterator(
+	new RecursiveCallbackFilterIterator(
+		new RecursiveDirectoryIterator( '.', FilesystemIterator::SKIP_DOTS ),
+		static function ( SplFileInfo $current ): bool {
+			return ! $current->isDir() || ! in_array( $current->getFilename(), array( 'vendor', 'node_modules' ), true );
+		}
+	)
+);
+$count = 0;
+foreach ( $iterator as $file ) {
+	if ( 'php' !== strtolower( $file->getExtension() ) ) {
+		continue;
+	}
+	$html = '';
+	foreach ( token_get_all( (string) file_get_contents( $file->getPathname() ) ) as $token ) {
+		if ( is_array( $token ) && T_INLINE_HTML === $token[0] ) {
+			$html .= $token[1];
+		}
+	}
+	$html = preg_replace( '/<!--.*?-->/s', ' ', $html );
+	preg_match_all( '/<img\b[^>]*>/is', (string) $html, $tags );
+	foreach ( $tags[0] as $tag ) {
+		if ( ! preg_match( '/\balt\s*=/i', $tag ) ) {
+			++$count;
+		}
+	}
+}
+echo $count;
+PHPEOF
 )
   else
     noalt=$(grep -rInE "<img[^>]*>" --include='*.php' --exclude-dir=vendor --exclude-dir=node_modules . 2>/dev/null \

@@ -30,7 +30,7 @@ if ( empty( $questions ) ) {
 
 		<div class="lp-faq__list">
 			<?php foreach ( $questions as $i => $item ) : ?>
-				<div class="lp-faq__item lp-rv" data-delay="<?php echo esc_attr( min( $i + 1, 5 ) ); ?>">
+				<div class="lp-faq__item lp-rv" data-delay="<?php echo esc_attr( (string) min( $i + 1, 5 ) ); ?>">
 					<button class="lp-faq__question" type="button"
 							id="lp-faq-q-<?php echo esc_attr( $i ); ?>"
 							aria-expanded="false"

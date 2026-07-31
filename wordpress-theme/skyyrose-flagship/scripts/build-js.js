@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Minify every assets/js/*.js (and assets/js/experiences/*.js) source to
+ * Minify every assets/js/*.js and assets/js/system/*.js source to
  * its .min.js sibling using terser.
  *
  * Hand-checked-in mins have drifted from sources, causing stale code to ship
@@ -9,8 +9,7 @@
  *
  * Excluded: anything already ending in .min.js, anything under vendor/
  * (already shipped minified by upstream), and directories not explicitly
- * listed below. experiences/*.js files are global-script-style Three.js
- * orchestration (no ESM imports) and minify cleanly with the default config.
+ * listed below.
  */
 
 const fs = require('fs');
@@ -26,7 +25,6 @@ const SRC_DIR = path.resolve(__dirname, '..', 'assets', 'js');
 // Each entry: directory absolute path, relative label for log output.
 const SCAN_DIRS = [
 	{ dir: SRC_DIR, label: '' },
-	{ dir: path.join(SRC_DIR, 'experiences'), label: 'experiences/' },
 	{ dir: path.join(SRC_DIR, 'system'), label: 'system/' },
 ];
 

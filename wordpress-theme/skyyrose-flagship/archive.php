@@ -9,7 +9,7 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main" role="main" tabindex="-1">
+<main id="primary" class="site-main skr-blog" role="main" tabindex="-1">
 
 	<?php if ( have_posts() ) : ?>
 
@@ -20,6 +20,7 @@ get_header();
 			?>
 		</header><!-- .page-header -->
 
+		<div class="skr-blog__grid">
 		<?php
 		// Start the Loop.
 		while ( have_posts() ) :
@@ -33,6 +34,9 @@ get_header();
 			get_template_part( 'template-parts/content/content', get_post_type() );
 
 		endwhile;
+		?>
+		</div>
+		<?php
 
 		the_posts_navigation();
 

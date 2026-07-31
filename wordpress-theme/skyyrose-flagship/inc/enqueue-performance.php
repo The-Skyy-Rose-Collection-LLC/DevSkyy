@@ -65,10 +65,10 @@ function skyyrose_preload_fonts() {
 		<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 		<?php
 	}
-	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
-	// templates). Skip the preload elsewhere so non-BR pages don't waste
+	// Cinzel is above-fold only on Black Rose collection pages. Skip the preload
+	// elsewhere so non-BR pages don't waste
 	// bandwidth on a font they never render.
-	if ( in_array( $slug, array( 'collection', 'collection-standalone', 'immersive' ), true ) ) {
+	if ( in_array( $slug, array( 'collection', 'collection-standalone' ), true ) ) {
 		$queried = get_queried_object();
 		$is_br   = $queried && isset( $queried->post_name )
 			&& false !== strpos( (string) $queried->post_name, 'black-rose' );
@@ -195,7 +195,7 @@ function skyyrose_async_noncritical_styles( $html, $handle ) {
 	// content templates the footer/mascot chrome renders at doc end and can
 	// never be in-viewport at first paint — the wave-2 render-blocking keep
 	// was for SHORT pages (cart/wishlist), which stay critical.
-	$tall_content_slugs = array( 'front-page', 'collection-standalone', 'landing', 'preorder-gateway', 'immersive', 'kc-launch', 'collections-world' );
+	$tall_content_slugs = array( 'front-page', 'collection-standalone', 'landing', 'preorder-gateway', 'kc-launch', 'collections-world' );
 	if ( in_array( $slug, $tall_content_slugs, true ) ) {
 		$async_handles[] = 'skyyrose-footer';
 		$async_handles[] = 'skyyrose-footer-cro';
@@ -205,9 +205,7 @@ function skyyrose_async_noncritical_styles( $html, $handle ) {
 
 	// Collection pages: grep-verified ZERO .col-hero selectors in these
 	// sheets — everything they style sits below the 100vh hero (the embedded
-	// scene layer renders at collection/page.php:184, after the hero). The
-	// immersive trio stays render-blocking on the 'immersive' slug, where
-	// the scene IS the above-fold surface.
+	// scene layer renders at collection/page.php:184, after the hero).
 	if ( 'collection-standalone' === $slug ) {
 		$async_handles[] = 'skyyrose-pin-narrative';
 		$async_handles[] = 'skyyrose-collection-feature-scroll';
@@ -313,9 +311,9 @@ function skyyrose_preload_hero_image() {
 		 * often 2-3MB (audit 2026-05-23).
 		 */
 		if ( $product instanceof WC_Product && $product->get_image_id() ) {
-			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+			$image_url = wp_get_attachment_image_url( absint( $product->get_image_id() ), 'woocommerce_single' );
 			if ( ! $image_url ) {
-				$image_url = wp_get_attachment_url( $product->get_image_id() );
+				$image_url = wp_get_attachment_url( absint( $product->get_image_id() ) );
 			}
 		}
 	} elseif ( is_page() ) {
@@ -326,22 +324,6 @@ function skyyrose_preload_hero_image() {
 			// generic branch below preloaded — that was a wasted fetch while
 			// the real LCP waited (load delay 1,142ms). Same file, same URL.
 			$image_url = get_theme_file_uri( 'assets/images/homepage-story-founder.webp' );
-		} else {
-			// Immersive pages: preload featured image if set. 'large' (max
-			// 1024px) instead of 'full' — full is typically 2-4MB and far
-			// exceeds what any viewport needs for a hero preload. Collection
-			// templates removed (Wave 5): skyyrose_preload_template_lcp()
-			// now preloads their measured LCP (.col-hero__bg srcset) exactly;
-			// a second featured-image preload here would be a wasted fetch.
-			$hero_templates = array(
-				'template-immersive-black-rose.php',
-				'template-immersive-love-hurts.php',
-				'template-immersive-signature.php',
-				'template-immersive-kids-capsule.php',
-			);
-			if ( $template && in_array( $template, $hero_templates, true ) && has_post_thumbnail() ) {
-				$image_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
-			}
 		}
 	}
 
@@ -482,9 +464,7 @@ function skyyrose_template_never_renders_content() {
 		'collections-index',
 		'kc-launch',
 		'landing',
-		'immersive',
 		'preorder-gateway',
-		'experiences',
 		'about',
 		'contact',
 		'faq',

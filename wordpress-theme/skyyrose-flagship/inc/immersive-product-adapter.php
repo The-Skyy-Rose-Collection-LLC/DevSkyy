@@ -8,8 +8,6 @@
  * name, price, image, sizes, and collection).
  *
  * Consumed by:
- *   - template-immersive-signature.php
- *   - template-immersive-black-rose.php
  *   - template-parts/immersive/scene.php
  *
  * Split out of `inc/product-catalog.php` in v6.5.1 to keep that module

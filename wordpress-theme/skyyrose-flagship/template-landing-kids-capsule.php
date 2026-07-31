@@ -173,7 +173,7 @@ get_header();
 				$r_delay = 1;
 				foreach ( $reviews as $review ) :
 					?>
-					<div class="lp-review-card lp-rv" data-delay="<?php echo esc_attr( $r_delay ); ?>">
+					<div class="lp-review-card lp-rv" data-delay="<?php echo esc_attr( (string) $r_delay ); ?>">
 						<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
 						<p class="lp-review-card__text"><?php echo esc_html( $review['text'] ); ?></p>
 						<cite class="lp-review-card__author">
@@ -226,7 +226,7 @@ get_header();
 				$delay = 1;
 				foreach ( $craft_cards as $card ) :
 					?>
-					<div class="lp-craft__card lp-rv" data-delay="<?php echo esc_attr( $delay ); ?>">
+					<div class="lp-craft__card lp-rv" data-delay="<?php echo esc_attr( (string) $delay ); ?>">
 						<span class="lp-craft__icon" aria-hidden="true"><?php echo esc_html( $card['icon'] ); ?></span>
 						<h3><?php echo esc_html( $card['title'] ); ?></h3>
 						<p><?php echo esc_html( $card['desc'] ); ?></p>

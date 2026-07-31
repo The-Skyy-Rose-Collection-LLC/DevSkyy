@@ -127,6 +127,15 @@ def build_pages(
     """
     pages: dict[str, dict[str, Any]] = {}
 
+    def url_for_slug(slug: str) -> str:
+        """Slug -> permalink. Collection pages route through the LOCKED
+        canonical /collections/{x}/ rewrite (inc/redirects.php, since 1.8.0);
+        collection-{x} is the legacy page slug and must never be emitted here.
+        """
+        if slug.startswith("collection-"):
+            return "/collections/" + slug[len("collection-") :] + "/"
+        return "/" + slug + "/"
+
     def add(slug: str, title: str, url: str) -> None:
         slug = slug.strip("-")
         if not slug or slug in pages:
@@ -134,14 +143,14 @@ def build_pages(
         pages[slug] = {"title": title, "url": url, "tips": []}
 
     for slug, title in page_registry.items():
-        add(slug, title, "/" + slug + "/")
+        add(slug, title, url_for_slug(slug))
 
     for slug, title in legal_links.items():
-        add(slug, title, "/" + slug + "/")
+        add(slug, title, url_for_slug(slug))
 
     for collection in collections:
         slug = "collection-" + slugify(collection)
-        add(slug, title_case_slug(collection) + " Collection", "/" + slug + "/")
+        add(slug, title_case_slug(collection) + " Collection", url_for_slug(slug))
 
     for item in menu_items:
         slug = slugify(item["url"].strip("/")) or "home"

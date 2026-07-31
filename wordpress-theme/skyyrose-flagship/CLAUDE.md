@@ -6,26 +6,24 @@
 Per-file map + token sizes: `.wolf/anatomy.md`. Directory layout is derivable via `ls`/`find` —
 not duplicated here.
 
-## Hybrid FSE (partial block-theme move)
+## Theme architecture
 
-**Status:** scaffolded, not production-cutover. `templates/index.html` makes
-`wp_is_block_theme()` true. Deploy only after Site Editor + frontend QA.
+SkyyRose is a classic PHP theme with `theme.json` design settings and Gutenberg
+block patterns. It deliberately does not ship `/templates/index.html`; adding
+that file converts WordPress routing to a block theme and bypasses the mature
+PHP storefront hierarchy.
 
 | Surface | Source of truth | Why |
 |---------|-----------------|-----|
 | Homepage | `front-page.php` | **No** `front-page.html` — classic keeps cinematic homepage |
 | Immersive / landing / Elementor | `template-*.php` | PHP Template Name still wins when assigned |
-| Generic page / single / archive / search / 404 | `templates/*.html` | Block templates take precedence over PHP twins |
-| Collection FSE shells | `templates/template-{black-rose,love-hurts,signature,kids-capsule,preorder}.html` | Match `theme.json` `customTemplates`; PHP twins remain selectable |
-| Header / footer (block views) | `parts/header.html`, `parts/footer.html` | Site Editor editable |
+| Generic page / single / archive / search / 404 | `*.php` | Classic template hierarchy |
+| Collection pages | `template-collection-*.php` | Canonical PHP collection shells |
 | Header / footer (PHP views) | `header.php`, `footer.php` | Full navbar, cart, newsletter, mascot mount |
-| WooCommerce | `woocommerce/*.php` | `skyyrose_override_fse_detection` forces classic WC |
+| WooCommerce | `woocommerce/*.php` | Classic WooCommerce overrides |
 
-**Do not add** without an explicit cutover plan: `front-page.html`,
-`single-product.html`, `archive-product.html`, `cart.html`, `checkout.html`.
-
-**theme.json** already declares `templateParts` (header/footer) and the five
-`customTemplates` names — HTML files must use those exact basenames.
+**Do not add** `/templates/index.html` or block template files without a full
+cutover plan for the storefront, WooCommerce, header, footer, and custom pages.
 
 **PHPCS compliance:**
 - `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix

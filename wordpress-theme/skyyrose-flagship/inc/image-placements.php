@@ -144,9 +144,6 @@ function skyyrose_image_srcset( string $src, array $widths ): string {
 
 	// Strip query string.
 	$clean_url = strtok( $src, '?' );
-	if ( false === $clean_url ) {
-		return '';
-	}
 
 	// Determine URL stem (no extension) and detected extension (if any).
 	$known_exts = array( 'avif', 'webp', 'jpg', 'jpeg', 'png' );

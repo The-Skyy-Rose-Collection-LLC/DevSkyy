@@ -51,7 +51,7 @@ if ( empty( $front_url ) ) {
 }
 // Only if the catalog/SOT has no render: fall back to a WC featured image.
 if ( empty( $front_url ) && $wc_product ) {
-	$front_url = wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) ?: '';
+	$front_url = wp_get_attachment_image_url( absint( $wc_product->get_image_id() ), 'large' ) ?: '';
 }
 $back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
 $permalink = $args['permalink'] ?? '';
@@ -86,7 +86,7 @@ $image_priority = ! empty( $args['image_priority'] );
 <div class="holo holo--<?php echo esc_attr( $collection ); ?>" 
 	data-sku="<?php echo esc_attr( $sku ); ?>"
 	data-garment-lock="<?php echo esc_attr( $garment_lock ); ?>"
-	style="--holo-delay: <?php echo esc_attr( $index * 80 ); ?>ms">
+	style="--holo-delay: <?php echo esc_attr( (string) ( $index * 80 ) ); ?>ms">
 
 	<div class="holo__body">
 		<div class="holo__gallery">
@@ -161,14 +161,14 @@ $image_priority = ! empty( $args['image_priority'] );
 			 */
 			?>
 			<button type="button" class="holo__buy"
-				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				data-product-id="<?php echo esc_attr( (string) absint( $product_id ) ); ?>"
 				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name. Must start with the visible "Add to Cart" text (WCAG 2.5.3 Label in Name). */ __( 'Add to Cart: %s', 'skyyrose' ), $title ) ); ?>"
 				<?php disabled( $product_id <= 0 ); ?>>
 				<?php esc_html_e( 'Add to Cart', 'skyyrose' ); ?>
 			</button>
 			<button type="button" class="holo__wishlist"
-				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
-				data-wishlist-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				data-product-id="<?php echo esc_attr( (string) absint( $product_id ) ); ?>"
+				data-wishlist-id="<?php echo esc_attr( (string) absint( $product_id ) ); ?>"
 				aria-pressed="false"
 				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to wishlist', 'skyyrose' ), $title ) ); ?>">
 				&#9825;

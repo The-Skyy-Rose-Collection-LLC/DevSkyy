@@ -137,24 +137,24 @@ class ProductCatalogTest extends TestCase {
 
 	// --- skyyrose_get_product_display_image() ------------------------------
 
-	public function test_display_image_returns_primary_image_slot(): void {
+	public function test_display_image_prefers_front_model_slot(): void {
 		$product = array(
 			'image'            => 'assets/images/br-001.webp',
 			'front_model_image' => 'assets/images/br-001-model.webp',
 			'back_image'       => '',
 			'back_model_image' => '',
 		);
-		$this->assertSame( 'assets/images/br-001.webp', skyyrose_get_product_display_image( $product ) );
+		$this->assertSame( 'assets/images/br-001-model.webp', skyyrose_get_product_display_image( $product ) );
 	}
 
-	public function test_display_image_falls_back_to_front_model(): void {
+	public function test_display_image_falls_back_to_flat_product_image(): void {
 		$product = array(
-			'image'            => '',
-			'front_model_image' => 'assets/images/model.webp',
+			'image'            => 'assets/images/product.webp',
+			'front_model_image' => '',
 			'back_image'       => 'assets/images/back.webp',
 			'back_model_image' => '',
 		);
-		$this->assertSame( 'assets/images/model.webp', skyyrose_get_product_display_image( $product ) );
+		$this->assertSame( 'assets/images/product.webp', skyyrose_get_product_display_image( $product ) );
 	}
 
 	public function test_display_image_falls_back_to_back_image(): void {

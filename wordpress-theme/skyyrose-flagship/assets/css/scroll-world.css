@@ -21,17 +21,17 @@
 
 /* ---- theme tokens: map the engine's knobs onto SkyyRose canon ------------ */
 .sw-root {
-  --sw-bg:        #0A0A0A;
-  --sw-ink:       #F4EFE9;                     /* warm paper white */
+  --sw-bg:        var(--color-page-bg);
+  --sw-ink:       var(--color-paper);
   --sw-ink-soft:  rgba(244, 239, 233, 0.60);
-  --sw-accent:    #B76E79;                     /* default; per-section overrides */
+  --sw-accent:    var(--color-rose-gold);       /* default; per-section overrides */
   --sw-font-display: var(--skyyrose-font-display, 'Archivo', system-ui, sans-serif);
   --sw-font-body:    var(--skyyrose-font-body, 'Hanken Grotesk', 'Inter', sans-serif);
   background: var(--sw-bg);
   color: var(--sw-ink);
   -webkit-font-smoothing: antialiased;
 }
-html, body { background: #0A0A0A; }
+html, body { background: var(--color-page-bg); }
 
 /* ---- cinematic frame: accent vignette + film grain over the whole world --- */
 /* Vignette frames every scene; uses the section accent as faint "world light"
@@ -90,14 +90,14 @@ html, body { background: #0A0A0A; }
 /* Lift the fill toward white so #0A0A0A text clears 4.5:1 on every accent —
    raw crimson #DC143C is only 3.97:1; +15% white brings it to ~4.6:1. */
 .sw-nav__item.is-active {
-	color: #0A0A0A;
-	background: color-mix(in srgb, var(--sw-accent) 85%, #fff);
+	color: var(--color-page-bg);
+	background: color-mix(in srgb, var(--sw-accent) 85%, var(--color-white));
 }
 
 /* Primary/top CTA -> rose-gold→gold pill, dark ink, tracked caps (immersive). */
 .sw-topcta {
-  background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
-  color: #0A0A0A;
+  background: linear-gradient(135deg, var(--color-rose-gold) 0%, var(--color-gold) 100%);
+  color: var(--color-page-bg);
   font-family: var(--sw-font-body);
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -126,7 +126,7 @@ html, body { background: #0A0A0A; }
   font-size: 0.72rem;
   /* lift the accent toward white so crimson/gold clear WCAG on #0A0A0A
      (crimson #DC143C alone is 3.97:1; +22% white pushes it past 4.5:1). */
-  color: color-mix(in srgb, var(--sw-accent) 78%, #fff);
+  color: color-mix(in srgb, var(--sw-accent) 78%, var(--color-white));
 }
 /* Widen the copy column so the monument title wraps to fewer lines (a 4-line
    title + body overflowed the vertically-centred block at 900px height). */
@@ -160,7 +160,7 @@ html, body { background: #0A0A0A; }
   font-family: var(--sw-font-body);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid color-mix(in srgb, var(--sw-accent) 42%, transparent);
-  color: color-mix(in srgb, var(--sw-accent) 72%, #fff);
+  color: color-mix(in srgb, var(--sw-accent) 72%, var(--color-white));
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-size: 0.7rem;
@@ -178,8 +178,8 @@ html, body { background: #0A0A0A; }
   font-size: 0.82rem;
 }
 .sw-btn--primary {
-  background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
-  color: #0A0A0A;
+  background: linear-gradient(135deg, var(--color-rose-gold) 0%, var(--color-gold) 100%);
+  color: var(--color-page-bg);
   box-shadow: 0 10px 30px rgba(183, 110, 121, 0.3);
 }
 .sw-btn--primary:hover {
@@ -221,6 +221,133 @@ html, body { background: #0A0A0A; }
 /* Progress bar track subtle on dark (fill stays accent, from the engine). */
 .sw-scrollbar { background: rgba(255, 255, 255, 0.06); }
 
+/* ---- chapter-grade reveal + one portable primary menu ------------------- */
+.sw-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--sw-bg);
+  color: var(--sw-ink);
+  opacity: 1;
+  transition: opacity 0.7s var(--ease-cinematic), visibility 0s linear 0.7s;
+}
+.sw-root--ready .sw-intro {
+  visibility: hidden;
+  opacity: 0;
+}
+.sw-intro__origin {
+  font-family: var(--sw-font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sw-accent) 76%, var(--color-white));
+}
+.sw-intro__brand {
+  font-family: var(--sw-font-display);
+  font-size: clamp(2.4rem, 8vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+.sw-intro__line {
+  width: min(280px, 42vw);
+  height: 1px;
+  background: var(--sw-accent);
+  transform-origin: left;
+  animation: sw-intro-line 0.8s var(--ease-cinematic) both;
+}
+@keyframes sw-intro-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.sw-live {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sw-copy__word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.7em);
+  transition:
+    opacity 0.7s var(--ease-cinematic),
+    transform 0.7s var(--ease-cinematic);
+  transition-delay: calc(var(--sw-word-index, 0) * 45ms);
+}
+.sw-copy.is-active .sw-copy__word {
+  opacity: 1;
+  transform: none;
+}
+
+.sw-route__dot i {
+  position: relative;
+  overflow: hidden;
+}
+.sw-route__dot i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sw-accent);
+  transform: scaleY(var(--sw-dot-progress, 0));
+  transform-origin: bottom;
+}
+
+.sw-nav__link {
+  color: var(--sw-ink-soft);
+  font-family: var(--sw-font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.sw-nav__link:hover,
+.sw-nav__link:focus-visible {
+  color: var(--sw-ink);
+  background: rgba(255, 255, 255, 0.07);
+}
+.sw-menu-toggle {
+  display: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.76);
+  color: var(--sw-ink);
+  font-family: var(--sw-font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+}
+.sw-topcta:focus-visible,
+.sw-menu-toggle:focus-visible,
+.sw-nav__link:focus-visible,
+.sw-route__dot:focus-visible {
+  outline: 2px solid var(--sw-accent);
+  outline-offset: 3px;
+}
+
 /* ---- mobile polish: keep the monument legible, tighten labels ----------- */
 @media (max-width: 860px) {
   .sw-brand__name {
@@ -234,4 +361,54 @@ html, body { background: #0A0A0A; }
   .sw-copy__tags li { font-size: 0.7rem; }
   /* Clear the notch / Dynamic Island — the top bar is position:fixed at top:0. */
   .sw-topbar { padding-top: calc(clamp(14px, 2.4vw, 26px) + env(safe-area-inset-top)); }
+  .sw-menu-toggle { display: inline-flex; }
+  .sw-nav {
+    position: fixed;
+    top: calc(64px + env(safe-area-inset-top));
+    right: 16px;
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 10px;
+    border-radius: 12px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      visibility 0s linear 0.2s;
+  }
+  .sw-menu-open .sw-nav {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .sw-nav__link {
+    padding: 12px 14px;
+  }
+  .sw-topcta {
+    max-width: 118px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-intro,
+  .sw-intro__line,
+  .sw-copy__word,
+  .sw-nav {
+    animation: none;
+    transition: none;
+  }
+  .sw-copy__word {
+    opacity: 1;
+    transform: none;
+  }
 }

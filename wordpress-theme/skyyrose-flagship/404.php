@@ -239,7 +239,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 
 					if ( function_exists( 'get_term_link' ) ) {
 						$skyyrose_term = get_term_by( 'slug', $skyyrose_collection['slug'], 'product_cat' );
-						if ( $skyyrose_term && ! is_wp_error( $skyyrose_term ) ) {
+						if ( $skyyrose_term ) {
 							$skyyrose_link  = get_term_link( $skyyrose_term );
 							$skyyrose_count = sprintf(
 								/* translators: %d: number of products */
@@ -310,7 +310,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 							</span>
 							<span class="error-404-product-price">
 								<?php
-								if ( is_string( $skyyrose_product_item['price'] ) && strpos( $skyyrose_product_item['price'], '<' ) !== false ) {
+									if ( strpos( $skyyrose_product_item['price'], '<' ) !== false ) {
 									// WooCommerce HTML price — already escaped by WC.
 									echo wp_kses_post( $skyyrose_product_item['price'] );
 								} else {

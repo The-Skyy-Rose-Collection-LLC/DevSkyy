@@ -93,6 +93,7 @@
 	var context = mascotEl.getAttribute('data-context') || 'default';
 
 	var guideData = ( window.SKYY_GUIDE_DATA && window.SKYY_GUIDE_DATA.intents ) ? window.SKYY_GUIDE_DATA : { pages: {}, intents: [] };
+	var guidePromise = null;
 	var mascotConfig = window.SKYY_MASCOT_CONFIG || { pageTip: '', llmEnabled: false };
 
 	// State: dormant | walking-in | greeting | idle | speaking | exiting
@@ -195,7 +196,10 @@
 			},
 			new_drops: {
 				text: 'The Black Rose and Love Hurts collections are live.',
-				chips: [{ id: 'shop', label: 'Take me there →', action: '/shop/', next: null }]
+				chips: [
+					{ id: 'shop', label: 'Shop now →', action: '/shop/', next: null },
+					{ id: 'world', label: 'Enter the world', action: '/collections-world/', next: null }
+				]
 			},
 			preorder: {
 				text: 'Most of the collection is pre-order — made for you, no overstock. 🌹',
@@ -211,12 +215,12 @@
 				text: 'Oakland in your DNA? 🖤 Black Rose was made for the ones who built something from nothing.',
 				chips: [
 					{ id: 'jerseys', label: 'Show me the jerseys',  next: 'jerseys'                            },
-					{ id: 'br_shop', label: 'Browse collection',    action: '/collection-black-rose/', next: null }
+					{ id: 'br_shop', label: 'Browse collection',    action: '/collections/black-rose/', next: null }
 				]
 			},
 			jerseys: {
 				text: 'SF inspired, Last Oakland, The Bay, The Rose — each its own story.',
-				chips: [{ id: 'br_shop', label: 'Browse →', action: '/collection-black-rose/', next: null }]
+				chips: [{ id: 'br_shop', label: 'Browse →', action: '/collections/black-rose/', next: null }]
 			}
 		},
 		'love-hurts': {
@@ -224,12 +228,12 @@
 				text: 'Love Hurts is for the ones who feel everything deeply. ❤️',
 				chips: [
 					{ id: 'lh_fannie', label: 'What’s The Fannie?', next: 'fannie'                              },
-					{ id: 'lh_browse', label: 'Browse collection',       action: '/collection-love-hurts/', next: null }
+					{ id: 'lh_browse', label: 'Browse collection',       action: '/collections/love-hurts/', next: null }
 				]
 			},
 			fannie: {
 				text: 'The Fannie is a statement piece — small, bold, SkyyRose. Love Hurts edition. 🌹',
-				chips: [{ id: 'lh_shop', label: 'See it →', action: '/collection-love-hurts/', next: null }]
+				chips: [{ id: 'lh_shop', label: 'See it →', action: '/collections/love-hurts/', next: null }]
 			}
 		},
 		signature: {
@@ -237,18 +241,18 @@
 				text: 'SF from the soul. 🌉 The Signature collection is Golden Gate, fog, and Bay Area energy.',
 				chips: [
 					{ id: 'sg_bridge', label: 'The Bay Bridge drops?', next: 'bridge'                               },
-					{ id: 'sg_browse', label: 'Browse collection',      action: '/collection-signature/', next: null }
+					{ id: 'sg_browse', label: 'Browse collection',      action: '/collections/signature/', next: null }
 				]
 			},
 			bridge: {
 				text: 'Bay Bridge Shorts + Shirt — the drop that defines the collection.',
-				chips: [{ id: 'sg_shop', label: 'See it →', action: '/collection-signature/', next: null }]
+				chips: [{ id: 'sg_shop', label: 'See it →', action: '/collections/signature/', next: null }]
 			}
 		},
 		'kids-capsule': {
 			greeting: {
 				text: 'Little rebels need luxury too. 👑 Kids Capsule brings the SkyyRose story down a size.',
-				chips: [{ id: 'kc_browse', label: 'Browse Kids Capsule', action: '/collection-kids-capsule/', next: null }]
+				chips: [{ id: 'kc_browse', label: 'Browse Kids Capsule', action: '/collections/kids-capsule/', next: null }]
 			}
 		},
 		preorder: {
@@ -404,6 +408,32 @@
 		return text.toLowerCase().replace(/[^\w\s-]/g, ' ').replace(/\s+/g, ' ').trim();
 	}
 
+	function ensureGuideData() {
+		if ( guideData.intents.length || ! mascotConfig.guideUrl ) {
+			return Promise.resolve( guideData );
+		}
+		if ( guidePromise ) {
+			return guidePromise;
+		}
+		guidePromise = fetch( mascotConfig.guideUrl, { credentials: 'same-origin' } )
+			.then( function ( response ) {
+				if ( ! response.ok ) {
+					throw new Error( 'Guide unavailable' );
+				}
+				return response.json();
+			} )
+			.then( function ( data ) {
+				if ( data && Array.isArray( data.intents ) ) {
+					guideData = data;
+				}
+				return guideData;
+			} )
+			.catch( function () {
+				return guideData;
+			} );
+		return guidePromise;
+	}
+
 	function matchIntent(rawQuery) {
 		var query = normalizeQuery(rawQuery);
 		if (!query || !guideData.intents.length) return null;
@@ -477,14 +507,14 @@
 
 	function handleAskSubmit(rawQuery) {
 		if (!rawQuery || !rawQuery.trim()) return;
-
-		var intent = matchIntent(rawQuery);
-		if (intent) {
-			speakIntentAnswer(intent);
-			return;
-		}
-
-		askTier2Fallback(rawQuery);
+		ensureGuideData().then(function () {
+			var intent = matchIntent(rawQuery);
+			if (intent) {
+				speakIntentAnswer(intent);
+				return;
+			}
+			askTier2Fallback(rawQuery);
+		});
 	}
 
 	// -------------------------------------------------------------------------

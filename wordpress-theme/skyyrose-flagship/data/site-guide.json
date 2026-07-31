@@ -20,49 +20,34 @@
       "url": "/pre-order/",
       "tips": []
     },
+    "collections": {
+      "title": "Collections",
+      "url": "/collections/",
+      "tips": []
+    },
+    "collections-world": {
+      "title": "Collections World",
+      "url": "/collections-world/",
+      "tips": []
+    },
     "collection-black-rose": {
       "title": "Black Rose Collection",
-      "url": "/collection-black-rose/",
+      "url": "/collections/black-rose/",
       "tips": []
     },
     "collection-love-hurts": {
       "title": "Love Hurts Collection",
-      "url": "/collection-love-hurts/",
+      "url": "/collections/love-hurts/",
       "tips": []
     },
     "collection-signature": {
       "title": "Signature Collection",
-      "url": "/collection-signature/",
+      "url": "/collections/signature/",
       "tips": []
     },
     "collection-kids-capsule": {
       "title": "Kids Capsule",
-      "url": "/collection-kids-capsule/",
-      "tips": []
-    },
-    "experience-black-rose": {
-      "title": "Black Rose Experience",
-      "url": "/experience-black-rose/",
-      "tips": []
-    },
-    "experience-love-hurts": {
-      "title": "Love Hurts Experience",
-      "url": "/experience-love-hurts/",
-      "tips": []
-    },
-    "experience-signature": {
-      "title": "Signature Experience",
-      "url": "/experience-signature/",
-      "tips": []
-    },
-    "experience-kids-capsule": {
-      "title": "Kids Capsule Experience",
-      "url": "/experience-kids-capsule/",
-      "tips": []
-    },
-    "experiences": {
-      "title": "Immersive Worlds",
-      "url": "/experiences/",
+      "url": "/collections/kids-capsule/",
       "tips": []
     },
     "landing-black-rose": {
@@ -90,6 +75,16 @@
       "url": "/wishlist/",
       "tips": []
     },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "url": "/faq/",
+      "tips": []
+    },
+    "shipping-returns": {
+      "title": "Shipping & Returns",
+      "url": "/shipping-returns/",
+      "tips": []
+    },
     "shop": {
       "title": "Shop",
       "url": "/shop/",
@@ -110,19 +105,14 @@
       "url": "/my-account/",
       "tips": []
     },
-    "faq": {
-      "title": "Care Instructions",
-      "url": "/faq/",
-      "tips": []
-    },
-    "shipping-returns": {
-      "title": "Shipping & Returns",
-      "url": "/shipping-returns/",
-      "tips": []
-    },
     "size-guide": {
       "title": "Size Guide",
       "url": "/size-guide/",
+      "tips": []
+    },
+    "track-order": {
+      "title": "Track Your Order",
+      "url": "/track-order/",
       "tips": []
     },
     "privacy-policy": {
@@ -148,11 +138,6 @@
     "cookie-policy": {
       "title": "Cookie Policy",
       "url": "/cookie-policy/",
-      "tips": []
-    },
-    "collections": {
-      "title": "Collections",
-      "url": "/collections/",
       "tips": []
     },
     "collections-black-rose": {
@@ -184,7 +169,7 @@
         "black-rose"
       ],
       "answer": "Head to Black Rose Collection →",
-      "link": "/collection-black-rose/"
+      "link": "/collections/black-rose/"
     },
     {
       "id": "where-kids-capsule",
@@ -193,7 +178,7 @@
         "kids-capsule"
       ],
       "answer": "Head to Kids Capsule →",
-      "link": "/collection-kids-capsule/"
+      "link": "/collections/kids-capsule/"
     },
     {
       "id": "where-love-hurts",
@@ -202,16 +187,15 @@
         "love-hurts"
       ],
       "answer": "Head to Love Hurts Collection →",
-      "link": "/collection-love-hurts/"
+      "link": "/collections/love-hurts/"
     },
     {
       "id": "where-signature",
       "patterns": [
-        "signature",
         "signature"
       ],
       "answer": "Head to Signature Collection →",
-      "link": "/collection-signature/"
+      "link": "/collections/signature/"
     },
     {
       "id": "where-shop",
@@ -248,8 +232,8 @@
         "runs big",
         "measurements"
       ],
-      "answer": "Fit notes live on every product page — general sizing lives in the FAQ →",
-      "link": "/faq/"
+      "answer": "Fit notes live on every product page — full measurements are in the size guide →",
+      "link": "/size-guide/"
     },
     {
       "id": "shipping",
@@ -273,8 +257,8 @@
         "my order",
         "tracking"
       ],
-      "answer": "Check your order status in your account →",
-      "link": "/my-account/"
+      "answer": "Use your order ID and billing email to check the latest status →",
+      "link": "/track-order/"
     }
   ]
 }

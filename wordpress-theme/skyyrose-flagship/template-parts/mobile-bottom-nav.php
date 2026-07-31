@@ -133,7 +133,7 @@ $mobile_nav_svg_kses = array(
 				</svg>
 				<?php if ( 'cart' === $item['id'] && $mobile_nav_cart_count > 0 ) : ?>
 					<span class="mobile-nav__badge" aria-label="<?php echo esc_attr( sprintf( __( '%d items in cart', 'skyyrose' ), $mobile_nav_cart_count ) ); ?>">
-						<?php echo esc_html( $mobile_nav_cart_count ); ?>
+						<?php echo esc_html( (string) $mobile_nav_cart_count ); ?>
 					</span>
 				<?php endif; ?>
 			</span>

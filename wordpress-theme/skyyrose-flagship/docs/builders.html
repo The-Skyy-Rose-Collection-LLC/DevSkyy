@@ -53,7 +53,7 @@
 <p><span class="badge default">Default</span> The native WordPress block editor is fully supported out of the box.</p>
 <ul>
   <li><strong>Block Patterns</strong> &mdash; Pre-built patterns for hero sections, product grids, collection banners, and testimonial rows are registered automatically.</li>
-  <li><strong>Site Editor</strong> &mdash; SkyyRose includes block theme templates editable via Appearance &rarr; Editor. Modify headers, footers, and archive layouts visually.</li>
+  <li><strong>Block Editor</strong> &mdash; SkyyRose includes <code>theme.json</code> design settings and collection block patterns while preserving the classic PHP storefront hierarchy.</li>
   <li><strong>theme.json</strong> &mdash; All design tokens (colors, typography, spacing) are defined in <code>theme.json</code> and surfaced in the editor UI.</li>
   <li><strong>Custom blocks</strong> &mdash; The <code>skyyrose/holographic-card</code> and <code>skyyrose/collection-hero</code> blocks are registered for Gutenberg only.</li>
 </ul>
@@ -84,8 +84,8 @@
 <p>Two layout templates are available for every supported builder:</p>
 <table>
   <tr><th>Template</th><th>Slug</th><th>Description</th></tr>
-  <tr><td>Canvas</td><td><code>template-canvas.php</code></td><td>No header, no footer. Full control for landing pages and custom funnels.</td></tr>
-  <tr><td>Full Width</td><td><code>template-full-width.php</code></td><td>Header and footer included, no sidebar, content spans the full viewport width.</td></tr>
+  <tr><td>Canvas</td><td><code>template-elementor-canvas.php</code></td><td>No header, no footer. Full control for landing pages and custom funnels.</td></tr>
+  <tr><td>Full Width</td><td><code>template-elementor-fullwidth.php</code></td><td>Header and footer included, no sidebar, content spans the full viewport width.</td></tr>
 </table>
 <p>Select the template from the Page Attributes panel (Gutenberg) or the builder's own template selector.</p>
 

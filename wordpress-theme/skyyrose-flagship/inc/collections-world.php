@@ -41,21 +41,29 @@ function skyyrose_get_collections_world_config() {
 	}
 
 	$scenes_uri = SKYYROSE_ASSETS_URI . '/scenes/collections-world';
+	$scenes_dir = SKYYROSE_DIR . '/assets/scenes/collections-world';
 	$shop_url   = esc_url( home_url( '/collections/' ) );
 
 	/**
 	 * Helper: build one scene's still + (pending) clip asset URLs.
 	 *
 	 * @param string $base Scene basename (e.g. 'scene-1-signature').
-	 * @return array{still:string,clip:string,clipMobile:string}
+	 * Only publish clip URLs for files that ship with the theme. This prevents
+	 * the scroll engine from probing placeholder MP4 paths on production.
+	 *
+	 * @return array<string,string>
 	 */
-	$assets = static function ( $base ) use ( $scenes_uri ) {
+	$assets = static function ( $base ) use ( $scenes_uri, $scenes_dir ) {
 		$still = esc_url( $scenes_uri . '/' . $base . '.webp' );
 		$out   = array(
-			'still'      => $still,
-			'clip'       => esc_url( $scenes_uri . '/' . $base . '.mp4' ),
-			'clipMobile' => esc_url( $scenes_uri . '/' . $base . '-m.mp4' ),
+			'still' => $still,
 		);
+		if ( file_exists( $scenes_dir . '/' . $base . '.mp4' ) ) {
+			$out['clip'] = esc_url( $scenes_uri . '/' . $base . '.mp4' );
+		}
+		if ( file_exists( $scenes_dir . '/' . $base . '-m.mp4' ) ) {
+			$out['clipMobile'] = esc_url( $scenes_uri . '/' . $base . '-m.mp4' );
+		}
 		// Photon width variants: the engine assigns srcset before src, so phones
 		// pull a viewport-sized still instead of the 1920px master (mobile LCP
 		// budget). Empty when Photon can't serve the URL (e.g. local dev).
@@ -75,8 +83,17 @@ function skyyrose_get_collections_world_config() {
 			'href' => esc_url( home_url( '/' ) ),
 		),
 		'cta'        => array(
-			'label' => __( 'Shop', 'skyyrose' ),
+			'label' => __( 'Shop All', 'skyyrose' ),
 			'href'  => $shop_url,
+		),
+		'menu'       => array_map(
+			static function ( $item ) {
+				return array(
+					'label' => $item['title'],
+					'href'  => esc_url( home_url( $item['url'] ) ),
+				);
+			},
+			skyyrose_get_primary_navigation_items()
 		),
 		'hint'       => __( 'scroll to enter', 'skyyrose' ),
 		'nav'        => true,
@@ -96,6 +113,12 @@ function skyyrose_get_collections_world_config() {
 					'title'   => __( 'Luxury Grows from Concrete.', 'skyyrose' ),
 					'body'    => __( 'Oakland-born luxury, cut in gold and earned on the block.', 'skyyrose' ),
 					'tags'    => array( __( 'Signature', 'skyyrose' ), __( 'Gold', 'skyyrose' ) ),
+					'cta'     => array(
+						'primary' => array(
+							'label' => __( 'Shop Signature', 'skyyrose' ),
+							'href'  => esc_url( home_url( '/collections/signature/' ) ),
+						),
+					),
 				)
 			),
 			array_merge(
@@ -109,6 +132,12 @@ function skyyrose_get_collections_world_config() {
 					'title'   => __( 'Worn As Armor', 'skyyrose' ),
 					'body'    => __( 'You wear it because you already stood up.', 'skyyrose' ),
 					'tags'    => array( __( 'Black Rose', 'skyyrose' ), __( 'Armor', 'skyyrose' ) ),
+					'cta'     => array(
+						'primary' => array(
+							'label' => __( 'Shop Black Rose', 'skyyrose' ),
+							'href'  => esc_url( home_url( '/collections/black-rose/' ) ),
+						),
+					),
 				)
 			),
 			array_merge(
@@ -122,6 +151,12 @@ function skyyrose_get_collections_world_config() {
 					'title'   => __( 'The Bloodline That Raised Me', 'skyyrose' ),
 					'body'    => __( 'Crimson and thorn — the love that scarred you is the love that made you.', 'skyyrose' ),
 					'tags'    => array( __( 'Love Hurts', 'skyyrose' ), __( 'Crimson', 'skyyrose' ) ),
+					'cta'     => array(
+						'primary' => array(
+							'label' => __( 'Shop Love Hurts', 'skyyrose' ),
+							'href'  => esc_url( home_url( '/collections/love-hurts/' ) ),
+						),
+					),
 				)
 			),
 			array_merge(
@@ -135,6 +170,12 @@ function skyyrose_get_collections_world_config() {
 					'title'   => __( 'The Next Generation, Suited', 'skyyrose' ),
 					'body'    => __( 'The same concrete-luxe, cut for the ones coming up.', 'skyyrose' ),
 					'tags'    => array( __( 'Kids Capsule', 'skyyrose' ), __( 'Rose Gold', 'skyyrose' ) ),
+					'cta'     => array(
+						'primary' => array(
+							'label' => __( 'Shop Kids Capsule', 'skyyrose' ),
+							'href'  => esc_url( home_url( '/collections/kids-capsule/' ) ),
+						),
+					),
 				)
 			),
 			array_merge(

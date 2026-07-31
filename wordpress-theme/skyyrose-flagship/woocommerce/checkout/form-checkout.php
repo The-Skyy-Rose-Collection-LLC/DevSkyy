@@ -19,6 +19,8 @@ if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 	return;
 }
 
+$checkout = WC()->checkout();
+
 // Bail if cart empty and redirect to shop.
 if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
 	return;
@@ -350,7 +352,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
 								<ul class="skyy-checkout__payment-methods rv-blur wc_payment_methods payment_methods methods">
 									<?php
-									if ( ! empty( $available_gateways = WC()->payment_gateways->get_available_payment_gateways() ) ) :
+									if ( ! empty( $available_gateways = WC()->payment_gateways()->get_available_payment_gateways() ) ) :
 										$first = true;
 										foreach ( $available_gateways as $gateway ) :
 											?>

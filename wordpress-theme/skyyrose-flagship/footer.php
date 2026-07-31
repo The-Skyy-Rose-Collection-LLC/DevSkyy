@@ -183,6 +183,7 @@ defined( 'ABSPATH' ) || exit;
 						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/track-order/' ) ); ?>"><?php esc_html_e( 'Track Order', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose' ); ?></a></li>
 					</ul>
@@ -236,7 +237,7 @@ defined( 'ABSPATH' ) || exit;
 								'theme_location' => 'footer',
 								'menu_id'        => 'footer-legal-menu',
 								'menu_class'     => 'footer-copyright__menu',
-								'container'      => false,
+								'container'      => '',
 								'depth'          => 1,
 								'fallback_cb'    => 'skyyrose_nav_fallback',
 							)

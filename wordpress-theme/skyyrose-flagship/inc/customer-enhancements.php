@@ -273,7 +273,7 @@ function skyyrose_ce_drop_block_customize_register( $wp_customize ) {
 	$wp_customize->add_setting(
 		'skyyrose_drop_block_enabled',
 		array(
-			'default'           => false,
+			'default'           => '0',
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'absint',
 		)
@@ -505,9 +505,6 @@ function skyyrose_render_drop_block() {
  * @return void
  */
 function skyyrose_render_ed_sticky_atc( $product, $price_html ) {
-	if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
-		return;
-	}
 	?>
 	<?php // ── Sticky ATC Bar ─────────────────────────────────────────────────── ?>
 	<?php // Fixed bottom bar (mobile) / bottom-right pill (desktop). ?>
