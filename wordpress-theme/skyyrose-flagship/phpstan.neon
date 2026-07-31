@@ -48,7 +48,7 @@ parameters:
         # Without (?) phpstan aborts before analysing anything.
         - node_modules/ (?)
         - tests/
-        - blueprints/
+        - blueprints/ (?)
         - docs/
 
     # scanFiles = symbol DISCOVERY (declares classes/functions/constants PHPStan

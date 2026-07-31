@@ -87,6 +87,14 @@ function skyyrose_page_upgrade_context() {
 		$context['primary_url']     = home_url( '/size-guide/' );
 		$context['secondary_label'] = __( 'Contact Support', 'skyyrose' );
 		$context['secondary_url']   = home_url( '/contact/' );
+	} elseif ( is_page_template( 'template-elementor-canvas.php' ) ) {
+		$context['eyebrow']         = __( 'Builder Canvas', 'skyyrose' );
+		$context['title']           = __( 'Custom page. Same brand lift.', 'skyyrose' );
+		$context['body']            = __( 'Even blank-builder pages keep the progress bar, proof stack, and next-step rail.', 'skyyrose' );
+		$context['primary_label']   = __( 'Shop Collections', 'skyyrose' );
+		$context['primary_url']     = home_url( '/collections/' );
+		$context['secondary_label'] = __( 'Contact Support', 'skyyrose' );
+		$context['secondary_url']   = home_url( '/contact/' );
 	}
 
 	return apply_filters( 'skyyrose_page_upgrade_context', $context );
@@ -98,7 +106,7 @@ function skyyrose_page_upgrade_context() {
  * @return void
  */
 function skyyrose_enqueue_page_upgrades() {
-	if ( is_admin() || is_page_template( 'template-coming-soon.php' ) || is_page_template( 'template-elementor-canvas.php' ) ) {
+	if ( is_admin() || is_page_template( 'template-coming-soon.php' ) ) {
 		return;
 	}
 
@@ -126,7 +134,7 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_page_upgrades', 30 );
 function skyyrose_render_page_upgrades() {
 	static $rendered = false;
 
-	if ( $rendered || is_admin() || is_feed() || is_page_template( 'template-coming-soon.php' ) || is_page_template( 'template-elementor-canvas.php' ) ) {
+	if ( $rendered || is_admin() || is_feed() || is_page_template( 'template-coming-soon.php' ) ) {
 		return;
 	}
 	$rendered = true;
