@@ -123,7 +123,7 @@ These resolve every "ask user per page" in the prior plans. Claude Code applies 
 | `cart` | Build `skyyrose-canvas.php` AS universal builder canvas + fully style WC blocks | Both paths: canvas is the shell, WC blocks are content. Solves ghost reference AND #1 category problem |
 | `checkout` | Same — WC blocks fully styled inside skyyrose-canvas shell, Stripe wired (Phase 5.10) | Same logic |
 | `collections` | Reassign to `skyyrose-canvas.php` (rendered as collections index via canvas hooks) | Reuse canvas; no separate template needed |
-| `experience` | Build `template-experiences.php` (Phase 4) | Immersive hub |
+| `experience` | Build `template-collections-world.php` (Phase 4) | Immersive hub |
 | `spatial` | Build `template-spatial-home.php` Phase 4 stub + Phase 5.8 full WebXR | NOT deferred |
 | `style-quiz` | Build `template-style-quiz.php` (Phase 4) | One of the 7 marketplace gaps |
 | Any other ghost | Build the corresponding template | Default action: build, don't delete pages |
@@ -457,7 +457,7 @@ For **each** new template, run the design-skill chain in this exact order:
 | Template | Purpose | Motion allowed? |
 |----------|---------|-----------------|
 | `template-info-page.php` | Terms/privacy/legal | No (info-quiet) |
-| `template-experiences.php` | Immersive hub | Yes (`gpt-taste`) |
+| `template-collections-world.php` | Immersive hub | Yes (`gpt-taste`) |
 | `template-style-quiz.php` | Quiz → curated products | `delight` only |
 | `skyyrose-canvas.php` | Universal builder shell (Elementor/Divi/Bricks-friendly) | No |
 | `template-spatial-home.php` | WebXR landing surface (stub here, full build in 5.8) | `overdrive` allowed |
@@ -645,7 +645,7 @@ If post-deploy verification fails: roll back via `npm run deploy:rollback` (atom
 | `landing-signature` | Consolidated (P3.1) | 16-line stub |
 | `collection-*` (4) | Already consolidated; polish (P6) | Polished |
 | `experience-*` (3) | Consolidated to data file (P3.2) | 16-line stub |
-| `experience` | Build `template-experiences.php` (P4) | Immersive hub |
+| `experience` | Build `template-collections-world.php` (P4) | Immersive hub |
 | `spatial` | Build stub (P4) + full WebXR (P5.8) | WebXR landing |
 | `style-quiz` | Build `template-style-quiz.php` (P4) | Quiz-to-cart |
 | `cart` | Build `skyyrose-canvas.php` shell + style WC blocks (P5.1) + Stripe (P5.10) | Block-based, fully styled |

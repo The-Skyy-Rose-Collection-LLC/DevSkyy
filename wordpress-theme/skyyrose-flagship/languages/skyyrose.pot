@@ -269,7 +269,6 @@ msgstr ""
 #: inc/template-functions.php:915
 #: patterns/collection-hero-black-rose.php:15
 #: search.php:251
-#: template-experiences.php:109
 #: template-landing-black-rose.php:85
 #: template-parts/hero-cinematic.php:59
 #: template-parts/immersive/scene.php:215
@@ -295,7 +294,6 @@ msgstr ""
 #: inc/template-functions.php:919
 #: patterns/collection-hero-love-hurts.php:15
 #: search.php:252
-#: template-experiences.php:114
 #: template-parts/hero-cinematic.php:63
 #: template-parts/immersive/scene.php:222
 #: template-parts/immersive/tab-bar.php:37
@@ -318,7 +316,6 @@ msgstr ""
 #: inc/template-functions.php:923
 #: patterns/collection-hero-signature.php:15
 #: search.php:253
-#: template-experiences.php:104
 #: template-landing-signature.php:81
 #: template-parts/hero-cinematic.php:67
 #: template-parts/immersive/scene.php:229
@@ -756,7 +753,6 @@ msgstr ""
 #: inc/experience-rooms.php:51
 #: template-about.php:173
 #: template-coming-soon.php:30
-#: template-experiences.php:148
 #: template-parts/kids-capsule/teaser.php:174
 #: template-preorder-gateway.php:755
 msgid "Luxury Grows from Concrete."
@@ -946,7 +942,6 @@ msgstr ""
 
 #: front-page.php:275
 #: template-about.php:197
-#: template-experiences.php:223
 #: template-landing-love-hurts.php:99
 #: template-parts/kids-capsule/teaser.php:42
 #: template-preorder-gateway.php:178
@@ -1554,7 +1549,6 @@ msgstr ""
 #: inc/template-functions.php:927
 #: inc/theme-activation-setup.php:85
 #: patterns/collection-hero-kids-capsule.php:15
-#: template-experiences.php:119
 #: template-parts/immersive/scene.php:236
 #: template-parts/immersive/tab-bar.php:43
 #: template-parts/kids-capsule/teaser.php:38
@@ -4838,33 +4832,6 @@ msgstr ""
 msgid "Elementor Editorial"
 msgstr ""
 
-#. Template Name of the theme
-#: template-elementor-fullwidth.php:3
-msgid "Full Width (SkyyRose)"
-msgstr ""
-
-#. Template Name of the theme
-#: template-experiences.php:3
-msgid "Experiences Hub"
-msgstr ""
-
-#: template-experiences.php:137
-msgid "Collection navigation"
-msgstr ""
-
-#. translators: %s: collection name
-#: template-experiences.php:166
-#, php-format
-msgid "%s — enter the world"
-msgstr ""
-
-#. translators: %s: collection name
-#: template-experiences.php:194
-#, php-format
-msgid "Enter the %s world"
-msgstr ""
-
-#: template-experiences.php:216
 #: template-parts/about/collections-grid.php:116
 msgid "Enter"
 msgstr ""

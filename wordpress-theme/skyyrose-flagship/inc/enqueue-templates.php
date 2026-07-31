@@ -67,7 +67,6 @@ function skyyrose_get_current_template_slug() {
 			'template-collections-world.php'       => 'collections-world',
 			'template-elementor-editorial.php'     => 'elementor-editorial',
 			'template-elementor-canvas.php'        => 'elementor-canvas',
-			'template-elementor-fullwidth.php'     => 'elementor-fullwidth',
 		);
 		$slug         = isset( $template_map[ $page_template ] ) ? $template_map[ $page_template ] : null;
 	}

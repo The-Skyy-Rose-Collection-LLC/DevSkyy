@@ -23,7 +23,6 @@ parameters:
         - template-coming-soon.php
         - template-size-guide.php
         - template-elementor-canvas.php
-        - template-elementor-fullwidth.php
         - template-elementor-editorial.php
         - template-faq.php
         - template-shipping-returns.php

@@ -24,7 +24,13 @@ mkdir -p "$OUTPUT_DIR"
 (
 	cd "$THEME_PARENT"
 	zip -q -r "$OUTPUT_FILE" skyyrose-flagship \
-		-x '*/.DS_Store' \
+		-x '*.DS_Store' \
+		-x '*.cache' \
+		-x '*.log' \
+		-x '*.map' \
+		-x '*.bak-*' \
+		-x '*/__pycache__/*' \
+		-x '*/_archive/*' \
 		-x '*/.gitignore' \
 		-x '*/AGENTS.md' \
 		-x '*/CLAUDE*.md' \
@@ -39,9 +45,7 @@ mkdir -p "$OUTPUT_DIR"
 		-x '*/phpstan-baseline.neon' \
 		-x '*/phpunit.xml.dist' \
 		-x '*/.phpcs.xml' \
-		-x '*/.phpunit.result.cache' \
-		-x '*/*.map' \
-		-x '*/*.bak-*'
+		-x '*/.phpunit.result.cache'
 )
 
 echo "$OUTPUT_FILE"

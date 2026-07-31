@@ -50,8 +50,12 @@
 		return !! ( navigator.connection && navigator.connection.saveData );
 	}
 
+	function reducedMotionOn() {
+		return window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	}
+
 	function shouldLoadThree() {
-		return !! config.skyy3dUrl && ! saveDataOn();
+		return !! config.skyy3dUrl && ! saveDataOn() && ! reducedMotionOn();
 	}
 
 	function loadThree() {

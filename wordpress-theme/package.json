@@ -1,6 +1,6 @@
 {
   "name": "skyyrose-flagship-theme",
-  "version": "1.5.23",
+  "version": "2.2.3",
   "private": true,
   "description": "SkyyRose Flagship — luxury streetwear WordPress theme. Local development, build, lint, deploy, and verification tooling for the production theme at skyyrose.co.",
   "author": {
@@ -56,6 +56,7 @@
     "verify:aspect": "bash skyyrose-flagship/scripts/verify-theme.sh --only",
     "verify:list": "bash skyyrose-flagship/scripts/verify-theme.sh --list",
     "verify:json": "bash skyyrose-flagship/scripts/verify-theme.sh --json",
+    "package:theme": "bash skyyrose-flagship/scripts/package-theme.sh",
     "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
     "watch:build": "npx chokidar 'skyyrose-flagship/assets/{css,js}/**/*' -c 'npm run build'",
     "deploy": "bash ../scripts/deploy-theme.sh",
