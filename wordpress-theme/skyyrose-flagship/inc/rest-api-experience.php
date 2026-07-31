@@ -426,9 +426,6 @@ function skyyrose_see_rest_get_settings( WP_REST_Request $request ): WP_REST_Res
  */
 function skyyrose_see_rest_update_settings( WP_REST_Request $request ): WP_REST_Response {
 	$body = $request->get_json_params();
-	if ( ! is_array( $body ) ) {
-		return new WP_REST_Response( array( 'error' => 'Request body must be a JSON object' ), 400 );
-	}
 
 	// Whitelist allowed keys.
 	$allowed = array(
@@ -504,9 +501,6 @@ function skyyrose_see_local_recommendations( string $collection, int $limit = 8 
 
 	// Prefer products from the specified collection.
 	foreach ( $catalog as $sku => $product ) {
-		if ( ! is_array( $product ) ) {
-			continue;
-		}
 		$prod_collection = $product['collection'] ?? '';
 		if ( $collection && $prod_collection === $collection ) {
 			$products[] = array(
@@ -526,9 +520,6 @@ function skyyrose_see_local_recommendations( string $collection, int $limit = 8 
 	// Fill remaining slots from other collections.
 	if ( count( $products ) < $limit ) {
 		foreach ( $catalog as $sku => $product ) {
-			if ( ! is_array( $product ) ) {
-				continue;
-			}
 			if ( count( $products ) >= $limit ) {
 				break;
 			}

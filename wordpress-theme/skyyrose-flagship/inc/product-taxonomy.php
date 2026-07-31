@@ -114,7 +114,7 @@ function skyyrose_create_product_categories() {
 		return;
 	}
 
-	$parent_id = is_array( $parent_term ) ? $parent_term['term_id'] : $parent_term;
+	$parent_id = $parent_term['term_id'];
 
 	// Define child collection categories.
 	$collections = array(

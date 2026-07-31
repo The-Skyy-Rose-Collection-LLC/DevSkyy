@@ -310,7 +310,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 							</span>
 							<span class="error-404-product-price">
 								<?php
-									if ( strpos( $skyyrose_product_item['price'], '<' ) !== false ) {
+								if ( strpos( $skyyrose_product_item['price'], '<' ) !== false ) {
 									// WooCommerce HTML price — already escaped by WC.
 									echo wp_kses_post( $skyyrose_product_item['price'] );
 								} else {

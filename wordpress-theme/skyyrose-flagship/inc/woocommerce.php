@@ -187,10 +187,6 @@ add_filter( 'woocommerce_get_image_size_thumbnail', 'skyyrose_woocommerce_thumbn
  */
 function skyyrose_woocommerce_cart_fragments( $fragments ) {
 
-	if ( ! WC()->cart ) {
-		return $fragments;
-	}
-
 	$count = WC()->cart->get_cart_contents_count();
 
 	ob_start();
@@ -510,7 +506,7 @@ function skyyrose_ajax_get_cart_count() {
 
 	check_ajax_referer( 'skyyrose-woo-nonce', 'nonce' );
 
-	$count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+	$count = WC()->cart->get_cart_contents_count();
 
 	wp_send_json_success(
 		array(
@@ -586,7 +582,7 @@ add_action( 'woocommerce_before_shop_loop_item_title', 'skyyrose_wc_inject_produ
  */
 function skyyrose_wc_ghost_loop_image( $html, $product, $size ) {
 	unset( $size );
-	if ( is_admin() || ! $product instanceof WC_Product ) {
+	if ( is_admin() ) {
 		return $html;
 	}
 	if ( $product->get_image_id() ) {
@@ -654,7 +650,7 @@ function skyyrose_product_filter_defaults( $args ) {
 		if ( $template === $template_name ) {
 			// Pre-select collection category in product filters.
 			$term = get_term_by( 'slug', $slug, 'product_cat' );
-			if ( $term && ! is_wp_error( $term ) ) {
+			if ( $term ) {
 				$args['product_cat'] = $term->term_id;
 			}
 

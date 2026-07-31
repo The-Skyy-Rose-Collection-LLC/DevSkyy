@@ -165,8 +165,8 @@ get_header();
 
 			$po_panel_index = 0;
 			foreach ( $po_collections as $po_slug => $po_col ) :
-				$po_portrait = isset( $po_portrait_map[ $po_slug ] ) ? $po_portrait_map[ $po_slug ] : null;
-				$po_lockup   = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
+				$po_portrait = $po_portrait_map[ $po_slug ];
+				$po_lockup   = $po_lockup_map[ $po_slug ];
 				?>
 				<?php // No list/listitem roles: aria-pressed is invalid on role="listitem", and the toggle semantics matter more than list semantics here. ?>
 				<button type="button"
@@ -175,7 +175,6 @@ get_header();
 					aria-label="<?php echo esc_attr( sprintf( /* translators: %s: collection label */ __( 'View %s collection', 'skyyrose' ), $po_col['label'] ) ); ?>">
 
 					<div class="po-panel__bg" aria-hidden="true">
-						<?php if ( $po_portrait ) : ?>
 							<?php
 							// Panels render ≤290px wide (minmax(220px,1fr) in a 900px grid)
 							// but shipped full-size AVIF (round-3 uses-responsive-images).
@@ -190,9 +189,7 @@ get_header();
 								<?php if ( '' !== $po_p_srcset ) : ?>
 									<source srcset="<?php echo esc_attr( $po_p_srcset ); ?>" sizes="<?php echo esc_attr( $po_p_sizes ); ?>" type="image/webp">
 								<?php else : ?>
-									<?php if ( ! empty( $po_portrait['avif'] ) ) : ?>
-										<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
-									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_portrait['avif'] ); ?>" type="image/avif">
 									<source srcset="<?php echo esc_url( $po_portrait['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
 								<img src="<?php echo esc_url( $po_portrait['jpg'] ); ?>"
@@ -205,7 +202,6 @@ get_header();
 									height="<?php echo absint( $po_portrait['h'] ); ?>"
 									loading="<?php echo 0 === $po_panel_index ? 'eager' : 'lazy'; ?>">
 							</picture>
-						<?php endif; ?>
 						<div class="po-panel__overlay" aria-hidden="true"></div>
 					</div>
 
@@ -214,7 +210,6 @@ get_header();
 							<?php echo esc_html( $po_col['number'] ); ?>
 						</span>
 
-						<?php if ( $po_lockup ) : ?>
 							<?php
 							// Lockup renders ≤120px (.po-panel__lockup) — full-size AVIF
 							// (50-93KB) was pure waste. Same Photon/avif-suppression trade.
@@ -226,9 +221,7 @@ get_header();
 								<?php if ( '' !== $po_l_srcset ) : ?>
 									<source srcset="<?php echo esc_attr( $po_l_srcset ); ?>" sizes="120px" type="image/webp">
 								<?php else : ?>
-									<?php if ( ! empty( $po_lockup['avif'] ) ) : ?>
-										<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
-									<?php endif; ?>
+									<source srcset="<?php echo esc_url( $po_lockup['avif'] ); ?>" type="image/avif">
 									<source srcset="<?php echo esc_url( $po_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
 								<img src="<?php echo esc_url( $po_lockup['png'] ); ?>"
@@ -242,8 +235,6 @@ get_header();
 										style="<?php echo esc_attr( $po_lockup['style'] ); ?>"
 									<?php endif; ?>>
 							</picture>
-						<?php endif; ?>
-
 						<p class="po-panel__tagline">
 							<?php echo esc_html( $po_col['tagline'] ); ?>
 						</p>
@@ -292,7 +283,7 @@ get_header();
 		<?php
 		$po_grid_first = true;
 		foreach ( $po_collections as $po_slug => $po_col ) :
-			$po_items = isset( $po_products[ $po_slug ] ) ? $po_products[ $po_slug ] : array();
+			$po_items = $po_products[ $po_slug ];
 			?>
 			<div class="po-grid"
 				id="po-grid-<?php echo esc_attr( $po_slug ); ?>"
@@ -307,21 +298,18 @@ get_header();
 					<div class="po-grid__meta">
 						<span class="po-grid__col-num"><?php echo esc_html( $po_col['number'] ); ?></span>
 						<?php
-						$po_g_lockup = isset( $po_lockup_map[ $po_slug ] ) ? $po_lockup_map[ $po_slug ] : null;
-						if ( $po_g_lockup ) :
+						$po_g_lockup = $po_lockup_map[ $po_slug ];
 							// Renders ≤140px (.po-grid__lockup) — same Photon/avif-suppression
 							// trade as the panel lockup above.
 							$po_gl_srcset = function_exists( 'skyyrose_photon_srcset' )
 								? skyyrose_photon_srcset( $po_g_lockup['webp'], array( 140, 280, 420 ) )
 								: '';
-							?>
+						?>
 							<picture class="po-grid__lockup">
 								<?php if ( '' !== $po_gl_srcset ) : ?>
 									<source srcset="<?php echo esc_attr( $po_gl_srcset ); ?>" sizes="140px" type="image/webp">
 								<?php else : ?>
-									<?php if ( ! empty( $po_g_lockup['avif'] ) ) : ?>
-										<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
-									<?php endif; ?>
+								<source srcset="<?php echo esc_url( $po_g_lockup['avif'] ); ?>" type="image/avif">
 									<source srcset="<?php echo esc_url( $po_g_lockup['webp'] ); ?>" type="image/webp">
 								<?php endif; ?>
 								<img src="<?php echo esc_url( $po_g_lockup['png'] ); ?>"
@@ -335,7 +323,6 @@ get_header();
 										style="<?php echo esc_attr( $po_g_lockup['style'] ); ?>"
 									<?php endif; ?>>
 							</picture>
-						<?php endif; ?>
 					</div>
 					<p class="po-grid__tagline"><?php echo esc_html( $po_col['tagline'] ); ?></p>
 				</header>

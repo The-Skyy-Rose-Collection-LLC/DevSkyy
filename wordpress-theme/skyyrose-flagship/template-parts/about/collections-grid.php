@@ -45,13 +45,6 @@ $collection_data = array(
 	),
 );
 
-// Map first catalog product per collection for the portal hero image.
-foreach ( $catalog as $product ) {
-	$col = $product['collection'] ?? '';
-	if ( isset( $collection_data[ $col ] ) && empty( $collection_data[ $col ]['img'] ) ) {
-		$collection_data[ $col ]['img'] = $product['image_url'] ?? '';
-	}
-}
 ?>
 
 <section class="abt-collections" id="collections">
@@ -83,10 +76,7 @@ foreach ( $catalog as $product ) {
 			$index = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
 			// Theme-relative paths (curated lookbook defaults) resolve via
 			// get_theme_file_uri; catalog overrides arrive as full URLs.
-			$img_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
-			if ( ! empty( $data['img'] ) ) {
-				$img_url = ( 0 === strpos( $data['img'], 'http' ) ) ? $data['img'] : get_theme_file_uri( $data['img'] );
-			}
+			$img_url = ( 0 === strpos( $data['img'], 'http' ) ) ? $data['img'] : get_theme_file_uri( $data['img'] );
 			?>
 			<li class="abt-coll-row" data-collection="<?php echo esc_attr( $slug ); ?>" role="listitem">
 				<a href="<?php echo esc_url( home_url( $data['link'] ) ); ?>" class="abt-coll-row__link">

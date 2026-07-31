@@ -85,6 +85,36 @@
       "url": "/shipping-returns/",
       "tips": []
     },
+    "privacy-policy": {
+      "title": "Privacy Policy",
+      "url": "/privacy-policy/",
+      "tips": []
+    },
+    "terms-of-service": {
+      "title": "Terms of Service",
+      "url": "/terms-of-service/",
+      "tips": []
+    },
+    "refund-policy": {
+      "title": "Refund Policy",
+      "url": "/refund-policy/",
+      "tips": []
+    },
+    "cookie-policy": {
+      "title": "Cookie Policy",
+      "url": "/cookie-policy/",
+      "tips": []
+    },
+    "accessibility": {
+      "title": "Accessibility Statement",
+      "url": "/accessibility/",
+      "tips": []
+    },
+    "track-order": {
+      "title": "Track Your Order",
+      "url": "/track-order/",
+      "tips": []
+    },
     "shop": {
       "title": "Shop",
       "url": "/shop/",
@@ -108,56 +138,6 @@
     "size-guide": {
       "title": "Size Guide",
       "url": "/size-guide/",
-      "tips": []
-    },
-    "track-order": {
-      "title": "Track Your Order",
-      "url": "/track-order/",
-      "tips": []
-    },
-    "privacy-policy": {
-      "title": "Privacy Policy",
-      "url": "/privacy-policy/",
-      "tips": []
-    },
-    "terms-of-service": {
-      "title": "Terms of Service",
-      "url": "/terms-of-service/",
-      "tips": []
-    },
-    "refund-policy": {
-      "title": "Refund Policy",
-      "url": "/refund-policy/",
-      "tips": []
-    },
-    "accessibility": {
-      "title": "Accessibility",
-      "url": "/accessibility/",
-      "tips": []
-    },
-    "cookie-policy": {
-      "title": "Cookie Policy",
-      "url": "/cookie-policy/",
-      "tips": []
-    },
-    "collections-black-rose": {
-      "title": "Black Rose",
-      "url": "/collections/black-rose/",
-      "tips": []
-    },
-    "collections-love-hurts": {
-      "title": "Love Hurts",
-      "url": "/collections/love-hurts/",
-      "tips": []
-    },
-    "collections-signature": {
-      "title": "Signature",
-      "url": "/collections/signature/",
-      "tips": []
-    },
-    "collections-kids-capsule": {
-      "title": "Kids Capsule",
-      "url": "/collections/kids-capsule/",
       "tips": []
     }
   },
@@ -192,6 +172,7 @@
     {
       "id": "where-signature",
       "patterns": [
+        "signature",
         "signature"
       ],
       "answer": "Head to Signature Collection →",
@@ -232,8 +213,8 @@
         "runs big",
         "measurements"
       ],
-      "answer": "Fit notes live on every product page — full measurements are in the size guide →",
-      "link": "/size-guide/"
+      "answer": "Fit notes live on every product page — general sizing lives in the FAQ →",
+      "link": "/faq/"
     },
     {
       "id": "shipping",
@@ -257,8 +238,8 @@
         "my order",
         "tracking"
       ],
-      "answer": "Use your order ID and billing email to check the latest status →",
-      "link": "/track-order/"
+      "answer": "Check your order status in your account →",
+      "link": "/my-account/"
     }
   ]
 }

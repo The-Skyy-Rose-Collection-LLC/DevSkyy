@@ -60,6 +60,7 @@ parameters:
         - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
         - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
         - phpstan/constants.php
+        - tests/stubs/wp-cli.php
 
     # These resolve to install-specific paths/URLs at runtime, so PHPStan must
     # not narrow them to the placeholder literals in phpstan/constants.php.
@@ -67,7 +68,7 @@ parameters:
         - SKYYROSE_DIR
         - SKYYROSE_URI
         - COOKIEPATH
-		- SKYYROSE_COMING_SOON_MODE
+        - SKYYROSE_COMING_SOON_MODE
 
     ignoreErrors:
         # Elementor — optional integration, not present in analysis environment

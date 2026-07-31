@@ -380,9 +380,11 @@ function skyyrose_mcp_render_admin_page(): void {
 			<?php esc_html_e( 'Endpoint:', 'skyyrose' ); ?>
 			<code><?php echo esc_html( $url ); ?></code> &mdash;
 			<?php
-			echo $has_token
-				? esc_html__( 'service token configured', 'skyyrose' )
-				: esc_html__( 'no service token — define SKYYROSE_MCP_TOKEN in wp-config.php', 'skyyrose' );
+			echo esc_html(
+				$has_token
+					? __( 'service token configured', 'skyyrose' )
+					: __( 'no service token — define SKYYROSE_MCP_TOKEN in wp-config.php', 'skyyrose' )
+			);
 			?>
 		</p>
 

@@ -213,11 +213,7 @@ get_header();
 					<?php endforeach; ?>
 					<li class="lp-pane__detail-item">
 						<?php
-						if ( ! empty( $pane['price_fmt'] ) && 'from' === $pane['price_fmt'] ) {
-							echo esc_html( sprintf( __( 'From $%s', 'skyyrose' ), number_format( (float) $prd['price'], 0 ) ) );
-						} else {
-							echo esc_html( sprintf( __( '$%s', 'skyyrose' ), number_format( (float) $prd['price'], 0 ) ) );
-						}
+						echo esc_html( sprintf( __( 'From $%s', 'skyyrose' ), number_format( (float) $prd['price'], 0 ) ) );
 						?>
 					</li>
 				</ul>

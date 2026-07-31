@@ -215,7 +215,7 @@ add_action( 'woocommerce_single_product_summary', 'skyyrose_preorder_single_prod
  * @return string Modified button text.
  */
 function skyyrose_preorder_button_text( $text, $product ) {
-	if ( $product && skyyrose_is_preorder( $product->get_id() ) ) {
+	if ( skyyrose_is_preorder( $product->get_id() ) ) {
 		return esc_html__( 'Pre-Order Now', 'skyyrose' );
 	}
 	return $text;

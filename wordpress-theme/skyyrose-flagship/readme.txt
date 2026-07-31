@@ -4,7 +4,7 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,6 +138,11 @@ Typography, header layout, footer layout, and collection palette overrides are c
 10. Mobile responsive layout
 
 == Changelog ==
+
+= 2.2.2 =
+* Architecture: split enqueue, SEO, and preorder rendering into focused modules while preserving hook order and public interfaces
+* Quality: resolved all PHPStan findings and tightened WooCommerce session, checkout, variation, and product type boundaries
+* Quality: removed impossible guards and fallbacks, corrected escaping verification, and enforced the 800-line PHP module ceiling
 
 = 2.2.1 =
 * Feature: page-aware conversion, confidence, and discovery upgrades across public storefront views

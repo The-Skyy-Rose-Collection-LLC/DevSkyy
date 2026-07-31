@@ -54,7 +54,7 @@ if ( is_front_page() ) {
 
 // Cart count (WooCommerce-aware).
 $mobile_nav_cart_count = 0;
-if ( function_exists( 'WC' ) && WC()->cart ) {
+if ( class_exists( 'WooCommerce' ) ) {
 	$mobile_nav_cart_count = WC()->cart->get_cart_contents_count();
 }
 

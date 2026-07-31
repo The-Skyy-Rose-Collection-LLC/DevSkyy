@@ -204,14 +204,11 @@ get_header();
 
 			<?php foreach ( $featured as $idx => $prd ) : ?>
 				<?php
-				$copy    = isset( $pane_copy[ $idx ] ) ? $pane_copy[ $idx ] : array(
-					'heading' => $prd['name'],
-					'body'    => '',
-				);
-				$img_src = ! empty( $prd['front_model_image'] )
+					$copy = $pane_copy[ $idx ];
+				$img_src  = ! empty( $prd['front_model_image'] )
 					? skyyrose_product_image_uri( $prd['front_model_image'] )
 					: '';
-				$prd_url = function_exists( 'wc_get_product_id_by_sku' )
+				$prd_url  = function_exists( 'wc_get_product_id_by_sku' )
 					? (string) get_permalink( wc_get_product_id_by_sku( $prd['sku'] ) )
 					: '#';
 				?>

@@ -249,9 +249,6 @@ function skyyrose_picture_sources( $src ) {
 	// direct skyyrose.co serving uses the file as-is. AVIF compresses so
 	// well that full-size variants are typically < 200KB.
 	$canonical_path_url = strtok( $canonical_src, '?' );
-	if ( false === $canonical_path_url ) {
-		return $result;
-	}
 
 	$abs_path = skyyrose_url_to_path( $canonical_path_url );
 	if ( null === $abs_path ) {
@@ -298,7 +295,7 @@ function skyyrose_photon_srcset( $src, $widths ) {
 		return '';
 	}
 	$bare = strtok( (string) $src, '?' );
-	if ( false === $bare || ! preg_match( '#^https://([^/]+)(/.+)$#', $bare, $m ) ) {
+	if ( ! preg_match( '#^https://([^/]+)(/.+)$#', $bare, $m ) ) {
 		return '';
 	}
 	// Already-Photon URLs and non-raster sources pass through unusable.
@@ -416,7 +413,7 @@ add_filter( 'wp_get_attachment_image', 'skyyrose_wrap_attachment_in_picture', 10
  * @return array                Unchanged metadata.
  */
 function skyyrose_generate_nextgen_siblings( $metadata, $attachment_id ) {
-	if ( ! is_array( $metadata ) || empty( $metadata['file'] ) ) {
+	if ( empty( $metadata['file'] ) ) {
 		return $metadata;
 	}
 

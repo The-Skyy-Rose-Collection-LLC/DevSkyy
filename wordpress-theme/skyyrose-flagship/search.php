@@ -277,10 +277,10 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 
 						if ( function_exists( 'get_term_link' ) ) {
 							$skyyrose_term = get_term_by( 'slug', $skyyrose_collection['slug'], 'product_cat' );
-							if ( $skyyrose_term && ! is_wp_error( $skyyrose_term ) ) {
+							if ( $skyyrose_term ) {
 								$skyyrose_link  = get_term_link( $skyyrose_term );
 								$skyyrose_count = sprintf(
-									/* translators: %d: number of products */
+								/* translators: %d: number of products */
 									_n( '%d product', '%d products', $skyyrose_term->count, 'skyyrose' ),
 									$skyyrose_term->count
 								);

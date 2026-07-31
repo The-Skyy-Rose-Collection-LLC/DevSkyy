@@ -107,8 +107,8 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => $data['sizes'] ?? '',
 			'color'             => $data['color'] ?? '',
 			'edition_size'      => isset( $data['edition_size'] ) ? (int) $data['edition_size'] : 0,
-			'published'         => ! empty( $data['published'] ) && '0' !== $data['published'],
-			'is_preorder'       => ! empty( $data['is_preorder'] ) && '0' !== $data['is_preorder'],
+			'published'         => (bool) (int) $data['published'],
+			'is_preorder'       => (bool) (int) $data['is_preorder'],
 			'garment_type_lock' => $data['garment_type_lock'] ?? '',
 			'dossier_slug'      => $data['dossier_slug'] ?? '',
 		);
@@ -136,9 +136,6 @@ function skyyrose_get_product_catalog() {
  * @return string Theme-relative path to the best available image.
  */
 function skyyrose_get_product_display_image( $product ) {
-	if ( ! is_array( $product ) ) {
-		return '';
-	}
 	// IMAGERY PRECEDENCE (canon, 2026-06-16): front-model-first, matching
 	// product-card-holo.php and the WC ghost-loop filter. Keep all three in sync.
 	foreach ( array( 'front_model_image', 'image', 'back_model_image', 'back_image' ) as $slot ) {

@@ -14,11 +14,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// Guard against null cart object.
-if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
-	return;
-}
-
 $checkout = WC()->checkout();
 
 // Bail if cart empty and redirect to shop.
