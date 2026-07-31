@@ -1,14 +1,14 @@
 """
 Phase 13 — Luxury Cursor Verification
 CURS-01: cursor z-index > 9999 (above all modals/overlays)
-CURS-03: cursor JS must NOT load on immersive templates (slug gate required)
+CURS-03: cursor JS must NOT load on pages with a competing 3D scene (slug gate required)
 
-test_cursor_not_loaded_on_immersive is expected to FAIL against the current
-enqueue.php implementation — this failure IS the CURS-03 gap report.
-The luxury cursor JS is enqueued unconditionally in skyyrose_enqueue_global_scripts()
-with no immersive-slug exclusion (see inc/enqueue.php lines 249-259).
-Fix target: move enqueue to skyyrose_enqueue_template_scripts() with
-    if ($slug !== 'immersive') guard.
+The four template-immersive-*.php rooms that originally motivated CURS-03 were
+retired in 2.2.2; their 3D-scene role now lives on 'preorder-gateway' and
+'collection-standalone' (the pages that load skyyrose-immersive-core — see
+inc/enqueue-templates.php). skyyrose_enqueue_template_scripts() also moved out
+of the monolithic inc/enqueue.php into inc/enqueue-templates.php in the same
+change, so both files are read here.
 """
 
 import re
@@ -17,6 +17,17 @@ from pathlib import Path
 MODULE_DIR = Path(__file__).parent.parent / "wordpress-theme/skyyrose-flagship"
 CSS_FILE = MODULE_DIR / "assets/css/luxury-cursor.css"
 ENQUEUE_FILE = MODULE_DIR / "inc/enqueue.php"
+ENQUEUE_TEMPLATES_FILE = MODULE_DIR / "inc/enqueue-templates.php"
+
+
+def read_enqueue_source() -> str:
+    """Concatenate both enqueue modules — inc/enqueue.php was split in 2.2.2,
+    moving skyyrose_enqueue_template_scripts() into inc/enqueue-templates.php."""
+    return (
+        ENQUEUE_FILE.read_text(encoding="utf-8")
+        + "\n"
+        + ENQUEUE_TEMPLATES_FILE.read_text(encoding="utf-8")
+    )
 
 
 def extract_function_body(php_text: str, fn_name: str) -> str:
@@ -91,7 +102,7 @@ def test_cursor_zindex_above_modals() -> None:
 
 def test_cursor_css_enqueued_globally() -> None:
     """luxury-cursor CSS must be registered inside skyyrose_enqueue_global_styles."""
-    php = ENQUEUE_FILE.read_text(encoding="utf-8")
+    php = read_enqueue_source()
     body = extract_function_body(php, "skyyrose_enqueue_global_styles")
     assert "luxury-cursor" in body, (
         "luxury-cursor CSS is not enqueued in skyyrose_enqueue_global_styles(). "
@@ -105,24 +116,20 @@ def test_cursor_css_enqueued_globally() -> None:
 
 
 def test_cursor_not_loaded_on_immersive() -> None:
-    """CURS-03: luxury cursor JS must NOT load on immersive templates.
+    """CURS-03: luxury cursor JS must NOT load on pages with a competing 3D scene.
 
-    This test INTENTIONALLY FAILS against the current implementation.
-    The cursor JS is enqueued unconditionally in skyyrose_enqueue_global_scripts()
-    with no slug=immersive exclusion guard.
-
-    Failure = CURS-03 GAP confirmed. Do not xfail — let CI surface this.
-    Fix: move wp_enqueue_script('skyyrose-luxury-cursor', ...) into
-         skyyrose_enqueue_template_scripts() behind:
-             if ($slug !== 'immersive') { ... }
+    'preorder-gateway' and 'collection-standalone' are the current slugs that load
+    the skyyrose-immersive-core engine (inc/enqueue-templates.php) — the successors
+    to the four retired template-immersive-*.php rooms. The cursor enqueue must be
+    excluded on both, or it visually competes with the scene.
     """
-    php = ENQUEUE_FILE.read_text(encoding="utf-8")
+    php = read_enqueue_source()
     global_body = extract_function_body(php, "skyyrose_enqueue_global_scripts")
 
     cursor_in_global = "luxury-cursor" in global_body
 
     if not cursor_in_global:
-        # Cursor JS was moved out of global enqueue — verify it has an immersive guard
+        # Cursor JS was moved out of global enqueue — verify it has a 3D-scene guard
         # in the template-specific enqueue function instead.
         template_body = extract_function_body(php, "skyyrose_enqueue_template_scripts")
         if "luxury-cursor" not in template_body:
@@ -130,18 +137,22 @@ def test_cursor_not_loaded_on_immersive() -> None:
 
             pytest.fail(
                 "CURS-03 GAP: luxury cursor JS is neither in global_scripts nor in "
-                "template_scripts. Cannot verify immersive exclusion."
+                "template_scripts. Cannot verify 3D-scene exclusion."
             )
-        # Check for immersive guard
-        has_guard = bool(
-            re.search(r"immersive", template_body) and re.search(r"luxury-cursor", template_body)
-        )
+        # The guard must reference both current 3D-scene slugs ahead of the enqueue
+        # call — matching only the word "immersive" would false-pass off stale
+        # comment text without ever excluding a reachable page (this test did
+        # exactly that for years against the now-retired 'immersive' room slug).
+        cursor_pos = template_body.find("luxury-cursor")
+        guard_window = template_body[max(0, cursor_pos - 500) : cursor_pos]
+        has_guard = "preorder-gateway" in guard_window and "collection-standalone" in guard_window
         assert has_guard, (
             "CURS-03 FAIL: luxury cursor JS is in skyyrose_enqueue_template_scripts() "
-            "but no immersive exclusion guard found. "
-            "Add: if (\\$slug !== 'immersive') { wp_enqueue_script('skyyrose-luxury-cursor', ...); }"
+            "but is not excluded on the current 3D-scene slugs ('preorder-gateway', "
+            "'collection-standalone'). Add a guard so the cursor doesn't compete with "
+            "the immersive-core scene on those pages."
         )
-        # CURS-03 PASSES: cursor JS in template_scripts with immersive guard
+        # CURS-03 PASSES: cursor JS in template_scripts with a real 3D-scene guard
         return
 
     # Cursor is in global_scripts — check if there is any immersive-slug guard

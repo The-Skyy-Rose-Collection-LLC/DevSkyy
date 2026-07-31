@@ -390,11 +390,14 @@ function skyyrose_enqueue_template_scripts() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
-	// CURS-03: Immersive templates intentionally hide cursor to keep focus on the 3D scene.
-	// Skip enqueue entirely on immersive slugs so the JS isn't downloaded for hidden UI.
+	// CURS-03: pages that also load the immersive-core 3D engine (preorder-gateway,
+	// collection-standalone — see the immersive-core in_array() below) hide the
+	// cursor so it doesn't compete with the scene. These are the successors to the
+	// four template-immersive-*.php rooms retired in 2.2.2.
 	// Also skip wherever luxury-cursor.css is skipped: the script builds a .cursor-label
 	// span, which without its stylesheet renders as stray visible text in the page flow.
-	if ( ! skyyrose_slug_skips_optional_assets( $slug ) ) {
+	$hides_cursor_for_scene = in_array( $slug, array( 'preorder-gateway', 'collection-standalone' ), true );
+	if ( ! skyyrose_slug_skips_optional_assets( $slug ) && ! $hides_cursor_for_scene ) {
 		$cursor_file = $use_min && file_exists( $base_js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
 		if ( file_exists( $base_js_dir . '/' . $cursor_file ) ) {
 			wp_enqueue_script(
