@@ -73,3 +73,24 @@ parameters:
     ignoreErrors:
         # Elementor — optional integration, not present in analysis environment
         - '#.*(unknown class|invalid type|call to method .* on an unknown class) Elementor\\.*#'
+
+        # vendor/php-stubs/woocommerce-stubs declares WC()->cart as non-nullable WC_Cart,
+        # but WooCommerce only populates it once wc_load_cart() runs on 'woocommerce_init' —
+        # it is genuinely null in early/edge-case contexts (nopriv admin-ajax before session
+        # bootstrap, WP-CLI, some REST paths). These instanceof/negation checks are real
+        # runtime guards against that gap, not dead code; the stub's type is optimistic.
+        -
+            identifier: instanceof.alwaysTrue
+            path: inc/woocommerce.php
+        -
+            identifier: instanceof.alwaysTrue
+            path: inc/wishlist-functions.php
+        -
+            identifier: instanceof.alwaysTrue
+            path: template-parts/mobile-bottom-nav.php
+        -
+            identifier: booleanNot.alwaysFalse
+            path: woocommerce/cart/cart.php
+        -
+            identifier: booleanNot.alwaysFalse
+            path: woocommerce/checkout/form-checkout.php

@@ -47,8 +47,11 @@ function skyyrose_get_wishlist_key() {
 	}
 
 	// Use session for non-logged-in users.
-	$session_key = WC()->session->get_customer_id();
-	return 'wishlist_session_' . $session_key;
+	$session = WC()->session;
+	if ( ! $session instanceof WC_Session_Handler ) {
+		return 'wishlist_session_guest';
+	}
+	return 'wishlist_session_' . $session->get_customer_id();
 }
 
 /**
@@ -208,7 +211,11 @@ function skyyrose_move_to_cart( $product_id ) {
 	}
 
 	// Add to cart.
-	$cart_item_key = WC()->cart->add_to_cart( $product_id );
+	$cart = WC()->cart;
+	if ( ! $cart instanceof WC_Cart ) {
+		return false;
+	}
+	$cart_item_key = $cart->add_to_cart( $product_id );
 
 	if ( $cart_item_key ) {
 		// Remove from wishlist.
@@ -380,7 +387,7 @@ function skyyrose_ajax_move_to_cart() {
 			array(
 				'message'    => esc_html__( 'Product moved to cart.', 'skyyrose' ),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => WC()->cart instanceof WC_Cart ? WC()->cart->get_cart_contents_count() : 0,
 			)
 		);
 	} else {
@@ -476,7 +483,7 @@ function skyyrose_ajax_move_all_to_cart() {
 					$result['success']
 				),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => WC()->cart instanceof WC_Cart ? WC()->cart->get_cart_contents_count() : 0,
 			)
 		);
 	} else {

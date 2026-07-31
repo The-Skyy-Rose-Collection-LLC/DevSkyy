@@ -187,7 +187,12 @@ add_filter( 'woocommerce_get_image_size_thumbnail', 'skyyrose_woocommerce_thumbn
  */
 function skyyrose_woocommerce_cart_fragments( $fragments ) {
 
-	$count = WC()->cart->get_cart_contents_count();
+	$cart = WC()->cart;
+	if ( ! $cart instanceof WC_Cart ) {
+		return $fragments;
+	}
+
+	$count = $cart->get_cart_contents_count();
 
 	ob_start();
 	?>
@@ -198,7 +203,7 @@ function skyyrose_woocommerce_cart_fragments( $fragments ) {
 	// Also provide the cart subtotal for mini-cart widgets.
 	ob_start();
 	?>
-	<span class="cart-subtotal"><?php echo wp_kses_post( WC()->cart->get_cart_subtotal() ); ?></span>
+	<span class="cart-subtotal"><?php echo wp_kses_post( $cart->get_cart_subtotal() ); ?></span>
 	<?php
 	$fragments['.cart-subtotal'] = ob_get_clean();
 
@@ -506,7 +511,8 @@ function skyyrose_ajax_get_cart_count() {
 
 	check_ajax_referer( 'skyyrose-woo-nonce', 'nonce' );
 
-	$count = WC()->cart->get_cart_contents_count();
+	$cart  = WC()->cart;
+	$count = $cart instanceof WC_Cart ? $cart->get_cart_contents_count() : 0;
 
 	wp_send_json_success(
 		array(
