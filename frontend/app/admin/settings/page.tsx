@@ -1,561 +1,132 @@
-'use client';
+import { TopBar } from '@/components/console/TopBar';
+import { ConsoleCard } from '@/components/console/Card';
+import { getPlatformConnections } from '@/lib/social-media/config';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Save,
-  RefreshCw,
-  Eye,
-  EyeOff,
-  Check,
-  AlertCircle,
-  Globe,
-  Zap,
-  Bot,
-  Palette,
-  Key,
-  Settings as SettingsIcon,
-} from 'lucide-react';
+type Status = 'Connected' | 'Action needed' | 'Not connected';
 
-interface SettingsState {
-  wordpress: {
-    url: string;
-    consumerKey: string;
-    consumerSecret: string;
-    autoSync: boolean;
-  };
-  vercel: {
-    projectId: string;
-    apiToken: string;
-    orgId: string;
-  };
-  autonomous: {
-    enabled: boolean;
-    circuitBreakerThreshold: number;
-    retryAttempts: number;
-    retryDelay: number;
-  };
-  ui: {
-    theme: 'light' | 'dark';
-    typography: 'playfair' | 'inter' | 'system';
-    accentColor: string;
-  };
-  system: {
-    apiTimeout: number;
-    maxConcurrentRequests: number;
-    logLevel: 'debug' | 'info' | 'warn' | 'error';
-  };
+interface IntegrationItem {
+  name: string;
+  desc: string;
+  status: Status;
+  fields: string[];
+}
+
+interface IntegrationGroup {
+  group: string;
+  items: IntegrationItem[];
+}
+
+function statusColor(status: Status): string {
+  if (status === 'Connected') return '#5FBF7F';
+  if (status === 'Action needed') return '#E5A85C';
+  return '#8A8A92';
+}
+
+function envStatus(present: boolean[]): Status {
+  if (present.every(Boolean)) return 'Connected';
+  if (present.some(Boolean)) return 'Action needed';
+  return 'Not connected';
 }
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<SettingsState>({
-    wordpress: {
-      url: '',
-      consumerKey: '',
-      consumerSecret: '',
-      autoSync: true,
+  const wpPresent = [Boolean(process.env.WP_BASE_URL), Boolean(process.env.WP_APP_USER), Boolean(process.env.WP_APP_PASSWORD)];
+  const wcPresent = [Boolean(process.env.WC_CONSUMER_KEY), Boolean(process.env.WC_CONSUMER_SECRET)];
+  const stripePresent = [Boolean(process.env.STRIPE_SECRET_KEY)];
+  const webhookPresent = [Boolean(process.env.WP_WEBHOOK_SECRET)];
+  const claudePresent = [Boolean(process.env.ANTHROPIC_API_KEY)];
+
+  const socials = getPlatformConnections();
+  const socialByPlatform = new Map(socials.map((s) => [s.platform, s]));
+
+  const groups: IntegrationGroup[] = [
+    {
+      group: 'Storefront',
+      items: [
+        { name: 'WordPress', desc: 'skyyrose.co · theme and REST API', status: envStatus(wpPresent), fields: ['Site URL (WP_BASE_URL)', 'Application password'] },
+        { name: 'WooCommerce', desc: 'Orders, products and inventory', status: envStatus(wcPresent), fields: ['Consumer key', 'Consumer secret'] },
+      ],
     },
-    vercel: {
-      projectId: '',
-      apiToken: '',
-      orgId: '',
+    {
+      group: 'Payments',
+      items: [
+        { name: 'Stripe', desc: 'Checkout and payouts', status: envStatus(stripePresent), fields: ['Secret key (STRIPE_SECRET_KEY)'] },
+      ],
     },
-    autonomous: {
-      enabled: true,
-      circuitBreakerThreshold: 5,
-      retryAttempts: 3,
-      retryDelay: 2000,
+    {
+      group: 'Social',
+      items: [
+        { name: 'Instagram', desc: 'DMs and scheduled posts', status: socialByPlatform.get('instagram')?.connected ? 'Connected' : 'Not connected', fields: ['INSTAGRAM_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID'] },
+        { name: 'TikTok', desc: 'Clip scheduling', status: socialByPlatform.get('tiktok')?.connected ? 'Connected' : 'Not connected', fields: ['TIKTOK_ACCESS_TOKEN'] },
+        { name: 'X', desc: 'Drop threads', status: socialByPlatform.get('twitter')?.connected ? 'Connected' : 'Not connected', fields: ['TWITTER_API_KEY', 'TWITTER_API_SECRET'] },
+        { name: 'Facebook', desc: 'Catalog sync', status: socialByPlatform.get('facebook')?.connected ? 'Connected' : 'Not connected', fields: ['FACEBOOK_ACCESS_TOKEN', 'FACEBOOK_PAGE_ID'] },
+        { name: 'Pinterest', desc: 'Lookbook pins', status: 'Not connected', fields: ['Not wired in this build'] },
+        { name: 'YouTube', desc: 'Film uploads', status: 'Not connected', fields: ['Not wired in this build'] },
+      ],
     },
-    ui: {
-      theme: 'dark',
-      typography: 'playfair',
-      accentColor: '#B76E79',
+    {
+      group: 'Automation and Infrastructure',
+      items: [
+        { name: 'Webhooks', desc: 'Real-time order and stock events', status: envStatus(webhookPresent), fields: ['Signing secret (WP_WEBHOOK_SECRET)'] },
+        { name: 'Claude API', desc: 'DevSkyy agent intelligence', status: envStatus(claudePresent), fields: ['API key (ANTHROPIC_API_KEY)'] },
+        { name: 'CDN / Media', desc: 'Imagery delivery and cache', status: 'Not connected', fields: ['Not wired in this build'] },
+      ],
     },
-    system: {
-      apiTimeout: 30000,
-      maxConcurrentRequests: 10,
-      logLevel: 'info',
-    },
-  });
-
-  const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      // Load from localStorage for now
-      const stored = localStorage.getItem('devskyy-settings');
-      if (stored) {
-        setSettings(JSON.parse(stored));
-      }
-    } catch {
-      // Settings load failed — defaults will be used
-    }
-  };
-
-  const saveSettings = async () => {
-    setSaveStatus('saving');
-    setErrorMessage('');
-
-    try {
-      // Save to localStorage for now
-      localStorage.setItem('devskyy-settings', JSON.stringify(settings));
-
-      // TODO: Also save to backend API
-      // await api.settings.update(settings)
-
-      setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    } catch (error) {
-      setSaveStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to save settings');
-    }
-  };
-
-  const toggleSecret = (key: string) => {
-    setShowSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const maskSecret = (value: string, show: boolean) => {
-    if (!value) return '';
-    return show ? value : '•'.repeat(Math.min(value.length, 20));
-  };
-
-  const updateSetting = (section: keyof SettingsState, key: string, value: any) => {
-    setSettings((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [key]: value,
-      },
-    }));
-  };
+  ];
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="font-display text-4xl luxury-text-gradient mb-2">Settings</h1>
-            <p className="text-gray-400">Configure your DevSkyy platform preferences</p>
-          </div>
-          <Button
-            onClick={saveSettings}
-            disabled={saveStatus === 'saving'}
-            className="bg-rose-500 hover:bg-rose-600"
-          >
-            {saveStatus === 'saving' ? (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : saveStatus === 'success' ? (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                Saved
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save All
-              </>
-            )}
-          </Button>
+    <>
+      <TopBar title="Settings" />
+      <div className="px-9 py-8 max-w-[1320px]">
+        <div
+          className="rounded-[10px] p-[24px_26px] mb-[22px] border"
+          style={{ borderColor: 'rgba(183,110,121,.28)', background: 'linear-gradient(135deg,#100E12,#0A0A0A)' }}
+        >
+          <span className="font-mono text-[10px] tracking-[0.22em] uppercase" style={{ color: 'var(--acc)' }}>
+            Configure and Wire Up
+          </span>
+          <p className="italic text-[15px] text-white/65 mt-2 max-w-[64ch]" style={{ fontFamily: 'var(--font-playfair)' }}>
+            Connection status reads real environment variables server-side — nothing here is simulated. Set the
+            missing ones in <code className="not-italic font-mono text-[13px]">.env.local</code> (see{' '}
+            <code className="not-italic font-mono text-[13px]">.env.example</code>) and redeploy to flip a card to
+            Connected.
+          </p>
         </div>
 
-        {saveStatus === 'error' && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3"
-          >
-            <AlertCircle className="h-5 w-5 text-red-400" />
-            <p className="text-red-400">{errorMessage}</p>
-          </motion.div>
-        )}
-
-        <Tabs defaultValue="wordpress" className="space-y-6">
-          <TabsList className="bg-gray-800 border border-gray-700">
-            <TabsTrigger value="wordpress" className="data-[state=active]:bg-rose-500/20">
-              <Globe className="mr-2 h-4 w-4" />
-              WordPress
-            </TabsTrigger>
-            <TabsTrigger value="vercel" className="data-[state=active]:bg-rose-500/20">
-              <Zap className="mr-2 h-4 w-4" />
-              Vercel
-            </TabsTrigger>
-            <TabsTrigger value="autonomous" className="data-[state=active]:bg-rose-500/20">
-              <Bot className="mr-2 h-4 w-4" />
-              Autonomous
-            </TabsTrigger>
-            <TabsTrigger value="ui" className="data-[state=active]:bg-rose-500/20">
-              <Palette className="mr-2 h-4 w-4" />
-              UI Preferences
-            </TabsTrigger>
-            <TabsTrigger value="system" className="data-[state=active]:bg-rose-500/20">
-              <SettingsIcon className="mr-2 h-4 w-4" />
-              System
-            </TabsTrigger>
-          </TabsList>
-
-          {/* WordPress Settings */}
-          <TabsContent value="wordpress" className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>WordPress Connection</CardTitle>
-                <CardDescription>Configure WordPress REST API credentials</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="wp-url">WordPress URL</Label>
-                  <Input
-                    id="wp-url"
-                    type="url"
-                    value={settings.wordpress.url}
-                    onChange={(e) => updateSetting('wordpress', 'url', e.target.value)}
-                    placeholder="https://skyyrose.co"
-                    className="bg-gray-800 border-gray-700"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="wp-key">Consumer Key</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="wp-key"
-                      type={showSecrets['wp-key'] ? 'text' : 'password'}
-                      value={settings.wordpress.consumerKey}
-                      onChange={(e) => updateSetting('wordpress', 'consumerKey', e.target.value)}
-                      placeholder="ck_xxxxxxxxxxxxx"
-                      className="bg-gray-800 border-gray-700 flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => toggleSecret('wp-key')}
-                      className="border-gray-700"
+        {groups.map((g) => (
+          <div key={g.group} className="mb-6">
+            <div className="font-mono text-[10px] tracking-[0.18em] text-[#8A8A92] uppercase mb-3">{g.group}</div>
+            <div className="grid grid-cols-2 gap-[14px]">
+              {g.items.map((item) => (
+                <ConsoleCard key={item.name} className="p-5">
+                  <div className="flex justify-between items-center gap-2.5">
+                    <span className="text-[15px] tracking-[0.06em] text-white uppercase" style={{ fontFamily: 'var(--font-cinzel)' }}>
+                      {item.name}
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1.5 font-mono text-[8.5px] tracking-[0.12em] uppercase"
+                      style={{ color: statusColor(item.status) }}
                     >
-                      {showSecrets['wp-key'] ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusColor(item.status) }} />
+                      {item.status}
+                    </span>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="wp-secret">Consumer Secret</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="wp-secret"
-                      type={showSecrets['wp-secret'] ? 'text' : 'password'}
-                      value={settings.wordpress.consumerSecret}
-                      onChange={(e) => updateSetting('wordpress', 'consumerSecret', e.target.value)}
-                      placeholder="cs_xxxxxxxxxxxxx"
-                      className="bg-gray-800 border-gray-700 flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => toggleSecret('wp-secret')}
-                      className="border-gray-700"
-                    >
-                      {showSecrets['wp-secret'] ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
+                  <div className="text-[12.5px] text-[#9A9AA2] mt-1.5">{item.desc}</div>
+                  <div className="flex flex-col gap-2.5 mt-4">
+                    {item.fields.map((field) => (
+                      <div key={field}>
+                        <div className="font-mono text-[8.5px] tracking-[0.12em] text-[#7A7A82] uppercase mb-1.5">{field}</div>
+                        <div className="font-mono text-[11px] text-[#5A5A62] bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-2.5">
+                          {item.status === 'Connected' ? 'Configured' : 'Not configured'}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-
-                <Separator className="bg-gray-800" />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto-Sync</Label>
-                    <p className="text-sm text-gray-400">
-                      Automatically sync Round Table results to WordPress
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.wordpress.autoSync}
-                    onCheckedChange={(checked) => updateSetting('wordpress', 'autoSync', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Vercel Settings */}
-          <TabsContent value="vercel" className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>Vercel Integration</CardTitle>
-                <CardDescription>Configure Vercel deployment settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="vercel-project">Project ID</Label>
-                  <Input
-                    id="vercel-project"
-                    value={settings.vercel.projectId}
-                    onChange={(e) => updateSetting('vercel', 'projectId', e.target.value)}
-                    placeholder="prj_xxxxxxxxxxxxx"
-                    className="bg-gray-800 border-gray-700"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="vercel-org">Organization ID</Label>
-                  <Input
-                    id="vercel-org"
-                    value={settings.vercel.orgId}
-                    onChange={(e) => updateSetting('vercel', 'orgId', e.target.value)}
-                    placeholder="team_xxxxxxxxxxxxx"
-                    className="bg-gray-800 border-gray-700"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="vercel-token">API Token</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="vercel-token"
-                      type={showSecrets['vercel-token'] ? 'text' : 'password'}
-                      value={settings.vercel.apiToken}
-                      onChange={(e) => updateSetting('vercel', 'apiToken', e.target.value)}
-                      placeholder="xxxxxxxxxxxxx"
-                      className="bg-gray-800 border-gray-700 flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => toggleSecret('vercel-token')}
-                      className="border-gray-700"
-                    >
-                      {showSecrets['vercel-token'] ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Autonomous Settings */}
-          <TabsContent value="autonomous" className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>Autonomous Agent Configuration</CardTitle>
-                <CardDescription>Control autonomous operations and self-healing behavior</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Enable Autonomous Operations</Label>
-                    <p className="text-sm text-gray-400">
-                      Allow agents to operate autonomously
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.autonomous.enabled}
-                    onCheckedChange={(checked) => updateSetting('autonomous', 'enabled', checked)}
-                  />
-                </div>
-
-                <Separator className="bg-gray-800" />
-
-                <div className="space-y-2">
-                  <Label htmlFor="circuit-threshold">Circuit Breaker Threshold</Label>
-                  <Input
-                    id="circuit-threshold"
-                    type="number"
-                    value={settings.autonomous.circuitBreakerThreshold}
-                    onChange={(e) =>
-                      updateSetting('autonomous', 'circuitBreakerThreshold', parseInt(e.target.value))
-                    }
-                    className="bg-gray-800 border-gray-700"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Number of failures before circuit breaker opens
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="retry-attempts">Retry Attempts</Label>
-                  <Input
-                    id="retry-attempts"
-                    type="number"
-                    value={settings.autonomous.retryAttempts}
-                    onChange={(e) =>
-                      updateSetting('autonomous', 'retryAttempts', parseInt(e.target.value))
-                    }
-                    className="bg-gray-800 border-gray-700"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Maximum number of retry attempts for failed operations
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="retry-delay">Retry Delay (ms)</Label>
-                  <Input
-                    id="retry-delay"
-                    type="number"
-                    value={settings.autonomous.retryDelay}
-                    onChange={(e) =>
-                      updateSetting('autonomous', 'retryDelay', parseInt(e.target.value))
-                    }
-                    className="bg-gray-800 border-gray-700"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Initial delay before first retry (exponential backoff applies)
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* UI Preferences */}
-          <TabsContent value="ui" className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>UI Preferences</CardTitle>
-                <CardDescription>Customize the look and feel of DevSkyy</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="theme">Theme</Label>
-                  <select
-                    id="theme"
-                    value={settings.ui.theme}
-                    onChange={(e) => updateSetting('ui', 'theme', e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md"
-                  >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="typography">Typography</Label>
-                  <select
-                    id="typography"
-                    value={settings.ui.typography}
-                    onChange={(e) => updateSetting('ui', 'typography', e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md"
-                  >
-                    <option value="playfair">Playfair Display (Luxury)</option>
-                    <option value="inter">Inter (Modern)</option>
-                    <option value="system">System Default</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="accent">Accent Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="accent"
-                      type="color"
-                      value={settings.ui.accentColor}
-                      onChange={(e) => updateSetting('ui', 'accentColor', e.target.value)}
-                      className="w-20 h-10 bg-gray-800 border-gray-700"
-                    />
-                    <Input
-                      type="text"
-                      value={settings.ui.accentColor}
-                      onChange={(e) => updateSetting('ui', 'accentColor', e.target.value)}
-                      className="bg-gray-800 border-gray-700 flex-1"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* System Settings */}
-          <TabsContent value="system" className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>System Configuration</CardTitle>
-                <CardDescription>Advanced system settings and performance tuning</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="timeout">API Timeout (ms)</Label>
-                  <Input
-                    id="timeout"
-                    type="number"
-                    value={settings.system.apiTimeout}
-                    onChange={(e) =>
-                      updateSetting('system', 'apiTimeout', parseInt(e.target.value))
-                    }
-                    className="bg-gray-800 border-gray-700"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Maximum time to wait for API responses
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="concurrent">Max Concurrent Requests</Label>
-                  <Input
-                    id="concurrent"
-                    type="number"
-                    value={settings.system.maxConcurrentRequests}
-                    onChange={(e) =>
-                      updateSetting('system', 'maxConcurrentRequests', parseInt(e.target.value))
-                    }
-                    className="bg-gray-800 border-gray-700"
-                  />
-                  <p className="text-sm text-gray-400">
-                    Maximum number of simultaneous API requests
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="log-level">Log Level</Label>
-                  <select
-                    id="log-level"
-                    value={settings.system.logLevel}
-                    onChange={(e) => updateSetting('system', 'logLevel', e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md"
-                  >
-                    <option value="debug">Debug</option>
-                    <option value="info">Info</option>
-                    <option value="warn">Warning</option>
-                    <option value="error">Error</option>
-                  </select>
-                  <p className="text-sm text-gray-400">
-                    Minimum severity level for logging
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
-    </div>
+                </ConsoleCard>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

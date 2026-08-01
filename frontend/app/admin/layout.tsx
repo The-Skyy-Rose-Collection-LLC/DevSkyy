@@ -1,38 +1,20 @@
-'use client';
-
 import { Suspense } from 'react';
-import { SessionProvider } from 'next-auth/react';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/dashboard/app-sidebar';
-import { Separator } from '@/components/ui/separator';
+import { SessionProvider } from './SessionProviderClient';
+import { ConsoleShell } from '@/components/console/ConsoleShell';
+import './console.css';
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Deliberately synchronous — no server-side data fetching here. An async
+// layout that awaits WC/session data before rendering breaks Next.js 16's
+// Cache Components prerendering for EVERY /admin/* route (children render
+// inside whatever Suspense boundary wraps the layout's own async work), which
+// took down unrelated pages like /admin/jobs. ConsoleShell fetches its own
+// nav-badge and identity data client-side (useSession/useQuery) instead.
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <SidebarProvider>
-        <Suspense fallback={null}>
-          <AppSidebar />
-        </Suspense>
-        <SidebarInset className="bg-gray-950">
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="text-gray-400 hover:text-white" />
-              <Separator orientation="vertical" className="h-4 bg-gray-700" />
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm text-gray-400">System Online</span>
-              </div>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto p-6">
-            {children}
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+      <Suspense fallback={null}>
+        <ConsoleShell>{children}</ConsoleShell>
+      </Suspense>
     </SessionProvider>
   );
 }

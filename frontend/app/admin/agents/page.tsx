@@ -1,331 +1,78 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Users,
-  Brain,
-  Zap,
-  ShoppingCart,
-  Globe,
-  Link,
-  Layers,
-  Cpu,
-  Image,
-  FileText,
-  Megaphone,
-  Bot,
-  RefreshCw,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { useAgents } from '@/hooks';
-import type { AgentInfo } from '@/lib/api/types';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { TopBar } from '@/components/console/TopBar';
+import { ConsoleCard } from '@/components/console/Card';
+import { StatusDot } from '@/components/console/StatusPill';
+import { agentStatusColor } from '@/lib/console/agents';
 
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  general: Bot,
-  infrastructure: Cpu,
-  ai: Brain,
-  visual: Image,
-  web: Globe,
-  integration: Link,
-  render: Layers,
-  core: Cpu,
-  automation: Zap,
-  ecommerce: ShoppingCart,
-  marketing: Megaphone,
-  content: FileText,
-};
-
-function getCategoryIcon(category: string): LucideIcon {
-  return CATEGORY_ICONS[category] ?? Bot;
-}
-
+/** Real `/api/v1/agents` roster. The handoff's mockup used five fictional
+ *  names (Atelier/Concierge/Curator/Scout/Ledger) with per-agent task prose
+ *  that has no backing field in the real API — this renders whatever the
+ *  platform actually reports, with the fields that actually exist. */
 export default function AgentsPage() {
-  const { data, loading, error, refresh } = useAgents();
-  const [selectedAgent, setSelectedAgent] = useState<AgentInfo | null>(null);
-  const [activeTab, setActiveTab] = useState('all');
-
-  const categories = data ? Object.entries(data.agents_by_category) : [];
-  const filteredAgents = data
-    ? activeTab === 'all'
-      ? data.agents
-      : data.agents.filter((a) => a.category === activeTab)
-    : [];
-
-  if (loading && !data) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">AI Agents</h1>
-            <p className="text-gray-400 mt-1">Loading agents...</p>
-          </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="bg-gray-900 border-gray-800 animate-pulse">
-              <CardContent className="pt-6">
-                <div className="h-12 bg-gray-800 rounded" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <Card key={i} className="bg-gray-900 border-gray-800 animate-pulse">
-              <CardContent className="pt-6">
-                <div className="h-16 bg-gray-800 rounded" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-white">AI Agents</h1>
-        <Card className="bg-gray-900 border-red-800">
-          <CardContent className="pt-6">
-            <p className="text-red-400">Failed to load agents: {error}</p>
-            <Button onClick={refresh} className="mt-4" variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['console-agents-page'],
+    queryFn: () => api.agents.list(),
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+  });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">AI Agents</h1>
-          <p className="text-gray-400 mt-1">
-            Manage {data?.total_agents ?? '...'} AI agents powering DevSkyy
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Badge variant="outline" className="border-green-500 text-green-400">
-            {data?.active_agents ?? 0} Active
-          </Badge>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={refresh}
-            className="text-gray-400 hover:text-white"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-rose-500/10 flex items-center justify-center">
-                <Brain className="h-6 w-6 text-rose-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{data?.total_agents ?? '—'}</p>
-                <p className="text-sm text-gray-400">Total Agents</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Zap className="h-6 w-6 text-green-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{data?.active_agents ?? '—'}</p>
-                <p className="text-sm text-gray-400">Active Agents</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">
-                  {data ? Object.keys(data.agents_by_category).length : '—'}
-                </p>
-                <p className="text-sm text-gray-400">Categories</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Category Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-gray-800 flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="all" className="data-[state=active]:bg-gray-700">
-            All ({data?.total_agents ?? 0})
-          </TabsTrigger>
-          {categories.map(([cat, count]) => (
-            <TabsTrigger
-              key={cat}
-              value={cat}
-              className="data-[state=active]:bg-gray-700 capitalize"
-            >
-              {cat} ({count})
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
-      {/* Agent Grid — rendered outside TabsContent to avoid N-content pattern for dynamic categories */}
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredAgents.map((agent) => {
-          const Icon = getCategoryIcon(agent.category);
-          const isSelected =
-            selectedAgent?.name === agent.name && selectedAgent?.category === agent.category;
-          return (
-            <Card
-              key={`${agent.category}/${agent.name}`}
-              className={`bg-gray-900 border-gray-800 cursor-pointer transition-all hover:border-rose-500/50 ${
-                isSelected ? 'border-rose-500' : ''
-              }`}
-              onClick={() => setSelectedAgent(isSelected ? null : agent)}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="h-9 w-9 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
-                      <Icon className="h-4 w-4 text-rose-400" />
+    <>
+      <TopBar title="DevSkyy Agents" />
+      <div className="px-9 py-8 max-w-[1320px]">
+        {isLoading && <div className="font-mono text-[11px] text-[#7A7A82]">Loading agent roster…</div>}
+        {error && (
+          <ConsoleCard className="p-5 mb-6">
+            <span className="font-mono text-[11px] text-[#E5A85C]">Couldn&apos;t reach the agents API.</span>
+          </ConsoleCard>
+        )}
+        {data && (
+          <div className="mb-6 font-mono text-[10px] tracking-[0.1em] text-[#7A7A82] uppercase">
+            {data.total_agents} total · {data.active_agents} active
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-[18px]">
+          {data?.agents.map((agent) => {
+            const color = agentStatusColor(agent.status);
+            return (
+              <ConsoleCard key={agent.name} className="p-[22px] flex gap-4 items-start">
+                <div className="mt-1.5">
+                  <StatusDot color={color} glow={`${color}99`} size={12} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center gap-2.5">
+                    <span
+                      className="text-[17px] tracking-[0.06em] text-white uppercase"
+                      style={{ fontFamily: 'var(--font-cinzel)' }}
+                    >
+                      {agent.name}
+                    </span>
+                    <span className="font-mono text-[9px] tracking-[0.14em] uppercase flex-none" style={{ color }}>
+                      {agent.status}
+                    </span>
+                  </div>
+                  <div className="text-[12.5px] text-[#9A9AA2] mt-2">
+                    {agent.category} · v{agent.version}
+                  </div>
+                  {agent.capabilities.length > 0 && (
+                    <div className="italic text-[13px] text-[#C8C8C8] leading-[1.4] mt-2.5 border-l-2 pl-3" style={{ borderColor: 'var(--acc)', fontFamily: 'var(--font-playfair)' }}>
+                      {agent.capabilities.slice(0, 3).join(' · ')}
                     </div>
-                    <div className="min-w-0">
-                      <CardTitle className="text-sm text-white leading-tight truncate">
-                        {agent.name.replace(/_/g, ' ')}
-                      </CardTitle>
-                      <p className="text-xs text-gray-500 capitalize">{agent.category}</p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="border-green-500 text-green-400 text-xs shrink-0"
-                  >
-                    {agent.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              {agent.capabilities.length > 0 && (
-                <CardContent className="pt-0 pb-3">
-                  <div className="flex flex-wrap gap-1">
-                    {agent.capabilities.slice(0, 2).map((cap) => (
-                      <Badge
-                        key={cap}
-                        variant="secondary"
-                        className="bg-gray-800 text-gray-300 text-xs"
-                      >
-                        {cap}
-                      </Badge>
-                    ))}
-                    {agent.capabilities.length > 2 && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-gray-800 text-gray-300 text-xs"
-                      >
-                        +{agent.capabilities.length - 2}
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Agent Detail Panel */}
-      {selectedAgent && (
-        <Card className="bg-gray-900 border-rose-500/30">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-lg bg-rose-500/10 flex items-center justify-center">
-                  {(() => {
-                    const Icon = getCategoryIcon(selectedAgent.category);
-                    return <Icon className="h-6 w-6 text-rose-400" />;
-                  })()}
-                </div>
-                <div>
-                  <CardTitle className="text-white">
-                    {selectedAgent.name.replace(/_/g, ' ')}
-                  </CardTitle>
-                  <CardDescription className="text-gray-400 capitalize">
-                    {selectedAgent.category} · v{selectedAgent.version}
-                  </CardDescription>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedAgent(null)}
-                className="text-gray-400"
-              >
-                Close
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <h4 className="text-sm font-medium text-gray-400 mb-2">Capabilities</h4>
-                {selectedAgent.capabilities.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedAgent.capabilities.map((cap) => (
-                      <Badge key={cap} className="bg-gray-800 text-gray-300">
-                        {cap}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">No capabilities listed</p>
-                )}
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400 mb-2">Info</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Status:</span>
-                    <span className="text-white capitalize">{selectedAgent.status}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Version:</span>
-                    <span className="text-white">{selectedAgent.version}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Category:</span>
-                    <span className="text-white capitalize">{selectedAgent.category}</span>
-                  </div>
-                  {selectedAgent.last_execution && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Last Run:</span>
-                      <span className="text-white">{selectedAgent.last_execution}</span>
+                  )}
+                  {agent.last_execution && (
+                    <div className="font-mono text-[9px] tracking-[0.1em] text-[#7A7A82] uppercase mt-2.5">
+                      Last run {new Date(agent.last_execution).toLocaleString()}
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+              </ConsoleCard>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }

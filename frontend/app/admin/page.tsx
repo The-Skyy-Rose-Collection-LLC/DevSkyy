@@ -1,501 +1,249 @@
-'use client';
-
-import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { connection } from 'next/server';
+import { TopBar } from '@/components/console/TopBar';
+import { ConsoleCard, ConsoleRow } from '@/components/console/Card';
+import { RevenueChart } from '@/components/console/RevenueChart';
+import { StatusPill } from '@/components/console/StatusPill';
+import { OverviewKpis } from '@/components/console/screens/OverviewKpis';
+import { AgentsListCard } from '@/components/console/screens/AgentsListCard';
+import { getOrders, getAdminProducts, type WcOrder, type WcAdminProduct } from '@/lib/wp/client';
+import { getCatalog } from '@/lib/catalog';
+import { getAdminSession } from '@/lib/require-admin-session';
+import { COLLECTION_ACCENT } from '@/lib/console/brand';
 import {
-  Zap,
-  Users,
-  Box,
-  Activity,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  ArrowRight,
-} from 'lucide-react';
-import { api, type ProviderStats, type PipelineStatus } from '@/lib/api';
-import { useQuery } from '@tanstack/react-query';
-import { ErrorState } from '@/components/shared';
-import { StatsCard, DashboardSkeleton } from '@/components/dashboard';
-import {
-  ProviderPerformanceChart,
-  CompetitionTrendChart,
-  AgentStatusChart,
-  PipelineMetricsChart,
-} from '@/components/dashboard/analytics-charts';
-import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
-import PulseAnalytics from '@/components/dashboard/pulse-analytics';
-import AuroraAnalytics from '@/components/dashboard/aurora-analytics';
-import { ConversionPulse } from '@/components/dashboard/conversion-pulse';
-import { PersonalizationAnalytics } from '@/components/dashboard/personalization-analytics';
+  buildSkuToCollectionMap,
+  latestOrderDate,
+  mapOrderStatus,
+  orderCollection,
+  orderCustomerName,
+  orderPieceSummary,
+  orderTotal,
+  revenueByCollection,
+  weeklyRevenueSeries,
+} from '@/lib/console/orders';
+import { formatCurrency, formatPercent } from '@/lib/console/format';
+import type { CollectionSlug } from '@/lib/collections';
 
-interface DashboardStats {
-  roundTable: {
-    totalCompetitions: number;
-    activeProviders: number;
-    topProvider: string;
-    avgLatency: number;
-  };
-  pipeline3d: PipelineStatus | null;
-  agents: {
-    total: number;
-    active: number;
-  };
+async function safeOrders(): Promise<WcOrder[]> {
+  // connection() must resolve before Date.now() — Cache Components treats
+  // the current time as request-bound data, not something a Server
+  // Component can read during static prerendering on its own.
+  await connection();
+  try {
+    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
+    return await getOrders({ after: sixtyDaysAgo, per_page: 100 });
+  } catch {
+    return [];
+  }
 }
 
-async function fetchDashboardData(): Promise<{
-  stats: DashboardStats;
-  providerStats: ProviderStats[];
-}> {
-  const [rtStats, pipelineStatus] = await Promise.all([
-    api.roundTable.getStats().catch(() => []),
-    api.pipeline3d.getStatus().catch(() => null),
-  ]);
-
-  const totalCompetitions = rtStats.reduce((sum, p) => sum + p.total_competitions, 0);
-  const topProvider =
-    rtStats.length > 0
-      ? rtStats.reduce((a, b) => (a.win_rate > b.win_rate ? a : b)).provider
-      : 'N/A';
-  const avgLatency =
-    rtStats.length > 0
-      ? Math.round(rtStats.reduce((sum, p) => sum + p.avg_latency_ms, 0) / rtStats.length)
-      : 0;
-
-  return {
-    stats: {
-      roundTable: {
-        totalCompetitions,
-        activeProviders: rtStats.length,
-        topProvider,
-        avgLatency,
-      },
-      pipeline3d: pipelineStatus,
-      agents: {
-        total: 54,
-        active: 6,
-      },
-    },
-    providerStats: rtStats,
-  };
+async function safeAdminProducts(): Promise<WcAdminProduct[]> {
+  try {
+    return await getAdminProducts();
+  } catch {
+    return [];
+  }
 }
 
-import { motion } from 'framer-motion';
+export default async function OverviewPage() {
+  const session = await getAdminSession();
+  const [orders, adminProducts] = session
+    ? await Promise.all([safeOrders(), safeAdminProducts()])
+    : [[], []];
+  const catalog = getCatalog();
+  const skuToCollection = buildSkuToCollectionMap(catalog);
+  const referenceDate = latestOrderDate(orders);
+  const wired = orders.length > 0 || adminProducts.length > 0;
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+  const currentWeekly = weeklyRevenueSeries(orders, 5, 0);
+  const priorWeekly = weeklyRevenueSeries(orders, 5, 5);
+  const revTotal = currentWeekly.reduce((a, b) => a + b, 0);
 
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
-};
+  const collectionRevenue = revenueByCollection(orders, skuToCollection);
+  const catalogCollections = new Set(catalog.map((p) => p.collection));
 
-export default function AdminDashboard() {
-  const { data, isLoading: loading, error, refetch } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: fetchDashboardData,
-    refetchInterval: 30000,
-  });
+  const inventory = adminProducts
+    .filter((p) => p.manage_stock)
+    .map((p) => {
+      const catalogEntry = catalog.find((c) => c.sku === p.sku);
+      const collectionLabel = catalogEntry?.collection ?? '—';
+      if (p.stock_status === 'outofstock') return { name: p.name, collectionLabel, flag: 'Out of stock', ...danger() };
+      if (typeof p.stock_quantity === 'number' && p.stock_quantity <= 5) {
+        return { name: p.name, collectionLabel, flag: `${p.stock_quantity} left`, ...warning() };
+      }
+      return { name: p.name, collectionLabel, flag: 'Healthy', ...idle() };
+    })
+    .filter((i) => i.flag !== 'Healthy')
+    .slice(0, 4);
 
-  if (loading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <ErrorState
-        title="Error Loading Dashboard"
-        message={error.message}
-        onRetry={refetch}
-        fullPage
-      />
-    );
-  }
-
-  const { stats, providerStats } = data!;
+  const recentOrders = [...orders]
+    .filter((o) => o.status !== 'trash')
+    .sort((a, b) => (b.date_created as string).localeCompare(a.date_created as string))
+    .slice(0, 5);
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-8"
-    >
-      {/* Header */}
-      <motion.header variants={itemVariants} className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            DevSkyy <span className="gradient-text-vibrant">Dashboard</span>
-          </h1>
-          <p className="text-gray-400 mt-2 text-lg font-medium">Enterprise AI Platform Overview</p>
-        </div>
-        <Badge variant="outline" className="border-green-500/50 bg-green-500/5 text-green-400 backdrop-blur-sm px-4 py-1">
-          <Activity className="h-3 w-3 mr-2 animate-pulse" aria-hidden="true" />
-          All Systems Operational
-        </Badge>
-      </motion.header>
+    <>
+      <TopBar title="Overview" />
+      <div className="px-9 py-8 max-w-[1320px]">
+        {!wired && (
+          <ConsoleCard className="p-5 mb-6">
+            <span className="font-mono text-[11px] text-[#E5A85C]">
+              WooCommerce isn&apos;t returning data yet — wire credentials on the Settings screen. Figures below are empty until then.
+            </span>
+          </ConsoleCard>
+        )}
 
-      {/* Stats Grid */}
-      <motion.section variants={itemVariants} aria-label="Platform Statistics">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="LLM Competitions"
-            value={stats.roundTable.totalCompetitions}
-            description="Total round table competitions"
-            icon={Zap}
-            trend="+12% from last week"
-            trendDirection="up"
-          />
-          <StatsCard
-            title="Active Agents"
-            value={`${stats.agents.active}/${stats.agents.total}`}
-            description="SuperAgents online"
-            icon={Users}
-            trend="6 ready for deployment"
-            trendDirection="neutral"
-          />
-          <StatsCard
-            title="3D Jobs"
-            value={stats.pipeline3d?.active_jobs || 0}
-            description={`${stats.pipeline3d?.queued_jobs || 0} queued`}
-            icon={Box}
-            trend={`${stats.pipeline3d?.providers_online || 0} providers online`}
-            trendDirection="up"
-          />
-          <StatsCard
-            title="Avg Latency"
-            value={`${stats.roundTable.avgLatency}ms`}
-            description="LLM response time"
-            icon={Clock}
-            trend="Within SLA targets"
-            trendDirection="up"
-          />
-        </div>
-      </motion.section>
+        <OverviewKpis orders={orders} referenceDate={referenceDate.toISOString()} />
 
-      {/* Provider & Pipeline Status */}
-      <motion.section variants={itemVariants} aria-label="Provider and Pipeline Status">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <ProviderRankingsCard providerStats={providerStats} />
-          <PipelineStatusCard status={stats.pipeline3d} />
-        </div>
-      </motion.section>
-
-      {/* Analytics Charts */}
-      <motion.section variants={itemVariants} aria-label="Analytics Charts">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <ProviderPerformanceChart stats={providerStats} />
-          <CompetitionTrendChart data={[]} />
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-2 mt-8">
-          <AgentStatusChart
-            active={stats.agents.active}
-            idle={42}
-            offline={6}
-          />
-          <PipelineMetricsChart
-            providers={stats.pipeline3d?.providers_online || 8}
-            activeJobs={stats.pipeline3d?.active_jobs || 0}
-            queuedJobs={stats.pipeline3d?.queued_jobs || 0}
-            completedToday={12}
-          />
-        </div>
-      </motion.section>
-
-      {/* 3D Product Showcase */}
-      <motion.section variants={itemVariants} aria-label="3D Product Showcase">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <div className="grid grid-cols-[1.55fr_1fr] gap-[18px] mb-[22px]">
+          <ConsoleCard className="p-6">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <CardTitle className="text-white font-display text-2xl luxury-text-gradient">
-                  3D Product Showcase
-                </CardTitle>
-                <CardDescription className="text-gray-400 mt-2">
-                  Luxury product visualization powered by React Three Fiber
-                </CardDescription>
-              </div>
-              <Link href="/admin/3d-pipeline">
-                <Button variant="outline" className="border-gray-700">
-                  <Box className="mr-2 h-4 w-4" />
-                  View Pipeline
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* 3D Viewer */}
-              <div className="h-[600px]">
-                <div className="relative w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-lg overflow-hidden flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <Box className="h-24 w-24 text-rose-400 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-2xl font-display text-white mb-2">
-                      3D Viewer Ready
-                    </h3>
-                    <p className="text-gray-400 mb-4">
-                      Upload a GLB model to /public/models/ to preview
-                    </p>
-                    <div className="text-sm text-gray-500 font-mono bg-gray-800/50 px-4 py-2 rounded inline-block">
-                      LuxuryProductViewer Component Active
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="flex flex-col justify-center space-y-6">
-                <div>
-                  <h3 className="text-2xl font-display text-white mb-2">
-                    Advanced 3D Rendering
-                  </h3>
-                  <p className="text-gray-400 mb-4">
-                    High-fidelity product visualization with real-time lighting,
-                    shadows, and post-processing effects.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">PBR Material Rendering</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">Real-time Shadows & Reflections</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">Bloom & Tone Mapping Effects</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">AR-Ready GLB Export</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">Luxury Rose Gold Lighting</span>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-2xl font-bold text-rose-400">8</p>
-                      <p className="text-xs text-gray-400 mt-1">3D Providers</p>
-                    </div>
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-2xl font-bold text-rose-400">1,240</p>
-                      <p className="text-xs text-gray-400 mt-1">Models Generated</p>
-                    </div>
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-2xl font-bold text-rose-400">99.2%</p>
-                      <p className="text-xs text-gray-400 mt-1">Success Rate</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Link href="/admin/3d-pipeline">
-                  <Button className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700">
-                    <Box className="mr-2 h-4 w-4" />
-                    Launch 3D Pipeline
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.section>
-
-      {/* The Pulse — Real-Time Social Proof & Urgency Engine */}
-      <motion.section variants={itemVariants} aria-label="The Pulse Analytics">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <PulseAnalytics />
-          <AuroraAnalytics />
-        </div>
-      </motion.section>
-
-      {/* Conversion Pulse — Live Sales Feed */}
-      <motion.section variants={itemVariants} aria-label="Conversion Pulse Live Feed">
-        <ConversionPulse />
-      </motion.section>
-
-      {/* Adaptive Personalization Engine — Behavioral Analytics */}
-      <motion.section variants={itemVariants} aria-label="Adaptive Personalization Analytics">
-        <PersonalizationAnalytics />
-      </motion.section>
-
-      {/* Quick Actions */}
-      <motion.section variants={itemVariants} aria-label="Quick Actions">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-white">Quick Actions</CardTitle>
-            <CardDescription className="text-gray-400">
-              Common platform operations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Link href="/admin/round-table">
-                <Button className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700">
-                  <Zap className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Run Competition
-                </Button>
-              </Link>
-              <Link href="/admin/3d-pipeline">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                >
-                  <Box className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Generate 3D Model
-                </Button>
-              </Link>
-              <Link href="/admin/agents">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                >
-                  <Users className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Manage Agents
-                </Button>
-              </Link>
-              <Link href="/admin/assets">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                >
-                  <Activity className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Asset Library
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.section>
-    </motion.div>
-  );
-}
-
-// Sub-components for better organization
-function ProviderRankingsCard({ providerStats }: { providerStats: ProviderStats[] }) {
-  return (
-    <Card className="bg-gray-900 border-gray-800">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-white">LLM Provider Rankings</CardTitle>
-          <CardDescription className="text-gray-400">
-            Win rates from Round Table competitions
-          </CardDescription>
-        </div>
-        <Link href="/admin/round-table">
-          <Button variant="ghost" size="sm" className="text-rose-400 hover:text-rose-300">
-            View All <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4" role="list" aria-label="Provider rankings">
-          {providerStats.slice(0, 5).map((stat, index) => (
-            <div key={stat.provider} className="flex items-center gap-4" role="listitem">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-sm font-medium text-gray-400"
-                aria-label={`Rank ${index + 1}`}
-              >
-                {index + 1}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-white">{stat.provider}</span>
-                  <span className="text-sm text-gray-400">
-                    {(stat.win_rate * 100).toFixed(1)}% win rate
-                  </span>
-                </div>
-                <div
-                  className="h-2 rounded-full bg-gray-800"
-                  role="progressbar"
-                  aria-valuenow={stat.win_rate * 100}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
-                  <div
-                    className="h-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-400"
-                    style={{ width: `${stat.win_rate * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-          {providerStats.length === 0 && (
-            <p className="text-center text-gray-500 py-4">
-              No competition data yet. Run your first Round Table!
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function PipelineStatusCard({ status }: { status: PipelineStatus | null }) {
-  return (
-    <Card className="bg-gray-900 border-gray-800">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-white">3D Pipeline Status</CardTitle>
-          <CardDescription className="text-gray-400">
-            Generation providers and job queue
-          </CardDescription>
-        </div>
-        <Link href="/admin/3d-pipeline">
-          <Button variant="ghost" size="sm" className="text-rose-400 hover:text-rose-300">
-            View All <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-lg bg-gray-800 p-4">
-              <div className="text-2xl font-bold text-white">
-                {status?.providers_online || 0}
-              </div>
-              <div className="text-sm text-gray-400">Providers Online</div>
-            </div>
-            <div className="rounded-lg bg-gray-800 p-4">
-              <div className="text-2xl font-bold text-white">
-                {status?.queued_jobs || 0}
-              </div>
-              <div className="text-sm text-gray-400">Jobs Queued</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {status?.status === 'healthy' ? (
-              <>
-                <CheckCircle2 className="h-5 w-5 text-green-500" aria-hidden="true" />
-                <span className="text-green-400">Pipeline Healthy</span>
-              </>
-            ) : (
-              <>
-                <AlertCircle className="h-5 w-5 text-yellow-500" aria-hidden="true" />
-                <span className="text-yellow-400">
-                  Pipeline {status?.status || 'Unknown'}
+                <span className="font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: 'var(--acc)' }}>
+                  Revenue
                 </span>
-              </>
-            )}
-          </div>
+                <div className="text-[28px] font-semibold text-white mt-2" style={{ fontFamily: 'var(--font-barlow)' }}>
+                  {formatCurrency(revTotal)}
+                </div>
+              </div>
+              <div className="flex gap-[18px] font-mono text-[10px] tracking-[0.1em] text-[#A0A0A0] uppercase">
+                <span className="flex items-center gap-[7px]">
+                  <span className="w-[9px] h-[2px]" style={{ background: 'var(--acc)' }} /> This period
+                </span>
+                <span className="flex items-center gap-[7px]">
+                  <span className="w-[9px] h-[2px] bg-[#3A3A42]" /> Prior
+                </span>
+              </div>
+            </div>
+            <RevenueChart
+              current={currentWeekly}
+              prior={priorWeekly}
+              labels={['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Now']}
+              gradientId="dshFillOverview"
+            />
+          </ConsoleCard>
+
+          <AgentsListCard />
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="grid grid-cols-[1.55fr_1fr] gap-[18px] mb-[22px]">
+          <ConsoleCard className="p-6">
+            <span className="font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: 'var(--acc)' }}>
+              Collection Performance
+            </span>
+            <div className="flex flex-col gap-5 mt-[22px]">
+              {collectionRevenue.length === 0 && (
+                <div className="font-mono text-[10px] text-[#7A7A82]">No attributed orders in the last 60 days.</div>
+              )}
+              {collectionRevenue.map((c) => {
+                const accent = COLLECTION_ACCENT[c.slug as CollectionSlug] ?? '#8A8A92';
+                const label = catalogCollections.has(c.slug) ? c.slug.replace('-', ' ') : c.slug;
+                return (
+                  <div key={c.slug}>
+                    <div className="flex justify-between items-baseline mb-[9px]">
+                      <span
+                        className="text-[13px] tracking-[0.12em] uppercase text-[#E0E0E0]"
+                        style={{ fontFamily: 'var(--font-cinzel)' }}
+                      >
+                        {label}
+                      </span>
+                      <span className="text-[13px] text-[#A0A0A0]" style={{ fontFamily: 'var(--font-barlow)' }}>
+                        {formatCurrency(c.revenue)} · {formatPercent(c.share)}
+                      </span>
+                    </div>
+                    <div className="h-[7px] rounded-full overflow-hidden bg-[#1A1A20]">
+                      <div className="h-full rounded-full" style={{ width: formatPercent(c.share), background: accent }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ConsoleCard>
+
+          <ConsoleCard className="p-6">
+            <span className="font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: 'var(--acc)' }}>
+              Inventory Signals
+            </span>
+            <div className="flex flex-col gap-0.5 mt-3.5">
+              {inventory.length === 0 && (
+                <div className="font-mono text-[10px] text-[#7A7A82] py-2">No low-stock or out-of-stock signals.</div>
+              )}
+              {inventory.map((item, i) => (
+                <ConsoleRow key={`${item.name}-${i}`} className="flex items-center gap-3 px-1.5 py-[11px]">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] text-[#E0E0E0] truncate">{item.name}</div>
+                    <div className="font-mono text-[9.5px] tracking-[0.12em] text-[#7A7A82] uppercase mt-0.5">
+                      {item.collectionLabel}
+                    </div>
+                  </div>
+                  <StatusPill label={item.flag} bg={item.bg} color={item.color} className="flex-none" />
+                </ConsoleRow>
+              ))}
+            </div>
+          </ConsoleCard>
+        </div>
+
+        <ConsoleCard className="p-6">
+          <div className="flex justify-between items-center mb-1.5">
+            <span className="font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: 'var(--acc)' }}>
+              Recent Orders
+            </span>
+            <a href="/admin/orders" className="font-mono text-[10px] tracking-[0.14em] text-[#A0A0A0] uppercase cursor-pointer">
+              View all
+            </a>
+          </div>
+          <div
+            className="grid gap-3 px-2 py-3.5 border-b border-white/[0.08] font-mono text-[9.5px] tracking-[0.14em] text-[#7A7A82] uppercase"
+            style={{ gridTemplateColumns: '120px 1.4fr 1.6fr 1fr 100px 120px' }}
+          >
+            <span>Order</span>
+            <span>Customer</span>
+            <span>Piece</span>
+            <span>Collection</span>
+            <span className="text-right">Total</span>
+            <span className="text-right">Status</span>
+          </div>
+          {recentOrders.length === 0 && (
+            <div className="font-mono text-[10px] text-[#7A7A82] py-4">No orders in the last 60 days.</div>
+          )}
+          {recentOrders.map((order) => {
+            const status = mapOrderStatus(order.status);
+            return (
+              <ConsoleRow
+                key={order.id}
+                className="grid gap-3 px-2 py-[15px] border-b border-white/[0.04] items-center"
+                style={{ gridTemplateColumns: '120px 1.4fr 1.6fr 1fr 100px 120px' }}
+              >
+                <span className="font-mono text-[11.5px] tracking-[0.04em]" style={{ color: 'var(--acc)' }}>
+                  #{(order.number as string) ?? order.id}
+                </span>
+                <span className="text-[13.5px] text-[#E0E0E0]">{orderCustomerName(order)}</span>
+                <span className="italic text-[14px] text-[#C8C8C8]" style={{ fontFamily: 'var(--font-playfair)' }}>
+                  {orderPieceSummary(order)}
+                </span>
+                <span className="font-mono text-[10px] tracking-[0.1em] text-[#9A9AA2] uppercase">
+                  {orderCollection(order, skuToCollection)}
+                </span>
+                <span className="text-[14px] text-white text-right font-medium" style={{ fontFamily: 'var(--font-barlow)' }}>
+                  {formatCurrency(orderTotal(order))}
+                </span>
+                <span className="text-right">
+                  <StatusPill label={status.label} bg={status.bg} color={status.color} />
+                </span>
+              </ConsoleRow>
+            );
+          })}
+        </ConsoleCard>
+      </div>
+    </>
   );
+}
+
+function danger() {
+  return { bg: 'rgba(220,20,60,.12)', color: '#DC143C' };
+}
+function warning() {
+  return { bg: 'rgba(229,168,92,.12)', color: '#E5A85C' };
+}
+function idle() {
+  return { bg: 'rgba(255,255,255,.05)', color: '#8A8A92' };
 }

@@ -136,6 +136,16 @@ export interface WcOrder {
   [key: string]: unknown;
 }
 
+export interface WcCustomer {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  billing?: { city?: string; state?: string; [key: string]: unknown };
+  is_paying_customer?: boolean;
+  [key: string]: unknown;
+}
+
 export interface SkyyRoseCollection {
   slug?: string;
   label?: string;
@@ -177,6 +187,27 @@ export async function getProducts(opts: { category?: string; page?: number } = {
   return { products, total };
 }
 
+export interface WcAdminProduct {
+  id: number;
+  sku: string;
+  name: string;
+  price: string;
+  stock_quantity: number | null;
+  stock_status: 'instock' | 'outofstock' | 'onbackorder';
+  manage_stock: boolean;
+  images: { src: string }[];
+  [key: string]: unknown;
+}
+
+/** Admin-authed product read via the classic `/wc/v3/products` resource
+ *  (unlike `getProducts()`, which reads the public Store API and lacks
+ *  `stock_quantity`/`stock_status`) — used where the console needs real
+ *  inventory numbers, not just storefront-visible availability. */
+export async function getAdminProducts(opts: { per_page?: number; page?: number } = {}): Promise<WcAdminProduct[]> {
+  const params = new URLSearchParams({ per_page: String(opts.per_page ?? 100), page: String(opts.page ?? 1) });
+  return wpRequest<WcAdminProduct[]>(`/wc/v3/products?${params.toString()}`);
+}
+
 export async function getStock(sku: string): Promise<unknown> {
   return wpRequest(`/skyyrose/v1/stock/${encodeURIComponent(sku)}`);
 }
@@ -185,11 +216,24 @@ export async function get3DProducts(category: string): Promise<unknown[]> {
   return wpRequest<unknown[]>(`/skyyrose/v1/products/3d/${encodeURIComponent(category)}`);
 }
 
-export async function getOrders(opts: { status?: string } = {}): Promise<WcOrder[]> {
-  const params = new URLSearchParams();
-  if (opts.status) params.set('status', opts.status);
-  const qs = params.toString();
-  return wpRequest<WcOrder[]>(`/wc/v3/orders${qs ? `?${qs}` : ''}`);
+export async function getOrders(
+  opts: { status?: string; after?: string; before?: string; per_page?: number; page?: number } = {}
+): Promise<WcOrder[]> {
+  const params = new URLSearchParams({ status: opts.status ?? 'any', per_page: String(opts.per_page ?? 100) });
+  if (opts.after) params.set('after', opts.after);
+  if (opts.before) params.set('before', opts.before);
+  if (opts.page) params.set('page', String(opts.page));
+  return wpRequest<WcOrder[]>(`/wc/v3/orders?${params.toString()}`);
+}
+
+export async function getCustomers(opts: { page?: number; per_page?: number } = {}): Promise<WcCustomer[]> {
+  const params = new URLSearchParams({
+    per_page: String(opts.per_page ?? 50),
+    page: String(opts.page ?? 1),
+    orderby: 'registered_date',
+    order: 'desc',
+  });
+  return wpRequest<WcCustomer[]>(`/wc/v3/customers?${params.toString()}`);
 }
 
 export async function updateOrder(id: number, patch: Record<string, unknown>): Promise<WcOrder> {
