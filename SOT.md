@@ -52,6 +52,8 @@
 | **Agent suite** | `skyyrose-suite/.claude-plugin/marketplace.json` | 5 plugins — `skyyrose` (orchestrator) + `-core` / `-design` / `-market` / `-qa`; skills auto-discover from each plugin's `skills/` dir | `claude plugin marketplace add ./skyyrose-suite` · hardening set documented in `skyyrose-suite/HARDENING.md` |
 | **Docs** | current: `README.md`, `CLAUDE.md`, `SOT.md`, `CHANGELOG.md`, `docs/` | — | historical: `docs/archive/`, `tasks/` (read-only context, never config) |
 
+Env split is part of source truth too: `.env` / `.env.example` own app runtime secrets and service URLs; `.env.wordpress` / `.env.wordpress.example` own WordPress transport, SSH/SFTP, and deploy bridge access. Keep both sides in sync with their matching example file, but never copy real secret values into docs.
+
 ## Picking the right verification
 
 The check must match the *kind* of claim (full matrix in `CLAUDE.md` → "Verification Protocol"):
