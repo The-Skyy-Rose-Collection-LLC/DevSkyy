@@ -128,4 +128,26 @@ if ( file_exists( $skyyrose_fcro_dir . '/' . $skyyrose_fcro_file ) ) {
 		</p>
 	</div>
 </section>
+
+<!-- Marketplace Flow -->
+<section class="ft-cro-market rv-clip-up" aria-label="<?php esc_attr_e( 'Marketplace flow', 'skyyrose' ); ?>">
+	<div class="ft-cro__container">
+		<div class="ft-cro-market__shell">
+			<div class="ft-cro-market__lead">
+				<p class="ft-cro-market__eyebrow"><?php esc_html_e( 'Marketplace Flow', 'skyyrose' ); ?></p>
+				<h2 class="ft-cro-market__title"><?php esc_html_e( 'Browse, save, fit, then buy without dead ends.', 'skyyrose' ); ?></h2>
+				<p class="ft-cro-market__text"><?php esc_html_e( 'Every page should point to next useful move: shop, wishlist, size, shipping, or support.', 'skyyrose' ); ?></p>
+			</div>
+			<nav class="ft-cro-market__nav" aria-label="<?php esc_attr_e( 'Marketplace quick links', 'skyyrose' ); ?>">
+				<?php $ft_cro_market_links = function_exists( 'skyyrose_get_marketplace_navigation_items' ) ? skyyrose_get_marketplace_navigation_items() : array(); ?>
+				<?php foreach ( $ft_cro_market_links as $item ) : ?>
+					<a class="ft-cro-market__link" href="<?php echo esc_url( home_url( $item['url'] ) ); ?>">
+						<span><?php echo esc_html( $item['title'] ); ?></span>
+						<small><?php esc_html_e( 'Open', 'skyyrose' ); ?></small>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+		</div>
+	</div>
+</section>
 <?php // FAQ accordion behavior lives in assets/js/footer-cro.js (enqueued globally via inc/enqueue.php). ?>

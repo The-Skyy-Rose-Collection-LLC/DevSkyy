@@ -140,8 +140,54 @@ function skyyrose_get_primary_navigation_items() {
 			'url'   => '/pre-order/',
 		),
 		array(
+			'title' => __( 'Size Guide', 'skyyrose' ),
+			'url'   => '/size-guide/',
+		),
+		array(
 			'title' => __( 'Our Story', 'skyyrose' ),
 			'url'   => '/about/',
+		),
+		array(
+			'title' => __( 'Contact', 'skyyrose' ),
+			'url'   => '/contact/',
+		),
+		array(
+			'title' => __( 'Wishlist', 'skyyrose' ),
+			'url'   => '/wishlist/',
+		),
+	);
+}
+
+/**
+ * Quick marketplace navigation used in site-wide footer and page upgrades.
+ *
+ * Keeps high-value routes visible on every page, independent of assigned
+ * WordPress menu state.
+ *
+ * @since 7.2.0
+ * @return array<int,array<string,string>>
+ */
+function skyyrose_get_marketplace_navigation_items() {
+	return array(
+		array(
+			'title' => __( 'Shop All', 'skyyrose' ),
+			'url'   => '/shop/',
+		),
+		array(
+			'title' => __( 'Collections World', 'skyyrose' ),
+			'url'   => '/collections-world/',
+		),
+		array(
+			'title' => __( 'Wishlist', 'skyyrose' ),
+			'url'   => '/wishlist/',
+		),
+		array(
+			'title' => __( 'Size Guide', 'skyyrose' ),
+			'url'   => '/size-guide/',
+		),
+		array(
+			'title' => __( 'Shipping & Returns', 'skyyrose' ),
+			'url'   => '/shipping-returns/',
 		),
 		array(
 			'title' => __( 'Contact', 'skyyrose' ),

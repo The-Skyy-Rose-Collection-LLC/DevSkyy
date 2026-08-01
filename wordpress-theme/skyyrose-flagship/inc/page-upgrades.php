@@ -59,6 +59,22 @@ function skyyrose_page_upgrade_context() {
 		$context['primary_url']     = home_url( '/shipping-returns/' );
 		$context['secondary_label'] = __( 'Contact Support', 'skyyrose' );
 		$context['secondary_url']   = home_url( '/contact/' );
+	} elseif ( is_page( 'wishlist' ) ) {
+		$context['eyebrow']         = __( 'Saved Pieces', 'skyyrose' );
+		$context['title']           = __( 'Build the cart with intent.', 'skyyrose' );
+		$context['body']            = __( 'Wishlist should shorten decision time, not stall it. Keep browsing or move to the shop.', 'skyyrose' );
+		$context['primary_label']   = __( 'Shop All Pieces', 'skyyrose' );
+		$context['primary_url']     = home_url( '/shop/' );
+		$context['secondary_label'] = __( 'Size Guide', 'skyyrose' );
+		$context['secondary_url']   = home_url( '/size-guide/' );
+	} elseif ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() ) ) {
+		$context['eyebrow']         = __( 'Marketplace Flow', 'skyyrose' );
+		$context['title']           = __( 'Browse. Save. Fit. Buy.', 'skyyrose' );
+		$context['body']            = __( 'Use the shop archive like a buying room: compare pieces, check fit, and keep support one tap away.', 'skyyrose' );
+		$context['primary_label']   = __( 'Open Wishlist', 'skyyrose' );
+		$context['primary_url']     = home_url( '/wishlist/' );
+		$context['secondary_label'] = __( 'Size Guide', 'skyyrose' );
+		$context['secondary_url']   = home_url( '/size-guide/' );
 	} elseif ( is_search() || is_404() ) {
 		$context['eyebrow']         = __( 'Find Your Way Back', 'skyyrose' );
 		$context['title']           = __( 'The piece moved. The story did not.', 'skyyrose' );
@@ -158,9 +174,9 @@ function skyyrose_render_page_upgrades() {
 		</ul>
 		<nav class="sr-upgrades__discover" aria-label="<?php esc_attr_e( 'Continue exploring', 'skyyrose' ); ?>">
 			<span><?php esc_html_e( 'Continue exploring', 'skyyrose' ); ?></span>
-			<a href="<?php echo esc_url( home_url( '/collections/' ) ); ?>"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></a>
-			<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
-			<a href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>"><?php esc_html_e( 'Fit Guide', 'skyyrose' ); ?></a>
+			<?php foreach ( skyyrose_get_marketplace_navigation_items() as $item ) : ?>
+				<a href="<?php echo esc_url( home_url( $item['url'] ) ); ?>"><?php echo esc_html( $item['title'] ); ?></a>
+			<?php endforeach; ?>
 		</nav>
 	</aside>
 	<?php

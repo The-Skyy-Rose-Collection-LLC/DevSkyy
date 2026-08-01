@@ -37,7 +37,7 @@
 .sr-upgrades__eyebrow {
 	margin: 0;
 	color: #b76e79;
-	font: 600 0.72rem/1.2 "Space Mono", monospace;
+	font: 600 0.72rem/1.2 var(--font-heading, var(--skyyrose-font-display));
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 }
@@ -45,7 +45,7 @@
 .sr-upgrades h2 {
 	max-width: 16ch;
 	margin: 0;
-	font: 500 clamp(2.5rem, 5vw, 5.5rem)/0.95 "Cormorant Garamond", Georgia, serif;
+	font: 500 clamp(2.5rem, 5vw, 5.5rem)/0.95 var(--font-heading, var(--skyyrose-font-display));
 	letter-spacing: -0.035em;
 }
 
@@ -73,7 +73,7 @@
 	min-height: 3.25rem;
 	padding: 0.8rem 1.4rem;
 	border: 1px solid #b76e79;
-	font: 600 0.75rem/1 "Space Mono", monospace;
+	font: 600 0.75rem/1 var(--font-body, var(--skyyrose-font-body));
 	letter-spacing: 0.08em;
 	text-decoration: none;
 	text-transform: uppercase;
@@ -126,7 +126,7 @@
 }
 
 .sr-upgrades__proof strong {
-	font: 600 0.78rem/1.2 "Space Mono", monospace;
+	font: 600 0.78rem/1.2 var(--font-body, var(--skyyrose-font-body));
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
 }
@@ -144,7 +144,7 @@
 	max-width: 90rem;
 	margin: 0 auto;
 	padding: 1.4rem clamp(1.25rem, 5vw, 5rem);
-	font: 600 0.72rem/1.2 "Space Mono", monospace;
+	font: 600 0.72rem/1.2 var(--font-body, var(--skyyrose-font-body));
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }

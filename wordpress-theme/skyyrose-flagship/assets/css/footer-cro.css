@@ -210,10 +210,96 @@
 	color: rgba(255, 255, 255, 0.55);
 }
 
+/* ═══ Marketplace Flow ═══ */
+.ft-cro-market {
+	padding: 0 5% 4rem;
+}
+
+.ft-cro-market__shell {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+	gap: 1.5rem;
+	padding: 1.6rem;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.ft-cro-market__lead {
+	max-width: 42rem;
+}
+
+.ft-cro-market__eyebrow {
+	margin: 0 0 0.5rem;
+	color: var(--color-gold, #D4AF37);
+	font-family: var(--skyyrose-font-display);
+	font-size: 0.72rem;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	text-transform: uppercase;
+}
+
+.ft-cro-market__title {
+	margin: 0;
+	font-family: var(--font-heading, var(--skyyrose-font-display));
+	font-size: clamp(1.6rem, 2vw, 2.6rem);
+	line-height: 1.05;
+	letter-spacing: -0.03em;
+}
+
+.ft-cro-market__text {
+	margin: 0.85rem 0 0;
+	max-width: 34rem;
+	color: rgba(255, 255, 255, 0.66);
+	line-height: 1.6;
+}
+
+.ft-cro-market__nav {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	align-content: start;
+}
+
+.ft-cro-market__link {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	min-height: 3.5rem;
+	padding: 0.95rem 1rem;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.02);
+	color: rgba(255, 255, 255, 0.86);
+	text-decoration: none;
+	transition: border-color var(--motion-duration, 0.3s) ease, transform var(--motion-duration, 0.3s) ease, background-color var(--motion-duration, 0.3s) ease;
+}
+
+.ft-cro-market__link span {
+	font-size: 0.82rem;
+	font-weight: 600;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	text-transform: uppercase;
+}
+
+.ft-cro-market__link small {
+	color: rgba(255, 255, 255, 0.45);
+	font-size: 0.7rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.ft-cro-market__link:hover,
+.ft-cro-market__link:focus-visible {
+	border-color: rgba(212, 175, 55, 0.28);
+	background: rgba(255, 255, 255, 0.04);
+	transform: translateY(-1px);
+}
+
 /* ═══ Responsive ═══ */
 @media (max-width: 768px) {
 	.ft-cro-reviews__grid { grid-template-columns: 1fr; }
 	.ft-cro-craft__grid   { grid-template-columns: repeat(2, 1fr); }
+	.ft-cro-market__shell { grid-template-columns: 1fr; }
+	.ft-cro-market__nav   { grid-template-columns: 1fr; }
 	.ft-cro-banner p {
 		font-size: 1rem;
 		letter-spacing: var(--tracking-wider, 0.1em);
