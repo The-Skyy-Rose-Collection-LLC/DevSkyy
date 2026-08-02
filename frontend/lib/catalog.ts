@@ -40,6 +40,12 @@ const CANONICAL_CSV_RELATIVE = path.join(
   'skyyrose-catalog.csv'
 );
 
+// Vercel builds this app with `frontend/` as its root directory, so it cannot
+// trace the WordPress SOT from the monorepo parent into a serverless function.
+// This file is an exact deployment replica, generated from the canonical SOT;
+// local and CI reads always prefer the canonical source above.
+const DEPLOYMENT_CSV_RELATIVE = path.join('data', 'skyyrose-catalog.csv');
+
 /**
  * Resolve a repo-relative file by walking up from cwd until it is found.
  * Shared by the catalog reader, the catalog writer, and the SOT-image reader
@@ -60,7 +66,13 @@ export function resolveRepoFile(relative: string): string {
 }
 
 export function resolveCsvPath(): string {
-  return resolveRepoFile(CANONICAL_CSV_RELATIVE);
+  try {
+    return resolveRepoFile(CANONICAL_CSV_RELATIVE);
+  } catch (canonicalError) {
+    const deployed = path.join(process.cwd(), DEPLOYMENT_CSV_RELATIVE);
+    if (fs.existsSync(deployed)) return deployed;
+    throw canonicalError;
+  }
 }
 
 function parseCsv(text: string): CatalogProduct[] {

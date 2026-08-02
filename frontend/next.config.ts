@@ -15,6 +15,18 @@ const tracingRoot = isVercel ? undefined : path.resolve(__dirname, '..')
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/admin',
+        permanent: false,
+      },
+    ]
+  },
+  outputFileTracingIncludes: {
+    '/*': ['./data/skyyrose-catalog.csv'],
+  },
   ...(tracingRoot && { outputFileTracingRoot: tracingRoot }),
   ...(tracingRoot && { turbopack: { root: tracingRoot } }),
   images: {
