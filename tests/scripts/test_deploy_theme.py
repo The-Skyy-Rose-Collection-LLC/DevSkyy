@@ -337,6 +337,36 @@ class TestCacheFlush:
         assert transfer_pos < cache_pos
 
 
+def _defs_only_script() -> str:
+    """scripts/deploy-theme.sh with the trailing `main "$@"` call stripped, so
+    sourcing it only defines functions/arrays and never executes a deploy."""
+    lines = SCRIPT_PATH.read_text().splitlines()
+    while lines and not lines[-1].strip():
+        lines.pop()
+    assert lines[-1].strip() == 'main "$@"', f"expected trailing main call, got: {lines[-1]!r}"
+    return "\n".join(lines[:-1]) + "\n"
+
+
+def _rendered_excludes() -> tuple[list[str], list[str]]:
+    """The actual RSYNC_EXCLUDES / tar_excludes arrays as built at runtime --
+    not a static grep of the source text, which breaks the moment the exclude
+    lists move from literal arrays to any data-driven construction (as they
+    did in the 2026-08-02 dedup refactor; see SKYY_EXCLUDE_COMMON_* +
+    skyyrose_render_rsync_excludes/skyyrose_render_tar_excludes)."""
+    script = (
+        _defs_only_script()
+        + '\nprintf "RSYNC:%s\\n" "${RSYNC_EXCLUDES[@]}"\n'
+        + 'skyyrose_render_tar_excludes | sed "s/^/TAR:/"\n'
+    )
+    result = subprocess.run(
+        ["bash", "-c", script], capture_output=True, text=True, timeout=15, check=True
+    )
+    lines = result.stdout.splitlines()
+    rsync_excludes = [line[len("RSYNC:") :] for line in lines if line.startswith("RSYNC:")]
+    tar_excludes = [line[len("TAR:") :] for line in lines if line.startswith("TAR:")]
+    return rsync_excludes, tar_excludes
+
+
 class TestExcludes:
     """Test 7: Rsync exclude list covers critical patterns."""
 
@@ -345,8 +375,9 @@ class TestExcludes:
         assert "node_modules" in source
 
     def test_excludes_git(self):
-        source = SCRIPT_PATH.read_text()
-        assert re.search(r"--exclude=['\"]?\.git['\"]?", source)
+        rsync_excludes, tar_excludes = _rendered_excludes()
+        assert "--exclude=.git" in rsync_excludes
+        assert "--exclude=.git" in tar_excludes
 
     def test_excludes_env_files(self):
         source = SCRIPT_PATH.read_text()
@@ -357,8 +388,9 @@ class TestExcludes:
         assert "*.map" in source
 
     def test_excludes_tests(self):
-        source = SCRIPT_PATH.read_text()
-        assert re.search(r"--exclude=['\"]?tests/?['\"]?", source)
+        rsync_excludes, tar_excludes = _rendered_excludes()
+        assert "--exclude=tests/" in rsync_excludes
+        assert "--exclude=tests" in tar_excludes
 
     def test_excludes_package_json(self):
         source = SCRIPT_PATH.read_text()

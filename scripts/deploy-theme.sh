@@ -310,18 +310,13 @@ wp_remote() {
 #     without its tracked signature emblem -> live 404)
 # Emergency override: PREFLIGHT_SKIP_COMPLETENESS=1 (logged loudly).
 # ---------------------------------------------------------------------------
-preflight_completeness() {
-    if [[ "${PREFLIGHT_SKIP_COMPLETENESS:-0}" == "1" ]]; then
-        log_warn "Source-completeness gate SKIPPED (PREFLIGHT_SKIP_COMPLETENESS=1) -- deploying an UNVERIFIED tree"
-        return 0
-    fi
-
-    # 1. The three version-carrying files must exist and agree. A MISSING
-    #    file is checked explicitly first: awk/sed on an absent path exit
-    #    non-zero, which under `set -e` would crash the script (raw "can't
-    #    open file", exit 2) BEFORE the -z fail-closed handler below runs.
-    #    The 2>/dev/null || true on the reads is defense-in-depth for the
-    #    exists-but-unreadable (permissions) edge -> empty -> clean exit 1.
+# Check 1/3 (preflight_completeness): the three version-carrying files must
+# exist and agree. A MISSING file is checked explicitly first: awk/sed on an
+# absent path exit non-zero, which under `set -e` would crash the script
+# (raw "can't open file", exit 2) BEFORE the -z fail-closed handler below
+# runs. The 2>/dev/null || true on the reads is defense-in-depth for the
+# exists-but-unreadable (permissions) edge -> empty -> clean exit 1.
+check_version_triple() {
     local vf v_style v_func v_readme
     for vf in style.css functions.php readme.txt; do
         if [[ ! -f "$THEME_DIR/$vf" ]]; then
@@ -342,43 +337,48 @@ preflight_completeness() {
         log_error "Version triple DRIFT: style.css=$v_style functions.php=$v_func readme.txt=$v_readme -- sync all three before deploying"
         exit 1
     fi
+}
 
-    # 2. Every git-tracked file must exist on disk (SOURCE-tree completeness).
-    #    Catches sparse checkouts and deleted-but-uncommitted files. Extra
-    #    untracked files are allowed (riders shipped that way for months).
-    #    NOTE: "on disk" != "reaches production" -- a tracked file whose
-    #    basename matches a tar/rsync exclude (CLAUDE.local.md, ._*,
-    #    __pycache__) still passes here but is dropped from the artifact by
-    #    design; this check asserts the source is whole, not the tarball.
-    if git -C "$THEME_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
-        # Capture the list with explicit failure handling. A bare
-        # `done < <(git ls-files)` process substitution does NOT propagate
-        # git's exit status, so a corrupt index / permissions / disk-full
-        # read would silently yield zero files -> false "0/0 OK" and pass the
-        # gate (the bug-230 fail-open class). `if ! ls=$(...)` fails CLOSED.
-        local ls_files missing=0 tracked=0 f
-        if ! ls_files=$(git -C "$THEME_DIR" ls-files 2>/dev/null); then
-            log_error "git ls-files failed -- cannot verify tracked-file completeness; refusing to deploy"
-            exit 1
-        fi
-        while IFS= read -r f; do
-            [[ -n "$f" ]] || continue
-            tracked=$((tracked + 1))
-            if [[ ! -e "$THEME_DIR/$f" ]]; then
-                log_error "Tracked file missing from deploy source: $f"
-                missing=$((missing + 1))
-            fi
-        done <<< "$ls_files"
-        if (( missing > 0 )); then
-            log_error "$missing tracked file(s) absent from the source tree -- the hot-swap would delete them from production"
-            exit 1
-        fi
-        log_success "Tracked-file completeness: $tracked/$tracked on disk"
-    else
+# Check 2/3 (preflight_completeness): every git-tracked file must exist on
+# disk (SOURCE-tree completeness). Catches sparse checkouts and
+# deleted-but-uncommitted files. Extra untracked files are allowed (riders
+# shipped that way for months). NOTE: "on disk" != "reaches production" -- a
+# tracked file whose basename matches a tar/rsync exclude (CLAUDE.local.md,
+# ._*, __pycache__) still passes here but is dropped from the artifact by
+# design; this check asserts the source is whole, not the tarball.
+check_tracked_files() {
+    if ! git -C "$THEME_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
         log_warn "Deploy source is not a git work tree -- relying on critical-asset floor only"
+        return 0
     fi
+    # Capture the list with explicit failure handling. A bare
+    # `done < <(git ls-files)` process substitution does NOT propagate
+    # git's exit status, so a corrupt index / permissions / disk-full read
+    # would silently yield zero files -> false "0/0 OK" and pass the gate
+    # (the bug-230 fail-open class). `if ! ls=$(...)` fails CLOSED.
+    local ls_files missing=0 tracked=0 f
+    if ! ls_files=$(git -C "$THEME_DIR" ls-files 2>/dev/null); then
+        log_error "git ls-files failed -- cannot verify tracked-file completeness; refusing to deploy"
+        exit 1
+    fi
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        tracked=$((tracked + 1))
+        if [[ ! -e "$THEME_DIR/$f" ]]; then
+            log_error "Tracked file missing from deploy source: $f"
+            missing=$((missing + 1))
+        fi
+    done <<< "$ls_files"
+    if (( missing > 0 )); then
+        log_error "$missing tracked file(s) absent from the source tree -- the hot-swap would delete them from production"
+        exit 1
+    fi
+    log_success "Tracked-file completeness: $tracked/$tracked on disk"
+}
 
-    # 3. Critical-asset floor (git-independent; static minimums, not exact counts).
+# Check 3/3 (preflight_completeness): critical-asset floor (git-independent;
+# static minimums, not exact counts).
+check_asset_floor() {
     local emblems fonts glb_state="MISSING"
     emblems=$({ find "$THEME_DIR/assets/images/emblems" -maxdepth 1 -name '*.webp' 2>/dev/null || true; } | wc -l | tr -d ' ')
     fonts=$({ find "$THEME_DIR/assets/fonts" -maxdepth 1 -name '*.woff2' 2>/dev/null || true; } | wc -l | tr -d ' ')
@@ -388,6 +388,16 @@ preflight_completeness() {
         exit 1
     fi
     log_success "Critical-asset floor: $emblems emblem webp, $fonts woff2, mascot GLB $glb_state"
+}
+
+preflight_completeness() {
+    if [[ "${PREFLIGHT_SKIP_COMPLETENESS:-0}" == "1" ]]; then
+        log_warn "Source-completeness gate SKIPPED (PREFLIGHT_SKIP_COMPLETENESS=1) -- deploying an UNVERIFIED tree"
+        return 0
+    fi
+    check_version_triple
+    check_tracked_files
+    check_asset_floor
 }
 
 # ---------------------------------------------------------------------------
@@ -489,69 +499,82 @@ skyyrose_data_extra_excludes() {
 }
 
 # ---------------------------------------------------------------------------
+# Exclude lists shared by BOTH transfer paths -- tar/sftp (try_rsync, the
+# LIVE path; WP.com doesn't support the rsync protocol) and lftp/sftp mirror
+# (try_lftp, fallback only). Previously two hand-maintained arrays with a
+# comment demanding "keep in sync" and nothing enforcing it -- they had
+# drifted: RSYNC_EXCLUDES additionally excluded package.json/
+# package-lock.json/composer.json/composer.lock/webpack.config.js/
+# generate_models.js that tar_excludes did not (so those files currently
+# ship via the live tar path); tar_excludes additionally excluded
+# _archive/.serena that RSYNC_EXCLUDES did not. Both asymmetries are
+# preserved below as explicit per-consumer arrays rather than silently
+# unified -- unifying would change what reaches production, a separate
+# decision from deduping the list mechanics (tasks/todo.md, 2026-08-01).
+#
+# Static-analysis config is dev-only. phpstan/constants.php exists purely so
+# PHPStan can discover SKYYROSE_DIR/_URI; WordPress never loads it, and a
+# stray phpstan/ directory is a marketplace-review flag.
+#
+# data/ ships ONLY runtime-read files (allowlist + file:line evidence in
+# tasks/wp-commercial-theme/architecture-census.md + fix-log.md Wave 1b):
+# skyyrose-catalog.csv, v7-cards.json, site-guide.json, collections/*/sot.json,
+# editorial-index.json. Everything below is internal (dossiers = Corey-authored
+# render specs, previously world-readable — 2026-07-19) or build-time-only.
+# ---------------------------------------------------------------------------
+SKYY_EXCLUDE_COMMON_DIRS=(
+    node_modules vendor tests test-results scripts
+    .deploy-archives phpstan playwright-report screenshots
+)
+SKYY_EXCLUDE_COMMON_PATTERNS=(
+    '.git' '.env*' '*.map' '*.log' '.DS_Store' 'deploy.sh'
+    'CLAUDE.md' 'CLAUDE.local.md' '._*' '__pycache__'
+    'IMMERSIVE-WORLDS-PLAN.md' '.gitignore' '.phpcs.xml'
+    'phpstan.neon' 'phpstan-baseline.neon'
+    '.eslintrc*' '.prettierrc*' '.editorconfig' 'phpunit.xml'
+    'data/dossiers' 'data/brand' 'data/brand-logos' 'data/product-references'
+    'data/*.py' 'data/*.bak*' 'data/product-embeddings.json'
+    'data/product-similarities.json' 'data/logo-registry.json'
+    'data/render-corrections.json' 'data/render-keepers.json'
+    'data/visual-manifest.json' 'data/collections/*/copy.md'
+    'data/collections/*/identity.json' 'data/collections/*/index.html'
+)
+# Historically present in RSYNC_EXCLUDES only -- these currently DO ship via
+# the live tar path (see divergence note above).
+SKYY_EXCLUDE_RSYNC_ONLY=(
+    '.git/' 'package.json' 'package-lock.json' 'composer.json'
+    'composer.lock' 'webpack.config.js' 'generate_models.js'
+)
+# Historically present in tar_excludes only.
+SKYY_EXCLUDE_TAR_ONLY=( '_archive' '.serena' )
+
+# Render the shared lists into --exclude= flags per transfer tool. Directory
+# entries get a trailing '/' for rsync/lftp (directory-only match per
+# rsync(1)) and no trailing slash for tar (no such syntax there).
+skyyrose_render_rsync_excludes() {
+    local d p
+    for d in "${SKYY_EXCLUDE_COMMON_DIRS[@]}"; do printf -- '--exclude=%s/\n' "$d"; done
+    for p in "${SKYY_EXCLUDE_COMMON_PATTERNS[@]}" "${SKYY_EXCLUDE_RSYNC_ONLY[@]}"; do
+        printf -- '--exclude=%s\n' "$p"
+    done
+}
+
+skyyrose_render_tar_excludes() {
+    local d p
+    for d in "${SKYY_EXCLUDE_COMMON_DIRS[@]}"; do printf -- '--exclude=%s\n' "$d"; done
+    for p in "${SKYY_EXCLUDE_COMMON_PATTERNS[@]}" "${SKYY_EXCLUDE_TAR_ONLY[@]}"; do
+        printf -- '--exclude=%s\n' "$p"
+    done
+}
+
+# ---------------------------------------------------------------------------
 # Rsync exclude list (comprehensive -- prevents dev files from reaching production)
 # ---------------------------------------------------------------------------
-RSYNC_EXCLUDES=(
-    --exclude='.git'
-    --exclude='.git/'
-    --exclude='node_modules/'
-    --exclude='vendor/'
-    --exclude='tests/'
-    --exclude='test-results/'
-    --exclude='.env*'
-    --exclude='*.map'
-    --exclude='*.log'
-    --exclude='.DS_Store'
-    --exclude='package.json'
-    --exclude='package-lock.json'
-    --exclude='composer.json'
-    --exclude='composer.lock'
-    --exclude='webpack.config.js'
-    --exclude='deploy.sh'
-    --exclude='CLAUDE.md'
-    --exclude='CLAUDE.local.md'
-    --exclude='._*'
-    --exclude='__pycache__'
-    --exclude='IMMERSIVE-WORLDS-PLAN.md'
-    --exclude='scripts/'
-    --exclude='.deploy-archives/'
-    --exclude='.gitignore'
-    --exclude='generate_models.js'
-    --exclude='.phpcs.xml'
-    # Static-analysis config is dev-only. phpstan/constants.php exists purely so
-    # PHPStan can discover SKYYROSE_DIR/_URI; WordPress never loads it, and a
-    # stray phpstan/ directory is a marketplace-review flag.
-    --exclude='phpstan.neon'
-    --exclude='phpstan-baseline.neon'
-    --exclude='phpstan/'
-    --exclude='.eslintrc*'
-    --exclude='.prettierrc*'
-    --exclude='.editorconfig'
-    --exclude='phpunit.xml'
-    --exclude='playwright-report/'
-    --exclude='screenshots/'
-    # data/ ships ONLY runtime-read files (allowlist + file:line evidence in
-    # tasks/wp-commercial-theme/architecture-census.md + fix-log.md Wave 1b):
-    # skyyrose-catalog.csv, v7-cards.json, site-guide.json, collections/*/sot.json,
-    # editorial-index.json. Everything below is internal (dossiers = Corey-authored
-    # render specs, previously world-readable — 2026-07-19) or build-time-only.
-    # Keep in sync with tar_excludes in try_rsync().
-    --exclude='data/dossiers'
-    --exclude='data/brand'
-    --exclude='data/brand-logos'
-    --exclude='data/product-references'
-    --exclude='data/*.py'
-    --exclude='data/*.bak*'
-    --exclude='data/product-embeddings.json'
-    --exclude='data/product-similarities.json'
-    --exclude='data/logo-registry.json'
-    --exclude='data/render-corrections.json'
-    --exclude='data/render-keepers.json'
-    --exclude='data/visual-manifest.json'
-    --exclude='data/collections/*/copy.md'
-    --exclude='data/collections/*/identity.json'
-    --exclude='data/collections/*/index.html'
-)
+RSYNC_EXCLUDES=()
+while IFS= read -r _skyy_exc; do
+    RSYNC_EXCLUDES+=("$_skyy_exc")
+done < <(skyyrose_render_rsync_excludes)
+unset _skyy_exc
 
 # Fail-closed gate: per-file excludes for everything in data/ outside the
 # runtime allowlist (see skyyrose_data_extra_excludes above).
@@ -608,38 +631,14 @@ try_rsync() {
         log_info "Using uncompressed tar (zstd unavailable — skipping gzip waste on pre-compressed media)"
     fi
 
-    local tar_excludes=(
-        --exclude='.git' --exclude='node_modules' --exclude='vendor'
-        --exclude='tests' --exclude='test-results' --exclude='_archive'
-        --exclude='.env*' --exclude='*.map' --exclude='*.log'
-        --exclude='.DS_Store' --exclude='deploy.sh' --exclude='CLAUDE.md'
-        --exclude='CLAUDE.local.md' --exclude='._*' --exclude='__pycache__'
-        --exclude='IMMERSIVE-WORLDS-PLAN.md' --exclude='.deploy-archives'
-        --exclude='.gitignore' --exclude='.phpcs.xml' --exclude='.eslintrc*'
-        --exclude='phpstan.neon' --exclude='phpstan-baseline.neon' --exclude='phpstan'
-        --exclude='.prettierrc*' --exclude='.editorconfig'
-        --exclude='phpunit.xml' --exclude='playwright-report'
-        --exclude='screenshots' --exclude='.serena'
-        # Theme-internal build tooling (mirrors RSYNC_EXCLUDES 'scripts/';
-        # the theme has exactly one scripts/ dir, at its root).
-        --exclude='scripts'
-        # Internal data/ files (dossiers = render specs, build inputs, QA
-        # artifacts) — runtime allowlist keeps only skyyrose-catalog.csv,
-        # v7-cards.json, site-guide.json, collections/*/sot.json,
-        # editorial-index.json. Keep in sync with RSYNC_EXCLUDES above.
-        --exclude='data/dossiers' --exclude='data/brand'
-        --exclude='data/brand-logos' --exclude='data/product-references'
-        --exclude='data/*.py' --exclude='data/*.bak*'
-        --exclude='data/product-embeddings.json'
-        --exclude='data/product-similarities.json'
-        --exclude='data/logo-registry.json'
-        --exclude='data/render-corrections.json'
-        --exclude='data/render-keepers.json'
-        --exclude='data/visual-manifest.json'
-        --exclude='data/collections/*/copy.md'
-        --exclude='data/collections/*/identity.json'
-        --exclude='data/collections/*/index.html'
-    )
+    # Rendered from the shared exclude lists defined above RSYNC_EXCLUDES
+    # (SKYY_EXCLUDE_COMMON_DIRS/PATTERNS + SKYY_EXCLUDE_TAR_ONLY) -- see the
+    # divergence note there for what differs from the rsync/lftp form.
+    local tar_excludes=()
+    local _skyy_texc
+    while IFS= read -r _skyy_texc; do
+        tar_excludes+=("$_skyy_texc")
+    done < <(skyyrose_render_tar_excludes)
 
     # Fail-closed gate (mirrors RSYNC_EXCLUDES): per-file excludes for every
     # data/ file outside the runtime allowlist — new data/ files never ship

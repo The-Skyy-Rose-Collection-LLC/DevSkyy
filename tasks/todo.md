@@ -1,5 +1,79 @@
 # Current Tasks
 
+## ACTIVE — Refactor scripts/deploy-theme.sh (2026-08-01)
+
+Scope narrowed after advisor review (production deploy script, bug-107 history
+with `if fn` suppressing errexit for the whole dynamic call stack). Splitting
+`try_rsync()` or `verify_live()` is explicitly OUT of scope this pass:
+- `verify_live()`: a RETURN trap on line 867 (`trap "rm -f '$tmpfile'" RETURN`)
+  would fire early if the fetch were extracted into a helper, deleting the
+  response body before the size/grep/version checks run — silent false
+  "response too small" → bogus auto-rollback on a healthy deploy.
+- `try_rsync()`: `tmpzip`/`remote_tar_name`/`zstd_flag`/`swap_id` cross
+  section boundaries; bash 3.2 has no namerefs, so a split forces new
+  globals for no real readability win.
+- Neither is exercised by `--dry-run` (both return at their first line), so
+  a split here is unverifiable without a real production deploy.
+
+- [x] Dedup `RSYNC_EXCLUDES` (top-level) vs `tar_excludes` (inside
+      `try_rsync()`) — two hand-maintained arrays the code itself flags as
+      "keep in sync" but nothing enforces it. Extract a shared base +
+      documented per-consumer-only arrays + tiny renderer functions.
+      **Found and preserved (not fixed) a real divergence**: RSYNC_EXCLUDES
+      excludes `package.json`/`package-lock.json`/`composer.json`/
+      `composer.lock`/`webpack.config.js`/`generate_models.js` that
+      tar_excludes does NOT; tar_excludes excludes `_archive`/`.serena` that
+      RSYNC_EXCLUDES does not. tar/sftp is the live path (rsync protocol
+      isn't supported by WP.com), so those RSYNC-only files currently ship
+      to production. Reported as a finding, not silently fixed.
+- [x] Split `preflight_completeness()` (~78 lines) into
+      `check_version_triple()`, `check_tracked_files()`, `check_asset_floor()`
+      — three independent checks, no shared state crossing boundaries, and
+      `--dry-run` actually exercises this path so it's verifiable.
+
+### Verification — all green 2026-08-02 (STOPSHOW_ACK confirmed by founder, all local/no-network)
+- [x] `bash -n scripts/deploy-theme.sh` — SYNTAX OK
+- [x] Rendered RSYNC_EXCLUDES/tar_excludes (sourced defs-only, main() stripped)
+      vs pristine `git show HEAD` reconstruction, sorted+diffed — **IDENTICAL**
+      both arrays (50 rsync / 45 tar entries incl. the live dynamic data/
+      fail-closed gate, which read the same real data/ dir both times).
+      Proves the dedup did not change what ships.
+- [x] shellcheck (git-HEAD vs modified, `-s bash`): 0 issues both sides,
+      SC-code set diff empty — no pre-existing debt to attribute, no new debt.
+- [x] `bash scripts/deploy-theme.sh --dry-run` — full local pass. Confirmed
+      the 3-way `preflight_completeness()` split runs correctly: "Version
+      triple in sync: 2.2.3", "Tracked-file completeness: 1828/1828 on
+      disk", "Critical-asset floor: 3 emblem webp, 12 woff2, mascot GLB
+      present". Zero network/SSH contact (dry-run skips connectivity test).
+- [x] `git diff --name-only` → exactly `scripts/deploy-theme.sh` +
+      `tasks/todo.md`, nothing else. File 1124→1122 lines (net -2, despite
+      adding ~35 lines of new comment/renderer code — the old file had two
+      arrays' worth of duplicated `--exclude=` lines that the shared-base
+      design collapsed).
+
+### Left alone / flagged, not fixed
+- Line 653 `tar $zstd_flag -cf "$tmpzip" ...` is unchecked inside
+  `try_rsync()`, which runs with errexit suppressed (called as
+  `if try_rsync; then`). A tar failure falls through to `du` on a missing
+  file and is only caught downstream by the scp size-mismatch retry loop.
+  Real bug-086/bug-107-class gap — worth its own follow-up change, not
+  bundled into this refactor.
+
+### Stop-hook catch — 2 real test failures, fixed properly (not weakened)
+`tests/scripts/test_deploy_theme.py::TestExcludes::test_excludes_git` and
+`::test_excludes_tests` did a static regex grep for `--exclude='.git'` /
+`--exclude='tests/'` literally in the script source — broke because those
+patterns moved into the `SKYY_EXCLUDE_COMMON_*` arrays. Root cause was the
+test coupling to an implementation detail (literal adjacency to
+`--exclude=`), not a real regression — confirmed by the same
+manually-run byte-identical-array verification above. Fixed by adding
+`_rendered_excludes()` (sources the script with `main "$@"` stripped,
+reads the actual `RSYNC_EXCLUDES` array + `skyyrose_render_tar_excludes`
+output) and rewriting the 2 tests to assert on real rendered output
+instead of source text — strictly more rigorous, not a weakened check
+(would now catch a typo inside the render functions that the old regex
+never could). All 31 tests in the file green; ruff/isort/black clean.
+
 ## ACTIVE — Harden repo middleware (2026-08-01)
 
 Scope: `security/security_middleware.py`, `billing/middleware.py`, `security/csp_middleware.py`,
