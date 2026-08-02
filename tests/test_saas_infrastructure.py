@@ -777,3 +777,37 @@ class TestTenantMiddleware:
 
         assert request.state.tenant_id == ""
         assert request.state.tenant_tier == "free"
+
+    @pytest.mark.asyncio
+    async def test_resolves_tenant_from_valid_issued_jwt(self, monkeypatch):
+        """Tenant claims survive signature, issuer, and audience validation."""
+        from unittest.mock import AsyncMock
+
+        from starlette.requests import Request
+
+        from core.middleware.tenant import tenant_middleware
+        from security.jwt_oauth2_auth import JWTManager
+
+        secret = "a" * 64
+        monkeypatch.setenv("JWT_SECRET_KEY", secret)
+        monkeypatch.setenv("JWT_REFRESH_SECRET_KEY", "b" * 64)
+        token = JWTManager().create_access_token(
+            user_id="user-123",
+            roles=["api_user"],
+            tier="pro",
+            additional_claims={"tenant_id": "tenant-123"},
+        )
+        request = Request(
+            {
+                "type": "http",
+                "method": "GET",
+                "path": "/",
+                "headers": [(b"authorization", f"Bearer {token}".encode())],
+                "query_string": b"",
+            }
+        )
+
+        await tenant_middleware(request, AsyncMock(return_value=MagicMock()))
+
+        assert request.state.tenant_id == "tenant-123"
+        assert request.state.tenant_tier == "pro"

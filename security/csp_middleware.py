@@ -120,7 +120,12 @@ class CSPMiddleware(BaseHTTPMiddleware):
         # Process request
         response = await call_next(request)
 
-        # Skip CSP for non-HTML responses
+        # Baseline hardening headers (nosniff, frame-options, etc.) apply to every
+        # response — including JSON API responses, which need them just as much.
+        self._add_security_headers(response)
+
+        # CSP itself only governs script/style execution, so it's only meaningful
+        # for HTML documents — skip the directive for non-HTML responses.
         content_type = response.headers.get("content-type", "")
         if not content_type.startswith("text/html"):
             return response
@@ -132,9 +137,6 @@ class CSPMiddleware(BaseHTTPMiddleware):
         )
 
         response.headers[header_name] = csp_header
-
-        # Add additional security headers
-        self._add_security_headers(response)
 
         logger.debug(f"CSP header added: {header_name}: {csp_header}")
 

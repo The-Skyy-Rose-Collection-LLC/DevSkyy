@@ -19,10 +19,12 @@ import time
 from collections.abc import Callable
 
 from fastapi import HTTPException, Request, Response, status
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from .advanced_auth import AdvancedAuthManager
 from .input_validation import SecurityValidator
+from .jwt_oauth2_auth import jwt_manager
 from .rate_limiting import AdvancedRateLimiter
 
 logger = logging.getLogger(__name__)
@@ -203,17 +205,20 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
             token = auth_header.split(" ", 1)[1]
 
-            # Validate token (simplified - in production use your JWT validation)
-            if not token or len(token) < 10:
+            # Validate token signature, expiry, type and blacklist status.
+            try:
+                token_payload = jwt_manager.validate_token(token)
+            except (ExpiredSignatureError, InvalidTokenError) as exc:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid token",
+                    detail="Invalid or expired token",
                     headers={"WWW-Authenticate": "Bearer"},
-                )
+                ) from exc
 
-            # Store user info in request state for later use
+            # Store verified user info in request state for later use
             request.state.authenticated = True
             request.state.token = token
+            request.state.user = token_payload
 
     async def _validate_input(self, request: Request):
         """Validate input data for security issues"""

@@ -15,6 +15,7 @@ Advanced input validation and sanitization for DevSkyy Enterprise Platform:
 import hashlib
 import hmac
 import html
+import logging
 import os
 import re
 import secrets
@@ -24,6 +25,20 @@ from typing import Any
 
 from fastapi import Request, UploadFile
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
+
+# Fallback remains stable for this process so independently constructed
+# validators can validate each other's tokens. Production deployments with
+# multiple workers must set CSRF_SECRET_KEY so every worker shares one key.
+_CSRF_SECRET = os.environ.get("CSRF_SECRET_KEY")
+if not _CSRF_SECRET:
+    _CSRF_SECRET = secrets.token_urlsafe(32)
+    logger.warning(
+        "CSRF_SECRET_KEY not set. Using an ephemeral per-process key; CSRF "
+        "tokens will be invalid after restart and across worker processes. "
+        "Set CSRF_SECRET_KEY for production."
+    )
 
 # Optional bleach import for HTML sanitization
 try:
@@ -143,6 +158,9 @@ class SecurityValidator:
             ".rb",
             ".pl",
         }
+
+        self._csrf_secret = _CSRF_SECRET
+        self._csrf_token_expiry = 3600  # 1 hour in seconds
 
     def detect_sql_injection(self, input_text: str) -> bool:
         """Detect potential SQL injection attempts"""
@@ -398,10 +416,6 @@ class SecurityValidator:
             validation_result["valid"] = False
 
         return validation_result
-
-    # CSRF secret key - should be set via environment variable in production
-    _csrf_secret: str = os.environ.get("CSRF_SECRET_KEY", secrets.token_urlsafe(32))
-    _csrf_token_expiry: int = 3600  # 1 hour in seconds
 
     def generate_csrf_token(self, session_id: str) -> str:
         """

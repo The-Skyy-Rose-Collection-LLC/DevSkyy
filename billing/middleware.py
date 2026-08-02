@@ -65,7 +65,9 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
     2. Read tenant context from ``request.state`` (set by tenant_middleware).
     3. Read intended creative operation from ``X-Creative-Intent`` header.
     4. If quota exceeded → return 402 immediately.
-    5. Otherwise → forward request and append ``X-Quota-Remaining`` header.
+    5. If the entitlement check itself fails (Redis/infra error) → return 503. The gate
+       fails CLOSED: an infra hiccup must not grant unmetered access to paid creative ops.
+    6. Otherwise → forward request and append ``X-Quota-Remaining`` header.
 
     Args:
         request:   Incoming HTTP request.
@@ -99,8 +101,17 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
         )
     except Exception as exc:
         logger.error("billing_middleware entitlement check error: %s", exc)
-        # Fail open — let the request through rather than block on infra error
-        return await call_next(request)
+        # Fail CLOSED — an entitlement-check outage must not become unmetered access to
+        # paid creative ops. 503 (not 402) so callers can tell "check failed, retry" apart
+        # from "quota exceeded".
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "entitlement_check_unavailable",
+                "message": "Billing verification is temporarily unavailable. Please retry shortly.",
+                "intent": intent,
+            },
+        )
 
     if not result.allowed:
         logger.info(

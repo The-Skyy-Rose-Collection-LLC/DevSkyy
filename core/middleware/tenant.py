@@ -26,6 +26,8 @@ from typing import Any
 import jwt
 from fastapi import Request, Response
 
+from security.jwt_oauth2_auth import JWTConfig
+
 logger = logging.getLogger(__name__)
 
 _INTERNAL_SERVICE_TOKEN_ENV = "TENANT_HEADER_TRUST_TOKEN"
@@ -98,13 +100,17 @@ def _internal_service_token_valid(request: Request) -> bool:
 
 def _extract_jwt_claims(request: Request) -> dict[str, Any]:
     """
-    Decode JWT claims WITHOUT verification (verification happens in auth middleware).
+    Decode and signature-verify the JWT bearer token to read tenant claims.
 
-    We only read the payload to retrieve ``tenant_id`` and ``tier``.
-    Token validation is the responsibility of ``security.jwt_oauth2_auth``.
+    ``jwt.decode`` verifies the signature against ``JWT_SECRET_KEY`` here (no
+    ``verify_signature: False`` override), so ``tenant_id``/``tier`` are trustworthy
+    once this returns non-empty. Issuer and audience are also validated against
+    ``JWTConfig``. Token type and blacklist checks remain
+    ``security.jwt_oauth2_auth``'s responsibility.
 
     Returns:
-        Decoded JWT payload dict, or empty dict if token is absent / malformed.
+        Decoded JWT payload dict, or empty dict if token is absent / malformed /
+        signature-invalid.
     """
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.lower().startswith("bearer "):
@@ -122,7 +128,9 @@ def _extract_jwt_claims(request: Request) -> dict[str, Any]:
         claims: dict[str, Any] = jwt.decode(
             token,
             secret,
-            algorithms=["HS256", "HS512"],
+            algorithms=[JWTConfig.algorithm],
+            issuer=JWTConfig.issuer,
+            audience=JWTConfig.audience,
             options={"require": ["exp"]},
         )
         return claims

@@ -1,5 +1,46 @@
 # Current Tasks
 
+## ACTIVE — Harden repo middleware (2026-08-01)
+
+Scope: `security/security_middleware.py`, `billing/middleware.py`, `security/csp_middleware.py`,
+`core/middleware/tenant.py`, `security/input_validation.py` (CSRF secret only).
+
+Live-wiring check `[repo]`: `main_enterprise.py` mounts `billing_middleware` + `tenant_middleware`
+directly (lines 452-461) and has its own inline `security_headers_middleware` / `rate_limit_middleware`
+(lines 268-296). `SecurityMiddleware` and `CSPMiddleware` are never passed to `app.add_middleware()`
+anywhere in the app, `mcp_service.py`, or `api/index.py` — confirmed via grep, no hit outside their own
+files. Dead code today, but fully-featured-looking and importable (`create_security_middleware` factory
+exists) — the auth bug below is a landmine, not yet a live exploit.
+
+- [x] 1. `security/security_middleware.py` `_check_authentication` — was accepting ANY bearer token
+      ≥10 chars as valid. FIXED: now calls `security.jwt_oauth2_auth.jwt_manager.validate_token()`,
+      401 on `ExpiredSignatureError`/`InvalidTokenError`, verified `TokenPayload` stored on
+      `request.state.user`. Still dead code (never mounted) — repair, not live hardening.
+- [x] 2. `billing/middleware.py` entitlement check — was failing OPEN on Redis/infra error. FIXED:
+      returns 503 `entitlement_check_unavailable` instead of `call_next(request)`; confirmed no
+      health-check route falls under the `elite-studio|portal` creative-path regex. **This was the
+      one live fix** — logged as bug recurrence below.
+- [x] 3. `security/csp_middleware.py` `dispatch` — was skipping `_add_security_headers()` for all
+      non-HTML responses. FIXED: baseline headers now apply to every response; only the CSP directive
+      itself is skipped for non-HTML. Dead code (never mounted) — repair, not live hardening.
+- [x] 4. `core/middleware/tenant.py` `_extract_jwt_claims` — algorithm allowlist widened to
+      `["HS256", "HS512"]` while the issuer (`JWTConfig.algorithm`) only ever signs HS512. FIXED:
+      narrowed to `["HS512"]`, and validates issuer/audience with `JWTConfig` alongside signature.
+      Regression test confirms tenant context resolves from a normally-issued JWT. Corrected the
+      "WITHOUT verification" docstring (signature IS verified).
+      Live code (tenant_middleware is mounted) — closes real unnecessary attack surface.
+- [x] 5. `security/input_validation.py` `SecurityValidator._csrf_secret` — class-level fallback was
+      per-process, so multi-worker deployments without `CSRF_SECRET_KEY` reject cross-worker tokens.
+      FIXED: module-level ephemeral fallback stays shared by every validator in one process; startup
+      warning requires `CSRF_SECRET_KEY` for multi-worker production. Review P2 addressed: added
+      cross-instance token-validation regression test. Only reachable via dead
+      `SecurityMiddleware`/`APISecurityMiddleware` today — repair, not live hardening.
+- [x] Verify: `rtk proxy pytest tests/test_security.py tests/test_saas_infrastructure.py -v` →
+      209 passed, 2 pre-existing intentional skips, 0 failures. `ruff check` + `isort --check-only` +
+      `black --check` on all 7 Python files → clean. `git diff --name-only` → scope-clean (5 hardened
+      files, 2 regression-test files, plus this todo.md; pre-existing unrelated dirty files from session
+      start untouched).
+
 ## ACTIVE — Commercial-Grade Theme Build, fashion-theme-architect owns it — 2026-07-27
 
 Supersedes the 2026-07-19 sweep below (same goal, folded in — live has since moved 1.12.0→1.12.8,
