@@ -436,3 +436,4 @@ loads directly from repo (no cache).
 ## 2026-08-03 — Compositor QA verdicts are caller-visible success gates
 
 - **Key Learning**: In `CompositorAgent.composite`, preserve the completed artifact, QA details, and audit log for every verdict, but derive `CompositorResult.success` from the explicit QA allowlist: `pass`/`warn` only. A `fail` (or unrecognized status) is a non-raising, fail-closed result so callers can inspect and route the retained evidence. (bug-319)
+- **Key Learning**: `_visual_qa` must normalize absent or falsey provider verdicts to `fail`; only explicit `pass` and `warn` statuses may reach the success allowlist. (bug-320)

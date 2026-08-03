@@ -5518,5 +5518,26 @@
     ],
     "occurrences": 1,
     "last_seen": "2026-08-03T15:53:39-07:00"
+  },
+  {
+    "id": "bug-320",
+    "timestamp": "2026-08-03T16:21:00-07:00",
+    "error_message": "A parseable compositor QA response without status defaulted to warn and returned a successful result.",
+    "file": "skyyrose/elite_studio/agents/compositor/orchestrator.py",
+    "root_cause": "_visual_qa used parsed.get(\"status\") or \"warn\", so absent and falsey provider verdicts bypassed the explicit success allowlist.",
+    "fix": "Changed the parser fallback to fail and added a regression test for a successful provider response whose JSON omits status.",
+    "tags": [
+      "compositor",
+      "qa",
+      "fail-closed",
+      "parser",
+      "regression"
+    ],
+    "related_bugs": [
+      "bug-319",
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-08-03T16:21:00-07:00"
   }
 ]

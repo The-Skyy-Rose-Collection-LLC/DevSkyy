@@ -740,7 +740,7 @@ class CompositorAgent(FluxProviderMixin):
         text = result.get("text", "")
         try:
             parsed = _safe_json_extract(text)
-            status = parsed.get("status") or "warn"
+            status = parsed.get("status") or "fail"
             return {**parsed, "status": status, "model": COMPOSITOR_QA_MODEL}
         except Exception:
             return {

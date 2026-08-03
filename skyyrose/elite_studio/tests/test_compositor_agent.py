@@ -380,6 +380,22 @@ class TestVisualQA:
         assert result["error_type"] == "qa_provider_error"
         assert "error" in result
 
+    @patch("skyyrose.elite_studio.agents.compositor_agent.analyze_vision")
+    def test_qa_missing_status_returns_fail(self, mock_gemini, compositor, tmp_path):
+        """A parseable QA response without a verdict fails closed."""
+        from PIL import Image
+
+        composite_path = str(tmp_path / "composite.png")
+        Image.new("RGB", (200, 300)).save(composite_path)
+        mock_gemini.return_value = {
+            "success": True,
+            "text": json.dumps({"lighting_match": {"score": 9}}),
+        }
+
+        result = compositor._visual_qa(composite_path, "scene", "collection")
+
+        assert result["status"] == "fail"
+
 
 # ---------------------------------------------------------------------------
 # Full Pipeline
