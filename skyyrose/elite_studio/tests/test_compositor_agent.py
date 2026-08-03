@@ -470,7 +470,7 @@ class TestFullPipeline:
         tmp_scene,
         tmp_model_image,
     ):
-        """QA failure returns details and artifacts without reporting success."""
+        """Only pass/warn QA verdicts succeed; failures retain evidence and reason."""
         from PIL import Image
 
         alpha_path = str(tmp_path / "alpha.png")
@@ -509,6 +509,7 @@ class TestFullPipeline:
         assert result.success is expected_success
         assert result.qa_status == qa_status
         assert result.qa_details == qa
+        assert result.error == ("" if expected_success else "contract regression")
         assert result.output_path == shadow_path
         assert result.audit_log_path == audit_log_path
 
@@ -616,3 +617,22 @@ class TestAuditLog:
         assert data["sku"] == "br-001"
         assert data["scene_name"] == "test-scene"
         assert "stages" in data
+
+    def test_audit_log_persists_failed_qa_details(self, compositor, tmp_path):
+        qa = {"status": "fail", "reason": "garment fidelity mismatch"}
+        result = CompositorResult(
+            success=False,
+            provider="fal-fill",
+            scene_name="test-scene",
+            qa_status="fail",
+            qa_details=qa,
+            error=qa["reason"],
+            stages_completed=6,
+        )
+
+        log_path = compositor._write_audit_log(
+            "br-001", "test-scene", {"qa": {"details": qa}}, result, str(tmp_path)
+        )
+
+        data = json.loads(Path(log_path).read_text())
+        assert data["result"]["success"] is False
