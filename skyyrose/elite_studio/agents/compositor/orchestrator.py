@@ -388,7 +388,11 @@ class CompositorAgent(FluxProviderMixin):
             result_kwargs["output_path"] = shadow_path
             result_kwargs["alpha_path"] = alpha_path
             result_kwargs["stages_completed"] = stages_done
-            result_kwargs["success"] = True
+            result_kwargs["success"] = result_kwargs["qa_status"] in {"pass", "warn"}
+            if not result_kwargs["success"]:
+                result_kwargs["error"] = str(
+                    qa.get("reason") or qa.get("error") or "QA rejected composite"
+                )
             result_kwargs["provider"] = result_kwargs.get("provider", "fal-fill")
 
             result = CompositorResult(**result_kwargs)
@@ -740,7 +744,7 @@ class CompositorAgent(FluxProviderMixin):
         text = result.get("text", "")
         try:
             parsed = _safe_json_extract(text)
-            status = parsed.get("status") or "warn"
+            status = parsed.get("status") or "fail"
             return {**parsed, "status": status, "model": COMPOSITOR_QA_MODEL}
         except Exception:
             return {

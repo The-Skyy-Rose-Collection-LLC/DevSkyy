@@ -433,3 +433,7 @@ loads directly from repo (no cache).
 - **Do-Not-Repeat — audit probes:** `querySelector('a, .b, [class*=c]')` returns the first match in DOCUMENT order, not selector order — caused the false "pre-order missing footer" P1 (matched .po-card__footer). Probe for a SPECIFIC selector (#colophon.site-footer) or query each selector separately. Likewise: rect.right > viewport does NOT mean an element causes horizontal scroll — position:fixed subtrees can't extend scrollWidth; filter them before naming culprits.
 - **Do-Not-Repeat — screenshot harnesses on this theme:** the site sets `scroll-behavior:smooth`; `window.scrollTo(0,0)` animates and a fixed 1s settle captures mid-scroll on long pages. Wait on `scrollY===0`, not a timer.
 
+## 2026-08-03 — Compositor QA verdicts are caller-visible success gates
+
+- **Key Learning**: In `CompositorAgent.composite`, preserve the completed artifact, QA details, and audit log for every verdict, but derive `CompositorResult.success` from the explicit QA allowlist: `pass`/`warn` only. A `fail` (or unrecognized status) is a non-raising, fail-closed result so callers can inspect and route the retained evidence. (bug-319)
+- **Key Learning**: `_visual_qa` must normalize absent or falsey provider verdicts to `fail`; only explicit `pass` and `warn` statuses may reach the success allowlist. (bug-320)

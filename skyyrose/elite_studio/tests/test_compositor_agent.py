@@ -380,6 +380,22 @@ class TestVisualQA:
         assert result["error_type"] == "qa_provider_error"
         assert "error" in result
 
+    @patch("skyyrose.elite_studio.agents.compositor_agent.analyze_vision")
+    def test_qa_missing_status_returns_fail(self, mock_gemini, compositor, tmp_path):
+        """A parseable QA response without a verdict fails closed."""
+        from PIL import Image
+
+        composite_path = str(tmp_path / "composite.png")
+        Image.new("RGB", (200, 300)).save(composite_path)
+        mock_gemini.return_value = {
+            "success": True,
+            "text": json.dumps({"lighting_match": {"score": 9}}),
+        }
+
+        result = compositor._visual_qa(composite_path, "scene", "collection")
+
+        assert result["status"] == "fail"
+
 
 # ---------------------------------------------------------------------------
 # Full Pipeline
@@ -387,13 +403,13 @@ class TestVisualQA:
 
 
 class TestFullPipeline:
-    @patch("skyyrose.elite_studio.agents.compositor_agent.analyze_vision")
+    @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._maybe_apply_gate")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._generate_shadows")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._composite_with_flux")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._relight_subject")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._engineer_flux_prompt")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._extract_alpha")
-    @patch("skyyrose.elite_studio.agents.compositor_agent.upload_to_fal")
+    @patch("skyyrose.elite_studio.agents.compositor.orchestrator.upload_to_fal")
     def test_full_pipeline_success(
         self,
         mock_upload,
@@ -424,10 +440,7 @@ class TestFullPipeline:
         mock_flux.return_value = (b"\x89PNG_FINAL", "fal-fill")
         mock_shadow.return_value = shadow_path
         mock_upload.return_value = "https://fal.cdn/uploaded.png"
-        mock_qa.return_value = {
-            "success": True,
-            "text": json.dumps({"status": "pass", "details": {}}),
-        }
+        mock_qa.return_value = {"status": "pass"}
 
         result = compositor.composite(
             sku="br-001",
@@ -442,6 +455,63 @@ class TestFullPipeline:
         assert result.success
         assert result.provider == "fal-fill"
         assert result.stages_completed == 6
+
+    @pytest.mark.parametrize(
+        ("qa_status", "expected_success"),
+        [("pass", True), ("warn", True), ("fail", False)],
+    )
+    def test_pipeline_success_fails_closed_on_qa_fail(
+        self,
+        qa_status,
+        expected_success,
+        compositor,
+        monkeypatch,
+        tmp_path,
+        tmp_scene,
+        tmp_model_image,
+    ):
+        """Only pass/warn QA verdicts succeed; failures retain evidence and reason."""
+        from PIL import Image
+
+        alpha_path = str(tmp_path / "alpha.png")
+        relit_path = str(tmp_path / "relit.png")
+        shadow_path = str(tmp_path / "shadow.png")
+        audit_log_path = str(tmp_path / "audit.json")
+        Image.new("RGBA", (100, 150)).save(alpha_path)
+        Image.new("RGBA", (100, 150)).save(relit_path)
+        Image.new("RGB", (100, 150)).save(shadow_path)
+
+        qa = {"status": qa_status, "reason": "contract regression"}
+        monkeypatch.setattr(compositor, "_extract_alpha", lambda *_: alpha_path)
+        monkeypatch.setattr(compositor, "_engineer_flux_prompt", lambda **_: "prompt")
+        monkeypatch.setattr(compositor, "_relight_subject", lambda *_: relit_path)
+        monkeypatch.setattr(
+            "skyyrose.elite_studio.agents.compositor.orchestrator.upload_to_fal",
+            lambda _: "https://fal.cdn/uploaded.png",
+        )
+        monkeypatch.setattr(
+            compositor, "_composite_with_flux", lambda **_: (b"\x89PNG_FINAL", "fal-fill")
+        )
+        monkeypatch.setattr(compositor, "_gimp_pixel_cleanup", lambda path, *_: path)
+        monkeypatch.setattr(compositor, "_generate_shadows", lambda *_: shadow_path)
+        monkeypatch.setattr(compositor, "_maybe_apply_gate", lambda *_: qa)
+        monkeypatch.setattr(compositor, "_write_audit_log", lambda *_: audit_log_path)
+
+        result = compositor.composite(
+            sku="br-001",
+            scene_image_path=str(tmp_scene),
+            model_image_path=str(tmp_model_image),
+            collection="black-rose",
+            scene_name="black-rose-rooftop-garden",
+            output_dir=str(tmp_path / "output"),
+        )
+
+        assert result.success is expected_success
+        assert result.qa_status == qa_status
+        assert result.qa_details == qa
+        assert result.error == ("" if expected_success else "contract regression")
+        assert result.output_path == shadow_path
+        assert result.audit_log_path == audit_log_path
 
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._extract_alpha")
     def test_pipeline_alpha_failure(
@@ -465,13 +535,13 @@ class TestFullPipeline:
 
 
 class TestCheckpointResume:
-    @patch("skyyrose.elite_studio.agents.compositor_agent.analyze_vision")
+    @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._maybe_apply_gate")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._generate_shadows")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._composite_with_flux")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._relight_subject")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._engineer_flux_prompt")
     @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._extract_alpha")
-    @patch("skyyrose.elite_studio.agents.compositor_agent.upload_to_fal")
+    @patch("skyyrose.elite_studio.agents.compositor.orchestrator.upload_to_fal")
     def test_resume_from_stage_4(
         self,
         mock_upload,
@@ -495,10 +565,7 @@ class TestCheckpointResume:
         mock_flux.return_value = (b"\x89PNG", "fal-fill")
         mock_shadow.return_value = shadow_path
         mock_upload.return_value = "https://fal.cdn/uploaded.png"
-        mock_qa.return_value = {
-            "success": True,
-            "text": json.dumps({"status": "pass"}),
-        }
+        mock_qa.return_value = {"status": "pass"}
 
         # Pre-create checkpoint artifacts
         alpha_path = str(tmp_path / "br-001-alpha.png")
@@ -550,3 +617,22 @@ class TestAuditLog:
         assert data["sku"] == "br-001"
         assert data["scene_name"] == "test-scene"
         assert "stages" in data
+
+    def test_audit_log_persists_failed_qa_details(self, compositor, tmp_path):
+        qa = {"status": "fail", "reason": "garment fidelity mismatch"}
+        result = CompositorResult(
+            success=False,
+            provider="fal-fill",
+            scene_name="test-scene",
+            qa_status="fail",
+            qa_details=qa,
+            error=qa["reason"],
+            stages_completed=6,
+        )
+
+        log_path = compositor._write_audit_log(
+            "br-001", "test-scene", {"qa": {"details": qa}}, result, str(tmp_path)
+        )
+
+        data = json.loads(Path(log_path).read_text())
+        assert data["result"]["success"] is False
