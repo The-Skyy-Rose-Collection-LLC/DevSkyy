@@ -5498,4 +5498,25 @@
     "occurrences": 1,
     "last_seen": "2026-08-01T00:00:00Z"
   }
+,
+  {
+    "id": "bug-319",
+    "timestamp": "2026-08-03T15:53:39-07:00",
+    "error_message": "CompositorAgent reported qa_status=\"fail\" but returned CompositorResult(success=True).",
+    "file": "skyyrose/elite_studio/agents/compositor/orchestrator.py",
+    "root_cause": "The final result assembly unconditionally set success=True after recording the QA verdict, so a failed QA gate did not control the caller-visible success contract.",
+    "fix": "Made success an explicit QA allowlist (pass/warn only), retaining qa_status, qa_details, output_path, and audit_log_path without raising. Added a parametrized pass/warn/fail regression test and updated stale full-pipeline mocks to stub the current QA gate and orchestrator upload binding.",
+    "tags": [
+      "compositor",
+      "qa",
+      "fail-closed",
+      "regression"
+    ],
+    "related_bugs": [
+      "bug-179",
+      "bug-230"
+    ],
+    "occurrences": 1,
+    "last_seen": "2026-08-03T15:53:39-07:00"
+  }
 ]

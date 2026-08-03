@@ -388,7 +388,7 @@ class CompositorAgent(FluxProviderMixin):
             result_kwargs["output_path"] = shadow_path
             result_kwargs["alpha_path"] = alpha_path
             result_kwargs["stages_completed"] = stages_done
-            result_kwargs["success"] = True
+            result_kwargs["success"] = result_kwargs["qa_status"] in {"pass", "warn"}
             result_kwargs["provider"] = result_kwargs.get("provider", "fal-fill")
 
             result = CompositorResult(**result_kwargs)
