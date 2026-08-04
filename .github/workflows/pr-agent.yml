@@ -56,7 +56,7 @@ jobs:
           fi
 
       - name: Run PR Intelligence Agent
-        uses: anthropics/claude-code-action@35037bb980d9bc03f0f74b65b68618b0be46c268  # v1
+        uses: anthropics/claude-code-action@b2963b9127309fd8ef897bb24a5d79761d566111  # v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
