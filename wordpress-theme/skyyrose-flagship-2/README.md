@@ -72,3 +72,12 @@ Run the PHP and JavaScript checks before creating an archive. Test the archive
 on a staging WordPress install with WooCommerce active, including product,
 cart, checkout, and an accessibility keyboard pass. No deployment scripts are
 included. Activate only after staging review.
+
+Create an installable archive from tracked files with:
+
+```bash
+./scripts/package-theme.sh
+```
+
+The resulting `dist/skyyrose-flagship-2.zip` contains one top-level theme
+directory and excludes local dependencies, editor files, and uncommitted work.
