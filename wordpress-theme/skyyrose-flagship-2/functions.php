@@ -236,30 +236,18 @@ function skyyrose2_product_cards( $limit = 6, $collection = '', $featured = fals
 	}
 	?>
 	<div class="sr2-products">
-		<?php foreach ( $products as $product ) : ?>
+		<?php foreach ( $products as $index => $product ) : ?>
 			<?php
-			$product_url = get_permalink( $product->get_id() );
-			$image_id    = $product->get_image_id();
-			$categories  = wc_get_product_category_list( $product->get_id(), ' · ' );
+			get_template_part(
+				'template-parts/product-card',
+				null,
+				array(
+					'product'        => $product,
+					'image_loading'  => 0 === $index ? 'eager' : 'lazy',
+					'image_priority' => 0 === $index,
+				)
+			);
 			?>
-			<article class="sr2-product" data-depth-card>
-				<a class="sr2-product__image" href="<?php echo esc_url( $product_url ); ?>">
-					<?php
-					if ( $image_id ) {
-						echo wp_kses_post( wp_get_attachment_image( $image_id, 'woocommerce_thumbnail', false, array( 'loading' => 'lazy', 'decoding' => 'async' ) ) );
-					} else {
-						echo '<span class="sr2-product__image-empty" aria-hidden="true"></span>';
-					}
-					?>
-					<span class="sr2-product__view"><?php esc_html_e( 'View piece', 'skyyrose-flagship-2' ); ?></span>
-				</a>
-				<p class="sr2-product__meta"><?php echo $categories ? wp_kses_post( $categories ) : esc_html__( 'SkyyRose', 'skyyrose-flagship-2' ); ?></p>
-				<h3><a href="<?php echo esc_url( $product_url ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></h3>
-				<div class="sr2-product__bottom">
-					<span><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
-					<span><?php echo esc_html( $product->is_in_stock() ? __( 'Available', 'skyyrose-flagship-2' ) : __( 'Reserved', 'skyyrose-flagship-2' ) ); ?></span>
-				</div>
-			</article>
 		<?php endforeach; ?>
 	</div>
 	<?php
