@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "name": "SkyyRose Theme Building Machine",
+  "purpose": "A gated, worktree-isolated operating system for premium, interactive WooCommerce themes.",
+  "request_contract": {
+    "required": ["theme_path", "surface_or_outcome", "commerce_authority"],
+    "defaults": {
+      "commerce_authority": "WooCommerce owns catalog, cart, tax, shipping, orders, and payment state; Stripe is a gateway."
+    }
+  },
+  "operating_rules": [
+    "Create a dedicated Git worktree for every lane that changes files. Never use the shared worktree for implementation.",
+    "The fashion-theme-architect is the primary end-to-end builder. It does not deploy, commit, alter permissions, or make paid calls.",
+    "Load skyyrose-wp-platform before SkyyRose theme work and load only the relevant reference for the surface being changed.",
+    "Use source files as the authority and rebuild committed minified CSS and JavaScript whenever their source changes.",
+    "Treat catalog and image SOT manifests as authoritative. Do not invent products, prices, inventory, or product imagery.",
+    "A skipped browser, performance, security, or release check is evidence of an incomplete gate, never a passing result.",
+    "Production deployment, paid image generation, and destructive operations require explicit approval."
+  ],
+  "lanes": [
+    {"id":"01-primary-builder","category":"end-to-end build","primary":"fashion-theme-architect","support":["skyyrose-wp-platform"],"owns":["theme architecture","template hierarchy","source-first implementation","build report"],"hands_off":["candidate worktree and verification evidence"],"depends_on":[]},
+    {"id":"02-platform-doctrine","category":"SkyyRose platform safety","primary":"skyyrose-wp-platform","support":["devskyy-patterns","coding-standards"],"owns":["platform constraints","asset and SOT rules","WordPress conventions"],"hands_off":["surface-specific implementation contract"],"depends_on":[]},
+    {"id":"03-luxury-direction","category":"high-end visual direction","primary":"luxury-design-taste","support":["design-system","frontend-design-direction"],"owns":["art direction","type, color, motion and density decisions","acceptance references"],"hands_off":["one-page design contract"],"depends_on":["02-platform-doctrine"]},
+    {"id":"04-storefront-composition","category":"responsive storefront surfaces","primary":"wp-frontend","support":["frontend-patterns","css-responsive","motion-ui"],"owns":["responsive layout","progressive enhancement","surface-level interaction"],"hands_off":["reviewable implementation in its worktree"],"depends_on":["01-primary-builder","03-luxury-direction"]},
+    {"id":"05-immersive-storytelling","category":"interactive and 3D experiences","primary":"wp-immersive","support":["immersive-interactive-architect","3d-rigging-pipeline"],"owns":["scroll scenes","WebGL fallbacks","interactive hotspots","performance budgets"],"hands_off":["isolated experience and fallback test plan"],"depends_on":["03-luxury-direction","04-storefront-composition"]},
+    {"id":"06-elementor-authoring","category":"editor-friendly components","primary":"wp-elementor","support":["frontend-patterns","accessibility"],"owns":["custom Elementor widgets","editor controls","escaped widget output"],"hands_off":["registered widgets and editor test evidence"],"depends_on":["01-primary-builder","03-luxury-direction"]},
+    {"id":"07-commerce-checkout","category":"WooCommerce and Stripe gateway integration","primary":"wp-woocommerce","support":["wordpress-woocommerce-automation","checkout-optimizer"],"owns":["WooCommerce templates","checkout correctness","Stripe gateway boundary"],"hands_off":["commerce contract and checkout evidence"],"depends_on":["01-primary-builder","02-platform-doctrine"]},
+    {"id":"08-catalog-integrity","category":"catalog and product-media authority","primary":"wp-catalog-sync","support":["skyyrose-wp-platform"],"owns":["catalog SOT mappings","SKU integrity","verified product media"],"hands_off":["catalog validation report"],"depends_on":["02-platform-doctrine","07-commerce-checkout"]},
+    {"id":"09-accessibility","category":"inclusive interface quality","primary":"accessibility","support":["frontend-a11y","css-a11y"],"owns":["semantic interaction","keyboard flows","motion and contrast safeguards"],"hands_off":["accessibility findings and remediation gate"],"depends_on":["04-storefront-composition","05-immersive-storytelling","06-elementor-authoring"]},
+    {"id":"10-e2e-visual-qa","category":"browser and visual verification","primary":"e2e-runner","support":["e2e-testing","design-qc"],"owns":["critical user journeys","cross-device browser checks","screenshots and artifacts"],"hands_off":["passing or failing QA evidence"],"depends_on":["07-commerce-checkout","08-catalog-integrity","09-accessibility"]},
+    {"id":"11-security-review","category":"WordPress and commerce security","primary":"security-reviewer","support":["security-review","adversarial-verification"],"owns":["input/output handling","nonce and authorization review","payment and webhook threat checks"],"hands_off":["severity-ranked security report"],"depends_on":["07-commerce-checkout","06-elementor-authoring"]},
+    {"id":"12-review-and-simplify","category":"maintainability and code quality","primary":"code-reviewer","support":["wp-code-simplifier","coding-standards"],"owns":["independent review","dead-reference removal","duplication and complexity reduction"],"hands_off":["resolved review findings and simplification report"],"depends_on":["09-accessibility","10-e2e-visual-qa","11-security-review"]},
+    {"id":"13-release-and-recovery","category":"release verification and incident recovery","primary":"deploy-and-verify","support":["theme-heal-doctor","adversarial-planning"],"owns":["release checklist","production verification after approval","measured regression recovery"],"hands_off":["deployment evidence or a recovery report"],"depends_on":["12-review-and-simplify"]}
+  ],
+  "gates": [
+    "Design contract is accepted before surface implementation begins.",
+    "Theme source, generated assets, and repository verification are complete before QA.",
+    "Commerce journeys pass against a non-production store before release consideration.",
+    "Accessibility, browser QA, security review, and simplification are complete with evidence.",
+    "Release-and-recovery executes only after explicit production approval."
+  ]
+}
