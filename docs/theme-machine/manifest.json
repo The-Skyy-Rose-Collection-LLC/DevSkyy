@@ -1,42 +1,474 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "name": "SkyyRose Theme Building Machine",
   "purpose": "A gated, worktree-isolated operating system for premium, interactive WooCommerce themes.",
+  "authority": {
+    "machine_role": "The machine recommends, builds, tests, and reports evidence; it is never the final business or creative authority.",
+    "final_approver": "user/founder",
+    "approval_domains": [
+      "creative",
+      "brand",
+      "commerce",
+      "asset-licensing",
+      "release",
+      "material-product"
+    ],
+    "approval_artifact": "founder-approval-record",
+    "approval_verification": {
+      "method": "ed25519",
+      "public_keys": [],
+      "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
+      "configuration_rule": "Release authorization remains blocked until the founder supplies and approves at least one Ed25519 public key outside a candidate report."
+    },
+    "rule": "A recommendation or passing technical gate does not replace explicit user/founder approval in every applicable approval domain."
+  },
   "request_contract": {
-    "required": ["theme_path", "surface_or_outcome", "commerce_authority"],
+    "required": [
+      "theme_path",
+      "surface_or_outcome",
+      "commerce_authority",
+      "target_release_profiles",
+      "distribution_model",
+      "target_compatibility"
+    ],
     "defaults": {
       "commerce_authority": "WooCommerce owns catalog, cart, tax, shipping, orders, and payment state; Stripe is a gateway."
     }
   },
+  "brand_story_constraints": [
+    {
+      "id": "black-rose-beauty-and-depth",
+      "collection": "Black Rose",
+      "canonical_direction": "Display the beauty and depth of black through the Black Rose, treating black as material, silhouette, reflection, and contrast; silver is supporting light, never the lead.",
+      "originality_rule": "Build collection-specific form, texture, light, pacing, imagery, and copy that reveal dimensional black rather than using darkness as a generic mood preset.",
+      "forbidden": [
+        "generic goth styling",
+        "grief or mourning as the default narrative",
+        "black-as-absence or emptiness cliches",
+        "silver overtaking black as the primary visual register",
+        "assets, copy, motifs, or scene language leaked from another collection"
+      ],
+      "clearance_gate": "collection-narrative-worlds"
+    },
+    {
+      "id": "love-hurts-original-beast-perspective",
+      "collection": "Love Hurts",
+      "canonical_direction": "An original Beauty-and-the-Beast-inspired archetypal story told from the Beast's perspective through isolation, devotion, transformation, and earned tenderness.",
+      "originality_rule": "Treat the archetype as thematic inspiration only. Build original setting, scene language, characters, sequence, assets, copy, sound design, and commerce transitions.",
+      "forbidden": [
+        "Disney names or marks",
+        "Disney characters or character likenesses",
+        "exact Disney plot beats or sequence",
+        "Disney imagery or recognizable visual motifs",
+        "Disney music or sound-alikes",
+        "Disney quotes or paraphrases",
+        "Disney logos, titles, or other marks",
+        "Disney trade dress or source-confusing presentation"
+      ],
+      "clearance_gate": "legal-ip-clearance"
+    },
+    {
+      "id": "kids-capsule-heir-to-throne",
+      "collection": "Kids Capsule",
+      "canonical_direction": "The heir to the throne: the future inheriting the world, expressed through playful sovereignty, protection, and possibility.",
+      "originality_rule": "Use an age-appropriate visual register, copy, pacing, controls, and commerce bridge designed for children and caregivers, with child-privacy safeguards and original collection-specific assets.",
+      "forbidden": [
+        "miniature adult collection reskins",
+        "dark-gothic or threatening treatment",
+        "adult-coded sensuality, copy, or interactions",
+        "manipulative or high-pressure interactions aimed at children",
+        "unconsented child profiling, tracking, or personal-data collection",
+        "assets, copy, motifs, or scene language leaked from another collection"
+      ],
+      "clearance_gate": "collection-narrative-worlds"
+    },
+    {
+      "id": "signature-flagship-house-standard",
+      "collection": "Signature",
+      "canonical_direction": "The Flagship collection and clearest expression of the entire house: Oakland confidence, craft, and forward motion, told through its city-tour world and gold visual register.",
+      "originality_rule": "Set the house-level visual and system standard through a coherent Signature world without becoming a neutral default template or a collage of other collection identities.",
+      "forbidden": [
+        "neutral or generic default-theme treatment",
+        "collage or sampling of other collection worlds",
+        "loss of the Oakland city-tour narrative",
+        "replacement of the gold register with another collection's palette",
+        "assets, copy, motifs, or scene language leaked from another collection"
+      ],
+      "clearance_gate": "collection-narrative-worlds"
+    }
+  ],
+  "evidence_policy": {
+    "gate_statuses": ["pass", "fail", "blocked", "not_applicable"],
+    "passing_rule": "A pass requires every criterion to pass, every required artifact to exist, and every recorded SHA-256 digest to match the file supplied in the handoff bundle.",
+    "incomplete_rule": "Skipped, missing, stale, placeholder, self-attested without an artifact, or not-run checks are blocked, never pass.",
+    "not_applicable_rule": "Not-applicable requires a written rationale and explicit user/founder approval; it cannot satisfy a gate required by a selected release profile.",
+    "readiness_claim_rule": "After evidence-review validation, the machine may say structurally and semantically validated for founder evidence review. Only a separately signed release-authorized report may say validated for release handoff. It must never say marketplace approved, certified, accepted, guaranteed, or production deployed.",
+    "policy_refresh_days": 120,
+    "evidence_refresh_days": 30
+  },
+  "trust_roots": {
+    "build_attestation": {
+      "method": "ed25519",
+      "public_keys": [],
+      "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
+      "rule": "Candidate validation is blocked until a separately controlled CI/build-attestor key signs the exact commit-to-package reproducibility and safe-extraction claims."
+    },
+    "policy_attestation": {
+      "method": "ed25519",
+      "public_keys": [],
+      "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
+      "rule": "Marketplace-profile validation is blocked until a separately controlled policy collector key signs official-source snapshots and coverage."
+    }
+  },
+  "authoritative_references": [
+    {
+      "id": "wordpress-org-required",
+      "release_profile": "wordpress-org",
+      "url": "https://make.wordpress.org/themes/handbook/review/required/",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["code-and-core", "functionality-and-theme-territory", "plugins", "naming-and-trademarks", "internationalization", "privacy-and-remote-resources", "style-headers-and-readme", "source-and-third-party-assets", "security-and-options", "block-theme-requirements"],
+      "purpose": "Current WordPress.org Theme Review requirements, including licensing, privacy, theme territory, internationalization, source files, and onboarding restrictions."
+    },
+    {
+      "id": "wordpress-org-release",
+      "release_profile": "wordpress-org",
+      "url": "https://developer.wordpress.org/themes/releasing-your-theme/",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["required-theme-files", "theme-check", "theme-unit-test-data", "documentation", "submission-review", "update-workflow"],
+      "purpose": "Required files, Theme Check, test data, documentation, submission, and update workflow."
+    },
+    {
+      "id": "themeforest-wordpress-hub",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000472383-WordPress-Theme-Requirements-Start-here",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["part-1-general", "part-2-features", "part-3-theme-plugins", "part-4-coding", "part-5-security", "part-6-gutenberg"],
+      "purpose": "Authoritative index for all six current Envato WordPress theme requirement sections."
+    },
+    {
+      "id": "themeforest-general",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000481263-WordPress-Theme-Requirements-Part-1-General",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["envato-theme-check", "unit-test-data", "data-privacy", "purchase-verification", "theme-updates", "malware", "public-documentation", "asset-licenses-and-remote-resources"],
+      "purpose": "Envato validation, privacy, updates, public documentation, and asset licensing requirements."
+    },
+    {
+      "id": "themeforest-features",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000480723-WordPress-Theme-Requirements-Part-2-Features",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["core-features", "core-settings", "sidebars-and-content", "menu-position", "customizer", "child-themes", "woocommerce-templates"],
+      "purpose": "Envato core feature, setting, content-area, Customizer, child-theme, and WooCommerce requirements."
+    },
+    {
+      "id": "themeforest-plugins",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000481223-WordPress-Theme-Requirements-Part-3-Theme-Plugins",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["plugin-territory", "plugin-fallbacks", "third-party-plugins-and-libraries", "plugin-inclusion", "out-of-box", "plugin-detection", "import-export"],
+      "purpose": "Envato theme/plugin territory, bundling, consent, fallback, out-of-box, and import requirements."
+    },
+    {
+      "id": "themeforest-coding",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000479946-WordPress-Theme-Requirements-Part-4-Coding",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["general-code-quality", "prefixing", "file-and-asset-loading", "wordpress-code", "php", "html-css", "javascript", "translation"],
+      "purpose": "Envato prefixing, loading, WordPress/PHP/HTML/CSS/JavaScript, translation, and code-quality requirements."
+    },
+    {
+      "id": "themeforest-security",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360000481243-WordPress-Theme-Requirements-Part-5-Theme-Security",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["validation", "sanitization", "database", "escaping", "capabilities", "nonces", "svg-upload", "security-changelog"],
+      "purpose": "Envato validation, sanitization, escaping, capability, nonce, database, and security changelog requirements."
+    },
+    {
+      "id": "themeforest-gutenberg",
+      "release_profile": "themeforest",
+      "url": "https://help.author.envato.com/hc/en-us/articles/360020255992-WordPress-Theme-Requirements-Part-6-Gutenberg",
+      "reviewed_on": "2026-08-04",
+      "required_sections": ["core-block-styling", "block-plugin-territory", "block-availability", "editor-errors", "wide-alignment", "editor-frontend-parity", "gutenberg-fallbacks", "plugin-block-requirements"],
+      "purpose": "Envato Gutenberg theme, editor-parity, fallback, and plugin-block requirements."
+    }
+  ],
   "operating_rules": [
     "Create a dedicated Git worktree for every lane that changes files. Never use the shared worktree for implementation.",
     "The fashion-theme-architect is the primary end-to-end builder. It does not deploy, commit, alter permissions, or make paid calls.",
     "Load skyyrose-wp-platform before SkyyRose theme work and load only the relevant reference for the surface being changed.",
     "Use source files as the authority and rebuild committed minified CSS and JavaScript whenever their source changes.",
     "Treat catalog and image SOT manifests as authoritative. Do not invent products, prices, inventory, or product imagery.",
-    "A skipped browser, performance, security, or release check is evidence of an incomplete gate, never a passing result.",
-    "Production deployment, paid image generation, and destructive operations require explicit approval."
+    "Give every collection a founder-approved narrative design contract; never substitute an accent-color reskin or leak another collection's assets, copy, or scene language.",
+    "Website-delivery video derivatives must contain zero audio streams, proven by ffprobe; preserve source masters outside the repository and record source-to-derivative provenance.",
+    "A skipped browser, performance, security, policy, packaging, or release check is evidence of an incomplete gate, never a passing result.",
+    "Production deployment, paid image generation, destructive operations, and final creative, brand, commerce, licensing, release, or material product decisions require explicit user/founder approval.",
+    "Refresh selected marketplace requirements from authoritative sources before release review; never infer cross-marketplace compliance.",
+    "Never claim marketplace readiness from code inspection alone; validate the candidate evidence report and preserve the resulting handoff bundle."
   ],
   "lanes": [
     {"id":"01-primary-builder","category":"end-to-end build","primary":"fashion-theme-architect","support":["skyyrose-wp-platform"],"owns":["theme architecture","template hierarchy","source-first implementation","build report"],"hands_off":["candidate worktree and verification evidence"],"depends_on":[]},
-    {"id":"02-platform-doctrine","category":"SkyyRose platform safety","primary":"skyyrose-wp-platform","support":["devskyy-patterns","coding-standards"],"owns":["platform constraints","asset and SOT rules","WordPress conventions"],"hands_off":["surface-specific implementation contract"],"depends_on":[]},
-    {"id":"03-luxury-direction","category":"high-end visual direction","primary":"luxury-design-taste","support":["design-system","frontend-design-direction"],"owns":["art direction","type, color, motion and density decisions","acceptance references"],"hands_off":["one-page design contract"],"depends_on":["02-platform-doctrine"]},
+    {"id":"02-platform-doctrine","category":"SkyyRose platform safety","primary":"skyyrose-wp-platform","support":["devskyy-patterns","coding-standards"],"owns":["platform constraints","asset and SOT rules","WordPress conventions","marketplace policy mapping"],"hands_off":["surface-specific implementation and distribution contract"],"depends_on":[]},
+    {"id":"03-luxury-direction","category":"high-end visual direction","primary":"luxury-design-taste","support":["design-system","frontend-design-direction"],"owns":["art direction","type, color, motion and density decisions","acceptance references"],"hands_off":["founder-reviewed design contract"],"depends_on":["02-platform-doctrine"]},
     {"id":"04-storefront-composition","category":"responsive storefront surfaces","primary":"wp-frontend","support":["frontend-patterns","css-responsive","motion-ui"],"owns":["responsive layout","progressive enhancement","surface-level interaction"],"hands_off":["reviewable implementation in its worktree"],"depends_on":["01-primary-builder","03-luxury-direction"]},
-    {"id":"05-immersive-storytelling","category":"interactive and 3D experiences","primary":"wp-immersive","support":["immersive-interactive-architect","3d-rigging-pipeline"],"owns":["scroll scenes","WebGL fallbacks","interactive hotspots","performance budgets"],"hands_off":["isolated experience and fallback test plan"],"depends_on":["03-luxury-direction","04-storefront-composition"]},
+    {"id":"05-immersive-storytelling","category":"interactive and 3D experiences","primary":"wp-immersive","support":["immersive-interactive-architect","3d-rigging-pipeline"],"owns":["scroll scenes","no-JavaScript, reduced-motion, WebGL-failure, and low-power fallbacks","interactive hotspots","performance budgets"],"hands_off":["isolated experience, fallback implementation, and fallback test evidence"],"depends_on":["03-luxury-direction","04-storefront-composition"]},
     {"id":"06-elementor-authoring","category":"editor-friendly components","primary":"wp-elementor","support":["frontend-patterns","accessibility"],"owns":["custom Elementor widgets","editor controls","escaped widget output"],"hands_off":["registered widgets and editor test evidence"],"depends_on":["01-primary-builder","03-luxury-direction"]},
     {"id":"07-commerce-checkout","category":"WooCommerce and Stripe gateway integration","primary":"wp-woocommerce","support":["wordpress-woocommerce-automation","checkout-optimizer"],"owns":["WooCommerce templates","checkout correctness","Stripe gateway boundary"],"hands_off":["commerce contract and checkout evidence"],"depends_on":["01-primary-builder","02-platform-doctrine"]},
-    {"id":"08-catalog-integrity","category":"catalog and product-media authority","primary":"wp-catalog-sync","support":["skyyrose-wp-platform"],"owns":["catalog SOT mappings","SKU integrity","verified product media"],"hands_off":["catalog validation report"],"depends_on":["02-platform-doctrine","07-commerce-checkout"]},
-    {"id":"09-accessibility","category":"inclusive interface quality","primary":"accessibility","support":["frontend-a11y","css-a11y"],"owns":["semantic interaction","keyboard flows","motion and contrast safeguards"],"hands_off":["accessibility findings and remediation gate"],"depends_on":["04-storefront-composition","05-immersive-storytelling","06-elementor-authoring"]},
-    {"id":"10-e2e-visual-qa","category":"browser and visual verification","primary":"e2e-runner","support":["e2e-testing","design-qc"],"owns":["critical user journeys","cross-device browser checks","screenshots and artifacts"],"hands_off":["passing or failing QA evidence"],"depends_on":["07-commerce-checkout","08-catalog-integrity","09-accessibility"]},
-    {"id":"11-security-review","category":"WordPress and commerce security","primary":"security-reviewer","support":["security-review","adversarial-verification"],"owns":["input/output handling","nonce and authorization review","payment and webhook threat checks"],"hands_off":["severity-ranked security report"],"depends_on":["07-commerce-checkout","06-elementor-authoring"]},
-    {"id":"12-review-and-simplify","category":"maintainability and code quality","primary":"code-reviewer","support":["wp-code-simplifier","coding-standards"],"owns":["independent review","dead-reference removal","duplication and complexity reduction"],"hands_off":["resolved review findings and simplification report"],"depends_on":["09-accessibility","10-e2e-visual-qa","11-security-review"]},
-    {"id":"13-release-and-recovery","category":"release verification and incident recovery","primary":"deploy-and-verify","support":["theme-heal-doctor","adversarial-planning"],"owns":["release checklist","production verification after approval","measured regression recovery"],"hands_off":["deployment evidence or a recovery report"],"depends_on":["12-review-and-simplify"]}
+    {"id":"08-catalog-integrity","category":"catalog and product-media authority","primary":"wp-catalog-sync","support":["skyyrose-wp-platform"],"owns":["catalog SOT mappings","SKU integrity","verified product media","product asset provenance"],"hands_off":["catalog validation and media provenance report"],"depends_on":["02-platform-doctrine","07-commerce-checkout"]},
+    {"id":"09-accessibility","category":"inclusive interface quality","primary":"accessibility","support":["frontend-a11y","css-a11y"],"owns":["semantic interaction","keyboard flows","motion and contrast safeguards","automated and manual accessibility evidence"],"hands_off":["accessibility findings and remediation gate"],"depends_on":["04-storefront-composition","05-immersive-storytelling","06-elementor-authoring"]},
+    {"id":"10-e2e-visual-qa","category":"browser and visual verification","primary":"e2e-runner","support":["e2e-testing","design-qc"],"owns":["critical user journeys","cross-device browser checks","compatibility matrix","screenshots and artifacts"],"hands_off":["passing or failing QA evidence and compatibility matrix"],"depends_on":["07-commerce-checkout","08-catalog-integrity","09-accessibility"]},
+    {"id":"11-security-review","category":"WordPress and commerce security","primary":"security-reviewer","support":["security-review","adversarial-verification"],"owns":["input/output handling","nonce and authorization review","payment and webhook threat checks","privacy and dependency risk"],"hands_off":["severity-ranked security and privacy report"],"depends_on":["07-commerce-checkout","06-elementor-authoring"]},
+    {"id":"12-review-and-simplify","category":"maintainability and code quality","primary":"code-reviewer","support":["wp-code-simplifier","coding-standards"],"owns":["independent review","dead-reference removal","duplication and complexity reduction","SBOM review"],"hands_off":["resolved review findings and simplification report"],"depends_on":["09-accessibility","10-e2e-visual-qa","11-security-review"]},
+    {"id":"13-release-and-recovery","category":"release verification and incident recovery","primary":"deploy-and-verify","support":["theme-heal-doctor","adversarial-planning"],"owns":["reproducible package","release and rollback checklist","update and child-theme strategy","handoff bundle","production verification after approval","measured regression recovery"],"hands_off":["validated candidate evidence report and founder approval request; deployment evidence or recovery report only after approval"],"depends_on":["12-review-and-simplify"]}
   ],
-  "gates": [
-    "Design contract is accepted before surface implementation begins.",
-    "Theme source, generated assets, and repository verification are complete before QA.",
-    "Commerce journeys pass against a non-production store before release consideration.",
-    "Accessibility, browser QA, security review, and simplification are complete with evidence.",
-    "Release-and-recovery executes only after explicit production approval."
-  ]
+  "quality_gates": [
+    {
+      "id": "marketplace-policy",
+      "owner_lane": "02-platform-doctrine",
+      "required_artifacts": ["marketplace-policy-audit"],
+      "criteria": [
+        "Selected release profiles are explicit and separately audited against non-stale authoritative requirements.",
+        "WordPress.org candidates satisfy Theme Check and theme-territory rules, including no prohibited plugin functionality, remote resources without consent, or demo import in theme onboarding.",
+        "ThemeForest candidates satisfy every applicable Envato WordPress requirements section and have zero REQUIRED Envato Theme Check notices.",
+        "Marketplace metadata and marketing claims do not exceed tested functionality or compatibility."
+      ]
+    },
+    {
+      "id": "licensing-attribution",
+      "owner_lane": "02-platform-doctrine",
+      "required_artifacts": ["license-asset-ledger"],
+      "criteria": [
+        "Theme code license is compatible with the selected distribution profile.",
+        "Every bundled and preview-only font, image, icon, video, 3D model, script, library, and demo asset has origin, author, version, license, attribution, modification, and redistribution rights recorded.",
+        "Unlicensed, incompatible, unverifiable, or non-redistributable assets are excluded from the distributable package and demo media is clearly identified.",
+        "User/founder approves the final asset-licensing ledger."
+      ]
+    },
+    {
+      "id": "legal-ip-clearance",
+      "owner_lane": "02-platform-doctrine",
+      "required_artifacts": ["legal-ip-clearance"],
+      "criteria": [
+        "Collection names, narratives, copy, characters, imagery, symbols, music, video, 3D, interaction, metadata, and trade dress are inventoried and reviewed for copyright, trademark, publicity, and source-confusion risk.",
+        "Love Hurts uses the Beauty-and-the-Beast archetype only as original thematic inspiration from the Beast's perspective through isolation, devotion, transformation, and earned tenderness.",
+        "Love Hurts contains no Disney names, characters, likenesses, exact plot beats, imagery, recognizable motifs, music or sound-alikes, quotes or paraphrases, marks, or trade dress.",
+        "All shipped assets and copy are original or separately licensed with recorded provenance; similarity risks are remediated rather than disclaimed.",
+        "A qualified human legal/IP reviewer records disposition for material risks and the founder approves the final original treatment; an agent cannot grant legal clearance."
+      ]
+    },
+    {
+      "id": "collection-narrative-worlds",
+      "owner_lane": "03-luxury-direction",
+      "required_artifacts": ["collection-narrative-contracts"],
+      "criteria": [
+        "Every collection has a founder-approved contract linking its identity SOT, world/scene, visual register, motion grammar, approved imagery, story beats, and commerce bridge.",
+        "Each world is compositionally and narratively distinct; an accent-color, type, or background swap on a shared layout is not sufficient.",
+        "Assets, product imagery, motifs, scene language, and copy are checked for cross-collection leakage against explicit allowlists.",
+        "Black Rose reveals the beauty and depth of black as material, silhouette, reflection, and contrast, with silver only supporting; it rejects generic goth, grief, and black-as-absence cliches.",
+        "Kids Capsule expresses the heir-to-the-throne direction through playful sovereignty, protection, possibility, and an age-appropriate child-and-caregiver experience; it is not a miniature adult or dark-gothic reskin.",
+        "Signature is the Flagship house standard: Oakland confidence, craft, and forward motion in its city-tour world and gold register, never a neutral default or collage of other collection worlds.",
+        "Mobile, reduced-motion, no-JavaScript, and non-WebGL equivalents preserve the collection's story and product path.",
+        "Eyes-on visual-drift QA compares every collection surface and fallback to its approved contract before release review."
+      ]
+    },
+    {
+      "id": "privacy-data",
+      "owner_lane": "11-security-review",
+      "required_artifacts": ["privacy-data-map"],
+      "criteria": [
+        "All remote calls, cookies, local storage, telemetry, purchase verification, fonts, embeds, and personal-data flows are inventoried with purpose, destination, retention, consent, and opt-out behavior.",
+        "No data or remote resource is transmitted before the consent required by the selected marketplace and applicable policy.",
+        "The public documentation explains third-party data exposure and how to disable optional connections.",
+        "Kids Capsule and any child-directed surface avoid child profiling, behavioral advertising, manipulative purchase pressure, and personal-data collection without documented lawful, age-appropriate caregiver consent and founder approval."
+      ]
+    },
+    {
+      "id": "video-delivery-safety",
+      "owner_lane": "08-catalog-integrity",
+      "required_artifacts": ["video-delivery-audit"],
+      "criteria": [
+        "A complete video inventory identifies every website-delivery video; an evidence-backed empty inventory passes when the candidate has no delivery video.",
+        "Every inventoried website-delivery video is a derivative whose media container has zero audio streams; muted playback, zero volume, and silent audio tracks do not satisfy this rule.",
+        "Source masters are preserved outside the repository and distributable archive.",
+        "Each derivative records source and derivative SHA-256, transformation command and toolchain, license provenance, and ffprobe machine output proving zero audio streams.",
+        "Any candidate video with an audio stream or missing provenance is excluded from the package and blocks advertised video evidence."
+      ]
+    },
+    {
+      "id": "accessibility",
+      "owner_lane": "09-accessibility",
+      "required_artifacts": ["accessibility-report"],
+      "criteria": [
+        "Automated scans and manual keyboard, focus, landmarks, names, errors, zoom/reflow, contrast, screen-reader smoke, and reduced-motion checks cover critical templates and commerce journeys.",
+        "No unresolved critical or serious accessibility defect remains; lower-severity exceptions are documented for founder acceptance.",
+        "Accessibility-ready is claimed only when the selected marketplace's current criteria are explicitly tested."
+      ]
+    },
+    {
+      "id": "performance",
+      "owner_lane": "10-e2e-visual-qa",
+      "required_artifacts": ["performance-report"],
+      "criteria": [
+        "Budgets for transfer size, JavaScript, CSS, images, fonts, requests, Core Web Vitals, and server queries are declared before measurement.",
+        "Cold and warm measurements cover representative mobile and desktop storefront and immersive pages without test-only bypasses.",
+        "Budget failures are blocked or explicitly remediated; a skipped or tool-failed measurement cannot pass."
+      ]
+    },
+    {
+      "id": "security",
+      "owner_lane": "11-security-review",
+      "required_artifacts": ["security-report"],
+      "criteria": [
+        "Theme code passes secret, malware, dependency, static-analysis, and WordPress-specific review with no unresolved critical or high finding.",
+        "Input is validated or sanitized, output and translations are escaped, state changes use authorization and nonces, and database access uses WordPress APIs and prepared queries.",
+        "Security fixes are identified in the changelog and no review or scanning mechanism is bypassed."
+      ]
+    },
+    {
+      "id": "updates-child-theme",
+      "owner_lane": "13-release-and-recovery",
+      "required_artifacts": ["update-child-theme-strategy"],
+      "criteria": [
+        "Semantic versioning, changelog, migration, rollback, backups, update channel, signature or checksum verification, and support windows are documented.",
+        "Parent updates preserve supported child-theme overrides and customizations; deprecated hooks/templates have a migration path.",
+        "Clean install, upgrade from the previous supported release, rollback, and child-theme activation are tested without data loss.",
+        "The update mechanism coexists with WordPress and selected marketplace update mechanisms."
+      ]
+    },
+    {
+      "id": "demo-import-onboarding",
+      "owner_lane": "13-release-and-recovery",
+      "required_artifacts": ["demo-onboarding-report"],
+      "criteria": [
+        "A clean-site onboarding journey documents prerequisites, required versus optional plugins, setup, import, recovery, reset, timeouts, and support paths.",
+        "Imports are explicit, idempotent where practical, capability- and nonce-protected, bounded, and never overwrite existing content without informed confirmation.",
+        "Demo content excludes licensed production/customer data and replaces non-redistributable media with clearly documented distributable substitutes.",
+        "WordPress.org candidates exclude prohibited demo-import, tracking, affiliate, and external-call onboarding behavior; ThemeForest candidates prove any advertised import reproduces the demo."
+      ]
+    },
+    {
+      "id": "sbom-dependencies",
+      "owner_lane": "12-review-and-simplify",
+      "required_artifacts": ["sbom"],
+      "criteria": [
+        "A machine-readable CycloneDX SBOM covers production PHP, JavaScript, CSS, fonts, binaries, build tools, and bundled libraries with versions, licenses, hashes, and supplier or source.",
+        "Lockfiles are present where supported; bundled dependencies are current, non-duplicative with WordPress core, and checked for known vulnerabilities and abandoned packages.",
+        "Every component in the distributable archive maps to the SBOM or the asset-license ledger."
+      ]
+    },
+    {
+      "id": "reproducible-package",
+      "owner_lane": "13-release-and-recovery",
+      "required_artifacts": ["build-provenance", "candidate-package", "package-checksums"],
+      "criteria": [
+        "The candidate is built from a clean, identified commit with locked toolchain versions and one documented non-interactive command.",
+        "Two clean builds using the same documented inputs produce byte-identical archives and matching SHA-256 digests.",
+        "The installable archive has one correctly named theme root and excludes secrets, VCS metadata, caches, tests, source maps not intended for release, OS metadata, node_modules, and development-only files.",
+        "Source files required by the selected marketplace accompany minified assets, and the installed version matches package and changelog metadata."
+      ]
+    },
+    {
+      "id": "compatibility",
+      "owner_lane": "10-e2e-visual-qa",
+      "required_artifacts": ["compatibility-matrix"],
+      "criteria": [
+        "The matrix records exact tested WordPress, PHP, WooCommerce, browser, device/viewport, editor, multisite, RTL, locale, and relevant plugin versions plus date, environment, result, and evidence.",
+        "Minimum, maximum advertised, and latest stable supported combinations are tested; unsupported combinations are explicit.",
+        "Marketplace compatibility metadata is a subset of passing matrix rows."
+      ]
+    },
+    {
+      "id": "handoff-support",
+      "owner_lane": "13-release-and-recovery",
+      "required_artifacts": ["handoff-index"],
+      "criteria": [
+        "The handoff index links the installable archive, checksums, SBOM, license ledger, source/build instructions, documentation, demo data, screenshots, test reports, compatibility matrix, changelog, rollback plan, known issues, and support/escalation ownership.",
+        "A fresh operator can install, configure, verify, update, roll back, and diagnose the candidate using only the handoff bundle and declared prerequisites.",
+        "Secrets, customer data, production credentials, and unapproved production URLs are absent."
+      ]
+    },
+    {
+      "id": "scroll-world-fallbacks",
+      "owner_lane": "05-immersive-storytelling",
+      "required_artifacts": ["scroll-fallback-report"],
+      "criteria": [
+        "A complete interaction inventory identifies every scroll-world or immersive surface; an evidence-backed empty inventory passes when the candidate has none.",
+        "For every inventoried surface, no-JavaScript, prefers-reduced-motion, WebGL unavailable, WebGL context loss, low-memory/low-power, input modality, and narrow viewport states are explicitly implemented and tested.",
+        "Fallbacks preserve the story's essential information, document order, keyboard focus, navigation, product links, pricing, and add-to-cart path without scroll trapping or hidden content.",
+        "Animation can be paused or bypassed, enhancement failures recover to a stable static experience, and fallback screenshots plus interaction traces are retained."
+      ]
+    },
+    {
+      "id": "commerce",
+      "owner_lane": "07-commerce-checkout",
+      "required_artifacts": ["commerce-report"],
+      "criteria": [
+        "WooCommerce remains authoritative for product, inventory, cart, tax, shipping, order, refund, and payment state.",
+        "Guest and account journeys cover product variants, cart mutation, coupons, tax, shipping, checkout errors, gateway return, order confirmation, and safe retry in a non-production environment.",
+        "The user/founder approves material commerce behavior, merchandising, pricing presentation, and gateway decisions."
+      ]
+    },
+    {
+      "id": "browser-e2e-quality",
+      "owner_lane": "10-e2e-visual-qa",
+      "required_artifacts": ["e2e-quality-report"],
+      "criteria": [
+        "Critical templates and editor, catalog, search, account, cart, checkout, error, and recovery journeys pass on the declared compatibility matrix.",
+        "Visual evidence covers responsive breakpoints, empty/error/loading states, content stress, and both enhanced and fallback experiences.",
+        "Independent code review and WordPress simplification findings are resolved or explicitly blocked; flaky, skipped, and quarantined checks are not counted as passes."
+      ]
+    }
+  ],
+  "artifact_contract": [
+    {"id":"marketplace-policy-audit","format":"json","semantic_validation":"marketplace-policy-v1","description":"Trusted-collector-signed profile coverage with official source snapshot hashes, retrieval time, human reviewer, and tool output."},
+    {"id":"license-asset-ledger","format":"markdown-or-json","description":"Code, bundled, demo, and preview asset provenance, license, attribution, modification, and redistribution rights."},
+    {"id":"legal-ip-clearance","format":"markdown-or-json","description":"Qualified human IP review, similarity inventory, remediation, original-work provenance, and founder approval; agent output alone is insufficient."},
+    {"id":"collection-narrative-contracts","format":"markdown-or-json","description":"Per-collection identity SOT, world, visual register, motion grammar, imagery allowlist, story beats, commerce bridge, fallbacks, approval, and visual-drift evidence."},
+    {"id":"privacy-data-map","format":"markdown-or-json","description":"Remote endpoints, data flows, storage, consent, retention, and opt-out inventory."},
+    {"id":"video-delivery-audit","format":"json","semantic_validation":"video-audit-v1","description":"Per-video source and derivative hashes, external master location reference, transformation provenance, license, and ffprobe zero-audio-stream evidence; an explicit empty inventory is allowed."},
+    {"id":"accessibility-report","format":"html-or-json","description":"Automated and manual results, environments, defects, remediation, and screenshots."},
+    {"id":"performance-report","format":"html-or-json","description":"Declared budgets and cold/warm mobile and desktop measurements."},
+    {"id":"security-report","format":"markdown-or-json","description":"Tool outputs, threat review, dependency findings, severity, and disposition."},
+    {"id":"update-child-theme-strategy","format":"markdown","description":"Version, migration, rollback, support, child-theme, and update-channel contract plus test results."},
+    {"id":"demo-onboarding-report","format":"markdown-or-json","description":"Clean-site onboarding/import procedure, destructive boundaries, recovery, and journey results."},
+    {"id":"sbom","format":"cyclonedx-json","semantic_validation":"cyclonedx-v1","description":"Machine-readable production and build dependency bill of materials."},
+    {"id":"build-provenance","format":"json","semantic_validation":"reproducible-build-v1","description":"Trusted-build-attestor-signed commit, toolchain, safe package inspection, and two-clean-build digest comparison."},
+    {"id":"candidate-package","format":"zip","semantic_validation":"wordpress-theme-zip-v1","description":"Installable candidate archive; its presence does not itself establish readiness."},
+    {"id":"package-checksums","format":"sha256","semantic_validation":"sha256-list-v1","description":"SHA-256 checksums for the candidate and material handoff artifacts."},
+    {"id":"compatibility-matrix","format":"json","semantic_validation":"compatibility-matrix-v1","description":"Exact platform and client combinations, advertised status, result, date, and evidence."},
+    {"id":"handoff-index","format":"markdown-or-json","description":"Complete operator and marketplace submission artifact index, known issues, ownership, and support path."},
+    {"id":"scroll-fallback-report","format":"json","semantic_validation":"scroll-fallback-v1","description":"Complete immersive-surface inventory with fallback checks, screenshots, and interaction traces for every degraded mode; an explicit empty inventory is allowed."},
+    {"id":"commerce-report","format":"html-or-json","description":"Non-production WooCommerce journey results and authority-boundary review."},
+    {"id":"e2e-quality-report","format":"html-or-json","description":"Browser, visual, editor, content-stress, and independent review evidence."},
+    {"id":"founder-approval-record","format":"json","semantic_validation":"founder-approval-v1","description":"Candidate-bound, signed user/founder decisions by approval domain; recommendations are not approvals."}
+  ],
+  "release_profiles": [
+    {
+      "id": "internal-production",
+      "policy_references": [],
+      "required_gates": ["licensing-attribution", "legal-ip-clearance", "collection-narrative-worlds", "privacy-data", "video-delivery-safety", "accessibility", "performance", "security", "updates-child-theme", "demo-import-onboarding", "sbom-dependencies", "reproducible-package", "compatibility", "handoff-support", "scroll-world-fallbacks", "commerce", "browser-e2e-quality"],
+      "required_approvals": ["creative", "brand", "commerce", "asset-licensing", "release", "material-product"]
+    },
+    {
+      "id": "wordpress-org",
+      "policy_references": ["wordpress-org-required", "wordpress-org-release"],
+      "required_gates": ["marketplace-policy", "licensing-attribution", "legal-ip-clearance", "collection-narrative-worlds", "privacy-data", "video-delivery-safety", "accessibility", "performance", "security", "updates-child-theme", "demo-import-onboarding", "sbom-dependencies", "reproducible-package", "compatibility", "handoff-support", "scroll-world-fallbacks", "commerce", "browser-e2e-quality"],
+      "required_approvals": ["creative", "brand", "commerce", "asset-licensing", "release", "material-product"]
+    },
+    {
+      "id": "themeforest",
+      "policy_references": ["themeforest-wordpress-hub", "themeforest-general", "themeforest-features", "themeforest-plugins", "themeforest-coding", "themeforest-security", "themeforest-gutenberg"],
+      "required_gates": ["marketplace-policy", "licensing-attribution", "legal-ip-clearance", "collection-narrative-worlds", "privacy-data", "video-delivery-safety", "accessibility", "performance", "security", "updates-child-theme", "demo-import-onboarding", "sbom-dependencies", "reproducible-package", "compatibility", "handoff-support", "scroll-world-fallbacks", "commerce", "browser-e2e-quality"],
+      "required_approvals": ["creative", "brand", "commerce", "asset-licensing", "release", "material-product"]
+    }
+  ],
+  "candidate_report_contract": {
+    "required": ["manifest_schema_version", "manifest_sha256", "evidence_root_sha256", "phase", "candidate", "target_release_profiles", "generated_at", "gates", "artifacts", "approvals"],
+    "candidate_required": ["theme_path", "version", "commit", "package_artifact_id"],
+    "artifact_required": ["id", "path", "sha256"],
+    "gate_required": ["id", "status", "evidence_artifacts", "criterion_results", "notes"],
+    "criterion_required": ["index", "status", "evidence_artifacts", "observed_at", "notes"],
+    "approval_required": ["domain", "decision", "approver", "recorded_at", "evidence_artifact"]
+  }
 }
