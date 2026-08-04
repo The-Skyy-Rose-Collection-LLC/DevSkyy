@@ -155,7 +155,7 @@
     const chapters = Array.from(rail.children);
     const storyProgress = rail.parentElement ? rail.parentElement.querySelector('.sr2-world-story__progress span') : null;
 
-    if (world?.classList.contains('sr2-worlds') && finePointer && !reducedMotion && window.matchMedia('(min-width: 901px)').matches) {
+    if (world?.matches('[data-pinned-scroll-world]') && finePointer && !reducedMotion && window.matchMedia('(min-width: 901px)').matches) {
       if (setupPinnedWorld(world, rail, chapters, previous, next, count, progress)) return;
     }
 

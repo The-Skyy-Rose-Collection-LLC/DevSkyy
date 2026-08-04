@@ -58,19 +58,7 @@ while ( have_posts() ) :
 			<section id="reserve" class="sr2-section sr2-section--products"><header class="sr2-section-head"><p><?php esc_html_e( 'Available to Reserve', 'skyyrose-flagship-2' ); ?></p><h2><?php esc_html_e( 'Future pieces. Present choice.', 'skyyrose-flagship-2' ); ?></h2><p class="sr2-section-head__note"><?php esc_html_e( 'Reserve now. We make each piece with intention and publish fulfillment timing before checkout.', 'skyyrose-flagship-2' ); ?></p></header><?php skyyrose2_product_cards( 12, 'pre-order' ); ?></section>
 
 		<?php elseif ( 'about' === $slug ) : ?>
-			<section class="sr2-page-hero sr2-page-hero--about" aria-labelledby="sr2-page-title">
-				<div class="sr2-page-hero__media"><img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'branding/hero/signature-golden-gate-yacht-1280w.webp' ) ); ?>" alt="SkyyRose yacht and the Golden Gate Bridge at night" width="1280" height="553" fetchpriority="high"></div>
-				<div class="sr2-page-hero__copy"><p class="sr2-eyebrow"><?php esc_html_e( 'About SkyyRose', 'skyyrose-flagship-2' ); ?></p><h1 id="sr2-page-title"><?php esc_html_e( 'Built by a father. Named after a daughter.', 'skyyrose-flagship-2' ); ?></h1></div>
-			</section>
-			<section class="sr2-about-origin"><p class="sr2-eyebrow"><?php esc_html_e( 'Oakland · 2020', 'skyyrose-flagship-2' ); ?></p><div><h2><?php esc_html_e( 'Family became foundation. Concrete became runway.', 'skyyrose-flagship-2' ); ?></h2><div class="sr2-page-copy"><?php if ( trim( get_the_content() ) ) { the_content(); } else { ?><p><?php esc_html_e( 'SkyyRose began with Corey Foster, a single father in Oakland, building a future his daughter could see herself inside. Her name became the house name. The city became its point of view.', 'skyyrose-flagship-2' ); ?></p><p><?php esc_html_e( 'Every collection turns that origin into a living world: pieces with memory, restraint, and enough edge to move through any room.', 'skyyrose-flagship-2' ); ?></p><?php } ?></div></div></section>
-			<section class="sr2-about-timeline" aria-labelledby="sr2-about-timeline-title" data-horizontal-world>
-				<header class="sr2-section-head"><p><?php esc_html_e( 'House Codes', 'skyyrose-flagship-2' ); ?></p><h2 id="sr2-about-timeline-title"><?php esc_html_e( 'Origin. Defiance. Legacy.', 'skyyrose-flagship-2' ); ?></h2></header>
-				<div class="sr2-about-timeline__rail" tabindex="0" data-horizontal-rail>
-					<article><img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'images/immersive/scene-signature-golden-gate.webp' ) ); ?>" alt="" width="1400" height="600" loading="lazy"><span>01</span><h3><?php esc_html_e( 'Origin', 'skyyrose-flagship-2' ); ?></h3><p><?php esc_html_e( 'Signature holds where it started.', 'skyyrose-flagship-2' ); ?></p></article>
-					<article><img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'images/immersive/scene-black-rose-moon-court-gpt2.webp' ) ); ?>" alt="" width="1920" height="1080" loading="lazy"><span>02</span><h3><?php esc_html_e( 'Defiance', 'skyyrose-flagship-2' ); ?></h3><p><?php esc_html_e( 'Black Rose defines beauty on its own terms.', 'skyyrose-flagship-2' ); ?></p></article>
-					<article><img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'images/immersive/scene-kids-capsule-runway.webp' ) ); ?>" alt="" width="1344" height="896" loading="lazy"><span>03</span><h3><?php esc_html_e( 'Legacy', 'skyyrose-flagship-2' ); ?></h3><p><?php esc_html_e( 'Kids Capsule keeps future inside the house.', 'skyyrose-flagship-2' ); ?></p></article>
-				</div>
-			</section>
+			<?php get_template_part( 'template-parts/about-scroll-world' ); ?>
 
 		<?php elseif ( 'contact' === $slug ) : ?>
 			<?php

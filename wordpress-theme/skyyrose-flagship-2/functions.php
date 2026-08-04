@@ -71,6 +71,50 @@ function skyyrose2_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose2_assets' );
 
+/**
+ * Return the approved, externally delivered About film URL.
+ *
+ * The film is intentionally hosted outside the theme archive so the installable
+ * package remains small and does not duplicate a high-bitrate source asset.
+ *
+ * @return string
+ */
+function skyyrose2_about_film_url() {
+	return esc_url( get_theme_mod( 'skyyrose2_about_film_url', '' ) );
+}
+
+/**
+ * Register the externally delivered, muted About film field.
+ *
+ * @param WP_Customize_Manager $customize_manager Theme customizer manager.
+ * @return void
+ */
+function skyyrose2_customize_about_film( $customize_manager ) {
+	$customize_manager->add_section(
+		'skyyrose2_about_film',
+		array(
+			'title'    => __( 'About Film', 'skyyrose-flagship-2' ),
+			'priority' => 35,
+		)
+	);
+	$customize_manager->add_setting(
+		'skyyrose2_about_film_url',
+		array(
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$customize_manager->add_control(
+		'skyyrose2_about_film_url',
+		array(
+			'label'       => __( 'Muted About film URL', 'skyyrose-flagship-2' ),
+			'description' => __( 'Use only the approved muted MP4 delivery URL. The film is opt-in and never autoplays.', 'skyyrose-flagship-2' ),
+			'section'     => 'skyyrose2_about_film',
+			'type'        => 'url',
+		)
+	);
+}
+add_action( 'customize_register', 'skyyrose2_customize_about_film' );
+
 /** Handle client-service messages without exposing raw mail endpoints. */
 function skyyrose2_contact_form_submit() {
 	if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || empty( $_POST['skyyrose2_contact_submit'] ) ) {
@@ -269,7 +313,7 @@ function skyyrose2_product_cards( $limit = 6, $collection = '', $featured = fals
 function skyyrose2_render_collection_rail() {
 	$collections = skyyrose2_collections();
 	?>
-	<section class="sr2-worlds" aria-labelledby="sr2-worlds-title" data-horizontal-world>
+	<section class="sr2-worlds" aria-labelledby="sr2-worlds-title" data-horizontal-world data-pinned-scroll-world>
 		<header class="sr2-section-head sr2-section-head--split">
 			<div><p><?php esc_html_e( 'Choose Your World', 'skyyrose-flagship-2' ); ?></p><h2 id="sr2-worlds-title"><?php esc_html_e( 'Four stories. One house.', 'skyyrose-flagship-2' ); ?></h2></div>
 			<div class="sr2-rail-controls"><button type="button" data-rail-prev aria-label="<?php esc_attr_e( 'Previous collection', 'skyyrose-flagship-2' ); ?>">←</button><span data-rail-count>01 / 04</span><button type="button" data-rail-next aria-label="<?php esc_attr_e( 'Next collection', 'skyyrose-flagship-2' ); ?>">→</button></div>
