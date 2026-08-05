@@ -7,13 +7,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SKYYROSE2_VERSION', '2.3.5' );
+define( 'SKYYROSE2_VERSION', '2.3.6' );
 define( 'SKYYROSE2_DIR', get_template_directory() );
 define( 'SKYYROSE2_URI', get_template_directory_uri() );
 define( 'SKYYROSE2_REWRITE_SCHEMA', '2026-08-04-1' );
 
 require_once SKYYROSE2_DIR . '/inc/product-3d-viewer.php';
 require_once SKYYROSE2_DIR . '/inc/builder-compat.php';
+require_once SKYYROSE2_DIR . '/inc/woocommerce-integration.php';
 
 /**
  * Resolve a theme-bundled, SOT-approved asset.
@@ -47,7 +48,21 @@ function skyyrose2_setup() {
 		'html5',
 		array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' )
 	);
-	add_theme_support( 'woocommerce' );
+	add_theme_support(
+		'woocommerce',
+		array(
+			'thumbnail_image_width' => 720,
+			'single_image_width'    => 1280,
+			'product_grid'          => array(
+				'default_rows'    => 3,
+				'min_rows'        => 1,
+				'max_rows'        => 8,
+				'default_columns' => 3,
+				'min_columns'     => 1,
+				'max_columns'     => 4,
+			),
+		)
+	);
 	add_theme_support( 'wc-product-gallery-zoom' );
 	add_theme_support( 'wc-product-gallery-lightbox' );
 	add_theme_support( 'wc-product-gallery-slider' );
@@ -515,10 +530,3 @@ function skyyrose2_collection_template( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'skyyrose2_collection_template', 20 );
-
-/** Keep custom Woo wrappers structurally clean. */
-function skyyrose2_woocommerce_wrappers() {
-	remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
-	remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );
-}
-add_action( 'wp', 'skyyrose2_woocommerce_wrappers' );

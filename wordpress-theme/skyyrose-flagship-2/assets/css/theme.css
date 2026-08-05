@@ -328,6 +328,9 @@ html.sr2-motion-ready .sr2-image-reveal:not(.is-seen) img { transform: scale(1.0
 .sr2-shop { min-height: 70vh; padding-top: var(--sr2-header); }
 .sr2-shop-head { display: flex; align-items: end; justify-content: space-between; gap: var(--sr2-space-12); padding: var(--sr2-section-pad) var(--sr2-page-pad) var(--sr2-space-16); border-bottom: 1px solid var(--sr2-line); }
 .sr2-shop-head > p { max-width: 40ch; color: var(--sr2-muted); }
+.sr2-shop-description { max-width: 46ch; color: var(--sr2-muted); }
+.sr2-shop-description > :first-child { margin-top: 0; }
+.sr2-shop-description > :last-child { margin-bottom: 0; }
 .sr2-shop-worlds { display: flex; gap: var(--sr2-space-3); overflow-x: auto; padding: var(--sr2-space-4) var(--sr2-page-pad); border-bottom: 1px solid var(--sr2-line); }
 .sr2-shop-worlds a { flex: none; padding: var(--sr2-space-2) var(--sr2-space-4); border: 1px solid var(--sr2-line); color: var(--sr2-accent); font-family: var(--sr2-font-ui); font-size: 0.65rem; letter-spacing: 0.1em; text-decoration: none; text-transform: uppercase; }
 .sr2-shop-loop { padding: var(--sr2-space-16) var(--sr2-page-pad) var(--sr2-section-pad); }
@@ -381,6 +384,8 @@ html.sr2-motion-ready .sr2-image-reveal:not(.is-seen) img { transform: scale(1.0
 .sr2-cart__item-copy h2 { margin: 0 0 var(--sr2-space-2); font-family: var(--sr2-font-display); font-size: 1.4rem; line-height: 1; }
 .sr2-cart__item-copy h2 a { text-decoration: none; }
 .sr2-cart__item-copy > span, .sr2-cart__item-copy .variation { color: var(--sr2-muted); }
+.sr2-cart__pricing { display: flex; flex-wrap: wrap; gap: var(--sr2-space-2) var(--sr2-space-4); margin-top: var(--sr2-space-3); color: var(--sr2-muted); font-size: .82rem; }
+.sr2-cart__pricing span:last-child { color: var(--sr2-ink); }
 .sr2-cart__controls { display: grid; align-content: start; justify-items: end; gap: var(--sr2-space-4); }
 .sr2-cart__controls a { color: var(--sr2-muted); font-family: var(--sr2-font-ui); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .sr2-cart__actions { display: flex; flex-wrap: wrap; gap: var(--sr2-space-3); padding: var(--sr2-space-6) 0; }

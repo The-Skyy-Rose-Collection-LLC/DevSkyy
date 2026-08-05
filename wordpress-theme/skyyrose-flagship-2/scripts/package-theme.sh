@@ -17,6 +17,14 @@ trap cleanup EXIT
 
 mkdir -p "${output_dir}"
 
+for verifier in \
+	"scripts/verify-builder-compat.php" \
+	"scripts/verify-commerce-truth.php" \
+	"scripts/verify-product-3d-resolver.php" \
+	"scripts/verify-woocommerce-contracts.php"; do
+	php "${repo_root}/${theme_dir}/${verifier}"
+done
+
 # Archive HEAD so ignored editor files, local dependencies, and uncommitted
 # experiments cannot be accidentally shipped. Git fixes archive member times to
 # the commit time, so equivalent clean-HEAD builds are byte-for-byte identical.

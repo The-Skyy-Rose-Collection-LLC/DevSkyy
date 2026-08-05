@@ -3,7 +3,7 @@
 ## Verified in source
 
 - The theme has a valid classic-theme stylesheet header, screenshot,
-  GPL-2.0 license text, WooCommerce declarations, and version `2.3.5`.
+  GPL-2.0 license text, WooCommerce declarations, and version `2.3.6`.
 - PHP syntax passes for all 25 bundled PHP files. JavaScript syntax passes for
   source, committed minified bundles, and the self-hosted 3D viewer runtime.
 - The builder regression harness passes for Elementor, Divi, and Beaver Builder
