@@ -10,6 +10,11 @@ defined( 'ABSPATH' ) || exit;
 $archive_title = woocommerce_page_title( false );
 
 get_header();
+
+if ( skyyrose2_render_builder_location( 'archive' ) ) {
+	get_footer();
+	return;
+}
 ?>
 <main id="primary" class="sr2-shop">
 	<header class="sr2-shop-head">

@@ -3,9 +3,13 @@
 ## Verified in source
 
 - The theme has a valid classic-theme stylesheet header, screenshot,
-  GPL-2.0 license text, WooCommerce declarations, and version `2.3.3`.
-- PHP syntax passes for all 20 bundled PHP files. JavaScript syntax passes for
+  GPL-2.0 license text, WooCommerce declarations, and version `2.3.4`.
+- PHP syntax passes for all 24 bundled PHP files. JavaScript syntax passes for
   source, committed minified bundles, and the self-hosted 3D viewer runtime.
+- The builder regression harness passes for Elementor, Divi, and Beaver Builder
+  page ownership. Elementor Pro header, footer, single, and archive
+  locations use the official location API with theme fallbacks; builder canvas
+  and full-width templates preserve required WordPress lifecycle hooks.
 - Product 3D models fail closed: only manifest-approved, local, self-contained
   GLB v2 files under `assets/sot/3d/models/` can resolve. The resolver verifies
   path confinement, file size, GLB structure, SHA-256, five reference hashes,
@@ -47,7 +51,8 @@ These are external release gates, not source-code blockers:
 2. Run WordPress Theme Check, WPCS, and PHPStan when the declared development
    tooling is available.
 3. Run browser accessibility, responsive, visual/SOT, and Lighthouse checks on
-   desktop and mobile against the installed archive.
+   desktop and mobile against the installed archive. Repeat the route matrix
+   with each builder version advertised as supported.
 4. Complete the redistribution-rights ledger for every bundled font, image,
    video, vendor runtime, and brand element.
 5. Produce and verify founder, build-attestor, and policy-collector signatures

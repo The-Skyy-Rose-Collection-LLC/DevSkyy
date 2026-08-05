@@ -330,6 +330,12 @@ html.sr2-motion-ready .sr2-image-reveal:not(.is-seen) img { transform: scale(1.0
 .sr2-service-links b { color: var(--sr2-rose); }
 .sr2-generic-head { padding: calc(var(--sr2-header) + var(--sr2-section-pad)) var(--sr2-page-pad) var(--sr2-space-12); }
 .sr2-page-copy--generic { padding: 0 var(--sr2-page-pad) var(--sr2-section-pad); }
+.sr2-builder-content { width: 100%; min-height: 100vh; }
+.sr2-builder-content--theme-header { padding-top: var(--sr2-header); }
+.sr2-builder-content > .elementor,
+.sr2-builder-content > .et-l,
+.sr2-builder-content > .fl-builder-content { width: 100%; }
+.sr2-builder-canvas .sr2-builder-content { padding-top: 0; }
 
 /* Shop archive */
 .sr2-shop { min-height: 70vh; padding-top: var(--sr2-header); }

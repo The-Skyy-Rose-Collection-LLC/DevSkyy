@@ -134,6 +134,8 @@ def main() -> int:
     required = [
         theme / "functions.php",
         theme / "style.css",
+        theme / "BUILDER-COMPATIBILITY.md",
+        theme / "inc/builder-compat.php",
         theme / "inc/product-3d-viewer.php",
         theme / "assets/css/product-3d-viewer.css",
         theme / "assets/css/product-3d-viewer.min.css",
@@ -141,7 +143,10 @@ def main() -> int:
         theme / "assets/js/product-3d-viewer.min.js",
         theme / "assets/js/lib/model-viewer.min.js",
         theme / "assets/sot/3d/approved-models.json",
+        theme / "template-builder-canvas.php",
+        theme / "template-builder-full-width.php",
         theme / "scripts/package-theme.sh",
+        theme / "scripts/verify-builder-compat.php",
     ]
     missing = [str(path.relative_to(repo)) for path in required if not path.is_file()]
     findings.append(
@@ -186,6 +191,19 @@ def main() -> int:
         if not ok:
             js_failures.append(f"{path.relative_to(repo)}: {output}")
     findings.append(check(not js_failures, "BLOCK", "Viewer JavaScript syntax", "; ".join(js_failures) or "3 files passed"))
+
+    builder_ok, builder_output = run(
+        ["php", str(theme / "scripts/verify-builder-compat.php")],
+        repo,
+    )
+    findings.append(
+        check(
+            builder_ok,
+            "BLOCK",
+            "Builder compatibility contracts",
+            builder_output or "builder verification produced no output",
+        )
+    )
 
     style_text = read_text(theme / "style.css")
     functions_text = read_text(theme / "functions.php")
@@ -336,7 +354,7 @@ def main() -> int:
         "plan": [
             "Secure GLB resolution and self-host all required decoder/runtime assets.",
             "Add versioned rewrite migration and guarantee the Collections index route.",
-            "Commit the scoped v2.3.3 source, generated assets, provenance, and documentation.",
+            "Commit the scoped versioned source, generated assets, provenance, and documentation.",
             "Build twice from clean HEAD; require identical ZIP digests and safe extraction.",
             "Produce policy, build, and founder signatures bound to the exact commit and ZIP.",
             "Install that ZIP on staging and pass the full commerce/browser/accessibility/performance/visual matrix.",

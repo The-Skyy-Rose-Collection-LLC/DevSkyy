@@ -1,7 +1,7 @@
 # SkyyRose Flagship 2
 
 A classic WordPress theme for standard WordPress and WooCommerce installations.
-It is marketplace-ready in packaging and installation boundaries, but it is not
+It is a marketplace candidate with deterministic packaging, but it is not
 a cross-platform frontend: Shopify, headless, or non-WordPress deployments need
 their own adapter rather than a copied PHP theme.
 
@@ -21,6 +21,9 @@ continue to render but commerce components intentionally fall back safely.
 - Collection-specific lockups, fonts, palettes, stories, product grids, immersive horizontal chapters, lookbooks, and cross-navigation.
 - WooCommerce shop archive, collection-aware single product, cart, notices, tabs, and checkout-ready controls.
 - Pre-Order, About, Contact, and generic content pages.
+- Builder-owned page content, Builder Full Width and Builder Canvas templates,
+  Elementor Pro theme locations, and Divi Builder theme support. See
+  `BUILDER-COMPATIBILITY.md` for the exact support and commerce boundaries.
 - Keyboard-operable navigation, pinned vertical-to-horizontal Scroll World on desktop, native snap scrolling on touch/reduced-motion, visible focus, image curtain reveals, sticky narrative chapters, and pointer-depth enhancement.
 
 ## Asset contract
@@ -79,6 +82,7 @@ node --check assets/js/theme.js
 node --check assets/js/product-3d-viewer.js
 node --check assets/js/product-3d-viewer.min.js
 php scripts/verify-product-3d-resolver.php
+php scripts/verify-builder-compat.php
 ```
 
 Run the PHP and JavaScript checks before creating an archive. Test the archive

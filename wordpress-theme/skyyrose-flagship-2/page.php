@@ -9,8 +9,19 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
+if ( skyyrose2_render_builder_location( 'single' ) ) {
+	get_footer();
+	return;
+}
+
 while ( have_posts() ) :
 	the_post();
+	if ( skyyrose2_builder_owns_page( get_the_ID() ) ) {
+		?>
+		<main id="primary" class="<?php echo esc_attr( skyyrose2_builder_content_class() ); ?>"><?php the_content(); ?></main>
+		<?php
+		continue;
+	}
 	$slug = sanitize_title( get_post_field( 'post_name', get_the_ID() ) );
 	?>
 	<main id="primary" class="sr2-page sr2-page--<?php echo esc_attr( $slug ); ?>">

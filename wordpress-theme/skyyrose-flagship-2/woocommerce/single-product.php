@@ -9,6 +9,11 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
+if ( skyyrose2_render_builder_location( 'single' ) ) {
+	get_footer();
+	return;
+}
+
 while ( have_posts() ) :
 	the_post();
 	$product     = wc_get_product( get_the_ID() );

@@ -8,6 +8,21 @@
 defined( 'ABSPATH' ) || exit;
 
 get_header();
+
+$skyyrose2_location = is_singular() ? 'single' : 'archive';
+if ( skyyrose2_render_builder_location( $skyyrose2_location ) ) {
+	get_footer();
+	return;
+}
+if ( is_singular() && skyyrose2_builder_owns_page() ) {
+	?>
+	<main id="primary" class="<?php echo esc_attr( skyyrose2_builder_content_class() ); ?>">
+		<?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
+	</main>
+	<?php
+	get_footer();
+	return;
+}
 ?>
 <main id="primary" class="sr2-section sr2-page-shell">
 	<header class="sr2-page-hero">

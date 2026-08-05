@@ -7,12 +7,13 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SKYYROSE2_VERSION', '2.3.3' );
+define( 'SKYYROSE2_VERSION', '2.3.4' );
 define( 'SKYYROSE2_DIR', get_template_directory() );
 define( 'SKYYROSE2_URI', get_template_directory_uri() );
 define( 'SKYYROSE2_REWRITE_SCHEMA', '2026-08-04-1' );
 
 require_once SKYYROSE2_DIR . '/inc/product-3d-viewer.php';
+require_once SKYYROSE2_DIR . '/inc/builder-compat.php';
 
 /**
  * Resolve a theme-bundled, SOT-approved asset.
@@ -41,6 +42,7 @@ function skyyrose2_setup() {
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'align-wide' );
+	add_theme_support( 'wp-block-styles' );
 	add_theme_support(
 		'html5',
 		array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' )
@@ -58,6 +60,12 @@ function skyyrose2_setup() {
 	);
 }
 add_action( 'after_setup_theme', 'skyyrose2_setup' );
+
+/** Set the default measure used by WordPress and builder content. */
+function skyyrose2_content_width() {
+	$GLOBALS['content_width'] = (int) apply_filters( 'skyyrose2_content_width', 1200 );
+}
+add_action( 'after_setup_theme', 'skyyrose2_content_width', 0 );
 
 /** Load self-hosted design system and progressive interactions. */
 function skyyrose2_assets() {

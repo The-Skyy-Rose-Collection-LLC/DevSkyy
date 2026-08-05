@@ -10,6 +10,20 @@ defined( 'ABSPATH' ) || exit;
 $shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
 
 get_header();
+
+if ( skyyrose2_render_builder_location( 'single' ) ) {
+	get_footer();
+	return;
+}
+if ( skyyrose2_builder_owns_page() ) {
+	?>
+	<main id="primary" class="<?php echo esc_attr( skyyrose2_builder_content_class() ); ?>">
+		<?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
+	</main>
+	<?php
+	get_footer();
+	return;
+}
 ?>
 <main id="primary" class="sr2-home">
 	<section class="sr2-home-hero" aria-labelledby="sr2-home-title" data-hero-depth>
