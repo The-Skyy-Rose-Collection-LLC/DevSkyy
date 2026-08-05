@@ -1,5 +1,7 @@
 # SkyyRose Theme Team Charter
 
+> **Current operating system:** New theme work is governed by the 13-lane [Theme Building Machine](theme-machine/OPERATING-SYSTEM.md). This charter remains useful background, but it does not independently schedule or override that system.
+
 **Scope:** `wordpress-theme/skyyrose-flagship/` — the production WordPress/WooCommerce theme for skyyrose.co.
 **Standard:** award-caliber fashion e-commerce that converts. This is a store, not a portfolio.
 **Synthesized:** 2026-07-28 from 44 audited skill/agent candidates. Seats below are the survivors; everything else on the audit list is absorbed into a seat or rejected as overlap.
