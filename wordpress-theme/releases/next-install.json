@@ -1,0 +1,37 @@
+{
+  "schema": "skyyrose.theme-next-install.v1",
+  "status": "pinned_for_next_install",
+  "theme": {
+    "slug": "skyyrose-flagship-2",
+    "version": "2.3.6"
+  },
+  "source": {
+    "commit": "bda95790d903f5d921276ab15f74225e4f3d4544",
+    "theme_path": "wordpress-theme/skyyrose-flagship-2"
+  },
+  "artifact": {
+    "path": "dist/skyyrose-flagship-2.zip",
+    "sha256": "60e2bbc2fdf233d9ef31072839e0778364d75d55298ad42a42a2f9d327919d69",
+    "bytes": 32542345,
+    "delivery": "generated_local_dist",
+    "rebuild_command": "bash wordpress-theme/skyyrose-flagship-2/scripts/package-theme.sh"
+  },
+  "install_policy": {
+    "replace_existing": true,
+    "activate_automatically": false,
+    "first_gate": "execution_smoke",
+    "defer_full_verification_until_execution": true,
+    "required_routes": [
+      "home",
+      "shop",
+      "product",
+      "cart",
+      "checkout",
+      "account",
+      "signature",
+      "black-rose",
+      "love-hurts",
+      "kids"
+    ]
+  }
+}
