@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SkyyRose V2 — WordPress Verification and Simplification</title>
+  <style>
+    :root{color-scheme:dark;--ink:#f6f1e8;--muted:#b8b0a4;--void:#09090b;--panel:#141318;--line:#302e35;--rose:#ef476f;--gold:#d8b66f;--good:#68daa9;--warn:#ffbf69;font:16px/1.62 Inter,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--void);color:var(--ink)}a{color:var(--gold)}header,main,footer{width:min(1160px,calc(100% - 2rem));margin:auto}.hero{padding:6rem 0 3rem;border-bottom:1px solid var(--line)}.kicker{color:var(--rose);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase}h1,h2,h3{font-family:Georgia,serif;line-height:1.04}h1{max-width:13ch;margin:.4rem 0;font-size:clamp(3rem,8vw,6.8rem)}h2{margin:4rem 0 1rem;font-size:clamp(2rem,4vw,3.8rem)}h3{font-size:1.4rem}.lede{max-width:72ch;color:var(--muted);font-size:1.1rem}.status{display:grid;grid-template-columns:auto 1fr;gap:1rem;margin:2rem 0;padding:1.25rem;border:1px solid var(--warn);background:var(--panel)}.status b{color:var(--warn);font-size:1.35rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}.card{padding:1.2rem;border:1px solid var(--line);background:var(--panel)}.card strong{display:block;color:var(--gold)}.table-wrap{overflow:auto;border:1px solid var(--line)}table{width:100%;min-width:850px;border-collapse:collapse;background:var(--panel)}th,td{padding:.85rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#1d1b22;color:var(--gold)}.done{color:var(--good);font-weight:800}.verify{color:var(--warn);font-weight:800}.code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.88rem}.callout{padding:1.2rem;border-left:4px solid var(--rose);background:var(--panel)}ul,ol{padding-left:1.2rem}li{margin-bottom:.6rem}.boundary{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.boundary>section{padding:1rem;border:1px solid var(--line)}footer{padding:4rem 0;color:var(--muted)}@media(max-width:700px){.boundary{grid-template-columns:1fr}.hero{padding-top:3rem}}
+  </style>
+</head>
+<body>
+<header class="hero">
+  <p class="kicker">SkyyRose Flagship 2 / source verification</p>
+  <h1>WordPress, simplified around the house.</h1>
+  <p class="lede">A code-backed record of what V2 now does, what was removed, what passed locally, and what still requires an installed archive on WordPress/WooCommerce staging.</p>
+</header>
+<main>
+  <div class="status"><b>HOLD</b><div><strong>Source blockers identified in this audit were corrected, but marketplace release is not certified.</strong><br>Static checks cannot replace real product, cart, checkout, builder, accessibility, visual, and performance tests against the exact packaged archive.</div></div>
+
+  <section aria-labelledby="outcome-title">
+    <h2 id="outcome-title">Outcome</h2>
+    <div class="grid">
+      <div class="card"><strong>Theme identity</strong><p>V2 is a classic WordPress/WooCommerce theme with protected SkyyRose collection worlds—not an interchangeable page skin.</p></div>
+      <div class="card"><strong>Version</strong><p>Source version advanced from 2.3.4 to 2.3.5 because PHP, CSS, JavaScript, and public behavior changed.</p></div>
+      <div class="card"><strong>Commerce truth</strong><p>WooCommerce remains authoritative for names, images, SKU resolution, visibility, stock, price, product URL, variations, and pre-order categorization.</p></div>
+      <div class="card"><strong>Builder boundary</strong><p>Gutenberg and supported builders may own page content. The theme retains WooCommerce and protected collection fallbacks unless an official Elementor Pro location is assigned.</p></div>
+      <div class="card"><strong>Brand boundary</strong><p>The continuous rotating mark remains the house header asset. WordPress-configured primary and footer menus now work with branded route fallbacks.</p></div>
+      <div class="card"><strong>3D boundary</strong><p>Product 3D remains fail-closed through the approved local GLB manifest. Raw Divi custom-element allow-listing was removed.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="changes-title">
+    <h2 id="changes-title">Implemented simplifications</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Area</th><th>Before</th><th>Now</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td>Page identity</td><td>Unbranded fallback class names and duplicated page title treatment.</td><td>One <span class="code">sr2-editorial-head</span> / <span class="code">sr2-page-copy--editorial</span> house shell.</td><td>Every ordinary WordPress page still feels authored by SkyyRose.</td></tr>
+        <tr><td>Builder rendering</td><td>Three copied builder loops in <span class="code">front-page.php</span>, <span class="code">page.php</span>, and <span class="code">index.php</span>.</td><td>One <span class="code">skyyrose2_render_builder_owned_content()</span> path preserves <span class="code">the_content</span> filters.</td><td>Less drift and fewer builder-specific regressions.</td></tr>
+        <tr><td>Pre-order product rail</td><td>An empty pre-order query silently fell back to ordinary products.</td><td>Empty pre-order and featured queries fail closed with honest copy.</td><td>Normal inventory cannot be mislabeled as reservable.</td></tr>
+        <tr><td>Black Rose salon</td><td>Five labels and links were hardcoded and unresolved items redirected to a collection.</td><td>Each slot resolves a real WooCommerce SKU, requires visibility plus the pre-order category, uses the live product name/description/permalink, and omits failures.</td><td>SOT and WooCommerce product truth control the experience.</td></tr>
+        <tr><td>Stock language</td><td>Every out-of-stock product was labeled “Reserved.”</td><td>Actual WooCommerce availability is used; the Pre-order label appears only for in-stock products in the pre-order category.</td><td>No invented reservation state.</td></tr>
+        <tr><td>Wishlist</td><td>A heart stored IDs only in local storage, with no destination or account persistence.</td><td>The incomplete control and JavaScript were removed.</td><td>No simulated feature or inaccessible dead end.</td></tr>
+        <tr><td>Skyy guide</td><td>Free-text UI expected missing guide/AJAX configuration and could collapse to canned copy.</td><td>Skyy is a deterministic, chip-driven house guide; dead free-text, remote fallback, old route, and unused 3D events were removed.</td><td>Honest behavior, smaller script, no hidden service dependency.</td></tr>
+        <tr><td>Woo loop hooks</td><td>The card override exposed only private before/after hooks.</td><td>The public WooCommerce product-loop hooks fire while duplicate default image/title/price/link/button callbacks are temporarily suspended.</td><td>Extensions retain standard integration points without duplicating core card markup.</td></tr>
+        <tr><td>WordPress menus</td><td>Menu locations were registered but the visible header/footer links were fixed.</td><td>Configured top-level primary/footer items render; branded links remain as safe fallbacks.</td><td>Real WordPress administration now controls navigation.</td></tr>
+        <tr><td>Builder footer</td><td>The mascot always rendered even when Elementor owned the footer.</td><td>The mascot is shell-owned and renders only with the theme footer.</td><td>Elementor footer ownership is complete.</td></tr>
+        <tr><td>About film</td><td>Visitors saw Customizer setup instructions when no URL was configured.</td><td>A finished branded still remains, with no administrator copy in public.</td><td>Incomplete setup never leaks into the storefront.</td></tr>
+        <tr><td>CSS</td><td>Unused About systems, wishlist rules, and a stale touch selector remained.</td><td>Dead rules were removed and touch devices now reveal <span class="code">sr2-product-card__view</span>.</td><td>Smaller, maintainable output and correct touch behavior.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="architecture-title">
+    <h2 id="architecture-title">Simplified WordPress contract</h2>
+    <div class="boundary">
+      <section><h3>Theme owns</h3><ul><li>House header/footer fallback and rotating brand mark.</li><li>Four protected collection identities and narrative surfaces.</li><li>Shared semantic product-card system.</li><li>Responsive SOT campaign media.</li><li>Fail-closed approved-model 3D resolver.</li><li>Builder canvas/full-width templates and official location handoff.</li></ul></section>
+      <section><h3>WordPress/WooCommerce owns</h3><ul><li>Page content and configured navigation menus.</li><li>Product names, SKUs, visibility, images, price, stock, variations, and categories.</li><li>Cart, checkout, tax, shipping, payment, order, and account state.</li><li>Standard product-loop extension hooks.</li><li>Administrator configuration for the approved muted About film URL.</li></ul></section>
+    </div>
+    <p class="callout">This is the key simplification: builders compose pages; WooCommerce controls commerce truth; SkyyRose controls the house. No layer is allowed to impersonate another.</p>
+  </section>
+
+  <section aria-labelledby="builders-title">
+    <h2 id="builders-title">Builder support, stated precisely</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>System</th><th>Source support</th><th>Boundary</th><th>Live evidence still required</th></tr></thead>
+      <tbody>
+        <tr><td>Gutenberg</td><td class="done">YES</td><td>Core content, wide alignment, block styles, responsive embeds.</td><td>Populated page and reusable-pattern browser checks.</td></tr>
+        <tr><td>Elementor / Pro</td><td class="done">YES</td><td>Page ownership plus official header, footer, single, and archive locations.</td><td>Exact advertised versions across all four location types.</td></tr>
+        <tr><td>Divi Builder plugin</td><td class="done">YES</td><td>Page ownership and theme support; no raw bypass around approved 3D resolution.</td><td>Builder edit, preview, publish, responsive, and Woo shortcode/block flows.</td></tr>
+        <tr><td>Beaver Builder</td><td class="done">YES</td><td>Page ownership via plugin metadata/API; theme commerce remains protected.</td><td>Exact plugin version and frontend editing flow.</td></tr>
+        <tr><td>Bricks</td><td class="verify">NO CLAIM</td><td>Bricks is itself a theme and cannot be activated alongside Flagship 2.</td><td>A separate adapter/product would be required.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="checks-title">
+    <h2 id="checks-title">Verification evidence</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Check</th><th>Result</th><th>Scope</th></tr></thead>
+      <tbody>
+        <tr><td>PHP syntax</td><td class="done">PASS</td><td>25 bundled PHP files.</td></tr>
+        <tr><td>JavaScript syntax</td><td class="done">PASS</td><td>Theme, mascot, product viewer source and committed top-level minified bundles.</td></tr>
+        <tr><td>Builder contract harness</td><td class="done">PASS</td><td>Elementor location caching; Elementor, Divi, and Beaver ownership; shared unwrapped content renderer.</td></tr>
+        <tr><td>3D resolver harness</td><td class="done">PASS</td><td>Manifest-approved local GLB contract and fail-closed resolver tests.</td></tr>
+        <tr><td>Commerce-truth harness</td><td class="done">PASS</td><td>Pre-order, SKU/category, stock copy, Woo loop-hook, wishlist, and deterministic Skyy guide contracts.</td></tr>
+        <tr><td>Production bundles rebuilt</td><td class="done">PASS</td><td><span class="code">theme.min.css</span>, <span class="code">theme.min.js</span>, and <span class="code">mascot.min.js</span> regenerated with cached local tools.</td></tr>
+        <tr><td>Whitespace / patch integrity</td><td class="done">PASS</td><td><span class="code">git diff --check</span>.</td></tr>
+        <tr><td>Research evidence</td><td class="done">PASS</td><td>22 cited source entries, 8 source hosts, 10 theme profiles.</td></tr>
+        <tr><td>Installed WordPress candidate</td><td class="verify">REQUIRED</td><td>Not replaced by static checks.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="performance-title">
+    <h2 id="performance-title">V1 audit issues mapped to V2</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>V1 issue</th><th>V2 source response</th><th>Current verdict</th></tr></thead>
+      <tbody>
+        <tr><td>Oversized LCP/hero imagery</td><td>Homepage hero uses four responsive WebP candidates, <span class="code">srcset</span>, <span class="code">sizes="100vw"</span>, explicit dimensions, and an image preload.</td><td class="verify">Verify on installed archive</td></tr>
+        <tr><td>Invisible text / remote font delay</td><td>Theme design tokens use self-hosted SOT fonts; Elementor Google-font printing is disabled.</td><td class="verify">Verify network waterfall</td></tr>
+        <tr><td>Blocking and broad scripts</td><td>Theme scripts are deferred; mascot CSS is requested only by the deferred mascot script; mascot is omitted on checkout.</td><td class="verify">Measure route-by-route</td></tr>
+        <tr><td>Plugin-driven main-thread load</td><td>V2 removes incomplete theme features and does not require Elementor, Divi, Beaver, or the mascot on checkout.</td><td class="verify">Staging plugin inventory required</td></tr>
+        <tr><td>Missing image dimensions</td><td>Primary bundled imagery inspected in V2 templates carries explicit width and height; Woo attachments use WordPress-generated responsive markup.</td><td class="verify">Browser audit all routes</td></tr>
+        <tr><td>Third-party accessibility widget</td><td>V2 contains native skip links, focus states, keyboard menu behavior, reduced motion, and semantic labels; no external widget is a theme dependency.</td><td class="verify">Keyboard + axe/Lighthouse required</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="gates-title">
+    <h2 id="gates-title">Release closeout still required</h2>
+    <ol>
+      <li>Commit the scoped 2.3.5 source, build the archive from that immutable commit, and verify its digest and contents.</li>
+      <li>Install that exact archive on the named staging WordPress site with WooCommerce active.</li>
+      <li>Verify home, collections index, all four collection worlds, pre-order, About, Contact, shop, product types, cart, coupon, tax, shipping, payment, receipt, account, search, empty, and 404 states.</li>
+      <li>Repeat builder ownership checks with the exact Gutenberg/Elementor/Divi/Beaver versions advertised.</li>
+      <li>Run desktop/mobile browser, keyboard, screen-reader spot checks, automated accessibility, Lighthouse/performance trace, responsive, and visual/SOT comparison.</li>
+      <li>Run Theme Check, WPCS, and PHPStan with declared marketplace tooling.</li>
+      <li>Complete the rights ledger for every distributed asset and sign founder, build-attestor, and policy-collector evidence over the final package digest.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="decision-title">
+    <h2 id="decision-title">Decision</h2>
+    <p class="callout"><strong>V2 is materially cleaner and more truthful, but it remains a release candidate—not a marketplace release.</strong> The next valid action is archive-bound staging verification. Adding more spectacle before those flows pass would increase risk without proving commerce quality.</p>
+    <p>See the companion <a href="top-10-fashion-theme-benchmark-2026-08-05.html">Top 10 Fashion Commerce Theme Benchmark</a> for the competitive evidence behind these choices.</p>
+  </section>
+</main>
+<footer>Prepared 05 August 2026 from the Flagship 2 release-candidate worktree. No deployment was performed and no paid API was used.</footer>
+</body>
+</html>
