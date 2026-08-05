@@ -8,7 +8,7 @@ if ( is_page( 'signature' ) ) { $context = 'signature'; }
 if ( is_page( 'kids-capsule' ) ) { $context = 'kids-capsule'; }
 $mascot = skyyrose2_sot_asset_uri( 'images/mascot/skyy-canonical-v2.png' );
 ?>
-<div id="skyyrose-mascot" class="skyyrose-mascot skyyrose-mascot--hidden" aria-label="Skyy, your SkyyRose style guide" data-context="<?php echo esc_attr( $context ); ?>" data-walk-side="right" role="complementary">
+<div id="skyyrose-mascot" class="skyyrose-mascot skyyrose-mascot--hidden" aria-label="Skyy, your SkyyRose style guide" data-context="<?php echo esc_attr( $context ); ?>" data-stylesheet="<?php echo esc_url( SKYYROSE2_URI . '/assets/css/mascot.min.css?ver=' . rawurlencode( SKYYROSE2_VERSION ) ); ?>" data-walk-side="right" role="complementary">
 	<div id="skyy-bubble" class="skyy-bubble" role="status" aria-live="polite" hidden>
 		<p id="skyy-bubble-text" class="skyy-bubble__text"></p>
 		<div id="skyy-chips" class="skyy-chips" role="group" aria-label="Quick replies"></div>

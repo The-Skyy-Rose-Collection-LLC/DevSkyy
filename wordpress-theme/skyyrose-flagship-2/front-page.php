@@ -14,7 +14,7 @@ get_header();
 <main id="primary" class="sr2-home">
 	<section class="sr2-home-hero" aria-labelledby="sr2-home-title" data-hero-depth>
 		<div class="sr2-home-hero__media" aria-hidden="true">
-			<img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2.webp' ) ); ?>" alt="" width="1920" height="1080" fetchpriority="high" decoding="sync">
+			<img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2-1440w.webp' ) ); ?>" srcset="<?php echo esc_attr( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2-640w.webp' ) ); ?> 640w, <?php echo esc_attr( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2-960w.webp' ) ); ?> 960w, <?php echo esc_attr( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2-1440w.webp' ) ); ?> 1440w, <?php echo esc_attr( skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2.webp' ) ); ?> 1920w" sizes="100vw" alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
 		</div>
 		<div class="sr2-home-hero__veil" aria-hidden="true"></div>
 		<div class="sr2-home-hero__copy">

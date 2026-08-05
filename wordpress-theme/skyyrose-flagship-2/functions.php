@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SKYYROSE2_VERSION', '2.3.1' );
+define( 'SKYYROSE2_VERSION', '2.3.2' );
 define( 'SKYYROSE2_DIR', get_template_directory() );
 define( 'SKYYROSE2_URI', get_template_directory_uri() );
 
@@ -59,17 +59,41 @@ add_action( 'after_setup_theme', 'skyyrose2_setup' );
 /** Load self-hosted design system and progressive interactions. */
 function skyyrose2_assets() {
 	$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-	$mascot_suffix = file_exists( SKYYROSE2_DIR . '/assets/css/mascot.css' ) ? $suffix : '.min';
 
 	wp_enqueue_style( 'skyyrose2-tokens', SKYYROSE2_URI . '/assets/css/design-tokens' . $suffix . '.css', array(), SKYYROSE2_VERSION );
 	wp_enqueue_style( 'skyyrose2-theme', SKYYROSE2_URI . '/assets/css/theme' . $suffix . '.css', array( 'skyyrose2-tokens' ), SKYYROSE2_VERSION );
 	wp_enqueue_script( 'skyyrose2-theme', SKYYROSE2_URI . '/assets/js/theme' . $suffix . '.js', array(), SKYYROSE2_VERSION, true );
+	wp_script_add_data( 'skyyrose2-theme', 'strategy', 'defer' );
+
+	// The mascot is deliberately initialized after the document is parsed. Its
+	// non-critical stylesheet is requested by the mascot script, ahead of its
+	// first possible appearance, rather than blocking the initial render.
 	if ( ! ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
-		wp_enqueue_style( 'skyyrose2-mascot', SKYYROSE2_URI . '/assets/css/mascot' . $mascot_suffix . '.css', array( 'skyyrose2-tokens' ), SKYYROSE2_VERSION );
 		wp_enqueue_script( 'skyyrose2-mascot', SKYYROSE2_URI . '/assets/js/mascot' . $suffix . '.js', array(), SKYYROSE2_VERSION, true );
+		wp_script_add_data( 'skyyrose2-mascot', 'strategy', 'defer' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose2_assets' );
+
+/** Preload the responsive homepage LCP image before styles are printed. */
+function skyyrose2_preload_home_hero() {
+	if ( ! is_front_page() ) {
+		return;
+	}
+
+	$hero_base = skyyrose2_sot_asset_uri( 'branding/hero/flagship-house-runway-gpt2' );
+	$srcset    = sprintf(
+		'%1$s-640w.webp 640w, %1$s-960w.webp 960w, %1$s-1440w.webp 1440w, %1$s.webp 1920w',
+		esc_url( $hero_base )
+	);
+
+	printf(
+		'<link rel="preload" as="image" href="%1$s" imagesrcset="%2$s" imagesizes="100vw" fetchpriority="high">' . "\n",
+		esc_url( $hero_base . '-1440w.webp' ),
+		esc_attr( $srcset )
+	);
+}
+add_action( 'wp_head', 'skyyrose2_preload_home_hero', 1 );
 
 /**
  * Return the approved, externally delivered About film URL.

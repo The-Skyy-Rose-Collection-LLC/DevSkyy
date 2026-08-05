@@ -485,3 +485,5 @@ html.sr2-motion-ready .sr2-reveal.is-seen { opacity: 1; transform: none; }
 	html.sr2-motion-ready .sr2-image-reveal::after { display: none; }
 	.sr2-preorder-hero__video { display: none; }
 }
+/* Keep the deferred mascot markup out of view until its own stylesheet loads. */
+.skyyrose-mascot--hidden { display: none !important; }

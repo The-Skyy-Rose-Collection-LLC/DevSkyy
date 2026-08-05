@@ -74,6 +74,14 @@
 
 	var mascotEl    = document.getElementById('skyyrose-mascot');
 	if (!mascotEl) return;
+	var mascotStylesheet = mascotEl.getAttribute('data-stylesheet');
+	if (mascotStylesheet && !document.getElementById('skyyrose2-mascot-css')) {
+		var stylesheetLink = document.createElement('link');
+		stylesheetLink.id = 'skyyrose2-mascot-css';
+		stylesheetLink.rel = 'stylesheet';
+		stylesheetLink.href = mascotStylesheet;
+		document.head.appendChild(stylesheetLink);
+	}
 
 	var triggerBtn   = document.getElementById('skyyrose-mascot-trigger');
 	var minimizeBtn  = document.getElementById('skyyrose-mascot-minimize');
