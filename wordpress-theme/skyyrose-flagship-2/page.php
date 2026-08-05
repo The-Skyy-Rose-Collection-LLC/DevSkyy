@@ -23,9 +23,15 @@ while ( have_posts() ) :
 			<section class="sr2-section sr2-section--products"><header class="sr2-section-head"><p><?php esc_html_e( 'Across the House', 'skyyrose-flagship-2' ); ?></p><h2><?php esc_html_e( 'Find your chapter.', 'skyyrose-flagship-2' ); ?></h2></header><?php skyyrose2_product_cards( 9 ); ?></section>
 
 		<?php elseif ( 'pre-order' === $slug || 'preorder' === $slug ) : ?>
-			<section class="sr2-preorder-hero" aria-labelledby="sr2-page-title">
-				<div class="sr2-preorder-hero__media"><img src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'branding/hero/luxury-nighttime-1280w.webp' ) ); ?>" alt="" width="1280" height="549" fetchpriority="high"></div>
-				<div class="sr2-preorder-hero__copy"><p class="sr2-eyebrow"><?php esc_html_e( 'Pre-Order · Limited Editions', 'skyyrose-flagship-2' ); ?></p><h1 id="sr2-page-title"><?php esc_html_e( 'Reserve the piece before the world moves on.', 'skyyrose-flagship-2' ); ?></h1><p><?php esc_html_e( 'No manufactured urgency. Clear edition status, expected timing, and your place secured.', 'skyyrose-flagship-2' ); ?></p><a class="sr2-button sr2-button--fill" href="#reserve"><?php esc_html_e( 'View reservable pieces', 'skyyrose-flagship-2' ); ?></a></div>
+			<?php $preorder_collection = skyyrose2_preorder_collection( get_the_ID() ); ?>
+			<section class="sr2-preorder-hero<?php echo $preorder_collection ? ' sr2-preorder-hero--' . esc_attr( $preorder_collection ) : ' sr2-preorder-hero--unassigned'; ?>" aria-labelledby="sr2-page-title"<?php echo $preorder_collection ? ' data-collection="' . esc_attr( $preorder_collection ) . '"' : ''; ?>>
+				<div class="sr2-preorder-hero__media" data-preorder-film>
+					<img class="sr2-preorder-hero__poster" src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'video/preorder-portrait-poster.jpg' ) ); ?>" alt="" width="720" height="1280" fetchpriority="high">
+					<video class="sr2-preorder-hero__video" poster="<?php echo esc_url( skyyrose2_sot_asset_uri( 'video/preorder-portrait-poster.jpg' ) ); ?>" width="720" height="1280" muted loop playsinline autoplay controls preload="metadata" aria-label="<?php esc_attr_e( 'Silent SkyyRose pre-order editorial film', 'skyyrose-flagship-2' ); ?>">
+						<source src="<?php echo esc_url( skyyrose2_sot_asset_uri( 'video/preorder-portrait-noaudio.mp4' ) ); ?>" type="video/mp4">
+					</video>
+				</div>
+				<div class="sr2-preorder-hero__copy"><p class="sr2-eyebrow"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship-2' ); ?></p><h1 id="sr2-page-title"><?php esc_html_e( 'The next chapter begins here.', 'skyyrose-flagship-2' ); ?></h1><p><?php esc_html_e( 'Explore pieces currently offered for pre-order. Product pages provide the details available for each piece.', 'skyyrose-flagship-2' ); ?></p><a class="sr2-button sr2-button--fill" href="#reserve"><?php esc_html_e( 'Explore pieces', 'skyyrose-flagship-2' ); ?></a></div>
 			</section>
 			<?php
 			$black_rose_scene_products = array(

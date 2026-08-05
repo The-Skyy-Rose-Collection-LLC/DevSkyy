@@ -23,6 +23,21 @@
     if (playback) playback.catch(() => {});
   });
 
+  document.querySelectorAll('[data-preorder-film]').forEach((film) => {
+    const video = film.querySelector('video');
+    const mobileViewport = window.matchMedia('(max-width: 700px)').matches;
+    if (!video || reducedMotion || saveData || mobileViewport) {
+      film.classList.add('is-static');
+      video?.pause();
+      return;
+    }
+
+    const playback = video.play();
+    if (playback) {
+      playback.catch(() => film.classList.add('is-static'));
+    }
+  });
+
   const setMenu = (open) => {
     if (!menuButton || !menu) return;
     menu.classList.toggle('is-open', open);

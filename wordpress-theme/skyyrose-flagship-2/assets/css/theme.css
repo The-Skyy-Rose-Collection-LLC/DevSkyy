@@ -256,6 +256,13 @@ html.sr2-motion-ready .sr2-image-reveal:not(.is-seen) img { transform: scale(1.0
 .sr2-page-hero__copy, .sr2-contact-hero__copy, .sr2-preorder-hero__copy { max-width: 930px; }
 .sr2-page-hero h1, .sr2-contact-hero h1, .sr2-preorder-hero h1, .sr2-generic-head h1, .sr2-shop-head h1 { margin: 0; font-family: var(--sr2-font-display); font-size: clamp(3.5rem, 8vw, 9rem); font-weight: 850; letter-spacing: -0.065em; line-height: 0.84; text-wrap: balance; }
 .sr2-page-hero__copy > p:last-child, .sr2-contact-hero__copy > p:last-child, .sr2-preorder-hero__copy > p:not(.sr2-eyebrow) { max-width: 50ch; color: var(--sr2-muted); font-size: 1.1rem; }
+.sr2-preorder-hero { min-height: min(900px, 100svh); }
+.sr2-preorder-hero--unassigned { --sr2-accent: var(--sr2-ink); --sr2-accent-rgb: 245, 245, 240; }
+.sr2-preorder-hero__media { background: var(--sr2-void); }
+.sr2-preorder-hero__poster, .sr2-preorder-hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.sr2-preorder-hero__poster { position: absolute; inset: 0; }
+.sr2-preorder-hero__video { position: relative; display: block; }
+.sr2-preorder-hero__media.is-static .sr2-preorder-hero__video { display: none; }
 .sr2-preorder-steps { padding: var(--sr2-section-pad) var(--sr2-page-pad); border-bottom: 1px solid var(--sr2-line); }
 .sr2-preorder-steps > header { max-width: 680px; }
 .sr2-preorder-steps h2, .sr2-about-origin h2 { margin: 0; font-family: var(--sr2-font-display); font-size: clamp(2.8rem, 6vw, 6rem); letter-spacing: -0.06em; line-height: 0.9; }
@@ -413,6 +420,7 @@ html.sr2-motion-ready .sr2-reveal.is-seen { opacity: 1; transform: none; }
 	.sr2-products, .woocommerce ul.products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.sr2-black-rose-scene__rail { grid-template-columns: repeat(5, minmax(220px, 1fr)); overflow-x: auto; }
 	.sr2-scene-hotspot { width: 2.35rem; height: 2.35rem; }
+	.sr2-preorder-hero { min-height: min(760px, 100svh); }
 	.sr2-house-story, .sr2-product-world { grid-template-columns: 1fr; }
 	.sr2-house-story__media, .sr2-product-world > img { min-height: 480px; }
 	.sr2-collection-intro { grid-template-columns: 1fr; }
@@ -465,4 +473,5 @@ html.sr2-motion-ready .sr2-reveal.is-seen { opacity: 1; transform: none; }
 	*, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 1ms !important; }
 	html.sr2-motion-ready .sr2-reveal { opacity: 1; transform: none; }
 	html.sr2-motion-ready .sr2-image-reveal::after { display: none; }
+	.sr2-preorder-hero__video { display: none; }
 }
