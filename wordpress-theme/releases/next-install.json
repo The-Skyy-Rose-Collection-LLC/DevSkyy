@@ -14,7 +14,7 @@
     "sha256": "60e2bbc2fdf233d9ef31072839e0778364d75d55298ad42a42a2f9d327919d69",
     "bytes": 32542345,
     "delivery": "generated_local_dist",
-    "rebuild_command": "bash wordpress-theme/skyyrose-flagship-2/scripts/package-theme.sh"
+    "rebuild_command": "python3 wordpress-theme/releases/rebuild-next-install.py"
   },
   "install_policy": {
     "replace_existing": true,
