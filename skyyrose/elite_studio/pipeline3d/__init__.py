@@ -11,6 +11,21 @@ from .models import (
     TaskStatus,
     ordered_stages,
 )
+from .replica_pipeline import (
+    CostLine,
+    ProviderCandidate,
+    ProviderRateCard,
+    ReplicaBatchPlan,
+    ReplicaBudgetError,
+    ReplicaExecutionResult,
+    ReplicaJobOutcome,
+    ReplicaJobPlan,
+    ReplicaPlanState,
+    ReplicaPreflightError,
+    ReplicaProviderError,
+    build_replica_plan,
+    execute_replica_plan,
+)
 
 __all__ = [
     "Artifact",
@@ -22,4 +37,17 @@ __all__ = [
     "TaskStatus",
     "STAGE_ORDER",
     "ordered_stages",
+    "CostLine",
+    "ProviderCandidate",
+    "ProviderRateCard",
+    "ReplicaBatchPlan",
+    "ReplicaBudgetError",
+    "ReplicaExecutionResult",
+    "ReplicaJobOutcome",
+    "ReplicaJobPlan",
+    "ReplicaPlanState",
+    "ReplicaPreflightError",
+    "ReplicaProviderError",
+    "build_replica_plan",
+    "execute_replica_plan",
 ]

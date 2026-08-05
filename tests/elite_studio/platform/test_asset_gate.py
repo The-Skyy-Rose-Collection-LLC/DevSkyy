@@ -1,5 +1,6 @@
 import base64
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
@@ -47,10 +48,14 @@ class _FakeRenderer:
 
 def _write_trust_manifest(path: Path, build_key, founder_key) -> None:
     def pem(key):
-        return key.public_key().public_bytes(
-            serialization.Encoding.PEM,
-            serialization.PublicFormat.SubjectPublicKeyInfo,
-        ).decode()
+        return (
+            key.public_key()
+            .public_bytes(
+                serialization.Encoding.PEM,
+                serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+            .decode()
+        )
 
     path.write_text(
         json.dumps(
@@ -131,14 +136,49 @@ def test_missing_canonical_references_reject_before_render(tmp_path):
     assert "back" in report.missing_angles
 
 
+def test_threshold_cannot_be_lowered_below_release_policy(tmp_path):
+    model, refs, trust, provenance, _, _ = _fixture(tmp_path)
+    report = verify_visual_asset(
+        replace(_request(tmp_path, model, refs, trust, provenance), threshold=0.5),
+    )
+
+    assert report.disposition is AssetGateDisposition.REJECT
+    assert any("threshold must be between 0.95 and 1.00" in reason for reason in report.reasons)
+
+
+def test_configured_policy_root_requires_signed_policy_attestation(tmp_path):
+    model, refs, trust, provenance, _, _ = _fixture(tmp_path)
+    policy_key = Ed25519PrivateKey.generate()
+    manifest = json.loads(trust.read_text(encoding="utf-8"))
+    manifest["trust_roots"]["policy_attestation"] = {
+        "public_keys": [
+            {
+                "id": "policy-test",
+                "public_key_pem": policy_key.public_key()
+                .public_bytes(
+                    serialization.Encoding.PEM,
+                    serialization.PublicFormat.SubjectPublicKeyInfo,
+                )
+                .decode(),
+            }
+        ]
+    }
+    trust.write_text(json.dumps(manifest), encoding="utf-8")
+
+    report = verify_visual_asset(
+        _request(tmp_path, model, refs, trust, provenance),
+    )
+
+    assert report.disposition is AssetGateDisposition.REJECT
+    assert "missing policy-collector attestation" in report.reasons
+
+
 def test_model_must_be_bound_to_exact_sku(tmp_path):
     model, refs, trust, provenance, _, _ = _fixture(tmp_path)
     wrong_model = tmp_path / "br-006-candidate.glb"
     wrong_model.write_bytes(model.read_bytes())
 
-    report = verify_visual_asset(
-        _request(tmp_path, wrong_model, refs, trust, provenance)
-    )
+    report = verify_visual_asset(_request(tmp_path, wrong_model, refs, trust, provenance))
 
     assert report.disposition is AssetGateDisposition.REJECT
     assert any("exact SKU" in reason for reason in report.reasons)

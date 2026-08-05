@@ -19,6 +19,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -30,6 +31,7 @@ from .render import BlenderRenderer, RENDER_ANGLES
 
 SKU_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 DEFAULT_THRESHOLD = 0.95
+MINIMUM_THRESHOLD = DEFAULT_THRESHOLD
 APPROVED_SOURCE_KINDS = frozenset({"approved_sot", "approved_product_media"})
 
 
@@ -52,6 +54,7 @@ class AssetVerificationRequest:
     provenance_path: Path
     trust_manifest_path: Path
     approval_path: Path | None = None
+    policy_attestation_path: Path | None = None
     report_root: Path = Path("renders/fidelity-reports")
     threshold: float = DEFAULT_THRESHOLD
 
@@ -71,6 +74,7 @@ class AssetVerificationReport:
     verified_angles: list[str] = field(default_factory=list)
     missing_angles: list[str] = field(default_factory=list)
     provenance_verified: bool = False
+    policy_attestation_verified: bool = False
     founder_approval_verified: bool = False
     render_attempted: bool = False
 
@@ -82,7 +86,9 @@ class AssetVerificationReport:
     def persist(self, root: Path) -> Path:
         path = root / self.sku / "visual-asset-verification.json"
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        path.write_text(
+            json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         return path
 
 
@@ -146,6 +152,8 @@ def _trust_keys(manifest: dict[str, Any], section: str) -> dict[str, str]:
         # Founder approval is stored under the manifest's authority block;
         # build and policy attestations live under trust_roots.
         section_data = manifest.get("authority", {}).get("approval_verification", {})
+    elif section == "policy":
+        section_data = manifest.get("trust_roots", {}).get("policy_attestation", {})
     else:
         roots = manifest.get("trust_roots", {})
         section_data = roots.get(section, {})
@@ -156,9 +164,11 @@ def _trust_keys(manifest: dict[str, Any], section: str) -> dict[str, str]:
     }
 
 
-def _verify_signature(
-    payload: dict[str, Any], signature: str, key_pem: str
-) -> tuple[bool, str]:
+def _has_configured_policy_root(manifest: dict[str, Any]) -> bool:
+    return bool(_trust_keys(manifest, "policy"))
+
+
+def _verify_signature(payload: dict[str, Any], signature: str, key_pem: str) -> tuple[bool, str]:
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         from cryptography.hazmat.primitives.serialization import load_pem_public_key
@@ -223,6 +233,56 @@ def _verify_provenance(
         report.provenance_verified = True
 
 
+def _verify_policy_attestation(
+    request: AssetVerificationRequest,
+    report: AssetVerificationReport,
+) -> None:
+    """Require a signed policy-collector record when the manifest configures one."""
+
+    try:
+        manifest = _load_json(request.trust_manifest_path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        report.reasons.append(f"invalid trust-root manifest: {exc}")
+        return
+    if not _has_configured_policy_root(manifest):
+        return
+    if request.policy_attestation_path is None:
+        report.reasons.append("missing policy-collector attestation")
+        return
+    try:
+        attestation = _load_json(request.policy_attestation_path)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        report.reasons.append(f"invalid policy-collector attestation: {exc}")
+        return
+
+    if attestation.get("decision") != "allow":
+        report.reasons.append("policy-collector decision is not allow")
+    if attestation.get("sku") != request.sku:
+        report.reasons.append("policy-collector SKU does not match requested SKU")
+    if attestation.get("model_sha256") != report.model_sha256:
+        report.reasons.append("policy-collector model SHA-256 does not match supplied model")
+    expected_refs = attestation.get("reference_sha256")
+    if not isinstance(expected_refs, dict):
+        report.reasons.append("policy-collector attestation has no reference_sha256 map")
+    else:
+        for angle, digest in report.reference_sha256.items():
+            if expected_refs.get(angle) != digest:
+                report.reasons.append(f"policy-collector reference SHA-256 mismatch: {angle}")
+
+    key_pem = _trust_keys(manifest, "policy").get(attestation.get("key_id"))
+    signature = attestation.get("signature")
+    if not key_pem or not signature:
+        report.reasons.append("policy-collector attestation is not signed by a configured root")
+        return
+    signed_payload = dict(attestation)
+    signed_payload.pop("signature", None)
+    ok, reason = _verify_signature(signed_payload, signature, key_pem)
+    if not ok:
+        report.reasons.append(reason)
+    else:
+        report.policy_attestation_verified = True
+
+
 def _verify_founder_approval(
     request: AssetVerificationRequest, report: AssetVerificationReport
 ) -> None:
@@ -273,6 +333,11 @@ def verify_visual_asset(
         disposition=AssetGateDisposition.REJECT,
     )
 
+    if not math.isfinite(request.threshold) or not (MINIMUM_THRESHOLD <= request.threshold <= 1.0):
+        report.reasons.append(
+            f"fidelity threshold must be between {MINIMUM_THRESHOLD:.2f} and 1.00"
+        )
+
     if not SKU_RE.fullmatch(request.sku):
         report.reasons.append("SKU is not a canonical lowercase hyphenated SKU")
     if not request.model_path.is_file():
@@ -297,6 +362,7 @@ def verify_visual_asset(
         )
 
     _verify_provenance(request, report, references)
+    _verify_policy_attestation(request, report)
     if report.reasons:
         report.persist(request.report_root)
         return report
@@ -314,7 +380,9 @@ def verify_visual_asset(
         report.missing_angles = list(views.inferred_angles())
         visible = []
         for angle in views.verified_angles():
-            score = scorer(views.angle_paths[angle], references[angle], sku=request.sku, angle=angle)
+            score = scorer(
+                views.angle_paths[angle], references[angle], sku=request.sku, angle=angle
+            )
             visible.append(score)
             report.composite_by_angle[angle] = float(score.composite)
         verdict = dispose(
@@ -350,6 +418,7 @@ __all__ = [
     "AssetVerificationReport",
     "AssetVerificationRequest",
     "DEFAULT_THRESHOLD",
+    "MINIMUM_THRESHOLD",
     "canonical_json",
     "resolve_references",
     "sha256_file",

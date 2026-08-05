@@ -31,6 +31,7 @@ def main() -> int:
     parser.add_argument("--provenance", required=True, type=Path)
     parser.add_argument("--trust-manifest", required=True, type=Path)
     parser.add_argument("--approval", type=Path)
+    parser.add_argument("--policy-attestation", type=Path)
     parser.add_argument("--report-root", type=Path, default=Path("renders/fidelity-reports"))
     parser.add_argument("--threshold", type=float, default=0.95)
     args = parser.parse_args()
@@ -43,6 +44,7 @@ def main() -> int:
             provenance_path=args.provenance,
             trust_manifest_path=args.trust_manifest,
             approval_path=args.approval,
+            policy_attestation_path=args.policy_attestation,
             report_root=args.report_root,
             threshold=args.threshold,
         )

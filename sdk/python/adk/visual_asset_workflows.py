@@ -21,14 +21,13 @@ from skyyrose.elite_studio.platform.fidelity.asset_gate import (
 logger = logging.getLogger(__name__)
 
 try:
-    from google.adk.agents import LlmAgent, ParallelAgent, SequentialAgent
+    from google.adk.agents import LlmAgent, SequentialAgent
     from google.adk.tools import FunctionTool
 
     ADK_VISUAL_WORKFLOW_AVAILABLE = True
 except ImportError:
     ADK_VISUAL_WORKFLOW_AVAILABLE = False
     LlmAgent = None
-    ParallelAgent = None
     SequentialAgent = None
     FunctionTool = None
 
@@ -48,6 +47,7 @@ def run_visual_asset_gate(
     provenance_path: str,
     trust_manifest_path: str,
     approval_path: str = "",
+    policy_attestation_path: str = "",
     report_root: str = "renders/fidelity-reports",
 ) -> dict[str, Any]:
     """ADK tool: execute the deterministic, fail-closed visual asset gate."""
@@ -60,6 +60,9 @@ def run_visual_asset_gate(
             provenance_path=Path(provenance_path),
             trust_manifest_path=Path(trust_manifest_path),
             approval_path=Path(approval_path) if approval_path else None,
+            policy_attestation_path=(
+                Path(policy_attestation_path) if policy_attestation_path else None
+            ),
             report_root=Path(report_root),
         )
     )
@@ -89,7 +92,8 @@ def create_visual_asset_intake_workflow() -> Any | None:
         instruction=(
             _NON_BYPASSABLE_POLICY
             + "\nParse the supplied request into sku, model_path, reference_root, "
-            "provenance_path, trust_manifest_path, optional approval_path, and report_root. "
+            "provenance_path, trust_manifest_path, optional approval_path, "
+            "policy_attestation_path, and report_root. "
             "Call run_visual_asset_gate exactly once. Return its JSON unchanged under "
             "the key visual_asset_intake. Do not call Tripo, Meshy, Blender, or any paid API.\n"
             "Request: {input_context}"
@@ -152,15 +156,13 @@ def create_visual_asset_verification_workflow() -> Any | None:
         description="Produces a release disposition without granting approval authority.",
         output_key="visual_asset_release_disposition",
     )
-    review_fanout = ParallelAgent(
-        name="visual_asset_verification_fanout",
-        sub_agents=[gate_runner, adversarial_review],
-        description="Runs primary and independent visual asset checks in parallel.",
-    )
     return SequentialAgent(
         name="visual_asset_verification_workflow",
-        sub_agents=[review_fanout, disposition],
-        description="Mandatory render verification, adversarial review, and disposition.",
+        sub_agents=[gate_runner, adversarial_review, disposition],
+        description=(
+            "Mandatory primary render verification, sequential independent challenge review, "
+            "and disposition."
+        ),
     )
 
 
