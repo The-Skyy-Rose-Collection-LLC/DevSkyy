@@ -27,6 +27,15 @@ video. Upload only the muted derivative to the WordPress Media Library, verify
 its final URL has no audio stream, then paste that URL into the About Film
 setting before release. Do not upload or deploy the original.
 
+## Rights authorization
+
+Corey Foster, Founder, confirmed on 2026-08-04 that SkyyRose LLC owns or
+holds the necessary worldwide rights to host, distribute, and include in
+theme/demo delivery both *The Skyy Rose Collection* film and its muted
+derivative, and the Pre-Order editorial film and its muted derivative. The
+authorization includes WordPress Media Library delivery of the muted About-film
+derivative.
+
 ## Collection-world gateways
 
 The four linked collection chapters reuse this theme’s verified Scroll World
