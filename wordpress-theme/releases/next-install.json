@@ -6,13 +6,13 @@
     "version": "2.3.6"
   },
   "source": {
-    "commit": "7c570e3bb",
+    "commit": "caec35012",
     "theme_path": "wordpress-theme/skyyrose-flagship-2"
   },
   "artifact": {
     "path": "dist/skyyrose-flagship-2.zip",
-    "sha256": "3f128cc89b68de1e678874961e4bbfb5c73cc92dd074f1718ea4e4ddcf6285ff",
-    "bytes": 32556721,
+    "sha256": "365a74c50a9e93a0b29e3dce8bd6c30d2c546448bb0e9f0804abe7d2b3aedd48",
+    "bytes": 32555974,
     "delivery": "generated_local_dist",
     "rebuild_command": "python3 wordpress-theme/releases/rebuild-next-install.py"
   },
