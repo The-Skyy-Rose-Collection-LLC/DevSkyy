@@ -5,11 +5,15 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import json
 import re
+import stat
 import subprocess
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
+from zipfile import BadZipFile, ZipFile
 
 
 def run(command: list[str], cwd: Path) -> tuple[bool, str]:
@@ -42,6 +46,75 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_package(
+    package: Path,
+    repo: Path,
+    theme: Path,
+    theme_arg: str,
+) -> tuple[bool, str]:
+    """Verify that a ZIP is safe and byte-identical to tracked theme HEAD."""
+    if not package.is_file():
+        return False, "package missing"
+
+    tracked_ok, tracked_output = run(
+        ["git", "ls-files", "--", theme_arg],
+        repo,
+    )
+    if not tracked_ok:
+        return False, f"cannot list tracked theme files: {tracked_output}"
+
+    tracked_paths = [Path(line) for line in tracked_output.splitlines() if line]
+    zip_root = theme.name
+    expected = {
+        f"{zip_root}/{path.relative_to(Path(theme_arg)).as_posix()}": repo / path
+        for path in tracked_paths
+    }
+
+    try:
+        with ZipFile(package) as archive:
+            members = [member for member in archive.infolist() if not member.is_dir()]
+            unsafe: list[str] = []
+            actual: dict[str, Any] = {}
+            for member in members:
+                path = PurePosixPath(member.filename)
+                mode = (member.external_attr >> 16) & 0o170000
+                if (
+                    member.filename.startswith("/")
+                    or "\\" in member.filename
+                    or ".." in path.parts
+                    or stat.S_ISLNK(mode)
+                    or member.flag_bits & 0x1
+                ):
+                    unsafe.append(member.filename)
+                if member.filename in actual:
+                    unsafe.append(f"duplicate:{member.filename}")
+                actual[member.filename] = member
+
+            if unsafe:
+                return False, "unsafe ZIP members=" + ",".join(sorted(unsafe)[:5])
+
+            expected_names = set(expected)
+            actual_names = set(actual)
+            if expected_names != actual_names:
+                missing = sorted(expected_names - actual_names)
+                extra = sorted(actual_names - expected_names)
+                return False, (
+                    f"archive drift: missing={missing[:3]}, extra={extra[:3]}"
+                )
+
+            for name, source in expected.items():
+                if actual[name].file_size != source.stat().st_size:
+                    return False, f"archive size drift={name}"
+                source_digest = sha256(source)
+                archived_digest = hashlib.sha256(archive.read(actual[name])).hexdigest()
+                if not hmac.compare_digest(source_digest, archived_digest):
+                    return False, f"archive content drift={name}"
+    except (BadZipFile, OSError) as exc:
+        return False, f"invalid package: {exc}"
+
+    return True, f"sha256={sha256(package)}, tracked_files={len(expected)}, safe_members=true"
 
 
 def main() -> int:
@@ -224,16 +297,18 @@ def main() -> int:
     )
 
     package = repo / "dist/skyyrose-flagship-2.zip"
-    package_exists = package.is_file()
-    package_evidence = f"sha256={sha256(package)}" if package_exists else "package missing"
-    package_current = package_exists and clean_theme
+    package_matches, package_evidence = verify_package(
+        package,
+        repo,
+        theme,
+        args.theme,
+    )
+    package_current = clean_theme and package_matches
     findings.append(check(package_current, "BLOCK", "Package built from current committed HEAD", package_evidence))
 
-    audit_text = read_text(theme / "MARKETPLACE-AUDIT.md")
-    rights_open = "Confirm redistribution rights" in audit_text
     findings.append(
         check(
-            not rights_open,
+            False,
             "VERIFY",
             "Complete asset redistribution-rights ledger",
             "film authorization exists; all bundled fonts, images, scripts, libraries, and demo/preview assets still need ledger closure",
