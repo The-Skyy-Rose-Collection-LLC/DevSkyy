@@ -18,7 +18,7 @@ if ( skyyrose2_render_builder_location( 'archive' ) ) {
 ?>
 <main id="primary" class="sr2-shop">
 	<header class="sr2-shop-head">
-		<div><p class="sr2-eyebrow"><?php esc_html_e( 'SkyyRose Marketplace', 'skyyrose-flagship-2' ); ?></p><h1><?php echo esc_html( $archive_title ); ?></h1></div>
+		<div><p class="sr2-eyebrow"><?php esc_html_e( 'The House / Shop', 'skyyrose-flagship-2' ); ?></p><h1><?php echo esc_html( $archive_title ); ?></h1></div>
 		<p><?php esc_html_e( 'Limited pieces across four story worlds. Choose what carries yours.', 'skyyrose-flagship-2' ); ?></p>
 	</header>
 	<nav class="sr2-shop-worlds" aria-label="<?php esc_attr_e( 'Shop by collection', 'skyyrose-flagship-2' ); ?>">

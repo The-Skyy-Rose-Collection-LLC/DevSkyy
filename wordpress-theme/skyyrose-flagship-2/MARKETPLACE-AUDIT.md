@@ -3,13 +3,16 @@
 ## Verified in source
 
 - The theme has a valid classic-theme stylesheet header, screenshot,
-  GPL-2.0 license text, WooCommerce declarations, and version `2.3.4`.
-- PHP syntax passes for all 24 bundled PHP files. JavaScript syntax passes for
+  GPL-2.0 license text, WooCommerce declarations, and version `2.3.5`.
+- PHP syntax passes for all 25 bundled PHP files. JavaScript syntax passes for
   source, committed minified bundles, and the self-hosted 3D viewer runtime.
 - The builder regression harness passes for Elementor, Divi, and Beaver Builder
   page ownership. Elementor Pro header, footer, single, and archive
   locations use the official location API with theme fallbacks; builder canvas
   and full-width templates preserve required WordPress lifecycle hooks.
+- The commerce-truth harness confirms that pre-order inventory fails closed,
+  salon products resolve through WooCommerce SKU/category truth, product cards
+  do not invent stock or wishlist state, and standard loop hooks remain present.
 - Product 3D models fail closed: only manifest-approved, local, self-contained
   GLB v2 files under `assets/sot/3d/models/` can resolve. The resolver verifies
   path confinement, file size, GLB structure, SHA-256, five reference hashes,
@@ -61,5 +64,5 @@ These are external release gates, not source-code blockers:
 ## Scope
 
 This is a portable WordPress/WooCommerce theme package. It can be installed on
-compatible WordPress hosts; it is not executable on Shopify, a generic static
+compatible WordPress hosts; it is not executable on Shopify, a plain static
 host, or a headless commerce platform without a separate frontend adapter.

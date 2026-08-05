@@ -15,12 +15,7 @@ if ( skyyrose2_render_builder_location( 'single' ) ) {
 	get_footer();
 	return;
 }
-if ( skyyrose2_builder_owns_page() ) {
-	?>
-	<main id="primary" class="<?php echo esc_attr( skyyrose2_builder_content_class() ); ?>">
-		<?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
-	</main>
-	<?php
+if ( skyyrose2_render_builder_owned_content() ) {
 	get_footer();
 	return;
 }

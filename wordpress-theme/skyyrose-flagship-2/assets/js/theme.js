@@ -104,45 +104,6 @@
     revealTargets.forEach((target) => target.classList.add('is-seen'));
   }
 
-  const wishlistKey = 'skyyrose2_wishlist';
-  const getWishlist = () => {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem(wishlistKey) || '[]');
-      return Array.isArray(stored) ? stored : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const setWishlist = (items) => {
-    try {
-      window.localStorage.setItem(wishlistKey, JSON.stringify(items));
-    } catch {
-      // Storage can be unavailable in privacy-restricted browser contexts.
-    }
-  };
-
-  document.querySelectorAll('[data-sr2-wishlist-id]').forEach((button) => {
-    const productId = button.dataset.sr2WishlistId;
-    if (!productId) return;
-
-    const renderWishlistState = (active) => {
-      button.setAttribute('aria-pressed', String(active));
-      button.setAttribute('aria-label', active ? button.dataset.wishlistRemoveLabel : button.dataset.wishlistAddLabel);
-    };
-
-    renderWishlistState(getWishlist().includes(productId));
-
-    button.addEventListener('click', () => {
-      const current = getWishlist();
-      const active = current.includes(productId);
-      const next = active ? current.filter((id) => id !== productId) : [...current, productId];
-      setWishlist(next);
-      renderWishlistState(!active);
-      document.dispatchEvent(new CustomEvent('skyyrose2:wishlist', { detail: { productId, action: active ? 'remove' : 'add' } }));
-    });
-  });
-
   const setupPinnedWorld = (world, rail, chapters, previous, next, count, progress) => {
     const stage = world.querySelector('[data-scroll-world-stage]');
     if (!stage) return false;

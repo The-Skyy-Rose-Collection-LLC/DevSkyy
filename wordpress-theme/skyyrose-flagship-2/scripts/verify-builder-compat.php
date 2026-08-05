@@ -11,6 +11,7 @@ $GLOBALS['skyyrose2_test_support']   = array();
 $GLOBALS['skyyrose2_test_meta']      = array();
 $GLOBALS['skyyrose2_test_locations'] = array();
 $GLOBALS['skyyrose2_test_renders']   = array();
+$GLOBALS['skyyrose2_test_loop']      = 0;
 
 /** @param string $hook Hook. @param mixed $callback Callback. */
 function add_action( $hook, $callback ) {
@@ -40,6 +41,26 @@ function sanitize_key( $value ) {
 /** @param string $value Value. @return string */
 function sanitize_html_class( $value ) {
 	return preg_replace( '/[^A-Za-z0-9_\-]/', '', $value );
+}
+
+/** @param string $value Value. @return string */
+function esc_attr( $value ) {
+	return htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+}
+
+/** @return bool */
+function have_posts() {
+	return $GLOBALS['skyyrose2_test_loop'] > 0;
+}
+
+/** @return void */
+function the_post() {
+	--$GLOBALS['skyyrose2_test_loop'];
+}
+
+/** @return void */
+function the_content() {
+	echo 'Builder content';
 }
 
 /** @return int */
@@ -119,17 +140,24 @@ $GLOBALS['skyyrose2_test_meta'][42] = array();
 if ( '' !== skyyrose2_page_builder( 42 ) || skyyrose2_builder_owns_page( 42 ) ) {
 	throw new RuntimeException( 'A page without builder metadata was claimed.' );
 }
+ob_start();
+if ( skyyrose2_render_builder_owned_content( 42 ) || '' !== ob_get_clean() ) {
+	throw new RuntimeException( 'Unowned content was rendered through the builder path.' );
+}
+
+$GLOBALS['skyyrose2_test_meta'][42] = $builder_meta['elementor'];
+$GLOBALS['skyyrose2_test_loop']     = 1;
+ob_start();
+$content_rendered = skyyrose2_render_builder_owned_content( 42 );
+$builder_output   = ob_get_clean();
+if ( ! $content_rendered || false === strpos( $builder_output, 'sr2-builder-content' ) || false === strpos( $builder_output, 'Builder content' ) ) {
+	throw new RuntimeException( 'Builder-owned content did not render through the shared path.' );
+}
 
 $GLOBALS['skyyrose2_test_meta'][42] = $builder_meta['beaver-builder'];
 $classes = skyyrose2_builder_body_classes( array( 'page' ) );
 if ( ! in_array( 'sr2-builder-beaver-builder', $classes, true ) ) {
 	throw new RuntimeException( 'Builder body class was not scoped.' );
-}
-
-$tags = skyyrose2_divi_allowed_tags( array( 'div' ) );
-$tags = skyyrose2_divi_allowed_tags( $tags );
-if ( 1 !== count( array_keys( $tags, 'model-viewer', true ) ) ) {
-	throw new RuntimeException( 'Divi model-viewer allow-list is not idempotent.' );
 }
 
 echo "Builder compatibility: PASS\n";

@@ -33,9 +33,15 @@ $image_id       = $card_product->get_image_id();
 $image_loading  = 'eager' === $args['image_loading'] ? 'eager' : 'lazy';
 $image_priority = ! empty( $args['image_priority'] );
 $categories     = wc_get_product_category_list( $product_id, ' · ' );
-$availability   = $card_product->is_in_stock()
-	? __( 'Available', 'skyyrose-flagship-2' )
-	: __( 'Reserved', 'skyyrose-flagship-2' );
+$stock_state    = $card_product->get_availability();
+$availability   = $stock_state['availability'] ?? '';
+if ( ! $card_product->is_in_stock() ) {
+	$availability = $availability ?: __( 'Out of stock', 'skyyrose-flagship-2' );
+} elseif ( true === has_term( 'pre-order', 'product_cat', $product_id ) ) {
+	$availability = __( 'Pre-order', 'skyyrose-flagship-2' );
+} else {
+	$availability = $availability ?: __( 'Available', 'skyyrose-flagship-2' );
+}
 
 $image_attributes = array(
 	'class'    => 'sr2-product-card__image-asset',
@@ -72,9 +78,6 @@ if ( '' === $image_html && $image_id ) {
 			<?php endif; ?>
 			<span class="sr2-product-card__view"><?php esc_html_e( 'View piece', 'skyyrose-flagship-2' ); ?></span>
 		</a>
-		<button class="sr2-product-card__wishlist" type="button" data-sr2-wishlist-id="<?php echo esc_attr( (string) $product_id ); ?>" data-wishlist-add-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship-2' ), $product_name ) ); ?>" data-wishlist-remove-label="<?php echo esc_attr( sprintf( __( 'Remove %s from wishlist', 'skyyrose-flagship-2' ), $product_name ) ); ?>" aria-pressed="false" aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship-2' ), $product_name ) ); ?>">
-			<span aria-hidden="true">♡</span>
-		</button>
 	</div>
 	<div class="sr2-product-card__info">
 		<p class="sr2-product-card__meta"><?php echo $categories ? wp_kses_post( $categories ) : esc_html__( 'SkyyRose', 'skyyrose-flagship-2' ); ?></p>

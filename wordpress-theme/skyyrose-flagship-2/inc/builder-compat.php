@@ -123,6 +123,31 @@ function skyyrose2_builder_content_class() {
 }
 
 /**
+ * Render the unwrapped WordPress loop when a supported builder owns the page.
+ *
+ * Keeping this path in one function prevents the front-page, page, and index
+ * templates from drifting while preserving the_content filters used by each
+ * supported builder.
+ *
+ * @param int|null $post_id Page or post ID. Defaults to the queried object.
+ * @return bool Whether builder-owned content was rendered.
+ */
+function skyyrose2_render_builder_owned_content( $post_id = null ) {
+	if ( ! skyyrose2_builder_owns_page( $post_id ) ) {
+		return false;
+	}
+
+	printf( '<main id="primary" class="%s">', esc_attr( skyyrose2_builder_content_class() ) );
+	while ( have_posts() ) {
+		the_post();
+		the_content();
+	}
+	echo '</main>';
+
+	return true;
+}
+
+/**
  * Mark builder-owned pages for scoped CSS and troubleshooting.
  *
  * @param array<int,string> $classes Existing body classes.
@@ -140,17 +165,3 @@ add_filter( 'body_class', 'skyyrose2_builder_body_classes' );
 
 /** Keep builder typography on the self-hosted SkyyRose font system. */
 add_filter( 'elementor/frontend/print_google_fonts', '__return_false' );
-
-/**
- * Permit the progressive product viewer custom element in Divi code modules.
- *
- * @param array<int,string> $tags Allowed tags.
- * @return array<int,string>
- */
-function skyyrose2_divi_allowed_tags( $tags ) {
-	if ( is_array( $tags ) && ! in_array( 'model-viewer', $tags, true ) ) {
-		$tags[] = 'model-viewer';
-	}
-	return $tags;
-}
-add_filter( 'et_pb_allowed_tags', 'skyyrose2_divi_allowed_tags' );

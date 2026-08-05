@@ -89,30 +89,16 @@
 	var bubble       = document.getElementById('skyy-bubble');
 	var bubbleText   = document.getElementById('skyy-bubble-text');
 	var chipsEl      = document.getElementById('skyy-chips');
-	var askTrigger   = document.getElementById('skyy-ask-trigger');
-	var askDialog    = document.getElementById('skyy-ask-dialog');
-	var askForm      = document.getElementById('skyy-ask-form');
-	var askInput     = document.getElementById('skyy-ask-input');
-	var askCancelBtn = document.getElementById('skyy-ask-cancel');
 
 	if (!triggerBtn || !minimizeBtn || !recallBtn || !bubble || !bubbleText || !chipsEl) return;
 
 	var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	var context = mascotEl.getAttribute('data-context') || 'default';
 
-	var guideData = ( window.SKYY_GUIDE_DATA && window.SKYY_GUIDE_DATA.intents ) ? window.SKYY_GUIDE_DATA : { pages: {}, intents: [] };
-	var guidePromise = null;
-	var mascotConfig = window.SKYY_MASCOT_CONFIG || { pageTip: '', llmEnabled: false };
+	var mascotConfig = window.SKYY_MASCOT_CONFIG || { pageTip: '' };
 
 	// State: dormant | walking-in | greeting | idle | speaking | exiting
 	var state = 'dormant';
-
-	// Bridge to skyy-3d.js: every state transition (and gesture moment) is
-	// broadcast as a `skyy:*` CustomEvent so the 3D loader can switch
-	// animation clips. skyy-3d.js listens; nothing else needs these.
-	function emitSkyy(name) {
-		document.dispatchEvent(new CustomEvent('skyy:' + name));
-	}
 
 	// Pending greeting delay (wave-then-speak). Tracked so any user action
 	// inside the gap — manual trigger, chip advance, minimize, ESC — cancels
@@ -130,8 +116,6 @@
 	var autoDismissTimer = null;
 	var idleTimer        = null;
 	var lastActivityReset = 0;
-	var askDialogOpener   = null;
-	var pendingQuestion   = null;
 
 	// -------------------------------------------------------------------------
 	// Session Memory — appearances, dismissal, shown-prompt dedupe
@@ -206,7 +190,7 @@
 				text: 'The Black Rose and Love Hurts collections are live.',
 				chips: [
 					{ id: 'shop', label: 'Shop now →', action: '/shop/', next: null },
-					{ id: 'world', label: 'Enter the world', action: '/collections-world/', next: null }
+					{ id: 'world', label: 'Enter the world', action: '/collections/', next: null }
 				]
 			},
 			preorder: {
@@ -319,7 +303,6 @@
 		clearGreetTimer();
 		clearTimeout(autoDismissTimer);
 		state = 'speaking';
-		emitSkyy('speaking');
 		mascotEl.classList.add('skyy--speaking');
 		triggerBtn.setAttribute('aria-expanded', 'true');
 
@@ -331,10 +314,6 @@
 		// Force reflow so transition fires
 		void bubble.offsetWidth;
 		bubble.classList.add('skyy-bubble--visible');
-
-		if (askTrigger) {
-			askTrigger.hidden = false;
-		}
 
 		// Typewrite, then render chips
 		typewrite(bubbleText, text, function () {
@@ -367,13 +346,9 @@
 				bubble.setAttribute('hidden', '');
 				bubbleText.textContent = '';
 				chipsEl.replaceChildren();
-				if (askTrigger) {
-					askTrigger.hidden = true;
-				}
 			}
 			if (state === 'speaking') {
 				state = 'idle';
-				emitSkyy('idle');
 			}
 		}, 300);
 	}
@@ -390,7 +365,6 @@
 		var next   = btn.dataset.next;
 
 		// Visitor picked a destination — Skyy points the way.
-		emitSkyy('point');
 
 		if (action) {
 			window.location.href = action;
@@ -409,164 +383,6 @@
 	});
 
 	// -------------------------------------------------------------------------
-	// Tier 1 Guide Brain — matches free text against data/site-guide.json
-	// -------------------------------------------------------------------------
-
-	function normalizeQuery(text) {
-		return text.toLowerCase().replace(/[^\w\s-]/g, ' ').replace(/\s+/g, ' ').trim();
-	}
-
-	function ensureGuideData() {
-		if ( guideData.intents.length || ! mascotConfig.guideUrl ) {
-			return Promise.resolve( guideData );
-		}
-		if ( guidePromise ) {
-			return guidePromise;
-		}
-		guidePromise = fetch( mascotConfig.guideUrl, { credentials: 'same-origin' } )
-			.then( function ( response ) {
-				if ( ! response.ok ) {
-					throw new Error( 'Guide unavailable' );
-				}
-				return response.json();
-			} )
-			.then( function ( data ) {
-				if ( data && Array.isArray( data.intents ) ) {
-					guideData = data;
-				}
-				return guideData;
-			} )
-			.catch( function () {
-				return guideData;
-			} );
-		return guidePromise;
-	}
-
-	function matchIntent(rawQuery) {
-		var query = normalizeQuery(rawQuery);
-		if (!query || !guideData.intents.length) return null;
-
-		var best = null;
-		var bestScore = 0;
-
-		guideData.intents.forEach(function (intent) {
-			var patterns = intent.patterns || [];
-			var score = 0;
-			patterns.forEach(function (pattern) {
-				var normalizedPattern = normalizeQuery(pattern);
-				if (normalizedPattern && query.indexOf(normalizedPattern) !== -1) {
-					// Longer, more specific patterns outrank single-word ones.
-					score += normalizedPattern.split(' ').length;
-				}
-			});
-			if (score > bestScore) {
-				bestScore = score;
-				best = intent;
-			}
-		});
-
-		return best;
-	}
-
-	function speakIntentAnswer(intent) {
-		var chips = null;
-		if (intent.link) {
-			chips = [{ id: 'guide-' + intent.id, label: 'Take me there →', action: intent.link, next: null }];
-		}
-		speak(intent.answer, chips);
-	}
-
-	function askTier2Fallback(rawQuery) {
-		if (!mascotConfig.llmEnabled || !window.skyyRoseData || !window.skyyRoseData.ajaxUrl) {
-			speakFallbackRedirect();
-			return;
-		}
-
-		var body = new URLSearchParams();
-		body.set('action', 'skyyrose_mascot_chat');
-		body.set('nonce', window.skyyRoseData.nonce || '');
-		body.set('message', rawQuery);
-
-		fetch(window.skyyRoseData.ajaxUrl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: body.toString()
-		})
-			.then(function (response) { return response.json(); })
-			.then(function (json) {
-				var data   = json && json.data ? json.data : null;
-				var answer = data && typeof data.answer === 'string' ? data.answer : '';
-				if (answer) {
-					var chips = data.link ? [{ id: 'tier2-link', label: 'Take me there →', action: data.link, next: null }] : null;
-					speak(answer, chips);
-				} else {
-					speakFallbackRedirect();
-				}
-			})
-			.catch(function () {
-				speakFallbackRedirect();
-			});
-	}
-
-	function speakFallbackRedirect() {
-		speak('Ask me about finding things, sizing, or shipping — that’s what I know best. 🌹', null);
-	}
-
-	function handleAskSubmit(rawQuery) {
-		if (!rawQuery || !rawQuery.trim()) return;
-		ensureGuideData().then(function () {
-			var intent = matchIntent(rawQuery);
-			if (intent) {
-				speakIntentAnswer(intent);
-				return;
-			}
-			askTier2Fallback(rawQuery);
-		});
-	}
-
-	// -------------------------------------------------------------------------
-	// Ask Skyy Dialog — native <dialog> + showModal(), focus trapped + restored
-	// -------------------------------------------------------------------------
-
-	if (askTrigger && askDialog && askForm && askInput) {
-		askTrigger.addEventListener('click', function () {
-			askDialogOpener = document.activeElement;
-			askInput.value = '';
-			if (typeof askDialog.showModal === 'function') {
-				askDialog.showModal();
-				askInput.focus();
-			}
-		});
-
-		askForm.addEventListener('submit', function () {
-			// method="dialog" closes the dialog natively on submit; capture the
-			// value now so the 'close' handler below can act on it afterward.
-			pendingQuestion = askInput.value;
-		});
-
-		if (askCancelBtn) {
-			askCancelBtn.addEventListener('click', function () {
-				pendingQuestion = null;
-				askDialog.close();
-			});
-		}
-
-		askDialog.addEventListener('close', function () {
-			if (askDialogOpener && typeof askDialogOpener.focus === 'function') {
-				askDialogOpener.focus();
-			}
-			askDialogOpener = null;
-
-			if (pendingQuestion) {
-				var question = pendingQuestion;
-				pendingQuestion = null;
-				handleAskSubmit(question);
-			}
-		});
-	}
-
-	// -------------------------------------------------------------------------
 	// Walk-On / Walk-Off
 	// -------------------------------------------------------------------------
 
@@ -580,7 +396,6 @@
 	function walkOn(isProactive) {
 		if (state === 'walking-in' || state === 'idle' || state === 'speaking') return;
 		state = 'walking-in';
-		emitSkyy('walking-in');
 		mascotEl.setAttribute('aria-hidden', 'false');
 		mascotEl.classList.remove('skyyrose-mascot--hidden', 'skyyrose-mascot--exiting');
 		mascotEl.classList.add('skyyrose-mascot--entering');
@@ -590,12 +405,11 @@
 			mascotEl.classList.remove('skyyrose-mascot--entering');
 			mascotEl.classList.add('skyyrose-mascot--idle');
 			state = 'idle';
-			emitSkyy('idle');
 
 			// First visit = one contextual nudge, never a tour. Greet once
 			// per session; never resurface the same greeting after that.
 			// A founder-authored page tip (Customizer, empty by default)
-			// takes the place of the generic greeting line when configured —
+			// takes the place of the fallback greeting line when configured —
 			// that IS the contextual nudge for this page.
 			if (isProactive && !sessionStorage.getItem(SESSION_KEY_GREETED)) {
 				try {
@@ -603,9 +417,7 @@
 				} catch (e) { /* degrade silently */ }
 				var script = SCRIPTS[context] || SCRIPTS['default'];
 				var greetingText = mascotConfig.pageTip ? mascotConfig.pageTip : script.greeting.text;
-				// Wave first, speak after — emitting both synchronously makes
-				// the talk clip instantly override the wave in the 3D layer.
-				emitSkyy('wave');
+				// Let the character arrive before the contextual message opens.
 				greetTimer = setTimeout(function () {
 					greetTimer = null;
 					// User may have acted during the gap — only greet an
@@ -621,7 +433,6 @@
 	function walkOff(onDone) {
 		clearGreetTimer();
 		state = 'exiting';
-		emitSkyy('exiting');
 		dismissBubble();
 		clearTimeout(idleTimer);
 		mascotEl.classList.remove('skyyrose-mascot--idle', 'skyyrose-mascot--entering');
@@ -635,7 +446,6 @@
 			state = 'dormant';
 			// The 3D canvas is a sibling of the mascot container — CSS state
 			// classes can't reach it, so it must be told to stop and hide.
-			emitSkyy('hidden');
 			if (onDone) onDone();
 		}, exitDuration);
 	}
@@ -696,21 +506,18 @@
 					setTimeout(function () {
 						mascotEl.classList.remove('skyy--glancing');
 					}, 2000);
-					if (proactiveSpeak('product-glance', 'These just landed. 👀', null)) {
-						emitSkyy('excited');
-					}
+					proactiveSpeak('product-glance', 'These just landed. 👀', null);
 				}
 			});
 		}, { threshold: 0.3 });
 
-		document.querySelectorAll('.products, .wc-block-grid, .collection-hero').forEach(function (el) {
+		document.querySelectorAll('.products, .wc-block-grid, .sr2-collection-hero').forEach(function (el) {
 			productObs.observe(el);
 		});
 	}
 
-	// React when hovering product cards. Throttled separately from the CSS
-	// class toggle below — rapid multi-card hovering must not thrash the 3D
-	// layer's clip-switching (skyy-3d.js listens for skyy:excited).
+	// React when hovering product cards without retriggering the animation on
+	// every pointer transition.
 	var HOVER_EXCITE_THROTTLE_MS = 2000;
 	var lastHoverExciteAt = 0;
 	document.addEventListener('mouseover', function (e) {
@@ -724,7 +531,6 @@
 			var now = Date.now();
 			if (now - lastHoverExciteAt > HOVER_EXCITE_THROTTLE_MS) {
 				lastHoverExciteAt = now;
-				emitSkyy('excited');
 			}
 		}
 	});

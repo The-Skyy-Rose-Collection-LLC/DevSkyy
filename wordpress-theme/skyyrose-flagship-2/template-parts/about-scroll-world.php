@@ -38,7 +38,7 @@ $hero_uri = skyyrose2_sot_asset_uri( 'branding/about/skyy-rose-founder-portrait.
 			<?php esc_html_e( 'Your browser does not support the film player.', 'skyyrose-flagship-2' ); ?>
 		</video>
 	<?php else : ?>
-		<div class="sr2-about-film__handoff"><img src="<?php echo esc_url( $hero_uri ); ?>" alt="Skyy Rose wearing the set that inspired the SkyyRose name" width="724" height="1086" loading="lazy" decoding="async"><p><?php esc_html_e( 'The founder film is prepared for approved muted delivery. Set its approved delivery URL in Appearance → Customize → About Film to publish the player.', 'skyyrose-flagship-2' ); ?></p></div>
+		<div class="sr2-about-film__handoff"><img src="<?php echo esc_url( $hero_uri ); ?>" alt="Skyy Rose wearing the set that inspired the SkyyRose name" width="724" height="1086" loading="lazy" decoding="async"></div>
 	<?php endif; ?>
 </section>
 

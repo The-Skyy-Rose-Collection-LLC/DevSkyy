@@ -10,7 +10,7 @@ WooCommerce fallbacks; an installed builder may explicitly own page content.
 |---|---:|---:|---:|---|
 | WordPress block editor | Yes | Yes | Theme fallback | Wide alignment and core block styles enabled. |
 | Elementor | Yes | Yes | Header, footer, single, archive | Pro locations use Elementor's official registration and display APIs. Google Fonts output is disabled because theme fonts are self-hosted. |
-| Divi Builder plugin | Yes | Yes | Divi Theme Builder/plugin-owned | `et-builder` theme support and safe `<model-viewer>` allow-listing are enabled. |
+| Divi Builder plugin | Yes | Yes | Divi Theme Builder/plugin-owned | `et-builder` theme support is enabled. Product 3D remains available only through the theme's approved-model resolver. |
 | Beaver Builder | Yes | Yes | Plugin-owned | Builder-owned pages receive an unwrapped content area. |
 
 Bricks is not compatible because Bricks is an active WordPress theme, not a
