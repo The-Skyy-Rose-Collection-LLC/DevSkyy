@@ -16,7 +16,12 @@
     "approval_artifact": "founder-approval-record",
     "approval_verification": {
       "method": "ed25519",
-      "public_keys": [],
+      "public_keys": [
+        {
+          "id": "founder-2026-08",
+          "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA5gNeHTB+qiNeudM0rmuKTnL0YfIvYvqV7v8eP/Zuw8Q=\n-----END PUBLIC KEY-----\n"
+        }
+      ],
       "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
       "configuration_rule": "Release authorization remains blocked until the founder supplies and approves at least one Ed25519 public key outside a candidate report."
     },
@@ -109,13 +114,23 @@
   "trust_roots": {
     "build_attestation": {
       "method": "ed25519",
-      "public_keys": [],
+      "public_keys": [
+        {
+          "id": "build-attestor-2026-08",
+          "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAeTzHqUR2vFsNADaXpp5uGCPBMr8644F7u7fgsxkjkF4=\n-----END PUBLIC KEY-----\n"
+        }
+      ],
       "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
       "rule": "Candidate validation is blocked until a separately controlled CI/build-attestor key signs the exact commit-to-package reproducibility and safe-extraction claims."
     },
     "policy_attestation": {
       "method": "ed25519",
-      "public_keys": [],
+      "public_keys": [
+        {
+          "id": "policy-collector-2026-08",
+          "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAAtGbHSnhodhGgaDnABfDznkm3CMICp7k6mIMJOTseUE=\n-----END PUBLIC KEY-----\n"
+        }
+      ],
       "canonicalization": "Recursively sort JSON object keys lexicographically, preserve array order, encode UTF-8, and omit insignificant whitespace.",
       "rule": "Marketplace-profile validation is blocked until a separately controlled policy collector key signs official-source snapshots and coverage."
     }
