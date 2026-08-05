@@ -230,9 +230,10 @@ function skyyrose2_collection_url( $slug ) {
 /**
  * Resolve founder-selected collection context for a Pre-Order page.
  *
- * The supplied campaign film is intentionally unassigned until its garment
- * and collection are verified against the catalog SOT. Editors may set the
- * `skyyrose2_preorder_collection` page meta to an approved collection slug.
+ * The supplied campaign film was visually verified against the catalog SOT as
+ * br-006 / The Bomber Sherpa, a Black Rose garment. Editors may override the
+ * default with page meta only when a later founder-approved verification
+ * records a different collection.
  *
  * @param int $post_id Page ID.
  * @return string Approved collection slug or an empty string when unassigned.
@@ -240,6 +241,7 @@ function skyyrose2_collection_url( $slug ) {
 function skyyrose2_preorder_collection( $post_id ) {
 	$allowed = array( 'signature', 'black-rose', 'love-hurts', 'kids-capsule' );
 	$value   = sanitize_title( (string) get_post_meta( absint( $post_id ), 'skyyrose2_preorder_collection', true ) );
+	$value   = $value ? $value : 'black-rose';
 
 	return in_array( $value, $allowed, true ) ? $value : '';
 }
