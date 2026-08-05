@@ -199,17 +199,14 @@
     next?.addEventListener('click', () => rail.scrollBy({ left: amount(), behavior: reducedMotion ? 'auto' : 'smooth' }));
     rail.addEventListener('scroll', () => window.requestAnimationFrame(updateRail), { passive: true });
 
-    if (finePointer && !reducedMotion) {
-      rail.addEventListener('wheel', (event) => {
-        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-        const max = rail.scrollWidth - rail.clientWidth;
-        const movingForward = event.deltaY > 0;
-        const canMove = movingForward ? rail.scrollLeft < max - 2 : rail.scrollLeft > 2;
-        if (!canMove) return;
-        event.preventDefault();
-        rail.scrollLeft += event.deltaY;
-      }, { passive: false });
-    }
+    rail.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      rail.scrollBy({
+        left: event.key === 'ArrowRight' ? amount() : -amount(),
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
+    });
 
     updateRail();
   };

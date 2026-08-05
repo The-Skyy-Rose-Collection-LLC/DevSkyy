@@ -199,8 +199,8 @@ function skyyrose2_collections() {
 		'signature'    => array(
 			'name'       => __( 'Signature', 'skyyrose-flagship-2' ),
 			'kicker'     => __( 'The Origin', 'skyyrose-flagship-2' ),
-			'headline'   => __( 'Where everything began.', 'skyyrose-flagship-2' ),
-			'line'       => __( 'Oakland-born luxury. Gold light. First rose. Every piece carries the beginning forward.', 'skyyrose-flagship-2' ),
+			'headline'   => __( 'Not basics. Blueprints.', 'skyyrose-flagship-2' ),
+			'line'       => __( 'The first rose. The Oakland foundation. Signature is that night made permanent.', 'skyyrose-flagship-2' ),
 			'manifesto'  => __( 'Before the collection became a house, it was one idea: build something worthy of a daughter and rooted in The Town.', 'skyyrose-flagship-2' ),
 			'hero'       => 'branding/hero/signature-golden-gate-yacht-1280w.webp',
 			'portrait'   => 'scene-1-signature.webp',
@@ -217,8 +217,8 @@ function skyyrose2_collections() {
 		'black-rose'   => array(
 			'name'       => __( 'Black Rose', 'skyyrose-flagship-2' ),
 			'kicker'     => __( 'Beauty Without Permission', 'skyyrose-flagship-2' ),
-			'headline'   => __( 'Defining beauty through black.', 'skyyrose-flagship-2' ),
-			'line'       => __( 'Silver-lit armor for people who learned to bloom where nobody expected beauty.', 'skyyrose-flagship-2' ),
+			'headline'   => __( 'Defining beauty through the color black.', 'skyyrose-flagship-2' ),
+			'line'       => __( 'A posture, a conviction, an Oakland truth made into fabric.', 'skyyrose-flagship-2' ),
 			'manifesto'  => __( 'Black is not absence. Black holds depth, power, protection, and elegance. The rose survives because it knows its own value.', 'skyyrose-flagship-2' ),
 			'hero'       => 'images/immersive/scene-black-rose-moon-court-gpt2.webp',
 			'portrait'   => 'scene-2-black-rose.webp',
@@ -235,8 +235,8 @@ function skyyrose2_collections() {
 		'love-hurts'   => array(
 			'name'       => __( 'Love Hurts', 'skyyrose-flagship-2' ),
 			'kicker'     => __( 'The Beast Speaks', 'skyyrose-flagship-2' ),
-			'headline'   => __( 'Love leaves a mark.', 'skyyrose-flagship-2' ),
-			'line'       => __( 'Beauty and the Beast retold from the Beast’s side—crimson, thorned, tender, unapologetic.', 'skyyrose-flagship-2' ),
+			'headline'   => __( 'They called me Beast. They were right.', 'skyyrose-flagship-2' ),
+			'line'       => __( 'The Hurts bloodline, the enchanted rose, and raw romance told from the Beast’s side.', 'skyyrose-flagship-2' ),
 			'manifesto'  => __( 'Some love heals. Some love scars. Both can shape the person who walks out wearing the truth.', 'skyyrose-flagship-2' ),
 			'hero'       => 'branding/hero/beauty-and-beast-1280w.webp',
 			'portrait'   => 'scene-3-love-hurts.webp',
@@ -253,8 +253,8 @@ function skyyrose2_collections() {
 		'kids-capsule' => array(
 			'name'       => __( 'Kids Capsule', 'skyyrose-flagship-2' ),
 			'kicker'     => __( 'The Heir', 'skyyrose-flagship-2' ),
-			'headline'   => __( 'Legacy starts early.', 'skyyrose-flagship-2' ),
-			'line'       => __( 'Same house codes. New generation. Dark premium pieces built for the ones coming next.', 'skyyrose-flagship-2' ),
+			'headline'   => __( 'The Heir to the throne.', 'skyyrose-flagship-2' ),
+			'line'       => __( 'Luxury runs in the family: same craftsmanship, smaller silhouettes, legacy carried forward.', 'skyyrose-flagship-2' ),
 			'manifesto'  => __( 'The next generation should inherit more than a name. Give them confidence, imagination, and room to build their own throne.', 'skyyrose-flagship-2' ),
 			'hero'       => 'images/immersive/scene-kids-capsule-runway.webp',
 			'portrait'   => 'scene-4-kids-capsule.webp',
@@ -381,10 +381,10 @@ function skyyrose2_render_collection_rail() {
 					$portrait_uri = skyyrose2_sot_asset_uri( $collection['portrait'] );
 				}
 				?>
-				<a class="sr2-world" data-collection="<?php echo esc_attr( $index ); ?>" href="<?php echo esc_url( skyyrose2_collection_url( $index ) ); ?>">
-					<img src="<?php echo esc_url( $portrait_uri ); ?>" alt="" width="1920" height="1275" loading="<?php echo 0 === array_search( $index, array_keys( $collections ), true ) ? 'eager' : 'lazy'; ?>" decoding="async">
-					<span class="sr2-world__shade" aria-hidden="true"></span>
-					<span class="sr2-world__copy"><small><?php echo esc_html( sprintf( '%02d · %s', array_search( $index, array_keys( $collections ), true ) + 1, $collection['kicker'] ) ); ?></small><strong><?php echo esc_html( $collection['name'] ); ?></strong><em><?php echo esc_html( $collection['line'] ); ?></em><b><?php esc_html_e( 'Enter world', 'skyyrose-flagship-2' ); ?> <span aria-hidden="true">↗</span></b></span>
+					<a class="sr2-world" data-collection="<?php echo esc_attr( $index ); ?>" href="<?php echo esc_url( skyyrose2_collection_url( $index ) ); ?>">
+						<img src="<?php echo esc_url( $portrait_uri ); ?>" alt="" width="1920" height="1275" loading="<?php echo 0 === array_search( $index, array_keys( $collections ), true ) ? 'eager' : 'lazy'; ?>" decoding="async">
+						<span class="sr2-world__shade" aria-hidden="true"></span>
+						<span class="sr2-world__copy"><small><?php echo esc_html( sprintf( '%02d · %s', array_search( $index, array_keys( $collections ), true ) + 1, $collection['kicker'] ) ); ?></small><img class="sr2-world__lockup" src="<?php echo esc_url( skyyrose2_sot_asset_uri( $collection['lockup'] ) ); ?>" alt="<?php echo esc_attr( $collection['name'] ); ?>" width="900" height="400" loading="lazy" decoding="async"><strong><?php echo esc_html( $collection['name'] ); ?></strong><em><?php echo esc_html( $collection['line'] ); ?></em><b><?php esc_html_e( 'Enter world', 'skyyrose-flagship-2' ); ?> <span aria-hidden="true">↗</span></b></span>
 				</a>
 			<?php endforeach; ?>
 		</div>
