@@ -101,6 +101,21 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "create_campaign_blitz_pipeline": ("adk.workflow_agents", "create_campaign_blitz_pipeline"),
     "get_pipeline": ("adk.workflow_agents", "get_pipeline"),
     "estimate_pipeline_savings": ("adk.workflow_agents", "estimate_pipeline_savings"),
+    # Mandatory visual product asset workflows
+    "VisualAssetWorkflowType": ("adk.visual_asset_workflows", "VisualAssetWorkflowType"),
+    "create_visual_asset_intake_workflow": (
+        "adk.visual_asset_workflows",
+        "create_visual_asset_intake_workflow",
+    ),
+    "create_visual_asset_verification_workflow": (
+        "adk.visual_asset_workflows",
+        "create_visual_asset_verification_workflow",
+    ),
+    "create_tripo_release_workflow": (
+        "adk.visual_asset_workflows",
+        "create_tripo_release_workflow",
+    ),
+    "get_visual_asset_workflow": ("adk.visual_asset_workflows", "get_visual_asset_workflow"),
 }
 
 __all__ = list(_LAZY_IMPORTS.keys())
