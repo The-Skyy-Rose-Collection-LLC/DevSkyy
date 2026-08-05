@@ -8,6 +8,7 @@ repo_root="$(git rev-parse --show-toplevel)"
 output_dir="${1:-${repo_root}/dist}"
 archive_path="${output_dir}/${theme_name}.zip"
 temporary_archive="${archive_path}.tmp"
+commit_time="$(git -C "${repo_root}" show -s --format=%cI HEAD)"
 
 cleanup() {
 	rm -f "${temporary_archive}"
@@ -22,6 +23,7 @@ mkdir -p "${output_dir}"
 git -C "${repo_root}" archive \
 	--format=zip \
 	--prefix="${theme_name}/" \
+	--mtime="${commit_time}" \
 	--output="${temporary_archive}" \
 	HEAD:"${theme_dir}"
 mv -f "${temporary_archive}" "${archive_path}"
