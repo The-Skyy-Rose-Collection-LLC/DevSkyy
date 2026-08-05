@@ -7,9 +7,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SKYYROSE2_VERSION', '2.3.2' );
+define( 'SKYYROSE2_VERSION', '2.3.3' );
 define( 'SKYYROSE2_DIR', get_template_directory() );
 define( 'SKYYROSE2_URI', get_template_directory_uri() );
+define( 'SKYYROSE2_REWRITE_SCHEMA', '2026-08-04-1' );
+
+require_once SKYYROSE2_DIR . '/inc/product-3d-viewer.php';
 
 /**
  * Resolve a theme-bundled, SOT-approved asset.
@@ -409,8 +412,61 @@ function skyyrose2_footer() {
 	<?php
 }
 
+/** Register virtual collection routes so staging does not require four hand-made pages. */
+function skyyrose2_collection_rewrites() {
+	add_rewrite_tag( '%skyyrose2_collections_index%', '([01])' );
+	add_rewrite_tag( '%skyyrose2_collection%', '([^&]+)' );
+	add_rewrite_rule( '^collections/?$', 'index.php?skyyrose2_collections_index=1', 'top' );
+	add_rewrite_rule( '^collections/([^/]+)/?$', 'index.php?skyyrose2_collection=$matches[1]', 'top' );
+}
+add_action( 'init', 'skyyrose2_collection_rewrites' );
+
+/** Flush the virtual collection routes when this theme is activated. */
+function skyyrose2_flush_collection_rewrites() {
+	skyyrose2_collection_rewrites();
+	flush_rewrite_rules( false );
+	update_option( 'skyyrose2_rewrite_schema', SKYYROSE2_REWRITE_SCHEMA, false );
+}
+add_action( 'after_switch_theme', 'skyyrose2_flush_collection_rewrites' );
+
+/** Flush rewritten collection routes once after an in-place theme update. */
+function skyyrose2_maybe_flush_collection_rewrites() {
+	if ( SKYYROSE2_REWRITE_SCHEMA === get_option( 'skyyrose2_rewrite_schema' ) ) {
+		return;
+	}
+
+	flush_rewrite_rules( false );
+	update_option( 'skyyrose2_rewrite_schema', SKYYROSE2_REWRITE_SCHEMA, false );
+}
+add_action( 'init', 'skyyrose2_maybe_flush_collection_rewrites', 99 );
+
+/** Mark only recognized virtual collection routes as successful before canonical redirects. */
+function skyyrose2_prepare_virtual_collection_response() {
+	$virtual_index = '1' === (string) get_query_var( 'skyyrose2_collections_index' );
+	$virtual_slug  = sanitize_title( (string) get_query_var( 'skyyrose2_collection' ) );
+	if ( ! $virtual_index && ! array_key_exists( $virtual_slug, skyyrose2_collections() ) ) {
+		return;
+	}
+
+	global $wp_query;
+	$wp_query->is_404 = false;
+	status_header( 200 );
+}
+add_action( 'template_redirect', 'skyyrose2_prepare_virtual_collection_response', 0 );
+
 /** Route collection child pages without manual template assignment. */
 function skyyrose2_collection_template( $template ) {
+	if ( '1' === (string) get_query_var( 'skyyrose2_collections_index' ) ) {
+		$index_template = SKYYROSE2_DIR . '/template-collections-index.php';
+		return file_exists( $index_template ) ? $index_template : $template;
+	}
+
+	$virtual_slug = sanitize_title( (string) get_query_var( 'skyyrose2_collection' ) );
+	if ( $virtual_slug && array_key_exists( $virtual_slug, skyyrose2_collections() ) ) {
+		$collection_template = SKYYROSE2_DIR . '/template-collection.php';
+		return file_exists( $collection_template ) ? $collection_template : $template;
+	}
+
 	if ( ! is_page() ) {
 		return $template;
 	}

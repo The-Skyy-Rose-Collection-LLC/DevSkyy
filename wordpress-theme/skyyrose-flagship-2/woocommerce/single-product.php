@@ -26,6 +26,7 @@ while ( have_posts() ) :
 	<main id="primary" class="sr2-product-page"<?php echo $active_slug ? ' data-collection="' . esc_attr( $active_slug ) . '"' : ''; ?>>
 		<nav class="sr2-product-crumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'skyyrose-flagship-2' ); ?>"><a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"><?php esc_html_e( 'Shop', 'skyyrose-flagship-2' ); ?></a><span>/</span><?php if ( $active_collection ) : ?><a href="<?php echo esc_url( skyyrose2_collection_url( $active_slug ) ); ?>"><?php echo esc_html( $active_collection['name'] ); ?></a><span>/</span><?php endif; ?><span aria-current="page"><?php echo esc_html( $product ? $product->get_name() : get_the_title() ); ?></span></nav>
 		<?php if ( $product && has_term( array( 'pre-order', 'preorder', 'pre_order' ), 'product_cat', get_the_ID() ) ) : ?><div class="sr2-product-release" role="note"><span><?php esc_html_e( 'Pre-order edition', 'skyyrose-flagship-2' ); ?></span><p><?php esc_html_e( 'Made for your order. Estimated fulfillment timing appears before checkout.', 'skyyrose-flagship-2' ); ?></p></div><?php endif; ?>
+		<?php if ( $product ) : ?><?php skyyrose2_render_product_3d_viewer( $product ); ?><?php endif; ?>
 		<section class="sr2-product-shell">
 			<?php wc_get_template_part( 'content', 'single-product' ); ?>
 		</section>

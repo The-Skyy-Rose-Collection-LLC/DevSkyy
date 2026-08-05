@@ -27,24 +27,34 @@ continue to render but commerce components intentionally fall back safely.
 
 - `assets/sot/` contains theme-local copies of verified non-product visuals and self-hosted fonts from current SkyyRose SOT.
 - Product truth and product imagery remain WooCommerce-managed.
+- Product 3D is fail-closed: `assets/sot/3d/approved-models.json` is the only
+  model registry, and the viewer appears only for entries carrying the required
+  model/reference hashes and founder, policy, provenance, and gate approvals.
+  Approved models must be self-contained theme-local GLB v2 files; the runtime
+  rejects external resources, unsupported compression, and hash mismatches.
 - `assets/sot/` contains runtime campaign art registered in production `data/visual-manifest.json` version 1.3.1. `IMAGE-PROMPTS.md` preserves GPT-Image-2 generation provenance without duplicate staging assets.
 - No legacy asset bundle exists in this theme.
 - Theme has no dependency on current production theme after upload.
 
 ## Routes
 
-Create pages using these slugs:
+The theme provides virtual routes for:
 
 - `/collections/`
 - `/collections/signature/`
 - `/collections/black-rose/`
 - `/collections/love-hurts/`
 - `/collections/kids-capsule/`
+
+Create WordPress pages using these slugs:
+
 - `/pre-order/`
 - `/about/`
 - `/contact/`
 
 Collection routes map automatically to `template-collection.php`; manual template selection is optional.
+The Collections index is also virtual, so no parent page is required. Existing
+pages with these slugs remain compatible with the same templates.
 
 ## Installation
 
@@ -66,6 +76,9 @@ a second catalog or order system.
 ```bash
 find . -name '*.php' -print0 | xargs -0 -n1 php -l
 node --check assets/js/theme.js
+node --check assets/js/product-3d-viewer.js
+node --check assets/js/product-3d-viewer.min.js
+php scripts/verify-product-3d-resolver.php
 ```
 
 Run the PHP and JavaScript checks before creating an archive. Test the archive

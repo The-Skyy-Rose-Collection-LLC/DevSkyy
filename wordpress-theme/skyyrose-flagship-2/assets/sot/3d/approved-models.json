@@ -1,0 +1,12 @@
+{
+	"schema": "skyyrose.approved-models.v2",
+	"model_policy": {
+		"asset_profile": "self-contained-glb-v1",
+		"compression": "none",
+		"external_resources": false,
+		"ktx2": false,
+		"lottie": false,
+		"maximum_bytes": 52428800
+	},
+	"models": {}
+}

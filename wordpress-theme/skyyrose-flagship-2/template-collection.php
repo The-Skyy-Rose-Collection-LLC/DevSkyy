@@ -9,7 +9,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$slug        = sanitize_title( get_post_field( 'post_name', get_queried_object_id() ) );
+$slug        = sanitize_title( (string) get_query_var( 'skyyrose2_collection' ) );
+$slug        = $slug ? $slug : sanitize_title( get_post_field( 'post_name', get_queried_object_id() ) );
 $collections = skyyrose2_collections();
 $collection  = $collections[ $slug ] ?? $collections['signature'];
 $shop_url    = '#shop';
