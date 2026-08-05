@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adversarial Planning Free"
+  short_description: "Zero-cost deterministic release closeout"
+  default_prompt: "Use $adversarial-planning-free to generate an evidence-backed release closeout plan without remote or paid calls."
