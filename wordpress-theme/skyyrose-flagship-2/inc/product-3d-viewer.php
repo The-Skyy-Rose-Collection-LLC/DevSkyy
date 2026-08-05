@@ -58,6 +58,38 @@ function skyyrose2_glb_document_has_external_reference( $value ) {
 }
 
 /**
+ * Detect prohibited decoder-dependent extension keys anywhere in GLB JSON.
+ *
+ * Valid glTF declares extensions at the document root, but the actual payload
+ * lives on nested objects. Checking both locations prevents an undeclared
+ * extension payload from bypassing the self-contained asset profile.
+ *
+ * @param mixed $value JSON value.
+ * @return bool
+ */
+function skyyrose2_glb_document_has_blocked_extension( $value ) {
+	if ( ! is_array( $value ) ) {
+		return false;
+	}
+
+	$blocked_extensions = array(
+		'EXT_meshopt_compression',
+		'KHR_draco_mesh_compression',
+		'KHR_texture_basisu',
+	);
+	foreach ( $value as $key => $item ) {
+		if ( is_string( $key ) && in_array( $key, $blocked_extensions, true ) ) {
+			return true;
+		}
+		if ( skyyrose2_glb_document_has_blocked_extension( $item ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Validate a self-contained GLB before exposing it to the browser.
  *
  * @param string $path Absolute model path.
@@ -113,7 +145,10 @@ function skyyrose2_validate_approved_glb_file( $path ) {
 		is_array( $document['extensionsUsed'] ?? null ) ? $document['extensionsUsed'] : array(),
 		is_array( $document['extensionsRequired'] ?? null ) ? $document['extensionsRequired'] : array()
 	);
-	if ( array_intersect( $blocked_extensions, $extensions ) ) {
+	if (
+		array_intersect( $blocked_extensions, $extensions )
+		|| skyyrose2_glb_document_has_blocked_extension( $document )
+	) {
 		return false;
 	}
 

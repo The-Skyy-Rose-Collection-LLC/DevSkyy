@@ -97,6 +97,33 @@ try {
 		throw new RuntimeException( 'GLB with an external resource passed validation.' );
 	}
 
+	$nested_extension_document = json_encode(
+		array(
+			'asset'  => array( 'version' => '2.0' ),
+			'meshes' => array(
+				array(
+					'primitives' => array(
+						array(
+							'extensions' => array(
+								'KHR_draco_mesh_compression' => array(
+									'bufferView' => 0,
+									'attributes' => array( 'POSITION' => 0 ),
+								),
+							),
+						),
+					),
+				),
+			),
+		)
+	);
+	$nested_extension_document .= str_repeat( ' ', ( 4 - strlen( $nested_extension_document ) % 4 ) % 4 );
+	$nested_extension_length    = 20 + strlen( $nested_extension_document );
+	$nested_extension_glb       = pack( 'a4VV', 'glTF', 2, $nested_extension_length ) . pack( 'VV', strlen( $nested_extension_document ), 0x4E4F534A ) . $nested_extension_document;
+	file_put_contents( $model_path, $nested_extension_glb );
+	if ( skyyrose2_validate_approved_glb_file( $model_path ) ) {
+		throw new RuntimeException( 'GLB with an undeclared nested compression extension passed validation.' );
+	}
+
 	echo "Product 3D resolver: PASS\n";
 } finally {
 	foreach ( array( $manifest_path, $model_path ) as $path ) {
