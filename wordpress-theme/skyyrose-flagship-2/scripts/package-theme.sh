@@ -6,26 +6,24 @@ theme_name="skyyrose-flagship-2"
 theme_dir="wordpress-theme/${theme_name}"
 repo_root="$(git rev-parse --show-toplevel)"
 output_dir="${1:-${repo_root}/dist}"
-stage_dir="$(mktemp -d)"
+archive_path="${output_dir}/${theme_name}.zip"
+temporary_archive="${archive_path}.tmp"
 
 cleanup() {
-
-	rm -rf "${stage_dir}"
+	rm -f "${temporary_archive}"
 }
 trap cleanup EXIT
 
 mkdir -p "${output_dir}"
-mkdir -p "${stage_dir}/${theme_name}"
 
 # Archive HEAD so ignored editor files, local dependencies, and uncommitted
-# experiments cannot be accidentally shipped.
-git -C "${repo_root}" archive HEAD:"${theme_dir}" | tar -x -C "${stage_dir}/${theme_name}"
-
-archive_path="${output_dir}/${theme_name}.zip"
-rm -f "${archive_path}"
-(
-	cd "${stage_dir}"
-	zip -qr "${archive_path}" "${theme_name}"
-)
+# experiments cannot be accidentally shipped. Git fixes archive member times to
+# the commit time, so equivalent clean-HEAD builds are byte-for-byte identical.
+git -C "${repo_root}" archive \
+	--format=zip \
+	--prefix="${theme_name}/" \
+	--output="${temporary_archive}" \
+	HEAD:"${theme_dir}"
+mv -f "${temporary_archive}" "${archive_path}"
 
 printf 'Created %s\n' "${archive_path}"
