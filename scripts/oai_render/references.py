@@ -13,13 +13,13 @@ skipped, never rendered as an incomplete image.
 
 from __future__ import annotations
 
-import csv
 import functools
 import logging
 from dataclasses import dataclass
 from pathlib import Path
 
 from . import config
+from skyyrose.core.catalog_loader import read_catalog_rows
 
 log = logging.getLogger(__name__)
 
@@ -43,17 +43,16 @@ def load_catalog() -> dict[str, dict]:
     catalog: dict[str, dict] = {}
     if not config.CATALOG_CSV.exists():
         raise FileNotFoundError(f"Catalog CSV not found: {config.CATALOG_CSV}")
-    with config.CATALOG_CSV.open(newline="", encoding="utf-8") as fh:
-        for row in csv.DictReader(fh):
-            sku = (row.get("sku") or "").strip()
-            if not sku:
-                continue
-            catalog[sku] = {
-                "name": (row.get("name") or "").strip(),
-                "collection": (row.get("collection") or "").strip(),
-                "is_preorder": (row.get("is_preorder") or "").strip() == "1",
-                "output_slug": (row.get("render_output_slug") or "").strip() or sku,
-            }
+    for row in read_catalog_rows(config.CATALOG_CSV):
+        sku = row["sku"].strip()
+        if not sku:
+            continue
+        catalog[sku] = {
+            "name": (row.get("name") or "").strip(),
+            "collection": (row.get("collection") or "").strip(),
+            "is_preorder": (row.get("is_preorder") or "").strip() == "1",
+            "output_slug": (row.get("render_output_slug") or "").strip() or sku,
+        }
     return catalog
 
 
