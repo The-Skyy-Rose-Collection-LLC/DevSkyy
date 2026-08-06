@@ -71,6 +71,13 @@
         "kind": "scene-art",
         "status": "verified",
         "notes": "KC runway immersive scene still \u2014 canon regen 2026-07-02."
+      },
+      {
+        "path": "images/immersive/scene-kids-capsule-heir-runway-gpt2",
+        "resolved": "images/immersive/scene-kids-capsule-heir-runway-gpt2.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "Kids Capsule dark rose-gold heir runway and constellation salon. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
       }
     ],
     "patches": [],
@@ -143,12 +150,18 @@
         },
         "back_model_image": {
           "path": "assets/images/products/kids-purple-set-back-model.webp",
-          "resolved": "images/products/kids-purple-set-back-model.webp"
+          "resolved": null
         }
       },
       "dossier": "data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": []
+  "unresolved_product_images": [
+    {
+      "sku": "kids-002",
+      "column": "back_model_image",
+      "path": "assets/images/products/kids-purple-set-back-model.webp"
+    }
+  ]
 }

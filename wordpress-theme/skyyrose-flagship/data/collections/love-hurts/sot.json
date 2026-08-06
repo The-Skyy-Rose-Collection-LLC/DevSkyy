@@ -71,7 +71,7 @@
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-love-hurts",
-      "resolved": "images/homepage-col-love-hurts.webp",
+      "resolved": null,
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "LH world art. Collection cards/panels/portals."
@@ -107,17 +107,24 @@
       },
       {
         "path": "branding/collection-logo-love-hurts",
-        "resolved": "branding/collection-logo-love-hurts.jpg",
+        "resolved": null,
         "kind": "collection-logo",
         "status": "verified",
         "notes": "LH collection logo badge (founder-kept 2026-06-13)."
       },
       {
         "path": "branding/love-hurts-neon-star-ref",
-        "resolved": "branding/love-hurts-neon-star-ref.jpg",
+        "resolved": null,
         "kind": "collection-logo-alt",
         "status": "verified",
         "notes": "Red neon star \u2014 ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
+      },
+      {
+        "path": "images/immersive/scene-love-hurts-cracked-rose-gpt2",
+        "resolved": "images/immersive/scene-love-hurts-cracked-rose-gpt2.webp",
+        "kind": "scene-art",
+        "status": "verified",
+        "notes": "Love Hurts cracked crystal rose chamber with oxblood drapery and thorned runway. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
       }
     ],
     "patches": [],
@@ -145,14 +152,14 @@
       },
       {
         "path": "branding/love-hurts-love-hero",
-        "resolved": "branding/love-hurts-love-hero.webp",
+        "resolved": null,
         "kind": "collection-lockup-part-alt",
         "status": "verified",
         "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
       },
       {
         "path": "branding/love-hurts-hurts-hero",
-        "resolved": "branding/love-hurts-hurts-hero.webp",
+        "resolved": null,
         "kind": "collection-lockup-part-alt",
         "status": "verified",
         "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
@@ -304,7 +311,7 @@
         },
         "back_model_image": {
           "path": "assets/images/products/love-hurts-bomber-back-model.webp",
-          "resolved": "images/products/love-hurts-bomber-back-model.webp"
+          "resolved": null
         }
       },
       "dossier": "data/dossiers/love-hurts-bomber-jacket.md",
@@ -361,5 +368,11 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": []
+  "unresolved_product_images": [
+    {
+      "sku": "lh-004",
+      "column": "back_model_image",
+      "path": "assets/images/products/love-hurts-bomber-back-model.webp"
+    }
+  ]
 }
