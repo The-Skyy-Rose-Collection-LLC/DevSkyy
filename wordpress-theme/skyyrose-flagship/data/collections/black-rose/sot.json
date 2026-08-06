@@ -76,7 +76,7 @@
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-black-rose",
-      "resolved": null,
+      "resolved": "images/homepage-col-black-rose.webp",
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
@@ -112,51 +112,44 @@
       },
       {
         "path": "images/immersive/scene-black-rose-courtyard",
-        "resolved": null,
+        "resolved": "images/immersive/scene-black-rose-courtyard.webp",
         "kind": "scene-art",
         "status": "verified",
         "notes": "BR courtyard immersive scene still \u2014 crop of night-editorial master."
       },
       {
         "path": "images/immersive/scene-black-rose-gazebo",
-        "resolved": null,
+        "resolved": "images/immersive/scene-black-rose-gazebo.webp",
         "kind": "scene-art",
         "status": "verified",
         "notes": "BR gazebo immersive scene still."
-      },
-      {
-        "path": "images/immersive/scene-black-rose-moon-court-gpt2",
-        "resolved": "images/immersive/scene-black-rose-moon-court-gpt2.webp",
-        "kind": "scene-art",
-        "status": "verified",
-        "notes": "Black Rose silver moon court with black rose mirror pool. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
       }
     ],
     "patches": [
       {
         "path": "images/hero-overlays/br-patch-hockey",
-        "resolved": null,
+        "resolved": "images/hero-overlays/br-patch-hockey.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
       },
       {
         "path": "images/hero-overlays/br-patch-mlb-baseball",
-        "resolved": null,
+        "resolved": "images/hero-overlays/br-patch-mlb-baseball.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (baseball, br-003/br-012)."
       },
       {
         "path": "images/hero-overlays/br-patch-nba-basketball",
-        "resolved": null,
+        "resolved": "images/hero-overlays/br-patch-nba-basketball.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (basketball, br-010)."
       },
       {
         "path": "images/hero-overlays/br-patch-nfl-football",
-        "resolved": null,
+        "resolved": "images/hero-overlays/br-patch-nfl-football.webp",
         "kind": "jersey-patch-art",
         "status": "verified",
         "notes": "Series patch (football, br-008/br-009)."
@@ -167,14 +160,14 @@
     "lookbook": [
       {
         "path": "images/lookbook/lb-black-rose-football",
-        "resolved": null,
+        "resolved": "images/lookbook/lb-black-rose-football-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "BIB football jersey editorial."
       },
       {
         "path": "images/lookbook/lb-black-rose-hockey",
-        "resolved": null,
+        "resolved": "images/lookbook/lb-black-rose-hockey-480w.webp",
         "kind": "lookbook",
         "status": "verified",
         "notes": "BIB hockey jersey editorial."
@@ -400,7 +393,7 @@
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp",
-          "resolved": null
+          "resolved": "images/products/jersey-sf-inspired-football-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-1-sf-inspired-football.md",
@@ -423,7 +416,7 @@
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-last-oakland-football-back-model.webp",
-          "resolved": null
+          "resolved": "images/products/jersey-last-oakland-football-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
@@ -446,7 +439,7 @@
         },
         "back_model_image": {
           "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp",
-          "resolved": null
+          "resolved": "images/products/jersey-the-bay-basketball-back-model.webp"
         }
       },
       "dossier": "data/dossiers/black-is-beautiful-jersey-series-3-the-bay-basketball.md",
@@ -553,21 +546,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [
-    {
-      "sku": "br-008",
-      "column": "back_model_image",
-      "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp"
-    },
-    {
-      "sku": "br-009",
-      "column": "back_model_image",
-      "path": "assets/images/products/jersey-last-oakland-football-back-model.webp"
-    },
-    {
-      "sku": "br-010",
-      "column": "back_model_image",
-      "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp"
-    }
-  ]
+  "unresolved_product_images": []
 }

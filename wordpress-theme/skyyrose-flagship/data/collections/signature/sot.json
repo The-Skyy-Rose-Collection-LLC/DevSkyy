@@ -69,7 +69,7 @@
   "imagery": {
     "scene_portrait": {
       "path": "images/homepage-col-signature",
-      "resolved": null,
+      "resolved": "images/homepage-col-signature.webp",
       "kind": "collection-portrait",
       "status": "verified",
       "notes": "Signature world art. Collection cards/panels/portals."
@@ -91,7 +91,7 @@
       },
       {
         "path": "branding/collection-logo-signature",
-        "resolved": null,
+        "resolved": "branding/collection-logo-signature.jpg",
         "kind": "collection-logo",
         "status": "verified",
         "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
@@ -105,17 +105,10 @@
       },
       {
         "path": "images/immersive/scene-signature-bay-bridge",
-        "resolved": null,
+        "resolved": "images/immersive/scene-signature-bay-bridge.webp",
         "kind": "scene-art",
         "status": "verified",
         "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
-      },
-      {
-        "path": "images/immersive/scene-signature-oakland-atelier-gpt2",
-        "resolved": "images/immersive/scene-signature-oakland-atelier-gpt2.webp",
-        "kind": "scene-art",
-        "status": "verified",
-        "notes": "Signature Oakland waterfront atelier with rose-gold origin artifact and tailoring table. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
       }
     ],
     "patches": [],
