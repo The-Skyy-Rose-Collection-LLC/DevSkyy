@@ -1,0 +1,22 @@
+{
+  "domain": "wordpress-theme/skyyrose-flagship",
+  "component": "lookbook",
+  "sources": [
+    {
+      "slug": "black-rose",
+      "sot": "wordpress-theme/skyyrose-flagship/data/collections/black-rose/sot.json"
+    },
+    {
+      "slug": "kids-capsule",
+      "sot": "wordpress-theme/skyyrose-flagship/data/collections/kids-capsule/sot.json"
+    },
+    {
+      "slug": "love-hurts",
+      "sot": "wordpress-theme/skyyrose-flagship/data/collections/love-hurts/sot.json"
+    },
+    {
+      "slug": "signature",
+      "sot": "wordpress-theme/skyyrose-flagship/data/collections/signature/sot.json"
+    }
+  ]
+}
