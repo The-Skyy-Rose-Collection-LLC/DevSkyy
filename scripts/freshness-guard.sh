@@ -12,8 +12,8 @@
 #   1. SOT drift     — data/collections/<slug>/{sot.json,index.html} + design-tokens.css
 #                      must match the masters (identity.json, catalog.csv,
 #                      visual-manifest.json, logo-registry.json).
-#   2. Lookbook SOT drift — lookbook-manifest.json drives scripts/build-lookbook-sot.py,
-#                      then from-sot to docs/campaigns/sot-lookbook.html.
+#   2. Lookbook SOT drift — the scripts/sot/lookbook.py component reads the manifest,
+#                      then derives the SOT and docs/campaigns/sot-lookbook.html.
 #   3. .min staleness — every assets/css|js source has an up-to-date *.min.*
 #                      (production serves .min; a stale .min = an inert fix).
 #   4. Version sync  — style.css "Version", functions.php SKYYROSE_VERSION,
@@ -101,7 +101,7 @@ if forced || staged_match "$SOT_TRIGGER"; then
 fi
 
 # ── CHECK 2: Lookbook SOT + HTML drift ──────────────────────────────────────
-LOOKBOOK_TRIGGER='scripts/lookbook-manifest\.json|scripts/build-lookbook-sot\.py|scripts/build-lookbook-from-sot\.py|wordpress-theme/skyyrose-flagship/data/lookbook-sot\.json|docs/campaigns/sot-lookbook\.html'
+LOOKBOOK_TRIGGER='scripts/(sot/lookbook\.py|lookbook-manifest\.json|build-lookbook-sot\.py|build-lookbook-from-sot\.py)|wordpress-theme/skyyrose-flagship/data/lookbook-sot\.json|docs/campaigns/sot-lookbook\.html'
 if forced || staged_match "$LOOKBOOK_TRIGGER"; then
   hdr "2. Lookbook SOT ↔ derived HTML"
   if [ -x "$PY" ]; then

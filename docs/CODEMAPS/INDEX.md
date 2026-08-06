@@ -13,6 +13,7 @@
 | [frontend.md](frontend.md) | Next.js 16 dashboard (`frontend/`), `proxy.ts` auth gate, legacy `src/` SDK |
 | [wordpress.md](wordpress.md) | `skyyrose-flagship` theme templates, `inc/` modules, `.min` build discipline |
 | [data.md](data.md) | Catalog CSV + dossiers, SOT imagery resolution, Alembic models, asset hub |
+| [sot-components.md](sot-components.md) | Token-cheap routes from a data/visual task to its one component owner and drift guard |
 | [dependencies.md](dependencies.md) | External services: WooCommerce, WP.com, Vercel, OAI gpt-image-2, Pinecone, Meshy/Tripo, LLM providers |
 
 ## Three independent systems — never cross-wire

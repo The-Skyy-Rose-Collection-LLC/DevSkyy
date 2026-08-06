@@ -94,11 +94,10 @@ _SOT_COMMON_PY: Path = (
     _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "sot_common.py"
 )
 _LOOKBOOK_MANIFEST: Path = _REPO_ROOT / "scripts" / "lookbook-manifest.json"
-_BUILD_LOOKBOOK_SOT: Path = _REPO_ROOT / "scripts" / "build-lookbook-sot.py"
+_LOOKBOOK_COMPONENT: Path = _REPO_ROOT / "scripts" / "sot" / "lookbook.py"
 _LOOKBOOK_SOT: Path = (
     _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "lookbook-sot.json"
 )
-_LOOKBOOK_FROM_SOT: Path = _REPO_ROOT / "scripts" / "build-lookbook-from-sot.py"
 _LOOKBOOK_HTML: Path = _REPO_ROOT / "docs" / "campaigns" / "sot-lookbook.html"
 
 # The 4 CSV columns build-collection-sot.py resolves via sot_common.resolve_asset()
@@ -987,8 +986,8 @@ def check_lookbook_sot_current() -> CheckResult:
     data/lookbook-sot.json cannot pass silently.
     """
     name = "lookbook_sot_current"
-    if not _BUILD_LOOKBOOK_SOT.exists():
-        return _ok(name, "build-lookbook-sot.py not present — skip")
+    if not _LOOKBOOK_COMPONENT.exists():
+        return _fail(name, f"canonical lookbook component missing: {_LOOKBOOK_COMPONENT}")
 
     if not _LOOKBOOK_MANIFEST.exists():
         return _fail(name, f"lookbook manifest missing: {_LOOKBOOK_MANIFEST}")
@@ -1000,14 +999,8 @@ def check_lookbook_sot_current() -> CheckResult:
         sys.path.insert(0, str(_REPO_ROOT))
     saved_path = sys.path[:]
     try:
-        import importlib.util
+        from scripts.sot import lookbook as gen_mod
 
-        spec = importlib.util.spec_from_file_location("build_lookbook_sot", _BUILD_LOOKBOOK_SOT)
-        if spec is None or spec.loader is None:
-            return _fail(name, "Could not load build-lookbook-sot.py spec")
-        gen_mod = importlib.util.module_from_spec(spec)
-        sys.modules["build_lookbook_sot"] = gen_mod
-        spec.loader.exec_module(gen_mod)
         payload = gen_mod.build_lookbook_payload(_LOOKBOOK_MANIFEST)
         generated = gen_mod.serialize(payload)
     except Exception as exc:  # defensive — never crash the whole validator run
@@ -1031,8 +1024,8 @@ def check_lookbook_html_current() -> CheckResult:
     build_lookbook_html function so template drift cannot hide until runtime.
     """
     name = "lookbook_html_current"
-    if not _LOOKBOOK_FROM_SOT.exists():
-        return _ok(name, "build-lookbook-from-sot.py not present — skip")
+    if not _LOOKBOOK_COMPONENT.exists():
+        return _fail(name, f"canonical lookbook component missing: {_LOOKBOOK_COMPONENT}")
 
     if not _LOOKBOOK_SOT.exists():
         return _fail(name, f"lookbook-sot.json not found: {_LOOKBOOK_SOT}")
@@ -1041,13 +1034,8 @@ def check_lookbook_html_current() -> CheckResult:
         return _fail(name, f"sot-lookbook.html not found: {_LOOKBOOK_HTML}")
 
     try:
-        import importlib.util
+        from scripts.sot import lookbook as gen_mod
 
-        spec = importlib.util.spec_from_file_location("build_lookbook_from_sot", _LOOKBOOK_FROM_SOT)
-        if spec is None or spec.loader is None:
-            return _fail(name, "Could not load build-lookbook-from-sot.py spec")
-        gen_mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(gen_mod)
         generated, _ = gen_mod.build_lookbook_html(
             json.loads(_LOOKBOOK_SOT.read_text(encoding="utf-8"))
         )

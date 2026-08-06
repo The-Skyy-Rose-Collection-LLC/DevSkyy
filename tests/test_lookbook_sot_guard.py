@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -12,6 +13,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 _BUILD_LOOKBOOK_SOT = _REPO_ROOT / "scripts" / "build-lookbook-sot.py"
 _BUILD_LOOKBOOK_FROM_SOT = _REPO_ROOT / "scripts" / "build-lookbook-from-sot.py"
+_LOOKBOOK_COMPONENT = _REPO_ROOT / "scripts" / "sot" / "lookbook.py"
 _LOOKBOOK_MANIFEST = _REPO_ROOT / "scripts" / "lookbook-manifest.json"
 
 
@@ -24,33 +26,72 @@ def _load(mod_name: str, path: Path):
     return module
 
 
-gen = _load("build_lookbook_sot", _BUILD_LOOKBOOK_SOT)
-html_gen = _load("build_lookbook_from_sot", _BUILD_LOOKBOOK_FROM_SOT)
+lookbook = _load("sot_lookbook", _LOOKBOOK_COMPONENT)
 validator = _load(
     "validate_catalog_consistency", _REPO_ROOT / "scripts" / "validate_catalog_consistency.py"
 )
 
 
 def _seed(tmp_dir: Path):
-    payload = gen.build_lookbook_payload(_LOOKBOOK_MANIFEST)
+    payload = lookbook.build_lookbook_payload(_LOOKBOOK_MANIFEST)
     sot_file = tmp_dir / "lookbook-sot.json"
     html_file = tmp_dir / "sot-lookbook.html"
-    sot_file.write_text(gen.serialize(payload), encoding="utf-8")
-    rendered, _ = html_gen.build_lookbook_html(payload)
+    sot_file.write_text(lookbook.serialize(payload), encoding="utf-8")
+    rendered, _ = lookbook.build_lookbook_html(payload)
     html_file.write_text(rendered, encoding="utf-8")
     return payload, sot_file, html_file
 
 
 class TestLookbookSotGenerator:
+    def test_compatibility_entrypoints_use_the_canonical_component(self):
+        assert _LOOKBOOK_COMPONENT.is_file()
+        assert "scripts.sot.lookbook" in _BUILD_LOOKBOOK_SOT.read_text(encoding="utf-8")
+        assert "scripts.sot.lookbook" in _BUILD_LOOKBOOK_FROM_SOT.read_text(encoding="utf-8")
+        legacy_sot = _load("legacy_lookbook_sot", _BUILD_LOOKBOOK_SOT)
+        legacy_html = _load("legacy_lookbook_html", _BUILD_LOOKBOOK_FROM_SOT)
+        assert Path(legacy_sot._lookbook.__file__).resolve() == _LOOKBOOK_COMPONENT
+        assert Path(legacy_html._lookbook.__file__).resolve() == _LOOKBOOK_COMPONENT
+
+    def test_compatibility_entrypoint_uses_directory_fallback_for_empty_manifest(
+        self, tmp_path, monkeypatch
+    ):
+        collections_dir = tmp_path / "collections"
+        collection_dir = collections_dir / "fallback"
+        collection_dir.mkdir(parents=True)
+        (collection_dir / "sot.json").write_text('{"name": "Fallback"}\n', encoding="utf-8")
+        manifest = tmp_path / "empty-manifest.json"
+        manifest.write_text(json.dumps({"sources": []}), encoding="utf-8")
+        output = tmp_path / "lookbook-sot.json"
+        legacy_sot = _load("legacy_lookbook_fallback", _BUILD_LOOKBOOK_SOT)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                str(_BUILD_LOOKBOOK_SOT),
+                "--manifest",
+                str(manifest),
+                "--collections-dir",
+                str(collections_dir),
+                "--out",
+                str(output),
+            ],
+        )
+
+        assert legacy_sot.main() == 0
+        assert (
+            json.loads(output.read_text(encoding="utf-8"))["collections"][0]["collection"]
+            == "fallback"
+        )
+
     def test_build_payload_and_serialize_are_stable(self):
-        payload = gen.build_lookbook_payload(_LOOKBOOK_MANIFEST)
+        payload = lookbook.build_lookbook_payload(_LOOKBOOK_MANIFEST)
         assert payload["domain"] == "wordpress-theme/skyyrose-flagship"
         assert payload["component"] == "lookbook"
         assert payload["collections"]
-        assert gen.serialize(payload) == gen.serialize(payload)
+        assert lookbook.serialize(payload) == lookbook.serialize(payload)
 
     def test_generator_output_includes_expected_collections(self):
-        payload = gen.build_lookbook_payload(_LOOKBOOK_MANIFEST)
+        payload = lookbook.build_lookbook_payload(_LOOKBOOK_MANIFEST)
         slugs = [item["collection"] for item in payload["collections"]]
         assert "black-rose" in slugs
         assert "love-hurts" in slugs
@@ -77,7 +118,7 @@ class TestLookbookSotFreshnessGuard:
     def test_guard_fails_on_lookbook_drift(self, tmp_path, monkeypatch):
         payload, _, html_file = _seed(tmp_path)
         sot_file = tmp_path / "lookbook-sot.json"
-        corrupted = gen.serialize(payload)
+        corrupted = lookbook.serialize(payload)
         corrupted = corrupted.replace("lookbook", "lookbook-drift", 1)
         sot_file.write_text(corrupted, encoding="utf-8")
         monkeypatch.setattr(
@@ -109,13 +150,13 @@ class TestLookbookSotFreshnessGuard:
         result = validator.check_lookbook_html_current()
         assert not result.passed
 
-    def test_guard_skips_when_build_script_missing(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(validator, "_BUILD_LOOKBOOK_SOT", tmp_path / "missing.py")
+    def test_guard_fails_when_canonical_component_missing(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(validator, "_LOOKBOOK_COMPONENT", tmp_path / "missing.py")
         result = validator.check_lookbook_sot_current()
-        assert result.passed
-        assert "skip" in result.message.lower()
+        assert not result.passed
+        assert "canonical" in result.message.lower()
 
-    def test_html_guard_skips_when_build_script_missing(self, tmp_path, monkeypatch):
+    def test_html_guard_fails_when_canonical_component_missing(self, tmp_path, monkeypatch):
         _, sot_file, html_file = _seed(tmp_path)
         monkeypatch.setattr(
             validator,
@@ -127,11 +168,7 @@ class TestLookbookSotFreshnessGuard:
             "_LOOKBOOK_HTML",
             html_file,
         )
-        monkeypatch.setattr(
-            validator,
-            "_LOOKBOOK_FROM_SOT",
-            tmp_path / "missing.py",
-        )
+        monkeypatch.setattr(validator, "_LOOKBOOK_COMPONENT", tmp_path / "missing.py")
         result = validator.check_lookbook_html_current()
-        assert result.passed
-        assert "skip" in result.message.lower()
+        assert not result.passed
+        assert "canonical" in result.message.lower()
