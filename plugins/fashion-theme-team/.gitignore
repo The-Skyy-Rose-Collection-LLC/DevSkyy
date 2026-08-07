@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+runtime/elite_web_builder/output/
+runtime/elite_web_builder/.coverage
+.DS_Store

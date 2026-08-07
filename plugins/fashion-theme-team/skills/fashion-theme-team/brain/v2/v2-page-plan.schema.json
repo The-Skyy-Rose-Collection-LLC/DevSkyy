@@ -1,0 +1,839 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skyyrose.local/contracts/v2-page-plan.schema.json",
+  "title": "SkyyRose V2 page and imagery contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "version",
+    "schema_version",
+    "contract_status",
+    "brand",
+    "status",
+    "media_policy",
+    "visual_thesis",
+    "recognition_devices",
+    "token_map",
+    "collection_tokens",
+    "imagery_manifest_contract",
+    "responsive_matrix",
+    "state_matrix",
+    "cta_system",
+    "cta_by_page",
+    "cta_state_matrix",
+    "motion_budget",
+    "rhythm_rules",
+    "acceptance_matrix",
+    "pages"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./v2-page-plan.schema.json"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "contract_status": {
+      "enum": [
+        "planned-not-implemented",
+        "implemented-unverified",
+        "blocked"
+      ]
+    },
+    "status": {
+      "enum": [
+        "planned-not-implemented",
+        "implemented-unverified",
+        "blocked"
+      ]
+    },
+    "brand": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "tagline",
+        "home"
+      ],
+      "properties": {
+        "id": {
+          "const": "skyyrose"
+        },
+        "name": {
+          "const": "SkyyRose"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "home": {
+          "type": "string"
+        }
+      }
+    },
+    "media_policy": {
+      "type": "string"
+    },
+    "visual_thesis": {
+      "type": "string"
+    },
+    "motion_reference": {
+      "type": "string"
+    },
+    "recognition_devices": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "logo_independent"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "logo_independent": {
+            "const": true
+          }
+        }
+      }
+    },
+    "token_map": {
+      "type": "object",
+      "required": [
+        "source_files",
+        "semantic",
+        "typography",
+        "resolution_rule",
+        "drift_rule"
+      ],
+      "properties": {
+        "source_files": {
+          "type": "array",
+          "minItems": 3
+        },
+        "semantic": {
+          "type": "object",
+          "minProperties": 8
+        },
+        "typography": {
+          "type": "object",
+          "required": [
+            "display",
+            "body",
+            "utility",
+            "prohibited"
+          ],
+          "properties": {
+            "display": {
+              "const": "Archivo"
+            },
+            "body": {
+              "const": "Hanken Grotesk"
+            },
+            "utility": {
+              "const": "Anton"
+            },
+            "prohibited": {
+              "type": "array",
+              "minItems": 2
+            }
+          }
+        },
+        "resolution_rule": {
+          "type": "string"
+        },
+        "drift_rule": {
+          "type": "string"
+        }
+      }
+    },
+    "collection_tokens": {
+      "type": "object",
+      "required": [
+        "black-rose",
+        "love-hurts",
+        "signature",
+        "kids-capsule"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/collectionToken"
+      }
+    },
+    "imagery_manifest_contract": {
+      "$ref": "#/$defs/imageryContract"
+    },
+    "responsive_matrix": {
+      "$ref": "#/$defs/responsiveMatrix"
+    },
+    "state_matrix": {
+      "$ref": "#/$defs/stateMatrix"
+    },
+    "cta_system": {
+      "type": "object",
+      "required": [
+        "primary",
+        "secondary",
+        "tertiary",
+        "commerce"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "cta_by_page": {
+      "type": "object",
+      "minProperties": 28,
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "cta_state_matrix": {
+      "$ref": "#/$defs/ctaContract"
+    },
+    "motion_budget": {
+      "$ref": "#/$defs/motionBudget"
+    },
+    "rhythm_rules": {
+      "type": "object",
+      "required": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "max_repeated_identical_rows",
+        "required_editorial_interruptions",
+        "featured_scale_ratio",
+        "filter_priority"
+      ]
+    },
+    "acceptance_matrix": {
+      "type": "object",
+      "required": [
+        "status",
+        "route_coverage",
+        "ids",
+        "evidence_required"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "planned-not-implemented",
+            "implemented-unverified",
+            "blocked"
+          ]
+        },
+        "ids": {
+          "type": "array",
+          "minItems": 8
+        },
+        "evidence_required": {
+          "type": "array",
+          "minItems": 4
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 28,
+      "items": {
+        "$ref": "#/$defs/page"
+      }
+    }
+  },
+  "$defs": {
+    "collectionToken": {
+      "type": "object",
+      "required": [
+        "identity_ref",
+        "accent_token",
+        "accent_dark_token",
+        "accent_hex",
+        "accent_dark_hex",
+        "lockup_ref",
+        "identity_status",
+        "hero_status",
+        "shippable_media"
+      ],
+      "properties": {
+        "identity_ref": {
+          "type": "string"
+        },
+        "accent_token": {
+          "const": "--skyyrose-accent"
+        },
+        "accent_dark_token": {
+          "const": "--skyyrose-accent-dark"
+        },
+        "accent_hex": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "accent_dark_hex": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "lockup_ref": {
+          "type": "string"
+        },
+        "identity_status": {
+          "const": "verified"
+        },
+        "hero_status": {
+          "const": "interim-pending-mj"
+        },
+        "shippable_media": {
+          "const": false
+        }
+      }
+    },
+    "imageryContract": {
+      "type": "object",
+      "required": [
+        "manifest_refs",
+        "key_pattern",
+        "source_kind_allowlist",
+        "required_fields",
+        "status_values",
+        "fail_closed_rules",
+        "publication_gate"
+      ],
+      "properties": {
+        "manifest_refs": {
+          "type": "array",
+          "minItems": 2
+        },
+        "key_pattern": {
+          "const": "page_id/shot_id"
+        },
+        "source_kind_allowlist": {
+          "type": "array",
+          "minItems": 3
+        },
+        "required_fields": {
+          "type": "array",
+          "minItems": 10
+        },
+        "status_values": {
+          "type": "array",
+          "minItems": 4
+        },
+        "fail_closed_rules": {
+          "type": "array",
+          "minItems": 4
+        },
+        "publication_gate": {
+          "type": "string"
+        }
+      }
+    },
+    "responsiveViewport": {
+      "type": "object",
+      "required": [
+        "composition",
+        "crop",
+        "density",
+        "interaction",
+        "commerce_order",
+        "fallback"
+      ],
+      "properties": {
+        "composition": {
+          "type": "string"
+        },
+        "crop": {
+          "type": "string"
+        },
+        "density": {
+          "type": "string"
+        },
+        "interaction": {
+          "type": "string"
+        },
+        "commerce_order": {
+          "type": "array",
+          "minItems": 4
+        },
+        "fallback": {
+          "type": "string"
+        }
+      }
+    },
+    "responsiveMatrix": {
+      "type": "object",
+      "required": [
+        "viewports",
+        "required_states",
+        "invariants"
+      ],
+      "properties": {
+        "viewports": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "width_css_px",
+              "height_css_px",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "390",
+                  "768",
+                  "1440"
+                ]
+              },
+              "width_css_px": {
+                "enum": [
+                  390,
+                  768,
+                  1440
+                ]
+              },
+              "height_css_px": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required_states": {
+          "type": "array",
+          "minItems": 7
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 3
+        }
+      }
+    },
+    "stateMatrix": {
+      "type": "object",
+      "required": [
+        "required",
+        "semantics"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "minItems": 7
+        },
+        "semantics": {
+          "type": "object",
+          "required": [
+            "loading",
+            "empty",
+            "error",
+            "unavailable",
+            "success",
+            "keyboard",
+            "reduced_motion"
+          ]
+        }
+      }
+    },
+    "ctaContract": {
+      "type": "object",
+      "required": [
+        "target_min_css_px",
+        "request_acknowledgement_max_ms",
+        "required_states",
+        "families"
+      ],
+      "properties": {
+        "target_min_css_px": {
+          "const": 44
+        },
+        "request_acknowledgement_max_ms": {
+          "type": "integer",
+          "maximum": 100
+        },
+        "required_states": {
+          "type": "array",
+          "minItems": 10
+        },
+        "families": {
+          "type": "object",
+          "minProperties": 5
+        }
+      }
+    },
+    "motionBudget": {
+      "type": "object",
+      "required": [
+        "showpiece_max_per_route",
+        "max_active_sections",
+        "duration_ms",
+        "max_staggered_items",
+        "allowed_properties",
+        "ease_token",
+        "forbidden_behaviors",
+        "reduced_motion",
+        "cancellation"
+      ],
+      "properties": {
+        "showpiece_max_per_route": {
+          "const": 1
+        },
+        "max_active_sections": {
+          "const": 1
+        },
+        "duration_ms": {
+          "type": "object",
+          "required": [
+            "fast",
+            "standard",
+            "slow"
+          ],
+          "properties": {
+            "fast": {
+              "const": 160
+            },
+            "standard": {
+              "const": 360
+            },
+            "slow": {
+              "const": 600
+            }
+          }
+        },
+        "max_staggered_items": {
+          "type": "integer",
+          "maximum": 3
+        },
+        "allowed_properties": {
+          "type": "array",
+          "minItems": 2
+        },
+        "ease_token": {
+          "const": "--ease-smooth-out"
+        },
+        "forbidden_behaviors": {
+          "type": "array",
+          "minItems": 3
+        },
+        "reduced_motion": {
+          "type": "string"
+        },
+        "cancellation": {
+          "type": "array",
+          "minItems": 5
+        }
+      }
+    },
+    "pageState": {
+      "type": "object",
+      "required": [
+        "render",
+        "announcement"
+      ],
+      "properties": {
+        "render": {
+          "type": "string"
+        },
+        "announcement": {
+          "type": "string"
+        }
+      }
+    },
+    "ctaStates": {
+      "type": "object",
+      "required": [
+        "default",
+        "hover",
+        "focus_visible",
+        "active",
+        "loading",
+        "success",
+        "disabled",
+        "unavailable",
+        "error",
+        "reduced_motion"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "pageCtaStates": {
+      "type": "object",
+      "required": [
+        "primary",
+        "secondary",
+        "tertiary"
+      ],
+      "properties": {
+        "primary": {
+          "$ref": "#/$defs/ctaStates"
+        },
+        "secondary": {
+          "$ref": "#/$defs/ctaStates"
+        },
+        "tertiary": {
+          "$ref": "#/$defs/ctaStates"
+        }
+      }
+    },
+    "pageMotionBudget": {
+      "type": "object",
+      "required": [
+        "showpiece_max",
+        "max_active_sections",
+        "duration_ms",
+        "max_staggered_items",
+        "allowed_properties",
+        "ease_token",
+        "reduced_motion_fallback",
+        "cancellation"
+      ],
+      "properties": {
+        "showpiece_max": {
+          "const": 1
+        },
+        "max_active_sections": {
+          "const": 1
+        },
+        "duration_ms": {
+          "type": "object",
+          "required": [
+            "fast",
+            "standard",
+            "slow"
+          ]
+        },
+        "max_staggered_items": {
+          "type": "integer",
+          "maximum": 3
+        },
+        "allowed_properties": {
+          "type": "array",
+          "minItems": 2
+        },
+        "ease_token": {
+          "const": "--ease-smooth-out"
+        },
+        "reduced_motion_fallback": {
+          "type": "string"
+        },
+        "cancellation": {
+          "type": "array",
+          "minItems": 5
+        }
+      }
+    },
+    "pageRhythm": {
+      "type": "object",
+      "required": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "max_repeated_identical_rows",
+        "editorial_interruptions",
+        "featured_scale",
+        "filter_priority"
+      ],
+      "properties": {
+        "max_repeated_identical_rows": {
+          "type": "integer",
+          "maximum": 2
+        },
+        "editorial_interruptions": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "priority",
+        "intent",
+        "layout",
+        "desktop",
+        "mobile",
+        "imagery",
+        "features",
+        "visual_identity",
+        "provenance",
+        "responsive",
+        "states",
+        "cta_state_matrix",
+        "motion_budget",
+        "rhythm",
+        "acceptance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "core",
+            "experience",
+            "extension"
+          ]
+        },
+        "intent": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "array",
+          "minItems": 3
+        },
+        "desktop": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "imagery": {
+          "type": "string"
+        },
+        "features": {
+          "type": "array"
+        },
+        "visual_identity": {
+          "type": "object",
+          "required": [
+            "collection_context",
+            "accent_token",
+            "accent_dark_token",
+            "lockup_ref",
+            "source",
+            "resolution"
+          ]
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "manifest_refs",
+            "status",
+            "shot_ref_pattern",
+            "source_kind_allowlist",
+            "required_fields",
+            "interim_media"
+          ],
+          "properties": {
+            "manifest_refs": {
+              "type": "array",
+              "minItems": 2
+            },
+            "status": {
+              "const": "planned-unverified"
+            },
+            "shot_ref_pattern": {
+              "type": "string"
+            },
+            "source_kind_allowlist": {
+              "type": "array",
+              "minItems": 3
+            },
+            "required_fields": {
+              "type": "array",
+              "minItems": 10
+            },
+            "interim_media": {
+              "const": "non-shippable"
+            }
+          }
+        },
+        "responsive": {
+          "type": "object",
+          "required": [
+            "390",
+            "768",
+            "1440"
+          ],
+          "properties": {
+            "390": {
+              "$ref": "#/$defs/responsiveViewport"
+            },
+            "768": {
+              "$ref": "#/$defs/responsiveViewport"
+            },
+            "1440": {
+              "$ref": "#/$defs/responsiveViewport"
+            }
+          }
+        },
+        "states": {
+          "type": "object",
+          "required": [
+            "loading",
+            "empty",
+            "error",
+            "unavailable",
+            "success",
+            "keyboard",
+            "reduced_motion"
+          ],
+          "properties": {
+            "loading": {
+              "$ref": "#/$defs/pageState"
+            },
+            "empty": {
+              "$ref": "#/$defs/pageState"
+            },
+            "error": {
+              "$ref": "#/$defs/pageState"
+            },
+            "unavailable": {
+              "$ref": "#/$defs/pageState"
+            },
+            "success": {
+              "$ref": "#/$defs/pageState"
+            },
+            "keyboard": {
+              "$ref": "#/$defs/pageState"
+            },
+            "reduced_motion": {
+              "$ref": "#/$defs/pageState"
+            }
+          }
+        },
+        "cta_state_matrix": {
+          "$ref": "#/$defs/pageCtaStates"
+        },
+        "motion_budget": {
+          "$ref": "#/$defs/pageMotionBudget"
+        },
+        "rhythm": {
+          "$ref": "#/$defs/pageRhythm"
+        },
+        "acceptance": {
+          "type": "object",
+          "required": [
+            "status",
+            "ids",
+            "required_evidence"
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+
+

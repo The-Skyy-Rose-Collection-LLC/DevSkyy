@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skyyrose.local/contracts/v2/commerce-state-contract.json",
+  "$comment": "Executable commerce state, component and API contract for the SkyyRose V2 design-system handoff. This is a contract, not proof that the current theme implements it.",
+  "contract_version": "2.0.0",
+  "status": "implementation-required",
+  "brand": {
+    "id": "skyyrose",
+    "name": "SkyyRose",
+    "tagline": "Luxury Grows from Concrete."
+  },
+  "owner": "fashion-component-commerce-engineer",
+  "effective_at": "2026-08-06T00:00:00-07:00",
+  "source_authority": {
+    "audit": "./team-run-commerce.md",
+    "merchandising": "../knowledge/merchandising-and-conversion.md",
+    "feature_scaffold": "../interactive/feature-scaffold.json",
+    "official_platform_docs": [
+      {
+        "id": "WOO-STORE-API",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/",
+        "retrieved_at": "2026-08-06",
+        "claims": ["public customer-facing product/cart/checkout API", "cookie sessions", "nonce or cart-token writes", "current-user data boundary"]
+      },
+      {
+        "id": "WOO-STORE-PRODUCTS",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/products/",
+        "retrieved_at": "2026-08-06",
+        "claims": ["published products only", "variation collection requires type=variation", "non-published products return 404"]
+      },
+      {
+        "id": "WOO-STORE-CART",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/cart/",
+        "retrieved_at": "2026-08-06",
+        "claims": ["cart responses contain authoritative items/totals/notices", "cart writes require nonce or cart token", "add/update/remove return current cart"]
+      },
+      {
+        "id": "WOO-STORE-CART-ITEMS",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/cart-items/",
+        "retrieved_at": "2026-08-06",
+        "claims": ["cart item add requires product-or-variation id, quantity and variation attributes", "cart item key controls edit/delete"]
+      },
+      {
+        "id": "WOO-STORE-CHECKOUT",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout",
+        "retrieved_at": "2026-08-06",
+        "claims": ["checkout GET creates/returns draft order data", "checkout writes require nonce or cart token", "payment payload is submitted to checkout order"]
+      },
+      {
+        "id": "WOO-STORE-CHECKOUT-ORDER",
+        "url": "https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout-order",
+        "retrieved_at": "2026-08-06",
+        "claims": ["payment processing requires order key and billing/address/payment data", "nonce or cart token required"]
+      },
+      {
+        "id": "WOO-REST-V3-VARIATIONS",
+        "url": "https://developer.woocommerce.com/docs/apis/rest-api/v3/product-variations/",
+        "retrieved_at": "2026-08-06",
+        "claims": ["authenticated management/read model", "variation id, sku, price, purchasable and attributes"]
+      }
+    ],
+    "boundary": "WooCommerce Store API or server-side WooCommerce functions are purchase truth. Catalog/SOT is identity and media provenance. Client state is a projection and never authorizes purchase."
+  },
+  "enums": {
+    "product_type": ["simple", "variable", "grouped", "external", "virtual", "downloadable"],
+    "product_visibility": ["publish", "draft", "pending", "private", "scheduled", "coming_soon", "expired", "missing"],
+    "variation_state": ["not_applicable", "required", "selected", "valid", "invalid", "unavailable", "stale", "unknown"],
+    "media_role": ["hero", "front", "back", "detail", "movement", "video_poster", "video", "360_frame", "swatch", "size_chart", "editorial", "fallback"],
+    "media_status": ["verified", "pending_review", "missing", "expired", "rejected", "unavailable"],
+    "media_rights": ["sot", "licensed", "owner_approved", "unknown", "expired"],
+    "availability_status": ["in_stock", "low_stock_authoritative", "on_backorder", "preorder", "out_of_stock", "coming_soon", "unavailable", "expired", "unknown"],
+    "cta_action": ["view_product", "add_to_cart", "preorder", "join_waitlist", "quick_view", "compare", "move_to_cart", "checkout", "place_order", "retry", "contact_service", "start_return", "book_appointment", "buy_gift_card", "join_loyalty"],
+    "cta_state": ["idle", "hover", "focus", "active", "selected", "disabled", "loading", "success", "warning", "error", "empty", "unavailable"],
+    "request_state": ["idle", "queued", "in_flight", "succeeded", "failed_retryable", "failed_terminal", "reconciled", "cancelled"],
+    "order_status": ["checkout_draft", "pending", "processing", "on_hold", "completed", "failed", "cancelled", "refunded", "unknown"],
+    "service_state": ["not_started", "loading", "needs_input", "eligible", "ineligible", "submitted", "confirmed", "expired", "error", "cancelled"],
+    "query_state": ["idle", "loading", "ready", "empty", "invalid", "error", "stale"],
+    "appointment_state": ["available", "held", "booked", "full", "expired", "cancelled", "unknown"],
+    "gift_card_state": ["draft", "validated", "purchased", "delivered", "redeemed", "expired", "refunded", "error"],
+    "loyalty_state": ["guest", "eligible", "enrolled", "suspended", "closed", "error"],
+    "waitlist_state": ["available", "joined", "duplicate", "unsubscribed", "ended", "error"]
+  },
+  "universal_state_contract": {
+    "states": {
+      "default": {"render": "authoritative read model", "aria": "none"},
+      "hover": {"render": "affordance only; never reveal purchase facts exclusively", "aria": "none"},
+      "focus": {"render": "visible focus indicator with 3:1 non-text contrast", "aria": "none"},
+      "active": {"render": "pressed/active styling plus non-color cue", "aria": "aria-pressed or aria-current when applicable"},
+      "selected": {"render": "selection and value are text-readable", "aria": "aria-selected or checked when applicable"},
+      "disabled": {"render": "disabled only when action cannot be attempted; provide reason", "aria": "disabled control or unavailable explanation"},
+      "loading": {"render": "stable layout, no duplicate submit, progress/status text", "aria": "aria-busy=true plus one live announcement"},
+      "empty": {"render": "context, explanation and next truthful action", "aria": "status"},
+      "success": {"render": "result, changed server entity and next action", "aria": "polite live region"},
+      "warning": {"render": "constraint or changed server truth before commitment", "aria": "status; not color-only"},
+      "error": {"render": "safe message, field mapping when relevant, retry/escalation", "aria": "alert for blocking errors"},
+      "unavailable": {"render": "reason plus View Product, waitlist or service recovery", "aria": "status"}
+    },
+    "hooks": {
+      "interactive_attributes": ["data-component-id", "data-action", "data-request-id"],
+      "live_region": "One scoped aria-live region per surface; deduplicate by requestId and message hash.",
+      "focus": "On success return focus to initiating control; on blocking error focus error summary then first invalid field; on dialog close restore trigger.",
+      "target_min_css_px": 44,
+      "reduced_motion": "Remove reveal, magnetic and scroll-jacking effects; keep state, order and purchase reachability.",
+      "no_js": "Links to full PDP, server-rendered forms and policy text remain usable."
+    }
+  },
+  "entities": {
+    "product": {
+      "required": ["id", "sku", "name", "type", "visibility", "permalink", "price", "availability", "media", "provenance"],
+      "properties": {
+        "id": {"type": "integer", "source": "Woo product ID"},
+        "sku": {"type": "string", "non_empty": true, "source": "catalog SOT and Woo parity"},
+        "name": {"type": "string", "escaped": true},
+        "type": {"enum_ref": "product_type"},
+        "visibility": {"enum_ref": "product_visibility"},
+        "permalink": {"type": "string", "required_for": ["view_product", "quick_view"]},
+        "price": {"ref": "price"},
+        "attributes": {"type": "array", "items_ref": "attribute"},
+        "selected_variation_id": {"type": ["integer", "null"]},
+        "availability": {"ref": "availability"},
+        "media": {"type": "array", "items_ref": "media"},
+        "fulfillment": {"ref": "fulfillment"},
+        "provenance": {"ref": "provenance"}
+      },
+      "boundary": "No product with visibility other than publish or an explicit approved coming-soon projection may expose purchase action. Missing parity or provenance downgrades to view-only or unavailable."
+    },
+    "variation": {
+      "required": ["id", "product_id", "attributes", "state", "price", "availability", "purchasable"],
+      "properties": {
+        "id": {"type": "integer", "source": "Woo variation ID"},
+        "product_id": {"type": "integer"},
+        "sku": {"type": ["string", "null"]},
+        "attributes": {"type": "array", "items_ref": "attribute_value"},
+        "state": {"enum_ref": "variation_state"},
+        "price": {"ref": "price"},
+        "availability": {"ref": "availability"},
+        "purchasable": {"type": "boolean", "source": "Woo"}
+      },
+      "boundary": "Variable-product actions require a selected valid variation and its exact attribute map. Hard-coded size/color options are forbidden."
+    },
+    "media": {
+      "required": ["id", "role", "src", "alt", "status", "rights", "bound_sku"],
+      "properties": {
+        "id": {"type": "string"},
+        "role": {"enum_ref": "media_role"},
+        "src": {"type": "string"},
+        "alt": {"type": "string", "non_empty": true},
+        "status": {"enum_ref": "media_status"},
+        "rights": {"enum_ref": "media_rights"},
+        "bound_sku": {"type": "string"},
+        "bound_variation_id": {"type": ["integer", "null"]},
+        "poster_src": {"type": ["string", "null"]}
+      },
+      "boundary": "Only verified media with matching SKU/variation, rights and non-empty alt text may be used as commerce evidence. Missing optional media uses media_role=fallback; it never invents a product view."
+    },
+    "availability": {
+      "required": ["status", "source", "checked_at"],
+      "properties": {
+        "status": {"enum_ref": "availability_status"},
+        "quantity": {"type": ["integer", "null"], "minimum": 0},
+        "ship_date": {"type": ["string", "null"], "format": "date-time"},
+        "timezone": {"type": ["string", "null"]},
+        "source": {"const": "woocommerce"},
+        "checked_at": {"type": "string", "format": "date-time"},
+        "reason": {"type": ["string", "null"]}
+      },
+      "boundary": "Quantity is shown only when Woo-authoritative and policy-approved. Never derive scarcity from a stale client count. unknown/unavailable blocks purchase."
+    },
+    "price": {
+      "required": ["currency", "display", "source"],
+      "properties": {
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "regular": {"type": ["string", "null"]},
+        "sale": {"type": ["string", "null"]},
+        "display": {"type": "string"},
+        "source": {"const": "woocommerce"},
+        "checked_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "attribute": {
+      "required": ["name", "options"],
+      "properties": {"name": {"type": "string"}, "options": {"type": "array", "items_ref": "attribute_value"}}
+    },
+    "attribute_value": {
+      "required": ["attribute", "value", "label", "available"],
+      "properties": {"attribute": {"type": "string"}, "value": {"type": "string"}, "label": {"type": "string"}, "available": {"type": "boolean"}}
+    },
+    "fulfillment": {
+      "required": ["shipping_text", "returns_text", "policy_version"],
+      "properties": {"shipping_text": {"type": "string"}, "returns_text": {"type": "string"}, "policy_version": {"type": "string"}, "region": {"type": "string"}}
+    },
+    "provenance": {
+      "required": ["catalog_sku", "catalog_source", "media_manifest"],
+      "properties": {"catalog_sku": {"type": "string"}, "catalog_source": {"type": "string"}, "media_manifest": {"type": "string"}, "rights_reference": {"type": ["string", "null"]}}
+    }
+  },
+  "component_contracts": {
+    "product_card": {
+      "source_of_truth": ["canonical product-card-holo", "shared catalog/Woo resolver"],
+      "slots": ["media", "collection_label", "name", "price", "badge", "variation_summary", "wishlist", "quick_view", "primary_cta", "status"],
+      "variants": ["simple", "variable", "preorder", "unavailable", "static_fallback", "compact", "rail", "grid"],
+      "sizes": ["compact", "default", "feature"],
+      "cta_rules": {
+        "simple_purchasable": "primary_cta=add_to_cart",
+        "variable_without_selection": "primary_cta=view_product or quick_view; never fake quick-add",
+        "variable_with_valid_selection": "primary_cta=add_to_cart",
+        "preorder": "primary_cta=preorder and show date, timezone, charge/cancel terms",
+        "out_of_stock": "primary_cta=join_waitlist or view_product",
+        "missing_or_unverified": "primary_cta=view_product only when permalink exists; otherwise unavailable"
+      },
+      "states": ["default", "hover", "focus", "active", "selected", "disabled", "loading", "success", "warning", "error", "empty", "unavailable", "in_stock", "low_stock_authoritative", "on_backorder", "preorder", "out_of_stock", "coming_soon", "missing_media"],
+      "accessibility": ["article or listitem semantics", "product name link is keyboard reachable", "badge/status is text-readable", "variation availability is announced", "CTA has product name in accessible name", "all actions have 44px target"],
+      "escape": "Named media, badge and status slots only; action and normalized product model remain canonical."
+    },
+    "quick_view": {
+      "status": "required-new-component",
+      "slots": ["dialog_title", "media", "identity", "price", "variation_controls", "fit_summary", "availability", "primary_cta", "full_pdp_link", "status"],
+      "variants": ["desktop_sheet", "mobile_sheet", "simple", "variable", "preorder", "unavailable"],
+      "sizes": ["sheet", "full_sheet"],
+      "states": ["closed", "open", "loading", "selected", "invalid", "unavailable", "success", "error", "network_error"],
+      "rules": ["aria-modal=true and labelled title", "focus trap and restore", "Escape closes", "background scroll/focus locked", "no-JS full PDP link", "same variation/availability/add idempotency rules as PDP", "stale product cannot survive a failed reload"],
+      "accessibility": ["dialog name includes product", "status live region is inside dialog", "close button is first or predictable", "mobile sheet has equivalent keyboard path"]
+    },
+    "pdp_decision_zone": {
+      "slots": ["identity", "price", "media_gallery", "variation_controls", "size_fit", "availability", "fulfillment", "returns", "primary_cta", "notices"],
+      "variants": ["simple", "variable", "grouped", "external", "virtual", "downloadable", "preorder", "backorder"],
+      "sizes": ["desktop_sticky", "mobile_inline"],
+      "states": ["default", "loading", "selected", "invalid_combination", "unavailable", "stock_race", "success", "error", "retry"],
+      "rules": ["decision facts precede editorial atmosphere on mobile", "gallery media is exact SKU/variation bound", "selection updates image, price, SKU, availability and CTA from server-projected variation data", "non-in_stock never silently becomes preorder", "add request includes productId, variationId, variation attributes and quantity", "duplicate submit is rejected client and server-side", "server notice is rendered and announced"],
+      "accessibility": ["fieldset/legend for each attribute group", "invalid combination is described and linked", "size guide dialog has focus management", "stock and fulfillment text is adjacent to CTA", "first error receives focus"]
+    },
+    "product_grid_query": {
+      "slots": ["heading", "controls", "active_filters", "grid", "editorial_insert", "pagination", "empty_recovery", "status"],
+      "variants": ["shop", "collection", "search", "wishlist", "related"],
+      "sizes": ["dense", "default", "rail"],
+      "states": ["loading", "ready", "empty", "no_results", "error", "stale", "partial_media"],
+      "query_contract": "URL query is the source for navigation state; server response is the source for result count and product truth.",
+      "accessibility": ["filter controls are labelled", "selected chips expose removal", "sort and pagination are keyboard operable", "loading/error/empty announced", "back navigation restores query and position"],
+      "escape": "Editorial insert may occupy a named slot but cannot replace an explicit empty result with featured products."
+    }
+  },
+  "surface_coverage": [
+    {"route": "global_shell", "required_contracts": ["universal_state_contract", "action_contract"], "states": ["default", "loading", "empty", "error"]},
+    {"route": "home", "required_contracts": ["product_card", "product_grid_query", "entities.product", "entities.media"], "states": ["default", "unavailable", "missing_media", "reduced_motion"]},
+    {"route": "shop", "required_contracts": ["product_card", "product_grid_query", "query_filter_contract"], "states": ["loading", "ready", "empty", "no_results", "error"]},
+    {"route": "collection", "required_contracts": ["product_card", "product_grid_query", "entities.availability", "query_filter_contract"], "states": ["scheduled", "live", "ended", "sold_out", "empty"]},
+    {"route": "search", "required_contracts": ["product_grid_query", "query_filter_contract", "action_contract"], "states": ["loading", "ready", "empty", "error", "cancelled"]},
+    {"route": "product", "required_contracts": ["pdp_decision_zone", "entities.product", "entities.variation", "entities.media", "cart_checkout_contract"], "states": ["default", "loading", "invalid", "unavailable", "stock_race", "success", "error"]},
+    {"route": "quick_view", "required_contracts": ["quick_view", "entities.variation", "action_contract"], "states": ["open", "loading", "invalid", "unavailable", "success", "error"]},
+    {"route": "compare", "required_contracts": ["product_card", "entities.product", "entities.availability"], "states": ["empty", "ready", "missing_data", "unavailable"]},
+    {"route": "lookbook_and_editorial", "required_contracts": ["entities.media", "entities.product", "product_grid_query"], "states": ["loading", "no_js", "reduced_motion", "unavailable"]},
+    {"route": "campaign_and_preorder", "required_contracts": ["entities.availability", "action_contract", "cart_checkout_contract"], "states": ["before_live", "live", "ended", "preorder", "sold_out", "payment_error"]},
+    {"route": "wishlist", "required_contracts": ["product_card", "action_contract", "entities.variation"], "states": ["guest", "authenticated", "empty", "duplicate", "variation_required", "partial_failure"]},
+    {"route": "cart", "required_contracts": ["cart_checkout_contract", "action_contract"], "states": ["empty", "updating", "stale_stock", "session_expired", "network_error"]},
+    {"route": "checkout", "required_contracts": ["cart_checkout_contract", "action_contract"], "states": ["field_error", "shipping_refresh", "payment_loading", "redirect", "verification", "failed", "pending", "success"]},
+    {"route": "order_confirmation", "required_contracts": ["surface_contracts.order_confirmation", "action_contract"], "states": ["completed", "pending", "failed", "cancelled", "missing", "unauthorized"]},
+    {"route": "account", "required_contracts": ["surface_contracts.account", "surface_contracts.order_confirmation"], "states": ["guest", "loading", "empty", "error", "unauthorized", "destructive_confirm"]},
+    {"route": "returns_and_exchanges", "required_contracts": ["surface_contracts.returns", "action_contract"], "states": ["eligible", "ineligible", "expired", "submitted", "label_pending", "error"]},
+    {"route": "service_contact_faq", "required_contracts": ["surface_contracts.service", "action_contract"], "states": ["faq_route", "needs_input", "submitted", "spam_error", "network_error"]},
+    {"route": "appointments", "required_contracts": ["surface_contracts.appointment", "action_contract"], "states": ["available", "full", "booked", "expired", "cancelled"]},
+    {"route": "gift_cards", "required_contracts": ["surface_contracts.gift_card", "action_contract"], "states": ["draft", "validated", "provider_error", "purchased", "refunded"]},
+    {"route": "loyalty", "required_contracts": ["surface_contracts.loyalty", "action_contract"], "states": ["guest", "eligible", "enrolled", "ledger_empty", "suspended", "closed"]},
+    {"route": "waitlist", "required_contracts": ["surface_contracts.waitlist", "action_contract"], "states": ["available", "joined", "duplicate", "unsubscribed", "ended", "error"]},
+    {"route": "coming_soon_and_errors", "required_contracts": ["universal_state_contract", "query_filter_contract", "entities.availability"], "states": ["coming_soon", "expired", "404", "empty", "network_error"]}
+  ],
+  "query_filter_contract": {
+    "url_keys": {
+      "q": "string, escaped search query",
+      "category": "slug or comma-separated canonical category IDs",
+      "collection": "canonical collection ID",
+      "attributes": "canonical attribute=value pairs",
+      "availability": "availability_status values",
+      "sort": "canonical allow-list: relevance, newest, price_asc, price_desc",
+      "page": "positive integer, default 1",
+      "per_page": "allow-list set by server"
+    },
+    "rules": ["unknown keys are ignored and not echoed into HTML", "filters are ANDed unless a field documents OR semantics", "result counts come from server query", "clear-all restores canonical route and page=1", "invalid page returns empty/recovery, not fake products", "query analytics removes raw personal data", "network retry reuses requestId and does not duplicate impressions"],
+    "response": {"state": "query_state", "items": "product[]", "total": "integer", "page": "integer", "per_page": "integer", "facets": "object", "canonical_url": "string", "request_id": "string", "source": "woocommerce|catalog_projection"}
+  },
+  "action_contract": {
+    "request": {
+      "required": ["action", "request_id", "client_timestamp"],
+      "properties": {
+        "action": {"enum_ref": "cta_action"},
+        "request_id": {"type": "string", "format": "uuid", "ttl_seconds": 900},
+        "client_timestamp": {"type": "string", "format": "date-time"},
+        "product_id": {"type": ["integer", "null"]},
+        "variation_id": {"type": ["integer", "null"]},
+        "variation": {"type": ["array", "null"], "items_ref": "attribute_value"},
+        "quantity": {"type": ["integer", "null"], "minimum": 1},
+        "cart_item_key": {"type": ["string", "null"]},
+        "idempotency_key": {"type": ["string", "null"], "format": "uuid"},
+        "order_id": {"type": ["integer", "null"]},
+        "order_key": {"type": ["string", "null"]}
+      }
+    },
+    "response": {
+      "required": ["ok", "state", "message", "request_id", "retryable", "source"],
+      "properties": {
+        "ok": {"type": "boolean"},
+        "state": {"enum_ref": "request_state"},
+        "message": {"type": "string"},
+        "request_id": {"type": "string"},
+        "idempotency_key": {"type": ["string", "null"]},
+        "cart_hash": {"type": ["string", "null"]},
+        "order_id": {"type": ["integer", "null"]},
+        "order_status": {"enum_ref": "order_status"},
+        "field_errors": {"type": "object"},
+        "notices": {"type": "array"},
+        "retryable": {"type": "boolean"},
+        "source": {"enum": ["woocommerce_store_api", "woocommerce_php", "woocommerce_rest_authenticated", "service_provider", "catalog_projection"]}
+      }
+    },
+    "server_truth": ["Every successful cart mutation rehydrates the full current cart before announcing success", "Every checkout submit rehydrates draft/order status before redirect or confirmation", "Client timeout is reconciled by request_id, cart_hash or order_id before retry", "A duplicate idempotency key returns the original result and does not create a second cart line/order", "If reconciliation cannot prove outcome, show unknown/error and require safe manual recovery rather than retrying payment"]
+  },
+  "cart_checkout_contract": {
+    "cart": {
+      "read": "GET /wp-json/wc/store/v1/cart",
+      "mutations": ["POST /cart/items", "PUT /cart/items/:key", "DELETE /cart/items/:key", "POST /cart/coupons", "POST /cart/update-customer", "POST /cart/select-shipping-rate"],
+      "required_projection": ["cart_hash", "items", "cart_item_key", "product_id", "variation_id", "variation", "quantity_limits", "prices", "totals", "coupons", "shipping_rates", "notices"],
+      "states": ["empty", "single", "multi", "backorder", "out_of_stock", "session_expired", "network_error", "stale_stock", "coupon_error", "updating"],
+      "idempotency": "Use idempotency_key per user intent and single-flight by cart_item_key; reconcile with full cart response. Do not infer success from HTTP 200 alone or mutate private Woo markup as a data source."
+    },
+    "checkout": {
+      "read": "GET /wp-json/wc/store/v1/checkout",
+      "update": "PUT /wp-json/wc/store/v1/checkout",
+      "pay": "POST /wp-json/wc/store/v1/checkout/{order_id}",
+      "required_projection": ["order_id", "order_key", "status", "billing_address", "shipping_address", "shipping_rates", "payment_methods", "totals", "notices"],
+      "states": ["loading", "field_error", "server_error", "shipping_refresh", "payment_loading", "redirect", "verification", "cancelled", "failed", "stock_race", "session_expired", "success", "pending"],
+      "idempotency": "Generate one idempotency_key for the payment intent. Disable duplicate submit, persist it through redirect/reload, reconcile order status by order_id+order_key, and never re-run payment when outcome is unknown. Platform nonce/cart-token remains required; idempotency is an integration contract and must be implemented/tested server-side.",
+      "validation": ["Server validation is authoritative", "Error summary links to fields and focuses first blocking error", "Dynamic address/shipping updates preserve entered fields and gateway state", "Classic and block/Store API modes are separate acceptance targets; unsupported mode is explicitly withdrawn"]
+    }
+  },
+  "surface_contracts": {
+    "order_confirmation": {"states": ["completed", "pending", "on_hold", "failed", "cancelled", "missing", "unauthorized"], "required": ["order reference", "items", "totals", "delivery/payment status", "track/help", "returns eligibility", "continue shopping"], "authorization": "order_id plus order_key or authenticated ownership; never email-only"},
+    "account": {"routes": ["dashboard", "orders", "order_detail", "downloads", "addresses", "payment_methods", "preferences", "privacy", "logout"], "states": ["guest", "loading", "ready", "empty", "error", "unauthorized", "destructive_confirm"], "authorization": "Current authenticated WP/WC customer and endpoint capability; HPOS-safe order reads; no cross-user leakage"},
+    "returns": {"states": ["needs_order", "eligible", "ineligible", "expired", "submitted", "label_pending", "label_ready", "exchange_unavailable", "confirmed", "error"], "required": ["order/item/quantity", "ownership or guest token", "policy version", "delivery/final-sale/preorder rules", "reason", "resolution", "service escalation"]},
+    "service": {"states": ["faq_route", "needs_input", "loading", "submitted", "success", "spam_error", "network_error", "escalated"], "required": ["response expectation", "nonce", "field errors", "optional permission-checked order context", "attachment policy", "reference on success"]},
+    "appointment": {"states": ["available", "held", "booked", "full", "expired", "cancelled", "reschedule_error"], "required": ["location/service", "slot timezone", "availability source", "confirmation", "cancel/reschedule token"], "fallback": "Accessible list of locations and contact service without map or location permission"},
+    "gift_card": {"states": ["draft", "validated", "provider_error", "purchased", "delivered", "balance_error", "refunded", "expired"], "required": ["amount/currency", "recipient validation", "delivery date", "terms", "balance/refund/regional constraints", "confirmation"]},
+    "loyalty": {"states": ["guest", "eligible", "enrolled", "ledger_loading", "ledger_empty", "ledger_error", "suspended", "closed"], "required": ["benefits/terms before enrollment", "separate marketing consent", "points ledger with expiry", "earn/redeem source", "leave/close"], "boundary": "Referral credit is not a loyalty ledger or loyalty UI."},
+    "waitlist": {"states": ["available", "joined", "duplicate", "unsubscribed", "ended", "variation_unavailable", "error"], "required": ["SKU/variation binding", "consent", "unsubscribe", "delay communication", "confirmation id"], "rules": ["duplicate signup is idempotent", "no promise of inventory or timing without source", "ended/unavailable retains View Product/service recovery"]}
+  },
+  "examples": {
+    "simple_card": {
+      "product": {"id": 101, "sku": "br-001", "name": "Black Rose Crewneck", "type": "simple", "visibility": "publish", "permalink": "/product/black-rose-crewneck/", "price": {"currency": "USD", "display": "$180.00", "source": "woocommerce"}, "availability": {"status": "in_stock", "quantity": null, "source": "woocommerce", "checked_at": "2026-08-06T12:00:00-07:00"}, "media": [{"id": "br-001-front", "role": "front", "src": "/media/br-001-front.webp", "alt": "Black Rose crewneck front", "status": "verified", "rights": "sot", "bound_sku": "br-001"}], "provenance": {"catalog_sku": "br-001", "catalog_source": "approved-catalog-sot", "media_manifest": "data/sot-images.json"}},
+      "cta": {"action": "add_to_cart", "state": "idle", "data_action": "add_to_cart"},
+      "expected": "Card may render Add to bag; request includes product_id=101 and quantity=1 and must rehydrate cart before success."
+    },
+    "variable_missing_selection": {
+      "product": {"id": 202, "sku": "lh-004", "name": "Love Hurts Varsity Jacket", "type": "variable", "visibility": "publish", "permalink": "/product/love-hurts-varsity-jacket/", "availability": {"status": "in_stock", "source": "woocommerce", "checked_at": "2026-08-06T12:00:00-07:00"}},
+      "variation": {"state": "required", "purchasable": false},
+      "cta": {"action": "view_product", "state": "warning"},
+      "expected": "Card cannot render a fake size radio group or Add to bag; it links to PDP or opens Quick View with real variation data."
+    },
+    "timeout_reconciliation": {
+      "request": {"action": "place_order", "request_id": "6f4d6f3f-62bd-4f87-9370-5f5c8f7c2442", "idempotency_key": "0cc27cf4-1f68-4e3a-8ac7-1d77a3f5cb1d"},
+      "expected": "On timeout, query current checkout/order status and return reconciled success or retryable error. Never submit payment again while state is unknown."
+    }
+  },
+  "acceptance_matrix": [
+    {"id": "COM-01", "area": "product_truth", "covers": ["AC-07", "AC-08", "AC-09", "AC-15", "AC-18", "AC-19", "AC-22"], "assert": "Every rendered SKU maps to Woo product/variation, verified SOT media, current price and explicit availability enum; unknown mapping cannot purchase."},
+    {"id": "COM-02", "area": "card_quick_view_pdp", "covers": ["AC-10", "AC-20", "AC-23", "AC-24", "AC-25", "AC-26"], "assert": "Canonical card, Quick View and PDP share product/variation resolver, CTA transition rules and focus/live-region hooks."},
+    {"id": "COM-03", "area": "query_filter", "covers": ["AC-11", "AC-12", "AC-13", "AC-17"], "assert": "URL query is shareable/restorable; counts and result truth are server-derived; empty/error has context and recovery."},
+    {"id": "COM-04", "area": "cart_checkout", "covers": ["AC-32", "AC-39", "AC-40", "AC-41", "AC-43", "AC-44", "AC-45", "AC-46", "AC-47", "AC-48", "AC-49"], "assert": "Nonce/cart-token writes rehydrate server truth; idempotency and timeout reconciliation prevent duplicate lines/orders/payment."},
+    {"id": "COM-05", "area": "post_purchase", "covers": ["AC-50", "AC-51", "AC-52", "AC-53", "AC-54", "AC-55", "AC-56"], "assert": "Order/account state is ownership-protected, status-specific, reload-safe and has truthful next actions."},
+    {"id": "COM-06", "area": "service_extensions", "covers": ["AC-57", "AC-58", "AC-59", "AC-60", "AC-61", "AC-62", "AC-63", "AC-64", "AC-65", "AC-66", "AC-67"], "assert": "Returns, service, appointment, gift, loyalty and waitlist use explicit provider/policy state, consent and retry/confirmation contracts."},
+    {"id": "COM-07", "area": "accessibility_and_escape", "covers": ["AC-01", "AC-02", "AC-03", "AC-04", "AC-05", "AC-06", "AC-68", "AC-69", "AC-70", "AC-71"], "assert": "All states have keyboard, focus, live-region, reduced-motion, no-JS and safe escaping behavior; escape hatches retain canonical data/action model."}
+  ],
+  "escape_hatch_policy": {
+    "canonical_first": ["product-card-holo", "product-grid", "shared catalog/Woo resolver", "stateful CTA", "Woo hooks and Store API/block extension"],
+    "allowed": ["Named slot for genuinely different semantics", "Adapter for provider payment/appointment/gift/loyalty service", "Editorial hotspot that emits normalized product ledger", "Account endpoint template that enforces ownership"],
+    "required_for_each": ["owner", "reason", "normalized input/output contract", "data-component-id and data-action", "all universal states", "keyboard/screen-reader result", "reduced-motion/no-JS fallback", "desktop/mobile render", "candidate-bound commerce proof"],
+    "forbidden": ["Hard-coded variation controls", "direct catalog price/stock as purchase authority", "dead # purchase links", "private Woo markup selector as only integration", "fake scarcity/countdown", "hover-only product facts", "silent duplicate payment/order retry", "unlabelled provider or AI output"],
+    "fail_closed": "If a classic override cannot support declared Cart/Checkout block or Store API behavior, mark the mode unsupported and remove the compatibility claim; never silently degrade."
+  },
+  "release_gate": {
+    "ready_when": ["All COM acceptance rows pass on one candidate snapshot", "No required state is SKIPPED; unavailable evidence is UNVERIFIED", "Server truth and idempotency traces are attached for cart and checkout", "Ownership/privacy and accessibility traces cover order/account/service surfaces", "Independent visual QA approves canonical-first adoption and escape hatches"],
+    "blocked_when": ["Any product/variation/media mismatch", "Unknown stock/price rendered as purchase CTA", "Duplicate order/payment cannot be ruled out", "Classic/block compatibility is claimed without separate evidence", "Account/order/returns/service states fall through to generic success/error", "An escape hatch bypasses normalized resolver or universal state hooks"]
+  }
+}

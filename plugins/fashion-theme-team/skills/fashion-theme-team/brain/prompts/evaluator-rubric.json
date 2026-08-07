@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "brand": {"id":"skyyrose","name":"SkyyRose","tagline":"Luxury Grows from Concrete."},
+  "pass_threshold": 85,
+  "hard_fails": [
+    "invented product, price, inventory, policy, review, rights, sustainability, scarcity, or permission claim",
+    "broken primary WooCommerce journey or suppressed recovery state",
+    "missing primary product media or decision-critical fit/service information",
+    "prose-only visual claim, unrendered preview, invalid JSON, or HTML/JSON stable-ID mismatch",
+    "serious unresolved accessibility defect",
+    "generic output that fails the approved logo-off recognition threshold",
+    "conversion uplift claim without candidate-bound experiment evidence",
+    "mixed candidate hashes or builder self-approval"
+  ],
+  "dimensions": [
+    {"id":"brand-distinction","weight":15,"minimum":11,"question":"Does the experience express evidence-backed, logo-independent brand recognition without generic fashion-theme devices?"},
+    {"id":"garment-product-truth","weight":15,"minimum":13,"question":"Are garment media, facts, variants, fit and service claims complete and provenance-bound?"},
+    {"id":"merchandising-customer-intent","weight":15,"minimum":11,"question":"Does every section serve a clear customer job with ethical, catalog-grounded merchandising?"},
+    {"id":"commerce-completeness","weight":15,"minimum":13,"question":"Do applicable product, cart, checkout, account, post-purchase and failure states use real WooCommerce behavior?"},
+    {"id":"responsive-visual-composition","weight":10,"minimum":7,"question":"Are mobile, tablet and desktop deliberate transformations with preserved product truth and controls?"},
+    {"id":"accessibility-content","weight":10,"minimum":8,"question":"Can customers perceive, understand, operate and recover across the full journey?"},
+    {"id":"performance-resilience","weight":5,"minimum":3,"question":"Are critical rendering, media, motion, third-party and fallback behavior within approved budgets?"},
+    {"id":"html-json-parity","weight":10,"minimum":10,"question":"Do rendered HTML and schema-valid JSON describe identical stable routes, sections, components and evidence?"},
+    {"id":"evidence-governance","weight":5,"minimum":5,"question":"Are claims correctly classified, current where required, candidate-bound and independently reviewed?"}
+  ],
+  "verdicts": ["PASS", "FAIL", "BLOCKED"]
+}

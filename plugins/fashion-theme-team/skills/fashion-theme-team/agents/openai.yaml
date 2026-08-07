@@ -1,0 +1,6 @@
+interface:
+  display_name: "Fashion Theme Team"
+  short_description: "Orchestrate commercial fashion theme delivery"
+  default_prompt: "Use $fashion-theme-team to take this fashion commerce theme from audit through release evidence."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyyRose V2 page layouts, commerce features, and imagery direction.">
+  <title>SkyyRose · V2 Page + Imagery Atlas</title>
+  <link rel="stylesheet" href="../brand/skyyrose-artifact.css">
+  <style>
+    .atlas-hero{padding:clamp(5rem,10vw,10rem) 0 5rem;border-bottom:1px solid var(--sr-line)}
+    .atlas-hero h1{max-width:11ch;margin:.8rem 0 1.5rem;font:850 clamp(3.4rem,8.5vw,8rem)/.84 var(--sr-display);font-stretch:125%;letter-spacing:-.06em;text-transform:uppercase}
+    .atlas-hero h1 span{display:block;color:var(--sr-rose)}
+    .atlas-note{max-width:70ch;padding:1.25rem;border-left:2px solid var(--sr-rose);background:var(--sr-asphalt);color:var(--sr-secondary)}
+    .atlas-controls{display:flex;flex-wrap:wrap;gap:.65rem;padding:2rem 0;border-bottom:1px solid var(--sr-line)}
+    .atlas-filter{min-height:44px;padding:.7rem 1rem;border:1px solid var(--sr-line);background:var(--sr-asphalt);color:var(--sr-white);font:400 .72rem var(--sr-utility);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+    .atlas-filter[aria-pressed="true"]{border-color:var(--sr-rose);color:var(--sr-rose)}
+    .atlas-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1px;background:var(--sr-line);border:1px solid var(--sr-line);margin:0 0 7rem}
+    .page-card{grid-column:span 6;display:flex;flex-direction:column;min-height:620px;padding:1.5rem;background:var(--sr-asphalt)}
+    .page-card[hidden]{display:none}
+    .page-head{display:flex;justify-content:space-between;gap:1rem;align-items:start}
+    .page-number{font:400 2.8rem/1 var(--sr-utility);color:var(--sr-rose)}
+    .page-priority{font:400 .62rem var(--sr-utility);letter-spacing:.15em;text-transform:uppercase;color:var(--sr-muted)}
+    .page-card h2{max-width:12ch;margin:1.8rem 0 .8rem;font:780 clamp(1.7rem,2.6vw,3.1rem)/.92 var(--sr-display);font-stretch:125%;letter-spacing:-.04em;text-transform:uppercase}
+    .page-intent{min-height:3.5em;color:var(--sr-secondary)}
+    .wireframe{display:grid;gap:4px;height:150px;margin:1.5rem 0;padding:10px;border:1px solid var(--sr-line);background:var(--sr-concrete)}
+    .wireframe span{display:grid;place-items:center;overflow:hidden;background:#202020;color:#aaa;font:400 .55rem var(--sr-utility);letter-spacing:.08em;text-align:center;text-transform:uppercase}
+    .wireframe span:first-child{background:var(--sr-rose);color:#0a0a0a}
+    .page-layout{margin:0 0 1.25rem;padding:0;list-style:none;counter-reset:steps}
+    .page-layout li{display:inline;color:var(--sr-secondary);font-size:.82rem}
+    .page-layout li:not(:last-child)::after{content:" → ";color:var(--sr-rose)}
+    .image-brief{margin-top:auto;padding-top:1.2rem;border-top:1px solid var(--sr-line)}
+    .image-brief b{display:block;margin-bottom:.5rem;color:var(--sr-rose);font:400 .68rem var(--sr-utility);letter-spacing:.14em;text-transform:uppercase}
+    .image-brief p{margin:0;color:var(--sr-secondary);font-size:.9rem}
+    .shot-system{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--sr-line);border:1px solid var(--sr-line)}
+    .shot-system article{min-height:190px;padding:1.3rem;background:var(--sr-asphalt)}
+    .shot-system strong{display:block;margin:.8rem 0;font-family:var(--sr-display);text-transform:uppercase}
+    .shot-system p{color:var(--sr-muted);font-size:.85rem}
+    @media(max-width:1000px){.shot-system{grid-template-columns:1fr 1fr}}
+    @media(max-width:680px){.page-card{grid-column:1/-1;min-height:auto}.shot-system{grid-template-columns:1fr}.page-intent{min-height:0}}
+  </style>
+</head>
+<body>
+  <a class="sr-skip" href="#main">Skip to content</a>
+  <nav class="sr-nav sr-shell" aria-label="Artifact navigation">
+    <a class="sr-wordmark" href="index.html">SkyyRose</a>
+    <div class="sr-nav-links"><a href="#pages">28 Pages</a><a href="#imagery">Imagery System</a><a href="../v2/v2-page-plan.json">JSON Contract</a></div>
+  </nav>
+  <main id="main">
+    <header class="atlas-hero sr-shell">
+      <p class="sr-kicker">V2 · Planned page architecture</p>
+      <h1>Page + <span>Imagery Atlas</span></h1>
+      <p class="sr-deck">The complete SkyyRose storefront mapped as visual compositions—not a homepage moodboard. Every surface connects section order, responsive behavior, commerce truth, and a rights-aware shot brief.</p>
+      <p class="atlas-note"><strong>Planning artifact.</strong> These layouts and image ideas are not claims that pages or assets exist. Product media must be SOT-verified; editorial media must be rights-cleared; new renders require founder approval.</p>
+    </header>
+
+    <section class="sr-section sr-shell" id="imagery" aria-labelledby="imagery-title">
+      <div class="sr-section-head"><p class="sr-kicker">01 · Shot families</p><h2 id="imagery-title">A system a creative team can actually produce.</h2></div>
+      <div class="shot-system">
+        <article><span class="sr-kicker">A</span><strong>Thesis wide</strong><p>Oakland context, architecture, or collection world. Garment remains legible.</p></article>
+        <article><span class="sr-kicker">B</span><strong>Commerce portrait</strong><p>Full look and silhouette with predictable mobile-safe focal space.</p></article>
+        <article><span class="sr-kicker">C</span><strong>SKU truth</strong><p>Matched front, back, side, scale, and variation-aware product views.</p></article>
+        <article><span class="sr-kicker">D</span><strong>Material proof</strong><p>Fabric, construction, hardware, label, stitching, and care evidence.</p></article>
+        <article><span class="sr-kicker">E</span><strong>Movement + life</strong><p>Fit in motion, styling context, process, people, and documented place.</p></article>
+      </div>
+    </section>
+
+    <section class="sr-shell" id="pages" aria-labelledby="pages-title">
+      <div class="sr-section-head"><p class="sr-kicker">02 · Storefront atlas</p><h2 id="pages-title">Twenty-eight connected surfaces.</h2></div>
+      <div class="atlas-controls" aria-label="Filter pages">
+        <button class="atlas-filter" type="button" data-filter="all" aria-pressed="true">All 28</button>
+        <button class="atlas-filter" type="button" data-filter="core" aria-pressed="false">Core commerce</button>
+        <button class="atlas-filter" type="button" data-filter="experience" aria-pressed="false">Brand experience</button>
+        <button class="atlas-filter" type="button" data-filter="extension" aria-pressed="false">Extensions</button>
+      </div>
+      <div class="atlas-grid" id="atlas-grid"></div>
+    </section>
+  </main>
+  <footer class="sr-footer sr-shell"><p><strong>SkyyRose LLC</strong><br>Fashion Theme Brain · V2 Planning System</p><p>Luxury Grows from Concrete.<br>Oakland, California</p></footer>
+  <script>
+    const pages = [
+      ["global-shell","Global Shell","core","Orient, search, and expose service state everywhere.",["Announcement","Masthead","Page slot","Service footer","Drawers"],"Approved monogram or concrete-line device only; no hero photography."],
+      ["home","Home","core","Turn brand interest into product or story discovery.",["Thesis hero","Gateways","Products","Editorial","Proof","Trust"],"Oakland establishing frame, verified hero garment, construction macro, movement, and process."],
+      ["shop","Shop","core","Browse the available assortment quickly and confidently.",["Title + count","Categories","Controls","Grid","Story insert","Pagination"],"Consistent SOT card crops with one rights-cleared collection detail insert."],
+      ["collection","Collection","core","Understand and shop one coherent creative world.",["Thesis hero","Chapters","Controls","Product grid","Story","Context"],"Campaign wide, portrait, fabric macro, styling pair, and Oakland-location detail."],
+      ["search","Search","core","Locate a known or describable item.",["Search field","Summary","Scope","Controls","Results","Recovery"],"Verified product media only; approved line mark may support an empty state."],
+      ["product","Product Detail","core","Judge fit, material, availability, and the exact variation.",["Gallery","Decision zone","Trust","Story","Specifications","Fit","Reviews"],"Ten-frame SKU sequence: all angles, details, on-body scale, movement, and styling."],
+      ["quick-view","Quick View","core","Evaluate essentials without leaving collection context.",["Compact media","Identity","Variation","Availability","Action","PDP link"],"First approved PDP image plus one alternate angle."],
+      ["compare","Compare","extension","Compare factual differences among suitable products.",["Selection","Matched media","Price","Attributes","Fit","Actions"],"Identical angle, scale, crop, and background for every compared SKU."],
+      ["lookbook","Lookbook","experience","Explore styling and reach exact featured products.",["Thesis","Scenes","Annotations","Outfits","Credits","Commerce"],"Oakland street wide, architecture crop, full look, movement, detail, and group."],
+      ["campaign-launch","Campaign / Drop","experience","Explain a timed proposition and enable fair participation.",["Thesis","Release facts","Rights","Assortment","Proof","Terms"],"Rights-cleared film still, release macro, complete looks, and product lineup."],
+      ["about","About","core","Establish credible identity, place, and purpose.",["Thesis","Founder","Oakland","Values","Timeline","Craft","Community"],"Founder portrait, Oakland context, studio process, archive, and community evidence."],
+      ["journal-index","Journal Index","experience","Discover useful editorial content.",["Feature","Topics","Article grid","Pagination","Search"],"Story hero, portrait, object study, or place frame in consistent crops."],
+      ["journal-article","Journal Article","experience","Read a story and follow disclosed related paths.",["Header","Credited hero","Body","Media","Products","More stories"],"Captioned story plates with creator, subject, date, place, and rights."],
+      ["size-fit","Size + Fit","core","Choose size with understandable evidence and limits.",["Category","Units","Tables","Method","Ease","Models","Help"],"Measurement diagrams, annotated garment flats, and exact model references."],
+      ["wishlist","Wishlist","extension","Preserve products for later consideration.",["Summary","Products","Changes","Controls","Move to cart","Recovery"],"Current verified product-card media only."],
+      ["cart","Cart","core","Verify the intended purchase and proceed or recover.",["Notices","Items","Quantity","Shipping","Totals","Checkout"],"Exact variation thumbnails; verified alternate path only with a catalog relationship ID."],
+      ["checkout","Checkout","core","Complete payment with minimal ambiguity.",["Errors","Contact","Address","Delivery","Summary","Payment","Order"],"Line-item thumbnails and approved payment marks only; no campaign imagery."],
+      ["order-confirmation","Confirmation","core","Confirm outcome and make next steps unmistakable.",["Status","Reference","Receipt","Delivery","Next steps","Help"],"Purchased-item thumbnails; optional approved packaging detail after facts."],
+      ["account-auth","Account + Auth","core","Securely access identity, orders, and preferences.",["Auth","Dashboard","Orders","Addresses","Payment","Preferences","Privacy"],"No independent editorial; verified purchased-item media in order history."],
+      ["returns-exchanges","Returns + Exchanges","core","Complete a fair post-purchase resolution.",["Policy","Select item","Eligibility","Reason","Resolution","Logistics","Status"],"Order thumbnails plus operationally accurate package or label diagrams."],
+      ["service-contact","Service + Contact","core","Resolve a question through the right channel.",["Navigation","FAQ","Policies","Channels","Form","Escalation"],"Photography is optional; service resolution remains the protagonist."],
+      ["store-appointment","Stores + Appointments","extension","Locate physical service or schedule a visit.",["Search","List + map","Facts","Services","Hours","Booking"],"Exterior, interior, service area, accessible entrance, and neighborhood."],
+      ["gift-card","Gift Card","extension","Purchase or redeem a gift with clear restrictions.",["Amount","Recipient","Schedule","Message","Terms","Preview","Purchase"],"Approved typography, monogram, and concrete texture—no invented product art."],
+      ["loyalty","Loyalty","extension","Understand value and voluntarily manage membership.",["Benefits","Eligibility","Earn","Terms","Activity","Preferences"],"Real member or benefit evidence only; otherwise stay typography-led."],
+      ["preorder-waitlist","Preorder + Waitlist","core","Act accurately on future or unavailable inventory.",["Status","Timing","Terms","Variation","Consent","Confirmation"],"Current SOT media with explicit status; never show speculative colorways."],
+      ["coming-soon","Coming Soon","experience","Explain access state and provide one legitimate action.",["Identity","Launch status","Access form","Service","Privacy"],"One approved teaser crop; all motion requires a poster fallback."],
+      ["error-empty-404","404 + Empty","core","Explain failure and provide useful recovery.",["Status","Context","Recovery","Search","Service"],"Approved monogram, rose line drawing, or concrete texture only."],
+      ["legal-policy","Legal + Policy","core","Communicate rights, policies, and support access.",["Title + date","Contents","Document","Disclosures","Contact","History"],"No photography; use typography, rules, and one restrained brand mark."]
+    ];
+    const grid = document.querySelector("#atlas-grid");
+    const escapeText = value => String(value).replace(/[&<>\"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[character]));
+    pages.forEach((page, index) => {
+      const [id,name,priority,intent,sections,imagery] = page;
+      const article = document.createElement("article");
+      article.className = "page-card";
+      article.dataset.pageId = id;
+      article.dataset.priority = priority;
+      article.innerHTML = `<div class="page-head"><span class="page-number">${String(index + 1).padStart(2,"0")}</span><span class="page-priority">${escapeText(priority)}</span></div><h2>${escapeText(name)}</h2><p class="page-intent">${escapeText(intent)}</p><div class="wireframe" aria-label="${escapeText(name)} layout diagram">${sections.map(section => `<span>${escapeText(section)}</span>`).join("")}</div><ol class="page-layout" aria-label="Section order">${sections.map(section => `<li>${escapeText(section)}</li>`).join("")}</ol><div class="image-brief"><b>Imagery direction</b><p>${escapeText(imagery)}</p></div>`;
+      grid.append(article);
+    });
+    document.querySelectorAll(".atlas-filter").forEach(button => button.addEventListener("click", () => {
+      const filter = button.dataset.filter;
+      document.querySelectorAll(".atlas-filter").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+      document.querySelectorAll(".page-card").forEach(card => { card.hidden = filter !== "all" && card.dataset.priority !== filter; });
+    }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "brand": {
+    "id": "skyyrose",
+    "name": "SkyyRose",
+    "tagline": "Luxury Grows from Concrete.",
+    "artifact_system": "../brand/skyyrose-artifact-system.json"
+  },
+  "artifact": {
+    "id": "collection-handoff-demo",
+    "candidate_id": "demo-001",
+    "title": "SkyyRose Collection Page Handoff",
+    "owner": "fashion-merchandising-conversion-architect",
+    "created_at": "2026-08-06T00:00:00-07:00",
+    "preview_path": "preview.html"
+  },
+  "context": {
+    "repository": "example-repository",
+    "theme_path": "wordpress-theme/example-theme",
+    "brand_source": "approved-brand-canon",
+    "catalog_source": "approved-catalog-sot",
+    "loaded_packs": [
+      "knowledge/merchandising-and-conversion.md",
+      "pages/page-blueprints.md",
+      "prompts/few-shot-patterns.md"
+    ],
+    "claim_policy": "claim-bound"
+  },
+  "routes": [
+    {
+      "id": "collection",
+      "page_type": "product collection",
+      "customer_intent": "Understand and browse a curated range",
+      "business_objective": "Connect collection identity to suitable available products",
+      "template_mapping": {
+        "classic": ["taxonomy-product_cat.php"],
+        "block": ["templates/taxonomy-product_cat.html"]
+      },
+      "viewports": ["mobile", "desktop"],
+      "sections": [
+        {
+          "id": "collection-thesis",
+          "order": 1,
+          "purpose": "Establish the collection point of view with verified product-led media",
+          "required": true,
+          "components": [
+            {
+              "id": "collection-hero",
+              "type": "collection hero",
+              "data_source": "approved collection SOT and media registry",
+              "accessibility": ["single page heading", "text alternative", "contrast-safe copy"],
+              "content_constraints": ["one primary CTA", "no unsupported scarcity", "verified garment crop"]
+            }
+          ],
+          "states": ["default", "missing-optional-media", "reduced-motion"],
+          "responsive_behavior": "Preserve garment focal point and shorten supporting copy without removing the collection identity",
+          "evidence_refs": ["ev-collection-render"]
+        },
+        {
+          "id": "collection-products",
+          "order": 2,
+          "purpose": "Expose truthful purchasable inventory",
+          "required": true,
+          "components": [
+            {
+              "id": "collection-grid",
+              "type": "product grid",
+              "data_source": "WooCommerce product query and catalog SOT",
+              "accessibility": ["named product list", "keyboard-operable controls"],
+              "content_constraints": ["accurate product identity", "price and availability states"]
+            }
+          ],
+          "states": ["default", "loading", "empty", "error", "unavailable"],
+          "responsive_behavior": "Three columns become two while controls move to a labeled drawer",
+          "evidence_refs": ["ev-collection-render"]
+        }
+      ],
+      "analytics_events": ["view_collection", "select_item"],
+      "acceptance_criteria": ["All rendered section IDs exist in this contract", "Empty and unavailable states have recovery paths"]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision-product-first",
+      "claim_class": "INFERENCE",
+      "decision": "Place product discovery immediately after the collection thesis",
+      "rationale": "The route serves both collection understanding and product discovery; store-specific impact remains unproven",
+      "evidence_refs": ["BAY-APPAREL"],
+      "status": "RECOMMENDED"
+    }
+  ],
+  "risks": [
+    {
+      "id": "risk-unverified-media",
+      "severity": "high",
+      "description": "Campaign media could be mapped to the wrong collection",
+      "mitigation": "Require media registry and collection SOT identity match before rendering",
+      "owner": "catalog-sot-integrator"
+    }
+  ]
+}

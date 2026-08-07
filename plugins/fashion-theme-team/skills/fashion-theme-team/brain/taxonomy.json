@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "brand": {"id":"skyyrose","name":"SkyyRose","tagline":"Luxury Grows from Concrete."},
+  "routes": [
+    {
+      "id": "fashion_strategy",
+      "triggers": ["audience", "positioning", "price architecture", "fashion segment", "what sells"],
+      "packs": ["knowledge/fashion-commerce-fundamentals.md", "research/fashion-commerce-research-2026-08-06.md"],
+      "owners": ["fashion-commerce-strategist", "fashion-brand-systems-researcher"]
+    },
+    {
+      "id": "merchandising_conversion",
+      "triggers": ["merchandising", "conversion", "collection", "cross-sell", "drop", "campaign"],
+      "packs": ["knowledge/merchandising-and-conversion.md", "pages/page-blueprints.md", "prompts/few-shot-patterns.md"],
+      "owners": ["fashion-merchandising-conversion-architect", "fashion-component-commerce-engineer"]
+    },
+    {
+      "id": "fit_imagery_returns",
+      "triggers": ["size", "fit", "returns", "imagery", "reviews", "product truth"],
+      "packs": ["knowledge/fit-imagery-and-returns.md", "research/fashion-commerce-research-2026-08-06.md"],
+      "owners": ["fashion-product-fit-returns-specialist", "catalog-sot-integrator"]
+    },
+    {
+      "id": "page_architecture",
+      "triggers": ["page", "template", "section", "feature", "route", "funnel"],
+      "packs": ["pages/page-blueprints.md", "pages/page-blueprints.json", "knowledge/theme-engineering.md"],
+      "owners": ["brand-experience-architect", "fashion-component-commerce-engineer", "woocommerce-theme-engineer"]
+    },
+    {
+      "id": "visual_design",
+      "triggers": ["visual", "layout", "typography", "motion", "responsive", "design system", "animation", "CTA"],
+      "packs": ["brand/skyyrose-artifact-system.json", "knowledge/do-dont.md", "pages/page-blueprints.md", "v2/v2-page-and-imagery-plan.md", "references/animated-prompt-pack-adaptation.md", "showcase/v2-page-atlas.html", "prompts/few-shot-patterns.md"],
+      "owners": ["fashion-design-system-engineer", "fashion-typography-layout-director", "fashion-motion-responsive-engineer"]
+    },
+    {
+      "id": "interactive_commerce",
+      "triggers": ["interactive", "immersive", "animation", "WebGL", "AI try-on", "visual search", "voice shopping", "co-creation", "proof system"],
+      "packs": ["research/interactive-commerce-research-2026-08-06.md", "interactive/feature-scaffold.json", "showcase/interactive-feature-scaffold.html", "v2/v2-page-plan.json"],
+      "owners": ["fashion-motion-responsive-engineer", "fashion-commerce-strategist", "fashion-visual-qa-red-team", "ecommerce-growth-analytics-engineer"]
+    },
+    {
+      "id": "theme_engineering",
+      "triggers": ["WordPress", "WooCommerce", "classic theme", "block theme", "hooks", "theme.json"],
+      "packs": ["knowledge/theme-engineering.md", "pages/page-blueprints.json"],
+      "owners": ["woocommerce-theme-engineer", "fashion-frontend-engineer"]
+    },
+    {
+      "id": "growth_measurement",
+      "triggers": ["analytics", "KPI", "experiment", "A/B", "retention", "lifecycle"],
+      "packs": ["knowledge/merchandising-and-conversion.md", "prompts/prompt-stack.md"],
+      "owners": ["ecommerce-growth-analytics-engineer"]
+    },
+    {
+      "id": "knowledge_governance",
+      "triggers": ["research", "source", "refresh", "contradiction", "knowledge"],
+      "packs": ["README.md", "source-registry.json", "research/fashion-commerce-research-2026-08-06.md"],
+      "owners": ["fashion-knowledge-curator"]
+    }
+  ]
+}

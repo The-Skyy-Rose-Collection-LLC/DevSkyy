@@ -1,0 +1,46 @@
+{
+  "name": "fashion-theme-team",
+  "version": "0.1.0+codex.20260806200422",
+  "description": "The SkyyRose motherbase and governed Fashion Theme Brain for evidence-backed, end-to-end WooCommerce fashion theme delivery.",
+  "author": {
+    "name": "SkyyRose LLC"
+  },
+  "keywords": [
+    "fashion",
+    "design-system",
+    "wordpress",
+    "woocommerce",
+    "theme-development",
+    "multi-agent"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Fashion Theme Team",
+    "shortDescription": "Build complete high-end fashion themes.",
+    "longDescription": "Runs the branded SkyyRose Fashion Theme Brain from discovery and full V2 page-and-imagery planning through complete WooCommerce implementation, browser QA, accessibility, performance, packaging, and candidate-bound release evidence.",
+    "developerName": "SkyyRose LLC",
+    "category": "Development",
+    "capabilities": [
+      "Agents",
+      "Write",
+      "Design System",
+      "Commerce",
+      "Browser",
+      "Verification",
+      "Fashion Commerce Brain",
+      "HTML JSON Handoffs",
+      "Page Blueprint Library",
+      "SkyyRose Visual Artifact System",
+      "V2 Page and Imagery Atlas",
+      "Lazy Elite Runtime"
+    ],
+    "brandColor": "#B76E79",
+    "defaultPrompt": [
+      "Take this fashion theme from audit through release evidence.",
+      "Build a design system and production-ready WooCommerce funnel.",
+      "Audit this fashion storefront and dispatch the right specialists.",
+      "Build a complete page-by-page fashion storefront contract with rendered HTML and schema-valid JSON handoffs.",
+      "Plan every V2 storefront page, section, feature, responsive transformation, and imagery brief."
+    ]
+  }
+}

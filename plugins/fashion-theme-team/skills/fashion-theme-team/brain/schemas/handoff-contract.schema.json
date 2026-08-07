@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skyyrose.local/schemas/fashion-theme-handoff-contract.schema.json",
+  "$comment": "SkyyRose LLC Fashion Theme Brain structured visual handoff.",
+  "title": "SkyyRose Fashion Theme HTML/JSON Handoff Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "brand", "artifact", "context", "routes", "decisions", "risks"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "tagline", "artifact_system"],
+      "properties": {
+        "id": {"const": "skyyrose"},
+        "name": {"const": "SkyyRose"},
+        "tagline": {"const": "Luxury Grows from Concrete."},
+        "artifact_system": {"const": "../brand/skyyrose-artifact-system.json"}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "candidate_id", "title", "owner", "created_at", "preview_path"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "candidate_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "created_at": {"type": "string", "format": "date-time"},
+        "preview_path": {"type": "string", "pattern": "\\.html$"}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "theme_path", "brand_source", "catalog_source", "loaded_packs", "claim_policy"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "theme_path": {"type": "string", "minLength": 1},
+        "brand_source": {"type": "string", "minLength": 1},
+        "catalog_source": {"type": "string", "minLength": 1},
+        "loaded_packs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "claim_policy": {"enum": ["claim-bound", "research-only"]}
+      }
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/route"}
+    },
+    "decisions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/decision"}
+    },
+    "risks": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/risk"}
+    }
+  },
+  "$defs": {
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "page_type", "customer_intent", "business_objective", "template_mapping", "viewports", "sections", "analytics_events", "acceptance_criteria"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "page_type": {"type": "string", "minLength": 1},
+        "customer_intent": {"type": "string", "minLength": 1},
+        "business_objective": {"type": "string", "minLength": 1},
+        "template_mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classic", "block"],
+          "properties": {
+            "classic": {"type": "array", "items": {"type": "string"}},
+            "block": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "viewports": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"enum": ["mobile", "tablet", "desktop", "wide"]}},
+        "sections": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/section"}},
+        "analytics_events": {"type": "array", "items": {"type": "string"}},
+        "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "purpose", "required", "components", "states", "responsive_behavior", "evidence_refs"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "order": {"type": "integer", "minimum": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "components": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/component"}},
+        "states": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "responsive_behavior": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "data_source", "accessibility", "content_constraints"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "type": {"type": "string", "minLength": 1},
+        "data_source": {"type": "string", "minLength": 1},
+        "accessibility": {"type": "array", "items": {"type": "string"}},
+        "content_constraints": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "claim_class", "decision", "rationale", "evidence_refs", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "claim_class": {"enum": ["DURABLE", "CURRENT", "BRAND_SPECIFIC", "INFERENCE", "EXPERIMENT"]},
+        "decision": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "status": {"enum": ["APPROVED", "RECOMMENDED", "UNKNOWN", "BLOCKED"]}
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "description", "mitigation", "owner"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "severity": {"enum": ["critical", "high", "medium", "low"]},
+        "description": {"type": "string", "minLength": 1},
+        "mitigation": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
