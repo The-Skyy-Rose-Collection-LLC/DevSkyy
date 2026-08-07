@@ -43,10 +43,10 @@ logger = logging.getLogger(__name__)
 class FailureCategory(Enum):
     """How a failure should be routed for healing."""
 
-    CODE_BUG = "code_bug"           # Syntax error, logic error, wrong value
-    CONFIG = "config"               # Missing env var, wrong path, bad setting
+    CODE_BUG = "code_bug"  # Syntax error, logic error, wrong value
+    CONFIG = "config"  # Missing env var, wrong path, bad setting
     WRONG_APPROACH = "wrong_approach"  # Need to replan entirely
-    EXTERNAL = "external"           # API down, rate limit, network issue
+    EXTERNAL = "external"  # API down, rate limit, network issue
 
 
 @dataclass(frozen=True)
@@ -158,10 +158,7 @@ class SelfHealer:
 
         Returns None if all gates passed (nothing to heal).
         """
-        failed_results = [
-            r for r in report.results
-            if r.status == GateStatus.FAILED
-        ]
+        failed_results = [r for r in report.results if r.status == GateStatus.FAILED]
 
         if not failed_results:
             return None

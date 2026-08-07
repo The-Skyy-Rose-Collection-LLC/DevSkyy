@@ -21,44 +21,20 @@ def routing_config() -> RoutingConfig:
     """Standard routing config matching the spec."""
     return RoutingConfig(
         routes={
-            "director": ProviderConfig(
-                provider="anthropic", model="claude-opus-4-6"
-            ),
-            "design_system": ProviderConfig(
-                provider="google", model="gemini-3-pro-preview"
-            ),
-            "frontend_dev": ProviderConfig(
-                provider="anthropic", model="claude-sonnet-4-6"
-            ),
-            "backend_dev": ProviderConfig(
-                provider="anthropic", model="claude-sonnet-4-6"
-            ),
-            "accessibility": ProviderConfig(
-                provider="anthropic", model="claude-haiku-4-5"
-            ),
-            "performance": ProviderConfig(
-                provider="google", model="gemini-3-flash-preview"
-            ),
-            "seo_content": ProviderConfig(
-                provider="openai", model="gpt-4o"
-            ),
-            "qa": ProviderConfig(
-                provider="xai", model="grok-3"
-            ),
+            "director": ProviderConfig(provider="anthropic", model="claude-opus-4-6"),
+            "design_system": ProviderConfig(provider="google", model="gemini-3-pro-preview"),
+            "frontend_dev": ProviderConfig(provider="anthropic", model="claude-sonnet-4-6"),
+            "backend_dev": ProviderConfig(provider="anthropic", model="claude-sonnet-4-6"),
+            "accessibility": ProviderConfig(provider="anthropic", model="claude-haiku-4-5"),
+            "performance": ProviderConfig(provider="google", model="gemini-3-flash-preview"),
+            "seo_content": ProviderConfig(provider="openai", model="gpt-4o"),
+            "qa": ProviderConfig(provider="xai", model="grok-3"),
         },
         fallbacks={
-            "anthropic": ProviderConfig(
-                provider="google", model="gemini-3-pro-preview"
-            ),
-            "google": ProviderConfig(
-                provider="anthropic", model="claude-sonnet-4-6"
-            ),
-            "openai": ProviderConfig(
-                provider="anthropic", model="claude-sonnet-4-6"
-            ),
-            "xai": ProviderConfig(
-                provider="google", model="gemini-3-flash-preview"
-            ),
+            "anthropic": ProviderConfig(provider="google", model="gemini-3-pro-preview"),
+            "google": ProviderConfig(provider="anthropic", model="claude-sonnet-4-6"),
+            "openai": ProviderConfig(provider="anthropic", model="claude-sonnet-4-6"),
+            "xai": ProviderConfig(provider="google", model="gemini-3-flash-preview"),
         },
     )
 
@@ -99,8 +75,14 @@ class TestRoutingResolution:
 
     def test_resolve_all_agents(self, router: ModelRouter) -> None:
         agents = [
-            "director", "design_system", "frontend_dev", "backend_dev",
-            "accessibility", "performance", "seo_content", "qa",
+            "director",
+            "design_system",
+            "frontend_dev",
+            "backend_dev",
+            "accessibility",
+            "performance",
+            "seo_content",
+            "qa",
         ]
         for agent in agents:
             result = router.resolve(agent)
@@ -220,6 +202,7 @@ class TestAsyncProviderCall:
     @pytest.mark.asyncio
     async def test_call_provider_all_fail_raises(self, router: ModelRouter) -> None:
         """When all providers fail, raises after exhausting retries."""
+
         async def always_fail(provider: str, model: str) -> str:
             raise ConnectionError(f"{provider} is down")
 

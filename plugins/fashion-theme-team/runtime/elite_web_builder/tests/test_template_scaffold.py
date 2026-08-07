@@ -7,6 +7,7 @@ All scaffold functions return frozen dataclasses (immutable).
 from __future__ import annotations
 
 import pytest
+
 from tools.template_scaffold import (
     ScaffoldError,
     ScaffoldFile,
@@ -138,9 +139,7 @@ class TestScaffoldWordPressTemplate:
             "cta-banner",
             options={"description": "Call to action banner"},
         )
-        php_content = next(
-            f.content for f in result.files if f.path.endswith(".php")
-        )
+        php_content = next(f.content for f in result.files if f.path.endswith(".php"))
         assert "Call to action banner" in php_content
 
     def test_invalid_template_type_raises(self) -> None:
@@ -206,9 +205,7 @@ class TestScaffoldShopifyTemplate:
     def test_section_has_schema(self) -> None:
         """Shopify sections must include a {% schema %} block."""
         result = scaffold_shopify_template("section", "testimonials")
-        liquid_content = next(
-            f.content for f in result.files if f.path.endswith(".liquid")
-        )
+        liquid_content = next(f.content for f in result.files if f.path.endswith(".liquid"))
         assert "{% schema %}" in liquid_content
 
     def test_online_store_2_metadata(self) -> None:
@@ -281,9 +278,7 @@ class TestScaffoldComponent:
 
     def test_vanilla_component_content(self) -> None:
         result = scaffold_component("vanilla", "Tabs")
-        js_file = next(
-            f for f in result.files if f.path.endswith(".js") and "test" not in f.path
-        )
+        js_file = next(f for f in result.files if f.path.endswith(".js") and "test" not in f.path)
         assert "Tabs" in js_file.content
 
     def test_invalid_framework_raises(self) -> None:
@@ -307,9 +302,7 @@ class TestScaffoldComponent:
 
     def test_options_with_typescript_vanilla(self) -> None:
         """Vanilla with typescript option should produce .ts files."""
-        result = scaffold_component(
-            "vanilla", "Counter", options={"typescript": True}
-        )
+        result = scaffold_component("vanilla", "Counter", options={"typescript": True})
         paths = [f.path for f in result.files]
         assert any(p.endswith(".ts") and "test" not in p for p in paths)
 

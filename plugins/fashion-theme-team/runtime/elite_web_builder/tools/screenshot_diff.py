@@ -116,8 +116,11 @@ def capture_screenshot(
     height = str(effective_viewport["height"])
 
     cmd = [
-        "npx", "playwright", "screenshot",
-        "--viewport-size", f"{width},{height}",
+        "npx",
+        "playwright",
+        "screenshot",
+        "--viewport-size",
+        f"{width},{height}",
         url,
         output_path,
     ]
@@ -126,9 +129,7 @@ def capture_screenshot(
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
 
     if proc.returncode != 0:
-        raise RuntimeError(
-            f"Screenshot capture failed (exit {proc.returncode}): {proc.stderr}"
-        )
+        raise RuntimeError(f"Screenshot capture failed (exit {proc.returncode}): {proc.stderr}")
 
     return output_path
 
@@ -138,9 +139,7 @@ def capture_screenshot(
 # ---------------------------------------------------------------------------
 
 
-def _load_and_normalize(
-    baseline_path: Path, current_path: Path
-) -> tuple[Image.Image, Image.Image]:
+def _load_and_normalize(baseline_path: Path, current_path: Path) -> tuple[Image.Image, Image.Image]:
     """
     Load two images, resizing current to match baseline if sizes differ.
 

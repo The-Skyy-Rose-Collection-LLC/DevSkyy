@@ -98,16 +98,17 @@ class Context7Bridge:
         """Make a GET request to Context7 API."""
         url = f"{self.base_url}{path}"
         try:
-            async with aiohttp.ClientSession() as session, session.get(
-                url,
-                params=params,
-                timeout=aiohttp.ClientTimeout(total=self.timeout),
-            ) as resp:
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(
+                    url,
+                    params=params,
+                    timeout=aiohttp.ClientTimeout(total=self.timeout),
+                ) as resp,
+            ):
                 if resp.status != 200:
                     body = await resp.text()
-                    raise Context7Error(
-                        f"Context7 API error {resp.status}: {body}"
-                    )
+                    raise Context7Error(f"Context7 API error {resp.status}: {body}")
                 return await resp.json()
         except aiohttp.ClientError as exc:
             raise Context7Error(f"Context7 request failed: {exc}") from exc
@@ -142,15 +143,10 @@ class Context7Bridge:
 
         results = data.get("results", [])
         if not results:
-            raise Context7Error(
-                f"No libraries found for '{library_name}'"
-            )
+            raise Context7Error(f"No libraries found for '{library_name}'")
 
         # Filter to finalized only
-        finalized = [
-            r for r in results
-            if r.get("state") == "finalized"
-        ]
+        finalized = [r for r in results if r.get("state") == "finalized"]
         if not finalized:
             raise Context7Error(
                 f"No finalized libraries found for '{library_name}' "
@@ -202,23 +198,27 @@ class Context7Bridge:
             code_list = cs.get("codeList", [])
             code = code_list[0]["code"] if code_list else ""
             lang = code_list[0]["language"] if code_list else cs.get("codeLanguage", "")
-            snippets.append(DocSnippet(
-                title=cs.get("codeTitle", ""),
-                description=cs.get("codeDescription", ""),
-                language=lang,
-                code=code,
-                source_url=cs.get("codeId", ""),
-            ))
+            snippets.append(
+                DocSnippet(
+                    title=cs.get("codeTitle", ""),
+                    description=cs.get("codeDescription", ""),
+                    language=lang,
+                    code=code,
+                    source_url=cs.get("codeId", ""),
+                )
+            )
 
         # Info snippets (prose documentation)
         for info in data.get("infoSnippets", []):
-            snippets.append(DocSnippet(
-                title=info.get("breadcrumb", info.get("pageId", "Doc")),
-                description="",
-                language="markdown",
-                code=info.get("content", ""),
-                source_url=info.get("pageId", ""),
-            ))
+            snippets.append(
+                DocSnippet(
+                    title=info.get("breadcrumb", info.get("pageId", "Doc")),
+                    description="",
+                    language="markdown",
+                    code=info.get("content", ""),
+                    source_url=info.get("pageId", ""),
+                )
+            )
 
         return snippets
 
