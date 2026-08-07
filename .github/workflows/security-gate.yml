@@ -74,6 +74,10 @@ jobs:
   # ===========================================================================
   codeql:
     name: 🔬 CodeQL Analysis
+    # GitHub default CodeQL setup is configured for this repository. This
+    # advanced matrix remains available only when explicitly enabled via a
+    # repository variable, avoiding duplicate SARIF submissions.
+    if: ${{ vars.SKYYROSE_ADVANCED_CODEQL == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

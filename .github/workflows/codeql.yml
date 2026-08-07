@@ -9,15 +9,14 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL Advanced"
+name: "CodeQL Advanced (opt-in)"
+
+# The repository's GitHub default CodeQL setup is configured and owns normal
+# push/PR scanning. Keep this advanced matrix available for an explicit opt-in
+# run without submitting a second SARIF configuration that conflicts with it.
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: '26 19 * * 5'
+  workflow_dispatch:
 
 jobs:
   analyze:
