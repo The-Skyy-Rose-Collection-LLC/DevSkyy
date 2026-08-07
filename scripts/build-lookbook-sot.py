@@ -33,7 +33,11 @@ def main() -> int:
             collections_dir=Path(args.collections_dir) if args.collections_dir else None,
         )
     except FileNotFoundError:
-        if args.collections_dir is None:
+        manifest_path = Path(args.manifest) if args.manifest else None
+        # A directory scan is an explicit migration fallback only when the
+        # manifest itself is absent.  Do not mask a missing source declared by
+        # an existing manifest: that is SOT drift and must fail loudly.
+        if args.collections_dir is None or manifest_path is None or manifest_path.exists():
             raise
         payload, output = _lookbook.run_build_lookbook_sot(
             None,

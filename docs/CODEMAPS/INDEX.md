@@ -1,6 +1,6 @@
 # DevSkyy Codemaps Index
 
-<!-- Generated: 2026-07-06 | Files scanned: 6 codemaps + repo root scan | Token estimate: ~450 -->
+<!-- Generated: 2026-07-06 | Files scanned: 7 codemaps + repo root scan | Token estimate: ~450 -->
 
 **Status: STAGED FOR APPROVAL.** This is a full rewrite of the codemap set (previous headers dated 2026-02-19, ~140 days stale, predating major repo growth). Files live in `docs/CODEMAPS/.pending/` — not yet promoted to `docs/CODEMAPS/`. See `.reports/codemap-diff.txt` for the full diff.
 

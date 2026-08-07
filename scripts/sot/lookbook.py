@@ -116,7 +116,7 @@ def build_lookbook_payload(
 
 def serialize(payload: dict[str, Any]) -> str:
     """Return the sole byte format for the generated lookbook SOT."""
-    return json.dumps(payload, indent=2) + "\n"
+    return json.dumps(payload, indent=2, ensure_ascii=True) + "\n"
 
 
 def esc(value: Any) -> str:
@@ -193,7 +193,7 @@ def render_collection(slug: str, data: dict[str, Any], asset_base: str) -> str:
       <header>
         {f'<img class="lockup" src="{esc(lockup_img)}" alt="{esc(data.get("name", slug))} lockup">' if lockup_img else ''}
         <div>
-          <h2>{esc(data.get("name", slug)).title()}</h2>
+          <h2>{esc(str(data.get("name", slug)).title())}</h2>
           <p>{esc((data.get("story") or {}).get("seed", ""))}</p>
         </div>
       </header>

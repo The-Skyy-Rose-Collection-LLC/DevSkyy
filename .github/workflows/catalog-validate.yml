@@ -17,6 +17,7 @@ on:
       - "scripts/build-lookbook-sot.py"
       - "scripts/build-lookbook-from-sot.py"
       - "scripts/sot/lookbook.py"
+      - "scripts/sot/__init__.py"
       - "scripts/nano_banana/catalog.py"
       - "scripts/oai_render/references.py"
       - "scripts/openai_feed/catalog.py"
@@ -26,6 +27,7 @@ on:
       - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
       - "tests/test_v7_cards_generator.py"
       - "tests/integrations/test_catalog_reader_consolidation.py"
+      - "tests/test_lookbook_sot_guard.py"
   push:
     branches: [main]
     paths:
@@ -39,12 +41,14 @@ on:
       - "scripts/build-lookbook-sot.py"
       - "scripts/build-lookbook-from-sot.py"
       - "scripts/sot/lookbook.py"
+      - "scripts/sot/__init__.py"
       - "scripts/nano_banana/catalog.py"
       - "scripts/oai_render/references.py"
       - "scripts/openai_feed/catalog.py"
       - "scripts/lookbook-manifest.json"
       - "docs/campaigns/sot-lookbook.html"
       - "wordpress-theme/skyyrose-flagship/data/lookbook-sot.json"
+      - "tests/test_lookbook_sot_guard.py"
       - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
 
 jobs:

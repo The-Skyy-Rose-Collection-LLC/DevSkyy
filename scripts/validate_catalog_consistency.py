@@ -931,9 +931,9 @@ def check_collection_sot_current() -> CheckResult:
     name = "collection_sot_current"
     if not _BUILD_COLLECTION_SOT.exists():
         return _ok(name, "build-collection-sot.py not present — skip")
+    saved_path = sys.path[:]
     if str(_REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(_REPO_ROOT))
-    saved_path = sys.path[:]
     try:
         import importlib.util
 
@@ -1033,6 +1033,9 @@ def check_lookbook_html_current() -> CheckResult:
     if not _LOOKBOOK_HTML.exists():
         return _fail(name, f"sot-lookbook.html not found: {_LOOKBOOK_HTML}")
 
+    saved_path = sys.path[:]
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
     try:
         from scripts.sot import lookbook as gen_mod
 
@@ -1041,6 +1044,8 @@ def check_lookbook_html_current() -> CheckResult:
         )
     except Exception as exc:  # defensive — never crash the whole validator run
         return _fail(name, f"lookbook HTML generator failed to run: {exc}")
+    finally:
+        sys.path[:] = saved_path
 
     if generated != _LOOKBOOK_HTML.read_text(encoding="utf-8"):
         return _fail(
