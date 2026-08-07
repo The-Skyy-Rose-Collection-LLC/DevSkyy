@@ -42,7 +42,9 @@ Available check names (pass comma-separated to --checks):
   product_embeddings_current  product-embeddings.json covers the current catalog SKU set (dim=512)
 
 The catalog workflow watches the tracked flagship asset tree because visual-manifest and
-collection SOT resolution depend on those files in a clean checkout.
+collection SOT resolution depend on those files in a clean checkout. Its focused pytest
+job also installs ``cryptography`` because the shared test fixture imports the security
+package while exercising these SOT guards.
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).

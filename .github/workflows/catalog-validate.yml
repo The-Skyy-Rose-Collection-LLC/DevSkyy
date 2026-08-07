@@ -8,6 +8,7 @@ on:
       - "skyyrose/elite_studio/logo_registry.py"
       - "skyyrose/elite_studio/commerce.py"
       - "scripts/validate_catalog_consistency.py"
+      - ".github/workflows/catalog-validate.yml"
       - "scripts/sync_catalog_downstream.py"
       - "skyyrose/elite_studio/tests/test_catalog_consistency.py"
       - "skyyrose/elite_studio/tests/conftest.py"
@@ -27,6 +28,7 @@ on:
       - "skyyrose/elite_studio/sku_resolver.py"
       - "skyyrose/elite_studio/logo_registry.py"
       - "scripts/validate_catalog_consistency.py"
+      - ".github/workflows/catalog-validate.yml"
       - "scripts/build_v7_cards.py"
       - "skyyrose/core/catalog_loader.py"
       - "scripts/build-lookbook-sot.py"
@@ -62,7 +64,7 @@ jobs:
           # without pytest-asyncio pytest errors "Unknown config option").
           # No project/base install — `.[dev]` pulls the heavy provider stack, was
           # timing out, and silently fell back to a pytest-only env that failed.
-          pip install pytest pytest-asyncio jsonschema --quiet
+          pip install pytest pytest-asyncio jsonschema cryptography --quiet
 
       - name: Run catalog consistency validator
         run: |
