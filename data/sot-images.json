@@ -45,17 +45,14 @@
     },
     "br-008": {
       "front": "assets/images/products/br-008-onmodel.webp",
-      "back": "assets/images/products/jersey-sf-inspired-football-back-model.webp",
       "packshot": "assets/images/products/br-008-sf-inspired.jpg"
     },
     "br-009": {
       "front": "assets/images/products/br-009-onmodel.webp",
-      "back": "assets/images/products/jersey-last-oakland-football-back-model.webp",
       "packshot": "assets/images/products/br-009-last-oakland-football.jpg"
     },
     "br-010": {
       "front": "assets/images/products/br-010-onmodel.webp",
-      "back": "assets/images/products/jersey-the-bay-basketball-back-model.webp",
       "packshot": "assets/images/products/br-010-the-bay-basketball.jpeg"
     },
     "br-011": {
@@ -87,7 +84,7 @@
     },
     "kids-002": {
       "front": "assets/images/products/ghost/kids-002-ghost-front.webp",
-      "back": "assets/images/products/kids-purple-set-back-model.webp",
+      "back": "assets/images/products/kids-purple-set/kids-purple-set-back-model.webp",
       "packshot": "assets/images/products/kids-002-purple-set.jpeg"
     },
     "lh-002": {
@@ -104,7 +101,7 @@
     },
     "lh-004": {
       "front": "assets/images/products/lh-004-onmodel.webp",
-      "back": "assets/images/products/love-hurts-bomber-back-model.webp",
+      "back": "assets/images/products/lh-004-bomber-back.webp",
       "packshot": "assets/images/products/lh-004-bomber.png",
       "back_packshot": "assets/images/products/lh-004-bomber-back.png"
     },
