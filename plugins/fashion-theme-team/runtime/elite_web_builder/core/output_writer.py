@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -45,15 +45,41 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 # Only these extensions may be written (security)
-ALLOWED_EXTENSIONS: frozenset[str] = frozenset({
-    ".php", ".css", ".js", ".json", ".html", ".htm", ".svg",
-    ".txt", ".md", ".xml", ".map", ".scss", ".less",
-    ".ts", ".tsx", ".jsx", ".vue",
-    ".liquid", ".twig", ".hbs",
-    ".yml", ".yaml", ".toml",
-    ".sh", ".bash",
-    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico",  # for base64 decode later
-})
+ALLOWED_EXTENSIONS: frozenset[str] = frozenset(
+    {
+        ".php",
+        ".css",
+        ".js",
+        ".json",
+        ".html",
+        ".htm",
+        ".svg",
+        ".txt",
+        ".md",
+        ".xml",
+        ".map",
+        ".scss",
+        ".less",
+        ".ts",
+        ".tsx",
+        ".jsx",
+        ".vue",
+        ".liquid",
+        ".twig",
+        ".hbs",
+        ".yml",
+        ".yaml",
+        ".toml",
+        ".sh",
+        ".bash",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".webp",
+        ".ico",  # for base64 decode later
+    }
+)
 
 # Maximum file size (bytes) — reject absurdly large outputs
 MAX_FILE_SIZE: int = 2 * 1024 * 1024  # 2 MB
@@ -89,9 +115,7 @@ class WriteResult:
 
 # Pattern 1: ```lang:path/to/file.ext
 _FENCE_WITH_PATH = re.compile(
-    r"```(\w+):([a-zA-Z0-9_\-./]+\.\w+)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"```(\w+):([a-zA-Z0-9_\-./]+\.\w+)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 
@@ -110,19 +134,13 @@ _FENCE_WITH_COMMENT = re.compile(
 
 # Pattern 3: ### File: path/to/file.ext\n```lang\n...\n```
 _HEADING_THEN_FENCE = re.compile(
-    r"#{1,4}\s*[Ff]ile:\s*([a-zA-Z0-9_\-./]+\.\w+)\s*\n+"
-    r"```(\w*)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"#{1,4}\s*[Ff]ile:\s*([a-zA-Z0-9_\-./]+\.\w+)\s*\n+" r"```(\w*)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 
 # Pattern 4: **`path/to/file.ext`**\n```lang\n...\n```
 _BOLD_PATH_THEN_FENCE = re.compile(
-    r"\*\*`([a-zA-Z0-9_\-./]+\.\w+)`\*\*\s*\n+"
-    r"```(\w*)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"\*\*`([a-zA-Z0-9_\-./]+\.\w+)`\*\*\s*\n+" r"```(\w*)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 

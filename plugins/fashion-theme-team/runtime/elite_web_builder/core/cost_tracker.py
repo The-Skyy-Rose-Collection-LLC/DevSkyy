@@ -17,7 +17,7 @@ Usage:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -136,7 +136,12 @@ class CostTracker:
         self._records.append(rec)
         logger.debug(
             "CostTracker: %s %s/%s — %d in, %d out, $%.4f",
-            story_id, provider, model, input_tokens, output_tokens, cost,
+            story_id,
+            provider,
+            model,
+            input_tokens,
+            output_tokens,
+            cost,
         )
         return rec
 
