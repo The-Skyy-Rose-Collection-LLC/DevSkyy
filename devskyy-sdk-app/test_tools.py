@@ -13,7 +13,6 @@ from __future__ import annotations
 import asyncio
 
 from catalog import find_products, products_in_collection
-
 from tools import catalog_server, collection_canon, list_collection, lookup_product
 
 # `@tool` returns an SdkMcpTool dataclass, not the raw function. The async handler is `.handler`;

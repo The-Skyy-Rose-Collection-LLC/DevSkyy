@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from claude_agent_sdk import ToolAnnotations, create_sdk_mcp_server, tool
+
 from catalog import (
     COLLECTIONS,
     Product,
@@ -25,7 +27,6 @@ from catalog import (
     find_products,
     products_in_collection,
 )
-from claude_agent_sdk import ToolAnnotations, create_sdk_mcp_server, tool
 
 
 def _format_product(p: Product) -> str:

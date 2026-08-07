@@ -452,7 +452,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+known-first-party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm", "catalog", "tools"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ARG001", "ARG002", "B017", "F841"]
@@ -496,7 +496,7 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 100
-known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm", "catalog", "tools"]
 skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/", "skyyrose/cli_harnesses/"]
 
 # =============================================================================
