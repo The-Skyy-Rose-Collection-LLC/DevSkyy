@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "brand_id": "skyyrose",
+  "candidate_id": "demo-001",
+  "items": [
+    {
+      "id": "ev-collection-render",
+      "claim": "The collection thesis and product discovery sections render in desktop and mobile frames with matching stable IDs",
+      "proof_class": "rendered-eyes-on",
+      "artifact": "preview.html",
+      "reviewer": "fashion-visual-qa-red-team",
+      "result": "PASS",
+      "captured_at": "2026-08-06T00:00:00-07:00"
+    }
+  ],
+  "verdict": "PASS"
+}

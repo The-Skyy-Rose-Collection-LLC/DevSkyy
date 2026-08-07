@@ -1,0 +1,45 @@
+{
+  "brand": "SkyyRose",
+  "tagline": "Luxury Grows from Concrete.",
+  "system": "Fashion Theme Brain Visual Artifacts",
+  "version": "1.0.0",
+  "visual_register": "Oakland-rooted expressive editorial",
+  "references": [
+    "Kith magazine-grid editorial structure",
+    "Oaklandish civic-pride anchoring",
+    "Fear of God scale and athletic restraint"
+  ],
+  "tokens": {
+    "color": {
+      "concrete": "#0A0A0A",
+      "asphalt": "#111111",
+      "surface": "#1A1A1A",
+      "line": "#2A2A2A",
+      "white": "#FFFFFF",
+      "secondary": "#CCCCCC",
+      "muted": "#999999",
+      "rose_gold": "#B76E79"
+    },
+    "type": {
+      "display": "Archivo",
+      "body": "Hanken Grotesk",
+      "utility": "Anton"
+    },
+    "motion": {
+      "ease": "cubic-bezier(.16, 1, .3, 1)",
+      "duration": "600ms"
+    },
+    "layout": {
+      "content_max": "1440px",
+      "reading_max": "72ch",
+      "section_space": "clamp(4rem, 8vw, 9rem)"
+    }
+  },
+  "rules": [
+    "Use rose gold as the single artifact accent.",
+    "Use asymmetry, scale, hairlines, and negative space instead of decorative cards.",
+    "Do not use unverified product or collection imagery.",
+    "Do not use gradient text, generic luxury serif styling, glass blur, fake scarcity, or ornamental motion.",
+    "Every sales visual must remain truthful about what is implemented and what is only a blueprint."
+  ]
+}

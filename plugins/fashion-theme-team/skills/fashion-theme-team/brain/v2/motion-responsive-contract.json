@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "SkyyRose V2 motion/responsive implementation contract. This describes required behavior; it is not runtime proof.",
+  "contract_id": "skyyrose-v2-motion-responsive",
+  "version": "1.0.0",
+  "run_date": "2026-08-06",
+  "owner": "fashion-motion-responsive-engineer",
+  "implementation_status": "planned-not-implemented",
+  "release_status": "BLOCKED",
+  "source_contracts": [
+    "brain/v2/v2-page-plan.json",
+    "brain/v2/v2-page-and-imagery-plan.md",
+    "brain/interactive/feature-scaffold.json",
+    "brain/references/animated-prompt-pack-adaptation.md",
+    "brain/brand/skyyrose-artifact-system.json",
+    "brain/brand/skyyrose-artifact.css",
+    "references/design-system-contract.md",
+    "docs/design/fashion-design-system-team.md"
+  ],
+  "purpose": {
+    "allowed": [
+      "guide attention to the next editorial chapter",
+      "communicate a state transition",
+      "preserve spatial continuity between related content"
+    ],
+    "priority_order": [
+      "garment",
+      "price",
+      "fit",
+      "availability",
+      "terms",
+      "primary CTA",
+      "atmosphere"
+    ],
+    "rule": "If motion does not guide attention, communicate state, or preserve continuity, omit it. Motion is always an after-effect of a usable state."
+  },
+  "tokens": {
+    "duration_fast_ms": 160,
+    "duration_standard_ms": 360,
+    "duration_slow_ms": 600,
+    "easing": "cubic-bezier(.16, 1, .3, 1)",
+    "distance_sm_px": 8,
+    "distance_md_px": 16,
+    "distance_lg_px": 24,
+    "stagger_ms": 40,
+    "max_staggered_items": 3,
+    "max_active_reveal_sections": 1,
+    "allowed_properties": ["opacity", "transform"],
+    "forbidden_properties": ["width", "height", "top", "left", "scroll-position"],
+    "prohibited_patterns": [
+      "uniform page or grid reveals",
+      "scroll-jacking",
+      "autoplay audio",
+      "custom cursor or cursor trail",
+      "fake scarcity or countdown urgency",
+      "garment-competing particles, aurora, or gradient mesh",
+      "hover-only product facts"
+    ]
+  },
+  "state_machine": {
+    "states": ["idle", "entering", "active", "exiting", "cancelled", "fallback"],
+    "transitions": [
+      {"from": "idle", "event": "intent_or_visibility", "to": "entering"},
+      {"from": "entering", "event": "sequence_complete", "to": "active"},
+      {"from": "entering", "event": "cancel", "to": "cancelled"},
+      {"from": "active", "event": "exit_or_visibility_hidden", "to": "exiting"},
+      {"from": "exiting", "event": "cleanup_complete", "to": "idle"},
+      {"from": "entering", "event": "provider_failure", "to": "fallback"},
+      {"from": "active", "event": "provider_failure", "to": "fallback"}
+    ],
+    "stable_identity": ["data-feature-id", "data-section-id", "candidate_id"],
+    "sequencing": {
+      "trigger": "visibility_or_explicit_intent",
+      "once_per_section": true,
+      "one_active_section": true,
+      "new_section_cancels_previous": true,
+      "critical_action_waits_for_motion": false,
+      "cta_acknowledgement_max_ms": 100
+    },
+    "cancellation_events": [
+      "route_change",
+      "component_unmount",
+      "visibilitychange_hidden",
+      "escape_or_skip",
+      "resize_breakpoint_change",
+      "pointercancel",
+      "prefers-reduced-motion_change",
+      "provider_timeout",
+      "webgl_context_lost"
+    ],
+    "cleanup_requirements": [
+      "disconnect observers",
+      "clear timers",
+      "cancel requestAnimationFrame",
+      "remove event listeners",
+      "abort media/provider requests with AbortController",
+      "release decoded frame buffers"
+    ]
+  },
+  "behavior_matrix": [
+    {
+      "surface_id": "global-shell-drawer",
+      "purpose": "Expose navigation, search, account, bag, and service paths without obscuring the page.",
+      "responsive": {
+        "390": {"layout": "compact masthead; near-full-screen drawer", "action_priority": ["close", "navigation", "search", "bag"], "motion": "short opacity/transform open; no backdrop dependency"},
+        "768": {"layout": "compact or two-row masthead; drawer remains modal", "action_priority": ["close", "navigation", "search", "bag"], "motion": "same tokenized open/close as 390"},
+        "1440": {"layout": "wide wordmark and category navigation", "action_priority": ["navigation", "search", "account", "bag"], "motion": "optional opacity/transform drawer; no layout animation"}
+      },
+      "trigger": "explicit click, tap, or keyboard activation",
+      "cancellation": ["Escape", "backdrop", "close control", "route change", "unmount", "reduced motion"],
+      "focus_keyboard_touch": {"focus_entry": "first meaningful control", "focus_trap": true, "escape_closes": true, "restore_focus_to_opener": true, "native_scroll": true, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "instant open/close with identical DOM, names, order, and focus path"
+    },
+    {
+      "surface_id": "chapter-reveal",
+      "purpose": "Guide attention to an authored editorial chapter while preserving immediate content access.",
+      "responsive": {
+        "390": {"layout": "one-column portrait art and linear content", "crop": "portrait/static crop", "commerce_order": ["product", "price", "fit", "availability", "terms", "primary_cta", "atmosphere"], "motion": "no sticky, parallax, or hover dependency"},
+        "768": {"layout": "tablet editorial composition; two columns only when content fits", "crop": "tablet crop with static alternative", "commerce_order": ["product", "price", "fit", "availability", "terms", "primary_cta", "atmosphere"], "motion": "one restrained reveal per section"},
+        "1440": {"layout": "cinematic 60/40 thesis composition", "crop": "wide thesis crop with commerce interruption", "commerce_order": ["product", "price", "fit", "availability", "terms", "primary_cta", "atmosphere"], "motion": "one authored text/image reveal; no global cascade"}
+      },
+      "trigger": "IntersectionObserver visibility threshold or explicit skip",
+      "cancellation": ["leave viewport before completion", "skip to CTA", "resize", "hidden tab", "route change"],
+      "focus_keyboard_touch": {"controls_are_real_links_or_buttons": true, "touch_scroll_native": true, "no_hover_only_content": true, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "final image/text order is visible immediately; headings, product facts, and CTA remain in the same DOM order"
+    },
+    {
+      "surface_id": "sticky-story-product-split",
+      "purpose": "Preserve spatial continuity between visual evidence and reading or purchase decisions.",
+      "responsive": {
+        "390": {"layout": "normal flow; media then evidence and CTA", "sticky": false, "motion": "none required"},
+        "768": {"layout": "two-column only after measured-height check", "sticky": "opt-in; fall back to normal flow if it can obscure focused content", "motion": "no scroll lock"},
+        "1440": {"layout": "sticky media beside reading/decision column", "sticky": "one controlled scene", "motion": "transform/opacity continuity only"}
+      },
+      "trigger": "both columns measurable and viewport eligible",
+      "cancellation": ["resize", "hidden tab", "reduced motion", "skip", "focus would be obscured"],
+      "focus_keyboard_touch": {"focused_content_never_moves_under_focused_control": true, "native_touch_scroll": true, "keyboard_alternative": "normal document order"},
+      "reduced_motion_equivalence": "normal document flow with identical captions and product links"
+    },
+    {
+      "surface_id": "shoppable-hotspots",
+      "purpose": "Connect an authored image to exact, available product records.",
+      "responsive": {
+        "390": {"layout": "captioned image followed by ordered product list", "hotspots": "not required", "commerce_order": ["image_caption", "product", "price", "availability", "shop_cta"]},
+        "768": {"layout": "product list first; optional static coordinate markers", "hotspots": "optional and labeled"},
+        "1440": {"layout": "labeled image hotspots plus adjacent product ledger", "hotspots": "enabled only with approved coordinates and DOM ledger"}
+      },
+      "trigger": "explicit activation of a labeled hotspot or product link",
+      "cancellation": ["route change", "unavailable SKU", "escape", "pointercancel"],
+      "focus_keyboard_touch": {"every_hotspot_tabbable": true, "label_includes": ["product", "price", "status"], "minimum_target_px": 44, "touch_parity": "ordered product list"},
+      "reduced_motion_equivalence": "captioned image and all product cards remain visible without coordinate animation"
+    },
+    {
+      "surface_id": "pdp-media-and-360",
+      "purpose": "Prove fit, material, movement, and construction without speculative media.",
+      "responsive": {
+        "390": {"layout": "poster plus swipeable static gallery", "auto_rotate": false, "lcp": "first verified frame or poster"},
+        "768": {"layout": "static gallery first; 360 only after explicit gesture", "auto_rotate": false},
+        "1440": {"layout": "two-up verified gallery; optional 36-72 frame viewer after activation", "auto_rotate": false}
+      },
+      "trigger": "visibility for poster; explicit click/tap/keyboard intent for 360",
+      "cancellation": ["pointerup", "pointercancel", "blur", "escape", "route change", "unmount", "timeout"],
+      "focus_keyboard_touch": {"touch": "drag/swipe without page lock", "keyboard": ["Left", "Right", "Home", "End", "Pause", "Stop"], "captions_focusable": true, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "static multi-angle gallery, alt text, specifications, and unchanged Add to Bag path"
+    },
+    {
+      "surface_id": "stateful-cta",
+      "purpose": "Communicate request state immediately and unambiguously.",
+      "responsive": {
+        "390": {"layout": "full-width or stacked stable 44px control", "state": "label and geometry remain stable"},
+        "768": {"layout": "explicit stateful control", "state": "loading/success/error/unavailable visible"},
+        "1440": {"layout": "rose-gold primary with restrained underline secondary", "state": "same explicit states; no magnetic movement"}
+      },
+      "trigger": "native button activation",
+      "cancellation": ["abort request", "route change", "unmount"],
+      "focus_keyboard_touch": {"native_button": true, "disabled_only_while_in_flight": true, "live_region": true, "focus_retained_or_returned": true, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "status text/live-region feedback appears with no transition delay; purchase and service actions never wait for motion"
+    },
+    {
+      "surface_id": "campaign-mystery",
+      "purpose": "Offer optional discovery while keeping a direct, non-urgent route to shop.",
+      "responsive": {
+        "390": {"layout": "poster, transcript, and Skip to shop near title", "timer": false},
+        "768": {"layout": "linear chapters with optional reveal", "timer": false},
+        "1440": {"layout": "optional progress/chapter sequence with skip", "timer": false}
+      },
+      "trigger": "user intent only",
+      "cancellation": ["pause", "abort", "hidden tab", "escape", "skip", "reduced motion", "route change"],
+      "focus_keyboard_touch": {"progress_announced": true, "each_clue_skippable": true, "touch_not_sole_path": true, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "linear lookbook and exact product links with no dark-pattern timer"
+    },
+    {
+      "surface_id": "webgl-collection-world",
+      "purpose": "Provide an optional memorable place while keeping DOM commerce primary.",
+      "responsive": {
+        "390": {"webgl": "never initialize", "layout": "poster plus chapter scroll", "commerce": "DOM heading, facts, and Shop CTA"},
+        "768": {"webgl": "poster first; opt-in only on capable device", "layout": "poster plus linear chapter"},
+        "1440": {"webgl": "lazy initialize after poster/LCP and explicit capability check", "layout": "scene with DOM commerce overlay"}
+      },
+      "trigger": "poster visible, capability check passes, and user intent where required",
+      "cancellation": ["context loss", "route change", "visibility hidden", "timeout", "offline", "reduced motion"],
+      "focus_keyboard_touch": {"canvas_is_not_required_for_navigation": true, "dom_heading_and_cta_independent": true, "keyboard_never_trapped_in_canvas": true, "touch_scroll_native": true},
+      "reduced_motion_equivalence": "static poster, editorial chapter scroll, and Shop CTA with identical product facts"
+    },
+    {
+      "surface_id": "optional-audio-ritual",
+      "purpose": "Add atmosphere only after an explicit user choice, with transcript parity.",
+      "responsive": {
+        "390": {"audio": "off by default", "fallback": "visual chapter and transcript"},
+        "768": {"audio": "explicit play with persistent pause/volume", "fallback": "visual chapter and transcript"},
+        "1440": {"audio": "explicit play only; no autoplay", "fallback": "visual chapter and transcript"}
+      },
+      "trigger": "click, tap, or keyboard activation only",
+      "cancellation": ["navigation", "pause", "reduced motion/audio-safe preference", "unmount"],
+      "focus_keyboard_touch": {"controls": ["play", "pause", "volume", "transcript"], "audio_only_information": false, "minimum_target_px": 44},
+      "reduced_motion_equivalence": "visual chapter, stills, and transcript; no autoplay"
+    }
+  ],
+  "focus_keyboard_touch_contract": {
+    "wcag_floor": "WCAG 2.2 AA",
+    "skip_link_first": true,
+    "focus_visible": true,
+    "dialog_rules": ["focus enters first meaningful control", "Tab remains within modal", "Escape closes", "focus restores to opener", "scroll position restores"],
+    "target_minimum_css_px": 44,
+    "touch_rules": ["native vertical scroll", "no gesture hijack or page lock", "pointercancel exits safely", "every drag/swipe has keyboard alternative", "no hover-only facts"],
+    "live_region_rules": ["loading, success, error, and unavailable states are announced", "CTA acknowledgement is not motion-gated"],
+    "focused_content_rule": "Never move focused content offscreen or underneath a sticky control."
+  },
+  "reduced_motion": {
+    "preference": "prefers-reduced-motion: reduce",
+    "implementation": ["CSS preference query", "JS MediaQueryList preference handling"],
+    "remove": ["parallax", "stagger", "clip or scale travel", "autoplay and ambient loops", "auto-rotate", "WebGL initialization", "audio autoplay"],
+    "retain": ["same DOM content", "same section and heading order", "same captions", "same focus path", "same product facts", "same CTA state transitions", "same error and unavailable recovery"],
+    "equivalence": "Equivalent usable composition is required; a blank or missing placeholder is not a reduced-motion fallback.",
+    "preference_change": "Cancel in-flight motion and media work, then render the equivalent static state."
+  },
+  "no_webgl_fallback": {
+    "required_for": ["webgl-collection-world", "webar-preview", "three-sixty-viewer", "video-or-provider-media"],
+    "initialize_policy": {"390": "never before explicit non-WebGL path", "768": "poster first and capability-gated opt-in", "1440": "lazy after poster/LCP and capability check"},
+    "failure_states": ["webgl_unsupported", "context_lost", "gpu_timeout", "offline", "decode_failure", "provider_failure", "route_abort", "reduced_motion"],
+    "fallback_output": ["reserved aspect-ratio box", "poster or verified static image", "meaningful alt and caption", "inline status when applicable", "DOM heading", "product/price/availability facts", "normal Shop/Add to Bag CTA"],
+    "dom_commerce_primary": true,
+    "canvas_keyboard_trap": false,
+    "proof": "Stub unavailable canvas context and induce every failure state; assert poster, status, facts, CTA, and keyboard reachability remain visible."
+  },
+  "budgets": {
+    "critical_css_gzip_kb_max": 35,
+    "route_css_gzip_kb_max": 90,
+    "route_owned_initial_js_gzip_kb_max": 80,
+    "lazy_webgl_360_provider_chunk_gzip_kb_max": 150,
+    "initial_fonts_woff2_kb_max": 150,
+    "hero_poster_kb_max": {"390": 120, "768": 160, "1440": 200},
+    "lazy_editorial_or_sku_image_kb_max": 250,
+    "lcp_p75_ms_max": {"390": 3000, "768": 2800, "1440": 2500},
+    "cls_p75_max": 0.1,
+    "cls_shell_pdp_target_max": 0.05,
+    "inp_p75_ms_max": 200,
+    "cta_ack_ms_max": 100,
+    "motion_fps_min": 55,
+    "motion_dropped_frames_percent_max": 5,
+    "motion_long_task_ms_max": 50,
+    "document_overflow": "documentElement.scrollWidth equals clientWidth at 390, 768, and 1440; only explicitly labeled inner table/rail scrollers may overflow.",
+    "touch_target_css_px_min": 44,
+    "image_requirements": ["intrinsic dimensions", "aspect-ratio reservation", "responsive srcset and sizes", "no eager gallery beyond LCP candidate"]
+  },
+  "evidence_artifacts": {
+    "binding": "Every artifact shares one candidate_id and stable data-feature-id. Missing or stale evidence is UNKNOWN and cannot satisfy release readiness.",
+    "required": [
+      {"id": "source-provenance", "format": "JSON", "fields": ["candidate_id", "feature_id", "page_id", "source_ref", "SKU_refs", "variation_refs", "rights_record", "status"]},
+      {"id": "responsive-captures", "format": "PNG or WebP", "required_viewports": ["390x844", "768x1024", "1440x900"], "required_states": ["default", "loading", "empty", "error", "unavailable", "long-content", "keyboard", "reduced-motion", "no-webgl-fallback"]},
+      {"id": "browser-interaction-trace", "format": "JSON or trace", "must_cover": ["skip link", "drawer focus trap", "Escape and focus restore", "keyboard alternatives", "touch targets", "native scroll", "CTA states", "cancellation"]},
+      {"id": "reduced-motion-trace", "format": "JSON plus capture", "must_assert": ["no parallax", "no RAF or auto-rotate", "no WebGL initialization", "no autoplay audio", "equal DOM order and CTA reachability"]},
+      {"id": "fallback-trace", "format": "JSON plus capture", "must_cover": ["unsupported", "context loss", "GPU timeout", "offline", "decode failure", "route abort"]},
+      {"id": "performance-trace", "format": "Lighthouse or browser trace", "metrics": ["LCP", "CLS", "INP", "long tasks", "transfer sizes", "font bytes", "image bytes", "memory", "dropped frames", "overflow"]},
+      {"id": "commerce-truth-log", "format": "JSON", "fields": ["SKU", "variation", "price", "availability", "CTA event", "request state", "idempotency", "error or unavailable recovery"]},
+      {"id": "independent-review", "format": "JSON or signed Markdown", "reviewers": ["visual QA red team", "accessibility", "performance", "security"], "self_approval_forbidden": true}
+    ],
+    "candidate_id_format": "v2-{git_sha}-{utc_timestamp}",
+    "release_gate": "All required artifacts must be present, candidate-bound, fresh for the implementation, and PASS. UNKNOWN, BLOCKED, stale, or missing evidence fails closed."
+  },
+  "validation_checks": [
+    {"id": "json-schema", "assert": "jq empty succeeds and every feature has stable identity, purpose, fallback, CTA, and acceptance data."},
+    {"id": "forbidden-patterns", "assert": "Production source contains no scroll-jacking, cursor trail, autoplay audio, fake scarcity, gradient mesh, or unverified 3D."},
+    {"id": "overflow", "assert": "At 390x844, 768x1024, and 1440x900 documentElement.scrollWidth equals clientWidth; inner scrollers are labeled."},
+    {"id": "responsive-snapshots", "assert": "All core pages and critical states are captured at all three viewports with CTA, content order, crop, and no-obscured-content assertions."},
+    {"id": "reduced-motion", "assert": "Preference removes parallax/RAF/auto-rotate/WebGL/autoplay/stagger and preserves DOM, order, facts, and CTA reachability."},
+    {"id": "keyboard-focus", "assert": "Skip, drawer, quick view, hotspots, media alternatives, dialogs, live regions, visible focus, Escape, and focus restoration pass."},
+    {"id": "touch", "assert": "Drawer, rails, gallery/360, hotspots, and CTA retain native scroll, pointer cancellation, 44px targets, and keyboard parity."},
+    {"id": "cancellation", "assert": "Observer, timer, RAF, listener, request, and decoded-buffer cleanup occurs on route, visibility, resize, pointer, Escape, and preference cancellation."},
+    {"id": "webgl-failure", "assert": "Unsupported/context-loss/timeout/offline/decode/abort paths retain poster, status, heading, facts, CTA, and keyboard reachability; no 390/reduced-motion canvas request."},
+    {"id": "cta-timing", "assert": "Loading or disabled state appears within 100ms, response status within 1s, duplicate requests are prevented, and focus is retained or restored."},
+    {"id": "core-web-vitals", "assert": "LCP, CLS, INP, frame health, long tasks, bytes, memory, and dropped frames meet the budget table; absent telemetry is UNKNOWN."},
+    {"id": "evidence-binding", "assert": "Source, captures, traces, commerce log, and independent reviews share candidate_id and feature_id before release-ready."}
+  ]
+}
