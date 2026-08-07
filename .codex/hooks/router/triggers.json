@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "description": "Pattern-to-resource-pack map for DevSkyy task router. First-match-wins. Patterns matched case-insensitively against user prompt. Each pack lists skills/agents/plugins recommended for that task domain.",
+  "patterns": [
+    {
+      "name": "wordpress",
+      "regex": "\\b(wordpress|wp-?theme|woocommerce|skyyrose-flagship|wp-?content|wp-?admin|php|elementor|divi|gutenberg)\\b",
+      "skills": ["wp-block-themes", "wp-block-development", "wp-plugin-development", "wp-rest-api", "wp-performance", "wp-phpstan", "wp-playground", "wordpress-plugin-core", "wordpress-router", "wordpress-woocommerce-automation", "woocommerce", "woocommerce-backend-dev", "woocommerce-code-review", "woocommerce-webhooks", "deploy-wp", "wp-simplify"],
+      "agents": ["deploy-and-verify", "wp-code-simplifier"],
+      "plugins": [],
+      "workflow": "skyyrose-dev-team"
+    },
+    {
+      "name": "frontend",
+      "regex": "\\b(next\\.?js|react|tsx|jsx|tailwind|vercel|dashboard|frontend|component|shadcn|nextjs)\\b",
+      "skills": ["nextjs-16-complete-guide", "nextjs-app-router-fundamentals", "nextjs-app-router-patterns", "nextjs-best-practices", "nextjs-performance", "nextjs-turbopack", "frontend-design", "frontend-patterns", "frontend-launchpad", "vercel-react-best-practices", "vercel-composition-patterns", "shadcn", "tdd-workflow"],
+      "agents": ["Frontend Developer", "UI Designer", "UX Architect"],
+      "plugins": [],
+      "workflow": "skyyrose-dev-team"
+    },
+    {
+      "name": "python-backend",
+      "regex": "\\b(fastapi|pytest|pydantic|sqlalchemy|alembic|asyncio|python|uvicorn|backend)\\b",
+      "skills": ["fastapi-python", "fastapi-async-patterns", "python-patterns", "python-testing", "pytest-patterns", "sqlalchemy-alembic-expert-best-practices-code-review", "tdd", "building-pydantic-ai-agents", "django-patterns", "django-tdd"],
+      "agents": ["Backend Architect", "python-reviewer", "AI Engineer"],
+      "plugins": []
+    },
+    {
+      "name": "imagery",
+      "regex": "\\b(image|imagery|nano-?banana|fashn|flux|render|mockup|compositor|elite-?studio|gemini-?image|gpt-?image|nano2|tripo|meshy)\\b",
+      "skills": ["banana-claude:banana", "ai-image-generation", "fal-ai-media", "image-taste-frontend", "high-end-visual-design"],
+      "agents": ["Image Prompt Engineer", "Inclusive Visuals Specialist", "Visual Storyteller"],
+      "plugins": ["banana-claude@banana-claude-marketplace"]
+    },
+    {
+      "name": "catalog",
+      "regex": "\\b(catalog|sku|dossier|product-?(card|copy|catalog)|skyyrose-catalog|csv)\\b",
+      "skills": ["sync-catalog", "skyyrose-product-copy", "product-master", "skyyrose-brand-dna"],
+      "agents": ["Content Creator", "Brand Guardian"],
+      "plugins": []
+    },
+    {
+      "name": "deploy",
+      "regex": "\\b(deploy|ship|production|release|vercel-deploy|sftp|cdn)\\b",
+      "skills": ["deploy-wp", "ship-check", "preflight", "verify", "finishing-a-development-branch"],
+      "agents": ["DevOps Automator", "deploy-and-verify", "Incident Response Commander"],
+      "plugins": []
+    },
+    {
+      "name": "debug",
+      "regex": "\\b(bug|fix|debug|error|failing|broken|regression|stack-?trace|exception)\\b",
+      "skills": ["systematic-debugging", "drive-to-green", "gsd-debug", "polyglot-build-resolver", "build-fix", "fix-and-learn"],
+      "agents": ["build-error-resolver"],
+      "plugins": []
+    },
+    {
+      "name": "docs",
+      "regex": "\\b(docs?|readme|api-?docs|documentation|markdown)\\b",
+      "skills": ["documentation-lookup", "docs", "update-docs", "obsidian-markdown", "writing-skills"],
+      "agents": ["Technical Writer", "doc-updater"],
+      "plugins": []
+    },
+    {
+      "name": "audit",
+      "regex": "\\b(audit|review|p0|p1|security-?audit|code-?review|quality-?gate)\\b",
+      "skills": ["audit", "code-review", "security-review", "audit-resolution-loop", "audit-pass2-verifier", "verification-before-completion", "verification-loop", "requesting-code-review", "receiving-code-review"],
+      "agents": ["code-reviewer", "security-reviewer", "python-reviewer", "typescript-reviewer", "Accessibility Auditor"],
+      "plugins": []
+    },
+    {
+      "name": "default",
+      "regex": ".*",
+      "skills": ["claude-mem:mem-search", "find-skills"],
+      "agents": [],
+      "plugins": []
+    }
+  ]
+}

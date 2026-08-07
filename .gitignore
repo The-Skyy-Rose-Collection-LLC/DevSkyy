@@ -392,6 +392,11 @@ CLAUDE.local.md
 # not tracked. Un-ignore deliberately if a variant must be preserved.
 prototypes/
 
+# --- Local scratchpad scripts ---
+# One-off rigging and gap-scan helpers remain available locally but are not
+# release inputs. Promote a helper into scripts/ when it becomes canonical.
+scratchpad/
+
 # --- Vendored third-party repo ---
 # Microsoft TRELLIS.2 — Linux+CUDA only, do not commit (see /TRELLIS.2/ above)
 

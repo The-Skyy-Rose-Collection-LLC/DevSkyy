@@ -7,7 +7,7 @@
 
 ---
 
-## 1. The Team (11 seats)
+## 1. The Team (12 seats)
 
 Roster convention: **Doctrine** = skills loaded into whoever holds the seat. **Hands** = the dispatchable agent. A seat with no concrete dispatch trigger does not exist; every trigger below is an observable event.
 
@@ -77,6 +77,12 @@ Roster convention: **Doctrine** = skills loaded into whoever holds the seat. **H
 - **Dispatch trigger:** Deploy — only after Seats 9+10 are clean AND founder `y` (or the standing sweep-clean auto-deploy auth) is in hand. Heal — an authoritative live-regression signal (S1 HTTP/size/PHP-error, S2 canon drift, S3 asset-version), one invocation per regression, reproduce-first (~25% of audit claims are false positives — exit without fixing on a false positive).
 - **Hard limits:** On ANY page failure: stop, capture evidence, `git revert`, redeploy the revert — never hot-patch live, never re-deploy without reverting, never declare "partial success." Refuses to run on failing `php -l`, unresolved DEAD-REF/BLOAT, or an unreviewed branch. Heal doctor never deploys, commits, or bumps versions — it hands the healed worktree back to the loop. Deploy-source completeness: the tracked-file preflight is blind to the 3 untracked riders (`.gitignore:290`) — check them by hand until the gate exists (§5).
 
+### Seat 12 — Fashion Design System Engineer (anti-generic authority)
+- **Filled by:** `fashion-design-system-engineer` (architect) commanding the inner pod documented at `docs/design/fashion-design-system-team.md`: brand systems research, token foundations, typography/layout, component/commerce, motion/responsive, accessibility/content, DesignOps/governance, and an independent visual QA red team. Doctrine is loaded on demand; rendered approval belongs to the red team with Seat 10 via `design-qc`.
+- **Mandate:** Converts art direction into an enforceable system: canonical tokens, typography roles, composition grammar, recognition devices, full commerce-component state coverage, responsive transformations, motion/reduced-motion rules, and a route/state verification matrix. Owns the anti-generic hard-fail list, 100-point distinctiveness score, and logo-off recognition test.
+- **Dispatch trigger:** After Seat 2 art direction and before any new or substantially redesigned surface enters Seat 3; whenever a page reads generic; whenever token, typography, component, or motion drift is found.
+- **Hard limits:** Never creates a parallel token system when canon exists; never invents brand facts or product imagery; never approves its own rendered pixels. Builder handoff requires >=85/100, every category >=70%, zero instant fails, fresh 390/768/1440 evidence, and independent Seat 10 approval. Missing evidence is `UNVERIFIED`, never PASS. All tools remain callable, but no more than three skill instruction sets may be loaded at once.
+
 **Rejected as redundant** (absorbed by the seats above): global `impeccable`/`immersive-interactive-architect`/`design-qc` duplicates (repo-local versions win), `skyyrose-3d-web-os` as a standalone seat (doctrine under Seat 5), `overdrive`/`animate`/`typeset`/`layout`/`polish` as standalone seats (instruments of Seats 3/5), `frontend-design` standalone (doctrine under Seat 3), generic `wp-frontend`-class candidates (subsumed by `fashion-theme-architect`).
 
 ---
@@ -89,8 +95,9 @@ One surface, brief → shipped. Steps 2–3 may run in parallel; everything else
 |---|------|------|----------------------------------|
 | 0 | **Doctrine load + plan** | 1 | `tasks/todo.md` plan (3+ steps) naming which reference file governs and which seats fire |
 | 1 | **Art direction** | 2 | Direction spec at `docs/design/<surface>-direction.md` citing the 176-pattern shortlist; if contested, 5 parallel prototype variants + the merged winner |
-| 2 | **Copy & schema authoring** (parallel with 1) | 7 | Copy deck + paste-ready WC REST payloads + JSON-LD plan — real words enter the build, so `no-placeholders` can pass |
-| 3 | **Build** | 3 (surface) / 4 (≤3-file) / 5 (immersive) | Gate-passing worktree + structured build report: `verify:theme` output attached, SKIP aspects explicitly flagged |
+| 2 | **Design-system contract** | 12 | `docs/design/<surface>-design-system.md`: recognition devices, token/component/state rules, distinctiveness baseline, responsive/motion matrix, and builder handoff verdict |
+| 3 | **Copy & schema authoring** (parallel with 1–2) | 7 | Copy deck + paste-ready WC REST payloads + JSON-LD plan — real words enter the build, so `no-placeholders` can pass |
+| 4 | **Build** | 3 (surface) / 4 (≤3-file) / 5 (immersive) | Gate-passing worktree + structured build report: `verify:theme` output attached, SKIP aspects explicitly flagged |
 | 4 | **Commerce battery** (WC surfaces only) | 6 | 7-step add-to-cart verification log (button states, AJAX contract, variation rules) |
 | 5 | **Code review gate** | 9 | Simplifier findings checklist → security findings → Fable review verdict. Findings return to the builder; loop until clean. **Gate: no unresolved CRITICAL/HIGH.** |
 | 6 | **Eyes-on QA — SKIP closure** | 10 | Screenshot/trace set (390px + desktop), axe results, journey-test results, design-qc capture verdict. **Gate: every builder SKIP closed by executed evidence.** |
@@ -183,7 +190,7 @@ Where analytics events don't exist yet for a metric, wiring the event is part of
 
 ### Gates that do NOT yet exist — build these
 
-1. **`brand-canon` aspect (CLI).** Automate what is manual in design-qc/§5.2: grep delivered CSS/JS/PHP for the four cut fonts (hard FAIL), extract all hex/rgba literals and diff against the token set, grep every `animation`/`transition` for a `prefers-reduced-motion` guard. Owner: Seat 10 defines, Seat 4 wires into `verify-theme.sh`. Highest-leverage missing gate — canon violations currently depend on a human remembering to grep.
+1. **`brand-canon` aspect (CLI).** Automate what is manual in design-qc/§5.2: grep delivered CSS/JS/PHP for the four cut fonts (hard FAIL), extract all hex/rgba literals and diff against the token set, grep every `animation`/`transition` for a `prefers-reduced-motion` guard. Owner: Seat 12 defines, Seat 4 wires into `verify-theme.sh`, Seat 10 corroborates against rendered pixels. Highest-leverage missing gate — canon violations currently depend on a human remembering to grep.
 2. **`contrast` aspect (BROWSER).** Computed-contrast pass over rendered text nodes: FAIL on body text <4.5:1, on #DC143C carrying text, on low-alpha-white text colors. Owner: Seat 10. The crimson rule is currently only prose in CLAUDE.md.
 3. **`sot-imagery` aspect (CLI).** Every product image reference in templates/PHP resolves through the SOT layer; FAIL on any hardcoded product image path. Owner: Seat 6. Filenames-are-not-identity is currently convention, not a gate.
 4. **CWV budget gate in CI.** The §4 numbers as machine-enforced budgets (Lighthouse CI or the Playwright battery) run on PR, not just pre-deploy — a vitals regression should fail review, not be discovered at step 7. Owner: Seat 8.

@@ -149,19 +149,13 @@
           "resolved": "images/products/ghost/kids-002-ghost-front.webp"
         },
         "back_model_image": {
-          "path": "assets/images/products/kids-purple-set-back-model.webp",
-          "resolved": null
+          "path": "assets/images/products/kids-purple-set/kids-purple-set-back-model.webp",
+          "resolved": "images/products/kids-purple-set/kids-purple-set-back-model.webp"
         }
       },
       "dossier": "data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [
-    {
-      "sku": "kids-002",
-      "column": "back_model_image",
-      "path": "assets/images/products/kids-purple-set-back-model.webp"
-    }
-  ]
+  "unresolved_product_images": []
 }

@@ -6,9 +6,10 @@ plugins are relevant for the task domain.
 
 ## Why
 
-Default Claude Code session injects all installed skills (~30K tokens) every
-prompt. Most are irrelevant to any given task. Router biases selection toward
-the right subset, reducing skill-list noise and cache thrash.
+Claude Code keeps MCP tool schemas deferred through Tool Search, while skill
+metadata and plugin commands remain separate startup concerns. The router
+biases selection toward the right skill and plugin subset without disabling
+registered MCP tools.
 
 **Nudge only** — does not enforce. Claude can still invoke off-pack tools.
 
@@ -122,8 +123,10 @@ Insert before the `default` entry. First-match-wins.
 1. **Hooks cannot dynamically load plugins.** `enabledPlugins` is read at session
    start. Router can suggest "enable plugin X" but you must run `enable-pack.sh`
    and restart Claude Code to apply.
-2. **Skill-list injection is core Claude Code behavior.** Router reduces
-   *recommended* set but the full skill list still gets injected on session start.
+2. **MCP Tool Search is enabled independently.** Keep
+   `ENABLE_TOOL_SEARCH=true` in settings so registered MCP tools remain callable
+   while their full schemas load only when selected. The router handles skill
+   and plugin recommendations; it does not replace Tool Search.
 3. **Pattern matching is regex-only.** Doesn't understand intent. A prompt
    like "I want to delete the wordpress theme" matches pattern 1 even though
    the task is destructive.

@@ -135,9 +135,6 @@ $faq_items = array(
 
 <main id="primary" class="site-main contact-page" role="main" tabindex="-1">
 
-	<!-- Film Grain Overlay -->
-	<div class="film-grain" aria-hidden="true"></div>
-
 	<!-- Page Header -->
 	<section class="contact-hero" aria-labelledby="contact-hero-title">
 		<div class="contact-hero__container">

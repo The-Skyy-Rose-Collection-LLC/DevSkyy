@@ -22,7 +22,7 @@ Analyze token overhead across every loaded component in a Claude Code session an
 
 Required before starting — verify each root actually exists (`ls -d`), never assume:
 
-- **Component roots**: project-level `.claude/skills/`, `.claude/agents/`, `.claude/rules/`, and their `~/.claude/` counterparts
+- **Component roots**: project-level `.agents/`, `.claude/`, and `.Codex/` trees, each scanned for `agents/`, `skills/`, and `rules/` subdirectories
 - **MCP config**: `.mcp.json` (project) and/or user-level MCP settings — only top-level `mcpServers` is read
 - **CLAUDE.md chain**: project + user-level CLAUDE.md files
 - Optional: a verbosity request from the user (`--verbose`)
@@ -52,7 +52,8 @@ Scan all component directories and estimate token consumption. Run the measureme
 
 **MCP Servers** (`.mcp.json` or active MCP config)
 - Count configured servers and total tool count
-- Estimate schema overhead at ~500 tokens per tool
+- Detect whether tool search/deferred loading is enabled before estimating resident overhead
+- Use ~500 tokens per tool only as potential upfront schema overhead when deferral is disabled
 - Flag: servers with >20 tools, servers that wrap simple CLI commands (`gh`, `git`, `npm`, `supabase`, `vercel`)
 
 **CLAUDE.md** (project + user-level)
@@ -127,14 +128,19 @@ Tag every number in the report with its evidence scope: measured this session = 
    from pathlib import Path
 
    total = 0
-   for root in (Path(".claude/agents"), Path(".claude/skills"), Path(".claude/rules")):
+   for root in (Path(".agents"), Path(".claude"), Path(".Codex")):
        if not root.is_dir():
            print(f"{root}: ABSENT — report as absent, do not estimate")
            continue
-       files = list(root.rglob("*.md"))
-       est = int(sum(len(p.read_text(errors="ignore").split()) for p in files) * 1.3)
-       total += est
-       print(f"{root}: {len(files)} .md files, ~{est:,} estimated tokens")
+       for component in ("agents", "skills", "rules"):
+           component_root = root / component
+           if not component_root.is_dir():
+               print(f"{component_root}: ABSENT — report as absent, do not estimate")
+               continue
+           files = list(component_root.rglob("*.md"))
+           est = int(sum(len(p.read_text(errors="ignore").split()) for p in files) * 1.3)
+           total += est
+           print(f"{component_root}: {len(files)} .md files, ~{est:,} estimated tokens")
 
    mcp = Path(".mcp.json")
    if mcp.is_file():
@@ -202,10 +208,15 @@ Skill: Current overhead 33% → adding 5 servers (~50 tools) would add ~25,000 t
 - **Recommending removal of a component that is actually load-bearing** — a "rarely needed" classification from step 2 is `[inferred]` until grepped: a component referenced by CLAUDE.md, an active command, or another skill is not removable. Cite the grep before recommending deletion.
 - **A counting run that dies is not a count** — if the step-1 script errors mid-scan, its partial TOTAL is an artifact, not a result. Fix and re-run; never report a partial as the audit.
 
+### Callability model
+
+The report must treat all discovered roots as callable inventory, not implicit resident context.
+Do not report zero as success for a missing root; report `ABSENT` and keep commands explicit.
+
 ## Best Practices
 
 - **Token estimation**: use `words × 1.3` for prose, `chars / 4` for code-heavy files
-- **MCP is the biggest lever**: each tool schema costs ~500 tokens; a 30-tool server costs more than all your skills combined
+- **MCP is the biggest lever only without deferral**: with tool search enabled, registered tools remain callable while full schemas load on demand
 - **Agent descriptions are loaded always**: even if the agent is never invoked, its description field is present in every Task tool context
 - **Verbose mode for debugging**: use when you need to pinpoint the exact files driving overhead, not for regular audits
 - **Audit after changes**: run after adding any agent, skill, or MCP server to catch creep early

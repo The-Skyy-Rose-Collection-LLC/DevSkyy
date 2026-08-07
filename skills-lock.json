@@ -166,6 +166,12 @@
       "sourceType": "github",
       "computedHash": "8edad33758f2461f51afdb51741bfcc4cc57d84ea42e2751a84be2c6a2d48f69"
     },
+    "socialclaw": {
+      "source": "ndesv21/socialclaw",
+      "sourceType": "github",
+      "skillPath": "skill/SKILL.md",
+      "computedHash": "ded15fc8ac533b567d96f4708c6151532fd54ce66327371e3be8c362dfe79216"
+    },
     "sqlalchemy-alembic-expert-best-practices-code-review": {
       "source": "wispbit-ai/skills",
       "sourceType": "github",

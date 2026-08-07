@@ -1,7 +1,7 @@
 {
  "$schema_note": "Canonical visual-asset registry for SkyyRose. Same authority tier as skyyrose-catalog.csv: every page layout, prototype brief, and agent dispatch that places NON-PRODUCT imagery MUST resolve through this file. Product imagery resolves through the catalog CSV (image/front_model_image/back_model_image columns). Paths relative to assets/. An asset used for a collection it is not registered to is a canon violation. status: 'verified' = founder-confirmed or canon-derived; 'needs-founder-review' = best-evidence assignment awaiting Corey's confirmation.",
- "version": "1.2.1",
- "updated": "2026-07-05",
+ "version": "1.3.2",
+ "updated": "2026-08-03",
  "collections": [
   "black-rose",
   "love-hurts",
@@ -108,6 +108,37 @@
     "kind": "cinematic-backdrop",
     "status": "verified",
     "notes": "Oakland nighttime luxury scene. Brand-global hero backdrop; used by preorder gateway poster + signature editorial rows."
+   },
+   {
+    "path": "branding/hero/flagship-house-runway-gpt2",
+    "formats": [
+     "webp"
+    ],
+    "kind": "campaign-hero",
+    "status": "verified",
+    "notes": "SkyyRose flagship house runway with black rose vitrine and Bay Area night skyline. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Multi-collection homepage and flagship campaign surfaces."
+   }
+  ],
+  "preorder_scenes": [
+   {
+    "path": "images/preorder/black-rose-salon",
+    "formats": [
+     "webp"
+    ],
+    "kind": "interactive-preorder-scene",
+    "status": "verified",
+    "notes": "Black Rose pre-order salon: Bay Bridge night view, Black Is Beautiful jersey, numbered red and white jerseys, Oakland jacket, and The Bay tee. Founder-supplied scene 2026-08-03."
+   }
+  ],
+  "mascot": [
+   {
+    "path": "images/mascot/skyy-canonical-v2",
+    "formats": [
+     "png"
+    ],
+    "kind": "brand-mascot",
+    "status": "verified",
+    "notes": "Full-body SkyyRose conversational mascot. Current mascot art restored to Flagship 2 SOT for sitewide chat host surfaces."
    }
   ],
   "video": [
@@ -127,9 +158,29 @@
      "mp4",
      "webm"
     ],
-    "kind": "brand-motion",
+   "kind": "brand-motion",
+   "status": "verified",
+   "notes": "Rose-gold rose spin loop. Accent/loader/brand-moment use."
+   },
+   {
+    "path": "images/branding/rose-gold-spin-alpha",
+    "formats": [
+     "webm",
+     "webp"
+    ],
+    "kind": "brand-motion-transparent",
+   "status": "verified",
+   "notes": "Transparent VP9-alpha hero derivative plus transparent poster, founder-directed 2026-08-02. 800x600, autoplay muted loop, preload=metadata, save-data and reduced-motion guards required. Preserve original MP4/WebM masters."
+   },
+   {
+    "path": "images/branding/tsrc-spin-alpha",
+    "formats": [
+     "webm",
+     "webp"
+    ],
+    "kind": "brand-motion-transparent",
     "status": "verified",
-    "notes": "Rose-gold rose spin loop. Accent/loader/brand-moment use."
+    "notes": "Founder-provided TSRC GIF converted to transparent VP9-alpha hero motion plus poster on 2026-08-03. Original 1920x1080 GIF is 41MB; deploy derivative is 800x600 WebM with white matte removed."
    }
   ]
  },
@@ -187,16 +238,6 @@
     "notes": "Black roses on clouds. Section backdrops at low opacity, BR surfaces only."
    },
    {
-    "path": "images/homepage-col-black-rose",
-    "formats": [
-     "avif",
-     "webp"
-    ],
-    "kind": "collection-portrait",
-    "status": "verified",
-    "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
-   },
-   {
     "path": "branding/collection-logo-black-rose",
     "formats": [
      "jpg"
@@ -215,98 +256,17 @@
     "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
    },
    {
-    "path": "images/immersive/scene-black-rose-courtyard",
+    "path": "images/immersive/scene-black-rose-moon-court-gpt2",
     "formats": [
-     "webp",
-     "avif"
+     "webp"
     ],
     "kind": "scene-art",
     "status": "verified",
-    "notes": "BR courtyard immersive scene still — crop of night-editorial master."
-   },
-   {
-    "path": "images/immersive/scene-black-rose-gazebo",
-    "formats": [
-     "webp",
-     "avif"
-    ],
-    "kind": "scene-art",
-    "status": "verified",
-    "notes": "BR gazebo immersive scene still."
+    "notes": "Black Rose silver moon court with black rose mirror pool. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
    }
   ],
-  "patches": [
-   {
-    "path": "images/hero-overlays/br-patch-hockey",
-    "formats": [
-     "avif",
-     "webp",
-     "png"
-    ],
-    "kind": "jersey-patch-art",
-    "status": "verified",
-    "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
-   },
-   {
-    "path": "images/hero-overlays/br-patch-mlb-baseball",
-    "formats": [
-     "avif",
-     "webp",
-     "png"
-    ],
-    "kind": "jersey-patch-art",
-    "status": "verified",
-    "notes": "Series patch (baseball, br-003/br-012)."
-   },
-   {
-    "path": "images/hero-overlays/br-patch-nba-basketball",
-    "formats": [
-     "avif",
-     "webp",
-     "png"
-    ],
-    "kind": "jersey-patch-art",
-    "status": "verified",
-    "notes": "Series patch (basketball, br-010)."
-   },
-   {
-    "path": "images/hero-overlays/br-patch-nfl-football",
-    "formats": [
-     "avif",
-     "webp",
-     "png"
-    ],
-    "kind": "jersey-patch-art",
-    "status": "verified",
-    "notes": "Series patch (football, br-008/br-009)."
-   }
-  ],
-  "lookbook": [
-   {
-    "path": "images/lookbook/lb-black-rose-football",
-    "formats": [
-     "480w.avif",
-     "480w.webp",
-     "960w.avif",
-     "960w.webp"
-    ],
-    "kind": "lookbook",
-    "status": "verified",
-    "notes": "BIB football jersey editorial."
-   },
-   {
-    "path": "images/lookbook/lb-black-rose-hockey",
-    "formats": [
-     "480w.avif",
-     "480w.webp",
-     "960w.avif",
-     "960w.webp"
-    ],
-    "kind": "lookbook",
-    "status": "verified",
-    "notes": "BIB hockey jersey editorial."
-   }
-  ],
+  "patches": [],
+  "lookbook": [],
   "hero_backdrops": [
    {
     "path": "branding/hero/forbidden-midnight",
@@ -414,24 +374,6 @@
     "kind": "lettering",
     "status": "verified",
     "notes": "Raster; SVG master available."
-   },
-   {
-    "path": "branding/love-hurts-love-hero",
-    "formats": [
-     "webp"
-    ],
-    "kind": "collection-lockup-part-alt",
-    "status": "verified",
-    "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
-   },
-   {
-    "path": "branding/love-hurts-hurts-hero",
-    "formats": [
-     "webp"
-    ],
-    "kind": "collection-lockup-part-alt",
-    "status": "verified",
-    "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
    }
   ],
   "atmospherics": [
@@ -458,42 +400,13 @@
     "notes": "Heart + rose composite. LH emotional register."
    },
    {
-    "path": "images/homepage-col-love-hurts",
+    "path": "images/immersive/scene-love-hurts-cracked-rose-gpt2",
     "formats": [
-     "avif",
-     "webp"
-    ],
-    "kind": "collection-portrait",
-    "status": "verified",
-    "notes": "LH world art. Collection cards/panels/portals."
-   },
-   {
-    "path": "images/immersive/scene-love-hurts-cathedral",
-    "formats": [
-     "avif",
      "webp"
     ],
     "kind": "scene-art",
     "status": "verified",
-    "notes": "LH cathedral immersive scene still. Heavy atmospheric — hero/manifesto scale."
-   },
-   {
-    "path": "branding/collection-logo-love-hurts",
-    "formats": [
-     "jpg"
-    ],
-    "kind": "collection-logo",
-    "status": "verified",
-    "notes": "LH collection logo badge (founder-kept 2026-06-13)."
-   },
-   {
-    "path": "branding/love-hurts-neon-star-ref",
-    "formats": [
-     "jpg"
-    ],
-    "kind": "collection-logo-alt",
-    "status": "verified",
-    "notes": "Red neon star — ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
+    "notes": "Love Hurts cracked crystal rose chamber with oxblood drapery and thorned runway. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
    }
   ],
   "lookbook": [
@@ -597,16 +510,6 @@
   ],
   "atmospherics": [
    {
-    "path": "images/homepage-col-signature",
-    "formats": [
-     "avif",
-     "webp"
-    ],
-    "kind": "collection-portrait",
-    "status": "verified",
-    "notes": "Signature world art. Collection cards/panels/portals."
-   },
-   {
     "path": "images/logos/rose-gold-rose",
     "formats": [
      "avif",
@@ -616,15 +519,6 @@
     "kind": "atmospheric-art",
     "status": "verified",
     "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
-   },
-   {
-    "path": "branding/collection-logo-signature",
-    "formats": [
-     "jpg"
-    ],
-    "kind": "collection-logo",
-    "status": "verified",
-    "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
    },
    {
     "path": "images/immersive/scene-signature-golden-gate",
@@ -637,14 +531,13 @@
     "notes": "SIG golden-gate immersive scene still."
    },
    {
-    "path": "images/immersive/scene-signature-bay-bridge",
+    "path": "images/immersive/scene-signature-oakland-atelier-gpt2",
     "formats": [
-     "webp",
-     "avif"
+     "webp"
     ],
     "kind": "scene-art",
     "status": "verified",
-    "notes": "SIG bay-bridge immersive scene still — from waterfront-runway master."
+    "notes": "Signature Oakland waterfront atelier with rose-gold origin artifact and tailoring table. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
    }
   ],
   "lookbook": [
@@ -708,6 +601,15 @@
     "kind": "scene-art",
     "status": "verified",
     "notes": "KC runway immersive scene still — canon regen 2026-07-02."
+   },
+   {
+    "path": "images/immersive/scene-kids-capsule-heir-runway-gpt2",
+    "formats": [
+     "webp"
+    ],
+    "kind": "scene-art",
+    "status": "verified",
+    "notes": "Kids Capsule dark rose-gold heir runway and constellation salon. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
    }
   ]
  },

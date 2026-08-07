@@ -67,13 +67,7 @@
     "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
-    "scene_portrait": {
-      "path": "images/homepage-col-signature",
-      "resolved": null,
-      "kind": "collection-portrait",
-      "status": "verified",
-      "notes": "Signature world art. Collection cards/panels/portals."
-    },
+    "scene_portrait": null,
     "hero_backdrop": {
       "path": "branding/hero/signature-golden-gate-yacht",
       "resolved": "branding/hero/signature-golden-gate-yacht-1280w.webp",
@@ -90,25 +84,11 @@
         "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
       },
       {
-        "path": "branding/collection-logo-signature",
-        "resolved": null,
-        "kind": "collection-logo",
-        "status": "verified",
-        "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
-      },
-      {
         "path": "images/immersive/scene-signature-golden-gate",
         "resolved": "images/immersive/scene-signature-golden-gate.webp",
         "kind": "scene-art",
         "status": "verified",
         "notes": "SIG golden-gate immersive scene still."
-      },
-      {
-        "path": "images/immersive/scene-signature-bay-bridge",
-        "resolved": null,
-        "kind": "scene-art",
-        "status": "verified",
-        "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
       },
       {
         "path": "images/immersive/scene-signature-oakland-atelier-gpt2",

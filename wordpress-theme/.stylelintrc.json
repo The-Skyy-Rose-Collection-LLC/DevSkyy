@@ -43,7 +43,28 @@
   },
   "ignoreFiles": [
     "skyyrose-flagship/assets/css/**/*.min.css",
+    "skyyrose-flagship-2/assets/css/**/*.min.css",
     "skyyrose-flagship/vendor/**/*",
     "node_modules/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "skyyrose-flagship-2/assets/css/**/*.css"
+      ],
+      "rules": {
+        "declaration-block-single-line-max-declarations": null,
+        "selector-id-pattern": null,
+        "property-no-vendor-prefix": null
+      }
+    },
+    {
+      "files": [
+        "skyyrose-flagship/assets/css/design-tokens.css"
+      ],
+      "rules": {
+        "color-hex-length": null
+      }
+    }
   ]
 }

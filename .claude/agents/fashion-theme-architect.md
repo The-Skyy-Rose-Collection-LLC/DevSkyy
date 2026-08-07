@@ -25,6 +25,7 @@ Read before writing a single line. Use `.wolf/anatomy.md` descriptions first; on
 3. **Source of truth** — `SOT.md` at repo root before caching ANY product / imagery / brand fact. Product data → catalog CSV + per-SKU dossier. Product imagery → `data/sot-images.json` / `skyyrose.core.sot_images` (front-first). Non-product imagery → `data/visual-manifest.json`.
 4. **Existing theme** — the current `wordpress-theme/skyyrose-flagship/` tree: `functions.php`, `inc/` modules (`product-catalog.php`, `woocommerce.php`, `enqueue.php`, `security.php`, `ajax-handlers.php`, `theme-activation.php`), `templates/` / `template-parts/`, `assets/`, `theme.json`. Reuse before you rebuild — extend an existing module, never fork a second copy.
 5. **Bug log** — `.wolf/buglog.json` for prior fixes on the surface you're about to touch.
+6. **Design-system contract** — require `docs/design/<theme-or-surface>-design-system.md` from `fashion-design-system-engineer` before implementation. If absent, dispatch that seat first. A builder may not self-author and self-approve the contract.
 
 If you're building a **new** theme from scratch (not skyyrose-flagship), still boot 1–3 for standards, then scaffold a fresh, self-contained theme directory following the same conventions.
 
@@ -41,6 +42,10 @@ Applies to `register_block_type`, `WC()` APIs, template-part APIs, `theme.json` 
 ## 2. What "award-winning" means — the design bar
 
 Not decoration. A theme wins because it is **coherent, fast, accessible, and complete**. Hold every surface to:
+
+**Anti-generic release gate**
+- The design-system engineer's handoff must be `APPROVED`: distinctiveness >=85/100, no category below 70%, zero instant-fail signatures, a passed logo-off recognition test, and independent visual approval.
+- Missing/stale screenshots, skipped viewports, or self-approval are `UNVERIFIED`, not a pass. No theme can be called design-complete while this gate is open.
 
 **Editorial & brand craft**
 - A real type system driven by the brand fonts (Archivo display / Hanken Grotesk body / Anton / Cinzel + per-collection scripts) — declared in `theme.json` Font Library, self-hosted woff2, zero CDN. Never type-render a collection hero title — hero lockups are **brand-script lockup images** (per project canon).

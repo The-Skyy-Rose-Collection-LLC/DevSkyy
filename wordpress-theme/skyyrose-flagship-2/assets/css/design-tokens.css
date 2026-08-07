@@ -1,0 +1,101 @@
+/**
+ * SkyyRose Flagship 2 design tokens.
+ * Sources: data/brand/typography.json and collection SOT palette views.
+ */
+
+@font-face { font-family: Archivo; src: url("../sot/fonts/archivo-latin.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Hanken Grotesk"; src: url("../sot/fonts/hanken-grotesk-latin.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; }
+@font-face { font-family: Anton; src: url("../sot/fonts/anton-latin.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: Cinzel; src: url("../sot/fonts/cinzel-latin.woff2") format("woff2"); font-style: normal; font-weight: 400 900; font-display: swap; }
+@font-face { font-family: Inter; src: url("../sot/fonts/inter-latin.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Pinyon Script"; src: url("../sot/fonts/pinyon-script-latin.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Grand Hotel"; src: url("../sot/fonts/grand-hotel-latin.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "SkyyRose Black Rose Script"; src: url("../sot/fonts/skyyrose-black-rose-script-latin.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "SkyyRose Love Hurts Graffiti"; src: url("../sot/fonts/skyyrose-love-hurts-graffiti-latin.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+
+:root {
+	--sr2-void: #0a0a0a;
+	--sr2-ink: #f5f5f0;
+	--sr2-paper: #f7f3e9;
+	--sr2-muted: #b3b3b3;
+	--sr2-dim: #808080;
+	--sr2-card: #111;
+	--sr2-card-hover: #161616;
+	--sr2-line: rgba(245, 245, 240, 0.16);
+	--sr2-line-soft: rgba(245, 245, 240, 0.08);
+	--sr2-rose: #b76e79;
+	--sr2-gold: #d4af37;
+	--sr2-silver: #c0c0c0;
+	--sr2-crimson: #dc143c;
+	--sr2-oxblood: #6f1821;
+	--sr2-accent: var(--sr2-rose);
+	--sr2-accent-rgb: 183, 110, 121;
+	--sr2-font-display: "Archivo", system-ui, sans-serif;
+	--sr2-font-body: "Hanken Grotesk", "Inter", sans-serif;
+	--sr2-font-ui: "Anton", sans-serif;
+	--sr2-font-caps: "Cinzel", serif;
+	--sr2-font-script: "Pinyon Script", cursive;
+	--sr2-ease: cubic-bezier(0.16, 1, 0.3, 1);
+	--sr2-ease-dramatic: cubic-bezier(0.65, 0, 0.35, 1);
+	--sr2-fast: 180ms;
+	--sr2-normal: 420ms;
+	--sr2-slow: 900ms;
+	--sr2-header: 76px;
+	--sr2-content: 1200px;
+	--sr2-wide: 1500px;
+	--sr2-space-1: 0.25rem;
+	--sr2-space-2: 0.5rem;
+	--sr2-space-3: 0.75rem;
+	--sr2-space-4: 1rem;
+	--sr2-space-5: 1.25rem;
+	--sr2-space-6: 1.5rem;
+	--sr2-space-8: 2rem;
+	--sr2-space-10: 2.5rem;
+	--sr2-space-12: 3rem;
+	--sr2-space-16: 4rem;
+	--sr2-space-20: 5rem;
+	--sr2-space-24: 6rem;
+	--sr2-page-pad: clamp(1rem, 4vw, 4rem);
+	--sr2-section-pad: clamp(5rem, 10vw, 10rem);
+	--sr2-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+	--sr2-focus: 0 0 0 2px var(--sr2-void), 0 0 0 4px var(--sr2-accent);
+}
+
+[data-collection="signature"] {
+	--sr2-accent: var(--sr2-gold);
+	--sr2-accent-rgb: 212, 175, 55;
+	--sr2-font-script: "Pinyon Script", cursive;
+}
+
+[data-collection="black-rose"] {
+	--sr2-accent: var(--sr2-silver);
+	--sr2-accent-rgb: 192, 192, 192;
+	--sr2-font-display: "Cinzel", serif;
+	--sr2-font-script: "SkyyRose Black Rose Script", cursive;
+}
+
+[data-collection="love-hurts"] {
+	--sr2-accent: var(--sr2-crimson);
+	--sr2-accent-rgb: 220, 20, 60;
+	--sr2-font-script: "SkyyRose Love Hurts Graffiti", cursive;
+}
+
+[data-collection="kids-capsule"] {
+	--sr2-accent: var(--sr2-rose);
+	--sr2-accent-rgb: 183, 110, 121;
+	--sr2-font-display: "Cinzel", serif;
+	--sr2-font-script: "Grand Hotel", cursive;
+}
+
+:focus-visible {
+	outline: 0;
+	box-shadow: var(--sr2-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--sr2-fast: 1ms;
+		--sr2-normal: 1ms;
+		--sr2-slow: 1ms;
+	}
+}

@@ -78,13 +78,7 @@
         "rule": "The lockup IS the collection name; never type-render it."
       },
       "imagery": {
-        "scene_portrait": {
-          "path": "images/homepage-col-black-rose",
-          "resolved": null,
-          "kind": "collection-portrait",
-          "status": "verified",
-          "notes": "BR world art (ballroom rose). Collection cards/panels/portals."
-        },
+        "scene_portrait": null,
         "hero_backdrop": {
           "path": "branding/hero/forbidden-midnight",
           "resolved": "branding/hero/forbidden-midnight-1280w.webp",
@@ -115,20 +109,6 @@
             "notes": "SR monogram + black rose hero art. Founder-assigned 2026-06-13 for the Black Rose PAGE hero."
           },
           {
-            "path": "images/immersive/scene-black-rose-courtyard",
-            "resolved": null,
-            "kind": "scene-art",
-            "status": "verified",
-            "notes": "BR courtyard immersive scene still \u2014 crop of night-editorial master."
-          },
-          {
-            "path": "images/immersive/scene-black-rose-gazebo",
-            "resolved": null,
-            "kind": "scene-art",
-            "status": "verified",
-            "notes": "BR gazebo immersive scene still."
-          },
-          {
             "path": "images/immersive/scene-black-rose-moon-court-gpt2",
             "resolved": "images/immersive/scene-black-rose-moon-court-gpt2.webp",
             "kind": "scene-art",
@@ -136,54 +116,10 @@
             "notes": "Black Rose silver moon court with black rose mirror pool. GPT-Image-2 campaign render; founder-approved for SOT 2026-08-02. Immersive chapter and collection campaign surfaces."
           }
         ],
-        "patches": [
-          {
-            "path": "images/hero-overlays/br-patch-hockey",
-            "resolved": null,
-            "kind": "jersey-patch-art",
-            "status": "verified",
-            "notes": "BLACK is Beautiful jersey series patch (hockey, br-011). Product-storytelling accents only."
-          },
-          {
-            "path": "images/hero-overlays/br-patch-mlb-baseball",
-            "resolved": null,
-            "kind": "jersey-patch-art",
-            "status": "verified",
-            "notes": "Series patch (baseball, br-003/br-012)."
-          },
-          {
-            "path": "images/hero-overlays/br-patch-nba-basketball",
-            "resolved": null,
-            "kind": "jersey-patch-art",
-            "status": "verified",
-            "notes": "Series patch (basketball, br-010)."
-          },
-          {
-            "path": "images/hero-overlays/br-patch-nfl-football",
-            "resolved": null,
-            "kind": "jersey-patch-art",
-            "status": "verified",
-            "notes": "Series patch (football, br-008/br-009)."
-          }
-        ],
+        "patches": [],
         "lettering_alt": [],
         "lockup_parts": [],
-        "lookbook": [
-          {
-            "path": "images/lookbook/lb-black-rose-football",
-            "resolved": null,
-            "kind": "lookbook",
-            "status": "verified",
-            "notes": "BIB football jersey editorial."
-          },
-          {
-            "path": "images/lookbook/lb-black-rose-hockey",
-            "resolved": null,
-            "kind": "lookbook",
-            "status": "verified",
-            "notes": "BIB hockey jersey editorial."
-          }
-        ],
+        "lookbook": [],
         "hero": {
           "path": "branding/hero/forbidden-midnight",
           "resolved": "branding/hero/forbidden-midnight-1280w.webp",
@@ -401,10 +337,6 @@
             "front_model_image": {
               "path": "assets/images/products/br-008-onmodel.webp",
               "resolved": "images/products/br-008-onmodel.webp"
-            },
-            "back_model_image": {
-              "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp",
-              "resolved": null
             }
           },
           "dossier": "data/dossiers/black-is-beautiful-jersey-series-1-sf-inspired-football.md",
@@ -424,10 +356,6 @@
             "front_model_image": {
               "path": "assets/images/products/br-009-onmodel.webp",
               "resolved": "images/products/br-009-onmodel.webp"
-            },
-            "back_model_image": {
-              "path": "assets/images/products/jersey-last-oakland-football-back-model.webp",
-              "resolved": null
             }
           },
           "dossier": "data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
@@ -447,10 +375,6 @@
             "front_model_image": {
               "path": "assets/images/products/br-010-onmodel.webp",
               "resolved": "images/products/br-010-onmodel.webp"
-            },
-            "back_model_image": {
-              "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp",
-              "resolved": null
             }
           },
           "dossier": "data/dossiers/black-is-beautiful-jersey-series-3-the-bay-basketball.md",
@@ -557,23 +481,7 @@
           "dossier_exists": true
         }
       ],
-      "unresolved_product_images": [
-        {
-          "sku": "br-008",
-          "column": "back_model_image",
-          "path": "assets/images/products/jersey-sf-inspired-football-back-model.webp"
-        },
-        {
-          "sku": "br-009",
-          "column": "back_model_image",
-          "path": "assets/images/products/jersey-last-oakland-football-back-model.webp"
-        },
-        {
-          "sku": "br-010",
-          "column": "back_model_image",
-          "path": "assets/images/products/jersey-the-bay-basketball-back-model.webp"
-        }
-      ]
+      "unresolved_product_images": []
     },
     {
       "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
@@ -726,21 +634,15 @@
               "resolved": "images/products/ghost/kids-002-ghost-front.webp"
             },
             "back_model_image": {
-              "path": "assets/images/products/kids-purple-set-back-model.webp",
-              "resolved": null
+              "path": "assets/images/products/kids-purple-set/kids-purple-set-back-model.webp",
+              "resolved": "images/products/kids-purple-set/kids-purple-set-back-model.webp"
             }
           },
           "dossier": "data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
           "dossier_exists": true
         }
       ],
-      "unresolved_product_images": [
-        {
-          "sku": "kids-002",
-          "column": "back_model_image",
-          "path": "assets/images/products/kids-purple-set-back-model.webp"
-        }
-      ]
+      "unresolved_product_images": []
     },
     {
       "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
@@ -813,13 +715,7 @@
         "rule": "The lockup IS the collection name; never type-render it."
       },
       "imagery": {
-        "scene_portrait": {
-          "path": "images/homepage-col-love-hurts",
-          "resolved": null,
-          "kind": "collection-portrait",
-          "status": "verified",
-          "notes": "LH world art. Collection cards/panels/portals."
-        },
+        "scene_portrait": null,
         "hero_backdrop": {
           "path": "branding/hero/beauty-and-beast",
           "resolved": "branding/hero/beauty-and-beast-1280w.webp",
@@ -841,27 +737,6 @@
             "kind": "atmospheric-art",
             "status": "verified",
             "notes": "Heart + rose composite. LH emotional register."
-          },
-          {
-            "path": "images/immersive/scene-love-hurts-cathedral",
-            "resolved": "images/immersive/scene-love-hurts-cathedral.webp",
-            "kind": "scene-art",
-            "status": "verified",
-            "notes": "LH cathedral immersive scene still. Heavy atmospheric \u2014 hero/manifesto scale."
-          },
-          {
-            "path": "branding/collection-logo-love-hurts",
-            "resolved": null,
-            "kind": "collection-logo",
-            "status": "verified",
-            "notes": "LH collection logo badge (founder-kept 2026-06-13)."
-          },
-          {
-            "path": "branding/love-hurts-neon-star-ref",
-            "resolved": null,
-            "kind": "collection-logo-alt",
-            "status": "verified",
-            "notes": "Red neon star \u2014 ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
           },
           {
             "path": "images/immersive/scene-love-hurts-cracked-rose-gpt2",
@@ -893,20 +768,6 @@
             "kind": "lettering",
             "status": "verified",
             "notes": "Raster; SVG master available."
-          },
-          {
-            "path": "branding/love-hurts-love-hero",
-            "resolved": null,
-            "kind": "collection-lockup-part-alt",
-            "status": "verified",
-            "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
-          },
-          {
-            "path": "branding/love-hurts-hurts-hero",
-            "resolved": null,
-            "kind": "collection-lockup-part-alt",
-            "status": "verified",
-            "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
           }
         ],
         "lockup_parts": [
@@ -1054,8 +915,8 @@
               "resolved": "images/products/lh-004-bomber-back.png"
             },
             "back_model_image": {
-              "path": "assets/images/products/love-hurts-bomber-back-model.webp",
-              "resolved": null
+              "path": "assets/images/products/lh-004-bomber-back.webp",
+              "resolved": "images/products/lh-004-bomber-back.webp"
             }
           },
           "dossier": "data/dossiers/love-hurts-bomber-jacket.md",
@@ -1112,13 +973,7 @@
           "dossier_exists": true
         }
       ],
-      "unresolved_product_images": [
-        {
-          "sku": "lh-004",
-          "column": "back_model_image",
-          "path": "assets/images/products/love-hurts-bomber-back-model.webp"
-        }
-      ]
+      "unresolved_product_images": []
     },
     {
       "_generated_by": "data/build-collection-sot.py \u2014 DO NOT EDIT. Fix identity.json / the masters, then regenerate.",
@@ -1189,13 +1044,7 @@
         "rule": "The lockup IS the collection name; never type-render it."
       },
       "imagery": {
-        "scene_portrait": {
-          "path": "images/homepage-col-signature",
-          "resolved": null,
-          "kind": "collection-portrait",
-          "status": "verified",
-          "notes": "Signature world art. Collection cards/panels/portals."
-        },
+        "scene_portrait": null,
         "hero_backdrop": {
           "path": "branding/hero/signature-golden-gate-yacht",
           "resolved": "branding/hero/signature-golden-gate-yacht-1280w.webp",
@@ -1212,25 +1061,11 @@
             "notes": "Rose-gold rose art. Signature (founder-assigned 2026-06-11)."
           },
           {
-            "path": "branding/collection-logo-signature",
-            "resolved": null,
-            "kind": "collection-logo",
-            "status": "verified",
-            "notes": "Signature collection logo badge (founder-kept 2026-06-13)."
-          },
-          {
             "path": "images/immersive/scene-signature-golden-gate",
             "resolved": "images/immersive/scene-signature-golden-gate.webp",
             "kind": "scene-art",
             "status": "verified",
             "notes": "SIG golden-gate immersive scene still."
-          },
-          {
-            "path": "images/immersive/scene-signature-bay-bridge",
-            "resolved": null,
-            "kind": "scene-art",
-            "status": "verified",
-            "notes": "SIG bay-bridge immersive scene still \u2014 from waterfront-runway master."
           },
           {
             "path": "images/immersive/scene-signature-oakland-atelier-gpt2",

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="SkyyRose Flagship SOT">
+    <file>.</file>
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+    <rule ref="WordPress">
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Squiz.Commenting.FileComment.Missing"/>
+        <exclude name="WordPress.WP.GlobalVariablesOverride.Prohibited"/>
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound"/>
+    </rule>
+    <rule ref="WordPress.WP.I18n">
+        <properties><property name="text_domain" type="array"><element value="skyyrose-flagship-sot"/></property></properties>
+    </rule>
+    <config name="prefixes" value="skyyrosesot"/>
+    <config name="minimum_wp_version" value="6.8"/>
+</ruleset>

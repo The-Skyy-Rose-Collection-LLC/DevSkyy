@@ -1,0 +1,136 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/paid-api-stopgate.sh'",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/prompt-eng-tripwire.sh'",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__.*[Cc]ontext7.*query-docs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/context7-touched.sh'",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/learning-tripwire.sh'",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/phpcs-on-write.sh'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/catalog-drift-guard.sh'",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/python-format-on-write.sh'",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(jq -r '.tool_input.file_path // empty'); case \"$fp\" in /Users/theceo/DevSkyy/frontend/*.ts|/Users/theceo/DevSkyy/frontend/*.tsx) cd /Users/theceo/DevSkyy/frontend && npx tsc --noEmit --pretty false 2>&1 | head -10 ;; esac; true",
+            "timeout": 90,
+            "statusMessage": "Type-checking frontend"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r fp; [ -z \"$fp\" ] && exit 0; case \"$fp\" in *.py) ruff check \"$fp\" 2>&1 | head -5;; */frontend/*.ts|*/frontend/*.tsx) cd /Users/theceo/DevSkyy/frontend && npx tsc --noEmit 2>&1 | tail -10;; *.php) /opt/homebrew/bin/php -l \"$fp\" 2>&1;; esac; true; }",
+            "timeout": 15,
+            "statusMessage": "Checking..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.wolf/hooks/memory-audit.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/theceo/DevSkyy/.wolf/hooks/claude-mem-sync.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/theceo/DevSkyy/.codex/hooks/learning-reminder.sh'",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/theceo/DevSkyy/scripts/wolf_recurring_sync.py >/dev/null 2>&1 || echo '[wolf-recurring-sync] FAILED — run python3 scripts/wolf_recurring_sync.py to see the error'; true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

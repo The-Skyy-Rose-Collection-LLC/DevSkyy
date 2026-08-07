@@ -69,13 +69,7 @@
     "rule": "The lockup IS the collection name; never type-render it."
   },
   "imagery": {
-    "scene_portrait": {
-      "path": "images/homepage-col-love-hurts",
-      "resolved": null,
-      "kind": "collection-portrait",
-      "status": "verified",
-      "notes": "LH world art. Collection cards/panels/portals."
-    },
+    "scene_portrait": null,
     "hero_backdrop": {
       "path": "branding/hero/beauty-and-beast",
       "resolved": "branding/hero/beauty-and-beast-1280w.webp",
@@ -97,27 +91,6 @@
         "kind": "atmospheric-art",
         "status": "verified",
         "notes": "Heart + rose composite. LH emotional register."
-      },
-      {
-        "path": "images/immersive/scene-love-hurts-cathedral",
-        "resolved": "images/immersive/scene-love-hurts-cathedral.webp",
-        "kind": "scene-art",
-        "status": "verified",
-        "notes": "LH cathedral immersive scene still. Heavy atmospheric \u2014 hero/manifesto scale."
-      },
-      {
-        "path": "branding/collection-logo-love-hurts",
-        "resolved": null,
-        "kind": "collection-logo",
-        "status": "verified",
-        "notes": "LH collection logo badge (founder-kept 2026-06-13)."
-      },
-      {
-        "path": "branding/love-hurts-neon-star-ref",
-        "resolved": null,
-        "kind": "collection-logo-alt",
-        "status": "verified",
-        "notes": "Red neon star \u2014 ANOTHER VARIANT of the Love Hurts collection logo. Founder-assigned 2026-06-13 for the Love Hurts PAGE."
       },
       {
         "path": "images/immersive/scene-love-hurts-cracked-rose-gpt2",
@@ -149,20 +122,6 @@
         "kind": "lettering",
         "status": "verified",
         "notes": "Raster; SVG master available."
-      },
-      {
-        "path": "branding/love-hurts-love-hero",
-        "resolved": null,
-        "kind": "collection-lockup-part-alt",
-        "status": "verified",
-        "notes": "'Love' hero graphic (separate from lh-logo-love). Founder-kept 2026-06-13."
-      },
-      {
-        "path": "branding/love-hurts-hurts-hero",
-        "resolved": null,
-        "kind": "collection-lockup-part-alt",
-        "status": "verified",
-        "notes": "'Hurts' hero graphic (separate from lh-logo-hurts). Founder-kept 2026-06-13."
       }
     ],
     "lockup_parts": [
@@ -310,8 +269,8 @@
           "resolved": "images/products/lh-004-bomber-back.png"
         },
         "back_model_image": {
-          "path": "assets/images/products/love-hurts-bomber-back-model.webp",
-          "resolved": null
+          "path": "assets/images/products/lh-004-bomber-back.webp",
+          "resolved": "images/products/lh-004-bomber-back.webp"
         }
       },
       "dossier": "data/dossiers/love-hurts-bomber-jacket.md",
@@ -368,11 +327,5 @@
       "dossier_exists": true
     }
   ],
-  "unresolved_product_images": [
-    {
-      "sku": "lh-004",
-      "column": "back_model_image",
-      "path": "assets/images/products/love-hurts-bomber-back-model.webp"
-    }
-  ]
+  "unresolved_product_images": []
 }

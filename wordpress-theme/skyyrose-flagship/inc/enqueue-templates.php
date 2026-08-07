@@ -105,7 +105,7 @@ function skyyrose_enqueue_template_styles() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
-		'front-page'          => 'homepage-v3.css',
+		'front-page'          => 'storefront-home.css',
 		'single-product'      => 'single-product.css',
 		'cart'                => 'woocommerce.css',
 		'checkout'            => 'woocommerce.css',
@@ -170,26 +170,6 @@ function skyyrose_enqueue_template_styles() {
 				$handle,
 				$base_css_uri . '/' . $css_file,
 				$global_deps,
-				SKYYROSE_VERSION
-			);
-		}
-	}
-
-	// Homepage v3 act stylesheets. One act group per file (many-small-files
-	// rule); each consumes the token block that homepage-v3.css declares, so
-	// every one of them depends on that handle and loads after it.
-	if ( 'front-page' === $slug ) {
-		$hp_sheets = array( 'homepage-v3-rooms', 'homepage-v3-editorial', 'homepage-v3-close' );
-		foreach ( $hp_sheets as $hp_sheet ) {
-			$hp_file = $use_min && file_exists( $base_css_dir . '/' . $hp_sheet . '.min.css' )
-				? $hp_sheet . '.min.css' : $hp_sheet . '.css';
-			if ( ! file_exists( $base_css_dir . '/' . $hp_file ) ) {
-				continue;
-			}
-			wp_enqueue_style(
-				'skyyrose-' . $hp_sheet,
-				$base_css_uri . '/' . $hp_file,
-				array( 'skyyrose-template-homepage-v3' ),
 				SKYYROSE_VERSION
 			);
 		}
@@ -329,7 +309,7 @@ function skyyrose_enqueue_template_styles() {
 	// collection pages (their shared product-grid part renders
 	// .product-grid__items, which lays out as full-width stacked blocks
 	// without this stylesheet — bug-112).
-	if ( in_array( $slug, array( 'landing', 'elementor-editorial', 'preorder-gateway', 'collection-standalone' ), true ) ) {
+	if ( in_array( $slug, array( 'front-page', 'landing', 'elementor-editorial', 'preorder-gateway', 'collection-standalone' ), true ) ) {
 		$grid_css = $use_min && file_exists( $base_css_dir . '/product-grid.min.css' )
 			? 'product-grid.min.css' : 'product-grid.css';
 		if ( file_exists( $base_css_dir . '/' . $grid_css ) ) {

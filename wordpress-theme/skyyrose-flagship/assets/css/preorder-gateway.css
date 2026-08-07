@@ -1196,3 +1196,8 @@
   .po-manifesto__bg { will-change: auto; }
   .po-marquee__track { animation: none; }
 }
+/* Pre-order stays focused: brand, bag, reservation journey. */
+.page-template-template-preorder-gateway .navbar__nav-wrapper,
+.page-template-template-preorder-gateway .navbar__hamburger {
+	display: none;
+}

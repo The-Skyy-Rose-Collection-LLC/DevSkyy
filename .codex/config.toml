@@ -1,5 +1,26 @@
 sandbox_mode = "danger-full-access"
+model_reasoning_summary = "detailed"
+
+[features]
+code_mode = true
+code_mode_host = true
+code_mode_only = true
+deferred_executor = true
+deferred_tool_world_state = true
+executor_capability_discovery = true
+skill_search = true
 
 [mcp_servers.gemini-api-docs-mcp]
 type = "http"
 url = "https://gemini-api-docs-mcp.dev"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = "60"
+CLAUDE_CODE_SUBAGENT_MODEL = "fable"
+CONTEXT7_PREFETCH_DISABLE = "1"
+CANON_PREFETCH_DISABLE = "1"
+PROMPT_ENG_NUDGE_DISABLE = "1"
+ENABLE_TOOL_SEARCH = "true"

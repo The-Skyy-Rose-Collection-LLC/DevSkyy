@@ -43,3 +43,5 @@ Name Python tests `test_*.py`; use `@pytest.mark.unit`, `integration`, `asyncio`
 History follows Conventional Commit-style subjects: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`, `chore(wolf): ...`. Use imperative, scoped summaries.
 
 Pull requests need problem statement, implementation summary, test evidence, linked issue/bug ID, and screenshots or recordings for UI changes. Note migrations, environment changes, security impact, and deployment steps. Never deploy WordPress or production services without explicit approval.
+
+Before any edit, check `.wolf/memory.md` for current session notes and open work.
