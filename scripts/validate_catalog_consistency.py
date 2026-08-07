@@ -41,6 +41,9 @@ Available check names (pass comma-separated to --checks):
   csv_image_columns_resolve  every non-empty value in the 4 CSV image columns resolves to a file
   product_embeddings_current  product-embeddings.json covers the current catalog SKU set (dim=512)
 
+The catalog workflow watches tracked immersive campaign masters because collection SOT
+resolution depends on their presence in a clean checkout.
+
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
     The jersey roster is a product-LINE concept (the "BLACK is Beautiful Jersey Series"), not a
