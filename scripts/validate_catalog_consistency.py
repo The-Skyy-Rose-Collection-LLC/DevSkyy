@@ -43,8 +43,8 @@ Available check names (pass comma-separated to --checks):
 
 The catalog workflow watches the tracked flagship asset tree because visual-manifest and
 collection SOT resolution depend on those files in a clean checkout. Its focused pytest
-job also installs ``cryptography`` because the shared test fixture imports the security
-package while exercising these SOT guards.
+job also installs the focused security dependencies because the shared test fixture imports
+the security package while exercising these SOT guards.
 
 Notes:
   jersey_skus: Compares _JERSEY_SKUS against registry sku_folders (not CSV garment_type_lock).
