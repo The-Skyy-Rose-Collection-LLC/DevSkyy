@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, TypeVar
@@ -149,7 +149,7 @@ class CircuitBreaker:
                 )
                 self.state_data.state = CircuitState.OPEN
 
-    async def call(self, func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
+    async def call(self, func: Callable[..., Awaitable[T]], *args: Any, **kwargs: Any) -> T:
         """Execute function with circuit breaker protection."""
         if not self._should_attempt():
             raise CircuitBreakerError(self.name, self.config.timeout)
@@ -202,7 +202,7 @@ class RetryStrategy:
 
     async def execute(
         self,
-        func: Callable[..., T],
+        func: Callable[..., Awaitable[T]],
         *args: Any,
         retryable_exceptions: tuple[type[Exception], ...] = (Exception,),
         **kwargs: Any,

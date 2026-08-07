@@ -17,7 +17,7 @@ Named after Ralph Wiggums because we try every possible approach until something
 import asyncio
 import functools
 import logging
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import TypeVar
@@ -260,7 +260,7 @@ class CircuitBreaker:
             return False
         return datetime.now() - self.last_failure_time > timedelta(seconds=self.timeout)
 
-    async def call(self, func: Callable[[], T], *args, **kwargs) -> T:
+    async def call(self, func: Callable[..., Awaitable[T]], *args, **kwargs) -> T:
         """
         Execute function with circuit breaker protection.
 
