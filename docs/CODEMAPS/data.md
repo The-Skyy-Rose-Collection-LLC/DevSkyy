@@ -9,6 +9,7 @@
 | Catalog | `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (root symlink `skyyrose-catalog.csv`) | Single product manifest — SKU, price, collection, metadata. Never invent SKUs. |
 | Dossiers | `wordpress-theme/skyyrose-flagship/data/dossiers/*.md` | Per-SKU, founder-authored narrative (never ML-drafted); `_template.md` defines the schema |
 | Collection identity | `wordpress-theme/skyyrose-flagship/data/collections/<slug>/identity.json` | Canon seed (palette, fonts, story). `design-tokens.css` / `sot.json` / `index.html` are **generated from it** — edit `identity.json` only, never the generated files |
+| Lookbook | `scripts/lookbook-manifest.json` | Ordered source list for the one lookbook component. `scripts/sot/lookbook.py` generates `wordpress-theme/skyyrose-flagship/data/lookbook-sot.json` and `docs/campaigns/sot-lookbook.html`; root `build-lookbook-*.py` scripts are compatibility entrypoints only. |
 | Brand/logos | `wordpress-theme/skyyrose-flagship/data/{brand,brand-logos,product-references}/` | Supporting brand assets |
 
 ## Imagery resolution (SOT-only, front-first)
@@ -27,7 +28,7 @@
 
 ## Rule
 
-Never fork or introduce a second copy of a SOT source. Product imagery must resolve through `sot_images.resolve_image()` on every surface (WP, dashboard, MCP, pipelines, agents) — never a hardcoded `assets/images/products/...` literal. Guard test: `tests/test_sot_no_adhoc_imagery.py`.
+Never fork or introduce a second copy of a SOT source. Product imagery must resolve through `sot_images.resolve_image()` on every surface (WP, dashboard, MCP, pipelines, agents) — never a hardcoded `assets/images/products/...` literal. The lookbook uses the explicit manifest rather than a directory scan; its guard fails if the canonical component is missing. Guard tests: `tests/test_sot_no_adhoc_imagery.py`, `tests/test_lookbook_sot_guard.py`.
 
 ## Related codemaps
 

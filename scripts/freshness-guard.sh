@@ -12,11 +12,13 @@
 #   1. SOT drift     — data/collections/<slug>/{sot.json,index.html} + design-tokens.css
 #                      must match the masters (identity.json, catalog.csv,
 #                      visual-manifest.json, logo-registry.json).
-#   2. .min staleness — every assets/css|js source has an up-to-date *.min.*
+#   2. Lookbook SOT drift — the scripts/sot/lookbook.py component reads the manifest,
+#                      then derives the SOT and docs/campaigns/sot-lookbook.html.
+#   3. .min staleness — every assets/css|js source has an up-to-date *.min.*
 #                      (production serves .min; a stale .min = an inert fix).
-#   3. Version sync  — style.css "Version", functions.php SKYYROSE_VERSION,
+#   4. Version sync  — style.css "Version", functions.php SKYYROSE_VERSION,
 #                      readme.txt "Stable tag" must all agree.
-#   4. Retired refs  — no code points at retired masters (product-masters/
+#   5. Retired refs  — no code points at retired masters (product-masters/
 #                      catalog.yaml, manifest.json, data/product-catalog.csv,
 #                      products.json, the deleted flat data/collections/*.json).
 #
@@ -38,6 +40,8 @@ PY="$ROOT/.venv/bin/python"
 
 MODE="${1:-check}"
 FAIL=0
+LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/freshness-guard.XXXXXX")" || exit 1
+trap 'rm -rf "$LOG_DIR"' EXIT
 
 c_ok()   { printf '\033[32m  ✓\033[0m %s\n' "$1"; }
 c_bad()  { printf '\033[31m  ✗\033[0m %s\n' "$1"; FAIL=1; }
@@ -60,17 +64,25 @@ hdr "freshness-guard ($MODE)"
 if [ "$MODE" = "--fix" ]; then
   if [ -x "$PY" ]; then
     ( cd "$THEME" && "$PY" data/gen-design-tokens.py && "$PY" data/build-collection-sot.py \
-        && "$PY" data/gen-collection-hub.py ) >/tmp/fg_fix_sot.log 2>&1 \
-      && c_ok "regenerated SOT (design-tokens + sot.json + hubs)" \
-      || { c_bad "SOT regeneration failed (see /tmp/fg_fix_sot.log)"; tail -8 /tmp/fg_fix_sot.log | sed 's/^/    /'; }
+        && "$PY" data/gen-collection-hub.py ) >"$LOG_DIR/fg_fix_sot.log" 2>&1 \
+      && c_ok "regenerated collection SOTs (design-tokens + collection sot.json + hubs)" \
+      || { c_bad "SOT regeneration failed (see $LOG_DIR/fg_fix_sot.log)"; tail -8 "$LOG_DIR/fg_fix_sot.log" | sed 's/^/    /'; }
+    ( cd "$ROOT" && "$PY" scripts/build-lookbook-sot.py ) >"$LOG_DIR/fg_fix_lookbook_sot.log" 2>&1 \
+      && c_ok "regenerated lookbook-sot.json" \
+      || { c_bad "lookbook SOT regeneration failed (see $LOG_DIR/fg_fix_lookbook_sot.log)"; tail -8 "$LOG_DIR/fg_fix_lookbook_sot.log" | sed 's/^/    /'; }
+    ( cd "$ROOT" && "$PY" scripts/build-lookbook-from-sot.py ) >"$LOG_DIR/fg_fix_lookbook_html.log" 2>&1 \
+      && c_ok "regenerated docs/campaigns/sot-lookbook.html" \
+      || { c_bad "lookbook HTML regeneration failed (see $LOG_DIR/fg_fix_lookbook_html.log)"; tail -8 "$LOG_DIR/fg_fix_lookbook_html.log" | sed 's/^/    /'; }
   fi
   if command -v npm >/dev/null 2>&1 && [ -d "$WP/node_modules/clean-css" ]; then
-    ( cd "$WP" && npm run build ) >/tmp/fg_fix_min.log 2>&1 \
+    ( cd "$WP" && npm run build ) >"$LOG_DIR/fg_fix_min.log" 2>&1 \
       && { c_ok "rebuilt .min (css + js)"; MIN_REBUILT=1; } \
-      || c_bad "min rebuild failed (see /tmp/fg_fix_min.log)"
+      || c_bad "min rebuild failed (see $LOG_DIR/fg_fix_min.log)"
   fi
   git -C "$ROOT" add -- "$THEME/assets/css/design-tokens.css" \
-      "$THEME/data/collections" "$THEME/assets/css" "$THEME/assets/js" 2>/dev/null || true
+      "$THEME/data/collections" "$THEME/assets/css" "$THEME/assets/js" \
+      "$ROOT/scripts/lookbook-manifest.json" "$ROOT/wordpress-theme/skyyrose-flagship/data/lookbook-sot.json" \
+      "$ROOT/docs/campaigns/sot-lookbook.html" 2>/dev/null || true
   c_ok "re-staged regenerated derived files — review then commit"
 fi
 
@@ -79,27 +91,43 @@ SOT_TRIGGER='wordpress-theme/skyyrose-flagship/data/(skyyrose-catalog\.csv|visua
 if forced || staged_match "$SOT_TRIGGER"; then
   hdr "1. Collection SOT ↔ masters"
   if [ -x "$PY" ] && [ -f "$THEME/data/verify-collection-sot.py" ]; then
-    if ( cd "$THEME" && "$PY" data/verify-collection-sot.py ) >/tmp/fg_sot.log 2>&1; then
-      c_ok "SOT in sync ($(grep -cE 'SKUs, 0 broken' /tmp/fg_sot.log) collections verified)"
+    if ( cd "$THEME" && "$PY" data/verify-collection-sot.py ) >"$LOG_DIR/fg_sot.log" 2>&1; then
+      c_ok "SOT in sync ($(grep -cE 'SKUs, 0 broken' "$LOG_DIR/fg_sot.log") collections verified)"
     else
       c_bad "SOT DRIFT — run: bash scripts/freshness-guard.sh --fix   (then git add + recommit)"
-      grep -E '✗|missing|drift|not in' /tmp/fg_sot.log | head -8 | sed 's/^/    /'
+      grep -E '✗|missing|drift|not in' "$LOG_DIR/fg_sot.log" | head -8 | sed 's/^/    /'
     fi
   else
     c_skip "SOT check skipped (no .venv python / verifier)"
   fi
 fi
 
-# ── CHECK 2: .min staleness ─────────────────────────────────────────────────
+# ── CHECK 2: Lookbook SOT + HTML drift ──────────────────────────────────────
+LOOKBOOK_TRIGGER='scripts/(sot/(lookbook\.py|__init__\.py)|lookbook-manifest\.json|build-lookbook-sot\.py|build-lookbook-from-sot\.py)|wordpress-theme/skyyrose-flagship/data/(collections/|lookbook-sot\.json)|docs/campaigns/sot-lookbook\.html'
+if forced || staged_match "$LOOKBOOK_TRIGGER"; then
+  hdr "2. Lookbook SOT ↔ derived HTML"
+  if [ -x "$PY" ]; then
+    if "$PY" scripts/validate_catalog_consistency.py --checks lookbook_sot_current,lookbook_html_current >"$LOG_DIR/fg_lookbook_guard.log" 2>&1; then
+      c_ok "lookbook-sot.json and sot-lookbook.html are in sync"
+    else
+      c_bad "lookbook drift — run: bash scripts/freshness-guard.sh --fix   (then git add + recommit)"
+      sed 's/^/    /' "$LOG_DIR/fg_lookbook_guard.log"
+    fi
+  else
+    c_skip "Lookbook SOT checks skipped (python unavailable)"
+  fi
+fi
+
+# ── CHECK 3: .min staleness ─────────────────────────────────────────────────
 MIN_TRIGGER='wordpress-theme/skyyrose-flagship/assets/(css|js)/.*\.(css|js)$'
 if forced || staged_match "$MIN_TRIGGER"; then
-  hdr "2. Minified assets ↔ source"
+  hdr "3. Minified assets ↔ source"
   if forced; then
     # --all/--fix audit: rebuild, surface any .min that differs from the build
     # (also catches toolchain drift), then restore the tree (read-only audit).
     if command -v npm >/dev/null 2>&1 && [ -d "$WP/node_modules/clean-css" ]; then
       # --fix already rebuilt above; avoid a second redundant minification pass.
-      [ "${MIN_REBUILT:-0}" = "1" ] || ( cd "$WP" && npm run build ) >/tmp/fg_min.log 2>&1 || true
+      [ "${MIN_REBUILT:-0}" = "1" ] || ( cd "$WP" && npm run build ) >"$LOG_DIR/fg_min.log" 2>&1 || true
       DRIFTED="$(git -C "$ROOT" diff --name-only -- '*.min.css' '*.min.js' 2>/dev/null)"
       [ "$MODE" = "--fix" ] || git -C "$ROOT" checkout -- '*.min.css' '*.min.js' 2>/dev/null || true
       if [ -n "$DRIFTED" ]; then
@@ -144,10 +172,10 @@ EOF
   fi
 fi
 
-# ── CHECK 3: theme version sync ─────────────────────────────────────────────
+# ── CHECK 4: theme version sync ─────────────────────────────────────────────
 VER_TRIGGER='wordpress-theme/skyyrose-flagship/(style\.css|readme\.txt|functions\.php)'
 if forced || staged_match "$VER_TRIGGER"; then
-  hdr "3. Theme version sync"
+  hdr "4. Theme version sync"
   v_style="$(extract_ver '^Version:' "$THEME/style.css")"
   v_fn="$(grep -E "SKYYROSE_VERSION" "$THEME/functions.php" 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
   v_rm="$(extract_ver 'stable tag' "$THEME/readme.txt")"
@@ -158,9 +186,9 @@ if forced || staged_match "$VER_TRIGGER"; then
   fi
 fi
 
-# ── CHECK 4: retired-master references ──────────────────────────────────────
+# ── CHECK 5: retired-master references ──────────────────────────────────────
 RETIRED='product-masters/(catalog\.yaml|manifest\.json)|data/product-catalog\.csv|/products\.json|data/collections/(black-rose|love-hurts|signature|kids-capsule)\.json'
-hdr "4. Retired-master references"
+hdr "5. Retired-master references"
 if forced; then
   HITS="$(git -C "$ROOT" grep -nIE "$RETIRED" -- '*.py' '*.php' '*.js' ':!*test*' ':!*/tests/*' ':!*/docs/*' ':!*.min.*' 2>/dev/null || true)"
 else

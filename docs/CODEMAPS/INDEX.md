@@ -1,6 +1,6 @@
 # DevSkyy Codemaps Index
 
-<!-- Generated: 2026-07-06 | Files scanned: 6 codemaps + repo root scan | Token estimate: ~450 -->
+<!-- Generated: 2026-07-06 | Files scanned: 7 codemaps + repo root scan | Token estimate: ~450 -->
 
 **Status: STAGED FOR APPROVAL.** This is a full rewrite of the codemap set (previous headers dated 2026-02-19, ~140 days stale, predating major repo growth). Files live in `docs/CODEMAPS/.pending/` — not yet promoted to `docs/CODEMAPS/`. See `.reports/codemap-diff.txt` for the full diff.
 
@@ -13,6 +13,7 @@
 | [frontend.md](frontend.md) | Next.js 16 dashboard (`frontend/`), `proxy.ts` auth gate, legacy `src/` SDK |
 | [wordpress.md](wordpress.md) | `skyyrose-flagship` theme templates, `inc/` modules, `.min` build discipline |
 | [data.md](data.md) | Catalog CSV + dossiers, SOT imagery resolution, Alembic models, asset hub |
+| [sot-components.md](sot-components.md) | Token-cheap routes from a data/visual task to its one component owner and drift guard |
 | [dependencies.md](dependencies.md) | External services: WooCommerce, WP.com, Vercel, OAI gpt-image-2, Pinecone, Meshy/Tripo, LLM providers |
 
 ## Three independent systems — never cross-wire

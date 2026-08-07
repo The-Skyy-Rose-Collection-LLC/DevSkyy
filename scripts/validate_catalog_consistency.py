@@ -35,6 +35,8 @@ Available check names (pass comma-separated to --checks):
   v7_cards_current      v7-cards.json equals fresh build_v7_cards.py output
   sot_images_current    sot-images.json equals fresh sot_images.serialize_manifest()
   collection_sot_current  collections/<slug>/sot.json equal fresh build-collection-sot.py output
+  lookbook_sot_current  lookbook-sot.json equals fresh build-lookbook-sot.py output
+  lookbook_html_current  sot-lookbook.html equals fresh build-lookbook-from-sot.py output
   no_hardcoded_product_images  Fail if any template hardcodes an /images/products/... path literal
   csv_image_columns_resolve  every non-empty value in the 4 CSV image columns resolves to a file
   product_embeddings_current  product-embeddings.json covers the current catalog SKU set (dim=512)
@@ -91,6 +93,12 @@ _BUILD_COLLECTION_SOT: Path = (
 _SOT_COMMON_PY: Path = (
     _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "sot_common.py"
 )
+_LOOKBOOK_MANIFEST: Path = _REPO_ROOT / "scripts" / "lookbook-manifest.json"
+_LOOKBOOK_COMPONENT: Path = _REPO_ROOT / "scripts" / "sot" / "lookbook.py"
+_LOOKBOOK_SOT: Path = (
+    _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "lookbook-sot.json"
+)
+_LOOKBOOK_HTML: Path = _REPO_ROOT / "docs" / "campaigns" / "sot-lookbook.html"
 
 # The 4 CSV columns build-collection-sot.py resolves via sot_common.resolve_asset()
 # (rooted at skyyrose.core.paths.WP_ASSETS_DIR) when building the per-collection SOT view.
@@ -923,9 +931,9 @@ def check_collection_sot_current() -> CheckResult:
     name = "collection_sot_current"
     if not _BUILD_COLLECTION_SOT.exists():
         return _ok(name, "build-collection-sot.py not present — skip")
+    saved_path = sys.path[:]
     if str(_REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(_REPO_ROOT))
-    saved_path = sys.path[:]
     try:
         import importlib.util
 
@@ -966,6 +974,85 @@ def check_collection_sot_current() -> CheckResult:
             stale,
         )
     return _ok(name, f"all {len(documents)} collection sot.json match fresh generator output")
+
+
+def check_lookbook_sot_current() -> CheckResult:
+    """Verify lookbook-sot.json equals fresh generator output.
+
+    The largest unguarded SOT surface in this repo was the aggregated lookbook
+    output. It is now treated as a generated artifact with a pure builder seam:
+    build_lookbook_payload and serialize. This check validates the exact
+    byte output committed file against those two functions, so manual edits to
+    data/lookbook-sot.json cannot pass silently.
+    """
+    name = "lookbook_sot_current"
+    if not _LOOKBOOK_COMPONENT.exists():
+        return _fail(name, f"canonical lookbook component missing: {_LOOKBOOK_COMPONENT}")
+
+    if not _LOOKBOOK_MANIFEST.exists():
+        return _fail(name, f"lookbook manifest missing: {_LOOKBOOK_MANIFEST}")
+
+    if not _LOOKBOOK_SOT.exists():
+        return _fail(name, f"lookbook-sot.json not found: {_LOOKBOOK_SOT}")
+
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    saved_path = sys.path[:]
+    try:
+        from scripts.sot import lookbook as gen_mod
+
+        payload = gen_mod.build_lookbook_payload(_LOOKBOOK_MANIFEST)
+        generated = gen_mod.serialize(payload)
+    except Exception as exc:  # defensive — never crash the whole validator run
+        return _fail(name, f"lookbook-sot generator failed to run: {exc}")
+    finally:
+        sys.path[:] = saved_path
+
+    if generated != _LOOKBOOK_SOT.read_text(encoding="utf-8"):
+        return _fail(
+            name,
+            "lookbook-sot.json is stale — run python scripts/build-lookbook-sot.py",
+        )
+    return _ok(name, "lookbook-sot.json matches fresh generator output")
+
+
+def check_lookbook_html_current() -> CheckResult:
+    """Verify sot-lookbook.html equals fresh build-lookbook-from-sot.py output.
+
+    This enforces the last mile in the lookbook SOT chain: once the aggregated SOT
+    is fresh, the docs/campaigns HTML view is regenerated from it using the
+    build_lookbook_html function so template drift cannot hide until runtime.
+    """
+    name = "lookbook_html_current"
+    if not _LOOKBOOK_COMPONENT.exists():
+        return _fail(name, f"canonical lookbook component missing: {_LOOKBOOK_COMPONENT}")
+
+    if not _LOOKBOOK_SOT.exists():
+        return _fail(name, f"lookbook-sot.json not found: {_LOOKBOOK_SOT}")
+
+    if not _LOOKBOOK_HTML.exists():
+        return _fail(name, f"sot-lookbook.html not found: {_LOOKBOOK_HTML}")
+
+    saved_path = sys.path[:]
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+    try:
+        from scripts.sot import lookbook as gen_mod
+
+        generated, _ = gen_mod.build_lookbook_html(
+            json.loads(_LOOKBOOK_SOT.read_text(encoding="utf-8"))
+        )
+    except Exception as exc:  # defensive — never crash the whole validator run
+        return _fail(name, f"lookbook HTML generator failed to run: {exc}")
+    finally:
+        sys.path[:] = saved_path
+
+    if generated != _LOOKBOOK_HTML.read_text(encoding="utf-8"):
+        return _fail(
+            name,
+            "sot-lookbook.html is stale — run python scripts/build-lookbook-from-sot.py",
+        )
+    return _ok(name, "sot-lookbook.html matches fresh generated output")
 
 
 def check_no_hardcoded_product_images() -> CheckResult:
@@ -1125,6 +1212,8 @@ ALL_CHECKS: dict[str, Any] = {
     "v7_cards_current": check_v7_cards_current,
     "sot_images_current": check_sot_images_current,
     "collection_sot_current": check_collection_sot_current,
+    "lookbook_sot_current": check_lookbook_sot_current,
+    "lookbook_html_current": check_lookbook_html_current,
     "no_hardcoded_product_images": check_no_hardcoded_product_images,
     "csv_image_columns_resolve": check_csv_image_columns_resolve,
     "product_embeddings_current": check_product_embeddings_current,

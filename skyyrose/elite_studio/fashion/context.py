@@ -9,7 +9,6 @@ and season. Loads product data from the product catalog CSV.
 
 from __future__ import annotations
 
-import csv
 import logging
 from dataclasses import dataclass
 
@@ -20,6 +19,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 from skyyrose.core.catalog_loader import CATALOG_CSV as _CATALOG_PATH
+from skyyrose.core.catalog_loader import read_catalog_rows
 
 _DEFAULT_SEASON = "FW26"
 
@@ -35,12 +35,11 @@ def _load_catalog() -> dict[str, dict[str, str]]:
 
     catalog: dict[str, dict[str, str]] = {}
     try:
-        with open(_CATALOG_PATH, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                sku = row.get("sku", "").strip().lower()
-                if sku:
-                    catalog[sku] = {k: (v or "") for k, v in row.items()}
+        for row in read_catalog_rows(_CATALOG_PATH):
+            sku = row["sku"].strip().lower()
+            if not sku:
+                continue
+            catalog[sku] = {key: value or "" for key, value in row.items()}
     except FileNotFoundError:
         logger.warning("Product catalog not found at %s", _CATALOG_PATH)
     except Exception as exc:
