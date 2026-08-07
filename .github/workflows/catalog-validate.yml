@@ -18,8 +18,7 @@ on:
       - "scripts/lookbook-manifest.json"
       - "docs/campaigns/sot-lookbook.html"
       - "wordpress-theme/skyyrose-flagship/data/lookbook-sot.json"
-      - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
-      - "wordpress-theme/skyyrose-flagship/assets/images/immersive/**"
+      - "wordpress-theme/skyyrose-flagship/assets/**"
       - "tests/test_v7_cards_generator.py"
   push:
     branches: [main]
@@ -35,8 +34,7 @@ on:
       - "scripts/lookbook-manifest.json"
       - "docs/campaigns/sot-lookbook.html"
       - "wordpress-theme/skyyrose-flagship/data/lookbook-sot.json"
-      - "wordpress-theme/skyyrose-flagship/assets/images/products/v7/**"
-      - "wordpress-theme/skyyrose-flagship/assets/images/immersive/**"
+      - "wordpress-theme/skyyrose-flagship/assets/**"
 
 jobs:
   validate:
