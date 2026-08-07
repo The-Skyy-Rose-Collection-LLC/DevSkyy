@@ -312,12 +312,7 @@ export class ThreePerformanceMonitor {
     const triangleScore = Math.min(100, (1 - metrics.triangles / thresholds.maxTriangles) * 100);
 
     // Weighted average
-    return Math.round(
-      fpsScore * 0.4 +
-      frameTimeScore * 0.3 +
-      drawCallScore * 0.15 +
-      triangleScore * 0.15
-    );
+    return Math.round(fpsScore * 0.4 + frameTimeScore * 0.3 + drawCallScore * 0.15 + triangleScore * 0.15);
   }
 
   /**
@@ -353,14 +348,13 @@ export class ThreePerformanceMonitor {
     if (!this.renderer || !this.scene) return;
 
     const info = this.renderer.info;
-    const avgFrameTime = this.frameTimes.length > 0
-      ? this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length
-      : 16.67;
+    const avgFrameTime =
+      this.frameTimes.length > 0 ? this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length : 16.67;
 
     // Count scene objects
     let objectCount = 0;
     let visibleObjects = 0;
-    this.scene.traverse((obj) => {
+    this.scene.traverse(obj => {
       objectCount++;
       if (obj.visible) visibleObjects++;
     });
@@ -413,7 +407,7 @@ export class ThreePerformanceMonitor {
     // Check warnings
     const warnings = this.checkPerformance();
     if (warnings.length > 0 && this.config.onWarning) {
-      warnings.forEach((w) => this.config.onWarning!(w));
+      warnings.forEach(w => this.config.onWarning!(w));
     }
 
     // Callback

@@ -129,18 +129,16 @@ const CartItemRow: React.FC<{
               </span>
             </>
           ) : (
-            <span style={{ color: COLORS.black, fontWeight: 600 }}>
-              ${item.price.toFixed(2)}
-            </span>
+            <span style={{ color: COLORS.black, fontWeight: 600 }}>${item.price.toFixed(2)}</span>
           )}
         </div>
 
         {/* Quantity Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
-            className="cart-quantity-btn"
+            className='cart-quantity-btn'
             onClick={() => onUpdateQuantity(item.productId, item.quantity - 1, item.size, item.color)}
-            aria-label="Decrease quantity"
+            aria-label='Decrease quantity'
             style={{
               width: '28px',
               height: '28px',
@@ -173,9 +171,9 @@ const CartItemRow: React.FC<{
           </span>
 
           <button
-            className="cart-quantity-btn"
+            className='cart-quantity-btn'
             onClick={() => onUpdateQuantity(item.productId, item.quantity + 1, item.size, item.color)}
-            aria-label="Increase quantity"
+            aria-label='Increase quantity'
             style={{
               width: '28px',
               height: '28px',
@@ -195,7 +193,7 @@ const CartItemRow: React.FC<{
           </button>
 
           <button
-            className="cart-remove-btn"
+            className='cart-remove-btn'
             onClick={() => onRemove(item.productId, item.size, item.color)}
             aria-label={`Remove ${item.name} from cart`}
             style={{
@@ -234,18 +232,7 @@ const CartItemRow: React.FC<{
  * Cart Modal Component
  */
 export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckout }) => {
-  const {
-    items,
-    subtotal,
-    tax,
-    total,
-    itemCount,
-    currency,
-    updateQuantity,
-    removeItem,
-    clearCart,
-    error,
-  } = useCart();
+  const { items, subtotal, tax, total, itemCount, currency, updateQuantity, removeItem, clearCart, error } = useCart();
 
   // Close on Escape key
   useEffect(() => {
@@ -303,9 +290,9 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
 
       {/* Modal */}
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cart-title"
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby='cart-title'
         style={{
           position: 'fixed',
           top: 0,
@@ -333,7 +320,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
         >
           <div>
             <h2
-              id="cart-title"
+              id='cart-title'
               style={{
                 margin: 0,
                 fontSize: '24px',
@@ -355,9 +342,9 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
           </div>
 
           <button
-            className="cart-close-btn"
+            className='cart-close-btn'
             onClick={onClose}
-            aria-label="Close cart"
+            aria-label='Close cart'
             style={{
               width: '32px',
               height: '32px',
@@ -410,12 +397,10 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
             >
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛍️</div>
               <p style={{ margin: 0, fontSize: '16px' }}>Your cart is empty</p>
-              <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
-                Add some items to get started
-              </p>
+              <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>Add some items to get started</p>
             </div>
           ) : (
-            items.map((item) => (
+            items.map(item => (
               <CartItemRow
                 key={`${item.productId}-${item.size || ''}-${item.color || ''}`}
                 item={item}
@@ -482,7 +467,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
             {/* Action Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <button
-                className="cart-checkout-btn"
+                className='cart-checkout-btn'
                 onClick={handleCheckout}
                 style={{
                   width: '100%',
@@ -501,7 +486,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
               </button>
 
               <button
-                className="cart-continue-btn"
+                className='cart-continue-btn'
                 onClick={onClose}
                 style={{
                   width: '100%',
@@ -520,7 +505,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
               </button>
 
               <button
-                className="cart-clear-btn"
+                className='cart-clear-btn'
                 onClick={clearCart}
                 style={{
                   width: '100%',

@@ -49,10 +49,10 @@ export interface InventoryConfig {
  * Visual indicator colors for Three.js (hex)
  */
 export const INVENTORY_COLORS = {
-  in_stock: 0x00ff00,      // Green
-  low_stock: 0xffa500,     // Orange
-  out_of_stock: 0xff0000,  // Red
-  default: 0xd4af37,       // Rose gold (SkyyRose brand)
+  in_stock: 0x00ff00, // Green
+  low_stock: 0xffa500, // Orange
+  out_of_stock: 0xff0000, // Red
+  default: 0xd4af37, // Rose gold (SkyyRose brand)
 } as const;
 
 /**

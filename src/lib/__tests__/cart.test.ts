@@ -272,10 +272,7 @@ describe('CartManager', () => {
       cart.addItem(createItem());
       await cart.syncWithWooCommerce();
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://shop.test/wp-json/wc/store/v1/cart',
-        expect.any(Object)
-      );
+      expect(global.fetch).toHaveBeenCalledWith('https://shop.test/wp-json/wc/store/v1/cart', expect.any(Object));
     });
 
     it('should throw on failed sync', async () => {

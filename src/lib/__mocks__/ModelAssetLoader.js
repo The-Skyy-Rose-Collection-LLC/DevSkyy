@@ -29,17 +29,19 @@ class ModelLoadError extends Error {
 function createMockScene() {
   return {
     children: [],
-    position: { set: function() {}, x: 0, y: 0, z: 0 },
-    scale: { set: function() {}, x: 1, y: 1, z: 1 },
-    rotation: { set: function() {}, x: 0, y: 0, z: 0 },
+    position: { set: function () {}, x: 0, y: 0, z: 0 },
+    scale: { set: function () {}, x: 1, y: 1, z: 1 },
+    rotation: { set: function () {}, x: 0, y: 0, z: 0 },
     userData: {},
     parent: null,
-    add: function(child) { this.children.push(child); },
-    remove: function(child) {
+    add: function (child) {
+      this.children.push(child);
+    },
+    remove: function (child) {
       const idx = this.children.indexOf(child);
       if (idx > -1) this.children.splice(idx, 1);
     },
-    traverse: function(callback) {
+    traverse: function (callback) {
       callback(this);
       for (const child of this.children) {
         if (child && typeof child.traverse === 'function') {
@@ -80,8 +82,12 @@ class MockModelAssetLoader {
       boundingBox: {
         min: { x: -1, y: -1, z: -1 },
         max: { x: 1, y: 1, z: 1 },
-        isEmpty: function() { return false; },
-        clone: function() { return {}; },
+        isEmpty: function () {
+          return false;
+        },
+        clone: function () {
+          return {};
+        },
       },
       loadTime: 100,
     };
@@ -95,7 +101,9 @@ class MockModelAssetLoader {
     for (const url of urls) {
       const loadOptions = {};
       if (onProgress) {
-        loadOptions.onProgress = function(p) { onProgress(url, p); };
+        loadOptions.onProgress = function (p) {
+          onProgress(url, p);
+        };
       }
       const model = await this.load(url, loadOptions);
       results.set(url, model);
@@ -103,12 +111,24 @@ class MockModelAssetLoader {
     return results;
   }
 
-  getCached(url) { return this.cache.get(url); }
-  clearCache() { this.cache.clear(); }
-  dispose() { this.cache.clear(); }
-  getConfig() { return Object.assign({}, this.config); }
-  getCacheSize() { return this.cache.size; }
-  getStats() { return { cached: this.cache.size, loaded: this.cache.size }; }
+  getCached(url) {
+    return this.cache.get(url);
+  }
+  clearCache() {
+    this.cache.clear();
+  }
+  dispose() {
+    this.cache.clear();
+  }
+  getConfig() {
+    return Object.assign({}, this.config);
+  }
+  getCacheSize() {
+    return this.cache.size;
+  }
+  getStats() {
+    return { cached: this.cache.size, loaded: this.cache.size };
+  }
 }
 
 let loaderInstance = null;

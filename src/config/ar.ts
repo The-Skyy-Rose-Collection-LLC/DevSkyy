@@ -62,7 +62,7 @@ export const AR_CONFIG: ARConfig = {
 export const COLLECTION_AR_SETTINGS: Record<string, CollectionARSettings> = {
   black_rose: {
     collection: 'black_rose',
-    accentColor: 0x8b0000,  // Dark red
+    accentColor: 0x8b0000, // Dark red
     ambientIntensity: 0.4,
     bloomStrength: 0.8,
     particleCount: 1000,
@@ -70,7 +70,7 @@ export const COLLECTION_AR_SETTINGS: Record<string, CollectionARSettings> = {
   },
   love_hurts: {
     collection: 'love_hurts',
-    accentColor: 0xff1493,  // Deep pink
+    accentColor: 0xff1493, // Deep pink
     ambientIntensity: 0.5,
     bloomStrength: 0.6,
     particleCount: 800,
@@ -78,7 +78,7 @@ export const COLLECTION_AR_SETTINGS: Record<string, CollectionARSettings> = {
   },
   signature: {
     collection: 'signature',
-    accentColor: 0xb76e79,  // Rose gold
+    accentColor: 0xb76e79, // Rose gold
     ambientIntensity: 0.6,
     bloomStrength: 0.5,
     particleCount: 500,
@@ -167,10 +167,7 @@ export class ARApiClient {
    * Get AR products for a collection
    */
   async getProducts(collection: string): Promise<any[]> {
-    const response = await fetch(
-      `${this.baseUrl}/api/v1/ar/products/${collection}`,
-      { method: 'GET' }
-    );
+    const response = await fetch(`${this.baseUrl}/api/v1/ar/products/${collection}`, { method: 'GET' });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch AR products: ${response.statusText}`);
@@ -196,10 +193,7 @@ export class ARApiClient {
       params.append('duration_ms', String(durationMs));
     }
 
-    await fetch(
-      `${this.baseUrl}/api/v1/ar/sessions/${this.sessionId}/tryon?${params}`,
-      { method: 'POST' }
-    );
+    await fetch(`${this.baseUrl}/api/v1/ar/sessions/${this.sessionId}/tryon?${params}`, { method: 'POST' });
   }
 
   /**
@@ -242,10 +236,9 @@ export class ARApiClient {
   async endSession(conversion: boolean = false): Promise<void> {
     if (!this.sessionId) return;
 
-    await fetch(
-      `${this.baseUrl}/api/v1/ar/sessions/${this.sessionId}?status=completed&conversion=${conversion}`,
-      { method: 'PATCH' }
-    );
+    await fetch(`${this.baseUrl}/api/v1/ar/sessions/${this.sessionId}?status=completed&conversion=${conversion}`, {
+      method: 'PATCH',
+    });
     this.sessionId = null;
   }
 

@@ -111,18 +111,18 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           }}
         >
           <svg
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
+            width='40'
+            height='40'
+            viewBox='0 0 24 24'
+            fill='none'
             stroke={COLORS.roseGold}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
           >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
+            <circle cx='12' cy='12' r='10' />
+            <line x1='12' y1='8' x2='12' y2='12' />
+            <line x1='12' y1='16' x2='12.01' y2='16' />
           </svg>
         </div>
 
@@ -224,9 +224,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: isHovered
-                ? '0 6px 16px rgba(183, 110, 121, 0.4)'
-                : '0 4px 12px rgba(183, 110, 121, 0.3)',
+              boxShadow: isHovered ? '0 6px 16px rgba(183, 110, 121, 0.4)' : '0 4px 12px rgba(183, 110, 121, 0.3)',
               transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >

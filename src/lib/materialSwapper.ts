@@ -34,7 +34,7 @@ export class MaterialSwapper {
 
     // Clone the material(s) to preserve original state
     if (Array.isArray(mesh.material)) {
-      const clonedMaterials = mesh.material.map((mat) => mat.clone());
+      const clonedMaterials = mesh.material.map(mat => mat.clone());
       this.originalMaterials.set(mesh, clonedMaterials);
     } else {
       const clonedMaterial = mesh.material.clone();
@@ -59,7 +59,7 @@ export class MaterialSwapper {
 
     // Dispose current material(s) if different from original
     if (Array.isArray(mesh.material)) {
-      mesh.material.forEach((mat) => {
+      mesh.material.forEach(mat => {
         if (!this.isSameMaterial(mat, originalMaterial)) {
           mat.dispose();
         }
@@ -72,14 +72,16 @@ export class MaterialSwapper {
 
     // Clone the original material to avoid modifying the saved copy
     if (Array.isArray(originalMaterial)) {
-      mesh.material = originalMaterial.map((mat) => mat.clone());
+      mesh.material = originalMaterial.map(mat => mat.clone());
     } else {
       mesh.material = originalMaterial.clone();
     }
 
     // Mark material(s) as needing update
     if (Array.isArray(mesh.material)) {
-      mesh.material.forEach((mat) => { mat.needsUpdate = true; });
+      mesh.material.forEach(mat => {
+        mat.needsUpdate = true;
+      });
     } else {
       mesh.material.needsUpdate = true;
     }
@@ -101,7 +103,7 @@ export class MaterialSwapper {
     const color = new THREE.Color(hex);
 
     if (Array.isArray(mesh.material)) {
-      mesh.material.forEach((mat) => {
+      mesh.material.forEach(mat => {
         if ('color' in mat && mat.color instanceof THREE.Color) {
           mat.color.copy(color);
           mat.needsUpdate = true;
@@ -131,7 +133,7 @@ export class MaterialSwapper {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
         textureUrl,
-        (texture) => {
+        texture => {
           // Configure texture
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.wrapS = THREE.RepeatWrapping;
@@ -139,7 +141,7 @@ export class MaterialSwapper {
 
           // Apply texture to material(s)
           if (Array.isArray(mesh.material)) {
-            mesh.material.forEach((mat) => {
+            mesh.material.forEach(mat => {
               const stdMat = mat as THREE.MeshStandardMaterial;
               if ('map' in stdMat) {
                 // Dispose old texture if exists
@@ -166,7 +168,7 @@ export class MaterialSwapper {
           resolve();
         },
         undefined,
-        (error) => {
+        error => {
           this.logger.error('Failed to load texture', error, { textureUrl });
           reject(error);
         }
@@ -230,10 +232,7 @@ export class MaterialSwapper {
   /**
    * Check if two materials are the same instance
    */
-  private isSameMaterial(
-    mat1: THREE.Material,
-    mat2: THREE.Material | THREE.Material[]
-  ): boolean {
+  private isSameMaterial(mat1: THREE.Material, mat2: THREE.Material | THREE.Material[]): boolean {
     if (Array.isArray(mat2)) {
       return mat2.includes(mat1);
     }

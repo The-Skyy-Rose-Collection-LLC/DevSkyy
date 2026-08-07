@@ -41,8 +41,8 @@ export type CartCallback = (event: CartEvent) => void;
  */
 const DEFAULT_CONFIG: Required<CartConfig> = {
   storageKey: 'skyyrose_cart',
-  taxRate: 0.08,  // 8% tax
-  shippingCost: 0,  // Free shipping
+  taxRate: 0.08, // 8% tax
+  shippingCost: 0, // Free shipping
   currency: 'USD',
 };
 
@@ -66,11 +66,7 @@ export class CartManager {
   /**
    * Add item to cart
    */
-  public async addItem(
-    product: ShowroomProduct,
-    quantity: number,
-    options?: AddToCartOptions
-  ): Promise<void> {
+  public async addItem(product: ShowroomProduct, quantity: number, options?: AddToCartOptions): Promise<void> {
     // Validate quantity
     if (quantity <= 0) {
       throw new Error('Quantity must be greater than 0');
@@ -78,10 +74,7 @@ export class CartManager {
 
     // Check if item already exists in cart
     const existingIndex = this.items.findIndex(
-      (item) =>
-        item.productId === product.id &&
-        item.size === options?.size &&
-        item.color?.name === options?.color?.name
+      item => item.productId === product.id && item.size === options?.size && item.color?.name === options?.color?.name
     );
 
     let cartItem: CartItem;
@@ -129,10 +122,7 @@ export class CartManager {
    */
   public removeItem(productId: string, size?: string, colorName?: string): void {
     const index = this.items.findIndex(
-      (item) =>
-        item.productId === productId &&
-        item.size === size &&
-        item.color?.name === colorName
+      item => item.productId === productId && item.size === size && item.color?.name === colorName
     );
 
     if (index === -1) {
@@ -163,17 +153,9 @@ export class CartManager {
   /**
    * Update item quantity
    */
-  public updateQuantity(
-    productId: string,
-    quantity: number,
-    size?: string,
-    colorName?: string
-  ): void {
+  public updateQuantity(productId: string, quantity: number, size?: string, colorName?: string): void {
     const item = this.items.find(
-      (item) =>
-        item.productId === productId &&
-        item.size === size &&
-        item.color?.name === colorName
+      item => item.productId === productId && item.size === size && item.color?.name === colorName
     );
 
     if (!item) {

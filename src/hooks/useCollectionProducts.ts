@@ -55,25 +55,18 @@ const productCache = new Map<string, CacheEntry>();
 /**
  * Fetch products from WordPress/WooCommerce API
  */
-async function fetchProductsFromAPI(
-  categorySlug: string,
-  perPage: number
-): Promise<Product[]> {
+async function fetchProductsFromAPI(categorySlug: string, perPage: number): Promise<Product[]> {
   const apiUrl = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:8000';
 
   // First, get category ID by slug
-  const categoriesResponse = await fetch(
-    `${apiUrl}/api/v1/wordpress/products/categories?per_page=100`
-  );
+  const categoriesResponse = await fetch(`${apiUrl}/api/v1/wordpress/products/categories?per_page=100`);
 
   if (!categoriesResponse.ok) {
     throw new Error(`Failed to fetch categories: ${categoriesResponse.statusText}`);
   }
 
   const categories = await categoriesResponse.json();
-  const category = categories.find(
-    (cat: { slug: string; id: number }) => cat.slug === categorySlug
-  );
+  const category = categories.find((cat: { slug: string; id: number }) => cat.slug === categorySlug);
 
   if (!category) {
     throw new Error(`Category not found: ${categorySlug}`);
@@ -111,16 +104,18 @@ async function fetchProductsFromAPI(
       name: cat.name,
       slug: cat.slug,
     })),
-    tags: raw.tags?.map((tag: any) => ({
-      id: tag.id,
-      name: tag.name,
-      slug: tag.slug,
-    })) || [],
-    attributes: raw.attributes?.map((attr: any) => ({
-      id: attr.id,
-      name: attr.name,
-      options: attr.options,
-    })) || [],
+    tags:
+      raw.tags?.map((tag: any) => ({
+        id: tag.id,
+        name: tag.name,
+        slug: tag.slug,
+      })) || [],
+    attributes:
+      raw.attributes?.map((attr: any) => ({
+        id: attr.id,
+        name: attr.name,
+        options: attr.options,
+      })) || [],
     inStock: raw.stock_status === 'instock',
     stockQuantity: raw.stock_quantity,
   }));
@@ -129,9 +124,7 @@ async function fetchProductsFromAPI(
 /**
  * Hook to fetch collection products with caching and retry logic
  */
-export function useCollectionProducts(
-  options: UseCollectionProductsOptions
-): UseCollectionProductsResult {
+export function useCollectionProducts(options: UseCollectionProductsOptions): UseCollectionProductsResult {
   const {
     categorySlug,
     perPage = 20,

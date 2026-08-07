@@ -32,17 +32,25 @@ function createMockMesh(overrides: Partial<any> = {}): any {
 
   return {
     position: {
-      x: 0, y: 0, z: 0,
+      x: 0,
+      y: 0,
+      z: 0,
       clone: jest.fn().mockReturnValue({
-        x: 0, y: 0, z: 0,
+        x: 0,
+        y: 0,
+        z: 0,
         project: jest.fn().mockReturnThis(),
       }),
     },
     scale: {
-      x: 1, y: 1, z: 1,
+      x: 1,
+      y: 1,
+      z: 1,
       clone: jest.fn().mockReturnValue({
         multiplyScalar: jest.fn().mockReturnThis(),
-        x: 1.2, y: 1.2, z: 1.2,
+        x: 1.2,
+        y: 1.2,
+        z: 1.2,
       }),
       lerpVectors: jest.fn(),
       copy: jest.fn(),
@@ -94,7 +102,9 @@ function createMockInventory(): InventoryManager {
 function createMockCamera(): any {
   return {
     position: {
-      x: 0, y: 0, z: 5,
+      x: 0,
+      y: 0,
+      z: 5,
       clone: jest.fn().mockReturnValue({ x: 0, y: 0, z: 5, lerpVectors: jest.fn() }),
       lerpVectors: jest.fn(),
     },

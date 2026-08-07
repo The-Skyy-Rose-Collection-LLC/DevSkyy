@@ -190,7 +190,7 @@ describe('MaterialSwapper', () => {
       // TextureLoader.load calls onLoad callback asynchronously
       const promise = swapper.setTexture(mesh, '/textures/fabric.jpg');
       // Wait for the setTimeout in TextureLoader mock
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise(r => setTimeout(r, 10));
       await promise;
 
       // Texture should have been applied
@@ -200,7 +200,7 @@ describe('MaterialSwapper', () => {
     it('should auto-save original before applying texture', async () => {
       const mesh = createMockMesh();
       const promise = swapper.setTexture(mesh, '/textures/fabric.jpg');
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise(r => setTimeout(r, 10));
       await promise;
 
       expect(mesh.material.clone).toHaveBeenCalled();
@@ -212,7 +212,7 @@ describe('MaterialSwapper', () => {
       const mesh = createMockMesh([mat1, mat2]);
 
       const promise = swapper.setTexture(mesh, '/textures/fabric.jpg');
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise(r => setTimeout(r, 10));
       await promise;
     });
   });

@@ -221,11 +221,7 @@ export class CheckoutManager {
       // Sync order to WooCommerce
       let wcOrderId: number | undefined;
       if (this.config.enableWooCommerceSync) {
-        wcOrderId = await this.createWooCommerceOrder(
-          cart,
-          paymentResult.paymentIntentId!,
-          customer
-        );
+        wcOrderId = await this.createWooCommerceOrder(cart, paymentResult.paymentIntentId!, customer);
       }
 
       // Create order record
@@ -247,11 +243,7 @@ export class CheckoutManager {
   /**
    * Create WooCommerce order via API
    */
-  async createWooCommerceOrder(
-    cart: CartState,
-    stripePaymentId: string,
-    customer: CustomerInfo
-  ): Promise<number> {
+  async createWooCommerceOrder(cart: CartState, stripePaymentId: string, customer: CustomerInfo): Promise<number> {
     try {
       const apiUrl = this.config.apiBaseUrl || '';
 
@@ -282,7 +274,7 @@ export class CheckoutManager {
           postcode: customer.shippingAddress.postalCode,
           country: customer.shippingAddress.country,
         },
-        line_items: cart.items.map((item) => ({
+        line_items: cart.items.map(item => ({
           product_id: parseInt(item.productId),
           quantity: item.quantity,
         })),

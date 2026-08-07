@@ -20,7 +20,7 @@ function createMockRenderer() {
 
 function createMockScene() {
   return {
-    traverse: jest.fn().mockImplementation((cb) => {
+    traverse: jest.fn().mockImplementation(cb => {
       // Simulate 3 objects, 2 visible
       cb({ visible: true });
       cb({ visible: true });

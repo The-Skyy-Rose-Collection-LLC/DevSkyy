@@ -37,15 +37,8 @@ export interface UseScrollAnimationResult {
 /**
  * Hook to animate elements when they scroll into view
  */
-export function useScrollAnimation(
-  options: UseScrollAnimationOptions = {}
-): UseScrollAnimationResult {
-  const {
-    threshold = 0.2,
-    rootMargin = '0px',
-    once = true,
-    delay = 0,
-  } = options;
+export function useScrollAnimation(options: UseScrollAnimationOptions = {}): UseScrollAnimationResult {
+  const { threshold = 0.2, rootMargin = '0px', once = true, delay = 0 } = options;
 
   const ref = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -66,8 +59,8 @@ export function useScrollAnimation(
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             if (delay > 0) {
               setTimeout(() => {

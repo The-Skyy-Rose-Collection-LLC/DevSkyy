@@ -100,9 +100,9 @@ describe('AgentService', () => {
     });
 
     it('should throw error for non-existent agent type', async () => {
-      await expect(
-        service.createTask('custom_agent', 'test', {})
-      ).rejects.toThrow('No agents found for type: custom_agent');
+      await expect(service.createTask('custom_agent', 'test', {})).rejects.toThrow(
+        'No agents found for type: custom_agent'
+      );
     });
 
     it('should create task with specified priority', async () => {
@@ -268,9 +268,7 @@ describe('AgentService', () => {
     });
 
     it('should throw error when executing task with non-existent taskId', async () => {
-      await expect(service.executeTask('non-existent-task-id')).rejects.toThrow(
-        'Task not found: non-existent-task-id'
-      );
+      await expect(service.executeTask('non-existent-task-id')).rejects.toThrow('Task not found: non-existent-task-id');
     });
 
     it('should handle task execution errors in catch block', async () => {
@@ -278,9 +276,7 @@ describe('AgentService', () => {
       const errorSpy = jest.spyOn((service as any).logger, 'error');
 
       // Spy on executeTask and make it throw
-      jest.spyOn(service, 'executeTask').mockRejectedValueOnce(
-        new Error('Task execution failed')
-      );
+      jest.spyOn(service, 'executeTask').mockRejectedValueOnce(new Error('Task execution failed'));
 
       await service.createTask('wordpress_agent', 'test', {});
 
@@ -288,10 +284,7 @@ describe('AgentService', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Verify error was logged (this covers the catch block on line 142-143)
-      expect(errorSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/Task execution failed:/),
-        expect.any(Error)
-      );
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringMatching(/Task execution failed:/), expect.any(Error));
     });
 
     it('should handle errors during task execution and mark task as failed', async () => {
@@ -300,9 +293,7 @@ describe('AgentService', () => {
       service.on('taskFailed', failedHandler);
 
       // Mock simulateTaskExecution to throw an error
-      jest.spyOn(service as any, 'simulateTaskExecution').mockRejectedValueOnce(
-        new Error('Simulated execution error')
-      );
+      jest.spyOn(service as any, 'simulateTaskExecution').mockRejectedValueOnce(new Error('Simulated execution error'));
 
       const taskId = await service.createTask('wordpress_agent', 'test', {});
 

@@ -63,7 +63,7 @@ export interface ProductVisualEffects {
  * Default configuration
  */
 const DEFAULT_CONFIG = {
-  animationDuration: 1000,  // 1 second
+  animationDuration: 1000, // 1 second
   highlightIntensity: 0.3,
 };
 
@@ -122,7 +122,7 @@ export class ProductInteractionHandler {
     this.originalMaterials.set(productData.id, mesh.material);
 
     // Subscribe to inventory updates
-    this.inventory.subscribe(productData.id, (status) => {
+    this.inventory.subscribe(productData.id, status => {
       this.updateProductVisuals(mesh, status);
     });
 
@@ -152,12 +152,14 @@ export class ProductInteractionHandler {
     }
 
     // Animate camera to product
-    this.animateToProduct(mesh).then(() => {
-      // Show product panel after animation
-      this.showProductPanel(productData);
-    }).catch((error) => {
-      this.logger.error('Failed to animate to product', error);
-    });
+    this.animateToProduct(mesh)
+      .then(() => {
+        // Show product panel after animation
+        this.showProductPanel(productData);
+      })
+      .catch(error => {
+        this.logger.error('Failed to animate to product', error);
+      });
   }
 
   /**
@@ -171,16 +173,12 @@ export class ProductInteractionHandler {
 
     this.isAnimating = true;
 
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const startPosition = this.camera.position.clone();
       const startRotation = this.camera.quaternion.clone();
 
       // Calculate target position (slightly in front and above the product)
-      const targetPosition = new THREE.Vector3(
-        mesh.position.x + 2,
-        mesh.position.y + 1,
-        mesh.position.z + 2
-      );
+      const targetPosition = new THREE.Vector3(mesh.position.x + 2, mesh.position.y + 1, mesh.position.z + 2);
 
       // Calculate target look-at
       const targetLookAt = mesh.position.clone();
@@ -199,9 +197,7 @@ export class ProductInteractionHandler {
         const t = Math.min(elapsed / duration, 1);
 
         // Ease-in-out cubic
-        const eased = t < 0.5
-          ? 4 * t * t * t
-          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
         // Interpolate position
         this.camera.position.lerpVectors(startPosition, targetPosition, eased);
@@ -229,9 +225,7 @@ export class ProductInteractionHandler {
 
     // Calculate screen position for panel
     const mesh = this.productMeshes.get(productData.id);
-    const position = mesh
-      ? this.worldToScreen(mesh.position)
-      : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const position = mesh ? this.worldToScreen(mesh.position) : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
     const panelData: ProductPanelData = {
       product: productData,
@@ -468,7 +462,7 @@ export class ProductInteractionHandler {
   public getProduct(productId: string): ShowroomProduct | null {
     const mesh = this.productMeshes.get(productId);
     if (!mesh) return null;
-    return mesh.userData['productData'] as ShowroomProduct || null;
+    return (mesh.userData['productData'] as ShowroomProduct) || null;
   }
 
   /**

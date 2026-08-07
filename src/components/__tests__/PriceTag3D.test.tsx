@@ -28,7 +28,7 @@ jest.mock('three/examples/jsm/renderers/CSS2DRenderer.js', () => ({
       style: { position: '', top: '', left: '', pointerEvents: '' },
     }),
   })),
-  CSS2DObject: jest.fn().mockImplementation((element) => ({
+  CSS2DObject: jest.fn().mockImplementation(element => ({
     element,
     position: { copy: jest.fn() },
     layers: { set: jest.fn() },

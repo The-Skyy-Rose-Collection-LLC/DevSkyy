@@ -32,16 +32,12 @@ describe('ErrorFallback', () => {
   });
 
   it('should render custom title', () => {
-    render(
-      <ErrorFallback error={testError} resetErrorBoundary={mockReset} title="Custom Error" />
-    );
+    render(<ErrorFallback error={testError} resetErrorBoundary={mockReset} title='Custom Error' />);
     expect(screen.getByText('Custom Error')).toBeTruthy();
   });
 
   it('should render custom message', () => {
-    render(
-      <ErrorFallback error={testError} resetErrorBoundary={mockReset} message="Custom msg" />
-    );
+    render(<ErrorFallback error={testError} resetErrorBoundary={mockReset} message='Custom msg' />);
     expect(screen.getByText('Custom msg')).toBeTruthy();
   });
 
@@ -99,9 +95,7 @@ describe('ErrorBoundary', () => {
 
   it('should render fallbackRender', () => {
     render(
-      <ErrorBoundary
-        fallbackRender={({ error }) => <div>Render: {error.message}</div>}
-      >
+      <ErrorBoundary fallbackRender={({ error }) => <div>Render: {error.message}</div>}>
         <ThrowingComponent shouldThrow={true} />
       </ErrorBoundary>
     );

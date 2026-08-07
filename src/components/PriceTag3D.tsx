@@ -42,9 +42,7 @@ export function PriceTag3D({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const hasDiscount = hasValidDiscount(price, salePrice);
-  const discountPercent = hasDiscount && salePrice
-    ? calculateDiscount(price, salePrice)
-    : 0;
+  const discountPercent = hasDiscount && salePrice ? calculateDiscount(price, salePrice) : 0;
 
   useEffect(() => {
     if (containerRef.current) {
@@ -61,9 +59,7 @@ export function PriceTag3D({
             {/* Sale Price */}
             <div style={styles['salePriceWrapper']}>
               <span style={styles['salePrice']}>{formatPrice(salePrice, currency)}</span>
-              {discountPercent > 0 && (
-                <span style={styles['discountBadge']}>-{discountPercent}%</span>
-              )}
+              {discountPercent > 0 && <span style={styles['discountBadge']}>-{discountPercent}%</span>}
             </div>
             {/* Original Price (Strikethrough) */}
             <span style={styles['originalPrice']}>{formatPrice(price, currency)}</span>
@@ -101,9 +97,7 @@ export function createPriceTag3DObject(
   currency: string = 'USD'
 ): CSS2DObject {
   const hasDiscount = hasValidDiscount(price, salePrice);
-  const discountPercent = hasDiscount && salePrice
-    ? calculateDiscount(price, salePrice)
-    : 0;
+  const discountPercent = hasDiscount && salePrice ? calculateDiscount(price, salePrice) : 0;
 
   // Create container element
   const container = document.createElement('div');
@@ -278,11 +272,7 @@ export function setupCSS2DRenderer(container: HTMLElement): CSS2DRenderer {
  * @param scene - Three.js scene
  * @param camera - Three.js camera
  */
-export function updateCSS2DRenderer(
-  renderer: CSS2DRenderer,
-  scene: THREE.Scene,
-  camera: THREE.Camera
-): void {
+export function updateCSS2DRenderer(renderer: CSS2DRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
   renderer.render(scene, camera);
 }
 

@@ -57,7 +57,8 @@ export const COLLECTIONS: Record<string, Collection> = {
     name: 'BLACK ROSE',
     tagline: 'Gothic Luxury Reimagined',
     description: 'Where darkness meets elegance in a symphony of rebellious sophistication',
-    story: 'The BLACK ROSE collection embodies the beauty found in darkness. Each piece tells a story of mystery and power, crafted for those who find strength in shadows and elegance in the unconventional.',
+    story:
+      'The BLACK ROSE collection embodies the beauty found in darkness. Each piece tells a story of mystery and power, crafted for those who find strength in shadows and elegance in the unconventional.',
     theme: {
       primaryColor: '#1a1a1a',
       backgroundColor: '#0a0a0a',
@@ -73,7 +74,8 @@ export const COLLECTIONS: Record<string, Collection> = {
     name: 'SIGNATURE',
     tagline: 'Timeless Luxury',
     description: 'Classic elegance with a contemporary edge - the foundation of refined streetwear',
-    story: 'Our SIGNATURE collection represents the perfect balance of timeless sophistication and modern sensibility. Each design is a testament to craftsmanship, created for those who appreciate understated luxury.',
+    story:
+      'Our SIGNATURE collection represents the perfect balance of timeless sophistication and modern sensibility. Each design is a testament to craftsmanship, created for those who appreciate understated luxury.',
     theme: {
       primaryColor: '#d4af37',
       backgroundColor: '#f5f5f0',
@@ -89,7 +91,8 @@ export const COLLECTIONS: Record<string, Collection> = {
     name: 'LOVE HURTS',
     tagline: 'Passion Meets Pain',
     description: 'Raw emotion transformed into wearable art - for hearts that bleed rebellion',
-    story: 'LOVE HURTS captures the duality of passion - the ecstasy and the agony. This collection is for those who wear their heart on their sleeve, literally. Bold, unapologetic, and deeply personal.',
+    story:
+      'LOVE HURTS captures the duality of passion - the ecstasy and the agony. This collection is for those who wear their heart on their sleeve, literally. Bold, unapologetic, and deeply personal.',
     theme: {
       primaryColor: '#b76e79',
       backgroundColor: '#1a0a0a',

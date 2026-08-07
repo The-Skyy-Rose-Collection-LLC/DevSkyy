@@ -373,9 +373,7 @@ export function detectDeviceConfig(): ThreeJSConfig {
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
 
   // Check for mobile
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   // Check hardware concurrency
   const cores = navigator.hardwareConcurrency || 2;
@@ -384,7 +382,7 @@ export function detectDeviceConfig(): ThreeJSConfig {
     return LOW_QUALITY_CONFIG;
   }
 
-  if ((memory && memory >= 8) && cores >= 8) {
+  if (memory && memory >= 8 && cores >= 8) {
     return HIGH_QUALITY_CONFIG;
   }
 
@@ -394,10 +392,7 @@ export function detectDeviceConfig(): ThreeJSConfig {
 /**
  * Create Three.js renderer with config
  */
-export function createRendererFromConfig(
-  config: ThreeJSConfig,
-  canvas?: HTMLCanvasElement
-): THREE.WebGLRenderer {
+export function createRendererFromConfig(config: ThreeJSConfig, canvas?: HTMLCanvasElement): THREE.WebGLRenderer {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: config.renderer.antialias,
@@ -410,9 +405,7 @@ export function createRendererFromConfig(
   });
 
   // Configure pixel ratio
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, config.performance.maxPixelRatio)
-  );
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, config.performance.maxPixelRatio));
 
   // Configure shadows
   renderer.shadowMap.enabled = config.shadows.enabled;
@@ -432,28 +425,12 @@ export function createRendererFromConfig(
 /**
  * Create camera from config
  */
-export function createCameraFromConfig(
-  config: ThreeJSConfig,
-  aspect: number
-): THREE.PerspectiveCamera {
-  const camera = new THREE.PerspectiveCamera(
-    config.camera.fov,
-    aspect,
-    config.camera.near,
-    config.camera.far
-  );
+export function createCameraFromConfig(config: ThreeJSConfig, aspect: number): THREE.PerspectiveCamera {
+  const camera = new THREE.PerspectiveCamera(config.camera.fov, aspect, config.camera.near, config.camera.far);
 
-  camera.position.set(
-    config.camera.position.x,
-    config.camera.position.y,
-    config.camera.position.z
-  );
+  camera.position.set(config.camera.position.x, config.camera.position.y, config.camera.position.z);
 
-  camera.lookAt(
-    config.camera.target.x,
-    config.camera.target.y,
-    config.camera.target.z
-  );
+  camera.lookAt(config.camera.target.x, config.camera.target.y, config.camera.target.z);
 
   return camera;
 }

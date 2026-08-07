@@ -40,7 +40,7 @@ export interface ShowroomProduct {
   stockQuantity: number;
   sizes: string[];
   colors: ProductColor[];
-  wcProductId?: number;  // WooCommerce product ID
+  wcProductId?: number; // WooCommerce product ID
 
   // Optional metadata
   description?: string;

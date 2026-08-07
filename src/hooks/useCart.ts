@@ -50,7 +50,7 @@ export function useCart(): UseCartReturn {
   useEffect(() => {
     logger.debug('Subscribing to cart updates');
 
-    const unsubscribe = cartManager.subscribe((newState) => {
+    const unsubscribe = cartManager.subscribe(newState => {
       setState(newState);
     });
 
@@ -129,8 +129,7 @@ export function useCart(): UseCartReturn {
       await cartManager.syncWithWooCommerce();
       logger.info('Cart synced with WooCommerce');
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to sync cart with WooCommerce';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to sync cart with WooCommerce';
       setError(errorMessage);
       logger.error('Error syncing cart with WooCommerce', err);
       throw err;
@@ -189,7 +188,7 @@ export function useCartItemCount(): number {
   const [itemCount, setItemCount] = useState<number>(cartManager.getItemCount());
 
   useEffect(() => {
-    const unsubscribe = cartManager.subscribe((state) => {
+    const unsubscribe = cartManager.subscribe(state => {
       setItemCount(state.itemCount);
     });
 
@@ -209,7 +208,7 @@ export function useCartTotal(): { total: number; currency: string } {
   const [currency, setCurrency] = useState<string>(cartManager.getState().currency);
 
   useEffect(() => {
-    const unsubscribe = cartManager.subscribe((state) => {
+    const unsubscribe = cartManager.subscribe(state => {
       setTotal(state.total);
       setCurrency(state.currency);
     });
@@ -223,15 +222,9 @@ export function useCartTotal(): { total: number; currency: string } {
 /**
  * Hook to check if a specific item is in cart
  */
-export function useIsInCart(
-  productId: string,
-  size?: string,
-  color?: string
-): boolean {
+export function useIsInCart(productId: string, size?: string, color?: string): boolean {
   const cartManager = useMemo(() => CartManager.getInstance(), []);
-  const [isInCart, setIsInCart] = useState<boolean>(
-    cartManager.hasItem(productId, size, color)
-  );
+  const [isInCart, setIsInCart] = useState<boolean>(cartManager.hasItem(productId, size, color));
 
   useEffect(() => {
     const unsubscribe = cartManager.subscribe(() => {

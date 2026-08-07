@@ -74,11 +74,7 @@ export function getEffectivePrice(price: number, salePrice?: number): number {
  * @param currency - Currency code (default: 'USD')
  * @returns Formatted price range string
  */
-export function formatPriceRange(
-  minPrice: number,
-  maxPrice: number,
-  currency: string = 'USD'
-): string {
+export function formatPriceRange(minPrice: number, maxPrice: number, currency: string = 'USD'): string {
   if (minPrice === maxPrice) {
     return formatPrice(minPrice, currency);
   }

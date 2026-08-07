@@ -177,10 +177,7 @@ describe('OpenAIService', () => {
         messages: [{ role: 'user', content: 'Hello' }],
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.openai.com/v1/chat/completions',
-        expect.any(Object)
-      );
+      expect(mockFetch).toHaveBeenCalledWith('https://api.openai.com/v1/chat/completions', expect.any(Object));
       expect(result.success).toBe(true);
     });
 
@@ -219,10 +216,7 @@ describe('OpenAIService', () => {
 
       const result = await service.createImage({ prompt: 'A beautiful sunset' });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.openai.com/v1/images/generations',
-        expect.any(Object)
-      );
+      expect(mockFetch).toHaveBeenCalledWith('https://api.openai.com/v1/images/generations', expect.any(Object));
       expect(result.success).toBe(true);
       expect(result.data.data[0]?.url).toBe('https://example.com/image.png');
     });
@@ -254,9 +248,10 @@ describe('OpenAIService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({
-          choices: [{ text: 'This is an image of a cat' }],
-        }),
+        json: () =>
+          Promise.resolve({
+            choices: [{ text: 'This is an image of a cat' }],
+          }),
         headers: new Map(),
       });
 
@@ -326,10 +321,7 @@ describe('OpenAIService', () => {
 
       const result = await service.createEmbeddings('Hello world');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.openai.com/v1/embeddings',
-        expect.any(Object)
-      );
+      expect(mockFetch).toHaveBeenCalledWith('https://api.openai.com/v1/embeddings', expect.any(Object));
       expect(result.success).toBe(true);
     });
 
@@ -365,11 +357,13 @@ describe('OpenAIService', () => {
   describe('moderateContent', () => {
     it('should make POST request to /moderations endpoint', async () => {
       const mockResponse = {
-        results: [{
-          flagged: false,
-          categories: { hate: false, violence: false },
-          categoryScores: { hate: 0.001, violence: 0.002 },
-        }],
+        results: [
+          {
+            flagged: false,
+            categories: { hate: false, violence: false },
+            categoryScores: { hate: 0.001, violence: 0.002 },
+          },
+        ],
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -381,21 +375,20 @@ describe('OpenAIService', () => {
 
       const result = await service.moderateContent('Hello, how are you?');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.openai.com/v1/moderations',
-        expect.any(Object)
-      );
+      expect(mockFetch).toHaveBeenCalledWith('https://api.openai.com/v1/moderations', expect.any(Object));
       expect(result.success).toBe(true);
       expect(result.data.results[0]?.flagged).toBe(false);
     });
 
     it('should detect flagged content', async () => {
       const mockResponse = {
-        results: [{
-          flagged: true,
-          categories: { hate: true, violence: false },
-          categoryScores: { hate: 0.95, violence: 0.01 },
-        }],
+        results: [
+          {
+            flagged: true,
+            categories: { hate: true, violence: false },
+            categoryScores: { hate: 0.95, violence: 0.01 },
+          },
+        ],
       };
 
       mockFetch.mockResolvedValueOnce({

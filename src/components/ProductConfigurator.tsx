@@ -77,7 +77,9 @@ export function ProductConfigurator({
   onAddToCart,
 }: ProductConfiguratorProps): React.ReactElement {
   const [selectedSize, setSelectedSize] = useState<string>(product.sizes[0] || '');
-  const [selectedColor, setSelectedColor] = useState<ProductColor>(product.colors[0] || { name: 'Default', hex: '#000000' });
+  const [selectedColor, setSelectedColor] = useState<ProductColor>(
+    product.colors[0] || { name: 'Default', hex: '#000000' }
+  );
   const [quantity, setQuantity] = useState<number>(1);
 
   // Update parent when config changes
@@ -141,12 +143,10 @@ export function ProductConfigurator({
 
   const hasDiscount = hasValidDiscount(product.price, product.salePrice);
   const effectivePrice = getEffectivePrice(product.price, product.salePrice);
-  const discountPercent = hasDiscount && product.salePrice
-    ? calculateDiscount(product.price, product.salePrice)
-    : 0;
+  const discountPercent = hasDiscount && product.salePrice ? calculateDiscount(product.price, product.salePrice) : 0;
 
   return (
-    <div className="product-configurator" style={styles['container']}>
+    <div className='product-configurator' style={styles['container']}>
       {/* Product Name */}
       <h2 style={styles['productName']}>{product.name}</h2>
 
@@ -164,9 +164,7 @@ export function ProductConfigurator({
           {getStockStatusLabel(product.stockStatus)}
         </span>
         {product.stockStatus !== 'out_of_stock' && (
-          <span style={styles['stockQuantity']}>
-            {product.stockQuantity} available
-          </span>
+          <span style={styles['stockQuantity']}>{product.stockQuantity} available</span>
         )}
       </div>
 
@@ -179,9 +177,7 @@ export function ProductConfigurator({
             <span style={styles['discountBadge']}>-{discountPercent}%</span>
           </>
         )}
-        {!hasDiscount && (
-          <span style={styles['regularPrice']}>{formatPrice(product.price)}</span>
-        )}
+        {!hasDiscount && <span style={styles['regularPrice']}>{formatPrice(product.price)}</span>}
       </div>
 
       {/* Color Selector */}
@@ -189,16 +185,14 @@ export function ProductConfigurator({
         <div style={styles['section']}>
           <label style={styles['label']}>Color: {selectedColor.name}</label>
           <div style={styles['colorSwatches']}>
-            {product.colors.map((color) => (
+            {product.colors.map(color => (
               <button
                 key={color.name}
                 onClick={() => handleColorChange(color)}
                 style={{
                   ...styles['colorSwatch'],
                   backgroundColor: color.hex,
-                  border: selectedColor.name === color.name
-                    ? '3px solid #B76E79'
-                    : '2px solid #333',
+                  border: selectedColor.name === color.name ? '3px solid #B76E79' : '2px solid #333',
                 }}
                 title={color.name}
                 aria-label={`Select ${color.name} color`}
@@ -213,7 +207,7 @@ export function ProductConfigurator({
         <div style={styles['section']}>
           <label style={styles['label']}>Size</label>
           <div style={styles['sizeButtons']}>
-            {product.sizes.map((size) => (
+            {product.sizes.map(size => (
               <button
                 key={size}
                 onClick={() => handleSizeChange(size)}
@@ -260,9 +254,7 @@ export function ProductConfigurator({
       {/* Total Price */}
       <div style={styles['totalPrice']}>
         <span style={styles['totalLabel']}>Total:</span>
-        <span style={styles['totalValue']}>
-          {formatPrice(effectivePrice * quantity)}
-        </span>
+        <span style={styles['totalValue']}>{formatPrice(effectivePrice * quantity)}</span>
       </div>
 
       {/* Add to Cart Button */}

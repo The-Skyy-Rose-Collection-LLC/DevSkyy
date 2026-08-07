@@ -46,12 +46,10 @@ const DEFAULT_FILTERS: ProductFilters = {
 function extractAttributeValues(products: Product[], attributeName: string): string[] {
   const values = new Set<string>();
 
-  products.forEach((product) => {
-    const attr = product.attributes.find(
-      (a) => a.name.toLowerCase() === attributeName.toLowerCase()
-    );
+  products.forEach(product => {
+    const attr = product.attributes.find(a => a.name.toLowerCase() === attributeName.toLowerCase());
     if (attr) {
-      attr.options.forEach((option) => values.add(option));
+      attr.options.forEach(option => values.add(option));
     }
   });
 
@@ -64,7 +62,7 @@ function extractAttributeValues(products: Product[], attributeName: string): str
 function calculatePriceRange(products: Product[]): [number, number] {
   if (products.length === 0) return [0, 1000];
 
-  const prices = products.map((p) => parseFloat(p.price) || 0);
+  const prices = products.map(p => parseFloat(p.price) || 0);
   return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
 }
 
@@ -80,10 +78,8 @@ function matchesFilters(product: Product, filters: ProductFilters): boolean {
 
   // Size filter
   if (filters.sizes.length > 0) {
-    const sizeAttr = product.attributes.find(
-      (a) => a.name.toLowerCase() === 'size'
-    );
-    if (!sizeAttr || !sizeAttr.options.some((opt) => filters.sizes.includes(opt))) {
+    const sizeAttr = product.attributes.find(a => a.name.toLowerCase() === 'size');
+    if (!sizeAttr || !sizeAttr.options.some(opt => filters.sizes.includes(opt))) {
       return false;
     }
   }
@@ -91,9 +87,9 @@ function matchesFilters(product: Product, filters: ProductFilters): boolean {
   // Color filter
   if (filters.colors.length > 0) {
     const colorAttr = product.attributes.find(
-      (a) => a.name.toLowerCase() === 'color' || a.name.toLowerCase() === 'colour'
+      a => a.name.toLowerCase() === 'color' || a.name.toLowerCase() === 'colour'
     );
-    if (!colorAttr || !colorAttr.options.some((opt) => filters.colors.includes(opt))) {
+    if (!colorAttr || !colorAttr.options.some(opt => filters.colors.includes(opt))) {
       return false;
     }
   }
@@ -153,10 +149,7 @@ function parseFiltersFromURL(searchParams: URLSearchParams): Partial<ProductFilt
   const priceMin = searchParams.get('priceMin');
   const priceMax = searchParams.get('priceMax');
   if (priceMin || priceMax) {
-    filters.priceRange = [
-      priceMin ? parseFloat(priceMin) : 0,
-      priceMax ? parseFloat(priceMax) : Infinity,
-    ];
+    filters.priceRange = [priceMin ? parseFloat(priceMin) : 0, priceMax ? parseFloat(priceMax) : Infinity];
   }
 
   const sortBy = searchParams.get('sortBy') as SortOption;
@@ -217,7 +210,7 @@ export function useProductFilters(
     const urlFilters = parseFiltersFromURL(searchParams);
 
     if (Object.keys(urlFilters).length > 0) {
-      setFilters((prev) => ({ ...prev, ...urlFilters }));
+      setFilters(prev => ({ ...prev, ...urlFilters }));
     }
   }, []);
 
@@ -226,9 +219,7 @@ export function useProductFilters(
     if (typeof window === 'undefined') return;
 
     const params = filtersToURLParams(filters);
-    const newURL = params.toString()
-      ? `${window.location.pathname}?${params.toString()}`
-      : window.location.pathname;
+    const newURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
 
     window.history.replaceState({}, '', newURL);
   }, [filters]);
@@ -244,12 +235,12 @@ export function useProductFilters(
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter((product) => matchesFilters(product, filters));
+    const filtered = products.filter(product => matchesFilters(product, filters));
     return sortProducts(filtered, filters.sortBy);
   }, [products, filters]);
 
   const updateFilters = useCallback((updates: Partial<ProductFilters>) => {
-    setFilters((prev) => ({ ...prev, ...updates }));
+    setFilters(prev => ({ ...prev, ...updates }));
   }, []);
 
   const clearFilters = useCallback(() => {

@@ -50,11 +50,7 @@ function itemsMatch(
   item1: CartItem,
   item2: { productId: string; size?: string | undefined; color?: string | undefined }
 ): boolean {
-  return (
-    item1.productId === item2.productId &&
-    item1.size === item2.size &&
-    item1.color === item2.color
-  );
+  return item1.productId === item2.productId && item1.size === item2.size && item1.color === item2.color;
 }
 
 /**
@@ -107,9 +103,7 @@ export class CartManager {
       }
 
       // Check if item already exists in cart
-      const existingItemIndex = this.items.findIndex((cartItem) =>
-        itemsMatch(cartItem, item)
-      );
+      const existingItemIndex = this.items.findIndex(cartItem => itemsMatch(cartItem, item));
 
       if (existingItemIndex !== -1) {
         // Update quantity of existing item
@@ -137,9 +131,7 @@ export class CartManager {
   public removeItem(productId: string, size?: string, color?: string): void {
     try {
       const initialLength = this.items.length;
-      this.items = this.items.filter(
-        (item) => !itemsMatch(item, { productId, size, color })
-      );
+      this.items = this.items.filter(item => !itemsMatch(item, { productId, size, color }));
 
       if (this.items.length < initialLength) {
         this.logger.info(`Removed item from cart: ${productId}`);
@@ -157,12 +149,7 @@ export class CartManager {
   /**
    * Update item quantity
    */
-  public updateQuantity(
-    productId: string,
-    quantity: number,
-    size?: string,
-    color?: string
-  ): void {
+  public updateQuantity(productId: string, quantity: number, size?: string, color?: string): void {
     try {
       if (quantity < 0) {
         throw new Error('Quantity cannot be negative');
@@ -173,9 +160,7 @@ export class CartManager {
         return;
       }
 
-      const item = this.items.find((cartItem) =>
-        itemsMatch(cartItem, { productId, size, color })
-      );
+      const item = this.items.find(cartItem => itemsMatch(cartItem, { productId, size, color }));
 
       if (item) {
         item.quantity = quantity;
@@ -263,7 +248,7 @@ export class CartManager {
 
       // Prepare cart data for WooCommerce
       const cartData = {
-        items: this.items.map((item) => ({
+        items: this.items.map(item => ({
           product_id: item.productId,
           quantity: item.quantity,
           variation_id: item.size || item.color ? `${item.size}-${item.color}` : undefined,
@@ -360,7 +345,7 @@ export class CartManager {
    */
   private notifySubscribers(): void {
     const state = this.getState();
-    this.subscribers.forEach((callback) => {
+    this.subscribers.forEach(callback => {
       try {
         callback(state);
       } catch (error) {
@@ -389,7 +374,7 @@ export class CartManager {
    * Get item by product ID
    */
   public getItem(productId: string, size?: string, color?: string): CartItem | undefined {
-    return this.items.find((item) => itemsMatch(item, { productId, size, color }));
+    return this.items.find(item => itemsMatch(item, { productId, size, color }));
   }
 
   /**

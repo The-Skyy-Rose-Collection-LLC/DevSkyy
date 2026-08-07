@@ -174,9 +174,9 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="success-title"
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='success-title'
       style={{
         position: 'fixed',
         top: 0,
@@ -236,22 +236,22 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
           }}
         >
           <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            width='48'
+            height='48'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='#FFFFFF'
+            strokeWidth='3'
+            strokeLinecap='round'
+            strokeLinejoin='round'
           >
-            <polyline points="20 6 9 17 4 12" />
+            <polyline points='20 6 9 17 4 12' />
           </svg>
         </div>
 
         {/* Success Message */}
         <h2
-          id="success-title"
+          id='success-title'
           style={{
             fontSize: '32px',
             fontWeight: 'bold',
@@ -302,9 +302,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
             }}
           >
             <span style={{ color: '#666666', fontSize: '14px' }}>Total:</span>
-            <strong style={{ color: '#B76E79', fontSize: '18px' }}>
-              {formatCurrency(orderTotal, currency)}
-            </strong>
+            <strong style={{ color: '#B76E79', fontSize: '18px' }}>{formatCurrency(orderTotal, currency)}</strong>
           </div>
           <div
             style={{
@@ -321,7 +319,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
         <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
           <button
             onClick={onContinueShopping}
-            aria-label="Continue shopping"
+            aria-label='Continue shopping'
             style={{
               backgroundColor: '#B76E79',
               color: '#FFFFFF',
@@ -334,12 +332,12 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
               transition: 'all 0.3s ease',
               boxShadow: '0 4px 12px rgba(183, 110, 121, 0.3)',
             }}
-            onMouseEnter={(e) => {
+            onMouseEnter={e => {
               e.currentTarget.style.backgroundColor = '#A05D6B';
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 6px 16px rgba(183, 110, 121, 0.4)';
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={e => {
               e.currentTarget.style.backgroundColor = '#B76E79';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(183, 110, 121, 0.3)';
@@ -351,7 +349,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
           {onViewOrder && (
             <button
               onClick={() => onViewOrder(orderId)}
-              aria-label="View order details"
+              aria-label='View order details'
               style={{
                 backgroundColor: 'transparent',
                 color: '#B76E79',
@@ -363,11 +361,11 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.backgroundColor = '#B76E79';
                 e.currentTarget.style.color = '#FFFFFF';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.backgroundColor = 'transparent';
                 e.currentTarget.style.color = '#B76E79';
               }}

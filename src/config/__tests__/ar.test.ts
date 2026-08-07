@@ -34,7 +34,7 @@ describe('COLLECTION_AR_SETTINGS', () => {
     expect(COLLECTION_AR_SETTINGS['signature']).toBeDefined();
   });
 
-  it.each(['black_rose', 'love_hurts', 'signature'])('%s should have required fields', (collection) => {
+  it.each(['black_rose', 'love_hurts', 'signature'])('%s should have required fields', collection => {
     const settings = COLLECTION_AR_SETTINGS[collection]!;
     expect(settings.collection).toBe(collection);
     expect(typeof settings.accentColor).toBe('number');
@@ -70,9 +70,11 @@ describe('detectARCapabilities', () => {
       value: {
         ...originalNavigator,
         mediaDevices: {
-          enumerateDevices: jest.fn().mockResolvedValue([
-            { kind: 'videoinput', deviceId: 'cam1', label: 'Camera', groupId: 'g1', toJSON: jest.fn() },
-          ]),
+          enumerateDevices: jest
+            .fn()
+            .mockResolvedValue([
+              { kind: 'videoinput', deviceId: 'cam1', label: 'Camera', groupId: 'g1', toJSON: jest.fn() },
+            ]),
         },
       },
       writable: true,
@@ -162,7 +164,8 @@ describe('ARApiClient', () => {
     });
 
     it('should record try-on with session', async () => {
-      global.fetch = jest.fn()
+      global.fetch = jest
+        .fn()
         .mockResolvedValueOnce({ ok: true, json: jest.fn().mockResolvedValue({ session_id: 's1' }) })
         .mockResolvedValueOnce({ ok: true });
 
@@ -225,7 +228,8 @@ describe('ARApiClient', () => {
     });
 
     it('should end session and clear ID', async () => {
-      global.fetch = jest.fn()
+      global.fetch = jest
+        .fn()
         .mockResolvedValueOnce({ ok: true, json: jest.fn().mockResolvedValue({ session_id: 's1' }) })
         .mockResolvedValueOnce({ ok: true });
 

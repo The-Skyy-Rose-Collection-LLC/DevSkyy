@@ -160,7 +160,8 @@ export const createTask = (
   priority?: import('./types/index.js').TaskPriority
 ): Promise<string> => devSkyy.agents.createTask(agentType, taskType, payload, priority);
 
-export const getTask = (taskId: string): import('./types/index.js').AgentTask | undefined => devSkyy.agents.getTask(taskId);
+export const getTask = (taskId: string): import('./types/index.js').AgentTask | undefined =>
+  devSkyy.agents.getTask(taskId);
 
 export const getAgents = (): import('./types/index.js').Agent[] => devSkyy.agents.getAgents();
 

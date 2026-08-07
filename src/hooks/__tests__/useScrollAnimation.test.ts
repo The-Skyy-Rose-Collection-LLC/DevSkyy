@@ -18,7 +18,7 @@ function installIntersectionObserverMock() {
   mockObserve = jest.fn();
   mockUnobserve = jest.fn();
   mockDisconnect = jest.fn();
-  MockIntersectionObserver = jest.fn().mockImplementation((cb) => {
+  MockIntersectionObserver = jest.fn().mockImplementation(cb => {
     intersectionCallback = cb;
     return {
       observe: mockObserve,
@@ -37,10 +37,8 @@ function installMatchMedia(prefersReducedMotion) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     configurable: true,
-    value: jest.fn().mockImplementation((query) => ({
-      matches: prefersReducedMotion
-        ? query === '(prefers-reduced-motion: reduce)'
-        : false,
+    value: jest.fn().mockImplementation(query => ({
+      matches: prefersReducedMotion ? query === '(prefers-reduced-motion: reduce)' : false,
       media: query,
       onchange: null,
       addListener: jest.fn(),
@@ -77,19 +75,17 @@ function TestComponent({ options, onResult }) {
 // Helper to render the hook with a real DOM element
 function renderWithElement(options) {
   let latestResult = { isVisible: false, hasAnimated: false, ref: { current: null } };
-  const onResult = (r) => { latestResult = r; };
+  const onResult = r => {
+    latestResult = r;
+  };
 
-  const rendered = render(
-    React.createElement(TestComponent, { options: options || {}, onResult })
-  );
+  const rendered = render(React.createElement(TestComponent, { options: options || {}, onResult }));
 
   return {
     getResult: () => latestResult,
     unmount: rendered.unmount,
-    rerender: (newOptions) => {
-      rendered.rerender(
-        React.createElement(TestComponent, { options: newOptions || options || {}, onResult })
-      );
+    rerender: newOptions => {
+      rendered.rerender(React.createElement(TestComponent, { options: newOptions || options || {}, onResult }));
     },
   };
 }
@@ -132,29 +128,27 @@ describe('useScrollAnimation', () => {
     it('should create IntersectionObserver with default options and observe element', () => {
       renderWithElement({});
 
-      expect(MockIntersectionObserver).toHaveBeenCalledWith(
-        expect.any(Function),
-        { threshold: 0.2, rootMargin: '0px' }
-      );
+      expect(MockIntersectionObserver).toHaveBeenCalledWith(expect.any(Function), {
+        threshold: 0.2,
+        rootMargin: '0px',
+      });
       expect(mockObserve).toHaveBeenCalled();
     });
 
     it('should pass custom threshold and rootMargin to IntersectionObserver', () => {
       renderWithElement({ threshold: 0.8, rootMargin: '50px' });
 
-      expect(MockIntersectionObserver).toHaveBeenCalledWith(
-        expect.any(Function),
-        { threshold: 0.8, rootMargin: '50px' }
-      );
+      expect(MockIntersectionObserver).toHaveBeenCalledWith(expect.any(Function), {
+        threshold: 0.8,
+        rootMargin: '50px',
+      });
     });
 
     it('should set isVisible and hasAnimated when entry is intersecting (no delay)', () => {
       const { getResult } = renderWithElement({});
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       expect(getResult().isVisible).toBe(true);
@@ -165,9 +159,7 @@ describe('useScrollAnimation', () => {
       const { getResult } = renderWithElement({ delay: 500 });
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       // Before timeout fires, still not visible
@@ -187,9 +179,7 @@ describe('useScrollAnimation', () => {
       renderWithElement({});
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       expect(mockUnobserve).toHaveBeenCalled();
@@ -199,9 +189,7 @@ describe('useScrollAnimation', () => {
       renderWithElement({ once: false });
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       expect(mockUnobserve).not.toHaveBeenCalled();
@@ -212,9 +200,7 @@ describe('useScrollAnimation', () => {
 
       // First, trigger intersection to set hasAnimated = true
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       expect(getResult().isVisible).toBe(true);
@@ -224,9 +210,7 @@ describe('useScrollAnimation', () => {
       // intersectionCallback is now the new observer's callback
       // Trigger leaving viewport
       act(() => {
-        intersectionCallback([
-          { isIntersecting: false, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: false, target: document.createElement('div') }]);
       });
 
       expect(getResult().isVisible).toBe(false);
@@ -236,18 +220,14 @@ describe('useScrollAnimation', () => {
       const { getResult } = renderWithElement({});
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: true, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: true, target: document.createElement('div') }]);
       });
 
       expect(getResult().isVisible).toBe(true);
 
       // Send not-intersecting entry; with once=true, the else-if branch is skipped
       act(() => {
-        intersectionCallback([
-          { isIntersecting: false, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: false, target: document.createElement('div') }]);
       });
 
       // Should remain visible
@@ -280,9 +260,7 @@ describe('useScrollAnimation', () => {
       const { getResult } = renderWithElement({ once: false });
 
       act(() => {
-        intersectionCallback([
-          { isIntersecting: false, target: document.createElement('div') },
-        ]);
+        intersectionCallback([{ isIntersecting: false, target: document.createElement('div') }]);
       });
 
       expect(getResult().isVisible).toBe(false);
