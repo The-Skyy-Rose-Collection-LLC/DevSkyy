@@ -3,7 +3,7 @@
  * @jest-environment jsdom
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useCollectionProducts } from '../useCollectionProducts';
 
 const mockCategories = [
@@ -43,7 +43,8 @@ describe('useCollectionProducts', () => {
   });
 
   it('should fetch and transform products', async () => {
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: true,
         json: jest.fn().mockResolvedValue(mockCategories),
@@ -53,9 +54,7 @@ describe('useCollectionProducts', () => {
         json: jest.fn().mockResolvedValue(mockRawProducts),
       });
 
-    const { result } = renderHook(() =>
-      useCollectionProducts({ categorySlug: 'black-rose', enableRetry: false })
-    );
+    const { result } = renderHook(() => useCollectionProducts({ categorySlug: 'black-rose', enableRetry: false }));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -73,9 +72,7 @@ describe('useCollectionProducts', () => {
       json: jest.fn().mockResolvedValue([]),
     });
 
-    const { result } = renderHook(() =>
-      useCollectionProducts({ categorySlug: 'nonexistent', enableRetry: false })
-    );
+    const { result } = renderHook(() => useCollectionProducts({ categorySlug: 'nonexistent', enableRetry: false }));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -118,9 +115,7 @@ describe('useCollectionProducts', () => {
   it('should start in loading state', () => {
     global.fetch = jest.fn().mockReturnValue(new Promise(() => {})); // never resolves
 
-    const { result } = renderHook(() =>
-      useCollectionProducts({ categorySlug: 'loading-test' })
-    );
+    const { result } = renderHook(() => useCollectionProducts({ categorySlug: 'loading-test' }));
 
     expect(result.current.loading).toBe(true);
   });

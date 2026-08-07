@@ -4,7 +4,7 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useProductFilters, ProductFilters } from '../useProductFilters';
+import { useProductFilters } from '../useProductFilters';
 import { Product } from '../../types/collections';
 
 function createProduct(overrides: Partial<Product> = {}): Product {
@@ -27,19 +27,28 @@ function createProduct(overrides: Partial<Product> = {}): Product {
 
 const sampleProducts: Product[] = [
   createProduct({
-    id: 1, name: 'Shirt A', price: '50', attributes: [
+    id: 1,
+    name: 'Shirt A',
+    price: '50',
+    attributes: [
       { id: 1, name: 'Size', options: ['S', 'M', 'L'] },
       { id: 2, name: 'Color', options: ['Red', 'Blue'] },
     ],
   }),
   createProduct({
-    id: 2, name: 'Shirt B', price: '100', attributes: [
+    id: 2,
+    name: 'Shirt B',
+    price: '100',
+    attributes: [
       { id: 1, name: 'Size', options: ['M', 'L', 'XL'] },
       { id: 2, name: 'Color', options: ['Black'] },
     ],
   }),
   createProduct({
-    id: 3, name: 'Shirt C', price: '75', attributes: [
+    id: 3,
+    name: 'Shirt C',
+    price: '75',
+    attributes: [
       { id: 1, name: 'Size', options: ['S'] },
       { id: 2, name: 'Color', options: ['Red'] },
     ],
@@ -168,9 +177,7 @@ describe('useProductFilters', () => {
   });
 
   it('should accept initial filters', () => {
-    const { result } = renderHook(() =>
-      useProductFilters(sampleProducts, { sortBy: 'price-low' })
-    );
+    const { result } = renderHook(() => useProductFilters(sampleProducts, { sortBy: 'price-low' }));
 
     expect(result.current.filters.sortBy).toBe('price-low');
   });

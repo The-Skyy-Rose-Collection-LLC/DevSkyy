@@ -3,7 +3,7 @@
  * @jest-environment jsdom
  */
 
-import { CartManager, getCartManager } from '../cartManager';
+import { CartManager } from '../cartManager';
 
 // Mock Logger
 jest.mock('../../utils/Logger', () => ({
@@ -36,16 +36,6 @@ function createProduct(overrides = {}) {
   };
 }
 
-/**
- * Reset the singleton between tests so getCartManager() is clean.
- */
-function resetSingleton() {
-  // The module-level `cartManagerInstance` is not exported directly,
-  // so we re-require the module to reset it. Instead, we just clear
-  // localStorage and rely on creating fresh CartManager instances.
-  // For the singleton tests we use a workaround below.
-}
-
 describe('CartManager', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -68,13 +58,13 @@ describe('CartManager', () => {
     it('should accept custom configuration', () => {
       const cart = new CartManager({
         storageKey: 'custom_cart',
-        taxRate: 0.10,
+        taxRate: 0.1,
         shippingCost: 15,
         currency: 'EUR',
       });
       const config = cart.getConfig();
       expect(config.storageKey).toBe('custom_cart');
-      expect(config.taxRate).toBe(0.10);
+      expect(config.taxRate).toBe(0.1);
       expect(config.shippingCost).toBe(15);
       expect(config.currency).toBe('EUR');
     });
@@ -145,16 +135,12 @@ describe('CartManager', () => {
 
     it('should throw when quantity is 0', async () => {
       const cart = new CartManager();
-      await expect(cart.addItem(createProduct(), 0)).rejects.toThrow(
-        'Quantity must be greater than 0'
-      );
+      await expect(cart.addItem(createProduct(), 0)).rejects.toThrow('Quantity must be greater than 0');
     });
 
     it('should throw when quantity is negative', async () => {
       const cart = new CartManager();
-      await expect(cart.addItem(createProduct(), -5)).rejects.toThrow(
-        'Quantity must be greater than 0'
-      );
+      await expect(cart.addItem(createProduct(), -5)).rejects.toThrow('Quantity must be greater than 0');
     });
 
     it('should increment quantity for existing item with same product/size/color', async () => {
@@ -374,7 +360,7 @@ describe('CartManager', () => {
     });
 
     it('getTax should calculate at configured rate', async () => {
-      const cart = new CartManager({ taxRate: 0.10 });
+      const cart = new CartManager({ taxRate: 0.1 });
       await cart.addItem(createProduct({ price: 200 }), 1);
       expect(cart.getTax()).toBeCloseTo(20);
     });
@@ -557,9 +543,7 @@ describe('CartManager', () => {
       cart.subscribe(cb);
       await cart.addItem(createProduct(), 1);
       expect(cb).toHaveBeenCalledTimes(1);
-      expect(cb).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'item_added' })
-      );
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ type: 'item_added' }));
     });
 
     it('should include the cart item in add event', async () => {
@@ -590,9 +574,7 @@ describe('CartManager', () => {
       const cb = jest.fn();
       cart.subscribe(cb);
       cart.removeItem('prod-1');
-      expect(cb).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'item_removed' })
-      );
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ type: 'item_removed' }));
     });
 
     it('should notify listeners on item_updated', async () => {
@@ -601,9 +583,7 @@ describe('CartManager', () => {
       const cb = jest.fn();
       cart.subscribe(cb);
       cart.updateQuantity('prod-1', 5);
-      expect(cb).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'item_updated' })
-      );
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ type: 'item_updated' }));
     });
 
     it('should notify listeners on cart_cleared', async () => {
@@ -612,9 +592,7 @@ describe('CartManager', () => {
       const cb = jest.fn();
       cart.subscribe(cb);
       cart.clearCart();
-      expect(cb).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'cart_cleared' })
-      );
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ type: 'cart_cleared' }));
     });
 
     it('should not include item in cart_cleared event', async () => {
@@ -680,13 +658,15 @@ describe('CartManager', () => {
   describe('localStorage persistence', () => {
     it('should load items from localStorage on construction', async () => {
       const data = {
-        items: [{
-          productId: 'p-saved',
-          sku: 'SKU-SAVED',
-          name: 'Saved Product',
-          price: 100,
-          quantity: 2,
-        }],
+        items: [
+          {
+            productId: 'p-saved',
+            sku: 'SKU-SAVED',
+            name: 'Saved Product',
+            price: 100,
+            quantity: 2,
+          },
+        ],
         timestamp: Date.now(),
       };
       localStorage.setItem('skyyrose_cart', JSON.stringify(data));
@@ -708,7 +688,7 @@ describe('CartManager', () => {
     });
 
     it('should clear expired cart older than 7 days', () => {
-      const eightDaysAgo = Date.now() - (8 * 24 * 60 * 60 * 1000);
+      const eightDaysAgo = Date.now() - 8 * 24 * 60 * 60 * 1000;
       const data = {
         items: [{ productId: 'old', sku: 'OLD', name: 'Old', price: 50, quantity: 1 }],
         timestamp: eightDaysAgo,
@@ -719,7 +699,7 @@ describe('CartManager', () => {
     });
 
     it('should keep cart that is less than 7 days old', () => {
-      const oneDayAgo = Date.now() - (1 * 24 * 60 * 60 * 1000);
+      const oneDayAgo = Date.now() - 1 * 24 * 60 * 60 * 1000;
       const data = {
         items: [{ productId: 'recent', sku: 'REC', name: 'Recent', price: 50, quantity: 1 }],
         timestamp: oneDayAgo,
@@ -846,9 +826,9 @@ describe('CartManager', () => {
     });
 
     it('should correctly compute totals with tax and shipping for multiple items', async () => {
-      const cart = new CartManager({ taxRate: 0.10, shippingCost: 20 });
+      const cart = new CartManager({ taxRate: 0.1, shippingCost: 20 });
       await cart.addItem(createProduct({ id: 'a', sku: 'A', name: 'A', price: 100 }), 2); // 200
-      await cart.addItem(createProduct({ id: 'b', sku: 'B', name: 'B', price: 50 }), 1);  // 50
+      await cart.addItem(createProduct({ id: 'b', sku: 'B', name: 'B', price: 50 }), 1); // 50
       // subtotal = 250, tax = 25, shipping = 20, total = 295
       expect(cart.getSubtotal()).toBe(250);
       expect(cart.getTax()).toBeCloseTo(25);

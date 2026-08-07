@@ -24,16 +24,13 @@ jest.mock('../../hooks/useCart', () => ({
 
 describe('CartModal', () => {
   const mockOnClose = jest.fn();
-  const mockOnCheckout = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders nothing when isOpen is false', () => {
-    const { container } = render(
-      <CartModal isOpen={false} onClose={mockOnClose} />
-    );
+    const { container } = render(<CartModal isOpen={false} onClose={mockOnClose} />);
     expect(container.firstChild).toBeNull();
   });
 

@@ -307,6 +307,10 @@ wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analys
 wordpress-theme/skyyrose-flagship/inc/brand.generated.php
 
 # --- Renders / generated media (2026-06-22, regenerable, kept on disk) ---
+# Scroll-world production/previz exports are local review artifacts. Keep the
+# source manifests and handoff docs elsewhere; do not make Git enumerate media
+# from this multi-gigabyte working tree.
+renders/scroll-world/
 renders/**/*.webp
 renders/**/*.avif
 renders/**/*.jpg

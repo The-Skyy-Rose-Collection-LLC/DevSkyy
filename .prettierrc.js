@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // Basic formatting
   semi: true,
   trailingComma: 'es5',

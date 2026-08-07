@@ -80,24 +80,13 @@ export interface LoaderStats {
   avgLoadTimeMs: number;
 }
 
-export type LoadErrorCode =
-  | 'NETWORK_ERROR'
-  | 'TIMEOUT'
-  | 'DECODE_ERROR'
-  | 'NOT_FOUND'
-  | 'INVALID_FORMAT'
-  | 'UNKNOWN';
+export type LoadErrorCode = 'NETWORK_ERROR' | 'TIMEOUT' | 'DECODE_ERROR' | 'NOT_FOUND' | 'INVALID_FORMAT' | 'UNKNOWN';
 
 export class ModelLoadError extends Error {
   public readonly code: LoadErrorCode;
   public readonly url: string;
 
-  constructor(
-    message: string,
-    code: LoadErrorCode,
-    url: string,
-    cause?: Error
-  ) {
+  constructor(message: string, code: LoadErrorCode, url: string, cause?: Error) {
     super(message, cause ? { cause } : undefined);
     this.name = 'ModelLoadError';
     this.code = code;
@@ -224,24 +213,25 @@ export class ModelAssetLoader {
     const chunks = this.chunkArray(urls, this.config.maxConcurrentLoads);
 
     for (const chunk of chunks) {
-      const promises = chunk.map(async (url) => {
+      const promises = chunk.map(async url => {
         try {
           const loadOptions: { onProgress?: (progress: LoadProgress) => void } = {};
           if (onProgress) {
-            loadOptions.onProgress = (p) => onProgress(url, p);
+            loadOptions.onProgress = p => onProgress(url, p);
           }
           const model = await this.load(url, loadOptions);
           results.set(url, model);
           onModelLoaded?.(url, model);
         } catch (error) {
-          const loadError = error instanceof ModelLoadError
-            ? error
-            : new ModelLoadError(
-                `Failed to load model: ${url}`,
-                'UNKNOWN',
-                url,
-                error instanceof Error ? error : undefined
-              );
+          const loadError =
+            error instanceof ModelLoadError
+              ? error
+              : new ModelLoadError(
+                  `Failed to load model: ${url}`,
+                  'UNKNOWN',
+                  url,
+                  error instanceof Error ? error : undefined
+                );
           results.set(url, loadError);
           onError?.(url, loadError);
         }
@@ -314,9 +304,10 @@ export class ModelAssetLoader {
       cacheSizeMB += model.sizeBytes / (1024 * 1024);
     }
 
-    const avgLoadTimeMs = this.stats.loadTimes.length > 0
-      ? this.stats.loadTimes.reduce((a, b) => a + b, 0) / this.stats.loadTimes.length
-      : 0;
+    const avgLoadTimeMs =
+      this.stats.loadTimes.length > 0
+        ? this.stats.loadTimes.reduce((a, b) => a + b, 0) / this.stats.loadTimes.length
+        : 0;
 
     return {
       cachedModels: this.cache.size,
@@ -376,27 +367,19 @@ export class ModelAssetLoader {
     );
   }
 
-  private loadSingle(
-    url: string,
-    name?: string,
-    onProgress?: (progress: LoadProgress) => void
-  ): Promise<LoadedModel> {
+  private loadSingle(url: string, name?: string, onProgress?: (progress: LoadProgress) => void): Promise<LoadedModel> {
     return new Promise((resolve, reject) => {
       const startTime = performance.now();
 
       // Create timeout
       const timeoutId = setTimeout(() => {
-        reject(new ModelLoadError(
-          `Model load timed out after ${this.config.loadTimeoutMs}ms`,
-          'TIMEOUT',
-          url
-        ));
+        reject(new ModelLoadError(`Model load timed out after ${this.config.loadTimeoutMs}ms`, 'TIMEOUT', url));
       }, this.config.loadTimeoutMs);
 
       this.gltfLoader.load(
         url,
         // Success
-        (gltf) => {
+        gltf => {
           clearTimeout(timeoutId);
           const loadTime = performance.now() - startTime;
           this.stats.loadTimes.push(loadTime);
@@ -420,7 +403,7 @@ export class ModelAssetLoader {
           });
         },
         // Progress
-        (event) => {
+        event => {
           if (onProgress && event.lengthComputable) {
             onProgress({
               url,
@@ -431,7 +414,7 @@ export class ModelAssetLoader {
           }
         },
         // Error
-        (error) => {
+        error => {
           clearTimeout(timeoutId);
           reject(error);
         }
@@ -442,12 +425,11 @@ export class ModelAssetLoader {
   private extractMetadata(gltf: GLTF, url: string, name?: string): ModelMetadata {
     let vertexCount = 0;
     let triangleCount = 0;
-    let materialCount = 0;
     let meshCount = 0;
     const materials = new Set<THREE.Material>();
     const boundingBox = new THREE.Box3();
 
-    gltf.scene.traverse((child) => {
+    gltf.scene.traverse(child => {
       if (child instanceof THREE.Mesh) {
         meshCount++;
         const geometry = child.geometry as THREE.BufferGeometry;
@@ -463,10 +445,8 @@ export class ModelAssetLoader {
           triangleCount += positionAttr.count / 3;
         }
 
-        const meshMaterials = Array.isArray(child.material)
-          ? child.material
-          : [child.material];
-        meshMaterials.forEach((m) => materials.add(m));
+        const meshMaterials = Array.isArray(child.material) ? child.material : [child.material];
+        meshMaterials.forEach(m => materials.add(m));
 
         // Expand bounding box
         if (geometry.boundingBox === null) {
@@ -480,8 +460,6 @@ export class ModelAssetLoader {
       }
     });
 
-    materialCount = materials.size;
-
     // Compute scene bounding box if needed
     if (boundingBox.isEmpty()) {
       boundingBox.setFromObject(gltf.scene);
@@ -493,17 +471,17 @@ export class ModelAssetLoader {
       boundingBox,
       vertexCount,
       triangleCount: Math.round(triangleCount),
-      materialCount,
+      materialCount: materials.size,
       meshCount,
       hasAnimations: gltf.animations.length > 0,
-      animationNames: gltf.animations.map((a) => a.name),
+      animationNames: gltf.animations.map(a => a.name),
     };
   }
 
   private estimateSize(object: THREE.Object3D): number {
     let size = 0;
 
-    object.traverse((child) => {
+    object.traverse(child => {
       if (child instanceof THREE.Mesh) {
         const geometry = child.geometry as THREE.BufferGeometry;
 
@@ -552,15 +530,13 @@ export class ModelAssetLoader {
   }
 
   private disposeModel(model: LoadedModel): void {
-    model.scene.traverse((child) => {
+    model.scene.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
 
-        const materials = Array.isArray(child.material)
-          ? child.material
-          : [child.material];
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
 
-        materials.forEach((material) => {
+        materials.forEach(material => {
           // Dispose textures
           for (const key in material) {
             const value = (material as Record<string, unknown>)[key];
@@ -612,7 +588,7 @@ export class ModelAssetLoader {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 

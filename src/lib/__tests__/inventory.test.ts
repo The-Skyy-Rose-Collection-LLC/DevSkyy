@@ -31,7 +31,7 @@ MockWebSocketClass.CLOSED = 3;
 const originalWebSocket = global.WebSocket;
 global.WebSocket = MockWebSocketClass;
 
-import { InventoryManager, INVENTORY_COLORS, getInventoryManager } from '../inventory';
+import { InventoryManager, INVENTORY_COLORS } from '../inventory';
 
 // Mock Logger
 jest.mock('../../utils/Logger', () => ({
@@ -171,7 +171,9 @@ describe('InventoryManager', () => {
     });
 
     it('should handle callback errors without breaking other subscribers', () => {
-      const errorCb = jest.fn().mockImplementation(() => { throw new Error('boom'); });
+      const errorCb = jest.fn().mockImplementation(() => {
+        throw new Error('boom');
+      });
       const goodCb = jest.fn();
       manager.subscribe('prod-1', errorCb);
       manager.subscribe('prod-1', goodCb);
@@ -270,7 +272,9 @@ describe('InventoryManager', () => {
 
     it('should handle WebSocket constructor failure', () => {
       // Override mock to throw
-      MockWebSocketClass.mockImplementation(() => { throw new Error('Connection refused'); });
+      MockWebSocketClass.mockImplementation(() => {
+        throw new Error('Connection refused');
+      });
 
       expect(() => manager.connect()).not.toThrow();
 
@@ -548,7 +552,9 @@ describe('InventoryManager', () => {
       const ws = manager['ws'];
       ws.readyState = WebSocket.OPEN;
       ws.onopen();
-      ws.send.mockImplementation(() => { throw new Error('Send failed'); });
+      ws.send.mockImplementation(() => {
+        throw new Error('Send failed');
+      });
 
       // Should not throw when send fails
       expect(() => {
