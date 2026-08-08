@@ -28,7 +28,7 @@
     "@anthropic-ai/claude-agent-sdk": "^0.2.52",
     "@anthropic-ai/sdk": "^0.106.0",
     "@apollo/server": "^5.4.0",
-    "@auth/core": "^0.34.3",
+    "@auth/core": "^0.41.3",
     "@copilotkit/react-core": "^1.51.2",
     "@copilotkit/react-ui": "^1.51.2",
     "@copilotkit/runtime": "^1.51.2",
