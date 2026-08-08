@@ -110,7 +110,7 @@
     "basic-ftp": ">=5.3.1",
     "js-yaml": "^4.3.0",
     "flatted": ">=3.4.2",
-    "fast-uri": ">=3.1.2",
+    "fast-uri": ">=4.1.2",
     "picomatch": ">=4.0.4",
     "protobufjs": ">=7.5.8"
   },
